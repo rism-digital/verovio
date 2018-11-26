@@ -39,6 +39,7 @@
 #include "ftrem.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
 #include "keysig.h"
@@ -454,6 +455,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(FTREM)) {
         m_currentNode = m_currentNode.append_child("fTrem");
         WriteFTrem(m_currentNode, dynamic_cast<FTrem *>(object));
+    }
+    else if (object->Is(HALFMRPT)) {
+        m_currentNode = m_currentNode.append_child("halfmRpt");
+        WriteHalfmRpt(m_currentNode, dynamic_cast<HalfmRpt *>(object));
     }
     else if (object->Is(KEYSIG)) {
         m_currentNode = m_currentNode.append_child("keySig");
@@ -1398,6 +1403,13 @@ void MeiOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     fTrem->WriteTremMeasured(currentNode);
 }
 
+void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
+{
+    assert(halfmRpt);
+
+    WriteLayerElement(currentNode, halfmRpt);
+}
+    
 void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 {
     assert(keySig);
@@ -3760,6 +3772,9 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "fTrem") {
             success = ReadFTrem(parent, xmlElement);
         }
+        else if (elementName == "halfmRpt") {
+            success = ReadHalfmRpt(parent, xmlElement);
+        }
         else if (elementName == "keySig") {
             success = ReadKeySig(parent, xmlElement);
         }
@@ -4010,7 +4025,17 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     ReadUnsupportedAttr(fTrem, vrvFTrem);
     return ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
+    
+bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
+{
+    HalfmRpt *vrvHalfmRpt = new HalfmRpt();
+    ReadLayerElement(halfmRpt, vrvHalfmRpt);
 
+    parent->AddChild(vrvHalfmRpt);
+    ReadUnsupportedAttr(halfmRpt, vrvHalfmRpt);
+    return true;
+}
+    
 bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 {
     KeySig *vrvKeySig = new KeySig();
@@ -5269,6 +5294,10 @@ void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
 
 void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp)
 {
+    if (staffGrp.attribute("barthru")) {
+        vrvStaffGrp->SetBarThru(vrvStaffGrp->AttStaffGrpVis::StrToBoolean(staffGrp.attribute("barthru").value()));
+        staffGrp.remove_attribute("barthru");
+    }
     if (staffGrp.attribute("label")) {
         Text *text = new Text();
         text->SetText(UTF8to16(staffGrp.attribute("label").value()));

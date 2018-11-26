@@ -526,12 +526,18 @@ double LayerElement::GetAlignmentDuration(
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
+    else if (this->Is({ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
-        return DUR_MAX / meterUnit * meterCount;
+        
+        if (this->Is(HALFMRPT)) {
+            return (DUR_MAX / meterUnit * meterCount) / 2;
+        }
+        else {
+            return DUR_MAX / meterUnit * meterCount;
+        }
     }
     else {
         return 0.0;

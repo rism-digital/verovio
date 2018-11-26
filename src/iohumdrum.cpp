@@ -503,12 +503,14 @@ bool HumdrumInput::convertHumdrum()
     m_multirest = analyzeMultiRest(infile);
 
     infile.analyzeSlurs();
+    infile.analyzeKernTies();
     infile.analyzeKernStems();
     infile.analyzeRestPositions();
     infile.analyzeOttavas();
     parseSignifiers(infile);
     checkForColorSpine(infile);
     infile.analyzeRScale();
+    infile.analyzeCrossStaffStemDirections();
     m_spine_color.resize(infile.getMaxTrack() + 1);
     initializeSpineColor(infile);
 
@@ -4374,7 +4376,7 @@ void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::Hum
             // ignore non-grace note beams
             continue;
         }
-        layerdata[i]->setValue("", "auto", "stem.dir", to_string(direction));
+        layerdata[i]->setValue("auto", "stem.dir", to_string(direction));
         if (beamend == beamstart) {
             // last note of beam so exit
             break;
@@ -6567,7 +6569,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
                 if (endline || (endtok->find("[[") != std::string::npos)) {
-                    tstamp2 += endtok->getLine()->getDuration();
+                    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+                    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+                    tstamp2 += endtok->getLine()->getDuration() * mfactor;
                 }
                 int measures = getMeasureDifference(line->token(i), endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
@@ -7075,13 +7079,11 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
         return;
     }
 
-    std::vector<hum::HTp> slurstarts;
-    std::vector<std::vector<int> > slurindex;
-
     // slurstarts contains a list of the correctly paired slurs
     // attached to the note/chord.  Deal with unopened slurs
     // here later (such as an excerpt of music where the opening
     // of the slur is not present in the data).
+    std::vector<hum::HTp> slurstarts;
     for (int i = 0; i < startcount; i++) {
         hum::HTp tok;
         tok = slurend->getSlurStartToken(i + 1);
@@ -7089,9 +7091,11 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             slurstarts.push_back(tok);
         }
     }
+
     // slurindex contains a list of the indexes into slurstarts,
     // with all identical slur starts placed on the first
     // position that the note/chord is found in the slurstarts list.
+    std::vector<std::vector<int> > slurindex;
     slurindex.resize(slurstarts.size());
     for (int i = 0; i < (int)slurstarts.size(); i++) {
         for (int j = 0; j <= i; j++) {
@@ -7103,6 +7107,9 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
     }
 
     std::vector<bool> indexused(32, false);
+
+    std::vector<pair<int, bool> > slurendnoteinfo;
+    extractSlurNoteAttachmentInformation(slurendnoteinfo, slurend, ')');
 
     int endsubtokcount = slurend->getSubtokenCount();
     std::vector<int> endpitches;
@@ -7129,6 +7136,9 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
     std::vector<int> startpitches;
 
     for (int i = 0; i < (int)slurindex.size(); i++) {
+        std::vector<pair<int, bool> > slurstartnoteinfo;
+        extractSlurNoteAttachmentInformation(slurstartnoteinfo, slurstarts.at(i), '(');
+
         startsubtokcount = slurstarts[i]->getSubtokenCount();
         startpitches.clear();
         for (int j = 0; j < startsubtokcount; j++) {
@@ -7140,8 +7150,9 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 startpitches.push_back(hum::Convert::kernToBase7(subtok));
             }
         }
-        std::vector<pair<int, int> > startchordsorted;
+        std::vector<std::pair<int, int> > startchordsorted;
         startchordsorted.reserve(startsubtokcount);
+
         pair<int, int> v;
         for (int i = 0; i < startsubtokcount; i++) {
             v.first = startpitches[i];
@@ -7152,6 +7163,10 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
         for (int j = 0; j < (int)slurindex[i].size(); j++) {
             hum::HTp slurstart = slurstarts[slurindex[i][j]];
+
+            std::vector<pair<int, bool> > slurstartnoteinfo;
+            extractSlurNoteAttachmentInformation(slurstartnoteinfo, slurstart, '(');
+
             if (!slurstart) {
                 // should never occur...
                 return;
@@ -7176,7 +7191,12 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             std::string endid = slurend->getValue("MEI", "xml:id");
 
             if (startid == "") {
-                startid = "note-L";
+                if (slurstart->isChord()) {
+                    startid = "chord-L";
+                }
+                else {
+                    startid = "note-L";
+                }
                 startid += to_string(slurstart->getLineNumber());
                 startid += "F";
                 startid += to_string(slurstart->getFieldNumber());
@@ -7193,12 +7213,35 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 }
             }
 
+            if (slurendnoteinfo.at(i).second) {
+                if (endid.find("chord") != std::string::npos) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(endid, "note", "chord");
+                    endid += "S";
+                    endid += to_string(slurendnoteinfo[i].first + 1);
+                }
+            }
+
+            if (slurstartnoteinfo.at(j).second) {
+                if (startid.find("chord") != std::string::npos) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(startid, "note", "chord");
+                    startid += "S";
+                    startid += to_string(slurstartnoteinfo[i].first + 1);
+                }
+            }
+
             slur->SetEndid("#" + endid);
             slur->SetStartid("#" + startid);
             setSlurLocationId(slur, slurstart, slurend, j);
 
             startmeasure->AddChild(slur);
-            setStaff(slur, m_currentstaff);
+            if (slurstart->getTrack() == slurend->getTrack()) {
+                // If the slur starts and ends on different staves,
+                // do not specify the staff attribute, but later
+                // add a list of the two staves involved.
+                setStaff(slur, m_currentstaff);
+            }
 
             if (hasAboveParameter(slurstart, "S")) {
                 slur->SetCurvedir(curvature_CURVEDIR_above);
@@ -7208,11 +7251,28 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             }
 
             std::string eid = slurend->getValue("auto", "id");
-            int slurindex = getSlurEndIndex(slurstart, eid, indexused);
-            if (slurindex < 0) {
+            int sluridx = getSlurEndIndex(slurstart, eid, indexused);
+            if (sluridx < 0) {
                 continue;
             }
-            indexused.at(slurindex) = true;
+            indexused.at(sluridx) = true;
+
+            // Calculate if the slur should be forced above or below
+            // this is the case for doubly slured chords.  Only the first
+            // two slurs between a pair of notes/chords will be oriented
+            // (other slurs will need to be manually adjusted and probably
+            // linked to individual notes to avoid overstriking the first
+            // two slurs.
+            if (slurindex[i].size() >= 2) {
+                if (slurstarts[slurindex[i][0]] == slurstarts[slurindex[i][1]]) {
+                    if (j == 0) {
+                        slur->SetCurvedir(curvature_CURVEDIR_above);
+                    }
+                    else {
+                        slur->SetCurvedir(curvature_CURVEDIR_below);
+                    }
+                }
+            }
 
             if (m_signifiers.above) {
                 int count = -1;
@@ -7220,7 +7280,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                     if (slurstart->at(k) == '(') {
                         count++;
                     }
-                    if (count == slurindex) {
+                    if (count == sluridx) {
                         if (slurstart->at(k + 1) == m_signifiers.above) {
                             slur->SetCurvedir(curvature_CURVEDIR_above);
                         }
@@ -7235,7 +7295,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                     if (slurstart->at(k) == '(') {
                         count++;
                     }
-                    if (count == slurindex) {
+                    if (count == sluridx) {
                         if (slurstart->at(k + 1) == m_signifiers.below) {
                             slur->SetCurvedir(curvature_CURVEDIR_below);
                         }
@@ -7249,6 +7309,60 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
 //////////////////////////////
 //
+// HumdrumInput::extractSlurNoteAttachmentInformation --
+//   Vector indexed by slur (open or close depending on slurtype) with data being the subtoken number and
+//   boolean for attached to note instead of chord.
+//
+
+void HumdrumInput::extractSlurNoteAttachmentInformation(
+    std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype)
+{
+    // slurtype == '(' for slur start
+    // slurtype == ')' for slur end
+    data.clear();
+    int subtokindex = 0;
+    int slurnumber = 0;
+    int toksize = (int)token->size();
+    bool notestate;
+    for (int i = 0; i < toksize; i++) {
+        if (token->at(i) == ' ') {
+            subtokindex++;
+        }
+        else if (token->at(i) == ')') {
+            slurnumber++;
+            if (slurtype == ')') {
+                notestate = getNoteState(token, slurnumber);
+                data.emplace_back(std::make_pair(subtokindex, notestate));
+            }
+        }
+        else if (token->at(i) == '(') {
+            slurnumber++;
+            if (slurtype == '(') {
+                notestate = getNoteState(token, slurnumber);
+                data.emplace_back(std::make_pair(subtokindex, notestate));
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getNoteState -- Return any slur attachment to a note parameter in a layout command for slurs.
+//
+
+bool HumdrumInput::getNoteState(hum::HTp token, int slurnumber)
+{
+    std::string data = token->getSlurLayoutParameter("note", slurnumber - 1);
+    if (data == "true") {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::calculateNoteIdForSlur --
 //
 
@@ -7256,32 +7370,39 @@ void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pai
 {
     int notecount = sortednotes.size();
     hum::HumRegex hre;
-    hre.replaceDestructive(idstring, "note-", "chord-");
-    int position = 0;
+    if (notecount == 1) {
+        hre.replaceDestructive(idstring, "note-", "chord-");
+    }
 
-    // odd:
-    // input (index):    0 1 2 3 4
-    // output       :    0 2 4 3 1
-    // even:
-    // input (index):    0 1 2 3
-    // output       :    0 2 3 1
+    /* Not attaching multiple slurs to note anymore, but leaving code
+            here in case there is a later need for it:
 
-    if (index < (notecount + 1) / 2) {
-        position = index * 2;
-    }
-    else {
-        position = (notecount - index) * 2 - 1;
-    }
-    if (position < 0) {
-        position += 100 * notecount;
-        position %= notecount;
-    }
-    int subtoken = sortednotes.at(position).second;
-    // collapse cases where there are more slurs than notes:
-    subtoken = subtoken % notecount;
-    // offset from 1 instead of 0:
-    subtoken++;
-    idstring += "S" + to_string(subtoken);
+        int position = 0;
+
+        // odd:
+        // input (index):    0 1 2 3 4
+        // output       :    0 2 4 3 1
+        // even:
+        // input (index):    0 1 2 3
+        // output       :    0 2 3 1
+
+        if (index < (notecount + 1) / 2) {
+            position = index * 2;
+        }
+        else {
+            position = (notecount - index) * 2 - 1;
+        }
+        if (position < 0) {
+            position += 100 * notecount;
+            position %= notecount;
+        }
+        int subtoken = sortednotes.at(position).second;
+        // collapse cases where there are more slurs than notes:
+        subtoken = subtoken % notecount;
+        // offset from 1 instead of 0:
+        subtoken++;
+        idstring += "S" + to_string(subtoken);
+    */
 }
 
 /////////////////////////////
@@ -8010,6 +8131,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     hum::HumNum tupletdur = 0;
     int tupletcount = 0;
     int samedurtup = true;
+
     for (int i = 0; i < (int)beampowdot.size(); ++i) {
         if (binarybeams[i]) {
             continue;
@@ -8018,8 +8140,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (beampowdot[i] >= 0) {
             for (int j = beamstarts[i]; j <= beamends[i]; ++j) {
 
-                // may have to deal with dotted triplets (which appear to be powers of
-                // two)
+                // may have to deal with dotted triplets (which appear to be powers of two)
                 if (poweroftwo[j]) {
                     if (ingroup) {
                         ingroup = false;
@@ -8053,6 +8174,22 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             }
             tupletnum++;
             tupletcount = 0;
+        }
+    }
+
+    int tcorrection = 0;
+    for (int i = 0; i < (int)tupletgroups.size(); i++) {
+        if (checkForTupletForcedBreak(duritems, i)) {
+            tcorrection++;
+        }
+        if (tupletgroups[i]) {
+            tupletgroups[i] += tcorrection;
+        }
+    }
+    if (tcorrection) {
+        // invalidate adjustcount
+        for (int i = 0; i < (int)adjustcount.size(); i++) {
+            adjustcount[i] = 0;
         }
     }
 
@@ -8331,6 +8468,38 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     mergeTupletsCuttingBeam(tg);
     resolveTupletBeamTie(tg);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForTupletForcedBreak --
+//
+
+bool HumdrumInput::checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index)
+{
+    if (index == 0) {
+        return false;
+    }
+    if (index > (int)duritems.size()) {
+        return false;
+    }
+
+    hum::HTp starttok = duritems[index];
+    hum::HTp endtok = duritems[index - 1];
+    int stopline = endtok->getLineIndex();
+    int curline = starttok->getLineIndex();
+    hum::HTp cur = starttok->getPreviousToken();
+    while (cur && (curline > stopline)) {
+        if (cur->isInterpretation() && (*cur == "*tupbreak")) {
+            return true;
+        }
+        cur = cur->getPreviousToken();
+        curline = cur->getLineIndex();
+        if (cur == endtok) {
+            break;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -9114,12 +9283,21 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     }
 
     // Stem direction of the chord.  If both up and down, then show up.
+    int crossdir = token->getValueInt("auto", "stem.dir");
+    if (crossdir == 1) {
+        chord->SetStemDir(STEMDIRECTION_up);
+    }
+    else if (crossdir == -1) {
+        chord->SetStemDir(STEMDIRECTION_down);
+    }
+    // Overwrite cross-stem direction if there is an explicit stem direction.
     if (token->find("/") != string::npos) {
         chord->SetStemDir(STEMDIRECTION_up);
     }
     else if (token->find("\\") != string::npos) {
         chord->SetStemDir(STEMDIRECTION_down);
     }
+
     checkForAutoStem(chord, token);
 
     token->setValue("MEI", "xml:id", chord->GetUuid());
@@ -9488,11 +9666,11 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
 
 template <class ELEMENT> void HumdrumInput::checkForAutoStem(ELEMENT element, hum::HTp token)
 {
-    std::string stemdir = token->getValue("", "auto", "stem.dir");
-    if (stemdir == "1") {
+    int stemdir = token->getValueInt("auto", "stem.dir");
+    if (stemdir == 1) {
         element->SetStemDir(STEMDIRECTION_up);
     }
-    else if (stemdir == "-1") {
+    else if (stemdir == -1) {
         element->SetStemDir(STEMDIRECTION_down);
     }
 }
@@ -11553,11 +11731,82 @@ void HumdrumInput::addTrill(hum::HTp token)
 
 //////////////////////////////
 //
-// HumdrumInput::processTieStart --
+// HumdrumInput::processTieStart -- linked slurs not allowed in chords yet.
 //
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    std::string endtag = "tieEnd";
+    if (subindex >= 0) {
+        endtag += to_string(subindex + 1);
+    }
+    hum::HTp tieend = token->getValueHTp("auto", endtag);
+    if (tieend) {
+        // A linked tie which can be inserted immediately (and
+        // not stored in the list of tie starts for later processing).
+
+        std::string endnumtag = "tieEndSubtokenNumber";
+        int endn = subindex + 1;
+        if (token->isChord()) {
+            if (endn > 0) {
+                endnumtag += to_string(endn);
+            }
+        }
+        int endnumber = token->getValueInt("auto", endnumtag);
+        if (endnumber <= 0) {
+            endnumber = 1;
+        }
+
+        vrv::Tie *tie = new Tie;
+        m_measure->AddChild(tie);
+        int endsubindex = endnumber - 1;
+        if (endsubindex < 0) {
+            endsubindex = 0;
+        }
+        setTieLocationId(tie, token, subindex, tieend, endsubindex);
+        std::string startid = getLocationId("note", token);
+        std::string endid = getLocationId("note", tieend);
+        if (token->isChord()) {
+            startid += "S" + to_string(subindex + 1);
+        }
+        if (tieend->isChord()) {
+            if (endnumber > 0) {
+                endid += "S" + to_string(endnumber);
+            }
+        }
+        tie->SetStartid("#" + startid);
+        tie->SetEndid("#" + endid);
+
+        std::string marker1 = "[";
+        std::string marker2 = "[";
+        std::string marker3 = "_";
+        std::string marker4 = "_";
+
+        if (m_signifiers.above) {
+            marker1 += m_signifiers.above;
+            marker3 += m_signifiers.above;
+        }
+        if (m_signifiers.below) {
+            marker2 += m_signifiers.below;
+            marker4 += m_signifiers.below;
+        }
+
+        if (m_signifiers.above && tstring.find(marker1) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_above);
+        }
+        else if (m_signifiers.below && tstring.find(marker2) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_below);
+        }
+        else if (m_signifiers.above && tstring.find(marker3) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_above);
+        }
+        else if (m_signifiers.below && tstring.find(marker4) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_below);
+        }
+
+        return;
+    }
+
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
     hum::HumNum endtime = timestamp + token->getDuration();
@@ -11599,12 +11848,25 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
 void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    std::string starttag = "tieStart";
+    if (token->isChord()) {
+        starttag += to_string(subindex + 1);
+    }
+    hum::HTp tiestart = token->getValueHTp("auto", starttag);
+    if (tiestart) {
+        // linked ties are handled in processTieStart().
+        return;
+    }
+
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
     int track = token->getTrack();
     int staffnum = m_rkern[track];
     std::string noteuuid = note->GetUuid();
     bool disjunct = token->find("]]") != std::string::npos;
+    if (token->find("__") != std::string::npos) {
+        disjunct = true;
+    }
 
     int pitch = hum::Convert::kernToMidiNoteNumber(tstring);
     int layer = m_currentlayer;
@@ -12722,7 +12984,7 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
         std::vector<int> index2(count2, 0);
         int counter;
 
-        if (count1 > 0) {
+        if (count1 > 1) {
             counter = 0;
             for (int i = 0; i < count1; ++i) {
                 std::string param = "slurEnd";
@@ -12736,7 +12998,7 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
             }
         }
 
-        if (count2 > 0) {
+        if (count2 > 1) {
             counter = 0;
             for (int i = 0; i < count2; ++i) {
                 std::string param = "slurStart";
@@ -12757,9 +13019,11 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
         }
     }
 
-    if (num1 > 0) {
-        id += "N";
-        id += to_string(num1);
+    if (count1 > 1) {
+        if (num1 > 0) {
+            id += "N";
+            id += to_string(num1);
+        }
     }
 
     int endline = slurend->getLineNumber();
@@ -12770,9 +13034,11 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
     id += "F";
     id += to_string(endfield);
 
-    if (num2 > 0) {
-        id += "N";
-        id += to_string(num2);
+    if (count2 > 1) {
+        if (num2 > 0) {
+            id += "N";
+            id += to_string(num2);
+        }
     }
 
     object->SetUuid(id);
@@ -12956,16 +13222,24 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
             m_signifiers.mark.push_back(signifier);
             m_signifiers.mcolor.push_back(hre.getMatch(1));
+
+            if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
+                m_signifiers.markdir.push_back(hre.getMatch(1));
+            }
+            else {
+                m_signifiers.markdir.push_back("");
+            }
         }
         else if (hre.search(value, "marked note|matched note")) {
             m_signifiers.mark.push_back(signifier);
             m_signifiers.mcolor.push_back("red");
-        }
-        if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
-            m_signifiers.markdir.push_back(hre.getMatch(1));
-        }
-        else {
-            m_signifiers.markdir.push_back("");
+
+            if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
+                m_signifiers.markdir.push_back(hre.getMatch(1));
+            }
+            else {
+                m_signifiers.markdir.push_back("");
+            }
         }
     }
 }
