@@ -526,7 +526,7 @@ Options::Options()
     this->Register(&m_noJustification, "noJustification", &m_general);
     
     m_openControlEvents.SetInfo("Open control event", "Render open control events");
-    m_openControlEvents.Init(true);
+    m_openControlEvents.Init(false);
     this->Register(&m_openControlEvents, "openControlEvents", &m_general);
 
     m_pageHeight.SetInfo("Page height", "The page height");
