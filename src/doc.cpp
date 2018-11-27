@@ -1526,6 +1526,13 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     if ((params->m_currentSyl && params->m_lastNote) && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
         params->m_currentSyl->SetEnd(params->m_lastNote);
     }
+    else if (m_options->m_openControlEvents.GetValue()) {
+        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
+            Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+            assert(lastMeasure);
+            params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
+        }
+    }
 
     return FUNCTOR_STOP;
 }
