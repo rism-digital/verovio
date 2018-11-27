@@ -233,6 +233,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         spanningType = SPANNING_MIDDLE;
     }
 
+    // Overwrite the spanningType for open ended control events
+    // We can identify them becaseu they end on a right barline attribute
+    if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
+        spanningType = SPANNING_START;
+    }
+    
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
@@ -447,16 +453,6 @@ void View::DrawOctave(
     int y1 = octave->GetDrawingY();
     int y2 = y1;
 
-    /************** parent layers **************/
-
-    LayerElement *start = dynamic_cast<LayerElement *>(octave->GetStart());
-    LayerElement *end = dynamic_cast<LayerElement *>(octave->GetEnd());
-
-    if (!start || !end) {
-        // no start or end, obviously nothing to do …
-        return;
-    }
-
     /********** adjust the start / end positions ***********/
 
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) {
@@ -559,13 +555,9 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     /************** parent layers **************/
 
     Note *note1 = dynamic_cast<Note *>(tie->GetStart());
-    TimestampAttr *tstamp1 = dynamic_cast<TimestampAttr *>(tie->GetStart());
-    LayerElement *start = tie->GetStart();
     Note *note2 = dynamic_cast<Note *>(tie->GetEnd());
-    TimestampAttr *tstamp2 = dynamic_cast<TimestampAttr *>(tie->GetEnd());
-    LayerElement *end = tie->GetEnd();
 
-    if ((!note1 && !tstamp1) || (!tstamp2 && !note2)) {
+    if (!note1 && !note2) {
         // no note, obviously nothing to do...
         // this also means that notes with tstamp events are not supported
         return;

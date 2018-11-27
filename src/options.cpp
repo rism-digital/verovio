@@ -524,6 +524,10 @@ Options::Options()
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_general);
+    
+    m_openControlEvents.SetInfo("Open control event", "Render open control events");
+    m_openControlEvents.Init(true);
+    this->Register(&m_openControlEvents, "openControlEvents", &m_general);
 
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);

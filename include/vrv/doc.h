@@ -337,6 +337,11 @@ public:
      * See Object::PrepareLyricsEnd
      */
     virtual int PrepareLyricsEnd(FunctorParams *functorParams);
+    
+    /**
+     * See Object::PrepareTimestampsEnd
+     */
+    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
 
 private:
     /**
