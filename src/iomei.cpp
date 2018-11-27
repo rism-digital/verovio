@@ -2074,6 +2074,21 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for dir
+    else if (filterParent->Is(DIR)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     else if (filterParent->Is(FIG)) {
         if (element == "svg") {
             return true;
