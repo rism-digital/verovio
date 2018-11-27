@@ -282,6 +282,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
     }
 
     // We can now add the pair to our stack
+    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
     params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
 
     return TimePointInterface::InterfacePrepareTimestamps(params, object);

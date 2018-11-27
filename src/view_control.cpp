@@ -47,6 +47,7 @@
 #include "textelement.h"
 #include "tie.h"
 #include "timeinterface.h"
+#include "timestamp.h"
 #include "trill.h"
 #include "turn.h"
 #include "vrv.h"
@@ -232,6 +233,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         spanningType = SPANNING_MIDDLE;
     }
 
+    // Overwrite the spanningType for open ended control events
+    // We can identify them becaseu they end on a right barline attribute
+    if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
+        spanningType = SPANNING_START;
+    }
+    
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
@@ -446,16 +453,6 @@ void View::DrawOctave(
     int y1 = octave->GetDrawingY();
     int y2 = y1;
 
-    /************** parent layers **************/
-
-    LayerElement *start = dynamic_cast<LayerElement *>(octave->GetStart());
-    LayerElement *end = dynamic_cast<LayerElement *>(octave->GetEnd());
-
-    if (!start || !end) {
-        // no start or end, obviously nothing to do …
-        return;
-    }
-
     /********** adjust the start / end positions ***********/
 
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) {
@@ -560,36 +557,46 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     Note *note1 = dynamic_cast<Note *>(tie->GetStart());
     Note *note2 = dynamic_cast<Note *>(tie->GetEnd());
 
-    if (!note1 || !note2) {
+    if (!note1 && !note2) {
         // no note, obviously nothing to do...
         // this also means that notes with tstamp events are not supported
         return;
     }
 
-    LayerElement *durElement = note1;
-    Chord *parentChord1 = note1->IsChordTone();
+    LayerElement *durElement = NULL;
+    Chord *parentChord1 = NULL;
+    Layer *layer1 = NULL;
+    if (note1) {
+        durElement = note1;
+        layer1 = dynamic_cast<Layer *>(note1->GetFirstParent(LAYER));
+        parentChord1 = note1->IsChordTone();
+    }
     if (parentChord1) {
         durElement = parentChord1;
-    }
-
-    Layer *layer1 = dynamic_cast<Layer *>(note1->GetFirstParent(LAYER));
-    Layer *layer2 = dynamic_cast<Layer *>(note2->GetFirstParent(LAYER));
-    assert(layer1 && layer2);
-
-    if (layer1->GetN() != layer2->GetN()) {
-        LogWarning("Ties between different layers may not be fully supported.");
     }
 
     /************** x positions **************/
 
     bool isShortTie = false;
     // shortTie correction cannot be applied for chords
-    if (!parentChord1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) isShortTie = true;
+    if (!parentChord1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
+        isShortTie = true;
+    }
+    
+    y1 = staff->GetDrawingY();
+    y2 = staff->GetDrawingY();
 
     // the normal case
     if (spanningType == SPANNING_START_END) {
-        y1 = note1->GetDrawingY();
-        y2 = note2->GetDrawingY();
+        if (note1) {
+            y1 = note1->GetDrawingY();
+            y2 = y1;
+        }
+        else if (note2) {
+            y2 = note2->GetDrawingY();
+            y1 = y2;
+        }
+        // isShort is never true with tstamp1
         if (!isShortTie) {
             x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
             x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
@@ -600,28 +607,38 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
             }
         }
-        noteStemDir = note1->GetDrawingStemDir();
+        if (note1) {
+            noteStemDir = note1->GetDrawingStemDir();
+        }
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if (spanningType == SPANNING_START) {
-        y1 = note1->GetDrawingY();
-        y2 = y1;
+        if (note1) {
+            y1 = note1->GetDrawingY();
+            y2 = y1;
+        }
         if (!isShortTie) {
             x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
         }
-        noteStemDir = note1->GetDrawingStemDir();
+        if (note1) {
+            noteStemDir = note1->GetDrawingStemDir();
+        }
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
-        y1 = note2->GetDrawingY();
-        y2 = y1;
+        if (note2) {
+            y2 = note2->GetDrawingY();
+            y1 = y2;
+        }
         if (!isShortTie) {
             x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
         }
-        noteStemDir = note2->GetDrawingStemDir();
+        if (note2) {
+            noteStemDir = note2->GetDrawingStemDir();
+        }
     }
-    // Finally
+    // Finally - this make no sense ?
     else {
         LogDebug("Tie across an entire system is not supported");
         return;

@@ -1140,7 +1140,7 @@ void MeiOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
 
     WriteControlElement(currentNode, mNum);
     WriteTextDirInterface(currentNode, mNum);
-    WriteTimeSpanningInterface(currentNode, mNum);
+    WriteTimePointInterface(currentNode, mNum);
     mNum->WriteColor(currentNode);
     mNum->WriteLang(currentNode);
     mNum->WriteTypography(currentNode);
@@ -3483,7 +3483,7 @@ bool MeiInput::ReadMNum(Object *parent, pugi::xml_node mNum)
     ReadControlElement(mNum, vrvMNum);
 
     ReadTextDirInterface(mNum, vrvMNum);
-    ReadTimeSpanningInterface(mNum, vrvMNum);
+    ReadTimePointInterface(mNum, vrvMNum);
     vrvMNum->ReadColor(mNum);
     vrvMNum->ReadLang(mNum);
     vrvMNum->ReadTypography(mNum);

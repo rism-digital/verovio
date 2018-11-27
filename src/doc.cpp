@@ -51,6 +51,7 @@
 #include "syl.h"
 #include "system.h"
 #include "text.h"
+#include "timestamp.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -502,7 +503,6 @@ void Doc::PrepareDrawing()
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsParams prepareTimestampsParams;
-    prepareTimestampsParams.m_timeSpanningInterfaces = prepareTimeSpanningParams.m_timeSpanningInterfaces;
     Functor prepareTimestamps(&Object::PrepareTimestamps);
     Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
     this->Process(&prepareTimestamps, &prepareTimestampsParams, &prepareTimestampsEnd);
@@ -1530,4 +1530,29 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     return FUNCTOR_STOP;
 }
 
+int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
+{
+    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    assert(params);
+    
+    if (!m_options->m_openControlEvents.GetValue() || params->m_timeSpanningInterfaces.empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    if (!lastMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    for (auto &pair : params->m_timeSpanningInterfaces) {
+        TimeSpanningInterface *interface = pair.first;
+        assert(interface);
+        if (!interface->GetEnd()) {
+            interface->SetEnd(lastMeasure->GetRightBarLine());
+        }
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+    
 } // namespace vrv
