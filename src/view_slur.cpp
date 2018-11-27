@@ -107,18 +107,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     // else
     Layer *layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
 
-    // idem
-    // if (end->Is(TIMESTAMP_ATTR))
-    //    layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    // else
-    Layer *layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
-
-    assert(layer1 && layer2);
-
-    if (layer1->GetN() != layer2->GetN()) {
-        LogWarning("Slurs between different layers may not be fully supported.");
-    }
-    else if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
+    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
         System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
         assert(system);
         // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
