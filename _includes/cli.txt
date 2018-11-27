@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-e12386e
+Verovio 2.0.0-dev-11fb481
 
 Example usage:
 
@@ -28,6 +28,7 @@ Input and page layout options
  --no-footer                       Do not add any footer
  --no-header                       Do not add any header
  --no-justification                Do not justify the system
+ --open-control-events             Render open control events
  --page-height <i>                 The page height (default: 2970; min: 100; max: 60000)
  --page-margin-bottom <i>          The page bottom margin (default: 50; min: 0; max: 500)
  --page-margin-left <i>            The page left margin (default: 50; min: 0; max: 500)
