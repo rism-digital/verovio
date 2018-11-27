@@ -2152,6 +2152,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "beam") {
             return true;
         }
+        else if (element == "bTrem") {
+            return true;
+        }
         else if (element == "chord") {
             return true;
         }
