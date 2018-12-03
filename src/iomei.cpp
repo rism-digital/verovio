@@ -1140,7 +1140,7 @@ void MeiOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
 
     WriteControlElement(currentNode, mNum);
     WriteTextDirInterface(currentNode, mNum);
-    WriteTimeSpanningInterface(currentNode, mNum);
+    WriteTimePointInterface(currentNode, mNum);
     mNum->WriteColor(currentNode);
     mNum->WriteLang(currentNode);
     mNum->WriteTypography(currentNode);
@@ -2074,6 +2074,21 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for dir
+    else if (filterParent->Is(DIR)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     else if (filterParent->Is(FIG)) {
         if (element == "svg") {
             return true;
@@ -2150,6 +2165,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for beam
     else if (filterParent->Is(BEAM)) {
         if (element == "beam") {
+            return true;
+        }
+        else if (element == "bTrem") {
             return true;
         }
         else if (element == "chord") {
@@ -3483,7 +3501,7 @@ bool MeiInput::ReadMNum(Object *parent, pugi::xml_node mNum)
     ReadControlElement(mNum, vrvMNum);
 
     ReadTextDirInterface(mNum, vrvMNum);
-    ReadTimeSpanningInterface(mNum, vrvMNum);
+    ReadTimePointInterface(mNum, vrvMNum);
     vrvMNum->ReadColor(mNum);
     vrvMNum->ReadLang(mNum);
     vrvMNum->ReadTypography(mNum);

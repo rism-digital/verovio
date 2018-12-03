@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -366,7 +367,7 @@ void Beam::AddChild(Object *child)
         assert(dynamic_cast<Beam *>(child));
     }
     else if (child->Is(BTREM)) {
-        assert(dynamic_cast<Chord *>(child));
+        assert(dynamic_cast<BTrem *>(child));
     }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));

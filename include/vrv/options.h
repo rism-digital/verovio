@@ -460,6 +460,7 @@ public:
     OptionBool m_noFooter;
     OptionBool m_noHeader;
     OptionBool m_noJustification;
+    OptionBool m_openControlEvents;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;
     OptionInt m_pageMarginLeft;
