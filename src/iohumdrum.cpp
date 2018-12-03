@@ -11960,6 +11960,10 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
             found = it;
             break;
         }
+        if (disjunct && (it->getStartTokenPointer()->find("__") != std::string::npos)) {
+            found = it;
+            break;
+        }
         else if (it->getEndTime() == timestamp) {
             found = it;
             break;
