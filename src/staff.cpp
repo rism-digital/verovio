@@ -462,6 +462,8 @@ int Staff::AdjustSylSpacing(FunctorParams *functorParams)
     if (params->m_wordSpace == 0) {
         FontInfo *fontDim = params->m_doc->GetDrawingLyricFont(this->m_drawingStaffSize);
         params->m_wordSpace = params->m_doc->GetTextGlyphWidth(L'o', fontDim, false);
+        // Adjust it proportionally to the lyric size
+        params->m_wordSpace *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
         params->m_staffSize = this->m_drawingStaffSize;
     }
 

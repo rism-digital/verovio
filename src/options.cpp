@@ -599,7 +599,7 @@ Options::Options()
     this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
-    m_lyricHyphenLength.Init(1.20, 1.00, 3.00);
+    m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
     
     m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");

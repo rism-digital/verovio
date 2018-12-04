@@ -81,7 +81,10 @@ int Syl::CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params)
     
     // We have a word connector - the space have to be wide enough
     if ((pos == sylLog_WORDPOS_i) || (pos == sylLog_WORDPOS_m)) {
-        overlap += (2 * params->m_doc->GetDrawingUnit(params->m_staffSize) * params->m_doc->GetOptions()->m_lyricHyphenLength.GetValue());
+        int hyphen = params->m_doc->GetDrawingUnit(params->m_staffSize) * params->m_doc->GetOptions()->m_lyricHyphenLength.GetValue();
+        // Adjust it proportionally to the lyric size
+        hyphen *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
+        overlap += (2 * hyphen);
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
@@ -176,7 +179,11 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     
-    this->SetDrawingXRel(-1 * params->m_doc->GetDrawingUnit(100));
+    int shift = params->m_doc->GetDrawingUnit(params->m_staffSize);
+    // Adjust it proportionally to the lyric size
+    shift *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
+    
+    this->SetDrawingXRel(-1 * shift);
     
     // Not much to do when we hit the first syllable of the system
     if (params->m_previousSyl == NULL) {
