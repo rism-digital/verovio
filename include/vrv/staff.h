@@ -175,6 +175,11 @@ public:
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
 
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.

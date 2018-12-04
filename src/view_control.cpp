@@ -882,23 +882,32 @@ void View::DrawSylConnector(
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
-        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &extend, true);
-        dc->ResetFont();
-        // x position of the syl is two units back
-        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 = syl->GetContentRight();
+        if (syl->m_nextWordSyl) {
+            x2 = syl->m_nextWordSyl->GetContentLeft();
+        }
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &extend, true);
-        dc->ResetFont();
-        // idem
-        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 = syl->GetContentRight();
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
-        // nothing to adjust
+        // If we do not want to show hyphens at start of a syatem and the the end is at time 0.0
+        if (m_options->m_lyricNoStartHyphen.GetValue() && (syl->GetEnd()->GetAlignment()->GetTime() == 0.0)) {
+            // Return but only if the end is in the first measure of the system...
+            Measure *measure = dynamic_cast<Measure *>(syl->GetEnd()->GetFirstParent(MEASURE));
+            assert(measure);
+            System *system = dynamic_cast<System*>(measure->GetFirstParent(SYSTEM));
+            assert(system);
+            if (measure == dynamic_cast<Measure*>(system->FindChildByType(MEASURE))) {
+                return;
+            }
+        }
+        // Otherwise just adjust x2
+        if (syl->m_nextWordSyl) {
+            x2 = syl->m_nextWordSyl->GetContentLeft();
+        }
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
@@ -921,6 +930,7 @@ void View::DrawSylConnector(
     DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
 
     dc->ReactivateGraphic();
+    
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -930,6 +940,10 @@ void View::DrawSylConnector(
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
 {
+    if (dc->Is(BBOX_DEVICE_CONTEXT)) {
+        return;
+    }
+    
     int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
@@ -938,7 +952,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
 
         y += (m_options->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
         // x position of the syl is two units back
-        x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        //x2 -= 1 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         // if (x1 > x2) {
         //    DrawFilledRectangle(dc, x1, y + 2 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 *
@@ -946,8 +960,8 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         //    LogDebug("x1 > x2 (%d %d)", x1, x2);
         //}
 
-        // the length of the dash and the space between them - can be made a parameter
-        int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
+        // the length of the dash and the space between them
+        int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
         int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         int halfDashLength = dashLength / 2;
 
@@ -957,10 +971,10 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         int margin = dist / 2;
         // no dash if the distance is smaller than a dash length
         if (dist < dashLength) {
-            nbDashes = 0;
+            LogDebug("Hyphen space under the limit");
         }
-        // at least one dash
-        else if (nbDashes < 2) {
+        
+        if (nbDashes < 2) {
             nbDashes = 1;
         }
         else {
@@ -972,8 +986,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
-            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+           DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
         }
+        //DrawFilledRectangle(dc, x1, y, x2, y + width);
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;

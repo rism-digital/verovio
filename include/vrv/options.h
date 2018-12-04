@@ -483,7 +483,9 @@ public:
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
     OptionDbl m_leftPosition;
+    OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricHyphenWidth;
+    OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
     OptionDbl m_lyricTopMinMargin;
     OptionInt m_measureMinWidth;

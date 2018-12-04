@@ -1337,9 +1337,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
-    // assert(false);
-    syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1);
     syl->SetDrawingYRel(GetSylYRel(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
