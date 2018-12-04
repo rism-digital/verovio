@@ -448,8 +448,8 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     
     dc->EndGraphic(graphic, this);
     
-    // keep the widest width for the system
-    system->SetDrawingLabelsWidth(label->GetContentX2() - label->GetContentX1() + space);
+    // keep the widest width for the system - careful: this can be the label OR labelAbbr
+    system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
     // also store in the system the maximum width with abbreviations for justification
     if (!abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
@@ -465,8 +465,6 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     
     dc->ResetFont();
     dc->ResetBrush();
-    
-    
 }
 
 void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
