@@ -302,8 +302,8 @@ public:
     {
         m_previousSyl = NULL;
         m_previousMeasure = NULL;
-        int m_freeSpace = 0;
-        int m_staffSize = 100;
+        m_freeSpace = 0;
+        m_staffSize = 100;
         m_wordSpace = 0;
         m_doc = doc;
     }
