@@ -2255,6 +2255,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "") {
             return true;
         }
+        else if (element == "lb") {
+            return true;
+        }
         else if (element == "rend") {
             return true;
         }

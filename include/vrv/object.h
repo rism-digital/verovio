@@ -1200,6 +1200,11 @@ public:
      * Returns a contatenated version of all the text children
      */
     std::wstring GetText(Object *node);
+    
+    /**
+     * Fill an array of lines with concatenated content of each line
+     */
+    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
 
 protected:
     /**
