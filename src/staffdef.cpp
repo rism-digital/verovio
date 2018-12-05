@@ -17,6 +17,7 @@
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
+#include "staffgrp.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -82,6 +83,19 @@ void StaffDef::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+    
+bool StaffDef::IsInBraceAndBracket()
+{
+    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp*>(this->GetFirstParent(STAFFGRP));
+    if (!staffGrp1 || !staffGrp1->HasSymbol()) {
+        return false;
+    }
+    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp*>(staffGrp1->GetFirstParent(STAFFGRP));
+    if (!staffGrp2 || !staffGrp2->HasSymbol()) {
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------

@@ -388,6 +388,9 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         
         // HARDCODED
         int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
+        if (staffDef->IsInBraceAndBracket()) {
+            space *= 2;
+        }
         int x = system->GetDrawingX() - space;
         int y = staff->GetDrawingY()
         - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
