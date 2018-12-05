@@ -26,6 +26,7 @@
 #include "rend.h"
 #include "smufl.h"
 #include "svg.h"
+#include "system.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -43,6 +44,14 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     dc->StartTextGraphic(f, "", f->GetUuid());
 
     DrawTextChildren(dc, f, params);
+    
+    if (f->GetStart() && f->GetEnd()) {
+        System *currentSystem = dynamic_cast<System *>(f->GetFirstParent(SYSTEM));
+        // Postpone the drawing of the end of the system; this will call DrawFConnector
+        if (currentSystem) {
+            currentSystem->AddToDrawingList(f);
+        }
+    }
 
     dc->EndTextGraphic(f, this);
 }

@@ -10,6 +10,7 @@
 
 #include "atts_shared.h"
 #include "textelement.h"
+#include "timeinterface.h"
 
 namespace vrv {
 
@@ -20,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <f> element.
  */
-class F : public TextElement {
+class F : public TextElement, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -33,12 +34,53 @@ public:
     virtual std::string GetClassName() const { return "F"; }
     virtual ClassId GetClassId() const { return FIGURE; }
     ///@}
+    
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    ///@}
 
     /**
      * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
+    
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    // Because F is a TextElement and not a ControlElement, these methods need to be implemented because
+    // TextElement does not inherit from FloatingObject.
+    
+    /**
+     * See Object::FillStaffCurrentTimeSpanning
+     */
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareTimePointing
+     */
+    virtual int PrepareTimePointing(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareTimeSpanning
+     */
+    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareTimestamps
+     */
+    virtual int PrepareTimestamps(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
     //

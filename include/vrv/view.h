@@ -398,6 +398,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
+    void DrawFConnector(
+        DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(
@@ -495,7 +497,7 @@ protected:
 
 private:
     /**
-     * @name Internal methods used for calculating tuplets
+     * @name Internal methods
      */
     ///@{
     data_STEMDIRECTION GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Point *start, Point *end, Point *center);
@@ -505,6 +507,7 @@ private:
     bool OneBeamInTuplet(Tuplet *tuplet);
     int NestedTuplets(Object *object);
     int GetSylYRel(Syl *syl, Staff *staff);
+    int GetFYRel(F *f, Staff *staff);
     ///@}
 
     /**

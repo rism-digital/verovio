@@ -28,6 +28,7 @@
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
+#include "f.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "halfmrpt.h"
@@ -1588,6 +1589,38 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
 // Calculation or preparation methods
 ///----------------------------------------------------------------------------
 
+int View::GetFYRel(F *f, Staff *staff)
+{
+    assert(f && staff);
+
+    int y = staff->GetDrawingY();
+    
+    StaffAlignment *alignment = staff->GetAlignment();
+    // Something must be seriously wrong...
+    if (!alignment) return y;
+    
+    y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
+    
+    FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
+    // There is no other harm, we use the bottom line.
+    if (!positioner) return y;
+    
+    y = positioner->GetDrawingY();
+    
+    Object *fb = f->GetFirstParent(FB);
+    assert(fb);
+    int line = fb->GetChildIndex(f, FIGURE, UNLIMITED_DEPTH);
+    
+    if (line > 0) {
+        FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        int lineHeight = m_doc->GetTextLineHeight(fFont, false);
+        y -= (line * lineHeight);
+    }
+    
+    return y;
+}
+
+    
 int View::GetSylYRel(Syl *syl, Staff *staff)
 {
     assert(syl && staff);

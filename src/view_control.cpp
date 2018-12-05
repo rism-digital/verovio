@@ -268,11 +268,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
-        if (element->IsControlElement())
+        if (element->IsControlElement()) {
             if (!system->SetCurrentFloatingPositioner(
                     (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
                 continue;
             }
+        }
 
         if (element->Is(DIR)) {
             // cast to Dir check in DrawDirConnector
@@ -281,6 +282,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         if (element->Is(DYNAM)) {
             // cast to Dynam check in DrawDynamConnector
             DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        if (element->Is(FIGURE)) {
+            // cast to Dynam check in DrawDynamConnector
+            DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -870,6 +875,60 @@ void View::DrawControlElementConnector(
     else
         dc->EndGraphic(dynam, this);
 }
+    
+void View::DrawFConnector(
+    DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    
+    assert(f);
+    assert(f->GetStart() && f->GetEnd());
+    if (!f->GetStart() || !f->GetEnd()) return;
+
+    int y = GetFYRel(f, staff);
+    TextExtend extend;
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (spanningType == SPANNING_START_END) {
+        x1 = f->GetContentRight();
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if (spanningType == SPANNING_START) {
+        x1 = f->GetContentRight();
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if (spanningType == SPANNING_END) {
+        // nothing to adjust
+    }
+    else {
+        // nothing to adjust
+    }
+
+    
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // object
+    // in order not to reset the Syl bounding box.
+    F fConnector;
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else
+        dc->StartGraphic(&fConnector, "spanning-connector", "");
+
+    dc->DeactivateGraphic();
+
+    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // Adjust it proportionally to the lyric size
+    width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+    DrawFilledRectangle(dc, x1, y, x2, y + width);
+    
+    dc->ReactivateGraphic();
+    
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else
+        dc->EndGraphic(&fConnector, this);
+}
 
 void View::DrawSylConnector(
     DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
@@ -1229,8 +1288,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     dc->StartGraphic(fb, "", fb->GetUuid());
 
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    int descender = -m_doc->GetTextGlyphDescender(L'q', fontDim, false);
-    int height = m_doc->GetTextGlyphHeight(L'1', fontDim, false);
+    int lineHeight =  m_doc->GetTextLineHeight(fontDim, false);
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
 
@@ -1252,7 +1310,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
         }
         dc->EndText();
 
-        params.m_y -= (descender + height);
+        params.m_y -= lineHeight;
     }
 
     dc->ResetFont();
