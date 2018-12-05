@@ -56,12 +56,12 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     dc->EndTextGraphic(f, this);
 }
 
-void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
+void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wstring s)
 {
     assert(dc);
 
-    int toDcX = ToDeviceContextX(x);
-    int toDcY = ToDeviceContextY(y);
+    int toDcX = ToDeviceContextX(params.m_x);
+    int toDcY = ToDeviceContextY(params.m_y);
 
     std::size_t prevPos = 0, pos;
     while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prevPos)) != std::wstring::npos) {
@@ -109,6 +109,10 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
         std::wstring substr = s.substr(prevPos, std::wstring::npos);
         dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
     }
+    
+    // Disable x for what is comming next as child of <f>
+    // The value is reset in DrawFb
+    params.m_x = VRV_UNSET;
 }
 
 void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingParams &params)
@@ -267,7 +271,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     if (text->GetFirstParent(HARM)) {
-        DrawHarmString(dc, params.m_x, params.m_y, text->GetText());
+        DrawHarmString(dc, params, text->GetText());
     }
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin

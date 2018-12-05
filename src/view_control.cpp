@@ -1289,6 +1289,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
 
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     int lineHeight =  m_doc->GetTextLineHeight(fontDim, false);
+    int startX = params.m_x;
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
 
@@ -1311,6 +1312,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
         dc->EndText();
 
         params.m_y -= lineHeight;
+        params.m_x = startX;
     }
 
     dc->ResetFont();
