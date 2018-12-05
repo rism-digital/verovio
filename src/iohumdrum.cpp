@@ -6836,7 +6836,7 @@ bool HumdrumInput::hasAboveParameter(hum::HTp token, const string &category)
 
 //////////////////////////////
 //
-// HumdrumInput::hasBelowParameter -- true if has an "a" parameter or has a "Z" parameter set to anything.
+// HumdrumInput::hasBelowParameter -- true if has an "b" parameter or has a "Z" parameter set to anything.
 //
 
 bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category)
