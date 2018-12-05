@@ -3629,6 +3629,10 @@ bool MeiInput::ReadTurn(Object *parent, pugi::xml_node turn)
 {
     Turn *vrvTurn = new Turn();
     ReadControlElement(turn, vrvTurn);
+    
+    if (m_version < MEI_4_0_0) {
+        UpgradeTurnTo_4_0_0(turn, vrvTurn);
+    }
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
@@ -5355,6 +5359,23 @@ void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
         labelAbbr->AddChild(text);
         vrvStaffGrp->AddChild(labelAbbr);
         staffGrp.remove_attribute("label.abbr");
+    }
+}
+    
+void MeiInput::UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn)
+{
+    if (turn.attribute("form")) {
+        std::string form = std::string(turn.attribute("form").value());
+        if (form == "inv") {
+            vrvTurn->SetForm(turnLog_FORM_lower);
+        }
+        else if (form == "norm") {
+            vrvTurn->SetForm(turnLog_FORM_lower);
+        }
+        else {
+            LogWarning("Unsupported value '%s' for att.turn.log@form (MEI 3.0)", form.c_str());
+        }
+        turn.remove_attribute("form");
     }
 }
 

@@ -640,6 +640,7 @@ private:
     void UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
     void UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp);
+    void UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn);
     // to MEI 3.0.0 (Page-Based MEI only)
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
