@@ -3517,6 +3517,10 @@ bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 {
     Mordent *vrvMordent = new Mordent();
     ReadControlElement(mordent, vrvMordent);
+    
+    if (m_version < MEI_4_0_0) {
+        UpgradeMordentTo_4_0_0(mordent, vrvMordent);
+    }
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
@@ -5267,6 +5271,23 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MeiInput::s_editorialElementNames.begin(), MeiInput::s_editorialElementNames.end(), elementName);
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
+}
+    
+void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)
+{
+    if (mordent.attribute("form")) {
+        std::string form = std::string(mordent.attribute("form").value());
+        if (form == "inv") {
+            vrvMordent->SetForm(mordentLog_FORM_lower);
+        }
+        else if (form == "norm") {
+            vrvMordent->SetForm(mordentLog_FORM_upper);
+        }
+        else {
+            LogWarning("Unsupported value '%s' for att.mordent.log@form (MEI 3.0)", form.c_str());
+        }
+        mordent.remove_attribute("form");
+    }
 }
 
 void MeiInput::UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef)
