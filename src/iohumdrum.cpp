@@ -9188,7 +9188,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_down);
-        pedal->SetVgrp(VGRP_PEDAL_DEFAULT);
+        assignVerticalGroup(pedal, token);
         setStaff(pedal, m_currentstaff);
     }
     else if (*token == "*Xped") {
@@ -9200,9 +9200,51 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_up);
-        pedal->SetVgrp(VGRP_PEDAL_DEFAULT);
+        assignVerticalGroup(pedal, token);
         setStaff(pedal, m_currentstaff);
         // }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::assignVerticalGroup -- Check for a layout parameter that sets the vertical
+//    group for the pedal mark.  Use "!LO:PED:vg=none" to explicitly prevent a value
+//    to be stored.  Use "!LO:PED:vg=default" for using the default group (which is currently
+//    set to 200). "!LO:PED:vg=0" is equivalent to "vg=default", and using a negative integer
+//    (or any other string) is equivalent to "vg=none".  In the future, there will be a
+//    tandem interpretation (probably called *vgp, for vertical group pedal) that will control
+//    the default vertical groupping (currenly hard-wired to the default (200) group if
+//    a layout parameter is not given to alter it).
+//
+
+void HumdrumInput::assignVerticalGroup(Pedal *pedal, hum::HTp token)
+{
+    std::string vg = token->getLayoutParameter("PED", "vg");
+    if (vg.empty()) {
+        // use the default group
+        pedal->SetVgrp(VGRP_PEDAL_DEFAULT);
+    }
+    else if (std::isdigit(vg[0])) {
+        int value = stoi(vg);
+        if (value < 0) {
+            // do not assign a vertical group
+        }
+        else if (value == 0) {
+            // use the default group
+            pedal->SetVgrp(VGRP_PEDAL_DEFAULT);
+        }
+        else {
+            // use the specified group
+            pedal->SetVgrp(value);
+        }
+    }
+    else if (vg == "default") {
+        // use the default group
+        pedal->SetVgrp(VGRP_PEDAL_DEFAULT);
+    }
+    else {
+        // do not store a vertical group parameter for this pedal marking
     }
 }
 

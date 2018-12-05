@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "ending.h"
 #include "io.h"
+#include "pedal.h"
 #include "runningelement.h"
 #include "section.h"
 #include "verse.h"
@@ -471,6 +472,7 @@ protected:
     bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
     void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype);
     bool getNoteState(hum::HTp token, int slurnumber);
+    void assignVerticalGroup(Pedal *ped, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
