@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        fb.h
-// Author:      Rodolfo Zitellini
-// Created:     2017
+// Name:        f.h
+// Author:      Laurent Pugin
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_FB_H__
-#define __VRV_FB_H__
+#ifndef __VRV_F_H__
+#define __VRV_F_H__
 
 #include "atts_shared.h"
 #include "textelement.h"
@@ -14,28 +14,28 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Fb (figured bass)
+// F (figure)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <fb> element.
+ * This class models the MEI <f> element.
  */
-class Fb : public Object {
+class F : public TextElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Fb();
-    virtual ~Fb();
+    F();
+    virtual ~F();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Fb"; }
-    virtual ClassId GetClassId() const { return FB; }
+    virtual std::string GetClassName() const { return "F"; }
+    virtual ClassId GetClassId() const { return FIGURE; }
     ///@}
 
     /**
-     * Add an element (f) to an fb.
+     * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
@@ -44,6 +44,7 @@ private:
     //
 public:
     //
+protected:
 private:
 };
 

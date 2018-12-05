@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        fb.cpp
-// Author:      Rodolfo Zitellini
-// Created:     2017
+// Name:        f.cpp
+// Author:      Laurent Pugin
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "fb.h"
+#include "f.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,32 +14,31 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "f.h"
+#include "text.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Fb
+// F (Figure)
 //----------------------------------------------------------------------------
 
-Fb::Fb() : Object("fb-")
+F::F() : TextElement("f-")
 {
-
     Reset();
 }
 
-Fb::~Fb() {}
+F::~F() {}
 
-void Fb::Reset()
+void F::Reset()
 {
-    Object::Reset();
+    TextElement::Reset();
 }
 
-void Fb::AddChild(Object *child)
+void F::AddChild(Object *child)
 {
-    if (child->Is(FIGURE)) {
-        assert(dynamic_cast<F *>(child));
+    if (child->Is(TEXT)) {
+        assert(dynamic_cast<Text *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

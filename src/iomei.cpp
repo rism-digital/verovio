@@ -33,6 +33,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "expansion.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"

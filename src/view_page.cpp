@@ -22,6 +22,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "f.h"
 #include "fb.h"
 #include "fig.h"
 #include "functorparams.h"

@@ -17,6 +17,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "f.h"
 #include "fb.h"
 #include "fig.h"
 #include "lb.h"

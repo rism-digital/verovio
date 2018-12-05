@@ -24,6 +24,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "functorparams.h"
