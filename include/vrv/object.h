@@ -220,7 +220,7 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
-    int GetChildCount(const ClassId, int deepth);
+    int GetChildCount(const ClassId classId, int deepth);
     ///@}
 
     /**
@@ -319,6 +319,11 @@ public:
      * Look for the Object in the children and return its position (-1 if not found)
      */
     int GetChildIndex(const Object *child);
+    
+    /**
+     * Look for all Objects of a class and return its position (-1 if not found)
+     */
+    int GetChildIndex(const Object *child, const ClassId classId, int deepth);
 
     /**
      * Insert an element at the idx position.
@@ -1200,6 +1205,11 @@ public:
      * Returns a contatenated version of all the text children
      */
     std::wstring GetText(Object *node);
+    
+    /**
+     * Fill an array of lines with concatenated content of each line
+     */
+    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
 
 protected:
     /**

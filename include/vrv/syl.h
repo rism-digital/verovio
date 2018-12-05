@@ -14,6 +14,7 @@
 
 namespace vrv {
 
+class AdjustSylSpacingParams;
 class Note;
 class TextElement;
 
@@ -62,6 +63,13 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
+           
+    /**
+     * Calculate the adjustment according to the overlap and the free space available before.
+     * Will move the syllable accordingly.
+     * Called from Syl::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     */
+    int CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params);
 
     //----------//
     // Functors //
@@ -95,6 +103,12 @@ public:
      * Value is 1 by default, set in PrepareLyrics
      */
     int m_drawingVerse;
+                
+    /**
+     * A pointer to the next syllable of the word.
+     * It is not set when the end of the lyric is not another syl but a note for extenders
+     */
+    Syl *m_nextWordSyl;
 
 private:
 };

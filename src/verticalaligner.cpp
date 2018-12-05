@@ -225,6 +225,16 @@ void StaffAlignment::SetCurrentFloatingPositioner(
     // LogDebug("BB %d", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner(positioner);
 }
+    
+FloatingPositioner *StaffAlignment::FindFirstFloatingPositioner(ClassId classId)
+{
+    auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
+                             [classId](FloatingPositioner *positioner) { return positioner->GetObject()->GetClassId() == classId; });
+    if (item != m_floatingPositioners.end()) {
+        return *item;
+    }
+    return NULL;
+}
 
 FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject *object)
 {

@@ -33,6 +33,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "expansion.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
@@ -1609,11 +1610,12 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     textElement->WriteTyped(currentNode);
 }
 
-void MeiOutput::WriteF(pugi::xml_node currentNode, F *figure)
+void MeiOutput::WriteF(pugi::xml_node currentNode, F *f)
 {
-    assert(figure);
+    assert(f);
 
-    WriteTextElement(currentNode, figure);
+    WriteTextElement(currentNode, f);
+    WriteTimeSpanningInterface(currentNode, f);
 }
 
 void MeiOutput::WriteFig(pugi::xml_node currentNode, Fig *fig)
@@ -2253,6 +2255,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for label
     else if (filterParent->Is(LABELABBR)) {
         if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
             return true;
         }
         else if (element == "rend") {
@@ -3514,6 +3519,10 @@ bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 {
     Mordent *vrvMordent = new Mordent();
     ReadControlElement(mordent, vrvMordent);
+    
+    if (m_version < MEI_4_0_0) {
+        UpgradeMordentTo_4_0_0(mordent, vrvMordent);
+    }
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
@@ -3622,6 +3631,10 @@ bool MeiInput::ReadTurn(Object *parent, pugi::xml_node turn)
 {
     Turn *vrvTurn = new Turn();
     ReadControlElement(turn, vrvTurn);
+    
+    if (m_version < MEI_4_0_0) {
+        UpgradeTurnTo_4_0_0(turn, vrvTurn);
+    }
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
@@ -4419,6 +4432,8 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
     F *vrvF = new F();
     ReadTextElement(f, vrvF);
 
+    ReadTimeSpanningInterface(f, vrvF);
+    
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);
     return ReadTextChildren(vrvF, f);
@@ -5265,6 +5280,23 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
 }
+    
+void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)
+{
+    if (mordent.attribute("form")) {
+        std::string form = std::string(mordent.attribute("form").value());
+        if (form == "inv") {
+            vrvMordent->SetForm(mordentLog_FORM_lower);
+        }
+        else if (form == "norm") {
+            vrvMordent->SetForm(mordentLog_FORM_upper);
+        }
+        else {
+            LogWarning("Unsupported value '%s' for att.mordent.log@form (MEI 3.0)", form.c_str());
+        }
+        mordent.remove_attribute("form");
+    }
+}
 
 void MeiInput::UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef)
 {
@@ -5331,6 +5363,23 @@ void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
         labelAbbr->AddChild(text);
         vrvStaffGrp->AddChild(labelAbbr);
         staffGrp.remove_attribute("label.abbr");
+    }
+}
+    
+void MeiInput::UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn)
+{
+    if (turn.attribute("form")) {
+        std::string form = std::string(turn.attribute("form").value());
+        if (form == "inv") {
+            vrvTurn->SetForm(turnLog_FORM_lower);
+        }
+        else if (form == "norm") {
+            vrvTurn->SetForm(turnLog_FORM_lower);
+        }
+        else {
+            LogWarning("Unsupported value '%s' for att.turn.log@form (MEI 3.0)", form.c_str());
+        }
+        turn.remove_attribute("form");
     }
 }
 

@@ -184,6 +184,7 @@ protected:
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false);
+    void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
@@ -397,6 +398,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
+    void DrawFConnector(
+        DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(
@@ -473,7 +476,7 @@ protected:
         DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
     void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
-    void DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s);
+    void DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wstring s);
     void DrawSmuflLine(DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill,
         wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100,
@@ -494,7 +497,7 @@ protected:
 
 private:
     /**
-     * @name Internal methods used for calculating tuplets
+     * @name Internal methods
      */
     ///@{
     data_STEMDIRECTION GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Point *start, Point *end, Point *center);
@@ -504,6 +507,7 @@ private:
     bool OneBeamInTuplet(Tuplet *tuplet);
     int NestedTuplets(Object *object);
     int GetSylYRel(Syl *syl, Staff *staff);
+    int GetFYRel(F *f, Staff *staff);
     ///@}
 
     /**

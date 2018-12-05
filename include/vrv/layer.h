@@ -188,11 +188,6 @@ public:
     virtual int CalcStem(FunctorParams *);
 
     /**
-     * See Object::AdjustSylSpacing
-     */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
-
-    /**
      * See Object::CalcOnsetOffset
      */
     ///@{
