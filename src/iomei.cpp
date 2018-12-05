@@ -33,6 +33,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "expansion.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
@@ -1609,11 +1610,12 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     textElement->WriteTyped(currentNode);
 }
 
-void MeiOutput::WriteF(pugi::xml_node currentNode, F *figure)
+void MeiOutput::WriteF(pugi::xml_node currentNode, F *f)
 {
-    assert(figure);
+    assert(f);
 
-    WriteTextElement(currentNode, figure);
+    WriteTextElement(currentNode, f);
+    WriteTimeSpanningInterface(currentNode, f);
 }
 
 void MeiOutput::WriteFig(pugi::xml_node currentNode, Fig *fig)
@@ -4430,6 +4432,8 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
     F *vrvF = new F();
     ReadTextElement(f, vrvF);
 
+    ReadTimeSpanningInterface(f, vrvF);
+    
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);
     return ReadTextChildren(vrvF, f);

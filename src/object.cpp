@@ -600,6 +600,21 @@ int Object::GetChildIndex(const Object *child)
     }
     return -1;
 }
+    
+int Object::GetChildIndex(const Object *child, const ClassId classId, int deepth)
+{
+    ArrayOfObjects objects;
+    AttComparison matchClassId(classId);
+    this->FindAllChildByComparison(&objects, &matchClassId);
+    ArrayOfObjects::iterator iter;
+    int i;
+    for (iter = objects.begin(), i = 0; iter != objects.end(); ++iter, ++i) {
+        if (child == *iter) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 void Object::Modify(bool modified)
 {
