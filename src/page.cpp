@@ -236,14 +236,18 @@ void Page::LayOutHorizontally()
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
         int longestActualDur = DUR_4;
-        // Get the longest duration in the piece
-        AttDurExtreme durExtremeComparison(LONGEST);
-        Object *longestDur = this->FindChildExtremeByComparison(&durExtremeComparison);
-        if (longestDur) {
-            DurationInterface *interface = longestDur->GetDurationInterface();
-            assert(interface);
-            longestActualDur = interface->GetActualDur();
-            // LogDebug("Longest duration is DUR_* code %d", longestActualDur);
+        
+        // Detect the longest duration in order to adjust the spacing (false by default)
+        if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
+            // Get the longest duration in the piece
+            AttDurExtreme durExtremeComparison(LONGEST);
+            Object *longestDur = this->FindChildExtremeByComparison(&durExtremeComparison);
+            if (longestDur) {
+                DurationInterface *interface = longestDur->GetDurationInterface();
+                assert(interface);
+                longestActualDur = interface->GetActualDur();
+                // LogDebug("Longest duration is DUR_* code %d", longestActualDur);
+            }
         }
 
         Functor setAlignmentX(&Object::SetAlignmentXPos);

@@ -497,6 +497,7 @@ public:
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
     OptionDbl m_slurThickness;
+    OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
     OptionInt m_spacingStaff;
