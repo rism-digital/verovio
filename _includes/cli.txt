@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-cefb196
+Verovio 2.0.0-dev-61da81a
 
 Example usage:
 
@@ -61,6 +61,7 @@ General layout options
  --slur-max-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 6.00)
  --slur-max-slope <i>              The maximum slur slope in degrees (default: 20; min: 0; max: 45)
  --slur-thickness <f>              The slur thickness in MEI units (default: 0.60; min: 0.20; max: 1.20)
+ --spacing-dur-detection           Detect long duration for adjusting spacing
  --spacing-linear <f>              Specify the linear spacing factor (default: 0.25; min: 0.00; max: 1.00)
  --spacing-non-linear <f>          Specify the non-linear spacing factor (default: 0.60; min: 0.00; max: 1.00)
  --spacing-staff <i>               The staff minimal spacing in MEI units (default: 8; min: 0; max: 24)
