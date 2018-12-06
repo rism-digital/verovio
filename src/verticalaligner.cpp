@@ -412,6 +412,16 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         // We must have found it
         assert(i != grpIdYRel.end());
         (*iter)->SetDrawingYRel((*i).second);
+        
+        //  Now update the staffAlignment max overflow (above or below)
+        if ((*iter)->GetDrawingPlace() == STAFFREL_basic_above) {
+            int overflowAbove = this->CalcOverflowAbove((*iter));
+            this->SetOverflowAbove(overflowAbove);
+        }
+        else {
+            int overflowBelow = this->CalcOverflowBelow((*iter));
+            this->SetOverflowBelow(overflowBelow);
+        }
     }
 
     return FUNCTOR_SIBLINGS;
