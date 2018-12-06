@@ -303,7 +303,7 @@ private:
     /**
      * An vector of line segments
      */
-    std::vector<std::pair<int, int> > m_segments;
+    ArrayOfIntPairs m_segments;
 };
 
 } // namespace vrv

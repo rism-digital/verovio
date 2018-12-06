@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class AdjustFloatingPostionerGrpsParams;
 class FloatingObject;
 class StaffAlignment;
 class SystemAligner;
@@ -187,6 +188,8 @@ public:
      */
     void FindAllIntersectionPoints(
         SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
+    
+    void ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params, const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
 
     //----------//
     // Functors //

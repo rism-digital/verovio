@@ -655,6 +655,10 @@ Options::Options()
     m_slurThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
 
+    m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
+    m_spacingDurDetection.Init(false);
+    this->Register(&m_spacingDurDetection, "spacingDurDetection", &m_generalLayout);
+    
     m_spacingLinear.SetInfo("Spacing linear", "Specify the linear spacing factor");
     m_spacingLinear.Init(0.25, 0.0, 1.0);
     this->Register(&m_spacingLinear, "spacingLinear", &m_generalLayout);
