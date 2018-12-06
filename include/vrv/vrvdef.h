@@ -259,6 +259,8 @@ typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmen
 typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+    
+typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
 

@@ -363,7 +363,6 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (this->m_place == STAFFREL_basic_above) {
             yRel = GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
-
             this->SetDrawingYRel(yRel);
         }
         else {
