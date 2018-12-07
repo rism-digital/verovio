@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>A very short example</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2019-12-07</date>
+            </pubStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="sc_01" meter.count="4" meter.unit="4" key.sig="1s" key.pname="g" key.mode="major"
+                        meter.sym="common">
+                        <staffGrp xml:id="sg_01" symbol="bracket" bar.thru="true">
+                            <staffDef xml:id="sd_P1" n="1" clef.shape="G" clef.line="2" lines="5"
+                                label="Violino I"/>
+                            <staffDef xml:id="sd_P2" n="2" clef.shape="G" clef.line="2" lines="5"
+                                label="Violino II"/>
+                            <staffDef xml:id="sd_P3" n="3" clef.shape="C" clef.line="3" lines="5"
+                                label="Viola"/>
+                            <staffDef xml:id="sd_P4" n="4" clef.shape="F" clef.line="4" lines="5"
+                                label="Violoncello e Basso">
+                                <layerDef xml:id="ld_3882" n="1" label="Violoncello"/>
+                                <layerDef xml:id="ld_3888" n="2" label="Basso"/>
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="m1" n="1">
+                            <tempo xml:id="t_01" tstamp="1" staff="1" place="above" midi.bpm="144">Allegro</tempo>
+                            <staff xml:id="s_3924" n="1">
+                                <layer xml:id="l_3930" n="1">
+                                    <chord xml:id="c_3936" dur="4" tstamp="1">
+                                        <note xml:id="n_3942" pname="g" oct="5"/>
+                                        <note xml:id="n_3948" pname="b" oct="4"/>
+                                        <note xml:id="n_3954" pname="d" oct="4"/>
+                                    </chord>
+                                    <rest xml:id="r_3963" dur="8"/>
+                                    <note xml:id="n_3969" pname="d" oct="5" dur="8"/>
+                                    <note xml:id="n_3975" pname="g" oct="5" dur="4"/>
+                                    <rest xml:id="r_3981" dur="8"/>
+                                    <note xml:id="n_3990" pname="d" oct="5" dur="8"/>
+                                </layer>
+                            </staff>
+                            <staff xml:id="s_4002" n="2">
+                                <layer xml:id="l_4008" n="1">
+                                    <chord xml:id="c_4014" dur="4" tstamp="1">
+                                        <note xml:id="n_4020" pname="g" oct="5"/>
+                                        <note xml:id="n_4026" pname="b" oct="4"/>
+                                        <note xml:id="n_4032" pname="d" oct="4"/>
+                                    </chord>
+                                    <rest xml:id="r_4041" dur="8"/>
+                                    <note xml:id="n_4047" pname="d" oct="5" dur="8"/>
+                                    <note xml:id="n_4053" pname="g" oct="5" dur="4"/>
+                                    <rest xml:id="r_4059" dur="8"/>
+                                    <note xml:id="n_4068" pname="d" oct="5" dur="8"/>
+                                </layer>
+                            </staff>
+                            <staff xml:id="s_4080" n="3">
+                                <layer xml:id="l_4086" n="1">
+                                    <note xml:id="n_4092" pname="g" oct="4" dur="4"/>
+                                    <rest xml:id="r_4098" dur="8"/>
+                                    <note xml:id="n_4104" pname="d" oct="4" dur="8"/>
+                                    <note xml:id="n_4110" pname="g" oct="4" dur="4"/>
+                                    <rest xml:id="r_4116" dur="8"/>
+                                    <note xml:id="n_4125" pname="d" oct="4" dur="8"/>
+                                </layer>
+                            </staff>
+                            <staff xml:id="s_4137" n="4">
+                                <layer xml:id="l_4143" n="1">
+                                    <note xml:id="n_4149" pname="g" oct="3" dur="4"/>
+                                    <rest xml:id="r_4155" dur="8"/>
+                                    <note xml:id="n_4161" pname="d" oct="3" dur="8"/>
+                                    <note xml:id="n_4167" pname="g" oct="3" dur="4"/>
+                                    <rest xml:id="r_4173" dur="8"/>
+                                    <note xml:id="n_4182" pname="d" oct="3" dur="8"/>
+                                </layer>
+                            </staff>
+                            <dynam xml:id="d_4206" staff="1" startid="#c_3936">f</dynam>
+                            <dynam xml:id="d_4215" staff="2" startid="#c_4014">f</dynam>
+                            <dynam xml:id="d_4224" staff="3" startid="#n_4092">f</dynam>
+                            <dynam xml:id="d_4233" staff="4" startid="#n_4149">f</dynam>              
+                        </measure>
+                        <measure xml:id="m2" n="2">
+                            <staff xml:id="s_4251" n="1">
+                                <layer xml:id="l_4257" n="1">
+                                    <beam xml:id="b_4263">
+                                        <note xml:id="n_4269" pname="g" oct="5" dur="8"/>
+                                        <note xml:id="n_4275" pname="d" oct="5" dur="8"/>
+                                        <note xml:id="n_4281" pname="g" oct="5" dur="8"/>
+                                        <note xml:id="n_4287" pname="b" oct="5" dur="8"/>
+                                    </beam>
+                                    <note xml:id="n_4296" pname="d" oct="6" dur="4"/>
+                                    <rest xml:id="r_4302" dur="4"/>
+                                </layer>
+                            </staff>
+                            <staff xml:id="s_4314" n="2">
+                                <layer xml:id="l_4320" n="1">
+                                    <beam xml:id="b_4326">
+                                        <note xml:id="n_4332" pname="g" oct="5" dur="8"/>
+                                        <note xml:id="n_4338" pname="d" oct="5" dur="8"/>
+                                        <note xml:id="n_4344" pname="g" oct="5" dur="8"/>
+                                        <note xml:id="n_4350" pname="b" oct="5" dur="8"/>
+                                    </beam>
+                                    <note xml:id="n_4359" pname="d" oct="6" dur="4"/>
+                                    <rest xml:id="r_4365" dur="4"/>
+                                </layer>
+                            </staff>
+                            <staff xml:id="s_4377" n="3">
+                                <layer xml:id="l_4383" n="1">
+                                    <beam xml:id="b_4389">
+                                        <note xml:id="n_4395" pname="g" oct="4" dur="8"/>
+                                        <note xml:id="n_4401" pname="d" oct="4" dur="8"/>
+                                        <note xml:id="n_4407" pname="g" oct="4" dur="8"/>
+                                        <note xml:id="n_4413" pname="b" oct="4" dur="8"/>
+                                    </beam>
+                                    <note xml:id="n_4422" pname="d" oct="5" dur="4"/>
+                                    <rest xml:id="r_4428" dur="4"/>
+                                </layer>
+                            </staff>
+                            <staff xml:id="s_4440" n="4">
+                                <layer xml:id="l_4446" n="1">
+                                    <beam xml:id="b_4452">
+                                        <note xml:id="n_4458" pname="g" oct="3" dur="8"/>
+                                        <note xml:id="n_4464" pname="d" oct="3" dur="8"/>
+                                        <note xml:id="n_4470" pname="g" oct="3" dur="8"/>
+                                        <note xml:id="n_4476" pname="b" oct="3" dur="8"/>
+                                    </beam>
+                                    <note xml:id="n_4485" pname="d" oct="4" dur="4"/>
+                                    <rest xml:id="r_4491" dur="4"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
