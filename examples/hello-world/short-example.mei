@@ -28,7 +28,7 @@
                                 <label>Viola</label>
                             </staffDef>
                             <staffDef xml:id="sd_P4" n="4" clef.shape="F" clef.line="4" lines="5">
-                                <label>Violoncello e Basso</label>
+                                <label>Violoncello<lb/>e Basso</label>
                             </staffDef>
                         </staffGrp>
                     </scoreDef>
