@@ -389,8 +389,7 @@ int System::AdjustSylSpacing(FunctorParams *functorParams)
     params->m_previousMeasure = NULL;
     params->m_freeSpace = 0;
     params->m_staffSize = 100;
-    params->m_wordSpace = 0;
-
+    
     return FUNCTOR_CONTINUE;
 }
     

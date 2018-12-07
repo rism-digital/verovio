@@ -939,6 +939,11 @@ void View::DrawSylConnector(
 
     int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
     TextExtend extend;
+    
+    // the length of the dash and the space between them
+    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
+    // Adjust it proportionally to the lyric size
+    dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
@@ -968,6 +973,7 @@ void View::DrawSylConnector(
         if (syl->m_nextWordSyl) {
             x2 = syl->m_nextWordSyl->GetContentLeft();
         }
+        x1 -= (dashLength / 2);
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system

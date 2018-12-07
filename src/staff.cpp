@@ -458,14 +458,8 @@ int Staff::AdjustSylSpacing(FunctorParams *functorParams)
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
     
-    // This is the first staff for this system, set the word spacing and staff size for this pass
-    if (params->m_wordSpace == 0) {
-        FontInfo *fontDim = params->m_doc->GetDrawingLyricFont(this->m_drawingStaffSize);
-        params->m_wordSpace = params->m_doc->GetTextGlyphWidth(L'o', fontDim, false);
-        // Adjust it proportionally to the lyric size
-        params->m_wordSpace *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
-        params->m_staffSize = this->m_drawingStaffSize;
-    }
+    // Set the staff size for this pass
+    params->m_staffSize = this->m_drawingStaffSize;
 
     return FUNCTOR_CONTINUE;
 }

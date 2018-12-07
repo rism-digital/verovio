@@ -88,7 +88,10 @@ int Syl::CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params)
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
-        overlap += (1  * params->m_wordSpace);
+        int wordSpace = params->m_doc->GetDrawingUnit(params->m_staffSize) * params->m_doc->GetOptions()->m_lyricWordSpace.GetValue();
+        // Adjust it proportionally to the lyric size
+        wordSpace *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
+        overlap += wordSpace;
     }
     
     if (overlap > 0) {
