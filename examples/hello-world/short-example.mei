@@ -16,19 +16,19 @@
         <body>
             <mdiv>
                 <score>
-                    <scoreDef xml:id="sc_01" meter.count="4" meter.unit="4" key.sig="1s" key.pname="g" key.mode="major"
-                        meter.sym="common">
+                    <scoreDef xml:id="sc_01" key.sig="1s" key.pname="g" key.mode="major" meter.sym="common">
                         <staffGrp xml:id="sg_01" symbol="bracket" bar.thru="true">
-                            <staffDef xml:id="sd_P1" n="1" clef.shape="G" clef.line="2" lines="5"
-                                label="Violino I"/>
-                            <staffDef xml:id="sd_P2" n="2" clef.shape="G" clef.line="2" lines="5"
-                                label="Violino II"/>
-                            <staffDef xml:id="sd_P3" n="3" clef.shape="C" clef.line="3" lines="5"
-                                label="Viola"/>
-                            <staffDef xml:id="sd_P4" n="4" clef.shape="F" clef.line="4" lines="5"
-                                label="Violoncello e Basso">
-                                <layerDef xml:id="ld_3882" n="1" label="Violoncello"/>
-                                <layerDef xml:id="ld_3888" n="2" label="Basso"/>
+                            <staffDef xml:id="sd_P1" n="1" clef.shape="G" clef.line="2" lines="5">
+                                <label>Violino I</label>
+                            </staffDef>
+                            <staffDef xml:id="sd_P2" n="2" clef.shape="G" clef.line="2" lines="5">
+                                <label>Violino II</label>
+                            </staffDef>
+                            <staffDef xml:id="sd_P3" n="3" clef.shape="C" clef.line="3" lines="5">
+                                <label>Viola</label>
+                            </staffDef>
+                            <staffDef xml:id="sd_P4" n="4" clef.shape="F" clef.line="4" lines="5">
+                                <label>Violoncello e Basso</label>
                             </staffDef>
                         </staffGrp>
                     </scoreDef>
