@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Visual dots</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-10-11</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Dots may be applied, or not, to individual notes with the "dots.ges" attribute.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001712877995">
+                <score xml:id="score-0000001322173930">
+                    <scoreDef xml:id="scoredef-0000001589089041" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000001159358684" symbol="brace" bar.thru="true">
+                            <staffDef xml:id="staffdef-0000000628691972" clef.shape="G" clef.line="2" meter.count="6" meter.unit="8" n="1" lines="5">
+                                <label xml:id="label-0000000226879165" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-L1F1">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000001679561681" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L5F1" dots.ges="1" type="marked" dur.ges="4" dur="4" oct="5" pname="c" color="red" stem.len="6.500000" accid.ges="n" />
+                                    <note xml:id="note-L6F1" dots="1" dur="4" oct="5" pname="d" stem.len="6.000000" accid.ges="n" />
+                                </layer>
+                                <layer xml:id="layer-L5F2N2" n="2">
+                                    <note xml:id="note-L5F2" dots="1" dur="4" oct="4" pname="c" stem.len="5.500000" accid.ges="n" />
+                                    <note xml:id="note-L6F2" dots="1" dur="4" oct="4" pname="b" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <scoreDef xml:id="scoredef-0000002009745369" meter.count="2" meter.unit="4" />
+                        <measure xml:id="measure-L7">
+                            <staff xml:id="staff-L7F1N1" n="1">
+                                <layer xml:id="layer-L7F1N1" n="1">
+                                    <note xml:id="note-L10F1" type="marked" dots="1" dots.ges="0" dur.ges="4" dur="4" oct="5" pname="e" color="red" stem.len="5.500000" accid.ges="n" />
+                                    <note xml:id="note-L11F1" dur="4" oct="5" pname="f" stem.len="5.500000" accid.ges="n" />
+                                </layer>
+                                <layer xml:id="layer-L7F2N2" n="2">
+                                    <note xml:id="note-L10F2" dur="4" oct="4" pname="a" stem.len="6.500000" accid.ges="n" />
+                                    <note xml:id="note-L11F2" dur="4" oct="4" pname="f" stem.len="5.500000" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

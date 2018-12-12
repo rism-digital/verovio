@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Collision avoidance between harmony indications</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-11-29</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio avoids horizontal collisions between harmony indications.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000000678905953">
+                <score xml:id="score-0000001568480599">
+                    <scoreDef xml:id="scoredef-0000001648110754" midi.bpm="120">
+                        <staffGrp xml:id="staffgrp-0000001209897731">
+                            <staffDef xml:id="staffdef-0000001566660485" clef.shape="G" clef.line="2" key.mode="major" key.sig="0" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <instrDef xml:id="instrdef-0000001816157280" midi.channel="0" midi.instrnum="0" midi.volume="80.00%" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001490755031">
+                        <pb xml:id="pb-0000001883516695" />
+                        <measure xml:id="measure-0000000912522486" n="1">
+                            <staff xml:id="staff-0000000849611296" n="1">
+                                <layer xml:id="layer-0000001331045584" n="1">
+                                    <note xml:id="note-0000001097673865" dur="4" oct="5" pname="c" stem.dir="down" />
+                                    <note xml:id="note-0000001842587603" dur="4" oct="5" pname="e" stem.dir="down" />
+                                    <note xml:id="note-0000000228160799" dur="4" oct="5" pname="d" stem.dir="down" />
+                                    <note xml:id="note-0000001671870541" dur="4" oct="5" pname="g" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000001424452039" staff="1" tstamp="1.000000">C</harm>
+                            <harm xml:id="harm-0000000696954607" staff="1" tstamp="3.000000">G/B</harm>
+                        </measure>
+                        <measure xml:id="measure-0000000066320556" n="2">
+                            <staff xml:id="staff-0000000388673541" n="1">
+                                <layer xml:id="layer-0000001345842093" n="1">
+                                    <note xml:id="note-0000002054142900" dur="4" oct="5" pname="e" stem.dir="down" />
+                                    <beam xml:id="beam-0000001582280782">
+                                        <note xml:id="note-0000000198236076" dur="8" oct="5" pname="d" stem.dir="down" />
+                                        <note xml:id="note-0000001593851368" dur="8" oct="5" pname="c" stem.dir="down" />
+                                    </beam>
+                                    <note xml:id="note-0000000137265568" dur="4" oct="5" pname="d" stem.dir="down" />
+                                    <note xml:id="note-0000000267783007" dur="4" oct="5" pname="g" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000001820137031" staff="1" tstamp="1.000000">C</harm>
+                            <harm xml:id="harm-0000000395079640" staff="1" tstamp="3.000000">G/B</harm>
+                        </measure>
+                        <measure xml:id="measure-0000001021458379" n="3">
+                            <staff xml:id="staff-0000002127463876" n="1">
+                                <layer xml:id="layer-0000000068421979" n="1">
+                                    <note xml:id="note-0000002099589408" dur="4" oct="5" pname="e" stem.dir="down" />
+                                    <beam xml:id="beam-0000001121706124">
+                                        <note xml:id="note-0000002080990312" dur="8" oct="5" pname="a" stem.dir="down" />
+                                        <note xml:id="note-0000001503926705" dur="8" oct="5" pname="c" stem.dir="down" />
+                                    </beam>
+                                    <note xml:id="note-0000000751691176" dur="4" oct="4" pname="b" stem.dir="down" />
+                                    <beam xml:id="beam-0000001849408542">
+                                        <note xml:id="note-0000002073710783" dur="8" oct="5" pname="g" stem.dir="down" />
+                                        <note xml:id="note-0000000861999596" dur="8" oct="4" pname="b" stem.dir="down" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000002146202315" staff="1" tstamp="1.000000">C</harm>
+                            <harm xml:id="harm-0000000940160974" staff="1" tstamp="3.000000">B/D</harm>
+                            <harm xml:id="harm-0000000958451422" staff="1" tstamp="4.000000">C/E</harm>
+                        </measure>
+                        <sb xml:id="sb-0000001578189113" />
+                        <measure xml:id="measure-0000001344000474" right="rptend" n="4">
+                            <staff xml:id="staff-0000001975273767" n="1">
+                                <layer xml:id="layer-0000001977676399" n="1">
+                                    <note xml:id="note-0000001325071702" dur="4" oct="4" pname="a" stem.dir="up" />
+                                    <note xml:id="note-0000000983250594" dur="4" oct="5" pname="f" stem.dir="down">
+                                        <accid xml:id="accid-0000001340985243" accid="s" accid.ges="s" />
+                                    </note>
+                                    <note xml:id="note-0000000693890694" dur="2" oct="5" pname="g" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000001493960167" staff="1" tstamp="1.000000">C</harm>
+                            <harm xml:id="harm-0000002012935263" staff="1" tstamp="2.000000">D</harm>
+                            <harm xml:id="harm-0000001746773372" staff="1" tstamp="3.000000">G</harm>
+                        </measure>
+                        <measure xml:id="measure-0000001913505996" n="5">
+                            <staff xml:id="staff-0000001553021065" n="1">
+                                <layer xml:id="layer-0000001282577342" n="1">
+                                    <note xml:id="note-0000000432703932" dur="4" oct="5" pname="g" stem.dir="down" />
+                                    <beam xml:id="beam-0000000113205136">
+                                        <note xml:id="note-0000000671628843" dur="8" oct="6" pname="c" stem.dir="down" />
+                                        <note xml:id="note-0000000274913366" dur="8" oct="5" pname="g" stem.dir="down" />
+                                    </beam>
+                                    <note xml:id="note-0000001497534589" dur="4" oct="5" pname="a" stem.dir="down" />
+                                    <note xml:id="note-0000000048328663" dur="4" oct="5" pname="g" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000001865529007" staff="1" tstamp="1.000000">C/E</harm>
+                            <harm xml:id="harm-0000000907536133" staff="1" tstamp="3.000000">F</harm>
+                            <harm xml:id="harm-0000000265485802" staff="1" tstamp="4.000000">C</harm>
+                        </measure>
+                        <measure xml:id="measure-0000000979296370" n="6">
+                            <staff xml:id="staff-0000001827872781" n="1">
+                                <layer xml:id="layer-0000001366426516" n="1">
+                                    <beam xml:id="beam-0000000410498343">
+                                        <note xml:id="note-0000000806644271" dur="8" oct="5" pname="e" stem.dir="down" />
+                                        <note xml:id="note-0000001622368823" dur="8" oct="5" pname="g" stem.dir="down" />
+                                        <note xml:id="note-0000000619993743" dur="8" oct="6" pname="c" stem.dir="down" />
+                                        <note xml:id="note-0000000138014370" dur="8" oct="5" pname="g" stem.dir="down" />
+                                    </beam>
+                                    <note xml:id="note-0000000661590156" dur="4" oct="5" pname="a" stem.dir="down" />
+                                    <note xml:id="note-0000001689728195" dur="4" oct="5" pname="g" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000001400383751" staff="1" tstamp="1.000000">C/E</harm>
+                            <harm xml:id="harm-0000000586561274" staff="1" tstamp="3.000000">F</harm>
+                            <harm xml:id="harm-0000001699208605" staff="1" tstamp="4.000000">C</harm>
+                        </measure>
+                        <sb xml:id="sb-0000001488193498" />
+                        <measure xml:id="measure-0000000934073925" n="7">
+                            <staff xml:id="staff-0000001664321560" n="1">
+                                <layer xml:id="layer-0000001458831627" n="1">
+                                    <beam xml:id="beam-0000000179103420">
+                                        <note xml:id="note-0000000358119617" dur="8" oct="5" pname="e" stem.dir="down" />
+                                        <note xml:id="note-0000001153233628" dur="8" oct="5" pname="g" stem.dir="down" />
+                                        <note xml:id="note-0000001684731051" dur="8" oct="6" pname="c" stem.dir="down" />
+                                        <note xml:id="note-0000001490011306" dur="8" oct="5" pname="b" stem.dir="down" />
+                                    </beam>
+                                    <beam xml:id="beam-0000000659137471">
+                                        <note xml:id="note-0000001437928415" dur="8" oct="5" pname="b" stem.dir="down" />
+                                        <note xml:id="note-0000000528577271" dur="8" oct="5" pname="a" stem.dir="down" />
+                                        <note xml:id="note-0000001868802393" dur="8" oct="5" pname="a" stem.dir="down" />
+                                        <note xml:id="note-0000000902848676" dur="8" oct="5" pname="g" stem.dir="down" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000001075184315" staff="1" tstamp="1.000000">C/E</harm>
+                            <harm xml:id="harm-0000000982202675" staff="1" tstamp="2.000000">C</harm>
+                            <harm xml:id="harm-0000000628042393" staff="1" tstamp="3.000000">F</harm>
+                            <harm xml:id="harm-0000001418560077" staff="1" tstamp="4.000000">C/E</harm>
+                        </measure>
+                        <measure xml:id="measure-0000002064887076" n="8">
+                            <staff xml:id="staff-0000002143172709" n="1">
+                                <layer xml:id="layer-0000000388323829" n="1">
+                                    <beam xml:id="beam-0000001503251638">
+                                        <note xml:id="note-0000001106388501" dur="8" oct="5" pname="g" stem.dir="down" />
+                                        <note xml:id="note-0000000394951416" dur="8" oct="5" pname="f" stem.dir="down" />
+                                    </beam>
+                                    <beam xml:id="beam-0000000730409340">
+                                        <note xml:id="note-0000001490919144" dur="16" oct="5" pname="e" stem.dir="down" />
+                                        <note xml:id="note-0000001110605952" dur="16" oct="5" pname="f" stem.dir="down" />
+                                        <note xml:id="note-0000001686917990" dur="8" oct="5" pname="g" stem.dir="down" />
+                                    </beam>
+                                    <note xml:id="note-0000002031157116" dur="2" oct="5" pname="d" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000002108003042" staff="1" tstamp="1.000000">G/D</harm>
+                            <harm xml:id="harm-0000001037972612" staff="1" tstamp="2.000000">C</harm>
+                            <harm xml:id="harm-0000001951949310" staff="1" tstamp="3.000000">G</harm>
+                        </measure>
+                        <measure xml:id="measure-0000000711407393" n="9">
+                            <staff xml:id="staff-0000000505901433" n="1">
+                                <layer xml:id="layer-0000000213839236" n="1">
+                                    <note xml:id="note-0000001465081728" dur="4" oct="5" pname="g" stem.dir="down" />
+                                    <note xml:id="note-0000001523497597" dur="4" oct="5" pname="c" stem.dir="down" />
+                                    <note xml:id="note-0000000378688086" dur="4" oct="5" pname="d" stem.dir="down" />
+                                    <note xml:id="note-0000000174987514" dur="4" oct="5" pname="c" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000000984193431" staff="1" tstamp="1.000000">C</harm>
+                            <harm xml:id="harm-0000000977484822" staff="1" tstamp="3.000000">Dm/F</harm>
+                            <harm xml:id="harm-0000001064976994" staff="1" tstamp="4.000000">C/E</harm>
+                        </measure>
+                        <sb xml:id="sb-0000001939157937" />
+                        <measure xml:id="measure-0000000291054808" n="10">
+                            <staff xml:id="staff-0000000608926390" n="1">
+                                <layer xml:id="layer-0000001055051251" n="1">
+                                    <beam xml:id="beam-0000000616631092">
+                                        <note xml:id="note-0000000269782559" dur="8" oct="5" pname="g" stem.dir="down" />
+                                        <note xml:id="note-0000001380523423" dur="8" oct="5" pname="e" stem.dir="down" />
+                                        <note xml:id="note-0000000463846268" dur="8" oct="5" pname="d" stem.dir="down" />
+                                        <note xml:id="note-0000000714591818" dur="8" oct="5" pname="c" stem.dir="down" />
+                                    </beam>
+                                    <beam xml:id="beam-0000001556575531">
+                                        <note xml:id="note-0000001388762337" dur="8" oct="5" pname="d" stem.dir="down" />
+                                        <note xml:id="note-0000001337777798" dur="8" oct="4" pname="b" stem.dir="down" />
+                                    </beam>
+                                    <note xml:id="note-0000000070002714" dur="4" oct="5" pname="c" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000000338908405" staff="1" tstamp="1.000000">C</harm>
+                            <harm xml:id="harm-0000000723357301" staff="1" tstamp="3.000000">Dm/F</harm>
+                            <harm xml:id="harm-0000001340807206" staff="1" tstamp="4.000000">C/E</harm>
+                        </measure>
+                        <measure xml:id="measure-0000000456608687" n="11">
+                            <staff xml:id="staff-0000001169258409" n="1">
+                                <layer xml:id="layer-0000000957050738" n="1">
+                                    <note xml:id="note-0000001704996291" dur="4" oct="5" pname="g" stem.dir="down" />
+                                    <beam xml:id="beam-0000001851433645">
+                                        <note xml:id="note-0000001560395193" dur="8" oct="5" pname="c" stem.dir="down" />
+                                        <note xml:id="note-0000001141684828" dur="8" oct="5" pname="d" stem.dir="down" />
+                                    </beam>
+                                    <beam xml:id="beam-0000002121441312">
+                                        <note xml:id="note-0000001190595976" dur="8" oct="4" pname="b" stem.dir="down" />
+                                        <note xml:id="note-0000000324565198" dur="8" oct="5" pname="f" stem.dir="down" />
+                                        <note xml:id="note-0000000593929177" dur="8" oct="5" pname="e" stem.dir="down" />
+                                        <note xml:id="note-0000000705401208" dur="8" oct="5" pname="d" stem.dir="down" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000000003105781" staff="1" tstamp="1.000000">C</harm>
+                            <harm xml:id="harm-0000000120716874" staff="1" tstamp="3.000000">G/D</harm>
+                            <harm xml:id="harm-0000000830988086" staff="1" tstamp="4.000000">C</harm>
+                        </measure>
+                        <measure xml:id="measure-0000001684215317" right="end" n="12">
+                            <staff xml:id="staff-0000000473688367" n="1">
+                                <layer xml:id="layer-0000001720375296" n="1">
+                                    <note xml:id="note-0000001149254897" dur="4" oct="5" pname="e" stem.dir="down" />
+                                    <beam xml:id="beam-0000001311383229">
+                                        <note xml:id="note-0000001985194867" dur="8" oct="5" pname="d" stem.dir="down" />
+                                        <note xml:id="note-0000001852609750" dur="8" oct="5" pname="c" stem.dir="down" />
+                                    </beam>
+                                    <note xml:id="note-0000000809540389" dur="2" oct="5" pname="c" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-0000001935293999" staff="1" tstamp="1.000000">C/G</harm>
+                            <harm xml:id="harm-0000000961485019" staff="1" tstamp="2.000000">G/D</harm>
+                            <harm xml:id="harm-0000001016021065" staff="1" tstamp="3.000000">C</harm>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

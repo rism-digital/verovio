@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Cross-staff beams (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-08-13</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio can move a beam to the next higher or lower staff.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001289723225">
+                <score xml:id="score-0000001288769168">
+                    <scoreDef xml:id="scoredef-0000001254256541">
+                        <staffGrp xml:id="staffgrp-0000000670102848" symbol="brace" bar.thru="true">
+                            <staffDef xml:id="staffdef-0000000681240754" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000001072277403" />
+                            </staffDef>
+                            <staffDef xml:id="staffdef-0000000507121344" clef.shape="F" clef.line="4" meter.count="4" meter.unit="4" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-L1F1">
+                        <measure xml:id="measure-L4" right="end" n="1">
+                            <staff xml:id="staff-L4F2N1" n="1">
+                                <layer xml:id="layer-L4F2N1" n="1">
+                                    <beam staff="2" beam.with="below" xml:id="beam-L5F2-L8F2">
+                                        <note xml:id="note-L5F2" dur="16" staff="2" oct="3" pname="c" accid.ges="n" />
+                                        <note xml:id="note-L6F2" dur="16" staff="2" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-L7F2" dur="16" staff="2" oct="3" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L8F2" dur="16" staff="2" oct="3" pname="c" accid.ges="n" />
+                                    </beam>
+                                    <note xml:id="note-L9F2" dur="4" staff="2" oct="3" pname="f" stem.dir="up" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L4F1N1" n="2">
+                                <layer xml:id="layer-L4F1N1" n="1">
+                                    <note xml:id="note-L5F1" dur="4" oct="2" pname="c" stem.dir="down" accid.ges="n" />
+                                    <note xml:id="note-L9F1" dur="4" oct="2" pname="b" stem.dir="down" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

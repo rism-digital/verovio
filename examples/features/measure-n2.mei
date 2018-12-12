@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Forced measure numbers</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-07-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio always shows numbers on measures bearing "mNum".</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001702221219">
+                <score xml:id="score-0000000454882399">
+                    <scoreDef xml:id="scoredef-0000001675463069" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000001544117511">
+                            <staffDef xml:id="staffdef-0000001352307423" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000001897687807" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-L1F1">
+                        <measure xml:id="measure-L3" right="dbl" n="1">
+                            <staff xml:id="staff-L3F1N1" n="1">
+                                <layer xml:id="layer-L3F1N1" n="1">
+                                    <note xml:id="note-L4F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L5" right="dbl" n="6">
+                            <mNum>6</mNum>
+                            <staff xml:id="staff-L5F1N1" n="1">
+                                <layer xml:id="layer-L5F1N1" n="1">
+                                    <note xml:id="note-L6F1" dur="1" oct="4" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L7" right="end" n="12">
+                            <mNum>12</mNum>
+                            <staff xml:id="staff-L7F1N1" n="1">
+                                <layer xml:id="layer-L7F1N1" n="1">
+                                    <note xml:id="note-L8F1" dur="1" oct="4" pname="e" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

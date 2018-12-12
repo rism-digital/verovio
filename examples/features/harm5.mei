@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Multiple harmonic analyses (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio renders alternative harmonic analyses on different lines above the staff system.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+   <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001237131063">
+                <score xml:id="score-0000000525105587">
+                    <scoreDef xml:id="scoredef-0000000621690074">
+                        <staffGrp xml:id="staffgrp-0000002005372762">
+                            <staffDef xml:id="staffdef-0000000978391294" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000001744824998">    </label>
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001439295186">
+                        <measure xml:id="measure-L3" right="end" n="1">
+                            <staff xml:id="staff-L3F1N1" n="1">
+                                <layer xml:id="layer-L3F1N1" n="1">
+                                    <note xml:id="note-L4F1" dur="4" oct="4" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L5F1" dur="4" oct="4" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L6F1" dur="4" oct="4" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L7F1" dur="4" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <harm n="1" xml:id="harm-L4F2" place="above" staff="1" tstamp="1.000000">1</harm>
+                            <harm n="2" xml:id="harm-L4F3" place="above" staff="1" tstamp="1.000000">A</harm>
+                            <harm n="2" xml:id="harm-L5F3" place="above" staff="1" tstamp="2.000000">B</harm>
+                            <harm n="1" xml:id="harm-L6F2" place="above" staff="1" tstamp="3.000000">3</harm>
+                            <harm n="1" xml:id="harm-L7F2" place="above" staff="1" tstamp="4.000000">4</harm>
+                            <harm n="2" xml:id="harm-L7F3" place="above" staff="1" tstamp="4.000000">D</harm>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

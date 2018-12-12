@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Reverse mensural signs</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-07-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports reversed mensural signs.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef clef.shape="C" clef.line="1" mensur.slash="1" mensur.sign="C" mensur.orient="reversed" n="1" notationtype="mensural" lines="5">
+                <label />
+              </staffDef>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <staff n="1">
+              <layer n="1">
+                <note dots="1" dur="brevis" oct="4" pname="f" />
+                <note dots="1" dur="semibrevis" oct="4" pname="f" />
+                <note dur="semibrevis" oct="4" pname="g" />
+                <note dur="minima" oct="4" pname="f" />
+                <note dur="minima" oct="4" pname="c" />
+                <note dur="minima" oct="4" pname="f" />
+                <dot />
+                <note dur="semiminima" oct="4" pname="g" />
+                <note dur="minima" oct="4" pname="a" />
+              </layer>
+            </staff>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

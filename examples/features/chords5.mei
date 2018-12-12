@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Chords with mixed durations</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-02-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the rendering of chords with mixed durations.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef meter.count="4" meter.unit="4" meter.sym="common">
+            <staffGrp>
+              <staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure>
+              <staff n="1">
+                <layer n="1">
+                  <chord xml:id="ch1" dur="2" dots="1">
+                    <note xml:id="ch1n1" pname="b" oct="5"/>
+                    <note xml:id="ch1n2" dur="4" dots="0" pname="b" oct="4"/>
+                    <note xml:id="ch1n3" dur="4" dots="0" pname="d" oct="4"/>
+                  </chord>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

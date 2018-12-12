@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Cue-sized notes (3)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio appropriately scales single notation elements in rendering cue-sized notes together with full-sized notes.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000000912338995">
+                <score xml:id="score-0000000648249385">
+                    <scoreDef xml:id="scoredef-0000001031183755">
+                        <staffGrp xml:id="staffgrp-0000000832319367" symbol="brace" bar.thru="true">
+                            <staffDef xml:id="staffdef-0000000575671235" clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000001135163419" />
+                            </staffDef>
+                            <staffDef xml:id="staffdef-0000000679236736" clef.shape="F" clef.line="4" meter.count="3" meter.unit="4" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000942872464">
+                        <measure xml:id="measure-L4">
+                            <staff xml:id="staff-L4F2N1" n="1">
+                                <layer xml:id="layer-L4F2N1" n="1">
+                                    <tuplet xml:id="tuplet-L8F2-L22F2" num="15" numbase="12" num.visible="false" bracket.visible="false" num.format="count">
+                                        <beam xml:id="beam-L8F2-L22F2">
+                                            <note xml:id="note-L8F2" dur.ges="16" dur="8" oct="5" pname="d" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L9F2" dur.ges="16" dur="8" oct="5" pname="e" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L10F2" dur.ges="16" dur="8" oct="5" pname="d" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L11F2" dur.ges="16" dur="8" oct="5" pname="c" cue="true" stem.dir="up" accid="s" />
+                                            <note xml:id="note-L12F2" dur.ges="16" dur="8" oct="5" pname="d" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L13F2" dur.ges="16" dur="8" oct="5" pname="d" cue="true" stem.dir="up" accid="s" />
+                                            <note xml:id="note-L14F2" dur.ges="16" dur="8" oct="5" pname="e" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L15F2" dur.ges="16" dur="8" oct="5" pname="f" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L16F2" dur.ges="16" dur="8" oct="5" pname="f" cue="true" stem.dir="up" accid="s" />
+                                            <note xml:id="note-L17F2" dur.ges="16" dur="8" oct="5" pname="g" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L18F2" dur.ges="16" dur="8" oct="5" pname="g" cue="true" stem.dir="up" accid="s" />
+                                            <note xml:id="note-L19F2" dur.ges="16" dur="8" oct="5" pname="b" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L20F2" dur.ges="16" dur="8" oct="5" pname="a" cue="true" stem.dir="up" accid.ges="n" />
+                                            <note xml:id="note-L21F2" dur.ges="16" dur="8" oct="5" pname="g" cue="true" stem.dir="up" accid="n" />
+                                            <note xml:id="note-L22F2" dur.ges="16" dur="8" oct="5" pname="f" cue="true" stem.dir="up" accid="n" />
+                                        </beam>
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L4F1N1" n="2">
+                                <layer xml:id="layer-L4F1N1" n="1">
+                                    <chord xml:id="chord-L8F1" dur="4">
+                                        <note xml:id="note-L8F1S1" oct="3" pname="g" accid.ges="n" />
+                                        <note xml:id="note-L8F1S2" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-L8F1S3" oct="4" pname="f" accid.ges="n" />
+                                    </chord>
+                                    <chord xml:id="chord-L13F1" dur="4">
+                                        <note xml:id="note-L13F1S1" oct="3" pname="g" accid.ges="n" />
+                                        <note xml:id="note-L13F1S2" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-L13F1S3" oct="4" pname="f" accid.ges="n" />
+                                    </chord>
+                                    <chord xml:id="chord-L18F1" dur="4">
+                                        <note xml:id="note-L18F1S1" oct="3" pname="g" accid.ges="n" />
+                                        <note xml:id="note-L18F1S2" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-L18F1S3" oct="4" pname="f" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-L8F2-L22F2N1" staff="1" startid="#note-L8F2" endid="#note-L22F2" curvedir="above" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

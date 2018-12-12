@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Dynamics/hairpin placement</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>The first staff shows automatic alignment of dynam and hairpin pointing to the same id or same tstamp. They are now grouped automatically, and aligned accordingly. Also, the spacing of the hairpin is adjusted to fit in between the dynam. The second system shows how @vgrp can be used to align non adjacent dynamics and hairpin.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" clef.line="2" clef.shape="G" lines="5" meter.count="4" meter.unit="4"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <pb/>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="c" oct="4" dur="4"/>
+                                    <note pname="d" oct="4" dur="4"/>
+                                    <note pname="e" oct="4" dur="4"/>
+                                    <note pname="f" oct="4" dur="4"/>
+                                </layer>
+                            </staff>
+                            <dir tstamp="1" staff="1" place="above">Default alignment</dir>
+                            <dynam tstamp="1.0" staff="1">f</dynam>
+                            <dynam tstamp="2.0" staff="1">p</dynam>
+                            <dynam tstamp="3.0" staff="1">fp</dynam>
+                            <hairpin form="cres" staff="1" tstamp="2.0" tstamp2="0m+3.0"/>
+                            <dynam tstamp="4.0" staff="1">rfz</dynam>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="g" oct="4" dur="4"/>
+                                    <note pname="a" oct="4" dur="4" xml:id="n1"/>
+                                    <note pname="a" oct="4" dur="4"/>
+                                    <note pname="a" oct="4" dur="4"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1.0" staff="1">ff</dynam>
+                            <dynam startid="#n1" staff="1">pp</dynam>
+                            <hairpin staff="1" form="cres" startid="#n1" tstamp2="1m+1.0" endid="#n2"/>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="a" oct="4" dur="2" xml:id="n2"/>
+                                    <note pname="a" oct="3" dur="2"/>
+                                </layer>
+                            </staff>
+                            <dynam startid="#n2" staff="1">fff</dynam>
+                            <hairpin staff="1" form="dim" tstamp="1.0" tstamp2="1m+1.0" startid="#n2"/>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="a" oct="4" dur="2"/>
+                                    <note pname="a" oct="4" dur="2"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1.0" staff="1">pppp</dynam>
+                        </measure>
+                        
+                        <sb/>
+                        
+                        <measure n="5">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="c" oct="4" dur="4"/>
+                                    <note pname="d" oct="4" dur="4"/>
+                                    <note pname="e" oct="4" dur="4"/>
+                                    <note pname="f" oct="4" dur="4"/>
+                                </layer>
+                            </staff>
+                            <dir tstamp="1" staff="1" place="above">Use of @vgrp</dir>
+                            <dynam tstamp="1.0" staff="1">f</dynam>
+                            <dynam tstamp="2.0" staff="1">p</dynam>
+                            <dynam tstamp="3.0" staff="1">fp</dynam>
+                            <hairpin form="cres" staff="1" tstamp="2.0" tstamp2="0m+3.0"/>
+                            <dynam tstamp="4.0" staff="1" vgrp="1">rfz</dynam>
+                            <dir tstamp="4.0" staff="1">@vgrp="1"</dir>
+                        </measure>
+                        <measure n="6">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="g" oct="4" dur="4"/>
+                                    <note pname="a" oct="4" dur="4" xml:id="n3"/>
+                                    <note pname="a" oct="4" dur="4"/>
+                                    <note pname="a" oct="4" dur="4"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1.0" staff="1">ff</dynam>
+                            <dynam startid="#n3" staff="1">pp</dynam>
+                            <hairpin staff="1" form="cres" startid="#n3" tstamp2="1m+1.0" endid="#n4"/>
+                        </measure>
+                        <measure n="7">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="a" oct="4" dur="2" xml:id="n4"/>
+                                    <note pname="a" oct="3" dur="2"/>
+                                </layer>
+                            </staff>
+                            <dynam startid="#n4" staff="1">fff</dynam>
+                            <hairpin staff="1" form="dim" tstamp="1.0" tstamp2="1m+1.0" startid="#n4" vgrp="1"/>
+                            <dir tstamp="1.0" staff="1">@vgrp="1"</dir>
+                        </measure>
+                        <measure n="8">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="a" oct="4" dur="2"/>
+                                    <note pname="a" oct="4" dur="2"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1.0" staff="1">pppp</dynam>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

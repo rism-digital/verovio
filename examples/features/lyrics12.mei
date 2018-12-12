@@ -5,13 +5,13 @@
   <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Barline thickness</title>
+                <title>Lyrics and hyphen size</title>
             </titleStmt>
             <pubStmt>
                 <date>2018-02-09</date>
             </pubStmt>
             <notesStmt>
-                <annot>As a styling option, Verovio renders barlines of different thickness.</annot>
+                <annot>As a styling option, Verovio renders lyrics and hyphens of different sizes.</annot>
             </notesStmt>
         </fileDesc>
         <encodingDesc>
@@ -27,7 +27,7 @@
             <mdiv>
                 <score>
                     <scoreDef xml:id="scoredef-0000000584071257">
-                        <staffGrp xml:id="staffgrp-0000000709406311" bar.thru="true">
+                        <staffGrp xml:id="staffgrp-0000000709406311">
                             <staffDef xml:id="staffdef-0000000162660833" clef.shape="G" clef.line="2" n="1" lines="5" />
                         </staffGrp>
                     </scoreDef>

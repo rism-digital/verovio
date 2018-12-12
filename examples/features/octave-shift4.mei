@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Ottava marks over line breaks</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-07-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Ottava marks after line breaks are appropriately spaced from clef.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000002097290569">
+                <score xml:id="score-0000001785371842">
+                    <scoreDef xml:id="scoredef-0000001951618443" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000002141134591">
+                            <staffDef xml:id="staffdef-0000000260564627" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000000836652366" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000616897066">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000000860580116" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L4F1" dur="1" oct.ges="5" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <octave xml:id="octave-0000001387881163" staff="1" startid="#note-L4F1" endid="#note-L14F1" dis="8" dis.place="above" />
+                        </measure>
+                        <measure xml:id="measure-L5">
+                            <staff xml:id="staff-L5F1N1" n="1">
+                                <layer xml:id="layer-L5F1N1" n="1">
+                                    <note xml:id="note-L6F1" dur="1" oct.ges="5" oct="4" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L7">
+                            <staff xml:id="staff-L7F1N1" n="1">
+                                <layer xml:id="layer-L7F1N1" n="1">
+                                    <note xml:id="note-L8F1" dur="1" oct.ges="5" oct="4" pname="e" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L9">
+                            <staff xml:id="staff-L9F1N1" n="1">
+                                <layer xml:id="layer-L9F1N1" n="1">
+                                    <note xml:id="note-L10F1" dur="1" oct.ges="5" oct="4" pname="f" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L11">
+                            <staff xml:id="staff-L11F1N1" n="1">
+                                <layer xml:id="layer-L11F1N1" n="1">
+                                    <note xml:id="note-L12F1" dur="1" oct.ges="5" oct="4" pname="g" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L13" right="end">
+                            <staff xml:id="staff-L13F1N1" n="1">
+                                <layer xml:id="layer-L13F1N1" n="1">
+                                    <note xml:id="note-L14F1" dur="1" oct.ges="5" oct="4" pname="a" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

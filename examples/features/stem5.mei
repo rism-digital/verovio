@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Stem direction (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-07-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Stem direction is rendered automatically also in presence of rests inside of beam groups.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000000583930627">
+                <score xml:id="score-0000000121781199">
+                    <scoreDef xml:id="scoredef-0000001173503525">
+                        <staffGrp xml:id="staffgrp-0000001673261767">
+                            <staffDef xml:id="staffdef-0000001189454188" clef.shape="F" clef.line="4" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000001651618853" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000224696002">
+                        <measure xml:id="measure-L1" right="dbl" n="0">
+                            <staff xml:id="staff-0000001426565561" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L5F1" dur="8" oct="2" pname="f" accid.ges="n" />
+                                    <rest xml:id="rest-L6F1" dur="4" />
+                                    <beam xml:id="beam-L7F1-L14F1">
+                                        <note xml:id="note-L7F1" dur="8" oct="1" pname="b" accid.ges="n" />
+                                        <note xml:id="note-L8F1" dur="16" oct="2" pname="d" accid.ges="n" />
+                                        <rest xml:id="rest-L9F1" dur="16" />
+                                        <rest xml:id="rest-L10F1" dur="8" />
+                                        <note xml:id="note-L11F1" dots="1" dur="16" oct="1" pname="e" accid.ges="n" />
+                                        <rest xml:id="rest-L12F1" dur="32" />
+                                        <rest xml:id="rest-L13F1" dur="16" />
+                                        <note xml:id="note-L14F1" dur="16" oct="2" pname="a" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-L5F1" place="above" staff="1" tstamp="1.000000">
+                                <rend xml:id="rend-0000001978501106" fontstyle="normal">no stem.dir</rend>
+                            </dir>
+                        </measure>
+                        <measure xml:id="measure-L15" right="dbl">
+                            <staff xml:id="staff-L15F1N1" n="1">
+                                <layer xml:id="layer-L15F1N1" n="1">
+                                    <note xml:id="note-L17F1" dur="8" oct="2" pname="f" accid.ges="n" />
+                                    <rest xml:id="rest-L18F1" dur="4" />
+                                    <beam xml:id="beam-L19F1-L26F1">
+                                        <note xml:id="note-L19F1" dur="8" oct="1" pname="b" stem.dir="up" accid.ges="n" />
+                                        <note xml:id="note-L20F1" dur="16" oct="2" pname="d" stem.dir="up" accid.ges="n" />
+                                        <rest xml:id="rest-L21F1" dur="16" />
+                                        <rest xml:id="rest-L22F1" dur="8" />
+                                        <note xml:id="note-L23F1" dots="1" dur="16" oct="1" pname="e" stem.dir="up" accid.ges="n" />
+                                        <rest xml:id="rest-L24F1" dur="32" />
+                                        <rest xml:id="rest-L25F1" dur="16" />
+                                        <note xml:id="note-L26F1" dur="16" oct="2" pname="a" stem.dir="up" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-L17F1" place="above" staff="1" tstamp="1.000000">
+                                <rend xml:id="rend-0000001343143708" fontstyle="normal">stem.dir="up"</rend>
+                            </dir>
+                        </measure>
+                        <measure xml:id="measure-L27">
+                            <staff xml:id="staff-L27F1N1" n="1">
+                                <layer xml:id="layer-L27F1N1" n="1">
+                                    <note xml:id="note-L29F1" dur="8" oct="2" pname="f" accid.ges="n" />
+                                    <rest xml:id="rest-L30F1" dur="4" />
+                                    <beam xml:id="beam-L31F1-L34F1">
+                                        <note xml:id="note-L31F1" dur="8" oct="1" pname="b" accid.ges="n" />
+                                        <note xml:id="note-L32F1" dur="16" oct="2" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L33F1" dots="1" dur="16" oct="1" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L34F1" dur="16" oct="2" pname="a" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-L29F1" place="above" staff="1" tstamp="1.000000">
+                                <rend xml:id="rend-0000000079568635" fontstyle="normal">no stem.dir</rend>
+                            </dir>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

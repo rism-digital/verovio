@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Options for appearence of mensural signs</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-07-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Mensural notation offer various layout options for mensural signs.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef clef.shape="C" clef.line="3" mensur.sign="C" mensur.slash="1" mensur.dot="true" proport.num="3" proport.numbase="1" n="1" notationtype="mensural.white" lines="5"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <staff n="1">
+              <layer n="1">
+                <note dur="brevis" oct="3" pname="c" />
+                <barLine />
+                <mensur loc="0" color="yellowgreen" tempus="3" prolatio="3" label="Tempus perfectum cum prolatione perfecta" />
+                <note dur="brevis" oct="4" pname="f" />
+                <mensur loc="2" color="darkgoldenrod" tempus="3" prolatio="2" label="Tempus perfectum cum prolatione imperfecta" />
+                <note dur="brevis" oct="4" pname="d" />
+                <mensur loc="4" color="turquoise" tempus="2" prolatio="3" label="Tempus imperfectum cum prolatione perfecta" />
+                <note dur="brevis" oct="3" pname="b" />
+                <mensur loc="6" color="purple" tempus="2" prolatio="2" label="Tempus imperfectum cum prolatione imperfecta" />
+                <note dur="brevis" oct="3" pname="g" />
+                <barLine />
+                <mensur loc="1" sign="O" num="3" />
+                <note dur="semiminima" oct="4" pname="f" color="darkgrey" />
+                <note dur="semiminima" oct="4" pname="g" color="darkgrey" />
+                <note dur="longa" oct="4" pname="f" color="brown" />
+                <barLine/>
+                <mensur sign="C" orient="reversed" dot="true" slash="1"/>
+                <note dur="semiminima" oct="4" pname="f" />
+                <note dur="semiminima" oct="4" pname="g" />
+                <note dur="longa" oct="4" pname="f" color="brown" />
+                <barLine/>
+                <mensur/>
+                <note dur="semibrevis" oct="4" pname="d" />
+              </layer>
+            </staff>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

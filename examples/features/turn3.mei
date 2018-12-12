@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Turns accidentals</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-10-29</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Turns can display both lower accidentals and upper accidentals.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001786626811">
+                <score xml:id="score-0000000804599206">
+                    <scoreDef xml:id="scoredef-0000001473103737" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000001709423055">
+                            <staffDef xml:id="staffdef-0000000112919969" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000001437083650" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-L1F1">
+                        <measure xml:id="measure-L3" right="end" n="1">
+                            <staff xml:id="staff-L3F1N1" n="1">
+                                <layer xml:id="layer-L3F1N1" n="1">
+                                    <note xml:id="note-L4F1" dur="2" oct="4" pname="g" accid.ges="n" />
+                                    <note xml:id="note-L5F1" dur="2" oct="4" pname="a">
+                                        <accid xml:id="accid-L5F1" accid="n" func="caution" />
+                                    </note>
+                                </layer>
+                            </staff>
+                            <turn xml:id="turn-L4F1" staff="1" tstamp="2.000000" accidupper="f" accidlower="s" form="lower" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

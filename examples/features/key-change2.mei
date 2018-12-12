@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Key changes example (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-08-13</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports appropriate cancellation key signatures.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001910486585">
+                <score xml:id="score-0000000372544151">
+                    <scoreDef xml:id="scoredef-0000001495570839" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000001695979779">
+                            <staffDef xml:id="staffdef-0000001306129048" clef.shape="G" clef.line="2" key.sig="4s" n="1" lines="5">
+                                <label xml:id="label-0000001302978332" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-L1F1">
+                        <measure xml:id="measure-L1" right="dbl" n="0">
+                            <staff xml:id="staff-0000000194550914" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L4F1" dur="1" oct="4" pname="c" accid.ges="s" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <scoreDef xml:id="scoredef-0000000798708518" key.sig="1s" keysig.showchange="true" />
+                        <measure xml:id="measure-L5" right="dbl">
+                            <staff xml:id="staff-L5F1N1" n="1">
+                                <layer xml:id="layer-L5F1N1" n="1">
+                                    <note xml:id="note-L7F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <scoreDef xml:id="scoredef-0000000351158523" key.sig="4s" keysig.showchange="true" />
+                        <measure xml:id="measure-L8" right="end">
+                            <staff xml:id="staff-L8F1N1" n="1">
+                                <layer xml:id="layer-L8F1N1" n="1">
+                                    <note xml:id="note-L10F1" dur="1" oct="4" pname="c" accid.ges="s" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

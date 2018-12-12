@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Trill line extensions</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio renders trill line extensions; line endings do not collide with barlines and several lines are horizontally aligned.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001333036987">
+                <score xml:id="score-0000001803235005">
+                    <scoreDef xml:id="scoredef-0000000201960921" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000001932407777" symbol="brace" bar.thru="true">
+                            <staffDef xml:id="staffdef-0000000128916277" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5">
+                                <label xml:id="label-0000001620817514" />
+                            </staffDef>
+                            <staffDef xml:id="staffdef-0000001664869736" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001681502571">
+                        <measure xml:id="measure-L4" n="1">
+                            <staff xml:id="staff-L4F2N1" n="1">
+                                <layer xml:id="layer-L4F2N1" n="1">
+                                    <note xml:id="note-L5F2" dur="4" oct="5" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L6F2" dur="4" oct="5" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L7F2" dur="2" oct="5" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L4F1N1" n="2">
+                                <layer xml:id="layer-L4F1N1" n="1">
+                                    <note xml:id="note-L5F1" dur="2" oct="4" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L7F1" dur="2" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <trill xml:id="trill-L5F2" staff="1" tstamp="1.000000" />
+                            <trill xml:id="trill-L6F2" staff="1" tstamp="2.000000" />
+                            <trill xml:id="trill-L7F2" staff="1" tstamp="3.000000" tstamp2="0m+5.0" />
+                            <trill xml:id="trill-L5F1" staff="2" tstamp="1.000000" tstamp2="1m+5.0" />
+                        </measure>
+                        <measure xml:id="measure-L8" right="end" n="2">
+                            <staff xml:id="staff-L8F2N1" n="1">
+                                <layer xml:id="layer-L8F2N1" n="1">
+                                    <note xml:id="note-L9F2" dur="2" oct="5" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L10F2" dur="2" oct="5" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L8F1N1" n="2">
+                                <layer xml:id="layer-L8F1N1" n="1">
+                                    <note xml:id="note-L9F1" dur="2" oct="4" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L10F1" dur="2" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <trill xml:id="trill-L9F2" staff="1" tstamp="1.000000" tstamp2="0m+3.0" />
+                            <trill xml:id="trill-L10F2" staff="1" tstamp="3.000000" tstamp2="0m+5.0" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

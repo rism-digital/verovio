@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Piano pedal bounce with star symbol</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Piano pedal bounce is rendered traditionally with a star symbol.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef clef.shape="G" clef.line="2" meter.count="6" meter.unit="8" n="1" lines="5">
+                            </staffDef>
+                            <staffDef clef.shape="F" clef.line="4" meter.count="6" meter.unit="8" n="2" lines="5">
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+<measure n="2" xml:id="d414233e371">
+    <staff n="1">
+        <layer n="1">
+            <rest xml:id="d414233e373" dur="8"/>
+            <beam>
+                <note xml:id="d414233e381" pname="c" oct="5" dur="8" stem.dir="down">
+                    <artic artic="stacc" place="above"/>
+                </note>
+                <note xml:id="d414233e400" pname="d" oct="5" dur="8" stem.dir="down" accid.ges="f">
+                    <artic artic="stacc" place="above"/>
+                </note>
+            </beam>
+            <beam>
+                <note xml:id="d414233e421" pname="c" oct="5" dur="8" stem.dir="down">
+                    <artic artic="stacc" place="above"/>
+                </note>
+                <note xml:id="d414233e445" pname="a" oct="5" dur="8" stem.dir="down" accid.ges="f">
+                    <artic artic="stacc" place="above"/>
+                </note>
+                <note xml:id="d414233e466" pname="g" oct="5" dur="8" stem.dir="down">
+                    <artic artic="stacc" place="above"/>
+                </note>
+            </beam>
+        </layer>
+    </staff>
+    <staff n="2">
+        <layer n="1">
+            <beam>
+                <note xml:id="d414233e486" pname="f" oct="2" dur="16" stem.dir="down"/>
+                <note xml:id="d414233e504" pname="c" oct="3" dur="16" stem.dir="down"/>
+                <note xml:id="d414233e522" pname="c" oct="4" dur="16" stem.dir="down"/>
+                <note xml:id="d414233e540" pname="c" oct="3" dur="16" stem.dir="down"/>
+                <note xml:id="d414233e558" pname="b" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
+                <note xml:id="d414233e578" pname="c" oct="3" dur="16" stem.dir="down"/>
+            </beam>
+            <beam>
+                <note xml:id="d414233e596" pname="f" oct="2" dur="16" stem.dir="down"/>
+                <note xml:id="d414233e614" pname="c" oct="3" dur="16" stem.dir="down"/>
+                <note xml:id="d414233e632" pname="a" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
+                <note xml:id="d414233e652" pname="c" oct="3" dur="16" stem.dir="down"/>
+                <note xml:id="d414233e670" pname="b" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
+                <note xml:id="d414233e691" pname="c" oct="3" dur="16" stem.dir="down"/>
+            </beam>
+        </layer>
+    </staff>
+    <dir staff="1" place="below" tstamp="1">cresc.</dir>
+    <hairpin form="cres" staff="1" tstamp="3" place="below" tstamp2="6.5"/>
+    <slur startid="#d414233e381" endid="#d414233e1055" curvedir="above"/>
+    <pedal dir="down" staff="2" tstamp="1"/>
+    <pedal dir="bounce" staff="2" tstamp="4"/>
+</measure>
+                    </section>
+                   </score>
+                   </mdiv>
+        </body>
+        </music>
+</mei>

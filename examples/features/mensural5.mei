@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Invisible barlines</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2018-07-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>In mensural notation, invisible lines help to layout the music</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001827838261">
+                <score xml:id="score-0000000724082292">
+                    <scoreDef xml:id="scoredef-0000001639055190" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000001042681310">
+                            <staffDef xml:id="staffdef-0000000264815307" clef.shape="C" clef.line="1" mensur.sign="C" mensur.slash="1" n="1" notationtype="mensural.white" lines="5">
+                                <label xml:id="label-0000001148571917" />
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000002008737742">
+                            <staff xml:id="staff-L6F1N1" n="1">
+                                <layer xml:id="layer-L6F1N1" n="1">
+                                    <note xml:id="note-L7F1" dur="semibrevis" oct="4" pname="c" accid.ges="n" />
+                                    <barLine/>
+                                    <note xml:id="note-L9F1" dur="semiminima" oct="3" pname="b" accid.ges="n" />
+                                    <note xml:id="note-L9F2" dur="semiminima" oct="4" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L9F3" dur="semiminima" oct="4" pname="d" accid.ges="n" />
+                                    <note xml:id="note-L9F4" dur="semiminima" oct="4" pname="e" accid.ges="n" />
+                                    <barLine visible="false" />
+                                    <note xml:id="note-L11F1" dur="semiminima" oct="4" pname="f" accid.ges="n" />
+                                    <note xml:id="note-L11F2" dur="semiminima" oct="4" pname="g" accid.ges="n" />
+                                    <note xml:id="note-L11F3" dur="minima" oct="4" pname="f" accid.ges="n" />
+                                    <barLine/>
+                                </layer>
+                            </staff>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
