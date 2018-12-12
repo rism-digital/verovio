@@ -22,6 +22,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "f.h"
 #include "fb.h"
 #include "fig.h"
 #include "functorparams.h"
@@ -173,6 +174,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, DIR);
     DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TRILL);
+    DrawSystemList(dc, system, FIGURE);
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
@@ -194,6 +196,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == DYNAM)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == FIGURE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
@@ -317,67 +322,15 @@ void View::DrawStaffGrp(
 
     // adjust the top and bottom according to staffline width
     x += barLineWidth / 2;
-    // yTop += m_doc->GetDrawingStaffLineWidth(100) / 1;
-    // yBottom -= m_doc->GetDrawingStaffLineWidth(100) / 4;
-
-    Label *label = dynamic_cast<Label *>(staffGrp->FindChildByType(LABEL, 1));
-    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffGrp->FindChildByType(LABELABBR, 1));
-    Object *graphic = label;
-
-    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
-    std::wstring labelStr = (label) ? label->GetText(label) : L"";
-
-    if (abbreviations) {
-        labelStr = labelAbbrStr;
-        graphic = labelAbbr;
-    }
-
-    if (graphic && (labelStr.length() != 0)) {
-        // HARDCODED
-        int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
-        int xLabel = x - space;
-        int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-
-        dc->SetBrush(m_currentColour, AxSOLID);
-
-        FontInfo grpTxt;
-        if (!dc->UseGlobalStyling()) {
-            grpTxt.SetFaceName("Times");
-        }
-
-        TextDrawingParams params;
-        params.m_x = xLabel;
-        params.m_y = yLabel;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
-
-        grpTxt.SetPointSize(params.m_pointSize);
-        dc->SetFont(&grpTxt);
-
-        dc->GetTextExtent(labelStr, &extend, true);
-
-        dc->StartGraphic(graphic, "", graphic->GetUuid());
-
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
-        DrawTextChildren(dc, graphic, params);
-        dc->EndText();
-
-        dc->EndGraphic(graphic, this);
-
-        // keep the widest width for the system
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-        if (system) {
-            system->SetDrawingLabelsWidth(extend.m_width + space);
-        }
-
-        // also store in the system the maximum width with abbreviations
-        if (system && !abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend, true);
-            system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
-        }
-
-        dc->ResetFont();
-        dc->ResetBrush();
-    }
+    
+    // HARDCODED
+    int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
+    int xLabel = x - space;
+    int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+    
+    System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+    
+    this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
 
     // actually draw the line, the brace or the bracket
     if (topStaffGrp && ((firstDef != lastDef) || (staffGrp->GetSymbol() != staffGroupingSym_SYMBOL_NONE))) {
@@ -412,8 +365,6 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
     assert(measure);
     assert(scoreDef);
 
-    TextExtend extend;
-
     const ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
     ListOfObjects::const_iterator iter = scoreDefChildren->begin();
     while (iter != scoreDefChildren->end()) {
@@ -439,68 +390,89 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             ++iter;
             continue;
         }
-
-        Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
-        LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffDef->FindChildByType(LABELABBR, 1));
-        Object *graphic = label;
-
-        std::wstring labelStr = (label) ? label->GetText(label) : L"";
-        std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
-
-        if (abbreviations) {
-            labelStr = labelAbbrStr;
-            graphic = labelAbbr;
-        }
-
-        if (!graphic || (labelStr.length() == 0)) {
-            ++iter;
-            continue;
-        }
-
+        
         // HARDCODED
         int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
+        if (staffDef->IsInBraceAndBracket()) {
+            space *= 2;
+        }
         int x = system->GetDrawingX() - space;
         int y = staff->GetDrawingY()
-            - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-
-        FontInfo labelTxt;
-        if (!dc->UseGlobalStyling()) {
-            labelTxt.SetFaceName("Times");
-        }
-
-        TextDrawingParams params;
-        params.m_x = x;
-        params.m_y = y;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
-
-        labelTxt.SetPointSize(params.m_pointSize);
-
-        dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&labelTxt);
-
-        dc->GetTextExtent(labelStr, &extend, true);
-
-        dc->StartGraphic(graphic, "", graphic->GetUuid());
-
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
-        DrawTextChildren(dc, graphic, params);
-        dc->EndText();
-
-        dc->EndGraphic(graphic, this);
-
-        // keep the widest width for the system
-        system->SetDrawingLabelsWidth(extend.m_width + space);
-        // also store in the system the maximum width with abbreviations for justification
-        if (!abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend, true);
-            system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
-        }
-
-        dc->ResetFont();
-        dc->ResetBrush();
+        - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        
+        this->DrawLabels(dc, measure, system, staffDef, x, y, abbreviations, staff->m_drawingStaffSize, space);
 
         ++iter;
     }
+}
+    
+void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
+{
+    assert(dc);
+    assert(measure);
+    assert(system);
+    assert(object->Is({STAFFDEF, STAFFGRP}));
+    
+    Label *label = dynamic_cast<Label *>(object->FindChildByType(LABEL, 1));
+    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindChildByType(LABELABBR, 1));
+    Object *graphic = label;
+    
+    std::wstring labelStr = (label) ? label->GetText(label) : L"";
+    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+    
+    if (abbreviations) {
+        labelStr = labelAbbrStr;
+        graphic = labelAbbr;
+    }
+    
+    if (!graphic || (labelStr.length() == 0)) {
+        return;
+    }
+
+    FontInfo labelTxt;
+    if (!dc->UseGlobalStyling()) {
+        labelTxt.SetFaceName("Times");
+    }
+    labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staffSize)->GetPointSize());
+    
+    int lineCount = graphic->GetChildCount(LB) + 1;
+    if (lineCount > 1) {
+        y += (m_doc->GetTextLineHeight(&labelTxt, false) * (lineCount - 1) / 2);
+    }
+
+    TextDrawingParams params;
+    params.m_x = x;
+    params.m_y = y;
+    params.m_pointSize = labelTxt.GetPointSize();
+    
+    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetFont(&labelTxt);
+    
+    dc->StartGraphic(graphic, "", graphic->GetUuid());
+    
+    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
+    DrawTextChildren(dc, graphic, params);
+    dc->EndText();
+    
+    dc->EndGraphic(graphic, this);
+    
+    // keep the widest width for the system - careful: this can be the label OR labelAbbr
+    system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
+    // also store in the system the maximum width with abbreviations for justification
+    if (!abbreviations && (labelAbbrStr.length() > 0)) {
+        TextExtend extend;
+        std::vector<std::wstring> lines;
+        labelAbbr->GetTextLines(labelAbbr, lines);
+        int maxLength = 0;
+        for (auto const &line : lines) {
+            dc->GetTextExtent(line, &extend, true);
+            maxLength = (extend.m_width > maxLength) ? extend.m_width : maxLength;
+        }
+        system->SetDrawingAbbrLabelsWidth(maxLength + space);
+    }
+    
+    dc->ResetFont();
+    dc->ResetBrush();
 }
 
 void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)

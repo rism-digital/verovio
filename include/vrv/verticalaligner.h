@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class AdjustFloatingPostionerGrpsParams;
 class FloatingObject;
 class StaffAlignment;
 class SystemAligner;
@@ -121,6 +122,12 @@ public:
     void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY, char spanningType);
 
     /**
+     * Look for the first FloatingPositioner corresponding to the FloatingObject of the ClassId.
+     * Return NULL if not found and does not create anything.
+     */
+    FloatingPositioner *FindFirstFloatingPositioner(ClassId classId);
+    
+    /**
      * Look for the FloatingPositioner corresponding to the FloatingObject.
      * Return NULL if not found and does not create anything.
      */
@@ -181,6 +188,8 @@ public:
      */
     void FindAllIntersectionPoints(
         SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
+    
+    void ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params, const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
 
     //----------//
     // Functors //

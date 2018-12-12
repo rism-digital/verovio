@@ -582,18 +582,6 @@ int Layer::CalcStem(FunctorParams *)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::AdjustSylSpacing(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // reset it
-    params->m_overlapingSyl.clear();
-    params->m_previousSyl = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 {
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);

@@ -24,6 +24,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "functorparams.h"
@@ -267,11 +268,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
-        if (element->IsControlElement())
+        if (element->IsControlElement()) {
             if (!system->SetCurrentFloatingPositioner(
                     (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
                 continue;
             }
+        }
 
         if (element->Is(DIR)) {
             // cast to Dir check in DrawDirConnector
@@ -280,6 +282,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         if (element->Is(DYNAM)) {
             // cast to Dynam check in DrawDynamConnector
             DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        if (element->Is(FIGURE)) {
+            // cast to Dynam check in DrawDynamConnector
+            DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -869,6 +875,60 @@ void View::DrawControlElementConnector(
     else
         dc->EndGraphic(dynam, this);
 }
+    
+void View::DrawFConnector(
+    DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    
+    assert(f);
+    assert(f->GetStart() && f->GetEnd());
+    if (!f->GetStart() || !f->GetEnd()) return;
+
+    int y = GetFYRel(f, staff);
+    TextExtend extend;
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (spanningType == SPANNING_START_END) {
+        x1 = f->GetContentRight();
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if (spanningType == SPANNING_START) {
+        x1 = f->GetContentRight();
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if (spanningType == SPANNING_END) {
+        // nothing to adjust
+    }
+    else {
+        // nothing to adjust
+    }
+
+    
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // object
+    // in order not to reset the Syl bounding box.
+    F fConnector;
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else
+        dc->StartGraphic(&fConnector, "spanning-connector", "");
+
+    dc->DeactivateGraphic();
+
+    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // Adjust it proportionally to the lyric size
+    width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+    DrawFilledRectangle(dc, x1, y, x2, y + width);
+    
+    dc->ReactivateGraphic();
+    
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else
+        dc->EndGraphic(&fConnector, this);
+}
 
 void View::DrawSylConnector(
     DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
@@ -879,26 +939,41 @@ void View::DrawSylConnector(
 
     int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
     TextExtend extend;
+    
+    // the length of the dash and the space between them
+    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
+    // Adjust it proportionally to the lyric size
+    dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
-        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &extend, true);
-        dc->ResetFont();
-        // x position of the syl is two units back
-        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 = syl->GetContentRight();
+        if (syl->m_nextWordSyl) {
+            x2 = syl->m_nextWordSyl->GetContentLeft();
+        }
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &extend, true);
-        dc->ResetFont();
-        // idem
-        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 = syl->GetContentRight();
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
-        // nothing to adjust
+        // If we do not want to show hyphens at start of a syatem and the the end is at time 0.0
+        if (m_options->m_lyricNoStartHyphen.GetValue() && (syl->GetEnd()->GetAlignment()->GetTime() == 0.0)) {
+            // Return but only if the end is in the first measure of the system...
+            Measure *measure = dynamic_cast<Measure *>(syl->GetEnd()->GetFirstParent(MEASURE));
+            assert(measure);
+            System *system = dynamic_cast<System*>(measure->GetFirstParent(SYSTEM));
+            assert(system);
+            if (measure == dynamic_cast<Measure*>(system->FindChildByType(MEASURE))) {
+                return;
+            }
+        }
+        // Otherwise just adjust x2
+        if (syl->m_nextWordSyl) {
+            x2 = syl->m_nextWordSyl->GetContentLeft();
+        }
+        x1 -= (dashLength / 2);
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
@@ -921,6 +996,7 @@ void View::DrawSylConnector(
     DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
 
     dc->ReactivateGraphic();
+    
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -930,6 +1006,10 @@ void View::DrawSylConnector(
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
 {
+    if (dc->Is(BBOX_DEVICE_CONTEXT)) {
+        return;
+    }
+    
     int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
@@ -937,30 +1017,24 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     if (syl->GetCon() == sylLog_CON_d) {
 
         y += (m_options->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
-        // x position of the syl is two units back
-        x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        // if (x1 > x2) {
-        //    DrawFilledRectangle(dc, x1, y + 2 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 *
-        //    m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
-        //    LogDebug("x1 > x2 (%d %d)", x1, x2);
-        //}
-
-        // the length of the dash and the space between them - can be made a parameter
-        int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
-        int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
+        // the length of the dash and the space between them
+        int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
+        // Adjust it proportionally to the lyric size
+        dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
         int halfDashLength = dashLength / 2;
-
+        
+        int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         int dist = x2 - x1;
         int nbDashes = dist / dashSpace;
 
         int margin = dist / 2;
         // no dash if the distance is smaller than a dash length
         if (dist < dashLength) {
-            nbDashes = 0;
+            LogDebug("Hyphen space under the limit");
         }
-        // at least one dash
-        else if (nbDashes < 2) {
+        
+        if (nbDashes < 2) {
             nbDashes = 1;
         }
         else {
@@ -972,8 +1046,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
-            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+           DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
         }
+        //DrawFilledRectangle(dc, x1, y, x2, y + width);
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
@@ -1219,8 +1294,8 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     dc->StartGraphic(fb, "", fb->GetUuid());
 
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    int descender = -m_doc->GetTextGlyphDescender(L'q', fontDim, false);
-    int height = m_doc->GetTextGlyphHeight(L'1', fontDim, false);
+    int lineHeight =  m_doc->GetTextLineHeight(fontDim, false);
+    int startX = params.m_x;
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
 
@@ -1242,7 +1317,8 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
         }
         dc->EndText();
 
-        params.m_y -= (descender + height);
+        params.m_y -= lineHeight;
+        params.m_x = startX;
     }
 
     dc->ResetFont();
@@ -1700,15 +1776,23 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         }
         int y = turn->GetDrawingY();
 
+        if (turn->HasAccidupper()) {
+            int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+            wchar_t accid = Accid::GetAccidGlyph(turn->GetAccidupper());
+            std::wstring accidStr;
+            accidStr.push_back(accid);
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            int accidYShit = m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true);
+            DrawSmuflString(dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+        }
         if (turn->HasAccidlower()) {
             int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
             wchar_t accid = Accid::GetAccidGlyph(turn->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x + accidXShift, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
-            // Adjust the y position
-            y = y + m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+            int accidYShit = -m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+            DrawSmuflString(dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
         }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));

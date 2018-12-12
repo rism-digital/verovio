@@ -1255,6 +1255,14 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
     if (graceSize) y = y * this->m_options->m_graceFactor.GetValue();
     return y;
 }
+    
+int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
+{
+    int descender = -this->GetTextGlyphDescender(L'q', font, graceSize);
+    int height = this->GetTextGlyphHeight(L'I', font, graceSize);
+    
+    return ((descender + height) * 1.1);
+}
 
 int Doc::GetDrawingUnit(int staffSize) const
 {

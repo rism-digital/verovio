@@ -600,6 +600,21 @@ int Object::GetChildIndex(const Object *child)
     }
     return -1;
 }
+    
+int Object::GetChildIndex(const Object *child, const ClassId classId, int deepth)
+{
+    ArrayOfObjects objects;
+    AttComparison matchClassId(classId);
+    this->FindAllChildByComparison(&objects, &matchClassId);
+    ArrayOfObjects::iterator iter;
+    int i;
+    for (iter = objects.begin(), i = 0; iter != objects.end(); ++iter, ++i) {
+        if (child == *iter) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 void Object::Modify(bool modified)
 {
@@ -878,19 +893,42 @@ std::wstring TextListInterface::GetText(Object *node)
     std::wstring concatText;
     const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
     for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+        if ((*it)->Is(LB)) {
+            continue;
+        }
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
     }
     return concatText;
 }
+    
+void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &lines)
+{
+    // alternatively we could cache the concatString in the interface and instantiate it in FilterList
+    std::wstring concatText;
+    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+        if ((*it)->Is(LB) && !concatText.empty()) {
+            lines.push_back(concatText);
+            concatText.clear();
+            continue;
+        }
+        Text *text = dynamic_cast<Text *>(*it);
+        assert(text);
+        concatText += text->GetText();
+    }
+    if (!concatText.empty()) {
+        lines.push_back(concatText);
+    }
+}
 
 void TextListInterface::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
     while (iter != childList->end()) {
-        if (!(*iter)->Is(TEXT)) {
-            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+        if (!(*iter)->Is({LB, TEXT})) {
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
             iter = childList->erase(iter);
             continue;
         }

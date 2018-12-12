@@ -897,7 +897,7 @@ void SegmentedLine::AddGap(int start, int end)
     if (m_segments.empty()) return;
 
     // insert the gap
-    std::vector<std::pair<int, int> >::iterator iter = m_segments.begin();
+    ArrayOfIntPairs::iterator iter = m_segments.begin();
     while (iter != m_segments.end()) {
         // drop the segment because the gap encompass it
         if ((start <= iter->first) && (end >= iter->second)) {

@@ -23,6 +23,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "ftrem.h"

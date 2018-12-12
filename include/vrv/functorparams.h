@@ -261,8 +261,13 @@ public:
 
 class AdjustFloatingPostionerGrpsParams : public FunctorParams {
 public:
-    AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
+    AdjustFloatingPostionerGrpsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_place = STAFFREL_basic_above;
+    }
     std::vector<ClassId> m_classIds;
+    data_STAFFREL_basic m_place;
     Doc *m_doc;
 };
 
@@ -301,10 +306,16 @@ public:
     AdjustSylSpacingParams(Doc *doc)
     {
         m_previousSyl = NULL;
+        m_previousMeasure = NULL;
+        m_freeSpace = 0;
+        m_staffSize = 100;
         m_doc = doc;
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
     Syl *m_previousSyl;
+    Measure *m_previousMeasure;
+    int m_freeSpace;
+    int m_staffSize;
     Doc *m_doc;
 };
 

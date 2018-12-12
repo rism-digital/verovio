@@ -483,9 +483,12 @@ public:
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
     OptionDbl m_leftPosition;
+    OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricHyphenWidth;
+    OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
     OptionDbl m_lyricTopMinMargin;
+    OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
     OptionInt m_slurControlPoints;
@@ -495,6 +498,7 @@ public:
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
     OptionDbl m_slurThickness;
+    OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
     OptionInt m_spacingStaff;
