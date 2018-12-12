@@ -346,7 +346,7 @@ bool Toolkit::LoadData(const std::string &data)
         }
 
         if (!tempinput->ImportString(data)) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (1)");
             delete tempinput;
             return false;
         }
@@ -392,7 +392,7 @@ bool Toolkit::LoadData(const std::string &data)
         tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (2)");
             delete tempinput;
             return false;
         }
@@ -422,7 +422,7 @@ bool Toolkit::LoadData(const std::string &data)
         tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (3)");
             delete tempinput;
             return false;
         }
@@ -450,7 +450,7 @@ bool Toolkit::LoadData(const std::string &data)
         tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (4)");
             delete tempinput;
             return false;
         }
