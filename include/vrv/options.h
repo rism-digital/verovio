@@ -488,6 +488,7 @@ public:
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
     OptionDbl m_lyricTopMinMargin;
+    OptionDbl m_lyricWordSpace;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
     OptionInt m_slurControlPoints;
