@@ -455,6 +455,52 @@ bool AttBeatRptLog::HasBeatdef() const
 /* include <attbeatdef> */
 
 //----------------------------------------------------------------------------
+// AttBracketSpanLog
+//----------------------------------------------------------------------------
+
+AttBracketSpanLog::AttBracketSpanLog() : Att()
+{
+    ResetBracketSpanLog();
+}
+
+AttBracketSpanLog::~AttBracketSpanLog()
+{
+}
+
+void AttBracketSpanLog::ResetBracketSpanLog()
+{
+    m_func = "";
+}
+
+bool AttBracketSpanLog::ReadBracketSpanLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToStr(element.attribute("func").value()));
+        element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttBracketSpanLog::WriteBracketSpanLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttBracketSpanLog::HasFunc() const
+{
+    return (m_func != "");
+}
+
+/* include <attfunc> */
+
+//----------------------------------------------------------------------------
 // AttCutout
 //----------------------------------------------------------------------------
 
@@ -1743,6 +1789,14 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
     }
+    if (element->HasAttClass(ATT_BRACKETSPANLOG)) {
+        AttBracketSpanLog *att = dynamic_cast<AttBracketSpanLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_CUTOUT)) {
         AttCutout *att = dynamic_cast<AttCutout *>(element);
         assert(att);
@@ -2043,6 +2097,13 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasBeatdef()) {
             attributes->push_back(std::make_pair("beatdef", att->DblToStr(att->GetBeatdef())));
+        }
+    }
+    if (element->HasAttClass(ATT_BRACKETSPANLOG)) {
+        const AttBracketSpanLog *att = dynamic_cast<const AttBracketSpanLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {

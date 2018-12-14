@@ -356,6 +356,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttBracketSpanLog
+//----------------------------------------------------------------------------
+
+class AttBracketSpanLog : public Att {
+public:
+    AttBracketSpanLog();
+    virtual ~AttBracketSpanLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetBracketSpanLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadBracketSpanLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteBracketSpanLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(std::string func_) { m_func = func_; }
+    std::string GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    std::string m_func;
+
+    /* include <attfunc> */
+};
+
+//----------------------------------------------------------------------------
 // AttCutout
 //----------------------------------------------------------------------------
 
@@ -825,7 +861,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     meterSigGrpLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -987,7 +1023,7 @@ public:
 private:
     /** Records the position of the piano damper pedal. **/
     pedalLog_DIR m_dir;
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
 
     /* include <attfunc> */

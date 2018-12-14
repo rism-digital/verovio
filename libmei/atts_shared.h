@@ -55,7 +55,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     accidLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -5008,7 +5008,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     tempoLog_FUNC m_func;
 
     /* include <attfunc> */
