@@ -22,6 +22,7 @@
 #include "beam.h"
 #include "beatrpt.h"
 #include "boundary.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
 #include "chord.h"
@@ -344,6 +345,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(ARPEG)) {
         m_currentNode = m_currentNode.append_child("arpeg");
         WriteArpeg(m_currentNode, dynamic_cast<Arpeg *>(object));
+    }
+    else if (object->Is(BRACKETSPAN)) {
+        m_currentNode = m_currentNode.append_child("bracketSpan");
+        WriteBracketSpan(m_currentNode, dynamic_cast<BracketSpan *>(object));
     }
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
@@ -1068,6 +1073,17 @@ void MeiOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     arpeg->WriteColor(currentNode);
 }
 
+void MeiOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
+{
+    assert(bracketSpan);
+    
+    WriteControlElement(currentNode, bracketSpan);
+    WriteTimePointInterface(currentNode, bracketSpan);
+    bracketSpan->WriteBracketSpanLog(currentNode);
+    bracketSpan->WriteColor(currentNode);
+    bracketSpan->WritePlacement(currentNode);
+}
+    
 void MeiOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
 {
     assert(breath);
@@ -3311,6 +3327,9 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "arpeg") {
             success = ReadArpeg(parent, current);
         }
+        else if (std::string(current.name()) == "bracketSpan") {
+            success = ReadBracketSpan(parent, current);
+        }
         else if (std::string(current.name()) == "breath") {
             success = ReadBreath(parent, current);
         }
@@ -3406,6 +3425,21 @@ bool MeiInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
 
     parent->AddChild(vrvArpeg);
     ReadUnsupportedAttr(arpeg, vrvArpeg);
+    return true;
+}
+    
+bool MeiInput::ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan)
+{
+    BracketSpan *vrvBracketSpan = new BracketSpan();
+    ReadControlElement(bracketSpan, vrvBracketSpan);
+
+    ReadTimePointInterface(bracketSpan, vrvBracketSpan);
+    vrvBracketSpan->ReadBracketSpanLog(bracketSpan);
+    vrvBracketSpan->ReadColor(bracketSpan);
+    vrvBracketSpan->ReadPlacement(bracketSpan);
+
+    parent->AddChild(vrvBracketSpan);
+    ReadUnsupportedAttr(bracketSpan, vrvBracketSpan);
     return true;
 }
 

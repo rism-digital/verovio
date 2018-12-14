@@ -118,6 +118,7 @@ enum ClassId {
     CONTROL_ELEMENT,
     ANCHORED_TEXT,
     ARPEG,
+    BRACKETSPAN,
     BREATH,
     DIR,
     DYNAM,

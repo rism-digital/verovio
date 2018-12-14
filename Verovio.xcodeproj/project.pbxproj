@@ -482,6 +482,10 @@
 		4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE644F41EDBEA01002FBE6C /* breath.cpp */; };
+		4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE96E3821C4370E00CB85BE /* bracketspan.h */; };
+		4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
+		4DE96E3C21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
+		4DE96E3D21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEEDE631E617C930087E8BC /* elementpart.cpp */; };
 		4DEF8A6221B7AACC0093A76B /* f.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEF8A6121B7AACC0093A76B /* f.h */; };
@@ -858,6 +862,8 @@
 		4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_text.cpp; path = src/view_text.cpp; sourceTree = "<group>"; };
 		4DE644F31EDBE9F8002FBE6C /* breath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = breath.h; path = include/vrv/breath.h; sourceTree = "<group>"; };
 		4DE644F41EDBEA01002FBE6C /* breath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = breath.cpp; path = src/breath.cpp; sourceTree = "<group>"; };
+		4DE96E3821C4370E00CB85BE /* bracketspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bracketspan.h; path = include/vrv/bracketspan.h; sourceTree = "<group>"; };
+		4DE96E3A21C4373200CB85BE /* bracketspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bracketspan.cpp; path = src/bracketspan.cpp; sourceTree = "<group>"; };
 		4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmn.cpp; path = libmei/atts_cmn.cpp; sourceTree = "<group>"; };
 		4DEE28F01940BCC100C76319 /* atts_cmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_cmn.h; path = libmei/atts_cmn.h; sourceTree = "<group>"; };
 		4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmnornaments.cpp; path = libmei/atts_cmnornaments.cpp; sourceTree = "<group>"; };
@@ -1237,6 +1243,8 @@
 				4DB3510D1C80409E002DD057 /* anchoredtext.h */,
 				4D6331F41F46D2CB00A0D6BF /* arpeg.cpp */,
 				4D6331F21F46D2B400A0D6BF /* arpeg.h */,
+				4DE96E3A21C4373200CB85BE /* bracketspan.cpp */,
+				4DE96E3821C4370E00CB85BE /* bracketspan.h */,
 				4DE644F41EDBEA01002FBE6C /* breath.cpp */,
 				4DE644F31EDBE9F8002FBE6C /* breath.h */,
 				4DB351111C8040B1002DD057 /* dir.cpp */,
@@ -1648,6 +1656,7 @@
 				4D4FCD101F5457020009C455 /* staffdef.h in Headers */,
 				4D1BE7791C6942930086DC0E /* pugixml.hpp in Headers */,
 				4DF440751D39567A00152B7E /* ending.h in Headers */,
+				4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */,
 				4DB3D8B41F83D08700B5FC2B /* devicecontextbase.h in Headers */,
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
 				4D1BE7821C69434C0086DC0E /* MidiFile.h in Headers */,
@@ -1828,6 +1837,7 @@
 				4DB3D8981F7C325C00B5FC2B /* lb.cpp in Sources */,
 				4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */,
 				4D16940B1E3A44F300569BF4 /* keysig.cpp in Sources */,
+				4DE96E3C21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4D16940C1E3A44F300569BF4 /* atts_midi.cpp in Sources */,
 				4D16940D1E3A44F300569BF4 /* hairpin.cpp in Sources */,
 				4DB3D8FC1F83D1FD00B5FC2B /* horizontalaligner.cpp in Sources */,
@@ -2049,6 +2059,7 @@
 				4DB351151C8040B1002DD057 /* tempo.cpp in Sources */,
 				4D94721F20CA702C00C780C8 /* linkinginterface.cpp in Sources */,
 				4D64137E2035F68600BB630E /* mdiv.cpp in Sources */,
+				4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				403BEFEE206C00B500D022D5 /* mrpt.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
@@ -2210,6 +2221,7 @@
 				4D766F0320ACAD6E006875D8 /* neume.cpp in Sources */,
 				4D94722120CA702C00C780C8 /* linkinginterface.cpp in Sources */,
 				4DB3D8EB1F83D18000B5FC2B /* proport.cpp in Sources */,
+				4DE96E3D21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4D6331F71F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4DB78743201F9F7300394520 /* svg.cpp in Sources */,
 				4DB3D8F61F83D1DC00B5FC2B /* view_mensural.cpp in Sources */,
