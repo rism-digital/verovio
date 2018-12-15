@@ -18,6 +18,7 @@
 #include "arpeg.h"
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "devicecontext.h"
 #include "dir.h"
@@ -150,7 +151,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ SLUR, HAIRPIN, OCTAVE, TIE })) return;
+            if (element->Is({ SLUR, BRACKETSPAN, HAIRPIN, OCTAVE, TIE })) return;
         }
     }
 
@@ -287,6 +288,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             // cast to Dynam check in DrawDynamConnector
             DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
+        else if (element->Is(BRACKETSPAN)) {
+            // cast to BracketSpan check in DrawBracketSpan
+            DrawBracketSpan(dc, dynamic_cast<BracketSpan *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
         else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
@@ -318,6 +323,55 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 }
 
+void View::DrawBracketSpan(
+    DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(bracketSpan);
+    assert(staff);
+    
+    if (!bracketSpan->HasFunc()) {
+        // we cannot draw a bracketSpan that has no func
+        return;
+    }
+    
+    int y = bracketSpan->GetDrawingY();
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (spanningType == SPANNING_START_END) {
+        //x1 = f->GetContentRight();
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if (spanningType == SPANNING_START) {
+        //x1 = f->GetContentRight();
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if (spanningType == SPANNING_END) {
+        // nothing to adjust
+    }
+    else {
+        // nothing to adjust
+    }
+
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else {
+        dc->StartGraphic(bracketSpan, "spanning-bracketspan", "");
+    }
+
+    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // Adjust it proportionally to the lyric size
+    width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+    DrawFilledRectangle(dc, x1, y, x2, y + width);
+    
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(bracketSpan, this);
+    }
+}
+    
 void View::DrawHairpin(
     DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
