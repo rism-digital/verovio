@@ -45,6 +45,11 @@ std::string Att::IntToStr(int data) const
     return StringFormat("%d", data);
 }
 
+std::string Att::VUToStr(data_VU data) const
+{
+    return StringFormat("%fvu", data);
+}
+
 // Basic converters for reading
 
 double Att::StrToDbl(std::string value) const
@@ -55,6 +60,16 @@ double Att::StrToDbl(std::string value) const
 int Att::StrToInt(std::string value) const
 {
     return atoi(value.c_str());
+}
+
+data_VU Att::StrToVU(std::string value, bool logWarning) const
+{
+    std::regex test("[0-9]*(\\.[0-9]+)?(vu)");
+    if (!std::regex_match(value, test)) {
+        if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
+        return VRV_UNSET;
+    }
+    return atof(value.substr(0, value.find("vu")).c_str());
 }
 
 // Converters for writing and reading
@@ -275,6 +290,30 @@ data_FONTSIZE Att::StrToFontsize(std::string value, bool logWarning) const
     data.SetTerm(StrToFontsizeterm(value, false));
     if (data.HasValue()) return data;
     data.SetPercent(StrToPercent(value, false));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+
+    return data;
+}
+
+std::string Att::LinewidthToStr(data_LINEWIDTH data) const
+{
+    std::string value;
+    if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm)
+        value = data.GetLineWithTerm();
+    else if (data.GetType() == LINEWIDTHTYPE_measurementAbs)
+        value = VUToStr(data.GetMeasurementAbs());
+
+    return value;
+}
+
+data_LINEWIDTH Att::StrToLinewidth(std::string value, bool logWarning) const
+{
+    data_LINEWIDTH data;
+    data.SetLineWidthTerm(StrToLinewidthterm(value, false));
+    if (data.HasValue()) return data;
+    data.SetMeasurementAbs(StrToInt(value));
     if (data.HasValue()) return data;
 
     if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());

@@ -30,11 +30,15 @@ BracketSpan::BracketSpan()
     , TimeSpanningInterface()
     , AttBracketSpanLog()
     , AttColor()
+    , AttLineRend()
+    , AttLineRendBase()
     , AttPlacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_BRACKETSPANLOG);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_LINEREND);
+    RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
@@ -48,6 +52,8 @@ void BracketSpan::Reset()
     TimeSpanningInterface::Reset();
     ResetBracketSpanLog();
     ResetColor();
+    ResetLineRend();
+    ResetLineRendBase();
     ResetPlacement();
 }
 

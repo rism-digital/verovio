@@ -25,6 +25,8 @@ class BracketSpan : public ControlElement,
                     public TimeSpanningInterface,
                     public AttBracketSpanLog,
                     public AttColor,
+                    public AttLineRend,
+                    public AttLineRendBase,
                     public AttPlacement {
 public:
     /**
