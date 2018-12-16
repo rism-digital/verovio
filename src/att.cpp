@@ -64,7 +64,7 @@ int Att::StrToInt(std::string value) const
 
 data_VU Att::StrToVU(std::string value, bool logWarning) const
 {
-    std::regex test("[0-9]*(\\.[0-9]+)?(vu)");
+    std::regex test("[0-9]*(\\.[0-9]+)?(vu)?");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
         return VRV_UNSET;
@@ -313,10 +313,10 @@ data_LINEWIDTH Att::StrToLinewidth(std::string value, bool logWarning) const
     data_LINEWIDTH data;
     data.SetLineWidthTerm(StrToLinewidthterm(value, false));
     if (data.HasValue()) return data;
-    data.SetMeasurementAbs(StrToInt(value));
+    data.SetMeasurementAbs(StrToVU(value));
     if (data.HasValue()) return data;
 
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());
 
     return data;
 }

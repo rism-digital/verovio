@@ -358,11 +358,64 @@ void View::DrawBracketSpan(
     else {
         dc->StartGraphic(bracketSpan, "spanning-bracketspan", "");
     }
-
-    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    // Adjust it proportionally to the lyric size
-    width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
-    DrawFilledRectangle(dc, x1, y, x2, y + width);
+    
+    int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    if (bracketSpan->HasLwidth()) {
+        if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
+            if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
+                lineWidth *= LINEWIDTHTERM_factor_narrow;
+            }
+            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
+                lineWidth *= LINEWIDTHTERM_factor_medium;
+            }
+            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
+                lineWidth *= LINEWIDTHTERM_factor_wide;
+            }
+        }
+        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
+            if (bracketSpan->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+        }
+    }
+    
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
+            DrawFilledRectangle(dc, x1, y, x1 + bracketSize, y + lineWidth);
+        }
+        DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y - bracketSize);
+    }
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
+            DrawFilledRectangle(dc, x2 - bracketSize, y, x2, y + lineWidth);
+        }
+        DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y - bracketSize);
+    }
+    if (bracketSpan->HasLform()) {
+        if (bracketSpan->GetLform() == LINEFORM_solid) {
+            DrawFilledRectangle(dc, x1, y, x2, y - lineWidth);
+        }
+        else if (bracketSpan->GetLform() == LINEFORM_dashed) {
+            dc->SetPen(m_currentColour, lineWidth, AxSOLID, bracketSize);
+            dc->SetBrush(m_currentColour, AxSOLID);
+            int yDotted = y + lineWidth / 2;
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(yDotted), ToDeviceContextX(x2), ToDeviceContextY(yDotted));
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
+        else if (bracketSpan->GetLform() == LINEFORM_dotted) {
+            dc->SetPen(m_currentColour, lineWidth, AxSOLID, lineWidth);
+            dc->SetBrush(m_currentColour, AxSOLID);
+            int x1Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
+            int x2Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
+            int yDotted = y + lineWidth / 2;
+            dc->DrawLine(ToDeviceContextX(x1Dotted), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted), ToDeviceContextY(yDotted));
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
+    }
     
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -558,11 +611,14 @@ void View::DrawOctave(
         int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         if (octave->HasLwidth()) {
             if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
-                if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
-                    lineWidth *= 4;
+                if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
+                    lineWidth *= LINEWIDTHTERM_factor_narrow;
                 }
                 else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
-                    lineWidth *= 2;
+                    lineWidth *= LINEWIDTHTERM_factor_medium;
+                }
+                else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
+                    lineWidth *= LINEWIDTHTERM_factor_wide;
                 }
             }
             else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
