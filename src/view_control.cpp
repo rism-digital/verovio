@@ -338,11 +338,11 @@ void View::DrawBracketSpan(
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
-        //x1 = f->GetContentRight();
+        // nothing to adjust
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        //x1 = f->GetContentRight();
+        // nothing to adjust
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
@@ -360,8 +360,8 @@ void View::DrawBracketSpan(
     }
     
     int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    
     int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    
     if (bracketSpan->HasLwidth()) {
         if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
             if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
@@ -381,18 +381,24 @@ void View::DrawBracketSpan(
         }
     }
     
+    // Opening bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
+        // (Do draw the horizontal line for doted lines at it looks better)
         if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
             DrawFilledRectangle(dc, x1, y, x1 + bracketSize, y + lineWidth);
         }
         DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y - bracketSize);
     }
+    // Closing bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        // Ditto
         if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
             DrawFilledRectangle(dc, x2 - bracketSize, y, x2, y + lineWidth);
         }
         DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y - bracketSize);
     }
+    // We have a @lform - draw a full line
     if (bracketSpan->HasLform()) {
         if (bracketSpan->GetLform() == LINEFORM_solid) {
             DrawFilledRectangle(dc, x1, y, x2, y - lineWidth);
@@ -408,6 +414,7 @@ void View::DrawBracketSpan(
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
             dc->SetPen(m_currentColour, lineWidth, AxSOLID, lineWidth);
             dc->SetBrush(m_currentColour, AxSOLID);
+            // Adjust the start and end because the horizontal line of the was drawn in that case
             int x1Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
             int x2Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
             int yDotted = y + lineWidth / 2;
