@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        subst.cpp
+// Name:        app.cpp
 // Author:      Laurent Pugin
 // Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "subst.h"
+#include "app.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,47 +13,44 @@
 
 //----------------------------------------------------------------------------
 
-#include "add.h"
-#include "del.h"
+#include "lem.h"
+#include "rdg.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Subst
+// App
 //----------------------------------------------------------------------------
 
-Subst::Subst() : EditorialElement("subst-")
+App::App() : EditorialElement("app-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
     Reset();
 }
 
-Subst::Subst(EditorialLevel level) : EditorialElement("subst-")
+App::App(EditorialLevel level) : EditorialElement("app-")
 {
     m_level = level;
 
     Reset();
 }
 
-void Subst::Reset()
+void App::Reset()
 {
     EditorialElement::Reset();
 }
 
-Subst::~Subst() {}
+App::~App() {}
 
-void Subst::AddChild(Object *child)
+void App::AddChild(Object *child)
 {
-    if (child->Is(ADD)) {
-        assert(dynamic_cast<Add *>(child));
+    if (child->Is(LEM)) {
+        assert(dynamic_cast<Lem *>(child));
     }
-    else if (child->Is(DEL)) {
-        assert(dynamic_cast<Del *>(child));
-    }
-    else if (child->Is(SUBST)) {
-        assert(dynamic_cast<Subst *>(child));
+    else if (child->Is(RDG)) {
+        assert(dynamic_cast<Rdg *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -66,7 +63,7 @@ void Subst::AddChild(Object *child)
 }
 
 //----------------------------------------------------------------------------
-// Subst functor methods
+// functor methods
 //----------------------------------------------------------------------------
 
 } // namespace vrv

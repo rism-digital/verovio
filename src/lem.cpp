@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        subst.cpp
+// Name:        lem.cpp
 // Author:      Laurent Pugin
 // Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "subst.h"
+#include "lem.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,60 +13,31 @@
 
 //----------------------------------------------------------------------------
 
-#include "add.h"
-#include "del.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Subst
+// Lem
 //----------------------------------------------------------------------------
 
-Subst::Subst() : EditorialElement("subst-")
+Lem::Lem() : EditorialElement("lem-"), AttSource()
 {
-    m_level = EDITORIAL_UNDEFINED;
+    RegisterAttClass(ATT_SOURCE);
 
     Reset();
 }
 
-Subst::Subst(EditorialLevel level) : EditorialElement("subst-")
-{
-    m_level = level;
+Lem::~Lem() {}
 
-    Reset();
-}
-
-void Subst::Reset()
+void Lem::Reset()
 {
     EditorialElement::Reset();
-}
-
-Subst::~Subst() {}
-
-void Subst::AddChild(Object *child)
-{
-    if (child->Is(ADD)) {
-        assert(dynamic_cast<Add *>(child));
-    }
-    else if (child->Is(DEL)) {
-        assert(dynamic_cast<Del *>(child));
-    }
-    else if (child->Is(SUBST)) {
-        assert(dynamic_cast<Subst *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    ResetSource();
 }
 
 //----------------------------------------------------------------------------
-// Subst functor methods
+// functor methods
 //----------------------------------------------------------------------------
 
 } // namespace vrv

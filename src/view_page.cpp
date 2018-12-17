@@ -13,9 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "app.h"
 #include "annot.h"
 #include "attcomparison.h"
 #include "beam.h"
+#include "choice.h"
 #include "clef.h"
 #include "controlelement.h"
 #include "devicecontext.h"
