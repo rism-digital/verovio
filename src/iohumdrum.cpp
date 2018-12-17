@@ -40,6 +40,7 @@
 #ifndef NO_HUMDRUM_SUPPORT
 
 #include "accid.h"
+#include "app.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "att.h"
@@ -64,6 +65,7 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
+#include "lem.h"
 #include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -76,6 +78,7 @@
 #include "page.h"
 #include "pedal.h"
 #include "pghead.h"
+#include "rdg.h"
 #include "rend.h"
 #include "rest.h"
 #include "score.h"
