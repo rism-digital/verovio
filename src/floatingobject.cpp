@@ -152,9 +152,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         BracketSpan *bracketSpan = dynamic_cast<BracketSpan *>(object);
         assert(bracketSpan);
         // breath above by default
-        m_place = (bracketSpan->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
-        ? bracketSpan->GetPlaceAlternate()->GetBasic()
-        : STAFFREL_basic_above;
+        m_place = STAFFREL_basic_above;
     }
     else if (object->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(object);

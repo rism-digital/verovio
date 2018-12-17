@@ -26,8 +26,7 @@ class BracketSpan : public ControlElement,
                     public AttBracketSpanLog,
                     public AttColor,
                     public AttLineRend,
-                    public AttLineRendBase,
-                    public AttPlacement {
+                    public AttLineRendBase {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

@@ -1083,7 +1083,6 @@ void MeiOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracke
     bracketSpan->WriteColor(currentNode);
     bracketSpan->WriteLineRend(currentNode);
     bracketSpan->WriteLineRendBase(currentNode);
-    bracketSpan->WritePlacement(currentNode);
 }
     
 void MeiOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
@@ -3440,7 +3439,6 @@ bool MeiInput::ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan)
     vrvBracketSpan->ReadColor(bracketSpan);
     vrvBracketSpan->ReadLineRend(bracketSpan);
     vrvBracketSpan->ReadLineRendBase(bracketSpan);
-    vrvBracketSpan->ReadPlacement(bracketSpan);
 
     parent->AddChild(vrvBracketSpan);
     ReadUnsupportedAttr(bracketSpan, vrvBracketSpan);
