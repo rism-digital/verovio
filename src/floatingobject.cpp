@@ -149,9 +149,6 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     m_spanningType = spanningType;
 
     if (object->Is(BRACKETSPAN)) {
-        BracketSpan *bracketSpan = dynamic_cast<BracketSpan *>(object);
-        assert(bracketSpan);
-        // breath above by default
         m_place = STAFFREL_basic_above;
     }
     else if (object->Is(BREATH)) {
