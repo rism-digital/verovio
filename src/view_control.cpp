@@ -329,24 +329,38 @@ void View::DrawBracketSpan(
     assert(bracketSpan);
     assert(staff);
     
+    assert(bracketSpan->GetStart());
+    assert(bracketSpan->GetEnd());
+    
     if (!bracketSpan->HasFunc()) {
         // we cannot draw a bracketSpan that has no func
         return;
     }
     
     int y = bracketSpan->GetDrawingY();
+    
+    int startRadius = 0;
+    if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
+        startRadius = bracketSpan->GetStart()->GetDrawingRadius(m_doc);
+    }
+    
+    int endRadius = 0;
+    if (!bracketSpan->GetEnd()->Is(TIMESTAMP_ATTR)) {
+        endRadius = bracketSpan->GetEnd()->GetDrawingRadius(m_doc);
+    }
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
-        // nothing to adjust
+        x1 -= startRadius;
+        x2 += endRadius;
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        // nothing to adjust
+        x1 -= startRadius;
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
-        // nothing to adjust
+        x2 += endRadius;
     }
     else {
         // nothing to adjust
