@@ -34,6 +34,7 @@ class BarLine;
 class Beam;
 class BeatRpt;
 class BoundaryEnd;
+class BracketSpan;
 class Breath;
 class BTrem;
 class Choice;
@@ -270,6 +271,7 @@ private:
     ///@{
     void WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
+    void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
@@ -513,6 +515,7 @@ private:
     ///@{
     bool ReadAnchoredText(Object *parent, pugi::xml_node anchoredText);
     bool ReadArpeg(Object *parent, pugi::xml_node arpeg);
+    bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);

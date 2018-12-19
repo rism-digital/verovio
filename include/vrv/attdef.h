@@ -27,6 +27,11 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 
 class data_STAFFREL;
 
+/**
+ * MEI virtual unit;
+ */
+typedef double data_VU;
+
 //----------------------------------------------------------------------------
 // Durations
 //----------------------------------------------------------------------------
@@ -159,6 +164,11 @@ enum data_KEYSIGNATURE {
 typedef std::pair<int, double> data_MEASUREBEAT;
 
 /**
+ * MEI data.MEASUREMENTABS
+ */
+typedef data_VU data_MEASUREMENTABS;
+    
+/**
  * MEI data.MIDIBPM
  */
 typedef int data_MIDIBPM;
@@ -285,7 +295,7 @@ enum data_TIE { TIE_NONE = 0, TIE_i, TIE_m, TIE_t };
  * NONE is -3 for perfect value (abs) by default
  */
 enum data_TEMPUS { TEMPUS_NONE = -3, TEMPUS_2 = 2, TEMPUS_3 };
-
+    
 /**
  * A typedef for a list of data.URI integer.
  * E.g., list { xsd:anyURI+ }

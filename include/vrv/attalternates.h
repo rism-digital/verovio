@@ -206,6 +206,65 @@ protected:
 };
 
 /**
+ * MEI data.LINEWIDTH
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum LinewidthType { LINEWIDTHTYPE_NONE = 0, LINEWIDTHTYPE_lineWidthTerm, LINEWIDTHTYPE_measurementAbs };
+
+class data_LINEWIDTH {
+public:
+    data_LINEWIDTH() { Reset(LINEWIDTHTYPE_NONE); }
+    virtual ~data_LINEWIDTH() {}
+
+    void Reset(LinewidthType type)
+    {
+        m_type = type;
+        m_lineWidthTerm = LINEWIDTHTERM_NONE;
+        m_measurementAbs = VRV_UNSET;
+    }
+
+    LinewidthType GetType() const { return m_type; }
+
+    data_LINEWIDTHTERM GetLineWithTerm() const { return m_lineWidthTerm; }
+    void SetLineWidthTerm(data_LINEWIDTHTERM value)
+    {
+        Reset(LINEWIDTHTYPE_lineWidthTerm);
+        m_lineWidthTerm = value;
+    }
+
+    data_MEASUREMENTABS GetMeasurementAbs() const { return m_measurementAbs; }
+    void SetMeasurementAbs(data_MEASUREMENTABS value)
+    {
+        Reset(LINEWIDTHTYPE_measurementAbs);
+        m_measurementAbs = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_lineWidthTerm != LINEWIDTHTERM_NONE) return true;
+        if (m_measurementAbs != VRV_UNSET) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_LINEWIDTH &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_lineWidthTerm != val.GetLineWithTerm()) return false;
+        if (m_measurementAbs != val.GetMeasurementAbs()) return false;
+        return true;
+    }
+    bool operator!=(const data_LINEWIDTH &val) const { return !(*this == val); }
+
+protected:
+    LinewidthType m_type;
+    data_LINEWIDTHTERM m_lineWidthTerm;
+    data_MEASUREMENTABS m_measurementAbs;
+};
+
+    
+/**
  * MEI data.MIDIVALUE_NAME
  * Since it can contain different subtype we need a dedicated class for it.
  */

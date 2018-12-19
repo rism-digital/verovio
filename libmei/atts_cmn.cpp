@@ -455,6 +455,52 @@ bool AttBeatRptLog::HasBeatdef() const
 /* include <attbeatdef> */
 
 //----------------------------------------------------------------------------
+// AttBracketSpanLog
+//----------------------------------------------------------------------------
+
+AttBracketSpanLog::AttBracketSpanLog() : Att()
+{
+    ResetBracketSpanLog();
+}
+
+AttBracketSpanLog::~AttBracketSpanLog()
+{
+}
+
+void AttBracketSpanLog::ResetBracketSpanLog()
+{
+    m_func = "";
+}
+
+bool AttBracketSpanLog::ReadBracketSpanLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToStr(element.attribute("func").value()));
+        element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttBracketSpanLog::WriteBracketSpanLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttBracketSpanLog::HasFunc() const
+{
+    return (m_func != "");
+}
+
+/* include <attfunc> */
+
+//----------------------------------------------------------------------------
 // AttCutout
 //----------------------------------------------------------------------------
 
@@ -1463,7 +1509,7 @@ AttSlurRend::~AttSlurRend()
 void AttSlurRend::ResetSlurRend()
 {
     m_slurLform = LINEFORM_NONE;
-    m_slurLwidth = "";
+    m_slurLwidth = data_LINEWIDTH();
 }
 
 bool AttSlurRend::ReadSlurRend(pugi::xml_node element)
@@ -1475,7 +1521,7 @@ bool AttSlurRend::ReadSlurRend(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("slur.lwidth")) {
-        this->SetSlurLwidth(StrToStr(element.attribute("slur.lwidth").value()));
+        this->SetSlurLwidth(StrToLinewidth(element.attribute("slur.lwidth").value()));
         element.remove_attribute("slur.lwidth");
         hasAttribute = true;
     }
@@ -1490,7 +1536,7 @@ bool AttSlurRend::WriteSlurRend(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasSlurLwidth()) {
-        element.append_attribute("slur.lwidth") = StrToStr(this->GetSlurLwidth()).c_str();
+        element.append_attribute("slur.lwidth") = LinewidthToStr(this->GetSlurLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1503,7 +1549,7 @@ bool AttSlurRend::HasSlurLform() const
 
 bool AttSlurRend::HasSlurLwidth() const
 {
-    return (m_slurLwidth != "");
+    return (m_slurLwidth.HasValue());
 }
 
 /* include <attslur.lwidth> */
@@ -1570,7 +1616,7 @@ AttTieRend::~AttTieRend()
 void AttTieRend::ResetTieRend()
 {
     m_tieLform = LINEFORM_NONE;
-    m_tieLwidth = "";
+    m_tieLwidth = data_LINEWIDTH();
 }
 
 bool AttTieRend::ReadTieRend(pugi::xml_node element)
@@ -1582,7 +1628,7 @@ bool AttTieRend::ReadTieRend(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("tie.lwidth")) {
-        this->SetTieLwidth(StrToStr(element.attribute("tie.lwidth").value()));
+        this->SetTieLwidth(StrToLinewidth(element.attribute("tie.lwidth").value()));
         element.remove_attribute("tie.lwidth");
         hasAttribute = true;
     }
@@ -1597,7 +1643,7 @@ bool AttTieRend::WriteTieRend(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTieLwidth()) {
-        element.append_attribute("tie.lwidth") = StrToStr(this->GetTieLwidth()).c_str();
+        element.append_attribute("tie.lwidth") = LinewidthToStr(this->GetTieLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1610,7 +1656,7 @@ bool AttTieRend::HasTieLform() const
 
 bool AttTieRend::HasTieLwidth() const
 {
-    return (m_tieLwidth != "");
+    return (m_tieLwidth.HasValue());
 }
 
 /* include <atttie.lwidth> */
@@ -1740,6 +1786,14 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         assert(att);
         if (attrType == "beatdef") {
             att->SetBeatdef(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_BRACKETSPANLOG)) {
+        AttBracketSpanLog *att = dynamic_cast<AttBracketSpanLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -1939,7 +1993,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "slur.lwidth") {
-            att->SetSlurLwidth(att->StrToStr(attrValue));
+            att->SetSlurLwidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -1959,7 +2013,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "tie.lwidth") {
-            att->SetTieLwidth(att->StrToStr(attrValue));
+            att->SetTieLwidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -2043,6 +2097,13 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasBeatdef()) {
             attributes->push_back(std::make_pair("beatdef", att->DblToStr(att->GetBeatdef())));
+        }
+    }
+    if (element->HasAttClass(ATT_BRACKETSPANLOG)) {
+        const AttBracketSpanLog *att = dynamic_cast<const AttBracketSpanLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {
@@ -2211,7 +2272,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("slur.lform", att->LineformToStr(att->GetSlurLform())));
         }
         if (att->HasSlurLwidth()) {
-            attributes->push_back(std::make_pair("slur.lwidth", att->StrToStr(att->GetSlurLwidth())));
+            attributes->push_back(std::make_pair("slur.lwidth", att->LinewidthToStr(att->GetSlurLwidth())));
         }
     }
     if (element->HasAttClass(ATT_STEMSCMN)) {
@@ -2228,7 +2289,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("tie.lform", att->LineformToStr(att->GetTieLform())));
         }
         if (att->HasTieLwidth()) {
-            attributes->push_back(std::make_pair("tie.lwidth", att->StrToStr(att->GetTieLwidth())));
+            attributes->push_back(std::make_pair("tie.lwidth", att->LinewidthToStr(att->GetTieLwidth())));
         }
     }
     if (element->HasAttClass(ATT_TREMMEASURED)) {

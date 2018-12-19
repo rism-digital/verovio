@@ -356,6 +356,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttBracketSpanLog
+//----------------------------------------------------------------------------
+
+class AttBracketSpanLog : public Att {
+public:
+    AttBracketSpanLog();
+    virtual ~AttBracketSpanLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetBracketSpanLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadBracketSpanLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteBracketSpanLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(std::string func_) { m_func = func_; }
+    std::string GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    std::string m_func;
+
+    /* include <attfunc> */
+};
+
+//----------------------------------------------------------------------------
 // AttCutout
 //----------------------------------------------------------------------------
 
@@ -825,7 +861,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     meterSigGrpLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -987,7 +1023,7 @@ public:
 private:
     /** Records the position of the piano damper pedal. **/
     pedalLog_DIR m_dir;
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
 
     /* include <attfunc> */
@@ -1129,16 +1165,18 @@ public:
     data_LINEFORM GetSlurLform() const { return m_slurLform; }
     bool HasSlurLform() const;
     //
-    void SetSlurLwidth(std::string slurLwidth_) { m_slurLwidth = slurLwidth_; }
-    std::string GetSlurLwidth() const { return m_slurLwidth; }
+    void SetSlurLwidth(data_LINEWIDTH slurLwidth_) { m_slurLwidth = slurLwidth_; }
+    data_LINEWIDTH GetSlurLwidth() const { return m_slurLwidth; }
     bool HasSlurLwidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetSlurLwidthAlternate() { return &m_slurLwidth; }
     ///@}
 
 private:
     /** --- **/
     data_LINEFORM m_slurLform;
     /** --- **/
-    std::string m_slurLwidth;
+    data_LINEWIDTH m_slurLwidth;
 
     /* include <attslur.lwidth> */
 };
@@ -1211,16 +1249,18 @@ public:
     data_LINEFORM GetTieLform() const { return m_tieLform; }
     bool HasTieLform() const;
     //
-    void SetTieLwidth(std::string tieLwidth_) { m_tieLwidth = tieLwidth_; }
-    std::string GetTieLwidth() const { return m_tieLwidth; }
+    void SetTieLwidth(data_LINEWIDTH tieLwidth_) { m_tieLwidth = tieLwidth_; }
+    data_LINEWIDTH GetTieLwidth() const { return m_tieLwidth; }
     bool HasTieLwidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetTieLwidthAlternate() { return &m_tieLwidth; }
     ///@}
 
 private:
     /** --- **/
     data_LINEFORM m_tieLform;
     /** --- **/
-    std::string m_tieLwidth;
+    data_LINEWIDTH m_tieLwidth;
 
     /* include <atttie.lwidth> */
 };
