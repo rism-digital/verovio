@@ -4590,8 +4590,18 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (trest) {
                 convertMRest(mrest, trest, -1, staffindex);
             }
+
             for (int z = 0; z < (int)layerdata.size(); ++z) {
+                // Don't look at first item in full-measure rest if it is a barline.
+                // This is to prevent text directions for previous measure being duplicated
+                // at the end of the mesure.  Disallowing initial measure token should
+                // be ok.
+                if ((z == 0) && layerdata[z]->isBarline()) {
+                    continue;
+                }
+
                 processDirections(layerdata[z], staffindex);
+
                 if (layerdata[z]->isInterpretation()) {
                     handlePedalMark(layerdata[z]);
                 }
