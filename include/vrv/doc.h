@@ -355,6 +355,16 @@ public:
      * A copy of the header tree stored as pugi::xml_document
      */
     pugi::xml_document m_header;
+    
+    /**
+     * A copy of the header tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_front;
+    
+    /**
+     * A copy of the header tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_back;
 
     /**
      * Holds the top scoreDef.
