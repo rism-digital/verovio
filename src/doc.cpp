@@ -100,6 +100,10 @@ void Doc::Reset()
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
+    
+    m_header.reset();
+    m_front.reset();
+    m_back.reset();
 }
 
 void Doc::SetType(DocType type)

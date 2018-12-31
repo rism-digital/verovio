@@ -193,6 +193,7 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
         params->m_previousSyl = this;
         // No free space because we never move the first one back
         params->m_freeSpace = 0;
+        params->m_previousMeasure = NULL;
         return FUNCTOR_CONTINUE;
     }
 

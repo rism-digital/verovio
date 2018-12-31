@@ -773,9 +773,18 @@ bool MeiOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
+    
+    if (m_doc->m_front.first_child()) {
+        music.append_copy(m_doc->m_front.first_child());
+    }
+    
     m_currentNode = music.append_child("body");
     m_nodeStack.push_back(m_currentNode);
 
+    if (m_doc->m_back.first_child()) {
+        music.append_copy(m_doc->m_back.first_child());
+    }
+    
     /*
     if (m_scoreBasedMEI) {
         m_currentNode = mdiv.append_child("score");
@@ -2418,8 +2427,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     // music
     pugi::xml_node music;
+    pugi::xml_node front;
     pugi::xml_node body;
     pugi::xml_node pages;
+    pugi::xml_node back;
 
     if (std::string(root.name()) == "music") {
         music = root;
@@ -2430,6 +2441,20 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     if (music.empty()) {
         LogError("No <music> element found in the MEI data");
         return false;
+    }
+    
+    front = music.child("front");
+    if (!front.empty()) {
+        m_doc->m_front.reset();
+        // copy the complete front into the master document
+        m_doc->m_front.append_copy(front);
+    }
+    
+    back = music.child("back");
+    if (!back.empty()) {
+        m_doc->m_back.reset();
+        // copy the complete front into the master document
+        m_doc->m_back.append_copy(back);
     }
 
     body = music.child("body");
@@ -4786,7 +4811,8 @@ bool MeiInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
     parent->AddChild(vrvAnnot);
     ReadUnsupportedAttr(annot, vrvAnnot);
-    return ReadTextChildren(vrvAnnot, annot, vrvAnnot);
+    // For Annot we do not load children because they preserved in Annot::m_content
+    return true;
 }
 
 bool MeiInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
