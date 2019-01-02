@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Nov 21 11:59:22 EST 2018
+// Last Modified: Mon Dec 31 13:18:53 EST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -20802,7 +20802,7 @@ string HumdrumLine::getXmlId(const string& prefix) const {
 	} else {
 		output = getXmlIdPrefix();
 	}
-	output += "loc" + to_string(getLineIndex());
+	output += "L" + to_string(getLineIndex() + 1);
 	return output;
 }
 

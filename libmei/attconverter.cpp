@@ -2505,6 +2505,27 @@ accidLog_FUNC AttConverter::StrToAccidLogFunc(std::string value, bool logWarning
     return accidLog_FUNC_NONE;
 }
 
+std::string AttConverter::AnchoredTextLogFuncToStr(anchoredTextLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case anchoredTextLog_FUNC_unknown: value = "unknown"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.anchoredText.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+anchoredTextLog_FUNC AttConverter::StrToAnchoredTextLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "unknown") return anchoredTextLog_FUNC_unknown;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.anchoredText.log@func", value.c_str());
+    return anchoredTextLog_FUNC_NONE;
+}
+
 std::string AttConverter::ArpegLogOrderToStr(arpegLog_ORDER data) const
 {
     std::string value;
@@ -2628,6 +2649,31 @@ beamingVis_BEAMREND AttConverter::StrToBeamingVisBeamrend(std::string value, boo
     return beamingVis_BEAMREND_NONE;
 }
 
+std::string AttConverter::BracketSpanLogFuncToStr(bracketSpanLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case bracketSpanLog_FUNC_coloration: value = "coloration"; break;
+        case bracketSpanLog_FUNC_cross_rhythm: value = "cross-rhythm"; break;
+        case bracketSpanLog_FUNC_ligature: value = "ligature"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.bracketSpan.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+bracketSpanLog_FUNC AttConverter::StrToBracketSpanLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "coloration") return bracketSpanLog_FUNC_coloration;
+    if (value == "cross-rhythm") return bracketSpanLog_FUNC_cross_rhythm;
+    if (value == "ligature") return bracketSpanLog_FUNC_ligature;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.bracketSpan.log@func", value.c_str());
+    return bracketSpanLog_FUNC_NONE;
+}
+
 std::string AttConverter::CurvatureCurvedirToStr(curvature_CURVEDIR data) const
 {
     std::string value;
@@ -2651,6 +2697,27 @@ curvature_CURVEDIR AttConverter::StrToCurvatureCurvedir(std::string value, bool 
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.curvature@curvedir", value.c_str());
     return curvature_CURVEDIR_NONE;
+}
+
+std::string AttConverter::CurveLogFuncToStr(curveLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case curveLog_FUNC_unknown: value = "unknown"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.curve.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+curveLog_FUNC AttConverter::StrToCurveLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "unknown") return curveLog_FUNC_unknown;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.curve.log@func", value.c_str());
+    return curveLog_FUNC_NONE;
 }
 
 std::string AttConverter::CutoutCutoutToStr(cutout_CUTOUT data) const
@@ -2743,6 +2810,52 @@ episemaVis_FORM AttConverter::StrToEpisemaVisForm(std::string value, bool logWar
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.episema.vis@form", value.c_str());
     return episemaVis_FORM_NONE;
+}
+
+std::string AttConverter::EvidenceEvidenceToStr(evidence_EVIDENCE data) const
+{
+    std::string value;
+    switch (data) {
+        case evidence_EVIDENCE_internal: value = "internal"; break;
+        case evidence_EVIDENCE_external: value = "external"; break;
+        case evidence_EVIDENCE_conjecture: value = "conjecture"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.evidence@evidence", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+evidence_EVIDENCE AttConverter::StrToEvidenceEvidence(std::string value, bool logWarning) const
+{
+    if (value == "internal") return evidence_EVIDENCE_internal;
+    if (value == "external") return evidence_EVIDENCE_external;
+    if (value == "conjecture") return evidence_EVIDENCE_conjecture;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.evidence@evidence", value.c_str());
+    return evidence_EVIDENCE_NONE;
+}
+
+std::string AttConverter::ExtSymGlyphauthToStr(extSym_GLYPHAUTH data) const
+{
+    std::string value;
+    switch (data) {
+        case extSym_GLYPHAUTH_smufl: value = "smufl"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.extSym@glyph.auth", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+extSym_GLYPHAUTH AttConverter::StrToExtSymGlyphauth(std::string value, bool logWarning) const
+{
+    if (value == "smufl") return extSym_GLYPHAUTH_smufl;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.extSym@glyph.auth", value.c_str());
+    return extSym_GLYPHAUTH_NONE;
 }
 
 std::string AttConverter::FTremLogFormToStr(fTremLog_FORM data) const
@@ -3135,6 +3248,31 @@ harpPedalLog_G AttConverter::StrToHarpPedalLogG(std::string value, bool logWarni
     return harpPedalLog_G_NONE;
 }
 
+std::string AttConverter::LineLogFuncToStr(lineLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case lineLog_FUNC_coloration: value = "coloration"; break;
+        case lineLog_FUNC_ligature: value = "ligature"; break;
+        case lineLog_FUNC_unknown: value = "unknown"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.line.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+lineLog_FUNC AttConverter::StrToLineLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "coloration") return lineLog_FUNC_coloration;
+    if (value == "ligature") return lineLog_FUNC_ligature;
+    if (value == "unknown") return lineLog_FUNC_unknown;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.line.log@func", value.c_str());
+    return lineLog_FUNC_NONE;
+}
+
 std::string AttConverter::LiquescentVisCurveToStr(liquescentVis_CURVE data) const
 {
     std::string value;
@@ -3156,6 +3294,59 @@ liquescentVis_CURVE AttConverter::StrToLiquescentVisCurve(std::string value, boo
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.liquescent.vis@curve", value.c_str());
     return liquescentVis_CURVE_NONE;
+}
+
+std::string AttConverter::MeasurementUnitToStr(measurement_UNIT data) const
+{
+    std::string value;
+    switch (data) {
+        case measurement_UNIT_byte: value = "byte"; break;
+        case measurement_UNIT_char: value = "char"; break;
+        case measurement_UNIT_cm: value = "cm"; break;
+        case measurement_UNIT_deg: value = "deg"; break;
+        case measurement_UNIT_in: value = "in"; break;
+        case measurement_UNIT_issue: value = "issue"; break;
+        case measurement_UNIT_ft: value = "ft"; break;
+        case measurement_UNIT_m: value = "m"; break;
+        case measurement_UNIT_mm: value = "mm"; break;
+        case measurement_UNIT_page: value = "page"; break;
+        case measurement_UNIT_pc: value = "pc"; break;
+        case measurement_UNIT_pt: value = "pt"; break;
+        case measurement_UNIT_px: value = "px"; break;
+        case measurement_UNIT_rad: value = "rad"; break;
+        case measurement_UNIT_record: value = "record"; break;
+        case measurement_UNIT_vol: value = "vol"; break;
+        case measurement_UNIT_vu: value = "vu"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.measurement@unit", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+measurement_UNIT AttConverter::StrToMeasurementUnit(std::string value, bool logWarning) const
+{
+    if (value == "byte") return measurement_UNIT_byte;
+    if (value == "char") return measurement_UNIT_char;
+    if (value == "cm") return measurement_UNIT_cm;
+    if (value == "deg") return measurement_UNIT_deg;
+    if (value == "in") return measurement_UNIT_in;
+    if (value == "issue") return measurement_UNIT_issue;
+    if (value == "ft") return measurement_UNIT_ft;
+    if (value == "m") return measurement_UNIT_m;
+    if (value == "mm") return measurement_UNIT_mm;
+    if (value == "page") return measurement_UNIT_page;
+    if (value == "pc") return measurement_UNIT_pc;
+    if (value == "pt") return measurement_UNIT_pt;
+    if (value == "px") return measurement_UNIT_px;
+    if (value == "rad") return measurement_UNIT_rad;
+    if (value == "record") return measurement_UNIT_record;
+    if (value == "vol") return measurement_UNIT_vol;
+    if (value == "vu") return measurement_UNIT_vu;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.measurement@unit", value.c_str());
+    return measurement_UNIT_NONE;
 }
 
 std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) const
@@ -3469,6 +3660,27 @@ noteGes_EXTREMIS AttConverter::StrToNoteGesExtremis(std::string value, bool logW
     return noteGes_EXTREMIS_NONE;
 }
 
+std::string AttConverter::NoteHeadsHeadauthToStr(noteHeads_HEADAUTH data) const
+{
+    std::string value;
+    switch (data) {
+        case noteHeads_HEADAUTH_smufl: value = "smufl"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.noteHeads@head.auth", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+noteHeads_HEADAUTH AttConverter::StrToNoteHeadsHeadauth(std::string value, bool logWarning) const
+{
+    if (value == "smufl") return noteHeads_HEADAUTH_smufl;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.noteHeads@head.auth", value.c_str());
+    return noteHeads_HEADAUTH_NONE;
+}
+
 std::string AttConverter::OctaveLogCollToStr(octaveLog_COLL data) const
 {
     std::string value;
@@ -3538,6 +3750,33 @@ pedalLog_DIR AttConverter::StrToPedalLogDir(std::string value, bool logWarning) 
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.pedal.log@dir", value.c_str());
     return pedalLog_DIR_NONE;
+}
+
+std::string AttConverter::PedalLogFuncToStr(pedalLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case pedalLog_FUNC_sustain: value = "sustain"; break;
+        case pedalLog_FUNC_soft: value = "soft"; break;
+        case pedalLog_FUNC_sostenuto: value = "sostenuto"; break;
+        case pedalLog_FUNC_silent: value = "silent"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.pedal.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+pedalLog_FUNC AttConverter::StrToPedalLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "sustain") return pedalLog_FUNC_sustain;
+    if (value == "soft") return pedalLog_FUNC_soft;
+    if (value == "sostenuto") return pedalLog_FUNC_sostenuto;
+    if (value == "silent") return pedalLog_FUNC_silent;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pedal.log@func", value.c_str());
+    return pedalLog_FUNC_NONE;
 }
 
 std::string AttConverter::PedalVisFormToStr(pedalVis_FORM data) const

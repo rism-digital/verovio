@@ -482,6 +482,7 @@ protected:
         const std::string &key, const std::string &role);
     void getRespPeople(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references);
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
+    void insertPeople(pugi::xml_node &work, std::vector<std::vector<string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);

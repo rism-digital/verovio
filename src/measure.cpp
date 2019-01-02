@@ -840,8 +840,6 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
 
 int Measure::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_leftBarLine.Reset();
-    this->m_rightBarLine.Reset();
     this->m_timestampAligner.Reset();
     m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;

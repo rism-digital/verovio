@@ -99,12 +99,14 @@ public:
     ///@{
     std::string DblToStr(double data) const;
     std::string IntToStr(int data) const;
+    std::string VUToStr(data_VU data) const;
     ///@}
 
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
+    data_VU StrToVU(std::string value, bool logWarning = true) const;
     ///@}
 
     /** @name Converters for writing and reading */
@@ -126,10 +128,13 @@ public:
 
     std::string KeysignatureToStr(data_KEYSIGNATURE data) const;
     data_KEYSIGNATURE StrToKeysignature(std::string value, bool logWarning = true) const;
-
+    
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
 
+    std::string MeasurementabsToStr(data_MEASUREMENTABS data) const { return VUToStr(data); }
+    data_MEASUREMENTABS StrToMeasurementabs(std::string value, bool logWarning = true) const { return StrToVU(value, logWarning); }
+    
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
     data_MODUSMAIOR StrToModusmaior(std::string value, bool logWarning = true) const;
 
@@ -202,6 +207,9 @@ public:
     std::string FontsizeToStr(data_FONTSIZE data) const;
     data_FONTSIZE StrToFontsize(std::string value, bool logWarning = true) const;
 
+    std::string LinewidthToStr(data_LINEWIDTH data) const;
+    data_LINEWIDTH StrToLinewidth(std::string value, bool logWarning = true) const;
+    
     std::string MidivalueNameToStr(data_MIDIVALUE_NAME data) const;
     data_MIDIVALUE_NAME StrToMidivalueName(std::string value, bool logWarning = true) const;
 

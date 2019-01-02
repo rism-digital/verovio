@@ -18,6 +18,7 @@
 #include "arpeg.h"
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "devicecontext.h"
 #include "dir.h"
@@ -150,7 +151,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ SLUR, HAIRPIN, OCTAVE, TIE })) return;
+            if (element->Is({ SLUR, BRACKETSPAN, HAIRPIN, OCTAVE, TIE })) return;
         }
     }
 
@@ -287,6 +288,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             // cast to Dynam check in DrawDynamConnector
             DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
+        else if (element->Is(BRACKETSPAN)) {
+            // cast to BracketSpan check in DrawBracketSpan
+            DrawBracketSpan(dc, dynamic_cast<BracketSpan *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
         else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
@@ -318,6 +323,129 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 }
 
+void View::DrawBracketSpan(
+    DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(bracketSpan);
+    assert(staff);
+    
+    assert(bracketSpan->GetStart());
+    assert(bracketSpan->GetEnd());
+    
+    if (!bracketSpan->HasFunc()) {
+        // we cannot draw a bracketSpan that has no func
+        return;
+    }
+    
+    int y = bracketSpan->GetDrawingY();
+    
+    int startRadius = 0;
+    if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
+        startRadius = bracketSpan->GetStart()->GetDrawingRadius(m_doc);
+    }
+    
+    int endRadius = 0;
+    if (!bracketSpan->GetEnd()->Is(TIMESTAMP_ATTR)) {
+        endRadius = bracketSpan->GetEnd()->GetDrawingRadius(m_doc);
+    }
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (spanningType == SPANNING_START_END) {
+        x1 -= startRadius;
+        x2 += endRadius;
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if (spanningType == SPANNING_START) {
+        x1 -= startRadius;
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if (spanningType == SPANNING_END) {
+        x2 += endRadius;
+    }
+    else {
+        // nothing to adjust
+    }
+
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else {
+        dc->StartGraphic(bracketSpan, "spanning-bracketspan", "");
+    }
+    
+    int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    
+    if (bracketSpan->HasLwidth()) {
+        if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
+            if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
+                lineWidth *= LINEWIDTHTERM_factor_narrow;
+            }
+            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
+                lineWidth *= LINEWIDTHTERM_factor_medium;
+            }
+            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
+                lineWidth *= LINEWIDTHTERM_factor_wide;
+            }
+        }
+        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
+            if (bracketSpan->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
+                lineWidth = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+        }
+    }
+    
+    // Opening bracket
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
+        // (Do draw the horizontal line for doted lines at it looks better)
+        if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
+            DrawFilledRectangle(dc, x1, y, x1 + bracketSize, y + lineWidth);
+        }
+        DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y - bracketSize);
+    }
+    // Closing bracket
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        // Ditto
+        if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
+            DrawFilledRectangle(dc, x2 - bracketSize, y, x2, y + lineWidth);
+        }
+        DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y - bracketSize);
+    }
+    // We have a @lform - draw a full line
+    if (bracketSpan->HasLform()) {
+        if (bracketSpan->GetLform() == LINEFORM_solid) {
+            DrawFilledRectangle(dc, x1, y, x2, y - lineWidth);
+        }
+        else if (bracketSpan->GetLform() == LINEFORM_dashed) {
+            dc->SetPen(m_currentColour, lineWidth, AxSOLID, bracketSize);
+            dc->SetBrush(m_currentColour, AxSOLID);
+            int yDotted = y + lineWidth / 2;
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(yDotted), ToDeviceContextX(x2), ToDeviceContextY(yDotted));
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
+        else if (bracketSpan->GetLform() == LINEFORM_dotted) {
+            dc->SetPen(m_currentColour, lineWidth, AxSOLID, lineWidth);
+            dc->SetBrush(m_currentColour, AxSOLID);
+            // Adjust the start and end because the horizontal line of the was drawn in that case
+            int x1Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
+            int x2Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
+            int yDotted = y + lineWidth / 2;
+            dc->DrawLine(ToDeviceContextX(x1Dotted), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted), ToDeviceContextY(yDotted));
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
+    }
+    
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(bracketSpan, this);
+    }
+}
+    
 void View::DrawHairpin(
     DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
@@ -501,16 +629,25 @@ void View::DrawOctave(
     str.push_back(code);
 
     if (octave->GetExtender() != BOOLEAN_false) {
-        int lineWidthFactor = 1;
+        int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         if (octave->HasLwidth()) {
-            if (octave->GetLwidth() == "wide") {
-                lineWidthFactor *= 4;
+            if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
+                if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
+                    lineWidth *= LINEWIDTHTERM_factor_narrow;
+                }
+                else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
+                    lineWidth *= LINEWIDTHTERM_factor_medium;
+                }
+                else if (octave->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
+                    lineWidth *= LINEWIDTHTERM_factor_wide;
+                }
             }
-            else if (octave->GetLwidth() == "medium") {
-                lineWidthFactor *= 2;
+            else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
+                if (octave->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
+                    lineWidth = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                }
             }
         }
-        int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         TextExtend extend;
         dc->GetSmuflTextExtent(str, &extend);

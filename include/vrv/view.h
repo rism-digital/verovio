@@ -20,6 +20,7 @@ class Arpeg;
 class BarLine;
 class Beam;
 class BeamDrawingParams;
+class BracketSpan;
 class Breath;
 class ControlElement;
 class Chord;
@@ -398,6 +399,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
+    void DrawBracketSpan(
+        DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawFConnector(
         DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHairpin(

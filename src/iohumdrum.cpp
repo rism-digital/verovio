@@ -40,6 +40,7 @@
 #ifndef NO_HUMDRUM_SUPPORT
 
 #include "accid.h"
+#include "app.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "att.h"
@@ -64,6 +65,7 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
+#include "lem.h"
 #include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -76,6 +78,7 @@
 #include "page.h"
 #include "pedal.h"
 #include "pghead.h"
+#include "rdg.h"
 #include "rend.h"
 #include "rest.h"
 #include "score.h"
@@ -663,6 +666,7 @@ void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
 // created.
 //         <appInfo>? <editorialDecl>?
 //
+// changed to <workList> in MEI 4.0:
 //     <workDesc>  . . . . . . . . Groupling for non-bibliograhpic aspects of
 // text.
 //        <identifier> <titleStmt> <history> <langUsage> <key> <tempo> <meter>
@@ -800,8 +804,11 @@ void HumdrumInput::createHeader()
     // <sourceDesc> /////////
 
     // <workDesc> /////////////
-    pugi::xml_node workDesc = meiHead.append_child("workDesc");
-    pugi::xml_node work = workDesc.append_child("work");
+    // <workDesc> changed to <workList> in MEI 4.0
+    // pugi::xml_node workDesc = meiHead.append_child("workDesc");
+    pugi::xml_node workList = meiHead.append_child("workList");
+    // pugi::xml_node work = workDesc.append_child("work");
+    pugi::xml_node work = workList.append_child("work");
 
     std::string SCT = getReferenceValue("SCT", references);
     if (!SCT.empty()) {
@@ -809,10 +816,15 @@ void HumdrumInput::createHeader()
         identifier.append_attribute("analog") = "humdrum:SCT";
         identifier.append_child(pugi::node_pcdata).set_value(SCT.c_str());
     }
-    pugi::xml_node titleStmt = work.append_child("titleStmt");
-    insertTitle(titleStmt, references);
+    // <titleStmt> removed in MEI 4.0
+    // pugi::xml_node titleStmt = work.append_child("titleStmt");
+    // pugi::xml_node titleStmt = work.append_child("titleStmt");
+    // insertTitle(titleStmt, references);
+    insertTitle(work, references);
     if (respPeople.size() > 0) {
-        insertRespStmt(titleStmt, respPeople);
+        // insertRespStmt(titleStmt, respPeople);
+        // Update for MEI 4.0:
+        insertPeople(work, respPeople);
     }
     std::string ODT = getReferenceValue("ODT", references);
     std::string OCY = getReferenceValue("OCY", references);
@@ -893,6 +905,7 @@ string HumdrumInput::getDateString()
 //////////////////////////////
 //
 // HumdrumInput::insertRespStmt -- Print a list of composer and/or lyricist.
+//     This is for MEI 3.0 and no longer used, so should eventually be deleted.
 //
 
 void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<string> > &respPeople)
@@ -907,6 +920,65 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::ve
         person.append_attribute("analog") = StringFormat("humdrum:%s", respPeople[i][2].c_str()).c_str();
         person.append_attribute("role") = unescapeHtmlEntities(respPeople[i][1]).c_str();
         person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertPeople -- Print a list of composer and/or lyricist.
+//    Adapted from HumdrumInput::insertRespStmt().
+//    Each entry in respPeople:
+//   [0] = Person's name
+//   [1] = role:
+//			COM = composer
+//			COA = attributed composer
+//			COS = suspected composer
+//			LYR = lyricist composer
+//          see definition of getRespPeople() for more roles.
+//   [2] = @analog
+//   [3] = Line number for xml:id creation
+//
+
+void HumdrumInput::insertPeople(pugi::xml_node &work, std::vector<std::vector<string> > &respPeople)
+{
+    if (respPeople.size() == 0) {
+        return;
+    }
+    // pugi::xml_node respStmt = titleStmt.append_child("respStmt");
+    bool created = false;
+    pugi::xml_node person;
+    for (int i = 0; i < (int)respPeople.size(); ++i) {
+        created = false;
+        if (respPeople[i][1] == "composer") {
+            person = work.append_child("composer");
+            created = true;
+        }
+        if (respPeople[i][1] == "attributed composer") {
+            person = work.append_child("composer");
+            person.append_attribute("cert") = "unknown";
+            created = true;
+        }
+        if (respPeople[i][1] == "suspected composer") {
+            person = work.append_child("composer");
+            person.append_attribute("cert") = "unknown";
+            created = true;
+        }
+        else if (respPeople[i][1] == "lyricist") {
+            person = work.append_child("lyricist");
+            created = true;
+        }
+        else if (respPeople[i][1] == "librettist") {
+            person = work.append_child("librettist");
+            created = true;
+        }
+
+        if (created) {
+            person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
+            if (!respPeople[i][2].empty()) {
+                person.append_attribute("analog") = StringFormat("humdrum:%s", respPeople[i][2].c_str()).c_str();
+            }
+            person.append_attribute("xml:id") = StringFormat("person-L%s", respPeople[i][3].c_str()).c_str();
+        }
     }
 }
 
@@ -977,7 +1049,7 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
 {
     stringstream xmldata;
     xmldata << "<extMeta>\n";
-    xmldata << "\t<frames xmlns:humxml=\"http://www.humdrum.org/ns/humxml\">\n";
+    xmldata << "\t<frames xmlns=\"http://www.humdrum.org/ns/humxml\">\n";
     for (int i = 0; i < (int)references.size(); ++i) {
         std::string refKey = references[i]->getReferenceKey();
         // Keep all reference records for round-trip conversions:
@@ -1007,7 +1079,7 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
 // HumdrumInput::insertTitle --
 //
 
-void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const std::vector<hum::HumdrumLine *> &references)
+void HumdrumInput::insertTitle(pugi::xml_node &work, const std::vector<hum::HumdrumLine *> &references)
 {
     std::string key;
     std::string value;
@@ -1058,7 +1130,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const std::vector<hum:
             language[j] = std::tolower(language[j]);
         }
 
-        pugi::xml_node title = titleStmt.append_child("title");
+        pugi::xml_node title = work.append_child("title");
         titlecount++;
         title.text().set(unescapeHtmlEntities(value).c_str());
         title.append_attribute("xml:id") = StringFormat("title-L%d", references[i]->getLineNumber()).c_str();
@@ -1094,7 +1166,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const std::vector<hum:
 
     if (!titlecount) {
         // Put in a required empty <title/> tag:
-        titleStmt.append_child("title");
+        work.append_child("title");
     }
 }
 
@@ -4587,8 +4659,18 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (trest) {
                 convertMRest(mrest, trest, -1, staffindex);
             }
+
             for (int z = 0; z < (int)layerdata.size(); ++z) {
+                // Don't look at first item in full-measure rest if it is a barline.
+                // This is to prevent text directions for previous measure being duplicated
+                // at the end of the mesure.  Disallowing initial measure token should
+                // be ok.
+                if ((z == 0) && layerdata[z]->isBarline()) {
+                    continue;
+                }
+
                 processDirections(layerdata[z], staffindex);
+
                 if (layerdata[z]->isInterpretation()) {
                     handlePedalMark(layerdata[z]);
                 }
@@ -6837,7 +6919,7 @@ bool HumdrumInput::hasAboveParameter(hum::HTp token, const string &category)
 
 //////////////////////////////
 //
-// HumdrumInput::hasBelowParameter -- true if has an "a" parameter or has a "Z" parameter set to anything.
+// HumdrumInput::hasBelowParameter -- true if has an "b" parameter or has a "Z" parameter set to anything.
 //
 
 bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category)
