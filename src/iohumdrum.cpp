@@ -692,7 +692,11 @@ void HumdrumInput::createHeader()
     std::string OTL = getReferenceValue("OTL", references);
     pugi::xml_node title = fileTitle.append_child("title");
     if (!OTL.empty()) {
+// behaving strangely in enscripten (HTML entities present SVG output, 
+// but not from CLI-compiled verovio), so monitoring on stderr:
+cerr << "HEADER OTL input: " << OTL << endl;
         title.append_child(pugi::node_pcdata).set_value(unescapeHtmlEntities(OTL).c_str());
+cerr << "HEADER OTL output: " << unescapeHtmlEntities(OTL) << endl;
     }
 
     // <pubStmt> /////////////
@@ -2198,7 +2202,7 @@ bool HumdrumInput::prepareFooter(
 //         Gardano, 1579)</rend>
 //     </rend>
 //     <rend halign="right" valign="bottom">Benedetto Pallavicino</rend>
-// <pgHead>
+// </pgHead>
 //
 
 bool HumdrumInput::prepareHeader(
@@ -2216,7 +2220,12 @@ bool HumdrumInput::prepareHeader(
         hre.split(pieces, ithc->second, "\\\\n");
         headcenter = "<rend halign=\"center\" valign=\"middle\">\n";
         for (int i = 0; i < (int)pieces.size(); ++i) {
-            headcenter += "<rend fontsize=\"x-large\">";
+            if (i == 0) {
+                headcenter += "<rend fontsize=\"large\">";
+            }
+            else {
+                headcenter += "<rend fontsize=\"normal\">";
+            }
             tstring = processReferenceTemplate(pieces[i], biblist, refmap);
             if (pieces[i].empty()) {
                 headcenter += "&#160;";
@@ -2465,7 +2474,7 @@ std::string HumdrumInput::automaticHeaderCenter(
     // <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
     if (!title.empty()) {
         output += "<rend halign=\"center\" valign=\"middle\">\n";
-        output += "   <rend fontsize=\"x-large\">";
+        output += "   <rend fontsize=\"large\">";
         output += unescapeHtmlEntities(title);
         if (!rime.empty()) {
             output += " (<rend fontstyle=\"italic\">Rime</rend>&#160;";
