@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Dec 31 13:18:53 EST 2018
+// Last Modified: Fri Jan  4 18:00:20 EST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -11258,7 +11258,13 @@ int HumRegex::getMatchCount(void) {
 //
 
 string HumRegex::getMatch(int index) {
-	return m_matches.str(index);
+	if (index < 0) {
+		return "";
+	} if (index >= (int)m_matches.size()) {
+		return "";
+	}
+	string output = m_matches.str(index);
+	return output;
 }
 
 
@@ -51412,11 +51418,11 @@ int Tool_myank::atEndOfFile(HumdrumFile& infile, int line) {
 	int i;
 	for (i=line+1; i<infile.getLineCount(); i++) {
 		if (infile[i].isData()) {
-			return 1;
+			return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 
@@ -55948,7 +55954,8 @@ void Tool_transpose::processInterpretationLine(HumdrumFile& infile, int line,
 		if (hre.search(infile.token(line, j), "^\\*k\\[([a-gA-G\\#-]*)\\]", "")) {
 			// transpose *k[] markers if necessary
 			if (tvals[ptrack] != 0) {
-				printNewKeySignature(hre.getMatch(1), tvals[ptrack]);
+				string value = hre.getMatch(1);
+				printNewKeySignature(value, tvals[ptrack]);
 			} else {
 				m_humdrum_text << infile.token(line, j);
 			}
@@ -56400,7 +56407,8 @@ void Tool_transpose::processFile(HumdrumFile& infile,
 				if (spineprocess[infile.token(i, j)->getTrack()] &&
 						hre.search(infile.token(i, j),
 							"^\\*k\\[([a-gA-G#-]*)\\]", "i")) {
-						printNewKeySignature(hre.getMatch(1), transval);
+						string value = hre.getMatch(1);
+						printNewKeySignature(value, transval);
 						if (j<infile[i].getFieldCount()-1) {
 						m_humdrum_text << "\t";
 						}
@@ -56464,7 +56472,6 @@ void Tool_transpose::printNewKeySignature(const string& keysig, int trans) {
 
 void Tool_transpose::printNewKeyInterpretation(HumdrumLine& aRecord,
 		int index, int transval) {
-
 	int mode = 0;
 	if (islower(aRecord.token(index)->at(1))) {
 		mode = 1;
@@ -56479,8 +56486,10 @@ void Tool_transpose::printNewKeyInterpretation(HumdrumLine& aRecord,
 	m_humdrum_text << "*" << Convert::base40ToKern(base40) << ":";
 
 	HumRegex hre;
-	if (hre.search((string)*aRecord.token(index), ":(.+)$", "")) {
-		m_humdrum_text << hre.getMatch(1);
+	string tvalue = *aRecord.token(index);
+	if (hre.search(tvalue, ":(.+)$", "")) {
+		string value = hre.getMatch(1);
+		m_humdrum_text << value;
 	}
 }
 
@@ -57282,7 +57291,7 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 
 	transval     =  getInteger("base40");
 	ssettonicQ   =  getBoolean("settonic");
-	ssettonic    =  Convert::kernToBase40(getString("settonic").data());
+	ssettonic    =  Convert::kernToBase40(getString("settonic").c_str());
 	autoQ        =  getBoolean("auto");
 	debugQ       =  getBoolean("debug");
 	spineQ       =  getBoolean("spines");
@@ -57310,7 +57319,7 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 	ssettonic = ssettonic % 40;
 
 	if (getBoolean("transpose")) {
-		transval = getBase40ValueFromInterval(getString("transpose").data());
+		transval = getBase40ValueFromInterval(getString("transpose").c_str());
 	}
 
 	transval += 40 * octave;
