@@ -1338,7 +1338,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     harm->AddChild(text);
     pugi::xpath_node offset = node.select_single_node("offset");
     if (offset) durOffset = offset.node().text().as_int();
-    harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterCount / (double)(4 * m_ppq) + 1.0);
+    harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     m_controlElements.push_back(std::make_pair(measureNum, harm));
     m_harmStack.push_back(harm);
 }
