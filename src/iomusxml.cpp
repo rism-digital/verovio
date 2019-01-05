@@ -17,6 +17,7 @@
 #include "attcomparison.h"
 #include "beam.h"
 #include "beatrpt.h"
+#include "breath.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -1689,6 +1690,17 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
 
     m_ID = "#" + element->GetUuid();
+
+    // breath marks
+    pugi::xpath_node xmlBreath = notations.node().select_single_node("articulations/breath-mark");
+    if (xmlBreath) {
+        Breath *breath = new Breath();
+        m_controlElements.push_back(std::make_pair(measureNum, breath));
+        breath->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        breath->SetPlace(breath->AttPlacement::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
+        breath->SetColor(xmlBreath.node().attribute("color").as_string());
+        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.8);
+    }
 
     // Dynamics
     pugi::xpath_node xmlDynam = notations.node().select_single_node("dynamics");
