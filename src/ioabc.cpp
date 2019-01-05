@@ -705,7 +705,8 @@ void AbcInput::parseTempo(std::string tempoString)
 {
     Tempo *tempo = new Tempo();
     if (tempoString.find('=') != std::string::npos) {
-      // tempo->SetMm();
+        int numStart = int(tempoString.find('=') + 1);
+        tempo->SetMm(std::atoi(tempoString.substr(numStart).c_str()));
     }
     if (tempoString.find('\"') != std::string::npos) {
         std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
@@ -714,10 +715,10 @@ void AbcInput::parseTempo(std::string tempoString)
           Text *text = new Text();
           text->SetText(UTF8to16(tempoWord));
           tempo->AddChild(text);
-          // this has to be fixed
-          tempo->SetTstamp(1);
         }
     }
+    // this has to be fixed
+    tempo->SetTstamp(1);
     m_tempoStack.push_back(tempo);
     LogWarning("ABC input: Tempo definitions are not fully supported yet");
 }
