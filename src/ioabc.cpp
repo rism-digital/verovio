@@ -292,12 +292,12 @@ void AbcInput::AddBeam()
             beam->AddChild(*iter);
         }
         if (beam->FindChildByType(NOTE)) {
-          m_layer->AddChild(beam);
+            m_layer->AddChild(beam);
         }
         else {
-          for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
-              m_layer->AddChild(*iter);
-          }
+            for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+                m_layer->AddChild(*iter);
+            }
         }
     }
     m_noteStack.clear();
@@ -414,10 +414,10 @@ void AbcInput::AddTie()
         return;
     }
     if (!m_ID.empty()) {
-      Tie *tie = new Tie();
-      tie->SetStartid(m_ID);
-      m_tieStack.push_back(tie);
-      m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), tie));
+        Tie *tie = new Tie();
+        tie->SetStartid(m_ID);
+        m_tieStack.push_back(tie);
+        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), tie));
     }
 }
 
@@ -712,9 +712,9 @@ void AbcInput::parseTempo(std::string tempoString)
         std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
         tempoWord = tempoWord.substr(0, tempoWord.find('\"'));
         if (!tempoWord.empty()) {
-          Text *text = new Text();
-          text->SetText(UTF8to16(tempoWord));
-          tempo->AddChild(text);
+            Text *text = new Text();
+            text->SetText(UTF8to16(tempoWord));
+            tempo->AddChild(text);
         }
     }
     // this has to be fixed
@@ -906,6 +906,9 @@ void AbcInput::readInformationField(char dataKey, std::string value)
 
     if (dataKey == 'C') {
         m_composer.push_back(std::make_pair(value, m_lineNum));
+    }
+    else if (dataKey == 'F') {
+        m_filename = value;
     }
     else if (dataKey == 'H') {
         m_history.push_back(std::make_pair(value, m_lineNum));
@@ -1408,21 +1411,21 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             i = SetBarLine(musicCode, i);
 
             if (m_barLines.second != BARRENDITION_NONE) {
-              Measure *measure = new Measure();
-              measure->SetLeft(m_barLines.first);
-              measure->SetRight(m_barLines.second);
-              m_barLines = std::make_pair(BARRENDITION_NONE, BARRENDITION_NONE);
-              Staff *staff = new Staff();
+                Measure *measure = new Measure();
+                measure->SetLeft(m_barLines.first);
+                measure->SetRight(m_barLines.second);
+                m_barLines = std::make_pair(BARRENDITION_NONE, BARRENDITION_NONE);
+                Staff *staff = new Staff();
 
-              staff->AddChild(m_layer);
-              measure->AddChild(staff);
-              section->AddChild(measure);
-              m_layer = new Layer();
-              m_layer->SetN(1);
-              for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
-                measure->AddChild(*it);
-              }
-              m_tempoStack.clear();
+                staff->AddChild(m_layer);
+                measure->AddChild(staff);
+                section->AddChild(measure);
+                m_layer = new Layer();
+                m_layer->SetN(1);
+                for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
+                    measure->AddChild(*it);
+                }
+                m_tempoStack.clear();
             }
         }
 
