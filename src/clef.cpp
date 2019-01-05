@@ -6,6 +6,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "clef.h"
+
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "scoredefinterface.h"
 
 namespace vrv {
@@ -53,6 +60,12 @@ void Clef::Reset()
 
 int Clef::GetClefLocOffset() const
 {
+    if (this->HasSameasLink() && this->GetSameasLink()->Is(CLEF)) {
+        Clef *sameas = dynamic_cast<Clef *>(this->GetSameasLink());
+        assert(sameas);
+        return sameas->GetClefLocOffset();
+    }
+    
     int offset = 0;
     if (GetShape() == CLEFSHAPE_G)
         offset = -4;

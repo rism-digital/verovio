@@ -25,6 +25,7 @@
 #include "pages.h"
 #include "section.h"
 #include "staff.h"
+#include "syl.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -73,6 +74,7 @@ void System::Reset()
     m_drawingJustifiableWidth = 0;
     m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
+    m_drawingIsOptimized = false;
 }
 
 void System::AddChild(Object *child)
@@ -229,6 +231,36 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
         m_drawingScoreDef = NULL;
     }
 
+    m_drawingIsOptimized = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::OptimizeScoreDef(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    this->IsDrawingOptimized(true);
+
+    if (params->m_firstScoreDef) {
+        params->m_firstScoreDef = false;
+        return FUNCTOR_SIBLINGS;
+    }
+
+    params->m_currentScoreDef = this->GetDrawingScoreDef();
+    assert(params->m_currentScoreDef);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -321,7 +353,7 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
 
     // Continue if the right position of the measure is larger than the widest element right
     int measureRightX
-        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetInnerWidth() - params->m_margin;
+        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetRightBarLineLeft() - params->m_margin;
     if (measureRightX > params->m_currentWidest->GetContentRight()) {
         return FUNCTOR_CONTINUE;
     }
@@ -342,6 +374,48 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
             left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
         params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AdjustSylSpacing(FunctorParams *functorParams)
+{
+    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    assert(params);
+
+    // reset it
+    params->m_overlapingSyl.clear();
+    params->m_previousSyl = NULL;
+    params->m_previousMeasure = NULL;
+    params->m_freeSpace = 0;
+    params->m_staffSize = 100;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
+{
+    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    assert(params);
+    
+    if (!params->m_previousMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Here we also need to handle the last syl of the measure - we check the alignment with the right barline
+    if (params->m_previousSyl) {
+        int overlap = params->m_previousSyl->GetContentRight() - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
+        params->m_previousSyl->CalcHorizontalAdjustment(overlap, params);
+        
+        if (overlap > 0) {
+            params->m_overlapingSyl.push_back(std::make_tuple(
+                params->m_previousSyl->GetAlignment(), params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
+        }
+    }
+
+    // Ajust the postion of the alignment according to what we have collected for this verse
+    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
+    params->m_overlapingSyl.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -478,8 +552,14 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    
+    params->m_classId = BRACKETSPAN;
+    m_systemAligner.Process(params->m_functor, params);
+    
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
 
@@ -494,6 +574,9 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(DIR);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = TEMPO;
@@ -504,6 +587,9 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(PEDAL);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = HARM;
@@ -511,6 +597,9 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = ENDING;
@@ -518,6 +607,9 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     // SYL check if they are some lyrics and make space for them if any

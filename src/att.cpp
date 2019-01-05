@@ -45,6 +45,11 @@ std::string Att::IntToStr(int data) const
     return StringFormat("%d", data);
 }
 
+std::string Att::VUToStr(data_VU data) const
+{
+    return StringFormat("%fvu", data);
+}
+
 // Basic converters for reading
 
 double Att::StrToDbl(std::string value) const
@@ -55,6 +60,16 @@ double Att::StrToDbl(std::string value) const
 int Att::StrToInt(std::string value) const
 {
     return atoi(value.c_str());
+}
+
+data_VU Att::StrToVU(std::string value, bool logWarning) const
+{
+    std::regex test("[0-9]*(\\.[0-9]+)?(vu)?");
+    if (!std::regex_match(value, test)) {
+        if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
+        return VRV_UNSET;
+    }
+    return atof(value.substr(0, value.find("vu")).c_str());
 }
 
 // Converters for writing and reading
@@ -205,6 +220,54 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
         LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
     return 0;
 }
+    
+std::string Att::CompassdirectionToStr(data_COMPASSDIRECTION data) const
+{
+    std::string value;
+    if (data.GetType() == COMPASSDIRECTION_basic)
+        value = CompassdirectionBasicToStr(data.GetBasic());
+    else if (data.GetType() == COMPASSDIRECTION_extended)
+        value = CompassdirectionExtendedToStr(data.GetExtended());
+    
+    return value;
+}
+
+data_COMPASSDIRECTION Att::StrToCompassdirection(std::string value, bool logWarning) const
+{
+    data_COMPASSDIRECTION data;
+    data.SetBasic(StrToCompassdirectionBasic(value, false));
+    if (data.HasValue()) return data;
+    data.SetExtended(StrToCompassdirectionExtended(value, false));
+    if (data.HasValue()) return data;
+    
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.COMPASSDIRECTION '%s'", value.c_str());
+    
+    return data;
+}
+    
+std::string Att::EventrelToStr(data_EVENTREL data) const
+{
+    std::string value;
+    if (data.GetType() == EVENTREL_basic)
+        value = EventrelBasicToStr(data.GetBasic());
+    else if (data.GetType() == EVENTREL_extended)
+        value = EventrelExtendedToStr(data.GetExtended());
+    
+    return value;
+}
+
+data_EVENTREL Att::StrToEventrel(std::string value, bool logWarning) const
+{
+    data_EVENTREL data;
+    data.SetBasic(StrToEventrelBasic(value, false));
+    if (data.HasValue()) return data;
+    data.SetExtended(StrToEventrelExtended(value, false));
+    if (data.HasValue()) return data;
+    
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.EVENTREL '%s'", value.c_str());
+    
+    return data;
+}
 
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
@@ -230,6 +293,30 @@ data_FONTSIZE Att::StrToFontsize(std::string value, bool logWarning) const
     if (data.HasValue()) return data;
 
     if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+
+    return data;
+}
+
+std::string Att::LinewidthToStr(data_LINEWIDTH data) const
+{
+    std::string value;
+    if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm)
+        value = data.GetLineWithTerm();
+    else if (data.GetType() == LINEWIDTHTYPE_measurementAbs)
+        value = VUToStr(data.GetMeasurementAbs());
+
+    return value;
+}
+
+data_LINEWIDTH Att::StrToLinewidth(std::string value, bool logWarning) const
+{
+    data_LINEWIDTH data;
+    data.SetLineWidthTerm(StrToLinewidthterm(value, false));
+    if (data.HasValue()) return data;
+    data.SetMeasurementAbs(StrToVU(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());
 
     return data;
 }
@@ -301,7 +388,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) con
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
 {
-    return StringFormat("%dm+%.1f", data.first, data.second);
+    return StringFormat("%dm+%.4f", data.first, data.second);
 }
 
 data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
@@ -349,7 +436,7 @@ data_MIDIVALUE_NAME Att::StrToMidivalueName(std::string value, bool logWarning) 
 
     return data;
 }
-    
+
 std::string Att::MidivaluePanToStr(data_MIDIVALUE_PAN data) const
 {
     std::string value;
@@ -373,7 +460,7 @@ data_MIDIVALUE_PAN Att::StrToMidivaluePan(std::string value, bool logWarning) co
 
     return data;
 }
-    
+
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
 {
     std::string value;
@@ -480,7 +567,7 @@ data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }
-    
+
 std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
 {
     return StringFormat("%.2f%%", data);
@@ -495,7 +582,7 @@ data_PERCENT_LIMITED Att::StrToPercentLimited(std::string value, bool logWarning
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }
-    
+
 std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) const
 {
     return StringFormat("%.2f%%", data);

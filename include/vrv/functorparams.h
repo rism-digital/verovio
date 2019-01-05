@@ -261,8 +261,13 @@ public:
 
 class AdjustFloatingPostionerGrpsParams : public FunctorParams {
 public:
-    AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
+    AdjustFloatingPostionerGrpsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_place = STAFFREL_basic_above;
+    }
     std::vector<ClassId> m_classIds;
+    data_STAFFREL_basic m_place;
     Doc *m_doc;
 };
 
@@ -301,10 +306,16 @@ public:
     AdjustSylSpacingParams(Doc *doc)
     {
         m_previousSyl = NULL;
+        m_previousMeasure = NULL;
+        m_freeSpace = 0;
+        m_staffSize = 100;
         m_doc = doc;
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
     Syl *m_previousSyl;
+    Measure *m_previousMeasure;
+    int m_freeSpace;
+    int m_staffSize;
     Doc *m_doc;
 };
 
@@ -433,7 +444,7 @@ public:
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
         m_functor = functor;
-        m_scoreDefRole = NONE;
+        m_scoreDefRole = SCOREDEF_NONE;
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
         m_doc = doc;
@@ -1181,6 +1192,38 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// OptimizeScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ * member 2: the flag indicating if we are optimizing encoded layout
+ * member 3: the doc
+ **/
+
+class OptimizeScoreDefParams : public FunctorParams {
+public:
+    OptimizeScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_encoded = false;
+        m_firstScoreDef = true;
+        m_hasFermata = false;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDef *m_currentScoreDef;
+    bool m_encoded;
+    bool m_firstScoreDef;
+    bool m_hasFermata;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
 // PrepareBoundariesParams
 //----------------------------------------------------------------------------
 
@@ -1278,9 +1321,10 @@ class PrepareLinkingParams : public FunctorParams {
 public:
     PrepareLinkingParams() { m_fillList = true; }
     ArrayOfLinkingInterfaceUuidPairs m_nextUuidPairs;
+    ArrayOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
 };
-    
+
 //----------------------------------------------------------------------------
 // PreparePlistParams
 //----------------------------------------------------------------------------

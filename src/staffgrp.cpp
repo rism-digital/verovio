@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -54,6 +55,8 @@ void StaffGrp::Reset()
     ResetStaffGroupingSym();
     ResetStaffGrpVis();
     ResetTyped();
+
+    m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
 void StaffGrp::AddChild(Object *child)
@@ -99,6 +102,49 @@ void StaffGrp::FilterList(ListOfObjects *childList)
             ++iter;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// StaffGrp functor methods
+//----------------------------------------------------------------------------
+
+int StaffGrp::OptimizeScoreDefEnd(FunctorParams *)
+{
+    // OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    // assert(params);
+
+    this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
+
+    for (auto &child : m_children) {
+        if (child->Is(STAFFDEF)) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(child);
+            assert(staffDef);
+            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
+                break;
+            }
+        }
+        else if (child->Is(STAFFGRP)) {
+            StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(child);
+            assert(staffGrp);
+            if (staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
+                break;
+            }
+        }
+    }
+
+    if ((this->GetSymbol() == staffGroupingSym_SYMBOL_brace) && (this->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) {
+        for (auto &child : m_children) {
+            if (child->Is(STAFFDEF)) {
+                StaffDef *staffDef = dynamic_cast<StaffDef *>(child);
+                assert(staffDef);
+                staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+            }
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

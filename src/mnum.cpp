@@ -28,13 +28,13 @@ MNum::MNum()
     : ControlElement("mnum-")
     , TextListInterface()
     , TextDirInterface()
-    , TimeSpanningInterface()
+    , TimePointInterface()
     , AttColor()
     , AttLang()
     , AttTypography()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_TYPOGRAPHY);
@@ -48,10 +48,12 @@ void MNum::Reset()
 {
     ControlElement::Reset();
     TextDirInterface::Reset();
-    TimeSpanningInterface::Reset();
+    TimePointInterface::Reset();
     ResetColor();
     ResetLang();
     ResetTypography();
+
+    m_isGenerated = false;
 }
 
 void MNum::AddChild(Object *child)

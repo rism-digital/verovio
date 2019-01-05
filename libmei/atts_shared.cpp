@@ -410,80 +410,80 @@ bool AttBarLineLog::HasForm() const
 /* include <attform> */
 
 //----------------------------------------------------------------------------
-// AttBarPlacement
+// AttBarring
 //----------------------------------------------------------------------------
 
-AttBarPlacement::AttBarPlacement() : Att()
+AttBarring::AttBarring() : Att()
 {
-    ResetBarPlacement();
+    ResetBarring();
 }
 
-AttBarPlacement::~AttBarPlacement()
+AttBarring::~AttBarring()
 {
 }
 
-void AttBarPlacement::ResetBarPlacement()
+void AttBarring::ResetBarring()
 {
-    m_barlinelen = 0.0;
-    m_barplace = BARPLACE_NONE;
-    m_taktplace = 0;
+    m_barLen = 0.0;
+    m_barMethod = BARMETHOD_NONE;
+    m_barPlace = 0;
 }
 
-bool AttBarPlacement::ReadBarPlacement(pugi::xml_node element)
+bool AttBarring::ReadBarring(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("barlinelen")) {
-        this->SetBarlinelen(StrToDbl(element.attribute("barlinelen").value()));
-        element.remove_attribute("barlinelen");
+    if (element.attribute("bar.len")) {
+        this->SetBarLen(StrToDbl(element.attribute("bar.len").value()));
+        element.remove_attribute("bar.len");
         hasAttribute = true;
     }
-    if (element.attribute("barplace")) {
-        this->SetBarplace(StrToBarplace(element.attribute("barplace").value()));
-        element.remove_attribute("barplace");
+    if (element.attribute("bar.method")) {
+        this->SetBarMethod(StrToBarmethod(element.attribute("bar.method").value()));
+        element.remove_attribute("bar.method");
         hasAttribute = true;
     }
-    if (element.attribute("taktplace")) {
-        this->SetTaktplace(StrToInt(element.attribute("taktplace").value()));
-        element.remove_attribute("taktplace");
+    if (element.attribute("bar.place")) {
+        this->SetBarPlace(StrToInt(element.attribute("bar.place").value()));
+        element.remove_attribute("bar.place");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttBarPlacement::WriteBarPlacement(pugi::xml_node element)
+bool AttBarring::WriteBarring(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasBarlinelen()) {
-        element.append_attribute("barlinelen") = DblToStr(this->GetBarlinelen()).c_str();
+    if (this->HasBarLen()) {
+        element.append_attribute("bar.len") = DblToStr(this->GetBarLen()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasBarplace()) {
-        element.append_attribute("barplace") = BarplaceToStr(this->GetBarplace()).c_str();
+    if (this->HasBarMethod()) {
+        element.append_attribute("bar.method") = BarmethodToStr(this->GetBarMethod()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasTaktplace()) {
-        element.append_attribute("taktplace") = IntToStr(this->GetTaktplace()).c_str();
+    if (this->HasBarPlace()) {
+        element.append_attribute("bar.place") = IntToStr(this->GetBarPlace()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttBarPlacement::HasBarlinelen() const
+bool AttBarring::HasBarLen() const
 {
-    return (m_barlinelen != 0.0);
+    return (m_barLen != 0.0);
 }
 
-bool AttBarPlacement::HasBarplace() const
+bool AttBarring::HasBarMethod() const
 {
-    return (m_barplace != BARPLACE_NONE);
+    return (m_barMethod != BARMETHOD_NONE);
 }
 
-bool AttBarPlacement::HasTaktplace() const
+bool AttBarring::HasBarPlace() const
 {
-    return (m_taktplace != 0);
+    return (m_barPlace != 0);
 }
 
-/* include <atttaktplace> */
+/* include <attbar.place> */
 
 //----------------------------------------------------------------------------
 // AttBasic
@@ -1219,7 +1219,7 @@ AttCurveRend::~AttCurveRend()
 void AttCurveRend::ResetCurveRend()
 {
     m_lform = LINEFORM_NONE;
-    m_lwidth = "";
+    m_lwidth = data_LINEWIDTH();
 }
 
 bool AttCurveRend::ReadCurveRend(pugi::xml_node element)
@@ -1231,7 +1231,7 @@ bool AttCurveRend::ReadCurveRend(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("lwidth")) {
-        this->SetLwidth(StrToStr(element.attribute("lwidth").value()));
+        this->SetLwidth(StrToLinewidth(element.attribute("lwidth").value()));
         element.remove_attribute("lwidth");
         hasAttribute = true;
     }
@@ -1246,7 +1246,7 @@ bool AttCurveRend::WriteCurveRend(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasLwidth()) {
-        element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
+        element.append_attribute("lwidth") = LinewidthToStr(this->GetLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1259,7 +1259,7 @@ bool AttCurveRend::HasLform() const
 
 bool AttCurveRend::HasLwidth() const
 {
-    return (m_lwidth != "");
+    return (m_lwidth.HasValue());
 }
 
 /* include <attlwidth> */
@@ -2257,14 +2257,14 @@ AttHeight::~AttHeight()
 
 void AttHeight::ResetHeight()
 {
-    m_height = "";
+    m_height = VRV_UNSET;
 }
 
 bool AttHeight::ReadHeight(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("height")) {
-        this->SetHeight(StrToStr(element.attribute("height").value()));
+        this->SetHeight(StrToMeasurementabs(element.attribute("height").value()));
         element.remove_attribute("height");
         hasAttribute = true;
     }
@@ -2275,7 +2275,7 @@ bool AttHeight::WriteHeight(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasHeight()) {
-        element.append_attribute("height") = StrToStr(this->GetHeight()).c_str();
+        element.append_attribute("height") = MeasurementabsToStr(this->GetHeight()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2283,7 +2283,7 @@ bool AttHeight::WriteHeight(pugi::xml_node element)
 
 bool AttHeight::HasHeight() const
 {
-    return (m_height != "");
+    return (m_height != VRV_UNSET);
 }
 
 /* include <attheight> */
@@ -2871,7 +2871,7 @@ void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
     m_lsegs = 0;
-    m_lwidth = "";
+    m_lwidth = data_LINEWIDTH();
 }
 
 bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element)
@@ -2888,7 +2888,7 @@ bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("lwidth")) {
-        this->SetLwidth(StrToStr(element.attribute("lwidth").value()));
+        this->SetLwidth(StrToLinewidth(element.attribute("lwidth").value()));
         element.remove_attribute("lwidth");
         hasAttribute = true;
     }
@@ -2907,7 +2907,7 @@ bool AttLineRendBase::WriteLineRendBase(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasLwidth()) {
-        element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
+        element.append_attribute("lwidth") = LinewidthToStr(this->GetLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2925,7 +2925,7 @@ bool AttLineRendBase::HasLsegs() const
 
 bool AttLineRendBase::HasLwidth() const
 {
-    return (m_lwidth != "");
+    return (m_lwidth.HasValue());
 }
 
 /* include <attlwidth> */
@@ -2947,7 +2947,9 @@ void AttLinking::ResetLinking()
 {
     m_copyof = "";
     m_corresp = "";
+    m_follows = "";
     m_next = "";
+    m_precedes = "";
     m_prev = "";
     m_sameas = "";
     m_synch = "";
@@ -2966,9 +2968,19 @@ bool AttLinking::ReadLinking(pugi::xml_node element)
         element.remove_attribute("corresp");
         hasAttribute = true;
     }
+    if (element.attribute("follows")) {
+        this->SetFollows(StrToStr(element.attribute("follows").value()));
+        element.remove_attribute("follows");
+        hasAttribute = true;
+    }
     if (element.attribute("next")) {
         this->SetNext(StrToStr(element.attribute("next").value()));
         element.remove_attribute("next");
+        hasAttribute = true;
+    }
+    if (element.attribute("precedes")) {
+        this->SetPrecedes(StrToStr(element.attribute("precedes").value()));
+        element.remove_attribute("precedes");
         hasAttribute = true;
     }
     if (element.attribute("prev")) {
@@ -3000,8 +3012,16 @@ bool AttLinking::WriteLinking(pugi::xml_node element)
         element.append_attribute("corresp") = StrToStr(this->GetCorresp()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasFollows()) {
+        element.append_attribute("follows") = StrToStr(this->GetFollows()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasNext()) {
         element.append_attribute("next") = StrToStr(this->GetNext()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPrecedes()) {
+        element.append_attribute("precedes") = StrToStr(this->GetPrecedes()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPrev()) {
@@ -3029,9 +3049,19 @@ bool AttLinking::HasCorresp() const
     return (m_corresp != "");
 }
 
+bool AttLinking::HasFollows() const
+{
+    return (m_follows != "");
+}
+
 bool AttLinking::HasNext() const
 {
     return (m_next != "");
+}
+
+bool AttLinking::HasPrecedes() const
+{
+    return (m_precedes != "");
 }
 
 bool AttLinking::HasPrev() const
@@ -4774,12 +4804,12 @@ AttPages::~AttPages()
 
 void AttPages::ResetPages()
 {
-    m_pageHeight = "";
-    m_pageWidth = "";
-    m_pageTopmar = "";
-    m_pageBotmar = "";
-    m_pageLeftmar = "";
-    m_pageRightmar = "";
+    m_pageHeight = VRV_UNSET;
+    m_pageWidth = VRV_UNSET;
+    m_pageTopmar = VRV_UNSET;
+    m_pageBotmar = VRV_UNSET;
+    m_pageLeftmar = VRV_UNSET;
+    m_pageRightmar = VRV_UNSET;
     m_pagePanels = "";
     m_pageScale = "";
 }
@@ -4788,32 +4818,32 @@ bool AttPages::ReadPages(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("page.height")) {
-        this->SetPageHeight(StrToStr(element.attribute("page.height").value()));
+        this->SetPageHeight(StrToMeasurementabs(element.attribute("page.height").value()));
         element.remove_attribute("page.height");
         hasAttribute = true;
     }
     if (element.attribute("page.width")) {
-        this->SetPageWidth(StrToStr(element.attribute("page.width").value()));
+        this->SetPageWidth(StrToMeasurementabs(element.attribute("page.width").value()));
         element.remove_attribute("page.width");
         hasAttribute = true;
     }
     if (element.attribute("page.topmar")) {
-        this->SetPageTopmar(StrToStr(element.attribute("page.topmar").value()));
+        this->SetPageTopmar(StrToMeasurementabs(element.attribute("page.topmar").value()));
         element.remove_attribute("page.topmar");
         hasAttribute = true;
     }
     if (element.attribute("page.botmar")) {
-        this->SetPageBotmar(StrToStr(element.attribute("page.botmar").value()));
+        this->SetPageBotmar(StrToMeasurementabs(element.attribute("page.botmar").value()));
         element.remove_attribute("page.botmar");
         hasAttribute = true;
     }
     if (element.attribute("page.leftmar")) {
-        this->SetPageLeftmar(StrToStr(element.attribute("page.leftmar").value()));
+        this->SetPageLeftmar(StrToMeasurementabs(element.attribute("page.leftmar").value()));
         element.remove_attribute("page.leftmar");
         hasAttribute = true;
     }
     if (element.attribute("page.rightmar")) {
-        this->SetPageRightmar(StrToStr(element.attribute("page.rightmar").value()));
+        this->SetPageRightmar(StrToMeasurementabs(element.attribute("page.rightmar").value()));
         element.remove_attribute("page.rightmar");
         hasAttribute = true;
     }
@@ -4834,27 +4864,27 @@ bool AttPages::WritePages(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPageHeight()) {
-        element.append_attribute("page.height") = StrToStr(this->GetPageHeight()).c_str();
+        element.append_attribute("page.height") = MeasurementabsToStr(this->GetPageHeight()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPageWidth()) {
-        element.append_attribute("page.width") = StrToStr(this->GetPageWidth()).c_str();
+        element.append_attribute("page.width") = MeasurementabsToStr(this->GetPageWidth()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPageTopmar()) {
-        element.append_attribute("page.topmar") = StrToStr(this->GetPageTopmar()).c_str();
+        element.append_attribute("page.topmar") = MeasurementabsToStr(this->GetPageTopmar()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPageBotmar()) {
-        element.append_attribute("page.botmar") = StrToStr(this->GetPageBotmar()).c_str();
+        element.append_attribute("page.botmar") = MeasurementabsToStr(this->GetPageBotmar()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPageLeftmar()) {
-        element.append_attribute("page.leftmar") = StrToStr(this->GetPageLeftmar()).c_str();
+        element.append_attribute("page.leftmar") = MeasurementabsToStr(this->GetPageLeftmar()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPageRightmar()) {
-        element.append_attribute("page.rightmar") = StrToStr(this->GetPageRightmar()).c_str();
+        element.append_attribute("page.rightmar") = MeasurementabsToStr(this->GetPageRightmar()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPagePanels()) {
@@ -4870,32 +4900,32 @@ bool AttPages::WritePages(pugi::xml_node element)
 
 bool AttPages::HasPageHeight() const
 {
-    return (m_pageHeight != "");
+    return (m_pageHeight != VRV_UNSET);
 }
 
 bool AttPages::HasPageWidth() const
 {
-    return (m_pageWidth != "");
+    return (m_pageWidth != VRV_UNSET);
 }
 
 bool AttPages::HasPageTopmar() const
 {
-    return (m_pageTopmar != "");
+    return (m_pageTopmar != VRV_UNSET);
 }
 
 bool AttPages::HasPageBotmar() const
 {
-    return (m_pageBotmar != "");
+    return (m_pageBotmar != VRV_UNSET);
 }
 
 bool AttPages::HasPageLeftmar() const
 {
-    return (m_pageLeftmar != "");
+    return (m_pageLeftmar != VRV_UNSET);
 }
 
 bool AttPages::HasPageRightmar() const
 {
-    return (m_pageRightmar != "");
+    return (m_pageRightmar != VRV_UNSET);
 }
 
 bool AttPages::HasPagePanels() const
@@ -5598,6 +5628,52 @@ bool AttSlurPresent::HasSlur() const
 /* include <attslur> */
 
 //----------------------------------------------------------------------------
+// AttSource
+//----------------------------------------------------------------------------
+
+AttSource::AttSource() : Att()
+{
+    ResetSource();
+}
+
+AttSource::~AttSource()
+{
+}
+
+void AttSource::ResetSource()
+{
+    m_source = "";
+}
+
+bool AttSource::ReadSource(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("source")) {
+        this->SetSource(StrToStr(element.attribute("source").value()));
+        element.remove_attribute("source");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSource::WriteSource(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasSource()) {
+        element.append_attribute("source") = StrToStr(this->GetSource()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSource::HasSource() const
+{
+    return (m_source != "");
+}
+
+/* include <attsource> */
+
+//----------------------------------------------------------------------------
 // AttSpacing
 //----------------------------------------------------------------------------
 
@@ -6180,7 +6256,7 @@ bool AttStems::ReadStems(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("stem.len")) {
-        this->SetStemLen(StrToInt(element.attribute("stem.len").value()));
+        this->SetStemLen(StrToDbl(element.attribute("stem.len").value()));
         element.remove_attribute("stem.len");
         hasAttribute = true;
     }
@@ -6220,7 +6296,7 @@ bool AttStems::WriteStems(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasStemLen()) {
-        element.append_attribute("stem.len") = IntToStr(this->GetStemLen()).c_str();
+        element.append_attribute("stem.len") = DblToStr(this->GetStemLen()).c_str();
         wroteAttribute = true;
     }
     if (this->HasStemMod()) {
@@ -6406,9 +6482,9 @@ AttSystems::~AttSystems()
 void AttSystems::ResetSystems()
 {
     m_systemLeftline = BOOLEAN_NONE;
-    m_systemLeftmar = "";
-    m_systemRightmar = "";
-    m_systemTopmar = "";
+    m_systemLeftmar = VRV_UNSET;
+    m_systemRightmar = VRV_UNSET;
+    m_systemTopmar = VRV_UNSET;
 }
 
 bool AttSystems::ReadSystems(pugi::xml_node element)
@@ -6420,17 +6496,17 @@ bool AttSystems::ReadSystems(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("system.leftmar")) {
-        this->SetSystemLeftmar(StrToStr(element.attribute("system.leftmar").value()));
+        this->SetSystemLeftmar(StrToMeasurementabs(element.attribute("system.leftmar").value()));
         element.remove_attribute("system.leftmar");
         hasAttribute = true;
     }
     if (element.attribute("system.rightmar")) {
-        this->SetSystemRightmar(StrToStr(element.attribute("system.rightmar").value()));
+        this->SetSystemRightmar(StrToMeasurementabs(element.attribute("system.rightmar").value()));
         element.remove_attribute("system.rightmar");
         hasAttribute = true;
     }
     if (element.attribute("system.topmar")) {
-        this->SetSystemTopmar(StrToStr(element.attribute("system.topmar").value()));
+        this->SetSystemTopmar(StrToMeasurementabs(element.attribute("system.topmar").value()));
         element.remove_attribute("system.topmar");
         hasAttribute = true;
     }
@@ -6445,15 +6521,15 @@ bool AttSystems::WriteSystems(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasSystemLeftmar()) {
-        element.append_attribute("system.leftmar") = StrToStr(this->GetSystemLeftmar()).c_str();
+        element.append_attribute("system.leftmar") = MeasurementabsToStr(this->GetSystemLeftmar()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSystemRightmar()) {
-        element.append_attribute("system.rightmar") = StrToStr(this->GetSystemRightmar()).c_str();
+        element.append_attribute("system.rightmar") = MeasurementabsToStr(this->GetSystemRightmar()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSystemTopmar()) {
-        element.append_attribute("system.topmar") = StrToStr(this->GetSystemTopmar()).c_str();
+        element.append_attribute("system.topmar") = MeasurementabsToStr(this->GetSystemTopmar()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6466,17 +6542,17 @@ bool AttSystems::HasSystemLeftline() const
 
 bool AttSystems::HasSystemLeftmar() const
 {
-    return (m_systemLeftmar != "");
+    return (m_systemLeftmar != VRV_UNSET);
 }
 
 bool AttSystems::HasSystemRightmar() const
 {
-    return (m_systemRightmar != "");
+    return (m_systemRightmar != VRV_UNSET);
 }
 
 bool AttSystems::HasSystemTopmar() const
 {
-    return (m_systemTopmar != "");
+    return (m_systemTopmar != VRV_UNSET);
 }
 
 /* include <attsystem.topmar> */
@@ -7703,14 +7779,14 @@ AttWidth::~AttWidth()
 
 void AttWidth::ResetWidth()
 {
-    m_width = "";
+    m_width = VRV_UNSET;
 }
 
 bool AttWidth::ReadWidth(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("width")) {
-        this->SetWidth(StrToStr(element.attribute("width").value()));
+        this->SetWidth(StrToMeasurementabs(element.attribute("width").value()));
         element.remove_attribute("width");
         hasAttribute = true;
     }
@@ -7721,7 +7797,7 @@ bool AttWidth::WriteWidth(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasWidth()) {
-        element.append_attribute("width") = StrToStr(this->GetWidth()).c_str();
+        element.append_attribute("width") = MeasurementabsToStr(this->GetWidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -7729,7 +7805,7 @@ bool AttWidth::WriteWidth(pugi::xml_node element)
 
 bool AttWidth::HasWidth() const
 {
-    return (m_width != "");
+    return (m_width != VRV_UNSET);
 }
 
 /* include <attwidth> */
@@ -7926,19 +8002,19 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
-    if (element->HasAttClass(ATT_BARPLACEMENT)) {
-        AttBarPlacement *att = dynamic_cast<AttBarPlacement *>(element);
+    if (element->HasAttClass(ATT_BARRING)) {
+        AttBarring *att = dynamic_cast<AttBarring *>(element);
         assert(att);
-        if (attrType == "barlinelen") {
-            att->SetBarlinelen(att->StrToDbl(attrValue));
+        if (attrType == "bar.len") {
+            att->SetBarLen(att->StrToDbl(attrValue));
             return true;
         }
-        if (attrType == "barplace") {
-            att->SetBarplace(att->StrToBarplace(attrValue));
+        if (attrType == "bar.method") {
+            att->SetBarMethod(att->StrToBarmethod(attrValue));
             return true;
         }
-        if (attrType == "taktplace") {
-            att->SetTaktplace(att->StrToInt(attrValue));
+        if (attrType == "bar.place") {
+            att->SetBarPlace(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -8086,7 +8162,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "lwidth") {
-            att->SetLwidth(att->StrToStr(attrValue));
+            att->SetLwidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -8278,7 +8354,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttHeight *att = dynamic_cast<AttHeight *>(element);
         assert(att);
         if (attrType == "height") {
-            att->SetHeight(att->StrToStr(attrValue));
+            att->SetHeight(att->StrToMeasurementabs(attrValue));
             return true;
         }
     }
@@ -8398,7 +8474,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "lwidth") {
-            att->SetLwidth(att->StrToStr(attrValue));
+            att->SetLwidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -8413,8 +8489,16 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             att->SetCorresp(att->StrToStr(attrValue));
             return true;
         }
+        if (attrType == "follows") {
+            att->SetFollows(att->StrToStr(attrValue));
+            return true;
+        }
         if (attrType == "next") {
             att->SetNext(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "precedes") {
+            att->SetPrecedes(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "prev") {
@@ -8770,27 +8854,27 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttPages *att = dynamic_cast<AttPages *>(element);
         assert(att);
         if (attrType == "page.height") {
-            att->SetPageHeight(att->StrToStr(attrValue));
+            att->SetPageHeight(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "page.width") {
-            att->SetPageWidth(att->StrToStr(attrValue));
+            att->SetPageWidth(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "page.topmar") {
-            att->SetPageTopmar(att->StrToStr(attrValue));
+            att->SetPageTopmar(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "page.botmar") {
-            att->SetPageBotmar(att->StrToStr(attrValue));
+            att->SetPageBotmar(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "page.leftmar") {
-            att->SetPageLeftmar(att->StrToStr(attrValue));
+            att->SetPageLeftmar(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "page.rightmar") {
-            att->SetPageRightmar(att->StrToStr(attrValue));
+            att->SetPageRightmar(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "page.panels") {
@@ -8934,6 +9018,14 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_SOURCE)) {
+        AttSource *att = dynamic_cast<AttSource *>(element);
+        assert(att);
+        if (attrType == "source") {
+            att->SetSource(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_SPACING)) {
         AttSpacing *att = dynamic_cast<AttSpacing *>(element);
         assert(att);
@@ -9046,7 +9138,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "stem.len") {
-            att->SetStemLen(att->StrToInt(attrValue));
+            att->SetStemLen(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "stem.mod") {
@@ -9098,15 +9190,15 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "system.leftmar") {
-            att->SetSystemLeftmar(att->StrToStr(attrValue));
+            att->SetSystemLeftmar(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "system.rightmar") {
-            att->SetSystemRightmar(att->StrToStr(attrValue));
+            att->SetSystemRightmar(att->StrToMeasurementabs(attrValue));
             return true;
         }
         if (attrType == "system.topmar") {
-            att->SetSystemTopmar(att->StrToStr(attrValue));
+            att->SetSystemTopmar(att->StrToMeasurementabs(attrValue));
             return true;
         }
     }
@@ -9342,7 +9434,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttWidth *att = dynamic_cast<AttWidth *>(element);
         assert(att);
         if (attrType == "width") {
-            att->SetWidth(att->StrToStr(attrValue));
+            att->SetWidth(att->StrToMeasurementabs(attrValue));
             return true;
         }
     }
@@ -9435,17 +9527,17 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("form", att->BarrenditionToStr(att->GetForm())));
         }
     }
-    if (element->HasAttClass(ATT_BARPLACEMENT)) {
-        const AttBarPlacement *att = dynamic_cast<const AttBarPlacement *>(element);
+    if (element->HasAttClass(ATT_BARRING)) {
+        const AttBarring *att = dynamic_cast<const AttBarring *>(element);
         assert(att);
-        if (att->HasBarlinelen()) {
-            attributes->push_back(std::make_pair("barlinelen", att->DblToStr(att->GetBarlinelen())));
+        if (att->HasBarLen()) {
+            attributes->push_back(std::make_pair("bar.len", att->DblToStr(att->GetBarLen())));
         }
-        if (att->HasBarplace()) {
-            attributes->push_back(std::make_pair("barplace", att->BarplaceToStr(att->GetBarplace())));
+        if (att->HasBarMethod()) {
+            attributes->push_back(std::make_pair("bar.method", att->BarmethodToStr(att->GetBarMethod())));
         }
-        if (att->HasTaktplace()) {
-            attributes->push_back(std::make_pair("taktplace", att->IntToStr(att->GetTaktplace())));
+        if (att->HasBarPlace()) {
+            attributes->push_back(std::make_pair("bar.place", att->IntToStr(att->GetBarPlace())));
         }
     }
     if (element->HasAttClass(ATT_BASIC)) {
@@ -9570,7 +9662,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lform", att->LineformToStr(att->GetLform())));
         }
         if (att->HasLwidth()) {
-            attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));
+            attributes->push_back(std::make_pair("lwidth", att->LinewidthToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass(ATT_CUSTOSLOG)) {
@@ -9733,7 +9825,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttHeight *att = dynamic_cast<const AttHeight *>(element);
         assert(att);
         if (att->HasHeight()) {
-            attributes->push_back(std::make_pair("height", att->StrToStr(att->GetHeight())));
+            attributes->push_back(std::make_pair("height", att->MeasurementabsToStr(att->GetHeight())));
         }
     }
     if (element->HasAttClass(ATT_HORIZONTALALIGN)) {
@@ -9835,7 +9927,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lsegs", att->IntToStr(att->GetLsegs())));
         }
         if (att->HasLwidth()) {
-            attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));
+            attributes->push_back(std::make_pair("lwidth", att->LinewidthToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass(ATT_LINKING)) {
@@ -9847,8 +9939,14 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasCorresp()) {
             attributes->push_back(std::make_pair("corresp", att->StrToStr(att->GetCorresp())));
         }
+        if (att->HasFollows()) {
+            attributes->push_back(std::make_pair("follows", att->StrToStr(att->GetFollows())));
+        }
         if (att->HasNext()) {
             attributes->push_back(std::make_pair("next", att->StrToStr(att->GetNext())));
+        }
+        if (att->HasPrecedes()) {
+            attributes->push_back(std::make_pair("precedes", att->StrToStr(att->GetPrecedes())));
         }
         if (att->HasPrev()) {
             attributes->push_back(std::make_pair("prev", att->StrToStr(att->GetPrev())));
@@ -10144,22 +10242,22 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttPages *att = dynamic_cast<const AttPages *>(element);
         assert(att);
         if (att->HasPageHeight()) {
-            attributes->push_back(std::make_pair("page.height", att->StrToStr(att->GetPageHeight())));
+            attributes->push_back(std::make_pair("page.height", att->MeasurementabsToStr(att->GetPageHeight())));
         }
         if (att->HasPageWidth()) {
-            attributes->push_back(std::make_pair("page.width", att->StrToStr(att->GetPageWidth())));
+            attributes->push_back(std::make_pair("page.width", att->MeasurementabsToStr(att->GetPageWidth())));
         }
         if (att->HasPageTopmar()) {
-            attributes->push_back(std::make_pair("page.topmar", att->StrToStr(att->GetPageTopmar())));
+            attributes->push_back(std::make_pair("page.topmar", att->MeasurementabsToStr(att->GetPageTopmar())));
         }
         if (att->HasPageBotmar()) {
-            attributes->push_back(std::make_pair("page.botmar", att->StrToStr(att->GetPageBotmar())));
+            attributes->push_back(std::make_pair("page.botmar", att->MeasurementabsToStr(att->GetPageBotmar())));
         }
         if (att->HasPageLeftmar()) {
-            attributes->push_back(std::make_pair("page.leftmar", att->StrToStr(att->GetPageLeftmar())));
+            attributes->push_back(std::make_pair("page.leftmar", att->MeasurementabsToStr(att->GetPageLeftmar())));
         }
         if (att->HasPageRightmar()) {
-            attributes->push_back(std::make_pair("page.rightmar", att->StrToStr(att->GetPageRightmar())));
+            attributes->push_back(std::make_pair("page.rightmar", att->MeasurementabsToStr(att->GetPageRightmar())));
         }
         if (att->HasPagePanels()) {
             attributes->push_back(std::make_pair("page.panels", att->StrToStr(att->GetPagePanels())));
@@ -10279,6 +10377,13 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("slur", att->StrToStr(att->GetSlur())));
         }
     }
+    if (element->HasAttClass(ATT_SOURCE)) {
+        const AttSource *att = dynamic_cast<const AttSource *>(element);
+        assert(att);
+        if (att->HasSource()) {
+            attributes->push_back(std::make_pair("source", att->StrToStr(att->GetSource())));
+        }
+    }
     if (element->HasAttClass(ATT_SPACING)) {
         const AttSpacing *att = dynamic_cast<const AttSpacing *>(element);
         assert(att);
@@ -10374,7 +10479,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("stem.dir", att->StemdirectionToStr(att->GetStemDir())));
         }
         if (att->HasStemLen()) {
-            attributes->push_back(std::make_pair("stem.len", att->IntToStr(att->GetStemLen())));
+            attributes->push_back(std::make_pair("stem.len", att->DblToStr(att->GetStemLen())));
         }
         if (att->HasStemMod()) {
             attributes->push_back(std::make_pair("stem.mod", att->StemmodifierToStr(att->GetStemMod())));
@@ -10416,13 +10521,13 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("system.leftline", att->BooleanToStr(att->GetSystemLeftline())));
         }
         if (att->HasSystemLeftmar()) {
-            attributes->push_back(std::make_pair("system.leftmar", att->StrToStr(att->GetSystemLeftmar())));
+            attributes->push_back(std::make_pair("system.leftmar", att->MeasurementabsToStr(att->GetSystemLeftmar())));
         }
         if (att->HasSystemRightmar()) {
-            attributes->push_back(std::make_pair("system.rightmar", att->StrToStr(att->GetSystemRightmar())));
+            attributes->push_back(std::make_pair("system.rightmar", att->MeasurementabsToStr(att->GetSystemRightmar())));
         }
         if (att->HasSystemTopmar()) {
-            attributes->push_back(std::make_pair("system.topmar", att->StrToStr(att->GetSystemTopmar())));
+            attributes->push_back(std::make_pair("system.topmar", att->MeasurementabsToStr(att->GetSystemTopmar())));
         }
     }
     if (element->HasAttClass(ATT_TARGETEVAL)) {
@@ -10622,7 +10727,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttWidth *att = dynamic_cast<const AttWidth *>(element);
         assert(att);
         if (att->HasWidth()) {
-            attributes->push_back(std::make_pair("width", att->StrToStr(att->GetWidth())));
+            attributes->push_back(std::make_pair("width", att->MeasurementabsToStr(att->GetWidth())));
         }
     }
     if (element->HasAttClass(ATT_XY)) {

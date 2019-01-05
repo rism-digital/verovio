@@ -50,6 +50,20 @@ public:
     ///@{
     virtual void AddChild(Object *object);
 
+    /**
+     * @name Setter and getter of the drawing visible flag
+     */
+    ///@{
+    VisibilityOptimization GetDrawingVisibility() const { return m_drawingVisibility; }
+    void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
+    ///@}
+                     
+    /**
+     * Return true if the staffDef in in a braced staffGrp within a bracket staffGrp.
+     * Used for increasing the spacing in View::DrawStaffDefLabels.
+     */
+    bool IsInBraceAndBracket();
+
     //----------//
     // Functors //
     //----------//
@@ -69,6 +83,13 @@ private:
 public:
     //
 private:
+    /**
+     * A flag indicating is the staffDef is visible or not.
+     * staffDef is not visible when scoreDef is optimized with dynamic rendering and
+     * when the corresponding staves contain only mRest elements.
+     * By default the value is OPTIMIZATION_NONE
+     */
+    VisibilityOptimization m_drawingVisibility;
 };
 
 } // namespace vrv

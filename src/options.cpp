@@ -341,9 +341,10 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
 
 OptionIntMap::OptionIntMap()
 {
-    m_values = NULL;
-    m_value = 0,
+    m_value = 0;
     m_defaultValue = 0;
+    
+    m_values = NULL;
 }
 
 void OptionIntMap::CopyTo(Option *option)
@@ -523,6 +524,10 @@ Options::Options()
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_general);
+    
+    m_openControlEvents.SetInfo("Open control event", "Render open control events");
+    m_openControlEvents.Init(false);
+    this->Register(&m_openControlEvents, "openControlEvents", &m_general);
 
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
@@ -593,10 +598,18 @@ Options::Options()
     m_leftPosition.Init(0.8, 0.0, 2.0);
     this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
 
+    m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
+    m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
+    this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
+    
     m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");
     m_lyricHyphenWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_lyricHyphenWidth, "lyricHyphenWidth", &m_generalLayout);
 
+    m_lyricNoStartHyphen.SetInfo("Lyric no start hyphen", "Do not show hyphens at the beginning of a system");
+    m_lyricNoStartHyphen.Init(false);
+    this->Register(&m_lyricNoStartHyphen, "lyricNoStartHyphen", &m_generalLayout);
+    
     m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
     m_lyricSize.Init(4.5, 2.0, 8.0);
     this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
@@ -604,6 +617,10 @@ Options::Options()
     m_lyricTopMinMargin.SetInfo("Lyric top min margin", "The minmal margin above the lyrics in MEI units");
     m_lyricTopMinMargin.Init(2.0, 0.0, 8.0);
     this->Register(&m_lyricTopMinMargin, "lyricTopMinMargin", &m_generalLayout);
+    
+    m_lyricWordSpace.SetInfo("Lyric word space", "The lyric word space length");
+    m_lyricWordSpace.Init(1.20, 0.50, 3.00);
+    this->Register(&m_lyricWordSpace, "lyricWordSpace", &m_generalLayout);
 
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
     m_measureMinWidth.Init(15, 1, 30);
@@ -613,18 +630,39 @@ Options::Options()
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
 
+    m_slurControlPoints.SetInfo(
+        "Slur control points", "Slur control points - higher value means more curved at the end");
+    m_slurControlPoints.Init(5, 1, 10);
+    this->Register(&m_slurControlPoints, "slurControlPointsr", &m_generalLayout);
+
+    m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
+    m_slurCurveFactor.Init(10, 1, 100);
+    this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
+
+    m_slurHeightFactor.SetInfo("Slur height factor", "Slur height factor -  high value means flatter slurs");
+    m_slurHeightFactor.Init(5, 1, 100);
+    this->Register(&m_slurHeightFactor, "slurHeightFactor", &m_generalLayout);
+
     m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
     m_slurMinHeight.Init(1.2, 0.3, 2.0);
     this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
 
     m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
-    m_slurMaxHeight.Init(3.0, 2.0, 4.0);
+    m_slurMaxHeight.Init(3.0, 2.0, 6.0);
     this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
+
+    m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
+    m_slurMaxSlope.Init(20, 0, 45);
+    this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
     m_slurThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
 
+    m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
+    m_spacingDurDetection.Init(false);
+    this->Register(&m_spacingDurDetection, "spacingDurDetection", &m_generalLayout);
+    
     m_spacingLinear.SetInfo("Spacing linear", "Specify the linear spacing factor");
     m_spacingLinear.Init(0.25, 0.0, 1.0);
     this->Register(&m_spacingLinear, "spacingLinear", &m_generalLayout);
@@ -675,6 +713,12 @@ Options::Options()
         "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
+
+    m_substXPathQuery.SetInfo("Subst xPath query",
+        "Set the xPath query for selecting <subst> child elements, for "
+        "example: \"./del\"; by default the first child is selected");
+    m_substXPathQuery.Init();
+    this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
 
     /********* The layout left margin by element *********/
 

@@ -162,9 +162,14 @@ public:
     static Point CalcPositionAfterRotation(Point point, float alpha, Point center);
 
     /**
-     * Calculate the position of a point after a rotation of alpha around the center
+     * Calculate the y position of a bezier at position x
      */
     static int CalcBezierAtPosition(const Point bezier[4], int x);
+
+    /**
+     * Calculate the point bezier point position for a t between 0.0 and 1.0
+     */
+    static Point CalcDeCasteljau(const Point bezier[4], double t);
 
     /**
      * Calculate the position of the bezier above and below for a thick bezier
@@ -242,11 +247,6 @@ private:
      * The font size for the smufl glyph used for calculating the bounding box rectangles.
      */
     int m_smuflGlyphFontSize;
-
-    /**
-     * Buffer for De-Casteljau algorithm
-     */
-    static int s_deCasteljau[4][4];
 };
 
 //----------------------------------------------------------------------------
@@ -303,7 +303,7 @@ private:
     /**
      * An vector of line segments
      */
-    std::vector<std::pair<int, int> > m_segments;
+    ArrayOfIntPairs m_segments;
 };
 
 } // namespace vrv

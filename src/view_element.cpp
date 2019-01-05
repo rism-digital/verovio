@@ -28,8 +28,10 @@
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
+#include "f.h"
 #include "ftrem.h"
 #include "functorparams.h"
+#include "halfmrpt.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -65,6 +67,13 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(layer);
     assert(staff);
     assert(measure);
+    
+    if (element->HasSameas()) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        element->SetEmptyBB();
+        dc->EndGraphic(element, this);
+        return;
+    }
 
     int previousColor = m_currentColour;
 
@@ -116,6 +125,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(FLAG)) {
         DrawFlag(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(HALFMRPT)) {
+        DrawHalfmRpt(dc, element, layer, staff, measure);
     }
     else if (element->Is(KEYSIG)) {
         DrawKeySig(dc, element, layer, staff, measure);
@@ -835,6 +847,27 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->EndGraphic(element, this);
 }
+    
+void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    HalfmRpt *halfmRpt = dynamic_cast<HalfmRpt *>(element);
+    assert(halfmRpt);
+
+    int x = halfmRpt->GetDrawingX();
+    x += m_doc->GetGlyphWidth(SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false) / 2;
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    DrawMRptPart(dc, x, SMUFL_E500_repeat1Bar, 0, false, staff);
+
+    dc->EndGraphic(element, this);
+}
 
 void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
@@ -869,12 +902,10 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     // C major (0) key sig and system scoreDef - cancellation (if any) is done at the end of the previous system
-    else if ((keySig->GetScoreDefRole() == SYSTEM_SCOREDEF) && (keySig->GetAlterationNumber() == 0)) {
+    else if ((keySig->GetScoreDefRole() == SCOREDEF_SYSTEM) && (keySig->GetAlterationNumber() == 0)) {
         keySig->SetEmptyBB();
         return;
     }
-
-    dc->StartGraphic(element, "", element->GetUuid());
 
     x = element->GetDrawingX();
     // HARDCODED
@@ -883,25 +914,31 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLocOffset = layer->GetClefLocOffset(element);
     int loc;
 
-    // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
-    // default)
-    if ((keySig->GetScoreDefRole() != SYSTEM_SCOREDEF)
-        && ((keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange)) {
+    // Show cancellation if C major (0)
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAlterationNumber() == 0)) {
+        dc->StartGraphic(element, "", element->GetUuid());
+
+        for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
+            data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+            loc = PitchInterface::CalcLoc(
+                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+            DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+            x += step;
+        }
+
+        dc->EndGraphic(element, this);
+        return;
+    }
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    // Show cancellation if show cancellation (showchange) is true (false by default)
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += step;
-            }
-        }
-        // Cancel some of them if more accid before
-        else if (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount) {
-            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; ++i) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
@@ -925,6 +962,23 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
         DrawSmuflCode(dc, x, y, symb, staff->m_drawingStaffSize, false);
         x += step;
+    }
+
+    // Show cancellation if show cancellation (showchange) is true (false by default)
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+        // Same time of alteration, but smaller number - cancellation is displayed afterwards
+        if ((keySig->GetAlterationType() == keySig->m_drawingCancelAccidType)
+            && (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount)) {
+            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; ++i) {
+                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+                loc = PitchInterface::CalcLoc(
+                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+                x += step;
+            }
+        }
     }
 
     dc->EndGraphic(element, this);
@@ -958,7 +1012,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         }
     }
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), NONE, staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), SCOREDEF_NONE, staff);
     }
     else if (meterSig->HasCount()) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
@@ -1284,9 +1338,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
-    // assert(false);
-    syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1);
     syl->SetDrawingYRel(GetSylYRel(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
@@ -1538,6 +1589,38 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
 // Calculation or preparation methods
 ///----------------------------------------------------------------------------
 
+int View::GetFYRel(F *f, Staff *staff)
+{
+    assert(f && staff);
+
+    int y = staff->GetDrawingY();
+    
+    StaffAlignment *alignment = staff->GetAlignment();
+    // Something must be seriously wrong...
+    if (!alignment) return y;
+    
+    y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
+    
+    FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
+    // There is no other harm, we use the bottom line.
+    if (!positioner) return y;
+    
+    y = positioner->GetDrawingY();
+    
+    Object *fb = f->GetFirstParent(FB);
+    assert(fb);
+    int line = fb->GetChildIndex(f, FIGURE, UNLIMITED_DEPTH);
+    
+    if (line > 0) {
+        FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        int lineHeight = m_doc->GetTextLineHeight(fFont, false);
+        y -= (line * lineHeight);
+    }
+    
+    return y;
+}
+
+    
 int View::GetSylYRel(Syl *syl, Staff *staff)
 {
     assert(syl && staff);

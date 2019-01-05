@@ -150,6 +150,17 @@ int Staff::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
+bool Staff::DrawingIsVisible()
+{
+    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    assert(system);
+    assert(system->GetDrawingScoreDef());
+
+    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
+    assert(staffDef);
+    return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
+}
+
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 {
     assert(doc);
@@ -264,6 +275,47 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Staff::OptimizeScoreDef(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_currentScoreDef);
+    StaffDef *staffDef = params->m_currentScoreDef->GetStaffDef(this->GetN());
+
+    if (!staffDef) {
+        LogDebug(
+            "Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::OptimizeScoreDef", this->GetN());
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Always show all staves when there is a fermata
+    // (without checking if the fermata is actually on that staff)
+    if (params->m_hasFermata) {
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    }
+
+    if (staffDef->GetDrawingVisibility() == OPTIMIZATION_SHOW) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
+
+    ArrayOfObjects layers;
+    AttComparison matchTypeLayer(LAYER);
+    this->FindAllChildByComparison(&layers, &matchTypeLayer);
+
+    ArrayOfObjects mRests;
+    AttComparison matchTypeMRest(MREST);
+    this->FindAllChildByComparison(&mRests, &matchTypeMRest);
+
+    if (mRests.size() != layers.size()) {
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_staffAlignment = NULL;
@@ -304,6 +356,10 @@ int Staff::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
+
+    if (!this->DrawingIsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     params->m_staffN = this->GetN();
 
@@ -393,6 +449,17 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
     else {
         params->m_notationType = NOTATIONTYPE_cmn;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int Staff::AdjustSylSpacing(FunctorParams *functorParams)
+{
+    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    assert(params);
+    
+    // Set the staff size for this pass
+    params->m_staffSize = this->m_drawingStaffSize;
 
     return FUNCTOR_CONTINUE;
 }

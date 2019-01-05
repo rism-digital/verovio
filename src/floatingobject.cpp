@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "bracketspan.h"
 #include "breath.h"
 #include "dir.h"
 #include "doc.h"
@@ -147,7 +148,10 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
     m_alignment = alignment;
     m_spanningType = spanningType;
 
-    if (object->Is(BREATH)) {
+    if (object->Is(BRACKETSPAN)) {
+        m_place = STAFFREL_basic_above;
+    }
+    else if (object->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(object);
         assert(breath);
         // breath above by default
@@ -363,7 +367,6 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (this->m_place == STAFFREL_basic_above) {
             yRel = GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
-
             this->SetDrawingYRel(yRel);
         }
         else {

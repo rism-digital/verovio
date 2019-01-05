@@ -38,6 +38,8 @@ void LinkingInterface::Reset()
 
     m_next = NULL;
     m_nextUuid = "";
+    m_sameas = NULL;
+    m_sameasUuid = "";
 }
 
 void LinkingInterface::SetNextLink(Object *next)
@@ -45,11 +47,20 @@ void LinkingInterface::SetNextLink(Object *next)
     assert(!m_next);
     m_next = next;
 }
+    
+void LinkingInterface::SetSameasLink(Object *sameas)
+{
+    assert(!m_sameas);
+    m_sameas = sameas;
+}
 
 void LinkingInterface::SetUuidStr()
 {
     if (this->HasNext()) {
         m_nextUuid = ExtractUuidFragment(this->GetNext());
+    }
+    if (this->HasSameas()) {
+        m_sameasUuid = ExtractUuidFragment(this->GetSameas());
     }
 }
 
@@ -74,31 +85,33 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
     }
 
     this->SetUuidStr();
-    
+
     if (!m_nextUuid.empty()) {
         params->m_nextUuidPairs.push_back(std::make_pair(this, m_nextUuid));
     }
+    if (!m_sameasUuid.empty()) {
+        params->m_sameasUuidPairs.push_back(std::make_pair(this, m_sameasUuid));
+    }
     
+
     return FUNCTOR_CONTINUE;
 }
-    
 
 int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
-    
-    
+
     // Only Dir and Dynam can be spanning with @next (extender)
-    if (!object->Is({DIR, DYNAM})) {
+    if (!object->Is({ DIR, DYNAM })) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // Only target control events are supported
     if (!this->GetNextLink() || !this->GetNextLink()->IsControlElement()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // if @extender is available, the explicit "true" is required
     if (object->HasAttClass(ATT_EXTENDER)) {
         AttExtender *att = dynamic_cast<AttExtender *>(object);
@@ -111,11 +124,12 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
     return FUNCTOR_CONTINUE;
 }
 
-
 int LinkingInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
 {
     m_next = NULL;
     m_nextUuid = "";
+    m_sameas = NULL;
+    m_sameasUuid = "";
     return FUNCTOR_CONTINUE;
 }
 

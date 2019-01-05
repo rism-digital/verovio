@@ -39,18 +39,23 @@ public:
     ///@}
 
     /**
-     * @name Set and get the next object
+     * @name Set and get the @next, @sameas, ... object
      * The setter asserts that no Object was previously set.
      */
     ///@{
     void SetNextLink(Object *next);
-    Object *GetNextLink() { return m_next; }
+    Object *GetNextLink() const { return m_next; }
+    void SetSameasLink(Object *sameas);
+    Object *GetSameasLink() const { return m_sameas; }
     ///@}
 
     /**
      * Return true if a object is given and resolved
      */
-    bool HasNextLink() { return (m_next); }
+    ///@{
+    bool HasNextLink() const { return (m_next); }
+    bool HasSameasLink() const { return (m_sameas); }
+    ///@}
 
     /**
      * Return the start measure of the next object (if any, NULL otherwise)
@@ -67,7 +72,7 @@ public:
      * the functor method. These not called by the Process/Call loop but by the implementaion
      * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
-    
+
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
@@ -96,6 +101,8 @@ public:
 private:
     Object *m_next;
     std::string m_nextUuid;
+    Object *m_sameas;
+    std::string m_sameasUuid;
 };
 
 } // namespace vrv

@@ -23,6 +23,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "ftrem.h"
@@ -176,8 +177,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
-        Object *current;
-        for (current = measure->GetFirst(); current; current = measure->GetNext()) {
+        for (auto current : *measure->GetChildren()) {
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
@@ -520,7 +520,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     partStaffGrp->AddChild(instrdef);
                 }
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
-                partStaffGrp->SetBarthru(BOOLEAN_true);
+                partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
             else {
@@ -639,11 +639,13 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     int nbStaves = 1;
 
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
+
         // We read all attribute elements until we reach something else
-        // barline, print, and sound elements may be present
-        if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "print")
-            && !IsElement(*it, "sound"))
+        // barline, direction, print, and sound elements may be present
+        if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "direction")
+            && !IsElement(*it, "print") && !IsElement(*it, "sound")) {
             break;
+        }
 
         // we do not want to read it again, just change the name
         if (IsElement(*it, "attributes")) it->set_name("mei-read");
@@ -841,13 +843,13 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
         if (m_multiRest != 0) {
-          m_multiRest--;
+            m_multiRest--;
         }
         else {
-          Measure *measure = new Measure();
-          ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
-          // Add the measure to the system - if already there from a previous part we'll just merge the content
-          AddMeasure(section, measure, i);
+            Measure *measure = new Measure();
+            ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
+            // Add the measure to the system - if already there from a previous part we'll just merge the content
+            AddMeasure(section, measure, i);
         }
         i++;
     }
@@ -868,7 +870,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
-        staff->SetVisible(ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
+        staff->SetVisible(
+            ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
@@ -886,7 +889,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // first check if there is a multi measure rest
         if (it->select_single_node(".//multiple-rest")) {
             m_multiRest = it->select_single_node(".//multiple-rest").node().text().as_int();
-            MultiRest * multiRest = new MultiRest;
+            MultiRest *multiRest = new MultiRest;
             multiRest->SetNum(m_multiRest);
             Layer *layer = SelectLayer(1, measure);
             AddLayerElement(layer, multiRest);
@@ -1335,7 +1338,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     harm->AddChild(text);
     pugi::xpath_node offset = node.select_single_node("offset");
     if (offset) durOffset = offset.node().text().as_int();
-    harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterCount / (double)(4 * m_ppq) + 1.0);
+    harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     m_controlElements.push_back(std::make_pair(measureNum, harm));
     m_harmStack.push_back(harm);
 }
@@ -1439,22 +1442,21 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // we assume /note without /type to be mRest
         else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
             if (m_slash) {
-              for (int i = m_meterCount; i > 0; --i) {
-                BeatRpt *slash = new BeatRpt;
-                AddLayerElement(layer, slash);
-              }
-              return;
+                for (int i = m_meterCount; i > 0; --i) {
+                    BeatRpt *slash = new BeatRpt;
+                    AddLayerElement(layer, slash);
+                }
+                return;
             }
             else {
-              MRest *mRest = new MRest();
-              element = mRest;
-              // FIXME MEI 4.0.0
-              // if (cue) mRest->SetSize(SIZE_cue);
-              if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
-              if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
-              AddLayerElement(layer, mRest);
+                MRest *mRest = new MRest();
+                element = mRest;
+                // FIXME MEI 4.0.0
+                // if (cue) mRest->SetSize(SIZE_cue);
+                if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
+                if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+                AddLayerElement(layer, mRest);
             }
-
         }
         else {
             Rest *rest = new Rest();
@@ -1650,7 +1652,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
              articulations = articulations.next_sibling("articulations")) {
             Artic *artic = new Artic();
             if (articulations.select_single_node("accent")) artics.push_back(ARTICULATION_acc);
-            if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
+            // Removed in MEI 4.0
+            //if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
             if (articulations.select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
             if (articulations.select_single_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
             if (articulations.select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);

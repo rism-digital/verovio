@@ -76,7 +76,6 @@ enum data_ARTICULATION {
     ARTICULATION_ten,
     ARTICULATION_stacciss,
     ARTICULATION_marc,
-    ARTICULATION_marc_stacc,
     ARTICULATION_spicc,
     ARTICULATION_doit,
     ARTICULATION_scoop,
@@ -93,7 +92,6 @@ enum data_ARTICULATION {
     ARTICULATION_harm,
     ARTICULATION_snap,
     ARTICULATION_fingernail,
-    ARTICULATION_ten_stacc,
     ARTICULATION_damp,
     ARTICULATION_dampall,
     ARTICULATION_open,
@@ -110,14 +108,14 @@ enum data_ARTICULATION {
 };
 
 /**
- * MEI data.BARPLACE
+ * MEI data.BARMETHOD
  */
-enum data_BARPLACE {
-    BARPLACE_NONE = 0,
-    BARPLACE_mensur,
-    BARPLACE_staff,
-    BARPLACE_takt,
-    BARPLACE_MAX
+enum data_BARMETHOD {
+    BARMETHOD_NONE = 0,
+    BARMETHOD_mensur,
+    BARMETHOD_staff,
+    BARMETHOD_takt,
+    BARMETHOD_MAX
 };
 
 /**
@@ -374,6 +372,30 @@ enum data_COLORNAMES {
 };
 
 /**
+ * MEI data.COMPASSDIRECTION.basic
+ */
+enum data_COMPASSDIRECTION_basic {
+    COMPASSDIRECTION_basic_NONE = 0,
+    COMPASSDIRECTION_basic_n,
+    COMPASSDIRECTION_basic_e,
+    COMPASSDIRECTION_basic_s,
+    COMPASSDIRECTION_basic_w,
+    COMPASSDIRECTION_basic_MAX
+};
+
+/**
+ * MEI data.COMPASSDIRECTION.extended
+ */
+enum data_COMPASSDIRECTION_extended {
+    COMPASSDIRECTION_extended_NONE = 0,
+    COMPASSDIRECTION_extended_ne,
+    COMPASSDIRECTION_extended_nw,
+    COMPASSDIRECTION_extended_se,
+    COMPASSDIRECTION_extended_sw,
+    COMPASSDIRECTION_extended_MAX
+};
+
+/**
  * MEI data.ENCLOSURE
  */
 enum data_ENCLOSURE {
@@ -381,6 +403,30 @@ enum data_ENCLOSURE {
     ENCLOSURE_paren,
     ENCLOSURE_brack,
     ENCLOSURE_MAX
+};
+
+/**
+ * MEI data.EVENTREL.basic
+ */
+enum data_EVENTREL_basic {
+    EVENTREL_basic_NONE = 0,
+    EVENTREL_basic_above,
+    EVENTREL_basic_below,
+    EVENTREL_basic_left,
+    EVENTREL_basic_right,
+    EVENTREL_basic_MAX
+};
+
+/**
+ * MEI data.EVENTREL.extended
+ */
+enum data_EVENTREL_extended {
+    EVENTREL_extended_NONE = 0,
+    EVENTREL_extended_above_left,
+    EVENTREL_extended_above_right,
+    EVENTREL_extended_below_left,
+    EVENTREL_extended_below_right,
+    EVENTREL_extended_MAX
 };
 
 /**
@@ -986,13 +1032,13 @@ enum data_STAFFITEM_cmn {
     STAFFITEM_cmn_NONE = 0,
     STAFFITEM_cmn_beam,
     STAFFITEM_cmn_bend,
+    STAFFITEM_cmn_bracketSpan,
     STAFFITEM_cmn_breath,
     STAFFITEM_cmn_cpMark,
     STAFFITEM_cmn_fermata,
     STAFFITEM_cmn_fing,
     STAFFITEM_cmn_hairpin,
     STAFFITEM_cmn_harpPedal,
-    STAFFITEM_cmn_ligatureSpan,
     STAFFITEM_cmn_lv,
     STAFFITEM_cmn_mordent,
     STAFFITEM_cmn_octave,
@@ -1133,6 +1179,15 @@ enum accidLog_FUNC {
 };
 
 /**
+ * MEI att.anchoredText.log@func
+ */
+enum anchoredTextLog_FUNC {
+    anchoredTextLog_FUNC_NONE = 0,
+    anchoredTextLog_FUNC_unknown,
+    anchoredTextLog_FUNC_MAX
+};
+
+/**
  * MEI att.arpeg.log@order
  */
 enum arpegLog_ORDER {
@@ -1187,6 +1242,17 @@ enum beamingVis_BEAMREND {
 };
 
 /**
+ * MEI att.bracketSpan.log@func
+ */
+enum bracketSpanLog_FUNC {
+    bracketSpanLog_FUNC_NONE = 0,
+    bracketSpanLog_FUNC_coloration,
+    bracketSpanLog_FUNC_cross_rhythm,
+    bracketSpanLog_FUNC_ligature,
+    bracketSpanLog_FUNC_MAX
+};
+
+/**
  * MEI att.curvature@curvedir
  */
 enum curvature_CURVEDIR {
@@ -1195,6 +1261,15 @@ enum curvature_CURVEDIR {
     curvature_CURVEDIR_below,
     curvature_CURVEDIR_mixed,
     curvature_CURVEDIR_MAX
+};
+
+/**
+ * MEI att.curve.log@func
+ */
+enum curveLog_FUNC {
+    curveLog_FUNC_NONE = 0,
+    curveLog_FUNC_unknown,
+    curveLog_FUNC_MAX
 };
 
 /**
@@ -1225,6 +1300,36 @@ enum endings_ENDINGREND {
     endings_ENDINGREND_barred,
     endings_ENDINGREND_grouped,
     endings_ENDINGREND_MAX
+};
+
+/**
+ * MEI att.episema.vis@form
+ */
+enum episemaVis_FORM {
+    episemaVis_FORM_NONE = 0,
+    episemaVis_FORM_h,
+    episemaVis_FORM_v,
+    episemaVis_FORM_MAX
+};
+
+/**
+ * MEI att.evidence@evidence
+ */
+enum evidence_EVIDENCE {
+    evidence_EVIDENCE_NONE = 0,
+    evidence_EVIDENCE_internal,
+    evidence_EVIDENCE_external,
+    evidence_EVIDENCE_conjecture,
+    evidence_EVIDENCE_MAX
+};
+
+/**
+ * MEI att.extSym@glyph.auth
+ */
+enum extSym_GLYPHAUTH {
+    extSym_GLYPHAUTH_NONE = 0,
+    extSym_GLYPHAUTH_smufl,
+    extSym_GLYPHAUTH_MAX
 };
 
 /**
@@ -1399,6 +1504,52 @@ enum harpPedalLog_G {
 };
 
 /**
+ * MEI att.line.log@func
+ */
+enum lineLog_FUNC {
+    lineLog_FUNC_NONE = 0,
+    lineLog_FUNC_coloration,
+    lineLog_FUNC_ligature,
+    lineLog_FUNC_unknown,
+    lineLog_FUNC_MAX
+};
+
+/**
+ * MEI att.liquescent.vis@curve
+ */
+enum liquescentVis_CURVE {
+    liquescentVis_CURVE_NONE = 0,
+    liquescentVis_CURVE_a,
+    liquescentVis_CURVE_c,
+    liquescentVis_CURVE_MAX
+};
+
+/**
+ * MEI att.measurement@unit
+ */
+enum measurement_UNIT {
+    measurement_UNIT_NONE = 0,
+    measurement_UNIT_byte,
+    measurement_UNIT_char,
+    measurement_UNIT_cm,
+    measurement_UNIT_deg,
+    measurement_UNIT_in,
+    measurement_UNIT_issue,
+    measurement_UNIT_ft,
+    measurement_UNIT_m,
+    measurement_UNIT_mm,
+    measurement_UNIT_page,
+    measurement_UNIT_pc,
+    measurement_UNIT_pt,
+    measurement_UNIT_px,
+    measurement_UNIT_rad,
+    measurement_UNIT_record,
+    measurement_UNIT_vol,
+    measurement_UNIT_vu,
+    measurement_UNIT_MAX
+};
+
+/**
  * MEI att.meiVersion@meiversion
  */
 enum meiVersion_MEIVERSION {
@@ -1484,56 +1635,34 @@ enum mordentLog_FORM {
 };
 
 /**
- * MEI att.nc.vis@con
+ * MEI att.ncForm@con
  */
-enum ncVis_CON {
-    ncVis_CON_NONE = 0,
-    ncVis_CON_g,
-    ncVis_CON_l,
-    ncVis_CON_MAX
+enum ncForm_CON {
+    ncForm_CON_NONE = 0,
+    ncForm_CON_g,
+    ncForm_CON_l,
+    ncForm_CON_e,
+    ncForm_CON_MAX
 };
 
 /**
- * MEI att.nc.vis@curved
+ * MEI att.ncForm@curve
  */
-enum ncVis_CURVED {
-    ncVis_CURVED_NONE = 0,
-    ncVis_CURVED_a,
-    ncVis_CURVED_c,
-    ncVis_CURVED_MAX
+enum ncForm_CURVE {
+    ncForm_CURVE_NONE = 0,
+    ncForm_CURVE_a,
+    ncForm_CURVE_c,
+    ncForm_CURVE_MAX
 };
 
 /**
- * MEI att.nc.vis@diagonalright
+ * MEI att.ncForm@rellen
  */
-enum ncVis_DIAGONALRIGHT {
-    ncVis_DIAGONALRIGHT_NONE = 0,
-    ncVis_DIAGONALRIGHT_u,
-    ncVis_DIAGONALRIGHT_d,
-    ncVis_DIAGONALRIGHT_MAX
-};
-
-/**
- * MEI att.nc.vis@oriscus
- */
-enum ncVis_ORISCUS {
-    ncVis_ORISCUS_NONE = 0,
-    ncVis_ORISCUS_c,
-    ncVis_ORISCUS_f,
-    ncVis_ORISCUS_j,
-    ncVis_ORISCUS_unknown,
-    ncVis_ORISCUS_MAX
-};
-
-/**
- * MEI att.nc.vis@quilisma
- */
-enum ncVis_QUILISMA {
-    ncVis_QUILISMA_NONE = 0,
-    ncVis_QUILISMA_2,
-    ncVis_QUILISMA_3,
-    ncVis_QUILISMA_unknown,
-    ncVis_QUILISMA_MAX
+enum ncForm_RELLEN {
+    ncForm_RELLEN_NONE = 0,
+    ncForm_RELLEN_l,
+    ncForm_RELLEN_s,
+    ncForm_RELLEN_MAX
 };
 
 /**
@@ -1554,6 +1683,15 @@ enum noteGes_EXTREMIS {
     noteGes_EXTREMIS_highest,
     noteGes_EXTREMIS_lowest,
     noteGes_EXTREMIS_MAX
+};
+
+/**
+ * MEI att.noteHeads@head.auth
+ */
+enum noteHeads_HEADAUTH {
+    noteHeads_HEADAUTH_NONE = 0,
+    noteHeads_HEADAUTH_smufl,
+    noteHeads_HEADAUTH_MAX
 };
 
 /**
@@ -1585,6 +1723,18 @@ enum pedalLog_DIR {
     pedalLog_DIR_half,
     pedalLog_DIR_bounce,
     pedalLog_DIR_MAX
+};
+
+/**
+ * MEI att.pedal.log@func
+ */
+enum pedalLog_FUNC {
+    pedalLog_FUNC_NONE = 0,
+    pedalLog_FUNC_sustain,
+    pedalLog_FUNC_soft,
+    pedalLog_FUNC_sostenuto,
+    pedalLog_FUNC_silent,
+    pedalLog_FUNC_MAX
 };
 
 /**

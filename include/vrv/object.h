@@ -220,12 +220,18 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
+    int GetChildCount(const ClassId classId, int deepth);
     ///@}
 
     /**
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
+    
+    /**
+     * Return a cont pointer to the children
+     */
+    const ArrayOfObjects *GetChildren() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -248,7 +254,15 @@ public:
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
     Object *GetNext();
+    ///@}
+
+    /**
+     * @name Retrieving next or previous sibling of a certain type.
+     * Returns NULL is not found
+     */
+    ///@{
     Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetPrevious(Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
@@ -305,6 +319,11 @@ public:
      * Look for the Object in the children and return its position (-1 if not found)
      */
     int GetChildIndex(const Object *child);
+    
+    /**
+     * Look for all Objects of a class and return its position (-1 if not found)
+     */
+    int GetChildIndex(const Object *child, const ClassId classId, int deepth);
 
     /**
      * Insert an element at the idx position.
@@ -765,6 +784,15 @@ public:
     virtual int SetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
+     * Optimize the scoreDef for each system.
+     * For automatic breaks, looks for staves with only mRests.
+     */
+    ///@{
+    virtual int OptimizeScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int OptimizeScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Set the cautionnary scoreDef wherever need.
      */
     virtual int SetCautionaryScoreDef(FunctorParams *functorParams);
@@ -801,7 +829,7 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-    
+
     /**
      * Match linking element (e.g, @next).
      */
@@ -1177,6 +1205,11 @@ public:
      * Returns a contatenated version of all the text children
      */
     std::wstring GetText(Object *node);
+    
+    /**
+     * Fill an array of lines with concatenated content of each line
+     */
+    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
 
 protected:
     /**

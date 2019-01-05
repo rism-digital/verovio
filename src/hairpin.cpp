@@ -10,11 +10,10 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
-#include <math.h>
 
 //----------------------------------------------------------------------------
 
+#include "devicecontext.h"
 #include "doc.h"
 #include "dynam.h"
 #include "functorparams.h"

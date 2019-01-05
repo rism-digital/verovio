@@ -190,7 +190,7 @@ int Measure::GetDrawingX() const
             return (system->m_systemLeftMar);
         }
     }
-    
+
     if (m_xAbs != VRV_UNSET) return m_xAbs;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
@@ -272,7 +272,7 @@ int Measure::GetWidth() const
             return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
         }
     }
-    
+
     if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());
@@ -544,6 +544,16 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::OptimizeScoreDef(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    params->m_hasFermata = (this->FindChildByType(FERMATA));
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     SetDrawingXRel(0);
@@ -600,8 +610,7 @@ int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
 
     // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
     // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work
-    // in
-    // MEI anyway.
+    // in MEI anyway.
     m_timestampAligner.Process(params->m_functor, params);
 
     // Next scoreDef will be INTERMEDIATE_SCOREDEF (See Layer::AlignHorizontally)
@@ -763,15 +772,9 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-
-    // Here we also need to handle the last syl or the measure - we check the alignment with the right barline
-    if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetContentRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
-        if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(
-                params->m_previousSyl->GetAlignment(), this->GetRightBarLine()->GetAlignment(), overlap));
-        }
-    }
+    
+    // At the end of the measure - pass it along for overlapping verses
+    params->m_previousMeasure = this;
 
     // Ajust the postion of the alignment according to what we have collected for this verse
     m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
@@ -837,8 +840,6 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
 
 int Measure::ResetDrawing(FunctorParams *functorParams)
 {
-    this->m_leftBarLine.Reset();
-    this->m_rightBarLine.Reset();
     this->m_timestampAligner.Reset();
     m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
@@ -1028,7 +1029,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
-        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM) || (iter->second == TRILL)) {
+        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {

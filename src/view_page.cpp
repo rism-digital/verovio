@@ -13,15 +13,18 @@
 
 //----------------------------------------------------------------------------
 
+#include "app.h"
 #include "annot.h"
 #include "attcomparison.h"
 #include "beam.h"
+#include "choice.h"
 #include "clef.h"
 #include "controlelement.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "f.h"
 #include "fb.h"
 #include "fig.h"
 #include "functorparams.h"
@@ -146,6 +149,18 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     dc->StartGraphic(system, "", system->GetUuid());
 
+    // Draw system divider (from the second one) if scoreDef is optimized
+    if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
+        int x1 = system->GetDrawingX() - m_doc->GetDrawingUnit(100) * 3;
+        int y1 = system->GetDrawingY() - m_doc->GetDrawingUnit(100) * 1;
+        int x2 = system->GetDrawingX() + m_doc->GetDrawingUnit(100) * 3;
+        int y2 = system->GetDrawingY() + m_doc->GetDrawingUnit(100) * 3;
+        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+        y1 += m_doc->GetDrawingUnit(100) * 2;
+        y2 += m_doc->GetDrawingUnit(100) * 2;
+        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+    }
+
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
 
@@ -157,10 +172,12 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemChildren(dc, system, system);
 
     DrawSystemList(dc, system, SYL);
+    DrawSystemList(dc, system, BRACKETSPAN);
     DrawSystemList(dc, system, DYNAM);
     DrawSystemList(dc, system, DIR);
     DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TRILL);
+    DrawSystemList(dc, system, FIGURE);
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
@@ -178,10 +195,16 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     ListOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
+        if ((*iter)->Is(classId) && (classId == BRACKETSPAN)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
         if ((*iter)->Is(classId) && (classId == DIR)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == DYNAM)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == FIGURE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
@@ -246,6 +269,10 @@ void View::DrawStaffGrp(
     assert(measure);
     assert(staffGrp);
 
+    if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+        return;
+    }
+
     TextExtend extend;
 
     const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
@@ -253,10 +280,29 @@ void View::DrawStaffGrp(
         return;
     }
 
-    // Get the first and last staffDef of the staffGrp
-    StaffDef *firstDef = dynamic_cast<StaffDef *>(staffDefs->front());
-    StaffDef *lastDef = dynamic_cast<StaffDef *>(staffDefs->back());
+    StaffDef *firstDef = NULL;
+    ListOfObjects::const_iterator iter;
+    for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+        assert(staffDef);
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+            firstDef = staffDef;
+            break;
+        }
+    }
 
+    StaffDef *lastDef = NULL;
+    ListOfObjects::const_reverse_iterator riter;
+    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
+        assert(staffDef);
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+            lastDef = staffDef;
+            break;
+        }
+    }
+
+    // Get the first and last staffDef of the staffGrp
     if (!firstDef || !lastDef) {
         LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
         return;
@@ -282,67 +328,15 @@ void View::DrawStaffGrp(
 
     // adjust the top and bottom according to staffline width
     x += barLineWidth / 2;
-    // yTop += m_doc->GetDrawingStaffLineWidth(100) / 1;
-    // yBottom -= m_doc->GetDrawingStaffLineWidth(100) / 4;
-
-    Label *label = dynamic_cast<Label *>(staffGrp->FindChildByType(LABEL, 1));
-    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffGrp->FindChildByType(LABELABBR, 1));
-    Object *graphic = label;
-
-    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
-    std::wstring labelStr = (label) ? label->GetText(label) : L"";
-
-    if (abbreviations) {
-        labelStr = labelAbbrStr;
-        graphic = labelAbbr;
-    }
-
-    if (graphic && (labelStr.length() != 0)) {
-        // HARDCODED
-        int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
-        int xLabel = x - space;
-        int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-
-        dc->SetBrush(m_currentColour, AxSOLID);
-
-        FontInfo grpTxt;
-        if (!dc->UseGlobalStyling()) {
-            grpTxt.SetFaceName("Times");
-        }
-
-        TextDrawingParams params;
-        params.m_x = xLabel;
-        params.m_y = yLabel;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
-
-        grpTxt.SetPointSize(params.m_pointSize);
-        dc->SetFont(&grpTxt);
-
-        dc->GetTextExtent(labelStr, &extend, true);
-
-        dc->StartGraphic(graphic, "", graphic->GetUuid());
-
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
-        DrawTextChildren(dc, graphic, params);
-        dc->EndText();
-
-        dc->EndGraphic(graphic, this);
-
-        // keep the widest width for the system
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-        if (system) {
-            system->SetDrawingLabelsWidth(extend.m_width + space);
-        }
-
-        // also store in the system the maximum width with abbreviations
-        if (system && !abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend, true);
-            system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
-        }
-
-        dc->ResetFont();
-        dc->ResetBrush();
-    }
+    
+    // HARDCODED
+    int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
+    int xLabel = x - space;
+    int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+    
+    System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+    
+    this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
 
     // actually draw the line, the brace or the bracket
     if (topStaffGrp && ((firstDef != lastDef) || (staffGrp->GetSymbol() != staffGroupingSym_SYMBOL_NONE))) {
@@ -377,8 +371,6 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
     assert(measure);
     assert(scoreDef);
 
-    TextExtend extend;
-
     const ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
     ListOfObjects::const_iterator iter = scoreDefChildren->begin();
     while (iter != scoreDefChildren->end()) {
@@ -400,67 +392,93 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             continue;
         }
 
-        Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
-        LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffDef->FindChildByType(LABELABBR, 1));
-        Object *graphic = label;
-
-        std::wstring labelStr = (label) ? label->GetText(label) : L"";
-        std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
-
-        if (abbreviations) {
-            labelStr = labelAbbrStr;
-            graphic = labelAbbr;
-        }
-
-        if (!graphic || (labelStr.length() == 0)) {
+        if (!staff->DrawingIsVisible()) {
             ++iter;
             continue;
         }
-
+        
         // HARDCODED
         int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
+        if (staffDef->IsInBraceAndBracket()) {
+            space *= 2;
+        }
         int x = system->GetDrawingX() - space;
         int y = staff->GetDrawingY()
-            - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-
-        FontInfo labelTxt;
-        if (!dc->UseGlobalStyling()) {
-            labelTxt.SetFaceName("Times");
-        }
-
-        TextDrawingParams params;
-        params.m_x = x;
-        params.m_y = y;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
-
-        labelTxt.SetPointSize(params.m_pointSize);
-
-        dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&labelTxt);
-
-        dc->GetTextExtent(labelStr, &extend, true);
-
-        dc->StartGraphic(graphic, "", graphic->GetUuid());
-
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
-        DrawTextChildren(dc, graphic, params);
-        dc->EndText();
-
-        dc->EndGraphic(graphic, this);
-
-        // keep the widest width for the system
-        system->SetDrawingLabelsWidth(extend.m_width + space);
-        // also store in the system the maximum width with abbreviations for justification
-        if (!abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend, true);
-            system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
-        }
-
-        dc->ResetFont();
-        dc->ResetBrush();
+        - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        
+        this->DrawLabels(dc, measure, system, staffDef, x, y, abbreviations, staff->m_drawingStaffSize, space);
 
         ++iter;
     }
+}
+    
+void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
+{
+    assert(dc);
+    assert(measure);
+    assert(system);
+    assert(object->Is({STAFFDEF, STAFFGRP}));
+    
+    Label *label = dynamic_cast<Label *>(object->FindChildByType(LABEL, 1));
+    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindChildByType(LABELABBR, 1));
+    Object *graphic = label;
+    
+    std::wstring labelStr = (label) ? label->GetText(label) : L"";
+    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+    
+    if (abbreviations) {
+        labelStr = labelAbbrStr;
+        graphic = labelAbbr;
+    }
+    
+    if (!graphic || (labelStr.length() == 0)) {
+        return;
+    }
+
+    FontInfo labelTxt;
+    if (!dc->UseGlobalStyling()) {
+        labelTxt.SetFaceName("Times");
+    }
+    labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staffSize)->GetPointSize());
+    
+    int lineCount = graphic->GetChildCount(LB) + 1;
+    if (lineCount > 1) {
+        y += (m_doc->GetTextLineHeight(&labelTxt, false) * (lineCount - 1) / 2);
+    }
+
+    TextDrawingParams params;
+    params.m_x = x;
+    params.m_y = y;
+    params.m_pointSize = labelTxt.GetPointSize();
+    
+    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetFont(&labelTxt);
+    
+    dc->StartGraphic(graphic, "", graphic->GetUuid());
+    
+    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
+    DrawTextChildren(dc, graphic, params);
+    dc->EndText();
+    
+    dc->EndGraphic(graphic, this);
+    
+    // keep the widest width for the system - careful: this can be the label OR labelAbbr
+    system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
+    // also store in the system the maximum width with abbreviations for justification
+    if (!abbreviations && (labelAbbrStr.length() > 0)) {
+        TextExtend extend;
+        std::vector<std::wstring> lines;
+        labelAbbr->GetTextLines(labelAbbr, lines);
+        int maxLength = 0;
+        for (auto const &line : lines) {
+            dc->GetTextExtent(line, &extend, true);
+            maxLength = (extend.m_width > maxLength) ? extend.m_width : maxLength;
+        }
+        system->SetDrawingAbbrLabelsWidth(maxLength + space);
+    }
+    
+    dc->ResetFont();
+    dc->ResetBrush();
 }
 
 void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
@@ -567,7 +585,11 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     assert(staffGrp);
     assert(barLine);
 
-    if (staffGrp->GetBarthru() != BOOLEAN_true) {
+    if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+        return;
+    }
+
+    if (staffGrp->GetBarThru() != BOOLEAN_true) {
         // recursively draw the children (staffDef or staffGrp) - we assume @barthru is false by default
         int i;
         StaffGrp *childStaffGrp = NULL;
@@ -602,9 +624,27 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             return;
         }
 
-        // Get the first and last staffDef of the staffGrp
-        StaffDef *firstDef = dynamic_cast<StaffDef *>(staffDefs->front());
-        StaffDef *lastDef = dynamic_cast<StaffDef *>(staffDefs->back());
+        StaffDef *firstDef = NULL;
+        ListOfObjects::const_iterator iter;
+        for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+            assert(staffDef);
+            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                firstDef = staffDef;
+                break;
+            }
+        }
+
+        StaffDef *lastDef = NULL;
+        ListOfObjects::const_reverse_iterator riter;
+        for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
+            assert(staffDef);
+            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                lastDef = staffDef;
+                break;
+            }
+        }
 
         if (!firstDef || !lastDef) {
             LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
@@ -803,13 +843,15 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // Draw the barlines only with measured music
     if (measure->IsMeasuredMusic()) {
+        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        assert(system);
         if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
-            DrawScoreDef(
-                dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(), measure->GetLeftBarLine());
+            DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetLeftBarLine()->GetDrawingX(),
+                measure->GetLeftBarLine());
         }
         if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
             bool isLast = (measure == system->FindChildByType(MEASURE, 1, BACKWARD)) ? true : false;
-            DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(),
+            DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetRightBarLine()->GetDrawingX(),
                 measure->GetRightBarLine(), isLast);
         }
     }
@@ -829,7 +871,18 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
     assert(measure);
     assert(mnum);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
+    Staff *staff = NULL;
+    ArrayOfObjects staves;
+    AttComparison matchType(STAFF);
+    measure->FindAllChildByComparison(&staves, &matchType, 1);
+    for (auto &child : staves) {
+        staff = dynamic_cast<Staff *>(child);
+        assert(staff);
+        if (staff->DrawingIsVisible()) {
+            break;
+        }
+        staff = NULL;
+    }
     if (staff) {
 
         dc->StartGraphic(mnum, "", mnum->GetUuid());
@@ -877,6 +930,12 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     assert(staff);
     assert(measure);
     assert(system);
+
+    assert(system->GetDrawingScoreDef());
+    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(staff->GetN());
+    if (staffDef && (staffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN)) {
+        return;
+    }
 
     dc->StartGraphic(staff, "", staff->GetUuid());
 
@@ -1159,8 +1218,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     assert(parent);
     assert(system);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(MEASURE)) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
@@ -1192,9 +1250,8 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(parent);
     assert(measure);
     assert(system);
-
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
@@ -1221,8 +1278,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Me
     assert(staff);
     assert(measure);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(LAYER)) {
             // cast to Layer check in DrawLayer
             DrawLayer(dc, dynamic_cast<Layer *>(current), staff, measure);
@@ -1245,8 +1301,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->IsLayerElement()) {
             DrawLayerElement(dc, dynamic_cast<LayerElement *>(current), layer, staff, measure);
         }
@@ -1265,8 +1320,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
     assert(dc);
     assert(parent);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->IsTextElement()) {
             DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
         }
@@ -1285,8 +1339,7 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &
     assert(dc);
     assert(parent);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->IsTextElement()) {
             DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
         }
@@ -1305,8 +1358,7 @@ void View::DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingPar
     assert(dc);
     assert(parent);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(FIG)) {
             DrawFig(dc, dynamic_cast<Fig *>(current), params);
         }

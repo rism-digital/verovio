@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 ### Added
+* Support for extendering line in `<f>`
+* Support for `@beam.with` on `<beam>`
+* Support for `@stem.pos` values "left" and "right" (@rettinghaus)
+* Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
+* Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
 * Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
 * Sutomatic positioning of rests within beam (@CCInc)
 * Fix for Plaine & Easie mensur changes in mensural notation
@@ -32,7 +37,7 @@
 * Adding getAvailableOptions and getOptions(bool) methods to the JS toolkit
 * Adding several layout options
 * Support for `<pgHead>`, `<pgHead2>`, `<pgFoot>` and `<pgFoot2>`
-* Support for `<lb>` within `<rend>`
+* Support for `<lb>` within `<rend>`, `<dir>`, `<label>` and `<labelAbbr>`
 * Generation of header and footer form the MEI header when none provided
 * Support for `<fig>` and `<svg>`
 * Distribution as NPM package

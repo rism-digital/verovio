@@ -58,16 +58,18 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), AttLabelled(), AttTyped()
+LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), AttLabelled(), AttTyped()
+LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -77,6 +79,7 @@ LayerElement::LayerElement(std::string classid) : Object(classid), AttLabelled()
 void LayerElement::Reset()
 {
     Object::Reset();
+    LinkingInterface::Reset();
     ResetLabelled();
     ResetTyped();
 
@@ -85,7 +88,7 @@ void LayerElement::Reset()
     m_drawingXRel = 0;
     m_drawingCueSize = false;
 
-    m_scoreDefRole = NONE;
+    m_scoreDefRole = SCOREDEF_NONE;
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
@@ -468,6 +471,12 @@ double LayerElement::GetAlignmentDuration(
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
     }
+    
+    if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
+        LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+        assert(sameas);
+        return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+    }
 
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
@@ -517,12 +526,18 @@ double LayerElement::GetAlignmentDuration(
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
+    else if (this->Is({ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
-        return DUR_MAX / meterUnit * meterCount;
+        
+        if (this->Is(HALFMRPT)) {
+            return (DUR_MAX / meterUnit * meterCount) / 2;
+        }
+        else {
+            return DUR_MAX / meterUnit * meterCount;
+        }
     }
     else {
         return 0.0;
@@ -600,18 +615,18 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_BARLINE;
     }
     else if (this->Is(CLEF)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_CLEF;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_CLEF;
         else {
             type = ALIGNMENT_CLEF;
         }
     }
     else if (this->Is(KEYSIG)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_KEYSIG;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
         else {
             // type = ALIGNMENT_KEYSIG;
@@ -621,9 +636,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is(MENSUR)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_MENSUR;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_MENSUR;
         else {
             // replace the current mensur
@@ -633,9 +648,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is(METERSIG)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_METERSIG;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_METERSIG;
         else {
             // replace the current meter signature
@@ -809,7 +824,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         MRest *mRest = dynamic_cast<MRest *>(this);
         assert(mRest);
         int loc = 0;
-        if (mRest->HasLoc()) {
+        if (mRest->HasPloc() && mRest->HasOloc()) {
+            loc = PitchInterface::CalcLoc(mRest->GetPloc(), mRest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+        }
+        else if (mRest->HasLoc()) {
             loc = mRest->GetLoc();
         }
         // Automatically calculate rest position
@@ -918,30 +936,28 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     loc = locAvg;
                 }
 
-                // note: bottomAlignedLoc and topAlignedLoc are only accouting for discrepencies 
+                // note: bottomAlignedLoc and topAlignedLoc are only accouting for discrepencies
                 // between 8th, 16th and 32nd notes, not 64th's and on
                 // I've described how to implement 64ths and beyond below
 
-                // we need to check for bottom and top alignment because a 32nd rest that's top is in the space 
+                // we need to check for bottom and top alignment because a 32nd rest that's top is in the space
                 // under the staff (d4 on treble) can not be moved any closer to center by an incriment of 1
                 // because the dots will collide with the staff
                 // whereas a 16th rest that is in the same "loc" as the 32nd is actually below the 32nd
                 // (the top of the 16th will be in note b3 on treble clef) so can be moved closer to the staff
                 // than the 32nd without fear of the dots colliding with the staff lines
 
-                //bottomAlignedLoc is the location where all of the rest's stems align to form a straight line
+                // bottomAlignedLoc is the location where all of the rest's stems align to form a straight line
                 int bottomAlignedLoc = loc;
-                // 8th note rests are aligned with the top of a 16th note rest, so to bottom align we have to push it down 2
-                if (rest->GetActualDur() == DURATION_8)
-                    bottomAlignedLoc -= 2;
-                // for durations smaller than 32nd, bottomAlignedLoc will need to decrease by 2 every iteration greater than from 32
-                // so 32 will be -0, 64 is -2, 128 is -4
-                // (currently not implemented)
+                // 8th note rests are aligned with the top of a 16th note rest, so to bottom align we have to push it
+                // down 2
+                if (rest->GetActualDur() == DURATION_8) bottomAlignedLoc -= 2;
+                // for durations smaller than 32nd, bottomAlignedLoc will need to decrease by 2 every iteration greater
+                // than from 32 so 32 will be -0, 64 is -2, 128 is -4 (currently not implemented)
 
-                //topAlignedLoc is the location where all of the top of the rests align to form a straight line
+                // topAlignedLoc is the location where all of the top of the rests align to form a straight line
                 int topAlignedLoc = loc;
-                if (rest->GetActualDur() == DURATION_32)
-                    topAlignedLoc += 2;
+                if (rest->GetActualDur() == DURATION_32) topAlignedLoc += 2;
                 // for smaller durations, topAlignedLoc offset will increase by 2 every iteration greater than from 32
                 // so 32 will need to be +2, 64 is +4, 128 is +6, etc.
                 // (currently only implemented for 32nds)
@@ -965,8 +981,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 if (loc % 2 != 0) {
                     // if it's above the staff, offset downwards
                     // if below the staff, offset upwards
-                    if (loc > 4) loc--;
-                    else loc++;
+                    if (loc > 4)
+                        loc--;
+                    else
+                        loc++;
                 }
             }
             else if (hasMultipleLayer) {
@@ -1127,6 +1145,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    if (this->HasSameasLink()) {
+        // nothing to do when the element has a @sameas attribute
+        return FUNCTOR_SIBLINGS;
+    }
+    
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account

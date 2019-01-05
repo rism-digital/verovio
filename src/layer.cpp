@@ -476,9 +476,9 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     params->m_time = DUR_MAX * -1.0;
 
     if (params->m_isFirstMeasure)
-        params->m_scoreDefRole = SYSTEM_SCOREDEF;
+        params->m_scoreDefRole = SCOREDEF_SYSTEM;
     else
-        params->m_scoreDefRole = INTERMEDIATE_SCOREDEF;
+        params->m_scoreDefRole = SCOREDEF_INTERMEDIATE;
 
     if (this->GetStaffDefClef()) {
         GetStaffDefClef()->AlignHorizontally(params);
@@ -493,7 +493,7 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
         GetStaffDefMeterSig()->AlignHorizontally(params);
     }
 
-    params->m_scoreDefRole = NONE;
+    params->m_scoreDefRole = SCOREDEF_NONE;
 
     // Now we have to set it to 0.0 since we will start aligning muscial content
     params->m_time = 0.0;
@@ -506,7 +506,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    params->m_scoreDefRole = CAUTIONARY_SCOREDEF;
+    params->m_scoreDefRole = SCOREDEF_CAUTIONARY;
     params->m_time = params->m_measureAligner->GetMaxTime();
 
     if (this->GetCautionStaffDefClef()) {
@@ -522,7 +522,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
         GetCautionStaffDefMeterSig()->AlignHorizontally(params);
     }
 
-    params->m_scoreDefRole = NONE;
+    params->m_scoreDefRole = SCOREDEF_NONE;
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
@@ -578,18 +578,6 @@ int Layer::CalcStem(FunctorParams *)
             this->SetDrawingStemDir(STEMDIRECTION_down);
         }
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::AdjustSylSpacing(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // reset it
-    params->m_overlapingSyl.clear();
-    params->m_previousSyl = NULL;
 
     return FUNCTOR_CONTINUE;
 }

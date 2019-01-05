@@ -94,6 +94,7 @@ enum ClassId {
     REG,
     RESTORE,
     SIC,
+    SUBST,
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
@@ -117,6 +118,7 @@ enum ClassId {
     CONTROL_ELEMENT,
     ANCHORED_TEXT,
     ARPEG,
+    BRACKETSPAN,
     BREATH,
     DIR,
     DYNAM,
@@ -152,6 +154,7 @@ enum ClassId {
     DOTS,
     FLAG,
     FTREM,
+    HALFMRPT,
     KEYSIG,
     LIGATURE,
     MENSUR,
@@ -257,9 +260,11 @@ typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmen
 typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+    
+typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
-    
+
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
@@ -283,7 +288,7 @@ typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 typedef std::map<std::string, Option *> MapOfStrOptions;
 
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
-    
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff
@@ -372,6 +377,14 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define VRV_TEXT_E552 0xE552
 
 //----------------------------------------------------------------------------
+// data.LINEWIDTHTERM factors
+//----------------------------------------------------------------------------
+    
+#define LINEWIDTHTERM_factor_narrow 0.5
+#define LINEWIDTHTERM_factor_medium 2.0
+#define LINEWIDTHTERM_factor_wide 4.0
+
+//----------------------------------------------------------------------------
 // Types for editorial element
 //----------------------------------------------------------------------------
 
@@ -424,13 +437,19 @@ enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
  * scoreDef layer elements and cautionary scoreDef layer elements
  */
 
-enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
+enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
 
 //----------------------------------------------------------------------------
 // Artic part types
 //----------------------------------------------------------------------------
 
 enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
+
+//----------------------------------------------------------------------------
+// Visibility optimization
+//----------------------------------------------------------------------------
+
+enum VisibilityOptimization { OPTIMIZATION_NONE = 0, OPTIMIZATION_HIDDEN, OPTIMIZATION_SHOW };
 
 //----------------------------------------------------------------------------
 // Layout positions (3 x 3 grid)

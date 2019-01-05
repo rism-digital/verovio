@@ -21,6 +21,122 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
+ * MEI data.COMPASSDIRECTION
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum CompassDirectionType { COMPASSDIRECTION_NONE = 0, COMPASSDIRECTION_basic, COMPASSDIRECTION_extended };
+
+class data_COMPASSDIRECTION {
+public:
+    data_COMPASSDIRECTION() { Reset(COMPASSDIRECTION_NONE); }
+    virtual ~data_COMPASSDIRECTION() {}
+
+    void Reset(CompassDirectionType type)
+    {
+        m_type = type;
+        m_basic = COMPASSDIRECTION_basic_NONE;
+        m_extended = COMPASSDIRECTION_extended_NONE;
+    }
+
+    CompassDirectionType GetType() const { return m_type; }
+
+    data_COMPASSDIRECTION_basic GetBasic() const { return m_basic; }
+    void SetBasic(data_COMPASSDIRECTION_basic value)
+    {
+        Reset(COMPASSDIRECTION_basic);
+        m_basic = value;
+    }
+
+    data_COMPASSDIRECTION_extended GetExtended() const { return m_extended; }
+    void SetExtended(data_COMPASSDIRECTION_extended value)
+    {
+        Reset(COMPASSDIRECTION_extended);
+        m_extended = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_basic != COMPASSDIRECTION_basic_NONE) return true;
+        if (m_extended != COMPASSDIRECTION_extended_NONE) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_COMPASSDIRECTION &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_basic != val.GetBasic()) return false;
+        if (m_extended != val.GetExtended()) return false;
+        return true;
+    }
+    bool operator!=(const data_COMPASSDIRECTION &val) const { return !(*this == val); }
+
+protected:
+    CompassDirectionType m_type;
+    data_COMPASSDIRECTION_basic m_basic;
+    data_COMPASSDIRECTION_extended m_extended;
+};
+    
+/**
+ * MEI data.EVENTREL
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum EventRelType { EVENTREL_NONE = 0, EVENTREL_basic, EVENTREL_extended };
+
+class data_EVENTREL {
+public:
+    data_EVENTREL() { Reset(EVENTREL_NONE); }
+    virtual ~data_EVENTREL() {}
+
+    void Reset(EventRelType type)
+    {
+        m_type = type;
+        m_basic = EVENTREL_basic_NONE;
+        m_extended = EVENTREL_extended_NONE;
+    }
+
+    EventRelType GetType() const { return m_type; }
+
+    data_EVENTREL_basic GetBasic() const { return m_basic; }
+    void SetBasic(data_EVENTREL_basic value)
+    {
+        Reset(EVENTREL_basic);
+        m_basic = value;
+    }
+
+    data_EVENTREL_extended GetExtended() const { return m_extended; }
+    void SetExtended(data_EVENTREL_extended value)
+    {
+        Reset(EVENTREL_extended);
+        m_extended = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_basic != EVENTREL_basic_NONE) return true;
+        if (m_extended != EVENTREL_extended_NONE) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_EVENTREL &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_basic != val.GetBasic()) return false;
+        if (m_extended != val.GetExtended()) return false;
+        return true;
+    }
+    bool operator!=(const data_EVENTREL &val) const { return !(*this == val); }
+
+protected:
+    EventRelType m_type;
+    data_EVENTREL_basic m_basic;
+    data_EVENTREL_extended m_extended;
+};
+
+/**
  * MEI data.FONTSIZE
  * Since it can contain different subtype we need a dedicated class for it.
  */
@@ -90,6 +206,65 @@ protected:
 };
 
 /**
+ * MEI data.LINEWIDTH
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum LinewidthType { LINEWIDTHTYPE_NONE = 0, LINEWIDTHTYPE_lineWidthTerm, LINEWIDTHTYPE_measurementAbs };
+
+class data_LINEWIDTH {
+public:
+    data_LINEWIDTH() { Reset(LINEWIDTHTYPE_NONE); }
+    virtual ~data_LINEWIDTH() {}
+
+    void Reset(LinewidthType type)
+    {
+        m_type = type;
+        m_lineWidthTerm = LINEWIDTHTERM_NONE;
+        m_measurementAbs = VRV_UNSET;
+    }
+
+    LinewidthType GetType() const { return m_type; }
+
+    data_LINEWIDTHTERM GetLineWithTerm() const { return m_lineWidthTerm; }
+    void SetLineWidthTerm(data_LINEWIDTHTERM value)
+    {
+        Reset(LINEWIDTHTYPE_lineWidthTerm);
+        m_lineWidthTerm = value;
+    }
+
+    data_MEASUREMENTABS GetMeasurementAbs() const { return m_measurementAbs; }
+    void SetMeasurementAbs(data_MEASUREMENTABS value)
+    {
+        Reset(LINEWIDTHTYPE_measurementAbs);
+        m_measurementAbs = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_lineWidthTerm != LINEWIDTHTERM_NONE) return true;
+        if (m_measurementAbs != VRV_UNSET) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_LINEWIDTH &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_lineWidthTerm != val.GetLineWithTerm()) return false;
+        if (m_measurementAbs != val.GetMeasurementAbs()) return false;
+        return true;
+    }
+    bool operator!=(const data_LINEWIDTH &val) const { return !(*this == val); }
+
+protected:
+    LinewidthType m_type;
+    data_LINEWIDTHTERM m_lineWidthTerm;
+    data_MEASUREMENTABS m_measurementAbs;
+};
+
+    
+/**
  * MEI data.MIDIVALUE_NAME
  * Since it can contain different subtype we need a dedicated class for it.
  */
@@ -116,7 +291,7 @@ public:
         Reset(MIDIVALUENAMETYPE_midivalue);
         m_midivalue = value;
     }
-    
+
     data_NCNAME GetNcname() const { return m_ncname; }
     void SetNcname(data_NCNAME value)
     {
@@ -146,7 +321,7 @@ protected:
     data_MIDIVALUE m_midivalue;
     data_NCNAME m_ncname;
 };
-    
+
 /**
  * MEI data.MIDIVALUE_PAN
  * Since it can contain different subtype we need a dedicated class for it.
@@ -174,7 +349,7 @@ public:
         Reset(MIDIVALUEPANTYPE_midivalue);
         m_midivalue = value;
     }
-    
+
     data_PERCENT_LIMITED_SIGNED GetPercentLimitedSigned() const { return m_percentLimitedSigned; }
     void SetPercentLimitedSigned(data_PERCENT_LIMITED_SIGNED value)
     {
@@ -204,7 +379,7 @@ protected:
     data_MIDIVALUE m_midivalue;
     data_PERCENT_LIMITED_SIGNED m_percentLimitedSigned;
 };
-    
+
 /**
  * MEI data.STAFFITEM
  * Since it can contain different subtype we need a dedicated class for it.

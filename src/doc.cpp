@@ -51,6 +51,7 @@
 #include "syl.h"
 #include "system.h"
 #include "text.h"
+#include "timestamp.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -99,6 +100,10 @@ void Doc::Reset()
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
+    
+    m_header.reset();
+    m_front.reset();
+    m_back.reset();
 }
 
 void Doc::SetType(DocType type)
@@ -237,7 +242,7 @@ void Doc::CalculateMidiTimemap()
         if (!page) {
             return;
         }
-        this->CollectScoreDefs();
+        this->SetCurrentScoreDefDoc();
         page->LayOutHorizontally();
     }
 
@@ -318,8 +323,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             midiTrack = staffDef->GetN();
             int trackCount = midiFile->getTrackCount();
             int addCount = midiTrack + 1 - trackCount;
-            if (addCount > 0) {            
-                 midiFile->addTracks(addCount);
+            if (addCount > 0) {
+                midiFile->addTracks(addCount);
             }
             // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
@@ -502,7 +507,6 @@ void Doc::PrepareDrawing()
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsParams prepareTimestampsParams;
-    prepareTimestampsParams.m_timeSpanningInterfaces = prepareTimeSpanningParams.m_timeSpanningInterfaces;
     Functor prepareTimestamps(&Object::PrepareTimestamps);
     Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
     this->Process(&prepareTimestamps, &prepareTimestampsParams, &prepareTimestampsEnd);
@@ -515,26 +519,25 @@ void Doc::PrepareDrawing()
 
     /************ Resolve linking (@next) ************/
 
-    // Try to match all pointing elements using @next
+    // Try to match all pointing elements using @next and @sameas
     PrepareLinkingParams prepareLinkingParams;
     Functor prepareLinking(&Object::PrepareLinking);
     this->Process(&prepareLinking, &prepareLinkingParams);
 
     // If we have some left process again backward
-    // But not now because we match only @next
-    /*
-    if (!prepareLinkingParams.m_interfaceUuidPairs.empty()) {
-        prepareLinkingParams.m_interfaceUuidPairs.empty = false;
+    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
+        prepareLinkingParams.m_fillList = false;
         this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
     }
-    */
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareLinkingParams.m_nextUuidPairs.empty()) {
-        LogWarning(
-            "%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
+        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
     }
-    
+    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
+        LogWarning("%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
+    }
+
     /************ Resolve @plist ************/
 
     // Try to match all pointing elements using @plist
@@ -723,7 +726,7 @@ void Doc::PrepareDrawing()
     m_drawingPreparationDone = true;
 }
 
-void Doc::CollectScoreDefs(bool force)
+void Doc::SetCurrentScoreDefDoc(bool force)
 {
     if (m_currentScoreDefDone && !force) {
         return;
@@ -742,11 +745,22 @@ void Doc::CollectScoreDefs(bool force)
     // the appropriate drawing values
     upcomingScoreDef.Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
 
-    // LogElapsedTimeStart();
     this->Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
-    // LogElapsedTimeEnd ("Setting scoreDefs");
 
     m_currentScoreDefDone = true;
+}
+
+void Doc::OptimizeScoreDefDoc(bool encoded)
+{
+    if (encoded) {
+        return;
+    }
+
+    Functor optimizeScoreDef(&Object::OptimizeScoreDef);
+    Functor optimizeScoreDefEnd(&Object::OptimizeScoreDefEnd);
+    OptimizeScoreDefParams optimizeScoreDefParams(this, &optimizeScoreDef, &optimizeScoreDefEnd);
+
+    this->Process(&optimizeScoreDef, &optimizeScoreDefParams, &optimizeScoreDefEnd);
 }
 
 void Doc::CastOffDoc()
@@ -759,7 +773,14 @@ void Doc::CastOffDoc()
         return;
     }
 
-    this->CollectScoreDefs();
+    // By default, optimize scores
+    bool optimize = (m_scoreDef.GetOptimize() != BOOLEAN_false);
+    // However, if nothing specified, do not if there is only one staffGrp
+    if ((m_scoreDef.GetOptimize() == BOOLEAN_NONE) && (m_scoreDef.GetChildCount(STAFFGRP, UNLIMITED_DEPTH) < 2)) {
+        optimize = false;
+    }
+
+    this->SetCurrentScoreDefDoc();
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
@@ -783,7 +804,10 @@ void Doc::CastOffDoc()
     delete contentSystem;
 
     // Reset the scoreDef at the beginning of each system
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
+    if (optimize) {
+        this->OptimizeScoreDefDoc(false);
+    }
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
@@ -803,11 +827,10 @@ void Doc::CastOffDoc()
     contentPage->Process(&castOffPages, &castOffPagesParams);
     delete contentPage;
 
-    // LogDebug("Layout: %d pages", this->GetChildCount());
-
-    // We need to reset the drawing page to NULL
-    // because idx will still be 0 but contentPage is dead!
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
+    if (optimize) {
+        this->OptimizeScoreDefDoc(false);
+    }
 }
 
 void Doc::CastOffRunningElements(CastOffPagesParams *params)
@@ -869,12 +892,12 @@ void Doc::UnCastOffDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::CastOffEncodingDoc()
 {
-    this->CollectScoreDefs();
+    this->SetCurrentScoreDefDoc();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -905,7 +928,7 @@ void Doc::CastOffEncodingDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::ConvertToPageBasedDoc()
@@ -940,7 +963,7 @@ void Doc::ConvertToPageBasedDoc()
 void Doc::ConvertToCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
-    
+
     // Do not convert transcription files
     if (this->GetType() == Transcription) return;
 
@@ -949,7 +972,7 @@ void Doc::ConvertToCastOffMensuralDoc()
         m_isMensuralMusicOnly = false;
     }
 
-    this->CollectScoreDefs();
+    this->SetCurrentScoreDefDoc();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -992,13 +1015,13 @@ void Doc::ConvertToCastOffMensuralDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::ConvertToUnCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
-    
+
     // Do not convert transcription files
     if (this->GetType() == Transcription) return;
 
@@ -1053,7 +1076,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
@@ -1235,6 +1258,14 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
     y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) y = y * this->m_options->m_graceFactor.GetValue();
     return y;
+}
+    
+int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
+{
+    int descender = -this->GetTextGlyphDescender(L'q', font, graceSize);
+    int height = this->GetTextGlyphHeight(L'I', font, graceSize);
+    
+    return ((descender + height) * 1.1);
 }
 
 int Doc::GetDrawingUnit(int staffSize) const
@@ -1507,8 +1538,40 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     if ((params->m_currentSyl && params->m_lastNote) && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
         params->m_currentSyl->SetEnd(params->m_lastNote);
     }
+    else if (m_options->m_openControlEvents.GetValue()) {
+        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
+            Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+            assert(lastMeasure);
+            params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
+        }
+    }
 
     return FUNCTOR_STOP;
 }
 
+int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
+{
+    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    assert(params);
+    
+    if (!m_options->m_openControlEvents.GetValue() || params->m_timeSpanningInterfaces.empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    if (!lastMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    for (auto &pair : params->m_timeSpanningInterfaces) {
+        TimeSpanningInterface *interface = pair.first;
+        assert(interface);
+        if (!interface->GetEnd()) {
+            interface->SetEnd(lastMeasure->GetRightBarLine());
+        }
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+    
 } // namespace vrv

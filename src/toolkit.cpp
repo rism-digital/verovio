@@ -360,7 +360,7 @@ bool Toolkit::LoadData(const std::string &data)
         }
 
         if (!tempinput->ImportString(data)) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (1)");
             delete tempinput;
             return false;
         }
@@ -406,7 +406,7 @@ bool Toolkit::LoadData(const std::string &data)
         tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (2)");
             delete tempinput;
             return false;
         }
@@ -436,7 +436,7 @@ bool Toolkit::LoadData(const std::string &data)
         tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (3)");
             delete tempinput;
             return false;
         }
@@ -464,7 +464,7 @@ bool Toolkit::LoadData(const std::string &data)
         tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
-            LogError("Error importing Humdrum data");
+            LogError("Error importing Humdrum data (4)");
             delete tempinput;
             return false;
         }
@@ -837,7 +837,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
             LogError("Unsupported type for option '%s'", iter->first.c_str());
         }
     }
-    
+
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed
     if (!Resources::SetFont(m_options->m_font.GetValue())) {
@@ -1003,7 +1003,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
     if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
         height = m_doc.GetAdjustedDrawingPageHeight();
-    
+
     if (m_doc.GetType() == Transcription) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
@@ -1209,6 +1209,22 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     return timeofElement;
 }
 
+std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
+{
+    jsonxx::Object o;
+
+    Object *element = m_doc.FindChildByUuid(xmlId);
+    if (element->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        int timeofElement = this->GetTimeForElement(xmlId);
+        int pitchofElement = note->GetMIDIPitch();
+        o << "time" << timeofElement;
+        o << "pitch" << pitchofElement;
+    }
+    return o.json();
+}
+
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
     if (m_humdrumBuffer) {
@@ -1252,7 +1268,8 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     }
     if (file.getExinterpCount("mens")) {
         m_options->m_evenNoteSpacing.SetValue(true);
-    } else {
+    }
+    else {
         m_options->m_evenNoteSpacing.SetValue(false);
     }
 

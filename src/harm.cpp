@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "f.h"
 #include "fb.h"
 #include "functorparams.h"
 #include "text.h"

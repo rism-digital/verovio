@@ -79,8 +79,9 @@ void Slur::GetCrossStaffOverflows(
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);
         endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
     }
-    else
+    else {
         endStaff = this->GetEnd()->GetCrossStaff(layer);
+    }
 
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
@@ -89,7 +90,10 @@ void Slur::GetCrossStaffOverflows(
     }
     if (!endStaff) {
         endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstParent(STAFF));
-        assert(endStaff);
+        // This happens with open-ended slurs ending on a right barline attr
+        if (!endStaff) {
+            endStaff = startStaff;
+        }
     }
 
     if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
