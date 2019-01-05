@@ -873,13 +873,13 @@ void AbcInput::CreateWorkEntry()
             histLine.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
         }
     }
-    if (!m_notes.empty()) {
+    if (!m_info.empty()) {
         pugi::xml_node notes = work.append_child("notesStmt");
-        for (auto it = m_notes.begin(); it != m_notes.end(); ++it) {
+        for (auto it = m_info.begin(); it != m_info.end(); ++it) {
             pugi::xml_node annot = notes.append_child("annot");
-            annot.text().set((it->first).c_str());
-            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
-            annot.append_attribute("analog").set_value("abc:N");
+            annot.text().set((it->first).first.c_str());
+            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->first.second).c_str());
+            annot.append_attribute("analog").set_value(StringFormat("abc:%c", it->second).c_str());
         }
     }
 }
@@ -923,13 +923,16 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         parseMeter(value);
     }
     else if (dataKey == 'N') {
-        m_notes.push_back(std::make_pair(value, m_lineNum));
+        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
     }
     else if (dataKey == 'O') {
         m_origin.push_back(std::make_pair(value, m_lineNum));
     }
     else if (dataKey == 'Q') {
         parseTempo(value);
+    }
+    else if (dataKey == 'S') {
+        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
     }
     else if (dataKey == 'T') {
         m_title.push_back(std::make_pair(value, m_lineNum));
@@ -945,6 +948,9 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     }
     else if (dataKey == 'X') {
         parseReferenceNumber(value);
+    }
+    else if (dataKey == 'Z') {
+        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
     }
     else
         LogWarning("ABC input: Information field %c is ignored", dataKey);
