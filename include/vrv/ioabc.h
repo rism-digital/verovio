@@ -142,7 +142,7 @@ private:
     /*
      * container for work entries
      */
-    pugi::xml_node m_workDesc;
+    pugi::xml_node m_workList;
 };
 
 } // namespace vrv

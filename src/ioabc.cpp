@@ -140,7 +140,7 @@ void AbcInput::parseABC(std::istream &infile)
     }
     // add work entry to meiHead
     pugi::xpath_node meiHead = m_doc->m_header.select_single_node("meiHead");
-    m_workDesc = meiHead.node().append_child("workDesc");
+    m_workList = meiHead.node().append_child("workList");
     CreateWorkEntry();
 
     // create page head
@@ -831,7 +831,7 @@ void AbcInput::CreateHeader()
 void AbcInput::CreateWorkEntry()
 {
     // <work> //
-    pugi::xml_node work = m_workDesc.append_child("work");
+    pugi::xml_node work = m_workList.append_child("work");
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
     work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetUuid().c_str()).c_str());
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
@@ -1425,7 +1425,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
     }
 
-    // by default, line-breaks in the code generate line-breaks in the typeset score
+    // by default, line-breaks in the code generate line-breaks in the score
     // has to be refined later
     if (sysBreak && (m_linebreak != '\0')) {
         Sb *sb = new Sb();
