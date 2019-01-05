@@ -120,6 +120,7 @@ private:
     std::vector<std::pair<std::string, int> > m_notes; // N:
     std::vector<std::pair<std::string, int> > m_origin; // O:
     std::vector<std::pair<std::string, int> > m_title; // T:
+    std::vector<std::pair<std::pair<std::string, int>, char> > m_info;
 
     std::vector<ControlElement *> m_tempoStack;
     std::vector<Harm *> m_harmStack;
