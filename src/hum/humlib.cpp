@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jan  4 18:00:20 EST 2019
+// Last Modified: Sat Jan  5 04:17:32 EST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -16896,7 +16896,7 @@ bool HumdrumFileContent::analyzeKernStems(HTp stok, HTp etok, vector<vector<int>
 			continue;
 		}
 		if (dur > 4) {
-			// half-note or greater (no stem)
+			// greater than a half-note (no stem)
 			tok = tok->getNextToken();
 			continue;
 		}
@@ -16961,6 +16961,7 @@ void HumdrumFileContent::getBaselines(vector<vector<int>>& centerlines) {
 			}
 			int centerline = Convert::kernClefToBaseline(tok) + 4;
 			centerlines[track][tok->getLineIndex()] = centerline;
+			clefcenter = centerline;
 			tok = tok->getNextToken();
 		}
 	}
