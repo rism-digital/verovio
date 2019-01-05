@@ -776,6 +776,15 @@ void AbcInput::PrintInformationFields()
         }
         pgHead->AddChild(compRend);
     }
+    if (m_composer.empty() && !m_origin.empty()) {
+        Rend *originRend = new Rend();
+        originRend->SetHalign(HORIZONTALALIGNMENT_right);
+        originRend->SetValign(VERTICALALIGNMENT_bottom);
+        Text *origin = new Text();
+        origin->SetText(UTF8to16("(" + m_origin.front().first + ")"));
+        originRend->AddChild(origin);
+        pgHead->AddChild(originRend);
+    }
     m_doc->m_scoreDef.AddChild(pgHead);
 }
 
