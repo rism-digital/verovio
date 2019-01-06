@@ -176,10 +176,9 @@ void AbcInput::parseABC(std::istream &infile)
     // read music code
     m_layer = new Layer();
     m_layer->SetN(1);
-    while (!infile.eof()) {
+    while (std::string(abcLine).find_first_not_of(' ') != std::string::npos) {
         infile.getline(abcLine, 10000);
         ++m_lineNum;
-        // if (abcLine[0] == '\0') break;
         if (abcLine[0] == 'X') {
             LogDebug("ABC input: Reading only first tune in file");
             break;
@@ -219,6 +218,7 @@ void AbcInput::parseABC(std::istream &infile)
 
     m_doc->ConvertToPageBasedDoc();
     m_composer.clear();
+    m_info.clear();
     m_title.clear();
 }
 
@@ -990,8 +990,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
     data_GRACE grace = GRACE_NONE;
     Chord *chord = NULL;
-
-    if (strlen(musicCode) < 1) return;
 
     while (i < int(strlen(musicCode))) {
         // eat the input...
