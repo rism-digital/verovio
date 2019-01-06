@@ -128,15 +128,10 @@ void AbcInput::parseABC(std::istream &infile)
     CreateHeader();
 
     // read tune header
-    readInformationField('X', &abcLine[2]);
-    // create score
-    assert(m_mdiv != NULL);
-    Score *score = new Score();
-    m_mdiv->AddChild(score);
     while (abcLine[0] != 'K') {
+        readInformationField(abcLine[0], &abcLine[2]);
         infile.getline(abcLine, 10000);
         ++m_lineNum;
-        readInformationField(abcLine[0], &abcLine[2]);
     }
     if (m_title.empty()) {
         LogWarning("ABC input: Title field missing, creating empty title");
@@ -144,6 +139,11 @@ void AbcInput::parseABC(std::istream &infile)
     }
     // add work entry to meiHead
     CreateWorkEntry();
+
+    // create score
+    assert(m_mdiv != NULL);
+    Score *score = new Score();
+    m_mdiv->AddChild(score);
 
     // create page head
     PrintInformationFields();
