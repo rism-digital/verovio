@@ -763,7 +763,7 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
     // reset information fields
     m_composer.clear();
     m_history.clear();
-    m_notes.clear();
+    m_info.clear();
     m_origin.clear();
     m_title.clear();
 }
