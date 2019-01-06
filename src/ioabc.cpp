@@ -220,6 +220,27 @@ void AbcInput::parseABC(std::istream &infile)
     m_composer.clear();
     m_info.clear();
     m_title.clear();
+
+    /* check other tunes
+    while (!infile.eof()) {
+        infile.getline(abcLine, 10000);
+        ++m_lineNum;
+        if (abcLine[0] == 'X') {
+            readInformationField('X', &abcLine[2]);
+            while (abcLine[0] != 'K') {
+                infile.getline(abcLine, 10000);
+                ++m_lineNum;
+                readInformationField(abcLine[0], &abcLine[2]);
+            }
+            if (m_title.empty()) {
+                LogWarning("ABC input: Title field missing, creating empty title");
+                m_title.push_back(std::make_pair("", 0));
+            }
+            // add work entry to meiHead
+            CreateWorkEntry();
+        }
+    }
+    */
 }
 
 /**********************************
