@@ -112,10 +112,8 @@ void AbcInput::parseABC(std::istream &infile)
     m_doc->SetType(Raw);
 
     // read file header
+    infile.getline(abcLine, 10000);
     while (abcLine[0] != 'X') {
-        infile.getline(abcLine, 10000);
-        ++m_lineNum;
-        if (abcLine[0] == 'X') break;
         if (infile.eof()) {
             LogError("ABC input: No tune found");
             exit(0);
@@ -124,6 +122,8 @@ void AbcInput::parseABC(std::istream &infile)
             LogWarning("ABC input: Stylesheet directives are ignored");
         else if (abcLine[1] == ':')
             readInformationField(abcLine[0], &abcLine[2]);
+        infile.getline(abcLine, 10000);
+        ++m_lineNum;
     }
     CreateHeader();
 
@@ -176,8 +176,8 @@ void AbcInput::parseABC(std::istream &infile)
     // read music code
     m_layer = new Layer();
     m_layer->SetN(1);
+    infile.getline(abcLine, 10000);
     while (std::string(abcLine).find_first_not_of(' ') != std::string::npos) {
-        infile.getline(abcLine, 10000);
         ++m_lineNum;
         if (abcLine[0] == 'X') {
             LogDebug("ABC input: Reading only first tune in file");
@@ -196,6 +196,7 @@ void AbcInput::parseABC(std::istream &infile)
         else {
             readMusicCode(abcLine, section);
         }
+        infile.getline(abcLine, 10000);
     }
 
     // add ornaments, ties, and slur

@@ -108,7 +108,7 @@ private:
      */
     char m_decoration = '!';
     char m_linebreak = '$';
-    int m_lineNum = 0;
+    int m_lineNum = 1;
     int m_broken = 0;
     int m_gracecount = 0;
     int m_stafflines = 5;
