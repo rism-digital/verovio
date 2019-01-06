@@ -909,8 +909,14 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     if (value.empty()) return;
     while (isspace(value[0])) value = value.substr(1);
 
-    if (dataKey == 'C') {
+    if (dataKey == 'B') {
+        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
+    }
+    else if (dataKey == 'C') {
         m_composer.push_back(std::make_pair(value, m_lineNum));
+    }
+    else if (dataKey == 'D') {
+        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
     }
     else if (dataKey == 'F') {
         m_filename = value;
