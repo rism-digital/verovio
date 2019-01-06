@@ -1190,15 +1190,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 dots = -m_broken;
                 m_broken = 0;
             }
-            while (musicCode[i + 1] == '>') {
-                ++i;
-                ++m_broken;
-                ++dots;
-            }
-            while (musicCode[i + 1] == '<') {
-                ++i;
-                --m_broken;
-            }
             while (isdigit(musicCode[i + 1])) {
                 ++i;
                 numStr.push_back(musicCode[i]);
@@ -1211,6 +1202,15 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 ++i;
                 numbaseStr.push_back(musicCode[i]);
             }
+            while (musicCode[i + 1] == '>') {
+                ++i;
+                ++m_broken;
+                ++dots;
+            }
+            while (musicCode[i + 1] == '<') {
+                ++i;
+                --m_broken;
+            }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
@@ -1220,8 +1220,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
             int dur = (num == 0) ? 4 : m_unitDur * numbase / num;
-            data_DURATION meiDur
-                = (dur == 0) ? DURATION_breve : note->AttDurationLogical::StrToDuration(std::to_string(dur));
 
             // set grace
             if (grace != GRACE_NONE) {
@@ -1253,6 +1251,15 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 AddOrnaments(note);
             }
 
+            if ((m_broken < 0) && (grace == GRACE_NONE)) {
+                for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
+            }
+            else if ((dots == 0) && (m_broken > 0) && (grace == GRACE_NONE)) {
+                for (; m_broken != 0; --m_broken) dur = dur * 2;
+            }
+            data_DURATION meiDur
+            = (dur == 0) ? DURATION_breve : note->AttDurationLogical::StrToDuration(std::to_string(dur));
+
             if (chord) {
                 chord->AddChild(note);
                 if (!chord->HasDur()) {
@@ -1264,12 +1271,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             else {
                 if (dots > 0) note->SetDots(dots);
                 if (num == 0) note->SetStemVisible(BOOLEAN_false);
-                if ((m_broken < 0) && (grace == GRACE_NONE)) {
-                    for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
-                }
-                else if (!note->HasDots() && (m_broken > 0) && (grace == GRACE_NONE)) {
-                    for (; m_broken != 0; --m_broken) dur = dur * 2;
-                }
                 note->SetDur(meiDur);
                 if (note->GetDur() < DURATION_8) {
                     // if note cannot be beamed, write it directly to the layer
@@ -1304,20 +1305,21 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             int numbase = 1;
-            if (musicCode[i + 1] == '>') {
-                ++i;
-                LogWarning("ABC input: Broken rhythms not supported");
-            }
             while (isdigit(musicCode[i + 1])) {
                 ++i;
                 numStr.push_back(musicCode[i]);
             }
-            if (musicCode[i + 1] == '/') {
+            while (musicCode[i + 1] == '/') {
                 ++i;
-                while (isdigit(musicCode[i + 1])) {
-                    ++i;
-                    numbaseStr.push_back(musicCode[i]);
-                }
+                numbase *= 2;
+            }
+            while (isdigit(musicCode[i + 1])) {
+                ++i;
+                numbaseStr.push_back(musicCode[i]);
+            }
+            if (musicCode[i + 1] == '>') {
+                ++i;
+                LogWarning("ABC input: Broken rhythms not supported");
             }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
@@ -1330,6 +1332,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             if (dots > 0) space->SetDots(dots);
             space->SetDur(space->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
+            // spaces cannot be beamed
+            AddBeam();
             m_noteStack.push_back(space);
         }
 
@@ -1357,15 +1361,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 dots = -m_broken;
                 m_broken = 0;
             }
-            while (musicCode[i + 1] == '>') {
-                ++i;
-                ++m_broken;
-                ++dots;
-            }
-            while (musicCode[i + 1] == '<') {
-                ++i;
-                --m_broken;
-            }
             while (isdigit(musicCode[i + 1])) {
                 ++i;
                 numStr.push_back(musicCode[i]);
@@ -1378,6 +1373,15 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 ++i;
                 numbaseStr.push_back(musicCode[i]);
             }
+            while (musicCode[i + 1] == '>') {
+                ++i;
+                ++m_broken;
+                ++dots;
+            }
+            while (musicCode[i + 1] == '<') {
+                ++i;
+                --m_broken;
+            }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
@@ -1387,18 +1391,21 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
             int dur = m_unitDur * numbase / num;
-            data_DURATION meiDur
-                = (dur == 0) ? DURATION_breve : rest->AttDurationLogical::StrToDuration(std::to_string(dur));
-
-            if (dots > 0) rest->SetDots(dots);
-            if ((m_broken < 0) && (grace == GRACE_NONE)) {
+            
+            if (m_broken < 0) {
                 for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
             }
-            else if (!rest->HasDots() && (m_broken > 0) && (grace == GRACE_NONE)) {
+            else if ((dots == 0) && (m_broken > 0)) {
                 for (; m_broken != 0; --m_broken) dur = dur * 2;
             }
+            data_DURATION meiDur
+            = (dur == 0) ? DURATION_breve : rest->AttDurationLogical::StrToDuration(std::to_string(dur));
+
+            if (dots > 0) rest->SetDots(dots);
             rest->SetDur(meiDur);
 
+            // rests cannot be beamed
+            AddBeam();
             m_noteStack.push_back(rest);
         }
 
