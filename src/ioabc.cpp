@@ -838,7 +838,7 @@ void AbcInput::CreateHeader()
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     app.append_attribute("isodate").set_value(dateStr.c_str());
     app.append_attribute("version").set_value(GetVersion().c_str());
-    
+
     m_workList = meiHead.append_child("workList");
 }
 
@@ -908,6 +908,11 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     while (isspace(value[value.length() - 1])) value.pop_back();
     if (value.empty()) return;
     while (isspace(value[0])) value = value.substr(1);
+
+    if (dataKey == '+') {
+        LogWarning("ABC input: Field continuation (+) is not supported");
+        return;
+    }
 
     if (dataKey == 'B') {
         m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
