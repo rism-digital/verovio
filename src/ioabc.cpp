@@ -116,6 +116,10 @@ void AbcInput::parseABC(std::istream &infile)
         infile.getline(abcLine, 10000);
         ++m_lineNum;
         if (abcLine[0] == 'X') break;
+        if (infile.eof()) {
+            LogError("ABC input: No tune found");
+            exit(0);
+        }
         if ((abcLine[0] == '%') && (abcLine[1] == '%'))
             LogWarning("ABC input: Stylesheet directives are ignored");
         else if (abcLine[1] == ':')
@@ -133,14 +137,12 @@ void AbcInput::parseABC(std::istream &infile)
         infile.getline(abcLine, 10000);
         ++m_lineNum;
         readInformationField(abcLine[0], &abcLine[2]);
-        if (infile.eof()) {
-            LogWarning("ABC input: No music found");
-            break;
-        }
+    }
+    if (m_title.empty()) {
+        LogWarning("ABC input: Title field missing, creating empty title");
+        m_title.push_back(std::make_pair("", 0));
     }
     // add work entry to meiHead
-    pugi::xpath_node meiHead = m_doc->m_header.select_single_node("meiHead");
-    m_workList = meiHead.node().append_child("workList");
     CreateWorkEntry();
 
     // create page head
@@ -836,6 +838,8 @@ void AbcInput::CreateHeader()
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     app.append_attribute("isodate").set_value(dateStr.c_str());
     app.append_attribute("version").set_value(GetVersion().c_str());
+    
+    m_workList = meiHead.append_child("workList");
 }
 
 void AbcInput::CreateWorkEntry()
@@ -847,7 +851,8 @@ void AbcInput::CreateWorkEntry()
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
         pugi::xml_node title = work.append_child("title");
         title.text().set((it->first).c_str());
-        title.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+        if (it->second != 0)
+            title.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
         title.append_attribute("analog").set_value("abc:T");
         if (it == m_title.begin()) {
             title.append_attribute("type").set_value("main");
