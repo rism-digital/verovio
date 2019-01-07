@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>merging rests</title>
+            </titleStmt>
+            <pubStmt />
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000000930386372">
+                <score xml:id="score-0000001679681882">
+                    <scoreDef xml:id="scoredef-0000000777211839">
+                        <staffGrp xml:id="staffgrp-0000001198227407">
+                            <staffDef xml:id="staffdef-0000000289145439" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000622944406">
+                        <pb xml:id="pb-0000002029893668" />
+                        <measure xml:id="measure-0000001708243152" n="1">
+                            <staff xml:id="staff-0000000313346093" n="1">
+                                <layer xml:id="layer-0000000912970797" n="1">
+                                    <rest xml:id="rest-0000000259646555" dur="4" sameas="#rest-0000001381701126"/>
+                                </layer>
+                                <layer xml:id="layer-0000001491911089" n="2">
+                                    <rest xml:id="rest-0000001381701126" dur="4" sameas="#rest-0000000259646555"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

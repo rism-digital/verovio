@@ -128,10 +128,11 @@ void AbcInput::parseABC(std::istream &infile)
     CreateHeader();
 
     // read tune header
-    while (abcLine[0] != 'K') {
-        readInformationField(abcLine[0], &abcLine[2]);
+    readInformationField('X', &abcLine[2]);
+    while (abcLine[0] != 'K' && !infile.eof()) {
         infile.getline(abcLine, 10000);
         ++m_lineNum;
+        readInformationField(abcLine[0], &abcLine[2]);
     }
     if (m_title.empty()) {
         LogWarning("ABC input: Title field missing, creating empty title");
@@ -176,14 +177,19 @@ void AbcInput::parseABC(std::istream &infile)
     // read music code
     m_layer = new Layer();
     m_layer->SetN(1);
-    infile.getline(abcLine, 10000);
-    while (std::string(abcLine).find_first_not_of(' ') != std::string::npos) {
+    while (!infile.eof()) {
+        infile.getline(abcLine, 10000);
         ++m_lineNum;
-        if (abcLine[0] == 'X') {
+        if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
+            // empty lines end tunes
+            break;
+        }
+        else if (abcLine[0] == 'X') {
             LogDebug("ABC input: Reading only first tune in file");
             break;
         }
         else if (abcLine[0] == '%')
+            // skipping comments and stylesheet directives
             continue;
         else if (abcLine[1] == ':' && abcLine[0] != '|') {
             if (abcLine[0] != 'K') {
@@ -196,7 +202,6 @@ void AbcInput::parseABC(std::istream &infile)
         else {
             readMusicCode(abcLine, section);
         }
-        infile.getline(abcLine, 10000);
     }
 
     // add ornaments, ties, and slur
@@ -1258,7 +1263,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 for (; m_broken != 0; --m_broken) dur = dur * 2;
             }
             data_DURATION meiDur
-            = (dur == 0) ? DURATION_breve : note->AttDurationLogical::StrToDuration(std::to_string(dur));
+                = (dur == 0) ? DURATION_breve : note->AttDurationLogical::StrToDuration(std::to_string(dur));
 
             if (chord) {
                 chord->AddChild(note);
@@ -1391,7 +1396,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
             int dur = m_unitDur * numbase / num;
-            
+
             if (m_broken < 0) {
                 for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
             }
@@ -1399,7 +1404,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 for (; m_broken != 0; --m_broken) dur = dur * 2;
             }
             data_DURATION meiDur
-            = (dur == 0) ? DURATION_breve : rest->AttDurationLogical::StrToDuration(std::to_string(dur));
+                = (dur == 0) ? DURATION_breve : rest->AttDurationLogical::StrToDuration(std::to_string(dur));
 
             if (dots > 0) rest->SetDots(dots);
             rest->SetDur(meiDur);
