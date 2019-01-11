@@ -692,11 +692,7 @@ void HumdrumInput::createHeader()
     std::string OTL = getReferenceValue("OTL", references);
     pugi::xml_node title = fileTitle.append_child("title");
     if (!OTL.empty()) {
-// behaving strangely in enscripten (HTML entities present SVG output, 
-// but not from CLI-compiled verovio), so monitoring on stderr:
-cerr << "HEADER OTL input: " << OTL << endl;
         title.append_child(pugi::node_pcdata).set_value(unescapeHtmlEntities(OTL).c_str());
-cerr << "HEADER OTL output: " << unescapeHtmlEntities(OTL) << endl;
     }
 
     // <pubStmt> /////////////
@@ -13515,6 +13511,67 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
         }
     }
 
+    // remove cases where **mxhm text is present at the same
+    // time as the whole-measure rest.  There will still be cases
+    // where there is a chord/dynamic which does not start
+    // at the same time as the rest that need to be accounted for.
+    for (int i = 0; i < (int)wholerest.size(); i++) {
+        if (wholerest[i] != 1) {
+            continue;
+        }
+        bool hasitem = false;
+        line = dataline[i];
+        for (int j = 0; j < infile[line].getFieldCount(); ++j) {
+            hum::HTp tok = infile.token(line, j);
+            if (tok->isNull()) {
+                continue;
+            }
+            if (tok->isDataType("**mxhm")) {
+                hasitem = true;
+                break;
+            }
+            else if (tok->isDataType("**dynam")) {
+                hasitem = true;
+                break;
+            }
+            else if (tok->isDataType("**text")) {
+                hasitem = true;
+                break;
+            }
+        }
+        if (hasitem) {
+            wholerest[i] = 0;
+        }
+    }
+
+    // ggg
+    // remove cases where there is text attached to the whole-measure rest
+    for (int i = 0; i < (int)wholerest.size(); i++) {
+        if (wholerest[i] != 1) {
+            continue;
+        }
+        bool hastext = false;
+        line = dataline[i];
+        for (int j = 0; j < infile[line].getFieldCount(); ++j) {
+            hum::HTp tok = infile.token(line, j);
+            if (tok->isNull()) {
+                continue;
+            }
+            if (!tok->isKern()) {
+                continue;
+            }
+            std::string text = tok->getLayoutParameter("TX", "t");
+            if (!text.empty()) {
+                hastext = true;
+                break;
+            }
+        }
+        if (hastext) {
+            wholerest[i] = 0;
+        }
+    }
+
+    // group sequences of whole-meaure rests
     for (int i = (int)wholerest.size() - 2; i >= 0; i--) {
         if (bardur[i] != bardur[i + 1]) {
             continue;
