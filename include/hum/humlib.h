@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jan  5 04:17:32 EST 2019
+// Last Modified: Fri Jan 11 04:50:39 EST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2730,6 +2730,7 @@ enum class SliceType {
 		_Measure,
 				Clefs,
 				Transpositions,
+				KeyDesignations,
 				KeySigs,
 				TimeSigs,
 				MeterSigs,
@@ -2999,25 +3000,26 @@ class GridSlice : public std::vector<GridPart*> {
 		          GridSlice* slice);
 		~GridSlice();
 
-		bool isNoteSlice(void)        { return m_type == SliceType::Notes;            }
-		bool isGraceSlice(void)       { return m_type == SliceType::GraceNotes;       }
-		bool isMeasureSlice(void)     { return m_type == SliceType::Measures;         }
-		bool isClefSlice(void)        { return m_type == SliceType::Clefs;            }
-		bool isLabelSlice(void)       { return m_type == SliceType::Labels;           }
-		bool isLabelAbbrSlice(void)   { return m_type == SliceType::LabelAbbrs;       }
-		bool isTransposeSlice(void)   { return m_type == SliceType::Transpositions;   }
-		bool isKeySigSlice(void)      { return m_type == SliceType::KeySigs;          }
-		bool isTimeSigSlice(void)     { return m_type == SliceType::TimeSigs;         }
-		bool isTempoSlice(void)       { return m_type == SliceType::Tempos;           }
-		bool isMeterSigSlice(void)    { return m_type == SliceType::MeterSigs;        }
-		bool isManipulatorSlice(void) { return m_type==SliceType::Manipulators;       }
-		bool isLayoutSlice(void)      { return m_type ==  SliceType::Layouts;         }
-		bool isLocalLayoutSlice(void) { return m_type ==  SliceType::Layouts;         }
-		bool isInvalidSlice(void)     { return m_type == SliceType::Invalid;          }
-		bool isGlobalComment(void)    { return m_type == SliceType::GlobalComments;   }
-		bool isGlobalLayout(void)     { return m_type == SliceType::GlobalLayouts;    }
-		bool isReferenceRecord(void)  { return m_type == SliceType::ReferenceRecords; }
-		bool isOttavaRecord(void)     { return m_type == SliceType::Ottavas; }
+		bool isNoteSlice(void)          { return m_type == SliceType::Notes;            }
+		bool isGraceSlice(void)         { return m_type == SliceType::GraceNotes;       }
+		bool isMeasureSlice(void)       { return m_type == SliceType::Measures;         }
+		bool isClefSlice(void)          { return m_type == SliceType::Clefs;            }
+		bool isLabelSlice(void)         { return m_type == SliceType::Labels;           }
+		bool isLabelAbbrSlice(void)     { return m_type == SliceType::LabelAbbrs;       }
+		bool isTransposeSlice(void)     { return m_type == SliceType::Transpositions;   }
+		bool isKeySigSlice(void)        { return m_type == SliceType::KeySigs;          }
+		bool isKeyDesignationSlice(void){ return m_type == SliceType::KeyDesignations;  }
+		bool isTimeSigSlice(void)       { return m_type == SliceType::TimeSigs;         }
+		bool isTempoSlice(void)         { return m_type == SliceType::Tempos;           }
+		bool isMeterSigSlice(void)      { return m_type == SliceType::MeterSigs;        }
+		bool isManipulatorSlice(void)   { return m_type==SliceType::Manipulators;       }
+		bool isLayoutSlice(void)        { return m_type ==  SliceType::Layouts;         }
+		bool isLocalLayoutSlice(void)   { return m_type ==  SliceType::Layouts;         }
+		bool isInvalidSlice(void)       { return m_type == SliceType::Invalid;          }
+		bool isGlobalComment(void)      { return m_type == SliceType::GlobalComments;   }
+		bool isGlobalLayout(void)       { return m_type == SliceType::GlobalLayouts;    }
+		bool isReferenceRecord(void)    { return m_type == SliceType::ReferenceRecords; }
+		bool isOttavaRecord(void)       { return m_type == SliceType::Ottavas;          }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		bool hasSpines(void);
@@ -5125,8 +5127,13 @@ class Tool_musicxml2hum : public HumTool {
 		                       std::vector<MxmlPart>& partdata, HumNum nowtime);
 		void addKeySigLine    (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& keysigs,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
+		void addKeyDesignationLine(GridMeasure* outdata, vector<vector<xml_node> >& keydesigs, 
+		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartKeySigs (pugi::xml_node keysig, GridPart& part);
+		void insertPartKeyDesignations(xml_node keydeg, GridPart& part);
 		pugi::xml_node convertKeySigToHumdrum(pugi::xml_node keysig,
+		                        HTp& token, int& staffindex);
+		pugi::xml_node convertKeySigToHumdrumKeyDesignation(xml_node keysig,
 		                        HTp& token, int& staffindex);
 
 		void addTimeSigLine    (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& timesigs,
