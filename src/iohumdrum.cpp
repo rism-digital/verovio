@@ -8472,11 +8472,17 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             tupbot[i] = nextLowerPowerOfTwo(tuptop[i]);
         }
         else {
-            // this may still need to be fixed: dotted tuplets.
             tuptop[i] = dotlessdur[i].getDenominator();
             tupbot[i] = dotlessdur[i].getNumerator();
             int nextpow = nextLowerPowerOfTwo((double)tuptop[i] / tupbot[i]);
             tupbot[i] *= nextpow;
+            hum::HumNum newtopval = tupbot[i];
+            newtopval /= fulldur[i];
+            if (newtopval.getDenominator() != 1) {
+                // there will be a problem if the denominator is not 1:
+                cerr << "Problem with tuplet calculation :" << newtopval << endl;
+            }
+            tuptop[i] = newtopval.getNumerator();
         }
         if ((tuptop[i] == 1) && (tupbot[i] == 1)) {
             tuptop[i] = 0;
