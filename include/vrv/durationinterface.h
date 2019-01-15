@@ -9,6 +9,7 @@
 #define __VRV_DURATION_INTERFACE_H__
 
 #include "atts_cmn.h"
+#include "atts_gestural.h"
 #include "atts_shared.h"
 
 namespace vrv {
@@ -25,13 +26,13 @@ class Object;
  * It is not an abstract class but should not be instanciated directly.
  */
 class DurationInterface : public Interface,
-                          public AttAugmentdots,
-                          public AttBeamsecondary,
-                          public AttDurationMusical,
-                          public AttDurationPerformed,
+                          public AttAugmentDots,
+                          public AttBeamSecondary,
+                          public AttDurationGestural,
+                          public AttDurationLogical,
                           public AttDurationRatio,
-                          public AttFermatapresent,
-                          public AttStaffident {
+                          public AttFermataPresent,
+                          public AttStaffIdent {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -70,12 +71,15 @@ public:
     bool IsLastInBeam(LayerElement *noteOrRest);
 
     /**
-     * Return the actual duration of the note, for both CMN and mensural durations
+     * @name Return the actual (gestural) duration of the note, for both CMN and mensural durations
      * See data_DURATION
      * For CMN, it is the same (DURATION_1 == DUR_1)
      * For mensural, we need to apply the DUR_MENSURAL_MASK
      */
+    ///@{
     int GetActualDur() const;
+    int GetActualDurGes() const;
+    ///@}
 
     /**
      * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.

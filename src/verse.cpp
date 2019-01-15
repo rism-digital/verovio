@@ -27,24 +27,24 @@ namespace vrv {
 // Verse
 //----------------------------------------------------------------------------
 
-Verse::Verse() : LayerElement("verse-"), AttColor(), AttLang(), AttTypography()
+Verse::Verse() : LayerElement("verse-"), AttColor(), AttLang(), AttNInteger(), AttTypography()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
+    RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPOGRAPHY);
 
     Reset();
 }
 
-Verse::~Verse()
-{
-}
+Verse::~Verse() {}
 
 void Verse::Reset()
 {
     LayerElement::Reset();
     ResetColor();
     ResetLang();
+    ResetNInteger();
     ResetTypography();
 }
 

@@ -9,15 +9,21 @@
 #define __VRV_FERMATA_H__
 
 #include "atts_cmn.h"
+#include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
 
+class ConvertAnalyticalMarkupParams;
+
 //----------------------------------------------------------------------------
 // Fermata
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <fermata> element.
+ */
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
@@ -42,6 +48,12 @@ public:
     ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
+
+    /**
+     * Helpler for converting markup (from Note, Chord, Rest, MRest)
+     */
+    void ConvertFromAnalyticalMarkup(
+        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertAnalyticalMarkupParams *params);
 
     //----------//
     // Functors //

@@ -9,6 +9,7 @@
 #ifndef __VRV_IOHUMDRUM_H__
 #define __VRV_IOHUMDRUM_H__
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -17,8 +18,13 @@
 #include "accid.h"
 #include "attdef.h"
 #include "clef.h"
+#include "dir.h"
 #include "ending.h"
 #include "io.h"
+#include "pedal.h"
+#include "runningelement.h"
+#include "section.h"
+#include "verse.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -26,7 +32,7 @@
 #ifndef NO_HUMDRUM_SUPPORT
 #include "humlib.h"
 #include "pugixml.hpp"
-#include "tool-musicxml2hum.h"
+// #include "tool-musicxml2hum.h"
 #endif /* NO_HUMDRUM_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -42,9 +48,11 @@ class Measure;
 class ScoreDef;
 class Note;
 class Hairpin;
+class MRest;
 class Rest;
 class Score;
 class Section;
+class Space;
 class Staff;
 class StaffDef;
 class StaffGrp;
@@ -58,28 +66,28 @@ namespace humaux {
 
     class HumdrumTie {
     public:
-        HumdrumTie(void);
+        HumdrumTie();
         HumdrumTie(const HumdrumTie &anothertie);
         ~HumdrumTie();
         HumdrumTie &operator=(const HumdrumTie &anothertie);
-        vrv::Tie *insertTieIntoDom(void);
+        vrv::Tie *insertTieIntoDom();
         void setStart(const std::string &id, Measure *starting, int layer, const std::string &token, int pitch,
             hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok);
         void setEnd(const std::string &id, Measure *ending, const std::string &token);
         vrv::Tie *setEndAndInsert(const std::string &id, Measure *ending, const std::string &token);
-        hum::HumNum getEndTime(void);
-        hum::HumNum getStartTime(void);
-        hum::HumNum getDuration(void);
-        std::string getStartToken(void);
-        hum::HTp getStartTokenPointer(void);
-        std::string getEndToken(void);
-        int getStartSubindex(void);
-        int getPitch(void);
-        int getLayer(void);
-        bool isInserted(void);
+        hum::HumNum getEndTime();
+        hum::HumNum getStartTime();
+        hum::HumNum getDuration();
+        std::string getStartToken();
+        hum::HTp getStartTokenPointer();
+        std::string getEndToken();
+        int getStartSubindex();
+        int getPitch();
+        int getLayer();
+        bool isInserted();
         void clear();
-        void setTieAbove(void);
-        void setTieBelow(void);
+        void setTieAbove();
+        void setTieBelow();
 
     private:
         std::string m_starttoken;
@@ -113,9 +121,9 @@ namespace humaux {
         int gbeamstart;
         int gbeamend;
         char priority;
-        HumdrumBeamAndTuplet(void) { clear(); }
-        ~HumdrumBeamAndTuplet(void) { clear(); }
-        void clear(void)
+        HumdrumBeamAndTuplet() { clear(); }
+        ~HumdrumBeamAndTuplet() { clear(); }
+        void clear()
         {
             group = bracket = 0;
             numbase = num = 1;
@@ -132,9 +140,9 @@ namespace humaux {
     // is used to store all variables which are vectors
     class StaffStateVariables {
     public:
-        StaffStateVariables(void);
-        ~StaffStateVariables(void);
-        void clear(void);
+        StaffStateVariables();
+        ~StaffStateVariables();
+        void clear();
 
         // verse == keeps track of whether or not staff contains associated
         // **text spines which will be converted into lyrics.
@@ -148,12 +156,46 @@ namespace humaux {
         // brackets should be displayed.
         bool suppress_bracket_tuplet;
 
+        // cue_size == keeps track of whether or not the notes in the current
+        // staff/layer should be cue sized.  Index 0 is used to control all
+        // layers.
+        vector<bool> cue_size;
+
+        // righthalfstem == true means to place half-note stems always on right side
+        // of noteheads.  False is standard modern style.
+        bool righthalfstem;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
         Note *ottavanotestart;
         Note *ottavanoteend;
+        hum::HumNum ottavaendtimestamp;
         Measure *ottavameasure;
+
+        // ottavadownnote == keep track of ottava down marks: stores the starting note of
+        // an ottava down line which will be turned off later.  ottavadownmeasure == the
+        // starting measure of the ottava down mark.
+        Note *ottavadownnotestart;
+        Note *ottavadownnoteend;
+        hum::HumNum ottavadownendtimestamp;
+        Measure *ottavadownmeasure;
+
+        // ottava2note == keep track of ottava2 marks: stores the starting note of
+        // an ottava2 line which will be turned off later.  ottava2measure == the
+        // starting measure of the ottava2 mark.
+        Note *ottava2notestart;
+        Note *ottava2noteend;
+        hum::HumNum ottava2endtimestamp;
+        Measure *ottava2measure;
+
+        // ottava2downnote == keep track of ottava2 down marks: stores the starting note of
+        // an ottava2 down line which will be turned off later.  ottava2downmeasure == the
+        // starting measure of the ottava2 down mark.
+        Note *ottava2downnotestart;
+        Note *ottava2downnoteend;
+        hum::HumNum ottava2downendtimestamp;
+        Measure *ottava2downmeasure;
 
         // meter_bottom == Used to keep track of bottom value of time signature.
         // This is needed to calculate tstamps.
@@ -167,24 +209,37 @@ namespace humaux {
         // 1: staff
         // 2: all open ties for the staff
         std::list<humaux::HumdrumTie> ties;
+
+        // m_dynampos == dynamic position relativ to the staff:
+        // +1 = above, -1=below, 0=undefined (deal center between staves later)
+        int m_dynampos = 0;
     };
-}
+} // namespace humaux
 
 class HumdrumSignifiers {
 public:
     bool empty = true;
 
     // boolean switches:
-    char nostem = '\0'; // !!!RDF**kern: i = no stem
-    char cuesize = '\0'; // !!!RDF**kern: i = cue size
-    char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
-    char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
-    char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
+    char nostem = '\0'; // !!!RDF**kern: N = no stem
+    char cuesize = '\0'; // !!!RDF**kern: @ = cue size
+    char terminallong = '\0'; // !!!RDF**kern: l = terminal long
+    vector<char> editacc; // !!!RDF**kern: i = editorial accidental
+    vector<string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
 
-    string space_color; // !!!RDF**kern: show spaces color=hotpink
-    string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
-    string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
-    string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
+    // for **dynam:
+    string cresctext; // !!!RDF**kern: > = "cresc."
+    string crescfontstyle; // !!!RDF**kern: < = "cresc." fontstyle="normal|italic|bold|bold-italic"
+    string decresctext; // !!!RDF**kern: > = "decresc."
+    string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
+
+    char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
+    char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
+
+    std::string space_color; // !!!RDF**kern: show spaces color=hotpink
+    std::string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
+    std::string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
+    std::string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
 
     // coloring of notes
     // !!!RDF**kern: i = marked note, color="#553325"
@@ -195,6 +250,10 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
+    std::vector<std::string> markdir;
+
+    std::vector<char> textmark;
+    std::vector<std::string> textcolor;
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -214,16 +273,13 @@ public:
 
 #ifndef NO_HUMDRUM_SUPPORT
 
-    std::string GetHumdrumString(void);
-    std::string GetMeiString(void);
-
-    int GetTypeOption(void) { return m_type; }
-    void SetTypeOption(int value) { m_type = value; }
+    std::string GetHumdrumString();
+    std::string GetMeiString();
 
 protected:
-    void clear(void);
-    bool convertHumdrum(void);
-    void setupMeiDocument(void);
+    void clear();
+    bool convertHumdrum();
+    void setupMeiDocument();
     int getMeasureEndLine(int startline);
     bool convertSystemMeasure(int &line);
     bool convertMeasureStaves(int startline, int endline);
@@ -232,38 +288,43 @@ protected:
     bool convertStaffLayer(int track, int startline, int endline, int layerindex);
     int getMeasureNumber(int startline, int endline);
     bool fillContentsOfLayer(int track, int startline, int endline, int layerindex);
-    void calculateLayout(void);
+    void calculateLayout();
     void setSystemMeasureStyle(int startline, int endline);
-    std::vector<int> getStaffLayerCounts(void);
-    void prepareStaffGroup(void);
+    std::vector<int> getStaffLayerCounts();
+    void prepareStaffGroups();
     void setClef(StaffDef *part, const std::string &clef);
-    void setTimeSig(StaffDef *part, const std::string &timesig);
-    void setMeterSymbol(StaffDef *part, const std::string &metersig);
+    void setTransposition(StaffDef *part, const std::string &transpose);
+    void setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose);
+    void setTimeSig(
+        StaffDef *part, const std::string &timesig, const std::string &metersig = "", hum::HTp partstart = NULL);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
-    void calculateReverseKernIndex(void);
-    void prepareTimeSigDur(void);
-    void printMeasureTokens(void);
+    void calculateReverseKernIndex();
+    void prepareTimeSigDur();
+    void printMeasureTokens();
     int characterCount(const std::string &text, char symbol);
     int characterCount(hum::HTp token, char symbol);
     int characterCountInSubtoken(hum::HTp token, char symbol);
     int characterCountInSubtoken(const std::string &text, char symbol);
-    bool emptyMeasures(void);
+    bool emptyMeasures();
     bool hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
-    void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
+    void convertNote(vrv::Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
+    void convertMRest(MRest *rest, hum::HTp token, int subtoken, int staffindex);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
+    void addBreath(hum::HTp token, vrv::Object *parent = NULL);
     void addTrill(hum::HTp token);
     void addTurn(vrv::Object *linked, hum::HTp token);
     void addMordent(vrv::Object *linked, hum::HTp token);
     void addOrnaments(vrv::Object *object, hum::HTp token);
+    void addArpeggio(vrv::Object *object, hum::HTp token);
     void getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
         hum::HumNum layerstarttime, hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token, int staffindex);
-    void prepareVerses(void);
+    void prepareVerses();
     void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HTp token, Note *note);
@@ -280,6 +341,8 @@ protected:
         std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void analyzeLayerBeams(
         std::vector<int> &beamnum, std::vector<int> &gbeamnum, const std::vector<hum::HTp> &layerdata);
+    void storeBreaksec(std::vector<int> &beamstate, std::vector<int> &gbeamstate,
+        const std::vector<hum::HTp> &layerdata, bool grace = false);
     void setBeamDirection(int direction, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int layerindex, bool grace);
     void handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<std::string> &elements,
@@ -287,6 +350,7 @@ protected:
     void handleGroupEnds(
         const humaux::HumdrumBeamAndTuplet &tg, std::vector<std::string> &elements, std::vector<void *> &pointers);
     void handleStaffStateVariables(hum::HTp token);
+    void handleStaffDynamStateVariables(hum::HTp token);
     void removeTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers);
     void removeGBeam(std::vector<std::string> &elements, std::vector<void *> &pointers);
     void removeBeam(std::vector<std::string> &elements, std::vector<void *> &pointers);
@@ -296,21 +360,33 @@ protected:
     void processSlurs(hum::HTp token);
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
+    void addFingeringsForMeasure(int startline, int endline);
+    void insertFingerNumberInMeasure(
+        const std::string &text, int staffindex, hum::HTp token, int maxstaff, bool aboveQ);
+    void addStringNumbersForMeasure(int startline, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
-    void processDirection(hum::HTp token, int staffindex);
+    void processDirections(hum::HTp token, int staffindex);
+    void processLinkedDirection(int index, hum::HTp token, int staffindex);
+    void processGlobalDirections(hum::HTp token, int staffindex);
     void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
+    hum::HumNum getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
+    hum::HumNum getMeasureFactor(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
     hum::HTp getHairpinEnd(hum::HTp token, const std::string &endchar);
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
-    void storeOriginalClefMensurationApp(void);
+    void storeOriginalClefMensurationApp();
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
+    std::string getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(const std::string &prefix, hum::HTp token, int subtoken = -1);
+    std::string getLocationId(const std::string &prefix, int lineindex, int fieldindex, int subtokenindex);
     void setLocationIdNSuffix(vrv::Object *object, hum::HTp token, int number);
     void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
@@ -324,48 +400,116 @@ protected:
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
     std::string getAutoClef(hum::HTp partstart, int partnumber);
-    void colorNote(vrv::Note *note, const std::string &token, int line, int field);
+    void colorNote(vrv::Note *note, hum::HTp token, const std::string &subtoken, int line, int field);
     void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
+    void colorVerse(Verse *verse, std::string &token);
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
-    void prepareEndings(void);
-    int getDirection(const string &token, const std::string &target);
+    void prepareSections();
+    int getDirection(const std::string &token, const std::string &target);
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
+    void mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::Rest *note, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::MRest *mrest, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::Space *irest, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
+    void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
+    void addDefaultTempo(ScoreDef &m_scoreDef);
+    int getChordNoteCount(hum::HTp token);
+    bool leftmostSystemArpeggio(hum::HTp token);
+    bool leftmostStaffArpeggio(hum::HTp token);
+    hum::HTp getRightmostSystemArpeggio(hum::HTp token);
+    hum::HTp getRightmostStaffArpeggio(hum::HTp token);
+    void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
+        int staffindex, int justification = 0, const std::string &color = "");
+    void processTerminalLong(hum::HTp token);
+    void removeCharacter(hum::HTp token, char removechar);
+    std::string getSystemDecoration(const std::string &tag);
+    void processStaffDecoration(const std::string &decoration);
+    int getStaffNumberLabel(hum::HTp spinestart);
+    bool isFirstTokenOnStaff(hum::HTp token);
+    bool hasAboveParameter(hum::HTp token, const string &category);
+    bool hasBelowParameter(hum::HTp token, const string &category);
+    bool hasBelowParameter(hum::HTp token, const string &category, int &output);
+    void prepareHeaderFooter();
+    bool prepareHeader(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    bool prepareFooter(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string processReferenceTemplate(const std::string &input, std::vector<std::pair<string, string> > &biblist,
+        std::map<std::string, std::string> &refmap);
+    std::string processTemplateOperator(const std::string &value, const std::string &op);
+    std::string automaticHeaderLeft(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount);
+    std::string automaticHeaderCenter(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string automaticHeaderRight(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
+    void convertMensuralToken(
+        std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
+    void initializeSpineColor(hum::HumdrumFile &infile);
+    void setStemLength(Note *note, hum::HTp token);
+    void storeExpansionLists(Section *section, hum::HTp starting);
+    void storeExpansionList(Section *section, hum::HTp etok);
+    std::string replaceMusicShapes(const std::string input);
+    int getStaffAdjustment(hum::HTp token);
+    void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
+    void promoteInstrumentNamesToGroup();
+    void promoteInstrumentsForStaffGroup(StaffGrp *group);
+    void promoteInstrumentAbbreviationsToGroup();
+    void promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group);
+    std::string getInstrumentName(StaffDef *sd);
+    std::string getInstrumentAbbreviation(StaffDef *sd);
+    void removeInstrumentName(StaffDef *sd);
+    void removeInstrumentAbbreviation(StaffDef *sd);
+    std::string getEndIdForOttava(hum::HTp token);
+    void prepareInitialOttavas(hum::HTp measure);
+    void linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex);
+    bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
+    void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype);
+    bool getNoteState(hum::HTp token, int slurnumber);
+    void assignVerticalGroup(Pedal *ped, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
-    void createHeader(void);
+    void createHeader();
     void insertTitle(pugi::xml_node &titleStmt, const std::vector<hum::HumdrumLine *> &references);
     void insertExtMeta(std::vector<hum::HumdrumLine *> &references);
     void addPerson(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references,
         const std::string &key, const std::string &role);
     void getRespPeople(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references);
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
+    void insertPeople(pugi::xml_node &work, std::vector<std::vector<string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
-    template <class ELEMENT> void setKeySig(ELEMENT element, const std::string &keysig);
+    template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
+    template <class ELEMENT> void setKeySig(int partindex, ELEMENT element, const std::string &keysig, bool secondary);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
-
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
-
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
-
+    template <class ELEMENT> void setRhythmFromDuration(ELEMENT element, hum::HumNum dur);
+    template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
-
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
+    template <class ELEMENT> void setN(ELEMENT element, int nvalue);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
+    void popElementStack(std::vector<string> &elements, std::vector<void *> &pointers);
 
-    template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
+    template <class ELEMENT>
+    void addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle = "");
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
+    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
+    template <class ELEMENT>
+    void setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL);
+    template <class ELEMENT> void setMensurationSymbol(ELEMENT *element, const std::string &metersig);
+    template <class ELEMENT> void setInstrumentName(ELEMENT *staffdef, const std::string &name);
+    template <class ELEMENT> void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -374,11 +518,15 @@ protected:
     static hum::HumNum removeFactorsOfTwo(hum::HumNum value, int &tcount, int &bcount);
     static int getDotPowerOfTwo(hum::HumNum value);
     static int nextLowerPowerOfTwo(int x);
-    static std::string getDateString(void);
+    static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
-    std::string cleanHarmString(const std::string &content);
-    std::vector<std::string> cleanFBString(const std::string &content);
+    static bool replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
+    std::wstring cleanHarmString(const std::string &content);
+    std::wstring cleanHarmString2(const std::string &content);
+    std::wstring cleanHarmString3(const std::string &content);
+    std::wstring cleanStringString(const std::string &content);
+    std::vector<std::wstring> cleanFBString(const std::string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -398,6 +546,9 @@ private:
     // m_sections stores segments of the music
     std::vector<Section *> m_sections;
 
+    // m_lastsection == The section label of the previous measure
+    string m_lastsection;
+
     //////////////////////////////
     //
     // State variables for doing the conversion without having to pass
@@ -405,7 +556,8 @@ private:
     //
 
     // m_staffgroup == information about parts
-    vrv::StaffGrp *m_staffgroup = NULL;
+    // no longer used
+    // vrv::StaffGrp *m_staffgroup = NULL;
 
     // m_staffdef == information about a staff.
     std::vector<vrv::StaffDef *> m_staffdef;
@@ -430,9 +582,10 @@ private:
     // converted.
     std::vector<std::vector<std::vector<hum::HTp> > > m_layertokens;
 
-    // m_kernspines == list of tracks in Humdrum file being parsed which
-    // contain **kern data.
-    std::vector<hum::HTp> m_kernstarts;
+    // m_staffstarts == list of tracks in Humdrum file being parsed which
+    // contain **kern, **mens data or whatever other data types
+    // will be converted into a staff in the conversion to MEI.
+    std::vector<hum::HTp> m_staffstarts;
 
     // m_rkern == reverse mapping of Humdrum track to staff number..
     std::vector<int> m_rkern;
@@ -465,12 +618,30 @@ private:
     // m_harm == state variable for keeping track of whether or not
     // the file to convert contains **mxhm spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_harm;
+    bool m_harm = false;
+
+    // m_fing == state variable for keeping track of whether or not
+    // the file to convert contains **fing spines that should be
+    // converted into <fing> elements in the MEI conversion.
+    bool m_fing = false;
+
+    // m_string == state variable for keeping track of whether or not
+    // the file to convert contains **string spines that should be
+    // converted into <string> elements in the MEI conversion.
+    bool m_string = false;
+
+    // m_mens == state variable for keeping track of whether or not
+    // the file to convert contains **mens spines that should be
+    // converted into mensuration notation staves.
+    bool m_mens = false;
 
     // m_fb == state variable for keeping track of whether or not
     // the file to convert contains **Bnum spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_fb;
+    bool m_fb = false;
+
+    // m_setrightstem == used for setting right-side stem of half notes
+    bool m_setrightstem = false;
 
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used
@@ -485,22 +656,32 @@ private:
     // m_multirest == boolean states to keep track of muti-rest cases.
     std::vector<int> m_multirest;
 
-    // m_ending == keep track of 1st/second endings.
-    std::vector<int> m_ending;
+    // m_sections == keep track of thru sections and 1st/second endings.
+    std::vector<std::string> m_sectionlabels;
 
-    // m_currentending == keep track of current ending.
+    // m_endingnum == keep track of current ending.
     int m_endingnum = 0;
 
     // m_currentending == keep track of current ending.
     vrv::Ending *m_currentending = NULL;
 
+    // m_currentsection == keep track of current section.
+    vrv::Section *m_currentsection = NULL;
+
     // m_has_color_spine == true if a color spine is present.
     bool m_has_color_spine = false;
 
-#endif /* NO_HUMDRUM_SUPPORT */
+    // m_spine_color == list of colors to apply to spine data
+    std::vector<string> m_spine_color;
 
-    // m_type == true means add type markup in Humdrum-to-MEI conversion.
-    bool m_type = true;
+    // m_traspose == transposition to go from sounding to written pitch.
+    vector<int> m_transpose;
+
+    //    *kcancel     = display cancellation key signatures
+    //    *Xkcancel    = do not display cancellation key signatures (default)
+    bool m_show_cautionary_keysig = false;
+
+#endif /* NO_HUMDRUM_SUPPORT */
 };
 
 } // namespace vrv

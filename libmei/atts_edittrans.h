@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttAgentident
+// AttAgentIdent
 //----------------------------------------------------------------------------
 
-class AttAgentident : public Att {
+class AttAgentIdent : public Att {
 public:
-    AttAgentident();
-    virtual ~AttAgentident();
+    AttAgentIdent();
+    virtual ~AttAgentIdent();
 
     /** Reset the default values for the attribute class **/
-    void ResetAgentident();
+    void ResetAgentIdent();
 
     /** Read the values for the attribute class **/
-    bool ReadAgentident(pugi::xml_node element);
+    bool ReadAgentIdent(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteAgentident(pugi::xml_node element);
+    bool WriteAgentIdent(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -65,104 +65,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttEvidence
+// AttReasonIdent
 //----------------------------------------------------------------------------
 
-class AttEvidence : public Att {
+class AttReasonIdent : public Att {
 public:
-    AttEvidence();
-    virtual ~AttEvidence();
+    AttReasonIdent();
+    virtual ~AttReasonIdent();
 
     /** Reset the default values for the attribute class **/
-    void ResetEvidence();
+    void ResetReasonIdent();
 
     /** Read the values for the attribute class **/
-    bool ReadEvidence(pugi::xml_node element);
+    bool ReadReasonIdent(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteEvidence(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetCert(data_CERTAINTY cert_) { m_cert = cert_; }
-    data_CERTAINTY GetCert() const { return m_cert; }
-    bool HasCert() const;
-    //
-    void SetEvidence(std::string evidence_) { m_evidence = evidence_; }
-    std::string GetEvidence() const { return m_evidence; }
-    bool HasEvidence() const;
-    ///@}
-
-private:
-    /** Signifies the degree of certainty or precision associated with a feature. **/
-    data_CERTAINTY m_cert;
-    /**
-     * Indicates the nature of the evidence supporting the reliability or accuracy of
-     * the intervention or interpretation.
-     * Suggested values include: 'internal', 'external', 'conjecture'.
-     **/
-    std::string m_evidence;
-
-    /* include <attevidence> */
-};
-
-//----------------------------------------------------------------------------
-// AttExtent
-//----------------------------------------------------------------------------
-
-class AttExtent : public Att {
-public:
-    AttExtent();
-    virtual ~AttExtent();
-
-    /** Reset the default values for the attribute class **/
-    void ResetExtent();
-
-    /** Read the values for the attribute class **/
-    bool ReadExtent(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteExtent(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetExtent(std::string extent_) { m_extent = extent_; }
-    std::string GetExtent() const { return m_extent; }
-    bool HasExtent() const;
-    ///@}
-
-private:
-    /** Indicates the extent of damage or omission. **/
-    std::string m_extent;
-
-    /* include <attextent> */
-};
-
-//----------------------------------------------------------------------------
-// AttReasonident
-//----------------------------------------------------------------------------
-
-class AttReasonident : public Att {
-public:
-    AttReasonident();
-    virtual ~AttReasonident();
-
-    /** Reset the default values for the attribute class **/
-    void ResetReasonident();
-
-    /** Read the values for the attribute class **/
-    bool ReadReasonident(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteReasonident(pugi::xml_node element);
+    bool WriteReasonIdent(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.

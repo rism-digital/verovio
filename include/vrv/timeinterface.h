@@ -26,7 +26,7 @@ class Measure;
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
  * It is not an abstract class but should not be instantiated directly.
  */
-class TimePointInterface : public Interface, public AttStaffident, public AttStartid, public AttTimestampMusical {
+class TimePointInterface : public Interface, public AttStaffIdent, public AttStartId, public AttTimestampLogical {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -84,16 +84,16 @@ public:
     //-----------------//
 
     /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
-
-    /**
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
      * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
+
+    /**
+     * See Object::PrepareTimeSpanning
+     */
+    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimestamps
@@ -110,11 +110,6 @@ protected:
      * Extract the fragment of the start or end @xml:id if given
      */
     void SetUuidStr();
-
-    /**
-     * Extract the uuid from a string
-     */
-    std::string ExtractUuidFragment(std::string refUuid);
 
 private:
     //
@@ -135,7 +130,7 @@ private:
  * This class is an interface for spanning elements, such as slur, hairpin, etc..
  * It is not an abstract class but should not be instantiated directly.
  */
-class TimeSpanningInterface : public TimePointInterface, public AttStartendid, public AttTimestamp2Musical {
+class TimeSpanningInterface : public TimePointInterface, public AttStartEndId, public AttTimestamp2Logical {
 public:
     /**
      * @name Constructors, destructors, reset methods

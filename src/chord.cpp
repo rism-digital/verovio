@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layer.h"
@@ -40,17 +41,17 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttColor()
+    , AttCue()
     , AttGraced()
-    , AttRelativesize()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -71,11 +72,11 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetColor();
+    ResetCue();
     ResetGraced();
-    ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     ClearClusters();
@@ -132,12 +133,19 @@ void Chord::FilterList(ListOfObjects *childList)
 
     while (iter != childList->end()) {
         if ((*iter)->Is(NOTE))
-            iter++;
+            ++iter;
         else
             iter = childList->erase(iter);
     }
 
     std::sort(childList->begin(), childList->end(), DiatonicSort());
+
+    if (childList->empty()) {
+        LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
+        Note *rescueNote = new Note();
+        this->AddChild(rescueNote);
+        childList->push_back(rescueNote);
+    }
 
     iter = childList->begin();
 
@@ -148,7 +156,7 @@ void Chord::FilterList(ListOfObjects *childList)
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
 
-    iter++;
+    ++iter;
 
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
@@ -173,7 +181,7 @@ void Chord::FilterList(ListOfObjects *childList)
         lastNote = curNote;
         lastPitch = curPitch;
 
-        iter++;
+        ++iter;
     }
 }
 
@@ -190,7 +198,7 @@ int Chord::PositionInChord(Note *note)
 
 void Chord::GetYExtremes(int &yMax, int &yMin)
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -201,7 +209,7 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
 
 int Chord::GetYTop()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The last note is the top
@@ -210,7 +218,7 @@ int Chord::GetYTop()
 
 int Chord::GetYBottom()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -219,7 +227,7 @@ int Chord::GetYBottom()
 
 Note *Chord::GetTopNote()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     Note *topNote = dynamic_cast<Note *>(childList->back());
@@ -229,7 +237,7 @@ Note *Chord::GetTopNote()
 
 Note *Chord::GetBottomNote()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -298,23 +306,93 @@ bool Chord::HasCrossStaff()
     return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
-Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
+Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 {
     Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
-    return bottomNote->GetStemUpSE(doc, staffSize, graceSize);
+    return bottomNote->GetStemUpSE(doc, staffSize, isCueSize);
 }
 
-Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
+Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 {
     Note *topNote = this->GetTopNote();
     assert(topNote);
-    return topNote->GetStemDownNW(doc, staffSize, graceSize);
+    return topNote->GetStemDownNW(doc, staffSize, isCueSize);
+}
+
+bool Chord::IsVisible()
+{
+    if (this->HasVisible()) {
+        return this->GetVisible() == BOOLEAN_true;
+    }
+
+    // if the chord doens't have it, see if all the children are invisible
+    const ListOfObjects *notes = this->GetList(this);
+    assert(notes);
+
+    for (auto &iter : *notes) {
+        Note *note = dynamic_cast<Note *>(iter);
+        assert(note);
+        if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Chord::HasNoteWithDots()
+{
+    const ListOfObjects *notes = this->GetList(this);
+    assert(notes);
+
+    for (auto &iter : *notes) {
+        Note *note = dynamic_cast<Note *>(iter);
+        assert(note);
+        if (note->GetDots() > 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    assert(!params->m_currentChord);
+    params->m_currentChord = this;
+
+    /****** fermata ******/
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    if (params->m_permanent) {
+        this->ResetTiePresent();
+    }
+
+    assert(params->m_currentChord);
+    params->m_currentChord = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Chord::CalcStem(FunctorParams *functorParams)
 {
@@ -327,6 +405,11 @@ int Chord::CalcStem(FunctorParams *functorParams)
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // if the chord isn't visible, carry on
+    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -359,18 +442,18 @@ int Chord::CalcStem(FunctorParams *functorParams)
     this->GetYExtremes(yMax, yMin);
     params->m_chordStemLength = yMin - yMax;
 
+    int staffY = staff->GetDrawingY();
     int staffSize = staff->m_drawingStaffSize;
+    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
 
-    params->m_verticalCenter
-        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
-
+    data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
+    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
     }
     else {
         stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down
@@ -393,8 +476,18 @@ int Chord::CalcDots(FunctorParams *functorParams)
     CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
-    if (!this->HasDots()) {
+    // if the chord isn't visible, stop here
+    if (!this->IsVisible()) {
         return FUNCTOR_SIBLINGS;
+    }
+    // if there aren't dot, stop here but only if no note has a dot
+    if (this->GetDots() < 1) {
+        if (!this->HasNoteWithDots()) {
+            return FUNCTOR_SIBLINGS;
+        }
+        else {
+            return FUNCTOR_CONTINUE;
+        }
     }
 
     Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
@@ -404,16 +497,20 @@ int Chord::CalcDots(FunctorParams *functorParams)
     params->m_chordDrawingX = this->GetDrawingX();
     params->m_chordStemDir = this->GetDrawingStemDir();
 
-    ListOfObjects::reverse_iterator rit;
-    ListOfObjects *notes = this->GetList(this);
+    ListOfObjects::const_reverse_iterator rit;
+    const ListOfObjects *notes = this->GetList(this);
     assert(notes);
 
     assert(this->GetTopNote());
     assert(this->GetBottomNote());
 
-    for (rit = notes->rbegin(); rit != notes->rend(); rit++) {
+    for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
         Note *note = dynamic_cast<Note *>(*rit);
         assert(note);
+
+        if (note->GetDots() == 0) {
+            continue;
+        }
 
         Layer *layer = NULL;
         Staff *staff = note->GetCrossStaff(layer);
@@ -512,8 +609,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     SetDrawingStem(currentStem);
 
     // Also set the drawing stem object (or NULL) to all child notes
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         assert((*it)->Is(NOTE));
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
@@ -529,7 +626,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -538,28 +635,35 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
-    return FUNCTOR_CONTINUE;
-};
+    /************ Prepare the drawing cue size ************/
 
-int Chord::PrepareTieAttr(FunctorParams *functorParams)
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    assert(!params->m_currentChord);
-    params->m_currentChord = this;
+    double incrementScoreTime
+        = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+    incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+
+    params->m_currentScoreTime += incrementScoreTime;
+    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
+int Chord::ResetDrawing(FunctorParams *functorParams)
 {
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentChord);
-    params->m_currentChord = NULL;
-
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
     return FUNCTOR_CONTINUE;
 }
-}
+
+} // namespace vrv

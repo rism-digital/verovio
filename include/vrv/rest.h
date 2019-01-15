@@ -26,7 +26,7 @@ class Rest : public LayerElement,
              public DurationInterface,
              public PositionInterface,
              public AttColor,
-             public AttRelativesize,
+             public AttCue,
              public AttRestVisMensural {
 public:
     /**
@@ -72,6 +72,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
 
     /**
      * See Object::CalcDots

@@ -9,6 +9,7 @@
 #define __VRV_METERSIG_H__
 
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -43,7 +44,16 @@ public:
     virtual bool HasToBeAligned() const { return true; }
 
     /** Convert rendition to form */
-    meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERREND rend);
+    meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form);
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
 
 private:
     //

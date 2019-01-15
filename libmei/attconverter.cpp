@@ -28,102 +28,104 @@ namespace vrv {
 // AttConverter
 //----------------------------------------------------------------------------
 
-std::string AttConverter::AccidentalExplicitToStr(data_ACCIDENTAL_EXPLICIT data) const
+std::string AttConverter::AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data) const
 {
     std::string value;
     switch (data) {
-        case ACCIDENTAL_EXPLICIT_s: value = "s"; break;
-        case ACCIDENTAL_EXPLICIT_f: value = "f"; break;
-        case ACCIDENTAL_EXPLICIT_ss: value = "ss"; break;
-        case ACCIDENTAL_EXPLICIT_x: value = "x"; break;
-        case ACCIDENTAL_EXPLICIT_ff: value = "ff"; break;
-        case ACCIDENTAL_EXPLICIT_xs: value = "xs"; break;
-        case ACCIDENTAL_EXPLICIT_sx: value = "sx"; break;
-        case ACCIDENTAL_EXPLICIT_ts: value = "ts"; break;
-        case ACCIDENTAL_EXPLICIT_tf: value = "tf"; break;
-        case ACCIDENTAL_EXPLICIT_n: value = "n"; break;
-        case ACCIDENTAL_EXPLICIT_nf: value = "nf"; break;
-        case ACCIDENTAL_EXPLICIT_ns: value = "ns"; break;
-        case ACCIDENTAL_EXPLICIT_su: value = "su"; break;
-        case ACCIDENTAL_EXPLICIT_sd: value = "sd"; break;
-        case ACCIDENTAL_EXPLICIT_fu: value = "fu"; break;
-        case ACCIDENTAL_EXPLICIT_fd: value = "fd"; break;
-        case ACCIDENTAL_EXPLICIT_nu: value = "nu"; break;
-        case ACCIDENTAL_EXPLICIT_nd: value = "nd"; break;
-        case ACCIDENTAL_EXPLICIT_1qf: value = "1qf"; break;
-        case ACCIDENTAL_EXPLICIT_3qf: value = "3qf"; break;
-        case ACCIDENTAL_EXPLICIT_1qs: value = "1qs"; break;
-        case ACCIDENTAL_EXPLICIT_3qs: value = "3qs"; break;
+        case ACCIDENTAL_GESTURAL_s: value = "s"; break;
+        case ACCIDENTAL_GESTURAL_f: value = "f"; break;
+        case ACCIDENTAL_GESTURAL_ss: value = "ss"; break;
+        case ACCIDENTAL_GESTURAL_ff: value = "ff"; break;
+        case ACCIDENTAL_GESTURAL_n: value = "n"; break;
+        case ACCIDENTAL_GESTURAL_su: value = "su"; break;
+        case ACCIDENTAL_GESTURAL_sd: value = "sd"; break;
+        case ACCIDENTAL_GESTURAL_fu: value = "fu"; break;
+        case ACCIDENTAL_GESTURAL_fd: value = "fd"; break;
         default:
-            LogWarning("Unknown value '%d' for data.ACCIDENTAL.EXPLICIT", data);
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.GESTURAL", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_ACCIDENTAL_EXPLICIT AttConverter::StrToAccidentalExplicit(std::string value) const
+data_ACCIDENTAL_GESTURAL AttConverter::StrToAccidentalGestural(std::string value, bool logWarning) const
 {
-    if (value == "s") return ACCIDENTAL_EXPLICIT_s;
-    if (value == "f") return ACCIDENTAL_EXPLICIT_f;
-    if (value == "ss") return ACCIDENTAL_EXPLICIT_ss;
-    if (value == "x") return ACCIDENTAL_EXPLICIT_x;
-    if (value == "ff") return ACCIDENTAL_EXPLICIT_ff;
-    if (value == "xs") return ACCIDENTAL_EXPLICIT_xs;
-    if (value == "sx") return ACCIDENTAL_EXPLICIT_sx;
-    if (value == "ts") return ACCIDENTAL_EXPLICIT_ts;
-    if (value == "tf") return ACCIDENTAL_EXPLICIT_tf;
-    if (value == "n") return ACCIDENTAL_EXPLICIT_n;
-    if (value == "nf") return ACCIDENTAL_EXPLICIT_nf;
-    if (value == "ns") return ACCIDENTAL_EXPLICIT_ns;
-    if (value == "su") return ACCIDENTAL_EXPLICIT_su;
-    if (value == "sd") return ACCIDENTAL_EXPLICIT_sd;
-    if (value == "fu") return ACCIDENTAL_EXPLICIT_fu;
-    if (value == "fd") return ACCIDENTAL_EXPLICIT_fd;
-    if (value == "nu") return ACCIDENTAL_EXPLICIT_nu;
-    if (value == "nd") return ACCIDENTAL_EXPLICIT_nd;
-    if (value == "1qf") return ACCIDENTAL_EXPLICIT_1qf;
-    if (value == "3qf") return ACCIDENTAL_EXPLICIT_3qf;
-    if (value == "1qs") return ACCIDENTAL_EXPLICIT_1qs;
-    if (value == "3qs") return ACCIDENTAL_EXPLICIT_3qs;
-    LogWarning("Unsupported value '%s' for data.ACCIDENTAL.EXPLICIT", value.c_str());
-    return ACCIDENTAL_EXPLICIT_NONE;
+    if (value == "s") return ACCIDENTAL_GESTURAL_s;
+    if (value == "f") return ACCIDENTAL_GESTURAL_f;
+    if (value == "ss") return ACCIDENTAL_GESTURAL_ss;
+    if (value == "ff") return ACCIDENTAL_GESTURAL_ff;
+    if (value == "n") return ACCIDENTAL_GESTURAL_n;
+    if (value == "su") return ACCIDENTAL_GESTURAL_su;
+    if (value == "sd") return ACCIDENTAL_GESTURAL_sd;
+    if (value == "fu") return ACCIDENTAL_GESTURAL_fu;
+    if (value == "fd") return ACCIDENTAL_GESTURAL_fd;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.GESTURAL", value.c_str());
+    return ACCIDENTAL_GESTURAL_NONE;
 }
 
-std::string AttConverter::AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data) const
+std::string AttConverter::AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) const
 {
     std::string value;
     switch (data) {
-        case ACCIDENTAL_IMPLICIT_s: value = "s"; break;
-        case ACCIDENTAL_IMPLICIT_f: value = "f"; break;
-        case ACCIDENTAL_IMPLICIT_ss: value = "ss"; break;
-        case ACCIDENTAL_IMPLICIT_ff: value = "ff"; break;
-        case ACCIDENTAL_IMPLICIT_n: value = "n"; break;
-        case ACCIDENTAL_IMPLICIT_su: value = "su"; break;
-        case ACCIDENTAL_IMPLICIT_sd: value = "sd"; break;
-        case ACCIDENTAL_IMPLICIT_fu: value = "fu"; break;
-        case ACCIDENTAL_IMPLICIT_fd: value = "fd"; break;
+        case ACCIDENTAL_WRITTEN_s: value = "s"; break;
+        case ACCIDENTAL_WRITTEN_f: value = "f"; break;
+        case ACCIDENTAL_WRITTEN_ss: value = "ss"; break;
+        case ACCIDENTAL_WRITTEN_x: value = "x"; break;
+        case ACCIDENTAL_WRITTEN_ff: value = "ff"; break;
+        case ACCIDENTAL_WRITTEN_xs: value = "xs"; break;
+        case ACCIDENTAL_WRITTEN_sx: value = "sx"; break;
+        case ACCIDENTAL_WRITTEN_ts: value = "ts"; break;
+        case ACCIDENTAL_WRITTEN_tf: value = "tf"; break;
+        case ACCIDENTAL_WRITTEN_n: value = "n"; break;
+        case ACCIDENTAL_WRITTEN_nf: value = "nf"; break;
+        case ACCIDENTAL_WRITTEN_ns: value = "ns"; break;
+        case ACCIDENTAL_WRITTEN_su: value = "su"; break;
+        case ACCIDENTAL_WRITTEN_sd: value = "sd"; break;
+        case ACCIDENTAL_WRITTEN_fu: value = "fu"; break;
+        case ACCIDENTAL_WRITTEN_fd: value = "fd"; break;
+        case ACCIDENTAL_WRITTEN_nu: value = "nu"; break;
+        case ACCIDENTAL_WRITTEN_nd: value = "nd"; break;
+        case ACCIDENTAL_WRITTEN_1qf: value = "1qf"; break;
+        case ACCIDENTAL_WRITTEN_3qf: value = "3qf"; break;
+        case ACCIDENTAL_WRITTEN_1qs: value = "1qs"; break;
+        case ACCIDENTAL_WRITTEN_3qs: value = "3qs"; break;
         default:
-            LogWarning("Unknown value '%d' for data.ACCIDENTAL.IMPLICIT", data);
+            LogWarning("Unknown value '%d' for data.ACCIDENTAL.WRITTEN", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_ACCIDENTAL_IMPLICIT AttConverter::StrToAccidentalImplicit(std::string value) const
+data_ACCIDENTAL_WRITTEN AttConverter::StrToAccidentalWritten(std::string value, bool logWarning) const
 {
-    if (value == "s") return ACCIDENTAL_IMPLICIT_s;
-    if (value == "f") return ACCIDENTAL_IMPLICIT_f;
-    if (value == "ss") return ACCIDENTAL_IMPLICIT_ss;
-    if (value == "ff") return ACCIDENTAL_IMPLICIT_ff;
-    if (value == "n") return ACCIDENTAL_IMPLICIT_n;
-    if (value == "su") return ACCIDENTAL_IMPLICIT_su;
-    if (value == "sd") return ACCIDENTAL_IMPLICIT_sd;
-    if (value == "fu") return ACCIDENTAL_IMPLICIT_fu;
-    if (value == "fd") return ACCIDENTAL_IMPLICIT_fd;
-    LogWarning("Unsupported value '%s' for data.ACCIDENTAL.IMPLICIT", value.c_str());
-    return ACCIDENTAL_IMPLICIT_NONE;
+    if (value == "s") return ACCIDENTAL_WRITTEN_s;
+    if (value == "f") return ACCIDENTAL_WRITTEN_f;
+    if (value == "ss") return ACCIDENTAL_WRITTEN_ss;
+    if (value == "x") return ACCIDENTAL_WRITTEN_x;
+    if (value == "ff") return ACCIDENTAL_WRITTEN_ff;
+    if (value == "xs") return ACCIDENTAL_WRITTEN_xs;
+    if (value == "sx") return ACCIDENTAL_WRITTEN_sx;
+    if (value == "ts") return ACCIDENTAL_WRITTEN_ts;
+    if (value == "tf") return ACCIDENTAL_WRITTEN_tf;
+    if (value == "n") return ACCIDENTAL_WRITTEN_n;
+    if (value == "nf") return ACCIDENTAL_WRITTEN_nf;
+    if (value == "ns") return ACCIDENTAL_WRITTEN_ns;
+    if (value == "su") return ACCIDENTAL_WRITTEN_su;
+    if (value == "sd") return ACCIDENTAL_WRITTEN_sd;
+    if (value == "fu") return ACCIDENTAL_WRITTEN_fu;
+    if (value == "fd") return ACCIDENTAL_WRITTEN_fd;
+    if (value == "nu") return ACCIDENTAL_WRITTEN_nu;
+    if (value == "nd") return ACCIDENTAL_WRITTEN_nd;
+    if (value == "1qf") return ACCIDENTAL_WRITTEN_1qf;
+    if (value == "3qf") return ACCIDENTAL_WRITTEN_3qf;
+    if (value == "1qs") return ACCIDENTAL_WRITTEN_1qs;
+    if (value == "3qs") return ACCIDENTAL_WRITTEN_3qs;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ACCIDENTAL.WRITTEN", value.c_str());
+    return ACCIDENTAL_WRITTEN_NONE;
 }
 
 std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
@@ -135,7 +137,6 @@ std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
         case ARTICULATION_ten: value = "ten"; break;
         case ARTICULATION_stacciss: value = "stacciss"; break;
         case ARTICULATION_marc: value = "marc"; break;
-        case ARTICULATION_marc_stacc: value = "marc-stacc"; break;
         case ARTICULATION_spicc: value = "spicc"; break;
         case ARTICULATION_doit: value = "doit"; break;
         case ARTICULATION_scoop: value = "scoop"; break;
@@ -152,7 +153,6 @@ std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
         case ARTICULATION_harm: value = "harm"; break;
         case ARTICULATION_snap: value = "snap"; break;
         case ARTICULATION_fingernail: value = "fingernail"; break;
-        case ARTICULATION_ten_stacc: value = "ten-stacc"; break;
         case ARTICULATION_damp: value = "damp"; break;
         case ARTICULATION_dampall: value = "dampall"; break;
         case ARTICULATION_open: value = "open"; break;
@@ -173,14 +173,13 @@ std::string AttConverter::ArticulationToStr(data_ARTICULATION data) const
     return value;
 }
 
-data_ARTICULATION AttConverter::StrToArticulation(std::string value) const
+data_ARTICULATION AttConverter::StrToArticulation(std::string value, bool logWarning) const
 {
     if (value == "acc") return ARTICULATION_acc;
     if (value == "stacc") return ARTICULATION_stacc;
     if (value == "ten") return ARTICULATION_ten;
     if (value == "stacciss") return ARTICULATION_stacciss;
     if (value == "marc") return ARTICULATION_marc;
-    if (value == "marc-stacc") return ARTICULATION_marc_stacc;
     if (value == "spicc") return ARTICULATION_spicc;
     if (value == "doit") return ARTICULATION_doit;
     if (value == "scoop") return ARTICULATION_scoop;
@@ -197,7 +196,6 @@ data_ARTICULATION AttConverter::StrToArticulation(std::string value) const
     if (value == "harm") return ARTICULATION_harm;
     if (value == "snap") return ARTICULATION_snap;
     if (value == "fingernail") return ARTICULATION_fingernail;
-    if (value == "ten-stacc") return ARTICULATION_ten_stacc;
     if (value == "damp") return ARTICULATION_damp;
     if (value == "dampall") return ARTICULATION_dampall;
     if (value == "open") return ARTICULATION_open;
@@ -210,32 +208,34 @@ data_ARTICULATION AttConverter::StrToArticulation(std::string value) const
     if (value == "lhpizz") return ARTICULATION_lhpizz;
     if (value == "dot") return ARTICULATION_dot;
     if (value == "stroke") return ARTICULATION_stroke;
-    LogWarning("Unsupported value '%s' for data.ARTICULATION", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ARTICULATION", value.c_str());
     return ARTICULATION_NONE;
 }
 
-std::string AttConverter::BarplaceToStr(data_BARPLACE data) const
+std::string AttConverter::BarmethodToStr(data_BARMETHOD data) const
 {
     std::string value;
     switch (data) {
-        case BARPLACE_mensur: value = "mensur"; break;
-        case BARPLACE_staff: value = "staff"; break;
-        case BARPLACE_takt: value = "takt"; break;
+        case BARMETHOD_mensur: value = "mensur"; break;
+        case BARMETHOD_staff: value = "staff"; break;
+        case BARMETHOD_takt: value = "takt"; break;
         default:
-            LogWarning("Unknown value '%d' for data.BARPLACE", data);
+            LogWarning("Unknown value '%d' for data.BARMETHOD", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_BARPLACE AttConverter::StrToBarplace(std::string value) const
+data_BARMETHOD AttConverter::StrToBarmethod(std::string value, bool logWarning) const
 {
-    if (value == "mensur") return BARPLACE_mensur;
-    if (value == "staff") return BARPLACE_staff;
-    if (value == "takt") return BARPLACE_takt;
-    LogWarning("Unsupported value '%s' for data.BARPLACE", value.c_str());
-    return BARPLACE_NONE;
+    if (value == "mensur") return BARMETHOD_mensur;
+    if (value == "staff") return BARMETHOD_staff;
+    if (value == "takt") return BARMETHOD_takt;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.BARMETHOD", value.c_str());
+    return BARMETHOD_NONE;
 }
 
 std::string AttConverter::BarrenditionToStr(data_BARRENDITION data) const
@@ -261,7 +261,7 @@ std::string AttConverter::BarrenditionToStr(data_BARRENDITION data) const
     return value;
 }
 
-data_BARRENDITION AttConverter::StrToBarrendition(std::string value) const
+data_BARRENDITION AttConverter::StrToBarrendition(std::string value, bool logWarning) const
 {
     if (value == "dashed") return BARRENDITION_dashed;
     if (value == "dotted") return BARRENDITION_dotted;
@@ -274,8 +274,34 @@ data_BARRENDITION AttConverter::StrToBarrendition(std::string value) const
     if (value == "rptboth") return BARRENDITION_rptboth;
     if (value == "rptend") return BARRENDITION_rptend;
     if (value == "single") return BARRENDITION_single;
-    LogWarning("Unsupported value '%s' for data.BARRENDITION", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.BARRENDITION", value.c_str());
     return BARRENDITION_NONE;
+}
+
+std::string AttConverter::BeamplaceToStr(data_BEAMPLACE data) const
+{
+    std::string value;
+    switch (data) {
+        case BEAMPLACE_above: value = "above"; break;
+        case BEAMPLACE_below: value = "below"; break;
+        case BEAMPLACE_mixed: value = "mixed"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.BEAMPLACE", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_BEAMPLACE AttConverter::StrToBeamplace(std::string value, bool logWarning) const
+{
+    if (value == "above") return BEAMPLACE_above;
+    if (value == "below") return BEAMPLACE_below;
+    if (value == "mixed") return BEAMPLACE_mixed;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.BEAMPLACE", value.c_str());
+    return BEAMPLACE_NONE;
 }
 
 std::string AttConverter::BetypeToStr(data_BETYPE data) const
@@ -303,7 +329,7 @@ std::string AttConverter::BetypeToStr(data_BETYPE data) const
     return value;
 }
 
-data_BETYPE AttConverter::StrToBetype(std::string value) const
+data_BETYPE AttConverter::StrToBetype(std::string value, bool logWarning) const
 {
     if (value == "byte") return BETYPE_byte;
     if (value == "smil") return BETYPE_smil;
@@ -318,7 +344,8 @@ data_BETYPE AttConverter::StrToBetype(std::string value) const
     if (value == "smpte-ndf29.97") return BETYPE_smpte_ndf29_97;
     if (value == "tcf") return BETYPE_tcf;
     if (value == "time") return BETYPE_time;
-    LogWarning("Unsupported value '%s' for data.BETYPE", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.BETYPE", value.c_str());
     return BETYPE_NONE;
 }
 
@@ -336,11 +363,12 @@ std::string AttConverter::BooleanToStr(data_BOOLEAN data) const
     return value;
 }
 
-data_BOOLEAN AttConverter::StrToBoolean(std::string value) const
+data_BOOLEAN AttConverter::StrToBoolean(std::string value, bool logWarning) const
 {
     if (value == "true") return BOOLEAN_true;
     if (value == "false") return BOOLEAN_false;
-    LogWarning("Unsupported value '%s' for data.BOOLEAN", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.BOOLEAN", value.c_str());
     return BOOLEAN_NONE;
 }
 
@@ -360,13 +388,14 @@ std::string AttConverter::CertaintyToStr(data_CERTAINTY data) const
     return value;
 }
 
-data_CERTAINTY AttConverter::StrToCertainty(std::string value) const
+data_CERTAINTY AttConverter::StrToCertainty(std::string value, bool logWarning) const
 {
     if (value == "high") return CERTAINTY_high;
     if (value == "medium") return CERTAINTY_medium;
     if (value == "low") return CERTAINTY_low;
     if (value == "unknown") return CERTAINTY_unknown;
-    LogWarning("Unsupported value '%s' for data.CERTAINTY", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.CERTAINTY", value.c_str());
     return CERTAINTY_NONE;
 }
 
@@ -388,7 +417,7 @@ std::string AttConverter::ClefshapeToStr(data_CLEFSHAPE data) const
     return value;
 }
 
-data_CLEFSHAPE AttConverter::StrToClefshape(std::string value) const
+data_CLEFSHAPE AttConverter::StrToClefshape(std::string value, bool logWarning) const
 {
     if (value == "G") return CLEFSHAPE_G;
     if (value == "GG") return CLEFSHAPE_GG;
@@ -396,7 +425,8 @@ data_CLEFSHAPE AttConverter::StrToClefshape(std::string value) const
     if (value == "C") return CLEFSHAPE_C;
     if (value == "perc") return CLEFSHAPE_perc;
     if (value == "TAB") return CLEFSHAPE_TAB;
-    LogWarning("Unsupported value '%s' for data.CLEFSHAPE", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.CLEFSHAPE", value.c_str());
     return CLEFSHAPE_NONE;
 }
 
@@ -415,12 +445,13 @@ std::string AttConverter::ClusterToStr(data_CLUSTER data) const
     return value;
 }
 
-data_CLUSTER AttConverter::StrToCluster(std::string value) const
+data_CLUSTER AttConverter::StrToCluster(std::string value, bool logWarning) const
 {
     if (value == "white") return CLUSTER_white;
     if (value == "black") return CLUSTER_black;
     if (value == "chromatic") return CLUSTER_chromatic;
-    LogWarning("Unsupported value '%s' for data.CLUSTER", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.CLUSTER", value.c_str());
     return CLUSTER_NONE;
 }
 
@@ -428,22 +459,153 @@ std::string AttConverter::ColornamesToStr(data_COLORNAMES data) const
 {
     std::string value;
     switch (data) {
+        case COLORNAMES_aliceblue: value = "aliceblue"; break;
+        case COLORNAMES_antiquewhite: value = "antiquewhite"; break;
         case COLORNAMES_aqua: value = "aqua"; break;
+        case COLORNAMES_aquamarine: value = "aquamarine"; break;
+        case COLORNAMES_azure: value = "azure"; break;
+        case COLORNAMES_beige: value = "beige"; break;
+        case COLORNAMES_bisque: value = "bisque"; break;
         case COLORNAMES_black: value = "black"; break;
+        case COLORNAMES_blanchedalmond: value = "blanchedalmond"; break;
         case COLORNAMES_blue: value = "blue"; break;
+        case COLORNAMES_blueviolet: value = "blueviolet"; break;
+        case COLORNAMES_brown: value = "brown"; break;
+        case COLORNAMES_burlywood: value = "burlywood"; break;
+        case COLORNAMES_cadetblue: value = "cadetblue"; break;
+        case COLORNAMES_chartreuse: value = "chartreuse"; break;
+        case COLORNAMES_chocolate: value = "chocolate"; break;
+        case COLORNAMES_coral: value = "coral"; break;
+        case COLORNAMES_cornflowerblue: value = "cornflowerblue"; break;
+        case COLORNAMES_cornsilk: value = "cornsilk"; break;
+        case COLORNAMES_crimson: value = "crimson"; break;
+        case COLORNAMES_cyan: value = "cyan"; break;
+        case COLORNAMES_darkblue: value = "darkblue"; break;
+        case COLORNAMES_darkcyan: value = "darkcyan"; break;
+        case COLORNAMES_darkgoldenrod: value = "darkgoldenrod"; break;
+        case COLORNAMES_darkgray: value = "darkgray"; break;
+        case COLORNAMES_darkgreen: value = "darkgreen"; break;
+        case COLORNAMES_darkgrey: value = "darkgrey"; break;
+        case COLORNAMES_darkkhaki: value = "darkkhaki"; break;
+        case COLORNAMES_darkmagenta: value = "darkmagenta"; break;
+        case COLORNAMES_darkolivegreen: value = "darkolivegreen"; break;
+        case COLORNAMES_darkorange: value = "darkorange"; break;
+        case COLORNAMES_darkorchid: value = "darkorchid"; break;
+        case COLORNAMES_darkred: value = "darkred"; break;
+        case COLORNAMES_darksalmon: value = "darksalmon"; break;
+        case COLORNAMES_darkseagreen: value = "darkseagreen"; break;
+        case COLORNAMES_darkslateblue: value = "darkslateblue"; break;
+        case COLORNAMES_darkslategray: value = "darkslategray"; break;
+        case COLORNAMES_darkslategrey: value = "darkslategrey"; break;
+        case COLORNAMES_darkturquoise: value = "darkturquoise"; break;
+        case COLORNAMES_darkviolet: value = "darkviolet"; break;
+        case COLORNAMES_deeppink: value = "deeppink"; break;
+        case COLORNAMES_deepskyblue: value = "deepskyblue"; break;
+        case COLORNAMES_dimgray: value = "dimgray"; break;
+        case COLORNAMES_dimgrey: value = "dimgrey"; break;
+        case COLORNAMES_dodgerblue: value = "dodgerblue"; break;
+        case COLORNAMES_firebrick: value = "firebrick"; break;
+        case COLORNAMES_floralwhite: value = "floralwhite"; break;
+        case COLORNAMES_forestgreen: value = "forestgreen"; break;
         case COLORNAMES_fuchsia: value = "fuchsia"; break;
+        case COLORNAMES_gainsboro: value = "gainsboro"; break;
+        case COLORNAMES_ghostwhite: value = "ghostwhite"; break;
+        case COLORNAMES_gold: value = "gold"; break;
+        case COLORNAMES_goldenrod: value = "goldenrod"; break;
         case COLORNAMES_gray: value = "gray"; break;
         case COLORNAMES_green: value = "green"; break;
+        case COLORNAMES_greenyellow: value = "greenyellow"; break;
+        case COLORNAMES_grey: value = "grey"; break;
+        case COLORNAMES_honeydew: value = "honeydew"; break;
+        case COLORNAMES_hotpink: value = "hotpink"; break;
+        case COLORNAMES_indianred: value = "indianred"; break;
+        case COLORNAMES_indigo: value = "indigo"; break;
+        case COLORNAMES_ivory: value = "ivory"; break;
+        case COLORNAMES_khaki: value = "khaki"; break;
+        case COLORNAMES_lavender: value = "lavender"; break;
+        case COLORNAMES_lavenderblush: value = "lavenderblush"; break;
+        case COLORNAMES_lawngreen: value = "lawngreen"; break;
+        case COLORNAMES_lemonchiffon: value = "lemonchiffon"; break;
+        case COLORNAMES_lightblue: value = "lightblue"; break;
+        case COLORNAMES_lightcoral: value = "lightcoral"; break;
+        case COLORNAMES_lightcyan: value = "lightcyan"; break;
+        case COLORNAMES_lightgoldenrodyellow: value = "lightgoldenrodyellow"; break;
+        case COLORNAMES_lightgray: value = "lightgray"; break;
+        case COLORNAMES_lightgreen: value = "lightgreen"; break;
+        case COLORNAMES_lightgrey: value = "lightgrey"; break;
+        case COLORNAMES_lightpink: value = "lightpink"; break;
+        case COLORNAMES_lightsalmon: value = "lightsalmon"; break;
+        case COLORNAMES_lightseagreen: value = "lightseagreen"; break;
+        case COLORNAMES_lightskyblue: value = "lightskyblue"; break;
+        case COLORNAMES_lightslategray: value = "lightslategray"; break;
+        case COLORNAMES_lightslategrey: value = "lightslategrey"; break;
+        case COLORNAMES_lightsteelblue: value = "lightsteelblue"; break;
+        case COLORNAMES_lightyellow: value = "lightyellow"; break;
         case COLORNAMES_lime: value = "lime"; break;
+        case COLORNAMES_limegreen: value = "limegreen"; break;
+        case COLORNAMES_linen: value = "linen"; break;
+        case COLORNAMES_magenta: value = "magenta"; break;
         case COLORNAMES_maroon: value = "maroon"; break;
+        case COLORNAMES_mediumaquamarine: value = "mediumaquamarine"; break;
+        case COLORNAMES_mediumblue: value = "mediumblue"; break;
+        case COLORNAMES_mediumorchid: value = "mediumorchid"; break;
+        case COLORNAMES_mediumpurple: value = "mediumpurple"; break;
+        case COLORNAMES_mediumseagreen: value = "mediumseagreen"; break;
+        case COLORNAMES_mediumslateblue: value = "mediumslateblue"; break;
+        case COLORNAMES_mediumspringgreen: value = "mediumspringgreen"; break;
+        case COLORNAMES_mediumturquoise: value = "mediumturquoise"; break;
+        case COLORNAMES_mediumvioletred: value = "mediumvioletred"; break;
+        case COLORNAMES_midnightblue: value = "midnightblue"; break;
+        case COLORNAMES_mintcream: value = "mintcream"; break;
+        case COLORNAMES_mistyrose: value = "mistyrose"; break;
+        case COLORNAMES_moccasin: value = "moccasin"; break;
+        case COLORNAMES_navajowhite: value = "navajowhite"; break;
         case COLORNAMES_navy: value = "navy"; break;
+        case COLORNAMES_oldlace: value = "oldlace"; break;
         case COLORNAMES_olive: value = "olive"; break;
+        case COLORNAMES_olivedrab: value = "olivedrab"; break;
+        case COLORNAMES_orange: value = "orange"; break;
+        case COLORNAMES_orangered: value = "orangered"; break;
+        case COLORNAMES_orchid: value = "orchid"; break;
+        case COLORNAMES_palegoldenrod: value = "palegoldenrod"; break;
+        case COLORNAMES_palegreen: value = "palegreen"; break;
+        case COLORNAMES_paleturquoise: value = "paleturquoise"; break;
+        case COLORNAMES_palevioletred: value = "palevioletred"; break;
+        case COLORNAMES_papayawhip: value = "papayawhip"; break;
+        case COLORNAMES_peachpuff: value = "peachpuff"; break;
+        case COLORNAMES_peru: value = "peru"; break;
+        case COLORNAMES_pink: value = "pink"; break;
+        case COLORNAMES_plum: value = "plum"; break;
+        case COLORNAMES_powderblue: value = "powderblue"; break;
         case COLORNAMES_purple: value = "purple"; break;
         case COLORNAMES_red: value = "red"; break;
+        case COLORNAMES_rosybrown: value = "rosybrown"; break;
+        case COLORNAMES_royalblue: value = "royalblue"; break;
+        case COLORNAMES_saddlebrown: value = "saddlebrown"; break;
+        case COLORNAMES_salmon: value = "salmon"; break;
+        case COLORNAMES_sandybrown: value = "sandybrown"; break;
+        case COLORNAMES_seagreen: value = "seagreen"; break;
+        case COLORNAMES_seashell: value = "seashell"; break;
+        case COLORNAMES_sienna: value = "sienna"; break;
         case COLORNAMES_silver: value = "silver"; break;
+        case COLORNAMES_skyblue: value = "skyblue"; break;
+        case COLORNAMES_slateblue: value = "slateblue"; break;
+        case COLORNAMES_slategray: value = "slategray"; break;
+        case COLORNAMES_slategrey: value = "slategrey"; break;
+        case COLORNAMES_snow: value = "snow"; break;
+        case COLORNAMES_springgreen: value = "springgreen"; break;
+        case COLORNAMES_steelblue: value = "steelblue"; break;
+        case COLORNAMES_tan: value = "tan"; break;
         case COLORNAMES_teal: value = "teal"; break;
+        case COLORNAMES_thistle: value = "thistle"; break;
+        case COLORNAMES_tomato: value = "tomato"; break;
+        case COLORNAMES_turquoise: value = "turquoise"; break;
+        case COLORNAMES_violet: value = "violet"; break;
+        case COLORNAMES_wheat: value = "wheat"; break;
         case COLORNAMES_white: value = "white"; break;
+        case COLORNAMES_whitesmoke: value = "whitesmoke"; break;
         case COLORNAMES_yellow: value = "yellow"; break;
+        case COLORNAMES_yellowgreen: value = "yellowgreen"; break;
         default:
             LogWarning("Unknown value '%d' for data.COLORNAMES", data);
             value = "";
@@ -452,26 +614,212 @@ std::string AttConverter::ColornamesToStr(data_COLORNAMES data) const
     return value;
 }
 
-data_COLORNAMES AttConverter::StrToColornames(std::string value) const
+data_COLORNAMES AttConverter::StrToColornames(std::string value, bool logWarning) const
 {
+    if (value == "aliceblue") return COLORNAMES_aliceblue;
+    if (value == "antiquewhite") return COLORNAMES_antiquewhite;
     if (value == "aqua") return COLORNAMES_aqua;
+    if (value == "aquamarine") return COLORNAMES_aquamarine;
+    if (value == "azure") return COLORNAMES_azure;
+    if (value == "beige") return COLORNAMES_beige;
+    if (value == "bisque") return COLORNAMES_bisque;
     if (value == "black") return COLORNAMES_black;
+    if (value == "blanchedalmond") return COLORNAMES_blanchedalmond;
     if (value == "blue") return COLORNAMES_blue;
+    if (value == "blueviolet") return COLORNAMES_blueviolet;
+    if (value == "brown") return COLORNAMES_brown;
+    if (value == "burlywood") return COLORNAMES_burlywood;
+    if (value == "cadetblue") return COLORNAMES_cadetblue;
+    if (value == "chartreuse") return COLORNAMES_chartreuse;
+    if (value == "chocolate") return COLORNAMES_chocolate;
+    if (value == "coral") return COLORNAMES_coral;
+    if (value == "cornflowerblue") return COLORNAMES_cornflowerblue;
+    if (value == "cornsilk") return COLORNAMES_cornsilk;
+    if (value == "crimson") return COLORNAMES_crimson;
+    if (value == "cyan") return COLORNAMES_cyan;
+    if (value == "darkblue") return COLORNAMES_darkblue;
+    if (value == "darkcyan") return COLORNAMES_darkcyan;
+    if (value == "darkgoldenrod") return COLORNAMES_darkgoldenrod;
+    if (value == "darkgray") return COLORNAMES_darkgray;
+    if (value == "darkgreen") return COLORNAMES_darkgreen;
+    if (value == "darkgrey") return COLORNAMES_darkgrey;
+    if (value == "darkkhaki") return COLORNAMES_darkkhaki;
+    if (value == "darkmagenta") return COLORNAMES_darkmagenta;
+    if (value == "darkolivegreen") return COLORNAMES_darkolivegreen;
+    if (value == "darkorange") return COLORNAMES_darkorange;
+    if (value == "darkorchid") return COLORNAMES_darkorchid;
+    if (value == "darkred") return COLORNAMES_darkred;
+    if (value == "darksalmon") return COLORNAMES_darksalmon;
+    if (value == "darkseagreen") return COLORNAMES_darkseagreen;
+    if (value == "darkslateblue") return COLORNAMES_darkslateblue;
+    if (value == "darkslategray") return COLORNAMES_darkslategray;
+    if (value == "darkslategrey") return COLORNAMES_darkslategrey;
+    if (value == "darkturquoise") return COLORNAMES_darkturquoise;
+    if (value == "darkviolet") return COLORNAMES_darkviolet;
+    if (value == "deeppink") return COLORNAMES_deeppink;
+    if (value == "deepskyblue") return COLORNAMES_deepskyblue;
+    if (value == "dimgray") return COLORNAMES_dimgray;
+    if (value == "dimgrey") return COLORNAMES_dimgrey;
+    if (value == "dodgerblue") return COLORNAMES_dodgerblue;
+    if (value == "firebrick") return COLORNAMES_firebrick;
+    if (value == "floralwhite") return COLORNAMES_floralwhite;
+    if (value == "forestgreen") return COLORNAMES_forestgreen;
     if (value == "fuchsia") return COLORNAMES_fuchsia;
+    if (value == "gainsboro") return COLORNAMES_gainsboro;
+    if (value == "ghostwhite") return COLORNAMES_ghostwhite;
+    if (value == "gold") return COLORNAMES_gold;
+    if (value == "goldenrod") return COLORNAMES_goldenrod;
     if (value == "gray") return COLORNAMES_gray;
     if (value == "green") return COLORNAMES_green;
+    if (value == "greenyellow") return COLORNAMES_greenyellow;
+    if (value == "grey") return COLORNAMES_grey;
+    if (value == "honeydew") return COLORNAMES_honeydew;
+    if (value == "hotpink") return COLORNAMES_hotpink;
+    if (value == "indianred") return COLORNAMES_indianred;
+    if (value == "indigo") return COLORNAMES_indigo;
+    if (value == "ivory") return COLORNAMES_ivory;
+    if (value == "khaki") return COLORNAMES_khaki;
+    if (value == "lavender") return COLORNAMES_lavender;
+    if (value == "lavenderblush") return COLORNAMES_lavenderblush;
+    if (value == "lawngreen") return COLORNAMES_lawngreen;
+    if (value == "lemonchiffon") return COLORNAMES_lemonchiffon;
+    if (value == "lightblue") return COLORNAMES_lightblue;
+    if (value == "lightcoral") return COLORNAMES_lightcoral;
+    if (value == "lightcyan") return COLORNAMES_lightcyan;
+    if (value == "lightgoldenrodyellow") return COLORNAMES_lightgoldenrodyellow;
+    if (value == "lightgray") return COLORNAMES_lightgray;
+    if (value == "lightgreen") return COLORNAMES_lightgreen;
+    if (value == "lightgrey") return COLORNAMES_lightgrey;
+    if (value == "lightpink") return COLORNAMES_lightpink;
+    if (value == "lightsalmon") return COLORNAMES_lightsalmon;
+    if (value == "lightseagreen") return COLORNAMES_lightseagreen;
+    if (value == "lightskyblue") return COLORNAMES_lightskyblue;
+    if (value == "lightslategray") return COLORNAMES_lightslategray;
+    if (value == "lightslategrey") return COLORNAMES_lightslategrey;
+    if (value == "lightsteelblue") return COLORNAMES_lightsteelblue;
+    if (value == "lightyellow") return COLORNAMES_lightyellow;
     if (value == "lime") return COLORNAMES_lime;
+    if (value == "limegreen") return COLORNAMES_limegreen;
+    if (value == "linen") return COLORNAMES_linen;
+    if (value == "magenta") return COLORNAMES_magenta;
     if (value == "maroon") return COLORNAMES_maroon;
+    if (value == "mediumaquamarine") return COLORNAMES_mediumaquamarine;
+    if (value == "mediumblue") return COLORNAMES_mediumblue;
+    if (value == "mediumorchid") return COLORNAMES_mediumorchid;
+    if (value == "mediumpurple") return COLORNAMES_mediumpurple;
+    if (value == "mediumseagreen") return COLORNAMES_mediumseagreen;
+    if (value == "mediumslateblue") return COLORNAMES_mediumslateblue;
+    if (value == "mediumspringgreen") return COLORNAMES_mediumspringgreen;
+    if (value == "mediumturquoise") return COLORNAMES_mediumturquoise;
+    if (value == "mediumvioletred") return COLORNAMES_mediumvioletred;
+    if (value == "midnightblue") return COLORNAMES_midnightblue;
+    if (value == "mintcream") return COLORNAMES_mintcream;
+    if (value == "mistyrose") return COLORNAMES_mistyrose;
+    if (value == "moccasin") return COLORNAMES_moccasin;
+    if (value == "navajowhite") return COLORNAMES_navajowhite;
     if (value == "navy") return COLORNAMES_navy;
+    if (value == "oldlace") return COLORNAMES_oldlace;
     if (value == "olive") return COLORNAMES_olive;
+    if (value == "olivedrab") return COLORNAMES_olivedrab;
+    if (value == "orange") return COLORNAMES_orange;
+    if (value == "orangered") return COLORNAMES_orangered;
+    if (value == "orchid") return COLORNAMES_orchid;
+    if (value == "palegoldenrod") return COLORNAMES_palegoldenrod;
+    if (value == "palegreen") return COLORNAMES_palegreen;
+    if (value == "paleturquoise") return COLORNAMES_paleturquoise;
+    if (value == "palevioletred") return COLORNAMES_palevioletred;
+    if (value == "papayawhip") return COLORNAMES_papayawhip;
+    if (value == "peachpuff") return COLORNAMES_peachpuff;
+    if (value == "peru") return COLORNAMES_peru;
+    if (value == "pink") return COLORNAMES_pink;
+    if (value == "plum") return COLORNAMES_plum;
+    if (value == "powderblue") return COLORNAMES_powderblue;
     if (value == "purple") return COLORNAMES_purple;
     if (value == "red") return COLORNAMES_red;
+    if (value == "rosybrown") return COLORNAMES_rosybrown;
+    if (value == "royalblue") return COLORNAMES_royalblue;
+    if (value == "saddlebrown") return COLORNAMES_saddlebrown;
+    if (value == "salmon") return COLORNAMES_salmon;
+    if (value == "sandybrown") return COLORNAMES_sandybrown;
+    if (value == "seagreen") return COLORNAMES_seagreen;
+    if (value == "seashell") return COLORNAMES_seashell;
+    if (value == "sienna") return COLORNAMES_sienna;
     if (value == "silver") return COLORNAMES_silver;
+    if (value == "skyblue") return COLORNAMES_skyblue;
+    if (value == "slateblue") return COLORNAMES_slateblue;
+    if (value == "slategray") return COLORNAMES_slategray;
+    if (value == "slategrey") return COLORNAMES_slategrey;
+    if (value == "snow") return COLORNAMES_snow;
+    if (value == "springgreen") return COLORNAMES_springgreen;
+    if (value == "steelblue") return COLORNAMES_steelblue;
+    if (value == "tan") return COLORNAMES_tan;
     if (value == "teal") return COLORNAMES_teal;
+    if (value == "thistle") return COLORNAMES_thistle;
+    if (value == "tomato") return COLORNAMES_tomato;
+    if (value == "turquoise") return COLORNAMES_turquoise;
+    if (value == "violet") return COLORNAMES_violet;
+    if (value == "wheat") return COLORNAMES_wheat;
     if (value == "white") return COLORNAMES_white;
+    if (value == "whitesmoke") return COLORNAMES_whitesmoke;
     if (value == "yellow") return COLORNAMES_yellow;
-    LogWarning("Unsupported value '%s' for data.COLORNAMES", value.c_str());
+    if (value == "yellowgreen") return COLORNAMES_yellowgreen;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.COLORNAMES", value.c_str());
     return COLORNAMES_NONE;
+}
+
+std::string AttConverter::CompassdirectionBasicToStr(data_COMPASSDIRECTION_basic data) const
+{
+    std::string value;
+    switch (data) {
+        case COMPASSDIRECTION_basic_n: value = "n"; break;
+        case COMPASSDIRECTION_basic_e: value = "e"; break;
+        case COMPASSDIRECTION_basic_s: value = "s"; break;
+        case COMPASSDIRECTION_basic_w: value = "w"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.COMPASSDIRECTION.basic", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_COMPASSDIRECTION_basic AttConverter::StrToCompassdirectionBasic(std::string value, bool logWarning) const
+{
+    if (value == "n") return COMPASSDIRECTION_basic_n;
+    if (value == "e") return COMPASSDIRECTION_basic_e;
+    if (value == "s") return COMPASSDIRECTION_basic_s;
+    if (value == "w") return COMPASSDIRECTION_basic_w;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.COMPASSDIRECTION.basic", value.c_str());
+    return COMPASSDIRECTION_basic_NONE;
+}
+
+std::string AttConverter::CompassdirectionExtendedToStr(data_COMPASSDIRECTION_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case COMPASSDIRECTION_extended_ne: value = "ne"; break;
+        case COMPASSDIRECTION_extended_nw: value = "nw"; break;
+        case COMPASSDIRECTION_extended_se: value = "se"; break;
+        case COMPASSDIRECTION_extended_sw: value = "sw"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.COMPASSDIRECTION.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_COMPASSDIRECTION_extended AttConverter::StrToCompassdirectionExtended(std::string value, bool logWarning) const
+{
+    if (value == "ne") return COMPASSDIRECTION_extended_ne;
+    if (value == "nw") return COMPASSDIRECTION_extended_nw;
+    if (value == "se") return COMPASSDIRECTION_extended_se;
+    if (value == "sw") return COMPASSDIRECTION_extended_sw;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.COMPASSDIRECTION.extended", value.c_str());
+    return COMPASSDIRECTION_extended_NONE;
 }
 
 std::string AttConverter::EnclosureToStr(data_ENCLOSURE data) const
@@ -488,12 +836,67 @@ std::string AttConverter::EnclosureToStr(data_ENCLOSURE data) const
     return value;
 }
 
-data_ENCLOSURE AttConverter::StrToEnclosure(std::string value) const
+data_ENCLOSURE AttConverter::StrToEnclosure(std::string value, bool logWarning) const
 {
     if (value == "paren") return ENCLOSURE_paren;
     if (value == "brack") return ENCLOSURE_brack;
-    LogWarning("Unsupported value '%s' for data.ENCLOSURE", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ENCLOSURE", value.c_str());
     return ENCLOSURE_NONE;
+}
+
+std::string AttConverter::EventrelBasicToStr(data_EVENTREL_basic data) const
+{
+    std::string value;
+    switch (data) {
+        case EVENTREL_basic_above: value = "above"; break;
+        case EVENTREL_basic_below: value = "below"; break;
+        case EVENTREL_basic_left: value = "left"; break;
+        case EVENTREL_basic_right: value = "right"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.EVENTREL.basic", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_EVENTREL_basic AttConverter::StrToEventrelBasic(std::string value, bool logWarning) const
+{
+    if (value == "above") return EVENTREL_basic_above;
+    if (value == "below") return EVENTREL_basic_below;
+    if (value == "left") return EVENTREL_basic_left;
+    if (value == "right") return EVENTREL_basic_right;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.EVENTREL.basic", value.c_str());
+    return EVENTREL_basic_NONE;
+}
+
+std::string AttConverter::EventrelExtendedToStr(data_EVENTREL_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case EVENTREL_extended_above_left: value = "above-left"; break;
+        case EVENTREL_extended_above_right: value = "above-right"; break;
+        case EVENTREL_extended_below_left: value = "below-left"; break;
+        case EVENTREL_extended_below_right: value = "below-right"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.EVENTREL.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_EVENTREL_extended AttConverter::StrToEventrelExtended(std::string value, bool logWarning) const
+{
+    if (value == "above-left") return EVENTREL_extended_above_left;
+    if (value == "above-right") return EVENTREL_extended_above_right;
+    if (value == "below-left") return EVENTREL_extended_below_left;
+    if (value == "below-right") return EVENTREL_extended_below_right;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.EVENTREL.extended", value.c_str());
+    return EVENTREL_extended_NONE;
 }
 
 std::string AttConverter::FillToStr(data_FILL data) const
@@ -514,7 +917,7 @@ std::string AttConverter::FillToStr(data_FILL data) const
     return value;
 }
 
-data_FILL AttConverter::StrToFill(std::string value) const
+data_FILL AttConverter::StrToFill(std::string value, bool logWarning) const
 {
     if (value == "void") return FILL_void;
     if (value == "solid") return FILL_solid;
@@ -522,7 +925,8 @@ data_FILL AttConverter::StrToFill(std::string value) const
     if (value == "bottom") return FILL_bottom;
     if (value == "left") return FILL_left;
     if (value == "right") return FILL_right;
-    LogWarning("Unsupported value '%s' for data.FILL", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.FILL", value.c_str());
     return FILL_NONE;
 }
 
@@ -533,7 +937,7 @@ std::string AttConverter::FontsizetermToStr(data_FONTSIZETERM data) const
         case FONTSIZETERM_xx_small: value = "xx-small"; break;
         case FONTSIZETERM_x_small: value = "x-small"; break;
         case FONTSIZETERM_small: value = "small"; break;
-        case FONTSIZETERM_medium: value = "medium"; break;
+        case FONTSIZETERM_normal: value = "normal"; break;
         case FONTSIZETERM_large: value = "large"; break;
         case FONTSIZETERM_x_large: value = "x-large"; break;
         case FONTSIZETERM_xx_large: value = "xx-large"; break;
@@ -547,18 +951,19 @@ std::string AttConverter::FontsizetermToStr(data_FONTSIZETERM data) const
     return value;
 }
 
-data_FONTSIZETERM AttConverter::StrToFontsizeterm(std::string value) const
+data_FONTSIZETERM AttConverter::StrToFontsizeterm(std::string value, bool logWarning) const
 {
     if (value == "xx-small") return FONTSIZETERM_xx_small;
     if (value == "x-small") return FONTSIZETERM_x_small;
     if (value == "small") return FONTSIZETERM_small;
-    if (value == "medium") return FONTSIZETERM_medium;
+    if (value == "normal") return FONTSIZETERM_normal;
     if (value == "large") return FONTSIZETERM_large;
     if (value == "x-large") return FONTSIZETERM_x_large;
     if (value == "xx-large") return FONTSIZETERM_xx_large;
     if (value == "smaller") return FONTSIZETERM_smaller;
     if (value == "larger") return FONTSIZETERM_larger;
-    LogWarning("Unsupported value '%s' for data.FONTSIZETERM", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.FONTSIZETERM", value.c_str());
     return FONTSIZETERM_NONE;
 }
 
@@ -577,12 +982,13 @@ std::string AttConverter::FontstyleToStr(data_FONTSTYLE data) const
     return value;
 }
 
-data_FONTSTYLE AttConverter::StrToFontstyle(std::string value) const
+data_FONTSTYLE AttConverter::StrToFontstyle(std::string value, bool logWarning) const
 {
     if (value == "italic") return FONTSTYLE_italic;
     if (value == "normal") return FONTSTYLE_normal;
     if (value == "oblique") return FONTSTYLE_oblique;
-    LogWarning("Unsupported value '%s' for data.FONTSTYLE", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.FONTSTYLE", value.c_str());
     return FONTSTYLE_NONE;
 }
 
@@ -600,12 +1006,104 @@ std::string AttConverter::FontweightToStr(data_FONTWEIGHT data) const
     return value;
 }
 
-data_FONTWEIGHT AttConverter::StrToFontweight(std::string value) const
+data_FONTWEIGHT AttConverter::StrToFontweight(std::string value, bool logWarning) const
 {
     if (value == "bold") return FONTWEIGHT_bold;
     if (value == "normal") return FONTWEIGHT_normal;
-    LogWarning("Unsupported value '%s' for data.FONTWEIGHT", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.FONTWEIGHT", value.c_str());
     return FONTWEIGHT_NONE;
+}
+
+std::string AttConverter::FrbrrelationshipToStr(data_FRBRRELATIONSHIP data) const
+{
+    std::string value;
+    switch (data) {
+        case FRBRRELATIONSHIP_hasAbridgement: value = "hasAbridgement"; break;
+        case FRBRRELATIONSHIP_isAbridgementOf: value = "isAbridgementOf"; break;
+        case FRBRRELATIONSHIP_hasAdaptation: value = "hasAdaptation"; break;
+        case FRBRRELATIONSHIP_isAdaptationOf: value = "isAdaptationOf"; break;
+        case FRBRRELATIONSHIP_hasAlternate: value = "hasAlternate"; break;
+        case FRBRRELATIONSHIP_isAlternateOf: value = "isAlternateOf"; break;
+        case FRBRRELATIONSHIP_hasArrangement: value = "hasArrangement"; break;
+        case FRBRRELATIONSHIP_isArrangementOf: value = "isArrangementOf"; break;
+        case FRBRRELATIONSHIP_hasComplement: value = "hasComplement"; break;
+        case FRBRRELATIONSHIP_isComplementOf: value = "isComplementOf"; break;
+        case FRBRRELATIONSHIP_hasEmbodiment: value = "hasEmbodiment"; break;
+        case FRBRRELATIONSHIP_isEmbodimentOf: value = "isEmbodimentOf"; break;
+        case FRBRRELATIONSHIP_hasExemplar: value = "hasExemplar"; break;
+        case FRBRRELATIONSHIP_isExemplarOf: value = "isExemplarOf"; break;
+        case FRBRRELATIONSHIP_hasImitation: value = "hasImitation"; break;
+        case FRBRRELATIONSHIP_isImitationOf: value = "isImitationOf"; break;
+        case FRBRRELATIONSHIP_hasPart: value = "hasPart"; break;
+        case FRBRRELATIONSHIP_isPartOf: value = "isPartOf"; break;
+        case FRBRRELATIONSHIP_hasRealization: value = "hasRealization"; break;
+        case FRBRRELATIONSHIP_isRealizationOf: value = "isRealizationOf"; break;
+        case FRBRRELATIONSHIP_hasReconfiguration: value = "hasReconfiguration"; break;
+        case FRBRRELATIONSHIP_isReconfigurationOf: value = "isReconfigurationOf"; break;
+        case FRBRRELATIONSHIP_hasReproduction: value = "hasReproduction"; break;
+        case FRBRRELATIONSHIP_isReproductionOf: value = "isReproductionOf"; break;
+        case FRBRRELATIONSHIP_hasRevision: value = "hasRevision"; break;
+        case FRBRRELATIONSHIP_isRevisionOf: value = "isRevisionOf"; break;
+        case FRBRRELATIONSHIP_hasSuccessor: value = "hasSuccessor"; break;
+        case FRBRRELATIONSHIP_isSuccessorOf: value = "isSuccessorOf"; break;
+        case FRBRRELATIONSHIP_hasSummarization: value = "hasSummarization"; break;
+        case FRBRRELATIONSHIP_isSummarizationOf: value = "isSummarizationOf"; break;
+        case FRBRRELATIONSHIP_hasSupplement: value = "hasSupplement"; break;
+        case FRBRRELATIONSHIP_isSupplementOf: value = "isSupplementOf"; break;
+        case FRBRRELATIONSHIP_hasTransformation: value = "hasTransformation"; break;
+        case FRBRRELATIONSHIP_isTransformationOf: value = "isTransformationOf"; break;
+        case FRBRRELATIONSHIP_hasTranslation: value = "hasTranslation"; break;
+        case FRBRRELATIONSHIP_isTranslationOf: value = "isTranslationOf"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.FRBRRELATIONSHIP", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FRBRRELATIONSHIP AttConverter::StrToFrbrrelationship(std::string value, bool logWarning) const
+{
+    if (value == "hasAbridgement") return FRBRRELATIONSHIP_hasAbridgement;
+    if (value == "isAbridgementOf") return FRBRRELATIONSHIP_isAbridgementOf;
+    if (value == "hasAdaptation") return FRBRRELATIONSHIP_hasAdaptation;
+    if (value == "isAdaptationOf") return FRBRRELATIONSHIP_isAdaptationOf;
+    if (value == "hasAlternate") return FRBRRELATIONSHIP_hasAlternate;
+    if (value == "isAlternateOf") return FRBRRELATIONSHIP_isAlternateOf;
+    if (value == "hasArrangement") return FRBRRELATIONSHIP_hasArrangement;
+    if (value == "isArrangementOf") return FRBRRELATIONSHIP_isArrangementOf;
+    if (value == "hasComplement") return FRBRRELATIONSHIP_hasComplement;
+    if (value == "isComplementOf") return FRBRRELATIONSHIP_isComplementOf;
+    if (value == "hasEmbodiment") return FRBRRELATIONSHIP_hasEmbodiment;
+    if (value == "isEmbodimentOf") return FRBRRELATIONSHIP_isEmbodimentOf;
+    if (value == "hasExemplar") return FRBRRELATIONSHIP_hasExemplar;
+    if (value == "isExemplarOf") return FRBRRELATIONSHIP_isExemplarOf;
+    if (value == "hasImitation") return FRBRRELATIONSHIP_hasImitation;
+    if (value == "isImitationOf") return FRBRRELATIONSHIP_isImitationOf;
+    if (value == "hasPart") return FRBRRELATIONSHIP_hasPart;
+    if (value == "isPartOf") return FRBRRELATIONSHIP_isPartOf;
+    if (value == "hasRealization") return FRBRRELATIONSHIP_hasRealization;
+    if (value == "isRealizationOf") return FRBRRELATIONSHIP_isRealizationOf;
+    if (value == "hasReconfiguration") return FRBRRELATIONSHIP_hasReconfiguration;
+    if (value == "isReconfigurationOf") return FRBRRELATIONSHIP_isReconfigurationOf;
+    if (value == "hasReproduction") return FRBRRELATIONSHIP_hasReproduction;
+    if (value == "isReproductionOf") return FRBRRELATIONSHIP_isReproductionOf;
+    if (value == "hasRevision") return FRBRRELATIONSHIP_hasRevision;
+    if (value == "isRevisionOf") return FRBRRELATIONSHIP_isRevisionOf;
+    if (value == "hasSuccessor") return FRBRRELATIONSHIP_hasSuccessor;
+    if (value == "isSuccessorOf") return FRBRRELATIONSHIP_isSuccessorOf;
+    if (value == "hasSummarization") return FRBRRELATIONSHIP_hasSummarization;
+    if (value == "isSummarizationOf") return FRBRRELATIONSHIP_isSummarizationOf;
+    if (value == "hasSupplement") return FRBRRELATIONSHIP_hasSupplement;
+    if (value == "isSupplementOf") return FRBRRELATIONSHIP_isSupplementOf;
+    if (value == "hasTransformation") return FRBRRELATIONSHIP_hasTransformation;
+    if (value == "isTransformationOf") return FRBRRELATIONSHIP_isTransformationOf;
+    if (value == "hasTranslation") return FRBRRELATIONSHIP_hasTranslation;
+    if (value == "isTranslationOf") return FRBRRELATIONSHIP_isTranslationOf;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.FRBRRELATIONSHIP", value.c_str());
+    return FRBRRELATIONSHIP_NONE;
 }
 
 std::string AttConverter::GlissandoToStr(data_GLISSANDO data) const
@@ -623,12 +1121,13 @@ std::string AttConverter::GlissandoToStr(data_GLISSANDO data) const
     return value;
 }
 
-data_GLISSANDO AttConverter::StrToGlissando(std::string value) const
+data_GLISSANDO AttConverter::StrToGlissando(std::string value, bool logWarning) const
 {
     if (value == "i") return GLISSANDO_i;
     if (value == "m") return GLISSANDO_m;
     if (value == "t") return GLISSANDO_t;
-    LogWarning("Unsupported value '%s' for data.GLISSANDO", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.GLISSANDO", value.c_str());
     return GLISSANDO_NONE;
 }
 
@@ -647,12 +1146,13 @@ std::string AttConverter::GraceToStr(data_GRACE data) const
     return value;
 }
 
-data_GRACE AttConverter::StrToGrace(std::string value) const
+data_GRACE AttConverter::StrToGrace(std::string value, bool logWarning) const
 {
     if (value == "acc") return GRACE_acc;
     if (value == "unacc") return GRACE_unacc;
     if (value == "unknown") return GRACE_unknown;
-    LogWarning("Unsupported value '%s' for data.GRACE", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.GRACE", value.c_str());
     return GRACE_NONE;
 }
 
@@ -684,7 +1184,7 @@ std::string AttConverter::HeadshapeListToStr(data_HEADSHAPE_list data) const
     return value;
 }
 
-data_HEADSHAPE_list AttConverter::StrToHeadshapeList(std::string value) const
+data_HEADSHAPE_list AttConverter::StrToHeadshapeList(std::string value, bool logWarning) const
 {
     if (value == "quarter") return HEADSHAPE_list_quarter;
     if (value == "half") return HEADSHAPE_list_half;
@@ -702,7 +1202,8 @@ data_HEADSHAPE_list AttConverter::StrToHeadshapeList(std::string value) const
     if (value == "slash") return HEADSHAPE_list_slash;
     if (value == "square") return HEADSHAPE_list_square;
     if (value == "x") return HEADSHAPE_list_x;
-    LogWarning("Unsupported value '%s' for data.HEADSHAPE.list", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.HEADSHAPE.list", value.c_str());
     return HEADSHAPE_list_NONE;
 }
 
@@ -722,74 +1223,15 @@ std::string AttConverter::HorizontalalignmentToStr(data_HORIZONTALALIGNMENT data
     return value;
 }
 
-data_HORIZONTALALIGNMENT AttConverter::StrToHorizontalalignment(std::string value) const
+data_HORIZONTALALIGNMENT AttConverter::StrToHorizontalalignment(std::string value, bool logWarning) const
 {
     if (value == "left") return HORIZONTALALIGNMENT_left;
     if (value == "right") return HORIZONTALALIGNMENT_right;
     if (value == "center") return HORIZONTALALIGNMENT_center;
     if (value == "justify") return HORIZONTALALIGNMENT_justify;
-    LogWarning("Unsupported value '%s' for data.HORIZONTALALIGNMENT", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.HORIZONTALALIGNMENT", value.c_str());
     return HORIZONTALALIGNMENT_NONE;
-}
-
-std::string AttConverter::IneumeformToStr(data_INEUMEFORM data) const
-{
-    std::string value;
-    switch (data) {
-        case INEUMEFORM_liquescent1: value = "liquescent1"; break;
-        case INEUMEFORM_liquescent2: value = "liquescent2"; break;
-        case INEUMEFORM_tied: value = "tied"; break;
-        case INEUMEFORM_tiedliquescent1: value = "tiedliquescent1"; break;
-        case INEUMEFORM_tiedliquescent2: value = "tiedliquescent2"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.INEUMEFORM", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_INEUMEFORM AttConverter::StrToIneumeform(std::string value) const
-{
-    if (value == "liquescent1") return INEUMEFORM_liquescent1;
-    if (value == "liquescent2") return INEUMEFORM_liquescent2;
-    if (value == "tied") return INEUMEFORM_tied;
-    if (value == "tiedliquescent1") return INEUMEFORM_tiedliquescent1;
-    if (value == "tiedliquescent2") return INEUMEFORM_tiedliquescent2;
-    LogWarning("Unsupported value '%s' for data.INEUMEFORM", value.c_str());
-    return INEUMEFORM_NONE;
-}
-
-std::string AttConverter::IneumenameToStr(data_INEUMENAME data) const
-{
-    std::string value;
-    switch (data) {
-        case INEUMENAME_pessubpunctis: value = "pessubpunctis"; break;
-        case INEUMENAME_climacus: value = "climacus"; break;
-        case INEUMENAME_scandicus: value = "scandicus"; break;
-        case INEUMENAME_bistropha: value = "bistropha"; break;
-        case INEUMENAME_tristropha: value = "tristropha"; break;
-        case INEUMENAME_pressusminor: value = "pressusminor"; break;
-        case INEUMENAME_pressusmaior: value = "pressusmaior"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.INEUMENAME", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_INEUMENAME AttConverter::StrToIneumename(std::string value) const
-{
-    if (value == "pessubpunctis") return INEUMENAME_pessubpunctis;
-    if (value == "climacus") return INEUMENAME_climacus;
-    if (value == "scandicus") return INEUMENAME_scandicus;
-    if (value == "bistropha") return INEUMENAME_bistropha;
-    if (value == "tristropha") return INEUMENAME_tristropha;
-    if (value == "pressusminor") return INEUMENAME_pressusminor;
-    if (value == "pressusmaior") return INEUMENAME_pressusmaior;
-    LogWarning("Unsupported value '%s' for data.INEUMENAME", value.c_str());
-    return INEUMENAME_NONE;
 }
 
 std::string AttConverter::LayerschemeToStr(data_LAYERSCHEME data) const
@@ -809,14 +1251,15 @@ std::string AttConverter::LayerschemeToStr(data_LAYERSCHEME data) const
     return value;
 }
 
-data_LAYERSCHEME AttConverter::StrToLayerscheme(std::string value) const
+data_LAYERSCHEME AttConverter::StrToLayerscheme(std::string value, bool logWarning) const
 {
     if (value == "1") return LAYERSCHEME_1;
     if (value == "2o") return LAYERSCHEME_2o;
     if (value == "2f") return LAYERSCHEME_2f;
     if (value == "3o") return LAYERSCHEME_3o;
     if (value == "3f") return LAYERSCHEME_3f;
-    LogWarning("Unsupported value '%s' for data.LAYERSCHEME", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.LAYERSCHEME", value.c_str());
     return LAYERSCHEME_NONE;
 }
 
@@ -834,11 +1277,12 @@ std::string AttConverter::LigatureformToStr(data_LIGATUREFORM data) const
     return value;
 }
 
-data_LIGATUREFORM AttConverter::StrToLigatureform(std::string value) const
+data_LIGATUREFORM AttConverter::StrToLigatureform(std::string value, bool logWarning) const
 {
     if (value == "recta") return LIGATUREFORM_recta;
     if (value == "obliqua") return LIGATUREFORM_obliqua;
-    LogWarning("Unsupported value '%s' for data.LIGATUREFORM", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.LIGATUREFORM", value.c_str());
     return LIGATUREFORM_NONE;
 }
 
@@ -858,13 +1302,14 @@ std::string AttConverter::LineformToStr(data_LINEFORM data) const
     return value;
 }
 
-data_LINEFORM AttConverter::StrToLineform(std::string value) const
+data_LINEFORM AttConverter::StrToLineform(std::string value, bool logWarning) const
 {
     if (value == "dashed") return LINEFORM_dashed;
     if (value == "dotted") return LINEFORM_dotted;
     if (value == "solid") return LINEFORM_solid;
     if (value == "wavy") return LINEFORM_wavy;
-    LogWarning("Unsupported value '%s' for data.LINEFORM", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.LINEFORM", value.c_str());
     return LINEFORM_NONE;
 }
 
@@ -881,6 +1326,16 @@ std::string AttConverter::LinestartendsymbolToStr(data_LINESTARTENDSYMBOL data) 
         case LINESTARTENDSYMBOL_arrowwhite: value = "arrowwhite"; break;
         case LINESTARTENDSYMBOL_harpoonleft: value = "harpoonleft"; break;
         case LINESTARTENDSYMBOL_harpoonright: value = "harpoonright"; break;
+        case LINESTARTENDSYMBOL_H: value = "H"; break;
+        case LINESTARTENDSYMBOL_N: value = "N"; break;
+        case LINESTARTENDSYMBOL_Th: value = "Th"; break;
+        case LINESTARTENDSYMBOL_ThRetro: value = "ThRetro"; break;
+        case LINESTARTENDSYMBOL_ThRetroInv: value = "ThRetroInv"; break;
+        case LINESTARTENDSYMBOL_ThInv: value = "ThInv"; break;
+        case LINESTARTENDSYMBOL_T: value = "T"; break;
+        case LINESTARTENDSYMBOL_TInv: value = "TInv"; break;
+        case LINESTARTENDSYMBOL_CH: value = "CH"; break;
+        case LINESTARTENDSYMBOL_RH: value = "RH"; break;
         case LINESTARTENDSYMBOL_none: value = "none"; break;
         default:
             LogWarning("Unknown value '%d' for data.LINESTARTENDSYMBOL", data);
@@ -890,7 +1345,7 @@ std::string AttConverter::LinestartendsymbolToStr(data_LINESTARTENDSYMBOL data) 
     return value;
 }
 
-data_LINESTARTENDSYMBOL AttConverter::StrToLinestartendsymbol(std::string value) const
+data_LINESTARTENDSYMBOL AttConverter::StrToLinestartendsymbol(std::string value, bool logWarning) const
 {
     if (value == "angledown") return LINESTARTENDSYMBOL_angledown;
     if (value == "angleup") return LINESTARTENDSYMBOL_angleup;
@@ -901,8 +1356,19 @@ data_LINESTARTENDSYMBOL AttConverter::StrToLinestartendsymbol(std::string value)
     if (value == "arrowwhite") return LINESTARTENDSYMBOL_arrowwhite;
     if (value == "harpoonleft") return LINESTARTENDSYMBOL_harpoonleft;
     if (value == "harpoonright") return LINESTARTENDSYMBOL_harpoonright;
+    if (value == "H") return LINESTARTENDSYMBOL_H;
+    if (value == "N") return LINESTARTENDSYMBOL_N;
+    if (value == "Th") return LINESTARTENDSYMBOL_Th;
+    if (value == "ThRetro") return LINESTARTENDSYMBOL_ThRetro;
+    if (value == "ThRetroInv") return LINESTARTENDSYMBOL_ThRetroInv;
+    if (value == "ThInv") return LINESTARTENDSYMBOL_ThInv;
+    if (value == "T") return LINESTARTENDSYMBOL_T;
+    if (value == "TInv") return LINESTARTENDSYMBOL_TInv;
+    if (value == "CH") return LINESTARTENDSYMBOL_CH;
+    if (value == "RH") return LINESTARTENDSYMBOL_RH;
     if (value == "none") return LINESTARTENDSYMBOL_none;
-    LogWarning("Unsupported value '%s' for data.LINESTARTENDSYMBOL", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.LINESTARTENDSYMBOL", value.c_str());
     return LINESTARTENDSYMBOL_NONE;
 }
 
@@ -921,12 +1387,13 @@ std::string AttConverter::LinewidthtermToStr(data_LINEWIDTHTERM data) const
     return value;
 }
 
-data_LINEWIDTHTERM AttConverter::StrToLinewidthterm(std::string value) const
+data_LINEWIDTHTERM AttConverter::StrToLinewidthterm(std::string value, bool logWarning) const
 {
     if (value == "narrow") return LINEWIDTHTERM_narrow;
     if (value == "medium") return LINEWIDTHTERM_medium;
     if (value == "wide") return LINEWIDTHTERM_wide;
-    LogWarning("Unsupported value '%s' for data.LINEWIDTHTERM", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.LINEWIDTHTERM", value.c_str());
     return LINEWIDTHTERM_NONE;
 }
 
@@ -970,7 +1437,7 @@ std::string AttConverter::MelodicfunctionToStr(data_MELODICFUNCTION data) const
     return value;
 }
 
-data_MELODICFUNCTION AttConverter::StrToMelodicfunction(std::string value) const
+data_MELODICFUNCTION AttConverter::StrToMelodicfunction(std::string value, bool logWarning) const
 {
     if (value == "aln") return MELODICFUNCTION_aln;
     if (value == "ant") return MELODICFUNCTION_ant;
@@ -1000,7 +1467,8 @@ data_MELODICFUNCTION AttConverter::StrToMelodicfunction(std::string value) const
     if (value == "un7") return MELODICFUNCTION_un7;
     if (value == "upt") return MELODICFUNCTION_upt;
     if (value == "upt7") return MELODICFUNCTION_upt7;
-    LogWarning("Unsupported value '%s' for data.MELODICFUNCTION", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MELODICFUNCTION", value.c_str());
     return MELODICFUNCTION_NONE;
 }
 
@@ -1018,11 +1486,12 @@ std::string AttConverter::MensurationsignToStr(data_MENSURATIONSIGN data) const
     return value;
 }
 
-data_MENSURATIONSIGN AttConverter::StrToMensurationsign(std::string value) const
+data_MENSURATIONSIGN AttConverter::StrToMensurationsign(std::string value, bool logWarning) const
 {
     if (value == "C") return MENSURATIONSIGN_C;
     if (value == "O") return MENSURATIONSIGN_O;
-    LogWarning("Unsupported value '%s' for data.MENSURATIONSIGN", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MENSURATIONSIGN", value.c_str());
     return MENSURATIONSIGN_NONE;
 }
 
@@ -1040,11 +1509,12 @@ std::string AttConverter::MetersignToStr(data_METERSIGN data) const
     return value;
 }
 
-data_METERSIGN AttConverter::StrToMetersign(std::string value) const
+data_METERSIGN AttConverter::StrToMetersign(std::string value, bool logWarning) const
 {
     if (value == "common") return METERSIGN_common;
     if (value == "cut") return METERSIGN_cut;
-    LogWarning("Unsupported value '%s' for data.METERSIGN", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.METERSIGN", value.c_str());
     return METERSIGN_NONE;
 }
 
@@ -1235,7 +1705,7 @@ std::string AttConverter::MidinamesToStr(data_MIDINAMES data) const
     return value;
 }
 
-data_MIDINAMES AttConverter::StrToMidinames(std::string value) const
+data_MIDINAMES AttConverter::StrToMidinames(std::string value, bool logWarning) const
 {
     if (value == "Acoustic_Grand_Piano") return MIDINAMES_Acoustic_Grand_Piano;
     if (value == "Bright_Acoustic_Piano") return MIDINAMES_Bright_Acoustic_Piano;
@@ -1412,7 +1882,8 @@ data_MIDINAMES AttConverter::StrToMidinames(std::string value) const
     if (value == "Open_Cuica") return MIDINAMES_Open_Cuica;
     if (value == "Mute_Triangle") return MIDINAMES_Mute_Triangle;
     if (value == "Open_Triangle") return MIDINAMES_Open_Triangle;
-    LogWarning("Unsupported value '%s' for data.MIDINAMES", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MIDINAMES", value.c_str());
     return MIDINAMES_NONE;
 }
 
@@ -1436,7 +1907,7 @@ std::string AttConverter::ModeToStr(data_MODE data) const
     return value;
 }
 
-data_MODE AttConverter::StrToMode(std::string value) const
+data_MODE AttConverter::StrToMode(std::string value, bool logWarning) const
 {
     if (value == "major") return MODE_major;
     if (value == "minor") return MODE_minor;
@@ -1446,8 +1917,91 @@ data_MODE AttConverter::StrToMode(std::string value) const
     if (value == "mixolydian") return MODE_mixolydian;
     if (value == "aeolian") return MODE_aeolian;
     if (value == "locrian") return MODE_locrian;
-    LogWarning("Unsupported value '%s' for data.MODE", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MODE", value.c_str());
     return MODE_NONE;
+}
+
+std::string AttConverter::ModsrelationshipToStr(data_MODSRELATIONSHIP data) const
+{
+    std::string value;
+    switch (data) {
+        case MODSRELATIONSHIP_preceding: value = "preceding"; break;
+        case MODSRELATIONSHIP_succeeding: value = "succeeding"; break;
+        case MODSRELATIONSHIP_original: value = "original"; break;
+        case MODSRELATIONSHIP_host: value = "host"; break;
+        case MODSRELATIONSHIP_constituent: value = "constituent"; break;
+        case MODSRELATIONSHIP_otherVersion: value = "otherVersion"; break;
+        case MODSRELATIONSHIP_otherFormat: value = "otherFormat"; break;
+        case MODSRELATIONSHIP_isReferencedBy: value = "isReferencedBy"; break;
+        case MODSRELATIONSHIP_references: value = "references"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.MODSRELATIONSHIP", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODSRELATIONSHIP AttConverter::StrToModsrelationship(std::string value, bool logWarning) const
+{
+    if (value == "preceding") return MODSRELATIONSHIP_preceding;
+    if (value == "succeeding") return MODSRELATIONSHIP_succeeding;
+    if (value == "original") return MODSRELATIONSHIP_original;
+    if (value == "host") return MODSRELATIONSHIP_host;
+    if (value == "constituent") return MODSRELATIONSHIP_constituent;
+    if (value == "otherVersion") return MODSRELATIONSHIP_otherVersion;
+    if (value == "otherFormat") return MODSRELATIONSHIP_otherFormat;
+    if (value == "isReferencedBy") return MODSRELATIONSHIP_isReferencedBy;
+    if (value == "references") return MODSRELATIONSHIP_references;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.MODSRELATIONSHIP", value.c_str());
+    return MODSRELATIONSHIP_NONE;
+}
+
+std::string AttConverter::NonstaffplaceToStr(data_NONSTAFFPLACE data) const
+{
+    std::string value;
+    switch (data) {
+        case NONSTAFFPLACE_botmar: value = "botmar"; break;
+        case NONSTAFFPLACE_topmar: value = "topmar"; break;
+        case NONSTAFFPLACE_leftmar: value = "leftmar"; break;
+        case NONSTAFFPLACE_rightmar: value = "rightmar"; break;
+        case NONSTAFFPLACE_facing: value = "facing"; break;
+        case NONSTAFFPLACE_overleaf: value = "overleaf"; break;
+        case NONSTAFFPLACE_end: value = "end"; break;
+        case NONSTAFFPLACE_inter: value = "inter"; break;
+        case NONSTAFFPLACE_intra: value = "intra"; break;
+        case NONSTAFFPLACE_super: value = "super"; break;
+        case NONSTAFFPLACE_sub: value = "sub"; break;
+        case NONSTAFFPLACE_inspace: value = "inspace"; break;
+        case NONSTAFFPLACE_superimposed: value = "superimposed"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.NONSTAFFPLACE", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_NONSTAFFPLACE AttConverter::StrToNonstaffplace(std::string value, bool logWarning) const
+{
+    if (value == "botmar") return NONSTAFFPLACE_botmar;
+    if (value == "topmar") return NONSTAFFPLACE_topmar;
+    if (value == "leftmar") return NONSTAFFPLACE_leftmar;
+    if (value == "rightmar") return NONSTAFFPLACE_rightmar;
+    if (value == "facing") return NONSTAFFPLACE_facing;
+    if (value == "overleaf") return NONSTAFFPLACE_overleaf;
+    if (value == "end") return NONSTAFFPLACE_end;
+    if (value == "inter") return NONSTAFFPLACE_inter;
+    if (value == "intra") return NONSTAFFPLACE_intra;
+    if (value == "super") return NONSTAFFPLACE_super;
+    if (value == "sub") return NONSTAFFPLACE_sub;
+    if (value == "inspace") return NONSTAFFPLACE_inspace;
+    if (value == "superimposed") return NONSTAFFPLACE_superimposed;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.NONSTAFFPLACE", value.c_str());
+    return NONSTAFFPLACE_NONE;
 }
 
 std::string AttConverter::NotationtypeToStr(data_NOTATIONTYPE data) const
@@ -1468,7 +2022,7 @@ std::string AttConverter::NotationtypeToStr(data_NOTATIONTYPE data) const
     return value;
 }
 
-data_NOTATIONTYPE AttConverter::StrToNotationtype(std::string value) const
+data_NOTATIONTYPE AttConverter::StrToNotationtype(std::string value, bool logWarning) const
 {
     if (value == "cmn") return NOTATIONTYPE_cmn;
     if (value == "mensural") return NOTATIONTYPE_mensural;
@@ -1476,7 +2030,8 @@ data_NOTATIONTYPE AttConverter::StrToNotationtype(std::string value) const
     if (value == "mensural.white") return NOTATIONTYPE_mensural_white;
     if (value == "neume") return NOTATIONTYPE_neume;
     if (value == "tab") return NOTATIONTYPE_tab;
-    LogWarning("Unsupported value '%s' for data.NOTATIONTYPE", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.NOTATIONTYPE", value.c_str());
     return NOTATIONTYPE_NONE;
 }
 
@@ -1502,7 +2057,7 @@ std::string AttConverter::NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_list d
     return value;
 }
 
-data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(std::string value) const
+data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(std::string value, bool logWarning) const
 {
     if (value == "slash") return NOTEHEADMODIFIER_list_slash;
     if (value == "backslash") return NOTEHEADMODIFIER_list_backslash;
@@ -1514,7 +2069,8 @@ data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(std::string v
     if (value == "box") return NOTEHEADMODIFIER_list_box;
     if (value == "circle") return NOTEHEADMODIFIER_list_circle;
     if (value == "dblwhole") return NOTEHEADMODIFIER_list_dblwhole;
-    LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER.list", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER.list", value.c_str());
     return NOTEHEADMODIFIER_list_NONE;
 }
 
@@ -1532,34 +2088,13 @@ std::string AttConverter::OtherstaffToStr(data_OTHERSTAFF data) const
     return value;
 }
 
-data_OTHERSTAFF AttConverter::StrToOtherstaff(std::string value) const
+data_OTHERSTAFF AttConverter::StrToOtherstaff(std::string value, bool logWarning) const
 {
     if (value == "above") return OTHERSTAFF_above;
     if (value == "below") return OTHERSTAFF_below;
-    LogWarning("Unsupported value '%s' for data.OTHERSTAFF", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.OTHERSTAFF", value.c_str());
     return OTHERSTAFF_NONE;
-}
-
-std::string AttConverter::PlaceToStr(data_PLACE data) const
-{
-    std::string value;
-    switch (data) {
-        case PLACE_above: value = "above"; break;
-        case PLACE_below: value = "below"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.PLACE", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_PLACE AttConverter::StrToPlace(std::string value) const
-{
-    if (value == "above") return PLACE_above;
-    if (value == "below") return PLACE_below;
-    LogWarning("Unsupported value '%s' for data.PLACE", value.c_str());
-    return PLACE_NONE;
 }
 
 std::string AttConverter::RotationdirectionToStr(data_ROTATIONDIRECTION data) const
@@ -1581,7 +2116,7 @@ std::string AttConverter::RotationdirectionToStr(data_ROTATIONDIRECTION data) co
     return value;
 }
 
-data_ROTATIONDIRECTION AttConverter::StrToRotationdirection(std::string value) const
+data_ROTATIONDIRECTION AttConverter::StrToRotationdirection(std::string value, bool logWarning) const
 {
     if (value == "none") return ROTATIONDIRECTION_none;
     if (value == "down") return ROTATIONDIRECTION_down;
@@ -1590,54 +2125,170 @@ data_ROTATIONDIRECTION AttConverter::StrToRotationdirection(std::string value) c
     if (value == "nw") return ROTATIONDIRECTION_nw;
     if (value == "se") return ROTATIONDIRECTION_se;
     if (value == "sw") return ROTATIONDIRECTION_sw;
-    LogWarning("Unsupported value '%s' for data.ROTATIONDIRECTION", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ROTATIONDIRECTION", value.c_str());
     return ROTATIONDIRECTION_NONE;
 }
 
-std::string AttConverter::SizeToStr(data_SIZE data) const
+std::string AttConverter::StaffitemBasicToStr(data_STAFFITEM_basic data) const
 {
     std::string value;
     switch (data) {
-        case SIZE_normal: value = "normal"; break;
-        case SIZE_cue: value = "cue"; break;
+        case STAFFITEM_basic_accid: value = "accid"; break;
+        case STAFFITEM_basic_annot: value = "annot"; break;
+        case STAFFITEM_basic_artic: value = "artic"; break;
+        case STAFFITEM_basic_dir: value = "dir"; break;
+        case STAFFITEM_basic_dynam: value = "dynam"; break;
+        case STAFFITEM_basic_harm: value = "harm"; break;
+        case STAFFITEM_basic_ornam: value = "ornam"; break;
+        case STAFFITEM_basic_sp: value = "sp"; break;
+        case STAFFITEM_basic_stageDir: value = "stageDir"; break;
+        case STAFFITEM_basic_tempo: value = "tempo"; break;
         default:
-            LogWarning("Unknown value '%d' for data.SIZE", data);
+            LogWarning("Unknown value '%d' for data.STAFFITEM.basic", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_SIZE AttConverter::StrToSize(std::string value) const
+data_STAFFITEM_basic AttConverter::StrToStaffitemBasic(std::string value, bool logWarning) const
 {
-    if (value == "normal") return SIZE_normal;
-    if (value == "cue") return SIZE_cue;
-    LogWarning("Unsupported value '%s' for data.SIZE", value.c_str());
-    return SIZE_NONE;
+    if (value == "accid") return STAFFITEM_basic_accid;
+    if (value == "annot") return STAFFITEM_basic_annot;
+    if (value == "artic") return STAFFITEM_basic_artic;
+    if (value == "dir") return STAFFITEM_basic_dir;
+    if (value == "dynam") return STAFFITEM_basic_dynam;
+    if (value == "harm") return STAFFITEM_basic_harm;
+    if (value == "ornam") return STAFFITEM_basic_ornam;
+    if (value == "sp") return STAFFITEM_basic_sp;
+    if (value == "stageDir") return STAFFITEM_basic_stageDir;
+    if (value == "tempo") return STAFFITEM_basic_tempo;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STAFFITEM.basic", value.c_str());
+    return STAFFITEM_basic_NONE;
 }
 
-std::string AttConverter::StaffrelToStr(data_STAFFREL data) const
+std::string AttConverter::StaffitemCmnToStr(data_STAFFITEM_cmn data) const
 {
     std::string value;
     switch (data) {
-        case STAFFREL_above: value = "above"; break;
-        case STAFFREL_below: value = "below"; break;
-        case STAFFREL_within: value = "within"; break;
+        case STAFFITEM_cmn_beam: value = "beam"; break;
+        case STAFFITEM_cmn_bend: value = "bend"; break;
+        case STAFFITEM_cmn_bracketSpan: value = "bracketSpan"; break;
+        case STAFFITEM_cmn_breath: value = "breath"; break;
+        case STAFFITEM_cmn_cpMark: value = "cpMark"; break;
+        case STAFFITEM_cmn_fermata: value = "fermata"; break;
+        case STAFFITEM_cmn_fing: value = "fing"; break;
+        case STAFFITEM_cmn_hairpin: value = "hairpin"; break;
+        case STAFFITEM_cmn_harpPedal: value = "harpPedal"; break;
+        case STAFFITEM_cmn_lv: value = "lv"; break;
+        case STAFFITEM_cmn_mordent: value = "mordent"; break;
+        case STAFFITEM_cmn_octave: value = "octave"; break;
+        case STAFFITEM_cmn_pedal: value = "pedal"; break;
+        case STAFFITEM_cmn_reh: value = "reh"; break;
+        case STAFFITEM_cmn_tie: value = "tie"; break;
+        case STAFFITEM_cmn_trill: value = "trill"; break;
+        case STAFFITEM_cmn_tuplet: value = "tuplet"; break;
+        case STAFFITEM_cmn_turn: value = "turn"; break;
         default:
-            LogWarning("Unknown value '%d' for data.STAFFREL", data);
+            LogWarning("Unknown value '%d' for data.STAFFITEM.cmn", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_STAFFREL AttConverter::StrToStaffrel(std::string value) const
+data_STAFFITEM_cmn AttConverter::StrToStaffitemCmn(std::string value, bool logWarning) const
 {
-    if (value == "above") return STAFFREL_above;
-    if (value == "below") return STAFFREL_below;
-    if (value == "within") return STAFFREL_within;
-    LogWarning("Unsupported value '%s' for data.STAFFREL", value.c_str());
-    return STAFFREL_NONE;
+    if (value == "beam") return STAFFITEM_cmn_beam;
+    if (value == "bend") return STAFFITEM_cmn_bend;
+    if (value == "bracketSpan") return STAFFITEM_cmn_bracketSpan;
+    if (value == "breath") return STAFFITEM_cmn_breath;
+    if (value == "cpMark") return STAFFITEM_cmn_cpMark;
+    if (value == "fermata") return STAFFITEM_cmn_fermata;
+    if (value == "fing") return STAFFITEM_cmn_fing;
+    if (value == "hairpin") return STAFFITEM_cmn_hairpin;
+    if (value == "harpPedal") return STAFFITEM_cmn_harpPedal;
+    if (value == "lv") return STAFFITEM_cmn_lv;
+    if (value == "mordent") return STAFFITEM_cmn_mordent;
+    if (value == "octave") return STAFFITEM_cmn_octave;
+    if (value == "pedal") return STAFFITEM_cmn_pedal;
+    if (value == "reh") return STAFFITEM_cmn_reh;
+    if (value == "tie") return STAFFITEM_cmn_tie;
+    if (value == "trill") return STAFFITEM_cmn_trill;
+    if (value == "tuplet") return STAFFITEM_cmn_tuplet;
+    if (value == "turn") return STAFFITEM_cmn_turn;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STAFFITEM.cmn", value.c_str());
+    return STAFFITEM_cmn_NONE;
+}
+
+std::string AttConverter::StaffitemMensuralToStr(data_STAFFITEM_mensural data) const
+{
+    std::string value;
+    switch (data) {
+        case STAFFITEM_mensural_ligature: value = "ligature"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STAFFITEM.mensural", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STAFFITEM_mensural AttConverter::StrToStaffitemMensural(std::string value, bool logWarning) const
+{
+    if (value == "ligature") return STAFFITEM_mensural_ligature;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STAFFITEM.mensural", value.c_str());
+    return STAFFITEM_mensural_NONE;
+}
+
+std::string AttConverter::StaffrelBasicToStr(data_STAFFREL_basic data) const
+{
+    std::string value;
+    switch (data) {
+        case STAFFREL_basic_above: value = "above"; break;
+        case STAFFREL_basic_below: value = "below"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STAFFREL.basic", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STAFFREL_basic AttConverter::StrToStaffrelBasic(std::string value, bool logWarning) const
+{
+    if (value == "above") return STAFFREL_basic_above;
+    if (value == "below") return STAFFREL_basic_below;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STAFFREL.basic", value.c_str());
+    return STAFFREL_basic_NONE;
+}
+
+std::string AttConverter::StaffrelExtendedToStr(data_STAFFREL_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case STAFFREL_extended_between: value = "between"; break;
+        case STAFFREL_extended_within: value = "within"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STAFFREL.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STAFFREL_extended AttConverter::StrToStaffrelExtended(std::string value, bool logWarning) const
+{
+    if (value == "between") return STAFFREL_extended_between;
+    if (value == "within") return STAFFREL_extended_within;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STAFFREL.extended", value.c_str());
+    return STAFFREL_extended_NONE;
 }
 
 std::string AttConverter::StemmodifierToStr(data_STEMMODIFIER data) const
@@ -1661,7 +2312,7 @@ std::string AttConverter::StemmodifierToStr(data_STEMMODIFIER data) const
     return value;
 }
 
-data_STEMMODIFIER AttConverter::StrToStemmodifier(std::string value) const
+data_STEMMODIFIER AttConverter::StrToStemmodifier(std::string value, bool logWarning) const
 {
     if (value == "none") return STEMMODIFIER_none;
     if (value == "1slash") return STEMMODIFIER_1slash;
@@ -1672,7 +2323,8 @@ data_STEMMODIFIER AttConverter::StrToStemmodifier(std::string value) const
     if (value == "6slash") return STEMMODIFIER_6slash;
     if (value == "sprech") return STEMMODIFIER_sprech;
     if (value == "z") return STEMMODIFIER_z;
-    LogWarning("Unsupported value '%s' for data.STEMMODIFIER", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STEMMODIFIER", value.c_str());
     return STEMMODIFIER_NONE;
 }
 
@@ -1691,12 +2343,13 @@ std::string AttConverter::StempositionToStr(data_STEMPOSITION data) const
     return value;
 }
 
-data_STEMPOSITION AttConverter::StrToStemposition(std::string value) const
+data_STEMPOSITION AttConverter::StrToStemposition(std::string value, bool logWarning) const
 {
     if (value == "left") return STEMPOSITION_left;
     if (value == "right") return STEMPOSITION_right;
     if (value == "center") return STEMPOSITION_center;
-    LogWarning("Unsupported value '%s' for data.STEMPOSITION", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STEMPOSITION", value.c_str());
     return STEMPOSITION_NONE;
 }
 
@@ -1716,13 +2369,14 @@ std::string AttConverter::TemperamentToStr(data_TEMPERAMENT data) const
     return value;
 }
 
-data_TEMPERAMENT AttConverter::StrToTemperament(std::string value) const
+data_TEMPERAMENT AttConverter::StrToTemperament(std::string value, bool logWarning) const
 {
     if (value == "equal") return TEMPERAMENT_equal;
     if (value == "just") return TEMPERAMENT_just;
     if (value == "mean") return TEMPERAMENT_mean;
     if (value == "pythagorean") return TEMPERAMENT_pythagorean;
-    LogWarning("Unsupported value '%s' for data.TEMPERAMENT", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.TEMPERAMENT", value.c_str());
     return TEMPERAMENT_NONE;
 }
 
@@ -1730,6 +2384,8 @@ std::string AttConverter::TextrenditionlistToStr(data_TEXTRENDITIONLIST data) co
 {
     std::string value;
     switch (data) {
+        case TEXTRENDITIONLIST_quote: value = "quote"; break;
+        case TEXTRENDITIONLIST_quotedbl: value = "quotedbl"; break;
         case TEXTRENDITIONLIST_italic: value = "italic"; break;
         case TEXTRENDITIONLIST_oblique: value = "oblique"; break;
         case TEXTRENDITIONLIST_smcaps: value = "smcaps"; break;
@@ -1749,7 +2405,9 @@ std::string AttConverter::TextrenditionlistToStr(data_TEXTRENDITIONLIST data) co
         case TEXTRENDITIONLIST_strike: value = "strike"; break;
         case TEXTRENDITIONLIST_sub: value = "sub"; break;
         case TEXTRENDITIONLIST_sup: value = "sup"; break;
+        case TEXTRENDITIONLIST_superimpose: value = "superimpose"; break;
         case TEXTRENDITIONLIST_underline: value = "underline"; break;
+        case TEXTRENDITIONLIST_x_through: value = "x-through"; break;
         case TEXTRENDITIONLIST_ltr: value = "ltr"; break;
         case TEXTRENDITIONLIST_rtl: value = "rtl"; break;
         case TEXTRENDITIONLIST_lro: value = "lro"; break;
@@ -1762,8 +2420,10 @@ std::string AttConverter::TextrenditionlistToStr(data_TEXTRENDITIONLIST data) co
     return value;
 }
 
-data_TEXTRENDITIONLIST AttConverter::StrToTextrenditionlist(std::string value) const
+data_TEXTRENDITIONLIST AttConverter::StrToTextrenditionlist(std::string value, bool logWarning) const
 {
+    if (value == "quote") return TEXTRENDITIONLIST_quote;
+    if (value == "quotedbl") return TEXTRENDITIONLIST_quotedbl;
     if (value == "italic") return TEXTRENDITIONLIST_italic;
     if (value == "oblique") return TEXTRENDITIONLIST_oblique;
     if (value == "smcaps") return TEXTRENDITIONLIST_smcaps;
@@ -1783,89 +2443,43 @@ data_TEXTRENDITIONLIST AttConverter::StrToTextrenditionlist(std::string value) c
     if (value == "strike") return TEXTRENDITIONLIST_strike;
     if (value == "sub") return TEXTRENDITIONLIST_sub;
     if (value == "sup") return TEXTRENDITIONLIST_sup;
+    if (value == "superimpose") return TEXTRENDITIONLIST_superimpose;
     if (value == "underline") return TEXTRENDITIONLIST_underline;
+    if (value == "x-through") return TEXTRENDITIONLIST_x_through;
     if (value == "ltr") return TEXTRENDITIONLIST_ltr;
     if (value == "rtl") return TEXTRENDITIONLIST_rtl;
     if (value == "lro") return TEXTRENDITIONLIST_lro;
     if (value == "rlo") return TEXTRENDITIONLIST_rlo;
-    LogWarning("Unsupported value '%s' for data.TEXTRENDITIONLIST", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.TEXTRENDITIONLIST", value.c_str());
     return TEXTRENDITIONLIST_NONE;
 }
 
-std::string AttConverter::UneumeformToStr(data_UNEUMEFORM data) const
+std::string AttConverter::VerticalalignmentToStr(data_VERTICALALIGNMENT data) const
 {
     std::string value;
     switch (data) {
-        case UNEUMEFORM_liquescent1: value = "liquescent1"; break;
-        case UNEUMEFORM_liquescent2: value = "liquescent2"; break;
-        case UNEUMEFORM_liquescent3: value = "liquescent3"; break;
-        case UNEUMEFORM_quilismatic: value = "quilismatic"; break;
-        case UNEUMEFORM_rectangular: value = "rectangular"; break;
-        case UNEUMEFORM_rhombic: value = "rhombic"; break;
-        case UNEUMEFORM_tied: value = "tied"; break;
+        case VERTICALALIGNMENT_top: value = "top"; break;
+        case VERTICALALIGNMENT_middle: value = "middle"; break;
+        case VERTICALALIGNMENT_bottom: value = "bottom"; break;
+        case VERTICALALIGNMENT_baseline: value = "baseline"; break;
         default:
-            LogWarning("Unknown value '%d' for data.UNEUMEFORM", data);
+            LogWarning("Unknown value '%d' for data.VERTICALALIGNMENT", data);
             value = "";
             break;
     }
     return value;
 }
 
-data_UNEUMEFORM AttConverter::StrToUneumeform(std::string value) const
+data_VERTICALALIGNMENT AttConverter::StrToVerticalalignment(std::string value, bool logWarning) const
 {
-    if (value == "liquescent1") return UNEUMEFORM_liquescent1;
-    if (value == "liquescent2") return UNEUMEFORM_liquescent2;
-    if (value == "liquescent3") return UNEUMEFORM_liquescent3;
-    if (value == "quilismatic") return UNEUMEFORM_quilismatic;
-    if (value == "rectangular") return UNEUMEFORM_rectangular;
-    if (value == "rhombic") return UNEUMEFORM_rhombic;
-    if (value == "tied") return UNEUMEFORM_tied;
-    LogWarning("Unsupported value '%s' for data.UNEUMEFORM", value.c_str());
-    return UNEUMEFORM_NONE;
-}
-
-std::string AttConverter::UneumenameToStr(data_UNEUMENAME data) const
-{
-    std::string value;
-    switch (data) {
-        case UNEUMENAME_punctum: value = "punctum"; break;
-        case UNEUMENAME_virga: value = "virga"; break;
-        case UNEUMENAME_pes: value = "pes"; break;
-        case UNEUMENAME_clivis: value = "clivis"; break;
-        case UNEUMENAME_torculus: value = "torculus"; break;
-        case UNEUMENAME_torculusresupinus: value = "torculusresupinus"; break;
-        case UNEUMENAME_porrectus: value = "porrectus"; break;
-        case UNEUMENAME_porrectusflexus: value = "porrectusflexus"; break;
-        case UNEUMENAME_apostropha: value = "apostropha"; break;
-        case UNEUMENAME_oriscus: value = "oriscus"; break;
-        case UNEUMENAME_pressusmaior: value = "pressusmaior"; break;
-        case UNEUMENAME_pressusminor: value = "pressusminor"; break;
-        case UNEUMENAME_virgastrata: value = "virgastrata"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.UNEUMENAME", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_UNEUMENAME AttConverter::StrToUneumename(std::string value) const
-{
-    if (value == "punctum") return UNEUMENAME_punctum;
-    if (value == "virga") return UNEUMENAME_virga;
-    if (value == "pes") return UNEUMENAME_pes;
-    if (value == "clivis") return UNEUMENAME_clivis;
-    if (value == "torculus") return UNEUMENAME_torculus;
-    if (value == "torculusresupinus") return UNEUMENAME_torculusresupinus;
-    if (value == "porrectus") return UNEUMENAME_porrectus;
-    if (value == "porrectusflexus") return UNEUMENAME_porrectusflexus;
-    if (value == "apostropha") return UNEUMENAME_apostropha;
-    if (value == "oriscus") return UNEUMENAME_oriscus;
-    if (value == "pressusmaior") return UNEUMENAME_pressusmaior;
-    if (value == "pressusminor") return UNEUMENAME_pressusminor;
-    if (value == "virgastrata") return UNEUMENAME_virgastrata;
-    LogWarning("Unsupported value '%s' for data.UNEUMENAME", value.c_str());
-    return UNEUMENAME_NONE;
+    if (value == "top") return VERTICALALIGNMENT_top;
+    if (value == "middle") return VERTICALALIGNMENT_middle;
+    if (value == "bottom") return VERTICALALIGNMENT_bottom;
+    if (value == "baseline") return VERTICALALIGNMENT_baseline;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.VERTICALALIGNMENT", value.c_str());
+    return VERTICALALIGNMENT_NONE;
 }
 
 std::string AttConverter::AccidLogFuncToStr(accidLog_FUNC data) const
@@ -1882,12 +2496,34 @@ std::string AttConverter::AccidLogFuncToStr(accidLog_FUNC data) const
     return value;
 }
 
-accidLog_FUNC AttConverter::StrToAccidLogFunc(std::string value) const
+accidLog_FUNC AttConverter::StrToAccidLogFunc(std::string value, bool logWarning) const
 {
     if (value == "caution") return accidLog_FUNC_caution;
     if (value == "edit") return accidLog_FUNC_edit;
-    LogWarning("Unsupported value '%s' for att.accid.log@func", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.accid.log@func", value.c_str());
     return accidLog_FUNC_NONE;
+}
+
+std::string AttConverter::AnchoredTextLogFuncToStr(anchoredTextLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case anchoredTextLog_FUNC_unknown: value = "unknown"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.anchoredText.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+anchoredTextLog_FUNC AttConverter::StrToAnchoredTextLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "unknown") return anchoredTextLog_FUNC_unknown;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.anchoredText.log@func", value.c_str());
+    return anchoredTextLog_FUNC_NONE;
 }
 
 std::string AttConverter::ArpegLogOrderToStr(arpegLog_ORDER data) const
@@ -1905,13 +2541,37 @@ std::string AttConverter::ArpegLogOrderToStr(arpegLog_ORDER data) const
     return value;
 }
 
-arpegLog_ORDER AttConverter::StrToArpegLogOrder(std::string value) const
+arpegLog_ORDER AttConverter::StrToArpegLogOrder(std::string value, bool logWarning) const
 {
     if (value == "up") return arpegLog_ORDER_up;
     if (value == "down") return arpegLog_ORDER_down;
     if (value == "nonarp") return arpegLog_ORDER_nonarp;
-    LogWarning("Unsupported value '%s' for att.arpeg.log@order", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.arpeg.log@order", value.c_str());
     return arpegLog_ORDER_NONE;
+}
+
+std::string AttConverter::AudienceAudienceToStr(audience_AUDIENCE data) const
+{
+    std::string value;
+    switch (data) {
+        case audience_AUDIENCE_private: value = "private"; break;
+        case audience_AUDIENCE_public: value = "public"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.audience@audience", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+audience_AUDIENCE AttConverter::StrToAudienceAudience(std::string value, bool logWarning) const
+{
+    if (value == "private") return audience_AUDIENCE_private;
+    if (value == "public") return audience_AUDIENCE_public;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.audience@audience", value.c_str());
+    return audience_AUDIENCE_NONE;
 }
 
 std::string AttConverter::BTremLogFormToStr(bTremLog_FORM data) const
@@ -1928,12 +2588,40 @@ std::string AttConverter::BTremLogFormToStr(bTremLog_FORM data) const
     return value;
 }
 
-bTremLog_FORM AttConverter::StrToBTremLogForm(std::string value) const
+bTremLog_FORM AttConverter::StrToBTremLogForm(std::string value, bool logWarning) const
 {
     if (value == "meas") return bTremLog_FORM_meas;
     if (value == "unmeas") return bTremLog_FORM_unmeas;
-    LogWarning("Unsupported value '%s' for att.bTrem.log@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.bTrem.log@form", value.c_str());
     return bTremLog_FORM_NONE;
+}
+
+std::string AttConverter::BeamRendFormToStr(beamRend_FORM data) const
+{
+    std::string value;
+    switch (data) {
+        case beamRend_FORM_acc: value = "acc"; break;
+        case beamRend_FORM_mixed: value = "mixed"; break;
+        case beamRend_FORM_rit: value = "rit"; break;
+        case beamRend_FORM_norm: value = "norm"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.beamRend@form", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+beamRend_FORM AttConverter::StrToBeamRendForm(std::string value, bool logWarning) const
+{
+    if (value == "acc") return beamRend_FORM_acc;
+    if (value == "mixed") return beamRend_FORM_mixed;
+    if (value == "rit") return beamRend_FORM_rit;
+    if (value == "norm") return beamRend_FORM_norm;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.beamRend@form", value.c_str());
+    return beamRend_FORM_NONE;
 }
 
 std::string AttConverter::BeamingVisBeamrendToStr(beamingVis_BEAMREND data) const
@@ -1951,39 +2639,39 @@ std::string AttConverter::BeamingVisBeamrendToStr(beamingVis_BEAMREND data) cons
     return value;
 }
 
-beamingVis_BEAMREND AttConverter::StrToBeamingVisBeamrend(std::string value) const
+beamingVis_BEAMREND AttConverter::StrToBeamingVisBeamrend(std::string value, bool logWarning) const
 {
     if (value == "acc") return beamingVis_BEAMREND_acc;
     if (value == "rit") return beamingVis_BEAMREND_rit;
     if (value == "norm") return beamingVis_BEAMREND_norm;
-    LogWarning("Unsupported value '%s' for att.beaming.vis@beam.rend", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.beaming.vis@beam.rend", value.c_str());
     return beamingVis_BEAMREND_NONE;
 }
 
-std::string AttConverter::BeamrendFormToStr(beamrend_FORM data) const
+std::string AttConverter::BracketSpanLogFuncToStr(bracketSpanLog_FUNC data) const
 {
     std::string value;
     switch (data) {
-        case beamrend_FORM_acc: value = "acc"; break;
-        case beamrend_FORM_mixed: value = "mixed"; break;
-        case beamrend_FORM_rit: value = "rit"; break;
-        case beamrend_FORM_norm: value = "norm"; break;
+        case bracketSpanLog_FUNC_coloration: value = "coloration"; break;
+        case bracketSpanLog_FUNC_cross_rhythm: value = "cross-rhythm"; break;
+        case bracketSpanLog_FUNC_ligature: value = "ligature"; break;
         default:
-            LogWarning("Unknown value '%d' for att.beamrend@form", data);
+            LogWarning("Unknown value '%d' for att.bracketSpan.log@func", data);
             value = "";
             break;
     }
     return value;
 }
 
-beamrend_FORM AttConverter::StrToBeamrendForm(std::string value) const
+bracketSpanLog_FUNC AttConverter::StrToBracketSpanLogFunc(std::string value, bool logWarning) const
 {
-    if (value == "acc") return beamrend_FORM_acc;
-    if (value == "mixed") return beamrend_FORM_mixed;
-    if (value == "rit") return beamrend_FORM_rit;
-    if (value == "norm") return beamrend_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.beamrend@form", value.c_str());
-    return beamrend_FORM_NONE;
+    if (value == "coloration") return bracketSpanLog_FUNC_coloration;
+    if (value == "cross-rhythm") return bracketSpanLog_FUNC_cross_rhythm;
+    if (value == "ligature") return bracketSpanLog_FUNC_ligature;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.bracketSpan.log@func", value.c_str());
+    return bracketSpanLog_FUNC_NONE;
 }
 
 std::string AttConverter::CurvatureCurvedirToStr(curvature_CURVEDIR data) const
@@ -2001,13 +2689,35 @@ std::string AttConverter::CurvatureCurvedirToStr(curvature_CURVEDIR data) const
     return value;
 }
 
-curvature_CURVEDIR AttConverter::StrToCurvatureCurvedir(std::string value) const
+curvature_CURVEDIR AttConverter::StrToCurvatureCurvedir(std::string value, bool logWarning) const
 {
     if (value == "above") return curvature_CURVEDIR_above;
     if (value == "below") return curvature_CURVEDIR_below;
     if (value == "mixed") return curvature_CURVEDIR_mixed;
-    LogWarning("Unsupported value '%s' for att.curvature@curvedir", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.curvature@curvedir", value.c_str());
     return curvature_CURVEDIR_NONE;
+}
+
+std::string AttConverter::CurveLogFuncToStr(curveLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case curveLog_FUNC_unknown: value = "unknown"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.curve.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+curveLog_FUNC AttConverter::StrToCurveLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "unknown") return curveLog_FUNC_unknown;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.curve.log@func", value.c_str());
+    return curveLog_FUNC_NONE;
 }
 
 std::string AttConverter::CutoutCutoutToStr(cutout_CUTOUT data) const
@@ -2023,10 +2733,11 @@ std::string AttConverter::CutoutCutoutToStr(cutout_CUTOUT data) const
     return value;
 }
 
-cutout_CUTOUT AttConverter::StrToCutoutCutout(std::string value) const
+cutout_CUTOUT AttConverter::StrToCutoutCutout(std::string value, bool logWarning) const
 {
     if (value == "cutout") return cutout_CUTOUT_cutout;
-    LogWarning("Unsupported value '%s' for att.cutout@cutout", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.cutout@cutout", value.c_str());
     return cutout_CUTOUT_NONE;
 }
 
@@ -2044,11 +2755,12 @@ std::string AttConverter::DotLogFormToStr(dotLog_FORM data) const
     return value;
 }
 
-dotLog_FORM AttConverter::StrToDotLogForm(std::string value) const
+dotLog_FORM AttConverter::StrToDotLogForm(std::string value, bool logWarning) const
 {
     if (value == "aug") return dotLog_FORM_aug;
     if (value == "div") return dotLog_FORM_div;
-    LogWarning("Unsupported value '%s' for att.dot.log@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.dot.log@form", value.c_str());
     return dotLog_FORM_NONE;
 }
 
@@ -2067,13 +2779,83 @@ std::string AttConverter::EndingsEndingrendToStr(endings_ENDINGREND data) const
     return value;
 }
 
-endings_ENDINGREND AttConverter::StrToEndingsEndingrend(std::string value) const
+endings_ENDINGREND AttConverter::StrToEndingsEndingrend(std::string value, bool logWarning) const
 {
     if (value == "top") return endings_ENDINGREND_top;
     if (value == "barred") return endings_ENDINGREND_barred;
     if (value == "grouped") return endings_ENDINGREND_grouped;
-    LogWarning("Unsupported value '%s' for att.endings@ending.rend", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.endings@ending.rend", value.c_str());
     return endings_ENDINGREND_NONE;
+}
+
+std::string AttConverter::EpisemaVisFormToStr(episemaVis_FORM data) const
+{
+    std::string value;
+    switch (data) {
+        case episemaVis_FORM_h: value = "h"; break;
+        case episemaVis_FORM_v: value = "v"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.episema.vis@form", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+episemaVis_FORM AttConverter::StrToEpisemaVisForm(std::string value, bool logWarning) const
+{
+    if (value == "h") return episemaVis_FORM_h;
+    if (value == "v") return episemaVis_FORM_v;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.episema.vis@form", value.c_str());
+    return episemaVis_FORM_NONE;
+}
+
+std::string AttConverter::EvidenceEvidenceToStr(evidence_EVIDENCE data) const
+{
+    std::string value;
+    switch (data) {
+        case evidence_EVIDENCE_internal: value = "internal"; break;
+        case evidence_EVIDENCE_external: value = "external"; break;
+        case evidence_EVIDENCE_conjecture: value = "conjecture"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.evidence@evidence", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+evidence_EVIDENCE AttConverter::StrToEvidenceEvidence(std::string value, bool logWarning) const
+{
+    if (value == "internal") return evidence_EVIDENCE_internal;
+    if (value == "external") return evidence_EVIDENCE_external;
+    if (value == "conjecture") return evidence_EVIDENCE_conjecture;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.evidence@evidence", value.c_str());
+    return evidence_EVIDENCE_NONE;
+}
+
+std::string AttConverter::ExtSymGlyphauthToStr(extSym_GLYPHAUTH data) const
+{
+    std::string value;
+    switch (data) {
+        case extSym_GLYPHAUTH_smufl: value = "smufl"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.extSym@glyph.auth", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+extSym_GLYPHAUTH AttConverter::StrToExtSymGlyphauth(std::string value, bool logWarning) const
+{
+    if (value == "smufl") return extSym_GLYPHAUTH_smufl;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.extSym@glyph.auth", value.c_str());
+    return extSym_GLYPHAUTH_NONE;
 }
 
 std::string AttConverter::FTremLogFormToStr(fTremLog_FORM data) const
@@ -2090,11 +2872,12 @@ std::string AttConverter::FTremLogFormToStr(fTremLog_FORM data) const
     return value;
 }
 
-fTremLog_FORM AttConverter::StrToFTremLogForm(std::string value) const
+fTremLog_FORM AttConverter::StrToFTremLogForm(std::string value, bool logWarning) const
 {
     if (value == "meas") return fTremLog_FORM_meas;
     if (value == "unmeas") return fTremLog_FORM_unmeas;
-    LogWarning("Unsupported value '%s' for att.fTrem.log@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.fTrem.log@form", value.c_str());
     return fTremLog_FORM_NONE;
 }
 
@@ -2112,11 +2895,12 @@ std::string AttConverter::FermataVisFormToStr(fermataVis_FORM data) const
     return value;
 }
 
-fermataVis_FORM AttConverter::StrToFermataVisForm(std::string value) const
+fermataVis_FORM AttConverter::StrToFermataVisForm(std::string value, bool logWarning) const
 {
     if (value == "inv") return fermataVis_FORM_inv;
     if (value == "norm") return fermataVis_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.fermata.vis@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.fermata.vis@form", value.c_str());
     return fermataVis_FORM_NONE;
 }
 
@@ -2135,13 +2919,87 @@ std::string AttConverter::FermataVisShapeToStr(fermataVis_SHAPE data) const
     return value;
 }
 
-fermataVis_SHAPE AttConverter::StrToFermataVisShape(std::string value) const
+fermataVis_SHAPE AttConverter::StrToFermataVisShape(std::string value, bool logWarning) const
 {
     if (value == "curved") return fermataVis_SHAPE_curved;
     if (value == "square") return fermataVis_SHAPE_square;
     if (value == "angular") return fermataVis_SHAPE_angular;
-    LogWarning("Unsupported value '%s' for att.fermata.vis@shape", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.fermata.vis@shape", value.c_str());
     return fermataVis_SHAPE_NONE;
+}
+
+std::string AttConverter::FingGrpLogFormToStr(fingGrpLog_FORM data) const
+{
+    std::string value;
+    switch (data) {
+        case fingGrpLog_FORM_alter: value = "alter"; break;
+        case fingGrpLog_FORM_combi: value = "combi"; break;
+        case fingGrpLog_FORM_subst: value = "subst"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.fingGrp.log@form", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+fingGrpLog_FORM AttConverter::StrToFingGrpLogForm(std::string value, bool logWarning) const
+{
+    if (value == "alter") return fingGrpLog_FORM_alter;
+    if (value == "combi") return fingGrpLog_FORM_combi;
+    if (value == "subst") return fingGrpLog_FORM_subst;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.fingGrp.log@form", value.c_str());
+    return fingGrpLog_FORM_NONE;
+}
+
+std::string AttConverter::FingGrpVisOrientToStr(fingGrpVis_ORIENT data) const
+{
+    std::string value;
+    switch (data) {
+        case fingGrpVis_ORIENT_horiz: value = "horiz"; break;
+        case fingGrpVis_ORIENT_vert: value = "vert"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.fingGrp.vis@orient", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+fingGrpVis_ORIENT AttConverter::StrToFingGrpVisOrient(std::string value, bool logWarning) const
+{
+    if (value == "horiz") return fingGrpVis_ORIENT_horiz;
+    if (value == "vert") return fingGrpVis_ORIENT_vert;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.fingGrp.vis@orient", value.c_str());
+    return fingGrpVis_ORIENT_NONE;
+}
+
+std::string AttConverter::GraceGrpLogAttachToStr(graceGrpLog_ATTACH data) const
+{
+    std::string value;
+    switch (data) {
+        case graceGrpLog_ATTACH_pre: value = "pre"; break;
+        case graceGrpLog_ATTACH_post: value = "post"; break;
+        case graceGrpLog_ATTACH_unknown: value = "unknown"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.graceGrp.log@attach", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+graceGrpLog_ATTACH AttConverter::StrToGraceGrpLogAttach(std::string value, bool logWarning) const
+{
+    if (value == "pre") return graceGrpLog_ATTACH_pre;
+    if (value == "post") return graceGrpLog_ATTACH_post;
+    if (value == "unknown") return graceGrpLog_ATTACH_unknown;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.graceGrp.log@attach", value.c_str());
+    return graceGrpLog_ATTACH_NONE;
 }
 
 std::string AttConverter::HairpinLogFormToStr(hairpinLog_FORM data) const
@@ -2158,12 +3016,36 @@ std::string AttConverter::HairpinLogFormToStr(hairpinLog_FORM data) const
     return value;
 }
 
-hairpinLog_FORM AttConverter::StrToHairpinLogForm(std::string value) const
+hairpinLog_FORM AttConverter::StrToHairpinLogForm(std::string value, bool logWarning) const
 {
     if (value == "cres") return hairpinLog_FORM_cres;
     if (value == "dim") return hairpinLog_FORM_dim;
-    LogWarning("Unsupported value '%s' for att.hairpin.log@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.hairpin.log@form", value.c_str());
     return hairpinLog_FORM_NONE;
+}
+
+std::string AttConverter::HarmAnlFormToStr(harmAnl_FORM data) const
+{
+    std::string value;
+    switch (data) {
+        case harmAnl_FORM_explicit: value = "explicit"; break;
+        case harmAnl_FORM_implied: value = "implied"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.harm.anl@form", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+harmAnl_FORM AttConverter::StrToHarmAnlForm(std::string value, bool logWarning) const
+{
+    if (value == "explicit") return harmAnl_FORM_explicit;
+    if (value == "implied") return harmAnl_FORM_implied;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harm.anl@form", value.c_str());
+    return harmAnl_FORM_NONE;
 }
 
 std::string AttConverter::HarmVisRendgridToStr(harmVis_RENDGRID data) const
@@ -2181,12 +3063,13 @@ std::string AttConverter::HarmVisRendgridToStr(harmVis_RENDGRID data) const
     return value;
 }
 
-harmVis_RENDGRID AttConverter::StrToHarmVisRendgrid(std::string value) const
+harmVis_RENDGRID AttConverter::StrToHarmVisRendgrid(std::string value, bool logWarning) const
 {
     if (value == "grid") return harmVis_RENDGRID_grid;
     if (value == "gridtext") return harmVis_RENDGRID_gridtext;
     if (value == "text") return harmVis_RENDGRID_text;
-    LogWarning("Unsupported value '%s' for att.harm.vis@rendgrid", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harm.vis@rendgrid", value.c_str());
     return harmVis_RENDGRID_NONE;
 }
 
@@ -2205,12 +3088,13 @@ std::string AttConverter::HarpPedalLogAToStr(harpPedalLog_A data) const
     return value;
 }
 
-harpPedalLog_A AttConverter::StrToHarpPedalLogA(std::string value) const
+harpPedalLog_A AttConverter::StrToHarpPedalLogA(std::string value, bool logWarning) const
 {
     if (value == "f") return harpPedalLog_A_f;
     if (value == "n") return harpPedalLog_A_n;
     if (value == "s") return harpPedalLog_A_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@a", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harpPedal.log@a", value.c_str());
     return harpPedalLog_A_NONE;
 }
 
@@ -2229,12 +3113,13 @@ std::string AttConverter::HarpPedalLogBToStr(harpPedalLog_B data) const
     return value;
 }
 
-harpPedalLog_B AttConverter::StrToHarpPedalLogB(std::string value) const
+harpPedalLog_B AttConverter::StrToHarpPedalLogB(std::string value, bool logWarning) const
 {
     if (value == "f") return harpPedalLog_B_f;
     if (value == "n") return harpPedalLog_B_n;
     if (value == "s") return harpPedalLog_B_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@b", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harpPedal.log@b", value.c_str());
     return harpPedalLog_B_NONE;
 }
 
@@ -2253,12 +3138,13 @@ std::string AttConverter::HarpPedalLogCToStr(harpPedalLog_C data) const
     return value;
 }
 
-harpPedalLog_C AttConverter::StrToHarpPedalLogC(std::string value) const
+harpPedalLog_C AttConverter::StrToHarpPedalLogC(std::string value, bool logWarning) const
 {
     if (value == "f") return harpPedalLog_C_f;
     if (value == "n") return harpPedalLog_C_n;
     if (value == "s") return harpPedalLog_C_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@c", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harpPedal.log@c", value.c_str());
     return harpPedalLog_C_NONE;
 }
 
@@ -2277,12 +3163,13 @@ std::string AttConverter::HarpPedalLogDToStr(harpPedalLog_D data) const
     return value;
 }
 
-harpPedalLog_D AttConverter::StrToHarpPedalLogD(std::string value) const
+harpPedalLog_D AttConverter::StrToHarpPedalLogD(std::string value, bool logWarning) const
 {
     if (value == "f") return harpPedalLog_D_f;
     if (value == "n") return harpPedalLog_D_n;
     if (value == "s") return harpPedalLog_D_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@d", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harpPedal.log@d", value.c_str());
     return harpPedalLog_D_NONE;
 }
 
@@ -2301,12 +3188,13 @@ std::string AttConverter::HarpPedalLogEToStr(harpPedalLog_E data) const
     return value;
 }
 
-harpPedalLog_E AttConverter::StrToHarpPedalLogE(std::string value) const
+harpPedalLog_E AttConverter::StrToHarpPedalLogE(std::string value, bool logWarning) const
 {
     if (value == "f") return harpPedalLog_E_f;
     if (value == "n") return harpPedalLog_E_n;
     if (value == "s") return harpPedalLog_E_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@e", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harpPedal.log@e", value.c_str());
     return harpPedalLog_E_NONE;
 }
 
@@ -2325,12 +3213,13 @@ std::string AttConverter::HarpPedalLogFToStr(harpPedalLog_F data) const
     return value;
 }
 
-harpPedalLog_F AttConverter::StrToHarpPedalLogF(std::string value) const
+harpPedalLog_F AttConverter::StrToHarpPedalLogF(std::string value, bool logWarning) const
 {
     if (value == "f") return harpPedalLog_F_f;
     if (value == "n") return harpPedalLog_F_n;
     if (value == "s") return harpPedalLog_F_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@f", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harpPedal.log@f", value.c_str());
     return harpPedalLog_F_NONE;
 }
 
@@ -2349,33 +3238,136 @@ std::string AttConverter::HarpPedalLogGToStr(harpPedalLog_G data) const
     return value;
 }
 
-harpPedalLog_G AttConverter::StrToHarpPedalLogG(std::string value) const
+harpPedalLog_G AttConverter::StrToHarpPedalLogG(std::string value, bool logWarning) const
 {
     if (value == "f") return harpPedalLog_G_f;
     if (value == "n") return harpPedalLog_G_n;
     if (value == "s") return harpPedalLog_G_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@g", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.harpPedal.log@g", value.c_str());
     return harpPedalLog_G_NONE;
 }
 
-std::string AttConverter::MeiversionMeiversionToStr(meiversion_MEIVERSION data) const
+std::string AttConverter::LineLogFuncToStr(lineLog_FUNC data) const
 {
     std::string value;
     switch (data) {
-        case meiversion_MEIVERSION_3_0_0: value = "3.0.0"; break;
+        case lineLog_FUNC_coloration: value = "coloration"; break;
+        case lineLog_FUNC_ligature: value = "ligature"; break;
+        case lineLog_FUNC_unknown: value = "unknown"; break;
         default:
-            LogWarning("Unknown value '%d' for att.meiversion@meiversion", data);
+            LogWarning("Unknown value '%d' for att.line.log@func", data);
             value = "";
             break;
     }
     return value;
 }
 
-meiversion_MEIVERSION AttConverter::StrToMeiversionMeiversion(std::string value) const
+lineLog_FUNC AttConverter::StrToLineLogFunc(std::string value, bool logWarning) const
 {
-    if (value == "3.0.0") return meiversion_MEIVERSION_3_0_0;
-    LogWarning("Unsupported value '%s' for att.meiversion@meiversion", value.c_str());
-    return meiversion_MEIVERSION_NONE;
+    if (value == "coloration") return lineLog_FUNC_coloration;
+    if (value == "ligature") return lineLog_FUNC_ligature;
+    if (value == "unknown") return lineLog_FUNC_unknown;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.line.log@func", value.c_str());
+    return lineLog_FUNC_NONE;
+}
+
+std::string AttConverter::LiquescentVisCurveToStr(liquescentVis_CURVE data) const
+{
+    std::string value;
+    switch (data) {
+        case liquescentVis_CURVE_a: value = "a"; break;
+        case liquescentVis_CURVE_c: value = "c"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.liquescent.vis@curve", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+liquescentVis_CURVE AttConverter::StrToLiquescentVisCurve(std::string value, bool logWarning) const
+{
+    if (value == "a") return liquescentVis_CURVE_a;
+    if (value == "c") return liquescentVis_CURVE_c;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.liquescent.vis@curve", value.c_str());
+    return liquescentVis_CURVE_NONE;
+}
+
+std::string AttConverter::MeasurementUnitToStr(measurement_UNIT data) const
+{
+    std::string value;
+    switch (data) {
+        case measurement_UNIT_byte: value = "byte"; break;
+        case measurement_UNIT_char: value = "char"; break;
+        case measurement_UNIT_cm: value = "cm"; break;
+        case measurement_UNIT_deg: value = "deg"; break;
+        case measurement_UNIT_in: value = "in"; break;
+        case measurement_UNIT_issue: value = "issue"; break;
+        case measurement_UNIT_ft: value = "ft"; break;
+        case measurement_UNIT_m: value = "m"; break;
+        case measurement_UNIT_mm: value = "mm"; break;
+        case measurement_UNIT_page: value = "page"; break;
+        case measurement_UNIT_pc: value = "pc"; break;
+        case measurement_UNIT_pt: value = "pt"; break;
+        case measurement_UNIT_px: value = "px"; break;
+        case measurement_UNIT_rad: value = "rad"; break;
+        case measurement_UNIT_record: value = "record"; break;
+        case measurement_UNIT_vol: value = "vol"; break;
+        case measurement_UNIT_vu: value = "vu"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.measurement@unit", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+measurement_UNIT AttConverter::StrToMeasurementUnit(std::string value, bool logWarning) const
+{
+    if (value == "byte") return measurement_UNIT_byte;
+    if (value == "char") return measurement_UNIT_char;
+    if (value == "cm") return measurement_UNIT_cm;
+    if (value == "deg") return measurement_UNIT_deg;
+    if (value == "in") return measurement_UNIT_in;
+    if (value == "issue") return measurement_UNIT_issue;
+    if (value == "ft") return measurement_UNIT_ft;
+    if (value == "m") return measurement_UNIT_m;
+    if (value == "mm") return measurement_UNIT_mm;
+    if (value == "page") return measurement_UNIT_page;
+    if (value == "pc") return measurement_UNIT_pc;
+    if (value == "pt") return measurement_UNIT_pt;
+    if (value == "px") return measurement_UNIT_px;
+    if (value == "rad") return measurement_UNIT_rad;
+    if (value == "record") return measurement_UNIT_record;
+    if (value == "vol") return measurement_UNIT_vol;
+    if (value == "vu") return measurement_UNIT_vu;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.measurement@unit", value.c_str());
+    return measurement_UNIT_NONE;
+}
+
+std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) const
+{
+    std::string value;
+    switch (data) {
+        case meiVersion_MEIVERSION_4_0_0: value = "4.0.0"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.meiVersion@meiversion", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+meiVersion_MEIVERSION AttConverter::StrToMeiVersionMeiversion(std::string value, bool logWarning) const
+{
+    if (value == "4.0.0") return meiVersion_MEIVERSION_4_0_0;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.meiVersion@meiversion", value.c_str());
+    return meiVersion_MEIVERSION_NONE;
 }
 
 std::string AttConverter::MensurVisFormToStr(mensurVis_FORM data) const
@@ -2392,11 +3384,12 @@ std::string AttConverter::MensurVisFormToStr(mensurVis_FORM data) const
     return value;
 }
 
-mensurVis_FORM AttConverter::StrToMensurVisForm(std::string value) const
+mensurVis_FORM AttConverter::StrToMensurVisForm(std::string value, bool logWarning) const
 {
     if (value == "horizontal") return mensurVis_FORM_horizontal;
     if (value == "vertical") return mensurVis_FORM_vertical;
-    LogWarning("Unsupported value '%s' for att.mensur.vis@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.mensur.vis@form", value.c_str());
     return mensurVis_FORM_NONE;
 }
 
@@ -2414,12 +3407,38 @@ std::string AttConverter::MensuralVisMensurformToStr(mensuralVis_MENSURFORM data
     return value;
 }
 
-mensuralVis_MENSURFORM AttConverter::StrToMensuralVisMensurform(std::string value) const
+mensuralVis_MENSURFORM AttConverter::StrToMensuralVisMensurform(std::string value, bool logWarning) const
 {
     if (value == "horizontal") return mensuralVis_MENSURFORM_horizontal;
     if (value == "vertical") return mensuralVis_MENSURFORM_vertical;
-    LogWarning("Unsupported value '%s' for att.mensural.vis@mensur.form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.mensural.vis@mensur.form", value.c_str());
     return mensuralVis_MENSURFORM_NONE;
+}
+
+std::string AttConverter::MeterConformanceMetconToStr(meterConformance_METCON data) const
+{
+    std::string value;
+    switch (data) {
+        case meterConformance_METCON_c: value = "c"; break;
+        case meterConformance_METCON_i: value = "i"; break;
+        case meterConformance_METCON_o: value = "o"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.meterConformance@metcon", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+meterConformance_METCON AttConverter::StrToMeterConformanceMetcon(std::string value, bool logWarning) const
+{
+    if (value == "c") return meterConformance_METCON_c;
+    if (value == "i") return meterConformance_METCON_i;
+    if (value == "o") return meterConformance_METCON_o;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.meterConformance@metcon", value.c_str());
+    return meterConformance_METCON_NONE;
 }
 
 std::string AttConverter::MeterSigVisFormToStr(meterSigVis_FORM data) const
@@ -2438,40 +3457,42 @@ std::string AttConverter::MeterSigVisFormToStr(meterSigVis_FORM data) const
     return value;
 }
 
-meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value) const
+meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value, bool logWarning) const
 {
     if (value == "num") return meterSigVis_FORM_num;
     if (value == "denomsym") return meterSigVis_FORM_denomsym;
     if (value == "norm") return meterSigVis_FORM_norm;
     if (value == "invis") return meterSigVis_FORM_invis;
-    LogWarning("Unsupported value '%s' for att.meterSig.vis@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.meterSig.vis@form", value.c_str());
     return meterSigVis_FORM_NONE;
 }
 
-std::string AttConverter::MeterSigDefaultVisMeterrendToStr(meterSigDefaultVis_METERREND data) const
+std::string AttConverter::MeterSigDefaultVisMeterformToStr(meterSigDefaultVis_METERFORM data) const
 {
     std::string value;
     switch (data) {
-        case meterSigDefaultVis_METERREND_num: value = "num"; break;
-        case meterSigDefaultVis_METERREND_denomsym: value = "denomsym"; break;
-        case meterSigDefaultVis_METERREND_norm: value = "norm"; break;
-        case meterSigDefaultVis_METERREND_invis: value = "invis"; break;
+        case meterSigDefaultVis_METERFORM_num: value = "num"; break;
+        case meterSigDefaultVis_METERFORM_denomsym: value = "denomsym"; break;
+        case meterSigDefaultVis_METERFORM_norm: value = "norm"; break;
+        case meterSigDefaultVis_METERFORM_invis: value = "invis"; break;
         default:
-            LogWarning("Unknown value '%d' for att.meterSigDefault.vis@meter.rend", data);
+            LogWarning("Unknown value '%d' for att.meterSigDefault.vis@meter.form", data);
             value = "";
             break;
     }
     return value;
 }
 
-meterSigDefaultVis_METERREND AttConverter::StrToMeterSigDefaultVisMeterrend(std::string value) const
+meterSigDefaultVis_METERFORM AttConverter::StrToMeterSigDefaultVisMeterform(std::string value, bool logWarning) const
 {
-    if (value == "num") return meterSigDefaultVis_METERREND_num;
-    if (value == "denomsym") return meterSigDefaultVis_METERREND_denomsym;
-    if (value == "norm") return meterSigDefaultVis_METERREND_norm;
-    if (value == "invis") return meterSigDefaultVis_METERREND_invis;
-    LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.rend", value.c_str());
-    return meterSigDefaultVis_METERREND_NONE;
+    if (value == "num") return meterSigDefaultVis_METERFORM_num;
+    if (value == "denomsym") return meterSigDefaultVis_METERFORM_denomsym;
+    if (value == "norm") return meterSigDefaultVis_METERFORM_norm;
+    if (value == "invis") return meterSigDefaultVis_METERFORM_invis;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.form", value.c_str());
+    return meterSigDefaultVis_METERFORM_NONE;
 }
 
 std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const
@@ -2489,45 +3510,22 @@ std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) cons
     return value;
 }
 
-meterSigGrpLog_FUNC AttConverter::StrToMeterSigGrpLogFunc(std::string value) const
+meterSigGrpLog_FUNC AttConverter::StrToMeterSigGrpLogFunc(std::string value, bool logWarning) const
 {
     if (value == "alternating") return meterSigGrpLog_FUNC_alternating;
     if (value == "interchanging") return meterSigGrpLog_FUNC_interchanging;
     if (value == "mixed") return meterSigGrpLog_FUNC_mixed;
-    LogWarning("Unsupported value '%s' for att.meterSigGrp.log@func", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.meterSigGrp.log@func", value.c_str());
     return meterSigGrpLog_FUNC_NONE;
-}
-
-std::string AttConverter::MeterconformanceMetconToStr(meterconformance_METCON data) const
-{
-    std::string value;
-    switch (data) {
-        case meterconformance_METCON_c: value = "c"; break;
-        case meterconformance_METCON_i: value = "i"; break;
-        case meterconformance_METCON_o: value = "o"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.meterconformance@metcon", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-meterconformance_METCON AttConverter::StrToMeterconformanceMetcon(std::string value) const
-{
-    if (value == "c") return meterconformance_METCON_c;
-    if (value == "i") return meterconformance_METCON_i;
-    if (value == "o") return meterconformance_METCON_o;
-    LogWarning("Unsupported value '%s' for att.meterconformance@metcon", value.c_str());
-    return meterconformance_METCON_NONE;
 }
 
 std::string AttConverter::MordentLogFormToStr(mordentLog_FORM data) const
 {
     std::string value;
     switch (data) {
-        case mordentLog_FORM_inv: value = "inv"; break;
-        case mordentLog_FORM_norm: value = "norm"; break;
+        case mordentLog_FORM_lower: value = "lower"; break;
+        case mordentLog_FORM_upper: value = "upper"; break;
         default:
             LogWarning("Unknown value '%d' for att.mordent.log@form", data);
             value = "";
@@ -2536,34 +3534,151 @@ std::string AttConverter::MordentLogFormToStr(mordentLog_FORM data) const
     return value;
 }
 
-mordentLog_FORM AttConverter::StrToMordentLogForm(std::string value) const
+mordentLog_FORM AttConverter::StrToMordentLogForm(std::string value, bool logWarning) const
 {
-    if (value == "inv") return mordentLog_FORM_inv;
-    if (value == "norm") return mordentLog_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.mordent.log@form", value.c_str());
+    if (value == "lower") return mordentLog_FORM_lower;
+    if (value == "upper") return mordentLog_FORM_upper;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.mordent.log@form", value.c_str());
     return mordentLog_FORM_NONE;
 }
 
-std::string AttConverter::NoteLogMensuralLigToStr(noteLogMensural_LIG data) const
+std::string AttConverter::NcFormConToStr(ncForm_CON data) const
 {
     std::string value;
     switch (data) {
-        case noteLogMensural_LIG_recta: value = "recta"; break;
-        case noteLogMensural_LIG_obliqua: value = "obliqua"; break;
+        case ncForm_CON_g: value = "g"; break;
+        case ncForm_CON_l: value = "l"; break;
+        case ncForm_CON_e: value = "e"; break;
         default:
-            LogWarning("Unknown value '%d' for att.note.log.mensural@lig", data);
+            LogWarning("Unknown value '%d' for att.ncForm@con", data);
             value = "";
             break;
     }
     return value;
 }
 
-noteLogMensural_LIG AttConverter::StrToNoteLogMensuralLig(std::string value) const
+ncForm_CON AttConverter::StrToNcFormCon(std::string value, bool logWarning) const
 {
-    if (value == "recta") return noteLogMensural_LIG_recta;
-    if (value == "obliqua") return noteLogMensural_LIG_obliqua;
-    LogWarning("Unsupported value '%s' for att.note.log.mensural@lig", value.c_str());
-    return noteLogMensural_LIG_NONE;
+    if (value == "g") return ncForm_CON_g;
+    if (value == "l") return ncForm_CON_l;
+    if (value == "e") return ncForm_CON_e;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.ncForm@con", value.c_str());
+    return ncForm_CON_NONE;
+}
+
+std::string AttConverter::NcFormCurveToStr(ncForm_CURVE data) const
+{
+    std::string value;
+    switch (data) {
+        case ncForm_CURVE_a: value = "a"; break;
+        case ncForm_CURVE_c: value = "c"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.ncForm@curve", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+ncForm_CURVE AttConverter::StrToNcFormCurve(std::string value, bool logWarning) const
+{
+    if (value == "a") return ncForm_CURVE_a;
+    if (value == "c") return ncForm_CURVE_c;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.ncForm@curve", value.c_str());
+    return ncForm_CURVE_NONE;
+}
+
+std::string AttConverter::NcFormRellenToStr(ncForm_RELLEN data) const
+{
+    std::string value;
+    switch (data) {
+        case ncForm_RELLEN_l: value = "l"; break;
+        case ncForm_RELLEN_s: value = "s"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.ncForm@rellen", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+ncForm_RELLEN AttConverter::StrToNcFormRellen(std::string value, bool logWarning) const
+{
+    if (value == "l") return ncForm_RELLEN_l;
+    if (value == "s") return ncForm_RELLEN_s;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.ncForm@rellen", value.c_str());
+    return ncForm_RELLEN_NONE;
+}
+
+std::string AttConverter::NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const
+{
+    std::string value;
+    switch (data) {
+        case noteAnlMensural_LIG_recta: value = "recta"; break;
+        case noteAnlMensural_LIG_obliqua: value = "obliqua"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.note.anl.mensural@lig", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+noteAnlMensural_LIG AttConverter::StrToNoteAnlMensuralLig(std::string value, bool logWarning) const
+{
+    if (value == "recta") return noteAnlMensural_LIG_recta;
+    if (value == "obliqua") return noteAnlMensural_LIG_obliqua;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.note.anl.mensural@lig", value.c_str());
+    return noteAnlMensural_LIG_NONE;
+}
+
+std::string AttConverter::NoteGesExtremisToStr(noteGes_EXTREMIS data) const
+{
+    std::string value;
+    switch (data) {
+        case noteGes_EXTREMIS_highest: value = "highest"; break;
+        case noteGes_EXTREMIS_lowest: value = "lowest"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.note.ges@extremis", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+noteGes_EXTREMIS AttConverter::StrToNoteGesExtremis(std::string value, bool logWarning) const
+{
+    if (value == "highest") return noteGes_EXTREMIS_highest;
+    if (value == "lowest") return noteGes_EXTREMIS_lowest;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.note.ges@extremis", value.c_str());
+    return noteGes_EXTREMIS_NONE;
+}
+
+std::string AttConverter::NoteHeadsHeadauthToStr(noteHeads_HEADAUTH data) const
+{
+    std::string value;
+    switch (data) {
+        case noteHeads_HEADAUTH_smufl: value = "smufl"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.noteHeads@head.auth", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+noteHeads_HEADAUTH AttConverter::StrToNoteHeadsHeadauth(std::string value, bool logWarning) const
+{
+    if (value == "smufl") return noteHeads_HEADAUTH_smufl;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.noteHeads@head.auth", value.c_str());
+    return noteHeads_HEADAUTH_NONE;
 }
 
 std::string AttConverter::OctaveLogCollToStr(octaveLog_COLL data) const
@@ -2579,10 +3694,11 @@ std::string AttConverter::OctaveLogCollToStr(octaveLog_COLL data) const
     return value;
 }
 
-octaveLog_COLL AttConverter::StrToOctaveLogColl(std::string value) const
+octaveLog_COLL AttConverter::StrToOctaveLogColl(std::string value, bool logWarning) const
 {
     if (value == "coll") return octaveLog_COLL_coll;
-    LogWarning("Unsupported value '%s' for att.octave.log@coll", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.octave.log@coll", value.c_str());
     return octaveLog_COLL_NONE;
 }
 
@@ -2600,11 +3716,12 @@ std::string AttConverter::PbVisFoliumToStr(pbVis_FOLIUM data) const
     return value;
 }
 
-pbVis_FOLIUM AttConverter::StrToPbVisFolium(std::string value) const
+pbVis_FOLIUM AttConverter::StrToPbVisFolium(std::string value, bool logWarning) const
 {
     if (value == "verso") return pbVis_FOLIUM_verso;
     if (value == "recto") return pbVis_FOLIUM_recto;
-    LogWarning("Unsupported value '%s' for att.pb.vis@folium", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pb.vis@folium", value.c_str());
     return pbVis_FOLIUM_NONE;
 }
 
@@ -2624,14 +3741,42 @@ std::string AttConverter::PedalLogDirToStr(pedalLog_DIR data) const
     return value;
 }
 
-pedalLog_DIR AttConverter::StrToPedalLogDir(std::string value) const
+pedalLog_DIR AttConverter::StrToPedalLogDir(std::string value, bool logWarning) const
 {
     if (value == "down") return pedalLog_DIR_down;
     if (value == "up") return pedalLog_DIR_up;
     if (value == "half") return pedalLog_DIR_half;
     if (value == "bounce") return pedalLog_DIR_bounce;
-    LogWarning("Unsupported value '%s' for att.pedal.log@dir", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pedal.log@dir", value.c_str());
     return pedalLog_DIR_NONE;
+}
+
+std::string AttConverter::PedalLogFuncToStr(pedalLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case pedalLog_FUNC_sustain: value = "sustain"; break;
+        case pedalLog_FUNC_soft: value = "soft"; break;
+        case pedalLog_FUNC_sostenuto: value = "sostenuto"; break;
+        case pedalLog_FUNC_silent: value = "silent"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.pedal.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+pedalLog_FUNC AttConverter::StrToPedalLogFunc(std::string value, bool logWarning) const
+{
+    if (value == "sustain") return pedalLog_FUNC_sustain;
+    if (value == "soft") return pedalLog_FUNC_soft;
+    if (value == "sostenuto") return pedalLog_FUNC_sostenuto;
+    if (value == "silent") return pedalLog_FUNC_silent;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pedal.log@func", value.c_str());
+    return pedalLog_FUNC_NONE;
 }
 
 std::string AttConverter::PedalVisFormToStr(pedalVis_FORM data) const
@@ -2649,37 +3794,39 @@ std::string AttConverter::PedalVisFormToStr(pedalVis_FORM data) const
     return value;
 }
 
-pedalVis_FORM AttConverter::StrToPedalVisForm(std::string value) const
+pedalVis_FORM AttConverter::StrToPedalVisForm(std::string value, bool logWarning) const
 {
     if (value == "line") return pedalVis_FORM_line;
     if (value == "pedstar") return pedalVis_FORM_pedstar;
     if (value == "altpedstar") return pedalVis_FORM_altpedstar;
-    LogWarning("Unsupported value '%s' for att.pedal.vis@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pedal.vis@form", value.c_str());
     return pedalVis_FORM_NONE;
 }
 
-std::string AttConverter::PianopedalsPedalstyleToStr(pianopedals_PEDALSTYLE data) const
+std::string AttConverter::PianoPedalsPedalstyleToStr(pianoPedals_PEDALSTYLE data) const
 {
     std::string value;
     switch (data) {
-        case pianopedals_PEDALSTYLE_line: value = "line"; break;
-        case pianopedals_PEDALSTYLE_pedstar: value = "pedstar"; break;
-        case pianopedals_PEDALSTYLE_altpedstar: value = "altpedstar"; break;
+        case pianoPedals_PEDALSTYLE_line: value = "line"; break;
+        case pianoPedals_PEDALSTYLE_pedstar: value = "pedstar"; break;
+        case pianoPedals_PEDALSTYLE_altpedstar: value = "altpedstar"; break;
         default:
-            LogWarning("Unknown value '%d' for att.pianopedals@pedal.style", data);
+            LogWarning("Unknown value '%d' for att.pianoPedals@pedal.style", data);
             value = "";
             break;
     }
     return value;
 }
 
-pianopedals_PEDALSTYLE AttConverter::StrToPianopedalsPedalstyle(std::string value) const
+pianoPedals_PEDALSTYLE AttConverter::StrToPianoPedalsPedalstyle(std::string value, bool logWarning) const
 {
-    if (value == "line") return pianopedals_PEDALSTYLE_line;
-    if (value == "pedstar") return pianopedals_PEDALSTYLE_pedstar;
-    if (value == "altpedstar") return pianopedals_PEDALSTYLE_altpedstar;
-    LogWarning("Unsupported value '%s' for att.pianopedals@pedal.style", value.c_str());
-    return pianopedals_PEDALSTYLE_NONE;
+    if (value == "line") return pianoPedals_PEDALSTYLE_line;
+    if (value == "pedstar") return pianoPedals_PEDALSTYLE_pedstar;
+    if (value == "altpedstar") return pianoPedals_PEDALSTYLE_altpedstar;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pianoPedals@pedal.style", value.c_str());
+    return pianoPedals_PEDALSTYLE_NONE;
 }
 
 std::string AttConverter::PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const
@@ -2698,13 +3845,14 @@ std::string AttConverter::PointingXlinkactuateToStr(pointing_XLINKACTUATE data) 
     return value;
 }
 
-pointing_XLINKACTUATE AttConverter::StrToPointingXlinkactuate(std::string value) const
+pointing_XLINKACTUATE AttConverter::StrToPointingXlinkactuate(std::string value, bool logWarning) const
 {
     if (value == "onLoad") return pointing_XLINKACTUATE_onLoad;
     if (value == "onRequest") return pointing_XLINKACTUATE_onRequest;
     if (value == "none") return pointing_XLINKACTUATE_none;
     if (value == "other") return pointing_XLINKACTUATE_other;
-    LogWarning("Unsupported value '%s' for att.pointing@xlink:actuate", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pointing@xlink:actuate", value.c_str());
     return pointing_XLINKACTUATE_NONE;
 }
 
@@ -2725,37 +3873,86 @@ std::string AttConverter::PointingXlinkshowToStr(pointing_XLINKSHOW data) const
     return value;
 }
 
-pointing_XLINKSHOW AttConverter::StrToPointingXlinkshow(std::string value) const
+pointing_XLINKSHOW AttConverter::StrToPointingXlinkshow(std::string value, bool logWarning) const
 {
     if (value == "new") return pointing_XLINKSHOW_new;
     if (value == "replace") return pointing_XLINKSHOW_replace;
     if (value == "embed") return pointing_XLINKSHOW_embed;
     if (value == "none") return pointing_XLINKSHOW_none;
     if (value == "other") return pointing_XLINKSHOW_other;
-    LogWarning("Unsupported value '%s' for att.pointing@xlink:show", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.pointing@xlink:show", value.c_str());
     return pointing_XLINKSHOW_NONE;
 }
 
-std::string AttConverter::RegularmethodMethodToStr(regularmethod_METHOD data) const
+std::string AttConverter::RecordTypeRecordtypeToStr(recordType_RECORDTYPE data) const
 {
     std::string value;
     switch (data) {
-        case regularmethod_METHOD_silent: value = "silent"; break;
-        case regularmethod_METHOD_tags: value = "tags"; break;
+        case recordType_RECORDTYPE_a: value = "a"; break;
+        case recordType_RECORDTYPE_c: value = "c"; break;
+        case recordType_RECORDTYPE_d: value = "d"; break;
+        case recordType_RECORDTYPE_e: value = "e"; break;
+        case recordType_RECORDTYPE_f: value = "f"; break;
+        case recordType_RECORDTYPE_g: value = "g"; break;
+        case recordType_RECORDTYPE_i: value = "i"; break;
+        case recordType_RECORDTYPE_j: value = "j"; break;
+        case recordType_RECORDTYPE_k: value = "k"; break;
+        case recordType_RECORDTYPE_m: value = "m"; break;
+        case recordType_RECORDTYPE_o: value = "o"; break;
+        case recordType_RECORDTYPE_p: value = "p"; break;
+        case recordType_RECORDTYPE_r: value = "r"; break;
+        case recordType_RECORDTYPE_t: value = "t"; break;
         default:
-            LogWarning("Unknown value '%d' for att.regularmethod@method", data);
+            LogWarning("Unknown value '%d' for att.recordType@recordtype", data);
             value = "";
             break;
     }
     return value;
 }
 
-regularmethod_METHOD AttConverter::StrToRegularmethodMethod(std::string value) const
+recordType_RECORDTYPE AttConverter::StrToRecordTypeRecordtype(std::string value, bool logWarning) const
 {
-    if (value == "silent") return regularmethod_METHOD_silent;
-    if (value == "tags") return regularmethod_METHOD_tags;
-    LogWarning("Unsupported value '%s' for att.regularmethod@method", value.c_str());
-    return regularmethod_METHOD_NONE;
+    if (value == "a") return recordType_RECORDTYPE_a;
+    if (value == "c") return recordType_RECORDTYPE_c;
+    if (value == "d") return recordType_RECORDTYPE_d;
+    if (value == "e") return recordType_RECORDTYPE_e;
+    if (value == "f") return recordType_RECORDTYPE_f;
+    if (value == "g") return recordType_RECORDTYPE_g;
+    if (value == "i") return recordType_RECORDTYPE_i;
+    if (value == "j") return recordType_RECORDTYPE_j;
+    if (value == "k") return recordType_RECORDTYPE_k;
+    if (value == "m") return recordType_RECORDTYPE_m;
+    if (value == "o") return recordType_RECORDTYPE_o;
+    if (value == "p") return recordType_RECORDTYPE_p;
+    if (value == "r") return recordType_RECORDTYPE_r;
+    if (value == "t") return recordType_RECORDTYPE_t;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.recordType@recordtype", value.c_str());
+    return recordType_RECORDTYPE_NONE;
+}
+
+std::string AttConverter::RegularMethodMethodToStr(regularMethod_METHOD data) const
+{
+    std::string value;
+    switch (data) {
+        case regularMethod_METHOD_silent: value = "silent"; break;
+        case regularMethod_METHOD_tags: value = "tags"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.regularMethod@method", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+regularMethod_METHOD AttConverter::StrToRegularMethodMethod(std::string value, bool logWarning) const
+{
+    if (value == "silent") return regularMethod_METHOD_silent;
+    if (value == "tags") return regularMethod_METHOD_tags;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.regularMethod@method", value.c_str());
+    return regularMethod_METHOD_NONE;
 }
 
 std::string AttConverter::RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) const
@@ -2773,12 +3970,13 @@ std::string AttConverter::RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) co
     return value;
 }
 
-rehearsal_REHENCLOSE AttConverter::StrToRehearsalRehenclose(std::string value) const
+rehearsal_REHENCLOSE AttConverter::StrToRehearsalRehenclose(std::string value, bool logWarning) const
 {
     if (value == "box") return rehearsal_REHENCLOSE_box;
     if (value == "circle") return rehearsal_REHENCLOSE_circle;
     if (value == "none") return rehearsal_REHENCLOSE_none;
-    LogWarning("Unsupported value '%s' for att.rehearsal@reh.enclose", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.rehearsal@reh.enclose", value.c_str());
     return rehearsal_REHENCLOSE_NONE;
 }
 
@@ -2795,39 +3993,41 @@ std::string AttConverter::SbVisFormToStr(sbVis_FORM data) const
     return value;
 }
 
-sbVis_FORM AttConverter::StrToSbVisForm(std::string value) const
+sbVis_FORM AttConverter::StrToSbVisForm(std::string value, bool logWarning) const
 {
     if (value == "hash") return sbVis_FORM_hash;
-    LogWarning("Unsupported value '%s' for att.sb.vis@form", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.sb.vis@form", value.c_str());
     return sbVis_FORM_NONE;
 }
 
-std::string AttConverter::StaffgroupingsymSymbolToStr(staffgroupingsym_SYMBOL data) const
+std::string AttConverter::StaffGroupingSymSymbolToStr(staffGroupingSym_SYMBOL data) const
 {
     std::string value;
     switch (data) {
-        case staffgroupingsym_SYMBOL_brace: value = "brace"; break;
-        case staffgroupingsym_SYMBOL_bracket: value = "bracket"; break;
-        case staffgroupingsym_SYMBOL_bracketsq: value = "bracketsq"; break;
-        case staffgroupingsym_SYMBOL_line: value = "line"; break;
-        case staffgroupingsym_SYMBOL_none: value = "none"; break;
+        case staffGroupingSym_SYMBOL_brace: value = "brace"; break;
+        case staffGroupingSym_SYMBOL_bracket: value = "bracket"; break;
+        case staffGroupingSym_SYMBOL_bracketsq: value = "bracketsq"; break;
+        case staffGroupingSym_SYMBOL_line: value = "line"; break;
+        case staffGroupingSym_SYMBOL_none: value = "none"; break;
         default:
-            LogWarning("Unknown value '%d' for att.staffgroupingsym@symbol", data);
+            LogWarning("Unknown value '%d' for att.staffGroupingSym@symbol", data);
             value = "";
             break;
     }
     return value;
 }
 
-staffgroupingsym_SYMBOL AttConverter::StrToStaffgroupingsymSymbol(std::string value) const
+staffGroupingSym_SYMBOL AttConverter::StrToStaffGroupingSymSymbol(std::string value, bool logWarning) const
 {
-    if (value == "brace") return staffgroupingsym_SYMBOL_brace;
-    if (value == "bracket") return staffgroupingsym_SYMBOL_bracket;
-    if (value == "bracketsq") return staffgroupingsym_SYMBOL_bracketsq;
-    if (value == "line") return staffgroupingsym_SYMBOL_line;
-    if (value == "none") return staffgroupingsym_SYMBOL_none;
-    LogWarning("Unsupported value '%s' for att.staffgroupingsym@symbol", value.c_str());
-    return staffgroupingsym_SYMBOL_NONE;
+    if (value == "brace") return staffGroupingSym_SYMBOL_brace;
+    if (value == "bracket") return staffGroupingSym_SYMBOL_bracket;
+    if (value == "bracketsq") return staffGroupingSym_SYMBOL_bracketsq;
+    if (value == "line") return staffGroupingSym_SYMBOL_line;
+    if (value == "none") return staffGroupingSym_SYMBOL_none;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.staffGroupingSym@symbol", value.c_str());
+    return staffGroupingSym_SYMBOL_NONE;
 }
 
 std::string AttConverter::SylLogConToStr(sylLog_CON data) const
@@ -2850,7 +4050,7 @@ std::string AttConverter::SylLogConToStr(sylLog_CON data) const
     return value;
 }
 
-sylLog_CON AttConverter::StrToSylLogCon(std::string value) const
+sylLog_CON AttConverter::StrToSylLogCon(std::string value, bool logWarning) const
 {
     if (value == "s") return sylLog_CON_s;
     if (value == "d") return sylLog_CON_d;
@@ -2860,7 +4060,8 @@ sylLog_CON AttConverter::StrToSylLogCon(std::string value) const
     if (value == "v") return sylLog_CON_v;
     if (value == "i") return sylLog_CON_i;
     if (value == "b") return sylLog_CON_b;
-    LogWarning("Unsupported value '%s' for att.syl.log@con", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.syl.log@con", value.c_str());
     return sylLog_CON_NONE;
 }
 
@@ -2879,37 +4080,39 @@ std::string AttConverter::SylLogWordposToStr(sylLog_WORDPOS data) const
     return value;
 }
 
-sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value) const
+sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value, bool logWarning) const
 {
     if (value == "i") return sylLog_WORDPOS_i;
     if (value == "m") return sylLog_WORDPOS_m;
     if (value == "t") return sylLog_WORDPOS_t;
-    LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str());
     return sylLog_WORDPOS_NONE;
 }
 
-std::string AttConverter::TargetevalEvaluateToStr(targeteval_EVALUATE data) const
+std::string AttConverter::TargetEvalEvaluateToStr(targetEval_EVALUATE data) const
 {
     std::string value;
     switch (data) {
-        case targeteval_EVALUATE_all: value = "all"; break;
-        case targeteval_EVALUATE_one: value = "one"; break;
-        case targeteval_EVALUATE_none: value = "none"; break;
+        case targetEval_EVALUATE_all: value = "all"; break;
+        case targetEval_EVALUATE_one: value = "one"; break;
+        case targetEval_EVALUATE_none: value = "none"; break;
         default:
-            LogWarning("Unknown value '%d' for att.targeteval@evaluate", data);
+            LogWarning("Unknown value '%d' for att.targetEval@evaluate", data);
             value = "";
             break;
     }
     return value;
 }
 
-targeteval_EVALUATE AttConverter::StrToTargetevalEvaluate(std::string value) const
+targetEval_EVALUATE AttConverter::StrToTargetEvalEvaluate(std::string value, bool logWarning) const
 {
-    if (value == "all") return targeteval_EVALUATE_all;
-    if (value == "one") return targeteval_EVALUATE_one;
-    if (value == "none") return targeteval_EVALUATE_none;
-    LogWarning("Unsupported value '%s' for att.targeteval@evaluate", value.c_str());
-    return targeteval_EVALUATE_NONE;
+    if (value == "all") return targetEval_EVALUATE_all;
+    if (value == "one") return targetEval_EVALUATE_one;
+    if (value == "none") return targetEval_EVALUATE_none;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.targetEval@evaluate", value.c_str());
+    return targetEval_EVALUATE_NONE;
 }
 
 std::string AttConverter::TempoLogFuncToStr(tempoLog_FUNC data) const
@@ -2928,13 +4131,14 @@ std::string AttConverter::TempoLogFuncToStr(tempoLog_FUNC data) const
     return value;
 }
 
-tempoLog_FUNC AttConverter::StrToTempoLogFunc(std::string value) const
+tempoLog_FUNC AttConverter::StrToTempoLogFunc(std::string value, bool logWarning) const
 {
     if (value == "continuous") return tempoLog_FUNC_continuous;
     if (value == "instantaneous") return tempoLog_FUNC_instantaneous;
     if (value == "metricmod") return tempoLog_FUNC_metricmod;
     if (value == "precedente") return tempoLog_FUNC_precedente;
-    LogWarning("Unsupported value '%s' for att.tempo.log@func", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.tempo.log@func", value.c_str());
     return tempoLog_FUNC_NONE;
 }
 
@@ -2952,11 +4156,12 @@ std::string AttConverter::TupletVisNumformatToStr(tupletVis_NUMFORMAT data) cons
     return value;
 }
 
-tupletVis_NUMFORMAT AttConverter::StrToTupletVisNumformat(std::string value) const
+tupletVis_NUMFORMAT AttConverter::StrToTupletVisNumformat(std::string value, bool logWarning) const
 {
     if (value == "count") return tupletVis_NUMFORMAT_count;
     if (value == "ratio") return tupletVis_NUMFORMAT_ratio;
-    LogWarning("Unsupported value '%s' for att.tuplet.vis@num.format", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.tuplet.vis@num.format", value.c_str());
     return tupletVis_NUMFORMAT_NONE;
 }
 
@@ -2964,8 +4169,8 @@ std::string AttConverter::TurnLogFormToStr(turnLog_FORM data) const
 {
     std::string value;
     switch (data) {
-        case turnLog_FORM_inv: value = "inv"; break;
-        case turnLog_FORM_norm: value = "norm"; break;
+        case turnLog_FORM_lower: value = "lower"; break;
+        case turnLog_FORM_upper: value = "upper"; break;
         default:
             LogWarning("Unknown value '%d' for att.turn.log@form", data);
             value = "";
@@ -2974,12 +4179,42 @@ std::string AttConverter::TurnLogFormToStr(turnLog_FORM data) const
     return value;
 }
 
-turnLog_FORM AttConverter::StrToTurnLogForm(std::string value) const
+turnLog_FORM AttConverter::StrToTurnLogForm(std::string value, bool logWarning) const
 {
-    if (value == "inv") return turnLog_FORM_inv;
-    if (value == "norm") return turnLog_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.turn.log@form", value.c_str());
+    if (value == "lower") return turnLog_FORM_lower;
+    if (value == "upper") return turnLog_FORM_upper;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.turn.log@form", value.c_str());
     return turnLog_FORM_NONE;
+}
+
+std::string AttConverter::VoltaGroupingSymVoltasymToStr(voltaGroupingSym_VOLTASYM data) const
+{
+    std::string value;
+    switch (data) {
+        case voltaGroupingSym_VOLTASYM_brace: value = "brace"; break;
+        case voltaGroupingSym_VOLTASYM_bracket: value = "bracket"; break;
+        case voltaGroupingSym_VOLTASYM_bracketsq: value = "bracketsq"; break;
+        case voltaGroupingSym_VOLTASYM_line: value = "line"; break;
+        case voltaGroupingSym_VOLTASYM_none: value = "none"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.voltaGroupingSym@voltasym", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+voltaGroupingSym_VOLTASYM AttConverter::StrToVoltaGroupingSymVoltasym(std::string value, bool logWarning) const
+{
+    if (value == "brace") return voltaGroupingSym_VOLTASYM_brace;
+    if (value == "bracket") return voltaGroupingSym_VOLTASYM_bracket;
+    if (value == "bracketsq") return voltaGroupingSym_VOLTASYM_bracketsq;
+    if (value == "line") return voltaGroupingSym_VOLTASYM_line;
+    if (value == "none") return voltaGroupingSym_VOLTASYM_none;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.voltaGroupingSym@voltasym", value.c_str());
+    return voltaGroupingSym_VOLTASYM_NONE;
 }
 
 std::string AttConverter::WhitespaceXmlspaceToStr(whitespace_XMLSPACE data) const
@@ -2996,11 +4231,12 @@ std::string AttConverter::WhitespaceXmlspaceToStr(whitespace_XMLSPACE data) cons
     return value;
 }
 
-whitespace_XMLSPACE AttConverter::StrToWhitespaceXmlspace(std::string value) const
+whitespace_XMLSPACE AttConverter::StrToWhitespaceXmlspace(std::string value, bool logWarning) const
 {
     if (value == "default") return whitespace_XMLSPACE_default;
     if (value == "preserve") return whitespace_XMLSPACE_preserve;
-    LogWarning("Unsupported value '%s' for att.whitespace@xml:space", value.c_str());
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.whitespace@xml:space", value.c_str());
     return whitespace_XMLSPACE_NONE;
 }
 

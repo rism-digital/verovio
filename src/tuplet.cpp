@@ -32,7 +32,7 @@ Tuplet::Tuplet()
     , ObjectListInterface()
     , AttColor()
     , AttDurationRatio()
-    , AttNumberplacement()
+    , AttNumberPlacement()
     , AttTupletVis()
 {
     RegisterAttClass(ATT_COLOR);
@@ -43,16 +43,14 @@ Tuplet::Tuplet()
     Reset();
 }
 
-Tuplet::~Tuplet()
-{
-}
+Tuplet::~Tuplet() {}
 
 void Tuplet::Reset()
 {
     LayerElement::Reset();
     ResetColor();
     ResetDurationRatio();
-    ResetNumberplacement();
+    ResetNumberPlacement();
     ResetTupletVis();
 }
 
@@ -103,9 +101,20 @@ void Tuplet::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Tuplet::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

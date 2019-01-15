@@ -9,6 +9,7 @@
 #define __VRV_MULTIREST_H__
 
 #include "atts_cmn.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {

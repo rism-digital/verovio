@@ -35,9 +35,7 @@ Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), Att
     Reset();
 }
 
-Slur::~Slur()
-{
-}
+Slur::~Slur() {}
 
 void Slur::Reset()
 {
@@ -45,6 +43,8 @@ void Slur::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetCurvature();
+
+    m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }
 
 void Slur::GetCrossStaffOverflows(
@@ -79,8 +79,9 @@ void Slur::GetCrossStaffOverflows(
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);
         endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
     }
-    else
+    else {
         endStaff = this->GetEnd()->GetCrossStaff(layer);
+    }
 
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
@@ -89,7 +90,10 @@ void Slur::GetCrossStaffOverflows(
     }
     if (!endStaff) {
         endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstParent(STAFF));
-        assert(endStaff);
+        // This happens with open-ended slurs ending on a right barline attr
+        if (!endStaff) {
+            endStaff = startStaff;
+        }
     }
 
     if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
@@ -97,6 +101,20 @@ void Slur::GetCrossStaffOverflows(
 
     if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
     if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Slur::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    ControlElement::ResetDrawing(functorParams);
+
+    m_drawingCurvedir = curvature_CURVEDIR_NONE;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

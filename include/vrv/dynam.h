@@ -20,7 +20,12 @@ class TextElement;
 // Dynam
 //----------------------------------------------------------------------------
 
-class Dynam : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class Dynam : public ControlElement,
+              public TextListInterface,
+              public TextDirInterface,
+              public TimeSpanningInterface,
+              public AttExtender,
+              public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -44,9 +49,9 @@ public:
     ///@}
 
     /**
-    * Add an element (text, rend. etc.) to a dynam.
-    * Only supported elements will be actually added to the child list.
-    */
+     * Add an element (text, rend. etc.) to a dynam.
+     * Only supported elements will be actually added to the child list.
+     */
     virtual void AddChild(Object *object);
 
     /**
@@ -59,6 +64,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::PrepareFloatingGrps
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
 protected:
     //

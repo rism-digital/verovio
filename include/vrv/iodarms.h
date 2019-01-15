@@ -15,6 +15,8 @@
 
 namespace vrv {
 
+#ifndef NO_DARMS_SUPPORT
+
 class Doc;
 class Layer;
 class Measure;
@@ -64,6 +66,8 @@ private:
 
     static pitchmap PitchMap[];
 };
+
+#endif /* NO_DARMS_SUPPORT */
 
 } // namespace vrv
 

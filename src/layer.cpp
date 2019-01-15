@@ -10,10 +10,13 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "attcomparison.h"
+#include "beam.h"
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
@@ -23,9 +26,10 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mrpt.h"
 #include "note.h"
-#include "rpt.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -35,9 +39,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer(int n)
-    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttCommon(), AttTyped(), AttVisibility()
+    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
 
@@ -65,11 +69,27 @@ void Layer::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
-    ResetCommon();
+    ResetNInteger();
     ResetTyped();
     ResetVisibility();
 
     ResetStaffDefObjects();
+
+    m_drawingStemDir = STEMDIRECTION_NONE;
+}
+
+void Layer::CopyReset()
+{
+    m_drawKeySigCancellation = false;
+    m_staffDefClef = NULL;
+    m_staffDefKeySig = NULL;
+    m_staffDefMensur = NULL;
+    m_staffDefMeterSig = NULL;
+    m_drawCautionKeySigCancel = false;
+    m_cautionStaffDefClef = NULL;
+    m_cautionStaffDefKeySig = NULL;
+    m_cautionStaffDefMensur = NULL;
+    m_cautionStaffDefMeterSig = NULL;
 
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
@@ -190,6 +210,91 @@ int Layer::GetClefLocOffset(LayerElement *test)
     return clef->GetClefLocOffset();
 }
 
+data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
+{
+    assert(element);
+
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    assert(measure);
+
+    // First check if there is any <space> in the measure - if not we can return the layer stem direction
+    if (!measure->FindChildByType(SPACE)) {
+        return m_drawingStemDir;
+    }
+
+    Alignment *alignment = element->GetAlignment();
+    assert(alignment);
+
+    Layer *layer = NULL;
+    Staff *staff = element->GetCrossStaff(layer);
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    }
+    // At this stage we have the parent or the cross-staff
+    assert(staff);
+
+    return GetDrawingStemDir(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+}
+
+data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coords)
+{
+    assert(!coords->empty());
+
+    // Adjust the x position of the first and last element for taking into account the stem width
+    LayerElement *first = dynamic_cast<LayerElement *>(coords->front()->m_element);
+    LayerElement *last = dynamic_cast<LayerElement *>(coords->back()->m_element);
+
+    if (!first || !last) {
+        return m_drawingStemDir;
+    }
+
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    assert(measure);
+
+    // First check if there is any <space> in the measure - if not we can return the layer stem direction
+    if (!measure->FindChildByType(SPACE)) {
+        return m_drawingStemDir;
+    }
+
+    Alignment *alignmentFirst = first->GetAlignment();
+    assert(alignmentFirst);
+    Alignment *alignmentLast = last->GetAlignment();
+    assert(alignmentLast);
+
+    // We are ignoring cross-staff situation here because this should not be called if we have one
+    Staff *staff = dynamic_cast<Staff *>(first->GetFirstParent(STAFF));
+    assert(staff);
+
+    double time = alignmentFirst->GetTime();
+    double duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();
+    duration = durRound(duration);
+
+    return GetDrawingStemDir(time, duration, measure, staff->GetN());
+}
+
+data_STEMDIRECTION Layer::GetDrawingStemDir(double time, double duration, Measure *measure, int staff)
+{
+    assert(measure);
+
+    Functor findSpaceInAlignment(&Object::FindSpaceInReferenceAlignments);
+    FindSpaceInAlignmentParams findSpaceInAlignmentParams(
+        GetCurrentMeterSig(), GetCurrentMensur(), &findSpaceInAlignment);
+    findSpaceInAlignmentParams.m_time = time;
+    findSpaceInAlignmentParams.m_duration = duration;
+
+    ArrayOfComparisons filters;
+    AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
+    filters.push_back(&matchStaff);
+
+    measure->m_measureAligner.Process(&findSpaceInAlignment, &findSpaceInAlignmentParams, NULL, &filters);
+
+    if (findSpaceInAlignmentParams.m_success && (findSpaceInAlignmentParams.m_layerCount < 3)) {
+        return STEMDIRECTION_NONE;
+    }
+
+    return m_drawingStemDir;
+}
+
 Clef *Layer::GetCurrentClef() const
 {
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
@@ -288,12 +393,75 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 // Layer functor methods
 //----------------------------------------------------------------------------
 
+int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    params->m_contentLayer = this;
+
+    params->m_targetLayer = new Layer(*this);
+    params->m_targetLayer->CopyReset();
+    // Keep the xml:id of the layer in the first segment
+    params->m_targetLayer->SwapUuid(this);
+    assert(params->m_targetStaff);
+    params->m_targetStaff->AddChild(params->m_targetLayer);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    if (params->m_contentLayer == NULL) {
+        params->m_contentLayer = this;
+    }
+    else {
+        params->m_contentLayer->MoveChildrenFrom(this);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     ResetStaffDefObjects();
 
     return FUNCTOR_CONTINUE;
-};
+}
+
+int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    if (this->GetStaffDefClef()) {
+        GetStaffDefClef()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefKeySig()) {
+        GetStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefMensur()) {
+        GetStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefMeterSig()) {
+        GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+    }
+
+    if (this->GetCautionStaffDefClef()) {
+        GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefKeySig()) {
+        GetCautionStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefMensur()) {
+        GetCautionStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefMeterSig()) {
+        GetCautionStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Layer::AlignHorizontally(FunctorParams *functorParams)
 {
@@ -308,9 +476,9 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     params->m_time = DUR_MAX * -1.0;
 
     if (params->m_isFirstMeasure)
-        params->m_scoreDefRole = SYSTEM_SCOREDEF;
+        params->m_scoreDefRole = SCOREDEF_SYSTEM;
     else
-        params->m_scoreDefRole = INTERMEDIATE_SCOREDEF;
+        params->m_scoreDefRole = SCOREDEF_INTERMEDIATE;
 
     if (this->GetStaffDefClef()) {
         GetStaffDefClef()->AlignHorizontally(params);
@@ -325,7 +493,7 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
         GetStaffDefMeterSig()->AlignHorizontally(params);
     }
 
-    params->m_scoreDefRole = NONE;
+    params->m_scoreDefRole = SCOREDEF_NONE;
 
     // Now we have to set it to 0.0 since we will start aligning muscial content
     params->m_time = 0.0;
@@ -338,7 +506,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    params->m_scoreDefRole = CAUTIONARY_SCOREDEF;
+    params->m_scoreDefRole = SCOREDEF_CAUTIONARY;
     params->m_time = params->m_measureAligner->GetMaxTime();
 
     if (this->GetCautionStaffDefClef()) {
@@ -354,14 +522,18 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
         GetCautionStaffDefMeterSig()->AlignHorizontally(params);
     }
 
-    params->m_scoreDefRole = NONE;
+    params->m_scoreDefRole = SCOREDEF_NONE;
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
 
     int i;
-    for (i = 0; i < params->m_measureAligner->GetChildCount(); i++) {
+    for (i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
         Alignment *alignment = dynamic_cast<Alignment *>(params->m_measureAligner->GetChild(i));
         assert(alignment);
-        if (alignment->HasGraceAligner()) {
-            alignment->GetGraceAligner()->AlignStack();
+        if (alignment->HasGraceAligner(graceAlignerId)) {
+            alignment->GetGraceAligner(graceAlignerId)->AlignStack();
         }
     }
 
@@ -395,11 +567,8 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::CalcStem(FunctorParams *functorParams)
+int Layer::CalcStem(FunctorParams *)
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
     // setting the layer stem direction
     if (this->GetParent()->GetChildCount(LAYER) > 1) {
         if (this->GetParent()->FindChildByType(LAYER) == this) {
@@ -413,25 +582,16 @@ int Layer::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::AdjustSylSpacing(FunctorParams *functorParams)
+int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // reset it
-    params->m_overlapingSyl.clear();
-    params->m_previousSyl = NULL;
+    params->m_currentScoreTime = 0.0;
+    params->m_currentRealTimeSeconds = 0.0;
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::CalcMaxMeasureDuration(FunctorParams *functorParams)
-{
-    CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    // reset it
-    params->m_currentValue = 0.0;
+    params->m_currentMensur = GetCurrentMensur();
+    params->m_currentMeterSig = GetCurrentMeterSig();
 
     return FUNCTOR_CONTINUE;
 }

@@ -40,6 +40,15 @@ public:
     ///@}
 
     /**
+     * @name Getter, setter and checker for the drawing curve direction
+     */
+    ///@{
+    curvature_CURVEDIR GetDrawingCurvedir() const { return m_drawingCurvedir; }
+    void SetDrawingCurvedir(curvature_CURVEDIR curvedir) { m_drawingCurvedir = curvedir; }
+    bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
+    ///@}
+
+    /**
      * Check if the slur needs to be taken into account as overflow above or below in case of cross-staff end points.
      * This methods assumes staff@n to be greater for the staff below.
      */
@@ -50,11 +59,24 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 public:
     //
 private:
+    /**
+     * The drawing curve direction.
+     * This is calculated only when start - end points are on the same system. Otherwise
+     * it is left unset. This also means that it is reset only in ResetDrawing and not when
+     * the alignment is reset. The reason is because we want to preserve the value when the
+     * document is cast-off.
+     */
+    curvature_CURVEDIR m_drawingCurvedir;
 };
 
 } // namespace vrv

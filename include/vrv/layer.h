@@ -17,6 +17,7 @@ namespace vrv {
 class Clef;
 class DeviceContext;
 class LayerElement;
+class Measure;
 class Note;
 class StaffDef;
 
@@ -28,11 +29,11 @@ class StaffDef;
  * This class represents a layer in a laid-out score (Doc).
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
-*/
+ */
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
-              public AttCommon,
+              public AttNInteger,
               public AttTyped,
               public AttVisibility {
 public:
@@ -47,6 +48,16 @@ public:
     virtual std::string GetClassName() const { return "Layer"; }
     virtual ClassId GetClassId() const { return LAYER; }
     ///@}
+
+    /**
+     * Do not copy children for layers
+     */
+    virtual bool CopyChildren() const { return false; }
+
+    /**
+     * Overriding CopyReset() method to be called after copy / assignment calls.
+     */
+    virtual void CopyReset();
 
     /**
      * @name Methods for adding allowed content
@@ -85,7 +96,9 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
-    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
+    data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
+    data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
+    data_STEMDIRECTION GetDrawingStemDir(double time, double duration, Measure *measure, int staff);
     ///@}
 
     Clef *GetCurrentClef() const;
@@ -130,9 +143,24 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
      * See Object::AlignHorizontally
@@ -157,16 +185,14 @@ public:
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    virtual int CalcStem(FunctorParams *);
 
     /**
-     * See Object::AdjustSylSpacing
+     * See Object::CalcOnsetOffset
      */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
-    /**
-     * See Object::CalcMaxMeasureDuration
-     */
-    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    ///@}
 
 private:
     //

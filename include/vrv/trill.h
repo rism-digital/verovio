@@ -19,10 +19,13 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <trill> element.
+ */
 class Trill : public ControlElement,
-              public TimePointInterface,
+              public TimeSpanningInterface,
               public AttColor,
-              public AttOrnamentaccid,
+              public AttOrnamentAccid,
               public AttPlacement {
 public:
     /**
@@ -42,6 +45,7 @@ public:
      */
     ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     //----------//

@@ -27,25 +27,25 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttNotationtype
+// AttNotationType
 //----------------------------------------------------------------------------
 
-AttNotationtype::AttNotationtype() : Att()
+AttNotationType::AttNotationType() : Att()
 {
-    ResetNotationtype();
+    ResetNotationType();
 }
 
-AttNotationtype::~AttNotationtype()
+AttNotationType::~AttNotationType()
 {
 }
 
-void AttNotationtype::ResetNotationtype()
+void AttNotationType::ResetNotationType()
 {
     m_notationtype = NOTATIONTYPE_NONE;
     m_notationsubtype = "";
 }
 
-bool AttNotationtype::ReadNotationtype(pugi::xml_node element)
+bool AttNotationType::ReadNotationType(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("notationtype")) {
@@ -61,7 +61,7 @@ bool AttNotationtype::ReadNotationtype(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttNotationtype::WriteNotationtype(pugi::xml_node element)
+bool AttNotationType::WriteNotationType(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasNotationtype()) {
@@ -75,12 +75,12 @@ bool AttNotationtype::WriteNotationtype(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttNotationtype::HasNotationtype() const
+bool AttNotationType::HasNotationtype() const
 {
     return (m_notationtype != NOTATIONTYPE_NONE);
 }
 
-bool AttNotationtype::HasNotationsubtype() const
+bool AttNotationType::HasNotationsubtype() const
 {
     return (m_notationsubtype != "");
 }
@@ -90,7 +90,7 @@ bool AttNotationtype::HasNotationsubtype() const
 bool Att::SetMei(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
-        AttNotationtype *att = dynamic_cast<AttNotationtype *>(element);
+        AttNotationType *att = dynamic_cast<AttNotationType *>(element);
         assert(att);
         if (attrType == "notationtype") {
             att->SetNotationtype(att->StrToNotationtype(attrValue));
@@ -108,7 +108,7 @@ bool Att::SetMei(Object *element, std::string attrType, std::string attrValue)
 void Att::GetMei(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
-        const AttNotationtype *att = dynamic_cast<const AttNotationtype *>(element);
+        const AttNotationType *att = dynamic_cast<const AttNotationType *>(element);
         assert(att);
         if (att->HasNotationtype()) {
             attributes->push_back(std::make_pair("notationtype", att->NotationtypeToStr(att->GetNotationtype())));

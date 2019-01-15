@@ -61,13 +61,13 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
-KeySig::KeySig() : LayerElement("ksig-"), AttAccidental(), AttPitch()
+KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch()
 {
     Init();
 }
 
-KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType)
-    : LayerElement("ksig-"), AttAccidental(), AttPitch()
+KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType)
+    : LayerElement("keysig-"), AttAccidental(), AttPitch()
 {
     Init();
 
@@ -75,7 +75,7 @@ KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType)
     m_alterationType = alterationType;
 }
 
-KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("ksig-"), AttAccidental(), AttPitch()
+KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("keysig-"), AttAccidental(), AttPitch()
 {
     Init();
 
@@ -93,17 +93,20 @@ KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("ksig-"), Att
         return;
     }
     if (key > 0) {
-        m_alterationType = ACCIDENTAL_EXPLICIT_s;
+        m_alterationType = ACCIDENTAL_WRITTEN_s;
     }
     else if (key < 0) {
-        m_alterationType = ACCIDENTAL_EXPLICIT_f;
+        m_alterationType = ACCIDENTAL_WRITTEN_f;
+    }
+    else {
+        m_alterationType = ACCIDENTAL_WRITTEN_n;
     }
     m_alterationNumber = abs(key);
 
-    if (keySigAttr->GetKeySigShow() == BOOLEAN_false) {
+    if (keySigAttr->GetKeysigShow() == BOOLEAN_false) {
         m_drawingShow = false;
     }
-    if (keySigAttr->GetKeySigShowchange() == BOOLEAN_true) {
+    if (keySigAttr->GetKeysigShowchange() == BOOLEAN_true) {
         m_drawingShowchange = true;
     }
 }
@@ -116,9 +119,7 @@ void KeySig::Init()
     Reset();
 }
 
-KeySig::~KeySig()
-{
-}
+KeySig::~KeySig() {}
 
 void KeySig::Reset()
 {
@@ -127,10 +128,10 @@ void KeySig::Reset()
     ResetPitch();
 
     m_alterationNumber = 0;
-    m_alterationType = ACCIDENTAL_EXPLICIT_NONE;
+    m_alterationType = ACCIDENTAL_WRITTEN_NONE;
 
     // key change drawing values
-    m_drawingCancelAccidType = ACCIDENTAL_EXPLICIT_n;
+    m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
     m_drawingShow = true;
     m_drawingShowchange = false;
@@ -139,8 +140,8 @@ void KeySig::Reset()
 void KeySig::ConvertToInternal()
 {
     int i;
-    if (this->GetAccid() == ACCIDENTAL_EXPLICIT_s) {
-        m_alterationType = ACCIDENTAL_EXPLICIT_s;
+    if (this->GetAccid() == ACCIDENTAL_WRITTEN_s) {
+        m_alterationType = ACCIDENTAL_WRITTEN_s;
         for (i = 0; i < 7; i++) {
             if (KeySig::sharps[i] == this->GetPname()) {
                 m_alterationNumber = i + 1;
@@ -148,8 +149,8 @@ void KeySig::ConvertToInternal()
             }
         }
     }
-    else if (this->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
-        m_alterationType = ACCIDENTAL_EXPLICIT_f;
+    else if (this->GetAccid() == ACCIDENTAL_WRITTEN_f) {
+        m_alterationType = ACCIDENTAL_WRITTEN_f;
         for (i = 0; i < 7; i++) {
             if (KeySig::flats[i] == this->GetPname()) {
                 m_alterationNumber = i + 1;
@@ -165,12 +166,12 @@ void KeySig::ConvertToMei()
 {
     if ((m_alterationNumber < 1) || (m_alterationNumber > 7)) return;
 
-    if (m_alterationType == ACCIDENTAL_EXPLICIT_s) {
-        this->SetAccid(ACCIDENTAL_EXPLICIT_s);
+    if (m_alterationType == ACCIDENTAL_WRITTEN_s) {
+        this->SetAccid(ACCIDENTAL_WRITTEN_s);
         this->SetPname(KeySig::sharps[m_alterationNumber - 1]);
     }
-    else if (m_alterationType == ACCIDENTAL_EXPLICIT_f) {
-        this->SetAccid(ACCIDENTAL_EXPLICIT_f);
+    else if (m_alterationType == ACCIDENTAL_WRITTEN_f) {
+        this->SetAccid(ACCIDENTAL_WRITTEN_f);
         this->SetPname(KeySig::flats[m_alterationNumber - 1]);
     }
     else
@@ -180,7 +181,7 @@ void KeySig::ConvertToMei()
 data_KEYSIGNATURE KeySig::ConvertToKeySigLog()
 {
     char key = m_alterationNumber;
-    if (m_alterationType == ACCIDENTAL_EXPLICIT_f) key = -key;
+    if (m_alterationType == ACCIDENTAL_WRITTEN_f) key = -key;
     return (data_KEYSIGNATURE)(key + KEYSIGNATURE_0);
 }
 
@@ -188,13 +189,13 @@ data_KEYSIGNATURE KeySig::ConvertToKeySigLog()
 // Static methods
 //----------------------------------------------------------------------------
 
-data_PITCHNAME KeySig::GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, int pos)
+data_PITCHNAME KeySig::GetAlterationAt(data_ACCIDENTAL_WRITTEN alterationType, int pos)
 {
     data_PITCHNAME *alteration_set;
 
     if (pos > 6) return PITCHNAME_c;
 
-    if (alterationType == ACCIDENTAL_EXPLICIT_f)
+    if (alterationType == ACCIDENTAL_WRITTEN_f)
         alteration_set = flats;
     else
         alteration_set = sharps;
@@ -202,12 +203,12 @@ data_PITCHNAME KeySig::GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, 
     return alteration_set[pos];
 }
 
-int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, Clef *clef)
+int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef)
 {
     int alter_set = 0; // flats
     int key_set = 0;
 
-    if (alterationType == ACCIDENTAL_EXPLICIT_s) alter_set = 1;
+    if (alterationType == ACCIDENTAL_WRITTEN_s) alter_set = 1;
 
     int shapeLine = 0;
     shapeLine = clef->GetShape() << 8 | clef->GetLine();
@@ -227,9 +228,7 @@ int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pi
 
         case (CLEFSHAPE_F << 8 | 3): key_set = 6; break;
         case (CLEFSHAPE_F << 8 | 4): key_set = 7; break;
-        case (CLEFSHAPE_F << 8 | 5):
-            key_set = 8;
-            break;
+        case (CLEFSHAPE_F << 8 | 5): key_set = 8; break;
 
         // does not really exist but just to make it somehow aligned with the clef
         case (CLEFSHAPE_F << 8 | 1): key_set = 8; break;
@@ -243,9 +242,9 @@ int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pi
     int disPlace = 0;
     if (clef->GetDis() != OCTAVE_DIS_NONE) {
         // DIS 22 not supported
-        if (clef->GetDisPlace() == PLACE_above)
+        if (clef->GetDisPlace() == STAFFREL_basic_above)
             disPlace = (clef->GetDis() == OCTAVE_DIS_8) ? -1 : -2;
-        else if (clef->GetDisPlace() == PLACE_below)
+        else if (clef->GetDisPlace() == STAFFREL_basic_below)
             disPlace = (clef->GetDis() == OCTAVE_DIS_8) ? 1 : 2;
     }
 

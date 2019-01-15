@@ -38,7 +38,6 @@ typedef std::vector<Note *> ChordCluster;
 /**
  * This class models the MEI <note> element.
  */
-
 class Note : public LayerElement,
              public StemmedDrawingInterface,
              public DurationInterface,
@@ -46,12 +45,12 @@ class Note : public LayerElement,
              public PositionInterface,
              public AttColor,
              public AttColoration,
+             public AttCue,
              public AttGraced,
-             public AttNoteLogMensural,
-             public AttRelativesize,
+             public AttNoteAnlMensural,
              public AttStems,
              public AttStemsCmn,
-             public AttTiepresent,
+             public AttTiePresent,
              public AttVisibility {
 public:
     /**
@@ -78,8 +77,11 @@ public:
     }
     ///@}
 
-    /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    /**
+     * Override the method since alignment is required.
+     * For notes we want not to align notes within a ligature (except first and last)
+     */
+    virtual bool HasToBeAligned() const;
 
     /**
      * Add an element (a verse or an accid) to a note.
@@ -92,9 +94,6 @@ public:
      */
     ///@{
     Accid *GetDrawingAccid();
-    void ResetDrawingTieAttr();
-    void SetDrawingTieAttr();
-    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
     /**
@@ -138,11 +137,6 @@ public:
     ///}
 
     /**
-     * Get the drawing radius of the note head taking into accound the note duration
-     */
-    int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
-
-    /**
      * Returns a single integer representing pitch and octave.
      */
     int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
@@ -152,8 +146,8 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
     ///@}
 
     /**
@@ -161,9 +155,38 @@ public:
      */
     wchar_t GetMensuralSmuflNoteHead();
 
+    /**
+     * Check if a note or its parent chord are visible
+     */
+    bool IsVisible();
+
+    /**
+     * MIDI timing information
+     */
+    ///@{
+    void SetScoreTimeOnset(double scoreTime);
+    void SetRealTimeOnsetSeconds(double timeInSeconds);
+    void SetScoreTimeOffset(double scoreTime);
+    void SetRealTimeOffsetSeconds(double timeInSeconds);
+    void SetScoreTimeTiedDuration(double timeInSeconds);
+    void SetMIDIPitch(char pitch);
+    double GetScoreTimeOnset();
+    int GetRealTimeOnsetMilliseconds();
+    double GetScoreTimeOffset();
+    double GetScoreTimeTiedDuration();
+    int GetRealTimeOffsetMilliseconds();
+    double GetScoreTimeDuration();
+    char GetMIDIPitch();
+    ///@}
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem
@@ -186,14 +209,9 @@ public:
     virtual int CalcLedgerLines(FunctorParams *functorParams);
 
     /**
-    * See Object::PrepareLayerElementParts
-    */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTieAttr
+     * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareLyrics
@@ -206,11 +224,6 @@ public:
     virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
-
-    /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
@@ -220,20 +233,21 @@ public:
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
+    /**
+     * See Object::GenerateTimemap
+     */
+    virtual int GenerateTimemap(FunctorParams *functorParams);
+
 private:
     //
 public:
-    double m_playingOnset;
-    double m_playingOffset;
-
+    //
 private:
-    /**
-     * Tie attributes are represented a pointers to Tie objects.
-     * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and takes care of deleting it
-     */
-    Tie *m_drawingTieAttr;
-
     /**
      * The drawing location of the note
      */
@@ -253,6 +267,47 @@ private:
      * Position in the cluster (1-indexed position in said cluster; 0 if does not have position)
      */
     int m_clusterPosition;
+
+    /**
+     * The score-time onset of the note in the measure (duration from the start of measure in
+     * quarter notes).
+     */
+    double m_scoreTimeOnset;
+
+    /**
+     * The score-time off-time of the note in the measure (duration from the start of the measure
+     * in quarter notes).  This is the duration of the printed note.  If the note is the start of
+     * a tied group, the score time of the tied group is this variable plus m_scoreTimeTiedDuration.
+     * If this note is a secondary note in a tied group, then this value is the score time end
+     * of the printed note, and the m_scoreTimeTiedDuration is -1.0 to indicate that it should not
+     * be exported when creating a MIDI file.
+     */
+    double m_scoreTimeOffset;
+
+    /**
+     * The time in milliseconds since the start of the measure element that contains the note.
+     */
+    int m_realTimeOnsetMilliseconds;
+
+    /**
+     * The time in milliseconds since the start of the measure element to end of printed note.
+     * The real-time duration of a tied group is not currently tracked (this gets complicated
+     * if there is a tempo change during a note sustain, which is currently not supported).
+     */
+    int m_realTimeOffsetMilliseconds;
+
+    /**
+     * If the note is the first in a tied group, then m_scoreTimeTiedDuration contains the
+     * score-time duration (in quarter notes) of all tied notes in the group after this note.
+     * If the note is a secondary note in a tied group, then this variable is set to -1.0 to
+     * indicate that it should not be written to MIDI output.
+     */
+    double m_scoreTimeTiedDuration;
+
+    /**
+     * The MIDI pitch of the note.
+     */
+    char m_MIDIPitch;
 };
 
 //----------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #ifndef __VRV_SCORE_H__
 #define __VRV_SCORE_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -21,20 +22,27 @@ namespace vrv {
  * It is used only for loading score-based MEI documents before they are
  * converted to page-based MEI.
  */
-class Score : public Object {
+class Score : public Object, public AttLabelled, public AttNNumberLike {
 
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
     Score();
     virtual ~Score();
-    virtual ClassId GetClassId() const { return SCORE; }
-
-    virtual void AddChild(Object *object);
-
-    /*
-     * Clear the content of the score.
-     */
     virtual void Reset();
+    virtual std::string GetClassName() const { return "Score"; }
+    virtual ClassId GetClassId() const { return SCORE; }
+    ///@}
+
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    virtual void AddChild(Object *object);
+    ///@}
 
     //----------//
     // Functors //
