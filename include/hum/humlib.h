@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jan 11 04:50:39 EST 2019
+// Last Modified: Mon Jan 14 20:43:44 PST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1237,6 +1237,7 @@ class HumdrumToken : public std::string, public HumHash {
 		int      hasCautionaryAccidental   (int subtokenIndex) const;
 		bool     hasLigatureBegin          (void);
 		bool     hasLigatureEnd            (void);
+		char     hasStemDirection          (void);
 
 		HumNum   getDuration               (void) const;
 		HumNum   getDuration               (HumNum scale) const;
@@ -2668,13 +2669,14 @@ class Convert {
 
 		// data-type specific (other than pitch/rhythm),
 		// defined in Convert-kern.cpp
-		static bool isKernRest              (const std::string& kerndata);
-		static bool isKernNote              (const std::string& kerndata);
-		static bool isKernNoteAttack        (const std::string& kerndata);
-		static bool hasKernSlurStart        (const std::string& kerndata);
-		static bool hasKernSlurEnd          (const std::string& kerndata);
-		static int  getKernSlurStartElisionLevel(const std::string& kerndata, int index);
-		static int  getKernSlurEndElisionLevel  (const std::string& kerndata, int index);
+		static bool isKernRest              (const string& kerndata);
+		static bool isKernNote              (const string& kerndata);
+		static bool isKernNoteAttack        (const string& kerndata);
+		static bool hasKernSlurStart        (const string& kerndata);
+		static bool hasKernSlurEnd          (const string& kerndata);
+		static int  getKernSlurStartElisionLevel(const string& kerndata, int index);
+		static int  getKernSlurEndElisionLevel  (const string& kerndata, int index);
+		static char hasKernStemDirection    (const string& kerndata);
 
 		static bool isKernSecondaryTiedNote (const std::string& kerndata);
 		static std::string getKernPitchAttributes(const std::string& kerndata);

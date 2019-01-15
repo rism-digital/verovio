@@ -284,6 +284,7 @@ namespace humaux {
     StaffStateVariables::StaffStateVariables()
     {
         cue_size.resize(100);
+        stem_type.resize(100);
         clear();
     }
     StaffStateVariables::~StaffStateVariables() { clear(); }
@@ -314,6 +315,7 @@ namespace humaux {
         meter_bottom = 4;
         meter_top = 4;
         std::fill(cue_size.begin(), cue_size.end(), false);
+        std::fill(stem_type.begin(), stem_type.end(), 'X');
     }
 
 } // end namespace humaux
@@ -2629,8 +2631,6 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string metersig;
     int top = 0;
     int bot = 0;
-    pair<int, hum::HTp> oclef;
-    pair<int, hum::HTp> omet;
 
     hum::HumRegex hre;
     hum::HTp part = partstart;
@@ -4872,6 +4872,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 popElementStack(elements, pointers);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
+                assignAutomaticStem(chord, layerdata[i], staffindex);
                 addArticulations(chord, layerdata[i]);
                 addOrnaments(chord, layerdata[i]);
                 addArpeggio(chord, layerdata[i]);
@@ -4988,6 +4989,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             convertNote(note, layerdata[i], 0, staffindex);
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
+            assignAutomaticStem(note, layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
@@ -5044,6 +5046,30 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::assignAutomaticStem --
+//   X = no automatic stem assignment
+//   x = no no stem
+//   \ = stem down
+//   / = stem up
+//
+
+template <class ELEMENT> void HumdrumInput::assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex)
+{
+    char value = m_staffstates.at(staffindex).stem_type.at(m_currentlayer);
+    if (value != 'X') {
+        char hasstem = tok->hasStemDirection();
+        if (!hasstem) {
+            switch (value) {
+                case '/': element->SetStemDir(STEMDIRECTION_up); break; // force stem up
+                case '\\': element->SetStemDir(STEMDIRECTION_down); break; // force stem down
+                case 'x': element->SetStemLen(0); break; // force no stem
+            }
+        }
+    }
 }
 
 //////////////////////////////
@@ -8937,6 +8963,11 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //    *Xkcancel    = do not display cancellation key signatures (default)
 //    *2\right     = place stems on right side of half notes when stem is down.
 //    *2\left      = place stems on left side of half notes when stem is down.
+//    *stem:       = automatic assignment of stems if there are no stems on the note already.
+//       *stem:X   = no automatic assignment
+//       *stem:x   = no stem
+//       *stem:/   = no stem up
+//       *stem:\   = no stem down
 //
 
 void HumdrumInput::handleStaffStateVariables(hum::HTp token)
@@ -8971,6 +9002,22 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
     else if (value == "*cue") {
         ss[staffindex].cue_size.at(layernum) = true;
+    }
+
+    if (value.substr(0, 5) == "*stem") {
+        string ending = value.substr(6);
+        if (ending == "x") {
+            ss[staffindex].stem_type.at(layernum) = 'x';
+        }
+        else if (ending == "/") {
+            ss[staffindex].stem_type.at(layernum) = '/';
+        }
+        else if (ending == "\\") {
+            ss[staffindex].stem_type.at(layernum) = '\\';
+        }
+        else {
+            ss[staffindex].stem_type.at(layernum) = 'X';
+        }
     }
 
     if (value == "*2\\left") {

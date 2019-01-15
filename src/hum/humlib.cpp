@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jan 11 04:50:39 EST 2019
+// Last Modified: Mon Jan 14 20:43:44 PST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -675,6 +675,26 @@ string Convert::getKernPitchAttributes(const string& kerndata) {
 	}
 
 	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::hasKernStemDirection -- Returns true if a stem direction in data; otherwise,
+//    return false.  If true, then '/' means stem up, and '\\' means stem down.
+//
+
+char Convert::hasKernStemDirection(const string& kerndata) {
+	for (int i=0; i<(int)kerndata.size(); i++) {
+		if (kerndata[i] == '/') {
+			return '/';
+		}
+		if (kerndata[i] == '\\') {
+			return '\\';
+		}
+	}
+	return '\0';
 }
 
 
@@ -14270,10 +14290,8 @@ bool HumdrumFileBase::adjustSpines(HumdrumLine& line, vector<string>& datatype,
 					break;
 				}
 			}
-			newinfo.resize(newtype.size() + 1);
-			newinfo.back() = getMergedSpineInfo(sinfo, i, mergecount);
-			newtype.resize(newtype.size() + 1);
-			newtype.back() = datatype[i];
+			newinfo.emplace_back(getMergedSpineInfo(sinfo, i, mergecount));
+			newtype.push_back(datatype[i]);
 			i += mergecount;
 		} else if (line.token(i)->isAddInterpretation()) {
 			newtype.resize(newtype.size() + 1);
@@ -14362,7 +14380,10 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 	string output;
 	int len1;
 	int len2;
-	if (extra == 1) {
+	if (extra < 1) {
+		// Strange if get here.
+		return info[starti];
+	} else if (extra == 1) {
 		len1 = (int)info[starti].size();
 		len2 = (int)info[starti+1].size();
 		if (len1 == len2) {
@@ -14375,9 +14396,53 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 		output = info[starti] + " " + info[starti+1];
 		return output;
 	}
-	output = info[starti];
-	for (int i=0; i<extra; i++) {
-		output += " " + info[starti+1+extra];
+	// Generalized code for simplifying up to 4 subspines at once.
+	// Not fully generlized so that the subspines will always be
+	// simplified if not merged in a simple way, though.
+	vector<string> newinfo;
+	int i;
+	for (i=0; i<=extra; i++) {
+		newinfo.push_back(info.at(starti+i));
+	}
+	for (i=1; i<(int)newinfo.size(); i++) {
+		int len1 = (int)newinfo[i-1].size();
+		int len2 = (int)newinfo[i].size();
+		if (len1 != len2) {
+			continue;
+		}
+		if (newinfo[i-1].compare(0, len1-1, newinfo[i], 0, len2-1) == 0) {
+			newinfo[i-1] = "";
+			newinfo[i] = newinfo[i].substr(1, len2-3);
+		}
+	}
+	vector<string> newinfo2;
+	for (i=0; i<(int)newinfo.size(); i++) {
+		if (newinfo[i].empty()) {
+			continue;
+		}
+		newinfo2.push_back(newinfo[i]);
+	}
+	for (i=1; i<(int)newinfo2.size(); i++) {
+		int len1 = (int)newinfo2[i-1].size();
+		int len2 = (int)newinfo2[i].size();
+		if (len1 != len2) {
+			continue;
+		}
+		if (newinfo2[i-1].compare(0, len1-1, newinfo2[i], 0, len2-1) == 0) {
+			newinfo2[i-1] = "";
+			newinfo2[i] = newinfo2[i].substr(1, len2-3);
+		}
+	}
+	newinfo.resize(0);
+	for (i=0; i<(int)newinfo2.size(); i++) {
+		if (newinfo2[i].empty()) {
+			continue;
+		}
+		newinfo.push_back(newinfo2[i]);
+	}
+	output = newinfo[0];
+	for (int i=1; i<(int)newinfo.size(); i++) {
+		output += " " + info.at(i);
 	}
 	return output;
 }
@@ -22497,6 +22562,21 @@ bool HumdrumToken::hasLigatureBegin(void) {
 	}
 }
 
+
+
+//////////////////////////////
+//
+// HumdrumToken::hasStemDirection --
+//
+
+char HumdrumToken::hasStemDirection(void) {
+	if (isKern()) {
+		return Convert::hasKernStemDirection(*this);
+	} else {
+		// don't know what a stem in this datatype is
+		return '\0';
+	}
+}
 
 
 //////////////////////////////
@@ -31962,6 +32042,7 @@ void Tool_chord::minimizeChordPitches(vector<string>& notes,
 	}
 	if (hre.search(notes[pitches[0].second], "([\\\\/])")) {
 		firststem = hre.getMatch(1);
+		hre.replaceDestructive(firststem, "\\\\", "\\", "g");
 	}
 
 	for (int i=1; i<(int)pitches.size(); i++) {

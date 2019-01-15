@@ -161,6 +161,14 @@ namespace humaux {
         // layers.
         vector<bool> cue_size;
 
+        // stem_type == keeps track of what type of stem to automatically
+	// add to a note/chord.  The states are:
+	// '\' == down stem
+	// '/' == up stem
+	// 'x' == no stem
+	// 'X' == no automatic assignments (assignment will be done automatically by verovio).
+        vector<char> stem_type;
+
         // righthalfstem == true means to place half-note stems always on right side
         // of noteheads.  False is standard modern style.
         bool righthalfstem;
@@ -495,6 +503,7 @@ protected:
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
     template <class ELEMENT> void setN(ELEMENT element, int nvalue);
+    template <class ELEMENT> void assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
