@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan 14 20:43:44 PST 2019
+// Last Modified: Wed Jan 16 14:52:45 EST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3691,6 +3691,10 @@ void GridMeasure::addLayoutParameter(GridSlice* slice, int partindex, const stri
 		if ((*previous)->isLayoutSlice()) {
 			part = (*previous)->at(partindex);
 			staff = part->at(0);
+			if (staff->size() == 0) {
+				GridVoice* v = new GridVoice;
+				staff->push_back(v);
+			}
 			voice = staff->at(0);
 			if (voice) {
 				if (voice->getToken() == NULL) {
@@ -3719,6 +3723,10 @@ void GridMeasure::addLayoutParameter(GridSlice* slice, int partindex, const stri
 	newslice->initializeBySlice(*iter);
 	this->insert(insertpoint, newslice);
 	HTp newtoken = new HumdrumToken(locomment);
+	if (newslice->at(partindex)->at(0)->size() == 0) {
+		GridVoice* v = new GridVoice;
+		newslice->at(partindex)->at(0)->push_back(v);
+	}
 	newslice->at(partindex)->at(0)->at(0)->setToken(newtoken);
 }
 
@@ -4588,7 +4596,6 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 						line->appendToken(token);
 					}
 				}
-
 			}
 
 			if (!this->hasSpines()) {
@@ -6382,6 +6389,15 @@ void HumGrid::transferOtherParts(GridSlice* oldline, GridSlice* newline, int max
 		temp = oldline->at(i);
 		oldline->at(i) = newline->at(i);
 		newline->at(i) = temp;
+		// duplicate the voice counts on the old line (needed if there are more
+		// than one voices in a staff when splitting a line due to *v merging.
+		for (int j=0; j<(int)oldline->at(i)->size(); j++) {
+			int voices = (int)newline->at(i)->at(j)->size();
+			oldline->at(i)->at(j)->resize(voices);
+			for (int k=0; k<voices; k++) {
+				oldline->at(i)->at(j)->at(k) = new GridVoice("*", 0);
+			}
+		}
 	}
 }
 
@@ -6462,7 +6478,6 @@ void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 		if (oldlaststaff->at(t) == NULL) {
 			int newsize = (int)oldlaststaff->size() - 1;
 			oldlaststaff->resize(newsize);
-		} else {
 		}
 	}
 }
@@ -26025,7 +26040,7 @@ bool MxmlEvent::nodeType(xml_node node, const char* testname) {
 // MxmlEvent::setTexts --
 //
 
-void MxmlEvent::setTexts(vector<xml_node>& nodes) {
+void MxmlEvent::setTexts(vector<pair<int, xml_node>>& nodes) {
 	m_text = nodes;
 }
 
@@ -26036,7 +26051,7 @@ void MxmlEvent::setTexts(vector<xml_node>& nodes) {
 // MxmlEvent::getTexts --
 //
 
-vector<xml_node>&  MxmlEvent::getTexts(void) {
+vector<pair<int, xml_node>>&  MxmlEvent::getTexts(void) {
 	return m_text;
 }
 
@@ -47718,7 +47733,7 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 	if (m_current_text.size() > 0) {
 		event->setTexts(m_current_text);
 		m_current_text.clear();
-		addTexts(slice, outdata, partindex, staffindex, voiceindex, event);
+		addTexts(slice, outdata, event->getPartIndex(), staffindex, voiceindex, event);
 	}
 
 	if (m_current_dynamic) {
@@ -47746,9 +47761,11 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 
 void Tool_musicxml2hum::addTexts(GridSlice* slice, GridMeasure* measure, int partindex,
 		int staffindex, int voiceindex, MxmlEvent* event) {
-	vector<xml_node>& nodes = event->getTexts();
-	for (xml_node item : nodes) {
-		addText(slice, measure, partindex, staffindex, voiceindex, item);
+	vector<pair<int, xml_node>>& nodes = event->getTexts();
+	for (auto item : nodes) {
+		int newpartindex = item.first;
+		int newstaffindex = 0; // Not allowing addressing text by layer (could be changed).
+		addText(slice, measure, newpartindex, newstaffindex, voiceindex, item.second);
 	}
 }
 
@@ -47859,7 +47876,6 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 	// If there is already an empty layout slice before the current one (with no spine manipulators
 	// in between), then insert onto the existing layout slice; otherwise create a new layout slice.
 	measure->addLayoutParameter(slice, partindex, output);
-
 }
 
 
@@ -48621,11 +48637,11 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 	for (int i=0; i<(int)nowevents.size(); i++) {
 		for (int j=0; j<(int)nowevents[i]->zerodur.size(); j++) {
 			xml_node element = nowevents[i]->zerodur[j]->getNode();
+			pindex = nowevents[i]->zerodur[j]->getPartIndex();
 
 			if (nodeType(element, "attributes")) {
 				child = element.first_child();
 				while (child) {
-					pindex = nowevents[i]->zerodur[j]->getPartIndex();
 					if (nodeType(child, "clef")) {
 						clefs[pindex].push_back(child);
 						hasclef = true;
@@ -48664,11 +48680,10 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 				if (nodeType(child, "direction-type")) {
 					grandchild = child.first_child();
 					if (nodeType(grandchild, "words")) {
-						m_current_text.push_back(element);
+						m_current_text.emplace_back(std::make_pair(pindex, element));
 					} else if (nodeType(grandchild, "dynamics")) {
 						m_current_dynamic = element;
 					} else if (nodeType(grandchild, "octave-shift")) {
-						pindex = nowevents[i]->zerodur[j]->getPartIndex();
 						ottavas[pindex].push_back(grandchild);
 						hasottava = true;
 					} else if (nodeType(grandchild, "wedge")) {
@@ -48742,12 +48757,28 @@ void Tool_musicxml2hum::processPrintElement(GridMeasure* outdata, xml_node eleme
 	if (!(isPageBreak || isSystemBreak)) {
 		return;
 	}
+	GridSlice* gs = outdata->back();
+
+	HTp token = NULL;
+	if (gs && gs->size() > 0) {
+		if (gs->at(0)->size() > 0) {
+			if (gs->at(0)->at(0)->size() > 0) {
+				token = gs->at(0)->at(0)->at(0)->getToken();
+			}
+		}
+	}
+
 	if (isPageBreak) {
-		outdata->addGlobalComment("!!pagebreak:original", timestamp);
+		if (!token || *token != "!!pagebreak:original")  {
+			outdata->addGlobalComment("!!pagebreak:original", timestamp);
+		}
 	} else if (isSystemBreak) {
-		outdata->addGlobalComment("!!linebreak:original", timestamp);
+		if (!token || *token != "!!linebreak:original")  {
+			outdata->addGlobalComment("!!linebreak:original", timestamp);
+		}
 	}
 }
+
 
 
 ///////////////////////////////
@@ -49125,6 +49156,7 @@ void Tool_musicxml2hum::insertPartKeyDesignations(xml_node keydesig, GridPart& p
 	HTp token;
 	int staffnum = 0;
 	while (keydesig) {
+		token = NULL;
 		keydesig = convertKeySigToHumdrumKeyDesignation(keydesig, token, staffnum);
 		if (token == NULL) {
 			return;
@@ -49135,7 +49167,8 @@ void Tool_musicxml2hum::insertPartKeyDesignations(xml_node keydesig, GridPart& p
 				if (s==0) {
 					part[s]->setTokenLayer(0, token, 0);
 				} else {
-					HTp token2 = new HumdrumToken(*token);
+					string value = *token;
+					HTp token2 = new HumdrumToken(value);
 					part[s]->setTokenLayer(0, token2, 0);
 				}
 			}
@@ -49354,6 +49387,7 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrumKeyDesignation(xml_node keysig
 		HTp& token, int& staffindex) {
 
 	if (!keysig) {
+		token = new HumdrumToken("*");
 		return keysig;
 	}
 
@@ -49378,12 +49412,12 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrumKeyDesignation(xml_node keysig
 			} else if (value == "minor") {
 				mode = 1;
 			}
-			fifths = atoi(child.child_value());
 		}
 		child = child.next_sibling();
 	}
 
 	if (mode < 0) {
+		token = new HumdrumToken("*");
 		return xml_node(NULL);
 	}
 
@@ -49407,7 +49441,9 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrumKeyDesignation(xml_node keysig
 			case -5: ss << "D-"; break;
 			case -6: ss << "G-"; break;
 			case -7: ss << "C-"; break;
-			default: return xml_node(NULL);
+			default: 
+				token = new HumdrumToken("*");
+				return xml_node(NULL);
 		}
 	} else if (mode == 1) { // minor:
 		switch (fifths) {
@@ -49426,7 +49462,9 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrumKeyDesignation(xml_node keysig
 			case -5: ss << "b-"; break;
 			case -6: ss << "e-"; break;
 			case -7: ss << "a-"; break;
-			default: return xml_node(NULL);
+			default:
+				token = new HumdrumToken("*");
+				return xml_node(NULL);
 		}
 	}
 	ss << ":";
@@ -49486,7 +49524,6 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrum(xml_node keysig,
 			} else if (value == "minor") {
 				mode = 1;
 			}
-			fifths = atoi(child.child_value());
 		}
 		child = child.next_sibling();
 	}

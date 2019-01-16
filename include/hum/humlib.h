@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan 14 20:43:44 PST 2019
+// Last Modified: Wed Jan 16 14:52:45 EST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3308,8 +3308,8 @@ class MxmlEvent {
 		void               forceInvisible     (void);
 		bool               isInvisible        (void);
 		void               setBarlineStyle    (xml_node node);
-		void               setTexts           (std::vector<xml_node>& nodes);
-		std::vector<xml_node>&  getTexts           (void);
+		void               setTexts           (std::vector<std::pair<int, xml_node>>& nodes);
+		std::vector<std::pair<int, xml_node>>&  getTexts           (void);
 		void               setDynamics        (xml_node node);
 		xml_node           getDynamics        (void);
 		std::string        getRestPitch       (void) const;
@@ -3320,7 +3320,7 @@ class MxmlEvent {
 		measure_event_type m_eventtype;  // enumeration type of event
 		xml_node           m_node;       // pointer to event in XML structure
 		MxmlMeasure*       m_owner;      // measure that contains this event
-		std::vector<MxmlEvent*> m_links;      // list of secondary chord notes
+		std::vector<MxmlEvent*> m_links; // list of secondary chord notes
 		bool               m_linked;     // true if a secondary chord note
 		int                m_sequence;   // ordering of event in XML file
 		static int         m_counter;    // counter for sequence variable
@@ -3333,7 +3333,7 @@ class MxmlEvent {
 		bool               m_stems;      // for preserving stems
 
 		xml_node          m_dynamics;    // dynamics <direction> starting just before note
-		std::vector<xml_node>  m_text;        // text <direction> starting just before note
+		std::vector<std::pair<int, xml_node>>  m_text;   // text <direction> starting just before note
 
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
@@ -5202,7 +5202,8 @@ class Tool_musicxml2hum : public HumTool {
 		std::string m_systemDecoration;
 
 		pugi::xml_node m_current_dynamic = pugi::xml_node(NULL);
-		std::vector<pugi::xml_node> m_current_text;
+		std::vector<std::pair<int, pugi::xml_node>> m_current_text;
+
 		bool m_hasTransposition = false;
 
 		// m_forceRecipQ is used to force the display of the **recip spint
