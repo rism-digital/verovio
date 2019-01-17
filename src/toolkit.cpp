@@ -522,6 +522,11 @@ bool Toolkit::LoadData(const std::string &data)
 
 std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
 {
+    if (GetPageCount() == 0) {
+        LogWarning("No data loaded");
+        return "";
+    }
+    
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
@@ -954,7 +959,8 @@ void Toolkit::ResetLogBuffer()
 
 void Toolkit::RedoLayout()
 {
-    if (m_doc.GetType() == Transcription) {
+    if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription)) {
+        LogWarning("No data to re-layout");
         return;
     }
 
@@ -967,7 +973,7 @@ void Toolkit::RedoPagePitchPosLayout()
     Page *page = m_doc.GetDrawingPage();
 
     if (!page) {
-        LogError("No page to re-layout");
+        LogWarning("No page to re-layout");
         return;
     }
 
@@ -976,6 +982,11 @@ void Toolkit::RedoPagePitchPosLayout()
 
 bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
+    if (pageNo > GetPageCount()) {
+        LogWarning("Page %d does not exist", pageNo);
+        return false;
+    }
+    
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
@@ -1175,6 +1186,12 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
+    
+    if (!element) {
+        LogWarning("Element '%s' not found", xmlId.c_str());
+        return 0;
+    }
+    
     int timeofElement = 0;
     if (element->Is(NOTE)) {
         if (!m_doc.HasMidiTimemap()) {
@@ -1197,9 +1214,14 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
-    jsonxx::Object o;
-
     Object *element = m_doc.FindChildByUuid(xmlId);
+    
+    if (!element) {
+        LogWarning("Element '%s' not found", xmlId.c_str());
+        return 0;
+    }
+    
+    jsonxx::Object o;
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
