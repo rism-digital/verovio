@@ -6401,7 +6401,7 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     else if (placement == "below") {
         setPlace(dir, "below");
     }
-    if ((!italic) || bold || justification) {
+    if (!tcolor.empty() || bold || justification) {
         Rend *rend = new Rend;
         if (!tcolor.empty()) {
             rend->SetColor(tcolor);
