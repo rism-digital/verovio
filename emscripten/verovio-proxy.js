@@ -176,7 +176,7 @@ verovio.toolkit.prototype.renderToSVG = function (pageNo, options) {
 };
 
 verovio.toolkit.prototype.renderToTimemap = function () {
-	return verovio.vrvToolkit.renderToTimemap(this.ptr);
+	return JSON.parse(verovio.vrvToolkit.renderToTimemap(this.ptr));
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {
