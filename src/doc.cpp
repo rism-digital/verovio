@@ -1152,8 +1152,7 @@ Pages *Doc::GetPages()
 int Doc::GetPageCount()
 {
     Pages *pages = this->GetPages();
-    assert(pages);
-    return pages->GetChildCount();
+    return ((pages) ? pages->GetChildCount() : 0);
 }
 
 int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
