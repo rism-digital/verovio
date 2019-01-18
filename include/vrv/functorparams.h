@@ -1210,6 +1210,7 @@ public:
         m_encoded = false;
         m_firstScoreDef = true;
         m_hasFermata = false;
+        m_hasTempo = false;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -1218,6 +1219,7 @@ public:
     bool m_encoded;
     bool m_firstScoreDef;
     bool m_hasFermata;
+    bool m_hasTempo;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;

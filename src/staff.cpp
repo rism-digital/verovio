@@ -289,9 +289,9 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Always show all staves when there is a fermata
+    // Always show all staves when there is a fermata or a tempo
     // (without checking if the fermata is actually on that staff)
-    if (params->m_hasFermata) {
+    if (params->m_hasFermata || params->m_hasTempo) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
 

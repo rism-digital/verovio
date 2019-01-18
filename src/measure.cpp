@@ -550,6 +550,7 @@ int Measure::OptimizeScoreDef(FunctorParams *functorParams)
     assert(params);
 
     params->m_hasFermata = (this->FindChildByType(FERMATA));
+    params->m_hasTempo = (this->FindChildByType(TEMPO));
 
     return FUNCTOR_CONTINUE;
 }
