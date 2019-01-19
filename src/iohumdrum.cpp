@@ -311,6 +311,8 @@ namespace humaux {
         ottava2downendtimestamp = 0;
         ottava2downmeasure = NULL;
 
+        acclev = 1;
+
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
@@ -5163,6 +5165,7 @@ void HumdrumInput::convertMensuralToken(
         appendElement(elements, pointers, note);
         convertNote(note, token, 0, staffindex);
         processSlurs(token);
+        processDirections(token, staffindex);
 
         if (token->find(':') != std::string::npos) {
             Dot *dot = new Dot();
@@ -6378,7 +6381,15 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     setStaff(dir, m_currentstaff);
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    dir->SetTstamp(tstamp.getFloat());
+    if (token->isMens()) {
+        // Attach to note, not with measure timestamp.
+        // Need to handle text on chords (will currently have a problem attaching to chords)
+        string startid = getLocationId("note", token);
+        dir->SetStartid("#" + startid);
+    }
+    else {
+        dir->SetTstamp(tstamp.getFloat());
+    }
 
     bool problemQ = false;
     std::string problem = token->getLayoutParameter("TX", "problem");
@@ -9012,7 +9023,7 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         ss[staffindex].cue_size.at(layernum) = true;
     }
 
-    if (value.substr(0, 5) == "*stem") {
+    else if (value.substr(0, 5) == "*stem") {
         string ending = value.substr(6);
         if (ending == "x") {
             ss[staffindex].stem_type.at(layernum) = 'x';
@@ -9028,7 +9039,37 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         }
     }
 
-    if (value == "*2\\left") {
+    else if ((value.size() > 8) && (value.substr(0, 8) == "*acclev:")) {
+        string state = value.substr(8);
+        if (!state.empty()) {
+            if (isdigit(state[0])) {
+                ss[staffindex].acclev = state[0] - '0';
+            }
+            else if (state == "YY") {
+                ss[staffindex].acclev = 1;
+            }
+            else if (state == "Y") {
+                ss[staffindex].acclev = 2;
+            }
+            else if (state == "yy") {
+                ss[staffindex].acclev = 3;
+            }
+            else if (state == "y") {
+                ss[staffindex].acclev = 4;
+            }
+        }
+    }
+    else if (value == "*acclev:") {
+        ss[staffindex].acclev = 0;
+    }
+    else if (value == "*acclev") {
+        ss[staffindex].acclev = 0;
+    }
+    else if (value == "*Xacclev") {
+        ss[staffindex].acclev = 0;
+    }
+
+    else if (value == "*2\\left") {
         ss[staffindex].righthalfstem = false;
     }
     else if (value == "*2\\right") {
@@ -10169,9 +10210,37 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
     }
-    if (token->isMens()) {
+
+    bool mensit = false;
+    bool gesturalQ = false;
+    bool hasAccidental = false;
+    int accidlevel = 0;
+    if (m_mens && token->isMens()) {
         // mensural notes are indicated differently, so check here for their method.
-        editorialQ = false;
+        if ((tstring.find("n") != string::npos) || (tstring.find("-") != string::npos)
+            || (tstring.find("#") != string::npos)) {
+            hasAccidental = true;
+        }
+
+        mensit = true;
+        if (tstring.find("YY") != string::npos) {
+            accidlevel = 1;
+        }
+        else if (tstring.find("Y") != string::npos) {
+            accidlevel = 2;
+        }
+        else if (tstring.find("yy") != string::npos) {
+            accidlevel = 3;
+        }
+        else if (tstring.find("y") != string::npos) {
+            accidlevel = 4;
+        }
+        if (accidlevel <= ss[staffindex].acclev) {
+            gesturalQ = false;
+        }
+        else {
+            gesturalQ = true;
+        }
     }
 
     int accidCount = hum::Convert::base40ToAccidental(base40);
@@ -10190,113 +10259,149 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         showInAccidGes = true;
     }
 
-    Accid *accid = new Accid;
-    appendElement(note, accid);
-    setLocationId(accid, token, subtoken);
+    if (mensit && hasAccidental) {
+        Accid *accid = new Accid;
+        appendElement(note, accid);
+        setLocationId(accid, token, subtoken);
 
-    if (!editorialQ) {
-        // don't mark cautionary accidentals if the note has
-        // an editorial accidental.
-        if (token->hasCautionaryAccidental(stindex)) {
-            addCautionaryAccidental(accid, token, accidCount);
-            cautionaryQ = true;
-            showInAccidGes = false;
-            showInAccid = false;
+        if (gesturalQ) {
+            switch (accidCount) {
+                case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
+                case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
+                case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
+                case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
+                case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
+            }
         }
-    }
-
-    if (!editorialQ) {
-        if (showInAccid) {
+        else {
             switch (accidCount) {
                 case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
                 case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
                 case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
-                case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+                case 0:
+                    if (tstring.find("n") != string::npos) {
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+                    }
+                    break;
                 case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
                 case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
                 case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                 default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
             }
-        }
-        else if (!loaccid.empty()) {
-            if (loaccid == "n#") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_ns);
+            if (accidlevel != 0) {
+                accid->SetFunc(accidLog_FUNC_edit);
             }
-            else if (loaccid == "#") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_s);
-            }
-            else if (loaccid == "n") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_n);
-            }
-            else if (loaccid == "##") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_ss);
-            }
-            else if (loaccid == "x") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_x);
-            }
-            else if (loaccid == "-") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_f);
-            }
-            else if (loaccid == "--") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
-            }
-            else if (loaccid == "#x") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_sx);
-            }
-            else if (loaccid == "###") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_ts);
-            }
-            else if (loaccid == "n-") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_nf);
-            }
-            else if (loaccid == "---") {
-                accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
-            }
-            else {
-                std::cerr << "Warning: unknown accidental type " << std::endl;
-            }
-            // add more accidentals here as necessary.  Mostly left are quarter tones
-            // which are not dealt with directly in **kern data: su, sd, fu, fd, nu,
-            // nd, 1qf, 3qf, 1qs, 3qs
-            // http://music-encoding.org/guidelines/v3/data-types/data.accidental.explicit.html
         }
     }
-    else {
-        if (edittype == "") {
-            accid->SetFunc(accidLog_FUNC_edit);
-        }
-        else if (edittype == "brack") {
-            // enclose="brack" cannot be present with func="edit" at the moment...
-            accid->SetEnclose(ENCLOSURE_brack);
-        }
-        else if (edittype == "paren") {
-            // enclose="paren" cannot be present with func="edit" at the moment...
-            accid->SetEnclose(ENCLOSURE_paren);
-        }
-        switch (accidCount) {
-            case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
-            case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
-            case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
-            case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
-            case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
-        }
-    }
+    else if (!mensit) {
+        Accid *accid = new Accid;
+        appendElement(note, accid);
+        setLocationId(accid, token, subtoken);
 
-    if (showInAccidGes) {
-        switch (accidCount) {
-            // case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
-            // case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
-            case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
-            case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
-            case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
-            case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
-            case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
+        if (!editorialQ) {
+            // don't mark cautionary accidentals if the note has
+            // an editorial accidental.
+            if (token->hasCautionaryAccidental(stindex)) {
+                addCautionaryAccidental(accid, token, accidCount);
+                cautionaryQ = true;
+                showInAccidGes = false;
+                showInAccid = false;
+            }
         }
-    }
 
-    if (!(editorialQ || cautionaryQ)) {
-        // No need for sub-element so make them attributes of the note:
-        accid->IsAttribute(true);
+        if (!editorialQ) {
+            if (showInAccid) {
+                switch (accidCount) {
+                    case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
+                    case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+                    case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                    case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+                    case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                    case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+                    case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                    default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
+                }
+            }
+            else if (!loaccid.empty()) {
+                if (loaccid == "n#") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ns);
+                }
+                else if (loaccid == "#") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+                }
+                else if (loaccid == "n") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+                }
+                else if (loaccid == "##") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ss);
+                }
+                else if (loaccid == "x") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_x);
+                }
+                else if (loaccid == "-") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+                }
+                else if (loaccid == "--") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
+                }
+                else if (loaccid == "#x") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_sx);
+                }
+                else if (loaccid == "###") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_ts);
+                }
+                else if (loaccid == "n-") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_nf);
+                }
+                else if (loaccid == "---") {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
+                }
+                else {
+                    std::cerr << "Warning: unknown accidental type " << std::endl;
+                }
+                // add more accidentals here as necessary.  Mostly left are quarter tones
+                // which are not dealt with directly in **kern data: su, sd, fu, fd, nu,
+                // nd, 1qf, 3qf, 1qs, 3qs
+                // http://music-encoding.org/guidelines/v3/data-types/data.accidental.explicit.html
+            }
+        }
+        else {
+            if (edittype == "") {
+                accid->SetFunc(accidLog_FUNC_edit);
+            }
+            else if (edittype == "brack") {
+                // enclose="brack" cannot be present with func="edit" at the moment...
+                accid->SetEnclose(ENCLOSURE_brack);
+            }
+            else if (edittype == "paren") {
+                // enclose="paren" cannot be present with func="edit" at the moment...
+                accid->SetEnclose(ENCLOSURE_paren);
+            }
+            switch (accidCount) {
+                case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+                case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+                case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+            }
+        }
+
+        if (showInAccidGes) {
+            switch (accidCount) {
+                // case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
+                // case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
+                case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
+                case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
+                case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
+                case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
+                case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
+            }
+        }
+
+        if (!(editorialQ || cautionaryQ)) {
+            // No need for sub-element so make them attributes of the note:
+            accid->IsAttribute(true);
+        }
     }
 
     if (!chordQ) {
@@ -10333,8 +10438,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         checkForAutoStem(note, token);
     }
 
-    if (tstring.find("yy") != string::npos) {
-        note->SetVisible(BOOLEAN_false);
+    if (!mensit) {
+        // yy means make invisible in **kern, but is used for accidental levels in **mens.
+        if (tstring.find("yy") != string::npos) {
+            note->SetVisible(BOOLEAN_false);
+        }
     }
 
     // handle ties

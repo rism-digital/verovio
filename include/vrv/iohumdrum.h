@@ -162,12 +162,40 @@ namespace humaux {
         vector<bool> cue_size;
 
         // stem_type == keeps track of what type of stem to automatically
-	// add to a note/chord.  The states are:
-	// '\' == down stem
-	// '/' == up stem
-	// 'x' == no stem
-	// 'X' == no automatic assignments (assignment will be done automatically by verovio).
+        // add to a note/chord.  The states are:
+        // '\' == down stem
+        // '/' == up stem
+        // 'x' == no stem
+        // 'X' == no automatic assignments (assignment will be done automatically by verovio).
         vector<char> stem_type;
+
+        // acclev == In **mens data, controls the accidental level conversion
+        // from gestural to editorial.
+        // *acclev:0 == no editorial acccidentals visible (all converted to gestural)
+        // *acclev:1 == accidentals marked with YY are displayed as editorial accidentals (above notes)
+        // *acclev:2 == accidentals marked with Y are displayed as editorial accidentals (above notes)
+        // *acclev:3 == accidentals marked with yy are displayed as editorial accidentals (above notes)
+        // *acclev:4 == accidentals marked with y are displayed as editorial accidentals (above notes)
+        // meaning of the accidental marks:
+        // y = algorithmic interpretation of an implicit accidental, primarily used for notes
+        //     with accidentals not shown but assigned by the key signature.
+        // yy = a cautionary type of accidental, such as returning to the accidental within the
+        //     key signature (such as a b-flat coming after a b-natural in a 1-flat key signature).
+        // Y = a performance interpretation accidental (musica ficta) that is not indicated or
+        //     directly implied in the source, but is needed due to performance practice.
+        // YY = an accidental that should be added due to what the editor thinks is an error.
+        //
+        // Equivalences to numbers:
+        // *Xacclev            == *acclev:0  all levels are mapped to @accid.ges
+        // *acclev             == *acclev:0  all levels are mapped to @accid.ges
+        // *acclev:            == *acclev:0  all levels are mapped to @accid.ges
+        // *acclev:YY          == *acclev:1  levels 2-4 are mapped to @accid.ges and level 1    to @accd+@edit
+        // *acclev:Y           == *acclev:2  levels 3-4 are mapped to @accid.ges and levels 1-2 to @accd+@edit
+        // *acclev:yy          == *acclev:3  level    4 is  mapped to @accid.ges and levels 1-3 to @accd+@edit
+        // *acclev:y           == *acclev:4  all levels are mapped to @accid+@edit
+        //
+        // The default level is *acclev:1 (YY will show as editorial accidental, y, yy, and Y will be @accid.ges)
+        int acclev = 1;
 
         // righthalfstem == true means to place half-note stems always on right side
         // of noteheads.  False is standard modern style.
