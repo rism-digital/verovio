@@ -45,6 +45,7 @@
 #include "artic.h"
 #include "att.h"
 #include "beam.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "chord.h"
 #include "dir.h"
@@ -4742,6 +4743,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if (layerdata[i]->isInterpretation()) {
             handleOttavaMark(layerdata[i], note);
+            handleLigature(layerdata[i]);
+            handleColoration(layerdata[i]);
             handlePedalMark(layerdata[i]);
             handleStaffStateVariables(layerdata[i]);
             handleStaffDynamStateVariables(layerdata[i]);
@@ -5048,6 +5051,148 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleLigature --
+//
+
+void HumdrumInput::handleLigature(hum::HTp token)
+{
+    if (token->compare("*lig") != 0) {
+        return;
+    }
+
+    // find end interpretation of ligature
+    hum::HTp ligend = token->getNextToken();
+    hum::HTp firstnote = NULL;
+    hum::HTp lastnote = NULL;
+    while (ligend) {
+        if (ligend->compare("*Xlig") == 0) {
+            break;
+        }
+        if (ligend->isNote()) {
+            if (!firstnote) {
+                firstnote = ligend;
+            }
+            lastnote = ligend;
+        }
+        ligend = ligend->getNextToken();
+    }
+    if (!ligend) {
+        // could not find a matching ending for the
+        // ligature start.  For now ignore it.  Perhaps
+        // later a partial ligature bracket could be
+        // rendered (but more likely a data error).
+        return;
+    }
+    if (!firstnote) {
+        // strange case: no notes in ligature
+        return;
+    }
+    if (!lastnote) {
+        // strange case: no notes in ligature
+        return;
+    }
+
+    BracketSpan *ligature = new BracketSpan;
+
+    int startline = token->getLineNumber();
+    int startfield = token->getFieldNumber();
+    int stopline = ligend->getLineNumber();
+    int stopfield = ligend->getFieldNumber();
+    std::string id = "ligature";
+    id += "-L" + to_string(startline);
+    id += "F" + to_string(startfield);
+    id += "-L" + to_string(stopline);
+    id += "F" + to_string(stopfield);
+    ligature->SetUuid(id);
+
+    // not considering if notes are in chords (which they should not)
+    std::string startid = getLocationId("note", firstnote);
+    ligature->SetStartid("#" + startid);
+    std::string endid = getLocationId("note", lastnote);
+    ligature->SetEndid("#" + endid);
+
+    ligature->SetLform(LINEFORM_solid);
+    ligature->SetFunc("ligature");
+
+    if (m_measure) {
+        m_measure->AddChild(ligature);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleColoration --
+//
+
+void HumdrumInput::handleColoration(hum::HTp token)
+{
+    if (token->compare("*col") != 0) {
+        return;
+    }
+
+    // find end interpretation of coloration
+    hum::HTp colend = token->getNextToken();
+    hum::HTp firstnote = NULL;
+    hum::HTp lastnote = NULL;
+    while (colend) {
+        if (colend->compare("*Xlig") == 0) {
+            break;
+        }
+        if (colend->isNote()) {
+            if (!firstnote) {
+                firstnote = colend;
+            }
+            lastnote = colend;
+        }
+        colend = colend->getNextToken();
+    }
+    if (!colend) {
+        // could not find a matching ending for the
+        // coloration start.  For now ignore it.  Perhaps
+        // later a partial coloration bracket could be
+        // rendered (but more likely a data error).
+        return;
+    }
+    if (!firstnote) {
+        // strange case: no notes in coloration
+        return;
+    }
+    if (!lastnote) {
+        // strange case: no notes in coloration
+        return;
+    }
+
+    BracketSpan *coloration = new BracketSpan;
+
+    int startline = token->getLineNumber();
+    int startfield = token->getFieldNumber();
+    int stopline = colend->getLineNumber();
+    int stopfield = colend->getFieldNumber();
+    std::string id = "coloration";
+    id += "-L" + to_string(startline);
+    id += "F" + to_string(startfield);
+    id += "-L" + to_string(stopline);
+    id += "F" + to_string(stopfield);
+    coloration->SetUuid(id);
+
+    // not considering if notes are in chords (which they should not)
+    std::string startid = getLocationId("note", firstnote);
+    coloration->SetStartid("#" + startid);
+    std::string endid = getLocationId("note", lastnote);
+    coloration->SetEndid("#" + endid);
+
+    // data_LINEWIDTH lw;
+    // lw.SetLineWidthTerm(LINEWIDTHTERM_medium);
+    // coloration->SetLwidth(lw);
+    coloration->SetFunc("coloration");
+
+    if (m_measure) {
+        m_measure->AddChild(coloration);
+    }
 }
 
 //////////////////////////////

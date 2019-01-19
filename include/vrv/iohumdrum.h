@@ -365,6 +365,8 @@ protected:
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HTp token, Note *note);
     void handlePedalMark(hum::HTp token);
+    void handleLigature(hum::HTp token);
+    void handleColoration(hum::HTp token);
     void prepareBeamAndTupletGroups(
         const std::vector<hum::HTp> &layerdata, std::vector<humaux::HumdrumBeamAndTuplet> &hg);
     void printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
