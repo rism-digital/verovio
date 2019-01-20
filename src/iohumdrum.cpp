@@ -2685,6 +2685,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
                 ss[partnumber - 1].meter_top *= 2;
             }
         }
+        else if (part->find("acclev") != string::npos) {
+            storeAcclev(*part, partnumber - 1);
+        }
 
         hum::HumdrumFile *hf = part->getOwner()->getOwner();
         int line = part->getLineIndex();
@@ -9199,7 +9202,40 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         }
     }
 
-    else if ((value.size() > 8) && (value.substr(0, 8) == "*acclev:")) {
+    else if (value.find("acclev") != string::npos) {
+        storeAcclev(value, staffindex);
+    }
+
+    else if (value == "*2\\left") {
+        ss[staffindex].righthalfstem = false;
+    }
+    else if (value == "*2\\right") {
+        ss[staffindex].righthalfstem = true;
+    }
+
+    // Key cancellation option is currently global to all staves:
+    if (value == "*Xkcancel") {
+        m_show_cautionary_keysig = false;
+    }
+    else if (value == "*kcancel") {
+        m_show_cautionary_keysig = true;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::storeAcclev -- Used for **mens accidental conversion to @accid+@edit or @accid.ges.
+//
+
+void HumdrumInput::storeAcclev(const std::string value, int staffindex)
+{
+    if (value.find("acclev") == string::npos) {
+        return;
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    if ((value.size() > 8) && (value.substr(0, 8) == "*acclev:")) {
         string state = value.substr(8);
         if (!state.empty()) {
             if (isdigit(state[0])) {
@@ -9227,21 +9263,6 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
     else if (value == "*Xacclev") {
         ss[staffindex].acclev = 0;
-    }
-
-    else if (value == "*2\\left") {
-        ss[staffindex].righthalfstem = false;
-    }
-    else if (value == "*2\\right") {
-        ss[staffindex].righthalfstem = true;
-    }
-
-    // Key cancellation option is currently global to all staves:
-    if (value == "*Xkcancel") {
-        m_show_cautionary_keysig = false;
-    }
-    else if (value == "*kcancel") {
-        m_show_cautionary_keysig = true;
     }
 }
 
