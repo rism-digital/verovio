@@ -169,6 +169,9 @@ namespace humaux {
         // 'X' == no automatic assignments (assignment will be done automatically by verovio).
         vector<char> stem_type;
 
+		// last_clef == keep track of last clef on staff to avoid duplications.
+		std::string last_clef;
+
         // acclev == In **mens data, controls the accidental level conversion
         // from gestural to editorial.
         // *acclev:0 == no editorial acccidentals visible (all converted to gestural)

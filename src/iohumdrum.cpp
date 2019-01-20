@@ -313,6 +313,7 @@ namespace humaux {
         ottava2downmeasure = NULL;
 
         acclev = 1;
+        last_clef = "";
 
         ties.clear();
         meter_bottom = 4;
@@ -2727,10 +2728,12 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
     if (clef.size() > 0) {
         setClef(m_staffdef.back(), clef);
+        ss.at(partnumber - 1).last_clef = clef;
     }
     else {
         std::string autoclef = getAutoClef(partstart, partnumber);
         setClef(m_staffdef.back(), autoclef);
+        ss.at(partnumber - 1).last_clef = clef;
     }
 
     if (transpose.size() > 0) {
@@ -4576,6 +4579,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     std::vector<hum::HumNum> &timesigdurs = m_timesigdurs;
     std::vector<int> &rkern = m_rkern;
     int staffindex = rkern[track];
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     if (staffindex < 0) {
         // not a kern spine.
@@ -4754,8 +4758,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             if (layerdata[i]->isMens()) {
                 if (layerdata[i]->isClef()) {
-                    Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
-                    setLocationId(clef, layerdata[i]);
+                    if (ss.at(m_currentstaff - 1).last_clef != *layerdata[i]) {
+                        Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
+                        setLocationId(clef, layerdata[i]);
+                    }
                 }
             }
             else if (layerdata[i]->getDurationFromStart() != 0) {
@@ -7930,6 +7936,9 @@ Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector
 {
     Clef *clef = new Clef;
     appendElement(elements, pointers, clef);
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    ss.at(m_currentstaff - 1).last_clef = *token;
 
     if (token->find("clefG") != string::npos) {
         clef->SetShape(CLEFSHAPE_G);
