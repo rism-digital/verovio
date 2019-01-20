@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jan 16 14:52:45 EST 2019
+// Last Modified: Sun Jan 20 01:35:27 EST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -834,6 +834,27 @@ double Convert::pearsonCorrelation(const vector<double>& x, const vector<double>
 	double covxy  = sumco / size;
 
 	return covxy / (popsdx * popsdy);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_transpose::standardDeviation --
+//
+
+double Convert::standardDeviation(const vector<double>& x) {
+	double sum = 0.0;
+	for (int i=0; i<(int)x.size(); i++) {
+		sum += x[i];
+	}
+	double mean = sum / x.size();
+	double variance = 0.0;
+	for (int i=0; i<(int)x.size(); i++) {
+		variance += pow(x[i] - mean, 2);
+	}
+	variance = variance / x.size();
+	return sqrt(variance);
 }
 
 
@@ -22370,7 +22391,7 @@ bool HumdrumToken::isGrace(void) {
 //
 
 bool HumdrumToken::isClef(void) {
-	if (!isDataType("**kern")) {
+	if (!(isDataType("**kern") || isDataType("**mens"))) {
 			return false;
 	}
 	if (!isInterpretation()) {
