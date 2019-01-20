@@ -4752,7 +4752,13 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 int track = layerdata[i]->getTrack();
                 m_spine_color[track] = hre.getMatch(1);
             }
-            if (layerdata[i]->getDurationFromStart() != 0) {
+            if (layerdata[i]->isMens()) {
+                if (layerdata[i]->isClef()) {
+                    Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
+                    setLocationId(clef, layerdata[i]);
+                }
+            }
+            else if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
                     int subtrack = layerdata[i]->getSubtrack();
                     if (subtrack) {
