@@ -5309,11 +5309,78 @@ void HumdrumInput::convertMensuralToken(
     if (!token->isMens()) {
         return;
     }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    bool roff = token->hasRectaLigatureEnd();
+    bool ooff = token->hasObliquaLigatureEnd();
+    bool ron = token->hasRectaLigatureBegin();
+    bool oon = token->hasObliquaLigatureBegin();
+    bool turnoffrecta = false;
+    bool embeddedobliqua = false;
+
+    if (roff) {
+        turnoffrecta = true;
+    }
+    if (ooff) {
+        if ((elements.back() == "ligature") && !ss[staffindex].ligature_obliqua) {
+            embeddedobliqua = true;
+        }
+    }
+    if (ooff && ss[staffindex].ligature_recta) {
+        embeddedobliqua = true;
+    }
+
+    if (oon && (elements.back() == "ligature")) {
+        embeddedobliqua = true;
+    }
+
     if (token->hasLigatureBegin()) {
-        Ligature *ligature = new Ligature;
-        appendElement(elements, pointers, ligature);
-        elements.push_back("ligature");
-        pointers.push_back((void *)ligature);
+        if (ron) {
+            ss[staffindex].ligature_recta = true;
+        }
+        if (ron && oon) {
+            ss[staffindex].ligature_recta = true;
+            ss[staffindex].ligature_obliqua = true;
+            // if both at same time, then assume obliqua is the start
+            // of a compound ligature
+            Ligature *ligature = new Ligature;
+            string id = getLocationId("ligature", token);
+            ligature->SetUuid(id);
+            ligature->SetForm(LIGATUREFORM_recta);
+            appendElement(elements, pointers, ligature);
+            elements.push_back("ligature");
+            pointers.push_back((void *)ligature);
+            embeddedobliqua = true;
+        }
+        else if (oon && elements.back() == "ligature") {
+            // if already in a ligature, encode obliqua differently
+            // this state variable will set note@lig="obliqua" further below
+            ss[staffindex].ligature_obliqua = true;
+        }
+        else if (oon) {
+            // create a new obliqua ligature
+            ss[staffindex].ligature_obliqua = true;
+            Ligature *ligature = new Ligature;
+            string id = getLocationId("ligature", token);
+            ligature->SetUuid(id);
+            ligature->SetForm(LIGATUREFORM_obliqua);
+            appendElement(elements, pointers, ligature);
+            elements.push_back("ligature");
+            pointers.push_back((void *)ligature);
+        }
+        else {
+            // create a new recta ligature (which could be compoound and
+            // contain an obliqua, which will be handled above.
+            Ligature *ligature = new Ligature;
+            string id = getLocationId("ligature", token);
+            ligature->SetUuid(id);
+            ligature->SetForm(LIGATUREFORM_recta);
+            appendElement(elements, pointers, ligature);
+            elements.push_back("ligature");
+            pointers.push_back((void *)ligature);
+            ss[staffindex].ligature_recta = true;
+        }
     }
 
     if (token->isRest()) {
@@ -5325,6 +5392,9 @@ void HumdrumInput::convertMensuralToken(
     else if (token->isNote()) {
         Note *note = new Note;
         setLocationId(note, token);
+        if (embeddedobliqua) {
+            note->SetLig(noteAnlMensural_LIG_obliqua);
+        }
         appendElement(elements, pointers, note);
         convertNote(note, token, 0, staffindex);
         processSlurs(token);
@@ -5354,13 +5424,24 @@ void HumdrumInput::convertMensuralToken(
         }
     }
 
-    if (token->hasLigatureEnd()) {
+    if (roff || ooff) {
         if (elements.back() == "ligature") {
-            popElementStack(elements, pointers);
+            if (roff) {
+                popElementStack(elements, pointers);
+            }
+            else if (ooff && !turnoffrecta && !ss[staffindex].ligature_recta) {
+                popElementStack(elements, pointers);
+            }
         }
         else {
             std::cerr << "WARNING: unmatched ligature ending" << std::endl;
         }
+    }
+    if (roff) {
+        ss[staffindex].ligature_recta = false;
+    }
+    if (ooff) {
+        ss[staffindex].ligature_obliqua = false;
     }
 }
 

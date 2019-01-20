@@ -169,6 +169,11 @@ namespace humaux {
         // 'X' == no automatic assignments (assignment will be done automatically by verovio).
         vector<char> stem_type;
 
+        // ligature_recta == true if in a recta ligature
+        bool ligature_recta = false;
+        // ligature_obliqua == true if in a obliqua ligature
+        bool ligature_obliqua = false;
+
         // last_clef == keep track of last clef on staff to avoid duplications.
         std::string last_clef;
 
