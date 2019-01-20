@@ -2688,6 +2688,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         else if (part->find("acclev") != string::npos) {
             storeAcclev(*part, partnumber - 1);
         }
+        else if (part->compare(0, 5, "*stem") == 0) {
+            storeStemInterpretation(*part, partnumber - 1, 1);
+        }
 
         hum::HumdrumFile *hf = part->getOwner()->getOwner();
         int line = part->getLineIndex();
@@ -5326,6 +5329,24 @@ void HumdrumInput::convertMensuralToken(
         convertNote(note, token, 0, staffindex);
         processSlurs(token);
         processDirections(token, staffindex);
+        bool hasstem = false;
+        string text = *token;
+        for (int i = 0; i < (int)text.size(); i++) {
+            switch (text[i]) {
+                case 'M': hasstem = true; break;
+                case 'm': hasstem = true; break;
+                case 'U': hasstem = true; break;
+                case 'u': hasstem = true; break;
+                case 'L': hasstem = true; break;
+                case 'X': hasstem = true; break;
+            }
+            if (hasstem) {
+                break;
+            }
+        }
+        if (hasstem) {
+            assignAutomaticStem(note, token, staffindex);
+        }
 
         if (token->find(':') != std::string::npos) {
             Dot *dot = new Dot();
@@ -9187,19 +9208,7 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
 
     else if (value.substr(0, 5) == "*stem") {
-        string ending = value.substr(6);
-        if (ending == "x") {
-            ss[staffindex].stem_type.at(layernum) = 'x';
-        }
-        else if (ending == "/") {
-            ss[staffindex].stem_type.at(layernum) = '/';
-        }
-        else if (ending == "\\") {
-            ss[staffindex].stem_type.at(layernum) = '\\';
-        }
-        else {
-            ss[staffindex].stem_type.at(layernum) = 'X';
-        }
+        storeStemInterpretation(value, staffindex, m_currentlayer);
     }
 
     else if (value.find("acclev") != string::npos) {
@@ -9219,6 +9228,34 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
     else if (value == "*kcancel") {
         m_show_cautionary_keysig = true;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::storeStemInterpretation --
+//
+
+void HumdrumInput::storeStemInterpretation(const std::string &value, int staffindex, int layernumber)
+{
+    if (value.find("stem") == string::npos) {
+        return;
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    string ending = value.substr(6);
+    if (ending == "x") {
+        ss[staffindex].stem_type.at(layernumber) = 'x';
+    }
+    else if (ending == "/") {
+        ss[staffindex].stem_type.at(layernumber) = '/';
+    }
+    else if (ending == "\\") {
+        ss[staffindex].stem_type.at(layernumber) = '\\';
+    }
+    else {
+        ss[staffindex].stem_type.at(layernumber) = 'X';
     }
 }
 

@@ -515,6 +515,7 @@ protected:
     bool getNoteState(hum::HTp token, int slurnumber);
     void assignVerticalGroup(Pedal *ped, hum::HTp token);
     void storeAcclev(const std::string value, int staffindex);
+    void storeStemInterpretation(const std::string &value, int staffindex, int layernumber);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
