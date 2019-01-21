@@ -16,16 +16,16 @@
 
 #include "devicecontext.h"
 #include "doc.h"
-#include "style.h"
+#include "options.h"
 #include "vrv.h"
 
 namespace vrv {
 
-void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr)
+void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(nbr)), AxSOLID);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
@@ -35,11 +35,11 @@ void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr)
     return;
 }
 
-void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr)
+void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(nbr)), AxSOLID);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
@@ -47,6 +47,24 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr
     dc->ResetPen();
     dc->ResetBrush();
     return;
+}
+
+void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength)
+{
+    int i, start, end;
+    for (i = 0; i < line.GetSegmentCount(); i++) {
+        line.GetStartEnd(start, end, i);
+        DrawVerticalLine(dc, start, end, x1, width, dashLength);
+    }
+}
+
+void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength)
+{
+    int i, start, end;
+    for (i = 0; i < line.GetSegmentCount(); i++) {
+        line.GetStartEnd(start, end, i);
+        DrawHorizontalLine(dc, start, end, y1, width, dashLength);
+    }
 }
 
 /*
@@ -163,9 +181,6 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
 
     if (code == 0) return;
 
-    dc->SetBackground(AxBLUE);
-    dc->SetBackgroundMode(AxTRANSPARENT);
-
     std::wstring str;
     str.push_back(code);
 
@@ -178,6 +193,44 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     dc->ResetBrush();
 
     return;
+}
+
+void View::DrawSmuflLine(
+    DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill, wchar_t start, wchar_t end)
+{
+    assert(dc);
+
+    int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
+    int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
+    int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
+
+    if (length <= 0) return;
+
+    // We add half a fill length for an average shorter / longer line result
+    int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
+
+    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
+
+    std::wstring str;
+
+    if (start != 0) {
+        str.push_back(start);
+    }
+
+    int i;
+    for (i = 0; i < count; ++i) {
+        str.push_back(fill);
+    }
+
+    if (end != 0) {
+        str.push_back(end);
+    }
+
+    dc->DrawMusicText(str, ToDeviceContextX(orig.x), ToDeviceContextY(orig.y), false);
+
+    dc->ResetFont();
+    dc->ResetBrush();
 }
 
 void View::DrawSmuflString(

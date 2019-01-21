@@ -9,15 +9,19 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
+#include "options.h"
 #include "scoredef.h"
-#include "style.h"
 
+namespace smf {
 class MidiFile;
+}
 
 namespace vrv {
 
+class CastOffPagesParams;
 class FontInfo;
 class Glyph;
+class Pages;
 class Page;
 class Score;
 
@@ -59,10 +63,26 @@ public:
     virtual void Refresh();
 
     /**
+     * Getter for the options
+     */
+    Options *GetOptions() const { return m_options; }
+    void SetOptions(Options *options) { (*m_options) = *options; };
+
+    /**
      * Generate a document scoreDef when none is provided.
      * This only looks at the content first system of the document.
      */
     bool GenerateDocumentScoreDef();
+
+    /**
+     * Generate a document pgHead from the MEI header if none is provided
+     */
+    bool GenerateHeaderAndFooter();
+
+    /**
+     * Generate measure numbers from measure attributes
+     */
+    bool GenerateMeasureNumbers();
 
     /**
      * Getter and setter for the DocType.
@@ -74,21 +94,29 @@ public:
     /**
      * Check if the document has a page with the specified value
      */
-    bool HasPage(int pageIdx) const;
+    bool HasPage(int pageIdx);
 
     /**
-     * Create a score buffer for loading or creating a scoreBased MEI document.
-     * Creating a mdiv buffer clear existing data (but not the header).
-     * The score buffer is owned by the Doc.
-     * Once the document is created, Doc::ConvertToPagePagedDoc should be called to convert it before rendering.
+     * Get the Score in the visible Mdiv.
+     * Will find it only when having read a score-based MEI file
      */
-    Score *CreateScoreBuffer();
+    Score *GetScore();
 
     /**
-    * Get the total page count
-    */
-    int GetPageCount() const;
+     * Get the Pages in the visible Mdiv.
+     * Will find it only when having read a pages-based MEI file,
+     * or when a file was converted to page-based MEI.
+     */
+    Pages *GetPages();
 
+    /**
+     * Get the total page count
+     */
+    int GetPageCount();
+
+    /**
+     * Return true if the MIDI generation is already done
+     */
     bool GetMidiExportDone() const;
 
     /**
@@ -98,6 +126,7 @@ public:
     int GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const;
     int GetDrawingUnit(int staffSize) const;
     int GetDrawingDoubleUnit(int staffSize) const;
     int GetDrawingStaffSize(int staffSize) const;
@@ -125,6 +154,7 @@ public:
     int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
+    int GetTextLineHeight(FontInfo *font, bool graceSize) const;
     ///@}
 
     /**
@@ -137,85 +167,44 @@ public:
     ///@}
 
     /**
-     * @name Setters for the page dimensions and margins
-     */
-    ///@{
-    void SetPageHeight(int pageHeight);
-    void SetPageWidth(int pageWidth);
-    void SetPageLeftMar(short pageLeftMar);
-    void SetPageRightMar(short pageRightMar);
-    void SetPageTopMar(short pageTopMar);
-    void SetSpacingStaff(short spacingStaff);
-    void SetSpacingSystem(short spacingSystem);
-    ///@}
-
-    /**
-     * @name Getters for tie and slur parameters
-     */
-    ///@{
-    char GetTieThickness() const { return m_style->m_tieThickness; }
-    char GetSlurMinHeight() const { return m_style->m_minSlurHeight; }
-    char GetSlurMaxHeight() const { return m_style->m_maxSlurHeight; }
-    char GetSlurThickness() const { return m_style->m_slurThickness; }
-    ///@}
-
-    /**
-     * @name Getters for the page dimensions and margins
-     */
-    ///@{
-    short GetSpacingStaff() const { return m_spacingStaff; }
-    short GetSpacingSystem() const { return m_spacingSystem; }
-    ///@}
-
-    /**
      * @name Getters for the object margins (left and right).
-     * The margins are given in x / PARAM_DENOMINATOR * UNIT
-     * With PARAM_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT.
-     * These should eventually be set at parameters.
+     * The margins are given in x * MEI UNIT
      */
     ///@{
-    char GetLeftMargin(const ClassId classId) const;
-    char GetRightMargin(const ClassId classId) const;
-    char GetLeftPosition() const;
-    char GetBottomMargin(const ClassId classId) const;
-    char GetTopMargin(const ClassId classId) const;
+    double GetLeftMargin(const ClassId classId) const;
+    double GetRightMargin(const ClassId classId) const;
+    double GetLeftPosition() const;
+    double GetBottomMargin(const ClassId classId) const;
+    double GetTopMargin(const ClassId classId) const;
     ///@}
 
-    /*
-     * @name Setter and getter for the justification (x-axis) flag.
-     * Justification is enabled by default. It needs to be disabled
-     * for drawing the entire document on one single system.
+    /**
+     * Prepare the MIDI timemap for MIDI and timemap file export.
+     * Run trough all the layers and fill the score-time and performance timing variables.
      */
-    ///@{
-    void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; }
-    bool GetJustificationX() const { return m_drawingJustifyX; }
-    ///@}
+    void CalculateMidiTimemap();
 
-    /*
-     * @name Setter and getter for the duration-based-spacing flag.
-     * Spacing by duration is always used with CMN, and it's enabled by default.
-     * It should be disabled (so we get "even" note spacing) for mensural notation.
+    /**
+     * Check to see if the MIDI timemap has already been calculated.  This needs to return
+     * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
+     * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
      */
-    ///@{
-    void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; }
-    bool GetEvenSpacing() const { return m_drawingEvenSpacing; }
-    ///@}
-
-    /*
-     * @name Setter and getter for linear and non-linear spacing parameters
-     */
-    ///@{
-    void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; }
-    double GetSpacingLinear() const { return m_drawingSpacingLinear; }
-    void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; }
-    double GetSpacingNonLinear() const { return m_drawingSpacingNonLinear; }
-    ///@}
+    bool HasMidiTimemap();
 
     /**
      * Export the document to a MIDI file.
-     * Run trough all the layer and fill the midi file content.
+     * Run trough all the layers and fill the midi file content.
      */
-    void ExportMIDI(MidiFile *midiFile);
+    void ExportMIDI(smf::MidiFile *midiFile);
+
+    /**
+     * Extract a timemap from the document to a JSON string.
+     * Run trough all the layers and fill the timemap file content.
+     */
+    bool ExportTimemap(std::string &output);
+    void PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
+        std::map<int, std::vector<std::string> > &realTimeToOnElements,
+        std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo);
 
     /**
      * Set the initial scoreDef of each page.
@@ -223,7 +212,12 @@ public:
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-    void CollectScoreDefs(bool force = false);
+    void SetCurrentScoreDefDoc(bool force = false);
+
+    /**
+     * Optimize the scoreDef once the document is cast-off.
+     */
+    void OptimizeScoreDefDoc(bool encoded = false);
 
     /**
      * Prepare the document for drawing.
@@ -237,6 +231,15 @@ public:
      * Starting from a single system, create and fill pages and systems.
      */
     void CastOffDoc();
+
+    /**
+     * Casts off the running elements (headers and footer)
+     * Called from Doc::CastOffDoc
+     * The doc needs to be empty, the methods adds two empty pages to calculate the
+     * size of the header and footer of the page one and two.
+     * Calcultated sizes are set in the CastOffPagesParams object.
+     */
+    void CastOffRunningElements(CastOffPagesParams *params);
 
     /**
      * Undo the cast off of the entire document.
@@ -256,6 +259,24 @@ public:
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();
+
+    /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    void ConvertToCastOffMensuralDoc();
+
+    /**
+     * Reverse of ConvertToCastOffMensuralDoc()
+     */
+    void ConvertToUnCastOffMensuralDoc();
+
+    /**
+     * Convert analytical encoding (@fermata, @tie) to correpsonding elements
+     * By default, the element are used only for the rendering and not preserved in the MEI output
+     * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
+     */
+    void ConvertAnalyticalMarkupDoc(bool permanent = false);
 
     /**
      * To be implemented.
@@ -296,6 +317,19 @@ public:
      */
     int GetAdjustedDrawingPageHeight() const;
 
+    /**
+     * Setter for analytical markup flag
+     */
+    void SetAnalyticalMarkup(bool hasAnalyticalMarkup) { m_hasAnalyticalMarkup = hasAnalyticalMarkup; }
+
+    /**
+     * @name Setter for and getter for mensural only flag
+     */
+    ///@{
+    void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
+    bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -304,6 +338,11 @@ public:
      * See Object::PrepareLyricsEnd
      */
     virtual int PrepareLyricsEnd(FunctorParams *functorParams);
+    
+    /**
+     * See Object::PrepareTimestampsEnd
+     */
+    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
 
 private:
     /**
@@ -316,6 +355,16 @@ public:
      * A copy of the header tree stored as pugi::xml_document
      */
     pugi::xml_document m_header;
+    
+    /**
+     * A copy of the header tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_front;
+    
+    /**
+     * A copy of the header tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_back;
 
     /**
      * Holds the top scoreDef.
@@ -325,28 +374,20 @@ public:
 
     /** The current page height */
     int m_drawingPageHeight;
-    /** The current page height */
+    /** The current page width */
     int m_drawingPageWidth;
-    /** The current page witdth */
-    int m_drawingPageLeftMar;
+    /** The current page bottom margin */
+    int m_drawingPageMarginBot;
     /** The current page left margin */
-    int m_drawingPageRightMar;
+    int m_drawingPageMarginLeft;
     /** The current page right margin */
-    int m_drawingPageTopMar;
+    int m_drawingPageMarginRight;
+    /** The current page top margin */
+    int m_drawingPageMarginTop;
     /** the current beam minimal slope */
     float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
-    /** flag for disabling justification */
-    bool m_drawingJustifyX;
-    /** flag for disabling spacing by duration */
-    bool m_drawingEvenSpacing;
-    /** value of the linear spacing factor */
-    double m_drawingSpacingLinear;
-    /** value of the non linear spacing factor */
-    double m_drawingSpacingNonLinear;
-    /** minimum measure width */
-    int m_drawingMinMeasureWidth;
 
 private:
     /**
@@ -360,7 +401,7 @@ private:
      * The object with the default values.
      * This could be saved somewhere as preferences (todo).
      */
-    Style *m_style;
+    Options *m_options;
 
     /*
      * The following values are set in the Doc::SetDrawingPage.
@@ -373,14 +414,6 @@ private:
 
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** Half a the space between to staff lines */
-    int m_drawingUnit;
-    /** Space between to staff lines */
-    int m_drawingDoubleUnit;
-    /** Height of a five line staff */
-    int m_drawingStaffSize;
-    /** Height of an octave */
-    int m_drawingOctaveSize;
     /** Height of a beam (10 and 6 by default) */
     int m_drawingBeamWidth;
     /** Height of a beam spacing (white) (10 and 6 by default) */
@@ -413,30 +446,37 @@ private:
     bool m_drawingPreparationDone;
 
     /**
-     * A flag to indicate if the MIDI export has been done.
-     * This is necessary for retrieving notes being played at a certain time.
+     * A flag to indicate that the MIDI timemap has been calculated.  The
+     * timemap needs to be prepared before MIDI files or timemap JSON files
+     * are generated.
      */
-    bool m_midiExportDone;
+    bool m_hasMidiTimemap;
+
+    /**
+     * A flag to indicate whereas the document contains analytical markup to be converted.
+     * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
+     * is converted during the import in MeiInput.
+     */
+    bool m_hasAnalyticalMarkup;
+
+    /**
+     * A flag to indicate whereas to document contains only mensural music.
+     * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
+     */
+    bool m_isMensuralMusicOnly;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;
     /** Page height (MEI scoredef@page.height) - currently not saved */
     int m_pageHeight;
+    /** Page bottom margin (MEI scoredef@page.botmar) - currently not saved */
+    int m_pageMarginBottom;
     /** Page left margin (MEI scoredef@page.leftmar) - currently not saved */
-    short m_pageLeftMar;
+    int m_pageMarginLeft;
     /** Page right margin (MEI scoredef@page.rightmar) - currently not saved */
-    short m_pageRightMar;
+    int m_pageMarginRight;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
-    short m_pageTopMar;
-    /** Staff minimal spacing (MEI scoredef@spacing.staff) - currently not saved */
-    short m_spacingStaff;
-    /** System minimal spacing (MEI scoredef@spacing.system) - currently not saved */
-    short m_spacingSystem;
-
-    /**
-     * A score buffer for loading or creating a scoreBased MEI.
-     */
-    Score *m_scoreBuffer;
+    int m_pageMarginTop;
 };
 
 } // namespace vrv

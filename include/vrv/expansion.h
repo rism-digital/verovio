@@ -9,6 +9,7 @@
 #define __VRV_EXPANSION_H__
 
 #include "atts_shared.h"
+#include "plistinterface.h"
 #include "systemelement.h"
 
 namespace vrv {
@@ -22,7 +23,7 @@ class Expansion;
 /**
  * This class represents a MEI expansion.
  */
-class Expansion : public SystemElement, public AttCommonPart, public AttPlist {
+class Expansion : public SystemElement, public PlistInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

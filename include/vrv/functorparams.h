@@ -12,7 +12,9 @@
 
 #include "vrvdef.h"
 
+namespace smf {
 class MidiFile;
+}
 
 namespace vrv {
 
@@ -20,9 +22,15 @@ class AttComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
+class Doc;
+class Dot;
 class Dots;
+class Dynam;
 class Ending;
 class FileOutputStream;
+class Functor;
+class Hairpin;
+class Harm;
 class KeySig;
 class Layer;
 class LayerElement;
@@ -37,6 +45,7 @@ class ScoreDef;
 class Staff;
 class StaffAlignment;
 class StaffDef;
+class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
@@ -49,7 +58,7 @@ class SystemAligner;
  * This is the base class for all MEI att classes.
  * It is not an abstract class but it should not be instanciated directly.
  * The att classes are generated with the libmei parser for Verovio.
-*/
+ */
 
 class FunctorParams {
 public:
@@ -79,7 +88,7 @@ public:
 
 /**
  * member 0: the ListOfObjects
-**/
+ **/
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
@@ -105,6 +114,31 @@ public:
         m_doc = doc;
     }
     Measure *m_currentMeasure;
+    Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArpegParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the array of Alignement, Arpeg, StaffN, bool tuples
+ * member 1: the MeasureAligner
+ * member 2: the Functor to be redirected to MeasureAligner
+ * member 3: the Doc
+ **/
+
+class AdjustArpegParams : public FunctorParams {
+public:
+    AdjustArpegParams(Doc *doc, Functor *functor)
+    {
+        m_measureAligner = NULL;
+        m_doc = doc;
+        m_functor = functor;
+    }
+    ArrayOfAligmentArpegTuples m_alignmentArpegTuples;
+    MeasureAligner *m_measureAligner;
     Functor *m_functor;
     Doc *m_doc;
 };
@@ -165,7 +199,7 @@ public:
  * member 0: the classId
  * member 1: the doc
  * member 2: a pointer to the functor for passing it to the system aligner
-**/
+ **/
 
 class AdjustFloatingPostionersParams : public FunctorParams {
 public:
@@ -193,7 +227,7 @@ public:
  * member 5: the current chord (if any)
  * member 6: the doc
  * member 7: a pointer to the functor for passing it to the system aligner
-**/
+ **/
 
 class AdjustLayersParams : public FunctorParams {
 public:
@@ -227,8 +261,13 @@ public:
 
 class AdjustFloatingPostionerGrpsParams : public FunctorParams {
 public:
-    AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
+    AdjustFloatingPostionerGrpsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_place = STAFFREL_basic_above;
+    }
     std::vector<ClassId> m_classIds;
+    data_STAFFREL_basic m_place;
     Doc *m_doc;
 };
 
@@ -239,7 +278,7 @@ public:
 /**
  * member 0: a pointer to the previous staff alignment
  * member 1: a pointer to the functor for passing it to the system aligner
-**/
+ **/
 
 class AdjustStaffOverlapParams : public FunctorParams {
 public:
@@ -267,11 +306,43 @@ public:
     AdjustSylSpacingParams(Doc *doc)
     {
         m_previousSyl = NULL;
+        m_previousMeasure = NULL;
+        m_freeSpace = 0;
+        m_staffSize = 100;
         m_doc = doc;
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
     Syl *m_previousSyl;
+    Measure *m_previousMeasure;
+    int m_freeSpace;
+    int m_staffSize;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustXOverflowParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current system
+ * member 1: the last measure;
+ * member 2: the current widest control event
+ * member 3: the margin
+ **/
+
+class AdjustXOverflowParams : public FunctorParams {
+public:
+    AdjustXOverflowParams(int margin)
+    {
+        m_currentSystem = NULL;
+        m_lastMeasure = NULL;
+        m_currentWidest = NULL;
+        m_margin = margin;
+    }
+    System *m_currentSystem;
+    Measure *m_lastMeasure;
+    FloatingPositioner *m_currentWidest;
+    int m_margin;
 };
 
 //----------------------------------------------------------------------------
@@ -355,33 +426,39 @@ public:
  * member 1: the time
  * member 2: the current Mensur
  * member 3: the current MeterSig
- * member 4: the functor for passing it to the TimeStampAligner
- * member 5: a flag indicating whereas we are processing the caution scoreDef
- * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
- * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
-**/
+ * member 4: the current notation type
+ * member 5: the functor for passing it to the TimeStampAligner
+ * member 6: a flag indicating whereas we are processing the caution scoreDef
+ * member 7: a flag indicating is we are in the first measure (for the scoreDef role)
+ * member 8: a flag indicating if we had mutliple layer alignment reference in the measure
+ * member 9: the doc
+ **/
 
 class AlignHorizontallyParams : public FunctorParams {
 public:
-    AlignHorizontallyParams(Functor *functor)
+    AlignHorizontallyParams(Functor *functor, Doc *doc)
     {
         m_measureAligner = NULL;
         m_time = 0.0;
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
+        m_notationType = NOTATIONTYPE_cmn;
         m_functor = functor;
-        m_scoreDefRole = NONE;
+        m_scoreDefRole = SCOREDEF_NONE;
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
+        m_doc = doc;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
+    data_NOTATIONTYPE m_notationType;
     Functor *m_functor;
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
     bool m_hasMultipleLayer;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -391,7 +468,7 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the cumulated justifiable width
-**/
+ **/
 
 class AlignMeasuresParams : public FunctorParams {
 public:
@@ -412,7 +489,7 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the system margin
-**/
+ **/
 
 class AlignSystemsParams : public FunctorParams {
 public:
@@ -434,18 +511,21 @@ public:
  * member 1: the staffIdx
  * member 2: the staffN
  * member 3: the cumulated shift for the default alignment
+ * member 4: the functor (for redirecting from page running elements)
  * member 4: the end functor (for redirecting from measure)
  * member 5: the doc
-**/
+ **/
 
 class AlignVerticallyParams : public FunctorParams {
 public:
-    AlignVerticallyParams(Doc *doc, Functor *functorEnd)
+    AlignVerticallyParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_systemAligner = NULL;
         m_staffIdx = 0;
         m_staffN = 0;
         m_cumulatedShift = 0;
+        m_pageWidth = 0;
+        m_functor = functor;
         m_functorEnd = functorEnd;
         m_doc = doc;
     }
@@ -453,6 +533,8 @@ public:
     int m_staffIdx;
     int m_staffN;
     int m_cumulatedShift;
+    int m_pageWidth;
+    Functor *m_functor;
     Functor *m_functorEnd;
     Doc *m_doc;
 };
@@ -508,6 +590,12 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcLedgerLine
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 
@@ -515,25 +603,56 @@ public:
  * member 0: std::vector<double>: a stack of maximum duration filled by the functor
  * member 1: double: the duration of the current measure
  * member 2: the current bpm
-**/
+ **/
 
 class CalcMaxMeasureDurationParams : public FunctorParams {
 public:
     CalcMaxMeasureDurationParams()
     {
-        m_currentValue = 0.0;
-        m_currentBpm = 120;
+        m_currentScoreTime = 0.0;
+        m_currentRealTimeSeconds = 0.0;
+        m_maxCurrentScoreTime = 0.0;
+        m_maxCurrentRealTimeSeconds = 0.0;
+        m_currentTempo = 120;
     }
-    std::vector<double> m_maxValues;
-    double m_currentValue;
-    int m_currentBpm;
+    double m_currentScoreTime;
+    double m_currentRealTimeSeconds;
+    double m_maxCurrentScoreTime;
+    double m_maxCurrentRealTimeSeconds;
+    int m_currentTempo;
 };
 
 //----------------------------------------------------------------------------
-// CalcLedgerLine
+// CalcOnsetOffset
 //----------------------------------------------------------------------------
 
-// Use FunctorDocParams
+/**
+ * member 0: double: the current score time in the measure (incremented by each element)
+ * member 1: double: the current real time in seconds in the measure (incremented by each element)
+ * member 2: the current Mensur
+ * member 3: the current MeterSig
+ * member 4: the current notation type
+ * member 5: the current tempo
+ **/
+
+class CalcOnsetOffsetParams : public FunctorParams {
+public:
+    CalcOnsetOffsetParams()
+    {
+        m_currentScoreTime = 0.0;
+        m_currentRealTimeSeconds = 0.0;
+        m_currentMensur = NULL;
+        m_currentMeterSig = NULL;
+        m_notationType = NOTATIONTYPE_cmn;
+        m_currentTempo = 120;
+    }
+    double m_currentScoreTime;
+    double m_currentRealTimeSeconds;
+    Mensur *m_currentMensur;
+    MeterSig *m_currentMeterSig;
+    data_NOTATIONTYPE m_notationType;
+    int m_currentTempo;
+};
 
 //----------------------------------------------------------------------------
 // CalcStemParams
@@ -593,13 +712,11 @@ public:
         m_currentPage = currentPage;
         m_currentSystem = currentSystem;
         m_contentSystem = contentSystem;
-        m_firstPbProcessed = false;
     }
     Doc *m_doc;
     Page *m_currentPage;
     System *m_contentSystem;
     System *m_currentSystem;
-    bool m_firstPbProcessed;
 };
 
 //----------------------------------------------------------------------------
@@ -612,7 +729,7 @@ public:
  * member 2: a pointer to the current page
  * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
  * member 4: the page height
-**/
+ **/
 
 class CastOffPagesParams : public FunctorParams {
 public:
@@ -623,12 +740,20 @@ public:
         m_currentPage = currentPage;
         m_shift = 0;
         m_pageHeight = 0;
+        m_pgHeadHeight = 0;
+        m_pgFootHeight = 0;
+        m_pgHead2Height = 0;
+        m_pgFoot2Height = 0;
     }
     Page *m_contentPage;
     Doc *m_doc;
     Page *m_currentPage;
     int m_shift;
     int m_pageHeight;
+    int m_pgHeadHeight;
+    int m_pgFootHeight;
+    int m_pgHead2Height;
+    int m_pgFoot2Height;
 };
 
 //----------------------------------------------------------------------------
@@ -643,11 +768,12 @@ public:
  * member 4: the system width
  * member 5: the current scoreDef width
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
-**/
+ * member 7: the doc
+ **/
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem)
+    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc)
     {
         m_contentSystem = contentSystem;
         m_page = page;
@@ -655,6 +781,7 @@ public:
         m_shift = 0;
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
+        m_doc = doc;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -663,6 +790,78 @@ public:
     int m_systemWidth;
     int m_currentScoreDefWidth;
     ArrayOfObjects m_pendingObjects;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// ConvertAnalyticalMarkupParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector<Note*>* that holds the current notes with open ties
+ * member 1: Chord** currentChord for the current chord if in a chord
+ * member 2: an array of control events to be added to the measure (at its end)
+ * member 3: a flag indicating whereas the conversion is permanent of not
+ **/
+
+class ConvertAnalyticalMarkupParams : public FunctorParams {
+public:
+    ConvertAnalyticalMarkupParams(bool permanent)
+    {
+        m_currentChord = NULL;
+        m_permanent = permanent;
+    }
+    std::vector<Note *> m_currentNotes;
+    Chord *m_currentChord;
+    ArrayOfObjects m_controlEvents;
+    bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
+// ConvertToCastOffMensuralParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer the document we are adding pages to
+ * member 1: a vector of all the staff @n for finding spliting bar lines
+ * member 2: a pointer to the content Layer from which we are copying the elements
+ * member 3: a pointer to the target destination System
+ * member 4: a pointer to a sub-system (e.g., section) to add measure segments
+ * member 4: a pointer to the target destination System
+ * member 5: a pointer to the target destination Measure
+ * member 6: a pointer to the target destination Staff
+ * member 7: a pointer to the target destination Layer
+ * member 8: a counter for segments in the sub-system (section)
+ * member 9  a counter for the total number of segments (previous sections)
+ * member 10: a IntTree for precessing by Layer
+ **/
+
+class ConvertToCastOffMensuralParams : public FunctorParams {
+public:
+    ConvertToCastOffMensuralParams(Doc *doc, System *targetSystem, IntTree *layerTree)
+    {
+        m_doc = doc;
+        m_contentLayer = NULL;
+        m_targetSystem = targetSystem;
+        m_targetSubSystem = NULL;
+        m_targetMeasure = NULL;
+        m_targetStaff = NULL;
+        m_targetLayer = NULL;
+        m_segmentIdx = 0;
+        m_segmentTotal = 0;
+        m_layerTree = layerTree;
+    }
+    Doc *m_doc;
+    std::vector<int> m_staffNs;
+    Layer *m_contentLayer;
+    System *m_targetSystem;
+    System *m_targetSubSystem;
+    Measure *m_targetMeasure;
+    Staff *m_targetStaff;
+    Layer *m_targetLayer;
+    int m_segmentIdx;
+    int m_segmentTotal;
+    IntTree *m_layerTree;
 };
 
 //----------------------------------------------------------------------------
@@ -680,12 +879,37 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertToUnCastOffMensuralParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the content / target Measure (NULL at the beginning of a section)
+ * member 1: a pointer to the content / target Layer (NULL at the beginning of a section)
+ * member 2: a flag indicating if we keep a reference of the measure segments to delete at the end
+ * member 3: a list of measure segments to delete at the end (fill in the first pass only)
+ **/
+
+class ConvertToUnCastOffMensuralParams : public FunctorParams {
+public:
+    ConvertToUnCastOffMensuralParams()
+    {
+        m_contentMeasure = NULL;
+        m_contentLayer = NULL;
+        m_addSegmentsToDelete = true;
+    }
+    Measure *m_contentMeasure;
+    Layer *m_contentLayer;
+    bool m_addSegmentsToDelete;
+    ArrayOfObjects m_segmentsToDelete;
+};
+
+//----------------------------------------------------------------------------
 // FillStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
-**/
+ **/
 
 class FillStaffCurrentTimeSpanningParams : public FunctorParams {
 public:
@@ -694,42 +918,68 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindAllByAttComparisonParams
+// FindAllBetweenParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the attComparision text
  * member 1: an array of all matching objects
-**/
+ * member 2: the start object range
+ * member 3: the end object range
+ **/
 
-class FindAllByAttComparisonParams : public FunctorParams {
+class FindAllBetweenParams : public FunctorParams {
 public:
-    FindAllByAttComparisonParams(AttComparison *attComparison, ArrayOfObjects *elements)
+    FindAllBetweenParams(Comparison *comparison, ArrayOfObjects *elements, Object *start, Object *end)
     {
-        m_attComparison = attComparison;
+        m_comparison = comparison;
+        m_elements = elements;
+        m_start = start;
+        m_end = end;
+    }
+    Comparison *m_comparison;
+    ArrayOfObjects *m_elements;
+    Object *m_start;
+    Object *m_end;
+};
+
+//----------------------------------------------------------------------------
+// FindAllByComparisonParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the attComparision text
+ * member 1: an array of all matching objects
+ **/
+
+class FindAllByComparisonParams : public FunctorParams {
+public:
+    FindAllByComparisonParams(Comparison *comparison, ArrayOfObjects *elements)
+    {
+        m_comparison = comparison;
         m_elements = elements;
     }
-    AttComparison *m_attComparison;
+    Comparison *m_comparison;
     ArrayOfObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------
-// FindByAttComparisonParams
+// FindByComparisonParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the attComparision text
  * member 1: the pointer to pointer to the Object
-**/
+ **/
 
-class FindByAttComparisonParams : public FunctorParams {
+class FindByComparisonParams : public FunctorParams {
 public:
-    FindByAttComparisonParams(AttComparison *attComparison)
+    FindByComparisonParams(Comparison *comparison)
     {
-        m_attComparison = attComparison;
+        m_comparison = comparison;
         m_element = NULL;
     }
-    AttComparison *m_attComparison;
+    Comparison *m_comparison;
     Object *m_element;
 };
 
@@ -740,7 +990,7 @@ public:
 /**
  * member 0: the uuid we are looking for
  * member 1: the pointer to pointer to the Object
-**/
+ **/
 
 class FindByUuidParams : public FunctorParams {
 public:
@@ -750,23 +1000,58 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindExtremeByAttComparisonParams
+// FindExtremeByComparisonParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the attComparision text
  * member 1: the pointer to pointer to the Object
-**/
+ **/
 
-class FindExtremeByAttComparisonParams : public FunctorParams {
+class FindExtremeByComparisonParams : public FunctorParams {
 public:
-    FindExtremeByAttComparisonParams(AttComparison *attComparison)
+    FindExtremeByComparisonParams(Comparison *comparison)
     {
-        m_attComparison = attComparison;
+        m_comparison = comparison;
         m_element = NULL;
     }
-    AttComparison *m_attComparison;
+    Comparison *m_comparison;
     Object *m_element;
+};
+
+//----------------------------------------------------------------------------
+// FindSpaceInAlignmentParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the time of the event
+ * member 1: the duration of the event
+ * member 2: the layer count at that position
+ * member 3: the flag indicating whereas the event is aligned with a space
+ * member 4: the current meter signature
+ * member 5: the current mensur
+ * member 6: the functor for redirection
+ **/
+
+class FindSpaceInAlignmentParams : public FunctorParams {
+public:
+    FindSpaceInAlignmentParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
+    {
+        m_time = 0.0;
+        m_duration = 0.0;
+        m_layerCount = 1;
+        m_success = false;
+        m_meterSig = meterSig;
+        m_mensur = mensur;
+        m_functor = functor;
+    }
+    double m_time;
+    double m_duration;
+    int m_layerCount;
+    bool m_success;
+    MeterSig *m_meterSig;
+    Mensur *m_mensur;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -797,32 +1082,60 @@ public:
 
 /**
  * member 0: MidiFile*: the MidiFile we are writing to
- * member 1: int*: the midi track number
- * member 2: int*: the current time in the measure (incremented by each element)
- * member 3: int*: the current total measure time (incremented by each measure
- * member 4: std::vector<double>: a stack of maximum duration filled by the functor
- * member 5: int* the semi tone transposition for the current track
- * member 6: int with the current bpm
-**/
+ * member 1: int: the midi track number
+ * member 3: double: the score time from the start of the music to the start of the current measure
+ * member 4: int: the semi tone transposition for the current track
+ * member 5: int with the current tempo
+ **/
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(MidiFile *midiFile)
+    GenerateMIDIParams(smf::MidiFile *midiFile)
     {
         m_midiFile = midiFile;
+        m_midiChannel = 0;
         m_midiTrack = 1;
-        m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;
-        m_currentBpm = 120;
+        m_currentTempo = 120;
     }
-    MidiFile *m_midiFile;
+    smf::MidiFile *m_midiFile;
+    int m_midiChannel;
     int m_midiTrack;
-    double m_currentMeasureTime;
     double m_totalTime;
-    std::vector<double> m_maxValues;
     int m_transSemi;
-    int m_currentBpm;
+    int m_currentTempo;
+};
+
+//----------------------------------------------------------------------------
+// GenerateTimemapParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: mapping of real times to score times
+ * member 1: mapping of real times to elements which should be highlighted at time
+ * member 2: mapping of real times to elements which should be unhighlighted at time
+ * member 3: mapping of real times to tempos
+ * member 4: Score time from the start of the piece to previous barline in quarter notes
+ * member 5: Real time from the start of the piece to previous barline in ms
+ * member 6: Currently active tempo
+ **/
+
+class GenerateTimemapParams : public FunctorParams {
+public:
+    GenerateTimemapParams()
+    {
+        m_scoreTimeOffset = 0.0;
+        m_realTimeOffsetMilliseconds = 0;
+        m_currentTempo = 120;
+    }
+    std::map<int, double> realTimeToScoreTime;
+    std::map<int, std::vector<std::string> > realTimeToOnElements;
+    std::map<int, std::vector<std::string> > realTimeToOffElements;
+    std::map<int, int> realTimeToTempo;
+    double m_scoreTimeOffset;
+    int m_realTimeOffsetMilliseconds;
+    int m_currentTempo;
 };
 
 //----------------------------------------------------------------------------
@@ -857,7 +1170,7 @@ public:
  * member 2: the non justifiable margin
  * member 3: the system full width (without system margins)
  * member 4: the functor to be redirected to the MeasureAligner
-**/
+ **/
 
 class JustifyXParams : public FunctorParams {
 public:
@@ -879,13 +1192,45 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// OptimizeScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ * member 2: the flag indicating if we are optimizing encoded layout
+ * member 3: the doc
+ **/
+
+class OptimizeScoreDefParams : public FunctorParams {
+public:
+    OptimizeScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_encoded = false;
+        m_firstScoreDef = true;
+        m_hasFermata = false;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDef *m_currentScoreDef;
+    bool m_encoded;
+    bool m_firstScoreDef;
+    bool m_hasFermata;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
 // PrepareBoundariesParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the last measure
  * member 1: the current boundary
-**/
+ **/
 
 class PrepareBoundariesParams : public FunctorParams {
 public:
@@ -906,17 +1251,18 @@ public:
 /**
  * member 0: the previous ending
  * member 1: the current grpId
+ * member 2: the dynam in the current measure
+ * member 3: the current hairpins to be linked / grouped
+ * member 4: the map of existing harms (based on @n)
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams()
-    {
-        m_previousEnding = NULL;
-        m_drawingGrpId = DRAWING_GRP_OTHER;
-    }
+    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
     Ending *m_previousEnding;
-    int m_drawingGrpId;
+    std::vector<Dynam *> m_dynams;
+    std::vector<Hairpin *> m_hairpins;
+    std::map<std::string, Harm *> m_harms;
 };
 
 //----------------------------------------------------------------------------
@@ -947,7 +1293,7 @@ public:
 /**
  * member 0: the current Syl
  * member 1: the last Note
-**/
+ **/
 
 class PrepareLyricsParams : public FunctorParams {
 public:
@@ -963,6 +1309,75 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareLinkingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
+ **/
+
+class PrepareLinkingParams : public FunctorParams {
+public:
+    PrepareLinkingParams() { m_fillList = true; }
+    ArrayOfLinkingInterfaceUuidPairs m_nextUuidPairs;
+    ArrayOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
+    bool m_fillList;
+};
+
+//----------------------------------------------------------------------------
+// PreparePlistParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
+ **/
+
+class PreparePlistParams : public FunctorParams {
+public:
+    PreparePlistParams() { m_fillList = true; }
+    ArrayOfPlistInterfaceUuidPairs m_interfaceUuidPairs;
+    bool m_fillList;
+};
+
+//----------------------------------------------------------------------------
+// PreparePointersByLayerParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current Note
+ * member 1: the last Dot
+ **/
+
+class PreparePointersByLayerParams : public FunctorParams {
+public:
+    PreparePointersByLayerParams()
+    {
+        m_currentNote = NULL;
+        m_lastDot = NULL;
+    }
+    Note *m_currentNote;
+    Dot *m_lastDot;
+};
+
+//----------------------------------------------------------------------------
+// PrepareProcessingListsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the IntTree* for staff/layer/verse
+ * member 1: the IntTree* for staff/layer
+ **/
+
+class PrepareProcessingListsParams : public FunctorParams {
+public:
+    PrepareProcessingListsParams() {}
+    IntTree m_verseTree;
+    IntTree m_layerTree;
+};
+
+//----------------------------------------------------------------------------
 // PrepareRptParams
 //----------------------------------------------------------------------------
 
@@ -970,7 +1385,7 @@ public:
  * member 0: a pointer to the current MRpt pointer
  * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
  * member 2: a pointer to the doc scoreDef
-**/
+ **/
 
 class PrepareRptParams : public FunctorParams {
 public:
@@ -983,53 +1398,6 @@ public:
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
     ScoreDef *m_currentScoreDef;
-};
-
-//----------------------------------------------------------------------------
-// PreparePointersByLayerParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current Note
-**/
-
-class PreparePointersByLayerParams : public FunctorParams {
-public:
-    PreparePointersByLayerParams() { m_currentNote = NULL; }
-    Note *m_currentNote;
-};
-
-//----------------------------------------------------------------------------
-// PrepareProcessingListsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the IntTree* for staff/layer/verse
- * member 1: the IntTree* for staff/layer
-**/
-
-class PrepareProcessingListsParams : public FunctorParams {
-public:
-    PrepareProcessingListsParams() {}
-    IntTree m_verseTree;
-    IntTree m_layerTree;
-};
-
-//----------------------------------------------------------------------------
-// PrepareTieAttrParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector<Note*>* that holds the current notes with open ties
- * member 1: Chord** currentChord for the current chord if in a chord
-**/
-
-class PrepareTieAttrParams : public FunctorParams {
-public:
-    PrepareTieAttrParams() { m_currentChord = NULL; }
-
-    std::vector<Note *> m_currentNotes;
-    Chord *m_currentChord;
 };
 
 //----------------------------------------------------------------------------
@@ -1053,7 +1421,7 @@ public:
 /**
  * member 0: std::vector< Object*>* that holds the current elements to match
  * member 1: bool* fillList for indicating whether the elements have to be stacked or not
-**/
+ **/
 
 class PrepareTimeSpanningParams : public FunctorParams {
 public:
@@ -1069,7 +1437,7 @@ public:
 /**
  * member 0: std::vector< Object*>* that holds the current elements to match
  * member 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-**/
+ **/
 
 class PrepareTimestampsParams : public FunctorParams {
 public:
@@ -1087,7 +1455,7 @@ public:
  * member 1: KeySig pointer (NULL if none)
  * member 2: Mensur pointer (NULL if none)
  * member 3: MeterSig pointer (NULL if none)
-**/
+ **/
 
 class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
 public:
@@ -1110,7 +1478,7 @@ public:
 
 /**
  * member 0: output stream
-**/
+ **/
 
 class SaveParams : public FunctorParams {
 public:
@@ -1142,7 +1510,7 @@ public:
  * member 2: duration of the longest note
  * member 3: the doc
  * member 4: the functor to be redirected to Aligner
-**/
+ **/
 
 class SetAlignmentXPosParams : public FunctorParams {
 public:
@@ -1193,7 +1561,7 @@ public:
  * member 4: the current system (for setting the system scoreDef)
  * member 5: the flag indicating whereas full labels have to be drawn
  * member 6: the doc
-**/
+ **/
 
 class SetCurrentScoreDefParams : public FunctorParams {
 public:
@@ -1223,7 +1591,7 @@ public:
 /**
  * member 0: the current staffAlignment
  * member 1: the doc
-**/
+ **/
 
 class SetOverflowBBoxesParams : public FunctorParams {
 public:
@@ -1246,7 +1614,7 @@ public:
  * member 2: bool mensur flag
  * member 3: bool meterSig flag
  * member 4: bool the flag for indicating if apply to all or not
-**/
+ **/
 
 class SetStaffDefRedrawFlagsParams : public FunctorParams {
 public:
@@ -1271,7 +1639,7 @@ public:
 
 /**
  * member 0: a pointer to the system we are adding system to
-**/
+ **/
 
 class UnCastOffParams : public FunctorParams {
 public:

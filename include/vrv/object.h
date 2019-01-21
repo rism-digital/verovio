@@ -28,6 +28,7 @@ class EditorialElement;
 class FileOutputStream;
 class Functor;
 class FunctorParams;
+class LinkingInterface;
 class PitchInterface;
 class PositionInterface;
 class ScoreDefInterface;
@@ -35,31 +36,6 @@ class StemmedDrawingInterface;
 class TextDirInterface;
 class TimePointInterface;
 class TimeSpanningInterface;
-
-/**
- * Generic int map recursive structure for storing hierachy of values
- * For example, we want to process all staves one by one, and within each staff
- * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store
- * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
- * The stucture must be filled first and can then be used by instanciating a vector
- * of corresponding AttComparison (typically AttCommonNComparison for @n attribute).
- * See Doc::PrepareDrawing for an example.
- */
-struct IntTree {
-    std::map<int, IntTree> child;
-};
-
-typedef std::map<int, IntTree> IntTree_t;
-
-/**
- * This is the alternate way for representing map of maps. With this solution,
- * we can easily have different types of key (attribute) at each level. We could
- * mix int, string, or even MEI data_* types. The drawback is that a type has to
- * be defined at each level. Also see Doc::PrepareDrawing for an example.
- */
-typedef std::map<int, bool> VerseN_t;
-typedef std::map<int, VerseN_t> LayerN_VerserN_t;
-typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true
@@ -123,6 +99,10 @@ public:
     {
         return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
     }
+    bool IsRunningElement() const
+    {
+        return (this->GetClassId() > RUNNING_ELEMENT && this->GetClassId() < RUNNING_ELEMENT_max);
+    }
     bool IsScoreDefElement() const
     {
         return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);
@@ -151,7 +131,9 @@ public:
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
+    virtual LinkingInterface *GetLinkingInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
+    virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
     virtual ScoreDefInterface *GetScoreDefInterface() { return NULL; }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return NULL; }
@@ -190,6 +172,12 @@ public:
     void MoveChildrenFrom(Object *sourceParent, int idx = -1, bool allowTypeChange = false);
 
     /**
+     * Replace the currentChild with the replacingChild.
+     * The currentChild is not deleted by the methods.
+     */
+    void ReplaceChild(Object *currentChild, Object *replacingChild);
+
+    /**
      * Move an object to another parent.
      * The object is relinquished from its current parent - see Object::Relinquish
      */
@@ -201,29 +189,49 @@ public:
      */
     virtual Object *Clone() const;
 
+    /**
+     * Indicate whereas children have to be copied in copy / assignment constructors.
+     * This is true by default but can be overriden (e.g., for Staff, Layer)
+     */
+    virtual bool CopyChildren() const { return true; }
+
+    /**
+     * Reset pointers after a copy and assignment constructor call.
+     * This methods has to be called expicitly when overriden because it is not called from the constructors.
+     * Do not forget to call base-class equivalent whenever applicable (e.g, with more than one hierarchy level).
+     */
+    virtual void CopyReset(){};
+
     std::string GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);
+    void SwapUuid(Object *other);
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
-    bool HasComment(void) { return !m_comment.empty(); }
+    bool HasComment() { return !m_comment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.
      * Used for classes with several types of children.
-     * The method with a ClassId only searches at the first level.
+     * The methods count at the first level.
      */
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
+    int GetChildCount(const ClassId classId, int deepth);
     ///@}
 
     /**
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
+    
+    /**
+     * Return a cont pointer to the children
+     */
+    const ArrayOfObjects *GetChildren() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -241,11 +249,20 @@ public:
      * GetFirst returns the first element child of the specified type.
      * Its position and the specified type are stored and used of accessing next elements
      * The methods returns NULL when no child is found or when the end is reached.
-     * Always call GetFirst before calling GetNext
+     * Always call GetFirst before calling GetNext() or call GetNext(child)
      */
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
     Object *GetNext();
+    ///@}
+
+    /**
+     * @name Retrieving next or previous sibling of a certain type.
+     * Returns NULL is not found
+     */
+    ///@{
+    Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetPrevious(Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
@@ -302,6 +319,11 @@ public:
      * Look for the Object in the children and return its position (-1 if not found)
      */
     int GetChildIndex(const Object *child);
+    
+    /**
+     * Look for all Objects of a class and return its position (-1 if not found)
+     */
+    int GetChildIndex(const Object *child, const ClassId classId, int deepth);
 
     /**
      * Insert an element at the idx position.
@@ -333,25 +355,31 @@ public:
     Object *FindChildByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return the first element matching the AttComparison functor
+     * Return the first element matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByAttComparison(
-        AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindChildByComparison(Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return the element matching the extreme value with an AttComparison functor
+     * Return the element matching the extreme value with an Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildExtremeByAttComparison(
-        AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindChildExtremeByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return all the object matching the AttComparison functor
+     * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
+    void FindAllChildByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+        bool direction = FORWARD, bool clear = true);
+
+    /**
+     * Return all the objects matching the Comparison functor and being between start and end in the tree.
+     * The start and end objects are included in the result set.
+     */
+    void FindAllChildBetween(
+        ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -369,6 +397,11 @@ public:
      * This has to be used when children are moved but then the parent is not deleted.
      */
     void ClearRelinquishedChildren();
+
+    /**
+     * Clear the children vector and delete all the objects.
+     */
+    void ClearChildren();
 
     /**
      * Remove and delete the child.
@@ -424,14 +457,14 @@ public:
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The ArrayOfAttComparisons filter parameter makes is possible to process only objects of a
-     * type that matches the attribute value given in the AttComparison object.
+     * The ArrayOfComparisons filter parameter makes is possible to process only objects of a
+     * type that matches the attribute value given in the Comparison object.
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
      */
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfAttComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     //----------//
     // Functors //
@@ -453,18 +486,28 @@ public:
     virtual int FindByUuid(FunctorParams *functorParams);
 
     /**
-     * Find a Object with a AttComparison functor .     */
-    virtual int FindByAttComparison(FunctorParams *functorParams);
+     * Find a Object with a Comparison functor .     */
+    virtual int FindByComparison(FunctorParams *functorParams);
 
     /**
-     * Find a Object with the extreme value with a AttComparison functor .
+     * Find a Object with the extreme value with a Comparison functor .
      */
-    virtual int FindExtremeByAttComparison(FunctorParams *functorParams);
+    virtual int FindExtremeByComparison(FunctorParams *functorParams);
 
     /**
-     * Find a all Object with a AttComparison functor.
+     * Find a all Object with an Comparison functor.
      */
-    virtual int FindAllByAttComparison(FunctorParams *functorParams);
+    virtual int FindAllByComparison(FunctorParams *functorParams);
+
+    /**
+     * Find a all Object between a start and end Object and with an Comparison functor.
+     */
+    virtual int FindAllBetween(FunctorParams *functorParams);
+
+    /**
+     * Look if the time / duration passed as parameter overlap with a space in the alignment references
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the time spanning layer elements between two points
@@ -490,6 +533,24 @@ public:
     ///@{
     virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    ///@{
+    virtual int ConvertToCastOffMensural(FunctorParams *functorParams);
+    virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Convert analytical markup (@fermata, @tie) to elements.
+     * See Doc::ConvertAnalyticalMarkupDoc
+     */
+    ///@{
+    virtual int ConvertAnalyticalMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -559,6 +620,13 @@ public:
     virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     */
+    ///@{
+    virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArpegEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Adjust the position the outside articulations.
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -577,6 +645,15 @@ public:
      * Adjust the x position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the x position of a right barline in order to make sure the is no text content
+     * overlflowing in the right margin
+     */
+    ///@{
+    virtual int AdjustXOverflow(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXOverflowEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
@@ -707,6 +784,15 @@ public:
     virtual int SetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
+     * Optimize the scoreDef for each system.
+     * For automatic breaks, looks for staves with only mRests.
+     */
+    ///@{
+    virtual int OptimizeScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int OptimizeScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Set the cautionnary scoreDef wherever need.
      */
     virtual int SetCautionaryScoreDef(FunctorParams *functorParams);
@@ -745,9 +831,23 @@ public:
     ///@}
 
     /**
+     * Match linking element (e.g, @next).
+     */
+    ///@{
+    virtual int PrepareLinking(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Match elements of @plist.
+     */
+    ///@{
+    virtual int PreparePlist(FunctorParams *functorParams);
+    ///@}
 
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
@@ -778,17 +878,6 @@ public:
     ///@}
 
     /**
-     * Process Chord and Note for matching @tie by processing by Layer and by looking
-     * at the Pname and Oct.
-     * At the end, processes Chord and Note for matching @tie by processing by Layer; resets the
-     * Chord pointer to NULL at the end of a chord.
-     */
-    ///@{
-    virtual int PrepareTieAttr(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int PrepareTieAttrEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
      * Process by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
      */
@@ -796,7 +885,7 @@ public:
 
     /**
      * Set wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfComparisons filter.
      * At the end, the functor is processed by doc at the end of a document of closing opened syl.
      */
     ///@{
@@ -812,7 +901,7 @@ public:
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
-     * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer using an ArrayOfComparisons filter.
      */
     virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -822,9 +911,13 @@ public:
     virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Functor for grouping FloatingObject by drawingGrpId
+     * @name Functor for grouping FloatingObject by drawingGrpId.
+     * Also chains the Dynam and Hairpin
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareFloatingGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Go through all the TimeSpanningInterface elements and set them a current to each staff
@@ -898,11 +991,32 @@ public:
     ///@{
 
     /**
+     * Prepare Note onsets
+     */
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Adjust note timings based on ties
+     */
+    ///@{
+    virtual int ResolveMIDITies(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Export the object to a MidiFile
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Export the object to a JSON timemap file.
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -913,11 +1027,7 @@ public:
     ///@}
 
 protected:
-    /**
-     * Clear the children vector and delete all the objects.
-     */
-    void ClearChildren();
-
+    //
 private:
     /**
      * Method for generating the uuid.
@@ -1054,7 +1164,7 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    ListOfObjects *GetList(Object *node);
+    const ListOfObjects *GetList(Object *node);
 
 private:
     mutable ListOfObjects m_list;
@@ -1095,6 +1205,11 @@ public:
      * Returns a contatenated version of all the text children
      */
     std::wstring GetText(Object *node);
+    
+    /**
+     * Fill an array of lines with concatenated content of each line
+     */
+    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
 
 protected:
     /**

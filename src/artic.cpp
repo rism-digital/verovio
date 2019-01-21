@@ -24,8 +24,7 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
-    ARTICULATION_marc_stacc, ARTICULATION_upbow, ARTICULATION_harm };
+std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
 
 std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
     = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
@@ -43,9 +42,7 @@ Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlace
     Reset();
 }
 
-Artic::~Artic()
-{
-}
+Artic::~Artic() {}
 
 void Artic::Reset()
 {
@@ -79,7 +76,7 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     auto end = Artic::s_outStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
 
-    for (iter = articList.begin(); iter != articList.end(); iter++) {
+    for (iter = articList.begin(); iter != articList.end(); ++iter) {
         // return false if one cannot be rendered on the staff
         auto i = std::find(Artic::s_outStaffArtic.begin(), end, *iter);
         if (i != end)
@@ -92,27 +89,26 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
 ArticPart *Artic::GetInsidePart()
 {
     ArticPartTypeComparison articPartComparison(ARTIC_PART_INSIDE);
-    return dynamic_cast<ArticPart *>(FindChildByAttComparison(&articPartComparison, 1));
+    return dynamic_cast<ArticPart *>(FindChildByComparison(&articPartComparison, 1));
 }
 
 ArticPart *Artic::GetOutsidePart()
 {
     ArticPartTypeComparison articPartComparison(ARTIC_PART_OUTSIDE);
-    return dynamic_cast<ArticPart *>(FindChildByAttComparison(&articPartComparison, 1));
+    return dynamic_cast<ArticPart *>(FindChildByComparison(&articPartComparison, 1));
 }
 
-wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
+wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
 {
-    if (place == STAFFREL_above) {
+    if (place.GetBasic() == STAFFREL_basic_above) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A0_articAccentAbove;
             case ARTICULATION_stacc: return SMUFL_E4A2_articStaccatoAbove;
             case ARTICULATION_ten: return SMUFL_E4A4_articTenutoAbove;
             case ARTICULATION_stacciss: return SMUFL_E4A8_articStaccatissimoWedgeAbove;
             case ARTICULATION_marc: return SMUFL_E4AC_articMarcatoAbove;
-            case ARTICULATION_marc_stacc: return SMUFL_E4AE_articMarcatoStaccatoAbove;
-            case ARTICULATION_spicc:
-                return SMUFL_E4A6_articStaccatissimoAbove;
+            // case ARTICULATION_marc_stacc: return SMUFL_E4AE_articMarcatoStaccatoAbove;
+            case ARTICULATION_spicc: return SMUFL_E4A6_articStaccatissimoAbove;
             // case ARTICULATION_doit;
             // case ARTICULATION_scoop;
             // case ARTICULATION_rip;
@@ -125,12 +121,10 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
             // case ARTICULATION_shake;
             case ARTICULATION_dnbow: return SMUFL_E610_stringsDownBow;
             case ARTICULATION_upbow: return SMUFL_E612_stringsUpBow;
-            case ARTICULATION_harm:
-                return SMUFL_E614_stringsHarmonic;
+            case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             // case ARTICULATION_snap;
             // case ARTICULATION_fingernail;
-            case ARTICULATION_ten_stacc:
-                return SMUFL_E4B2_articTenutoStaccatoAbove;
+            // case ARTICULATION_ten_stacc: return SMUFL_E4B2_articTenutoStaccatoAbove;
             // case ARTICULATION_damp;
             // case ARTICULATION_dampall;
             // case ARTICULATION_open;
@@ -146,24 +140,23 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
             default: return 0; break;
         }
     }
-    else if (place == STAFFREL_below) {
+    else if (place.GetBasic() == STAFFREL_basic_below) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A1_articAccentBelow;
             case ARTICULATION_stacc: return SMUFL_E4A3_articStaccatoBelow;
             case ARTICULATION_ten: return SMUFL_E4A5_articTenutoBelow;
             case ARTICULATION_stacciss: return SMUFL_E4A9_articStaccatissimoWedgeBelow;
             case ARTICULATION_marc: return SMUFL_E4AD_articMarcatoBelow;
-            case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
-            case ARTICULATION_spicc:
-                return SMUFL_E4A7_articStaccatissimoBelow;
+            // Removed in MEI 4.0
+            //case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
+            case ARTICULATION_spicc: return SMUFL_E4A7_articStaccatissimoBelow;
             //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
             case ARTICULATION_upbow: return SMUFL_E613_stringsUpBowTurned;
-            case ARTICULATION_harm:
-                return SMUFL_E614_stringsHarmonic;
+            case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             //
-            case ARTICULATION_ten_stacc:
-                return SMUFL_E4B3_articTenutoStaccatoBelow;
+            // Removed in MEI 4.0
+            //case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
             default: return 0; break;
         }
@@ -172,9 +165,9 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
         return 0;
 }
 
-bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
+bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
 {
-    if (place == STAFFREL_above)
+    if (place.GetBasic() == STAFFREL_basic_above)
         return false;
     else if (code == SMUFL_E611_stringsDownBowTurned)
         return true;
@@ -212,9 +205,7 @@ ArticPart::ArticPart(ArticPartType type, Artic *artic)
     this->SetColor(artic->GetColor());
 }
 
-ArticPart::~ArticPart()
-{
-}
+ArticPart::~ArticPart() {}
 
 void ArticPart::Reset()
 {
@@ -230,7 +221,7 @@ bool ArticPart::AlwaysAbove()
     auto end = Artic::s_aboveStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
 
-    for (iter = articList.begin(); iter != articList.end(); iter++) {
+    for (iter = articList.begin(); iter != articList.end(); ++iter) {
         // return false if one has always to be rendered above the staff
         auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, *iter);
         if (i != end) {
@@ -269,7 +260,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     Note *parentNote = NULL;
     Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, 2));
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-    data_STAFFREL place = STAFFREL_NONE;
+    data_STAFFREL_basic place = STAFFREL_basic_NONE;
 
     if (!parentChord) {
         parentNote = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
@@ -294,22 +285,28 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     /************** placement **************/
 
     bool allowAbove = true;
+    data_STEMDIRECTION layerStemDir;
 
     // for now we ignore within @place
-    if (this->HasPlace() && (this->GetPlace() != STAFFREL_within)) {
-        place = this->GetPlace();
+    if (this->GetPlace().GetBasic() != STAFFREL_basic_NONE) {
+        place = this->GetPlace().GetBasic();
         // If we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
+    else if ((layerStemDir = layer->GetDrawingStemDir(parent)) != STEMDIRECTION_NONE) {
+        place = (layerStemDir == STEMDIRECTION_up) ? STAFFREL_basic_above : STAFFREL_basic_below;
         // If we have more than one layer do not allow to be changed to above
         allowAbove = false;
     }
     else if (stemDir == STEMDIRECTION_up)
-        place = STAFFREL_below;
+        place = STAFFREL_basic_below;
     else
-        place = STAFFREL_above;
+        place = STAFFREL_basic_above;
+
+    /************** adjust the xRel position **************/
+
+    int xShift = parent->GetDrawingRadius(params->m_doc);
+    this->SetDrawingXRel(xShift);
 
     /************** set it to both the inside and outside part **************/
 
@@ -317,19 +314,24 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     ArticPart *outsidePart = this->GetOutsidePart();
 
     if (insidePart) {
-        insidePart->SetPlace(place);
+        data_STAFFREL staffRel;
+        staffRel.SetBasic(place);
+        insidePart->SetPlace(staffRel);
     }
 
     if (outsidePart) {
         // If allowAbove is true it will place the above if the content requires so (even if place below if given)
-        if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
-        outsidePart->SetPlace(place);
+        if (place == STAFFREL_basic_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_basic_above;
+        data_STAFFREL staffRel;
+        staffRel.SetBasic(place);
+        outsidePart->SetPlace(staffRel);
     }
 
     /************** calculate the y position **************/
 
     Staff *staffAbove = NULL;
     Staff *staffBelow = NULL;
+    Layer *crossLayer = NULL;
 
     // Cross-staff handling of articulation will need to be re-thought. We can look at assiging a cross-staff to the
     // appropriate ArticPart
@@ -338,6 +340,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         staff = parent->m_crossStaff;
         staffAbove = staff;
         staffBelow = staff;
+        crossLayer = parent->m_crossLayer;
     }
     else if (parentChord) {
         parentChord->GetCrossStaffExtremes(staffAbove, staffBelow);
@@ -356,24 +359,36 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     // notes
     // The problem is that in MEI artic are children of chord element and not of the notes
     if (insidePart) {
-        if (insidePart->GetPlace() == STAFFREL_above) {
+        if (insidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
             insidePart->SetDrawingYRel(yInAbove);
-            insidePart->m_crossStaff = staffAbove;
+            if (parent->m_crossStaff) {
+                insidePart->m_crossStaff = staffAbove;
+                insidePart->m_crossLayer = crossLayer;
+            }
         }
         else {
             insidePart->SetDrawingYRel(yInBelow);
-            insidePart->m_crossStaff = staffBelow;
+            if (parent->m_crossStaff) {
+                insidePart->m_crossStaff = staffBelow;
+                insidePart->m_crossLayer = crossLayer;
+            }
         }
     }
 
     if (outsidePart) {
-        if (outsidePart->GetPlace() == STAFFREL_above) {
+        if (outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
             outsidePart->SetDrawingYRel(yOutAbove);
-            outsidePart->m_crossStaff = staffAbove;
+            if (parent->m_crossStaff) {
+                outsidePart->m_crossStaff = staffAbove;
+                outsidePart->m_crossLayer = crossLayer;
+            }
         }
         else {
             outsidePart->SetDrawingYRel(yOutBelow);
-            outsidePart->m_crossStaff = staffBelow;
+            if (parent->m_crossStaff) {
+                outsidePart->m_crossStaff = staffBelow;
+                outsidePart->m_crossLayer = crossLayer;
+            }
         }
     }
 
@@ -382,10 +397,10 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     if (insidePart && outsidePart) {
 
         int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
-            * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+            * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         if (insidePart->GetPlace() == outsidePart->GetPlace()) {
-            if (insidePart->GetPlace() == STAFFREL_above) {
+            if (insidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
                 int inTop = insidePart->GetContentTop();
                 int outBottom = outsidePart->GetContentBottom();
                 if (inTop > outBottom)
@@ -421,8 +436,13 @@ int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
         this->AddChild(articPart);
     }
 
+    /************ Prepare the drawing cue size ************/
+
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
+
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Artic::ResetDrawing(FunctorParams *functorParams)
 {
@@ -433,7 +453,7 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
     ClearChildren();
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 {
@@ -451,7 +471,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
 
     std::vector<FloatingPositioner *>::iterator iter;
-    for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); iter++) {
+    for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); ++iter) {
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
@@ -460,7 +480,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
         }
     }
 
-    for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); iter++) {
+    for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); ++iter) {
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {

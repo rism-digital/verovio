@@ -69,7 +69,7 @@ public:
     virtual ~FileInputStream();
 
     void SetOutputFormat(const std::string &format) { m_outformat = format; }
-    std::string GetOutputFormat(void) { return m_outformat; }
+    std::string GetOutputFormat() { return m_outformat; }
 
     // read
     virtual bool ImportFile() { return true; }
@@ -80,26 +80,6 @@ public:
      * if layout information is found (and not to be ignored).
      */
     bool HasLayoutInformation() { return m_hasLayoutInformation; }
-
-    /**
-     * Set XPath queries for <app> (MEI only)
-     */
-    virtual void SetAppXPathQueries(std::vector<std::string> &xPathQueries) {}
-
-    /**
-     * Set XPath queries for <choice> (MEI only)
-     */
-    virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) {}
-
-    /**
-     * Set XPath query for <mdiv> (MEI only)
-     */
-    virtual void SetMdivXPathQuery(std::string &xPathQuery) {}
-
-    /**
-     * Set Humdrum import type option (Humdrum only)
-     */
-    virtual void SetTypeOption(int value) {}
 
 private:
     /**

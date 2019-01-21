@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/mei">
+        <file alias="test.mei">../../../doc/tests/mei/01_mensural/01_durations.mei</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file alias="Bravura.otf">../../../fonts/Bravura-1.204.otf</file>
+        <file alias="Leipzig.ttf">../../../fonts/Leipzig-5.2.ttf</file>
+        <file alias="Gootville.otf">../../../fonts/Gootville-1.2.otf</file>
+        <file alias="VerovioText.ttf">../../../fonts/VerovioText-1.0.ttf</file>
+    </qresource>
+</RCC>

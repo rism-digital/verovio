@@ -6,16 +6,15 @@ var vrvToolkit = new verovio.toolkit();
 // Load the default file or the file passed in the URL
 var file = getParameterByName("file");
 
-if (!file || (file.length == 0)) {
+if (!file || (file.length === 0)) {
     file = "examples/downloads/Chopin_Etude_op.10_no.9.mei";
 }
 
 $.ajax({
     url: file
     , dataType: "text"
-    , success: function(data) {
-
-        outputFilename = file.replace(/^.*[\\\/]/, '')
+    , success(data) {
+        var outputFilename = file.replace(/^.*[\\\/]/, "");
         load_data( data );
     }
 });

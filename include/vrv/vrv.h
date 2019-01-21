@@ -43,7 +43,7 @@ void DisableLog();
 #ifdef EMSCRIPTEN
 enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR };
 extern std::vector<std::string> logBuffer;
-bool LogBufferContains(std::string s);
+bool LogBufferContains(const std::string &s);
 void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level);
 #endif
 
@@ -51,6 +51,11 @@ void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel l
  * Utility for comparing doubles
  */
 bool AreEqual(double dFirstVal, double dSecondVal);
+
+/**
+ * Extract the uuid from a any uri string
+ */
+std::string ExtractUuidFragment(std::string refUuid);
 
 /**
  * Utility for converting UTF16 (std::wstring) to UTF-8

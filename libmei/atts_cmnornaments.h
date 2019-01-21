@@ -59,11 +59,11 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     mordentLog_FORM m_form;
     /**
-     * When the long attribute is set to 'yes', a double or long mordent, consisting of
-     * 5 notes, is indicated.
+     * When set to 'true', a double or long mordent, sometimes called a "pincé double",
+     * consisting of 5 notes, is indicated.
      **/
     data_BOOLEAN m_long;
 
@@ -71,22 +71,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttOrnam
+// AttOrnamPresent
 //----------------------------------------------------------------------------
 
-class AttOrnam : public Att {
+class AttOrnamPresent : public Att {
 public:
-    AttOrnam();
-    virtual ~AttOrnam();
+    AttOrnamPresent();
+    virtual ~AttOrnamPresent();
 
     /** Reset the default values for the attribute class **/
-    void ResetOrnam();
+    void ResetOrnamPresent();
 
     /** Read the values for the attribute class **/
-    bool ReadOrnam(pugi::xml_node element);
+    bool ReadOrnamPresent(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteOrnam(pugi::xml_node element);
+    bool WriteOrnamPresent(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -111,22 +111,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttOrnamentaccid
+// AttOrnamentAccid
 //----------------------------------------------------------------------------
 
-class AttOrnamentaccid : public Att {
+class AttOrnamentAccid : public Att {
 public:
-    AttOrnamentaccid();
-    virtual ~AttOrnamentaccid();
+    AttOrnamentAccid();
+    virtual ~AttOrnamentAccid();
 
     /** Reset the default values for the attribute class **/
-    void ResetOrnamentaccid();
+    void ResetOrnamentAccid();
 
     /** Read the values for the attribute class **/
-    bool ReadOrnamentaccid(pugi::xml_node element);
+    bool ReadOrnamentAccid(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteOrnamentaccid(pugi::xml_node element);
+    bool WriteOrnamentAccid(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -134,20 +134,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAccidupper(data_ACCIDENTAL_EXPLICIT accidupper_) { m_accidupper = accidupper_; }
-    data_ACCIDENTAL_EXPLICIT GetAccidupper() const { return m_accidupper; }
+    void SetAccidupper(data_ACCIDENTAL_WRITTEN accidupper_) { m_accidupper = accidupper_; }
+    data_ACCIDENTAL_WRITTEN GetAccidupper() const { return m_accidupper; }
     bool HasAccidupper() const;
     //
-    void SetAccidlower(data_ACCIDENTAL_EXPLICIT accidlower_) { m_accidlower = accidlower_; }
-    data_ACCIDENTAL_EXPLICIT GetAccidlower() const { return m_accidlower; }
+    void SetAccidlower(data_ACCIDENTAL_WRITTEN accidlower_) { m_accidlower = accidlower_; }
+    data_ACCIDENTAL_WRITTEN GetAccidlower() const { return m_accidlower; }
     bool HasAccidlower() const;
     ///@}
 
 private:
     /** Records the written accidental associated with an upper neighboring note. **/
-    data_ACCIDENTAL_EXPLICIT m_accidupper;
+    data_ACCIDENTAL_WRITTEN m_accidupper;
     /** Records the written accidental associated with a lower neighboring note. **/
-    data_ACCIDENTAL_EXPLICIT m_accidlower;
+    data_ACCIDENTAL_WRITTEN m_accidlower;
 
     /* include <attaccidlower> */
 };
@@ -186,13 +186,9 @@ public:
     ///@}
 
 private:
-    /**
-     * When the delayed attribute is set to 'true', the turn begins on the second half
-     * of the beat.
-     * See Read, p. 246.
-     **/
+    /** When set to 'true', the turn begins on the second half of the beat. **/
     data_BOOLEAN m_delayed;
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     turnLog_FORM m_form;
 
     /* include <attform> */

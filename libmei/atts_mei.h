@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttNotationtype
+// AttNotationType
 //----------------------------------------------------------------------------
 
-class AttNotationtype : public Att {
+class AttNotationType : public Att {
 public:
-    AttNotationtype();
-    virtual ~AttNotationtype();
+    AttNotationType();
+    virtual ~AttNotationType();
 
     /** Reset the default values for the attribute class **/
-    void ResetNotationtype();
+    void ResetNotationType();
 
     /** Read the values for the attribute class **/
-    bool ReadNotationtype(pugi::xml_node element);
+    bool ReadNotationType(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteNotationtype(pugi::xml_node element);
+    bool WriteNotationType(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.

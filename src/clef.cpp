@@ -6,6 +6,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "clef.h"
+
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "scoredefinterface.h"
 
 namespace vrv {
@@ -14,7 +21,7 @@ namespace vrv {
 // Clef
 //----------------------------------------------------------------------------
 
-Clef::Clef() : LayerElement("clef-"), AttClefshape(), AttColor(), AttLineloc(), AttOctavedisplacement()
+Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement()
 {
     Init();
 }
@@ -40,21 +47,25 @@ void Clef::Init()
     Reset();
 }
 
-Clef::~Clef()
-{
-}
+Clef::~Clef() {}
 
 void Clef::Reset()
 {
     LayerElement::Reset();
-    ResetClefshape();
+    ResetClefShape();
     ResetColor();
-    ResetLineloc();
-    ResetOctavedisplacement();
+    ResetLineLoc();
+    ResetOctaveDisplacement();
 }
 
 int Clef::GetClefLocOffset() const
 {
+    if (this->HasSameasLink() && this->GetSameasLink()->Is(CLEF)) {
+        Clef *sameas = dynamic_cast<Clef *>(this->GetSameasLink());
+        assert(sameas);
+        return sameas->GetClefLocOffset();
+    }
+    
     int offset = 0;
     if (GetShape() == CLEFSHAPE_G)
         offset = -4;
@@ -64,9 +75,9 @@ int Clef::GetClefLocOffset() const
     offset += (GetLine() - 1) * 2;
 
     int disPlace = 0;
-    if (GetDisPlace() == PLACE_above)
+    if (GetDisPlace() == STAFFREL_basic_above)
         disPlace = -1;
-    else if (GetDisPlace() == PLACE_below)
+    else if (GetDisPlace() == STAFFREL_basic_below)
         disPlace = 1;
 
     if ((disPlace != 0) && (GetDis() != OCTAVE_DIS_NONE)) offset += (disPlace * (GetDis() - 1));
@@ -74,7 +85,7 @@ int Clef::GetClefLocOffset() const
     return offset;
 }
 
-int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_PLACE place)
+int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place)
 {
     return place << 24 | octaveDis << 16 | line << 8 | shape;
 }

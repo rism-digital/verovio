@@ -19,10 +19,13 @@ namespace vrv {
 // Turn
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <turn> element.
+ */
 class Turn : public ControlElement,
              public TimePointInterface,
              public AttColor,
-             public AttOrnamentaccid,
+             public AttOrnamentAccid,
              public AttPlacement,
              public AttTurnLog {
 public:

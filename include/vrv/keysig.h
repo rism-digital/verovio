@@ -40,7 +40,7 @@ public:
      */
     ///@{
     KeySig();
-    KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType);
+    KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType);
     KeySig(const ScoreDefInterface *keySigAttr);
     void Init();
     virtual ~KeySig();
@@ -57,8 +57,8 @@ public:
     void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; }
 
     /* Alteration number getter/setter */
-    data_ACCIDENTAL_EXPLICIT GetAlterationType() const { return m_alterationType; }
-    void SetAlterationType(data_ACCIDENTAL_EXPLICIT alterationType) { m_alterationType = alterationType; }
+    data_ACCIDENTAL_WRITTEN GetAlterationType() const { return m_alterationType; }
+    void SetAlterationType(data_ACCIDENTAL_WRITTEN alterationType) { m_alterationType = alterationType; }
 
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */
     void ConvertToMei();
@@ -70,8 +70,8 @@ public:
     /**
      * Static methods for calculating position;
      */
-    static data_PITCHNAME GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, int pos);
-    static int GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, Clef *clef);
+    static data_PITCHNAME GetAlterationAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
+    static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef);
 
 private:
     //
@@ -80,7 +80,7 @@ public:
      * Variables for storing cancellation introduced by the key sig.
      * The values are StaffDefDrawingInterface::ReplaceKeySig
      */
-    data_ACCIDENTAL_EXPLICIT m_drawingCancelAccidType;
+    data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
     /**
      * Equivalent to @key.sig.show and @showchange, but set for drawing
@@ -97,7 +97,7 @@ private:
 
     // This is temporary - it needs to be changed to libMEI atts
     int m_alterationNumber;
-    data_ACCIDENTAL_EXPLICIT m_alterationType;
+    data_ACCIDENTAL_WRITTEN m_alterationType;
 };
 
 } // namespace vrv

@@ -26,42 +26,6 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttFretlocation
-//----------------------------------------------------------------------------
-
-class AttFretlocation : public Att {
-public:
-    AttFretlocation();
-    virtual ~AttFretlocation();
-
-    /** Reset the default values for the attribute class **/
-    void ResetFretlocation();
-
-    /** Read the values for the attribute class **/
-    bool ReadFretlocation(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteFretlocation(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetFret(data_FRET fret_) { m_fret = fret_; }
-    data_FRET GetFret() const { return m_fret; }
-    bool HasFret() const;
-    ///@}
-
-private:
-    /** Records the location at which a string should be stopped against a fret. **/
-    data_FRET m_fret;
-
-    /* include <attfret> */
-};
-
-//----------------------------------------------------------------------------
 // AttHarmLog
 //----------------------------------------------------------------------------
 
@@ -91,46 +55,10 @@ public:
     ///@}
 
 private:
-    /** Contains a reference to a <chordDef> element elsewhere in the document. **/
+    /** Contains a reference to a **/
     std::string m_chordref;
 
     /* include <attchordref> */
-};
-
-//----------------------------------------------------------------------------
-// AttHarmVis
-//----------------------------------------------------------------------------
-
-class AttHarmVis : public Att {
-public:
-    AttHarmVis();
-    virtual ~AttHarmVis();
-
-    /** Reset the default values for the attribute class **/
-    void ResetHarmVis();
-
-    /** Read the values for the attribute class **/
-    bool ReadHarmVis(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteHarmVis(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetRendgrid(harmVis_RENDGRID rendgrid_) { m_rendgrid = rendgrid_; }
-    harmVis_RENDGRID GetRendgrid() const { return m_rendgrid; }
-    bool HasRendgrid() const;
-    ///@}
-
-private:
-    /** Describes how the harmonic indication should be rendered. **/
-    harmVis_RENDGRID m_rendgrid;
-
-    /* include <attrendgrid> */
 };
 
 } // vrv namespace

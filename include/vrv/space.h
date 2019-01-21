@@ -18,7 +18,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <space>
+ * This class models the MEI <space> element.
  */
 class Space : public LayerElement, public DurationInterface {
 public:
@@ -40,6 +40,15 @@ public:
     ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
 
 private:
     //

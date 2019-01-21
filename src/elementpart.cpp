@@ -25,39 +25,46 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Bracket
+//----------------------------------------------------------------------------
+
+Bracket::Bracket() : LayerElement("bracket-")
+{
+
+    Reset();
+}
+
+Bracket::~Bracket() {}
+
+void Bracket::Reset()
+{
+    LayerElement::Reset();
+}
+
+//----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
 
-Dots::Dots() : LayerElement("dots-"), AttAugmentdots()
+Dots::Dots() : LayerElement("dots-"), AttAugmentDots()
 {
     RegisterAttClass(ATT_AUGMENTDOTS);
 
     Reset();
 }
 
-Dots::~Dots()
-{
-}
+Dots::~Dots() {}
 
 void Dots::Reset()
 {
     LayerElement::Reset();
-    ResetAugmentdots();
+    ResetAugmentDots();
+
+    m_dotLocsByStaff.clear();
 }
 
 std::list<int> *Dots::GetDotLocsForStaff(Staff *staff)
 {
     return &m_dotLocsByStaff[staff];
-    /*
-    if (m_dotLocsByStaff.count(staff) == 0)
-        m_dotLocsByStaff[staff] =
-
-    auto item = std::find_if(m_dotLocsByStaff.begin(), m_dotLocsByStaff.end(),
-                             [staff](MapOfDotLocs dotLocs) { return (staff == dotLocs. .first) });
-    if (item != m_dotLocsByStaff.end()) {
-        // LogDebug("Found it!");
-    }
-    */
 }
 
 //----------------------------------------------------------------------------
@@ -70,13 +77,13 @@ Flag::Flag() : LayerElement("flag-")
     Reset();
 }
 
-Flag::~Flag()
-{
-}
+Flag::~Flag() {}
 
 void Flag::Reset()
 {
     LayerElement::Reset();
+
+    m_drawingNbFlags = 0;
 }
 
 wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
@@ -121,6 +128,23 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 }
 
 //----------------------------------------------------------------------------
+// TupletNum
+//----------------------------------------------------------------------------
+
+TupletNum::TupletNum() : LayerElement("num-")
+{
+
+    Reset();
+}
+
+TupletNum::~TupletNum() {}
+
+void TupletNum::Reset()
+{
+    LayerElement::Reset();
+}
+
+//----------------------------------------------------------------------------
 // Stem
 //----------------------------------------------------------------------------
 
@@ -133,9 +157,7 @@ Stem::Stem() : LayerElement("stem-"), AttGraced(), AttStems(), AttStemsCmn()
     Reset();
 }
 
-Stem::~Stem()
-{
-}
+Stem::~Stem() {}
 
 void Stem::Reset()
 {
@@ -167,6 +189,14 @@ void Stem::AddChild(Object *child)
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Bracket::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Dots::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -175,7 +205,7 @@ int Dots::ResetDrawing(FunctorParams *functorParams)
     m_dotLocsByStaff.clear();
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -194,7 +224,15 @@ int Flag::ResetDrawing(FunctorParams *functorParams)
     m_drawingNbFlags = 0;
 
     return FUNCTOR_CONTINUE;
-};
+}
+
+int TupletNum::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Stem::CalcStem(FunctorParams *functorParams)
 {
@@ -206,7 +244,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     assert(params->m_interface);
 
     int staffSize = params->m_staff->m_drawingStaffSize;
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
 
     /************ Set the position, the length and adjust to the note head ************/
 
@@ -220,25 +258,34 @@ int Stem::CalcStem(FunctorParams *functorParams)
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
-    // Also, the given stem length is understood as being mesured from the center of the note.
+    // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
     if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
         baseStem += params->m_chordStemLength;
 
+        Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            if (this->GetStemPos() == STEMPOSITION_left) {
+                p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+            }
+            else {
+                p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            }
             baseStem += p.y;
-            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-            this->SetDrawingXRel(p.x);
             this->SetDrawingStemLen(baseStem);
         }
         else {
-            Point p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+            if (this->GetStemPos() == STEMPOSITION_right) {
+                p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            }
+            else {
+                p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+            }
             baseStem -= p.y;
-            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-            this->SetDrawingXRel(p.x);
             this->SetDrawingStemLen(-baseStem);
         }
+        this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
+        this->SetDrawingXRel(p.x);
     }
 
     /************ Set the flag (if necessary) and adjust the length ************/
@@ -302,6 +349,6 @@ int Stem::ResetDrawing(FunctorParams *functorParams)
     m_drawingStemLen = 0;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

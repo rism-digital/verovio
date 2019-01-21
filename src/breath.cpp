@@ -30,9 +30,7 @@ Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), 
     Reset();
 }
 
-Breath::~Breath()
-{
-}
+Breath::~Breath() {}
 
 void Breath::Reset()
 {
@@ -41,9 +39,5 @@ void Breath::Reset()
     ResetColor();
     ResetPlacement();
 }
-
-//----------------------------------------------------------------------------
-// Breath functor methods
-//----------------------------------------------------------------------------
 
 } // namespace vrv

@@ -22,30 +22,25 @@ namespace vrv {
 // SystemElement
 //----------------------------------------------------------------------------
 
-SystemElement::SystemElement() : FloatingObject("se"), AttCommon(), AttTyped()
+SystemElement::SystemElement() : FloatingObject("se"), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-SystemElement::SystemElement(std::string classid) : FloatingObject(classid), AttCommon(), AttTyped()
+SystemElement::SystemElement(std::string classid) : FloatingObject(classid), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-SystemElement::~SystemElement()
-{
-}
+SystemElement::~SystemElement() {}
 
 void SystemElement::Reset()
 {
     FloatingObject::Reset();
-    ResetCommon();
     ResetTyped();
 }
 
@@ -59,6 +54,17 @@ int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_targetSystem);
+    this->MoveItselfTo(params->m_targetSystem);
 
     return FUNCTOR_CONTINUE;
 }

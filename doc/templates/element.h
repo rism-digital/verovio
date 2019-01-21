@@ -19,7 +19,7 @@ class ChildElement;
 // Element
 //----------------------------------------------------------------------------
 
-class Element : public LayerElement, public AttCommon {
+class Element : public LayerElement, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,13 +30,13 @@ public:
     virtual ~Element();
     virtual void Reset();
     virtual std::string GetClassName() { return "Element"; };
-    virtual ClassId Is() { return ELEMENT; };
+    virtual ClassId GetClassId() { return ELEMENT; };
     ///@}
 
     /**
-     * Add childElement to a element.
+     * Add an element to a element.
      */
-    void AddChildElement(Object *childElement);
+    virtual void AddChild(Object *object);
 
 protected:
     //

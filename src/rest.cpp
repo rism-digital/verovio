@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "smufl.h"
 #include "staff.h"
@@ -28,24 +29,17 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Rest::Rest()
-    : LayerElement("rest-")
-    , DurationInterface()
-    , PositionInterface()
-    , AttColor()
-    , AttRelativesize()
-    , AttRestVisMensural()
+    : LayerElement("rest-"), DurationInterface(), PositionInterface(), AttColor(), AttCue(), AttRestVisMensural()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
 }
 
-Rest::~Rest()
-{
-}
+Rest::~Rest() {}
 
 void Rest::Reset()
 {
@@ -53,7 +47,7 @@ void Rest::Reset()
     DurationInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
-    ResetRelativesize();
+    ResetCue();
     ResetRestVisMensural();
 }
 
@@ -121,16 +115,29 @@ int Rest::GetRestLocOffset(int loc)
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Rest::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
 
-    if ((this->GetDur() > DUR_BR) && this->HasDots()) {
+    if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
         if (!currentDots) {
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -139,8 +146,13 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
+    /************ Prepare the drawing cue size ************/
+
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
+
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Rest::CalcDots(FunctorParams *functorParams)
 {
@@ -153,7 +165,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     // Nothing to do
-    if ((this->GetDur() <= DUR_BR) || !this->HasDots()) {
+    if ((this->GetDur() <= DUR_BR) || (this->GetDots() < 1)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -162,13 +174,11 @@ int Rest::CalcDots(FunctorParams *functorParams)
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
-    Dots *dots = NULL;
-
-    // For single notes we need here to set the dot loc
-    dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    // For single rests we need here to set the dot loc
+    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
     assert(dots);
 
     std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
@@ -180,7 +190,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     switch (this->GetActualDur()) {
-        case DUR_1: loc += 2; break;
+        case DUR_1: loc -= 2; break;
         case DUR_2: loc += 0; break;
         case DUR_4: loc += 2; break;
         case DUR_8: loc += 2; break;
@@ -195,10 +205,10 @@ int Rest::CalcDots(FunctorParams *functorParams)
     dotLocs->push_back(loc);
 
     // HARDCODED
-    int xRel = params->m_doc->GetDrawingUnit(staffSize) * 1.5;
+    int xRel = params->m_doc->GetDrawingUnit(staffSize) * 2.5;
     if (drawingCueSize) xRel = params->m_doc->GetCueSize(xRel);
     if (this->GetDur() > DUR_2) {
-        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize) / 2;
+        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
     }
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
@@ -212,7 +222,7 @@ int Rest::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Rest::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

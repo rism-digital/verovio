@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttIneumeLog
+// AttNcLog
 //----------------------------------------------------------------------------
 
-class AttIneumeLog : public Att {
+class AttNcLog : public Att {
 public:
-    AttIneumeLog();
-    virtual ~AttIneumeLog();
+    AttNcLog();
+    virtual ~AttNcLog();
 
     /** Reset the default values for the attribute class **/
-    void ResetIneumeLog();
+    void ResetNcLog();
 
     /** Read the values for the attribute class **/
-    bool ReadIneumeLog(pugi::xml_node element);
+    bool ReadNcLog(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteIneumeLog(pugi::xml_node element);
+    bool WriteNcLog(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,41 +49,41 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_INEUMEFORM form_) { m_form = form_; }
-    data_INEUMEFORM GetForm() const { return m_form; }
-    bool HasForm() const;
+    void SetOct(std::string oct_) { m_oct = oct_; }
+    std::string GetOct() const { return m_oct; }
+    bool HasOct() const;
     //
-    void SetName(data_INEUMENAME name_) { m_name = name_; }
-    data_INEUMENAME GetName() const { return m_name; }
-    bool HasName() const;
+    void SetPname(std::string pname_) { m_pname = pname_; }
+    std::string GetPname() const { return m_pname; }
+    bool HasPname() const;
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
-    data_INEUMEFORM m_form;
-    /** Records the name of the neume. **/
-    data_INEUMENAME m_name;
+    /** Captures written octave information. **/
+    std::string m_oct;
+    /** Contains a written pitch name. **/
+    std::string m_pname;
 
-    /* include <attname> */
+    /* include <attpname> */
 };
 
 //----------------------------------------------------------------------------
-// AttUneumeLog
+// AttNcForm
 //----------------------------------------------------------------------------
 
-class AttUneumeLog : public Att {
+class AttNcForm : public Att {
 public:
-    AttUneumeLog();
-    virtual ~AttUneumeLog();
+    AttNcForm();
+    virtual ~AttNcForm();
 
     /** Reset the default values for the attribute class **/
-    void ResetUneumeLog();
+    void ResetNcForm();
 
     /** Read the values for the attribute class **/
-    bool ReadUneumeLog(pugi::xml_node element);
+    bool ReadNcForm(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteUneumeLog(pugi::xml_node element);
+    bool WriteNcForm(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -91,22 +91,66 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_UNEUMEFORM form_) { m_form = form_; }
-    data_UNEUMEFORM GetForm() const { return m_form; }
-    bool HasForm() const;
+    void SetAngled(data_BOOLEAN angled_) { m_angled = angled_; }
+    data_BOOLEAN GetAngled() const { return m_angled; }
+    bool HasAngled() const;
     //
-    void SetName(data_UNEUMENAME name_) { m_name = name_; }
-    data_UNEUMENAME GetName() const { return m_name; }
-    bool HasName() const;
+    void SetCon(ncForm_CON con_) { m_con = con_; }
+    ncForm_CON GetCon() const { return m_con; }
+    bool HasCon() const;
+    //
+    void SetCurve(ncForm_CURVE curve_) { m_curve = curve_; }
+    ncForm_CURVE GetCurve() const { return m_curve; }
+    bool HasCurve() const;
+    //
+    void SetHooked(data_BOOLEAN hooked_) { m_hooked = hooked_; }
+    data_BOOLEAN GetHooked() const { return m_hooked; }
+    bool HasHooked() const;
+    //
+    void SetLigated(data_BOOLEAN ligated_) { m_ligated = ligated_; }
+    data_BOOLEAN GetLigated() const { return m_ligated; }
+    bool HasLigated() const;
+    //
+    void SetRellen(ncForm_RELLEN rellen_) { m_rellen = rellen_; }
+    ncForm_RELLEN GetRellen() const { return m_rellen; }
+    bool HasRellen() const;
+    //
+    void SetSShape(std::string sShape_) { m_sShape = sShape_; }
+    std::string GetSShape() const { return m_sShape; }
+    bool HasSShape() const;
+    //
+    void SetTilt(data_COMPASSDIRECTION tilt_) { m_tilt = tilt_; }
+    data_COMPASSDIRECTION GetTilt() const { return m_tilt; }
+    bool HasTilt() const;
+    /** Getter for reference (for alternate type only) */
+    data_COMPASSDIRECTION *GetTiltAlternate() { return &m_tilt; }
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
-    data_UNEUMEFORM m_form;
-    /** Records the name of the neume. **/
-    data_UNEUMENAME m_name;
+    /** --- **/
+    data_BOOLEAN m_angled;
+    /**
+     * Connection to the previous component within the same neume; this attribute
+     * should not be used for the first component of a neume.
+     **/
+    ncForm_CON m_con;
+    /** Records direction of curvature. **/
+    ncForm_CURVE m_curve;
+    /** Pen stroke has an extension; specific to Hispanic notation. **/
+    data_BOOLEAN m_hooked;
+    /** Indicates participation in a ligature. **/
+    data_BOOLEAN m_ligated;
+    /**
+     * Length of the pen stroke relative to the previous component within the same
+     * neume; this attribute should not be used for the first component of a neume.
+     **/
+    ncForm_RELLEN m_rellen;
+    /** --- **/
+    std::string m_sShape;
+    /** Direction of the pen stroke. **/
+    data_COMPASSDIRECTION m_tilt;
 
-    /* include <attname> */
+    /* include <atttilt> */
 };
 
 } // vrv namespace

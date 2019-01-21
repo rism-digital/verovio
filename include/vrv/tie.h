@@ -17,6 +17,9 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <tie> element.
+ */
 class Tie : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature {
 public:
     /**
@@ -42,6 +45,13 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * see Object::ResolveMIDITies
+     */
+    ///@{
+    virtual int ResolveMIDITies(FunctorParams *functorParams);
+    ///@}
 
 private:
     //

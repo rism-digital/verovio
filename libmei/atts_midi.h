@@ -53,12 +53,12 @@ public:
     data_MIDICHANNEL GetMidiChannel() const { return m_midiChannel; }
     bool HasMidiChannel() const;
     //
-    void SetMidiDuty(data_PERCENT midiDuty_) { m_midiDuty = midiDuty_; }
-    data_PERCENT GetMidiDuty() const { return m_midiDuty; }
+    void SetMidiDuty(data_PERCENT_LIMITED midiDuty_) { m_midiDuty = midiDuty_; }
+    data_PERCENT_LIMITED GetMidiDuty() const { return m_midiDuty; }
     bool HasMidiDuty() const;
     //
-    void SetMidiPort(data_MIDIVALUE midiPort_) { m_midiPort = midiPort_; }
-    data_MIDIVALUE GetMidiPort() const { return m_midiPort; }
+    void SetMidiPort(data_MIDIVALUE_NAME midiPort_) { m_midiPort = midiPort_; }
+    data_MIDIVALUE_NAME GetMidiPort() const { return m_midiPort; }
     bool HasMidiPort() const;
     //
     void SetMidiTrack(int midiTrack_) { m_midiTrack = midiTrack_; }
@@ -70,9 +70,9 @@ private:
     /** Records a MIDI channel value. **/
     data_MIDICHANNEL m_midiChannel;
     /** Specifies the 'on' part of the duty cycle as a percentage of a note's duration. **/
-    data_PERCENT m_midiDuty;
+    data_PERCENT_LIMITED m_midiDuty;
     /** Sets the MIDI port value. **/
-    data_MIDIVALUE m_midiPort;
+    data_MIDIVALUE_NAME m_midiPort;
     /** Sets the MIDI track. **/
     int m_midiTrack;
 
@@ -80,22 +80,61 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMidiinstrument
+// AttInstrumentIdent
 //----------------------------------------------------------------------------
 
-class AttMidiinstrument : public Att {
+class AttInstrumentIdent : public Att {
 public:
-    AttMidiinstrument();
-    virtual ~AttMidiinstrument();
+    AttInstrumentIdent();
+    virtual ~AttInstrumentIdent();
 
     /** Reset the default values for the attribute class **/
-    void ResetMidiinstrument();
+    void ResetInstrumentIdent();
 
     /** Read the values for the attribute class **/
-    bool ReadMidiinstrument(pugi::xml_node element);
+    bool ReadInstrumentIdent(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMidiinstrument(pugi::xml_node element);
+    bool WriteInstrumentIdent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetInstr(std::string instr_) { m_instr = instr_; }
+    std::string GetInstr() const { return m_instr; }
+    bool HasInstr() const;
+    ///@}
+
+private:
+    /**
+     * Provides a way of pointing to a MIDI instrument definition.
+     * It must contain the ID of an
+     **/
+    std::string m_instr;
+
+    /* include <attinstr> */
+};
+
+//----------------------------------------------------------------------------
+// AttMidiInstrument
+//----------------------------------------------------------------------------
+
+class AttMidiInstrument : public Att {
+public:
+    AttMidiInstrument();
+    virtual ~AttMidiInstrument();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMidiInstrument();
+
+    /** Read the values for the attribute class **/
+    bool ReadMidiInstrument(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMidiInstrument(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -111,48 +150,66 @@ public:
     data_MIDINAMES GetMidiInstrname() const { return m_midiInstrname; }
     bool HasMidiInstrname() const;
     //
-    void SetMidiPan(data_MIDIVALUE midiPan_) { m_midiPan = midiPan_; }
-    data_MIDIVALUE GetMidiPan() const { return m_midiPan; }
+    void SetMidiPan(data_MIDIVALUE_PAN midiPan_) { m_midiPan = midiPan_; }
+    data_MIDIVALUE_PAN GetMidiPan() const { return m_midiPan; }
     bool HasMidiPan() const;
     //
-    void SetMidiVolume(data_MIDIVALUE midiVolume_) { m_midiVolume = midiVolume_; }
-    data_MIDIVALUE GetMidiVolume() const { return m_midiVolume; }
+    void SetMidiPatchname(std::string midiPatchname_) { m_midiPatchname = midiPatchname_; }
+    std::string GetMidiPatchname() const { return m_midiPatchname; }
+    bool HasMidiPatchname() const;
+    //
+    void SetMidiPatchnum(data_MIDIVALUE midiPatchnum_) { m_midiPatchnum = midiPatchnum_; }
+    data_MIDIVALUE GetMidiPatchnum() const { return m_midiPatchnum; }
+    bool HasMidiPatchnum() const;
+    //
+    void SetMidiVolume(data_PERCENT midiVolume_) { m_midiVolume = midiVolume_; }
+    data_PERCENT GetMidiVolume() const { return m_midiVolume; }
     bool HasMidiVolume() const;
     ///@}
 
 private:
-    /** Sets the MIDI instrument number. **/
+    /**
+     * Captures the General MIDI instrument number.
+     * Use an integer for a 0-based value. An integer preceded by "in" indicates a
+     * 1-based value.
+     **/
     data_MIDIVALUE m_midiInstrnum;
     /** Provides a General MIDI label for the MIDI instrument. **/
     data_MIDINAMES m_midiInstrname;
     /**
      * Sets the instrument's position in a stereo field.
-     * Values of 0 and 1 both pan left, 127 pans right, and 64 pans to the center.
+     * MIDI values of 0 and 1 both pan left, 127 or 128 pans right, and 63 or 64 pans
+     * to the center. Positve percentage values pan to the right, negative ones to the
+     * left. 0% is centered.
      **/
-    data_MIDIVALUE m_midiPan;
+    data_MIDIVALUE_PAN m_midiPan;
+    /** Records a non-General MIDI patch/instrument name. **/
+    std::string m_midiPatchname;
+    /** Records a non-General MIDI patch/instrument number. **/
+    data_MIDIVALUE m_midiPatchnum;
     /** Sets the instrument's volume. **/
-    data_MIDIVALUE m_midiVolume;
+    data_PERCENT m_midiVolume;
 
     /* include <attmidi.volume> */
 };
 
 //----------------------------------------------------------------------------
-// AttMidinumber
+// AttMidiNumber
 //----------------------------------------------------------------------------
 
-class AttMidinumber : public Att {
+class AttMidiNumber : public Att {
 public:
-    AttMidinumber();
-    virtual ~AttMidinumber();
+    AttMidiNumber();
+    virtual ~AttMidiNumber();
 
     /** Reset the default values for the attribute class **/
-    void ResetMidinumber();
+    void ResetMidiNumber();
 
     /** Read the values for the attribute class **/
-    bool ReadMidinumber(pugi::xml_node element);
+    bool ReadMidiNumber(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMidinumber(pugi::xml_node element);
+    bool WriteMidiNumber(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -166,32 +223,29 @@ public:
     ///@}
 
 private:
-    /**
-     * Along with numbase, describes duration as a ratio.
-     * num is the first value in the ratio, while numbase is the second.
-     **/
+    /** Records a number or count accompanying a notational feature. **/
     int m_num;
 
     /* include <attnum> */
 };
 
 //----------------------------------------------------------------------------
-// AttMiditempo
+// AttMidiTempo
 //----------------------------------------------------------------------------
 
-class AttMiditempo : public Att {
+class AttMidiTempo : public Att {
 public:
-    AttMiditempo();
-    virtual ~AttMiditempo();
+    AttMidiTempo();
+    virtual ~AttMidiTempo();
 
     /** Reset the default values for the attribute class **/
-    void ResetMiditempo();
+    void ResetMidiTempo();
 
     /** Read the values for the attribute class **/
-    bool ReadMiditempo(pugi::xml_node element);
+    bool ReadMidiTempo(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMiditempo(pugi::xml_node element);
+    bool WriteMidiTempo(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -227,22 +281,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMidivalue
+// AttMidiValue
 //----------------------------------------------------------------------------
 
-class AttMidivalue : public Att {
+class AttMidiValue : public Att {
 public:
-    AttMidivalue();
-    virtual ~AttMidivalue();
+    AttMidiValue();
+    virtual ~AttMidiValue();
 
     /** Reset the default values for the attribute class **/
-    void ResetMidivalue();
+    void ResetMidiValue();
 
     /** Read the values for the attribute class **/
-    bool ReadMidivalue(pugi::xml_node element);
+    bool ReadMidiValue(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMidivalue(pugi::xml_node element);
+    bool WriteMidiValue(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -263,22 +317,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMidivalue2
+// AttMidiValue2
 //----------------------------------------------------------------------------
 
-class AttMidivalue2 : public Att {
+class AttMidiValue2 : public Att {
 public:
-    AttMidivalue2();
-    virtual ~AttMidivalue2();
+    AttMidiValue2();
+    virtual ~AttMidiValue2();
 
     /** Reset the default values for the attribute class **/
-    void ResetMidivalue2();
+    void ResetMidiValue2();
 
     /** Read the values for the attribute class **/
-    bool ReadMidivalue2(pugi::xml_node element);
+    bool ReadMidiValue2(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMidivalue2(pugi::xml_node element);
+    bool WriteMidiValue2(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -299,22 +353,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMidivelocity
+// AttMidiVelocity
 //----------------------------------------------------------------------------
 
-class AttMidivelocity : public Att {
+class AttMidiVelocity : public Att {
 public:
-    AttMidivelocity();
-    virtual ~AttMidivelocity();
+    AttMidiVelocity();
+    virtual ~AttMidiVelocity();
 
     /** Reset the default values for the attribute class **/
-    void ResetMidivelocity();
+    void ResetMidiVelocity();
 
     /** Read the values for the attribute class **/
-    bool ReadMidivelocity(pugi::xml_node element);
+    bool ReadMidiVelocity(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMidivelocity(pugi::xml_node element);
+    bool WriteMidiVelocity(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -335,22 +389,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttTimebase
+// AttTimeBase
 //----------------------------------------------------------------------------
 
-class AttTimebase : public Att {
+class AttTimeBase : public Att {
 public:
-    AttTimebase();
-    virtual ~AttTimebase();
+    AttTimeBase();
+    virtual ~AttTimeBase();
 
     /** Reset the default values for the attribute class **/
-    void ResetTimebase();
+    void ResetTimeBase();
 
     /** Read the values for the attribute class **/
-    bool ReadTimebase(pugi::xml_node element);
+    bool ReadTimeBase(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteTimebase(pugi::xml_node element);
+    bool WriteTimeBase(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.

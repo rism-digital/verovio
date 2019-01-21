@@ -27,24 +27,24 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttAltsym
+// AttAltSym
 //----------------------------------------------------------------------------
 
-AttAltsym::AttAltsym() : Att()
+AttAltSym::AttAltSym() : Att()
 {
-    ResetAltsym();
+    ResetAltSym();
 }
 
-AttAltsym::~AttAltsym()
+AttAltSym::~AttAltSym()
 {
 }
 
-void AttAltsym::ResetAltsym()
+void AttAltSym::ResetAltSym()
 {
     m_altsym = "";
 }
 
-bool AttAltsym::ReadAltsym(pugi::xml_node element)
+bool AttAltSym::ReadAltSym(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("altsym")) {
@@ -55,7 +55,7 @@ bool AttAltsym::ReadAltsym(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttAltsym::WriteAltsym(pugi::xml_node element)
+bool AttAltSym::WriteAltSym(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasAltsym()) {
@@ -65,20 +65,182 @@ bool AttAltsym::WriteAltsym(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttAltsym::HasAltsym() const
+bool AttAltSym::HasAltsym() const
 {
     return (m_altsym != "");
 }
 
 /* include <attaltsym> */
 
+//----------------------------------------------------------------------------
+// AttAnchoredTextLog
+//----------------------------------------------------------------------------
+
+AttAnchoredTextLog::AttAnchoredTextLog() : Att()
+{
+    ResetAnchoredTextLog();
+}
+
+AttAnchoredTextLog::~AttAnchoredTextLog()
+{
+}
+
+void AttAnchoredTextLog::ResetAnchoredTextLog()
+{
+    m_func = "";
+}
+
+bool AttAnchoredTextLog::ReadAnchoredTextLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToStr(element.attribute("func").value()));
+        element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttAnchoredTextLog::WriteAnchoredTextLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttAnchoredTextLog::HasFunc() const
+{
+    return (m_func != "");
+}
+
+/* include <attfunc> */
+
+//----------------------------------------------------------------------------
+// AttCurveLog
+//----------------------------------------------------------------------------
+
+AttCurveLog::AttCurveLog() : Att()
+{
+    ResetCurveLog();
+}
+
+AttCurveLog::~AttCurveLog()
+{
+}
+
+void AttCurveLog::ResetCurveLog()
+{
+    m_func = "";
+}
+
+bool AttCurveLog::ReadCurveLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToStr(element.attribute("func").value()));
+        element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCurveLog::WriteCurveLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCurveLog::HasFunc() const
+{
+    return (m_func != "");
+}
+
+/* include <attfunc> */
+
+//----------------------------------------------------------------------------
+// AttLineLog
+//----------------------------------------------------------------------------
+
+AttLineLog::AttLineLog() : Att()
+{
+    ResetLineLog();
+}
+
+AttLineLog::~AttLineLog()
+{
+}
+
+void AttLineLog::ResetLineLog()
+{
+    m_func = "";
+}
+
+bool AttLineLog::ReadLineLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToStr(element.attribute("func").value()));
+        element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttLineLog::WriteLineLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttLineLog::HasFunc() const
+{
+    return (m_func != "");
+}
+
+/* include <attfunc> */
+
 bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
-        AttAltsym *att = dynamic_cast<AttAltsym *>(element);
+        AttAltSym *att = dynamic_cast<AttAltSym *>(element);
         assert(att);
         if (attrType == "altsym") {
             att->SetAltsym(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_ANCHOREDTEXTLOG)) {
+        AttAnchoredTextLog *att = dynamic_cast<AttAnchoredTextLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_CURVELOG)) {
+        AttCurveLog *att = dynamic_cast<AttCurveLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_LINELOG)) {
+        AttLineLog *att = dynamic_cast<AttLineLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -89,10 +251,31 @@ bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attr
 void Att::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
-        const AttAltsym *att = dynamic_cast<const AttAltsym *>(element);
+        const AttAltSym *att = dynamic_cast<const AttAltSym *>(element);
         assert(att);
         if (att->HasAltsym()) {
             attributes->push_back(std::make_pair("altsym", att->StrToStr(att->GetAltsym())));
+        }
+    }
+    if (element->HasAttClass(ATT_ANCHOREDTEXTLOG)) {
+        const AttAnchoredTextLog *att = dynamic_cast<const AttAnchoredTextLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+        }
+    }
+    if (element->HasAttClass(ATT_CURVELOG)) {
+        const AttCurveLog *att = dynamic_cast<const AttCurveLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+        }
+    }
+    if (element->HasAttClass(ATT_LINELOG)) {
+        const AttLineLog *att = dynamic_cast<const AttLineLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
         }
     }
 }

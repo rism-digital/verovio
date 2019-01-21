@@ -30,9 +30,7 @@ DrawingListInterface::DrawingListInterface()
     Reset();
 }
 
-DrawingListInterface::~DrawingListInterface()
-{
-}
+DrawingListInterface::~DrawingListInterface() {}
 
 void DrawingListInterface::Reset()
 {
@@ -72,9 +70,7 @@ StaffDefDrawingInterface::StaffDefDrawingInterface()
     Reset();
 }
 
-StaffDefDrawingInterface::~StaffDefDrawingInterface()
-{
-}
+StaffDefDrawingInterface::~StaffDefDrawingInterface() {}
 
 void StaffDefDrawingInterface::Reset()
 {
@@ -104,7 +100,7 @@ void StaffDefDrawingInterface::SetCurrentKeySig(KeySig *keySig)
 {
     if (keySig) {
         char drawingCancelAccidCount = m_currentKeySig.GetAlterationNumber();
-        data_ACCIDENTAL_EXPLICIT drawingCancelAccidType = m_currentKeySig.GetAlterationType();
+        data_ACCIDENTAL_WRITTEN drawingCancelAccidType = m_currentKeySig.GetAlterationType();
         m_currentKeySig = *keySig;
         m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;
         m_currentKeySig.m_drawingCancelAccidType = drawingCancelAccidType;
@@ -134,9 +130,7 @@ StemmedDrawingInterface::StemmedDrawingInterface()
     Reset();
 }
 
-StemmedDrawingInterface::~StemmedDrawingInterface()
-{
-}
+StemmedDrawingInterface::~StemmedDrawingInterface() {}
 
 void StemmedDrawingInterface::Reset()
 {

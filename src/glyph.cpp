@@ -86,9 +86,7 @@ Glyph::Glyph(int unitsPerEm)
     m_codeStr = "[unset]";
 }
 
-Glyph::~Glyph()
-{
-}
+Glyph::~Glyph() {}
 
 void Glyph::SetBoundingBox(double x, double y, double w, double h)
 {

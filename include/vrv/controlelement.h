@@ -11,6 +11,7 @@
 #include "atts_shared.h"
 #include "devicecontextbase.h"
 #include "floatingobject.h"
+#include "linkinginterface.h"
 
 namespace vrv {
 
@@ -22,7 +23,7 @@ namespace vrv {
  * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class ControlElement : public FloatingObject, public AttCommon, public AttCommonPart, public AttTyped {
+class ControlElement : public FloatingObject, public LinkingInterface, public AttLabelled, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -37,13 +38,30 @@ public:
     ///@}
 
     /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual LinkingInterface *GetLinkingInterface() { return dynamic_cast<LinkingInterface *>(this); }
+    ///@}
+
+    /**
      * Check if the ControlElement has a Rend child and return its @halign equivalent (if any)
      */
-    char GetAlignment();
+    data_HORIZONTALALIGNMENT GetChildRendAlignment();
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::AdjustXOverflow
+     */
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
     //
