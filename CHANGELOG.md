@@ -1,8 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0] - 2019-01-21
 ### Added
-* Support for extendering line in `<f>`
+* Support for `<bracketSpan>`
+* Support for extending line in `<f>`
 * Support for `@beam.with` on `<beam>`
 * Support for `@stem.pos` values "left" and "right" (@rettinghaus)
 * Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
