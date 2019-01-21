@@ -89,6 +89,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "supplied.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
@@ -8039,8 +8040,18 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 
 Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token)
 {
+    bool iseditorial = getBooleanParameter(token, "CL", "ed");
     Clef *clef = new Clef;
-    appendElement(elements, pointers, clef);
+    if (iseditorial) {
+        Supplied *supplied = new Supplied;
+        appendElement(supplied, clef);
+        appendElement(elements, pointers, supplied);
+        clef->SetColor("#aaa"); // hard-code to gray for now
+        clef->SetType("editorial");
+    }
+    else {
+        appendElement(elements, pointers, clef);
+    }
 
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     ss.at(m_currentstaff - 1).last_clef = *token;
@@ -8077,6 +8088,38 @@ Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector
     }
 
     return clef;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getBooleanParameter --
+//
+
+bool HumdrumInput::getBooleanParameter(hum::HTp token, const string &category, const string &key)
+{
+    int lcount = token->getLinkedParameterCount();
+    for (int i = 0; i < lcount; ++i) {
+        hum::HumParamSet *hps = token->getLinkedParameter(i);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        string pkey;
+        // string value;
+        for (int i = 0; i < hps->getCount(); ++i) {
+            pkey = hps->getParameterName(i);
+            // value = hps->getParameterValue(i);
+            if (pkey == key) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 //////////////////////////////

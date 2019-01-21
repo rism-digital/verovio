@@ -521,6 +521,7 @@ protected:
     void assignVerticalGroup(Pedal *ped, hum::HTp token);
     void storeAcclev(const std::string value, int staffindex);
     void storeStemInterpretation(const std::string &value, int staffindex, int layernumber);
+    bool getBooleanParameter(hum::HTp token, const string &category, const string &key);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
