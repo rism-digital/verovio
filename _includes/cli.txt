@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-61da81a
+Verovio 2.1.0-dev-533442f
 
 Example usage:
 
@@ -52,6 +52,7 @@ General layout options
  --lyric-no-start-hyphen           Do not show hyphens at the beginning of a system
  --lyric-size <f>                  The lyrics size in MEI units (default: 4.50; min: 2.00; max: 8.00)
  --lyric-top-min-margin <f>        The minmal margin above the lyrics in MEI units (default: 2.00; min: 0.00; max: 8.00)
+ --lyric-word-space <f>            The lyric word space length (default: 1.20; min: 0.50; max: 3.00)
  --min-measure-width <i>           The minimal measure width in MEI units (default: 15; min: 1; max: 30)
  --measure-number <s>              The measure numbering rule (unused) (default: "system"; other values: "interval")
  --slur-control-pointsr <i>        Slur control points - higher value means more curved at the end (default: 5; min: 1; max: 10)
