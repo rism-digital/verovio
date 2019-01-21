@@ -778,18 +778,18 @@ bool MeiOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
-    
+
     if (m_doc->m_front.first_child()) {
         music.append_copy(m_doc->m_front.first_child());
     }
-    
+
     m_currentNode = music.append_child("body");
     m_nodeStack.push_back(m_currentNode);
 
     if (m_doc->m_back.first_child()) {
         music.append_copy(m_doc->m_back.first_child());
     }
-    
+
     /*
     if (m_scoreBasedMEI) {
         m_currentNode = mdiv.append_child("score");
@@ -1106,7 +1106,7 @@ void MeiOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
 void MeiOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
 {
     assert(bracketSpan);
-    
+
     WriteControlElement(currentNode, bracketSpan);
     WriteTimeSpanningInterface(currentNode, bracketSpan);
     bracketSpan->WriteBracketSpanLog(currentNode);
@@ -1114,7 +1114,7 @@ void MeiOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracke
     bracketSpan->WriteLineRend(currentNode);
     bracketSpan->WriteLineRendBase(currentNode);
 }
-    
+
 void MeiOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
 {
     assert(breath);
@@ -1467,7 +1467,7 @@ void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
 
     WriteLayerElement(currentNode, halfmRpt);
 }
-    
+
 void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 {
     assert(keySig);
@@ -2481,14 +2481,14 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         LogError("No <music> element found in the MEI data");
         return false;
     }
-    
+
     front = music.child("front");
     if (!front.empty()) {
         m_doc->m_front.reset();
         // copy the complete front into the master document
         m_doc->m_front.append_copy(front);
     }
-    
+
     back = music.child("back");
     if (!back.empty()) {
         m_doc->m_back.reset();
@@ -3508,7 +3508,7 @@ bool MeiInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
     ReadUnsupportedAttr(arpeg, vrvArpeg);
     return true;
 }
-    
+
 bool MeiInput::ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan)
 {
     BracketSpan *vrvBracketSpan = new BracketSpan();
@@ -3635,7 +3635,7 @@ bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 {
     Mordent *vrvMordent = new Mordent();
     ReadControlElement(mordent, vrvMordent);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeMordentTo_4_0_0(mordent, vrvMordent);
     }
@@ -3747,7 +3747,7 @@ bool MeiInput::ReadTurn(Object *parent, pugi::xml_node turn)
 {
     Turn *vrvTurn = new Turn();
     ReadControlElement(turn, vrvTurn);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeTurnTo_4_0_0(turn, vrvTurn);
     }
@@ -4175,17 +4175,7 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     ReadUnsupportedAttr(fTrem, vrvFTrem);
     return ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
-    
-bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
-{
-    HalfmRpt *vrvHalfmRpt = new HalfmRpt();
-    ReadLayerElement(halfmRpt, vrvHalfmRpt);
 
-    parent->AddChild(vrvHalfmRpt);
-    ReadUnsupportedAttr(halfmRpt, vrvHalfmRpt);
-    return true;
-}
-    
 bool MeiInput::ReadGraceGrp(Object *parent, pugi::xml_node graceGrp)
 {
     GraceGrp *vrvGraceGrp = new GraceGrp();
@@ -4198,6 +4188,16 @@ bool MeiInput::ReadGraceGrp(Object *parent, pugi::xml_node graceGrp)
     parent->AddChild(vrvGraceGrp);
     ReadUnsupportedAttr(graceGrp, vrvGraceGrp);
     return ReadLayerChildren(vrvGraceGrp, graceGrp, vrvGraceGrp);
+}
+
+bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
+{
+    HalfmRpt *vrvHalfmRpt = new HalfmRpt();
+    ReadLayerElement(halfmRpt, vrvHalfmRpt);
+
+    parent->AddChild(vrvHalfmRpt);
+    ReadUnsupportedAttr(halfmRpt, vrvHalfmRpt);
+    return true;
 }
 
 bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
@@ -4566,7 +4566,7 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
     ReadTextElement(f, vrvF);
 
     ReadTimeSpanningInterface(f, vrvF);
-    
+
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);
     return ReadTextChildren(vrvF, f);
@@ -5414,7 +5414,7 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
 }
-    
+
 void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)
 {
     if (mordent.attribute("form")) {
@@ -5499,7 +5499,7 @@ void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
         staffGrp.remove_attribute("label.abbr");
     }
 }
-    
+
 void MeiInput::UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn)
 {
     if (turn.attribute("form")) {
