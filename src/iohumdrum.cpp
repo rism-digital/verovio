@@ -8041,16 +8041,25 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token)
 {
     bool iseditorial = getBooleanParameter(token, "CL", "ed");
+    std::string color = getStringParameter(token, "CL", "color");
     Clef *clef = new Clef;
     if (iseditorial) {
         Supplied *supplied = new Supplied;
         appendElement(supplied, clef);
         appendElement(elements, pointers, supplied);
-        clef->SetColor("#aaa"); // hard-code to gray for now
+        if (color.empty()) {
+            clef->SetColor("#aaa"); // hard-code to gray by default for now
+        }
+        else {
+            clef->SetColor(color);
+        }
         clef->SetType("editorial");
     }
     else {
         appendElement(elements, pointers, clef);
+        if (!color.empty()) {
+            clef->SetColor(color);
+        }
     }
 
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
@@ -8120,6 +8129,38 @@ bool HumdrumInput::getBooleanParameter(hum::HTp token, const string &category, c
         }
     }
     return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getStringParameter --
+//
+
+std::string HumdrumInput::getStringParameter(hum::HTp token, const string &category, const string &key)
+{
+    int lcount = token->getLinkedParameterCount();
+    for (int i = 0; i < lcount; ++i) {
+        hum::HumParamSet *hps = token->getLinkedParameter(i);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        string pkey;
+        string value;
+        for (int i = 0; i < hps->getCount(); ++i) {
+            pkey = hps->getParameterName(i);
+            if (pkey == key) {
+                value = hps->getParameterValue(i);
+                return value;
+            }
+        }
+    }
+    return "";
 }
 
 //////////////////////////////
