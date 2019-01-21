@@ -154,6 +154,7 @@ enum ClassId {
     DOTS,
     FLAG,
     FTREM,
+    GRACEGRP,
     HALFMRPT,
     KEYSIG,
     LIGATURE,

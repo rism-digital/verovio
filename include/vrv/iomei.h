@@ -58,6 +58,7 @@ class Fig;
 class Fermata;
 class FloatingElement;
 class FTrem;
+class GraceGrp;
 class Hairpin;
 class HalfmRpt;
 class Harm;
@@ -245,6 +246,7 @@ private:
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
+    void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
     void WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt);
     void WriteKeySig(pugi::xml_node currentNode, KeySig *keySig);
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
@@ -487,6 +489,7 @@ private:
     bool ReadCustos(Object *parent, pugi::xml_node custos);
     bool ReadDot(Object *parent, pugi::xml_node dot);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
+    bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);
     bool ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt);
     bool ReadKeySig(Object *parent, pugi::xml_node keySig);
     bool ReadLigature(Object *parent, pugi::xml_node ligature);

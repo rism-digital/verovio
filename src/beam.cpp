@@ -19,6 +19,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "layer.h"
 #include "note.h"
 #include "rest.h"
@@ -363,6 +364,7 @@ void Beam::Reset()
 
 void Beam::AddChild(Object *child)
 {
+    LogWarning("%i", child->GetClassId());
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
     }
@@ -374,6 +376,9 @@ void Beam::AddChild(Object *child)
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(GRACEGRP)) {
+        assert(dynamic_cast<GraceGrp *>(child));
     }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
