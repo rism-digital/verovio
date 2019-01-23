@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 20 13:32:59 EST 2019
+// Last Modified: Wed Jan 23 12:27:35 EST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -47727,8 +47727,8 @@ void Tool_musicxml2hum::insertOffsetHarmonyIntoMeasure(GridMeasure* gm) {
 					     << " since first timestamp in measure is " << timestamp << endl;
 				} else {
 					m_forceRecipQ = true;
-					// go back to previous note line and insert new slice to stor
-					// the harmony token
+					// go back to previous note line and insert
+					// new slice to store the harmony token
 					auto tempit = it;
 					tempit--;
 					while (tempit != gm->end()) {
@@ -47750,6 +47750,21 @@ void Tool_musicxml2hum::insertOffsetHarmonyIntoMeasure(GridMeasure* gm) {
 		}
 		beginQ = false;
 	}
+	// If there are still valid harmonies in the input list, apppend
+	// them to the end of the measure.
+	for (int i=0; i<(int)offsetHarmony.size(); i++) {
+		if (offsetHarmony[i].token == NULL) {
+			continue;
+ 		}
+		m_forceRecipQ = true;
+		int partcount = (int)gm->back()->size();
+		GridSlice* newgs = new GridSlice(gm, offsetHarmony[i].timestamp,
+				SliceType::Notes, partcount);
+		newgs->at(offsetHarmony[i].partindex)->setHarmony(offsetHarmony[i].token);
+		gm->insert(gm->end(), newgs);
+		offsetHarmony[i].token = NULL;
+	}
+	offsetHarmony.clear();
 }
 
 
