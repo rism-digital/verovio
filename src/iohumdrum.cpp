@@ -625,6 +625,106 @@ bool HumdrumInput::convertHumdrum()
 
 //////////////////////////////
 //
+// HumdrumInput::parseEmbeddedOptions --
+//
+
+void HumdrumInput::parseEmbeddedOptions(Doc &doc)
+{
+    Options *opts = doc.GetOptions();
+    if (!opts) {
+        return;
+    }
+    hum::HumdrumFile &infile = m_infile;
+    hum::HumRegex hre;
+    // find the last !!!verovio-parameter-groups: entry in the file
+    // (only the last one will be read).
+    std::vector<std::string> pgroups;
+    for (int i = infile.getLineCount() - 1; i >= 0; i--) {
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        std::string key = infile[i].getReferenceKey();
+        if (key != "verovio-parameter-group") {
+            continue;
+        }
+        std::string groups = infile[i].getReferenceValue();
+        if (groups.empty()) {
+            break;
+        }
+        hre.split(pgroups, groups, "[\\s,]+");
+        break;
+    }
+
+    map<std::string, std::string> inputparameters;
+    // Now read through the file searching for verovio parameters
+    // that are either unassigned to a group, or is in one of the
+    // given groups.
+    std::string pkey;
+    std::string pvalue;
+    std::string value;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        std::string key = infile[i].getReferenceKey();
+        if (key == "verovio-parameter-group") {
+            continue;
+        }
+        if (key.compare(0, 7, "verovio") != 0) {
+            continue;
+        }
+        if (key == "verovio") {
+            // in the global group, so process always:
+            value = infile[i].getReferenceValue();
+
+            if (!hre.search(value, "\\s*([^\\s]+)\\s+(.*)\\s*$")) {
+                continue;
+            }
+            std::string pkey = hre.getMatch(1);
+            std::string pvalue = hre.getMatch(2);
+            if (value.empty()) {
+                cerr << "Warning: value is empty for parameter " << key << endl;
+                continue;
+            }
+            inputparameters[pkey] = pvalue;
+        }
+        else {
+            // check to see if parameter is in desired group
+            for (int j = 0; j < (int)pgroups.size(); j++) {
+                if (key.compare(8, std::string::npos, pgroups[j]) != 0) {
+                    continue;
+                }
+                value = infile[i].getReferenceValue();
+
+                if (!hre.search(value, "\\s*([^\\s]+)\\s+(.*)\\s*$")) {
+                    continue;
+                }
+                std::string pkey = hre.getMatch(1);
+                std::string pvalue = hre.getMatch(2);
+                if (value.empty()) {
+                    cerr << "Warning: value is empty for parameter " << key << endl;
+                    continue;
+                }
+                inputparameters[pkey] = pvalue;
+                break;
+            }
+        }
+    }
+
+    const MapOfStrOptions *optionlist = opts->GetItems();
+    for (auto inputoption : inputparameters) {
+        auto entry = optionlist->find(inputoption.first);
+        if (entry == optionlist->end()) {
+            cerr << "Warning: option " << inputoption.first << " is not recognized" << endl;
+            continue;
+        }
+        // cerr << "SETTING OPTION " << inputoption.first << " TO " << inputoption.second << endl;
+        entry->second->SetValue(inputoption.second);
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::initializeSpineColor -- Look for *color: interpretations before data.
 //
 

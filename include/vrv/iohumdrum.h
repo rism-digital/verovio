@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "ending.h"
 #include "io.h"
+#include "options.h"
 #include "pedal.h"
 #include "runningelement.h"
 #include "section.h"
@@ -315,6 +316,8 @@ public:
     virtual bool ImportFile();
     virtual bool ImportString(std::string const &humdrum);
 
+    void parseEmbeddedOptions(vrv::Doc &doc);
+
 #ifndef NO_HUMDRUM_SUPPORT
 
     std::string GetHumdrumString();
@@ -522,7 +525,7 @@ protected:
     void storeAcclev(const std::string value, int staffindex);
     void storeStemInterpretation(const std::string &value, int staffindex, int layernumber);
     bool getBooleanParameter(hum::HTp token, const string &category, const string &key);
-	std::string getStringParameter(hum::HTp token, const string &category, const string &key);
+    std::string getStringParameter(hum::HTp token, const string &category, const string &key);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -580,7 +583,8 @@ protected:
     std::vector<std::wstring> cleanFBString(const std::string &content);
 
 private:
-    std::string m_filename; // Filename to read/was read.
+    // m_filename == Filename to read/was read.
+    std::string m_filename;
 
     // m_debug == mostly for printing MEI data to standard input.
     int m_debug = 0;
