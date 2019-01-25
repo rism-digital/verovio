@@ -4761,6 +4761,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             MultiRest *multirest = new MultiRest();
             multirest->SetNum(m_multirest[startline]);
             appendElement(layer, multirest);
+            for (int j = 0; j < (int)layerdata.size(); j++) {
+                if (!layerdata[j]->isData()) {
+                    continue;
+                }
+                processDirections(layerdata[j], staffindex);
+            }
         }
         else {
             MRest *mrest = new MRest();
@@ -14136,6 +14142,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 
     // check to see if measures with single data item is a rest.
     std::vector<int> wholerest(barindex.size(), 0);
+    std::vector<int> textrest(barindex.size(), 0);
     bool restQ;
     int line;
     for (int i = 0; i < (int)barindex.size(); ++i) {
@@ -14187,10 +14194,10 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
         }
         if (hasitem) {
             wholerest[i] = 0;
+            textrest[i] = 1;
         }
     }
 
-    // ggg
     // remove cases where there is text attached to the whole-measure rest
     for (int i = 0; i < (int)wholerest.size(); i++) {
         if (wholerest[i] != 1) {
@@ -14214,6 +14221,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
         }
         if (hastext) {
             wholerest[i] = 0;
+            textrest[i] = 1;
         }
     }
 
@@ -14227,6 +14235,15 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
         }
         if (wholerest[i] && wholerest[i + 1]) {
             wholerest[i] += wholerest[i + 1];
+            wholerest[i + 1] = -1;
+        }
+    }
+
+    // Expand backwards to include a whole-measure rest with a
+    // measure that has text.
+    for (int i = 0; i < (int)wholerest.size() - 1; i++) {
+        if ((textrest[i] == 1) && (wholerest[i + 1] >= 1)) {
+            wholerest[i] = wholerest[i + 1] + 1;
             wholerest[i + 1] = -1;
         }
     }
