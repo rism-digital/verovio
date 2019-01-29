@@ -7216,7 +7216,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 belowadj = forcebelowadj;
             }
             if (endtok != NULL) {
-
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff + belowadj);
                 setLocationId(hairpin, line->token(i), -1);
@@ -7260,6 +7259,10 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 m_measure->AddChild(dir);
                 setStaff(dir, m_currentstaff + belowadj);
                 setLocationId(dir, line->token(i));
+                bool aboveQ = hasAboveParameter(line->token(i), "HP");
+                if (aboveQ) {
+                    setPlace(dir, "above");
+                }
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 dir->SetTstamp(tstamp.getFloat());
                 std::string fontstyle = "";
