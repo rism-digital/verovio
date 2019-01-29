@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jan 23 12:27:35 EST 2019
+// Last Modified: Sun Jan 27 15:34:28 EST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4215,10 +4215,10 @@ class Tool_dissonant : public HumTool {
 		void    findYs             (vector<vector<string> >& results,
 		                            NoteGrid& grid,
 		                            vector<NoteCell*>& attacks, int vindex);
-		void	findCadentialVoiceFunctions(vector<vector<string> >& results,
-									NoteGrid& grid,	vector<NoteCell*>& attacks,
-									vector<vector<string> >& voiceFuncs,
-									int vindex);
+		void    findCadentialVoiceFunctions(vector<vector<string> >& results,
+		                            NoteGrid& grid, vector<NoteCell*>& attacks,
+		                            vector<vector<string> >& voiceFuncs,
+		                            int vindex);
 
 		void    printColorLegend   (HumdrumFile& infile);
 		int     getNextPitchAttackIndex(NoteGrid& grid, int voicei,
@@ -4242,14 +4242,21 @@ class Tool_dissonant : public HumTool {
 		void    changeDurationOfNote(HTp note, HumNum dur);
 		void    changePitch        (HTp note2, HTp note1);
 		void    simplePreviousMerge(HTp pnote, HTp cnote);
-		void    simpleNextMerge	   (HTp cnote, HTp nnote);
+		void    simpleNextMerge    (HTp cnote, HTp nnote);
 		void    changePitchOfTieGroupFollowing(HTp note, const string& pitch);
 		void    mergeWithPreviousNoteViaTies(HTp pnote, HTp cnote);
 		void    mergeWithPreviousNote(HumdrumFile& infile, NoteCell* cell);
-		void    mergeWithNextNote(HumdrumFile& infile, NoteCell* cell);
+		void    mergeWithNextNote    (HumdrumFile& infile, NoteCell* cell);
+		void    adjustColorization   (HumdrumFile& infile);
+		void    adjustColorForVoice  (HTp spinestart, vector<string>& labels);
+		void    removeAgentColor     (HTp disslabel, const string& marker, const string& query);
+		void    addLabelToSuspensions(HTp disslabel, const string& marker);
+		bool    isSuspension         (HTp token);
+		void    addSuspensionMarkToNote(HTp start, const string& marks);
+		void    adjustSuspensionColors(HTp speinstart);
 
 	private:
-	 	vector<HTp> m_kernspines;
+		vector<HTp> m_kernspines;
 		bool diss2Q = false;
 		bool diss7Q = false;
 		bool diss4Q = false;
@@ -4288,28 +4295,28 @@ class Tool_dissonant : public HumTool {
 		const int THIRD_Q_PASS_DOWN    = 19; // dissonant third quarter
 		const int THIRD_Q_UPPER_NEI    = 20; // dissonant third quarter
 		const int THIRD_Q_LOWER_NEI    = 21; // dissonant third quarter
-		const int ACC_PASSING_UP	   = 22; // appoggiatura
-		const int ACC_PASSING_DOWN	   = 23; // appoggiatura
-		const int ACC_UP_NEI		   = 24; // appoggiatura
-		const int ACC_LO_NEI		   = 25; // appoggiatura
+		const int ACC_PASSING_UP       = 22; // appoggiatura
+		const int ACC_PASSING_DOWN     = 23; // appoggiatura
+		const int ACC_UP_NEI           = 24; // appoggiatura
+		const int ACC_LO_NEI           = 25; // appoggiatura
 		const int APP_UPPER            = 26; // appoggiatura
 		const int APP_LOWER            = 27; // appoggiatura
-		const int SUS_BIN  	           = 28; // binary suspension
-		const int SUS_TERN  	       = 29; // ternary suspension
-		const int AGENT_BIN		       = 30; // binary agent
-		const int AGENT_TERN		   = 31; // ternary agent
+		const int SUS_BIN              = 28; // binary suspension
+		const int SUS_TERN             = 29; // ternary suspension
+		const int AGENT_BIN            = 30; // binary agent
+		const int AGENT_TERN           = 31; // ternary agent
 		const int SUSPENSION_REP       = 32; // suspension repeated note
 		const int FAKE_SUSPENSION_LEAP = 33; // fake suspension approached by leap
 		const int FAKE_SUSPENSION_STEP = 34; // fake suspension approached by step or anticipation
 		const int SUS_NO_AGENT_LEAP    = 35; // suspension missing a normal agent approached by leap
 		const int SUS_NO_AGENT_STEP    = 36; // suspension missing a normal agent approached by step or anticipation
 		const int CHANSON_IDIOM        = 37; // chanson idiom
-		const int ORNAMENTAL_SUS	   = 38; // purely ornamental suspension
+		const int ORNAMENTAL_SUS       = 38; // purely ornamental suspension
 
 		// unknown dissonances:
 		const int PARALLEL_UP          = 39; // moves in parallel with known dissonant, approached from below
 		const int PARALLEL_DOWN        = 40; // moves in parallel with known dissonant, approached from above
-		const int RES_PITCH			   = 41; // note of resolution of a suspension against suspension dissonance
+		const int RES_PITCH            = 41; // note of resolution of a suspension against suspension dissonance
 
 		const int ONLY_WITH_VALID_UP   = 42; // only dissonant with identifiable dissonances, approached from below
 		const int ONLY_WITH_VALID_DOWN = 43; // only dissonant with identifiable dissonances, approached from above
