@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.0.1] - 2019-02-04
+* Fix for Plaine & Easie empty beams
+
 ## [2.0.0] - 2019-01-21
 ### Added
 * Support for `<bracketSpan>`
