@@ -4817,7 +4817,7 @@ bool MeiInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
 bool MeiInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef) {
+    if (!m_hasScoreDef && m_useScoreDefForDoc) {
         LogError("<app> before any <scoreDef> is not supported");
         return false;
     }
