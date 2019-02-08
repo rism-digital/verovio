@@ -69,8 +69,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         return;
     }
 
-    if (start->Is(TIMESTAMP_ATTR) || end->Is(TIMESTAMP_ATTR)) {
-        // for now ignore slur using tstamps
+    if (start->Is(TIMESTAMP_ATTR) && end->Is(TIMESTAMP_ATTR)) {
+        // for now ignore slur using 2 tstamps
         return;
     }
 
@@ -101,11 +101,18 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         isGraceToNoteSlur = true;
     }
 
+    Layer *layer = NULL;
+    LayerElement *layerElement = NULL;
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    // if (start->Is(TIMESTAMP_ATTR))
-    //    layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    // else
-    Layer *layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+    if (!start->Is(TIMESTAMP_ATTR)) {
+        layer = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+        layerElement = start;
+    }
+    else {
+        layer = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+        layerElement = end;
+    }
+    assert(layer);
 
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
         System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
@@ -158,7 +165,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // grace notes - always below unless we have a drawing stem direction on the layer
-    else if (isGraceToNoteSlur && (layer1->GetDrawingStemDir(startNote) == STEMDIRECTION_NONE)) {
+    else if (isGraceToNoteSlur && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
         drawingCurveDir = curvature_CURVEDIR_below;
     }
     // the normal case
@@ -166,7 +173,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         drawingCurveDir = slur->GetDrawingCurvedir();
     }
     // then layer direction trumps note direction
-    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(start)) != STEMDIRECTION_NONE)) {
+    else if (layer && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
@@ -368,7 +375,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     points[0] = Point(x1, y1);
     points[3] = Point(x2, y2);
 
-    float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
+    float angle = AdjustSlur(slur, staff, layer->GetN(), drawingCurveDir, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
 
