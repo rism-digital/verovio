@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+* Embedding of Petaluma font (1.055) from Steinberg
+
+## [2.0.2] - 2019-02-06
+* Fix issue with <app> and multiple <mdiv>
+
+## [2.0.1] - 2019-02-04
+* Fix for Plaine & Easie empty beams
+
 ## [2.0.0] - 2019-01-21
 ### Added
 * Support for `<bracketSpan>`
