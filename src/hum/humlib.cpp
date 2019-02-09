@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 27 15:34:28 EST 2019
+// Last Modified: Sat Feb  2 03:55:18 EST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4240,6 +4240,11 @@ void GridSide::setHarmony(HTp token) {
 }
 
 
+void GridSide::setHarmony(const string& token) {
+	HTp newtoken = new HumdrumToken(token);
+	setHarmony(newtoken);
+}
+
 
 //////////////////////////////
 //
@@ -4401,6 +4406,7 @@ GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
 	m_measure = measure;
 	int partcount = (int)slice.size();
 	int staffcount;
+	int voicecount;
 	if (partcount > 0) {
 		this->resize(partcount);
 		for (int p=0; p<partcount; p++) {
@@ -4410,6 +4416,13 @@ GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
 			part->resize(staffcount);
 			for (int s=0; s<staffcount; s++) {
 				part->at(s) = new GridStaff;
+				// voicecount = (int)slice.at(p)->at(s)->size();
+				voicecount = 0;
+				GridStaff* staff = part->at(s);
+				staff->resize(voicecount);
+				for (int v=0; v<voicecount; v++) {
+					staff->at(v) = new GridVoice;
+				}
 			}
 		}
 	}
@@ -4424,6 +4437,7 @@ GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
 	m_measure = measure;
 	int partcount = (int)slice->size();
 	int staffcount;
+	int voicecount;
 	if (partcount > 0) {
 		this->resize(partcount);
 		for (int p=0; p<partcount; p++) {
@@ -4433,6 +4447,13 @@ GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
 			part->resize(staffcount);
 			for (int s=0; s<staffcount; s++) {
 				part->at(s) = new GridStaff;
+				// voicecount = (int)slice->at(p)->at(s)->size();
+				voicecount = 0;
+				GridStaff* staff = part->at(s);
+				staff->resize(voicecount);
+				for (int v=0; v<voicecount; v++) {
+					staff->at(v) = new GridVoice;
+				}
 			}
 		}
 	}
@@ -6073,6 +6094,20 @@ void HumGrid::setDynamicsPresent(int partindex) {
 
 //////////////////////////////
 //
+// HumGrid::setHarmonyPresent -- Indicate that part needs a **harm spine.
+//
+
+void HumGrid::setHarmonyPresent(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_harmony.size())) {
+		return;
+	}
+	m_harmony[partindex] = true;
+}
+
+
+
+//////////////////////////////
+//
 // HumGrid::setHarmonyCount -- part size hardwired to 100 for now.
 //
 
@@ -6390,7 +6425,6 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 
 	GridSlice* newmanip = new GridSlice(curr->getMeasure(), curr->getTimestamp(),
 		curr->getType(), curr);
-
 	lastvoice = NULL;
 	GridStaff* laststaff    = NULL;
 	GridStaff* newstaff     = NULL;
@@ -6400,23 +6434,33 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 	int lastp = 0;
 	int lasts = 0;
 	int partsplit = -1;
+	int voicecount;
 
 	for (p=partcount-1; p>=0; p--) {
 		part  = curr->at(p);
 		staffcount = (int)part->size();
 		for (s=staffcount-1; s>=0; s--) {
 			staff = part->at(s);
+			voicecount = (int)staff->size();
 			voice = staff->back();
+			newstaff = newmanip->at(p)->at(s);
 			if (lastvoice != NULL) {
            	if ((*voice->getToken() == "*v") &&
 						(*lastvoice->getToken() == "*v")) {
                // splitting the slices at this staff boundary
-					newstaff     = newmanip->at(p)->at(s);
+
 					newlaststaff = newmanip->at(lastp)->at(lasts);
 					transferMerges(staff, laststaff, newstaff, newlaststaff);
 					foundnew = true;
 					partsplit = p;
 					break;
+				}
+			} else {
+				if (voicecount > 1) {
+					for (int j=newstaff->size(); j<voicecount; j++) {
+						GridVoice* vdata = new GridVoice("*", 0);
+						newstaff->push_back(vdata);
+					}
 				}
 			}
 			laststaff = staff;
@@ -6485,7 +6529,6 @@ void HumGrid::transferOtherParts(GridSlice* oldline, GridSlice* newline, int max
 
 void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 		GridStaff* newstaff, GridStaff* newlaststaff) {
-
 	if ((oldstaff == NULL) || (oldlaststaff == NULL)) {
 		cerr << "Weird error in HumGrid::transferMerges()" << endl;
 		return;
@@ -13103,7 +13146,7 @@ bool HumdrumFileBase::read(const char* filename) {
 	} else {
 		infile.open(filename);
 		if (!infile.is_open()) {
-			return setParseError("Cannot open file %s for reading. A", filename);
+			return setParseError("Cannot open file >>%s<< for reading. A", filename);
 		}
 	}
 	HumdrumFileBase::read(infile);
@@ -19120,26 +19163,39 @@ void HumdrumFileStructure::assignLineDurations(void) {
 
 bool HumdrumFileStructure::assignDurationsToNonRhythmicTrack(
 		HTp endtoken, HTp current) {
+
+	string spineinfo = endtoken->getSpineInfo();
 	HTp token = endtoken;
-	int tcount = token->getPreviousTokenCount();
-	while (tcount > 0) {
-		for (int i=1; i<tcount; i++) {
-			if (!assignDurationsToNonRhythmicTrack(token->getPreviousToken(i),
-					current)) {
-				return isValid();
+
+	while (token) {
+		if (token->getSpineInfo() != spineinfo) {
+			if (token->getSpineInfo().find("b") != std::string::npos) {
+				break;
+			}
+			if (spineinfo.find("b") != std::string::npos) {
+				break;
+			}
+		}
+		int tcount = token->getPreviousTokenCount();
+		if (tcount == 0) {
+			break;
+		}
+		if (tcount > 1) {
+			for (int i=1; i<tcount; i++) {
+				HTp ptok = token->getPreviousToken(i);
+				if (!assignDurationsToNonRhythmicTrack(ptok, current)) {
+					return isValid();
+				}
 			}
 		}
 		if (token->isData()) {
 			if (!token->isNull()) {
 				token->setDuration(current->getDurationFromStart() -
-						token->getDurationFromStart());
+					token->getDurationFromStart());
 				current = token;
 			}
 		}
-		// Data tokens can only be followed by up to one previous token,
-		// so no need to check for more than one next token.
 		token = token->getPreviousToken(0);
-		tcount = token->getPreviousTokenCount();
 	}
 
 	return isValid();
@@ -42259,6 +42315,9 @@ Tool_mei2hum::Tool_mei2hum(void) {
 
 	m_hasDynamics.resize(m_maxstaff);
 	fill(m_hasDynamics.begin(), m_hasDynamics.end(), false);
+
+	m_hasHarm.resize(m_maxstaff);
+	fill(m_hasHarm.begin(), m_hasHarm.end(), false);
 }
 
 
@@ -42331,7 +42390,6 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 	systemstamp = parseScore(score, systemstamp);
 
 	m_outdata.removeRedundantClefChanges();
-	// m_outdata.removeSibeliusIncipit();
 
 	processHairpins();
 
@@ -42353,6 +42411,14 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 			continue;
 		}
 		m_outdata.setDynamicsPresent(i);
+	}
+
+	// Report <harm> presence for each staff to HumGrid:
+	for (int i=0; i<(int)m_hasHarm.size(); i++) {
+		if (m_hasHarm[i] == false) {
+			continue;
+		}
+		m_outdata.setHarmonyPresent(i);
 	}
 
 	auto measure = doc.select_node("/mei/music/body/mdiv/score/section/measure").node();
@@ -42473,6 +42539,7 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 		lastgs = *it;
 		it++;
 	}
+
 	if (lastgs) {
 		GridPart* part = lastgs->at(staffnum-1);
 		part->setDynamics(hairopen);
@@ -43447,6 +43514,8 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 			parseDynam(children[i], starttime);
 		} else if (nodename == "hairpin") {
 			parseHairpin(children[i], starttime);
+		} else if (nodename == "harm") {
+			parseHarm(children[i], starttime);
 		} else if (nodename == "tempo") {
 			parseTempo(children[i], starttime);
 		} else if (nodename == "dir") {
@@ -46037,6 +46106,130 @@ void Tool_mei2hum::parseTempo(xml_node tempo, HumNum starttime) {
 
 //////////////////////////////
 //
+// Tool_mei2hum::parseHarm -- Not yet ready to convert <harm> data.
+//    There will be different types of harm (such as figured bass), which
+//    will need to be subcategorized into different datatypes, such as
+//    *fb for figured bass.  Also free-text can be present in <harm>
+//    data, so the current datatype for that is **cdata  (meaning chord-like
+//    data that will be mapped back into <harm> which converting back to
+//    MEI data.
+//
+// Example:
+//     <harm staff="1" tstamp="1.000000">C major</harm>
+//
+
+void Tool_mei2hum::parseHarm(xml_node harm, HumNum starttime) {
+	NODE_VERIFY(harm, )
+	MAKE_CHILD_LIST(children, harm);
+
+	string text = harm.child_value();
+
+	if (text.empty()) { // looking at <rend> sub-elements
+		int count = 0;
+		for (int i=0; i<(int)children.size(); i++) {
+			string nodename = children[i].name();
+			if (nodename == "rend") {
+				if (count) {
+					text += " ";
+				}
+				count++;
+				text += children[i].child_value();
+				//if (strcmp(children[i].attribute("fontstyle").value(), "normal") == 0) {
+				//	font = "";  // normal is default in Humdrum layout
+				//}
+				//if (strcmp(children[i].attribute("fontweight").value(), "bold") == 0) {
+				//	font += "B";  // normal is default in Humdrum layout
+				//}
+			} else if (nodename == "") {
+				// text node
+				if (count) {
+					text += " ";
+				}
+				count++;
+				text += children[i].value();
+			} else {
+				cerr << DKHTP << harm.name() << "/" << nodename << CURRLOC << endl;
+			}
+		}
+	}
+
+	if (text.empty()) {
+		return;
+	}
+
+   // cerr << "FOUND HARM DATA " << text << endl;
+
+/*
+
+	string startid = harm.attribute("startid").value();
+
+	int staffnum = harm.attribute("staff").as_int();
+	if (staffnum == 0) {
+		cerr << "Error: staff number required on harm element" << endl;
+		return;
+	}
+	double meterunit = m_currentMeterUnit[staffnum - 1];
+
+	if (!startid.empty()) {
+		// Harmony is (or at least should) be attached directly
+		// do a note, so it is handled elsewhere.
+		cerr << "Warning DYNAMIC " << text << " is not yet processed." << endl;
+		return;
+	}
+
+	string ts = harm.attribute("tstamp").value();
+	if (ts.empty()) {
+		cerr << "Error: no timestamp on harm element" << endl;
+		return;
+	}
+	double tsd = (stof(ts)-1) * 4.0 / meterunit;
+	double tolerance = 0.001;
+	GridMeasure* gm = m_outdata.back();
+	double tsm = gm->getTimestamp().getFloat();
+	bool foundslice = false;
+	GridSlice *nextgs = NULL;
+	for (auto gs : *gm) {
+		if (!gs->isDataSlice()) {
+			continue;
+		}
+		double gsts = gs->getTimestamp().getFloat();
+		double difference = (gsts-tsm) - tsd;
+		if (difference < tolerance) {
+			// did not find data line at exact timestamp, so move
+			// the harm to the next event. Need to think about adding
+			// a new timeslice for the harm when it is not attached to
+			// a note.
+			nextgs = gs;
+			break;
+		}
+		if (!(fabs(difference) < tolerance)) {
+			continue;
+		}
+		GridPart* part = gs->at(staffnum-1);
+		part->setHarmony(text);
+		m_outdata.setHarmonyPresent(staffnum-1);
+		foundslice = true;
+		break;
+	}
+	if (!foundslice) {
+		if (nextgs == NULL) {
+			cerr << "Warning: harmony not attched to system events "
+					<< "are not yet supported in measure " << m_currentMeasure << endl;
+		} else {
+			GridPart* part = nextgs->at(staffnum-1);
+			part->setHarmony(text);
+			m_outdata.setHarmonyPresent(staffnum-1);
+			// Give a time offset for displaying the harmmony here.
+		}
+	}
+*/
+
+}
+
+
+
+//////////////////////////////
+//
 // Tool_mei2hum::parseDynam --
 //
 // Example:
@@ -47115,7 +47308,7 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		if (transpose.hasHumdrumText()) {
 			stringstream ss;
 			transpose.getHumdrumText(ss);
-			outfile.read(ss.str());
+			outfile.readString(ss.str());
 			printResult(out, outfile);
 		}
 	} else {
@@ -50792,9 +50985,9 @@ bool Tool_myank::run(HumdrumFile& infile, ostream& out) {
 bool Tool_myank::run(HumdrumFile& infile) {
 	// Max track in enscripten is wrong for some reason,
 	// so making a copy and forcing reanalysis:
-	stringstream ss;
-	ss << infile;
-	infile.read(ss);
+	// stringstream ss;
+	// ss << infile;
+	// infile.read(ss);
 	initialize(infile);
 	processFile(infile);
 	// Re-load the text for each line from their tokens.

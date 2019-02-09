@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 27 15:34:28 EST 2019
+// Last Modified: Sat Feb  2 03:55:18 EST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2873,6 +2873,7 @@ class GridSide {
 
 		int   getHarmonyCount   (void);
 		void  setHarmony        (HTp token);
+		void  setHarmony        (const std::string& token);
 		void  detachHarmony     (void);
 		HTp   getHarmony        (void);
 
@@ -3135,6 +3136,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 		int  getVerseCount              (int partindex, int staffindex);
 		bool hasDynamics                (int partindex);
 		void setDynamicsPresent         (int partindex);
+		void setHarmonyPresent          (int partindex);
 		void setVerseCount              (int partindex, int staffindex, int count);
 		void setHarmonyCount            (int partindex, int count);
 		void removeRedundantClefChanges (void);
@@ -3209,6 +3211,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 		std::vector<int>              m_harmonyCount;
 		bool                          m_pickup;
 		std::vector<bool>             m_dynamics;
+		std::vector<bool>             m_harmony;
 
 		// options:
 		bool m_recip;               // include **recip spine in output
@@ -4793,6 +4796,7 @@ class Tool_mei2hum : public HumTool {
 		HumNum parseTuplet          (xml_node note, HumNum starttime);
 		void   parseClef            (xml_node clef, HumNum starttime);
 		void   parseDynam           (xml_node dynam, HumNum starttime);
+		void   parseHarm            (xml_node harm, HumNum starttime);
 		void   parseTempo           (xml_node tempo, HumNum starttime);
 		void   parseDir             (xml_node dir, HumNum starttime);
 		HumNum getDuration          (xml_node element);
@@ -4884,6 +4888,7 @@ class Tool_mei2hum : public HumTool {
 		vector<int>    m_maxverse;
 		vector<HumNum> m_measureDuration;
 		vector<bool>   m_hasDynamics;
+		vector<bool>   m_hasHarm;
 		const int      m_maxstaff = 1000;
 
 		bool           m_fermata = false;     // set priority of note/fermata over note@fermata
