@@ -4508,10 +4508,13 @@ void HumdrumInput::printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg,
         cerr << "LAYER SIZE = " << layerdata.size() << "\tTGSIZE" << tg.size() << endl;
         return;
     }
-    cerr << "TOK\tGRP\tBRAK\tNUM\tNBASE\tNSCAL\tBSTART\tBEND\tGBST\tGBEND\tTSTART"
+    cerr << "TOK\t\tGRP\tBRAK\tNUM\tNBASE\tNSCAL\tBSTART\tBEND\tGBST\tGBEND\tTSTART"
             "\tTEND\tPRIORITY\n";
     for (int i = 0; i < (int)tg.size(); ++i) {
         cerr << *layerdata[i] << "\t";
+        if (layerdata[i]->size() < 8) {
+            cerr << "\t";
+        }
         cerr << tg[i].group << "\t";
         cerr << tg[i].bracket << "\t";
         cerr << tg[i].num << "\t";
@@ -8651,7 +8654,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<hum::HumNum> dotlessdur(duritems.size());
     for (int i = 0; i < (int)duritems.size(); ++i) {
         hum::HumNum duration = hum::Convert::recipToDurationNoDots(*duritems[i]);
-        dotlessdur[i] = duration;
+        dotlessdur[i] = duration / 4;
         poweroftwo[i] = duration.isPowerOfTwo();
         hastupletQ |= !poweroftwo[i];
     }
@@ -8748,7 +8751,6 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<int> twocounttop(dotlessdur.size(), 0);
     std::vector<int> twocountbot(dotlessdur.size(), 0);
     for (int i = 0; i < (int)dotlessdur.size(); ++i) {
-        dotlessdur[i] = removeFactorsOfTwo(dotlessdur[i], twocounttop[i], twocountbot[i]);
         fulldur[i] = hum::Convert::recipToDuration(*duritems[i]);
         dursum[i] = sum;
         sum += fulldur[i];
@@ -8964,28 +8966,16 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (!tupletgroups[i]) {
             continue;
         }
-        if (dotlessdur[i].getNumerator() == 1) {
-            tuptop[i] = dotlessdur[i].getDenominator();
-            tupbot[i] = nextLowerPowerOfTwo(tuptop[i]);
+        hum::HumNum nextpowoftwo;
+        if (dotlessdur[i] < 1) {
+            nextpowoftwo = nextHigherPowerOfTwo(dotlessdur[i]);
         }
         else {
-            tuptop[i] = dotlessdur[i].getDenominator();
-            tupbot[i] = dotlessdur[i].getNumerator();
-            int nextpow = nextLowerPowerOfTwo((double)tuptop[i] / tupbot[i]);
-            tupbot[i] *= nextpow;
-            hum::HumNum newtopval = tupbot[i];
-            newtopval /= fulldur[i];
-            if (newtopval.getDenominator() != 1) {
-                // there will be a problem if the denominator is not 1:
-                cerr << "Problem with tuplet calculation :" << newtopval << endl;
-            }
-            tuptop[i] = newtopval.getNumerator();
+            nextpowoftwo = nextLowerPowerOfTwo((double)tuptop[i] / tupbot[i]);
         }
-        if ((tuptop[i] == 1) && (tupbot[i] == 1)) {
-            tuptop[i] = 0;
-            tupbot[i] = 0;
-            cerr << "NOT A TUPLET " << endl;
-        }
+        hum::HumNum value = dotlessdur[i] / nextpowoftwo;
+        tuptop[i] = value.getDenominator();
+        tupbot[i] = value.getNumerator();
     }
 
     // adjust tupletgroups based on tuptop and tupbot changes
@@ -9004,76 +8994,88 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             continue;
         }
         if ((tuptop[i] != tuptop[i - 1]) || (tupbot[i] != tupbot[i - 1])) {
-            correction++;
-            tupletstartboolean[i] = true;
-            tupletendboolean[i - 1] = true;
+            if (tupletgroups[i] == tupletgroups[i - 1]) {
+                correction++;
+                tupletstartboolean[i] = true;
+                tupletendboolean[i - 1] = true;
+            }
         }
         tupletgroups[i] += correction;
     }
 
     // tupletscale == 3 for three triplets, 6 for six sextuplets.
-    int xmin = 0;
-    int state = 0;
-    int value = 0;
-    int starti = -1;
+    // int xmin = 0;
+    // int state = 0;
+    // int value = 0;
+    // int starti = -1;
     hum::HumNum vdur;
     hum::HumNum val2;
     std::vector<int> tupletscale(tupletstartboolean.size(), 1);
     for (int i = 0; i < (int)tupletstartboolean.size(); ++i) {
-        if (tupletstartboolean[i]) {
-            state = 1;
-            xmin = twocountbot[i];
-            starti = i;
-            if (tupletendboolean[i]) {
-                // Tuplet also ends on the same note so process and then continue
-                state = 0;
-                value = (1 << xmin);
-                vdur = dursum[i] - dursum[starti] + fulldur[i];
-                if (vdur < 1) {
-                    val2 = vdur * value;
-                    if (val2.isInteger()) {
-                        tupletscale[i] = val2.getNumerator();
-                    }
-                    else {
-                        tupletscale[i] = value;
-                    }
-                }
-                else if (vdur / 3 * 2 == 1) {
-                    tupletscale[i] = 1;
-                }
-                else {
-                    tupletscale[i] = value;
-                }
-            }
-            continue;
-        }
-        if (!state) {
-            continue;
-        }
-        if (twocountbot[i] < xmin) {
-            xmin = twocountbot[i];
-        }
-        if (tupletendboolean[i]) {
-            state = 0;
-            value = (1 << xmin);
-            vdur = dursum[i] - dursum[starti] + fulldur[i];
-
-            if (vdur < 1) {
-                val2 = vdur * value;
-                if (val2.isInteger()) {
-                    tupletscale[i] = val2.getNumerator();
-                }
-                else {
-                    tupletscale[i] = value;
-                }
-            }
-            else if (vdur / 3 * 2 == 1) {
-                tupletscale[i] = 1;
+        hum::HumNum xx = groupdur / 4 / dotlessdur[i] / tuptop[i];
+        tupletscale[i] = xx.getNumerator();
+        continue;
+        /*
+if (tupletstartboolean[i]) {
+    state = 1;
+    xmin = twocountbot[i];
+    starti = i;
+    if (tupletendboolean[i]) {
+        // Tuplet also ends on the same note so process and then continue
+        state = 0;
+        value = (1 << xmin);
+        vdur = dursum[i] - dursum[starti] + fulldur[i];
+        if (vdur < 1) {
+            val2 = vdur * value;
+            if (val2.isInteger()) {
+                tupletscale[i] = val2.getNumerator();
             }
             else {
                 tupletscale[i] = value;
             }
         }
+        else if (vdur / 3 * 2 == 1) {
+            tupletscale[i] = 1;
+        }
+        else {
+            tupletscale[i] = value;
+        }
+    }
+    continue;
+}
+if (!state) {
+    continue;
+}
+if (twocountbot[i] < xmin) {
+    xmin = twocountbot[i];
+}
+if (tupletendboolean[i]) {
+    state = 0;
+    value = (1 << xmin);
+    vdur = dursum[i] - dursum[starti] + fulldur[i];
+
+    if (vdur < 1) {
+        val2 = vdur * value;
+        if (val2.isInteger()) {
+            tupletscale[i] = val2.getNumerator();
+        }
+        else {
+            tupletscale[i] = value;
+        }
+    }
+    else if (vdur / 3 * 2 == 1) {
+        tupletscale[i] = 1;
+    }
+    else {
+                        hum::HumNum newval = groupdur / 4 / dotlessdur[i] / tuptop[i];
+                        if (newval.isInteger()) {
+                                tupletscale[i] = newval.getNumerator();
+                        } else {
+                                tupletscale[i] = value;
+                        }
+    }
+}
+        */
     }
 
     tg.resize(layerdata.size());
@@ -9103,7 +9105,8 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             tg[i].tupletstart = tupletstartboolean[indexmapping2[i]];
             tg[i].tupletend = tupletendboolean[indexmapping2[i]];
             if (tg[i].group > 0) {
-                tg[i].numscale = tupletscale[tg[i].group - 1];
+                // tg[i].numscale = tupletscale[tg[i].group - 1];
+                tg[i].numscale = tupletscale[i];
             }
             else {
                 tg[i].numscale = 1;
@@ -9352,7 +9355,22 @@ void HumdrumInput::resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTup
 
 //////////////////////////////
 //
-// HumdrumInput::nextLowerPowerOfTwo --
+// HumdrumInput::nextHigherPowerOfTwo -- Use with values between 0 and 1.
+//
+
+hum::HumNum HumdrumInput::nextHigherPowerOfTwo(hum::HumNum x)
+{
+    double value = log(x.getFloat()) / log(2.0);
+    value = -value;
+    int denom = int(value);
+    hum::HumNum rval = 1;
+    rval /= (int)pow(2.0, denom);
+    return rval;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::nextLowerPowerOfTwo -- For integers above 1.
 //
 
 int HumdrumInput::nextLowerPowerOfTwo(int x)

@@ -572,6 +572,7 @@ protected:
     static hum::HumNum removeFactorsOfTwo(hum::HumNum value, int &tcount, int &bcount);
     static int getDotPowerOfTwo(hum::HumNum value);
     static int nextLowerPowerOfTwo(int x);
+    static hum::HumNum nextHigherPowerOfTwo(hum::HumNum x);
     static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
