@@ -1168,44 +1168,11 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     assert(staff);
     assert(measure);
 
-    // first we need to clear the drawing list of postponed elements
-    layer->ResetDrawingList();
-
-    // Now start to draw the layer content
-
     dc->StartGraphic(layer, "", layer->GetUuid());
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
 
     dc->EndGraphic(layer, this);
-
-    // first draw the postponed tuplets
-    DrawLayerList(dc, layer, staff, measure, TUPLET);
-}
-
-void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId)
-{
-    assert(dc);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    ListOfObjects *drawingList = layer->GetDrawingList();
-    ListOfObjects::iterator iter;
-
-    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        if ((*iter)->Is(classId) && (classId == TUPLET)) {
-            Tuplet *tuplet = dynamic_cast<Tuplet *>((*iter));
-            assert(tuplet);
-            dc->ResumeGraphic(tuplet, tuplet->GetUuid());
-            DrawTupletPostponed(dc, tuplet, layer, staff);
-            dc->EndResumedGraphic(tuplet, this);
-        }
-        else {
-            // This should never happen
-            LogError("Element '%s' in the layer list cannot be drawn", (*iter)->GetClassName().c_str());
-        }
-    }
 }
 
 //----------------------------------------------------------------------------

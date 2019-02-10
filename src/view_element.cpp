@@ -1385,9 +1385,6 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Draw the inner elements
     DrawLayerChildren(dc, tuplet, layer, staff, measure);
 
-    // Add to the list of postponed element
-    layer->AddToDrawingList(tuplet);
-
     dc->EndGraphic(element, this);
 }
 
