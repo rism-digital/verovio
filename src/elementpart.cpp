@@ -25,23 +25,6 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Bracket
-//----------------------------------------------------------------------------
-
-Bracket::Bracket() : LayerElement("bracket-")
-{
-
-    Reset();
-}
-
-Bracket::~Bracket() {}
-
-void Bracket::Reset()
-{
-    LayerElement::Reset();
-}
-
-//----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
 
@@ -128,6 +111,23 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 }
 
 //----------------------------------------------------------------------------
+// TupletBracket
+//----------------------------------------------------------------------------
+
+TupletBracket::TupletBracket() : LayerElement("bracket-")
+{
+
+    Reset();
+}
+
+TupletBracket::~TupletBracket() {}
+
+void TupletBracket::Reset()
+{
+    LayerElement::Reset();
+}
+    
+//----------------------------------------------------------------------------
 // TupletNum
 //----------------------------------------------------------------------------
 
@@ -189,14 +189,6 @@ void Stem::AddChild(Object *child)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Bracket::ResetDrawing(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Dots::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -226,6 +218,14 @@ int Flag::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int TupletBracket::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    return FUNCTOR_CONTINUE;
+}
+    
 int TupletNum::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too

@@ -16,52 +16,6 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Bracket
-//----------------------------------------------------------------------------
-
-/**
- * This class models a bracket as a layer element part and has not direct MEI equivlatent.
- * It is used to represent tuplet brackets.
- */
-class Bracket : public LayerElement {
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method resets all attribute classes
-     */
-    ///@{
-    Bracket();
-    virtual ~Bracket();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Bracket"; }
-    virtual ClassId GetClassId() const { return BRACKET; }
-    ///@}
-
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
-
-private:
-    //
-public:
-    //
-private:
-};
-
-//----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
 
@@ -182,6 +136,52 @@ public:
 private:
 };
 
+//----------------------------------------------------------------------------
+// TupletBracket
+//----------------------------------------------------------------------------
+
+/**
+ * This class models a bracket as a layer element part and has not direct MEI equivlatent.
+ * It is used to represent tuplet brackets.
+ */
+class TupletBracket : public LayerElement {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    TupletBracket();
+    virtual ~TupletBracket();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "TupletBracket"; }
+    virtual ClassId GetClassId() const { return TUPLET_BRACKET; }
+    ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Overwritten version of Save that avoids anything to be written
+     */
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+private:
+    //
+public:
+    //
+private:
+};
+    
 //----------------------------------------------------------------------------
 // TupletNum
 //----------------------------------------------------------------------------

@@ -60,8 +60,8 @@ void Tuplet::AddChild(Object *child)
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
     }
-    else if (child->Is(BRACKET)) {
-        assert(dynamic_cast<Bracket *>(child));
+    else if (child->Is(TUPLET_BRACKET)) {
+        assert(dynamic_cast<TupletBracket *>(child));
     }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
@@ -96,7 +96,7 @@ void Tuplet::AddChild(Object *child)
     
     // Num and bracket are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ BRACKET, TUPLET_NUM }))
+    if (child->Is({ TUPLET_BRACKET, TUPLET_NUM }))
         m_children.insert(m_children.begin(), child);
     else
         m_children.push_back(child);
@@ -126,12 +126,12 @@ void Tuplet::FilterList(ListOfObjects *childList)
     
 int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Bracket *currentBracket = dynamic_cast<Bracket *>(this->FindChildByType(BRACKET, 1));
+    TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(this->FindChildByType(TUPLET_BRACKET, 1));
     TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM, 1));
 
     if (!this->HasBracketVisible() || (this->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
-            currentBracket = new Bracket();
+            currentBracket = new TupletBracket();
             this->AddChild(currentBracket);
         }
         //currentStem->AttGraced::operator=(*this);
