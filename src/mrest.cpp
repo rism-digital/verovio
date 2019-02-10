@@ -7,6 +7,15 @@
 
 #include "mrest.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "fermata.h"
+#include "functorparams.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -23,9 +32,7 @@ MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttCue(), AttFerma
     Reset();
 }
 
-MRest::~MRest()
-{
-}
+MRest::~MRest() {}
 
 void MRest::Reset()
 {
@@ -40,6 +47,19 @@ void MRest::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
+int MRest::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int MRest::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -47,7 +67,7 @@ int MRest::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

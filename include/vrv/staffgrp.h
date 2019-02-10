@@ -51,14 +51,26 @@ public:
     virtual void AddChild(Object *object);
     ///@}
 
+    /**
+     * @name Setter and getter of the drawing visible flag
+     */
+    ///@{
+    VisibilityOptimization GetDrawingVisibility() const { return m_drawingVisibility; }
+    void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
 
+    /**
+     * See Object::OptimizeScoreDef
+     */
+    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+
 protected:
     /**
-     * Filter the list for a specific class.
-     * For example, keep staffDef for fast access.
+     * Filter the flat list and keep only StaffDef elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 
@@ -67,6 +79,13 @@ private:
 public:
     //
 private:
+    /**
+     * A flag indicating is the staffGrp is visible or not.
+     * staffGrp is not visible when scoreDef is optimized with dynamic rendering and
+     * when all its content is not visible.
+     * By default the value is OPTIMIZATION_NONE
+     */
+    VisibilityOptimization m_drawingVisibility;
 };
 
 } // namespace vrv

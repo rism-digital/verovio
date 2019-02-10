@@ -1,0 +1,5 @@
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/include/Binasc.h -O Binasc.h
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/include/MidiEvent.h -O MidiEvent.h
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/include/MidiEventList.h -O MidiEventList.h
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/include/MidiFile.h -O MidiFile.h
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/include/MidiMessage.h -O MidiMessage.h

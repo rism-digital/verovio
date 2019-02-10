@@ -44,9 +44,7 @@ Tuplet::Tuplet()
     Reset();
 }
 
-Tuplet::~Tuplet()
-{
-}
+Tuplet::~Tuplet() {}
 
 void Tuplet::Reset()
 {
@@ -74,8 +72,8 @@ void Tuplet::AddChild(Object *child)
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
-    else if (child->Is(NUM)) {
-        assert(dynamic_cast<Num *>(child));
+    else if (child->Is(TUPLET_NUM)) {
+        assert(dynamic_cast<TupletNum *>(child));
     }
     else if (child->Is(REST)) {
         assert(dynamic_cast<Rest *>(child));
@@ -98,7 +96,7 @@ void Tuplet::AddChild(Object *child)
     
     // Num and bracket are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ BRACKET, NUM }))
+    if (child->Is({ BRACKET, TUPLET_NUM }))
         m_children.insert(m_children.begin(), child);
     else
         m_children.push_back(child);
@@ -117,7 +115,7 @@ void Tuplet::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 }
@@ -129,7 +127,7 @@ void Tuplet::FilterList(ListOfObjects *childList)
 int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Bracket *currentBracket = dynamic_cast<Bracket *>(this->FindChildByType(BRACKET, 1));
-    Num *currentNum = dynamic_cast<Num *>(this->FindChildByType(NUM, 1));
+    TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM, 1));
 
     if (!this->HasBracketVisible() || (this->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
@@ -149,7 +147,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 
     if (!this->HasNumVisible() || (this->GetNumVisible() == BOOLEAN_true)) {
         if (!currentNum) {
-            currentNum = new Num();
+            currentNum = new TupletNum();
             this->AddChild(currentNum);
         }
         currentNum->AttTupletVis::operator=(*this);
@@ -168,5 +166,12 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 };
+
+int Tuplet::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

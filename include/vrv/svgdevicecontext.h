@@ -21,12 +21,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "pugixml.hpp"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BBoxDeviceContext
+// SvgDeviceContext
 //----------------------------------------------------------------------------
 
 /**
@@ -40,7 +38,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    SvgDeviceContext(int width, int height);
+    SvgDeviceContext();
     virtual ~SvgDeviceContext();
     virtual ClassId GetClassId() const { return SVG_DEVICE_CONTEXT; }
     ///@}
@@ -55,7 +53,6 @@ public:
     virtual void SetTextForeground(int colour);
     virtual void SetTextBackground(int colour);
     virtual void SetLogicalOrigin(int x, int y);
-    virtual void SetUserScale(double xScale, double yScale);
     ///@}
 
     /**
@@ -84,9 +81,11 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"");
+    virtual void DrawText(
+        const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET);
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
     virtual void DrawSpline(int n, Point points[]);
+    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
     virtual void DrawBackgroundImage(int x = 0, int y = 0);
     ///@}
 
@@ -94,13 +93,13 @@ public:
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText(int x, int y, char alignement = LEFT);
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left);
     virtual void EndText();
 
     /**
-     * Move a text to the specified position, for example when starting a new line
+     * Move a text to the specified position
      */
-    virtual void MoveTextTo(int x, int y);
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
 
     /**
      * @name Method for starting and ending a graphic
@@ -135,6 +134,13 @@ public:
     ///@}
 
     /**
+     * @name Method for rotating a graphic (clockwise).
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle);
+    ///@}
+
+    /**
      * @name Method for starting and ending page
      */
     ///@{
@@ -148,7 +154,12 @@ public:
     ///@{
     virtual void AddDescription(const std::string &text);
     ///@}
-    
+
+    /**
+     * In SVG use global styling but not with mm output (for pdf generation)
+     */
+    virtual bool UseGlobalStyling() { return !m_mmOutput; }
+
     /**
      * Setting mm output flag (false by default)
      */
@@ -173,7 +184,7 @@ private:
 
     /**
      * Flush the data to the internal buffer.
-     * Adds the xml tag if necessary and the <defs> from m_smufl_glyphs
+     * Adds the xml tag if necessary and the <defs> from m_smuflGlyphs
      */
     void Commit(bool xml_declaration);
 
@@ -200,20 +211,19 @@ private:
     std::ostringstream m_outdata;
 
     bool m_committed; // did we flushed the file?
-    int m_width, m_height;
     int m_originX, m_originY;
-    double m_userScaleX, m_userScaleY;
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::vector<std::string> m_smufl_glyphs;
+    std::vector<std::string> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;
     pugi::xml_node m_svgNode;
+    pugi::xml_node m_pageNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
-    
+
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
 };

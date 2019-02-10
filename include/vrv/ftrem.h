@@ -16,11 +16,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// FTrem
+// FTrem (fingered tremolo)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <fTrem>
+ * This class models the MEI <fTrem> element.
  */
 class FTrem : public LayerElement, public ObjectListInterface, public AttSlashCount, public AttTremMeasured {
 public:
@@ -67,11 +67,16 @@ public:
      */
     virtual int CalcStem(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 protected:
     /**
-     * Filter the list for a specific fTrem;
+     * Filter the flat list and keep only Note or Chords elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 

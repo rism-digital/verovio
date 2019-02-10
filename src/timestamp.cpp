@@ -24,9 +24,7 @@ TimestampAttr::TimestampAttr() : LayerElement("tstp-")
     Reset();
 }
 
-TimestampAttr::~TimestampAttr()
-{
-}
+TimestampAttr::~TimestampAttr() {}
 
 void TimestampAttr::Reset()
 {

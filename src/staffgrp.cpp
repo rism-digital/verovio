@@ -14,12 +14,15 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
+#include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "staffdef.h"
 #include "vrv.h"
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // StaffGrp
 //----------------------------------------------------------------------------
@@ -42,9 +45,7 @@ StaffGrp::StaffGrp()
     Reset();
 }
 
-StaffGrp::~StaffGrp()
-{
-}
+StaffGrp::~StaffGrp() {}
 
 void StaffGrp::Reset()
 {
@@ -54,21 +55,26 @@ void StaffGrp::Reset()
     ResetStaffGroupingSym();
     ResetStaffGrpVis();
     ResetTyped();
+
+    m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
 void StaffGrp::AddChild(Object *child)
 {
-    if (child->Is(STAFFDEF)) {
-        assert(dynamic_cast<StaffDef *>(child));
-    }
-    else if (child->Is(STAFFGRP)) {
-        assert(dynamic_cast<StaffGrp *>(child));
+    if (child->Is(INSTRDEF)) {
+        assert(dynamic_cast<InstrDef *>(child));
     }
     else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }
     else if (child->Is(LABELABBR)) {
         assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else if (child->Is(STAFFDEF)) {
+        assert(dynamic_cast<StaffDef *>(child));
+    }
+    else if (child->Is(STAFFGRP)) {
+        assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -93,9 +99,52 @@ void StaffGrp::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// StaffGrp functor methods
+//----------------------------------------------------------------------------
+
+int StaffGrp::OptimizeScoreDefEnd(FunctorParams *)
+{
+    // OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    // assert(params);
+
+    this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
+
+    for (auto &child : m_children) {
+        if (child->Is(STAFFDEF)) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(child);
+            assert(staffDef);
+            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
+                break;
+            }
+        }
+        else if (child->Is(STAFFGRP)) {
+            StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(child);
+            assert(staffGrp);
+            if (staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
+                break;
+            }
+        }
+    }
+
+    if ((this->GetSymbol() == staffGroupingSym_SYMBOL_brace) && (this->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) {
+        for (auto &child : m_children) {
+            if (child->Is(STAFFDEF)) {
+                StaffDef *staffDef = dynamic_cast<StaffDef *>(child);
+                assert(staffDef);
+                staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+            }
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

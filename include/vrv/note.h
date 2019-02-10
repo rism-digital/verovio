@@ -38,7 +38,6 @@ typedef std::vector<Note *> ChordCluster;
 /**
  * This class models the MEI <note> element.
  */
-
 class Note : public LayerElement,
              public StemmedDrawingInterface,
              public DurationInterface,
@@ -78,8 +77,11 @@ public:
     }
     ///@}
 
-    /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    /**
+     * Override the method since alignment is required.
+     * For notes we want not to align notes within a ligature (except first and last)
+     */
+    virtual bool HasToBeAligned() const;
 
     /**
      * Add an element (a verse or an accid) to a note.
@@ -92,9 +94,6 @@ public:
      */
     ///@{
     Accid *GetDrawingAccid();
-    void ResetDrawingTieAttr();
-    void SetDrawingTieAttr();
-    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
     /**
@@ -157,6 +156,11 @@ public:
     wchar_t GetMensuralSmuflNoteHead();
 
     /**
+     * Check if a note or its parent chord are visible
+     */
+    bool IsVisible();
+
+    /**
      * MIDI timing information
      */
     ///@{
@@ -165,17 +169,24 @@ public:
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
+    void SetMIDIPitch(char pitch);
     double GetScoreTimeOnset();
     int GetRealTimeOnsetMilliseconds();
     double GetScoreTimeOffset();
     double GetScoreTimeTiedDuration();
     int GetRealTimeOffsetMilliseconds();
     double GetScoreTimeDuration();
+    char GetMIDIPitch();
     ///@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem
@@ -203,11 +214,6 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
-
-    /**
      * See Object::PrepareLyrics
      */
     virtual int PrepareLyrics(FunctorParams *functorParams);
@@ -216,11 +222,6 @@ public:
      * See Object::PreparePointersByLayer
      */
     virtual int PreparePointersByLayer(FunctorParams *functorParams);
-
-    /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -247,13 +248,6 @@ private:
 public:
     //
 private:
-    /**
-     * Tie attributes are represented a pointers to Tie objects.
-     * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and takes care of deleting it
-     */
-    Tie *m_drawingTieAttr;
-
     /**
      * The drawing location of the note
      */
@@ -309,6 +303,11 @@ private:
      * indicate that it should not be written to MIDI output.
      */
     double m_scoreTimeTiedDuration;
+
+    /**
+     * The MIDI pitch of the note.
+     */
+    char m_MIDIPitch;
 };
 
 //----------------------------------------------------------------------------

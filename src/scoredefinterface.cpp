@@ -31,8 +31,10 @@ ScoreDefInterface::ScoreDefInterface()
     , AttKeySigDefaultLog()
     , AttKeySigDefaultVis()
     , AttLyricStyle()
+    , AttMeasureNumbers()
     , AttMensuralLog()
     , AttMensuralShared()
+    , AttMensuralVis()
     , AttMeterSigDefaultLog()
     , AttMeterSigDefaultVis()
     , AttMidiTempo()
@@ -44,8 +46,10 @@ ScoreDefInterface::ScoreDefInterface()
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_LYRICSTYLE);
+    RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
     RegisterInterfaceAttClass(ATT_MENSURALLOG);
     RegisterInterfaceAttClass(ATT_MENSURALSHARED);
+    RegisterInterfaceAttClass(ATT_MENSURALVIS);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_MIDITEMPO);
@@ -54,9 +58,7 @@ ScoreDefInterface::ScoreDefInterface()
     Reset();
 }
 
-ScoreDefInterface::~ScoreDefInterface()
-{
-}
+ScoreDefInterface::~ScoreDefInterface() {}
 
 void ScoreDefInterface::Reset()
 {
@@ -66,8 +68,10 @@ void ScoreDefInterface::Reset()
     ResetKeySigDefaultLog();
     ResetKeySigDefaultVis();
     ResetLyricStyle();
+    ResetMeasureNumbers();
     ResetMensuralLog();
     ResetMensuralShared();
+    ResetMensuralVis();
     ResetMeterSigDefaultLog();
     ResetMeterSigDefaultVis();
     ResetMidiTempo();

@@ -40,4 +40,8 @@ echo "Generating Gootville files ..."
 saxon9ee Gootville.svg extract-glyphs.xsl > tmp/Gootville-bounding-boxes.svg
 phantomjs generate-bbox.js tmp/Gootville-bounding-boxes.svg ../data/Gootville.xml json/gootville-1.2_metadata.json
 
+echo "Generating Petaluma files ..."
+saxon9ee Petaluma.svg extract-glyphs.xsl > tmp/Petaluma-bounding-boxes.svg
+phantomjs generate-bbox.js tmp/Petaluma-bounding-boxes.svg ../data/Petaluma.xml json/petaluma_metadata.json
+
 echo "Done!"

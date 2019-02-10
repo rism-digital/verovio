@@ -9,6 +9,7 @@
 #define __VRV_LAYER_ELEMENT_H__
 
 #include "atts_shared.h"
+#include "linkinginterface.h"
 #include "object.h"
 
 namespace vrv {
@@ -29,7 +30,7 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public Object, public AttLabelled, public AttTyped {
+class LayerElement : public Object, public LinkingInterface, public AttLabelled, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -47,6 +48,13 @@ public:
      * Copy assignment for resetting pointers
      */
     LayerElement &operator=(const LayerElement &element);
+    
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual LinkingInterface *GetLinkingInterface() { return dynamic_cast<LinkingInterface *>(this); }
+    ///@}
 
     /**
      * Return true if the element has to be aligned horizontally
@@ -80,7 +88,7 @@ public:
     /** Return true if the element is has to be rederred as cue sized */
     bool GetDrawingCueSize();
     /** Return true if the element is a note within a ligature */
-    bool IsInLigature();
+    bool IsInLigature() const;
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
     /**
@@ -163,7 +171,8 @@ public:
     /**
      * Returns the duration if the child element has a DurationInterface
      */
-    double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true);
+    double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     //----------//
     // Functors //
@@ -223,6 +232,11 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
     virtual int PrepareCrossStaffEnd(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::PreparePointersByLayer
+     */
+    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTimePointing

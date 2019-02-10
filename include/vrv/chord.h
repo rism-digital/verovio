@@ -72,8 +72,6 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    virtual void FilterList(ListOfObjects *childlist);
-
     /**
      * Return the maximum and minimum Y positions of the notes in the chord
      */
@@ -127,6 +125,16 @@ public:
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
     ///@}
 
+    /**
+     * Check if the chord or one of its children is visible
+     */
+    bool IsVisible();
+
+    /**
+     * Return true if the chord has at least one note with a @dots > 0
+     */
+    bool HasNoteWithDots();
+
     //----------//
     // Functors //
     //----------//
@@ -135,6 +143,14 @@ public:
      * See Object::AdjustCrossStaffYPos
      */
     virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    ///@{
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::CalcStem
@@ -152,21 +168,25 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
-    virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
-
-    /**
      * See Object::GenerateMIDIEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     /**
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
+
+    /**
+     * Filter the flat list and keep only Note elements.
+     */
+    virtual void FilterList(ListOfObjects *childlist);
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

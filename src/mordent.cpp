@@ -33,9 +33,7 @@ Mordent::Mordent()
     Reset();
 }
 
-Mordent::~Mordent()
-{
-}
+Mordent::~Mordent() {}
 
 void Mordent::Reset()
 {

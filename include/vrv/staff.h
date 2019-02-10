@@ -47,6 +47,16 @@ public:
     ///@}
 
     /**
+     * Do not copy children for layers
+     */
+    virtual bool CopyChildren() const { return false; }
+
+    /**
+     * Overriding CopyReset() method to be called after copy / assignment calls.
+     */
+    virtual void CopyReset();
+
+    /**
      * Delete all the legder line arrays.
      */
     void ClearLedgerLines();
@@ -63,6 +73,12 @@ public:
      */
     ///@{
     virtual int GetDrawingY() const;
+
+    /**
+     * Check if the staff is currently visible.
+     * Looks for the parent system and its current drawing scoreDef
+     */
+    bool DrawingIsVisible();
 
     /**
      * Return the index position of the staff in its measure parent
@@ -103,9 +119,19 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * See Object::OptimizeScoreDef
+     */
+    virtual int OptimizeScoreDef(FunctorParams *functorParams);
 
     /**
      * See Object::ResetVerticalAlignment
@@ -116,6 +142,11 @@ public:
      * See Object::ApplyPPUFactor
      */
     virtual int ApplyPPUFactor(FunctorParams *functorParams);
+
+    /**
+     * See Object::AlignHorizontally
+     */
+    virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
      * See Object::AlignVertically
@@ -136,6 +167,18 @@ public:
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcOnsetOffset
+     */
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
 private:
     /**

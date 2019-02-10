@@ -16,27 +16,37 @@
 
 #include "attcomparison.h"
 #include "beam.h"
+#include "beatrpt.h"
+#include "breath.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "ftrem.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mordent.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "multirest.h"
 #include "note.h"
 #include "octave.h"
+#include "pb.h"
 #include "pedal.h"
+#include "rend.h"
 #include "rest.h"
-#include "rpt.h"
+#include "sb.h"
 #include "score.h"
 #include "section.h"
 #include "slur.h"
@@ -65,13 +75,12 @@ MusicXmlInput::MusicXmlInput(Doc *doc, std::string filename) : FileInputStream(d
     m_filename = filename;
 }
 
-MusicXmlInput::~MusicXmlInput()
-{
-}
+MusicXmlInput::~MusicXmlInput() {}
 
 bool MusicXmlInput::ImportFile()
 {
     try {
+        m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document xmlDoc;
         pugi::xml_parse_result result = xmlDoc.load_file(m_filename.c_str());
@@ -90,6 +99,7 @@ bool MusicXmlInput::ImportFile()
 bool MusicXmlInput::ImportString(std::string const &musicxml)
 {
     try {
+        m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document xmlDoc;
         xmlDoc.load(musicxml.c_str());
@@ -109,7 +119,7 @@ bool MusicXmlInput::HasAttributeWithValue(pugi::xml_node node, std::string attri
 {
     assert(node);
 
-    if (GetAttributeValue(node, attribute) == value) {
+    if (node.attribute(attribute.c_str()).value() == value) {
         return true;
     }
     return false;
@@ -135,23 +145,6 @@ bool MusicXmlInput::HasContentWithValue(pugi::xml_node node, std::string value)
     return false;
 }
 
-bool MusicXmlInput::HasContent(pugi::xml_node node)
-{
-    assert(node);
-
-    return (node.text());
-}
-
-std::string MusicXmlInput::GetAttributeValue(pugi::xml_node node, std::string attribute)
-{
-    assert(node);
-
-    if (node.attribute(attribute.c_str())) {
-        return std::string(node.attribute(attribute.c_str()).value());
-    }
-    return "";
-}
-
 std::string MusicXmlInput::GetContent(pugi::xml_node node)
 {
     assert(node);
@@ -165,7 +158,7 @@ std::string MusicXmlInput::GetContent(pugi::xml_node node)
 std::string MusicXmlInput::GetContentOfChild(pugi::xml_node node, std::string child)
 {
     pugi::xpath_node childNode = node.select_single_node(child.c_str());
-    if (childNode && HasContent(childNode.node())) {
+    if (childNode.node()) {
         return GetContent(childNode.node());
     }
     return "";
@@ -177,16 +170,15 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     assert(i >= 0);
 
     // we just need to add a measure
-    if (i == section->GetChildCount(MEASURE)) {
+    if (section->GetChildCount(MEASURE) <= i) {
         section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
     else if (section->GetChildCount(MEASURE) > i) {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
-        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
+        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
-        Object *current;
-        for (current = measure->GetFirst(); current; current = measure->GetNext()) {
+        for (auto current : *measure->GetChildren()) {
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
@@ -259,7 +251,7 @@ Layer *MusicXmlInput::SelectLayer(int layerNum, Staff *staff)
     }
     else {
         AttNIntegerComparison comparisonLayer(LAYER, layerNum);
-        layer = dynamic_cast<Layer *>(staff->FindChildByAttComparison(&comparisonLayer, 1));
+        layer = dynamic_cast<Layer *>(staff->FindChildByComparison(&comparisonLayer, 1));
     }
     if (layer) return layer;
     // else add it
@@ -273,7 +265,7 @@ Layer *MusicXmlInput::SelectLayer(int layerNum, Staff *staff)
 void MusicXmlInput::RemoveLastFromStack(ClassId classId)
 {
     std::vector<LayerElement *>::reverse_iterator riter;
-    for (riter = m_elementStack.rbegin(); riter != m_elementStack.rend(); riter++) {
+    for (riter = m_elementStack.rbegin(); riter != m_elementStack.rend(); ++riter) {
         if ((*riter)->Is(classId)) {
             m_elementStack.erase((riter + 1).base());
             return;
@@ -323,7 +315,7 @@ void MusicXmlInput::OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie)
 void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie)
 {
     std::vector<std::pair<Tie *, musicxml::OpenTie> >::iterator iter;
-    for (iter = m_tieStack.begin(); iter != m_tieStack.end(); iter++) {
+    for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
         if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
             && (iter->second.m_pname == note->GetPname()) && iter->second.m_oct == note->GetOct()) {
             iter->first->SetEndid("#" + note->GetUuid());
@@ -349,7 +341,7 @@ void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur)
 void MusicXmlInput::CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element)
 {
     std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
-    for (iter = m_slurStack.begin(); iter != m_slurStack.end(); iter++) {
+    for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
         if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
             && (iter->second.m_number == number)) {
             iter->first->SetEndid("#" + element->GetUuid());
@@ -367,13 +359,13 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
 {
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
-        std::string textStr = GetContent(textNode);
-        std::string textAlign = GetAttributeValue(textNode, "halign");
-        std::string textColor = GetAttributeValue(textNode, "color");
-        std::string textFont = GetAttributeValue(textNode, "font-family");
-        std::string textStyle = GetAttributeValue(textNode, "font-style");
-        std::string textWeight = GetAttributeValue(textNode, "font-weight");
-        std::string lang = GetAttributeValue(textNode, "xml:lang");
+        std::string textStr = textNode.text().as_string();
+        std::string textAlign = textNode.attribute("halign").as_string();
+        std::string textColor = textNode.attribute("color").as_string();
+        std::string textFont = textNode.attribute("font-family").as_string();
+        std::string textStyle = textNode.attribute("font-style").as_string();
+        std::string textWeight = textNode.attribute("font-weight").as_string();
+        std::string lang = textNode.attribute("xml:lang").as_string();
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         if (!textColor.empty() || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
@@ -381,9 +373,9 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             if (words.size() > 1 && !lang.empty()) {
                 rend->SetLang(lang.c_str());
             }
+            rend->SetColor(textNode.attribute("color").as_string());
             if (!textAlign.empty())
                 rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(textAlign.c_str()));
-            if (!textColor.empty()) rend->SetColor(textColor.c_str());
             if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
             if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
             if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
@@ -400,7 +392,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     std::string tempoText = "M.M.";
     if (metronome.select_single_node("per-minute").node()) {
         std::string mm = GetContent(metronome.select_single_node("per-minute").node());
-        if (atoi(mm.c_str())) tempo->SetMm(mm.c_str());
+        if (atoi(mm.c_str())) tempo->SetMm(atoi(mm.c_str()));
         tempoText = tempoText + StringFormat(" = %s", mm.c_str());
     }
     if (metronome.select_single_node("beat-unit").node()) {
@@ -409,7 +401,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     if (metronome.select_single_node("beat-unit-dot")) {
         tempo->SetMmDots((int)metronome.select_nodes("beat-unit-dot").size());
     }
-    if (GetAttributeValue(metronome, "parentheses") == "yes") tempoText = "(" + tempoText + ")";
+    if (HasAttributeWithValue(metronome, "parentheses", "yes")) tempoText = "(" + tempoText + ")";
     Text *text = new Text();
     text->SetText(UTF8to16(tempoText));
     tempo->AddChild(text);
@@ -424,10 +416,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     ReadMusicXmlTitle(root);
 
-    Score *score = m_doc->CreateScoreBuffer();
+    // the mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // the score
+    Score *score = new Score();
+    mdiv->AddChild(score);
     // the section
     Section *section = new Section();
     score->AddChild(section);
+    // initialize layout
+    if (root.select_single_node("/score-partwise/identification/encoding/supports[@element='print']")) {
+        m_hasLayoutInformation = true;
+        // always start with a new page
+        Pb *pb = new Pb();
+        section->AddChild(pb);
+    }
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
@@ -438,7 +443,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_single_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
-    if (scoreMidiBpm) m_doc->m_scoreDef.SetMidiBpm(atoi(GetAttributeValue(scoreMidiBpm.node(), "tempo").c_str()));
+    if (scoreMidiBpm) m_doc->m_scoreDef.SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_int());
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -480,6 +485,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // part-name should be revised, as soon MEI can suppress labels
             std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
             std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
+            pugi::xpath_node midiInstrument = xpathNode.node().select_single_node("midi-instrument");
+            pugi::xpath_node midiChannel = midiInstrument.node().select_single_node("midi-channel");
+            pugi::xpath_node midiName = midiInstrument.node().select_single_node("midi-name");
+            // pugi::xpath_node midiPan = midiInstrument.node().select_single_node("pan");
+            pugi::xpath_node midiProgram = midiInstrument.node().select_single_node("midi-program");
+            pugi::xpath_node midiVolume = midiInstrument.node().select_single_node("volume");
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
@@ -495,12 +506,22 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (!partAbbr.empty()) {
                     LabelAbbr *labelAbbr = new LabelAbbr();
                     Text *text = new Text();
-                    text->SetText(UTF8to16(partName));
+                    text->SetText(UTF8to16(partAbbr));
                     labelAbbr->AddChild(text);
                     partStaffGrp->AddChild(labelAbbr);
                 }
+                if (midiInstrument) {
+                    InstrDef *instrdef = new InstrDef;
+                    instrdef->SetMidiInstrname(
+                        instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
+                    if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
+                    // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
+                    if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
+                    if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
+                    partStaffGrp->AddChild(instrdef);
+                }
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
-                partStaffGrp->SetBarthru(BOOLEAN_true);
+                partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
             else {
@@ -516,9 +537,17 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     if (!partAbbr.empty()) {
                         LabelAbbr *labelAbbr = new LabelAbbr();
                         Text *text = new Text();
-                        text->SetText(UTF8to16(partName));
+                        text->SetText(UTF8to16(partAbbr));
                         labelAbbr->AddChild(text);
                         staffDef->AddChild(labelAbbr);
+                    }
+                    if (midiInstrument) {
+                        InstrDef *instrdef = new InstrDef;
+                        if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
+                        // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
+                        if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
+                        if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
+                        staffDef->AddChild(instrdef);
                     }
                 }
                 m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
@@ -543,10 +572,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     Measure *measure = NULL;
     std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
-    for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
+    for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
+            measure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning("Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(),
@@ -574,9 +603,9 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
     pugi::xml_node meiTitle = titleStmt.append_child("title");
     if (movementTitle)
-        meiTitle.text().set(GetContent(movementTitle.node()).c_str());
+        meiTitle.text().set(movementTitle.node().text().as_string());
     else if (workTitle)
-        meiTitle.text().set(GetContent(workTitle.node()).c_str());
+        meiTitle.text().set(workTitle.node().text().as_string());
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
@@ -611,11 +640,13 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     int nbStaves = 1;
 
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
+
         // We read all attribute elements until we reach something else
-        // barline, print, and sound elements may be present
-        if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "print")
-            && !IsElement(*it, "sound"))
+        // barline, direction, print, and sound elements may be present
+        if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "direction")
+            && !IsElement(*it, "print") && !IsElement(*it, "sound")) {
             break;
+        }
 
         // we do not want to read it again, just change the name
         if (IsElement(*it, "attributes")) it->set_name("mei-read");
@@ -634,9 +665,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         // Create as many staffDef
         for (i = 0; i < nbStaves; i++) {
             // Find or create the staffDef
-            StaffDef *staffDef = NULL;
             AttNIntegerComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
-            staffDef = dynamic_cast<StaffDef *>(staffGrp->FindChildByAttComparison(&comparisonStaffDef, 1));
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindChildByComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
@@ -653,7 +683,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!clefSign) {
                 clefSign = it->select_single_node("clef/sign");
             }
-            if (clefSign && HasContent(clefSign.node())) {
+            if (clefSign.node().text()) {
                 staffDef->SetClefShape(
                     staffDef->AttCleffingLog::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
             }
@@ -664,7 +694,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!clefLine) {
                 clefLine = it->select_single_node("clef/line");
             }
-            if (clefLine && HasContent(clefLine.node())) {
+            if (clefLine.node().text()) {
                 staffDef->SetClefLine(staffDef->AttCleffingLog::StrToInt(clefLine.node().text().as_string()));
             }
             // clef octave change
@@ -674,7 +704,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!clefOctaveChange) {
                 clefOctaveChange = it->select_single_node("clef/clef-octave-change");
             }
-            if (clefOctaveChange && HasContent(clefOctaveChange.node())) {
+            if (clefOctaveChange.node().text()) {
                 int change = clefOctaveChange.node().text().as_int();
                 if (abs(change) == 1)
                     staffDef->SetClefDis(OCTAVE_DIS_8);
@@ -727,7 +757,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 staffDef->SetLines(5);
             std::string scaleStr = staffDetails.node().select_single_node("staff-size").node().text().as_string();
             if (!scaleStr.empty()) {
-                staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr));
+                staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr + "%"));
             }
             pugi::xpath_node staffTuning = staffDetails.node().select_single_node("staff-tuning");
             if (staffTuning) {
@@ -741,20 +771,20 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 time = it->select_single_node("time");
             }
             if (time) {
-                std::string symbol = GetAttributeValue(time.node(), "symbol");
+                std::string symbol = time.node().attribute("symbol").as_string();
                 if (!symbol.empty()) {
                     if (symbol == "cut" || symbol == "common")
                         staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
                     else if (symbol == "single-number")
-                        staffDef->SetMeterRend(meterSigDefaultVis_METERREND_num);
+                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
                     else
-                        staffDef->SetMeterRend(meterSigDefaultVis_METERREND_norm);
+                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
                 }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("Compound meter signatures are not supported");
                 }
                 pugi::xpath_node beats = time.node().select_single_node("beats");
-                if (beats && HasContent(beats.node())) {
+                if (beats.node().text()) {
                     m_meterCount = beats.node().text().as_int();
                     // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
                     // this is a little "hack", until libMEI is fixed
@@ -766,7 +796,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     staffDef->SetMeterCount(m_meterCount);
                 }
                 pugi::xpath_node beatType = time.node().select_single_node("beat-type");
-                if (beatType && HasContent(beatType.node())) {
+                if (beatType.node().text()) {
                     m_meterUnit = beatType.node().text().as_int();
                     staffDef->SetMeterUnit(m_meterUnit);
                 }
@@ -784,7 +814,15 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // ppq
             pugi::xpath_node divisions = it->select_single_node("divisions");
-            if (divisions) m_ppq = atoi(GetContent(divisions.node()).c_str());
+            if (divisions) m_ppq = divisions.node().text().as_int();
+            // measure style
+            pugi::xpath_node measureSlash = it->select_single_node("measure-style/slash");
+            if (measureSlash) {
+                if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+                    m_slash = true;
+                else
+                    m_slash = false;
+            }
         }
     }
 
@@ -805,10 +843,15 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     int i = 0;
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
-        Measure *measure = new Measure();
-        ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
-        // Add the measure to the system - if already there from a previous part we'll just merge the content
-        AddMeasure(section, measure, i);
+        if (m_multiRest != 0) {
+            m_multiRest--;
+        }
+        else {
+            Measure *measure = new Measure();
+            ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
+            // Add the measure to the system - if already there from a previous part we'll just merge the content
+            AddMeasure(section, measure, i);
+        }
         i++;
     }
     return false;
@@ -820,7 +863,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(node);
     assert(measure);
 
-    std::string measureNum(GetAttributeValue(node, "number").c_str());
+    std::string measureNum = node.attribute("number").as_string();
     if (measure != NULL) measure->SetN(measureNum);
 
     int i = 0;
@@ -828,12 +871,14 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
+        staff->SetVisible(
+            ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
 
     // Normally the stack should be empty
-    // LogDebug("Measure %s", GetAttributeValue(node, "number").c_str());
+    // LogDebug("Measure %s", node.attribute("number").as_string());
     // assert(m_elementStack.empty());
     m_elementStack.clear();
 
@@ -842,6 +887,16 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 
     // read the content of the measure
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
+        // first check if there is a multi measure rest
+        if (it->select_single_node(".//multiple-rest")) {
+            m_multiRest = it->select_single_node(".//multiple-rest").node().text().as_int();
+            MultiRest *multiRest = new MultiRest;
+            multiRest->SetNum(m_multiRest);
+            Layer *layer = SelectLayer(1, measure);
+            AddLayerElement(layer, multiRest);
+            --m_multiRest;
+            break;
+        }
         if (IsElement(*it, "attributes")) {
             ReadMusicXmlAttributes(*it, section, measure, measureNum);
         }
@@ -886,18 +941,18 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     pugi::xpath_node clef = node.select_single_node("clef");
     if (clef) {
         // check if we have a staff number
-        std::string numberStr = GetAttributeValue(clef.node(), "number");
-        int staffNum = (numberStr.empty()) ? 1 : atoi(numberStr.c_str());
+        int staffNum = clef.node().attribute("number").as_int();
+        staffNum = (staffNum < 1) ? 1 : staffNum;
         Layer *layer = SelectLayer(staffNum, measure);
         pugi::xpath_node clefSign = clef.node().select_single_node("sign");
         pugi::xpath_node clefLine = clef.node().select_single_node("line");
         if (clefSign && clefLine) {
             Clef *meiClef = new Clef();
-            meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign.node())));
+            meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(clefSign.node().text().as_string()));
             meiClef->SetLine(meiClef->AttClefShape::StrToInt(clefLine.node().text().as_string()));
             // clef octave change
             pugi::xpath_node clefOctaveChange = clef.node().select_single_node("clef-octave-change");
-            if (clefOctaveChange && HasContent(clefOctaveChange.node())) {
+            if (clefOctaveChange.node().text()) {
                 int change = clefOctaveChange.node().text().as_int();
                 if (abs(change) == 1)
                     meiClef->SetDis(OCTAVE_DIS_8);
@@ -937,20 +992,20 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 key.node().select_single_node("mode").node().text().as_string()));
         }
         if (time) {
-            std::string symbol = GetAttributeValue(time.node(), "symbol");
+            std::string symbol = time.node().attribute("symbol").as_string();
             if (!symbol.empty()) {
                 if (symbol == "cut" || symbol == "common")
                     scoreDef->SetMeterSym(scoreDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
-                    scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_num);
+                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
                 else
-                    scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_norm);
+                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
             }
             if (time.node().select_nodes("beats").size() > 1) {
                 LogWarning("Compound meter signatures are not supported");
             }
             pugi::xpath_node beats = time.node().select_single_node("beats");
-            if (beats && HasContent(beats.node())) {
+            if (beats.node().text()) {
                 m_meterCount = beats.node().text().as_int();
                 // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
                 // this is a little "hack", until libMEI is fixed
@@ -962,7 +1017,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 scoreDef->SetMeterCount(m_meterCount);
             }
             pugi::xpath_node beatType = time.node().select_single_node("beat-type");
-            if (beatType && HasContent(beatType.node())) {
+            if (beatType.node().text()) {
                 m_meterUnit = beatType.node().text().as_int();
                 scoreDef->SetMeterUnit(m_meterUnit);
             }
@@ -971,11 +1026,18 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     }
 
     pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
+    pugi::xpath_node measureSlash = node.select_single_node("measure-style/slash");
     if (measureRepeat) {
-        if (GetAttributeValue(measureRepeat.node(), "type") == "start")
+        if (HasAttributeWithValue(measureRepeat.node(), "type", "start"))
             m_mRpt = true;
         else
             m_mRpt = false;
+    }
+    if (measureSlash) {
+        if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+            m_slash = true;
+        else
+            m_slash = false;
     }
 }
 
@@ -1038,10 +1100,9 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         }
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         // color
-        std::string colorStr = GetAttributeValue(xmlFermata.node(), "color");
-        if (!colorStr.empty()) fermata->SetColor(colorStr.c_str());
+        fermata->SetColor(xmlFermata.node().attribute("color").as_string());
         // shape
-        fermata->SetShape(ConvertFermataShape(GetContent(xmlFermata.node())));
+        fermata->SetShape(ConvertFermataShape(xmlFermata.node().text().as_string()));
         // form and place
         if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
             fermata->SetForm(fermataVis_FORM_inv);
@@ -1060,17 +1121,16 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     assert(measure);
 
     pugi::xpath_node type = node.select_single_node("direction-type");
-    std::string placeStr = GetAttributeValue(node, "placement");
+    std::string placeStr = node.attribute("placement").as_string();
     pugi::xpath_node_set words = type.node().select_nodes("words");
 
     // Directive
     if (words.size() != 0 && !node.select_single_node("sound[@tempo]")) {
         Dir *dir = new Dir();
         if (words.size() == 1) {
-            std::string lang = GetAttributeValue(words.first().node(), "xml:lang");
-            if (!lang.empty()) dir->SetLang(lang.c_str());
+            dir->SetLang(words.first().node().attribute("xml:lang").as_string());
         }
-        if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         TextRendition(words, dir);
         m_controlElements.push_back(std::make_pair(measureNum, dir));
         m_dirStack.push_back(dir);
@@ -1082,7 +1142,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         std::string dynamStr = GetContentOfChild(dynam.node(), "other-dynamics");
         if (dynamStr.empty()) dynamStr = dynam.node().first_child().name();
         Dynam *dynam = new Dynam();
-        if (!placeStr.empty()) dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(placeStr.c_str()));
         Text *text = new Text();
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
@@ -1093,11 +1153,11 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     // Hairpins
     pugi::xpath_node wedge = type.node().select_single_node("wedge");
     if (wedge) {
-        int hairpinNumber = atoi(GetAttributeValue(wedge.node(), "number").c_str());
+        int hairpinNumber = wedge.node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
             std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
-            for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
+            for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
                 if (iter->second.m_dirN == hairpinNumber) {
                     iter->first->SetEndid(iter->second.m_endID);
                     m_hairpinStack.erase(iter);
@@ -1114,9 +1174,8 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             else if (HasAttributeWithValue(wedge.node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
             }
-            std::string colorStr = GetAttributeValue(wedge.node(), "color");
-            if (!colorStr.empty()) hairpin->SetColor(colorStr.c_str());
-            if (!placeStr.empty()) hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            hairpin->SetColor(wedge.node().attribute("color").as_string());
+            hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             m_controlElements.push_back(std::make_pair(measureNum, hairpin));
             m_hairpinStack.push_back(std::make_pair(hairpin, openHairpin));
         }
@@ -1126,11 +1185,11 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     pugi::xpath_node xmlShift = type.node().select_single_node("octave-shift");
     if (xmlShift) {
         pugi::xpath_node staffNode = node.select_single_node("staff");
-        int staffN = (!staffNode) ? 1 : atoi(GetContent(staffNode.node()).c_str());
+        int staffN = (!staffNode) ? 1 : staffNode.node().text().as_int();
         if (HasAttributeWithValue(xmlShift.node(), "type", "stop")) {
             m_octDis[staffN] = 0;
             std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
-            for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
+            for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
                 if (iter->second->Is(OCTAVE)) {
                     Octave *octave = dynamic_cast<Octave *>(iter->second);
                     std::vector<int> staffAttr = octave->GetStaff();
@@ -1143,15 +1202,13 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         }
         else {
             Octave *octave = new Octave();
-            std::string colorStr = GetAttributeValue(xmlShift.node(), "color");
-            if (!colorStr.empty()) octave->SetColor(colorStr.c_str());
-            if (!placeStr.empty())
-                octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
+            octave->SetColor(xmlShift.node().attribute("color").as_string());
+            octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
             octave->SetStaff(octave->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffN)));
             octave->SetDis(
-                octave->AttOctaveDisplacement::StrToOctaveDis(GetAttributeValue(xmlShift.node(), "size").c_str()));
-            m_octDis[staffN] = (atoi(GetAttributeValue(xmlShift.node(), "size").c_str()) + 2) / 8;
-            if (HasAttributeWithValue(xmlShift.node(), "type", "down")) {
+                octave->AttOctaveDisplacement::StrToOctaveDis(xmlShift.node().attribute("size").as_string()));
+            m_octDis[staffN] = (xmlShift.node().attribute("size").as_int() + 2) / 8;
+            if (HasAttributeWithValue(xmlShift.node(), "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
                 m_octDis[staffN] = -1 * m_octDis[staffN];
             }
@@ -1167,7 +1224,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     if (xmlPedal) {
         Pedal *pedal = new Pedal();
         if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
-        std::string pedalType = GetAttributeValue(xmlPedal.node(), "type");
+        std::string pedalType = xmlPedal.node().attribute("type").as_string();
         if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
         if (pedalType == "stop") pedal->SetStartid(m_ID);
         m_controlElements.push_back(std::make_pair(measureNum, pedal));
@@ -1179,15 +1236,14 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     if (node.select_single_node("sound[@tempo]") || metronome) {
         Tempo *tempo = new Tempo();
         if (words.size() == 1) {
-            std::string lang = GetAttributeValue(words.first().node(), "xml:lang");
-            if (!lang.empty()) tempo->SetLang(lang.c_str());
+            tempo->SetLang(words.first().node().attribute("xml:lang").as_string());
         }
-        if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
         if (words.size() != 0) TextRendition(words, tempo);
         if (metronome)
             PrintMetronome(metronome.node(), tempo);
         else
-            tempo->SetMidiBpm(atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str()));
+            tempo->SetMidiBpm(node.select_single_node("sound").node().attribute("tempo").as_int());
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
         m_tempoStack.push_back(tempo);
     }
@@ -1203,13 +1259,13 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    if (GetAttributeValue(node, "print-object") != "no") {
+    if (!HasAttributeWithValue(node, "print-object", "no")) {
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        std::string textColor = GetAttributeValue(node, "color");
-        std::string textStyle = GetAttributeValue(node, "font-style");
-        std::string textWeight = GetAttributeValue(node, "font-weight");
+        // std::string textColor = node.attribute("color").as_string();
+        // std::string textStyle = node.attribute("font-style").as_string();
+        // std::string textWeight = node.attribute("font-weight").as_string();
         for (pugi::xml_node figure = node.child("figure"); figure; figure = figure.next_sibling("figure")) {
             std::string textStr = GetContent(figure.select_single_node("figure-number").node());
             F *f = new F();
@@ -1253,27 +1309,37 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    std::string placeStr = GetAttributeValue(node, "placement");
-    std::string typeStr = GetAttributeValue(node, "type");
+    int durOffset = 0;
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_single_node("root/root-alter");
-    if (alter) {
-        if (GetContent(alter.node()) == "-1")
-            harmText = harmText + "♭";
-        else if (GetContent(alter.node()) == "0")
-            harmText = harmText + "♮";
-        else if (GetContent(alter.node()) == "1")
-            harmText = harmText + "♯";
-    }
+    harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xpath_node kind = node.select_single_node("kind");
-    if (kind) harmText = harmText + GetAttributeValue(kind.node(), "text").c_str();
+    if (kind) {
+        harmText = harmText + kind.node().attribute("text").as_string();
+        if (HasAttributeWithValue(kind.node(), "use-symbols", "yes"))
+            harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
+    }
+    pugi::xpath_node degree = node.select_single_node("degree");
+    if (degree) {
+        pugi::xpath_node alter = node.select_single_node("degree/degree-alter");
+        harmText += ConvertAlterToSymbol(GetContent(alter.node())) + GetContentOfChild(node, "degree/degree-value");
+    }
+    pugi::xpath_node bass = node.select_single_node("bass");
+    if (bass) {
+        harmText += "/" + GetContentOfChild(node, "bass/bass-step");
+        pugi::xpath_node alter = node.select_single_node("bass/bass-alter");
+        harmText += ConvertAlterToSymbol(GetContent(alter.node()));
+    }
     Harm *harm = new Harm();
     Text *text = new Text();
-    if (!placeStr.empty()) harm->SetPlace(harm->AttPlacement::StrToStaffrel(placeStr.c_str()));
-    if (!typeStr.empty()) harm->SetType(typeStr.c_str());
     text->SetText(UTF8to16(harmText));
+    harm->SetPlace(harm->AttPlacement::StrToStaffrel(node.attribute("placement").as_string()));
+    harm->SetType(node.attribute("type").as_string());
     harm->AddChild(text);
+    pugi::xpath_node offset = node.select_single_node("offset");
+    if (offset) durOffset = offset.node().text().as_int();
+    harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     m_controlElements.push_back(std::make_pair(measureNum, harm));
     m_harmStack.push_back(harm);
 }
@@ -1304,34 +1370,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         return;
     }
 
-    std::string noteColor = GetAttributeValue(node, "color");
-
     pugi::xpath_node notations = node.select_single_node("notations[not(@print-object='no')]");
 
-    bool cue = false;
-    if (node.select_single_node("cue") || node.select_single_node("type[@size='cue']")) cue = true;
+    // bool cue = false;
+    // if (node.select_single_node("cue") || node.select_single_node("type[@size='cue']")) cue = true;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
     int dots = (int)node.select_nodes("dot").size();
-
-    // tremolos
-    pugi::xpath_node tremolo = notations.node().select_single_node("ornaments/tremolo");
-    std::string tremSlashNum = "0";
-    if (tremolo) {
-        if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
-            BTrem *bTrem = new BTrem();
-            AddLayerElement(layer, bTrem);
-            m_elementStack.push_back(bTrem);
-            tremSlashNum = GetContent(tremolo.node());
-        }
-        else if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
-            FTrem *fTrem = new FTrem();
-            AddLayerElement(layer, fTrem);
-            m_elementStack.push_back(fTrem);
-            fTrem->SetSlash(atoi(GetContent(tremolo.node()).c_str()));
-        }
-    }
 
     // beam start
     bool beamStart = node.select_single_node("beam[@number='1'][text()='begin']");
@@ -1339,6 +1385,24 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         Beam *beam = new Beam();
         AddLayerElement(layer, beam);
         m_elementStack.push_back(beam);
+    }
+
+    // tremolos
+    pugi::xpath_node tremolo = notations.node().select_single_node("ornaments/tremolo");
+    int tremSlashNum = 0;
+    if (tremolo) {
+        if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
+            BTrem *bTrem = new BTrem();
+            AddLayerElement(layer, bTrem);
+            m_elementStack.push_back(bTrem);
+            tremSlashNum = tremolo.node().text().as_int();
+        }
+        else if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
+            FTrem *fTrem = new FTrem();
+            AddLayerElement(layer, fTrem);
+            m_elementStack.push_back(fTrem);
+            fTrem->SetSlash(tremolo.node().text().as_int());
+        }
     }
 
     // tuplet start
@@ -1354,18 +1418,16 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         pugi::xpath_node actualNotes = node.select_single_node("time-modification/actual-notes");
         pugi::xpath_node normalNotes = node.select_single_node("time-modification/normal-notes");
         if (actualNotes && normalNotes) {
-            tuplet->SetNum(atoi(GetContent(actualNotes.node()).c_str()));
-            tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
+            tuplet->SetNum(actualNotes.node().text().as_int());
+            tuplet->SetNumbase(normalNotes.node().text().as_int());
         }
-        if (!GetAttributeValue(tupletStart.node(), "placement").empty()) {
-            tuplet->SetNumPlace(
-                tuplet->AttTupletVis::StrToStaffrelBasic(GetAttributeValue(tupletStart.node(), "placement")));
-            tuplet->SetBracketPlace(
-                tuplet->AttTupletVis::StrToStaffrelBasic(GetAttributeValue(tupletStart.node(), "placement")));
-        }
-        tuplet->SetNumFormat(ConvertTupletNumberValue(GetAttributeValue(tupletStart.node(), "show-number")));
+        tuplet->SetNumPlace(
+            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
+        tuplet->SetBracketPlace(
+            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
+        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
         if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
-        tuplet->SetBracketVisible(ConvertWordToBool(GetAttributeValue(tupletStart.node(), "bracket")));
+        tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
     }
 
     pugi::xpath_node rest = node.select_single_node("rest");
@@ -1380,13 +1442,22 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
         // we assume /note without /type to be mRest
         else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
-            MRest *mRest = new MRest();
-            element = mRest;
-            // FIXME MEI 4.0.0
-            // if (cue) mRest->SetSize(SIZE_cue);
-            if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
-            if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
-            AddLayerElement(layer, mRest);
+            if (m_slash) {
+                for (int i = m_meterCount; i > 0; --i) {
+                    BeatRpt *slash = new BeatRpt;
+                    AddLayerElement(layer, slash);
+                }
+                return;
+            }
+            else {
+                MRest *mRest = new MRest();
+                element = mRest;
+                // FIXME MEI 4.0.0
+                // if (cue) mRest->SetSize(SIZE_cue);
+                if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
+                if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+                AddLayerElement(layer, mRest);
+            }
         }
         else {
             Rest *rest = new Rest();
@@ -1403,16 +1474,15 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     else {
         Note *note = new Note();
         element = note;
-        note->SetVisible(ConvertWordToBool(GetAttributeValue(node, "print-object")));
-        if (!noteColor.empty()) note->SetColor(noteColor.c_str());
+        note->SetVisible(ConvertWordToBool(node.append_attribute("print-object").as_string()));
+        note->SetColor(node.attribute("color").as_string());
 
         // accidental
         pugi::xpath_node accidental = node.select_single_node("accidental");
         if (accidental) {
             Accid *accid = new Accid();
-            accid->SetAccid(ConvertAccidentalToAccid(GetContent(accidental.node())));
-            std::string accidColor = GetAttributeValue(accidental.node(), "color");
-            if (!accidColor.empty()) accid->SetColor(accidColor.c_str());
+            accid->SetAccid(ConvertAccidentalToAccid(accidental.node().text().as_string()));
+            accid->SetColor(accidental.node().attribute("color").as_string());
             if (HasAttributeWithValue(accidental.node(), "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
             if (HasAttributeWithValue(accidental.node(), "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
             if (HasAttributeWithValue(accidental.node(), "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
@@ -1438,7 +1508,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!octaveStr.empty()) {
                 if (m_octDis[staff->GetN()] != 0) {
-                    note->SetOct(atoi(octaveStr.c_str()) + m_octDis[staff->GetN()]);
+                    note->SetOct(atoi(octaveStr.c_str()) - m_octDis[staff->GetN()]);
                     note->SetOctGes(atoi(octaveStr.c_str()));
                 }
                 else
@@ -1475,7 +1545,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 chord->SetStemDir(stemDir);
                 // FIXME MEI 4.0.0
                 // if (cue) chord->SetSize(SIZE_cue);
-                if (tremSlashNum != "0") chord->SetStemMod(chord->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
+                if (tremSlashNum != 0)
+                    chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
                 element = chord;
@@ -1485,7 +1556,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // grace notes
         pugi::xpath_node grace = node.select_single_node("grace");
         if (grace) {
-            std::string slashStr = GetAttributeValue(grace.node(), "slash");
+            std::string slashStr = grace.node().attribute("slash").as_string();
             if (slashStr == "no") {
                 note->SetGrace(GRACE_acc);
             }
@@ -1505,30 +1576,29 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             note->SetStemDir(stemDir);
             // FIXME MEI 4.0.0
             // if (cue) note->SetSize(SIZE_cue);
-            if (tremSlashNum != "0") note->SetStemMod(note->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
+            if (tremSlashNum != 0)
+                note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
         }
 
         // verse / syl
         pugi::xpath_node_set lyrics = node.select_nodes("lyric");
         for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it) {
             pugi::xml_node lyric = it->node();
-            int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
+            int lyricNumber = lyric.attribute("number").as_int();
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
-            std::string lyricName = GetAttributeValue(lyric, "name");
-            std::string lyricColor = GetAttributeValue(lyric, "color");
             Verse *verse = new Verse();
+            verse->SetColor(lyric.attribute("color").as_string());
+            verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
-            if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
-            // if (!lyricName.empty()) verse->SetLabel(lyricName.c_str());
             for (pugi::xml_node textNode = lyric.child("text"); textNode; textNode = textNode.next_sibling("text")) {
-                if (GetAttributeValue(lyric, "print-object") != "no") {
-                    // std::string textColor = GetAttributeValue(textNode.node(), "color");
-                    std::string textStyle = GetAttributeValue(textNode, "font-style");
-                    std::string textWeight = GetAttributeValue(textNode, "font-weight");
-                    std::string lang = GetAttributeValue(textNode, "xml:lang");
-                    std::string textStr = GetContent(textNode);
+                if (!HasAttributeWithValue(lyric, "print-object", "no")) {
+                    // std::string textColor = textNode.attribute("color").as_string();
+                    std::string textStyle = textNode.attribute("font-style").as_string();
+                    std::string textWeight = textNode.attribute("font-weight").as_string();
+                    std::string lang = textNode.attribute("xml:lang").as_string();
+                    std::string textStr = textNode.text().as_string();
                     Syl *syl = new Syl();
-                    if (!lang.empty()) syl->SetLang(lang.c_str());
+                    syl->SetLang(lang.c_str());
                     if (lyric.select_single_node("extend")) {
                         syl->SetCon(sylLog_CON_u);
                     }
@@ -1567,13 +1637,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         if ((startTie)) {
             Tie *tie = new Tie();
             // color
-            std::string colorStr = GetAttributeValue(startTie.node(), "color");
-            if (!colorStr.empty()) tie->SetColor(colorStr.c_str());
+            tie->SetColor(startTie.node().attribute("color").as_string());
             // placement and orientation
-            tie->SetCurvedir(ConvertOrientationToCurvedir(GetAttributeValue(startTie.node(), "orientation").c_str()));
-            if (!GetAttributeValue(startTie.node(), "placement").empty())
-                tie->SetCurvedir(
-                    tie->AttCurvature::StrToCurvatureCurvedir(GetAttributeValue(startTie.node(), "placement").c_str()));
+            tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
+            tie->SetCurvedir(
+                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(staff, layer, note, tie);
@@ -1585,7 +1653,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
              articulations = articulations.next_sibling("articulations")) {
             Artic *artic = new Artic();
             if (articulations.select_single_node("accent")) artics.push_back(ARTICULATION_acc);
-            if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
+            // Removed in MEI 4.0
+            //if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
             if (articulations.select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
             if (articulations.select_single_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
             if (articulations.select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);
@@ -1622,6 +1691,17 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     m_ID = "#" + element->GetUuid();
 
+    // breath marks
+    pugi::xpath_node xmlBreath = notations.node().select_single_node("articulations/breath-mark");
+    if (xmlBreath) {
+        Breath *breath = new Breath();
+        m_controlElements.push_back(std::make_pair(measureNum, breath));
+        breath->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        breath->SetPlace(breath->AttPlacement::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
+        breath->SetColor(xmlBreath.node().attribute("color").as_string());
+        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.8);
+    }
+
     // Dynamics
     pugi::xpath_node xmlDynam = notations.node().select_single_node("dynamics");
     if (xmlDynam) {
@@ -1632,8 +1712,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         std::string dynamStr = GetContentOfChild(xmlDynam.node(), "other-dynamics");
         if (dynamStr.empty()) dynamStr = xmlDynam.node().first_child().name();
         // place
-        std::string placeStr = GetAttributeValue(xmlDynam.node(), "placement");
-        if (!placeStr.empty()) dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.node().attribute("placement").as_string()));
         Text *text = new Text();
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
@@ -1647,10 +1726,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         fermata->SetStartid(m_ID);
         // color
-        std::string colorStr = GetAttributeValue(xmlFermata.node(), "color");
-        if (!colorStr.empty()) fermata->SetColor(colorStr.c_str());
+        fermata->SetColor(xmlFermata.node().attribute("color").as_string());
         // shape
-        fermata->SetShape(ConvertFermataShape(GetContent(xmlFermata.node())));
+        fermata->SetShape(ConvertFermataShape(xmlFermata.node().text().as_string()));
         // form and place
         if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
             fermata->SetForm(fermataVis_FORM_inv);
@@ -1670,16 +1748,13 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         mordent->SetStartid(m_ID);
         // color
-        std::string colorStr = GetAttributeValue(xmlMordent.node(), "color");
-        if (!colorStr.empty()) mordent->SetColor(colorStr.c_str());
+        mordent->SetColor(xmlMordent.node().attribute("color").as_string());
         // form
         mordent->SetForm(mordentLog_FORM_lower);
         // long
-        std::string elongation = GetAttributeValue(xmlMordent.node(), "long");
-        if (!elongation.empty()) mordent->SetLong(ConvertWordToBool(elongation.c_str()));
+        mordent->SetLong(ConvertWordToBool(xmlMordent.node().attribute("long").as_string()));
         // place
-        std::string placeStr = GetAttributeValue(xmlMordent.node(), "placement");
-        if (!placeStr.empty()) mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlMordent.node().attribute("placement").as_string()));
     }
     pugi::xpath_node xmlMordentInv = notations.node().select_single_node("ornaments/inverted-mordent");
     if (xmlMordentInv) {
@@ -1688,16 +1763,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         mordent->SetStartid(m_ID);
         // color
-        std::string colorStr = GetAttributeValue(xmlMordentInv.node(), "color");
-        if (!colorStr.empty()) mordent->SetColor(colorStr.c_str());
+        mordent->SetColor(xmlMordentInv.node().attribute("color").as_string());
         // form
         mordent->SetForm(mordentLog_FORM_upper);
         // long
-        std::string elongation = GetAttributeValue(xmlMordentInv.node(), "long");
-        if (!elongation.empty()) mordent->SetLong(ConvertWordToBool(elongation.c_str()));
+        mordent->SetLong(ConvertWordToBool(xmlMordentInv.node().attribute("long").as_string()));
         // place
-        std::string placeStr = GetAttributeValue(xmlMordentInv.node(), "placement");
-        if (!placeStr.empty()) mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        mordent->SetPlace(
+            mordent->AttPlacement::StrToStaffrel(xmlMordentInv.node().attribute("placement").as_string()));
     }
 
     // trill
@@ -1708,11 +1781,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         trill->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         trill->SetStartid(m_ID);
         // color
-        std::string colorStr = GetAttributeValue(xmlTrill.node(), "color");
-        if (!colorStr.empty()) trill->SetColor(colorStr.c_str());
+        trill->SetColor(xmlTrill.node().attribute("color").as_string());
         // place
-        std::string placeStr = GetAttributeValue(xmlTrill.node(), "placement");
-        if (!placeStr.empty()) trill->SetPlace(trill->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        trill->SetPlace(trill->AttPlacement::StrToStaffrel(xmlTrill.node().attribute("placement").as_string()));
     }
 
     // turn
@@ -1723,13 +1794,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         turn->SetStartid(m_ID);
         // color
-        std::string colorStr = GetAttributeValue(xmlTurn.node(), "color");
-        if (!colorStr.empty()) turn->SetColor(colorStr.c_str());
+        turn->SetColor(xmlTurn.node().attribute("color").as_string());
         // form
         turn->SetForm(turnLog_FORM_lower);
         // place
-        std::string placeStr = GetAttributeValue(xmlTurn.node(), "placement");
-        if (!placeStr.empty()) turn->SetPlace(turn->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
     }
     pugi::xpath_node xmlTurnInv = notations.node().select_single_node("ornaments/inverted-turn");
     if (xmlTurnInv) {
@@ -1738,13 +1807,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         turn->SetStartid(m_ID);
         // color
-        std::string colorStr = GetAttributeValue(xmlTurnInv.node(), "color");
-        if (!colorStr.empty()) turn->SetColor(colorStr.c_str());
+        turn->SetColor(xmlTurnInv.node().attribute("color").as_string());
         // form
         turn->SetForm(turnLog_FORM_upper);
         // place
-        std::string placeStr = GetAttributeValue(xmlTurnInv.node(), "placement");
-        if (!placeStr.empty()) turn->SetPlace(turn->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurnInv.node().attribute("placement").as_string()));
     }
 
     // slur
@@ -1752,20 +1819,18 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
     for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
         pugi::xml_node slur = it->node();
-        int slurNumber = atoi(GetAttributeValue(slur, "number").c_str());
+        int slurNumber = slur.attribute("number").as_int();
         slurNumber = (slurNumber < 1) ? 1 : slurNumber;
         if (HasAttributeWithValue(slur, "type", "start")) {
             Slur *meiSlur = new Slur();
             // color
-            std::string colorStr = GetAttributeValue(slur, "color");
-            if (!colorStr.empty()) meiSlur->SetColor(colorStr.c_str());
+            meiSlur->SetColor(slur.attribute("color").as_string());
             // lineform
-            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(GetAttributeValue(slur, "line-type ").c_str()));
+            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(slur.attribute("line-type ").as_string()));
             // placement and orientation
-            meiSlur->SetCurvedir(ConvertOrientationToCurvedir(GetAttributeValue(slur, "orientation").c_str()));
-            if (!GetAttributeValue(slur, "placement").empty())
-                meiSlur->SetCurvedir(
-                    meiSlur->AttCurvature::StrToCurvatureCurvedir(GetAttributeValue(slur, "placement").c_str()));
+            meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
+            meiSlur->SetCurvedir(
+                meiSlur->AttCurvature::StrToCurvatureCurvedir(slur.attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(staff, layer, slurNumber, meiSlur);
@@ -1800,7 +1865,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
         std::vector<Dir *>::iterator iter;
-        for (iter = m_dirStack.begin(); iter != m_dirStack.end(); iter++) {
+        for (iter = m_dirStack.begin(); iter != m_dirStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid(m_ID);
         }
@@ -1808,7 +1873,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
     if (!m_dynamStack.empty()) {
         std::vector<Dynam *>::iterator iter;
-        for (iter = m_dynamStack.begin(); iter != m_dynamStack.end(); iter++) {
+        for (iter = m_dynamStack.begin(); iter != m_dynamStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid(m_ID);
         }
@@ -1816,15 +1881,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
     if (!m_harmStack.empty()) {
         std::vector<Harm *>::iterator iter;
-        for (iter = m_harmStack.begin(); iter != m_harmStack.end(); iter++) {
+        for (iter = m_harmStack.begin(); iter != m_harmStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            (*iter)->SetStartid(m_ID);
         }
         m_harmStack.clear();
     }
     if (!m_octaveStack.empty()) {
         std::vector<Octave *>::iterator iter;
-        for (iter = m_octaveStack.begin(); iter != m_octaveStack.end(); iter++) {
+        for (iter = m_octaveStack.begin(); iter != m_octaveStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid(m_ID);
         }
@@ -1832,7 +1896,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
     if (!m_pedalStack.empty()) {
         std::vector<Pedal *>::iterator iter;
-        for (iter = m_pedalStack.begin(); iter != m_pedalStack.end(); iter++) {
+        for (iter = m_pedalStack.begin(); iter != m_pedalStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid(m_ID);
         }
@@ -1840,7 +1904,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
     if (!m_tempoStack.empty()) {
         std::vector<Tempo *>::iterator iter;
-        for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); iter++) {
+        for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
             (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid(m_ID);
         }
@@ -1849,7 +1913,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     // add StartID to hairpins
     if (!m_hairpinStack.empty()) {
         std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
-        for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
+        for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
             if (!iter->first->HasStartid()) {
                 iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
                 iter->first->SetStartid(m_ID);
@@ -2034,6 +2098,34 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
         return tupletVis_NUMFORMAT_ratio;
     else
         return tupletVis_NUMFORMAT_NONE;
+}
+
+std::string MusicXmlInput::ConvertAlterToSymbol(std::string value)
+{
+    if (value == "-1")
+        return "♭";
+    else if (value == "0")
+        return "♮";
+    else if (value == "1")
+        return "♯";
+    else
+        return "";
+}
+
+std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
+{
+    if (value.find("major") != std::string::npos)
+        return "△";
+    else if (value.find("minor") != std::string::npos)
+        return "-";
+    else if (value.find("augmented") != std::string::npos)
+        return "+";
+    else if (value.find("diminished") != std::string::npos)
+        return "°";
+    else if (value.find("half-diminished") != std::string::npos)
+        return "ø";
+    else
+        return "";
 }
 
 } // namespace vrv

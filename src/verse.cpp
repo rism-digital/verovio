@@ -37,9 +37,7 @@ Verse::Verse() : LayerElement("verse-"), AttColor(), AttLang(), AttNInteger(), A
     Reset();
 }
 
-Verse::~Verse()
-{
-}
+Verse::~Verse() {}
 
 void Verse::Reset()
 {

@@ -15,10 +15,15 @@
 
 namespace vrv {
 
+class ConvertAnalyticalMarkupParams;
+
 //----------------------------------------------------------------------------
 // Fermata
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <fermata> element.
+ */
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
@@ -43,6 +48,12 @@ public:
     ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
+
+    /**
+     * Helpler for converting markup (from Note, Chord, Rest, MRest)
+     */
+    void ConvertFromAnalyticalMarkup(
+        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertAnalyticalMarkupParams *params);
 
     //----------//
     // Functors //

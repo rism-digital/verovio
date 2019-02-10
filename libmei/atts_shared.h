@@ -55,7 +55,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     accidLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -140,6 +140,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttAttaccaLog
+//----------------------------------------------------------------------------
+
+class AttAttaccaLog : public Att {
+public:
+    AttAttaccaLog();
+    virtual ~AttAttaccaLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetAttaccaLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadAttaccaLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteAttaccaLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTarget(std::string target_) { m_target = target_; }
+    std::string GetTarget() const { return m_target; }
+    bool HasTarget() const;
+    ///@}
+
+private:
+    /** Indicates the next section or movement to be performed. **/
+    std::string m_target;
+
+    /* include <atttarget> */
+};
+
+//----------------------------------------------------------------------------
 // AttAudience
 //----------------------------------------------------------------------------
 
@@ -205,7 +241,7 @@ public:
     ///@}
 
 private:
-    /** Records the number of augmentation dots required by a dotted duration. **/
+    /** Records the number of augmentation dots required by a written dotted duration. **/
     int m_dots;
 
     /* include <attdots> */
@@ -246,13 +282,15 @@ public:
 
 private:
     /**
-     * A name or label associated with the controlled vocabulary from which the value
-     * is taken.
+     * A name or label associated with a controlled vocabulary or other authoritative
+     * source for this element or its content.
      **/
     std::string m_auth;
     /**
-     * The web-accessible location of the controlled vocabulary from which the value is
-     * taken.
+     * A web-accessible location of the controlled vocabulary or other authoritative
+     * source of identification or definition for this element or its content.
+     * This attribute may contain a complete URI or a partial URI which is completed by
+     * the value of the codedval attribute.
      **/
     std::string m_authUri;
 
@@ -296,22 +334,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttBarPlacement
+// AttBarring
 //----------------------------------------------------------------------------
 
-class AttBarPlacement : public Att {
+class AttBarring : public Att {
 public:
-    AttBarPlacement();
-    virtual ~AttBarPlacement();
+    AttBarring();
+    virtual ~AttBarring();
 
     /** Reset the default values for the attribute class **/
-    void ResetBarPlacement();
+    void ResetBarring();
 
     /** Read the values for the attribute class **/
-    bool ReadBarPlacement(pugi::xml_node element);
+    bool ReadBarring(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteBarPlacement(pugi::xml_node element);
+    bool WriteBarring(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -319,31 +357,35 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBarplace(data_BARPLACE barplace_) { m_barplace = barplace_; }
-    data_BARPLACE GetBarplace() const { return m_barplace; }
-    bool HasBarplace() const;
+    void SetBarLen(double barLen_) { m_barLen = barLen_; }
+    double GetBarLen() const { return m_barLen; }
+    bool HasBarLen() const;
     //
-    void SetTaktplace(int taktplace_) { m_taktplace = taktplace_; }
-    int GetTaktplace() const { return m_taktplace; }
-    bool HasTaktplace() const;
+    void SetBarMethod(data_BARMETHOD barMethod_) { m_barMethod = barMethod_; }
+    data_BARMETHOD GetBarMethod() const { return m_barMethod; }
+    bool HasBarMethod() const;
+    //
+    void SetBarPlace(int barPlace_) { m_barPlace = barPlace_; }
+    int GetBarPlace() const { return m_barPlace; }
+    bool HasBarPlace() const;
     ///@}
 
 private:
-    /** Records the location of a bar line. **/
-    data_BARPLACE m_barplace;
     /**
-     * If takt bar lines are to be used, then the taktplace attribute may be used to
-     * denote the staff location of the shortened bar line.
-     * The location may include staff lines, spaces, and the spaces directly above and
-     * below the staff. The value ranges between 0 (just below the staff) to 2 * number
-     * of staff lines (directly above the staff). For example, on a 5-line staff the
-     * lines would be numbered 1,3,5,7, and 9 while the spaces would be numbered
-     * 0,2,4,6,8,10. For example, a value of '9' puts the bar line through the top line
-     * of a 5-line staff.
+     * States the length of barlines in virtual units.
+     * The value must be greater than 0 and is typically equal to 2 times (the number
+     * of staff lines - 1); e.g., a value of '8' for a 5-line staff.
      **/
-    int m_taktplace;
+    double m_barLen;
+    /** Records the method of barring. **/
+    data_BARMETHOD m_barMethod;
+    /**
+     * Denotes the staff location of bar lines, if the length is non-standard; that is,
+     * not equal to 2 times (the number of staff lines - 1).
+     **/
+    int m_barPlace;
 
-    /* include <atttaktplace> */
+    /* include <attbar.place> */
 };
 
 //----------------------------------------------------------------------------
@@ -491,8 +533,9 @@ public:
 
 private:
     /**
-     * A value that represents or identifies the element content.
-     * May serve as a primary key in a web-accessible database identified by the
+     * A value that represents or identifies other data.
+     * Often, it is a primary key in the database or a unique value in the coded list
+     * identified by the
      **/
     std::string m_codedval;
 
@@ -930,16 +973,18 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
-    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
-    std::string GetLwidth() const { return m_lwidth; }
+    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
+    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
     ///@}
 
 private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
     /** Width of a curved line. **/
-    std::string m_lwidth;
+    data_LINEWIDTH m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -974,10 +1019,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes the target note when its pitch differs from the pitch at which the
-     * custos appears.
-     **/
+    /** Indicates the next section or movement to be performed. **/
     std::string m_target;
 
     /* include <atttarget> */
@@ -1463,7 +1505,6 @@ private:
     /**
      * Indicates the nature of the evidence supporting the reliability or accuracy of
      * the intervention or interpretation.
-     * Suggested values include: 'internal', 'external', 'conjecture'.
      **/
     std::string m_evidence;
 
@@ -1616,7 +1657,7 @@ public:
 
 private:
     /**
-     * Holds the number of initial characters (such as those constituing an article or
+     * Holds the number of initial characters (such as those constituting an article or
      * preposition) that should not be used for sorting a title or name.
      **/
     int m_nonfiling;
@@ -1723,14 +1764,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHeight(std::string height_) { m_height = height_; }
-    std::string GetHeight() const { return m_height; }
+    void SetHeight(data_MEASUREMENTABS height_) { m_height = height_; }
+    data_MEASUREMENTABS GetHeight() const { return m_height; }
     bool HasHeight() const;
     ///@}
 
 private:
     /** Measurement of the vertical dimension of an entity. **/
-    std::string m_height;
+    data_MEASUREMENTABS m_height;
 
     /* include <attheight> */
 };
@@ -1957,8 +1998,9 @@ public:
 
 private:
     /**
-     * Provides a name or label for an element.
-     * Should not be used to capture document content.
+     * Captures text to be used to generate a label for the element to which it's
+     * attached, a "tool tip" or prefatory text, for example.
+     * Should not be used to record document content.
      **/
     std::string m_label;
 
@@ -2201,16 +2243,30 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
-    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
-    std::string GetLwidth() const { return m_lwidth; }
+    void SetLsegs(int lsegs_) { m_lsegs = lsegs_; }
+    int GetLsegs() const { return m_lsegs; }
+    bool HasLsegs() const;
+    //
+    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
+    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
     ///@}
 
 private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
+    /**
+     * Describes the number of segments into which a dashed or dotted line may be
+     * divided, or the number of "peaks" of a wavy line; a pair of space-separated
+     * values (minimum and maximum, respectively) provides a range between which a
+     * rendering system-supplied value may fall, while a single value indicates a fixed
+     * amount of space; that is, the minimum and maximum values are equal.
+     **/
+    int m_lsegs;
     /** Width of a curved line. **/
-    std::string m_lwidth;
+    data_LINEWIDTH m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -2247,9 +2303,17 @@ public:
     std::string GetCorresp() const { return m_corresp; }
     bool HasCorresp() const;
     //
+    void SetFollows(std::string follows_) { m_follows = follows_; }
+    std::string GetFollows() const { return m_follows; }
+    bool HasFollows() const;
+    //
     void SetNext(std::string next_) { m_next = next_; }
     std::string GetNext() const { return m_next; }
     bool HasNext() const;
+    //
+    void SetPrecedes(std::string precedes_) { m_precedes = precedes_; }
+    std::string GetPrecedes() const { return m_precedes; }
+    bool HasPrecedes() const;
     //
     void SetPrev(std::string prev_) { m_prev = prev_; }
     std::string GetPrev() const { return m_prev; }
@@ -2272,8 +2336,18 @@ private:
      * fashion.
      **/
     std::string m_corresp;
+    /**
+     * Points to one or more events in a user-defined collection that are known to be
+     * predecessors of the current element.
+     **/
+    std::string m_follows;
     /** Used to point to the next event(s) in a user-defined collection. **/
     std::string m_next;
+    /**
+     * Points to one or more events in a user-defined collection that are known to be
+     * successors of the current element.
+     **/
+    std::string m_precedes;
     /** Points to the previous event(s) in a user-defined collection. **/
     std::string m_prev;
     /**
@@ -2353,52 +2427,6 @@ private:
     data_FONTWEIGHT m_lyricWeight;
 
     /* include <attlyric.weight> */
-};
-
-//----------------------------------------------------------------------------
-// AttMeasureLog
-//----------------------------------------------------------------------------
-
-class AttMeasureLog : public Att {
-public:
-    AttMeasureLog();
-    virtual ~AttMeasureLog();
-
-    /** Reset the default values for the attribute class **/
-    void ResetMeasureLog();
-
-    /** Read the values for the attribute class **/
-    bool ReadMeasureLog(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteMeasureLog(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetLeft(data_BARRENDITION left_) { m_left = left_; }
-    data_BARRENDITION GetLeft() const { return m_left; }
-    bool HasLeft() const;
-    //
-    void SetRight(data_BARRENDITION right_) { m_right = right_; }
-    data_BARRENDITION GetRight() const { return m_right; }
-    bool HasRight() const;
-    ///@}
-
-private:
-    /**
-     * Indicates the visual rendition of the left bar line.
-     * It is present here only for facilitation of translation from legacy encodings
-     * which use it. Usually, it can be safely ignored.
-     **/
-    data_BARRENDITION m_left;
-    /** Indicates the function of the right bar line and is structurally important. **/
-    data_BARRENDITION m_right;
-
-    /* include <attright> */
 };
 
 //----------------------------------------------------------------------------
@@ -2911,8 +2939,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMm(std::string mm_) { m_mm = mm_; }
-    std::string GetMm() const { return m_mm; }
+    void SetMm(int mm_) { m_mm = mm_; }
+    int GetMm() const { return m_mm; }
     bool HasMm() const;
     //
     void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; }
@@ -2932,7 +2960,7 @@ private:
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
-    std::string m_mm;
+    int m_mm;
     /** Captures the metronomic unit. **/
     data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
@@ -3273,14 +3301,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOct(char oct_) { m_oct = oct_; }
-    char GetOct() const { return m_oct; }
+    void SetOct(data_OCTAVE oct_) { m_oct = oct_; }
+    data_OCTAVE GetOct() const { return m_oct; }
     bool HasOct() const;
     ///@}
 
 private:
     /** Captures written octave information. **/
-    char m_oct;
+    data_OCTAVE m_oct;
 
     /* include <attoct> */
 };
@@ -3309,8 +3337,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOctDefault(char octDefault_) { m_octDefault = octDefault_; }
-    char GetOctDefault() const { return m_octDefault; }
+    void SetOctDefault(data_OCTAVE octDefault_) { m_octDefault = octDefault_; }
+    data_OCTAVE GetOctDefault() const { return m_octDefault; }
     bool HasOctDefault() const;
     ///@}
 
@@ -3320,7 +3348,7 @@ private:
      * chord, etc.
      * in a measure does not have an octave value specified.
      **/
-    char m_octDefault;
+    data_OCTAVE m_octDefault;
 
     /* include <attoct.default> */
 };
@@ -3636,28 +3664,28 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPageHeight(std::string pageHeight_) { m_pageHeight = pageHeight_; }
-    std::string GetPageHeight() const { return m_pageHeight; }
+    void SetPageHeight(data_MEASUREMENTABS pageHeight_) { m_pageHeight = pageHeight_; }
+    data_MEASUREMENTABS GetPageHeight() const { return m_pageHeight; }
     bool HasPageHeight() const;
     //
-    void SetPageWidth(std::string pageWidth_) { m_pageWidth = pageWidth_; }
-    std::string GetPageWidth() const { return m_pageWidth; }
+    void SetPageWidth(data_MEASUREMENTABS pageWidth_) { m_pageWidth = pageWidth_; }
+    data_MEASUREMENTABS GetPageWidth() const { return m_pageWidth; }
     bool HasPageWidth() const;
     //
-    void SetPageTopmar(std::string pageTopmar_) { m_pageTopmar = pageTopmar_; }
-    std::string GetPageTopmar() const { return m_pageTopmar; }
+    void SetPageTopmar(data_MEASUREMENTABS pageTopmar_) { m_pageTopmar = pageTopmar_; }
+    data_MEASUREMENTABS GetPageTopmar() const { return m_pageTopmar; }
     bool HasPageTopmar() const;
     //
-    void SetPageBotmar(std::string pageBotmar_) { m_pageBotmar = pageBotmar_; }
-    std::string GetPageBotmar() const { return m_pageBotmar; }
+    void SetPageBotmar(data_MEASUREMENTABS pageBotmar_) { m_pageBotmar = pageBotmar_; }
+    data_MEASUREMENTABS GetPageBotmar() const { return m_pageBotmar; }
     bool HasPageBotmar() const;
     //
-    void SetPageLeftmar(std::string pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
-    std::string GetPageLeftmar() const { return m_pageLeftmar; }
+    void SetPageLeftmar(data_MEASUREMENTABS pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
+    data_MEASUREMENTABS GetPageLeftmar() const { return m_pageLeftmar; }
     bool HasPageLeftmar() const;
     //
-    void SetPageRightmar(std::string pageRightmar_) { m_pageRightmar = pageRightmar_; }
-    std::string GetPageRightmar() const { return m_pageRightmar; }
+    void SetPageRightmar(data_MEASUREMENTABS pageRightmar_) { m_pageRightmar = pageRightmar_; }
+    data_MEASUREMENTABS GetPageRightmar() const { return m_pageRightmar; }
     bool HasPageRightmar() const;
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; }
@@ -3674,26 +3702,74 @@ private:
      * Specifies the height of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    std::string m_pageHeight;
+    data_MEASUREMENTABS m_pageHeight;
     /**
      * Describes the width of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    std::string m_pageWidth;
+    data_MEASUREMENTABS m_pageWidth;
     /** Indicates the amount of whitespace at the top of a page. **/
-    std::string m_pageTopmar;
+    data_MEASUREMENTABS m_pageTopmar;
     /** Indicates the amount of whitespace at the bottom of a page. **/
-    std::string m_pageBotmar;
+    data_MEASUREMENTABS m_pageBotmar;
     /** Indicates the amount of whitespace at the left side of a page. **/
-    std::string m_pageLeftmar;
+    data_MEASUREMENTABS m_pageLeftmar;
     /** Indicates the amount of whitespace at the right side of a page. **/
-    std::string m_pageRightmar;
+    data_MEASUREMENTABS m_pageRightmar;
     /** Indicates the number of logical pages to be rendered on a single physical page. **/
     std::string m_pagePanels;
     /** Indicates how the page should be scaled when rendered. **/
     std::string m_pageScale;
 
     /* include <attpage.scale> */
+};
+
+//----------------------------------------------------------------------------
+// AttPartIdent
+//----------------------------------------------------------------------------
+
+class AttPartIdent : public Att {
+public:
+    AttPartIdent();
+    virtual ~AttPartIdent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPartIdent();
+
+    /** Read the values for the attribute class **/
+    bool ReadPartIdent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePartIdent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPart(std::string part_) { m_part = part_; }
+    std::string GetPart() const { return m_part; }
+    bool HasPart() const;
+    //
+    void SetPartstaff(std::string partstaff_) { m_partstaff = partstaff_; }
+    std::string GetPartstaff() const { return m_partstaff; }
+    bool HasPartstaff() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the part in which the current feature should appear.
+     * Use '%all' when the feature should occur in every part.
+     **/
+    std::string m_part;
+    /**
+     * Signifies the part staff on which a notated feature occurs.
+     * Use '%all' when the feature should occur on every staff.
+     **/
+    std::string m_partstaff;
+
+    /* include <attpartstaff> */
 };
 
 //----------------------------------------------------------------------------
@@ -3867,10 +3943,7 @@ private:
     std::string m_role;
     /** --- **/
     std::string m_show;
-    /**
-     * Encodes the target note when its pitch differs from the pitch at which the
-     * custos appears.
-     **/
+    /** Indicates the next section or movement to be performed. **/
     std::string m_target;
     /**
      * Characterization of target resource(s) using any convenient classification
@@ -3913,11 +3986,81 @@ public:
 private:
     /**
      * Numeric value capturing a measurement or count.
-     * Can only be interpreted in combination with the unit or currency attribute.
+     * Can only be interpreted in combination with the unit attribute.
      **/
     double m_quantity;
 
     /* include <attquantity> */
+};
+
+//----------------------------------------------------------------------------
+// AttRanging
+//----------------------------------------------------------------------------
+
+class AttRanging : public Att {
+public:
+    AttRanging();
+    virtual ~AttRanging();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRanging();
+
+    /** Read the values for the attribute class **/
+    bool ReadRanging(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRanging(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAtleast(double atleast_) { m_atleast = atleast_; }
+    double GetAtleast() const { return m_atleast; }
+    bool HasAtleast() const;
+    //
+    void SetAtmost(double atmost_) { m_atmost = atmost_; }
+    double GetAtmost() const { return m_atmost; }
+    bool HasAtmost() const;
+    //
+    void SetMin(double min_) { m_min = min_; }
+    double GetMin() const { return m_min; }
+    bool HasMin() const;
+    //
+    void SetMax(double max_) { m_max = max_; }
+    double GetMax() const { return m_max; }
+    bool HasMax() const;
+    //
+    void SetConfidence(double confidence_) { m_confidence = confidence_; }
+    double GetConfidence() const { return m_confidence; }
+    bool HasConfidence() const;
+    ///@}
+
+private:
+    /** Gives a minimum estimated value for an approximate measurement. **/
+    double m_atleast;
+    /** Gives a maximum estimated value for an approximate measurement. **/
+    double m_atmost;
+    /**
+     * Where the measurement summarizes more than one observation or a range of values,
+     * supplies the minimum value observed.
+     **/
+    double m_min;
+    /**
+     * Where the measurement summarizes more than one observation or a range of values,
+     * supplies the maximum value observed.
+     **/
+    double m_max;
+    /**
+     * Specifies the degree of statistical confidence (between zero and one) that a
+     * value falls within the range specified by min and max, or the proportion of
+     * observed values that fall within that range.
+     **/
+    double m_confidence;
+
+    /* include <attconfidence> */
 };
 
 //----------------------------------------------------------------------------
@@ -3951,8 +4094,8 @@ public:
 
 private:
     /**
-     * Indicates the agent(s) responsible for some aspect of the text's creation,
-     * transcription, editing, or encoding.
+     * Indicates the agent(s) responsible for some aspect of the text's transcription,
+     * editing, or encoding.
      * Its value must point to one or more identifiers declared in the document header.
      **/
     std::string m_resp;
@@ -4108,6 +4251,46 @@ private:
     std::string m_slur;
 
     /* include <attslur> */
+};
+
+//----------------------------------------------------------------------------
+// AttSource
+//----------------------------------------------------------------------------
+
+class AttSource : public Att {
+public:
+    AttSource();
+    virtual ~AttSource();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSource();
+
+    /** Read the values for the attribute class **/
+    bool ReadSource(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSource(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSource(std::string source_) { m_source = source_; }
+    std::string GetSource() const { return m_source; }
+    bool HasSource() const;
+    ///@}
+
+private:
+    /**
+     * Contains a list of one or more pointers indicating the sources which attest to a
+     * given reading.
+     * Each value should correspond to the ID of a
+     **/
+    std::string m_source;
+
+    /* include <attsource> */
 };
 
 //----------------------------------------------------------------------------
@@ -4445,8 +4628,8 @@ public:
     data_PITCHNAME GetPloc() const { return m_ploc; }
     bool HasPloc() const;
     //
-    void SetOloc(char oloc_) { m_oloc = oloc_; }
-    char GetOloc() const { return m_oloc; }
+    void SetOloc(data_OCTAVE oloc_) { m_oloc = oloc_; }
+    data_OCTAVE GetOloc() const { return m_oloc; }
     bool HasOloc() const;
     ///@}
 
@@ -4454,7 +4637,7 @@ private:
     /** Captures staff location in terms of written pitch name. **/
     data_PITCHNAME m_ploc;
     /** Records staff location in terms of written octave. **/
-    char m_oloc;
+    data_OCTAVE m_oloc;
 
     /* include <attoloc> */
 };
@@ -4565,8 +4748,8 @@ public:
     data_STEMDIRECTION GetStemDir() const { return m_stemDir; }
     bool HasStemDir() const;
     //
-    void SetStemLen(int stemLen_) { m_stemLen = stemLen_; }
-    int GetStemLen() const { return m_stemLen; }
+    void SetStemLen(double stemLen_) { m_stemLen = stemLen_; }
+    double GetStemLen() const { return m_stemLen; }
     bool HasStemLen() const;
     //
     void SetStemMod(data_STEMMODIFIER stemMod_) { m_stemMod = stemMod_; }
@@ -4594,7 +4777,7 @@ private:
     /** Describes the direction of a stem. **/
     data_STEMDIRECTION m_stemDir;
     /** Encodes the stem length. **/
-    int m_stemLen;
+    double m_stemLen;
     /**
      * Encodes any stem "modifiers"; that is, symbols rendered on the stem, such as
      * tremolo or Sprechstimme indicators.
@@ -4647,8 +4830,8 @@ public:
 
 private:
     /**
-     * Describes the symbols typically used to indicate breaks between syllables and
-     * their functions.
+     * Connection to the previous component within the same neume; this attribute
+     * should not be used for the first component of a neume.
      **/
     sylLog_CON m_con;
     /** Records the position of a syllable within a word. **/
@@ -4721,16 +4904,16 @@ public:
     data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; }
     bool HasSystemLeftline() const;
     //
-    void SetSystemLeftmar(std::string systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
-    std::string GetSystemLeftmar() const { return m_systemLeftmar; }
+    void SetSystemLeftmar(data_MEASUREMENTABS systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
+    data_MEASUREMENTABS GetSystemLeftmar() const { return m_systemLeftmar; }
     bool HasSystemLeftmar() const;
     //
-    void SetSystemRightmar(std::string systemRightmar_) { m_systemRightmar = systemRightmar_; }
-    std::string GetSystemRightmar() const { return m_systemRightmar; }
+    void SetSystemRightmar(data_MEASUREMENTABS systemRightmar_) { m_systemRightmar = systemRightmar_; }
+    data_MEASUREMENTABS GetSystemRightmar() const { return m_systemRightmar; }
     bool HasSystemRightmar() const;
     //
-    void SetSystemTopmar(std::string systemTopmar_) { m_systemTopmar = systemTopmar_; }
-    std::string GetSystemTopmar() const { return m_systemTopmar; }
+    void SetSystemTopmar(data_MEASUREMENTABS systemTopmar_) { m_systemTopmar = systemTopmar_; }
+    data_MEASUREMENTABS GetSystemTopmar() const { return m_systemTopmar; }
     bool HasSystemTopmar() const;
     ///@}
 
@@ -4745,17 +4928,17 @@ private:
      * Describes the amount of whitespace at the left system margin relative to
      * page.leftmar.
      **/
-    std::string m_systemLeftmar;
+    data_MEASUREMENTABS m_systemLeftmar;
     /**
      * Describes the amount of whitespace at the right system margin relative to
      * page.rightmar.
      **/
-    std::string m_systemRightmar;
+    data_MEASUREMENTABS m_systemRightmar;
     /**
      * Describes the distance from page's top edge to the first system; used for first
      * page only.
      **/
-    std::string m_systemTopmar;
+    data_MEASUREMENTABS m_systemTopmar;
 
     /* include <attsystem.topmar> */
 };
@@ -4829,7 +5012,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     tempoLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -5024,8 +5207,8 @@ public:
 
 private:
     /**
-     * Encodes the onset time in terms of musical time, i.e.,
-     * beats[.fractional_beat_part].
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
      **/
     double m_tstamp;
 
@@ -5063,8 +5246,8 @@ public:
 
 private:
     /**
-     * Encodes the ending point of an event in terms of musical time, i.e., a count of
-     * measures plus a beat location.
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
      **/
     data_MEASUREBEAT m_tstamp2;
 
@@ -5264,22 +5447,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttVerticalAlignment
+// AttVerticalAlign
 //----------------------------------------------------------------------------
 
-class AttVerticalAlignment : public Att {
+class AttVerticalAlign : public Att {
 public:
-    AttVerticalAlignment();
-    virtual ~AttVerticalAlignment();
+    AttVerticalAlign();
+    virtual ~AttVerticalAlign();
 
     /** Reset the default values for the attribute class **/
-    void ResetVerticalAlignment();
+    void ResetVerticalAlign();
 
     /** Read the values for the attribute class **/
-    bool ReadVerticalAlignment(pugi::xml_node element);
+    bool ReadVerticalAlign(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteVerticalAlignment(pugi::xml_node element);
+    bool WriteVerticalAlign(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -5287,14 +5470,50 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVgrp(std::string vgrp_) { m_vgrp = vgrp_; }
-    std::string GetVgrp() const { return m_vgrp; }
+    void SetValign(data_VERTICALALIGNMENT valign_) { m_valign = valign_; }
+    data_VERTICALALIGNMENT GetValign() const { return m_valign; }
+    bool HasValign() const;
+    ///@}
+
+private:
+    /** Records vertical alignment. **/
+    data_VERTICALALIGNMENT m_valign;
+
+    /* include <attvalign> */
+};
+
+//----------------------------------------------------------------------------
+// AttVerticalGroup
+//----------------------------------------------------------------------------
+
+class AttVerticalGroup : public Att {
+public:
+    AttVerticalGroup();
+    virtual ~AttVerticalGroup();
+
+    /** Reset the default values for the attribute class **/
+    void ResetVerticalGroup();
+
+    /** Read the values for the attribute class **/
+    bool ReadVerticalGroup(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteVerticalGroup(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetVgrp(int vgrp_) { m_vgrp = vgrp_; }
+    int GetVgrp() const { return m_vgrp; }
     bool HasVgrp() const;
     ///@}
 
 private:
-    /** --- **/
-    std::string m_vgrp;
+    /** Provides a label for members of a vertically aligned group. **/
+    int m_vgrp;
 
     /* include <attvgrp> */
 };
@@ -5697,14 +5916,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetWidth(std::string width_) { m_width = width_; }
-    std::string GetWidth() const { return m_width; }
+    void SetWidth(data_MEASUREMENTABS width_) { m_width = width_; }
+    data_MEASUREMENTABS GetWidth() const { return m_width; }
     bool HasWidth() const;
     ///@}
 
 private:
     /** Measurement of the horizontal dimension of an entity. **/
-    std::string m_width;
+    data_MEASUREMENTABS m_width;
 
     /* include <attwidth> */
 };

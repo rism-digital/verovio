@@ -24,8 +24,6 @@
 
 namespace vrv {
 
-int BoundingBox::s_deCasteljau[4][4];
-
 //----------------------------------------------------------------------------
 // BoundingBox
 //----------------------------------------------------------------------------
@@ -49,7 +47,7 @@ ClassId BoundingBox::GetClassId() const
     // we should always have the method overridden
     assert(false);
     return BOUNDING_BOX;
-};
+}
 
 bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
 {
@@ -60,16 +58,16 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
+    int minX = std::min(x1, x2);
+    int maxX = std::max(x1, x2);
 
     int drawingX = GetDrawingX();
 
-    min_x -= drawingX;
-    max_x -= drawingX;
+    minX -= drawingX;
+    maxX -= drawingX;
 
-    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
+    if (m_contentBB_x1 > minX) m_contentBB_x1 = minX;
+    if (m_contentBB_x2 < maxX) m_contentBB_x2 = maxX;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
     // GetClassName().c_str());
@@ -98,18 +96,16 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
 {
     // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
+    int minX = std::min(x1, x2);
+    int maxX = std::max(x1, x2);
 
     int drawingX = GetDrawingX();
 
-    min_x -= drawingX;
-    max_x -= drawingX;
+    minX -= drawingX;
+    maxX -= drawingX;
 
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
+    if (m_selfBB_x1 > minX) m_selfBB_x1 = minX;
+    if (m_selfBB_x2 < maxX) m_selfBB_x2 = maxX;
 
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
@@ -128,8 +124,6 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
 
     if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
     if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
 
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
@@ -150,15 +144,10 @@ void BoundingBox::ResetBoundingBox()
 
     m_smuflGlyph = 0;
     m_smuflGlyphFontSize = 100;
-
-    m_updatedBBoxX = false;
-    m_updatedBBoxY = false;
 }
 
-void BoundingBox::SetEmptyBB(bool onlyIfUnset)
+void BoundingBox::SetEmptyBB()
 {
-    // if (onlyIfUnset && this->HasContentBB() && this->HasSelfBB()) return;
-
     m_contentBB_x1 = 0;
     m_contentBB_y1 = 0;
     m_contentBB_x2 = 0;
@@ -167,27 +156,42 @@ void BoundingBox::SetEmptyBB(bool onlyIfUnset)
     m_selfBB_y1 = 0;
     m_selfBB_x2 = 0;
     m_selfBB_y2 = 0;
-
-    m_updatedBBoxX = true;
-    m_updatedBBoxY = true;
 }
 
 bool BoundingBox::HasEmptyBB() const
 {
-    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
-        && (m_contentBB_y2 == 0));
+    // We are checking only the content bounding box - this should be OK
+    return ((m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0) && (m_contentBB_y2 == 0));
 }
 
 bool BoundingBox::HasContentBB() const
 {
-    return ((m_contentBB_x1 != -VRV_UNSET) && (m_contentBB_y1 != -VRV_UNSET) && (m_contentBB_x2 != VRV_UNSET)
-        && (m_contentBB_y2 != VRV_UNSET));
+    return (HasContentHorizontalBB() && HasContentVerticalBB());
+}
+
+bool BoundingBox::HasContentHorizontalBB() const
+{
+    return ((m_contentBB_x1 != -VRV_UNSET) && (m_contentBB_x2 != VRV_UNSET));
+}
+
+bool BoundingBox::HasContentVerticalBB() const
+{
+    return ((m_contentBB_y1 != -VRV_UNSET) && (m_contentBB_y2 != VRV_UNSET));
 }
 
 bool BoundingBox::HasSelfBB() const
 {
-    return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET)
-        && (m_selfBB_y2 != VRV_UNSET));
+    return (HasSelfHorizontalBB() && HasSelfVerticalBB());
+}
+
+bool BoundingBox::HasSelfHorizontalBB() const
+{
+    return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET));
+}
+
+bool BoundingBox::HasSelfVerticalBB() const
+{
+    return ((m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
 }
 
 void BoundingBox::SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize)
@@ -247,8 +251,8 @@ int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, Doc *doc, int m
 
     anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB1rect, doc);
     anchor2 = other->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB2rect, doc);
-    for (i = 0; i < anchor1; i++) {
-        for (j = 0; j < anchor2; j++) {
+    for (i = 0; i < anchor1; ++i) {
+        for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectLeftOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
         }
     }
@@ -265,8 +269,8 @@ int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, Doc *doc, int 
 
     anchor1 = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB1rect, doc);
     anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB2rect, doc);
-    for (i = 0; i < anchor1; i++) {
-        for (j = 0; j < anchor2; j++) {
+    for (i = 0; i < anchor1; ++i) {
+        for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectRightOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
         }
     }
@@ -283,8 +287,8 @@ int BoundingBox::VerticalTopOverlap(const BoundingBox *other, Doc *doc, int marg
 
     anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB1rect, doc);
     anchor2 = other->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB2rect, doc);
-    for (i = 0; i < anchor1; i++) {
-        for (j = 0; j < anchor2; j++) {
+    for (i = 0; i < anchor1; ++i) {
+        for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectTopOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
         }
     }
@@ -301,8 +305,8 @@ int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int m
 
     anchor1 = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB1rect, doc);
     anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB2rect, doc);
-    for (i = 0; i < anchor1; i++) {
-        for (j = 0; j < anchor2; j++) {
+    for (i = 0; i < anchor1; ++i) {
+        for (j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectBottomOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
         }
     }
@@ -335,7 +339,7 @@ int BoundingBox::GetRectangles(
         }
     }
     if (!glyphRect) {
-        LogError("Illogical values for anchor points in glyph '%02x'", m_smuflGlyph);
+        LogDebug("Illogical values for anchor points in glyph '%02x'", m_smuflGlyph);
     }
 
     rect[0][0] = Point(this->GetSelfLeft(), this->GetSelfTop());
@@ -491,7 +495,7 @@ bool BoundingBox::GetGlyph1PointRectangles(
         rect[1][1] = Point(selfRight, selfBottom);
     }
     else {
-        assert(false);
+        // assert(false);
         return false;
     }
 
@@ -532,9 +536,8 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
             // The curve is already below the content
             if ((curve->GetContentTop() + margin) < this->GetContentBottom()) return 0;
             int xMaxY = curve->CalcXMinMaxY(topBezier);
-            // Check if the box is below (should be + margin, but because of de Casteljau different it is ommitted)
-            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft());
-            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight());
+            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) + margin;
+            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight() + margin);
             // Everything is underneath
             if ((leftY >= this->GetContentTop()) && (rightY >= this->GetContentTop())) return 0;
             // Recalculate for above
@@ -554,9 +557,8 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
             if ((curve->GetContentBottom() - margin) > this->GetContentTop()) return 0;
             int xMinY = curve->CalcXMinMaxY(bottomBezier);
             // Check if the box is above
-            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft());
-            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight());
-            // Everything is above (should be - margin, but because of de Casteljau different it is ommitted)
+            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) - margin;
+            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) - margin;
             if ((leftY <= this->GetContentBottom()) && (rightY <= this->GetContentBottom())) return 0;
             // Recalculate for below
             leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) - margin;
@@ -676,10 +678,10 @@ void BoundingBox::Swap(int &v1, int &v2)
     v2 = tmp;
 }
 
-Point BoundingBox::CalcPositionAfterRotation(Point point, float rot_alpha, Point center)
+Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point center)
 {
-    float s = sin(rot_alpha);
-    float c = cos(rot_alpha);
+    float s = sin(alpha);
+    float c = cos(alpha);
 
     // translate point back to origin:
     point.x -= center.x;
@@ -713,21 +715,26 @@ pow (t, 3)* bezier[3].y;
 
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
 {
-    int i, j;
     double t = 0.0;
     // avoid division by 0
     if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
     t = std::min(1.0, std::max(0.0, t));
-    int n = 4;
 
-    for (i = 0; i < n; i++) BoundingBox::s_deCasteljau[0][i] = bezier[i].y;
-    for (j = 1; j < n; j++) {
-        for (int i = 0; i < 4 - j; i++) {
-            BoundingBox::s_deCasteljau[j][i]
-                = BoundingBox::s_deCasteljau[j - 1][i] * (1 - t) + BoundingBox::s_deCasteljau[j - 1][i + 1] * t;
-        }
-    }
-    return BoundingBox::s_deCasteljau[n - 1][0];
+    Point p = BoundingBox::CalcDeCasteljau(bezier, t);
+
+    return p.y;
+}
+
+Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
+{
+    Point p;
+
+    p.x = pow((1 - t), 3) * bezier[0].x + 3 * t * pow((1 - t), 2) * bezier[1].x + 3 * (1 - t) * pow(t, 2) * bezier[2].x
+        + pow(t, 3) * bezier[3].x;
+    p.y = pow((1 - t), 3) * bezier[0].y + 3 * t * pow((1 - t), 2) * bezier[1].y + 3 * (1 - t) * pow(t, 2) * bezier[2].y
+        + pow(t, 3) * bezier[3].y;
+
+    return p;
 }
 
 void BoundingBox::CalcThickBezier(
@@ -794,7 +801,7 @@ void BoundingBox::ApproximateBezierBoundingBox(
     tody = dy - cy;
     double step = 1.0 / BEZIER_APPROXIMATION;
     int i;
-    for (i = 0; i < (int)(BEZIER_APPROXIMATION + 1.0); i++) {
+    for (i = 0; i < (int)(BEZIER_APPROXIMATION + 1.0); ++i) {
         double d = i * step;
         px = ax + d * tobx;
         py = ay + d * toby;
@@ -855,6 +862,65 @@ int BoundingBox::RectBottomOverlap(const Point rect1[2], const Point rect2[2], i
 {
     if ((rect1[0].x > rect2[1].x + hMargin) || (rect1[1].x < rect2[0].x - hMargin)) return 0;
     return std::max(0, rect2[1].y - rect1[0].y + margin);
+}
+
+//----------------------------------------------------------------------------
+// SegmentedLine
+//----------------------------------------------------------------------------
+
+SegmentedLine::SegmentedLine(int start, int end)
+{
+    if (start > end) {
+        BoundingBox::Swap(start, end);
+    }
+    m_segments.push_back(std::make_pair(start, end));
+}
+
+void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
+{
+    assert(idx >= 0);
+    assert(idx < GetSegmentCount());
+
+    start = m_segments.at(idx).first;
+    end = m_segments.at(idx).second;
+}
+
+void SegmentedLine::AddGap(int start, int end)
+{
+    assert(start != end);
+
+    if (start > end) {
+        BoundingBox::Swap(start, end);
+    }
+
+    // nothing to do
+    if (m_segments.empty()) return;
+
+    // insert the gap
+    ArrayOfIntPairs::iterator iter = m_segments.begin();
+    while (iter != m_segments.end()) {
+        // drop the segment because the gap encompass it
+        if ((start <= iter->first) && (end >= iter->second)) {
+            iter = m_segments.erase(iter);
+            continue;
+        }
+        // cut the segment because the gap in within it
+        if ((iter->first <= start) && (iter->second >= end)) {
+            iter = m_segments.insert(iter, std::make_pair(iter->first, start));
+            ++iter;
+            iter->first = end;
+            break;
+        }
+        // move the start of the segment
+        if ((start < iter->first) && (end >= iter->first)) {
+            iter->first = end;
+        }
+        // move the end of the segment
+        if ((end > iter->second) && (start <= iter->second)) {
+            iter->second = start;
+        }
+        ++iter;
+    }
 }
 
 } // namespace vrv

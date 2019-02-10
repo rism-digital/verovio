@@ -14,7 +14,10 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
+#include "staffgrp.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -44,9 +47,7 @@ StaffDef::StaffDef()
     Reset();
 }
 
-StaffDef::~StaffDef()
-{
-}
+StaffDef::~StaffDef() {}
 
 void StaffDef::Reset()
 {
@@ -59,11 +60,16 @@ void StaffDef::Reset()
     ResetScalable();
     ResetStaffDefLog();
     ResetTransposition();
+
+    m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
 void StaffDef::AddChild(Object *child)
 {
-    if (child->Is(LABEL)) {
+    if (child->Is(INSTRDEF)) {
+        assert(dynamic_cast<InstrDef *>(child));
+    }
+    else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }
     else if (child->Is(LABELABBR)) {
@@ -78,6 +84,19 @@ void StaffDef::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
+    
+bool StaffDef::IsInBraceAndBracket()
+{
+    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp*>(this->GetFirstParent(STAFFGRP));
+    if (!staffGrp1 || !staffGrp1->HasSymbol()) {
+        return false;
+    }
+    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp*>(staffGrp1->GetFirstParent(STAFFGRP));
+    if (!staffGrp2 || !staffGrp2->HasSymbol()) {
+        return false;
+    }
+    return true;
+}
 
 //----------------------------------------------------------------------------
 // StaffDef functor methods
@@ -87,7 +106,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 {
     ReplaceDrawingValuesInStaffDefParams *params = dynamic_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_clef) {
         this->SetCurrentClef(params->m_clef);
     }
@@ -100,7 +119,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
     if (params->m_meterSig) {
         this->SetCurrentMeterSig(params->m_meterSig);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -108,7 +127,7 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
 {
     SetStaffDefRedrawFlagsParams *params = dynamic_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_clef || params->m_applyToAll) {
         this->SetDrawClef(params->m_clef);
     }
@@ -121,7 +140,7 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
     if (params->m_meterSig || params->m_applyToAll) {
         this->SetDrawMeterSig(params->m_meterSig);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -35,9 +35,7 @@ Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), Att
     Reset();
 }
 
-Slur::~Slur()
-{
-}
+Slur::~Slur() {}
 
 void Slur::Reset()
 {
@@ -81,18 +79,26 @@ void Slur::GetCrossStaffOverflows(
         chord->GetCrossStaffExtremes(staffAbove, staffBelow);
         endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
     }
-    else
+    else {
         endStaff = this->GetEnd()->GetCrossStaff(layer);
+    }
 
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
         startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstParent(STAFF));
-        assert(startStaff);
     }
     if (!endStaff) {
         endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstParent(STAFF));
-        assert(endStaff);
     }
+    
+    // This happens with slurs starting or ending with a timestamp
+    if (!endStaff) {
+        endStaff = startStaff;
+    }
+    else if (!startStaff) {
+        startStaff = endStaff;
+    }
+    assert(startStaff && endStaff);
 
     if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
     if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
@@ -113,6 +119,6 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

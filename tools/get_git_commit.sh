@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 cd ..
 output="./include/vrv/git_commit.h"
-COMMIT=`git describe --abbrev=7 --always --dirty`
+COMMIT=$(git describe --abbrev=7 --always --dirty)
 
 if [ -z "$COMMIT" ]; then
     echo "Undefined git commit version"

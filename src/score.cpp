@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "ending.h"
 #include "scoredef.h"
 #include "section.h"
 #include "vrv.h"
@@ -24,18 +25,21 @@ namespace vrv {
 // Score
 //----------------------------------------------------------------------------
 
-Score::Score() : Object("score-")
+Score::Score() : Object("score-"), AttLabelled(), AttNNumberLike()
 {
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
-Score::~Score()
-{
-}
+Score::~Score() {}
 
 void Score::Reset()
 {
     Object::Reset();
+    ResetLabelled();
+    ResetNNumberLike();
 }
 
 void Score::AddChild(Object *child)
@@ -45,6 +49,9 @@ void Score::AddChild(Object *child)
     }
     else if (child->Is(SECTION)) {
         assert(dynamic_cast<Section *>(child));
+    }
+    else if (child->Is(ENDING)) {
+        assert(dynamic_cast<Ending *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

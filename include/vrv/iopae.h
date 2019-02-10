@@ -62,6 +62,7 @@ namespace pae {
             rest = old.rest;
 
             clef = old.clef;
+            mensur = old.mensur;
             meter = old.meter;
             key = old.key;
 
@@ -72,8 +73,7 @@ namespace pae {
         void clear()
         {
             appoggiatura = 0;
-            acciaccatura = fermata = trill = chord = false;
-            tie = 0;
+            acciaccatura = fermata = tie = trill = chord = false;
 
             octave = 4;
             beam = 0;
@@ -88,6 +88,7 @@ namespace pae {
             tuplet_note = 0;
 
             clef = NULL;
+            mensur = NULL;
             meter = NULL;
             key = NULL;
         }
@@ -113,6 +114,7 @@ namespace pae {
             rest = d.rest;
 
             clef = d.clef;
+            mensur = d.mensur;
             meter = d.meter;
             key = d.key;
 
@@ -129,12 +131,12 @@ namespace pae {
         int tuplet_notes; // quantity of notes in the tuplet
         int tuplet_note; // indicates this note is the nth in the tuplet
 
-        int tie;
         bool acciaccatura;
         int appoggiatura;
-        bool fermata;
-        bool trill;
         bool chord;
+        bool fermata;
+        bool tie;
+        bool trill;
 
         char octave;
         unsigned char beam;
@@ -146,6 +148,7 @@ namespace pae {
         bool rest;
 
         Clef *clef;
+        Mensur *mensur;
         MeterSig *meter;
         KeySig *key;
     };
@@ -282,7 +285,7 @@ private:
     Staff *m_staff;
     Measure *m_measure;
     Layer *m_layer;
-    Note *m_last_tied_note;
+    Tie *m_tie;
     bool m_is_in_chord;
     bool m_is_mensural;
     std::string m_keySigString;

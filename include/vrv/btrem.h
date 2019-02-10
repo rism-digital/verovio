@@ -14,11 +14,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BTrem
+// BTrem (bowed tremolo)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <bTrem>
+ * This class models the MEI <bTrem> element.
  */
 class BTrem : public LayerElement, public AttTremMeasured {
 public:

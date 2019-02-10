@@ -24,13 +24,9 @@ namespace vrv {
 // Att
 //----------------------------------------------------------------------------
 
-Att::Att() : AttConverter()
-{
-}
+Att::Att() : AttConverter() {}
 
-Att::~Att()
-{
-}
+Att::~Att() {}
 
 std::string Att::StrToStr(std::string str) const
 {
@@ -49,6 +45,11 @@ std::string Att::IntToStr(int data) const
     return StringFormat("%d", data);
 }
 
+std::string Att::VUToStr(data_VU data) const
+{
+    return StringFormat("%fvu", data);
+}
+
 // Basic converters for reading
 
 double Att::StrToDbl(std::string value) const
@@ -59,6 +60,16 @@ double Att::StrToDbl(std::string value) const
 int Att::StrToInt(std::string value) const
 {
     return atoi(value.c_str());
+}
+
+data_VU Att::StrToVU(std::string value, bool logWarning) const
+{
+    std::regex test("[0-9]*(\\.[0-9]+)?(vu)?");
+    if (!std::regex_match(value, test)) {
+        if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
+        return VRV_UNSET;
+    }
+    return atof(value.substr(0, value.find("vu")).c_str());
 }
 
 // Converters for writing and reading
@@ -112,7 +123,7 @@ data_BEATRPT_REND Att::StrToBeatrptRend(std::string value, bool logWarning) cons
     if (value == "64") return BEATRPT_REND_64;
     if (value == "128") return BEATRPT_REND_128;
     if (value == "mixed") return BEATRPT_REND_mixed;
-    if (logWarning) LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
     return BEATRPT_REND_NONE;
 }
 
@@ -205,9 +216,57 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
     // existing SMuFL glyph num or that it is supported by Verovio
     if ((wc >= 0xE000) && (wc <= 0xF8FF))
         return wc;
-    else if (logWarning)
+    else if (logWarning && !value.empty())
         LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
     return 0;
+}
+    
+std::string Att::CompassdirectionToStr(data_COMPASSDIRECTION data) const
+{
+    std::string value;
+    if (data.GetType() == COMPASSDIRECTION_basic)
+        value = CompassdirectionBasicToStr(data.GetBasic());
+    else if (data.GetType() == COMPASSDIRECTION_extended)
+        value = CompassdirectionExtendedToStr(data.GetExtended());
+    
+    return value;
+}
+
+data_COMPASSDIRECTION Att::StrToCompassdirection(std::string value, bool logWarning) const
+{
+    data_COMPASSDIRECTION data;
+    data.SetBasic(StrToCompassdirectionBasic(value, false));
+    if (data.HasValue()) return data;
+    data.SetExtended(StrToCompassdirectionExtended(value, false));
+    if (data.HasValue()) return data;
+    
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.COMPASSDIRECTION '%s'", value.c_str());
+    
+    return data;
+}
+    
+std::string Att::EventrelToStr(data_EVENTREL data) const
+{
+    std::string value;
+    if (data.GetType() == EVENTREL_basic)
+        value = EventrelBasicToStr(data.GetBasic());
+    else if (data.GetType() == EVENTREL_extended)
+        value = EventrelExtendedToStr(data.GetExtended());
+    
+    return value;
+}
+
+data_EVENTREL Att::StrToEventrel(std::string value, bool logWarning) const
+{
+    data_EVENTREL data;
+    data.SetBasic(StrToEventrelBasic(value, false));
+    if (data.HasValue()) return data;
+    data.SetExtended(StrToEventrelExtended(value, false));
+    if (data.HasValue()) return data;
+    
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.EVENTREL '%s'", value.c_str());
+    
+    return data;
 }
 
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
@@ -233,7 +292,31 @@ data_FONTSIZE Att::StrToFontsize(std::string value, bool logWarning) const
     data.SetPercent(StrToPercent(value, false));
     if (data.HasValue()) return data;
 
-    if (logWarning) LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+
+    return data;
+}
+
+std::string Att::LinewidthToStr(data_LINEWIDTH data) const
+{
+    std::string value;
+    if (data.GetType() == LINEWIDTHTYPE_lineWidthTerm)
+        value = data.GetLineWithTerm();
+    else if (data.GetType() == LINEWIDTHTYPE_measurementAbs)
+        value = VUToStr(data.GetMeasurementAbs());
+
+    return value;
+}
+
+data_LINEWIDTH Att::StrToLinewidth(std::string value, bool logWarning) const
+{
+    data_LINEWIDTH data;
+    data.SetLineWidthTerm(StrToLinewidthterm(value, false));
+    if (data.HasValue()) return data;
+    data.SetMeasurementAbs(StrToVU(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.LINEWIDTH '%s'", value.c_str());
 
     return data;
 }
@@ -245,9 +328,10 @@ std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
 
 data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarning) const
 {
-    std::regex test("[0-9](\\.[0-9]+)?(pt)");
-    if (std::regex_match(value, test)) {
-        if (logWarning) LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+    std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
+    if (!std::regex_match(value, test)) {
+        if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+        return VRV_UNSET;
     }
     return atof(value.substr(0, value.find("pt")).c_str());
 }
@@ -298,18 +382,18 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) con
     if (value == "6s") return KEYSIGNATURE_6s;
     if (value == "7s") return KEYSIGNATURE_7s;
     if (value == "mixed") return KEYSIGNATURE_mixed;
-    if (logWarning) LogWarning("Unsupported key signature '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported key signature '%s'", value.c_str());
     return KEYSIGNATURE_NONE;
 }
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
 {
-    return StringFormat("%dm+%.1f", data.first, data.second);
+    return StringFormat("%dm+%.4f", data.first, data.second);
 }
 
 data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
 {
-    for (size_t i = 0; i < value.length(); i++) {
+    for (size_t i = 0; i < value.length(); ++i) {
         if (iswspace(value[i])) {
             value.erase(i, 1);
             i--;
@@ -327,6 +411,54 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
         timePoint = atof(value.c_str());
     }
     return std::make_pair(measure, timePoint);
+}
+
+std::string Att::MidivalueNameToStr(data_MIDIVALUE_NAME data) const
+{
+    std::string value;
+    if (data.GetType() == MIDIVALUENAMETYPE_midivalue)
+        value = MidivalueToStr(data.GetMidivalue());
+    else if (data.GetType() == MIDIVALUENAMETYPE_mcname)
+        value = NcnameToStr(data.GetNcname());
+
+    return value;
+}
+
+data_MIDIVALUE_NAME Att::StrToMidivalueName(std::string value, bool logWarning) const
+{
+    data_MIDIVALUE_NAME data;
+    data.SetMidivalue(StrToMidivalue(value));
+    if (data.HasValue()) return data;
+    data.SetNcname(StrToNcname(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_NAME '%s'", value.c_str());
+
+    return data;
+}
+
+std::string Att::MidivaluePanToStr(data_MIDIVALUE_PAN data) const
+{
+    std::string value;
+    if (data.GetType() == MIDIVALUEPANTYPE_midivalue)
+        value = MidivalueToStr(data.GetMidivalue());
+    else if (data.GetType() == MIDIVALUEPANTYPE_percentLimitedSigned)
+        value = PercentLimitedSignedToStr(data.GetPercentLimitedSigned());
+
+    return value;
+}
+
+data_MIDIVALUE_PAN Att::StrToMidivaluePan(std::string value, bool logWarning) const
+{
+    data_MIDIVALUE_PAN data;
+    data.SetMidivalue(StrToMidivalue(value));
+    if (data.HasValue()) return data;
+    data.SetPercentLimitedSigned(StrToPercentLimitedSigned(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_PAN '%s'", value.c_str());
+
+    return data;
 }
 
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
@@ -347,7 +479,7 @@ data_MODUSMAIOR Att::StrToModusmaior(std::string value, bool logWarning) const
 {
     if (value == "2") return MODUSMAIOR_2;
     if (value == "3") return MODUSMAIOR_3;
-    if (logWarning) LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMAIOR_NONE;
 }
 
@@ -369,7 +501,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value, bool logWarning) const
 {
     if (value == "2") return MODUSMINOR_2;
     if (value == "3") return MODUSMINOR_3;
-    if (logWarning) LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMINOR_NONE;
 }
 
@@ -393,7 +525,7 @@ data_OCTAVE_DIS Att::StrToOctaveDis(std::string value, bool logWarning) const
     if (value == "8") return OCTAVE_DIS_8;
     if (value == "15") return OCTAVE_DIS_15;
     if (value == "22") return OCTAVE_DIS_22;
-    if (logWarning) LogWarning("Unsupported octave dis '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported octave dis '%s'", value.c_str());
     return OCTAVE_DIS_NONE;
 }
 
@@ -417,7 +549,7 @@ data_ORIENTATION Att::StrToOrientation(std::string value, bool logWarning) const
     if (value == "reversed") return ORIENTATION_reversed;
     if (value == "90CW") return ORIENTATION_90CW;
     if (value == "90CCW") return ORIENTATION_90CCW;
-    if (logWarning) LogWarning("Unsupported orientation '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported orientation '%s'", value.c_str());
     return ORIENTATION_NONE;
 }
 
@@ -429,8 +561,39 @@ std::string Att::PercentToStr(data_PERCENT data) const
 data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
 {
     std::regex test("[0-9]+(\\.?[0-9]*)?%");
-    if (std::regex_match(value, test)) {
+    if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
+        return 0;
+    }
+    return atof(value.substr(0, value.find("%")).c_str());
+}
+
+std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
+{
+    return StringFormat("%.2f%%", data);
+}
+
+data_PERCENT_LIMITED Att::StrToPercentLimited(std::string value, bool logWarning) const
+{
+    std::regex test("[0-9]+(\\.?[0-9]*)?%");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED '%s'", value.c_str());
+        return 0;
+    }
+    return atof(value.substr(0, value.find("%")).c_str());
+}
+
+std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) const
+{
+    return StringFormat("%.2f%%", data);
+}
+
+data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(std::string value, bool logWarning) const
+{
+    std::regex test("(+|-)?[0-9]+(\\.?[0-9]*)?%");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED.SIGNEd '%s'", value.c_str());
+        return 0;
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }
@@ -463,7 +626,7 @@ data_PITCHNAME Att::StrToPitchname(std::string value, bool logWarning) const
     if (value == "g") return PITCHNAME_g;
     if (value == "a") return PITCHNAME_a;
     if (value == "b") return PITCHNAME_b;
-    if (logWarning) LogWarning("Unsupported pitch name '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported pitch name '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 
@@ -491,7 +654,7 @@ data_PLACEMENT Att::StrToPlacement(std::string value, bool logWarning) const
     data.SetNMToken(value);
     if (data.HasValue()) return data;
 
-    if (logWarning) LogWarning("Unsupported data.PLACEMENT '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.PLACEMENT '%s'", value.c_str());
 
     return data;
 }
@@ -514,7 +677,7 @@ data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
 {
     if (value == "2") return PROLATIO_2;
     if (value == "3") return PROLATIO_3;
-    if (logWarning) LogWarning("Unsupported prolatio '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported prolatio '%s'", value.c_str());
     return PROLATIO_NONE;
 }
 
@@ -553,7 +716,7 @@ data_STAFFREL Att::StrToStaffrel(std::string value, bool logWarning) const
     data.SetExtended(StrToStaffrelExtended(value, false));
     if (data.HasValue()) return data;
 
-    if (logWarning) LogWarning("Unsupported data.STAFFREL '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.STAFFREL '%s'", value.c_str());
 
     return data;
 }
@@ -576,7 +739,7 @@ data_STEMDIRECTION Att::StrToStemdirection(std::string value, bool logWarning) c
 {
     if (value == "up") return STEMDIRECTION_up;
     if (value == "down") return STEMDIRECTION_down;
-    if (logWarning) LogWarning("Unsupported stem direction '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported stem direction '%s'", value.c_str());
     return STEMDIRECTION_NONE;
 }
 
@@ -598,7 +761,7 @@ data_TEMPUS Att::StrToTempus(std::string value, bool logWarning) const
 {
     if (value == "2") return TEMPUS_2;
     if (value == "3") return TEMPUS_3;
-    if (logWarning) LogWarning("Unsupported tempus '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported tempus '%s'", value.c_str());
     return TEMPUS_NONE;
 }
 
@@ -622,7 +785,7 @@ data_TIE Att::StrToTie(std::string value, bool logWarning) const
     if (value == "i") return TIE_i;
     if (value == "m") return TIE_m;
     if (value == "t") return TIE_t;
-    if (logWarning) LogWarning("Unsupported tie '%s'", value.c_str());
+    if (logWarning && !value.empty()) LogWarning("Unsupported tie '%s'", value.c_str());
     return TIE_NONE;
 }
 
@@ -683,6 +846,26 @@ bool AttComparison::operator()(Object *object)
 bool AttComparison::MatchesType(Object *object)
 {
     if (object->Is(m_classId)) {
+        return true;
+    }
+    return false;
+}
+
+//----------------------------------------------------------------------------
+// InterfaceComparison
+//----------------------------------------------------------------------------
+
+bool InterfaceComparison::operator()(Object *object)
+{
+    if (object->HasInterface(m_interfaceId)) {
+        return true;
+    }
+    return false;
+}
+
+bool InterfaceComparison::MatchesType(Object *object)
+{
+    if (object->HasInterface(m_interfaceId)) {
         return true;
     }
     return false;

@@ -33,9 +33,7 @@ BTrem::BTrem() : LayerElement("btrem-"), AttTremMeasured()
     Reset();
 }
 
-BTrem::~BTrem()
-{
-}
+BTrem::~BTrem() {}
 
 void BTrem::Reset()
 {

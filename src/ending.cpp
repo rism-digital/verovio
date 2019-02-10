@@ -35,9 +35,7 @@ Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttLineRe
     Reset();
 }
 
-Ending::~Ending()
-{
-}
+Ending::~Ending() {}
 
 void Ending::Reset()
 {
@@ -51,6 +49,9 @@ void Ending::AddChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is(SCOREDEF)) {
+        assert(dynamic_cast<ScoreDef *>(child));
     }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
@@ -119,7 +120,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
     this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Ending::CastOffSystems(FunctorParams *functorParams)
 {
@@ -156,9 +157,11 @@ int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_previousEnding) {
-        // We need to group the previous and this ending
-        params->m_previousEnding->SetDrawingGrpId(params->m_drawingGrpId);
-        this->SetDrawingGrpId(params->m_drawingGrpId);
+        // We need to group the previous and this ending - the previous one should have a grpId
+        if (params->m_previousEnding->GetDrawingGrpId() == 0) {
+            LogDebug("Something went wrong with the gouping of the endings");
+        }
+        this->SetDrawingGrpId(params->m_previousEnding->GetDrawingGrpId());
         // Also set the previous ending to NULL to the grpId is _not_ incremented at the next measure
         // We need this because three or more endings might have to be grouped together
         params->m_previousEnding = NULL;

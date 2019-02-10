@@ -5,8 +5,12 @@
 //   Sean Middleditch <sean@middleditch.us>
 //   rlyeh <https://github.com/r-lyeh>
 
+// Modification: Laurent Pugin <https://github.com/lpugin>
+//    adding precision_ member to Value for ostream precision control
+
 #pragma once
 
+#include <cstddef>
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -32,11 +36,25 @@
 #define JSONXX_COMPILER_HAS_CXX11 0
 #endif
 
+#ifdef _MSC_VER
+// disable the C4127 warning if using VC, see http://stackoverflow.com/a/12042515
+#define JSONXX_ASSERT(...) \
+  do { \
+    __pragma(warning(push)) __pragma(warning(disable:4127)) \
+    if( jsonxx::Assertions ) \
+    __pragma(warning(pop)) \
+      jsonxx::assertion(__FILE__,__LINE__,#__VA_ARGS__,bool(__VA_ARGS__)); \
+  __pragma(warning(push)) __pragma(warning(disable:4127)) \
+  } while(0) \
+  __pragma(warning(pop))
+#else
 #define JSONXX_ASSERT(...) do { if( jsonxx::Assertions ) \
   jsonxx::assertion(__FILE__,__LINE__,#__VA_ARGS__,bool(__VA_ARGS__)); } while(0)
+#endif
 
 namespace jsonxx {
 
+// FIXME(hjiang): Those should really be dynamic.
 // Settings
 enum Settings {
   // constants
@@ -46,8 +64,20 @@ enum Settings {
   Strict = false,
   // values
   Parser = Permissive,  // permissive or strict parsing
+  UnquotedKeys = Disabled, // support of unquoted keys
   Assertions = Enabled  // enabled or disabled assertions (these asserts work both in DEBUG and RELEASE builds)
 };
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
+inline bool parser_is_strict() { return Parser == Strict; }
+inline bool parser_is_permissive() { return Parser == Permissive; }
+inline bool unquoted_keys_are_enabled() { return UnquotedKeys == Enabled; }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 // Constants for .write() and .xml() methods
 enum Format {
@@ -67,9 +97,17 @@ class Value;
 class Object;
 class Array;
 
+// Identity meta-function
+template <typename T>
+struct identity {
+  typedef T type;
+};
+
 // Tools
 bool validate( const std::string &input );
 bool validate( std::istream &input );
+std::string reformat( const std::string &input );
+std::string reformat( std::istream &input );
 std::string xml( const std::string &input, unsigned format = JSONx );
 std::string xml( std::istream &input, unsigned format = JSONx );
 
@@ -91,6 +129,9 @@ class Object {
   T& get(const std::string& key);
   template <typename T>
   const T& get(const std::string& key) const;
+
+  template <typename T>
+  const T& get(const std::string& key, const typename identity<T>::type& default_value) const;
 
   size_t size() const;
   bool empty() const;
@@ -140,6 +181,9 @@ class Array {
   template <typename T>
   const T& get(unsigned int i) const;
 
+  template <typename T>
+  const T& get(unsigned int i, const typename identity<T>::type& default_value) const;
+
   const std::vector<Value*>& values() const {
     return values_;
   }
@@ -151,6 +195,8 @@ class Array {
   bool parse(std::istream &input);
   bool parse(const std::string &input);
   typedef std::vector<Value*> container;
+  void append(const Array &other);
+  void append(const Value &value) { import(value); }
   void import(const Array &other);
   void import(const Value &value);
   Array &operator<<(const Array &other);
@@ -189,7 +235,7 @@ class Value {
   void import( const TYPE &n ) { \
     reset(); \
     type_ = NUMBER_; \
-    number_value_ = n; \
+    number_value_ = static_cast<long double>(n); \
   }
   $number( char )
   $number( int )
@@ -239,6 +285,7 @@ class Value {
         break;
       case NUMBER_:
         import( other.number_value_ );
+        precision_ = other.precision_;
         break;
       case STRING_:
         import( *other.string_value_ );
@@ -302,6 +349,7 @@ class Value {
     Array* array_value_;
     Object* object_value_;
   };
+  int precision_;
 
 protected:
   static bool parse(std::istream& input, Value& value);
@@ -332,6 +380,16 @@ const T& Array::get(unsigned int i) const {
 }
 
 template <typename T>
+const T& Array::get(unsigned int i, const typename identity<T>::type& default_value) const {
+  if(has<T>(i)) {
+    const Value* v = values_.at(i);
+    return v->get<T>();
+  } else {
+    return default_value;
+  }
+}
+
+template <typename T>
 bool Object::has(const std::string& key) const {
   container::const_iterator it(value_map_.find(key));
   return it != value_map_.end() && it->second->is<T>();
@@ -347,6 +405,20 @@ template <typename T>
 const T& Object::get(const std::string& key) const {
   JSONXX_ASSERT(has<T>(key));
   return value_map_.find(key)->second->get<T>();
+}
+
+template <typename T>
+const T& Object::get(const std::string& key, const typename identity<T>::type& default_value) const {
+  if (has<T>(key)) {
+    return value_map_.find(key)->second->get<T>();
+  } else {
+    return default_value;
+  }
+}
+
+template<>
+inline bool Value::is<Value>() const {
+    return true;
 }
 
 template<>
@@ -377,6 +449,16 @@ inline bool Value::is<Array>() const {
 template<>
 inline bool Value::is<Object>() const {
   return type_ == OBJECT_;
+}
+
+template<>
+inline Value& Value::get<Value>() {
+    return *this;
+}
+
+template<>
+inline const Value& Value::get<Value>() const {
+    return *this;
 }
 
 template<>

@@ -8,6 +8,7 @@
 #ifndef __VRV_SCORE_H__
 #define __VRV_SCORE_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -21,7 +22,7 @@ namespace vrv {
  * It is used only for loading score-based MEI documents before they are
  * converted to page-based MEI.
  */
-class Score : public Object {
+class Score : public Object, public AttLabelled, public AttNNumberLike {
 
 public:
     /**

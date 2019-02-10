@@ -19,9 +19,11 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
+#include "ligature.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -69,18 +71,10 @@ Note::Note()
     RegisterAttClass(ATT_TIEPRESENT);
     RegisterAttClass(ATT_VISIBILITY);
 
-    m_drawingTieAttr = NULL;
-
     Reset();
 }
 
-Note::~Note()
-{
-    // This deletes the Tie, Slur, and Accid objects if necessary
-    if (m_drawingTieAttr) {
-        delete m_drawingTieAttr;
-    }
-}
+Note::~Note() {}
 
 void Note::Reset()
 {
@@ -99,9 +93,6 @@ void Note::Reset()
     ResetTiePresent();
     ResetVisibility();
 
-    // tie pointers
-    ResetDrawingTieAttr();
-
     m_clusterPosition = 0;
     m_cluster = NULL;
 
@@ -113,6 +104,17 @@ void Note::Reset()
     m_realTimeOnsetMilliseconds = 0;
     m_realTimeOffsetMilliseconds = 0;
     m_scoreTimeTiedDuration = 0.0;
+
+    m_MIDIPitch = -1;
+}
+
+bool Note::HasToBeAligned() const
+{
+    if (!this->IsInLigature()) return true;
+    Note *note = const_cast<Note *>(this);
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
+    assert(ligature);
+    return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
 }
 
 void Note::AddChild(Object *child)
@@ -120,12 +122,12 @@ void Note::AddChild(Object *child)
     // additional verification for accid and artic - this will no be raised with editorial markup, though
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindChildByAttComparison(&isAttributeComparison))
+        if (this->FindChildByComparison(&isAttributeComparison))
             LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
     }
     else if (child->Is(ARTIC)) {
         IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindChildByAttComparison(&isAttributeComparison))
+        if (this->FindChildByComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
 
@@ -166,22 +168,6 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
-void Note::SetDrawingTieAttr()
-{
-    assert(!this->m_drawingTieAttr);
-    if (m_drawingTieAttr) return;
-    m_drawingTieAttr = new Tie();
-    m_drawingTieAttr->SetStart(this);
-}
-
-void Note::ResetDrawingTieAttr()
-{
-    if (m_drawingTieAttr) {
-        delete m_drawingTieAttr;
-        m_drawingTieAttr = NULL;
-    }
-}
-
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
@@ -196,7 +182,7 @@ Chord *Note::IsChordTone() const
 int Note::GetDrawingDur() const
 {
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-    if (chordParent) {
+    if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
     else {
@@ -315,6 +301,13 @@ wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
 
+    int drawingDur = this->GetDrawingDur();
+
+    // No SMuFL code used for these values
+    if (drawingDur < DUR_1) {
+        return 0;
+    }
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
@@ -324,21 +317,38 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
     }
     else {
-        int drawingDur = this->GetDrawingDur();
-        if (this->GetColored()) {
-            if (drawingDur == DUR_2)
-                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
-            else
+        if (this->GetColored() == BOOLEAN_true) {
+            if (drawingDur > DUR_2) {
                 code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            }
+            else {
+                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            }
         }
         else {
-            if (drawingDur == DUR_2)
-                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
-            else
+            if (drawingDur > DUR_2) {
                 code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            }
+            else {
+                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            }
         }
     }
     return code;
+}
+
+bool Note::IsVisible()
+{
+    if (this->HasVisible()) {
+        return this->GetVisible() == BOOLEAN_true;
+    }
+    // if the chord doens't have it, see if all the children are invisible
+    else if (GetParent() && GetParent()->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord *>(GetParent());
+        assert(chord);
+        return chord->IsVisible();
+    }
+    return true;
 }
 
 void Note::SetScoreTimeOnset(double scoreTime)
@@ -364,6 +374,11 @@ void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
 void Note::SetScoreTimeTiedDuration(double scoreTime)
 {
     m_scoreTimeTiedDuration = scoreTime;
+}
+
+void Note::SetMIDIPitch(char pitch)
+{
+    m_MIDIPitch = pitch;
 }
 
 double Note::GetScoreTimeOnset()
@@ -396,14 +411,79 @@ double Note::GetScoreTimeDuration()
     return GetScoreTimeOffset() - GetScoreTimeOnset();
 }
 
+char Note::GetMIDIPitch()
+{
+    return m_MIDIPitch;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    /****** ties ******/
+
+    AttTiePresent *check = this;
+    // Use the parent chord if there is no @tie on the note
+    if (!this->HasTie() && params->m_currentChord) {
+        check = params->m_currentChord;
+    }
+    assert(check);
+
+    std::vector<Note *>::iterator iter = params->m_currentNotes.begin();
+    while (iter != params->m_currentNotes.end()) {
+        // same octave and same pitch - this is the one!
+        if ((this->GetOct() == (*iter)->GetOct()) && (this->GetPname() == (*iter)->GetPname())) {
+            // right flag
+            if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_t)) {
+                Tie *tie = new Tie();
+                if (!params->m_permanent) {
+                    tie->IsAttribute(true);
+                }
+                tie->SetStartid("#" + (*iter)->GetUuid());
+                tie->SetEndid("#" + this->GetUuid());
+                params->m_controlEvents.push_back(tie);
+            }
+            else {
+                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
+            }
+            iter = params->m_currentNotes.erase(iter);
+            // we are done for this note
+            break;
+        }
+        ++iter;
+    }
+
+    if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
+        params->m_currentNotes.push_back(this);
+    }
+
+    if (params->m_permanent) {
+        this->ResetTiePresent();
+    }
+
+    /****** fermata ******/
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Note::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
+
+    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
@@ -540,6 +620,9 @@ int Note::CalcDots(FunctorParams *functorParams)
     if (this->IsMensural()) {
         return FUNCTOR_SIBLINGS;
     }
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
@@ -555,12 +638,13 @@ int Note::CalcDots(FunctorParams *functorParams)
     // The shift to the left when a stem flag requires it
     int flagShift = 0;
 
-    if (chord) {
+    if (chord && (chord->GetDots() > 0)) {
         dots = params->m_chordDots;
         assert(dots);
 
         // Stem up, shorter than 4th and not in beam
-        if ((params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+        if ((this->GetDots() != 0) && (params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4)
+            && !this->IsInBeam()) {
             // Shift according to the flag width if the top note is not flipped
             if ((this == chord->GetTopNote()) && !this->GetFlippedNotehead()) {
                 // HARDCODED
@@ -568,7 +652,7 @@ int Note::CalcDots(FunctorParams *functorParams)
             }
         }
     }
-    else if (this->HasDots()) {
+    else if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
         dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
         assert(dots);
@@ -611,6 +695,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
+
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
@@ -659,6 +747,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
     Flag *currentFlag = NULL;
+    Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
     if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
@@ -693,13 +782,17 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
-    if (!this->IsChordTone()) SetDrawingStem(currentStem);
+    if (!chord) SetDrawingStem(currentStem);
 
     /************ dots ***********/
 
     Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
+        if (chord && (chord->GetDots() == this->GetDots())) {
+            LogWarning(
+                "Note '%s' with a @dots attribute with the same value as its chord parent", this->GetUuid().c_str());
+        }
         if (!currentDots) {
             currentDots = new Dots();
             this->AddChild(currentDots);
@@ -719,56 +812,6 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
-
-int Note::PrepareTieAttr(FunctorParams *functorParams)
-{
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
-    assert(params);
-
-    AttTiePresent *check = this;
-    // Use the parent chord if there is no @tie on the note
-    if (!this->HasTie() && params->m_currentChord) {
-        check = params->m_currentChord;
-    }
-    assert(check);
-
-    std::vector<Note *>::iterator iter = params->m_currentNotes.begin();
-    while (iter != params->m_currentNotes.end()) {
-        // same octave and same pitch - this is the one!
-        if ((this->GetOct() == (*iter)->GetOct()) && (this->GetPname() == (*iter)->GetPname())) {
-            // right flag
-            if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_t)) {
-                assert((*iter)->GetDrawingTieAttr());
-                (*iter)->GetDrawingTieAttr()->SetEnd(this);
-            }
-            else {
-                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
-                (*iter)->ResetDrawingTieAttr();
-            }
-            iter = params->m_currentNotes.erase(iter);
-            // we are done for this note
-            break;
-        }
-        iter++;
-    }
-
-    if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
-        this->SetDrawingTieAttr();
-        params->m_currentNotes.push_back(this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->m_drawingTieAttr) {
-        return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Note::PrepareLyrics(FunctorParams *functorParams)
@@ -784,6 +827,9 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
 
 int Note::PreparePointersByLayer(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::PreparePointersByLayer(functorParams);
+
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
@@ -798,13 +844,11 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
-    this->ResetDrawingTieAttr();
-
     m_drawingLoc = 0;
     m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -828,7 +872,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
 
     // For now just ignore grace notes
-    if (this->HasGrace()) {
+    if (this->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -882,7 +926,8 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     if (this->HasOctGes()) oct = this->GetOctGes();
 
     int pitch = midiBase + (oct + 1) * 12;
-    int channel = 0;
+    this->SetMIDIPitch(pitch);
+    int channel = params->m_midiChannel;
     int velocity = 64;
 
     double starttime = params->m_totalTime + this->GetScoreTimeOnset();

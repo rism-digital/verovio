@@ -19,7 +19,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <mRest>
+ * This class models the MEI <mRest> element.
  */
 class MRest : public LayerElement,
               public PositionInterface,
@@ -49,6 +49,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing

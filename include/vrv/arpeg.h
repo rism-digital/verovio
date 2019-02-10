@@ -20,6 +20,9 @@ namespace vrv {
 // Arpeg
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <arpeg> element.
+ */
 class Arpeg : public ControlElement,
               public PlistInterface,
               public TimePointInterface,
@@ -40,12 +43,33 @@ public:
     ///@}
 
     /**
+     * @name Get the X drawing position (relative to the top note)
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    ///@}
+
+    /**
+     * Set the top and bottom note of the arpeg.
+     * Pointers will be NULL if resovling fails (e.g., pointing to one single note)
+     */
+    void GetDrawingTopBottomNotes(Note *&top, Note *&bottom);
+
+    /**
      * @name Getter to interfaces
      */
     ///@{
     virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ////@}
+
+    /**
+     * @name Get and set the X drawing relative position
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
+    ///@}
 
     /**
      * Custom method for @plist validation
@@ -56,6 +80,18 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustArpeg
+     */
+    ///@{
+    virtual int AdjustArpeg(FunctorParams *functorParams);
+    ///@}
+
 protected:
     //
 private:
@@ -63,7 +99,12 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The X drawing relative position of the object.
+     * Arpeg are positionned according to the top note through the FloatingPositioner
+     * (See View::DrawArpeg that sets the FloatingPositioner)
+     */
+    int m_drawingXRel;
 };
 
 } // namespace vrv

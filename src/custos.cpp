@@ -15,21 +15,21 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-Custos::Custos() : LayerElement("custos-"), PositionInterface(), AttColor()
+Custos::Custos() : LayerElement("custos-"), PitchInterface(), PositionInterface(), AttColor()
 {
+    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
 
     Reset();
 }
 
-Custos::~Custos()
-{
-}
+Custos::~Custos() {}
 
 void Custos::Reset()
 {
     LayerElement::Reset();
+    PitchInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
 }
@@ -45,7 +45,7 @@ int Custos::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Custos::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

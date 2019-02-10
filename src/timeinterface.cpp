@@ -35,9 +35,7 @@ TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStar
     Reset();
 }
 
-TimePointInterface::~TimePointInterface()
-{
-}
+TimePointInterface::~TimePointInterface() {}
 
 void TimePointInterface::Reset()
 {
@@ -92,7 +90,7 @@ bool TimePointInterface::IsOnStaff(int n)
     if (this->HasStaff()) {
         std::vector<int> staffList = this->GetStaff();
         std::vector<int>::iterator iter;
-        for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+        for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
             if (*iter == n) return true;
         }
         return false;
@@ -120,16 +118,18 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
         staffList.push_back(1);
     }
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison comparison(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
+        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
             continue;
         }
+        if (!staff->DrawingIsVisible()) {
+            continue;
+        }
         staves.push_back(staff);
     }
-    if (staves.empty()) LogDebug("Empty @staff array");
     return staves;
 }
 
@@ -145,9 +145,7 @@ TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartE
     Reset();
 }
 
-TimeSpanningInterface::~TimeSpanningInterface()
-{
-}
+TimeSpanningInterface::~TimeSpanningInterface() {}
 
 void TimeSpanningInterface::Reset()
 {
@@ -284,6 +282,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
     }
 
     // We can now add the pair to our stack
+    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
     params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
 
     return TimePointInterface::InterfacePrepareTimestamps(params, object);

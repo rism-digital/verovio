@@ -50,6 +50,16 @@ public:
     ///@}
 
     /**
+     * Do not copy children for layers
+     */
+    virtual bool CopyChildren() const { return false; }
+
+    /**
+     * Overriding CopyReset() method to be called after copy / assignment calls.
+     */
+    virtual void CopyReset();
+
+    /**
      * @name Methods for adding allowed content
      */
     ///@{
@@ -133,9 +143,24 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
      * See Object::AlignHorizontally
@@ -161,11 +186,6 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *);
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
     /**
      * See Object::CalcOnsetOffset
