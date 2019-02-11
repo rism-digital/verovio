@@ -186,6 +186,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
+    else if (element->Is(TUPLET_BRACKET)) {
+        DrawTupletBracket(dc, element, layer, staff, measure);
+    }
     else if (element->Is(VERSE)) {
         DrawVerse(dc, element, layer, staff, measure);
     }

@@ -71,6 +71,8 @@ class Tie;
 class Trill;
 class Turn;
 class Tuplet;
+class TupletBracket;
+class TupletNum;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -460,11 +462,11 @@ protected:
 
     /**
      * @name Method for drawing Tuplet.
-     * Called from the the layer postponed drawing list.
      * Defined in view_tuplet.cpp
      */
     ///@{
-    void DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff);
+    void DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
 
     /**
      * @name Low level drawing methods

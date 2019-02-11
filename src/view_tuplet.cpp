@@ -16,6 +16,7 @@
 #include "beam.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "note.h"
 #include "options.h"
 #include "smufl.h"
@@ -268,12 +269,19 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     return direction;
 }
 
-void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff)
+void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
-    assert(tuplet);
+    assert(element);
     assert(layer);
     assert(staff);
+    assert(measure);
+    
+    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(element);
+    assert(tupletBracket);
+    
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletBracket->GetFirstParent(TUPLET));
+    assert(tuplet);
 
     if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
         tuplet->SetEmptyBB();
