@@ -471,6 +471,12 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
                 tupletNum->SetDrawingYRel(tupletNum->GetDrawingYRel() + yMidRel);
             }
+            else {
+                int yRel = (m_drawingBracketPos == STAFFREL_basic_above)
+                    ? 0
+                    : -params->m_doc->GetDrawingStaffSize(staffSize);
+                tupletNum->SetDrawingYRel(yRel);
+            }
 
             int yRel = tupletNum->GetDrawingY();
 
@@ -483,7 +489,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 if (!descendant->HasSelfBB()) {
                     continue;
                 }
-                if (!descendant->HorizontalLeftOverlap(tupletNum, params->m_doc)) {
+                if (!tupletNum->HorizontalSelfOverlap(descendant)) {
                     continue;
                 }
                 if (m_drawingNumPos == STAFFREL_basic_above) {
