@@ -40,17 +40,17 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
-    
+
     Staff *beamStaff = staff;
     if (beam->GetBeamWith() == OTHERSTAFF_below) {
-        beamStaff = dynamic_cast<Staff*>(measure->GetNext(staff, STAFF));
+        beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
         if (beamStaff == NULL) {
             LogError("Cannot access staff below for beam '%s'", beam->GetUuid().c_str());
             beamStaff = staff;
         }
     }
     else if (beam->GetBeamWith() == OTHERSTAFF_above) {
-        beamStaff = dynamic_cast<Staff*>(measure->GetPrevious(staff, STAFF));
+        beamStaff = dynamic_cast<Staff *>(measure->GetPrevious(staff, STAFF));
         if (beamStaff == NULL) {
             LogError("Cannot access staff above for beam '%s'", beam->GetUuid().c_str());
             beamStaff = staff;

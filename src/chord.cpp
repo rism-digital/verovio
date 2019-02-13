@@ -245,12 +245,12 @@ Note *Chord::GetBottomNote()
     assert(bottomNote);
     return bottomNote;
 }
-    
+
 int Chord::GetXMin()
 {
     const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
-    
+
     int x = -VRV_UNSET;
     ListOfObjects::const_iterator iter = childList->begin();
     while (iter != childList->end()) {
@@ -264,7 +264,7 @@ int Chord::GetXMax()
 {
     const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
-    
+
     int x = VRV_UNSET;
     ListOfObjects::const_iterator iter = childList->begin();
     while (iter != childList->end()) {
@@ -393,21 +393,21 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
-    
+
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
-    
+
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
-    
+
     CalcStemParams calcStemParams(params->m_doc);
     Functor calcStem(&Object::CalcStem);
     this->Process(&calcStem, &calcStemParams);
 
     return FUNCTOR_SIBLINGS;
 }
-    
+
 int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
 {
     ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);

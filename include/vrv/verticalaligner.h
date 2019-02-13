@@ -126,7 +126,7 @@ public:
      * Return NULL if not found and does not create anything.
      */
     FloatingPositioner *FindFirstFloatingPositioner(ClassId classId);
-    
+
     /**
      * Look for the FloatingPositioner corresponding to the FloatingObject.
      * Return NULL if not found and does not create anything.
@@ -188,8 +188,9 @@ public:
      */
     void FindAllIntersectionPoints(
         SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
-    
-    void ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params, const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
+
+    void ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params,
+        const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
 
     //----------//
     // Functors //

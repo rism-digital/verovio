@@ -187,7 +187,8 @@ protected:
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false);
-    void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
+    void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
+        bool abbreviations, int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
@@ -401,8 +402,8 @@ protected:
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
-    void DrawBracketSpan(
-        DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawBracketSpan(DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType,
+        Object *graphic = NULL);
     void DrawFConnector(
         DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHairpin(
@@ -509,7 +510,6 @@ private:
     std::wstring IntToTupletFigures(unsigned short number);
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
-    bool OneBeamInTuplet(Tuplet *tuplet);
     int NestedTuplets(Object *object);
     int GetSylYRel(Syl *syl, Staff *staff);
     int GetFYRel(F *f, Staff *staff);

@@ -84,14 +84,14 @@ void StaffDef::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 bool StaffDef::IsInBraceAndBracket()
 {
-    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp*>(this->GetFirstParent(STAFFGRP));
+    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp *>(this->GetFirstParent(STAFFGRP));
     if (!staffGrp1 || !staffGrp1->HasSymbol()) {
         return false;
     }
-    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp*>(staffGrp1->GetFirstParent(STAFFGRP));
+    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp *>(staffGrp1->GetFirstParent(STAFFGRP));
     if (!staffGrp2 || !staffGrp2->HasSymbol()) {
         return false;
     }

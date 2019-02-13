@@ -227,7 +227,7 @@ public:
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
-    
+
     /**
      * Return a cont pointer to the children
      */
@@ -319,7 +319,7 @@ public:
      * Look for the Object in the children and return its position (-1 if not found)
      */
     int GetChildIndex(const Object *child);
-    
+
     /**
      * Look for all Objects of a class and return its position (-1 if not found)
      */
@@ -672,7 +672,7 @@ public:
     virtual int AdjustSylSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
     virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
     ///@}
-    
+
     /**
      * Calculate the x position of tuplet brackets and num
      */
@@ -713,7 +713,7 @@ public:
      * Adjust the position the outside articulations with slur.
      */
     virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * @name Adjust the position of cross-staff element after the adjustment of the staves.
      * This is called by Chords and Tuplets with cross-staff content
@@ -737,7 +737,7 @@ public:
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
     virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * Calculate the y position of tuplet brackets and num
      */
@@ -1224,7 +1224,7 @@ public:
      * Returns a contatenated version of all the text children
      */
     std::wstring GetText(Object *node);
-    
+
     /**
      * Fill an array of lines with concatenated content of each line
      */

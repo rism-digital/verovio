@@ -226,11 +226,11 @@ void StaffAlignment::SetCurrentFloatingPositioner(
     // LogDebug("BB %d", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner(positioner);
 }
-    
+
 FloatingPositioner *StaffAlignment::FindFirstFloatingPositioner(ClassId classId)
 {
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
-                             [classId](FloatingPositioner *positioner) { return positioner->GetObject()->GetClassId() == classId; });
+        [classId](FloatingPositioner *positioner) { return positioner->GetObject()->GetClassId() == classId; });
     if (item != m_floatingPositioners.end()) {
         return *item;
     }
@@ -260,19 +260,20 @@ void StaffAlignment::FindAllIntersectionPoints(
         }
     }
 }
-    
-void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params, const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel)
+
+void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params,
+    const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel)
 {
     if (grpIdYRel.empty()) {
         return;
     }
-    
+
     std::sort(grpIdYRel.begin(), grpIdYRel.end());
-    
+
     int yRel;
     // The initial next position is the original position of the first group. Nothing will happen for it.
     int nextYRel = grpIdYRel.at(0).second;
-    
+
     // For each grpId (sorted, see above), loop to find the highest / lowest positon to put the next group
     // The move the next group (if not already higher or lower)
     ArrayOfFloatingPositioners::const_iterator iter;
@@ -293,13 +294,17 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrps
             (*iter)->SetDrawingYRel(yRel);
             // Then find the highest / lowest position for the next group
             if (params->m_place == STAFFREL_basic_above) {
-                int iterY = yRel - (*iter)->GetContentY2() - (params->m_doc->GetTopMargin((*iter)->GetObject()->GetClassId()) * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                int iterY = yRel - (*iter)->GetContentY2()
+                    - (params->m_doc->GetTopMargin((*iter)->GetObject()->GetClassId())
+                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel > iterY) {
                     nextYRel = iterY;
                 }
             }
             else {
-                int iterY = yRel + (*iter)->GetContentY2() + (params->m_doc->GetBottomMargin((*iter)->GetObject()->GetClassId()) * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                int iterY = yRel + (*iter)->GetContentY2()
+                    + (params->m_doc->GetBottomMargin((*iter)->GetObject()->GetClassId())
+                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel < iterY) {
                     nextYRel = iterY;
                 }
@@ -425,9 +430,10 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             return (
                 (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
                     != params->m_classIds.end())
-                && (positioner->GetObject()->GetDrawingGrpId() != 0) && (positioner->GetDrawingPlace() == params->m_place));
+                && (positioner->GetObject()->GetDrawingGrpId() != 0)
+                && (positioner->GetDrawingPlace() == params->m_place));
         });
-    
+
     if (positioners.empty()) {
         return FUNCTOR_SIBLINGS;
     }
@@ -455,10 +461,8 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             }
         }
     }
-    
-    
-    if (std::find(params->m_classIds.begin(), params->m_classIds.end(), HARM) != params->m_classIds.end())
-    {
+
+    if (std::find(params->m_classIds.begin(), params->m_classIds.end(), HARM) != params->m_classIds.end()) {
         // Re-adjust the postion in order to make sure the group remain in the right order
         this->ReAdjustFloatingPositionersGrps(params, positioners, grpIdYRel);
         // The already move them, so the loop below is not necessary.
@@ -474,7 +478,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             (*iter)->SetDrawingYRel((*i).second);
         }
     }
-    
+
     //  Now update the staffAlignment max overflow (above or below)
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
         if (params->m_place == STAFFREL_basic_above) {

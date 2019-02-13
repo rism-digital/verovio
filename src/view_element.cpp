@@ -67,7 +67,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     if (element->HasSameas()) {
         dc->StartGraphic(element, "", element->GetUuid());
         element->SetEmptyBB();
@@ -184,16 +184,17 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawSyllable(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET)) {
-        dc->StartGraphic(element, "", element->GetUuid());
-        dc->EndGraphic(element, this);
-        dynamic_cast<<#type#>>(<#expression#>)
-        system->AddToDrawingList(element);
+        DrawTuplet(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET_BRACKET)) {
-        DrawTupletBracket(dc, element, layer, staff, measure);
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        layer->AddToDrawingList(element);
     }
     else if (element->Is(TUPLET_NUM)) {
-        DrawTupletNum(dc, element, layer, staff, measure);
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        layer->AddToDrawingList(element);
     }
     else if (element->Is(VERSE)) {
         DrawVerse(dc, element, layer, staff, measure);
@@ -845,7 +846,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->EndGraphic(element, this);
 }
-    
+
 void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -1570,33 +1571,32 @@ int View::GetFYRel(F *f, Staff *staff)
     assert(f && staff);
 
     int y = staff->GetDrawingY();
-    
+
     StaffAlignment *alignment = staff->GetAlignment();
     // Something must be seriously wrong...
     if (!alignment) return y;
-    
+
     y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
-    
+
     FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
     // There is no other harm, we use the bottom line.
     if (!positioner) return y;
-    
+
     y = positioner->GetDrawingY();
-    
+
     Object *fb = f->GetFirstParent(FB);
     assert(fb);
     int line = fb->GetChildIndex(f, FIGURE, UNLIMITED_DEPTH);
-    
+
     if (line > 0) {
         FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int lineHeight = m_doc->GetTextLineHeight(fFont, false);
         y -= (line * lineHeight);
     }
-    
+
     return y;
 }
 
-    
 int View::GetSylYRel(Syl *syl, Staff *staff)
 {
     assert(syl && staff);

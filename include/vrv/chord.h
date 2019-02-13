@@ -86,7 +86,7 @@ public:
     int GetYTop();
     int GetYBottom();
     ///@}
-                  
+
     /**
      * Return min or max note X position
      */
@@ -146,7 +146,7 @@ public:
     //----------//
     // Functors //
     //----------//
-                  
+
     /**
      * See Object::AdjustCrossStaffYPos
      */

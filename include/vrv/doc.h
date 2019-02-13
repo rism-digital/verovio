@@ -338,7 +338,7 @@ public:
      * See Object::PrepareLyricsEnd
      */
     virtual int PrepareLyricsEnd(FunctorParams *functorParams);
-    
+
     /**
      * See Object::PrepareTimestampsEnd
      */
@@ -355,12 +355,12 @@ public:
      * A copy of the header tree stored as pugi::xml_document
      */
     pugi::xml_document m_header;
-    
+
     /**
      * A copy of the header tree stored as pugi::xml_document
      */
     pugi::xml_document m_front;
-    
+
     /**
      * A copy of the header tree stored as pugi::xml_document
      */

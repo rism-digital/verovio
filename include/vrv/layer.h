@@ -31,6 +31,7 @@ class StaffDef;
  * It contains LayerElement objects.
  */
 class Layer : public Object,
+              public DrawingListInterface,
               public ObjectListInterface,
               public AttNInteger,
               public AttTyped,

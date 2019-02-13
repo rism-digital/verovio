@@ -15,6 +15,8 @@
 
 namespace vrv {
 
+class TupletNum;
+
 //----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
@@ -157,7 +159,7 @@ public:
     virtual std::string GetClassName() const { return "TupletBracket"; }
     virtual ClassId GetClassId() const { return TUPLET_BRACKET; }
     ///@}
-    
+
     /**
      * @name Setter and getter for darwing positions
      */
@@ -166,14 +168,20 @@ public:
     void SetDrawingXRelLeft(int drawingXRelLeft) { m_drawingXRelLeft = drawingXRelLeft; }
     int GetDrawingXRelRight() { return m_drawingXRelRight; }
     void SetDrawingXRelRight(int drawingXRelRight) { m_drawingXRelRight = drawingXRelRight; }
-    int GetDrawingYRelLeft() { return m_drawingYRelLeft; }
-    void SetDrawingYRelLeft(int drawingYRelLeft) { m_drawingYRelLeft = drawingYRelLeft; }
-    int GetDrawingYRelRight() { return m_drawingYRelRight; }
-    void SetDrawingYRelRight(int drawingYRelRight) { m_drawingYRelRight = drawingYRelRight; }
     ///@}
-    
+
+    int GetDrawingXLeft();
+    int GetDrawingXRight();
     int GetDrawingYLeft();
     int GetDrawingYRight();
+
+    /**
+     * @name Setter and getter for the aligned num
+     */
+    ///@{
+    TupletNum *GetAlignedNum() { return m_alignedNum; }
+    void SetAlignedNum(TupletNum *alignedNum) { m_alignedNum = alignedNum; }
+    ///@}
 
     //----------//
     // Functors //
@@ -191,7 +199,7 @@ public:
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ResetVerticalAlignment
      */
@@ -207,12 +215,9 @@ private:
     /** */
     int m_drawingXRelRight;
     /** */
-    int m_drawingYRelLeft;
-    /** */
-    int m_drawingYRelRight;
-    
+    TupletNum *m_alignedNum;
 };
-    
+
 //----------------------------------------------------------------------------
 // TupletNum
 //----------------------------------------------------------------------------
@@ -234,15 +239,25 @@ public:
     virtual std::string GetClassName() const { return "TupletNum"; }
     virtual ClassId GetClassId() const { return TUPLET_NUM; }
     ///@}
-    
+
     /**
      * @name Setter and getter for darwing positions
      */
     ///@{
     int GetDrawingXRelMid() { return m_drawingXRelMid; }
     void SetDrawingXRelMid(int drawingXRelMid) { m_drawingXRelMid = drawingXRelMid; }
-    int GetDrawingYRelMid() { return m_drawingYRelMid; }
+    int GetDrawingYMid(); // { return m_drawingYRelMid; }
+    int GetDrawingXMid(); // { return m_drawingYRelMid; }
+
     void SetDrawingYRelMid(int drawingYRelMid) { m_drawingYRelMid = drawingYRelMid; }
+    ///@}
+
+    /**
+     * @name Setter and getter for the aligned bracket
+     */
+    ///@{
+    TupletBracket *GetAlignedBracket() { return m_alignedBracket; }
+    void SetAlignedBracket(TupletBracket *alignedBracket);
     ///@}
 
     //----------//
@@ -256,12 +271,12 @@ public:
     virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-    
+
     /**
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ResetVerticalAlignment
      */
@@ -276,6 +291,8 @@ private:
     int m_drawingXRelMid;
     /** */
     int m_drawingYRelMid;
+    /** */
+    TupletBracket *m_alignedBracket;
 };
 
 //----------------------------------------------------------------------------

@@ -90,7 +90,7 @@ void Slur::GetCrossStaffOverflows(
     if (!endStaff) {
         endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstParent(STAFF));
     }
-    
+
     // This happens with slurs starting or ending with a timestamp
     if (!endStaff) {
         endStaff = startStaff;

@@ -44,7 +44,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     dc->StartTextGraphic(f, "", f->GetUuid());
 
     DrawTextChildren(dc, f, params);
-    
+
     if (f->GetStart() && f->GetEnd()) {
         System *currentSystem = dynamic_cast<System *>(f->GetFirstParent(SYSTEM));
         // Postpone the drawing of the end of the system; this will call DrawFConnector
@@ -109,7 +109,7 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
         std::wstring substr = s.substr(prevPos, std::wstring::npos);
         dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
     }
-    
+
     // Disable x for what is comming next as child of <f>
     // The value is reset in DrawFb
     params.m_x = VRV_UNSET;

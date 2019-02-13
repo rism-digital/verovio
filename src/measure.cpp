@@ -773,7 +773,7 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-    
+
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 

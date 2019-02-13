@@ -118,7 +118,7 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 TupletBracket::TupletBracket() : LayerElement("bracket-"), AttTupletVis()
 {
     RegisterAttClass(ATT_TUPLETVIS);
-    
+
     Reset();
 }
 
@@ -131,51 +131,59 @@ void TupletBracket::Reset()
 
     m_drawingXRelLeft = 0;
     m_drawingXRelRight = 0;
-    m_drawingYRelLeft = 0;
-    m_drawingYRelRight = 0;
+    m_alignedNum = NULL;
 }
-    
-    
+
+int TupletBracket::GetDrawingXLeft()
+{
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    assert(tuplet && tuplet->GetDrawingLeft());
+
+    return tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
+}
+
+int TupletBracket::GetDrawingXRight()
+{
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    assert(tuplet && tuplet->GetDrawingRight());
+
+    return tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
+}
+
 int TupletBracket::GetDrawingYLeft()
 {
     Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
     assert(tuplet);
-    
-    int yLeft = 0;
+
     Beam *beam = tuplet->GetAlignedBeam();
     if (beam) {
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
-        yLeft = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_beamSlope *
-        (xLeft - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
+        return beam->m_drawingParams.m_startingY
+            + beam->m_drawingParams.m_beamSlope * (xLeft - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
     }
     else {
-        yLeft = this->GetDrawingY();
+        return this->GetDrawingY();
     }
-    return yLeft;
 }
-    
+
 int TupletBracket::GetDrawingYRight()
 {
     Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
     assert(tuplet);
-    
-    int yRight = 0;
+
     Beam *beam = tuplet->GetAlignedBeam();
     if (beam) {
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
-        yRight = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_beamSlope *
-         (xRight - beam->m_drawingParams.m_startingX);
+        return beam->m_drawingParams.m_startingY
+            + beam->m_drawingParams.m_beamSlope * (xRight - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
     }
     else {
-        yRight = this->GetDrawingY();
+        return this->GetDrawingY();
     }
-    return yRight;
-    
 }
-    
-    
+
 //----------------------------------------------------------------------------
 // TupletNum
 //----------------------------------------------------------------------------
@@ -195,9 +203,41 @@ void TupletNum::Reset()
     LayerElement::Reset();
     ResetNumberPlacement();
     ResetTupletVis();
-    
+
     m_drawingXRelMid = 0;
     m_drawingYRelMid = 0;
+    m_alignedBracket = NULL;
+}
+
+int TupletNum::GetDrawingYMid()
+{
+    if (m_alignedBracket) {
+        int yLeft = m_alignedBracket->GetDrawingYLeft();
+        int yRight = m_alignedBracket->GetDrawingYRight();
+        return yLeft + ((yRight - yLeft) / 2);
+    }
+    else {
+        return this->GetDrawingY();
+    }
+}
+
+int TupletNum::GetDrawingXMid()
+{
+    if (m_alignedBracket) {
+        int xLeft = m_alignedBracket->GetDrawingXLeft();
+        int xRight = m_alignedBracket->GetDrawingXRight();
+        return xLeft + ((xRight - xLeft) / 2);
+    }
+    else {
+        return this->GetDrawingX();
+    }
+}
+
+void TupletNum::SetAlignedBracket(TupletBracket *alignedBracket)
+{
+    if (m_alignedBracket) m_alignedBracket->SetAlignedNum(NULL);
+    m_alignedBracket = alignedBracket;
+    if (m_alignedBracket) m_alignedBracket->SetAlignedNum(this);
 }
 
 //----------------------------------------------------------------------------
@@ -278,39 +318,38 @@ int TupletBracket::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetHorizontalAlignment(functorParams);
-    
+
     m_drawingXRelLeft = 0;
     m_drawingXRelRight = 0;
+    m_alignedNum = NULL;
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetVerticalAlignment(functorParams);
-    
-    m_drawingYRelLeft = 0;
-    m_drawingYRelRight = 0;
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int TupletNum::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetHorizontalAlignment(functorParams);
-    
+
     m_drawingXRelMid = 0;
+    m_alignedBracket = NULL;
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetVerticalAlignment(functorParams);
-    
+
     m_drawingYRelMid = 0;
 
     return FUNCTOR_CONTINUE;

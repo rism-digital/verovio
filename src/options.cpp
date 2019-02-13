@@ -343,7 +343,7 @@ OptionIntMap::OptionIntMap()
 {
     m_value = 0;
     m_defaultValue = 0;
-    
+
     m_values = NULL;
 }
 
@@ -524,7 +524,7 @@ Options::Options()
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_general);
-    
+
     m_openControlEvents.SetInfo("Open control event", "Render open control events");
     m_openControlEvents.Init(false);
     this->Register(&m_openControlEvents, "openControlEvents", &m_general);
@@ -601,7 +601,7 @@ Options::Options()
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
-    
+
     m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");
     m_lyricHyphenWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_lyricHyphenWidth, "lyricHyphenWidth", &m_generalLayout);
@@ -609,7 +609,7 @@ Options::Options()
     m_lyricNoStartHyphen.SetInfo("Lyric no start hyphen", "Do not show hyphens at the beginning of a system");
     m_lyricNoStartHyphen.Init(false);
     this->Register(&m_lyricNoStartHyphen, "lyricNoStartHyphen", &m_generalLayout);
-    
+
     m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
     m_lyricSize.Init(4.5, 2.0, 8.0);
     this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
@@ -617,7 +617,7 @@ Options::Options()
     m_lyricTopMinMargin.SetInfo("Lyric top min margin", "The minmal margin above the lyrics in MEI units");
     m_lyricTopMinMargin.Init(2.0, 0.0, 8.0);
     this->Register(&m_lyricTopMinMargin, "lyricTopMinMargin", &m_generalLayout);
-    
+
     m_lyricWordSpace.SetInfo("Lyric word space", "The lyric word space length");
     m_lyricWordSpace.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricWordSpace, "lyricWordSpace", &m_generalLayout);
@@ -662,7 +662,7 @@ Options::Options()
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
     m_spacingDurDetection.Init(false);
     this->Register(&m_spacingDurDetection, "spacingDurDetection", &m_generalLayout);
-    
+
     m_spacingLinear.SetInfo("Spacing linear", "Specify the linear spacing factor");
     m_spacingLinear.Init(0.25, 0.0, 1.0);
     this->Register(&m_spacingLinear, "spacingLinear", &m_generalLayout);

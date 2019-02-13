@@ -236,7 +236,7 @@ void Page::LayOutHorizontally()
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
         int longestActualDur = DUR_4;
-        
+
         // Detect the longest duration in order to adjust the spacing (false by default)
         if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
             // Get the longest duration in the piece
@@ -320,7 +320,7 @@ void Page::LayOutHorizontally()
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
-    
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsXParams(doc);
     Functor adjustTupletsX(&Object::AdjustTupletsX);
@@ -381,7 +381,7 @@ void Page::LayOutVertically()
     FunctorDocParams adjustArticWithSlursParams(doc);
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
-    
+
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsYParams(doc);
     Functor adjustTupletsY(&Object::AdjustTupletsY);
@@ -408,7 +408,7 @@ void Page::LayOutVertically()
     Functor adjustYPos(&Object::AdjustYPos);
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
-    
+
     Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
     Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
     FunctorDocParams adjustCrossStaffYPosParams(doc);

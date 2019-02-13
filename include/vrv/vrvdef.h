@@ -260,7 +260,7 @@ typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmen
 typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
-    
+
 typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
@@ -379,7 +379,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 //----------------------------------------------------------------------------
 // data.LINEWIDTHTERM factors
 //----------------------------------------------------------------------------
-    
+
 #define LINEWIDTHTERM_factor_narrow 0.5
 #define LINEWIDTHTERM_factor_medium 2.0
 #define LINEWIDTHTERM_factor_wide 4.0

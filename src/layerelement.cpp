@@ -471,7 +471,7 @@ double LayerElement::GetAlignmentDuration(
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
     }
-    
+
     if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
         LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
         assert(sameas);
@@ -531,7 +531,7 @@ double LayerElement::GetAlignmentDuration(
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
-        
+
         if (this->Is(HALFMRPT)) {
             return (DUR_MAX / meterUnit * meterCount) / 2;
         }
@@ -1149,7 +1149,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // nothing to do when the element has a @sameas attribute
         return FUNCTOR_SIBLINGS;
     }
-    
+
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account

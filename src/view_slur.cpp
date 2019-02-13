@@ -504,7 +504,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
         Note *note = NULL;
         // We keep only notes and chords for now
-        if (!(*it)->Is({CHORD, NOTE, TUPLET_BRACKET, TUPLET_NUM})) continue;
+        if (!(*it)->Is({ CHORD, NOTE, TUPLET_BRACKET, TUPLET_NUM })) continue;
         // Also skip notes that are part of a chords since we already have the chord
         if ((note = dynamic_cast<Note *>(*it)) && note->IsChordTone()) continue;
         Point p;

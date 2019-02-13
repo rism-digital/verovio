@@ -48,7 +48,7 @@ public:
      * Copy assignment for resetting pointers
      */
     LayerElement &operator=(const LayerElement &element);
-    
+
     /**
      * @name Getter to interfaces
      */

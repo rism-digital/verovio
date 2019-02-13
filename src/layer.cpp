@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer(int n)
-    : Object("layer-"), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
+    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
@@ -68,6 +68,7 @@ Layer::~Layer()
 void Layer::Reset()
 {
     Object::Reset();
+    DrawingListInterface::Reset();
     ResetNInteger();
     ResetTyped();
     ResetVisibility();

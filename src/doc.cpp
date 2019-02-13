@@ -100,7 +100,7 @@ void Doc::Reset()
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
-    
+
     m_header.reset();
     m_front.reset();
     m_back.reset();
@@ -535,7 +535,8 @@ void Doc::PrepareDrawing()
         LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
     }
     if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
-        LogWarning("%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
+        LogWarning(
+            "%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
     }
 
     /************ Resolve @plist ************/
@@ -1258,12 +1259,12 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
     if (graceSize) y = y * this->m_options->m_graceFactor.GetValue();
     return y;
 }
-    
+
 int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
 {
     int descender = -this->GetTextGlyphDescender(L'q', font, graceSize);
     int height = this->GetTextGlyphHeight(L'I', font, graceSize);
-    
+
     return ((descender + height) * 1.1);
 }
 
@@ -1538,7 +1539,8 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
         params->m_currentSyl->SetEnd(params->m_lastNote);
     }
     else if (m_options->m_openControlEvents.GetValue()) {
-        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
+        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i)
+            || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
             Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
             assert(lastMeasure);
             params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
@@ -1552,16 +1554,16 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
 {
     PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
-    
+
     if (!m_options->m_openControlEvents.GetValue() || params->m_timeSpanningInterfaces.empty()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
     if (!lastMeasure) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     for (auto &pair : params->m_timeSpanningInterfaces) {
         TimeSpanningInterface *interface = pair.first;
         assert(interface);
@@ -1569,8 +1571,8 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
             interface->SetEnd(lastMeasure->GetRightBarLine());
         }
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 } // namespace vrv

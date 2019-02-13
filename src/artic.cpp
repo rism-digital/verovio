@@ -24,7 +24,8 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
+std::vector<data_ARTICULATION> Artic::s_outStaffArtic
+    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
 
 std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
     = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
@@ -148,7 +149,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             case ARTICULATION_stacciss: return SMUFL_E4A9_articStaccatissimoWedgeBelow;
             case ARTICULATION_marc: return SMUFL_E4AD_articMarcatoBelow;
             // Removed in MEI 4.0
-            //case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
+            // case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
             case ARTICULATION_spicc: return SMUFL_E4A7_articStaccatissimoBelow;
             //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
@@ -156,7 +157,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             //
             // Removed in MEI 4.0
-            //case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
+            // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
             default: return 0; break;
         }

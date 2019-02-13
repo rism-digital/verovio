@@ -160,8 +160,7 @@ public:
     virtual int AdjustXOverflow(FunctorParams *functorParams);
     virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
     ///@}
-    
-    
+
     /**
      * See Object::AdjustSylSpacing
      */

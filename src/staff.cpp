@@ -452,12 +452,12 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Staff::AdjustSylSpacing(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-    
+
     // Set the staff size for this pass
     params->m_staffSize = this->m_drawingStaffSize;
 
