@@ -153,9 +153,9 @@ int TupletBracket::GetDrawingXRight()
 int TupletBracket::GetDrawingYLeft()
 {
     Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
-    assert(tuplet);
+    assert(tuplet && tuplet->GetDrawingLeft());
 
-    Beam *beam = tuplet->GetAlignedBeam();
+    Beam *beam = tuplet->GetBracketAlignedBeam();
     if (beam) {
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
@@ -170,9 +170,9 @@ int TupletBracket::GetDrawingYLeft()
 int TupletBracket::GetDrawingYRight()
 {
     Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
-    assert(tuplet);
+    assert(tuplet && tuplet->GetDrawingRight());
 
-    Beam *beam = tuplet->GetAlignedBeam();
+    Beam *beam = tuplet->GetBracketAlignedBeam();
     if (beam) {
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
@@ -229,7 +229,19 @@ int TupletNum::GetDrawingXMid()
         return xLeft + ((xRight - xLeft) / 2);
     }
     else {
-        return this->GetDrawingX();
+        Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+        assert(tuplet && tuplet->GetDrawingLeft() && tuplet->GetDrawingRight());
+        if (tuplet->GetNumAlignedBeam()) {
+            const ArrayOfBeamElementCoords *coords = tuplet->GetNumAlignedBeam()->GetElementCoords();
+            int xLeft = coords->front()->m_x;
+            int xRight = coords->back()->m_x;
+            return xLeft + ((xRight - xLeft) / 2);
+        }
+        else {
+            int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
+            int xRight = tuplet->GetDrawingRight()->GetDrawingX();
+            return xLeft + ((xRight - xLeft) / 2);
+        }
     }
 }
 

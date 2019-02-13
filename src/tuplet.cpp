@@ -60,7 +60,8 @@ void Tuplet::Reset()
     m_drawingLeft = NULL;
     m_drawingRight = NULL;
     m_drawingBracketPos = STAFFREL_basic_NONE;
-    m_alignedBeam = NULL;
+    m_bracketAlignedBeam = NULL;
+    m_numAlignedBeam = NULL;
 }
 
 void Tuplet::AddChild(Object *child)
@@ -128,10 +129,24 @@ void Tuplet::FilterList(ListOfObjects *childList)
     }
 }
 
-data_STAFFREL_basic Tuplet::CalcDrawingBracketPos()
+void Tuplet::CalcDrawingBracketAndNumPos()
 {
+    m_drawingBracketPos = STAFFREL_basic_NONE;
+
     if (this->HasBracketPlace()) {
-        return this->GetBracketPlace();
+        m_drawingBracketPos = this->GetBracketPlace();
+    }
+
+    if (this->HasNumPlace()) {
+        m_drawingNumPos = this->GetNumPlace();
+    }
+    else {
+        m_drawingNumPos = m_drawingBracketPos;
+    }
+
+    // if both are given we are all good (num is set in any case if bracket is)
+    if (m_drawingBracketPos != STAFFREL_basic_NONE) {
+        return;
     }
 
     const ListOfObjects *tupletChildren = this->GetList(this);
@@ -167,9 +182,14 @@ data_STAFFREL_basic Tuplet::CalcDrawingBracketPos()
         ++iter;
     }
     // true means up
-    data_STAFFREL_basic position = ups > downs ? STAFFREL_basic_above : STAFFREL_basic_below;
+    m_drawingBracketPos = ups > downs ? STAFFREL_basic_above : STAFFREL_basic_below;
 
-    return position;
+    // also use it for the num unless it is already set
+    if (m_drawingNumPos == STAFFREL_basic_NONE) {
+        m_drawingNumPos = m_drawingBracketPos;
+    }
+
+    return;
 }
 
 void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc)
@@ -214,21 +234,6 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(this->FindChildByType(TUPLET_BRACKET, 1));
     TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM, 1));
-
-    /*
-    if (!currentBracket) {
-        currentBracket = new TupletBracket();
-        this->AddChild(currentBracket);
-    }
-    currentBracket->AttTupletVis::operator=(*this);
-
-    if (!currentNum) {
-        currentNum = new TupletNum();
-        this->AddChild(currentNum);
-    }
-    currentNum->AttNumberPlacement::operator=(*this);
-    currentNum->AttTupletVis::operator=(*this);
-    */
 
     if (!this->HasBracketVisible() || (this->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
@@ -288,7 +293,6 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    m_drawingBracketPos = this->GetDrawingBracketPos();
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 
     // Carefull: this will not work if the tuplet has editorial markup (one child) and then notes + one beam
@@ -297,26 +301,39 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     if (beamParent) {
         // is only the tuplet beamed and no other tuplet contained?
         if ((beamParent->GetChildCount() == 1) && (this->GetChildCount(TUPLET) == 0)) {
-            m_alignedBeam = beamParent;
+            m_bracketAlignedBeam = beamParent;
         }
     }
     Beam *beamChild = dynamic_cast<Beam *>(this->FindChildByType(BEAM));
     // Do we contain a beam?
     if (beamChild) {
         if ((this->GetChildCount(NOTE) == 0) && (this->GetChildCount(CHORD) == 0) && (this->GetChildCount(BEAM) == 1)) {
-            m_alignedBeam = beamChild;
+            m_bracketAlignedBeam = beamChild;
         }
     }
 
-    // Cancel alignment with the beam if position and stemdirection are not concordant
-    if (m_alignedBeam && (m_alignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_up)
+    m_numAlignedBeam = m_bracketAlignedBeam;
+
+    // Cancel alignment of the bracket with the beam if position and stemdirection are not concordant
+    if (m_bracketAlignedBeam && (m_bracketAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_up)
         && (m_drawingBracketPos == STAFFREL_basic_below)) {
-        m_alignedBeam = NULL;
+        m_bracketAlignedBeam = NULL;
     }
-    else if (m_alignedBeam
-        && ((m_alignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
+    else if (m_bracketAlignedBeam
+        && ((m_bracketAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
                && (m_drawingBracketPos == STAFFREL_basic_above))) {
-        m_alignedBeam = NULL;
+        m_bracketAlignedBeam = NULL;
+    }
+
+    // Cancel alignment of the num with the beam if position and stemdirection are not concordant
+    if (m_numAlignedBeam && (m_numAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_up)
+        && (m_drawingNumPos == STAFFREL_basic_below)) {
+        m_numAlignedBeam = NULL;
+    }
+    else if (m_numAlignedBeam
+        && ((m_numAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
+               && (m_drawingNumPos == STAFFREL_basic_above))) {
+        m_numAlignedBeam = NULL;
     }
 
     int XRelLeft;
@@ -332,7 +349,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM));
     if (tupletNum && (this->GetNumVisible() != BOOLEAN_false)) {
         // We have a bracket and the num is not on its opposite side
-        if (tupletBracket && (!tupletNum->HasNumPlace() || tupletNum->GetNumPlace() == m_drawingBracketPos)) {
+        if (tupletBracket && (m_drawingNumPos == m_drawingBracketPos)) {
             tupletNum->SetAlignedBracket(tupletBracket);
         }
         else {
@@ -361,18 +378,19 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
     assert(staff);
     int staffSize = staff->m_drawingStaffSize;
 
-    data_STAFFREL_basic position = this->GetDrawingBracketPos();
-    assert(position != STAFFREL_basic_NONE);
+    assert(m_drawingBracketPos != STAFFREL_basic_NONE);
+
+    int verticalLine = params->m_doc->GetDrawingUnit(staffSize);
+    int verticalMargin = 2 * verticalLine;
+    int yReference = staff->GetDrawingY();
 
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindChildByType(TUPLET_BRACKET));
     if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
 
-        int verticalLine = params->m_doc->GetDrawingUnit(staffSize);
-        int verticalMargin = 2 * verticalLine;
-        verticalMargin *= (position == STAFFREL_basic_above) ? 1 : -1;
-        int yReference = staff->GetDrawingY();
+        int bracketVerticalMargin = verticalMargin;
+        bracketVerticalMargin *= (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
 
-        Beam *beam = this->GetAlignedBeam();
+        Beam *beam = this->GetBracketAlignedBeam();
         if (beam) {
             // Check for possible articulations
             ArrayOfObjects artics;
@@ -382,7 +400,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             int articPadding = 0;
             for (auto &artic : artics) {
                 if (!artic->HasSelfBB()) continue;
-                if (position == STAFFREL_basic_above) {
+                if (m_drawingBracketPos == STAFFREL_basic_above) {
                     // Left point when slope is going up and right when going down
                     int relevantX
                         = (beam->m_drawingParams.m_beamSlope > 0) ? artic->GetSelfLeft() : artic->GetSelfRight();
@@ -402,11 +420,12 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 }
             }
 
-            tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() - articPadding + verticalMargin);
+            tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() - articPadding + bracketVerticalMargin);
         }
         else {
             // Default position is above or below the staff
-            int yRel = (position == STAFFREL_basic_above) ? 0 : -params->m_doc->GetDrawingStaffSize(staffSize);
+            int yRel
+                = (m_drawingBracketPos == STAFFREL_basic_above) ? 0 : -params->m_doc->GetDrawingStaffSize(staffSize);
 
             // Check for overlap with content
             // Possible issue with beam above the tuplet - not sure this will be noticable
@@ -416,7 +435,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
             for (auto &descendant : descendants) {
                 if (!descendant->HasSelfBB()) continue;
-                if (position == STAFFREL_basic_above) {
+                if (m_drawingBracketPos == STAFFREL_basic_above) {
                     int dist = descendant->GetSelfTop() - yReference;
                     if (yRel < dist) yRel = dist;
                 }
@@ -426,16 +445,59 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 }
             }
 
-            // tupletBracket->SetDrawingYRelLeft(yRel + verticalMargin);
-            tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + yRel + verticalMargin);
+            tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + yRel + bracketVerticalMargin);
         }
     }
 
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM));
     if (tupletNum && (this->GetNumVisible() != BOOLEAN_false)) {
+        // The num is within a bracket
         if (tupletNum->GetAlignedBracket()) {
             // yRel is not used for drawing but we need to adjust it for the bounding box to follow the changes
             tupletNum->SetDrawingYRel(tupletNum->GetAlignedBracket()->GetDrawingYRel());
+        }
+        // The num is on its own
+        else {
+            int numVerticalMargin = verticalMargin;
+            numVerticalMargin *= (m_drawingNumPos == STAFFREL_basic_above) ? 1 : -1;
+
+            Beam *beam = this->GetNumAlignedBeam();
+            // If we have a beam first move it to the appropriate postion
+            if (beam) {
+                int xMid = tupletNum->GetDrawingXMid();
+                int yMid = beam->m_drawingParams.m_startingY
+                    + beam->m_drawingParams.m_beamSlope * (xMid - beam->m_drawingParams.m_startingX);
+                int yMidRel = yMid - yReference;
+
+                tupletNum->SetDrawingYRel(tupletNum->GetDrawingYRel() + yMidRel);
+            }
+
+            int yRel = tupletNum->GetDrawingY();
+
+            // Check for overlap with content - beam is not taken into account
+            ArrayOfObjects descendants;
+            ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, DOT, FLAG, NOTE, REST, STEM });
+            this->FindAllChildByComparison(&descendants, &comparison);
+
+            for (auto &descendant : descendants) {
+                if (!descendant->HasSelfBB()) {
+                    continue;
+                }
+                if (!descendant->HorizontalLeftOverlap(tupletNum, params->m_doc)) {
+                    continue;
+                }
+                if (m_drawingNumPos == STAFFREL_basic_above) {
+                    int dist = descendant->GetSelfTop();
+                    if (yRel < dist) yRel = dist;
+                }
+                else {
+                    int dist = descendant->GetSelfBottom();
+                    if (yRel > dist) yRel = dist;
+                }
+            }
+
+            yRel -= yReference;
+            tupletNum->SetDrawingYRel(yRel + numVerticalMargin);
         }
     }
 
@@ -459,7 +521,8 @@ int Tuplet::ResetHorizontalAlignment(FunctorParams *functorParams)
     LayerElement::ResetHorizontalAlignment(functorParams);
 
     m_drawingBracketPos = STAFFREL_basic_NONE;
-    m_alignedBeam = NULL;
+    m_bracketAlignedBeam = NULL;
+    m_numAlignedBeam = NULL;
 
     return FUNCTOR_CONTINUE;
 }

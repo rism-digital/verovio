@@ -55,15 +55,16 @@ public:
     LayerElement *GetDrawingRight() { return m_drawingRight; }
     void SetDrawingRight(LayerElement *drawingRight) { m_drawingRight = drawingRight; }
     data_STAFFREL_basic GetDrawingBracketPos() { return m_drawingBracketPos; }
-    void SetDrawingBracketPos(data_STAFFREL_basic drawingBracketPos) { m_drawingBracketPos = drawingBracketPos; }
+    data_STAFFREL_basic GetDrawingNumPos() { return m_drawingNumPos; }
     ///@}
 
-    Beam *GetAlignedBeam() { return m_alignedBeam; }
+    Beam *GetBracketAlignedBeam() { return m_bracketAlignedBeam; }
+    Beam *GetNumAlignedBeam() { return m_numAlignedBeam; }
 
     /**
      *
      */
-    data_STAFFREL_basic CalcDrawingBracketPos();
+    void CalcDrawingBracketAndNumPos();
 
     /**
      * Return the maximum and minimum X positions of the notes in the tuplets
@@ -117,7 +118,11 @@ private:
     /** */
     data_STAFFREL_basic m_drawingBracketPos;
     /** */
-    Beam *m_alignedBeam;
+    data_STAFFREL_basic m_drawingNumPos;
+    /** */
+    Beam *m_bracketAlignedBeam;
+    /** */
+    Beam *m_numAlignedBeam;
 };
 
 } // namespace vrv
