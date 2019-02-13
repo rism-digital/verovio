@@ -184,10 +184,16 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawSyllable(dc, element, layer, staff, measure);
     }
     else if (element->Is(TUPLET)) {
-        DrawTuplet(dc, element, layer, staff, measure);
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        dynamic_cast<<#type#>>(<#expression#>)
+        system->AddToDrawingList(element);
     }
     else if (element->Is(TUPLET_BRACKET)) {
         DrawTupletBracket(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(TUPLET_NUM)) {
+        DrawTupletNum(dc, element, layer, staff, measure);
     }
     else if (element->Is(VERSE)) {
         DrawVerse(dc, element, layer, staff, measure);
@@ -1370,25 +1376,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->ReactivateGraphic();
     dc->EndGraphic(syl, this);
-}
-
-void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert(dc);
-    assert(element);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(element);
-    assert(tuplet);
-
-    dc->StartGraphic(element, "", element->GetUuid());
-
-    // Draw the inner elements
-    DrawLayerChildren(dc, tuplet, layer, staff, measure);
-
-    dc->EndGraphic(element, this);
 }
 
 void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

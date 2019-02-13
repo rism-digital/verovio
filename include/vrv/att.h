@@ -305,6 +305,23 @@ public:
 protected:
     ClassId m_classId;
 };
+    
+//----------------------------------------------------------------------------
+// ClassIdsComparison
+//----------------------------------------------------------------------------
+
+class ClassIdsComparison : public Comparison {
+
+public:
+    ClassIdsComparison(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
+
+    virtual bool operator()(Object *object);
+
+    bool MatchesType(Object *object) { return true; }
+
+protected:
+    std::vector<ClassId> m_classIds;
+};
 
 //----------------------------------------------------------------------------
 // InterfaceComparison
@@ -316,8 +333,6 @@ public:
     InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
 
     virtual bool operator()(Object *object);
-
-    InterfaceId GetInterface() { return m_interfaceId; }
 
     bool MatchesType(Object *object);
 

@@ -320,6 +320,11 @@ void Page::LayOutHorizontally()
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+    
+    // Adjust the position of the tuplets
+    FunctorDocParams adjustTupletsXParams(doc);
+    Functor adjustTupletsX(&Object::AdjustTupletsX);
+    this->Process(&adjustTupletsX, &adjustTupletsXParams);
 
     // Prevent a margin overflow
     Functor adjustXOverlfow(&Object::AdjustXOverflow);
@@ -376,6 +381,11 @@ void Page::LayOutVertically()
     FunctorDocParams adjustArticWithSlursParams(doc);
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
+    
+    // Adjust the position of the tuplets
+    FunctorDocParams adjustTupletsYParams(doc);
+    Functor adjustTupletsY(&Object::AdjustTupletsY);
+    this->Process(&adjustTupletsY, &adjustTupletsYParams);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);

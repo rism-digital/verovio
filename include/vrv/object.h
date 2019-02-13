@@ -672,6 +672,11 @@ public:
     virtual int AdjustSylSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
     virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
     ///@}
+    
+    /**
+     * Calculate the x position of tuplet brackets and num
+     */
+    virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -732,6 +737,11 @@ public:
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
     virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Calculate the y position of tuplet brackets and num
+     */
+    virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.

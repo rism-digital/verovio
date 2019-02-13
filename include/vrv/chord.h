@@ -86,6 +86,14 @@ public:
     int GetYTop();
     int GetYBottom();
     ///@}
+                  
+    /**
+     * Return min or max note X position
+     */
+    ///@{
+    int GetXMin();
+    int GetXMax();
+    ///@}
 
     /**
      * Return the cross staff above or below (if  any).

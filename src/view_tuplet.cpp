@@ -45,6 +45,7 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     }
 
     // Do we contain a beam?
+    // Carefull: this will not work if the tuplet has editorial markup (one child) and then notes + one beam
     if ((tuplet->GetChildCount() == 1) && (tuplet->GetChildCount(BEAM) == 1)) return true;
 
     return false;
@@ -268,6 +269,30 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     center->y = y;
     return direction;
 }
+    
+void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(element);
+    assert(tuplet);
+    
+    // We do it here because we have no dedicated functor to do it (which would be an overkill)
+    if (tuplet->GetDrawingBracketPos() == STAFFREL_basic_NONE) {
+        tuplet->SetDrawingBracketPos(tuplet->CalcDrawingBracketPos());
+    }
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    // Draw the inner elements
+    DrawLayerChildren(dc, tuplet, layer, staff, measure);
+
+    dc->EndGraphic(element, this);
+}
 
 void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
@@ -279,107 +304,106 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     
     TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(element);
     assert(tupletBracket);
+
+    if (tupletBracket->GetBracketVisible() == BOOLEAN_false) {
+        tupletBracket->SetEmptyBB();
+        return;
+    }
     
     Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletBracket->GetFirstParent(TUPLET));
     assert(tuplet);
-
-    if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
-        tuplet->SetEmptyBB();
+    
+    if (!tuplet->GetDrawingLeft() || !tuplet->GetDrawingRight()) {
+        tupletBracket->SetEmptyBB();
         return;
     }
-
-    tuplet->ResetList(tuplet);
+    
+    data_STAFFREL_basic position = tuplet->GetDrawingBracketPos();
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        
+    dc->StartGraphic(tupletBracket, "", tupletBracket->GetUuid());
+    
+    int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + tupletBracket->GetDrawingXRelLeft();
+    int xRight = tuplet->GetDrawingRight()->GetDrawingX() + tupletBracket->GetDrawingXRelRight();
+    int yLeft = tupletBracket->GetDrawingYLeft() - lineWidth / 2;
+    int yRight = tupletBracket->GetDrawingYRight() - lineWidth / 2;
+    DrawObliquePolygon(dc, xLeft, yLeft, xRight, yRight, lineWidth);
+    
+    // HARDCODED
+    int verticalLine = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6 / 5;
+    if (position == STAFFREL_basic_above) {
+        verticalLine *= -1;
+    }
+    
+    DrawFilledRectangle(dc, xLeft, yLeft, xLeft + lineWidth, yLeft + verticalLine);
+    DrawFilledRectangle(dc, xRight, yRight, xRight - lineWidth, yRight + verticalLine);
+    
+    dc->EndGraphic(tupletBracket, this);
+    
+    return;
+}
+    
+void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+    
+    TupletNum *tupletNum = dynamic_cast<TupletNum *>(element);
+    assert(tupletNum);
+    
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletNum->GetFirstParent(TUPLET));
+    assert(tuplet);
+    
+    if ((tuplet->GetNum() == 0) || (tuplet->GetNumVisible() == BOOLEAN_false)) {
+        tupletNum->SetEmptyBB();
+        return;
+    }
+    
+    if (!tuplet->GetDrawingLeft() || !tuplet->GetDrawingRight()) {
+        tupletNum->SetEmptyBB();
+        return;
+    }
+    
+    data_STAFFREL_basic position = tuplet->GetDrawingBracketPos();   // int xLeft;
+    //int xRight;
 
     TextExtend extend;
     std::wstring notes;
 
-    Point start, end, center;
-    data_STEMDIRECTION direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
-    int x1 = center.x, x2 = center.x;
-
-    // draw tuplet numerator
-    if ((tuplet->GetNum() > 0) && (tuplet->GetNumVisible() != BOOLEAN_false)) {
-        bool drawingCueSize = tuplet->GetDrawingCueSize();
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
-        notes = IntToTupletFigures((short int)tuplet->GetNum());
-        if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
-            notes.push_back(SMUFL_E88A_tupletColon);
-            notes = notes + IntToTupletFigures((short int)tuplet->GetNumbase());
-        }
-        dc->GetSmuflTextExtent(notes, &extend);
-
-        // Calculate position for number 0x82
-        // since the number is slanted, move the center left
-        int txtX = x1 - (extend.m_width / 2);
-        // and move it further, when it is under the stave
-        if (direction == STEMDIRECTION_down) {
-            txtX -= staff->m_drawingStaffSize;
-        }
-        // we need to move down the figure of half of it height, which is about an accid width;
-        // also, cue size is not supported. Does it has to?
-        int txt_y
-            = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
-
-        DrawSmuflString(dc, txtX, txt_y, notes, false, staff->m_drawingStaffSize);
-
-        // x1 = 10 pixels before the number
-        x1 = ((txtX - 40) > start.x) ? txtX - 40 : start.x;
-        // x2 = just after, the number is abundant so I do not add anything
-        x2 = txtX + extend.m_width + 20;
-
-        dc->ResetFont();
+    bool drawingCueSize = tuplet->GetDrawingCueSize();
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+    notes = IntToTupletFigures((short int)tuplet->GetNum());
+    if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
+        notes.push_back(SMUFL_E88A_tupletColon);
+        notes = notes + IntToTupletFigures((short int)tuplet->GetNumbase());
     }
+    dc->GetSmuflTextExtent(notes, &extend);
+    
+    // Calculate position for number 0x82
+    // since the number is slanted, move the center left
+    int txtX =  tuplet->GetDrawingLeft()->GetDrawingX() + tupletNum->GetDrawingXRel();
+    txtX -= (extend.m_width / 2);
+    
+    int txt_y =  staff->GetDrawingY() + tupletNum->GetDrawingYRel();
+    txt_y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6 / 5;
 
-    // Nothing to do if the bracket is not visible
-    if (tuplet->GetBracketVisible() == BOOLEAN_false) {
-        return;
-    }
-    // If all tuplets beamed draw no bracket by default
-    if (OneBeamInTuplet(tuplet) && !(tuplet->GetBracketVisible() == BOOLEAN_true)) {
-        return;
-    }
+    dc->StartGraphic(tupletNum, "", tupletNum->GetUuid());
+    
+    DrawSmuflString(dc, txtX, txt_y, notes, false, staff->m_drawingStaffSize);
 
-    int verticalLine = m_doc->GetDrawingUnit(100);
+    // x1 = 10 pixels before the number
+    //x1 = ((txtX - 40) > start.x) ? txtX - 40 : start.x;
+    // x2 = just after, the number is abundant so I do not add anything
+    //x2 = txtX + extend.m_width + 20;
+    
+    dc->EndGraphic(tupletNum, this);
 
-    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
-
-    // Draw the bracket, interrupt where the number is
-
-    // get the slope
-    double m = (double)(start.y - end.y) / (double)(start.x - end.x);
-
-    // calculate the y coords in the slope
-    double y1 = (double)start.y + m * (x1 - (double)start.x);
-    double y2 = (double)start.y + m * (x2 - (double)start.x);
-
-    if (tuplet->GetNumVisible() == BOOLEAN_false) {
-        // one single line
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), end.x, ToDeviceContextY(end.y));
-    }
-    else {
-        // first line
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x1, ToDeviceContextY((int)y1));
-        // second line after gap
-        dc->DrawLine((int)x2, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
-    }
-
-    // vertical bracket lines
-    if (direction == STEMDIRECTION_up) {
-        dc->DrawLine(start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(start.y),
-            start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-            ToDeviceContextY(start.y - verticalLine));
-        dc->DrawLine(end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y),
-            end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y - verticalLine));
-    }
-    else {
-        dc->DrawLine(start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(start.y),
-            start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-            ToDeviceContextY(start.y + verticalLine));
-        dc->DrawLine(end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y),
-            end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y + verticalLine));
-    }
-
-    dc->ResetPen();
+    dc->ResetFont();
+    
+    return;
 }
 
 } // namespace vrv

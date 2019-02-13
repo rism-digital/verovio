@@ -144,7 +144,7 @@ private:
  * This class models a bracket as a layer element part and has not direct MEI equivlatent.
  * It is used to represent tuplet brackets.
  */
-class TupletBracket : public LayerElement {
+class TupletBracket : public LayerElement, public AttTupletVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -157,6 +157,23 @@ public:
     virtual std::string GetClassName() const { return "TupletBracket"; }
     virtual ClassId GetClassId() const { return TUPLET_BRACKET; }
     ///@}
+    
+    /**
+     * @name Setter and getter for darwing positions
+     */
+    ///@{
+    int GetDrawingXRelLeft() { return m_drawingXRelLeft; }
+    void SetDrawingXRelLeft(int drawingXRelLeft) { m_drawingXRelLeft = drawingXRelLeft; }
+    int GetDrawingXRelRight() { return m_drawingXRelRight; }
+    void SetDrawingXRelRight(int drawingXRelRight) { m_drawingXRelRight = drawingXRelRight; }
+    int GetDrawingYRelLeft() { return m_drawingYRelLeft; }
+    void SetDrawingYRelLeft(int drawingYRelLeft) { m_drawingYRelLeft = drawingYRelLeft; }
+    int GetDrawingYRelRight() { return m_drawingYRelRight; }
+    void SetDrawingYRelRight(int drawingYRelRight) { m_drawingYRelRight = drawingYRelRight; }
+    ///@}
+    
+    int GetDrawingYLeft();
+    int GetDrawingYRight();
 
     //----------//
     // Functors //
@@ -171,15 +188,29 @@ public:
     ///@}
 
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
 private:
     //
 public:
     //
 private:
+    /** */
+    int m_drawingXRelLeft;
+    /** */
+    int m_drawingXRelRight;
+    /** */
+    int m_drawingYRelLeft;
+    /** */
+    int m_drawingYRelRight;
+    
 };
     
 //----------------------------------------------------------------------------
@@ -190,7 +221,7 @@ private:
  * This class models a tuplet num as a layer element part and has not direct MEI equivlatent.
  * It is used to represent tuplet number
  */
-class TupletNum : public LayerElement, public AttTupletVis {
+class TupletNum : public LayerElement, public AttNumberPlacement, public AttTupletVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -203,6 +234,16 @@ public:
     virtual std::string GetClassName() const { return "TupletNum"; }
     virtual ClassId GetClassId() const { return TUPLET_NUM; }
     ///@}
+    
+    /**
+     * @name Setter and getter for darwing positions
+     */
+    ///@{
+    int GetDrawingXRelMid() { return m_drawingXRelMid; }
+    void SetDrawingXRelMid(int drawingXRelMid) { m_drawingXRelMid = drawingXRelMid; }
+    int GetDrawingYRelMid() { return m_drawingYRelMid; }
+    void SetDrawingYRelMid(int drawingYRelMid) { m_drawingYRelMid = drawingYRelMid; }
+    ///@}
 
     //----------//
     // Functors //
@@ -215,17 +256,26 @@ public:
     virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-
+    
     /**
-     * See Object::ResetDrawing
+     * See Object::ResetHorizontalAlignment
      */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
 private:
     //
 public:
     //
 private:
+    /** */
+    int m_drawingXRelMid;
+    /** */
+    int m_drawingYRelMid;
 };
 
 //----------------------------------------------------------------------------

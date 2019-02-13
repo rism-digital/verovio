@@ -20,6 +20,7 @@
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "tuplet.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -114,9 +115,10 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 // TupletBracket
 //----------------------------------------------------------------------------
 
-TupletBracket::TupletBracket() : LayerElement("bracket-")
+TupletBracket::TupletBracket() : LayerElement("bracket-"), AttTupletVis()
 {
-
+    RegisterAttClass(ATT_TUPLETVIS);
+    
     Reset();
 }
 
@@ -125,14 +127,63 @@ TupletBracket::~TupletBracket() {}
 void TupletBracket::Reset()
 {
     LayerElement::Reset();
+    ResetTupletVis();
+
+    m_drawingXRelLeft = 0;
+    m_drawingXRelRight = 0;
+    m_drawingYRelLeft = 0;
+    m_drawingYRelRight = 0;
 }
+    
+    
+int TupletBracket::GetDrawingYLeft()
+{
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    assert(tuplet);
+    
+    int yLeft = 0;
+    Beam *beam = tuplet->GetAlignedBeam();
+    if (beam) {
+        // Calculate the y point aligning with the beam
+        int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
+        yLeft = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_beamSlope *
+        (xLeft - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
+    }
+    else {
+        yLeft = this->GetDrawingY();
+    }
+    return yLeft;
+}
+    
+int TupletBracket::GetDrawingYRight()
+{
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    assert(tuplet);
+    
+    int yRight = 0;
+    Beam *beam = tuplet->GetAlignedBeam();
+    if (beam) {
+        // Calculate the y point aligning with the beam
+        int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
+        yRight = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_beamSlope *
+         (xRight - beam->m_drawingParams.m_startingX);
+    }
+    else {
+        yRight = this->GetDrawingY();
+    }
+    return yRight;
+    
+}
+    
     
 //----------------------------------------------------------------------------
 // TupletNum
 //----------------------------------------------------------------------------
 
-TupletNum::TupletNum() : LayerElement("num-")
+TupletNum::TupletNum() : LayerElement("num-"), AttNumberPlacement(), AttTupletVis()
 {
+    RegisterAttClass(ATT_NUMBERPLACEMENT);
+    RegisterAttClass(ATT_TUPLETVIS);
 
     Reset();
 }
@@ -142,6 +193,11 @@ TupletNum::~TupletNum() {}
 void TupletNum::Reset()
 {
     LayerElement::Reset();
+    ResetNumberPlacement();
+    ResetTupletVis();
+    
+    m_drawingXRelMid = 0;
+    m_drawingYRelMid = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -218,18 +274,44 @@ int Flag::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int TupletBracket::ResetDrawing(FunctorParams *functorParams)
+int TupletBracket::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetHorizontalAlignment(functorParams);
+    
+    m_drawingXRelLeft = 0;
+    m_drawingXRelRight = 0;
 
     return FUNCTOR_CONTINUE;
 }
     
-int TupletNum::ResetDrawing(FunctorParams *functorParams)
+int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    LayerElement::ResetVerticalAlignment(functorParams);
+    
+    m_drawingYRelLeft = 0;
+    m_drawingYRelRight = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int TupletNum::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetHorizontalAlignment(functorParams);
+    
+    m_drawingXRelMid = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetVerticalAlignment(functorParams);
+    
+    m_drawingYRelMid = 0;
 
     return FUNCTOR_CONTINUE;
 }

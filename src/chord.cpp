@@ -245,6 +245,34 @@ Note *Chord::GetBottomNote()
     assert(bottomNote);
     return bottomNote;
 }
+    
+int Chord::GetXMin()
+{
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+    
+    int x = -VRV_UNSET;
+    ListOfObjects::const_iterator iter = childList->begin();
+    while (iter != childList->end()) {
+        if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
+        ++iter;
+    }
+    return x;
+}
+
+int Chord::GetXMax()
+{
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+    
+    int x = VRV_UNSET;
+    ListOfObjects::const_iterator iter = childList->begin();
+    while (iter != childList->end()) {
+        if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
+        ++iter;
+    }
+    return x;
+}
 
 void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
 {
