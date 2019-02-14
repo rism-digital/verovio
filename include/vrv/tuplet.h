@@ -58,16 +58,23 @@ public:
     data_STAFFREL_basic GetDrawingNumPos() { return m_drawingNumPos; }
     ///@}
 
+    /**
+     * @name Getter for the beam with which the bracket and / or the num is aligned.
+     */
+    ///@{
     Beam *GetBracketAlignedBeam() { return m_bracketAlignedBeam; }
     Beam *GetNumAlignedBeam() { return m_numAlignedBeam; }
+    ///@}
 
     /**
-     *
+     * Calculate the position of the bracket and the num looking at the stem direction or at the encoded values (if
+     * any). Called in View::DrawTuplet the first time it is called (and not trough a dedicated CalcTuplet functor)
      */
     void CalcDrawingBracketAndNumPos();
 
     /**
-     * Return the maximum and minimum X positions of the notes in the tuplets
+     * Return the maximum and minimum X positions of the notes in the tuplets.
+     * Look at flipped noteheads in chords.
      */
     void GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc);
 
@@ -111,17 +118,23 @@ private:
 public:
     //
 private:
-    /** */
+    /**
+     * The first Chord / Note / Rest in the tuplet.
+     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     */
     LayerElement *m_drawingLeft;
-    /** */
+    /**
+     * The last Chord / Note / Rest in the tuplet.
+     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     */
     LayerElement *m_drawingRight;
-    /** */
+    /** The calcultated drawing position of the bracket set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingBracketPos;
-    /** */
+    /** The calcultated drawing position of the num set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingNumPos;
-    /** */
+    /** The beam with which the bracket aligns (in any) set in Tuplet::AdjustTupletsX */
     Beam *m_bracketAlignedBeam;
-    /** */
+    /** The beam with which the num aligns (in any) set in Tuplet::AdjustTupletsX */
     Beam *m_numAlignedBeam;
 };
 

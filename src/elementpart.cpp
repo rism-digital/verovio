@@ -204,8 +204,6 @@ void TupletNum::Reset()
     ResetNumberPlacement();
     ResetTupletVis();
 
-    m_drawingXRelMid = 0;
-    m_drawingYRelMid = 0;
     m_alignedBracket = NULL;
 }
 
@@ -351,7 +349,6 @@ int TupletNum::ResetHorizontalAlignment(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetHorizontalAlignment(functorParams);
 
-    m_drawingXRelMid = 0;
     m_alignedBracket = NULL;
 
     return FUNCTOR_CONTINUE;
@@ -361,8 +358,6 @@ int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetVerticalAlignment(functorParams);
-
-    m_drawingYRelMid = 0;
 
     return FUNCTOR_CONTINUE;
 }

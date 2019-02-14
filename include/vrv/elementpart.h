@@ -161,7 +161,7 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for darwing positions
+     * @name Setter and getter for darwing rel positions
      */
     ///@{
     int GetDrawingXRelLeft() { return m_drawingXRelLeft; }
@@ -170,10 +170,18 @@ public:
     void SetDrawingXRelRight(int drawingXRelRight) { m_drawingXRelRight = drawingXRelRight; }
     ///@}
 
+    /**
+     * @name Setter and getter for darwing positions.
+     * Takes into account:
+     * - the position of the first and last element.
+     * - the position of the beam if aligned with a beam.
+     */
+    ///@{
     int GetDrawingXLeft();
     int GetDrawingXRight();
     int GetDrawingYLeft();
     int GetDrawingYRight();
+    ///@}
 
     /**
      * @name Setter and getter for the aligned num
@@ -210,11 +218,17 @@ private:
 public:
     //
 private:
-    /** */
+    /**
+     * The XRel shift from the left X position.
+     * The left X position is the one of the first Chord / Note / Rest in the tuplet
+     */
     int m_drawingXRelLeft;
-    /** */
+    /**
+     * The XRel shift from the right X position.
+     * The right X position is the one of the last Chord / Note / Rest in the tuplet
+     */
     int m_drawingXRelRight;
-    /** */
+    /** A pointer to the num with which the TupletBracket is aligned (if any) */
     TupletNum *m_alignedNum;
 };
 
@@ -241,15 +255,15 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for darwing positions
+     * @name Setter and getter for darwing positions.
+     * Takes into account:
+     * - the position of the first and last element.
+     * - the position of the bracket if aligned with a bracket.
+     * - the position of the beam if aligned with a beam.
      */
     ///@{
-    int GetDrawingXRelMid() { return m_drawingXRelMid; }
-    void SetDrawingXRelMid(int drawingXRelMid) { m_drawingXRelMid = drawingXRelMid; }
-    int GetDrawingYMid(); // { return m_drawingYRelMid; }
-    int GetDrawingXMid(); // { return m_drawingYRelMid; }
-
-    void SetDrawingYRelMid(int drawingYRelMid) { m_drawingYRelMid = drawingYRelMid; }
+    int GetDrawingYMid();
+    int GetDrawingXMid();
     ///@}
 
     /**
@@ -287,11 +301,7 @@ private:
 public:
     //
 private:
-    /** */
-    int m_drawingXRelMid;
-    /** */
-    int m_drawingYRelMid;
-    /** */
+    /** A pointer to the bracket with which the TupletNum is aligned (if any) */
     TupletBracket *m_alignedBracket;
 };
 
