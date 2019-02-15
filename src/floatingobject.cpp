@@ -407,7 +407,7 @@ void FloatingCurvePositioner::ResetPositioner()
     m_angle = 0.0;
     m_thickness = 0;
     m_dir = curvature_CURVEDIR_NONE;
-    m_cachedMinMaxY = -1;
+    m_cachedMinMaxY = VRV_UNSET;
 }
     
 void FloatingCurvePositioner::UpdateCurveParams(
@@ -425,7 +425,7 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_angle = angle;
     m_thickness = thickness;
     m_dir = curveDir;
-    m_cachedMinMaxY = -1;
+    m_cachedMinMaxY = VRV_UNSET;
 }
     
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
@@ -434,7 +434,7 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
     assert(this->GetObject()->Is({ SLUR, TIE }));
     assert(m_dir != curvature_CURVEDIR_NONE);
 
-    if (m_cachedMinMaxY != -1) return m_cachedMinMaxY;
+    if (m_cachedMinMaxY != VRV_UNSET) return m_cachedMinMaxY;
     Point pos;
     int width, height;
     int minYPos, maxYPos;
