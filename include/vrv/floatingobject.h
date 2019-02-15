@@ -252,7 +252,16 @@ public:
     virtual ClassId GetClassId() const { return FLOATING_CURVE_POSITIONER; }
 
     virtual void ResetPositioner();
+    
+    /**
+     * Reset the curve parameters in FloatingCurvePositioner::FloatingCurvePositioner and in FloatingCurvePositioner::ResetPositioner
+     */
+    void ResetCurveParams();
 
+    /**
+     * Update the curve parameters.
+     * Stored points are made relative to the curve darwingY.
+     */
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
     int CalcMinMaxY(const Point points[4]);

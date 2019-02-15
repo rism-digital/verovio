@@ -393,13 +393,18 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 FloatingCurvePositioner::FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType)
     : FloatingPositioner(object, alignment, spanningType)
 {
-    
+    ResetCurveParams();
 }
     
 void FloatingCurvePositioner::ResetPositioner()
 {
     FloatingPositioner::ResetPositioner();
 
+    ResetCurveParams();
+}
+
+void FloatingCurvePositioner::ResetCurveParams()
+{
     m_points[0] = Point(0, 0);
     m_points[1] = Point(0, 0);
     m_points[2] = Point(0, 0);
