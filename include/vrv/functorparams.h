@@ -192,7 +192,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPostionersParams
+// AdjustFloatingPositionersParams
 //----------------------------------------------------------------------------
 
 /**
@@ -201,9 +201,9 @@ public:
  * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
-class AdjustFloatingPostionersParams : public FunctorParams {
+class AdjustFloatingPositionersParams : public FunctorParams {
 public:
-    AdjustFloatingPostionersParams(Doc *doc, Functor *functor)
+    AdjustFloatingPositionersParams(Doc *doc, Functor *functor)
     {
         m_classId = OBJECT;
         m_doc = doc;
@@ -251,7 +251,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPostionerGrpsParams
+// AdjustFloatingPositionerGrpsParams
 //----------------------------------------------------------------------------
 
 /**
@@ -259,9 +259,9 @@ public:
  * member 1: the doc
  **/
 
-class AdjustFloatingPostionerGrpsParams : public FunctorParams {
+class AdjustFloatingPositionerGrpsParams : public FunctorParams {
 public:
-    AdjustFloatingPostionerGrpsParams(Doc *doc)
+    AdjustFloatingPositionerGrpsParams(Doc *doc)
     {
         m_doc = doc;
         m_place = STAFFREL_basic_above;

@@ -34,6 +34,7 @@ class Ending;
 class F;
 class Fb;
 class Fig;
+class FloatingCurvePositioner;
 class Fermata;
 class Hairpin;
 class Harm;
@@ -412,8 +413,6 @@ protected:
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSlur(
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
-    void DrawSlurInitial(
-        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTrillExtension(
         DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
@@ -520,6 +519,8 @@ private:
     /**
      * @name Internal methods used for calculating slurs
      */
+    void DrawSlurInitial(
+        FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
     float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4]);
     int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
         Point *c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);

@@ -525,13 +525,13 @@ int System::AdjustStaffOverlap(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AdjustFloatingPostioners(FunctorParams *functorParams)
+int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
-    AdjustFloatingPostionerGrpsParams adjustFloatingPostionerGrpsParams(params->m_doc);
-    Functor adjustFloatingPostionerGrps(&Object::AdjustFloatingPostionerGrps);
+    AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
+    Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
@@ -554,13 +554,13 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     params->m_classId = BRACKETSPAN;
     m_systemAligner.Process(params->m_functor, params);
@@ -577,12 +577,12 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DIR);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DIR);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
@@ -590,32 +590,32 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(PEDAL);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(PEDAL);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(HARM);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(ENDING);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;

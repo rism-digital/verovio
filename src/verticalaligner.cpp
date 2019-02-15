@@ -219,8 +219,14 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        positioner = new FloatingPositioner(object, this, spanningType);
-        m_floatingPositioners.push_back(positioner);
+        if (object->Is({SLUR, TIE})) {
+            positioner = new FloatingCurvePositioner(object, this, spanningType);
+            m_floatingPositioners.push_back(positioner);
+        }
+        else {
+            positioner = new FloatingPositioner(object, this, spanningType);
+            m_floatingPositioners.push_back(positioner);
+        }
     }
     positioner->SetObjectXY(objectX, objectY);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
@@ -261,7 +267,7 @@ void StaffAlignment::FindAllIntersectionPoints(
     }
 }
 
-void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params,
+void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
     const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel)
 {
     if (grpIdYRel.empty()) {
@@ -317,9 +323,9 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrps
 // Functors methods
 //----------------------------------------------------------------------------
 
-int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
+int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
     int staffSize = this->GetStaffSize();
@@ -352,13 +358,17 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
+            assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
+            FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+            assert(curve);
+            
             bool skipAbove = false;
             bool skipBelow = false;
 
             if ((*iter)->GetObject()->Is(SLUR)) {
                 Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
-                slur->GetCrossStaffOverflows(this, (*iter)->m_cuvreDir, skipAbove, skipBelow);
+                slur->GetCrossStaffOverflows(this, curve->m_cuvreDir, skipAbove, skipBelow);
             }
 
             int overflowAbove = 0;
@@ -416,9 +426,9 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
+int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionerGrpsParams *params = dynamic_cast<AdjustFloatingPostionerGrpsParams *>(functorParams);
+    AdjustFloatingPositionerGrpsParams *params = dynamic_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);
     assert(params);
 
     ArrayOfFloatingPositioners positioners;

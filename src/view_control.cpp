@@ -888,7 +888,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     bezier[3] = Point(x2, y2);
 
     assert(tie->GetCurrentFloatingPositioner());
-    tie->GetCurrentFloatingPositioner()->UpdateCurvePosition(bezier, 0.0, thickness, drawingCurveDir);
+    FloatingPositioner *positioner = tie->GetCurrentFloatingPositioner();
+    assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
+    FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(positioner);
+    assert(curve);
+    curve->UpdateCurvePosition(bezier, 0.0, thickness, drawingCurveDir);
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());

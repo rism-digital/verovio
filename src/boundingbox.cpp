@@ -511,7 +511,7 @@ bool BoundingBox::Encloses(const Point point) const
     return true;
 }
 
-int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
+int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
 {
     assert(curve);
     assert(curve->GetObject());

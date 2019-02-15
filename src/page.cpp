@@ -394,9 +394,9 @@ void Page::LayOutVertically()
     this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
 
     // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
-    Functor adjustFloatingPostioners(&Object::AdjustFloatingPostioners);
-    AdjustFloatingPostionersParams adjustFloatingPostionersParams(doc, &adjustFloatingPostioners);
-    this->Process(&adjustFloatingPostioners, &adjustFloatingPostionersParams);
+    Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
+    AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
+    this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
 
     // Adjust the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);

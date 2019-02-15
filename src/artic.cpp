@@ -232,7 +232,7 @@ bool ArticPart::AlwaysAbove()
     return false;
 }
 
-void ArticPart::AddSlurPositioner(FloatingPositioner *positioner, bool start)
+void ArticPart::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 {
     if (start) {
         if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
@@ -471,7 +471,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
 
-    std::vector<FloatingPositioner *>::iterator iter;
+    std::vector<FloatingCurvePositioner *>::iterator iter;
     for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); ++iter) {
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));

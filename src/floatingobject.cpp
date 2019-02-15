@@ -264,14 +264,6 @@ void FloatingPositioner::ResetPositioner()
 
     m_drawingYRel = 0;
     m_drawingXRel = 0;
-    m_cuvrePoints[0] = Point(0, 0);
-    m_cuvrePoints[1] = Point(0, 0);
-    m_cuvrePoints[2] = Point(0, 0);
-    m_cuvrePoints[3] = Point(0, 0);
-    m_cuvreAngle = 0.0;
-    m_cuvreThickness = 0;
-    m_cuvreDir = curvature_CURVEDIR_NONE;
-    m_cuvreXMinMaxY = -1;
 }
 
 int FloatingPositioner::GetDrawingX() const
@@ -303,44 +295,6 @@ void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
 
     m_objectX = objectX;
     m_objectY = objectY;
-}
-
-void FloatingPositioner::UpdateCurvePosition(
-    const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
-{
-    m_cuvrePoints[0] = points[0];
-    m_cuvrePoints[1] = points[1];
-    m_cuvrePoints[2] = points[2];
-    m_cuvrePoints[3] = points[3];
-    int currentY = this->GetDrawingY();
-    m_cuvrePoints[0].y -= currentY;
-    m_cuvrePoints[1].y -= currentY;
-    m_cuvrePoints[2].y -= currentY;
-    m_cuvrePoints[3].y -= currentY;
-    m_cuvreAngle = angle;
-    m_cuvreThickness = thickness;
-    m_cuvreDir = curveDir;
-    m_cuvreXMinMaxY = -1;
-}
-
-int FloatingPositioner::CalcXMinMaxY(const Point points[4])
-{
-    assert(this->GetObject());
-    assert(this->GetObject()->Is({ SLUR, TIE }));
-    assert(m_cuvreDir != curvature_CURVEDIR_NONE);
-
-    if (m_cuvreXMinMaxY != -1) return m_cuvreXMinMaxY;
-    Point pos;
-    int width, height;
-    int minYPos, maxYPos;
-
-    BoundingBox::ApproximateBezierBoundingBox(points, pos, width, height, minYPos, maxYPos);
-    if (m_cuvreDir == curvature_CURVEDIR_above)
-        m_cuvreXMinMaxY = maxYPos;
-    else
-        m_cuvreXMinMaxY = minYPos;
-
-    return m_cuvreXMinMaxY;
 }
 
 void FloatingPositioner::SetDrawingXRel(int drawingXRel)
@@ -381,7 +335,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
     }
     else {
-        FloatingPositioner *curve = dynamic_cast<FloatingPositioner *>(horizOverlapingBBox);
+        FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(horizOverlapingBBox);
         if (curve) {
             assert(curve->m_object);
         }
@@ -430,6 +384,68 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
     }
     return true;
+}
+    
+//----------------------------------------------------------------------------
+// FloatingCurvePositioner
+//----------------------------------------------------------------------------
+
+FloatingCurvePositioner::FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType)
+    : FloatingPositioner(object, alignment, spanningType)
+{
+    
+}
+    
+void FloatingCurvePositioner::ResetPositioner()
+{
+    FloatingPositioner::ResetPositioner();
+
+    m_cuvrePoints[0] = Point(0, 0);
+    m_cuvrePoints[1] = Point(0, 0);
+    m_cuvrePoints[2] = Point(0, 0);
+    m_cuvrePoints[3] = Point(0, 0);
+    m_cuvreAngle = 0.0;
+    m_cuvreThickness = 0;
+    m_cuvreDir = curvature_CURVEDIR_NONE;
+    m_cuvreXMinMaxY = -1;
+}
+    
+void FloatingCurvePositioner::UpdateCurvePosition(
+    const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
+{
+    m_cuvrePoints[0] = points[0];
+    m_cuvrePoints[1] = points[1];
+    m_cuvrePoints[2] = points[2];
+    m_cuvrePoints[3] = points[3];
+    int currentY = this->GetDrawingY();
+    m_cuvrePoints[0].y -= currentY;
+    m_cuvrePoints[1].y -= currentY;
+    m_cuvrePoints[2].y -= currentY;
+    m_cuvrePoints[3].y -= currentY;
+    m_cuvreAngle = angle;
+    m_cuvreThickness = thickness;
+    m_cuvreDir = curveDir;
+    m_cuvreXMinMaxY = -1;
+}
+    
+int FloatingCurvePositioner::CalcXMinMaxY(const Point points[4])
+{
+    assert(this->GetObject());
+    assert(this->GetObject()->Is({ SLUR, TIE }));
+    assert(m_cuvreDir != curvature_CURVEDIR_NONE);
+
+    if (m_cuvreXMinMaxY != -1) return m_cuvreXMinMaxY;
+    Point pos;
+    int width, height;
+    int minYPos, maxYPos;
+
+    BoundingBox::ApproximateBezierBoundingBox(points, pos, width, height, minYPos, maxYPos);
+    if (m_cuvreDir == curvature_CURVEDIR_above)
+        m_cuvreXMinMaxY = maxYPos;
+    else
+        m_cuvreXMinMaxY = minYPos;
+
+    return m_cuvreXMinMaxY;
 }
 
 //----------------------------------------------------------------------------

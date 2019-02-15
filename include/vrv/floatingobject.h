@@ -189,10 +189,6 @@ public:
 
     data_STAFFREL_basic GetDrawingPlace() const { return m_place; }
 
-    void UpdateCurvePosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
-
-    int CalcXMinMaxY(const Point points[4]);
-
     /**
      * @name Get and set the X and Y drawing relative position.
      * (X is currently used only for Arpeg)
@@ -234,18 +230,41 @@ protected:
     data_STAFFREL_basic m_place;
 
 public:
-    Point m_cuvrePoints[4];
-    float m_cuvreAngle;
-    int m_cuvreThickness;
-    curvature_CURVEDIR m_cuvreDir;
-    int m_cuvreXMinMaxY;
-
     /**
      * The spanning type of the positionner for spanning control elements
      */
     char m_spanningType;
 };
 
+    
+//----------------------------------------------------------------------------
+// FloatingCurvePositioner
+//----------------------------------------------------------------------------
+
+/**
+ * This class represents a basic object for a curve (slur, tie) in the layout domain
+ */
+class FloatingCurvePositioner : public FloatingPositioner {
+public:
+    // constructors and destructors
+    FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
+    virtual ~FloatingCurvePositioner(){};
+    virtual ClassId GetClassId() const { return FLOATING_CURVE_POSITIONER; }
+
+    virtual void ResetPositioner();
+
+    void UpdateCurvePosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+
+    int CalcXMinMaxY(const Point points[4]);
+
+public:
+    Point m_cuvrePoints[4];
+    float m_cuvreAngle;
+    int m_cuvreThickness;
+    curvature_CURVEDIR m_cuvreDir;
+    int m_cuvreXMinMaxY;
+};
+    
 } // namespace vrv
 
 #endif

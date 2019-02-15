@@ -204,9 +204,9 @@ public:
     virtual int AdjustStaffOverlap(FunctorParams *functorParams);
 
     /**
-     * See Object::AdjustFloatingPostioners
+     * See Object::AdjustFloatingPositioners
      */
-    virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
+    virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffPages

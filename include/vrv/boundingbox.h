@@ -15,6 +15,7 @@
 namespace vrv {
 
 class Doc;
+class FloatingCurvePositioner;
 class Glyph;
 
 //----------------------------------------------------------------------------
@@ -142,7 +143,7 @@ public:
      * Return true if the bounding box intersects with the curve represented by the FloatingPositioner.
      * The Object pointed by the FloatingPositioner is expected to be a SLUR or a TIE
      */
-    int Intersects(FloatingPositioner *curve, int margin = 0) const;
+    int Intersects(FloatingCurvePositioner *curve, int margin = 0) const;
 
     /**
      * Swap values.

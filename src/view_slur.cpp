@@ -43,10 +43,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     assert(slur);
     assert(staff);
     
-    FloatingPositioner *curve = slur->GetCurrentFloatingPositioner();
+    FloatingPositioner *positioner = slur->GetCurrentFloatingPositioner();
+    assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
+    FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
+    
     if (curve->m_cuvreDir == curvature_CURVEDIR_NONE) {
-        this->DrawSlurInitial(dc, slur, x1, x2, staff, spanningType);
+        this->DrawSlurInitial(curve, slur, x1, x2, staff, spanningType);
     }
     else {
         int currentY = curve->GetDrawingY();
@@ -78,7 +81,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->EndGraphic(slur, this);
 }
     
-void View::DrawSlurInitial(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType)
+void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType)
 {
     Beam *parentBeam = NULL;
     Chord *startParentChord = NULL;
@@ -422,8 +425,7 @@ void View::DrawSlurInitial(DeviceContext *dc, Slur *slur, int x1, int x2, Staff 
     float angle = AdjustSlur(slur, staff, layer->GetN(), drawingCurveDir, points);
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
     
-    assert(slur->GetCurrentFloatingPositioner());
-    slur->GetCurrentFloatingPositioner()->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
+    curve->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
     
     /************** articulation **************/
     
@@ -443,11 +445,11 @@ void View::DrawSlurInitial(DeviceContext *dc, Slur *slur, int x1, int x2, Staff 
             if (outsidePart) {
                 if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
                     && (drawingCurveDir == curvature_CURVEDIR_above)) {
-                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
+                    outsidePart->AddSlurPositioner(curve, true);
                 }
                 else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
                          && (drawingCurveDir == curvature_CURVEDIR_below)) {
-                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
+                    outsidePart->AddSlurPositioner(curve, true);
                 }
             }
         }
@@ -463,11 +465,11 @@ void View::DrawSlurInitial(DeviceContext *dc, Slur *slur, int x1, int x2, Staff 
             if (outsidePart) {
                 if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
                     && (drawingCurveDir == curvature_CURVEDIR_above)) {
-                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
+                    outsidePart->AddSlurPositioner(curve, false);
                 }
                 else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
                          && (drawingCurveDir == curvature_CURVEDIR_below)) {
-                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
+                    outsidePart->AddSlurPositioner(curve, false);
                 }
             }
         }
