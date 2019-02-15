@@ -312,6 +312,11 @@ void FloatingPositioner::UpdateCurvePosition(
     m_cuvrePoints[1] = points[1];
     m_cuvrePoints[2] = points[2];
     m_cuvrePoints[3] = points[3];
+    int currentY = this->GetDrawingY();
+    m_cuvrePoints[0].y -= currentY;
+    m_cuvrePoints[1].y -= currentY;
+    m_cuvrePoints[2].y -= currentY;
+    m_cuvrePoints[3].y -= currentY;
     m_cuvreAngle = angle;
     m_cuvreThickness = thickness;
     m_cuvreDir = curveDir;

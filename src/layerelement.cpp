@@ -1402,7 +1402,8 @@ int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
     FindTimeSpanningLayerElementsParams *params = dynamic_cast<FindTimeSpanningLayerElementsParams *>(functorParams);
     assert(params);
 
-    if ((this->GetDrawingX() > params->m_minPos) && (this->GetDrawingX() < params->m_maxPos)) {
+    if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
+        && (this->GetContentLeft() < params->m_maxPos)) {
         params->m_spanningContent.push_back(this);
     }
     else if (this->GetDrawingX() > params->m_maxPos) {

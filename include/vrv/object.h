@@ -705,10 +705,15 @@ public:
     virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the position the outside articulations.
+     * Calcultate the position the outside articulations.
      */
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
+    
+    /**
+     * Adjust the postion position of slurs.
+     */
+    virtual int AjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
     /**
      * Adjust the position the outside articulations with slur.
      */

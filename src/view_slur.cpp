@@ -42,7 +42,44 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     assert(dc);
     assert(slur);
     assert(staff);
+    
+    FloatingPositioner *curve = slur->GetCurrentFloatingPositioner();
+    assert(curve);
+    if (curve->m_cuvreDir == curvature_CURVEDIR_NONE) {
+        this->DrawSlurInitial(dc, slur, x1, x2, staff, spanningType);
+    }
+    else {
+        int currentY = curve->GetDrawingY();
+        curve->m_cuvrePoints[0].y += currentY;
+        curve->m_cuvrePoints[1].y += currentY;
+        curve->m_cuvrePoints[2].y += currentY;
+        curve->m_cuvrePoints[3].y += currentY;
+    }
 
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(slur, "spanning-slur", "");
+
+    DrawThickBezierCurve(dc, curve->m_cuvrePoints, curve->m_cuvreThickness, staff->m_drawingStaffSize, curve->m_cuvreAngle);
+
+    /* drawing debug points */
+    /*
+    int i;
+    for (i = 0; i <= 10; ++i) {
+        Point p = BoundingBox::CalcDeCasteljau(points, (double)i / 10.0);
+        DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
+    }
+    */
+
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(slur, this);
+}
+    
+void View::DrawSlurInitial(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType)
+{
     Beam *parentBeam = NULL;
     Chord *startParentChord = NULL;
     Chord *endParentChord = NULL;
@@ -50,7 +87,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Note *endNote = NULL;
     Chord *startChord = NULL;
     Chord *endChord = NULL;
-
+    
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
@@ -58,22 +95,22 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     bool isGraceToNoteSlur = false;
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
-
+    
     /************** parent layers **************/
-
+    
     LayerElement *start = dynamic_cast<LayerElement *>(slur->GetStart());
     LayerElement *end = dynamic_cast<LayerElement *>(slur->GetEnd());
-
+    
     if (!start || !end) {
         // no start and end, obviously nothing to do...
         return;
     }
-
+    
     if (start->Is(TIMESTAMP_ATTR) && end->Is(TIMESTAMP_ATTR)) {
         // for now ignore slur using 2 tstamps
         return;
     }
-
+    
     if (start->Is(NOTE)) {
         startNote = dynamic_cast<Note *>(start);
         assert(startNote);
@@ -96,11 +133,11 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
     }
-
+    
     if (startNote && endNote && startNote->IsGraceNote() && !endNote->IsGraceNote()) {
         isGraceToNoteSlur = true;
     }
-
+    
     Layer *layer = NULL;
     LayerElement *layerElement = NULL;
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
@@ -113,7 +150,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         layerElement = end;
     }
     assert(layer);
-
+    
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
         System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
         assert(system);
@@ -123,21 +160,21 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
         }
     }
-
+    
     /************** calculate the radius for adjusting the x position **************/
-
+    
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
     }
-
+    
     int endRadius = 0;
     if (!end->Is(TIMESTAMP_ATTR)) {
         endRadius = end->GetDrawingRadius(m_doc);
     }
-
+    
     /************** note stem dir **************/
-
+    
     if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
     }
@@ -154,15 +191,15 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else {
         stemDir = STEMDIRECTION_down;
     }
-
+    
     /************** direction **************/
-
+    
     data_STEMDIRECTION layerStemDir;
-
+    
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
         drawingCurveDir
-            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // grace notes - always below unless we have a drawing stem direction on the layer
     else if (isGraceToNoteSlur && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
@@ -197,12 +234,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         drawingCurveDir = (start->GetDrawingY() > center) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
-
+    
     /************** adjusting y position **************/
-
+    
     bool isShortSlur = false;
     if (x2 - x1 < 1 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
-
+    
     int yChordMax, yChordMin;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
@@ -324,7 +361,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             }
         }
     }
-
+    
     // Positions not attached to a note
     if (spanningType == SPANNING_START) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
@@ -359,9 +396,9 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             y1 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
         y2 = y1;
     }
-
+    
     /************** y position **************/
-
+    
     if (drawingCurveDir == curvature_CURVEDIR_above) {
         y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -370,25 +407,31 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-
+    
     Point points[4];
     points[0] = Point(x1, y1);
     points[3] = Point(x2, y2);
-
+    
+    /*
+     assert(slur->GetCurrentFloatingPositioner());
+     slur->GetCurrentFloatingPositioner();
+     FloatingPositioner curve = *slur->GetCurrentFloatingPositioner();
+     *slur->GetCurrentFloatingPositioner() = curve;
+     */
+    
     float angle = AdjustSlur(slur, staff, layer->GetN(), drawingCurveDir, points);
-
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
-
+    
     assert(slur->GetCurrentFloatingPositioner());
     slur->GetCurrentFloatingPositioner()->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
-
+    
     /************** articulation **************/
-
+    
     // First get all artic children
     AttComparison matchType(ARTIC);
     ArrayOfObjects artics;
     ArrayOfObjects::iterator articIter;
-
+    
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         start->FindAllChildByComparison(&artics, &matchType);
@@ -403,7 +446,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
                 }
                 else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                         && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
                 }
             }
@@ -423,33 +466,14 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
                 }
                 else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                         && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
                 }
             }
         }
     }
-
-    if (graphic)
-        dc->ResumeGraphic(graphic, graphic->GetUuid());
-    else
-        dc->StartGraphic(slur, "spanning-slur", "");
-
-    DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
-
-    /* drawing debug points */
-    /*
-    int i;
-    for (i = 0; i <= 10; ++i) {
-        Point p = BoundingBox::CalcDeCasteljau(points, (double)i / 10.0);
-        DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
-    }
-    */
-
-    if (graphic)
-        dc->EndResumedGraphic(graphic, this);
-    else
-        dc->EndGraphic(slur, this);
+    
+    return;
 }
 
 float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
@@ -504,7 +528,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
         Note *note = NULL;
         // We keep only notes and chords for now
-        if (!(*it)->Is({ CHORD, NOTE, TUPLET_BRACKET, TUPLET_NUM })) continue;
+        if (!(*it)->Is({ CHORD, NOTE, TUPLET_BRACKET })) continue;
         // Also skip notes that are part of a chords since we already have the chord
         if ((note = dynamic_cast<Note *>(*it)) && note->IsChordTone()) continue;
         Point p;
@@ -618,23 +642,37 @@ void View::GetSpanningPointPositions(
     ArrayOfLayerElementPointPairs::iterator itPoint;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); ++itPoint) {
         Point p;
-        if (curveDir == curvature_CURVEDIR_above) {
-            p.y = itPoint->first->GetDrawingTop(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
+        int margin = 2;
+        if (itPoint->first->Is({ CHORD, NOTE })) {
+            if (curveDir == curvature_CURVEDIR_above) {
+                p.y = itPoint->first->GetDrawingTop(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
+            }
+            else {
+                p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
+            }
+            p.x = itPoint->first->GetDrawingX();
         }
         else {
-            p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
+            if (curveDir == curvature_CURVEDIR_above) {
+                p.y = itPoint->first->GetContentTop();
+            }
+            else {
+                p.y = itPoint->first->GetContentBottom();
+            }
+            margin = 0;
+            p.x = itPoint->first->GetContentLeft()
+                + ((itPoint->first->GetContentRight() - itPoint->first->GetContentLeft()) / 2);
         }
-        p.x = itPoint->first->GetDrawingX();
         // Not sure if it is better to add the margin before or after the rotation...
         // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
         itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
         if (curveDir == curvature_CURVEDIR_above) {
-            itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
+            itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * margin;
         }
         else {
-            itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 2;
+            itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * margin;
         }
     }
 }
