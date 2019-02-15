@@ -48,23 +48,19 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
     
-    if (curve->m_cuvreDir == curvature_CURVEDIR_NONE) {
+    if (curve->GetDir() == curvature_CURVEDIR_NONE) {
         this->DrawSlurInitial(curve, slur, x1, x2, staff, spanningType);
     }
-    else {
-        int currentY = curve->GetDrawingY();
-        curve->m_cuvrePoints[0].y += currentY;
-        curve->m_cuvrePoints[1].y += currentY;
-        curve->m_cuvrePoints[2].y += currentY;
-        curve->m_cuvrePoints[3].y += currentY;
-    }
+
+    Point points[4];
+    curve->GetPoints(points);
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
 
-    DrawThickBezierCurve(dc, curve->m_cuvrePoints, curve->m_cuvreThickness, staff->m_drawingStaffSize, curve->m_cuvreAngle);
+    DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle());
 
     /* drawing debug points */
     /*
@@ -425,7 +421,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     float angle = AdjustSlur(slur, staff, layer->GetN(), drawingCurveDir, points);
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
     
-    curve->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
+    curve->UpdateCurveParams(points, angle, thickness, drawingCurveDir);
     
     /************** articulation **************/
     

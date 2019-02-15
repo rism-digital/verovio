@@ -368,7 +368,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             if ((*iter)->GetObject()->Is(SLUR)) {
                 Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
-                slur->GetCrossStaffOverflows(this, curve->m_cuvreDir, skipAbove, skipBelow);
+                slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
 
             int overflowAbove = 0;

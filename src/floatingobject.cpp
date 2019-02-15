@@ -400,52 +400,62 @@ void FloatingCurvePositioner::ResetPositioner()
 {
     FloatingPositioner::ResetPositioner();
 
-    m_cuvrePoints[0] = Point(0, 0);
-    m_cuvrePoints[1] = Point(0, 0);
-    m_cuvrePoints[2] = Point(0, 0);
-    m_cuvrePoints[3] = Point(0, 0);
-    m_cuvreAngle = 0.0;
-    m_cuvreThickness = 0;
-    m_cuvreDir = curvature_CURVEDIR_NONE;
-    m_cuvreXMinMaxY = -1;
+    m_points[0] = Point(0, 0);
+    m_points[1] = Point(0, 0);
+    m_points[2] = Point(0, 0);
+    m_points[3] = Point(0, 0);
+    m_angle = 0.0;
+    m_thickness = 0;
+    m_dir = curvature_CURVEDIR_NONE;
+    m_cachedMinMaxY = -1;
 }
     
-void FloatingCurvePositioner::UpdateCurvePosition(
+void FloatingCurvePositioner::UpdateCurveParams(
     const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
 {
-    m_cuvrePoints[0] = points[0];
-    m_cuvrePoints[1] = points[1];
-    m_cuvrePoints[2] = points[2];
-    m_cuvrePoints[3] = points[3];
+    m_points[0] = points[0];
+    m_points[1] = points[1];
+    m_points[2] = points[2];
+    m_points[3] = points[3];
     int currentY = this->GetDrawingY();
-    m_cuvrePoints[0].y -= currentY;
-    m_cuvrePoints[1].y -= currentY;
-    m_cuvrePoints[2].y -= currentY;
-    m_cuvrePoints[3].y -= currentY;
-    m_cuvreAngle = angle;
-    m_cuvreThickness = thickness;
-    m_cuvreDir = curveDir;
-    m_cuvreXMinMaxY = -1;
+    m_points[0].y -= currentY;
+    m_points[1].y -= currentY;
+    m_points[2].y -= currentY;
+    m_points[3].y -= currentY;
+    m_angle = angle;
+    m_thickness = thickness;
+    m_dir = curveDir;
+    m_cachedMinMaxY = -1;
 }
     
-int FloatingCurvePositioner::CalcXMinMaxY(const Point points[4])
+int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
     assert(this->GetObject()->Is({ SLUR, TIE }));
-    assert(m_cuvreDir != curvature_CURVEDIR_NONE);
+    assert(m_dir != curvature_CURVEDIR_NONE);
 
-    if (m_cuvreXMinMaxY != -1) return m_cuvreXMinMaxY;
+    if (m_cachedMinMaxY != -1) return m_cachedMinMaxY;
     Point pos;
     int width, height;
     int minYPos, maxYPos;
 
     BoundingBox::ApproximateBezierBoundingBox(points, pos, width, height, minYPos, maxYPos);
-    if (m_cuvreDir == curvature_CURVEDIR_above)
-        m_cuvreXMinMaxY = maxYPos;
-    else
-        m_cuvreXMinMaxY = minYPos;
+    m_cachedMinMaxY = (m_dir == curvature_CURVEDIR_above) ? maxYPos : minYPos;
 
-    return m_cuvreXMinMaxY;
+    return m_cachedMinMaxY;
+}
+    
+void FloatingCurvePositioner::GetPoints(Point points[4])
+{
+    points[0] = m_points[0];
+    points[1] = m_points[1];
+    points[2] = m_points[2];
+    points[3] = m_points[3];
+    int currentY = this->GetDrawingY();
+    points[0].y += currentY;
+    points[1].y += currentY;
+    points[2].y += currentY;
+    points[3].y += currentY;
 }
 
 //----------------------------------------------------------------------------

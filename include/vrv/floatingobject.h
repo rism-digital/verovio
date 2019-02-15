@@ -253,16 +253,38 @@ public:
 
     virtual void ResetPositioner();
 
-    void UpdateCurvePosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+    void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
-    int CalcXMinMaxY(const Point points[4]);
+    int CalcMinMaxY(const Point points[4]);
+    
+    /**
+     * @name Getters for the current parameters
+     */
+    ///@{
+    void GetPoints(Point points[4]);
+    float GetAngle() { return m_angle; }
+    int GetThickness() { return m_thickness; }
+    curvature_CURVEDIR GetDir() { return m_dir; }
+    ///@}
 
+private:
+    //
 public:
-    Point m_cuvrePoints[4];
-    float m_cuvreAngle;
-    int m_cuvreThickness;
-    curvature_CURVEDIR m_cuvreDir;
-    int m_cuvreXMinMaxY;
+    //
+private:
+    /**
+     * @name Current parameters.
+     * Points are relative to the curve current drawingY.
+     */
+    ///@{
+    Point m_points[4];
+    float m_angle;
+    int m_thickness;
+    curvature_CURVEDIR m_dir;
+    ///@}
+    
+    /** The cached min or max value (depending on the curvature) */
+    int m_cachedMinMaxY;
 };
     
 } // namespace vrv

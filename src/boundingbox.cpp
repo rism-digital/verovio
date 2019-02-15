@@ -518,8 +518,10 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
     assert(curve->GetObject()->Is({ SLUR, TIE }));
 
     // for lisability
-    Point p1 = curve->m_cuvrePoints[0];
-    Point p2 = curve->m_cuvrePoints[3];
+    Point points[4];
+    curve->GetPoints(points);
+    Point p1 = points[0];
+    Point p2 = points[3];
 
     // first check if they overlap at all
     if (p2.x < this->GetContentLeft()) return 0;
@@ -527,15 +529,15 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
 
     Point topBezier[4], bottomBezier[4];
     BoundingBox::CalcThickBezier(
-        curve->m_cuvrePoints, curve->m_cuvreThickness, curve->m_cuvreAngle, topBezier, bottomBezier);
+        points, curve->GetThickness(), curve->GetAngle(), topBezier, bottomBezier);
 
     // The curve overflows on both sides
     if ((p1.x < this->GetContentLeft()) && p2.x > this->GetContentRight()) {
         // LogDebug("overflows both sides");
-        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
+        if (curve->GetDir() == curvature_CURVEDIR_above) {
             // The curve is already below the content
             if ((curve->GetContentTop() + margin) < this->GetContentBottom()) return 0;
-            int xMaxY = curve->CalcXMinMaxY(topBezier);
+            int xMaxY = curve->CalcMinMaxY(topBezier);
             int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) + margin;
             int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight() + margin);
             // Everything is underneath
@@ -555,7 +557,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
         else {
             // The curve is already above the content
             if ((curve->GetContentBottom() - margin) > this->GetContentTop()) return 0;
-            int xMinY = curve->CalcXMinMaxY(bottomBezier);
+            int xMinY = curve->CalcMinMaxY(bottomBezier);
             // Check if the box is above
             int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) - margin;
             int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) - margin;
@@ -577,8 +579,8 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
     else if ((p1.x < this->GetContentLeft()) && p2.x <= this->GetContentRight()) {
         // LogDebug("left T-L %d %d ; B-R %d %d", this->GetContentTop(), this->GetContentLeft(),
         // this->GetContentBottom(), this->GetContentRight());
-        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
-            int xMaxY = curve->CalcXMinMaxY(topBezier);
+        if (curve->GetDir() == curvature_CURVEDIR_above) {
+            int xMaxY = curve->CalcMinMaxY(topBezier);
             // The starting point is above the top
             if (p2.y > this->GetContentTop() + margin) return 0;
             // The left point is beyond (before) the summit of the curve
@@ -593,7 +595,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
             return (leftY - this->GetContentBottom());
         }
         else {
-            int xMinY = curve->CalcXMinMaxY(topBezier);
+            int xMinY = curve->CalcMinMaxY(topBezier);
             // The starting point is below the bottom
             if (p2.y < this->GetContentBottom() + margin) return 0;
             // The left point is beyond (before) the summit of the curve
@@ -612,8 +614,8 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
     else if ((p1.x >= this->GetContentLeft()) && p2.x > this->GetContentRight()) {
         // LogDebug("right T-L %d %d ; B-R %d %d", this->GetContentTop(), this->GetContentLeft(),
         // this->GetContentBottom(), this->GetContentRight());
-        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
-            int xMaxY = curve->CalcXMinMaxY(topBezier);
+        if (curve->GetDir() == curvature_CURVEDIR_above) {
+            int xMaxY = curve->CalcMinMaxY(topBezier);
             // The starting point is above the top
             if (p1.y > this->GetContentTop() + margin) return 0;
             // The right point is beyond the summit of the curve
@@ -628,7 +630,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
             return (rightY - this->GetContentBottom());
         }
         else {
-            int xMinY = curve->CalcXMinMaxY(bottomBezier);
+            int xMinY = curve->CalcMinMaxY(bottomBezier);
             // The starting point is below the bottom
             if (p1.y < this->GetContentBottom() + margin) return 0;
             // The right point is beyond the summit of the curve
@@ -646,7 +648,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
     // The curve in inside the left and right side of the content
     else if ((p1.x >= this->GetContentLeft()) && p2.x <= this->GetContentRight()) {
         // LogDebug("inside");
-        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
+        if (curve->GetDir() == curvature_CURVEDIR_above) {
             return (curve->GetContentTop() - this->GetContentBottom() + margin);
         }
         else {
