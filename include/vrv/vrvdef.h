@@ -17,6 +17,16 @@
 
 #include "attdef.h"
 
+//----------------------------------------------------------------------------
+
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
+#include <math.h>
+
+// In case it is not defined before...
+#ifndef M_PI
+#define M_PI (3.14159265358979323846264338327950288)
+#endif
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
