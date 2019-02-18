@@ -496,9 +496,10 @@ float View::CalcInitialSlur(
 
     System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
     assert(system);
-    FindTimeSpanningLayerElementsParams findTimeSpanningLayerElementsParams;
-    findTimeSpanningLayerElementsParams.m_minPos = p1->x;
-    findTimeSpanningLayerElementsParams.m_maxPos = p2->x;
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
+    findSpannedLayerElementsParams.m_minPos = p1->x;
+    findSpannedLayerElementsParams.m_maxPos = p2->x;
+    findSpannedLayerElementsParams.m_classIds = { ARTIC, CHORD, FLAG, NOTE, STEM, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
@@ -507,29 +508,32 @@ float View::CalcInitialSlur(
     filters.push_back(&matchStaff);
     filters.push_back(&matchLayer);
 
-    Functor timeSpanningLayerElements(&Object::FindTimeSpanningLayerElements);
-    system->Process(&timeSpanningLayerElements, &findTimeSpanningLayerElementsParams, NULL, &filters);
+    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
+    system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
 
-    ArrayOfLayerElementPointPairs *spanningPoints = curve->GetSpanningPoints();
-    spanningPoints->clear();
+    ArrayOfLayerElementPointPairs *spannedPoints = curve->GetSpannedPoints();
+    spannedPoints->clear();
     std::vector<LayerElement *>::iterator it;
-    for (it = findTimeSpanningLayerElementsParams.m_spanningContent.begin();
-         it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); ++it) {
-        // We skip the start or end of the slur
-        if ((*it == slur->GetStart()) || (*it == slur->GetEnd())) continue;
+    for (auto &element : findSpannedLayerElementsParams.m_elements) {
 
-        Note *note = NULL;
-        // We keep only notes and chords for now
-        if (!(*it)->Is({ CHORD, NOTE })) continue;
-        // Also skip notes that are part of a chords since we already have the chord
-        if ((note = dynamic_cast<Note *>(*it)) && note->IsChordTone()) continue;
-        Point p;
-        spanningPoints->push_back(std::make_pair((*it), p));
+        Point pRotated;
+        Point pLeft;
+        pLeft.x = element->GetSelfLeft();
+        if ((pLeft.x > p1->x) && (pLeft.x < p2->x)) {
+            pLeft.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
+            spannedPoints->push_back(std::make_pair(element, std::make_pair(pLeft, pRotated)));
+        }
+        Point pRight;
+        pRight.x = element->GetSelfRight();
+        if ((pRight.x > p1->x) && (pRight.x < p2->x)) {
+            pRight.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
+            spannedPoints->push_back(std::make_pair(element, std::make_pair(pRight, pRotated)));
+        }
     }
 
     /************** angle **************/
 
-    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spanningPoints->size() > 0));
+    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spannedPoints->size() > 0));
     Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
 
     /************** control points **************/

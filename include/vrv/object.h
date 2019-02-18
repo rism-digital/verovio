@@ -510,9 +510,9 @@ public:
     virtual int FindSpaceInReferenceAlignments(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Retrieve the time spanning layer elements between two points
+     * Retrieve the layer elements spanned by two points
      */
-    virtual int FindTimeSpanningLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.

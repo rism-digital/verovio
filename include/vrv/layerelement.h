@@ -254,9 +254,9 @@ public:
     virtual int SetAlignmentPitchPos(FunctorParams *functorParams);
 
     /**
-     * See Object::FindTimeSpanningLayerElements
+     * See Object::FindSpannedLayerElements
      */
-    virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams);
+    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
 
     /**
      * See Object::CalcOnsetOffset

@@ -40,6 +40,7 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
+#include "slur.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -1397,14 +1398,30 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
+int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 {
-    FindTimeSpanningLayerElementsParams *params = dynamic_cast<FindTimeSpanningLayerElementsParams *>(functorParams);
+    FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
+    
+    if (!this->Is(params->m_classIds)) {
+        return FUNCTOR_CONTINUE;
+    }
 
     if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
         && (this->GetContentLeft() < params->m_maxPos)) {
-        params->m_spanningContent.push_back(this);
+        
+        // We skip the start or end of the slur
+        if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetStart()->HasChild(this) || this->HasChild(params->m_interface->GetStart())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetEnd()->HasChild(this) || this->HasChild(params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+        
+        params->m_elements.push_back(this);
     }
     else if (this->GetDrawingX() > params->m_maxPos) {
         return FUNCTOR_STOP;

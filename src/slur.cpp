@@ -119,7 +119,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     curvature_CURVEDIR curveDir = curve->GetDir();
     Point points[4];
     curve->GetPoints(points);
-    ArrayOfLayerElementPointPairs *spanningPoints = curve->GetSpanningPoints();
+    ArrayOfLayerElementPointPairs *spannedPoints = curve->GetSpannedPoints();
 
     // For readability
     Point *p1 = &points[0];
@@ -128,13 +128,13 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     Point rotatedC1 = BoundingBox::CalcPositionAfterRotation(points[1], -slurAngle, *p1);
     Point rotatedC2 = BoundingBox::CalcPositionAfterRotation(points[2], -slurAngle, *p1);
 
-    GetSpanningPointPositions(doc, spanningPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
+    GetSpannedPointPositions(doc, spannedPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
     bool adjusted = false;
-    if (!spanningPoints->empty()) {
+    if (!spannedPoints->empty()) {
 
         // Adjust the curvatur (control points are move)
-        int adjustedHeight = AdjustSlurCurve(doc, spanningPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir,
+        int adjustedHeight = AdjustSlurCurve(doc, spannedPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir,
             slurAngle, staff->m_drawingStaffSize, true);
 
         // The adjustedHeight value is 0 if everything fits within the slur
@@ -143,20 +143,18 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
             // The slur is being adjusted
             adjusted = true;
             // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-            AdjustSlurPosition(
-                doc, spanningPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, false);
+            AdjustSlurPosition( doc, spannedPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, false);
             // Re-calculate the control points with the new height
-            GetControlPoints(
-                doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
+            GetControlPoints( doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
         }
 
         // If we still have spanning points then move the slur but now by forcing both sides to be move
-        if (!spanningPoints->empty()) {
+        if (!spannedPoints->empty()) {
             // First re-calcuate the spanning point positions
-            GetSpanningPointPositions(doc, spanningPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
+            GetSpannedPointPositions(doc, spannedPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
             // Move it and force both sides to move
-            AdjustSlurPosition(doc, spanningPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
+            AdjustSlurPosition(doc, spannedPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
             GetControlPoints(
                 doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
         }
@@ -224,48 +222,27 @@ void Slur::GetControlPoints(
     }
 }
 
-void Slur::GetSpanningPointPositions(Doc *doc, ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle,
+void Slur::GetSpannedPointPositions(Doc *doc, ArrayOfLayerElementPointPairs *spannedPoints, Point p1, float angle,
     curvature_CURVEDIR curveDir, int staffSize)
 {
     ArrayOfLayerElementPointPairs::iterator itPoint;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); ++itPoint) {
-        Point p;
-        int margin = 2;
-        if (itPoint->first->Is({ CHORD, NOTE })) {
-            if (curveDir == curvature_CURVEDIR_above) {
-                p.y = itPoint->first->GetDrawingTop(doc, staffSize, true, ARTIC_PART_OUTSIDE);
-            }
-            else {
-                p.y = itPoint->first->GetDrawingBottom(doc, staffSize, true, ARTIC_PART_OUTSIDE);
-            }
-            p.x = itPoint->first->GetDrawingX();
-        }
-        else {
-            if (curveDir == curvature_CURVEDIR_above) {
-                p.y = itPoint->first->GetContentTop();
-            }
-            else {
-                p.y = itPoint->first->GetContentBottom();
-            }
-            margin = 0;
-            p.x = itPoint->first->GetContentLeft()
-                + ((itPoint->first->GetContentRight() - itPoint->first->GetContentLeft()) / 2);
-        }
+    for (itPoint = spannedPoints->begin(); itPoint != spannedPoints->end(); ++itPoint) {
+        int margin = 1;
         // Not sure if it is better to add the margin before or after the rotation...
         // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
-        itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
+        itPoint->second.second = BoundingBox::CalcPositionAfterRotation(itPoint->second.first, -angle, p1);
         // This would add it after
         if (curveDir == curvature_CURVEDIR_above) {
-            itPoint->second.y += doc->GetDrawingUnit(staffSize) * margin;
+            itPoint->second.second.y += doc->GetDrawingUnit(staffSize) * margin;
         }
         else {
-            itPoint->second.y -= doc->GetDrawingUnit(staffSize) * margin;
+            itPoint->second.second.y -= doc->GetDrawingUnit(staffSize) * margin;
         }
     }
 }
 
-int Slur::AdjustSlurCurve(Doc *doc, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
+int Slur::AdjustSlurCurve(Doc *doc, ArrayOfLayerElementPointPairs *spannedPoints, Point *p1, Point *p2, Point *c1,
     Point *c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio)
 {
     Point bezier[4];
@@ -297,38 +274,50 @@ int Slur::AdjustSlurCurve(Doc *doc, ArrayOfLayerElementPointPairs *spanningPoint
         float maxRatio = 1.0;
         float posXRatio = 1.0;
         int posX;
-        for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-            y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
+        for (itPoint = spannedPoints->begin(); itPoint != spannedPoints->end();) {
+            
+            if (itPoint->second.second.x < p1->x) {
+                //itPoint = spannedPoints->erase(itPoint);
+                ++itPoint;
+                continue;
+            }
+            if (itPoint->second.second.x > p2->x) {
+                //itPoint = spannedPoints->erase(itPoint);
+                ++itPoint;
+                continue;
+            }
+            
+            y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.second.x);
 
             // Weight the desired height according to the x position if wanted
             posXRatio = 1.0;
             if (posRatio && (dist != 0)) {
-                posX = itPoint->second.x - p1->x;
-                if (posX > dist / 2) posX = p2->x - itPoint->second.x;
+                posX = itPoint->second.second.x - p1->x;
+                if (posX > dist / 2) posX = p2->x - itPoint->second.second.x;
                 if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
             }
 
             // Keep the maximum desired ratio
             if (curveDir == curvature_CURVEDIR_above) {
-                if (y < itPoint->second.y) {
-                    float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
+                if (y < itPoint->second.second.y) {
+                    float ratio = (float)(p1->y - itPoint->second.second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
                     ++itPoint;
                 }
                 // The point is below, we can drop it
                 else {
-                    itPoint = spanningPoints->erase(itPoint);
+                    itPoint = spannedPoints->erase(itPoint);
                 }
             }
             else {
-                if (y > itPoint->second.y) {
-                    float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
+                if (y > itPoint->second.second.y) {
+                    float ratio = (float)(p1->y - itPoint->second.second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
                     ++itPoint;
                 }
                 // the point is above, we can drop it
                 else {
-                    itPoint = spanningPoints->erase(itPoint);
+                    itPoint = spannedPoints->erase(itPoint);
                 }
             }
         }
@@ -357,28 +346,28 @@ int Slur::AdjustSlurCurve(Doc *doc, ArrayOfLayerElementPointPairs *spanningPoint
     // Check if we need further adjustment of the points with the curve
     bezier[1] = *c1;
     bezier[2] = *c2;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
+    for (itPoint = spannedPoints->begin(); itPoint != spannedPoints->end();) {
+        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.second.x);
         if (curveDir == curvature_CURVEDIR_above) {
-            if (y >= itPoint->second.y)
-                itPoint = spanningPoints->erase(itPoint);
+            if (y >= itPoint->second.second.y)
+                itPoint = spannedPoints->erase(itPoint);
             else
                 ++itPoint;
         }
         else {
-            if (y <= itPoint->second.y)
-                itPoint = spanningPoints->erase(itPoint);
+            if (y <= itPoint->second.second.y)
+                itPoint = spannedPoints->erase(itPoint);
             else
                 ++itPoint;
         }
     }
 
-    if (!spanningPoints->empty()) return maxHeight;
+    if (!spannedPoints->empty()) return maxHeight;
 
     return 0;
 }
 
-void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
+void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spannedPoints, Point *p1, Point *p2, Point *c1,
     Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides)
 {
     Point bezier[4];
@@ -395,15 +384,29 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spanningP
     float posXRatio = 1.0;
 
     ArrayOfLayerElementPointPairs::iterator itPoint;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
+    for (itPoint = spannedPoints->begin(); itPoint != spannedPoints->end();) {
+        
+        
+        if (itPoint->second.second.x < p1->x) {
+            //itPoint = spannedPoints->erase(itPoint);
+            ++itPoint;
+            continue;
+        }
+        if (itPoint->second.second.x > p2->x) {
+            //itPoint = spannedPoints->erase(itPoint);
+            ++itPoint;
+            continue;
+        }
+        
+        
+        int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.second.x);
 
         // Weight the desired height according to the x position on the other side
         posXRatio = 1.0;
         bool leftPoint = true;
-        int posX = itPoint->second.x - p1->x;
+        int posX = itPoint->second.second.x - p1->x;
         if (posX > dist / 2) {
-            posX = p2->x - itPoint->second.x;
+            posX = p2->x - itPoint->second.second.x;
             leftPoint = false;
         }
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
@@ -411,13 +414,13 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spanningP
         shift = 0;
         // Keep the maximum shift on the left and right
         if (curveDir == curvature_CURVEDIR_above) {
-            if (y < itPoint->second.y) {
-                shift = (itPoint->second.y - p1->y) - (y - p1->y);
+            if (y < itPoint->second.second.y) {
+                shift = (itPoint->second.second.y - p1->y) - (y - p1->y);
             }
         }
         else {
-            if (y > itPoint->second.y) {
-                shift = (p1->y - itPoint->second.y) - (p1->y - y);
+            if (y > itPoint->second.second.y) {
+                shift = (p1->y - itPoint->second.second.y) - (p1->y - y);
             }
         }
         if (shift > 0) {
@@ -428,13 +431,13 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spanningP
             ++itPoint;
         }
         else {
-            // itPoint = spanningPoints->erase(itPoint);
+            // itPoint = spannedPoints->erase(itPoint);
             ++itPoint;
         }
     }
 
     // Actually nothing to do
-    if (spanningPoints->empty()) return;
+    if (spannedPoints->empty()) return;
 
     // Unrotated the slur
     *p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);

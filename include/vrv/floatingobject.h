@@ -276,7 +276,7 @@ public:
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
 
-    ArrayOfLayerElementPointPairs *GetSpanningPoints() { return &m_spanningPoints; }
+    ArrayOfLayerElementPointPairs *GetSpannedPoints() { return &m_spannedPoints; }
 
 private:
     //
@@ -294,7 +294,7 @@ private:
     curvature_CURVEDIR m_dir;
     ///@}
 
-    ArrayOfLayerElementPointPairs m_spanningPoints;
+    ArrayOfLayerElementPointPairs m_spannedPoints;
 
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
