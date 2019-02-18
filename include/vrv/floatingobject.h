@@ -236,7 +236,6 @@ public:
     char m_spanningType;
 };
 
-    
 //----------------------------------------------------------------------------
 // FloatingCurvePositioner
 //----------------------------------------------------------------------------
@@ -252,9 +251,10 @@ public:
     virtual ClassId GetClassId() const { return FLOATING_CURVE_POSITIONER; }
 
     virtual void ResetPositioner();
-    
+
     /**
-     * Reset the curve parameters in FloatingCurvePositioner::FloatingCurvePositioner and in FloatingCurvePositioner::ResetPositioner
+     * Reset the curve parameters in FloatingCurvePositioner::FloatingCurvePositioner and in
+     * FloatingCurvePositioner::ResetPositioner
      */
     void ResetCurveParams();
 
@@ -265,7 +265,7 @@ public:
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
     int CalcMinMaxY(const Point points[4]);
-    
+
     /**
      * @name Getters for the current parameters
      */
@@ -275,6 +275,8 @@ public:
     int GetThickness() { return m_thickness; }
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
+
+    ArrayOfLayerElementPointPairs *GetSpanningPoints() { return &m_spanningPoints; }
 
 private:
     //
@@ -291,11 +293,13 @@ private:
     int m_thickness;
     curvature_CURVEDIR m_dir;
     ///@}
-    
+
+    ArrayOfLayerElementPointPairs m_spanningPoints;
+
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
 };
-    
+
 } // namespace vrv
 
 #endif

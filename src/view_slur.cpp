@@ -42,12 +42,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     assert(dc);
     assert(slur);
     assert(staff);
-    
+
     FloatingPositioner *positioner = slur->GetCurrentFloatingPositioner();
     assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
     FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(positioner);
     assert(curve);
-    
+
     if (curve->GetDir() == curvature_CURVEDIR_NONE) {
         this->DrawSlurInitial(curve, slur, x1, x2, staff, spanningType);
     }
@@ -76,7 +76,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else
         dc->EndGraphic(slur, this);
 }
-    
+
 void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType)
 {
     Beam *parentBeam = NULL;
@@ -86,7 +86,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     Note *endNote = NULL;
     Chord *startChord = NULL;
     Chord *endChord = NULL;
-    
+
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
@@ -94,22 +94,22 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     bool isGraceToNoteSlur = false;
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
-    
+
     /************** parent layers **************/
-    
+
     LayerElement *start = dynamic_cast<LayerElement *>(slur->GetStart());
     LayerElement *end = dynamic_cast<LayerElement *>(slur->GetEnd());
-    
+
     if (!start || !end) {
         // no start and end, obviously nothing to do...
         return;
     }
-    
+
     if (start->Is(TIMESTAMP_ATTR) && end->Is(TIMESTAMP_ATTR)) {
         // for now ignore slur using 2 tstamps
         return;
     }
-    
+
     if (start->Is(NOTE)) {
         startNote = dynamic_cast<Note *>(start);
         assert(startNote);
@@ -132,11 +132,11 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
     }
-    
+
     if (startNote && endNote && startNote->IsGraceNote() && !endNote->IsGraceNote()) {
         isGraceToNoteSlur = true;
     }
-    
+
     Layer *layer = NULL;
     LayerElement *layerElement = NULL;
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
@@ -149,7 +149,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         layerElement = end;
     }
     assert(layer);
-    
+
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
         System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
         assert(system);
@@ -159,21 +159,21 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
         }
     }
-    
+
     /************** calculate the radius for adjusting the x position **************/
-    
+
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
     }
-    
+
     int endRadius = 0;
     if (!end->Is(TIMESTAMP_ATTR)) {
         endRadius = end->GetDrawingRadius(m_doc);
     }
-    
+
     /************** note stem dir **************/
-    
+
     if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
     }
@@ -190,15 +190,15 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     else {
         stemDir = STEMDIRECTION_down;
     }
-    
+
     /************** direction **************/
-    
+
     data_STEMDIRECTION layerStemDir;
-    
+
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
         drawingCurveDir
-        = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // grace notes - always below unless we have a drawing stem direction on the layer
     else if (isGraceToNoteSlur && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
@@ -233,12 +233,12 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         drawingCurveDir = (start->GetDrawingY() > center) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
-    
+
     /************** adjusting y position **************/
-    
+
     bool isShortSlur = false;
     if (x2 - x1 < 1 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
-    
+
     int yChordMax, yChordMin;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
@@ -360,7 +360,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             }
         }
     }
-    
+
     // Positions not attached to a note
     if (spanningType == SPANNING_START) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
@@ -395,9 +395,9 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             y1 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
         y2 = y1;
     }
-    
+
     /************** y position **************/
-    
+
     if (drawingCurveDir == curvature_CURVEDIR_above) {
         y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -406,30 +406,23 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
         y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-    
+
     Point points[4];
     points[0] = Point(x1, y1);
     points[3] = Point(x2, y2);
-    
-    /*
-     assert(slur->GetCurrentFloatingPositioner());
-     slur->GetCurrentFloatingPositioner();
-     FloatingPositioner curve = *slur->GetCurrentFloatingPositioner();
-     *slur->GetCurrentFloatingPositioner() = curve;
-     */
-    
-    float angle = AdjustSlur(slur, staff, layer->GetN(), drawingCurveDir, points);
+
+    float angle = CalcInitialSlur(curve, slur, staff, layer->GetN(), drawingCurveDir, points);
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
-    
+
     curve->UpdateCurveParams(points, angle, thickness, drawingCurveDir);
-    
+
     /************** articulation **************/
-    
+
     // First get all artic children
     AttComparison matchType(ARTIC);
     ArrayOfObjects artics;
     ArrayOfObjects::iterator articIter;
-    
+
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         start->FindAllChildByComparison(&artics, &matchType);
@@ -444,7 +437,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
                     outsidePart->AddSlurPositioner(curve, true);
                 }
                 else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                         && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(curve, true);
                 }
             }
@@ -464,17 +457,18 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
                     outsidePart->AddSlurPositioner(curve, false);
                 }
                 else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                         && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(curve, false);
                 }
             }
         }
     }
-    
+
     return;
 }
 
-float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
+float View::CalcInitialSlur(
+    FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
 {
     // For readability makes them p1 and p2
     Point *p1 = &points[0];
@@ -515,9 +509,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
     Functor timeSpanningLayerElements(&Object::FindTimeSpanningLayerElements);
     system->Process(&timeSpanningLayerElements, &findTimeSpanningLayerElementsParams, NULL, &filters);
-    // if (spanningContent.size() > 12) LogDebug("### %d %s", spanningContent.size(), slur->GetUuid().c_str());
 
-    ArrayOfLayerElementPointPairs spanningContentPoints;
+    ArrayOfLayerElementPointPairs *spanningPoints = curve->GetSpanningPoints();
+    spanningPoints->clear();
     std::vector<LayerElement *>::iterator it;
     for (it = findTimeSpanningLayerElementsParams.m_spanningContent.begin();
          it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); ++it) {
@@ -526,340 +520,28 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
         Note *note = NULL;
         // We keep only notes and chords for now
-        if (!(*it)->Is({ CHORD, NOTE, TUPLET_BRACKET })) continue;
+        if (!(*it)->Is({ CHORD, NOTE })) continue;
         // Also skip notes that are part of a chords since we already have the chord
         if ((note = dynamic_cast<Note *>(*it)) && note->IsChordTone()) continue;
         Point p;
-        spanningContentPoints.push_back(std::make_pair((*it), p));
+        spanningPoints->push_back(std::make_pair((*it), p));
     }
 
     /************** angle **************/
 
-    float slurAngle = GetAdjustedSlurAngle(p1, p2, curveDir, (spanningContentPoints.size() > 0));
-
+    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spanningPoints->size() > 0));
     Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
-    // LogDebug("P1 %d %d, P2 %d %d, Angle %f, Pres %d %d", x1, y1, x2, y2, slurAnge, rotadedP2.x, rotatedP2.y);
 
     /************** control points **************/
 
     Point rotatedC1, rotatedC2;
-    GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
-
-    GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
-
-    if (!spanningContentPoints.empty()) {
-
-        // Adjust the curvatur (control points are move)
-        int adjustedHeight = AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2,
-            curveDir, slurAngle, staff->m_drawingStaffSize, true);
-
-        // The adjustedHeight value is 0 if everything fits within the slur
-        // If not we need to move its position
-        if (adjustedHeight != 0) {
-            // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-            AdjustSlurPosition(
-                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, false);
-            // Re-calculate the control points with the new height
-            GetControlPoints(
-                p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
-        }
-
-        // If we still have spanning points then move the slur but now by forcing both sides to be move
-        if (!spanningContentPoints.empty()) {
-            // First re-calcuate the spanning point positions
-            GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
-
-            // Move it and force both sides to move
-            AdjustSlurPosition(
-                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
-            GetControlPoints(
-                p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
-        }
-    }
+    slur->GetControlPoints(m_doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
     points[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
     points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
     points[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
 
     return slurAngle;
-}
-
-float View::GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveDir, bool withPoints)
-{
-    float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
-    float maxSlope = (float)m_options->m_slurMaxSlope.GetValue() * M_PI / 180.0;
-
-    // For slurs without spanning points allow for double angle
-    // This normally looks better with slurs with two notes and high ambitus
-    if (!withPoints) maxSlope *= 2.0;
-
-    // the slope of the slur is high and needs to be corrected
-    if (fabs(slurAngle) > maxSlope) {
-        int side = (p2->x - p1->x) * sin(maxSlope) / sin(M_PI / 2 - maxSlope);
-        if (p2->y > p1->y) {
-            if (curveDir == curvature_CURVEDIR_above)
-                p1->y = p2->y - side;
-            else
-                p2->y = p1->y + side;
-            slurAngle = maxSlope;
-        }
-        else {
-            if (curveDir == curvature_CURVEDIR_above)
-                p2->y = p1->y - side;
-            else
-                p1->y = p2->y + side;
-            slurAngle = -maxSlope;
-        }
-    }
-
-    return slurAngle;
-}
-
-void View::GetControlPoints(
-    Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize)
-{
-    // Set the x position of the control points
-    int cPos
-        = std::min((p2->x - p1->x) / m_options->m_slurControlPoints.GetValue(), m_doc->GetDrawingStaffSize(staffSize));
-    c1->x = p1->x + cPos;
-    c2->x = p2->x - cPos;
-
-    if (curveDir == curvature_CURVEDIR_above) {
-        c1->y = p1->y + height;
-        c2->y = p2->y + height;
-    }
-    else {
-        c1->y = p1->y - height;
-        c2->y = p2->y - height;
-    }
-}
-
-void View::GetSpanningPointPositions(
-    ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, curvature_CURVEDIR curveDir, int staffSize)
-{
-    ArrayOfLayerElementPointPairs::iterator itPoint;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); ++itPoint) {
-        Point p;
-        int margin = 2;
-        if (itPoint->first->Is({ CHORD, NOTE })) {
-            if (curveDir == curvature_CURVEDIR_above) {
-                p.y = itPoint->first->GetDrawingTop(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
-            }
-            else {
-                p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
-            }
-            p.x = itPoint->first->GetDrawingX();
-        }
-        else {
-            if (curveDir == curvature_CURVEDIR_above) {
-                p.y = itPoint->first->GetContentTop();
-            }
-            else {
-                p.y = itPoint->first->GetContentBottom();
-            }
-            margin = 0;
-            p.x = itPoint->first->GetContentLeft()
-                + ((itPoint->first->GetContentRight() - itPoint->first->GetContentLeft()) / 2);
-        }
-        // Not sure if it is better to add the margin before or after the rotation...
-        // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
-        // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
-        itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
-        // This would add it after
-        if (curveDir == curvature_CURVEDIR_above) {
-            itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * margin;
-        }
-        else {
-            itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * margin;
-        }
-    }
-}
-
-int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-    Point *c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio)
-{
-    Point bezier[4];
-    bezier[0] = *p1;
-    bezier[1] = *c1;
-    bezier[2] = *c2;
-    bezier[3] = *p2;
-
-    ArrayOfLayerElementPointPairs::iterator itPoint;
-    int y;
-
-    int dist = abs(p2->x - p1->x);
-    int currentHeight = abs(c1->y - p1->y);
-    int maxHeight = 0;
-
-    // 0.2 for avoiding / by 0 (below)
-    float maxHeightFactor = std::max(0.2f, fabsf(angle));
-    maxHeight = dist
-        / (maxHeightFactor
-              * (m_options->m_slurCurveFactor.GetValue()
-                    + 5)); // 5 is the minimum - can be increased for limiting curvature
-
-    maxHeight = std::max(maxHeight, currentHeight);
-    maxHeight = std::min(maxHeight, m_doc->GetDrawingOctaveSize(staffSize));
-
-    bool hasReachedMaxHeight = false;
-
-    if (maxHeight > currentHeight) {
-        float maxRatio = 1.0;
-        float posXRatio = 1.0;
-        int posX;
-        for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-            y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
-
-            // Weight the desired height according to the x position if wanted
-            posXRatio = 1.0;
-            if (posRatio && (dist != 0)) {
-                posX = itPoint->second.x - p1->x;
-                if (posX > dist / 2) posX = p2->x - itPoint->second.x;
-                if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
-            }
-
-            // Keep the maximum desired ratio
-            if (curveDir == curvature_CURVEDIR_above) {
-                if (y < itPoint->second.y) {
-                    float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
-                    maxRatio = ratio > maxRatio ? ratio : maxRatio;
-                    ++itPoint;
-                }
-                // The point is below, we can drop it
-                else {
-                    itPoint = spanningPoints->erase(itPoint);
-                }
-            }
-            else {
-                if (y > itPoint->second.y) {
-                    float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
-                    maxRatio = ratio > maxRatio ? ratio : maxRatio;
-                    ++itPoint;
-                }
-                // the point is above, we can drop it
-                else {
-                    itPoint = spanningPoints->erase(itPoint);
-                }
-            }
-        }
-
-        // We should not adjust it more than the maximum height
-        int desiredHeight = currentHeight * maxRatio;
-        if (desiredHeight > maxHeight) {
-            hasReachedMaxHeight = true;
-            maxRatio = (float)maxHeight / (float)currentHeight;
-        }
-
-        if (maxRatio > 1.0) {
-            if (curveDir == curvature_CURVEDIR_above) {
-                c1->y = p1->y + currentHeight * maxRatio;
-                c2->y = c1->y;
-            }
-            else {
-                c1->y = p1->y - currentHeight * maxRatio;
-                c2->y = c1->y;
-            }
-        }
-    }
-
-    if (hasReachedMaxHeight) return maxHeight;
-
-    // Check if we need further adjustment of the points with the curve
-    bezier[1] = *c1;
-    bezier[2] = *c2;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
-        if (curveDir == curvature_CURVEDIR_above) {
-            if (y >= itPoint->second.y)
-                itPoint = spanningPoints->erase(itPoint);
-            else
-                ++itPoint;
-        }
-        else {
-            if (y <= itPoint->second.y)
-                itPoint = spanningPoints->erase(itPoint);
-            else
-                ++itPoint;
-        }
-    }
-
-    if (!spanningPoints->empty()) return maxHeight;
-
-    return 0;
-}
-
-void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2,
-    Point *c1, Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides)
-{
-    Point bezier[4];
-    bezier[0] = *p1;
-    bezier[1] = *c1;
-    bezier[2] = *c2;
-    bezier[3] = *p2;
-
-    int maxShiftLeft = 0;
-    int maxShiftRight = 0;
-    int shift, leftShift, rightShift;
-
-    int dist = abs(p2->x - p1->x);
-    float posXRatio = 1.0;
-
-    ArrayOfLayerElementPointPairs::iterator itPoint;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
-
-        // Weight the desired height according to the x position on the other side
-        posXRatio = 1.0;
-        bool leftPoint = true;
-        int posX = itPoint->second.x - p1->x;
-        if (posX > dist / 2) {
-            posX = p2->x - itPoint->second.x;
-            leftPoint = false;
-        }
-        if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
-
-        shift = 0;
-        // Keep the maximum shift on the left and right
-        if (curveDir == curvature_CURVEDIR_above) {
-            if (y < itPoint->second.y) {
-                shift = (itPoint->second.y - p1->y) - (y - p1->y);
-            }
-        }
-        else {
-            if (y > itPoint->second.y) {
-                shift = (p1->y - itPoint->second.y) - (p1->y - y);
-            }
-        }
-        if (shift > 0) {
-            leftShift = (forceBothSides || leftPoint) ? shift : shift * posXRatio;
-            rightShift = (forceBothSides || !leftPoint) ? shift : shift * posXRatio;
-            maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
-            maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
-            ++itPoint;
-        }
-        else {
-            // itPoint = spanningPoints->erase(itPoint);
-            ++itPoint;
-        }
-    }
-
-    // Actually nothing to do
-    if (spanningPoints->empty()) return;
-
-    // Unrotated the slur
-    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);
-
-    if (curveDir == curvature_CURVEDIR_above) {
-        p1->y += maxShiftLeft;
-        p2->y += maxShiftRight;
-    }
-    else {
-        p1->y -= maxShiftLeft;
-        p2->y -= maxShiftRight;
-    }
-
-    *angle = GetAdjustedSlurAngle(p1, p2, curveDir, true);
-    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
 } // namespace vrv

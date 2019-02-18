@@ -528,8 +528,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
     if (p1.x > this->GetContentRight()) return 0;
 
     Point topBezier[4], bottomBezier[4];
-    BoundingBox::CalcThickBezier(
-        points, curve->GetThickness(), curve->GetAngle(), topBezier, bottomBezier);
+    BoundingBox::CalcThickBezier(points, curve->GetThickness(), curve->GetAngle(), topBezier, bottomBezier);
 
     // The curve overflows on both sides
     if ((p1.x < this->GetContentLeft()) && p2.x > this->GetContentRight()) {

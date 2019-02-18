@@ -209,6 +209,11 @@ public:
     virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustSlurs
+     */
+    virtual int AdjustSlurs(FunctorParams *functorParams);
+
+    /**
      * See Object::CastOffPages
      */
     virtual int CastOffPages(FunctorParams *functorParams);

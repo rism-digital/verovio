@@ -215,6 +215,27 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustFloatingPositionerGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector of the classId to group
+ * member 1: the doc
+ **/
+
+class AdjustFloatingPositionerGrpsParams : public FunctorParams {
+public:
+    AdjustFloatingPositionerGrpsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_place = STAFFREL_basic_above;
+    }
+    std::vector<ClassId> m_classIds;
+    data_STAFFREL_basic m_place;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustLayersParams
 //----------------------------------------------------------------------------
 
@@ -251,24 +272,25 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPositionerGrpsParams
+// AdjustSlursParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a vector of the classId to group
  * member 1: the doc
+ * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
-class AdjustFloatingPositionerGrpsParams : public FunctorParams {
+class AdjustSlursParams : public FunctorParams {
 public:
-    AdjustFloatingPositionerGrpsParams(Doc *doc)
+    AdjustSlursParams(Doc *doc, Functor *functor)
     {
+        m_adjusted = false;
         m_doc = doc;
-        m_place = STAFFREL_basic_above;
+        m_functor = functor;
     }
-    std::vector<ClassId> m_classIds;
-    data_STAFFREL_basic m_place;
+    bool m_adjusted;
     Doc *m_doc;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------

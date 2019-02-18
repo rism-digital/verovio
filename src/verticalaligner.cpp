@@ -219,7 +219,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        if (object->Is({SLUR, TIE})) {
+        if (object->Is({ SLUR, TIE })) {
             positioner = new FloatingCurvePositioner(object, this, spanningType);
             m_floatingPositioners.push_back(positioner);
         }
@@ -361,7 +361,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
             FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
             assert(curve);
-            
+
             bool skipAbove = false;
             bool skipBelow = false;
 
@@ -498,6 +498,34 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
         else {
             int overflowBelow = this->CalcOverflowBelow((*iter));
             this->SetOverflowBelow(overflowBelow);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
+{
+    AdjustSlursParams *params = dynamic_cast<AdjustSlursParams *>(functorParams);
+    assert(params);
+
+    ArrayOfFloatingPositioners::iterator iter;
+    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
+        assert((*iter)->GetObject());
+        if (!(*iter)->GetObject()->Is(SLUR)) continue;
+        Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
+        assert(slur);
+
+        assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
+        FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+        assert(curve);
+
+        // Skip if no content bounding box is available
+        if (!curve->HasContentBB()) continue;
+
+        bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
+        if (adjusted) {
+            params->m_adjusted = true;
         }
     }
 

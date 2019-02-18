@@ -385,7 +385,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     }
     return true;
 }
-    
+
 //----------------------------------------------------------------------------
 // FloatingCurvePositioner
 //----------------------------------------------------------------------------
@@ -395,7 +395,7 @@ FloatingCurvePositioner::FloatingCurvePositioner(FloatingObject *object, StaffAl
 {
     ResetCurveParams();
 }
-    
+
 void FloatingCurvePositioner::ResetPositioner()
 {
     FloatingPositioner::ResetPositioner();
@@ -414,7 +414,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_dir = curvature_CURVEDIR_NONE;
     m_cachedMinMaxY = VRV_UNSET;
 }
-    
+
 void FloatingCurvePositioner::UpdateCurveParams(
     const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
 {
@@ -432,7 +432,7 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_dir = curveDir;
     m_cachedMinMaxY = VRV_UNSET;
 }
-    
+
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
@@ -449,7 +449,7 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 
     return m_cachedMinMaxY;
 }
-    
+
 void FloatingCurvePositioner::GetPoints(Point points[4])
 {
     points[0] = m_points[0];

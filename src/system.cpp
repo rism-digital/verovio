@@ -624,6 +624,16 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int System::AdjustSlurs(FunctorParams *functorParams)
+{
+    AdjustSlursParams *params = dynamic_cast<AdjustSlursParams *>(functorParams);
+    assert(params);
+
+    m_systemAligner.Process(params->m_functor, params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int System::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = dynamic_cast<CastOffPagesParams *>(functorParams);

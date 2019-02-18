@@ -221,6 +221,11 @@ public:
      */
     virtual int AdjustFloatingPositionerGrps(FunctorParams *functorParams);
 
+    /**
+     * See Object::AdjustSlurs
+     */
+    virtual int AdjustSlurs(FunctorParams *functorParams);
+
 private:
     //
 public:

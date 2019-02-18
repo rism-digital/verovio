@@ -387,6 +387,17 @@ void Page::LayOutVertically()
     Functor adjustTupletsY(&Object::AdjustTupletsY);
     this->Process(&adjustTupletsY, &adjustTupletsYParams);
 
+    // Adjust the position of the slurs
+    Functor adjustSlurs(&Object::AdjustSlurs);
+    AdjustSlursParams adjustSlursParams(doc, &adjustSlurs);
+    this->Process(&adjustSlurs, &adjustSlursParams);
+
+    // If slurs were adjusted we need to redraw to adjust the bounding boxes
+    if (adjustSlursParams.m_adjusted) {
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
+
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);
     Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
