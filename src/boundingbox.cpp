@@ -511,7 +511,7 @@ bool BoundingBox::Encloses(const Point point) const
     return true;
 }
 
-int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
+int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int margin) const
 {
     assert(curve);
     assert(curve->GetObject());
@@ -524,134 +524,134 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, int margin) const
     Point p2 = points[3];
 
     // first check if they overlap at all
-    if (p2.x < this->GetContentLeft()) return 0;
-    if (p1.x > this->GetContentRight()) return 0;
+    if (p2.x < this->GetLeftBy(type)) return 0;
+    if (p1.x > this->GetRightBy(type)) return 0;
 
     Point topBezier[4], bottomBezier[4];
     BoundingBox::CalcThickBezier(points, curve->GetThickness(), curve->GetAngle(), topBezier, bottomBezier);
 
     // The curve overflows on both sides
-    if ((p1.x < this->GetContentLeft()) && p2.x > this->GetContentRight()) {
+    if ((p1.x < this->GetLeftBy(type)) && p2.x > this->GetRightBy(type)) {
         // LogDebug("overflows both sides");
         if (curve->GetDir() == curvature_CURVEDIR_above) {
             // The curve is already below the content
-            if ((curve->GetContentTop() + margin) < this->GetContentBottom()) return 0;
+            if ((curve->GetTopBy(type) + margin) < this->GetBottomBy(type)) return 0;
             int xMaxY = curve->CalcMinMaxY(topBezier);
-            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) + margin;
-            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight() + margin);
+            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetLeftBy(type)) + margin;
+            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetRightBy(type)) + margin;
             // Everything is underneath
-            if ((leftY >= this->GetContentTop()) && (rightY >= this->GetContentTop())) return 0;
+            if ((leftY >= this->GetTopBy(type)) && (rightY >= this->GetTopBy(type))) return 0;
             // Recalculate for above
-            leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) + margin;
-            rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) + margin;
+            leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetLeftBy(type)) + margin;
+            rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetRightBy(type)) + margin;
             // The box is above the summit of the curve
-            if ((this->GetContentLeft() < (p1.x + xMaxY)) && (this->GetContentRight() > (p1.x + xMaxY)))
-                return (curve->GetContentTop() - this->GetContentBottom() + margin);
+            if ((this->GetLeftBy(type) < (p1.x + xMaxY)) && (this->GetRightBy(type) > (p1.x + xMaxY)))
+                return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
             // The content is on the left
-            if (this->GetContentRight() < (p1.x + xMaxY))
-                return (rightY - this->GetContentBottom());
+            if (this->GetRightBy(type) < (p1.x + xMaxY))
+                return (rightY - this->GetBottomBy(type));
             else
-                return (leftY - this->GetContentBottom());
+                return (leftY - this->GetBottomBy(type));
         }
         else {
             // The curve is already above the content
-            if ((curve->GetContentBottom() - margin) > this->GetContentTop()) return 0;
+            if ((curve->GetBottomBy(type) - margin) > this->GetTopBy(type)) return 0;
             int xMinY = curve->CalcMinMaxY(bottomBezier);
             // Check if the box is above
-            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) - margin;
-            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) - margin;
-            if ((leftY <= this->GetContentBottom()) && (rightY <= this->GetContentBottom())) return 0;
+            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetLeftBy(type)) - margin;
+            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetRightBy(type)) - margin;
+            if ((leftY <= this->GetBottomBy(type)) && (rightY <= this->GetBottomBy(type))) return 0;
             // Recalculate for below
-            leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) - margin;
-            rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight()) - margin;
+            leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetLeftBy(type)) - margin;
+            rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetRightBy(type)) - margin;
             // The box is above the summit of the curve
-            if ((this->GetContentLeft() < (p1.x + xMinY)) && (this->GetContentRight() > (p1.x + xMinY)))
-                return (curve->GetContentBottom() - this->GetContentTop() - margin);
+            if ((this->GetLeftBy(type) < (p1.x + xMinY)) && (this->GetRightBy(type) > (p1.x + xMinY)))
+                return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
             // The content is on the left
-            if (this->GetContentRight() < (p1.x + xMinY))
-                return (rightY - this->GetContentTop());
+            if (this->GetRightBy(type) < (p1.x + xMinY))
+                return (rightY - this->GetTopBy(type));
             else
-                return (leftY - this->GetContentTop());
+                return (leftY - this->GetTopBy(type));
         }
     }
     // The curve overflows on the left
-    else if ((p1.x < this->GetContentLeft()) && p2.x <= this->GetContentRight()) {
-        // LogDebug("left T-L %d %d ; B-R %d %d", this->GetContentTop(), this->GetContentLeft(),
-        // this->GetContentBottom(), this->GetContentRight());
+    else if ((p1.x < this->GetLeftBy(type)) && p2.x <= this->GetRightBy(type)) {
+        // LogDebug("left T-L %d %d ; B-R %d %d", this->GetTopBy(type), this->GetLeftBy(type),
+        // this->GetBottom(), this->GetRight());
         if (curve->GetDir() == curvature_CURVEDIR_above) {
             int xMaxY = curve->CalcMinMaxY(topBezier);
             // The starting point is above the top
-            if (p2.y > this->GetContentTop() + margin) return 0;
+            if (p2.y > this->GetTopBy(type) + margin) return 0;
             // The left point is beyond (before) the summit of the curve
-            if (this->GetContentLeft() < (p1.x + xMaxY))
-                return (curve->GetContentTop() - this->GetContentBottom() + margin);
+            if (this->GetLeftBy(type) < (p1.x + xMaxY))
+                return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
             // Calcultate the Y position of the curve one the left
-            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) + margin;
-            // LogDebug("leftY %d, %d, %d", leftY, this->GetContentBottom(), this->GetContentTop());
+            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetLeftBy(type)) + margin;
+            // LogDebug("leftY %d, %d, %d", leftY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content left is below the bottom
-            if (leftY < this->GetContentBottom()) return 0;
+            if (leftY < this->GetBottomBy(type)) return 0;
             // Else return the shift needed
-            return (leftY - this->GetContentBottom());
+            return (leftY - this->GetBottomBy(type));
         }
         else {
             int xMinY = curve->CalcMinMaxY(topBezier);
             // The starting point is below the bottom
-            if (p2.y < this->GetContentBottom() + margin) return 0;
+            if (p2.y < this->GetBottomBy(type) + margin) return 0;
             // The left point is beyond (before) the summit of the curve
-            if (this->GetContentLeft() < (p1.x + xMinY))
-                return (curve->GetContentBottom() - this->GetContentTop() - margin);
+            if (this->GetLeftBy(type) < (p1.x + xMinY))
+                return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
             // Calcultate the Y position of the curve one the left
-            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) - margin;
-            // LogDebug("leftY %d, %d, %d", leftY, this->GetContentBottom(), this->GetContentTop());
+            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetLeftBy(type)) - margin;
+            // LogDebug("leftY %d, %d, %d", leftY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content left is above the top
-            if (leftY > this->GetContentTop()) return 0;
+            if (leftY > this->GetTopBy(type)) return 0;
             // Else return the shift needed
-            return (leftY - this->GetContentTop());
+            return (leftY - this->GetTopBy(type));
         }
     }
     // The curve overflows on the right
-    else if ((p1.x >= this->GetContentLeft()) && p2.x > this->GetContentRight()) {
-        // LogDebug("right T-L %d %d ; B-R %d %d", this->GetContentTop(), this->GetContentLeft(),
-        // this->GetContentBottom(), this->GetContentRight());
+    else if ((p1.x >= this->GetLeftBy(type)) && p2.x > this->GetRightBy(type)) {
+        // LogDebug("right T-L %d %d ; B-R %d %d", this->GetTopBy(type), this->GetLeftBy(type),
+        // this->GetBottomBy(type), this->GetRightBy(type));
         if (curve->GetDir() == curvature_CURVEDIR_above) {
             int xMaxY = curve->CalcMinMaxY(topBezier);
             // The starting point is above the top
-            if (p1.y > this->GetContentTop() + margin) return 0;
+            if (p1.y > this->GetTopBy(type) + margin) return 0;
             // The right point is beyond the summit of the curve
-            if (this->GetContentRight() > (p1.x + xMaxY))
-                return (curve->GetContentTop() - this->GetContentBottom() + margin);
+            if (this->GetRightBy(type) > (p1.x + xMaxY))
+                return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
             // Calcultate the Y position of the curve one the right
-            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) + margin;
-            // LogDebug("rightY %d, %d, %d", rightY, this->GetContentBottom(), this->GetContentTop());
+            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetRightBy(type)) + margin;
+            // LogDebug("rightY %d, %d, %d", rightY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content right is below the bottom
-            if (rightY < this->GetContentBottom()) return 0;
+            if (rightY < this->GetBottomBy(type)) return 0;
             // Return the shift needed
-            return (rightY - this->GetContentBottom());
+            return (rightY - this->GetBottomBy(type));
         }
         else {
             int xMinY = curve->CalcMinMaxY(bottomBezier);
             // The starting point is below the bottom
-            if (p1.y < this->GetContentBottom() + margin) return 0;
+            if (p1.y < this->GetBottomBy(type) + margin) return 0;
             // The right point is beyond the summit of the curve
-            if (this->GetContentRight() > (p1.x + xMinY))
-                return (curve->GetContentBottom() - this->GetContentTop() - margin);
+            if (this->GetRightBy(type) > (p1.x + xMinY))
+                return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
             // Calcultate the Y position of the curve one the right
-            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight()) - margin;
-            // LogDebug("rightY %d, %d, %d", rightY, this->GetContentBottom(), this->GetContentTop());
+            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetRightBy(type)) - margin;
+            // LogDebug("rightY %d, %d, %d", rightY, this->GetBottomBy(type), this->GetTopBy(type));
             // The content right is above the top
-            if (rightY > this->GetContentTop()) return 0;
+            if (rightY > this->GetTopBy(type)) return 0;
             // Return the shift needed
-            return (rightY - this->GetContentTop());
+            return (rightY - this->GetTopBy(type));
         }
     }
     // The curve in inside the left and right side of the content
-    else if ((p1.x >= this->GetContentLeft()) && p2.x <= this->GetContentRight()) {
+    else if ((p1.x >= this->GetLeftBy(type)) && p2.x <= this->GetRightBy(type)) {
         // LogDebug("inside");
         if (curve->GetDir() == curvature_CURVEDIR_above) {
-            return (curve->GetContentTop() - this->GetContentBottom() + margin);
+            return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
         }
         else {
-            return (curve->GetContentBottom() - this->GetContentTop() - margin);
+            return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
         }
     }
     else {

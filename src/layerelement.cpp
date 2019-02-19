@@ -1402,14 +1402,14 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 {
     FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
-    
+
     if (!this->Is(params->m_classIds)) {
         return FUNCTOR_CONTINUE;
     }
 
     if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
         && (this->GetContentLeft() < params->m_maxPos)) {
-        
+
         // We skip the start or end of the slur
         if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
             return FUNCTOR_CONTINUE;
@@ -1420,7 +1420,7 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
         if (params->m_interface->GetEnd()->HasChild(this) || this->HasChild(params->m_interface->GetEnd())) {
             return FUNCTOR_CONTINUE;
         }
-        
+
         params->m_elements.push_back(this);
     }
     else if (this->GetDrawingX() > params->m_maxPos) {

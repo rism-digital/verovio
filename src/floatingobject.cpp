@@ -343,7 +343,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 
         if (this->m_place == STAFFREL_basic_above) {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
-                int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
+                int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     // LogDebug("Shift %d", shift);
@@ -363,7 +363,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
         else {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
-                int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
+                int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     // LogDebug("Shift %d", shift);

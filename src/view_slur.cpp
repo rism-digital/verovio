@@ -511,7 +511,7 @@ float View::CalcInitialSlur(
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
     findSpannedLayerElementsParams.m_minPos = p1->x;
     findSpannedLayerElementsParams.m_maxPos = p2->x;
-    findSpannedLayerElementsParams.m_classIds = { ARTIC, CHORD, FLAG, NOTE, STEM, TUPLET_NUM };
+    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
