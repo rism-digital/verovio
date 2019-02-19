@@ -60,9 +60,21 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else
         dc->StartGraphic(slur, "spanning-slur", "");
 
-    DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle());
-
     /* drawing debug points */
+    if (dc->Is(SVG_DEVICE_CONTEXT)) {
+        int colors[4] = {AxRED, AxGREEN, AxBLUE, AxCYAN};
+        int stages = (int)curve->m_stages.size() / 4;
+        for (int i = 0; i < stages; i++) {
+            Point points[4];
+            curve->GetPoints(points, i);
+            m_currentColour = colors[i];
+            DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle());
+        }
+        m_currentColour = AxBLACK;
+    }
+    else {
+        DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle());
+    }
     /*
     int i;
     for (i = 0; i <= 10; ++i) {

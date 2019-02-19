@@ -270,7 +270,7 @@ public:
      * @name Getters for the current parameters
      */
     ///@{
-    void GetPoints(Point points[4]);
+    void GetPoints(Point points[4], int stage = -1);
     float GetAngle() { return m_angle; }
     int GetThickness() { return m_thickness; }
     curvature_CURVEDIR GetDir() { return m_dir; }
@@ -282,6 +282,7 @@ private:
     //
 public:
     //
+    std::vector<Point > m_stages;
 private:
     /**
      * @name Current parameters.

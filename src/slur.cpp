@@ -136,16 +136,26 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         // Adjust the curvatur (control points are move)
         int adjustedHeight = AdjustSlurCurve(doc, spannedPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir,
             slurAngle, staff->m_drawingStaffSize, true);
+        
+        adjusted = true;
+        
+        Point points2[4];
+        points2[0] = *p1;
+        points2[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
+        points2[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+        points2[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+        curve->UpdateCurveParams(points2, slurAngle, curve->GetThickness(), curveDir);
 
+        
         // The adjustedHeight value is 0 if everything fits within the slur
         // If not we need to move its position
         if (adjustedHeight != 0) {
             // The slur is being adjusted
             adjusted = true;
             // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-            AdjustSlurPosition( doc, spannedPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, false);
+            AdjustSlurPosition(doc, spannedPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, false);
             // Re-calculate the control points with the new height
-            GetControlPoints( doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
+            GetControlPoints(doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
         }
 
         // If we still have spanning points then move the slur but now by forcing both sides to be move
@@ -158,6 +168,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
             GetControlPoints(
                 doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
         }
+        
     }
 
     if (adjusted) {
@@ -389,13 +400,13 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spannedPo
         
         if (itPoint->second.second.x < p1->x) {
             //itPoint = spannedPoints->erase(itPoint);
-            ++itPoint;
-            continue;
+            //++itPoint;
+            //continue;
         }
         if (itPoint->second.second.x > p2->x) {
             //itPoint = spannedPoints->erase(itPoint);
-            ++itPoint;
-            continue;
+            //++itPoint;
+            //continue;
         }
         
         
