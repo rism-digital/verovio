@@ -61,6 +61,7 @@ public:
         Point *c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
     void AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spannedPoints, Point *p1, Point *p2, Point *c1,
         Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides);
+
     float GetAdjustedSlurAngle(Doc *doc, Point *p1, Point *p2, curvature_CURVEDIR curveDir, bool withPoints);
     void GetControlPoints(
         Doc *doc, Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize);
@@ -89,6 +90,23 @@ private:
      * document is cast-off.
      */
     curvature_CURVEDIR m_drawingCurvedir;
+};
+
+//----------------------------------------------------------------------------
+// SlurAdjustmentElement
+//----------------------------------------------------------------------------
+
+class SlurAdjustmentElement {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    SlurAdjustmentElement() { m_element = NULL; }
+    virtual ~SlurAdjustmentElement();
+
+    Point m_rotatedPoints[4];
+    LayerElement *m_element;
 };
 
 } // namespace vrv
