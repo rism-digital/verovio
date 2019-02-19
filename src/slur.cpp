@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <cmath>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -124,10 +125,10 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     // For readability
     Point *p1 = &points[0];
 
-    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(points[3], -slurAngle, *p1);
     Point rotatedC1 = BoundingBox::CalcPositionAfterRotation(points[1], -slurAngle, *p1);
     Point rotatedC2 = BoundingBox::CalcPositionAfterRotation(points[2], -slurAngle, *p1);
-
+    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(points[3], -slurAngle, *p1);
+    
     GetSpannedPointPositions(doc, spannedPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
     bool adjusted = false;
@@ -147,6 +148,10 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         curve->UpdateCurveParams(points2, slurAngle, curve->GetThickness(), curveDir);
 
         
+        rotatedC1 = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
+        rotatedC2 = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+        rotatedP2 = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+        
         // The adjustedHeight value is 0 if everything fits within the slur
         // If not we need to move its position
         if (adjustedHeight != 0) {
@@ -161,6 +166,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 
         // If we still have spanning points then move the slur but now by forcing both sides to be move
         if (!spannedPoints->empty()) {
+            
             // First re-calcuate the spanning point positions
             GetSpannedPointPositions(doc, spannedPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
@@ -168,14 +174,15 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
             AdjustSlurPosition(doc, spannedPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
             GetControlPoints(
                 doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
+            
         }
         
     }
 
     if (adjusted) {
-        points[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
-        points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
-        points[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+        points[1] = rotatedC1; //BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
+        points[2] = rotatedC2; //BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+        points[3] = rotatedP2; // BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
         curve->UpdateCurveParams(points, slurAngle, curve->GetThickness(), curveDir);
         // Since we are going to redraw-it reset its bounding box
         curve->BoundingBox::ResetBoundingBox();
@@ -328,25 +335,25 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spannedPo
     ArrayOfLayerElementPointPairs::iterator itPoint;
     for (itPoint = spannedPoints->begin(); itPoint != spannedPoints->end();) {
 
-        if (itPoint->second.second.x < p1->x) {
+        if (itPoint->second.first.x < p1->x) {
             // itPoint = spannedPoints->erase(itPoint);
             ++itPoint;
             continue;
         }
-        if (itPoint->second.second.x > p2->x) {
+        if (itPoint->second.first.x > p2->x) {
             // itPoint = spannedPoints->erase(itPoint);
             ++itPoint;
             continue;
         }
 
-        int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.second.x);
+        int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.first.x);
 
         // Weight the desired height according to the x position on the other side
         posXRatio = 1.0;
         bool leftPoint = true;
-        int posX = itPoint->second.second.x - p1->x;
+        int posX = itPoint->second.first.x - p1->x;
         if (posX > dist / 2) {
-            posX = p2->x - itPoint->second.second.x;
+            posX = p2->x - itPoint->second.first.x;
             leftPoint = false;
         }
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
@@ -354,13 +361,13 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spannedPo
         shift = 0;
         // Keep the maximum shift on the left and right
         if (curveDir == curvature_CURVEDIR_above) {
-            if (y < itPoint->second.second.y) {
-                shift = (itPoint->second.second.y - p1->y) - (y - p1->y);
+            if (y < itPoint->second.first.y) {
+                shift = (itPoint->second.first.y - p1->y) - (y - p1->y);
             }
         }
         else {
-            if (y > itPoint->second.second.y) {
-                shift = (p1->y - itPoint->second.second.y) - (p1->y - y);
+            if (y > itPoint->second.first.y) {
+                shift = (p1->y - itPoint->second.first.y) - (p1->y - y);
             }
         }
         if (shift > 0) {
@@ -380,7 +387,7 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spannedPo
     if (spannedPoints->empty()) return;
 
     // Unrotated the slur
-    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);
+    //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);
 
     if (curveDir == curvature_CURVEDIR_above) {
         p1->y += maxShiftLeft;
@@ -392,7 +399,7 @@ void Slur::AdjustSlurPosition(Doc *doc, ArrayOfLayerElementPointPairs *spannedPo
     }
 
     *angle = GetAdjustedSlurAngle(doc, p1, p2, curveDir, true);
-    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
+    //*p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
 float Slur::GetAdjustedSlurAngle(Doc *doc, Point *p1, Point *p2, curvature_CURVEDIR curveDir, bool withPoints)
@@ -425,16 +432,29 @@ float Slur::GetAdjustedSlurAngle(Doc *doc, Point *p1, Point *p2, curvature_CURVE
 
     return slurAngle;
 }
-
+    
+    
 void Slur::GetControlPoints(
     Doc *doc, Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize)
 {
+    float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
+    if (slurAngle != 0.0) {
+        *p2 = BoundingBox::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
+        // Just to avoid recursive calls...
+        if (p2->y != p1->y) p2->y = p1->y;
+        GetControlPoints(doc, p1, p2, c1, c2, curveDir, height, staffSize);
+        *p2 = BoundingBox::CalcPositionAfterRotation(*p2, slurAngle, *p1);
+        *c1 = BoundingBox::CalcPositionAfterRotation(*c1, slurAngle, *p1);
+        *c2 = BoundingBox::CalcPositionAfterRotation(*c2, slurAngle, *p1);
+        return;
+    }
+
     // Set the x position of the control points
     int cPos = std::min(
-        (p2->x - p1->x) / doc->GetOptions()->m_slurControlPoints.GetValue(), doc->GetDrawingStaffSize(staffSize));
+                        (p2->x - p1->x) / doc->GetOptions()->m_slurControlPoints.GetValue(), doc->GetDrawingStaffSize(staffSize));
     c1->x = p1->x + cPos;
     c2->x = p2->x - cPos;
-
+    
     if (curveDir == curvature_CURVEDIR_above) {
         c1->y = p1->y + height;
         c2->y = p2->y + height;

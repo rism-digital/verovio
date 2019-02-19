@@ -69,6 +69,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             curve->GetPoints(points, i);
             m_currentColour = colors[i];
             DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle());
+            
+            int j;
+            for (j = 0; j < 4; j++) {
+                DrawDot(dc, points[j].x, points[j].y, staff->m_drawingStaffSize);
+            }
+            
         }
         m_currentColour = AxBLACK;
     }
