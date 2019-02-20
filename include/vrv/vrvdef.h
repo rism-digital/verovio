@@ -240,6 +240,7 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class Comparison;
+class CurveSpannedElement;
 class FloatingPositioner;
 class GraceAligner;
 class InterfaceComparison;
@@ -277,8 +278,8 @@ typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
-
-typedef std::vector<std::pair<LayerElement *, std::pair<Point, Point> > > ArrayOfLayerElementPointPairs;
+    
+typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
 

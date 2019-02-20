@@ -265,6 +265,8 @@ public:
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
     int CalcMinMaxY(const Point points[4]);
+    
+    int CalcAdjustment(LayerElement *element, bool &discard, int margin = 0);
 
     /**
      * @name Getters for the current parameters
@@ -276,7 +278,7 @@ public:
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
 
-    ArrayOfLayerElementPointPairs *GetSpannedPoints() { return &m_spannedPoints; }
+    ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
 
 private:
     //
@@ -295,10 +297,32 @@ private:
     curvature_CURVEDIR m_dir;
     ///@}
 
-    ArrayOfLayerElementPointPairs m_spannedPoints;
+    ArrayOfCurveSpannedElements m_spannedElements;
 
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
+};
+    
+    
+//----------------------------------------------------------------------------
+// CurveSpannedElement
+//----------------------------------------------------------------------------
+
+class CurveSpannedElement {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    CurveSpannedElement() {
+        m_element = NULL;
+        m_discarded = false;
+    }
+    virtual ~CurveSpannedElement() {};
+    
+    Point m_rotatedPoints[4];
+    LayerElement *m_element;
+    bool m_discarded;
 };
 
 } // namespace vrv
