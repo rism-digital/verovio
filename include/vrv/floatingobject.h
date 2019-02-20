@@ -264,8 +264,15 @@ public:
      */
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
+    /**
+     * Calculate the min or max Y for a set of points
+     */
     int CalcMinMaxY(const Point points[4]);
     
+    /**
+     * Calculate the adjustment needed for an element for the curve not to overlap with it.
+     * Discard will be true if the element already fits.
+     */
     int CalcAdjustment(LayerElement *element, bool &discard, int margin = 0);
 
     /**

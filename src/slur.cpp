@@ -341,7 +341,7 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfC
     int dist = abs(p2.x - p1.x);
     float posXRatio = 1.0;
     
-    int margin = 1 * doc->GetDrawingUnit(100) / 2;
+    int margin = 0 * doc->GetDrawingUnit(100) / 1;
 
     for (auto & spannedElement : *spannedElements) {
         
