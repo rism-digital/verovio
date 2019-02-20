@@ -263,7 +263,7 @@ public:
      */
     ///@{
     int GetDrawingYMid();
-    int GetDrawingXMid();
+    int GetDrawingXMid(Doc *doc = NULL);
     ///@}
 
     /**

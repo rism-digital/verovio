@@ -173,7 +173,7 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
     dc->GetSmuflTextExtent(notes, &extend);
 
-    int x = tupletNum->GetDrawingXMid();
+    int x = tupletNum->GetDrawingXMid(m_doc);
     // since the number is slanted, move the center left
     x -= (extend.m_width / 2);
 

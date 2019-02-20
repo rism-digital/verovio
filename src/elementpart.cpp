@@ -219,7 +219,7 @@ int TupletNum::GetDrawingYMid()
     }
 }
 
-int TupletNum::GetDrawingXMid()
+int TupletNum::GetDrawingXMid(Doc *doc)
 {
     if (m_alignedBracket) {
         int xLeft = m_alignedBracket->GetDrawingXLeft();
@@ -238,6 +238,9 @@ int TupletNum::GetDrawingXMid()
         else {
             int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
             int xRight = tuplet->GetDrawingRight()->GetDrawingX();
+            if (doc) {
+                xRight += tuplet->GetDrawingRight()->GetDrawingRadius(doc);
+            }
             return xLeft + ((xRight - xLeft) / 2);
         }
     }
