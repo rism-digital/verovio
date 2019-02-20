@@ -5248,7 +5248,7 @@ bool MeiInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
 bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)
 {
     if (!measure) {
-        LogWarning("Cannot read <tupleSpan> within editorial markup");
+        LogWarning("Cannot read <tupletSpan> within editorial markup");
         return false;
     }
 
@@ -5257,6 +5257,8 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     LayerElement *start = NULL;
     LayerElement *end = NULL;
+    
+    AttConverter converter;
 
     // label
     if (tupletSpan.attribute("label")) {
@@ -5270,7 +5272,19 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     if (tupletSpan.attribute("numbase")) {
         tuplet->SetNumbase(atoi(tupletSpan.attribute("numbase").value()));
     }
-
+    if (tupletSpan.attribute("num.visible")) {
+        tuplet->SetNumVisible(converter.StrToBoolean(tupletSpan.attribute("num.visible").value()));
+    }
+    if (tupletSpan.attribute("num.place")) {
+        tuplet->SetNumPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("num.place").value()));
+    }
+    if (tupletSpan.attribute("bracket.visible")) {
+        tuplet->SetBracketVisible(converter.StrToBoolean(tupletSpan.attribute("bracket.visible").value()));
+    }
+    if (tupletSpan.attribute("bracket.place")) {
+        tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
+    }
+    
     // position (pitch)
     if (tupletSpan.attribute("startid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("startid").value());
