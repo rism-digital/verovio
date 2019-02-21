@@ -1,4 +1,4 @@
-Verovio 2.1.0-dev-6120ad3
+Verovio 2.1.0-dev-80c1ca7
 
 Example usage:
 
@@ -38,6 +38,7 @@ Input and page layout options
  --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
 
 General layout options
+ --midi-tempo-adjustment <f>       The MIDI tempo adjustment factor (default: 1.00; min: 0.20; max: 4.00)
  --bar-line-width <f>              The barLine width (default: 0.30; min: 0.10; max: 0.80)
  --beam-max-slope <i>              The maximum beam slope (default: 10; min: 1; max: 20)
  --beam-min-slope <i>              The minimum beam slope (default: 0; min: 0; max: 0)
