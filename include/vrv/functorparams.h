@@ -42,6 +42,7 @@ class MRpt;
 class Object;
 class Page;
 class ScoreDef;
+class Slur;
 class Staff;
 class StaffAlignment;
 class StaffDef;
@@ -1077,25 +1078,35 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindTimeSpanningLayerElementsParams
+// FindSpannedLayerElementsParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: a pointer to the vector of LayerElement pointer to fill
  * member 1: the minimum position
  * member 2: the maximum position
+ * member 3: the timespanning interface
+ * member 4: the class Ids to keep
+ * member 5: the slur for finding ties (too specific, to be refactored)
+ * member 6: the ties we need to consider (too specific, to be refactored)
  **/
 
-class FindTimeSpanningLayerElementsParams : public FunctorParams {
+class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindTimeSpanningLayerElementsParams()
+    FindSpannedLayerElementsParams(TimeSpanningInterface *interface, Slur *slur)
     {
+        m_interface = interface;
         m_minPos = 0;
         m_maxPos = 0;
+        m_slur = slur;
     }
-    std::vector<LayerElement *> m_spanningContent;
+    std::vector<LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
+    TimeSpanningInterface *m_interface;
+    std::vector<ClassId> m_classIds;
+    Slur *m_slur;
+    std::vector<FloatingPositioner *> m_ties;
 };
 
 //----------------------------------------------------------------------------

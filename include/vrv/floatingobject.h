@@ -264,7 +264,16 @@ public:
      */
     void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
+    /**
+     * Calculate the min or max Y for a set of points
+     */
     int CalcMinMaxY(const Point points[4]);
+    
+    /**
+     * Calculate the adjustment needed for an element for the curve not to overlap with it.
+     * Discard will be true if the element already fits.
+     */
+    int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0);
 
     /**
      * @name Getters for the current parameters
@@ -276,7 +285,7 @@ public:
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
 
-    ArrayOfLayerElementPointPairs *GetSpanningPoints() { return &m_spanningPoints; }
+    ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
 
 private:
     //
@@ -294,10 +303,32 @@ private:
     curvature_CURVEDIR m_dir;
     ///@}
 
-    ArrayOfLayerElementPointPairs m_spanningPoints;
+    ArrayOfCurveSpannedElements m_spannedElements;
 
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
+};
+    
+    
+//----------------------------------------------------------------------------
+// CurveSpannedElement
+//----------------------------------------------------------------------------
+
+class CurveSpannedElement {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    CurveSpannedElement() {
+        m_boundingBox = NULL;
+        m_discarded = false;
+    }
+    virtual ~CurveSpannedElement() {};
+    
+    Point m_rotatedPoints[4];
+    BoundingBox *m_boundingBox;
+    bool m_discarded;
 };
 
 } // namespace vrv

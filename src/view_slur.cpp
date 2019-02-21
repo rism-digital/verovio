@@ -62,7 +62,6 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle());
 
-    /* drawing debug points */
     /*
     int i;
     for (i = 0; i <= 10; ++i) {
@@ -471,8 +470,8 @@ float View::CalcInitialSlur(
     FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
 {
     // For readability makes them p1 and p2
-    Point *p1 = &points[0];
-    Point *p2 = &points[3];
+    Point p1 = points[0];
+    Point p2 = points[3];
 
     /************** height **************/
 
@@ -482,7 +481,7 @@ float View::CalcInitialSlur(
         height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slur->GetBulge();
     }
     else {
-        int dist = abs(p2->x - p1->x);
+        int dist = abs(p2.x - p1.x);
         height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
             dist / m_options->m_slurHeightFactor.GetValue());
         height = std::min(
@@ -496,9 +495,10 @@ float View::CalcInitialSlur(
 
     System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
     assert(system);
-    FindTimeSpanningLayerElementsParams findTimeSpanningLayerElementsParams;
-    findTimeSpanningLayerElementsParams.m_minPos = p1->x;
-    findTimeSpanningLayerElementsParams.m_maxPos = p2->x;
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
+    findSpannedLayerElementsParams.m_minPos = p1.x;
+    findSpannedLayerElementsParams.m_maxPos = p2.x;
+    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
@@ -507,39 +507,54 @@ float View::CalcInitialSlur(
     filters.push_back(&matchStaff);
     filters.push_back(&matchLayer);
 
-    Functor timeSpanningLayerElements(&Object::FindTimeSpanningLayerElements);
-    system->Process(&timeSpanningLayerElements, &findTimeSpanningLayerElementsParams, NULL, &filters);
+    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
+    system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
 
-    ArrayOfLayerElementPointPairs *spanningPoints = curve->GetSpanningPoints();
-    spanningPoints->clear();
-    std::vector<LayerElement *>::iterator it;
-    for (it = findTimeSpanningLayerElementsParams.m_spanningContent.begin();
-         it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); ++it) {
-        // We skip the start or end of the slur
-        if ((*it == slur->GetStart()) || (*it == slur->GetEnd())) continue;
+    ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    spannedElements->clear();
+    for (auto &element : findSpannedLayerElementsParams.m_elements) {
 
-        Note *note = NULL;
-        // We keep only notes and chords for now
-        if (!(*it)->Is({ CHORD, NOTE })) continue;
-        // Also skip notes that are part of a chords since we already have the chord
-        if ((note = dynamic_cast<Note *>(*it)) && note->IsChordTone()) continue;
-        Point p;
-        spanningPoints->push_back(std::make_pair((*it), p));
+        CurveSpannedElement *spannedElement = new CurveSpannedElement;
+        spannedElement->m_boundingBox = element;
+        
+        Point pRotated;
+        Point pLeft;
+        pLeft.x = element->GetSelfLeft();
+        //if ((pLeft.x > p1->x) && (pLeft.x < p2->x)) {
+        //    pLeft.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
+        //    spannedElements->push_back(spannedElement);
+        //}
+        Point pRight;
+        pRight.x = element->GetSelfRight();
+        //if ((pRight.x > p1->x) && (pRight.x < p2->x)) {
+        //    pRight.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
+        //    spannedElements->push_back(spannedElement);
+        //}
+        if (((pLeft.x > p1.x) && (pLeft.x < p2.x)) || ((pRight.x > p1.x) && (pRight.x < p2.x))) {
+            spannedElements->push_back(spannedElement);
+        }
+    }
+    
+    for (auto &positioner : findSpannedLayerElementsParams.m_ties) {
+        CurveSpannedElement *spannedElement = new CurveSpannedElement;
+        spannedElement->m_boundingBox = positioner;
+        spannedElements->push_back(spannedElement);
     }
 
     /************** angle **************/
 
-    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spanningPoints->size() > 0));
-    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
+    float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spannedElements->size() > 0));
+    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(p2, -slurAngle, p1);
 
     /************** control points **************/
 
     Point rotatedC1, rotatedC2;
-    slur->GetControlPoints(m_doc, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
+    slur->GetControlPoints(m_doc, p1, rotatedP2, rotatedC1, rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
-    points[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
-    points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
-    points[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+    points[0] = p1;
+    points[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, p1);
+    points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, p1);
+    points[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, p1);
 
     return slurAngle;
 }
