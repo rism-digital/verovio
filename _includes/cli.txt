@@ -1,4 +1,4 @@
-Verovio 2.1.0-dev-9325da1
+Verovio 2.1.0-dev-44725fa
 
 Example usage:
 
@@ -82,6 +82,7 @@ Element margins
  --default-left-margin <f>         The default left margin (default: 0.00; min: 0.00; max: 2.00)
  --default-right-margin <f>        The default right margin (default: 0.00; min: 0.00; max: 2.00)
  --default-top-margin <f>          The default top margin (default: 0.50; min: 0.00; max: 6.00)
+ --bottom-margin-harm <f>          The margin for harm in MEI units (default: 0.50; min: 0.00; max: 10.00)
  --left-margin-accid <f>           The margin for accid in MEI units (default: 1.00; min: 0.00; max: 2.00)
  --left-margin-bar-line <f>        The margin for barLine in MEI units (default: 0.00; min: 0.00; max: 2.00)
  --left-margin-beat-rpt <f>        The margin for beatRpt in MEI units (default: 2.00; min: 0.00; max: 2.00)
@@ -114,3 +115,4 @@ Element margins
  --right-margin-note <f>           The right margin for note in MEI units (default: 0.00; min: 0.00; max: 2.00)
  --right-margin-rest <f>           The right margin for rest in MEI units (default: 0.00; min: 0.00; max: 2.00)
  --right-margin-right-bar-line <f> The right margin for right barLine in MEI units (default: 0.00; min: 0.00; max: 2.00)
+ --top-margin-harm <f>             The margin for harm in MEI units (default: 0.50; min: 0.00; max: 10.00)
