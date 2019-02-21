@@ -26,6 +26,7 @@ public:
     ///@{
     Supplied();
     virtual ~Supplied();
+    virtual Object *Clone() const { return new Supplied(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Supplied"; }
     virtual ClassId GetClassId() const { return SUPPLIED; }

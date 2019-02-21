@@ -2099,10 +2099,11 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
 
     // editorial
     if (IsEditorialElementName(element)) {
-        if (filterParent->Is(LABEL)) {
+        // Because of the Clone issue on annot do not support it in label and labelAbbr
+        if (filterParent->Is(LABEL) && (element == "annot")) {
             return false;
         }
-        else if (filterParent->Is(LABELABBR)) {
+        else if (filterParent->Is(LABELABBR) && (element == "annot")) {
             return false;
         }
         else {

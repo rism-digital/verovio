@@ -26,6 +26,7 @@ public:
     ///@{
     Restore();
     virtual ~Restore();
+    virtual Object *Clone() const { return new Restore(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Restore"; }
     virtual ClassId GetClassId() const { return RESTORE; }
