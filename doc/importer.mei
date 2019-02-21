@@ -109,7 +109,6 @@
                                     <note xml:id="note-000000027899475" dots="1" dur="4" oct="4" pname="f" />
                                 </layer>
                             </staff>
-                            <slur xml:id="slur-000000174768073" startid="note-000000174813826" endid="note-000000067078534" />
                         </measure>
                         <ending xml:id="ending-000000110807949" n="1">
                             <measure xml:id="measure-000000051393610" n="7" right="rptend">
@@ -131,6 +130,7 @@
                                         </beam>
                                     </layer>
                                 </staff>
+                                <slur xml:id="slur-000000174768073" startid="#note-000000174813826" endid="#note-000000067078534" />
                             </measure>
                         </ending>
                         <ending xml:id="ending-000000213623951" n="2">
