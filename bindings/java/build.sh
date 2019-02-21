@@ -37,5 +37,5 @@ FILES="$SRCFILES \
  ../../libmei/atts_visual.cpp"
 
 CXXOPTS="-g -fpic -std=c++11 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/midi -I../../include/pugi -I../../include/utf8 -I../../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
-g++ -shared -o target/libverovio.jnilib $CXXOPTS $FILES verovio_wrap.cxx
+g++ -shared -o -I$JAVA_HOME/include -I$JAVA_HOME/include/linux target/libverovio.jnilib $CXXOPTS $FILES verovio_wrap.cxx
 cp target/libverovio.jnilib target/classes/META-INF/lib
