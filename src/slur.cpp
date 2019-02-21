@@ -122,9 +122,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     curve->GetPoints(points);
     ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
-    // For readability
     Point p1 = points[0];
-
     Point rotatedC1 = BoundingBox::CalcPositionAfterRotation(points[1], -slurAngle, p1);
     Point rotatedC2 = BoundingBox::CalcPositionAfterRotation(points[2], -slurAngle, p1);
     Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(points[3], -slurAngle, p1);
@@ -341,7 +339,7 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfC
     int dist = abs(p2.x - p1.x);
     float posXRatio = 1.0;
     
-    int margin = 0 * doc->GetDrawingUnit(100) / 1;
+    int margin = 1 * doc->GetDrawingUnit(100) / 2;
 
     for (auto & spannedElement : *spannedElements) {
         
@@ -350,7 +348,7 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfC
         }
         
         bool discard = false;
-        int intersection = curve->CalcAdjustment(spannedElement->m_element, discard, margin);
+        int intersection = curve->CalcAdjustment(spannedElement->m_boundingBox, discard, margin);
         
         if (discard == true) {
             spannedElement->m_discarded = true;
@@ -361,8 +359,8 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfC
             continue;
         }
         
-        int xLeft = std::max(p1.x, spannedElement->m_element->GetSelfLeft());
-        int xRight = std::min(p2.x, spannedElement->m_element->GetSelfRight());
+        int xLeft = std::max(p1.x, spannedElement->m_boundingBox->GetSelfLeft());
+        int xRight = std::min(p2.x, spannedElement->m_boundingBox->GetSelfRight());
         int xMiddle = xLeft + ((xRight - xLeft) / 2);
         int posX = xMiddle - p1.x;
 

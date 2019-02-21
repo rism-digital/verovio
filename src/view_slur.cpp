@@ -514,10 +514,10 @@ float View::CalcInitialSlur(
 
     System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
     assert(system);
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
+    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
     findSpannedLayerElementsParams.m_minPos = p1.x;
     findSpannedLayerElementsParams.m_maxPos = p2.x;
-    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TUPLET_BRACKET, TUPLET_NUM };
+    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
@@ -531,11 +531,10 @@ float View::CalcInitialSlur(
 
     ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
     spannedElements->clear();
-    std::vector<LayerElement *>::iterator it;
     for (auto &element : findSpannedLayerElementsParams.m_elements) {
 
         CurveSpannedElement *spannedElement = new CurveSpannedElement;
-        spannedElement->m_element = element;
+        spannedElement->m_boundingBox = element;
         
         Point pRotated;
         Point pLeft;
@@ -553,6 +552,12 @@ float View::CalcInitialSlur(
         if (((pLeft.x > p1.x) && (pLeft.x < p2.x)) || ((pRight.x > p1.x) && (pRight.x < p2.x))) {
             spannedElements->push_back(spannedElement);
         }
+    }
+    
+    for (auto &positioner : findSpannedLayerElementsParams.m_ties) {
+        CurveSpannedElement *spannedElement = new CurveSpannedElement;
+        spannedElement->m_boundingBox = positioner;
+        spannedElements->push_back(spannedElement);
     }
 
     /************** angle **************/

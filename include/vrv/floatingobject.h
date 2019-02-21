@@ -273,7 +273,7 @@ public:
      * Calculate the adjustment needed for an element for the curve not to overlap with it.
      * Discard will be true if the element already fits.
      */
-    int CalcAdjustment(LayerElement *element, bool &discard, int margin = 0);
+    int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0);
 
     /**
      * @name Getters for the current parameters
@@ -322,13 +322,13 @@ public:
      */
     ///@{
     CurveSpannedElement() {
-        m_element = NULL;
+        m_boundingBox = NULL;
         m_discarded = false;
     }
     virtual ~CurveSpannedElement() {};
     
     Point m_rotatedPoints[4];
-    LayerElement *m_element;
+    BoundingBox *m_boundingBox;
     bool m_discarded;
 };
 
