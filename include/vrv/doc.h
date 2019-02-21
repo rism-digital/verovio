@@ -448,9 +448,9 @@ private:
     /**
      * A flag to indicate that the MIDI timemap has been calculated.  The
      * timemap needs to be prepared before MIDI files or timemap JSON files
-     * are generated.
+     * are generated. Value is 0.0 when no timemap has been generated.
      */
-    bool m_hasMidiTimemap;
+    double m_MIDITimemapTempo;
 
     /**
      * A flag to indicate whereas the document contains analytical markup to be converted.

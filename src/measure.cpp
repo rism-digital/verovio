@@ -1158,7 +1158,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
         }
         params->m_currentTempo = int(mm * 4.0 / mmUnit + 0.5);
     }
-    m_currentTempo = params->m_currentTempo;
+    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
 
     m_realTimeOffsetMilliseconds.clear();
     m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));

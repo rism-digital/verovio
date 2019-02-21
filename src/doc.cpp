@@ -92,7 +92,7 @@ void Doc::Reset()
     m_drawingPage = NULL;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
-    m_hasMidiTimemap = false;
+    m_MIDITimemapTempo = 0.0;
     m_hasAnalyticalMarkup = false;
     m_isMensuralMusicOnly = false;
 
@@ -229,12 +229,12 @@ bool Doc::GenerateMeasureNumbers()
 
 bool Doc::HasMidiTimemap()
 {
-    return m_hasMidiTimemap;
+    return (m_MIDITimemapTempo == m_options->m_midiTempoAdjustment.GetValue());
 }
 
 void Doc::CalculateMidiTimemap()
 {
-    m_hasMidiTimemap = false;
+    m_MIDITimemapTempo = 0.0;
 
     // This happens if the document was never cast off (no-layout option in the toolkit)
     if (!m_drawingPage && GetPageCount() == 1) {
@@ -256,6 +256,7 @@ void Doc::CalculateMidiTimemap()
     // We first calculate the maximum duration of each measure
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
     calcMaxMeasureDurationParams.m_currentTempo = tempo;
+    calcMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
 
@@ -269,7 +270,7 @@ void Doc::CalculateMidiTimemap()
     Functor resolveMIDITies(&Object::ResolveMIDITies);
     this->Process(&resolveMIDITies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
 
-    m_hasMidiTimemap = true;
+    m_MIDITimemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
 
 void Doc::ExportMIDI(smf::MidiFile *midiFile)

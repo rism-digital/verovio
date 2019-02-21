@@ -456,6 +456,7 @@ public:
     OptionBool m_humType;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
+    OptionDbl m_midiTempoAdjustment;
     OptionBool m_mmOutput;
     OptionBool m_noFooter;
     OptionBool m_noHeader;

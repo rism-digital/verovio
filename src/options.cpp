@@ -509,6 +509,10 @@ Options::Options()
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);
 
+    m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
+    m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
+    this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
+    
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
