@@ -239,7 +239,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
             int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
             int xRight = tuplet->GetDrawingRight()->GetDrawingX();
             if (doc) {
-                xRight += tuplet->GetDrawingRight()->GetDrawingRadius(doc);
+                xRight += (tuplet->GetDrawingRight()->GetDrawingRadius(doc) * 2);
             }
             return xLeft + ((xRight - xLeft) / 2);
         }
