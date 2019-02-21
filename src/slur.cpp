@@ -138,14 +138,6 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
         
         adjusted = true;
         
-        Point points2[4];
-        points2[0] = p1;
-        points2[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, p1);
-        points2[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, p1);
-        points2[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, p1);
-        //curve->UpdateCurveParams(points2, slurAngle, curve->GetThickness(), curveDir);
-
-        
         rotatedC1 = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, p1);
         rotatedC2 = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, p1);
         rotatedP2 = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, p1);
@@ -180,7 +172,6 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
                 doc, p1, rotatedP2, rotatedC1, rotatedC2, curveDir, adjustedHeight, staff->m_drawingStaffSize);
             
         }
-        
     }
 
     if (adjusted) {

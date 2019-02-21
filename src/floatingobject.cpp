@@ -433,11 +433,6 @@ void FloatingCurvePositioner::UpdateCurveParams(
     m_thickness = thickness;
     m_dir = curveDir;
     m_cachedMinMaxY = VRV_UNSET;
-    
-    m_stages.push_back(m_points[0]);
-    m_stages.push_back(m_points[1]);
-    m_stages.push_back(m_points[2]);
-    m_stages.push_back(m_points[3]);
 }
 
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
@@ -563,20 +558,12 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
     }
 }
 
-void FloatingCurvePositioner::GetPoints(Point points[4], int stage)
+void FloatingCurvePositioner::GetPoints(Point points[4])
 {
-    if (stage == -1) {
-        points[0] = m_points[0];
-        points[1] = m_points[1];
-        points[2] = m_points[2];
-        points[3] = m_points[3];
-    }
-    else {
-        points[0] = m_stages.at(0 + stage * 4);
-        points[1] = m_stages.at(1 + stage * 4);
-        points[2] = m_stages.at(2 + stage * 4);
-        points[3] = m_stages.at(3 + stage * 4);
-    }
+    points[0] = m_points[0];
+    points[1] = m_points[1];
+    points[2] = m_points[2];
+    points[3] = m_points[3];
     int currentY = this->GetDrawingY();
     points[0].y += currentY;
     points[1].y += currentY;
