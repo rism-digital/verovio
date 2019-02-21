@@ -593,7 +593,7 @@ Options::Options()
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
-
+    
     m_leftPosition.SetInfo("Left position", "The left position");
     m_leftPosition.Init(0.8, 0.0, 2.0);
     this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
@@ -741,6 +741,14 @@ Options::Options()
     m_defaultTopMargin.Init(0.5, 0.0, 6.0);
     this->Register(&m_defaultTopMargin, "defaultTopMargin", &m_elementMargins);
 
+    /// custom bottom
+    
+    m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
+    m_bottomMarginHarm.Init(0.5, 0.0, 10.0);
+    this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
+    
+    /// custom left
+    
     m_leftMarginAccid.SetInfo("Left margin accid", "The margin for accid in MEI units");
     m_leftMarginAccid.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginAccid, "leftMarginAccid", &m_elementMargins);
@@ -805,6 +813,8 @@ Options::Options()
     m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginRightBarLine, "leftMarginRightBarLine", &m_elementMargins);
 
+    /// custom right
+    
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
     m_rightMarginAccid.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginAccid, "rightMarginAccid", &m_elementMargins);
@@ -869,6 +879,12 @@ Options::Options()
     m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
 
+    /// custom top
+    
+    m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
+    m_topMarginHarm.Init(0.5, 0.0, 10.0);
+    this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
+    
     /*
     // Example of a staffRel param
     OptionStaffrel rel;

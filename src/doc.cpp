@@ -1409,11 +1409,13 @@ double Doc::GetRightMargin(const ClassId classId) const
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
+    if (classId == HARM) return m_options->m_bottomMarginHarm.GetValue();
     return m_options->m_defaultBottomMargin.GetValue();
 }
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
+    if (classId == HARM) return m_options->m_topMarginHarm.GetValue();
     return m_options->m_defaultTopMargin.GetValue();
 }
 
