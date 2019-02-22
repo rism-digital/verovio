@@ -83,8 +83,8 @@ RunningElement *Page::GetHeader() const
     Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page?
-    if (pages->GetFirst() == this) {
+    // first page or use the pgHeader for all pages?
+    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
         return doc->m_scoreDef.GetPgHead();
     }
     else {
@@ -102,8 +102,8 @@ RunningElement *Page::GetFooter() const
     Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page?
-    if (pages->GetFirst() == this) {
+    // first page or use the pgFooter for all pages?
+    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
         return doc->m_scoreDef.GetPgFoot();
     }
     else {

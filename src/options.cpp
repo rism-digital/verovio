@@ -560,6 +560,14 @@ Options::Options()
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
+    
+    m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
+    m_usePgFooterForAll.Init(false);
+    this->Register(&m_usePgFooterForAll, "usePgFooterForAll", &m_general);
+    
+    m_usePgHeaderForAll.SetInfo("Use PgHeader for all", "Use the pgHeader for all pages");
+    m_usePgHeaderForAll.Init(false);
+    this->Register(&m_usePgHeaderForAll, "usePgHeaderForAll", &m_general);
 
     /********* General layout *********/
 

@@ -469,6 +469,8 @@ public:
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionInt m_unit;
+    OptionBool m_usePgFooterForAll;
+    OptionBool m_usePgHeaderForAll;
 
     /**
      * General layout
