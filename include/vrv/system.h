@@ -160,8 +160,7 @@ public:
     virtual int AdjustXOverflow(FunctorParams *functorParams);
     virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
     ///@}
-    
-    
+
     /**
      * See Object::AdjustSylSpacing
      */
@@ -205,9 +204,14 @@ public:
     virtual int AdjustStaffOverlap(FunctorParams *functorParams);
 
     /**
-     * See Object::AdjustFloatingPostioners
+     * See Object::AdjustFloatingPositioners
      */
-    virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
+    virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustSlurs
+     */
+    virtual int AdjustSlurs(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffPages

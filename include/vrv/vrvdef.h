@@ -17,6 +17,16 @@
 
 #include "attdef.h"
 
+//----------------------------------------------------------------------------
+
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
+#include <math.h>
+
+// In case it is not defined before...
+#ifndef M_PI
+#define M_PI (3.14159265358979323846264338327950288)
+#endif
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -48,6 +58,7 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
+    FLOATING_CURVE_POSITIONER,
     // Ids for ungrouped objects
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
@@ -145,7 +156,6 @@ enum ClassId {
     BARLINE_ATTR_RIGHT,
     BEAM,
     BEATRPT,
-    BRACKET,
     BTREM,
     CHORD,
     CLEF,
@@ -167,7 +177,6 @@ enum ClassId {
     NC,
     NOTE,
     NEUME,
-    TUPLET_NUM,
     PROPORT,
     REST,
     SPACE,
@@ -176,6 +185,8 @@ enum ClassId {
     SYLLABLE,
     TIMESTAMP_ATTR,
     TUPLET,
+    TUPLET_BRACKET,
+    TUPLET_NUM,
     VERSE,
     LAYER_ELEMENT_max,
     // Ids for ScoreDefElement child classes
@@ -229,6 +240,7 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class Comparison;
+class CurveSpannedElement;
 class FloatingPositioner;
 class GraceAligner;
 class InterfaceComparison;
@@ -260,14 +272,14 @@ typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmen
 typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
-    
+
 typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
-
-typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
+    
+typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
 
@@ -379,7 +391,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 //----------------------------------------------------------------------------
 // data.LINEWIDTHTERM factors
 //----------------------------------------------------------------------------
-    
+
 #define LINEWIDTHTERM_factor_narrow 0.5
 #define LINEWIDTHTERM_factor_medium 2.0
 #define LINEWIDTHTERM_factor_wide 4.0
@@ -466,6 +478,12 @@ enum {
     POSITION_MIDDLE = 3,
     POSITION_BOTTOM = 6,
 };
+
+//----------------------------------------------------------------------------
+// Bounding box access
+//----------------------------------------------------------------------------
+
+enum Accessor { SELF = 0, CONTENT };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

@@ -219,18 +219,24 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        positioner = new FloatingPositioner(object, this, spanningType);
-        m_floatingPositioners.push_back(positioner);
+        if (object->Is({ SLUR, TIE })) {
+            positioner = new FloatingCurvePositioner(object, this, spanningType);
+            m_floatingPositioners.push_back(positioner);
+        }
+        else {
+            positioner = new FloatingPositioner(object, this, spanningType);
+            m_floatingPositioners.push_back(positioner);
+        }
     }
     positioner->SetObjectXY(objectX, objectY);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner(positioner);
 }
-    
+
 FloatingPositioner *StaffAlignment::FindFirstFloatingPositioner(ClassId classId)
 {
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
-                             [classId](FloatingPositioner *positioner) { return positioner->GetObject()->GetClassId() == classId; });
+        [classId](FloatingPositioner *positioner) { return positioner->GetObject()->GetClassId() == classId; });
     if (item != m_floatingPositioners.end()) {
         return *item;
     }
@@ -260,19 +266,20 @@ void StaffAlignment::FindAllIntersectionPoints(
         }
     }
 }
-    
-void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrpsParams *params, const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel)
+
+void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
+    const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel)
 {
     if (grpIdYRel.empty()) {
         return;
     }
-    
+
     std::sort(grpIdYRel.begin(), grpIdYRel.end());
-    
+
     int yRel;
     // The initial next position is the original position of the first group. Nothing will happen for it.
     int nextYRel = grpIdYRel.at(0).second;
-    
+
     // For each grpId (sorted, see above), loop to find the highest / lowest positon to put the next group
     // The move the next group (if not already higher or lower)
     ArrayOfFloatingPositioners::const_iterator iter;
@@ -293,13 +300,17 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrps
             (*iter)->SetDrawingYRel(yRel);
             // Then find the highest / lowest position for the next group
             if (params->m_place == STAFFREL_basic_above) {
-                int iterY = yRel - (*iter)->GetContentY2() - (params->m_doc->GetTopMargin((*iter)->GetObject()->GetClassId()) * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                int iterY = yRel - (*iter)->GetContentY2()
+                    - (params->m_doc->GetTopMargin((*iter)->GetObject()->GetClassId())
+                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel > iterY) {
                     nextYRel = iterY;
                 }
             }
             else {
-                int iterY = yRel + (*iter)->GetContentY2() + (params->m_doc->GetBottomMargin((*iter)->GetObject()->GetClassId()) * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                int iterY = yRel + (*iter)->GetContentY2()
+                    + (params->m_doc->GetBottomMargin((*iter)->GetObject()->GetClassId())
+                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel < iterY) {
                     nextYRel = iterY;
                 }
@@ -312,9 +323,9 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPostionerGrps
 // Functors methods
 //----------------------------------------------------------------------------
 
-int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
+int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
     int staffSize = this->GetStaffSize();
@@ -347,13 +358,17 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
+            assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
+            FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+            assert(curve);
+
             bool skipAbove = false;
             bool skipBelow = false;
 
             if ((*iter)->GetObject()->Is(SLUR)) {
                 Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
-                slur->GetCrossStaffOverflows(this, (*iter)->m_cuvreDir, skipAbove, skipBelow);
+                slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
 
             int overflowAbove = 0;
@@ -411,9 +426,9 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
+int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionerGrpsParams *params = dynamic_cast<AdjustFloatingPostionerGrpsParams *>(functorParams);
+    AdjustFloatingPositionerGrpsParams *params = dynamic_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);
     assert(params);
 
     ArrayOfFloatingPositioners positioners;
@@ -425,9 +440,10 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             return (
                 (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
                     != params->m_classIds.end())
-                && (positioner->GetObject()->GetDrawingGrpId() != 0) && (positioner->GetDrawingPlace() == params->m_place));
+                && (positioner->GetObject()->GetDrawingGrpId() != 0)
+                && (positioner->GetDrawingPlace() == params->m_place));
         });
-    
+
     if (positioners.empty()) {
         return FUNCTOR_SIBLINGS;
     }
@@ -455,10 +471,8 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             }
         }
     }
-    
-    
-    if (std::find(params->m_classIds.begin(), params->m_classIds.end(), HARM) != params->m_classIds.end())
-    {
+
+    if (std::find(params->m_classIds.begin(), params->m_classIds.end(), HARM) != params->m_classIds.end()) {
         // Re-adjust the postion in order to make sure the group remain in the right order
         this->ReAdjustFloatingPositionersGrps(params, positioners, grpIdYRel);
         // The already move them, so the loop below is not necessary.
@@ -474,7 +488,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             (*iter)->SetDrawingYRel((*i).second);
         }
     }
-    
+
     //  Now update the staffAlignment max overflow (above or below)
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
         if (params->m_place == STAFFREL_basic_above) {
@@ -484,6 +498,34 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         else {
             int overflowBelow = this->CalcOverflowBelow((*iter));
             this->SetOverflowBelow(overflowBelow);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
+{
+    AdjustSlursParams *params = dynamic_cast<AdjustSlursParams *>(functorParams);
+    assert(params);
+
+    ArrayOfFloatingPositioners::iterator iter;
+    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
+        assert((*iter)->GetObject());
+        if (!(*iter)->GetObject()->Is(SLUR)) continue;
+        Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
+        assert(slur);
+
+        assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
+        FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+        assert(curve);
+
+        // Skip if no content bounding box is available
+        if (!curve->HasContentBB()) continue;
+
+        bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
+        if (adjusted) {
+            params->m_adjusted = true;
         }
     }
 

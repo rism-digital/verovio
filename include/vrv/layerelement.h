@@ -48,7 +48,7 @@ public:
      * Copy assignment for resetting pointers
      */
     LayerElement &operator=(const LayerElement &element);
-    
+
     /**
      * @name Getter to interfaces
      */
@@ -254,9 +254,9 @@ public:
     virtual int SetAlignmentPitchPos(FunctorParams *functorParams);
 
     /**
-     * See Object::FindTimeSpanningLayerElements
+     * See Object::FindSpannedLayerElements
      */
-    virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams);
+    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
 
     /**
      * See Object::CalcOnsetOffset

@@ -128,13 +128,16 @@ public:
 
     std::string KeysignatureToStr(data_KEYSIGNATURE data) const;
     data_KEYSIGNATURE StrToKeysignature(std::string value, bool logWarning = true) const;
-    
+
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
 
     std::string MeasurementabsToStr(data_MEASUREMENTABS data) const { return VUToStr(data); }
-    data_MEASUREMENTABS StrToMeasurementabs(std::string value, bool logWarning = true) const { return StrToVU(value, logWarning); }
-    
+    data_MEASUREMENTABS StrToMeasurementabs(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
+
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
     data_MODUSMAIOR StrToModusmaior(std::string value, bool logWarning = true) const;
 
@@ -200,16 +203,16 @@ public:
     ///@{
     std::string CompassdirectionToStr(data_COMPASSDIRECTION data) const;
     data_COMPASSDIRECTION StrToCompassdirection(std::string value, bool logWarning = true) const;
-    
+
     std::string EventrelToStr(data_EVENTREL data) const;
     data_EVENTREL StrToEventrel(std::string value, bool logWarning = true) const;
-    
+
     std::string FontsizeToStr(data_FONTSIZE data) const;
     data_FONTSIZE StrToFontsize(std::string value, bool logWarning = true) const;
 
     std::string LinewidthToStr(data_LINEWIDTH data) const;
     data_LINEWIDTH StrToLinewidth(std::string value, bool logWarning = true) const;
-    
+
     std::string MidivalueNameToStr(data_MIDIVALUE_NAME data) const;
     data_MIDIVALUE_NAME StrToMidivalueName(std::string value, bool logWarning = true) const;
 
@@ -307,6 +310,23 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// ClassIdsComparison
+//----------------------------------------------------------------------------
+
+class ClassIdsComparison : public Comparison {
+
+public:
+    ClassIdsComparison(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
+
+    virtual bool operator()(Object *object);
+
+    bool MatchesType(Object *object) { return true; }
+
+protected:
+    std::vector<ClassId> m_classIds;
+};
+
+//----------------------------------------------------------------------------
 // InterfaceComparison
 //----------------------------------------------------------------------------
 
@@ -316,8 +336,6 @@ public:
     InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
 
     virtual bool operator()(Object *object);
-
-    InterfaceId GetInterface() { return m_interfaceId; }
 
     bool MatchesType(Object *object);
 

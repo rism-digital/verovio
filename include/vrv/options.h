@@ -456,6 +456,7 @@ public:
     OptionBool m_humType;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
+    OptionDbl m_midiTempoAdjustment;
     OptionBool m_mmOutput;
     OptionBool m_noFooter;
     OptionBool m_noHeader;
@@ -468,6 +469,8 @@ public:
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionInt m_unit;
+    OptionBool m_usePgFooterForAll;
+    OptionBool m_usePgHeaderForAll;
 
     /**
      * General layout
@@ -526,6 +529,9 @@ public:
     OptionDbl m_defaultLeftMargin;
     OptionDbl m_defaultRightMargin;
     OptionDbl m_defaultTopMargin;
+    //
+    OptionDbl m_bottomMarginHarm;
+    //
     OptionDbl m_leftMarginAccid;
     OptionDbl m_leftMarginBarLine;
     OptionDbl m_leftMarginBeatRpt;
@@ -542,6 +548,7 @@ public:
     OptionDbl m_leftMarginNote;
     OptionDbl m_leftMarginRest;
     OptionDbl m_leftMarginRightBarLine;
+    //
     OptionDbl m_rightMarginAccid;
     OptionDbl m_rightMarginBarLine;
     OptionDbl m_rightMarginBeatRpt;
@@ -558,6 +565,8 @@ public:
     OptionDbl m_rightMarginNote;
     OptionDbl m_rightMarginRest;
     OptionDbl m_rightMarginRightBarLine;
+    //
+    OptionDbl m_topMarginHarm;
 
 private:
     /** The array of style parameters */

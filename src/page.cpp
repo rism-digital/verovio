@@ -83,8 +83,8 @@ RunningElement *Page::GetHeader() const
     Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page?
-    if (pages->GetFirst() == this) {
+    // first page or use the pgHeader for all pages?
+    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
         return doc->m_scoreDef.GetPgHead();
     }
     else {
@@ -102,8 +102,8 @@ RunningElement *Page::GetFooter() const
     Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page?
-    if (pages->GetFirst() == this) {
+    // first page or use the pgFooter for all pages?
+    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
         return doc->m_scoreDef.GetPgFoot();
     }
     else {
@@ -236,7 +236,7 @@ void Page::LayOutHorizontally()
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
         int longestActualDur = DUR_4;
-        
+
         // Detect the longest duration in order to adjust the spacing (false by default)
         if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
             // Get the longest duration in the piece
@@ -321,6 +321,11 @@ void Page::LayOutHorizontally()
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
 
+    // Adjust the position of the tuplets
+    FunctorDocParams adjustTupletsXParams(doc);
+    Functor adjustTupletsX(&Object::AdjustTupletsX);
+    this->Process(&adjustTupletsX, &adjustTupletsXParams);
+
     // Prevent a margin overflow
     Functor adjustXOverlfow(&Object::AdjustXOverflow);
     Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
@@ -377,6 +382,22 @@ void Page::LayOutVertically()
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
+    // Adjust the position of the tuplets
+    FunctorDocParams adjustTupletsYParams(doc);
+    Functor adjustTupletsY(&Object::AdjustTupletsY);
+    this->Process(&adjustTupletsY, &adjustTupletsYParams);
+
+    // Adjust the position of the slurs
+    Functor adjustSlurs(&Object::AdjustSlurs);
+    AdjustSlursParams adjustSlursParams(doc, &adjustSlurs);
+    this->Process(&adjustSlurs, &adjustSlursParams);
+
+    // If slurs were adjusted we need to redraw to adjust the bounding boxes
+    if (adjustSlursParams.m_adjusted) {
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
+
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);
     Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
@@ -384,9 +405,9 @@ void Page::LayOutVertically()
     this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
 
     // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
-    Functor adjustFloatingPostioners(&Object::AdjustFloatingPostioners);
-    AdjustFloatingPostionersParams adjustFloatingPostionersParams(doc, &adjustFloatingPostioners);
-    this->Process(&adjustFloatingPostioners, &adjustFloatingPostionersParams);
+    Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
+    AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
+    this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
 
     // Adjust the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
@@ -398,6 +419,11 @@ void Page::LayOutVertically()
     Functor adjustYPos(&Object::AdjustYPos);
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
+
+    Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
+    Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
+    FunctorDocParams adjustCrossStaffYPosParams(doc);
+    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
 
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();

@@ -9,6 +9,7 @@
 #ifndef __VRV_KEYSIG_H__
 #define __VRV_KEYSIG_H__
 
+#include "atts_analytical.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 
@@ -32,7 +33,7 @@ class ScoreDefInterface;
  * are available for converting from and to the MEI representation to the
  * internal (and vice versa)
  */
-class KeySig : public LayerElement, public AttAccidental, public AttPitch {
+class KeySig : public LayerElement, public AttAccidental, public AttPitch, public AttKeySigAnl {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

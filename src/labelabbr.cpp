@@ -40,6 +40,9 @@ void LabelAbbr::AddChild(Object *child)
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);

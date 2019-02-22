@@ -646,7 +646,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("stroke-opacity") = "1.0";
     rectChild.append_attribute("stroke-width") = "10";
     rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
-     */
+    */
 }
 
 void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)

@@ -26,7 +26,7 @@ namespace vrv {
 F::F() : TextElement("f-"), TimeSpanningInterface()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    
+
     Reset();
 }
 
@@ -59,13 +59,13 @@ void F::AddChild(Object *child)
 //----------------------------------------------------------------------------
 // F functor methods
 //----------------------------------------------------------------------------
-    
+
 int F::PrepareTimePointing(FunctorParams *functorParams)
 {
     // At this stage we require <f> to have a @startid - eventually we can
     // modify this method and set as start the parent <harm> so @startid would not be
     // required anymore
-    
+
     // Pass it to the pseudo functor of the interface
     TimePointInterface *interface = this->GetTimePointInterface();
     assert(interface);
@@ -83,7 +83,7 @@ int F::PrepareTimeSpanning(FunctorParams *functorParams)
 int F::PrepareTimestamps(FunctorParams *functorParams)
 {
     // Using @tstamp on <f> will work only if @staff is also given on <f>
-    
+
     // Pass it to the pseudo functor of the interface
     TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
     assert(interface);
@@ -104,6 +104,6 @@ int F::ResetDrawing(FunctorParams *functorParams)
     TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
     assert(interface);
     return interface->InterfaceResetDrawing(functorParams, this);
-}    
+}
 
 } // namespace vrv

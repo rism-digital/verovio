@@ -57,7 +57,7 @@ public:
     VisibilityOptimization GetDrawingVisibility() const { return m_drawingVisibility; }
     void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
     ///@}
-                     
+
     /**
      * Return true if the staffDef in in a braced staffGrp within a bracket staffGrp.
      * Used for increasing the spacing in View::DrawStaffDefLabels.

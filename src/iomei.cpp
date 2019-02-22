@@ -773,18 +773,18 @@ bool MeiOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
-    
+
     if (m_doc->m_front.first_child()) {
         music.append_copy(m_doc->m_front.first_child());
     }
-    
+
     m_currentNode = music.append_child("body");
     m_nodeStack.push_back(m_currentNode);
 
     if (m_doc->m_back.first_child()) {
         music.append_copy(m_doc->m_back.first_child());
     }
-    
+
     /*
     if (m_scoreBasedMEI) {
         m_currentNode = mdiv.append_child("score");
@@ -1101,7 +1101,7 @@ void MeiOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
 void MeiOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
 {
     assert(bracketSpan);
-    
+
     WriteControlElement(currentNode, bracketSpan);
     WriteTimeSpanningInterface(currentNode, bracketSpan);
     bracketSpan->WriteBracketSpanLog(currentNode);
@@ -1109,7 +1109,7 @@ void MeiOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracke
     bracketSpan->WriteLineRend(currentNode);
     bracketSpan->WriteLineRendBase(currentNode);
 }
-    
+
 void MeiOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
 {
     assert(breath);
@@ -1452,7 +1452,7 @@ void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
 
     WriteLayerElement(currentNode, halfmRpt);
 }
-    
+
 void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 {
     assert(keySig);
@@ -1460,6 +1460,7 @@ void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
     WriteLayerElement(currentNode, keySig);
     keySig->WriteAccidental(currentNode);
     keySig->WritePitch(currentNode);
+    keySig->WriteKeySigAnl(currentNode);
 }
 
 void MeiOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
@@ -2099,10 +2100,11 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
 
     // editorial
     if (IsEditorialElementName(element)) {
-        if (filterParent->Is(LABEL)) {
+        // Because of the Clone issue on annot do not support it in label and labelAbbr
+        if (filterParent->Is(LABEL) && (element == "annot")) {
             return false;
         }
-        else if (filterParent->Is(LABELABBR)) {
+        else if (filterParent->Is(LABELABBR) && (element == "annot")) {
             return false;
         }
         else {
@@ -2442,14 +2444,14 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         LogError("No <music> element found in the MEI data");
         return false;
     }
-    
+
     front = music.child("front");
     if (!front.empty()) {
         m_doc->m_front.reset();
         // copy the complete front into the master document
         m_doc->m_front.append_copy(front);
     }
-    
+
     back = music.child("back");
     if (!back.empty()) {
         m_doc->m_back.reset();
@@ -3469,7 +3471,7 @@ bool MeiInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
     ReadUnsupportedAttr(arpeg, vrvArpeg);
     return true;
 }
-    
+
 bool MeiInput::ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan)
 {
     BracketSpan *vrvBracketSpan = new BracketSpan();
@@ -3596,7 +3598,7 @@ bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 {
     Mordent *vrvMordent = new Mordent();
     ReadControlElement(mordent, vrvMordent);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeMordentTo_4_0_0(mordent, vrvMordent);
     }
@@ -3708,7 +3710,7 @@ bool MeiInput::ReadTurn(Object *parent, pugi::xml_node turn)
 {
     Turn *vrvTurn = new Turn();
     ReadControlElement(turn, vrvTurn);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeTurnTo_4_0_0(turn, vrvTurn);
     }
@@ -4133,7 +4135,7 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     ReadUnsupportedAttr(fTrem, vrvFTrem);
     return ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
-    
+
 bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
 {
     HalfmRpt *vrvHalfmRpt = new HalfmRpt();
@@ -4143,7 +4145,7 @@ bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
     ReadUnsupportedAttr(halfmRpt, vrvHalfmRpt);
     return true;
 }
-    
+
 bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 {
     KeySig *vrvKeySig = new KeySig();
@@ -4151,6 +4153,7 @@ bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 
     vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadPitch(keySig);
+    vrvKeySig->ReadKeySigAnl(keySig);
 
     // special processing required
     vrvKeySig->ConvertToInternal();
@@ -4510,7 +4513,7 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
     ReadTextElement(f, vrvF);
 
     ReadTimeSpanningInterface(f, vrvF);
-    
+
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);
     return ReadTextChildren(vrvF, f);
@@ -5248,7 +5251,7 @@ bool MeiInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
 bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)
 {
     if (!measure) {
-        LogWarning("Cannot read <tupleSpan> within editorial markup");
+        LogWarning("Cannot read <tupletSpan> within editorial markup");
         return false;
     }
 
@@ -5257,6 +5260,8 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     LayerElement *start = NULL;
     LayerElement *end = NULL;
+    
+    AttConverter converter;
 
     // label
     if (tupletSpan.attribute("label")) {
@@ -5270,7 +5275,19 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     if (tupletSpan.attribute("numbase")) {
         tuplet->SetNumbase(atoi(tupletSpan.attribute("numbase").value()));
     }
-
+    if (tupletSpan.attribute("num.visible")) {
+        tuplet->SetNumVisible(converter.StrToBoolean(tupletSpan.attribute("num.visible").value()));
+    }
+    if (tupletSpan.attribute("num.place")) {
+        tuplet->SetNumPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("num.place").value()));
+    }
+    if (tupletSpan.attribute("bracket.visible")) {
+        tuplet->SetBracketVisible(converter.StrToBoolean(tupletSpan.attribute("bracket.visible").value()));
+    }
+    if (tupletSpan.attribute("bracket.place")) {
+        tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
+    }
+    
     // position (pitch)
     if (tupletSpan.attribute("startid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("startid").value());
@@ -5358,7 +5375,7 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
 }
-    
+
 void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)
 {
     if (mordent.attribute("form")) {
@@ -5443,7 +5460,7 @@ void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
         staffGrp.remove_attribute("label.abbr");
     }
 }
-    
+
 void MeiInput::UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn)
 {
     if (turn.attribute("form")) {

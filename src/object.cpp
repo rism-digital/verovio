@@ -353,7 +353,7 @@ Object *Object::GetNext(Object *child, const ClassId classId)
     }
     return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;
 }
-    
+
 Object *Object::GetPrevious(Object *child, const ClassId classId)
 {
     ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
@@ -600,7 +600,7 @@ int Object::GetChildIndex(const Object *child)
     }
     return -1;
 }
-    
+
 int Object::GetChildIndex(const Object *child, const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
@@ -902,7 +902,7 @@ std::wstring TextListInterface::GetText(Object *node)
     }
     return concatText;
 }
-    
+
 void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &lines)
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
@@ -927,7 +927,7 @@ void TextListInterface::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
     while (iter != childList->end()) {
-        if (!(*iter)->Is({LB, TEXT})) {
+        if (!(*iter)->Is({ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
             iter = childList->erase(iter);
             continue;
@@ -1105,11 +1105,11 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         i->first->SetNextLink(this);
         params->m_nextUuidPairs.erase(i);
     }
-    
+
     // @sameas
     std::string sameas = this->GetUuid();
     auto j = std::find_if(params->m_sameasUuidPairs.begin(), params->m_sameasUuidPairs.end(),
-                          [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+        [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
     if (j != params->m_sameasUuidPairs.end()) {
         j->first->SetSameasLink(this);
         params->m_sameasUuidPairs.erase(j);

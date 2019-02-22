@@ -42,6 +42,7 @@ class MRpt;
 class Object;
 class Page;
 class ScoreDef;
+class Slur;
 class Staff;
 class StaffAlignment;
 class StaffDef;
@@ -192,7 +193,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPostionersParams
+// AdjustFloatingPositionersParams
 //----------------------------------------------------------------------------
 
 /**
@@ -201,9 +202,9 @@ public:
  * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
-class AdjustFloatingPostionersParams : public FunctorParams {
+class AdjustFloatingPositionersParams : public FunctorParams {
 public:
-    AdjustFloatingPostionersParams(Doc *doc, Functor *functor)
+    AdjustFloatingPositionersParams(Doc *doc, Functor *functor)
     {
         m_classId = OBJECT;
         m_doc = doc;
@@ -212,6 +213,27 @@ public:
     ClassId m_classId;
     Doc *m_doc;
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// AdjustFloatingPositionerGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector of the classId to group
+ * member 1: the doc
+ **/
+
+class AdjustFloatingPositionerGrpsParams : public FunctorParams {
+public:
+    AdjustFloatingPositionerGrpsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_place = STAFFREL_basic_above;
+    }
+    std::vector<ClassId> m_classIds;
+    data_STAFFREL_basic m_place;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -251,24 +273,25 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPostionerGrpsParams
+// AdjustSlursParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a vector of the classId to group
  * member 1: the doc
+ * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
-class AdjustFloatingPostionerGrpsParams : public FunctorParams {
+class AdjustSlursParams : public FunctorParams {
 public:
-    AdjustFloatingPostionerGrpsParams(Doc *doc)
+    AdjustSlursParams(Doc *doc, Functor *functor)
     {
+        m_adjusted = false;
         m_doc = doc;
-        m_place = STAFFREL_basic_above;
+        m_functor = functor;
     }
-    std::vector<ClassId> m_classIds;
-    data_STAFFREL_basic m_place;
+    bool m_adjusted;
     Doc *m_doc;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -614,12 +637,14 @@ public:
         m_maxCurrentScoreTime = 0.0;
         m_maxCurrentRealTimeSeconds = 0.0;
         m_currentTempo = 120;
+        m_tempoAdjustment = 1.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     double m_maxCurrentScoreTime;
     double m_maxCurrentRealTimeSeconds;
     int m_currentTempo;
+    double m_tempoAdjustment;
 };
 
 //----------------------------------------------------------------------------
@@ -1055,25 +1080,35 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindTimeSpanningLayerElementsParams
+// FindSpannedLayerElementsParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: a pointer to the vector of LayerElement pointer to fill
  * member 1: the minimum position
  * member 2: the maximum position
+ * member 3: the timespanning interface
+ * member 4: the class Ids to keep
+ * member 5: the slur for finding ties (too specific, to be refactored)
+ * member 6: the ties we need to consider (too specific, to be refactored)
  **/
 
-class FindTimeSpanningLayerElementsParams : public FunctorParams {
+class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindTimeSpanningLayerElementsParams()
+    FindSpannedLayerElementsParams(TimeSpanningInterface *interface, Slur *slur)
     {
+        m_interface = interface;
         m_minPos = 0;
         m_maxPos = 0;
+        m_slur = slur;
     }
-    std::vector<LayerElement *> m_spanningContent;
+    std::vector<LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
+    TimeSpanningInterface *m_interface;
+    std::vector<ClassId> m_classIds;
+    Slur *m_slur;
+    std::vector<FloatingPositioner *> m_ties;
 };
 
 //----------------------------------------------------------------------------

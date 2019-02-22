@@ -220,7 +220,7 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
         LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
     return 0;
 }
-    
+
 std::string Att::CompassdirectionToStr(data_COMPASSDIRECTION data) const
 {
     std::string value;
@@ -228,7 +228,7 @@ std::string Att::CompassdirectionToStr(data_COMPASSDIRECTION data) const
         value = CompassdirectionBasicToStr(data.GetBasic());
     else if (data.GetType() == COMPASSDIRECTION_extended)
         value = CompassdirectionExtendedToStr(data.GetExtended());
-    
+
     return value;
 }
 
@@ -239,12 +239,12 @@ data_COMPASSDIRECTION Att::StrToCompassdirection(std::string value, bool logWarn
     if (data.HasValue()) return data;
     data.SetExtended(StrToCompassdirectionExtended(value, false));
     if (data.HasValue()) return data;
-    
+
     if (logWarning && !value.empty()) LogWarning("Unsupported data.COMPASSDIRECTION '%s'", value.c_str());
-    
+
     return data;
 }
-    
+
 std::string Att::EventrelToStr(data_EVENTREL data) const
 {
     std::string value;
@@ -252,7 +252,7 @@ std::string Att::EventrelToStr(data_EVENTREL data) const
         value = EventrelBasicToStr(data.GetBasic());
     else if (data.GetType() == EVENTREL_extended)
         value = EventrelExtendedToStr(data.GetExtended());
-    
+
     return value;
 }
 
@@ -263,9 +263,9 @@ data_EVENTREL Att::StrToEventrel(std::string value, bool logWarning) const
     if (data.HasValue()) return data;
     data.SetExtended(StrToEventrelExtended(value, false));
     if (data.HasValue()) return data;
-    
+
     if (logWarning && !value.empty()) LogWarning("Unsupported data.EVENTREL '%s'", value.c_str());
-    
+
     return data;
 }
 
@@ -846,6 +846,18 @@ bool AttComparison::operator()(Object *object)
 bool AttComparison::MatchesType(Object *object)
 {
     if (object->Is(m_classId)) {
+        return true;
+    }
+    return false;
+}
+
+//----------------------------------------------------------------------------
+// ClassIdsComparison
+//----------------------------------------------------------------------------
+
+bool ClassIdsComparison::operator()(Object *object)
+{
+    if (object->Is(m_classIds)) {
         return true;
     }
     return false;

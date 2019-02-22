@@ -34,7 +34,7 @@ public:
     virtual std::string GetClassName() const { return "F"; }
     virtual ClassId GetClassId() const { return FIGURE; }
     ///@}
-    
+
     /**
      * @name Getter to interfaces
      */
@@ -48,15 +48,14 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
-    
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
     // Because F is a TextElement and not a ControlElement, these methods need to be implemented because
     // TextElement does not inherit from FloatingObject.
-    
+
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */

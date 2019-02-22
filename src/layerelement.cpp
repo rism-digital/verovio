@@ -40,6 +40,7 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
+#include "slur.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -471,7 +472,7 @@ double LayerElement::GetAlignmentDuration(
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
     }
-    
+
     if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
         LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
         assert(sameas);
@@ -531,7 +532,7 @@ double LayerElement::GetAlignmentDuration(
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
-        
+
         if (this->Is(HALFMRPT)) {
             return (DUR_MAX / meterUnit * meterCount) / 2;
         }
@@ -1149,7 +1150,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // nothing to do when the element has a @sameas attribute
         return FUNCTOR_SIBLINGS;
     }
-    
+
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
@@ -1397,13 +1398,30 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
+int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
 {
-    FindTimeSpanningLayerElementsParams *params = dynamic_cast<FindTimeSpanningLayerElementsParams *>(functorParams);
+    FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
-    if ((this->GetDrawingX() > params->m_minPos) && (this->GetDrawingX() < params->m_maxPos)) {
-        params->m_spanningContent.push_back(this);
+    if (!this->Is(params->m_classIds)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
+        && (this->GetContentLeft() < params->m_maxPos)) {
+
+        // We skip the start or end of the slur
+        if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetStart()->HasChild(this) || this->HasChild(params->m_interface->GetStart())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetEnd()->HasChild(this) || this->HasChild(params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+
+        params->m_elements.push_back(this);
     }
     else if (this->GetDrawingX() > params->m_maxPos) {
         return FUNCTOR_STOP;

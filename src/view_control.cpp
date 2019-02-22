@@ -240,7 +240,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
         spanningType = SPANNING_START;
     }
-    
+
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
@@ -328,22 +328,22 @@ void View::DrawBracketSpan(
 {
     assert(bracketSpan);
     assert(staff);
-    
+
     assert(bracketSpan->GetStart());
     assert(bracketSpan->GetEnd());
-    
+
     if (!bracketSpan->HasFunc()) {
         // we cannot draw a bracketSpan that has no func
         return;
     }
-    
+
     int y = bracketSpan->GetDrawingY();
-    
+
     int startRadius = 0;
     if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
         startRadius = bracketSpan->GetStart()->GetDrawingRadius(m_doc);
     }
-    
+
     int endRadius = 0;
     if (!bracketSpan->GetEnd()->Is(TIMESTAMP_ATTR)) {
         endRadius = bracketSpan->GetEnd()->GetDrawingRadius(m_doc);
@@ -372,10 +372,10 @@ void View::DrawBracketSpan(
     else {
         dc->StartGraphic(bracketSpan, "spanning-bracketspan", "");
     }
-    
+
     int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    
+
     if (bracketSpan->HasLwidth()) {
         if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
             if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
@@ -390,11 +390,12 @@ void View::DrawBracketSpan(
         }
         else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
             if (bracketSpan->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                lineWidth
+                    = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
     }
-    
+
     // Opening bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
@@ -421,7 +422,8 @@ void View::DrawBracketSpan(
             dc->SetPen(m_currentColour, lineWidth, AxSOLID, bracketSize);
             dc->SetBrush(m_currentColour, AxSOLID);
             int yDotted = y + lineWidth / 2;
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(yDotted), ToDeviceContextX(x2), ToDeviceContextY(yDotted));
+            dc->DrawLine(
+                ToDeviceContextX(x1), ToDeviceContextY(yDotted), ToDeviceContextX(x2), ToDeviceContextY(yDotted));
             dc->ResetPen();
             dc->ResetBrush();
         }
@@ -429,15 +431,18 @@ void View::DrawBracketSpan(
             dc->SetPen(m_currentColour, lineWidth, AxSOLID, lineWidth);
             dc->SetBrush(m_currentColour, AxSOLID);
             // Adjust the start and end because the horizontal line of the was drawn in that case
-            int x1Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
-            int x2Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
+            int x1Dotted
+                = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
+            int x2Dotted
+                = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
             int yDotted = y + lineWidth / 2;
-            dc->DrawLine(ToDeviceContextX(x1Dotted), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted), ToDeviceContextY(yDotted));
+            dc->DrawLine(ToDeviceContextX(x1Dotted), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted),
+                ToDeviceContextY(yDotted));
             dc->ResetPen();
             dc->ResetBrush();
         }
     }
-    
+
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -445,7 +450,7 @@ void View::DrawBracketSpan(
         dc->EndGraphic(bracketSpan, this);
     }
 }
-    
+
 void View::DrawHairpin(
     DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
@@ -644,7 +649,8 @@ void View::DrawOctave(
             }
             else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
                 if (octave->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                    lineWidth = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                    lineWidth
+                        = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
                 }
             }
         }
@@ -699,7 +705,6 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     Note *note1 = dynamic_cast<Note *>(tie->GetStart());
     Note *note2 = dynamic_cast<Note *>(tie->GetEnd());
-    
 
     if (!note1 && !note2) {
         // no note, obviously nothing to do...
@@ -726,7 +731,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (!parentChord1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
         isShortTie = true;
     }
-    
+
     y1 = staff->GetDrawingY();
     y2 = staff->GetDrawingY();
 
@@ -883,7 +888,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     bezier[3] = Point(x2, y2);
 
     assert(tie->GetCurrentFloatingPositioner());
-    tie->GetCurrentFloatingPositioner()->UpdateCurvePosition(bezier, 0.0, thickness, drawingCurveDir);
+    FloatingPositioner *positioner = tie->GetCurrentFloatingPositioner();
+    assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
+    FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(positioner);
+    assert(curve);
+    curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
@@ -1013,11 +1022,10 @@ void View::DrawControlElementConnector(
     else
         dc->EndGraphic(dynam, this);
 }
-    
-void View::DrawFConnector(
-    DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+
+void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
-    
+
     assert(f);
     assert(f->GetStart() && f->GetEnd());
     if (!f->GetStart() || !f->GetEnd()) return;
@@ -1041,7 +1049,6 @@ void View::DrawFConnector(
         // nothing to adjust
     }
 
-    
     // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
     // object
     // in order not to reset the Syl bounding box.
@@ -1058,9 +1065,9 @@ void View::DrawFConnector(
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
     DrawFilledRectangle(dc, x1, y, x2, y + width);
-    
+
     dc->ReactivateGraphic();
-    
+
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -1077,7 +1084,7 @@ void View::DrawSylConnector(
 
     int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
     TextExtend extend;
-    
+
     // the length of the dash and the space between them
     int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
     // Adjust it proportionally to the lyric size
@@ -1101,9 +1108,9 @@ void View::DrawSylConnector(
             // Return but only if the end is in the first measure of the system...
             Measure *measure = dynamic_cast<Measure *>(syl->GetEnd()->GetFirstParent(MEASURE));
             assert(measure);
-            System *system = dynamic_cast<System*>(measure->GetFirstParent(SYSTEM));
+            System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
             assert(system);
-            if (measure == dynamic_cast<Measure*>(system->FindChildByType(MEASURE))) {
+            if (measure == dynamic_cast<Measure *>(system->FindChildByType(MEASURE))) {
                 return;
             }
         }
@@ -1134,7 +1141,7 @@ void View::DrawSylConnector(
     DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
 
     dc->ReactivateGraphic();
-    
+
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -1147,7 +1154,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     if (dc->Is(BBOX_DEVICE_CONTEXT)) {
         return;
     }
-    
+
     int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
@@ -1161,7 +1168,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         // Adjust it proportionally to the lyric size
         dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
         int halfDashLength = dashLength / 2;
-        
+
         int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         int dist = x2 - x1;
         int nbDashes = dist / dashSpace;
@@ -1171,7 +1178,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         if (dist < dashLength) {
             LogDebug("Hyphen space under the limit");
         }
-        
+
         if (nbDashes < 2) {
             nbDashes = 1;
         }
@@ -1184,9 +1191,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
-           DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
         }
-        //DrawFilledRectangle(dc, x1, y, x2, y + width);
+        // DrawFilledRectangle(dc, x1, y, x2, y + width);
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
@@ -1432,7 +1439,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     dc->StartGraphic(fb, "", fb->GetUuid());
 
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    int lineHeight =  m_doc->GetTextLineHeight(fontDim, false);
+    int lineHeight = m_doc->GetTextLineHeight(fontDim, false);
     int startX = params.m_x;
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
@@ -1921,7 +1928,8 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             int accidYShit = m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true);
-            DrawSmuflString(dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            DrawSmuflString(
+                dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
         }
         if (turn->HasAccidlower()) {
             int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
@@ -1930,7 +1938,8 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             int accidYShit = -m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
-            DrawSmuflString(dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            DrawSmuflString(
+                dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
         }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
