@@ -277,7 +277,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
     m_drawingRight = dynamic_cast<LayerElement *>(this->FindChildByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 {
