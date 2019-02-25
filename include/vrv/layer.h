@@ -183,11 +183,6 @@ public:
     virtual int PrepareRpt(FunctorParams *functorParams);
 
     /**
-     * See Object::CalcStem
-     */
-    virtual int CalcStem(FunctorParams *);
-
-    /**
      * See Object::CalcOnsetOffset
      */
     ///@{
