@@ -286,14 +286,15 @@ private:
 class ArticPartTypeComparison : public ClassIdComparison {
 
 public:
-    ArticPartTypeComparison(const ArticPartType type) : ClassIdComparison(OBJECT) { m_type = type; }
+    ArticPartTypeComparison(const ArticPartType type) : ClassIdComparison(ARTIC_PART) { m_type = type; }
 
     void SetType(ArticPartType type) { m_type = type; }
 
     virtual bool operator()(Object *object)
     {
+        if (!MatchesType(object)) return false;
         ArticPart *articPart = dynamic_cast<ArticPart *>(object);
-        if (!articPart) return false;
+        assert(articPart);
         return (articPart->GetType() == m_type);
     }
 
@@ -311,14 +312,15 @@ private:
 class MeasureAlignerTypeComparison : public ClassIdComparison {
 
 public:
-    MeasureAlignerTypeComparison(const AlignmentType type) : ClassIdComparison(OBJECT) { m_type = type; }
+    MeasureAlignerTypeComparison(const AlignmentType type) : ClassIdComparison(ALIGNMENT) { m_type = type; }
 
     void SetType(AlignmentType type) { m_type = type; }
 
     virtual bool operator()(Object *object)
     {
+        if (!MatchesType(object)) return false;
         Alignment *alignment = dynamic_cast<Alignment *>(object);
-        if (!alignment) return false;
+        assert(alignment);
         return (alignment->GetType() == m_type);
     }
 
