@@ -23,8 +23,21 @@
 
 namespace vrv {
 
-
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, ABC, DARMS, MUSICXML, MUSICXMLHUM, MEIHUM, ESAC, MIDI, TIMEMAP };
+enum FileFormat {
+    UNKNOWN = 0,
+    AUTO,
+    MEI,
+    HUMDRUM,
+    PAE,
+    ABC,
+    DARMS,
+    MUSICXML,
+    MUSICXMLHUM,
+    MEIHUM,
+    ESAC,
+    MIDI,
+    TIMEMAP
+};
 
 //----------------------------------------------------------------------------
 // Toolkit

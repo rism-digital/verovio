@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        attcomparison.h
+// Name:        comparison.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATT_COMPARISON_H__
-#define __VRV_ATT_COMPARISON_H__
+#ifndef __VRV_COMPARISON_H__
+#define __VRV_COMPARISON_H__
 
 #include "artic.h"
 #include "atts_shared.h"
@@ -21,16 +21,124 @@ namespace vrv {
 enum DurExtreme { LONGEST = 0, SHORTEST };
 
 //----------------------------------------------------------------------------
+// Comparison
+//----------------------------------------------------------------------------
+
+class Comparison {
+
+public:
+    virtual bool operator()(Object *object) = 0;
+    virtual bool MatchesType(Object *object) = 0;
+};
+
+//----------------------------------------------------------------------------
+// ClassIdComparison
+//----------------------------------------------------------------------------
+
+class ClassIdComparison : public Comparison {
+
+public:
+    ClassIdComparison(ClassId classId) { m_classId = classId; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (object->Is(m_classId)) {
+            return true;
+        }
+        return false;
+    }
+
+    ClassId GetType() { return m_classId; }
+
+    bool MatchesType(Object *object)
+    {
+        if (object->Is(m_classId)) {
+            return true;
+        }
+        return false;
+    }
+
+protected:
+    ClassId m_classId;
+};
+
+//----------------------------------------------------------------------------
+// ClassIdsComparison
+//----------------------------------------------------------------------------
+
+class ClassIdsComparison : public Comparison {
+
+public:
+    ClassIdsComparison(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (object->Is(m_classIds)) {
+            return true;
+        }
+        return false;
+    }
+
+    bool MatchesType(Object *object) { return true; }
+
+protected:
+    std::vector<ClassId> m_classIds;
+};
+
+//----------------------------------------------------------------------------
+// InterfaceComparison
+//----------------------------------------------------------------------------
+
+class InterfaceComparison : public Comparison {
+
+public:
+    InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (object->HasInterface(m_interfaceId)) {
+            return true;
+        }
+        return false;
+    }
+
+    bool MatchesType(Object *object) { return true; }
+
+protected:
+    InterfaceId m_interfaceId;
+};
+
+//----------------------------------------------------------------------------
+// IsEmptyElement
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId and is empty
+ */
+class IsEmptyElement : public ClassIdComparison {
+
+public:
+    IsEmptyElement(ClassId ClassId) : ClassIdComparison(ClassId) {}
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        if (object->GetChildCount() == 0) return true;
+        return false;
+    }
+};
+
+//----------------------------------------------------------------------------
 // IsAttributeComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and is an attribute in the original MEI.
  */
-class IsAttributeComparison : public AttComparison {
+class IsAttributeComparison : public ClassIdComparison {
 
 public:
-    IsAttributeComparison(ClassId AttClassId) : AttComparison(AttClassId) {}
+    IsAttributeComparison(ClassId ClassId) : ClassIdComparison(ClassId) {}
 
     virtual bool operator()(Object *object)
     {
@@ -47,10 +155,10 @@ public:
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttNIntegerComparison : public AttComparison {
+class AttNIntegerComparison : public ClassIdComparison {
 
 public:
-    AttNIntegerComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; }
+    AttNIntegerComparison(ClassId ClassId, const int n) : ClassIdComparison(ClassId) { m_n = n; }
 
     void SetN(int n) { m_n = n; }
 
@@ -75,10 +183,10 @@ private:
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttNIntegerComparisonAny : public AttComparison {
+class AttNIntegerComparisonAny : public ClassIdComparison {
 
 public:
-    AttNIntegerComparisonAny(ClassId AttClassId, std::vector<int> ns) : AttComparison(AttClassId) { m_ns = ns; }
+    AttNIntegerComparisonAny(ClassId ClassId, std::vector<int> ns) : ClassIdComparison(ClassId) { m_ns = ns; }
 
     void SetNs(std::vector<int> ns) { m_ns = ns; }
 
@@ -103,10 +211,10 @@ private:
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttNNumberLikeComparison : public AttComparison {
+class AttNNumberLikeComparison : public ClassIdComparison {
 
 public:
-    AttNNumberLikeComparison(ClassId AttClassId, const std::string n) : AttComparison(AttClassId) { m_n = n; }
+    AttNNumberLikeComparison(ClassId ClassId, const std::string n) : ClassIdComparison(ClassId) { m_n = n; }
 
     void SetN(std::string n) { m_n = n; }
 
@@ -125,30 +233,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttComparisonAny
-//----------------------------------------------------------------------------
-
-/**
- * This class evaluates if the object is of a certain ClassId and has a @n of value n.
- */
-class AttComparisonAny : public AttComparison {
-
-public:
-    AttComparisonAny(std::vector<ClassId> classIds) : AttComparison(OBJECT) { m_classIds = classIds; }
-
-    void SetClassIds(std::vector<ClassId> classIds) { m_classIds = classIds; }
-
-    virtual bool operator()(Object *object)
-    {
-        ClassId classId = object->GetClassId();
-        return (std::find(m_classIds.begin(), m_classIds.end(), classId) != m_classIds.end());
-    }
-
-private:
-    std::vector<ClassId> m_classIds;
-};
-
-//----------------------------------------------------------------------------
 // AttDurExtreme
 //----------------------------------------------------------------------------
 
@@ -157,10 +241,10 @@ private:
  * The object has to have a DurationInterface and to have a @dur.
  * The class can look for LONGEST or SHORTEST duration (Constructor)
  */
-class AttDurExtreme : public AttComparison {
+class AttDurExtreme : public ClassIdComparison {
 
 public:
-    AttDurExtreme(DurExtreme extremeType) : AttComparison(OBJECT)
+    AttDurExtreme(DurExtreme extremeType) : ClassIdComparison(OBJECT)
     {
         m_extremeType = extremeType;
         if (m_extremeType == LONGEST)
@@ -199,10 +283,10 @@ private:
 /**
  * This class evaluates if the object is an Alignment of a certain type
  */
-class ArticPartTypeComparison : public AttComparison {
+class ArticPartTypeComparison : public ClassIdComparison {
 
 public:
-    ArticPartTypeComparison(const ArticPartType type) : AttComparison(OBJECT) { m_type = type; }
+    ArticPartTypeComparison(const ArticPartType type) : ClassIdComparison(OBJECT) { m_type = type; }
 
     void SetType(ArticPartType type) { m_type = type; }
 
@@ -224,10 +308,10 @@ private:
 /**
  * This class evaluates if the object is an Alignment of a certain type
  */
-class MeasureAlignerTypeComparison : public AttComparison {
+class MeasureAlignerTypeComparison : public ClassIdComparison {
 
 public:
-    MeasureAlignerTypeComparison(const AlignmentType type) : AttComparison(OBJECT) { m_type = type; }
+    MeasureAlignerTypeComparison(const AlignmentType type) : ClassIdComparison(OBJECT) { m_type = type; }
 
     void SetType(AlignmentType type) { m_type = type; }
 
@@ -249,10 +333,10 @@ private:
 /**
  * This class evaluates if the object is a measure enclosing the given time
  */
-class MeasureOnsetOffsetComparison : public AttComparison {
+class MeasureOnsetOffsetComparison : public ClassIdComparison {
 
 public:
-    MeasureOnsetOffsetComparison(const int time) : AttComparison(MEASURE) { m_time = time; }
+    MeasureOnsetOffsetComparison(const int time) : ClassIdComparison(MEASURE) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 
@@ -275,10 +359,10 @@ private:
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class NoteOnsetOffsetComparison : public AttComparison {
+class NoteOnsetOffsetComparison : public ClassIdComparison {
 
 public:
-    NoteOnsetOffsetComparison(const int time) : AttComparison(NOTE) { m_time = time; }
+    NoteOnsetOffsetComparison(const int time) : ClassIdComparison(NOTE) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 

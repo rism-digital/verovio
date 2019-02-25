@@ -13,8 +13,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "bboxdevicecontext.h"
+#include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
 #include "pages.h"

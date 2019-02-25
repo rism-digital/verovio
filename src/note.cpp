@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"

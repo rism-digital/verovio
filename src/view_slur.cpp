@@ -15,8 +15,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "bboxdevicecontext.h"
+#include "comparison.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "functorparams.h"
@@ -418,7 +418,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     /************** articulation **************/
 
     // First get all artic children
-    AttComparison matchType(ARTIC);
+    ClassIdComparison matchType(ARTIC);
     ArrayOfObjects artics;
     ArrayOfObjects::iterator articIter;
 
@@ -498,7 +498,8 @@ float View::CalcInitialSlur(
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
     findSpannedLayerElementsParams.m_minPos = p1.x;
     findSpannedLayerElementsParams.m_maxPos = p2.x;
-    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
+    findSpannedLayerElementsParams.m_classIds
+        = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
@@ -516,17 +517,17 @@ float View::CalcInitialSlur(
 
         CurveSpannedElement *spannedElement = new CurveSpannedElement;
         spannedElement->m_boundingBox = element;
-        
+
         Point pRotated;
         Point pLeft;
         pLeft.x = element->GetSelfLeft();
-        //if ((pLeft.x > p1->x) && (pLeft.x < p2->x)) {
+        // if ((pLeft.x > p1->x) && (pLeft.x < p2->x)) {
         //    pLeft.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
         //    spannedElements->push_back(spannedElement);
         //}
         Point pRight;
         pRight.x = element->GetSelfRight();
-        //if ((pRight.x > p1->x) && (pRight.x < p2->x)) {
+        // if ((pRight.x > p1->x) && (pRight.x < p2->x)) {
         //    pRight.y = (curveDir == curvature_CURVEDIR_above) ? element->GetSelfTop() : element->GetSelfBottom();
         //    spannedElements->push_back(spannedElement);
         //}
@@ -534,7 +535,7 @@ float View::CalcInitialSlur(
             spannedElements->push_back(spannedElement);
         }
     }
-    
+
     for (auto &positioner : findSpannedLayerElementsParams.m_ties) {
         CurveSpannedElement *spannedElement = new CurveSpannedElement;
         spannedElement->m_boundingBox = positioner;

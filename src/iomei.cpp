@@ -5260,7 +5260,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     LayerElement *start = NULL;
     LayerElement *end = NULL;
-    
+
     AttConverter converter;
 
     // label
@@ -5287,7 +5287,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     if (tupletSpan.attribute("bracket.place")) {
         tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
     }
-    
+
     // position (pitch)
     if (tupletSpan.attribute("startid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("startid").value());

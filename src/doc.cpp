@@ -14,10 +14,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "barline.h"
 #include "beatrpt.h"
 #include "chord.h"
+#include "comparison.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
@@ -140,7 +140,7 @@ bool Doc::GenerateDocumentScoreDef()
     }
 
     ArrayOfObjects staves;
-    AttComparison matchType(STAFF);
+    ClassIdComparison matchType(STAFF);
     measure->FindAllChildByComparison(&staves, &matchType);
 
     if (staves.empty()) {
@@ -205,7 +205,7 @@ bool Doc::GenerateHeaderAndFooter()
 
 bool Doc::GenerateMeasureNumbers()
 {
-    AttComparison matchType(MEASURE);
+    ClassIdComparison matchType(MEASURE);
     ArrayOfObjects measures;
     ArrayOfObjects::iterator measureIter;
     this->FindAllChildByComparison(&measures, &matchType);

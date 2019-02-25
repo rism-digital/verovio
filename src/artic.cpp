@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"

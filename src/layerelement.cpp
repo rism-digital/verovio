@@ -13,13 +13,13 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
@@ -138,7 +138,7 @@ bool LayerElement::IsGraceNote()
         return (chord->HasGrace());
     }
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) return child->IsGraceNote();
@@ -1222,7 +1222,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For tuplet, we also need to look at the first note or chord
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) m_drawingCueSize = child->GetDrawingCueSize();

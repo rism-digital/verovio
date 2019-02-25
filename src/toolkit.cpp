@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "custos.h"
 #include "functorparams.h"
 #include "ioabc.h"
@@ -1353,7 +1353,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
 
         // Get components of neume
-        AttComparison ac(NC);
+        ClassIdComparison ac(NC);
         ArrayOfObjects objects;
         neume->FindAllChildByComparison(&objects, &ac);
 

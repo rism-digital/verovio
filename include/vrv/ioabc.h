@@ -102,7 +102,8 @@ private:
     data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
     std::string m_ID;
     int m_unitDur;
-    std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines = std::make_pair(BARRENDITION_NONE, BARRENDITION_NONE); //
+    std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines
+        = std::make_pair(BARRENDITION_NONE, BARRENDITION_NONE); //
     /*
      * ABC variables with default values
      */

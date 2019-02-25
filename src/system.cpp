@@ -13,8 +13,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "boundary.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
@@ -179,7 +179,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
 bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 {
-    AttComparisonAny matchType({ CHORD, NOTE });
+    ClassIdsComparison matchType({ CHORD, NOTE });
     ArrayOfObjects children;
     ArrayOfObjects::iterator childrenIter;
     this->FindAllChildBetween(&children, &matchType, start, end);

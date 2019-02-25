@@ -15,8 +15,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "boundary.h"
+#include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
 #include "editorial.h"
@@ -322,7 +322,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     std::vector<int> staffList;
 
     // First get all the staffGrps
-    AttComparison matchType(STAFFGRP);
+    ClassIdComparison matchType(STAFFGRP);
     ArrayOfObjects staffGrps;
     ArrayOfObjects::iterator staffGrpIter;
     scoreDef->FindAllChildByComparison(&staffGrps, &matchType);

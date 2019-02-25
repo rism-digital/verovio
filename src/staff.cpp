@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
@@ -302,11 +303,11 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
     staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
     ArrayOfObjects layers;
-    AttComparison matchTypeLayer(LAYER);
+    ClassIdComparison matchTypeLayer(LAYER);
     this->FindAllChildByComparison(&layers, &matchTypeLayer);
 
     ArrayOfObjects mRests;
-    AttComparison matchTypeMRest(MREST);
+    ClassIdComparison matchTypeMRest(MREST);
     this->FindAllChildByComparison(&mRests, &matchTypeMRest);
 
     if (mRests.size() != layers.size()) {

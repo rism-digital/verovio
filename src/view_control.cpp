@@ -16,10 +16,10 @@
 //----------------------------------------------------------------------------
 
 #include "arpeg.h"
-#include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "comparison.h"
 #include "devicecontext.h"
 #include "dir.h"
 #include "doc.h"

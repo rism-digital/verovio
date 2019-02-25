@@ -15,10 +15,10 @@
 
 #include "annot.h"
 #include "app.h"
-#include "attcomparison.h"
 #include "beam.h"
 #include "choice.h"
 #include "clef.h"
+#include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
 #include "doc.h"
@@ -874,7 +874,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
 
     Staff *staff = NULL;
     ArrayOfObjects staves;
-    AttComparison matchType(STAFF);
+    ClassIdComparison matchType(STAFF);
     measure->FindAllChildByComparison(&staves, &matchType, 1);
     for (auto &child : staves) {
         staff = dynamic_cast<Staff *>(child);

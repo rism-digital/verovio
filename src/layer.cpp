@@ -15,9 +15,9 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "attcomparison.h"
 #include "beam.h"
 #include "clef.h"
+#include "comparison.h"
 #include "custos.h"
 #include "doc.h"
 #include "editorial.h"

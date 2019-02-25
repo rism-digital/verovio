@@ -15,6 +15,7 @@
 
 #include "beam.h"
 #include "chord.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"

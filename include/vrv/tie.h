@@ -52,7 +52,7 @@ public:
     ///@{
     virtual int ResolveMIDITies(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::FindSpannedLayerElements
      */

@@ -14,13 +14,13 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "breath.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"

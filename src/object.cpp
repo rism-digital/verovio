@@ -19,6 +19,7 @@
 #include "boundary.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -286,7 +287,7 @@ int Object::GetChildCount(const ClassId classId) const
 int Object::GetChildCount(const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
-    AttComparison matchClassId(classId);
+    ClassIdComparison matchClassId(classId);
     this->FindAllChildByComparison(&objects, &matchClassId);
     return (int)objects.size();
 }
@@ -453,7 +454,7 @@ Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
 
 Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 {
-    AttComparison comparison(classId);
+    ClassIdComparison comparison(classId);
     return FindChildByComparison(&comparison, deepness, direction);
 }
 
@@ -604,7 +605,7 @@ int Object::GetChildIndex(const Object *child)
 int Object::GetChildIndex(const Object *child, const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
-    AttComparison matchClassId(classId);
+    ClassIdComparison matchClassId(classId);
     this->FindAllChildByComparison(&objects, &matchClassId);
     ArrayOfObjects::iterator iter;
     int i;
@@ -737,7 +738,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                     // if yes, we will use it (*comparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    AttComparison *attComparison = dynamic_cast<AttComparison *>(*comparisonIter);
+                    ClassIdComparison *attComparison = dynamic_cast<ClassIdComparison *>(*comparisonIter);
                     assert(attComparison);
                     if (o->GetClassId() == attComparison->GetType()) {
                         hasComparison = true;
