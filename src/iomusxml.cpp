@@ -1401,7 +1401,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             FTrem *fTrem = new FTrem();
             AddLayerElement(layer, fTrem);
             m_elementStack.push_back(fTrem);
-            fTrem->SetSlash(tremolo.node().text().as_int());
+            fTrem->SetBeams(tremolo.node().text().as_int());
         }
     }
 

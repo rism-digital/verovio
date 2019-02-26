@@ -1442,7 +1442,7 @@ void MeiOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     assert(fTrem);
 
     WriteLayerElement(currentNode, fTrem);
-    fTrem->WriteSlashCount(currentNode);
+    fTrem->WriteFTremVis(currentNode);
     fTrem->WriteTremMeasured(currentNode);
 }
 
@@ -4127,8 +4127,12 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
 {
     FTrem *vrvFTrem = new FTrem();
     ReadLayerElement(fTrem, vrvFTrem);
+    
+    if (m_version < MEI_4_0_0) {
+        UpgradeFTremTo_4_0_0(fTrem, vrvFTrem);
+    }
 
-    vrvFTrem->ReadSlashCount(fTrem);
+    vrvFTrem->ReadFTremVis(fTrem);
     vrvFTrem->ReadTremMeasured(fTrem);
 
     parent->AddChild(vrvFTrem);
@@ -5376,6 +5380,14 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     return false;
 }
 
+void MeiInput::UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem)
+{
+    if (fTrem.attribute("slash")) {
+        vrvFTrem->SetBeams(vrvFTrem->AttFTremVis::StrToInt(fTrem.attribute("slash").value()));
+        fTrem.remove_attribute("slash");
+    }
+}
+    
 void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)
 {
     if (mordent.attribute("form")) {

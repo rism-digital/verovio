@@ -22,7 +22,7 @@ namespace vrv {
 /**
  * This class models the MEI <fTrem> element.
  */
-class FTrem : public LayerElement, public ObjectListInterface, public AttSlashCount, public AttTremMeasured {
+class FTrem : public LayerElement, public ObjectListInterface, public AttFTremVis, public AttTremMeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
