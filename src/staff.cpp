@@ -466,7 +466,7 @@ int Staff::CalcStem(FunctorParams *)
     }
 
     // Detecting empty layers (empty layers can also have @sameas) which have to be ignored for stem direction
-    IsEmptyElement isEmptyElement(LAYER);
+    IsEmptyComparison isEmptyElement(LAYER);
     ArrayOfObjects emptyLayers;
     this->FindAllChildByComparison(&emptyLayers, &isEmptyElement);
 

@@ -240,7 +240,7 @@ void Page::LayOutHorizontally()
         // Detect the longest duration in order to adjust the spacing (false by default)
         if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
             // Get the longest duration in the piece
-            AttDurExtreme durExtremeComparison(LONGEST);
+            AttDurExtremeComparison durExtremeComparison(LONGEST);
             Object *longestDur = this->FindChildExtremeByComparison(&durExtremeComparison);
             if (longestDur) {
                 DurationInterface *interface = longestDur->GetDurationInterface();

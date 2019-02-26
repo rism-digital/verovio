@@ -663,7 +663,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, NULL, &filters);
@@ -735,7 +735,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);

@@ -109,16 +109,16 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-// IsEmptyElement
+// IsEmptyComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and is empty
  */
-class IsEmptyElement : public ClassIdComparison {
+class IsEmptyComparison : public ClassIdComparison {
 
 public:
-    IsEmptyElement(ClassId ClassId) : ClassIdComparison(ClassId) {}
+    IsEmptyComparison(ClassId ClassId) : ClassIdComparison(ClassId) {}
 
     virtual bool operator()(Object *object)
     {
@@ -177,16 +177,16 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttNIntegerComparisonAny
+// AttNIntegerAnyComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttNIntegerComparisonAny : public ClassIdComparison {
+class AttNIntegerAnyComparison : public ClassIdComparison {
 
 public:
-    AttNIntegerComparisonAny(ClassId ClassId, std::vector<int> ns) : ClassIdComparison(ClassId) { m_ns = ns; }
+    AttNIntegerAnyComparison(ClassId ClassId, std::vector<int> ns) : ClassIdComparison(ClassId) { m_ns = ns; }
 
     void SetNs(std::vector<int> ns) { m_ns = ns; }
 
@@ -233,7 +233,7 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttDurExtreme
+// AttDurExtremeComparison
 //----------------------------------------------------------------------------
 
 /**
@@ -241,10 +241,10 @@ private:
  * The object has to have a DurationInterface and to have a @dur.
  * The class can look for LONGEST or SHORTEST duration (Constructor)
  */
-class AttDurExtreme : public ClassIdComparison {
+class AttDurExtremeComparison : public ClassIdComparison {
 
 public:
-    AttDurExtreme(DurExtreme extremeType) : ClassIdComparison(OBJECT)
+    AttDurExtremeComparison(DurExtreme extremeType) : ClassIdComparison(OBJECT)
     {
         m_extremeType = extremeType;
         if (m_extremeType == LONGEST)
