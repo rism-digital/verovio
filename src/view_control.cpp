@@ -68,8 +68,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && !element->Is(DIR)
-        && !element->Is({ DYNAM, FERMATA, HARM, TRILL })) {
+    if (element->Is({ FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -89,17 +88,13 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dir *dir = dynamic_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
-        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(dir);
     }
     else if (element->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
-        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(dynam);
     }
     else if (element->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(element);
@@ -130,9 +125,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Trill *trill = dynamic_cast<Trill *>(element);
         assert(trill);
         DrawTrill(dc, trill, measure, system);
-        if (trill->GetEnd()) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(trill);
     }
     else if (element->Is(TURN)) {
         Turn *turn = dynamic_cast<Turn *>(element);

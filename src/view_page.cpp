@@ -961,9 +961,8 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffDefCautionary(dc, staff, measure);
 
-    std::vector<Object *>::iterator iter;
-    for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
-        system->AddToDrawingList(*iter);
+    for (auto &spanningElement : staff->m_timeSpanningElements) {
+        system->AddToDrawingListIfNeccessary(spanningElement);
     }
 
     dc->EndGraphic(staff, this);

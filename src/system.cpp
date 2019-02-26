@@ -15,7 +15,9 @@
 
 #include "boundary.h"
 #include "comparison.h"
+#include "dir.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
@@ -26,6 +28,7 @@
 #include "section.h"
 #include "staff.h"
 #include "syl.h"
+#include "trill.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -218,6 +221,38 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     }
 
     return false;
+}
+
+void System::AddToDrawingListIfNeccessary(Object *object)
+{
+    assert(object);
+
+    if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
+
+    if (object->Is({ FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
+        this->AddToDrawingList(object);
+    }
+    else if (object->Is(DIR)) {
+        Dir *dir = dynamic_cast<Dir *>(object);
+        assert(dir);
+        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
+            this->AddToDrawingList(dir);
+        }
+    }
+    else if (object->Is(DYNAM)) {
+        Dynam *dynam = dynamic_cast<Dynam *>(object);
+        assert(dynam);
+        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
+            this->AddToDrawingList(dynam);
+        }
+    }
+    else if (object->Is(TRILL)) {
+        Trill *trill = dynamic_cast<Trill *>(object);
+        assert(trill);
+        if (trill->GetEnd()) {
+            this->AddToDrawingListIfNeccessary(trill);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
