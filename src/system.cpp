@@ -235,14 +235,14 @@ void System::AddToDrawingListIfNeccessary(Object *object)
     else if (object->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(object);
         assert(dir);
-        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
+        if (dir->GetEnd() || (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true))) {
             this->AddToDrawingList(dir);
         }
     }
     else if (object->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(object);
         assert(dynam);
-        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
+        if (dynam->GetEnd() || (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true))) {
             this->AddToDrawingList(dynam);
         }
     }
