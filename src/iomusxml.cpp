@@ -1476,6 +1476,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         element = note;
         note->SetVisible(ConvertWordToBool(node.append_attribute("print-object").as_string()));
         note->SetColor(node.attribute("color").as_string());
+        if (node.attribute("xml:id")) {
+            note->SetUuid(node.attribute("xml:id").as_string());
+        }
 
         // accidental
         pugi::xpath_node accidental = node.select_single_node("accidental");
