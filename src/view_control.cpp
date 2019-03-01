@@ -947,10 +947,10 @@ void View::DrawControlElementConnector(
     DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(element);
-    
+
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
-    
+
     assert(element->GetNextLink() || interface->GetEnd());
     if (!element->GetNextLink() && !interface->GetEnd()) return;
 
@@ -1005,14 +1005,14 @@ void View::DrawControlElementConnector(
     else {
         dc->StartGraphic(element, "spanning-element", "");
     }
-    
+
     bool deactivate = true;
     // If there is no end link and we are not starting the control element, then do not deactivate the element.
     // The vertical spacing will not be consistent but a least is does not leave the connector un-laidout
     if (!element->GetNextLink() && (spanningType != SPANNING_START_END) && (spanningType != SPANNING_START)) {
         deactivate = false;
     }
-    
+
     if (deactivate) {
         dc->DeactivateGraphic();
     }

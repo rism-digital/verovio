@@ -478,8 +478,7 @@ double LayerElement::GetAlignmentDuration(
         assert(sameas);
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
-
-    if (this->HasInterface(INTERFACE_DURATION)) {
+    else if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET, MAX_TUPLET_DEPTH));
@@ -543,6 +542,31 @@ double LayerElement::GetAlignmentDuration(
     else {
         return 0.0;
     }
+}
+
+double LayerElement::GetContentAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+{
+    if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
+        return 0.0;
+    }
+
+    double duration = 0.0;
+
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    assert(sameas);
+
+    for (auto child : *sameas->GetChildren()) {
+        // Skip everything that does not have a duration interface and notes in chords
+        if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstParent(CHORD, MAX_CHORD_DEPTH) != NULL)) {
+            continue;
+        }
+        LayerElement *element = dynamic_cast<LayerElement *>(child);
+        assert(element);
+        duration += element->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+    }
+
+    return duration;
 }
 
 //----------------------------------------------------------------------------
@@ -610,6 +634,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
+        double duration = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        params->m_time += duration;
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(BARLINE)) {

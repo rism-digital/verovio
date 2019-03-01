@@ -4127,7 +4127,7 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
 {
     FTrem *vrvFTrem = new FTrem();
     ReadLayerElement(fTrem, vrvFTrem);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeFTremTo_4_0_0(fTrem, vrvFTrem);
     }
@@ -5387,7 +5387,7 @@ void MeiInput::UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem)
         fTrem.remove_attribute("slash");
     }
 }
-    
+
 void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)
 {
     if (mordent.attribute("form")) {
