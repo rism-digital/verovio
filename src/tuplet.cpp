@@ -236,7 +236,19 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
     TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(this->FindChildByType(TUPLET_BRACKET, 1));
     TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM, 1));
 
-    if (!this->HasBracketVisible() || (this->GetBracketVisible() == BOOLEAN_true)) {
+    bool beamed = false;
+    // Are we contained in a beam?
+    if (this->GetFirstParent(BEAM, MAX_BEAM_DEPTH)) {
+        // is only the tuplet beamed? (will not work with nested tuplets)
+        Beam *currentBeam = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+        if (currentBeam->GetChildCount() == 1) {
+            beamed = true;
+        }
+    }
+    // Is a beam the only child? (will not work with editorial elements)
+    if ((this->GetChildCount() == 1) && (this->GetChildCount(BEAM) == 1)) beamed = true;
+
+    if ((!this->HasBracketVisible() && !beamed) || (this->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
             currentBracket = new TupletBracket();
             this->AddChild(currentBracket);
