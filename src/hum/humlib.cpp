@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Feb  2 03:55:18 EST 2019
+// Last Modified: Sun Mar  3 23:19:52 PST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -6195,11 +6195,21 @@ bool HumGrid::transferTokens(HumdrumFile& outfile, int startbarnum) {
 //
 
 void HumGrid::cleanupManipulators(void) {
+	GridSlice* current = NULL;
+	GridSlice* last = NULL;
 	vector<GridSlice*> newslices;
 	for (int m=0; m<(int)this->size(); m++) {
 		for (auto it = this->at(m)->begin(); it != this->at(m)->end(); it++) {
+			last = current;
+			current = *it;
 			if ((*it)->getType() != SliceType::Manipulators) {
+				if (last && (last->getType() != SliceType::Manipulators)) {
+					matchVoices(current, last);
+				}
 				continue;
+			}
+			if (last && (last->getType() != SliceType::Manipulators)) {
+				matchVoices(current, last);
 			}
 			// check to see if manipulator needs to be split into
 			// multiple lines.
@@ -6209,6 +6219,54 @@ void HumGrid::cleanupManipulators(void) {
 				for (int j=0; j<(int)newslices.size(); j++) {
 					this->at(m)->insert(it, newslices.at(j));
 				}
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::matchVoices --
+//
+
+void HumGrid::matchVoices(GridSlice* current, GridSlice* last) {
+	if (current == NULL) {
+		return;
+	}
+	if (last == NULL) {
+		return;
+	}
+	int pcount1 = (int)current->size();
+	int pcount2 = (int)current->size();
+	if (pcount1 != pcount2) {
+		return;
+	}
+	for (int i=0; i<pcount1; i++) {
+		GridPart* part1 = current->at(i);
+		GridPart* part2 = current->at(i);
+		int scount1 = (int)part1->size();
+		int scount2 = (int)part2->size();
+		if (scount1 != scount2) {
+			continue;
+		}
+		for (int j=0; j<scount1; j++) {
+			GridStaff* staff1 = part1->at(j);
+			GridStaff* staff2 = part2->at(j);
+			int vcount1 = (int)staff1->size();
+			int vcount2 = (int)staff2->size();
+			if (vcount1 == vcount2) {
+				continue;
+			}
+			if (vcount2 > vcount1) {
+				// strange if it happens
+				continue;
+			}
+			int difference = vcount1 - vcount2;
+			for (int k=0; k<difference; k++) {
+				GridVoice* gv = new GridVoice("*", 0);
+				staff2->push_back(gv);
 			}
 		}
 	}
@@ -6503,10 +6561,43 @@ void HumGrid::transferOtherParts(GridSlice* oldline, GridSlice* newline, int max
 		// than one voices in a staff when splitting a line due to *v merging.
 		for (int j=0; j<(int)oldline->at(i)->size(); j++) {
 			int voices = (int)newline->at(i)->at(j)->size();
+			int adjustment = 0;
+			for (int k=0; k<voices; k++) {
+				if (!newline->at(i)->at(j)->at(k)) {
+					continue;
+				}
+				HTp tok = newline->at(i)->at(j)->at(k)->getToken();
+				if (*tok == "*v") {
+					adjustment++;
+				}
+			}
+			if (adjustment > 0) {
+				adjustment--;
+			}
+			voices -= adjustment;
 			oldline->at(i)->at(j)->resize(voices);
 			for (int k=0; k<voices; k++) {
 				oldline->at(i)->at(j)->at(k) = new GridVoice("*", 0);
 			}
+		}
+	}
+
+	for (int p=0; p<(int)newline->size(); p++) {
+			GridPart* newpart = newline->at(p);
+			GridPart* oldpart = oldline->at(p);
+		for (int s=0; s<(int)newpart->size(); s++) {
+			GridStaff* newstaff = newpart->at(s);
+			GridStaff* oldstaff = oldpart->at(s);
+			if (newstaff->size() >= oldstaff->size()) {
+				continue;
+			}
+			int diff = (int)(oldstaff->size() - newstaff->size());
+
+			for (int v=0; v<diff; v++) {
+				GridVoice* voice = new GridVoice("*", 0);
+				newstaff->push_back(voice);
+			}
+
 		}
 	}
 }
@@ -11265,6 +11356,7 @@ void HumRegex::setGlobal(void) {
 
 bool HumRegex::getGlobal(void) {
 	auto value = m_searchflags & std::regex_constants::format_first_only;
+	// return value.none();
 	return !value;
 }
 
@@ -18212,6 +18304,7 @@ bool HumdrumFileStructure::assignRhythmFromRecip(HTp spinestart) {
 		if (current->isNull()) {
 			// This should not occur in a well-formed **recip spine, but
 			// treat as a zero duration.
+			current = current->getNextToken();
 			continue;
 		}
 
@@ -47442,6 +47535,39 @@ string& Tool_musicxml2hum::cleanSpaces(string& input) {
 
 //////////////////////////////
 //
+// Tool_musicxml2hum::cleanSpacesAndColons -- Converts newlines and
+//     tabs to spaces, and removes leading and trailing spaces from the
+//     string.  Another variation would be to use \n to encode newlines
+//     if they need to be preserved, but for now converting them to spaces.
+//     Colons (:) are also converted to &colon;.
+
+string Tool_musicxml2hum::cleanSpacesAndColons(const string& input) {
+	string output;
+	bool foundnonspace = false;
+	for (int i=0; i<(int)input.size(); i++) {
+		if (std::isspace(input[i])) {
+			if (!foundnonspace) {
+				output += ' ';
+			}
+		}
+		if (input[i] == ':') {
+			foundnonspace = true;
+			output += "&colon;";
+		} else {
+			output += input[i];
+			foundnonspace = true;
+		}
+	}
+	while ((!output.empty()) && std::isspace(output.back())) {
+		output.resize(output.size() - 1);
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_musicxml2hum::addHeaderRecords -- Inserted in reverse order
 //      (last record inserted first).
 //
@@ -48608,7 +48734,7 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 		stylestring = ":B";
 	}
 
-	text = cleanSpaces(text);
+	text = cleanSpacesAndColons(text);
 	if (text.empty()) {
 		// no text to display after removing whitespace
 		return;
@@ -50258,7 +50384,7 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrum(xml_node keysig,
 	}
 
 	int fifths = 0;
-	int mode = -1;
+	//int mode = -1;
 
 	xml_node child = keysig.first_child();
 	while (child) {
@@ -50268,9 +50394,9 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrum(xml_node keysig,
 		if (nodeType(child, "mode")) {
 			string value = child.child_value();
 			if (value == "major") {
-				mode = 0;
+				// mode = 0;
 			} else if (value == "minor") {
-				mode = 1;
+				// mode = 1;
 			}
 		}
 		child = child.next_sibling();
@@ -50985,9 +51111,10 @@ bool Tool_myank::run(HumdrumFile& infile, ostream& out) {
 bool Tool_myank::run(HumdrumFile& infile) {
 	// Max track in enscripten is wrong for some reason,
 	// so making a copy and forcing reanalysis:
-	// stringstream ss;
-	// ss << infile;
-	// infile.read(ss);
+	//perhaps not needed anymore:
+	//stringstream ss;
+	//ss << infile;
+	//infile.read(ss);
 	initialize(infile);
 	processFile(infile);
 	// Re-load the text for each line from their tokens.
