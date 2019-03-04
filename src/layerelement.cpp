@@ -13,13 +13,13 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
@@ -138,7 +138,7 @@ bool LayerElement::IsGraceNote()
         return (chord->HasGrace());
     }
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) return child->IsGraceNote();
@@ -478,8 +478,7 @@ double LayerElement::GetAlignmentDuration(
         assert(sameas);
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
-
-    if (this->HasInterface(INTERFACE_DURATION)) {
+    else if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET, MAX_TUPLET_DEPTH));
@@ -543,6 +542,31 @@ double LayerElement::GetAlignmentDuration(
     else {
         return 0.0;
     }
+}
+
+double LayerElement::GetContentAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+{
+    if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
+        return 0.0;
+    }
+
+    double duration = 0.0;
+
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    assert(sameas);
+
+    for (auto child : *sameas->GetChildren()) {
+        // Skip everything that does not have a duration interface and notes in chords
+        if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstParent(CHORD, MAX_CHORD_DEPTH) != NULL)) {
+            continue;
+        }
+        LayerElement *element = dynamic_cast<LayerElement *>(child);
+        assert(element);
+        duration += element->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+    }
+
+    return duration;
 }
 
 //----------------------------------------------------------------------------
@@ -610,6 +634,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
+        double duration = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        params->m_time += duration;
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(BARLINE)) {
@@ -1222,7 +1249,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For tuplet, we also need to look at the first note or chord
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) m_drawingCueSize = child->GetDrawingCueSize();

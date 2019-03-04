@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
@@ -302,11 +303,11 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
     staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
     ArrayOfObjects layers;
-    AttComparison matchTypeLayer(LAYER);
+    ClassIdComparison matchTypeLayer(LAYER);
     this->FindAllChildByComparison(&layers, &matchTypeLayer);
 
     ArrayOfObjects mRests;
-    AttComparison matchTypeMRest(MREST);
+    ClassIdComparison matchTypeMRest(MREST);
     this->FindAllChildByComparison(&mRests, &matchTypeMRest);
 
     if (mRests.size() != layers.size()) {
@@ -448,6 +449,46 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
     }
     else {
         params->m_notationType = NOTATIONTYPE_cmn;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::CalcStem(FunctorParams *)
+{
+    ClassIdComparison isLayer(LAYER);
+    ArrayOfObjects layers;
+    this->FindAllChildByComparison(&layers, &isLayer);
+
+    // Not more than one layer - drawing stem dir remains unset
+    if (layers.size() < 2) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Detecting empty layers (empty layers can also have @sameas) which have to be ignored for stem direction
+    IsEmptyComparison isEmptyElement(LAYER);
+    ArrayOfObjects emptyLayers;
+    this->FindAllChildByComparison(&emptyLayers, &isEmptyElement);
+
+    // We have only one layer (or less) with content - drawing stem dir remains unset
+    if ((layers.size() < 3) && (emptyLayers.size() > 0)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (!emptyLayers.empty()) {
+        ArrayOfObjects nonEmptyLayers;
+        // not need to sort since it already sorted
+        std::set_difference(layers.begin(), layers.end(), emptyLayers.begin(), emptyLayers.end(),
+            std::inserter(nonEmptyLayers, nonEmptyLayers.begin()));
+        layers = nonEmptyLayers;
+    }
+
+    data_STEMDIRECTION stemDir = STEMDIRECTION_up;
+    for (auto &object : layers) {
+        Layer *layer = dynamic_cast<Layer *>(object);
+        layer->SetDrawingStemDir(stemDir);
+        // All remaining layers with stem down
+        stemDir = STEMDIRECTION_down;
     }
 
     return FUNCTOR_CONTINUE;

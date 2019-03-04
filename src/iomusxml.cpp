@@ -14,13 +14,13 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "breath.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -1401,7 +1401,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             FTrem *fTrem = new FTrem();
             AddLayerElement(layer, fTrem);
             m_elementStack.push_back(fTrem);
-            fTrem->SetSlash(tremolo.node().text().as_int());
+            fTrem->SetBeams(tremolo.node().text().as_int());
         }
     }
 
@@ -1476,6 +1476,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         element = note;
         note->SetVisible(ConvertWordToBool(node.append_attribute("print-object").as_string()));
         note->SetColor(node.attribute("color").as_string());
+        if (node.attribute("xml:id")) {
+            note->SetUuid(node.attribute("xml:id").as_string());
+        }
 
         // accidental
         pugi::xpath_node accidental = node.select_single_node("accidental");

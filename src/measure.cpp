@@ -15,8 +15,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "boundary.h"
+#include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
 #include "editorial.h"
@@ -322,7 +322,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     std::vector<int> staffList;
 
     // First get all the staffGrps
-    AttComparison matchType(STAFFGRP);
+    ClassIdComparison matchType(STAFFGRP);
     ArrayOfObjects staffGrps;
     ArrayOfObjects::iterator staffGrpIter;
     scoreDef->FindAllChildByComparison(&staffGrps, &matchType);
@@ -663,7 +663,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, NULL, &filters);
@@ -735,7 +735,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);

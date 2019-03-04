@@ -236,7 +236,7 @@ enum InterfaceId {
 
 class Alignment;
 class Arpeg;
-class AttComparison;
+class ClassIdComparison;
 class BeamElementCoord;
 class BoundingBox;
 class Comparison;
@@ -278,7 +278,7 @@ typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
-    
+
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;

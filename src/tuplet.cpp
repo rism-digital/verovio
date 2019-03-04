@@ -15,6 +15,7 @@
 
 #include "beam.h"
 #include "chord.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -276,7 +277,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
     m_drawingRight = dynamic_cast<LayerElement *>(this->FindChildByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 {

@@ -1442,7 +1442,7 @@ void MeiOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     assert(fTrem);
 
     WriteLayerElement(currentNode, fTrem);
-    fTrem->WriteSlashCount(currentNode);
+    fTrem->WriteFTremVis(currentNode);
     fTrem->WriteTremMeasured(currentNode);
 }
 
@@ -4128,7 +4128,11 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     FTrem *vrvFTrem = new FTrem();
     ReadLayerElement(fTrem, vrvFTrem);
 
-    vrvFTrem->ReadSlashCount(fTrem);
+    if (m_version < MEI_4_0_0) {
+        UpgradeFTremTo_4_0_0(fTrem, vrvFTrem);
+    }
+
+    vrvFTrem->ReadFTremVis(fTrem);
     vrvFTrem->ReadTremMeasured(fTrem);
 
     parent->AddChild(vrvFTrem);
@@ -5260,7 +5264,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     LayerElement *start = NULL;
     LayerElement *end = NULL;
-    
+
     AttConverter converter;
 
     // label
@@ -5287,7 +5291,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     if (tupletSpan.attribute("bracket.place")) {
         tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
     }
-    
+
     // position (pitch)
     if (tupletSpan.attribute("startid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("startid").value());
@@ -5374,6 +5378,14 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MeiInput::s_editorialElementNames.begin(), MeiInput::s_editorialElementNames.end(), elementName);
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MeiInput::UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem)
+{
+    if (fTrem.attribute("slash")) {
+        vrvFTrem->SetBeams(vrvFTrem->AttFTremVis::StrToInt(fTrem.attribute("slash").value()));
+        fTrem.remove_attribute("slash");
+    }
 }
 
 void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)

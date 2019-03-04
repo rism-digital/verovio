@@ -169,9 +169,16 @@ public:
     ///@}
 
     /**
-     * Returns the duration if the child element has a DurationInterface
+     * Returns the duration if the element has a DurationInterface
      */
     double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
+
+    /**
+     * Returns the duration if the content of the layer element with a @sameas attribute.
+     * Used only on beam, tuplet or ftrem have.
+     */
+    double GetContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     //----------//

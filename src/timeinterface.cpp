@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "functorparams.h"
 #include "layerelement.h"
 #include "measure.h"

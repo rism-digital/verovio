@@ -16,10 +16,10 @@
 //----------------------------------------------------------------------------
 
 #include "arpeg.h"
-#include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "comparison.h"
 #include "devicecontext.h"
 #include "dir.h"
 #include "doc.h"
@@ -68,8 +68,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && !element->Is(DIR)
-        && !element->Is({ DYNAM, FERMATA, HARM, TRILL })) {
+    if (element->Is({ FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -89,17 +88,13 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dir *dir = dynamic_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
-        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(dir);
     }
     else if (element->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
-        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(dynam);
     }
     else if (element->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(element);
@@ -130,9 +125,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Trill *trill = dynamic_cast<Trill *>(element);
         assert(trill);
         DrawTrill(dc, trill, measure, system);
-        if (trill->GetEnd()) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(trill);
     }
     else if (element->Is(TURN)) {
         Turn *turn = dynamic_cast<Turn *>(element);
@@ -277,15 +270,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
 
         if (element->Is(DIR)) {
-            // cast to Dir check in DrawDirConnector
+            // cast to Dir check in DrawControlElementConnector
             DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         if (element->Is(DYNAM)) {
-            // cast to Dynam check in DrawDynamConnector
+            // cast to Dynam check in DrawControlElementConnector
             DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         if (element->Is(FIGURE)) {
-            // cast to Dynam check in DrawDynamConnector
+            // cast to Dynam check in DrawFConnector
             DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(BRACKETSPAN)) {
@@ -951,27 +944,33 @@ void View::DrawTrillExtension(
 }
 
 void View::DrawControlElementConnector(
-    DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+    DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
-    assert(dynam);
-    assert(dynam->GetNextLink());
-    if (!dynam->GetNextLink()) return;
+    assert(element);
 
-    int y = dynam->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
+    assert(interface);
+
+    assert(element->GetNextLink() || interface->GetEnd());
+    if (!element->GetNextLink() && !interface->GetEnd()) return;
+
+    int y = element->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
 
     // Adjust the x1
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
-        if (dynam->GetCurrentFloatingPositioner() && dynam->GetCurrentFloatingPositioner()->HasContentBB()) {
-            x1 = dynam->GetCurrentFloatingPositioner()->GetContentRight();
+        if (element->GetCurrentFloatingPositioner() && element->GetCurrentFloatingPositioner()->HasContentBB()) {
+            x1 = element->GetCurrentFloatingPositioner()->GetContentRight();
         }
     }
 
     // Adjust the x2 for extensions with @endid
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
-        FloatingPositioner *nextLink
-            = dynam->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(dynam->GetNextLink()));
-        if (nextLink && nextLink->HasContentBB()) {
-            x2 = nextLink->GetContentLeft();
+        if (element->GetNextLink()) {
+            FloatingPositioner *nextLink
+                = element->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(element->GetNextLink()));
+            if (nextLink && nextLink->HasContentBB()) {
+                x2 = nextLink->GetContentLeft();
+            }
         }
     }
 
@@ -1000,12 +999,23 @@ void View::DrawControlElementConnector(
 
     /************** draw it **************/
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
-    else
-        dc->StartGraphic(dynam, "spanning-trill", "");
+    }
+    else {
+        dc->StartGraphic(element, "spanning-element", "");
+    }
 
-    dc->DeactivateGraphic();
+    bool deactivate = true;
+    // If there is no end link and we are not starting the control element, then do not deactivate the element.
+    // The vertical spacing will not be consistent but a least is does not leave the connector un-laidout
+    if (!element->GetNextLink() && (spanningType != SPANNING_START_END) && (spanningType != SPANNING_START)) {
+        deactivate = false;
+    }
+
+    if (deactivate) {
+        dc->DeactivateGraphic();
+    }
 
     int i;
     for (i = 0; i < nbDashes; ++i) {
@@ -1015,12 +1025,16 @@ void View::DrawControlElementConnector(
         DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
     }
 
-    dc->ReactivateGraphic();
+    if (deactivate) {
+        dc->ReactivateGraphic();
+    }
 
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
-        dc->EndGraphic(dynam, this);
+    }
+    else {
+        dc->EndGraphic(element, this);
+    }
 }
 
 void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic)

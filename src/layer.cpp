@@ -15,9 +15,9 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "attcomparison.h"
 #include "beam.h"
 #include "clef.h"
+#include "comparison.h"
 #include "custos.h"
 #include "doc.h"
 #include "editorial.h"
@@ -564,21 +564,6 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     if (params->m_currentMRpt && !this->FindChildByType(MRPT)) {
         params->m_currentMRpt = NULL;
     }
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::CalcStem(FunctorParams *)
-{
-    // setting the layer stem direction
-    if (this->GetParent()->GetChildCount(LAYER) > 1) {
-        if (this->GetParent()->FindChildByType(LAYER) == this) {
-            this->SetDrawingStemDir(STEMDIRECTION_up);
-        }
-        else {
-            this->SetDrawingStemDir(STEMDIRECTION_down);
-        }
-    }
-
     return FUNCTOR_CONTINUE;
 }
 

@@ -176,6 +176,11 @@ public:
     ///@}
 
     /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *);
+
+    /**
      * See Object::AdjustSylSpacing
      */
     virtual int AdjustSylSpacing(FunctorParams *functorParams);

@@ -451,20 +451,20 @@ int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 
     return m_cachedMinMaxY;
 }
-    
+
 int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin)
 {
     assert(boundingBox);
     assert(boundingBox->HasSelfBB());
-    
+
     Point points[4];
     // We need to get the points because then stored points are relative
     this->GetPoints(points);
-    
+
     // for lisability
     Point p1 = points[0];
     Point p2 = points[3];
-    
+
     Accessor type = SELF;
     // bool keepInside = element->Is({ARTIC, ARTIC_PART, NOTE, STEM}));
     // The idea is to force only some of the elements to be inside a slur.
@@ -472,14 +472,14 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
     // the slur is eventually adjusted. Keeping erverything inside now.
     bool keepInside = true;
     discard = false;
-    
+
     // first check if they overlap at all
     if (p2.x < boundingBox->GetLeftBy(type) + margin) return 0;
     if (p1.x > boundingBox->GetRightBy(type) + margin) return 0;
-    
+
     Point topBezier[4], bottomBezier[4];
     BoundingBox::CalcThickBezier(points, this->GetThickness(), this->GetAngle(), topBezier, bottomBezier);
-    
+
     if (this->GetDir() == curvature_CURVEDIR_above) {
         // The curve is below the content - if the element needs to be kept inside (e.g. a note), then do not return.
         if (((this->GetTopBy(type) + margin) < boundingBox->GetBottomBy(type)) && !keepInside) {
@@ -508,7 +508,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
             leftY = p1.y - margin;
             rightY = p2.y - margin;
         }
-        
+
         // Now check what to do
         // Everything is underneath - we can discard the element
         if ((leftY >= boundingBox->GetTopBy(type)) && (rightY >= boundingBox->GetTopBy(type))) {
@@ -546,7 +546,7 @@ int FloatingCurvePositioner::CalcAdjustment(BoundingBox *boundingBox, bool &disc
             leftY = p1.y + margin;
             rightY = p2.y + margin;
         }
-        
+
         // Now check what to do
         // Everything is above - we can discard the element
         if ((leftY <= boundingBox->GetBottomBy(type)) && (rightY <= boundingBox->GetBottomBy(type))) {

@@ -268,7 +268,7 @@ public:
      * Calculate the min or max Y for a set of points
      */
     int CalcMinMaxY(const Point points[4]);
-    
+
     /**
      * Calculate the adjustment needed for an element for the curve not to overlap with it.
      * Discard will be true if the element already fits.
@@ -308,8 +308,7 @@ private:
     /** The cached min or max value (depending on the curvature) */
     int m_cachedMinMaxY;
 };
-    
-    
+
 //----------------------------------------------------------------------------
 // CurveSpannedElement
 //----------------------------------------------------------------------------
@@ -320,12 +319,13 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    CurveSpannedElement() {
+    CurveSpannedElement()
+    {
         m_boundingBox = NULL;
         m_discarded = false;
     }
-    virtual ~CurveSpannedElement() {};
-    
+    virtual ~CurveSpannedElement(){};
+
     Point m_rotatedPoints[4];
     BoundingBox *m_boundingBox;
     bool m_discarded;

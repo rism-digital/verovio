@@ -18,7 +18,7 @@ class MidiFile;
 
 namespace vrv {
 
-class AttComparison;
+class ClassIdComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
