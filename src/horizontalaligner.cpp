@@ -636,13 +636,17 @@ void AlignmentReference::AddChild(Object *child)
     LayerElement *childElement = dynamic_cast<LayerElement *>(child);
     assert(childElement);
 
-    ArrayOfObjects::iterator childrenIter;
-    // Check if the we will have a reference with multiple layers
-    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
-        LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
-        if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) break;
+    if (!childElement->HasSameas()) {
+        ArrayOfObjects::iterator childrenIter;
+        // Check if the we will have a reference with multiple layers
+        for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
+            LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
+            if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) {
+                break;
+            }
+        }
+        if (childrenIter == m_children.end()) m_layerCount++;
     }
-    if (childrenIter == m_children.end()) m_layerCount++;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
