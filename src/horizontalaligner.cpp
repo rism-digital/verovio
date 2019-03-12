@@ -1126,16 +1126,14 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int AlignmentReference::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+int AlignmentReference::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     if (!this->HasMultipleLayer()) {
         return FUNCTOR_SIBLINGS;
     }
-
-    params->m_layerCount = this->m_layerCount;
 
     return FUNCTOR_CONTINUE;
 }

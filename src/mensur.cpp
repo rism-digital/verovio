@@ -93,9 +93,9 @@ void Mensur::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Mensur::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+int Mensur::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     params->m_mensur = this;

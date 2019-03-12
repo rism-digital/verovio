@@ -51,9 +51,9 @@ public:
     //----------//
 
     /**
-     * See Object::FindSpaceInReferenceAlignments
+     * See Object::LayerCountInTimeSpan
      */
-    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
 
 private:
     //

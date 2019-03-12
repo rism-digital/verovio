@@ -507,7 +507,7 @@ public:
     /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
      */
-    virtual int FindSpaceInReferenceAlignments(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the layer elements spanned by two points

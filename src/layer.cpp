@@ -217,11 +217,6 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
 
-    // First check if there is any <space> in the measure - if not we can return the layer stem direction
-    if (!measure->FindChildByType(SPACE)) {
-        return m_drawingStemDir;
-    }
-
     Alignment *alignment = element->GetAlignment();
     assert(alignment);
 
@@ -251,11 +246,6 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
 
-    // First check if there is any <space> in the measure - if not we can return the layer stem direction
-    if (!measure->FindChildByType(SPACE)) {
-        return m_drawingStemDir;
-    }
-
     Alignment *alignmentFirst = first->GetAlignment();
     assert(alignmentFirst);
     Alignment *alignmentLast = last->GetAlignment();
@@ -276,19 +266,19 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(double time, double duration, Measur
 {
     assert(measure);
 
-    Functor findSpaceInAlignment(&Object::FindSpaceInReferenceAlignments);
-    FindSpaceInAlignmentParams findSpaceInAlignmentParams(
-        GetCurrentMeterSig(), GetCurrentMensur(), &findSpaceInAlignment);
-    findSpaceInAlignmentParams.m_time = time;
-    findSpaceInAlignmentParams.m_duration = duration;
+    Functor layerCountInTimeSpan(&Object::LayerCountInTimeSpan);
+    LayerCountInTimeSpanParams layerCountInTimeSpanParams(
+        GetCurrentMeterSig(), GetCurrentMensur(), &layerCountInTimeSpan);
+    layerCountInTimeSpanParams.m_time = time;
+    layerCountInTimeSpanParams.m_duration = duration;
 
     ArrayOfComparisons filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.push_back(&matchStaff);
 
-    measure->m_measureAligner.Process(&findSpaceInAlignment, &findSpaceInAlignmentParams, NULL, &filters);
+    measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
-    if (findSpaceInAlignmentParams.m_success && (findSpaceInAlignmentParams.m_layerCount < 3)) {
+    if (layerCountInTimeSpanParams.m_layers.size() < 2) {
         return STEMDIRECTION_NONE;
     }
 
