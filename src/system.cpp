@@ -250,7 +250,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
         Trill *trill = dynamic_cast<Trill *>(object);
         assert(trill);
         if (trill->GetEnd()) {
-            this->AddToDrawingListIfNeccessary(trill);
+            this->AddToDrawingList(trill);
         }
     }
 }
