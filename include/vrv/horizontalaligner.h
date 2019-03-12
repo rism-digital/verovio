@@ -320,11 +320,6 @@ public:
      */
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
-    /**
-     * See Object::LayerCountInTimeSpan
-     */
-    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
-
 private:
     //
 public:

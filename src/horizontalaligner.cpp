@@ -1126,16 +1126,4 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int AlignmentReference::LayerCountInTimeSpan(FunctorParams *functorParams)
-{
-    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasMultipleLayer()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

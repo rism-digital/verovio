@@ -1436,7 +1436,7 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
     double time = m_alignment->GetTime();
 
     // The event is starting after the end of the element
-    if ((time + duration) < params->m_time) {
+    if ((time + duration) <= params->m_time) {
         return FUNCTOR_CONTINUE;
     }
     // The element is starting after the event end - we can stop here
