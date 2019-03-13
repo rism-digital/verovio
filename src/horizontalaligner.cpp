@@ -1126,4 +1126,24 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int AlignmentReference::UnsetCurrentScoreDef(FunctorParams *functorParams)
+{
+    Alignment *alignment = dynamic_cast<Alignment *>(this->GetParent());
+    assert(alignment);
+
+    switch (alignment->GetType()) {
+        case ALIGNMENT_SCOREDEF_CLEF:
+        case ALIGNMENT_SCOREDEF_KEYSIG:
+        case ALIGNMENT_SCOREDEF_MENSUR:
+        case ALIGNMENT_SCOREDEF_METERSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_CLEF:
+        case ALIGNMENT_SCOREDEF_CAUTION_KEYSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_MENSUR:
+        case ALIGNMENT_SCOREDEF_CAUTION_METERSIG: this->ClearChildren(); break;
+        default: break;
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv

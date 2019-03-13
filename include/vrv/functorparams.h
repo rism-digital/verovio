@@ -1680,6 +1680,20 @@ public:
     System *m_currentSystem;
 };
 
+//----------------------------------------------------------------------------
+// UnsetCurrentScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor to be redirected to Aligner
+ **/
+
+class UnsetCurrentScoreDefParams : public FunctorParams {
+public:
+    UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
+    Functor *m_functor;
+};
+
 } // namespace vrv
 
 #endif

@@ -68,7 +68,7 @@ public:
      */
     ///@{
     void SetAsReferenceObject();
-    bool IsReferenceObject() const { return m_isReferencObject; }
+    bool IsReferenceObject() const { return m_isReferenceObject; }
     ///@}
 
     /**
@@ -1095,7 +1095,7 @@ private:
      * A reference object do not own children.
      * Destructor will not delete them.
      */
-    bool m_isReferencObject;
+    bool m_isReferenceObject;
 
     /**
      * Indicates whether the object content is up-to-date or not.

@@ -736,7 +736,8 @@ void Doc::SetCurrentScoreDefDoc(bool force)
 
     if (m_currentScoreDefDone) {
         Functor unsetCurrentScoreDef(&Object::UnsetCurrentScoreDef);
-        this->Process(&unsetCurrentScoreDef, NULL);
+        UnsetCurrentScoreDefParams unsetCurrentScoreDefParams(&unsetCurrentScoreDef);
+        this->Process(&unsetCurrentScoreDef, &unsetCurrentScoreDefParams);
     }
 
     ScoreDef upcomingScoreDef = m_scoreDef;

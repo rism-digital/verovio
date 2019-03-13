@@ -536,10 +536,16 @@ int Measure::SaveEnd(FunctorParams *functorParams)
 
 int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
+    UnsetCurrentScoreDefParams *params = dynamic_cast<UnsetCurrentScoreDefParams *>(functorParams);
+    assert(params);
+
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
         m_drawingScoreDef = NULL;
     }
+
+    // We also need to remove scoreDef elements in the AlignmentReference objects
+    m_measureAligner.Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;
 }
