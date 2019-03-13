@@ -1016,12 +1016,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 }
             }
             else if (hasMultipleLayer) {
-                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
-                assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN())
-                    loc += 2;
-                else
-                    loc -= 2;
+                Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+                assert(parentLayer);
+                int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+                if (layerCount > 1) {
+                    Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                    assert(firstLayer);
+                    if (firstLayer->GetN() == layerY->GetN())
+                        loc += 2;
+                    else
+                        loc -= 2;
+                }
             }
         }
         loc = rest->GetRestLocOffset(loc);
@@ -1430,7 +1435,7 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
     LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
-    if (!this->GetDurationInterface() || this->Is(SPACE)) return FUNCTOR_CONTINUE;
+    if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
 
     double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
     double time = m_alignment->GetTime();

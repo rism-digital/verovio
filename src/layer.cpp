@@ -214,21 +214,12 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
 {
     assert(element);
 
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
-    assert(measure);
-
-    Alignment *alignment = element->GetAlignment();
-    assert(alignment);
-
-    Layer *layer = NULL;
-    Staff *staff = element->GetCrossStaff(layer);
-    if (!staff) {
-        staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    if (this->GetLayerCountForTimeSpanOf(element) < 2) {
+        return STEMDIRECTION_NONE;
     }
-    // At this stage we have the parent or the cross-staff
-    assert(staff);
-
-    return GetDrawingStemDir(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+    else {
+        return m_drawingStemDir;
+    }
 }
 
 data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coords)
@@ -259,10 +250,36 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     double duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();
     duration = durRound(duration);
 
-    return GetDrawingStemDir(time, duration, measure, staff->GetN());
+    if (this->GetLayerCountInTimeSpan(time, duration, measure, staff->GetN()) < 2) {
+        return STEMDIRECTION_NONE;
+    }
+    else {
+        return m_drawingStemDir;
+    }
 }
 
-data_STEMDIRECTION Layer::GetDrawingStemDir(double time, double duration, Measure *measure, int staff)
+int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
+{
+    assert(element);
+
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    assert(measure);
+
+    Alignment *alignment = element->GetAlignment();
+    assert(alignment);
+
+    Layer *layer = NULL;
+    Staff *staff = element->GetCrossStaff(layer);
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    }
+    // At this stage we have the parent or the cross-staff
+    assert(staff);
+
+    return this->GetLayerCountInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+}
+
+int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff)
 {
     assert(measure);
 
@@ -278,11 +295,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(double time, double duration, Measur
 
     measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
-    if (layerCountInTimeSpanParams.m_layers.size() < 2) {
-        return STEMDIRECTION_NONE;
-    }
-
-    return m_drawingStemDir;
+    return (int)layerCountInTimeSpanParams.m_layers.size();
 }
 
 Clef *Layer::GetCurrentClef() const
