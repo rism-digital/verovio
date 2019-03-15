@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Mar  3 23:19:52 PST 2019
+// Last Modified: Fri Mar 15 12:10:58 PDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -39792,11 +39792,19 @@ void Tool_extract::fillFieldData(vector<int>& field, vector<int>& subfield,
 	hre.replaceDestructive(buffer, "", "\\s", "gs");
 	int start = 0;
 	string tempstr;
+	vector<int> tempfield;
+	vector<int> tempsubfield;
+	vector<int> tempmodel;
 	while (hre.search(buffer,  start, "^([^,]+,?)")) {
-		processFieldEntry(field, subfield, model, hre.getMatch(1), infile);
+		tempfield.clear();
+		tempsubfield.clear();
+		tempmodel.clear();
+		processFieldEntry(tempfield, tempsubfield, tempmodel, hre.getMatch(1), infile);
 		start += hre.getMatchEndIndex(1);
+		field.insert(field.end(), tempfield.begin(), tempfield.end());
+		subfield.insert(subfield.end(), tempsubfield.begin(), tempsubfield.end());
+		model.insert(model.end(), tempmodel.begin(), tempmodel.end());
 	}
-
 }
 
 
@@ -39813,13 +39821,12 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 		vector<int>& subfield, vector<int>& model, const string& astring,
 		HumdrumFile& infile) {
 
+	int finitsize = field.size();
 	int maxtrack = infile.getMaxTrack();
 
 	vector<HTp> ktracks;
 	infile.getKernSpineStartList(ktracks);
-	if (kernQ) {
-		maxtrack = (int)ktracks.size();
-	}
+	int maxkerntrack = (int)ktracks.size();
 
 	int modletter;
 	int subletter;
@@ -39831,7 +39838,11 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 	hre.replaceDestructive(buffer, "", ",", "g");
 
 	// first remove $ symbols and replace with the correct values
-	removeDollarsFromString(buffer, maxtrack);
+	if (kernQ) {
+		removeDollarsFromString(buffer, maxkerntrack);
+	} else {
+		removeDollarsFromString(buffer, maxtrack);
+	}
 
 	int zero = 0;
 	if (hre.search(buffer, "^(\\d+)-(\\d+)$")) {
@@ -39925,42 +39936,38 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 		return;
 	}
 
-	maxtrack = infile.getMaxTrack();
-
-	// Fields to next kern track.
-	// Needs some more bug fixing
-	// Most just needs a fix to preserve old field data
-	// For secondary passes into thi function.
+	// Insert fields to next **kern spine.
 	vector<int> newfield;
 	vector<int> newsubfield;
 	vector<int> newmodel;
-	int i, j;
-
-	for (i=0; i<(int)field.size(); i++) {
-		if (field[i] != 0) {
-		   field[i] = ktracks[field[i] - 1]->getTrack();
-		}
-	}
 
 	vector<HTp> trackstarts;
 	infile.getTrackStartList(trackstarts);
+	int i, j;
+	int spine;
 
-	int start, stop;
+	// convert kern tracks into spine tracks:
+	for (i=finitsize; i<(int)field.size(); i++) {
+		if (field[i] > 0) {
+			spine = ktracks[field[i]-1]->getTrack();
+		   field[i] = spine;
+		}
+	}
+
+	int startspineindex, stopspineindex;
 	for (i=0; i<(int)field.size(); i++) {
-		newfield.push_back(field[i]);
+		newfield.push_back(field[i]); // copy **kern spine index into new list
 		newsubfield.push_back(subfield[i]);
 		newmodel.push_back(model[i]);
-		start = field[i] + 1;
-		if (i < (int)field.size()-1) {
-		   stop = field[i+1];
-		} else {
-			stop = maxtrack+1;
-		}
-		for (j=start; j<stop; j++) {
-			if (trackstarts[j-1]->isKern()) {
+
+		// search for non **kern spines after specified **kern spine:
+		startspineindex = field[i] + 1 - 1;
+		stopspineindex = maxtrack;
+		for (j=startspineindex; j<stopspineindex; j++) {
+			if (trackstarts[j]->isKern()) {
 				break;
 			}
-			newfield.push_back(j);
+			newfield.push_back(j+1);
 			newsubfield.push_back(zero);
 			newmodel.push_back(zero);
 		}
