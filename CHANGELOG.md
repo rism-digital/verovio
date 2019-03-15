@@ -6,10 +6,10 @@
 * Support for editorial markup in `<label>` and `<labelAbbr>`
 * Support of ties and slurs starting or ending with timestamp (but not both)
 * Support for ABC notation import (@rettinghaus)
-* Avoid system optimisation when tempo change occurs
-* Improve tuplets and support for additional attributes
+* Avoid system optimisation when a tempo change occurs
+* Improved tuplets and support for additional attributes
 * Improved slur placement
-* Option of adjusting MIDI tempo output (--midi-tempo-adjustment)
+* Option for adjusting MIDI tempo output (--midi-tempo-adjustment)
 * Option for top/bottom margin `<harm>` (--top/bottom-margin-harm)
 * Option to use first footer / header for all pages (--use-pg-footer/header-for-all)
 * Embedding of Petaluma font (1.055) from Steinberg
