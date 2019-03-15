@@ -1,6 +1,17 @@
 # Changelog
 
 ## [Unreleased]
+* Support for `@spacing` on `<staffDef>`
+* Support for `@sameas` on `<beam>`, `<chord>`, `<layer>`, `<note>`, `<rest>`, and `<tuplet>`
+* Support for editorial markup in `<label>` and `<labelAbbr>`
+* Support of ties and slurs starting or ending with timestamp (but not both)
+* Support for ABC notation import (@rettinghaus)
+* Avoid system optimisation when tempo change occurs
+* Improve tuplets and support for additional attributes
+* Improved slur placement
+* Option of adjusting MIDI tempo output (--midi-tempo-adjustment)
+* Option for top/bottom margin `<harm>` (--top/bottom-margin-harm)
+* Option to use first footer / header for all pages (--use-pg-footer/header-for-all)
 * Embedding of Petaluma font (1.055) from Steinberg
 
 ## [2.0.2] - 2019-02-06
