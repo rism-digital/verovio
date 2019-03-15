@@ -138,6 +138,12 @@ public:
         return StrToVU(value, logWarning);
     }
 
+    std::string MeasurementrelToStr(data_MEASUREMENTREL data) const { return VUToStr(data); }
+    data_MEASUREMENTREL StrToMeasurementrel(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
+
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
     data_MODUSMAIOR StrToModusmaior(std::string value, bool logWarning = true) const;
 

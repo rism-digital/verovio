@@ -169,6 +169,11 @@ typedef std::pair<int, double> data_MEASUREBEAT;
 typedef data_VU data_MEASUREMENTABS;
 
 /**
+ * MEI data.MEASUREMENTREL
+ */
+typedef data_VU data_MEASUREMENTREL;
+
+/**
  * MEI data.MIDIBPM
  */
 typedef int data_MIDIBPM;

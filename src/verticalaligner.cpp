@@ -20,6 +20,7 @@
 #include "functorparams.h"
 #include "slur.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -578,10 +579,19 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
+    if (params->m_staffIdx > 0) {
+        // Default or staffDef spacing
+        int spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
+        if (this->m_staff && this->m_staff->m_drawingStaffDef && this->m_staff->m_drawingStaffDef->HasSpacing()) {
+            spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
+        }
+        params->m_cumulatedShift += spacing * params->m_doc->GetDrawingUnit(100);
+    }
+
     SetYRel(-params->m_cumulatedShift);
 
-    params->m_cumulatedShift
-        += m_staffHeight + params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift += m_staffHeight;
+    params->m_staffIdx++;
 
     return FUNCTOR_CONTINUE;
 }
@@ -605,9 +615,14 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 
     // Add a margin
     maxOverflowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize());
+    // Default or staffDef spacing
+    int spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
+    if (this->m_staff && this->m_staff->m_drawingStaffDef && this->m_staff->m_drawingStaffDef->HasSpacing()) {
+        spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
+    }
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
-    maxOverflowAbove -= params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    maxOverflowAbove -= spacing * params->m_doc->GetDrawingUnit(100);
     // Is the maximum the overflow (+ overlap) shift, or the default ?
     int shift = std::max(0, maxOverflowAbove);
 

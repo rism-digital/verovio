@@ -1017,6 +1017,7 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteNotationType(currentNode);
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefLog(currentNode);
+    staffDef->WriteStaffDefVis(currentNode);
     staffDef->WriteTransposition(currentNode);
 }
 
@@ -3253,6 +3254,7 @@ bool MeiInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     vrvStaffDef->ReadNotationType(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
     vrvStaffDef->ReadStaffDefLog(staffDef);
+    vrvStaffDef->ReadStaffDefVis(staffDef);
     vrvStaffDef->ReadTransposition(staffDef);
 
     if (!vrvStaffDef->HasN()) {
