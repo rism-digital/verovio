@@ -96,6 +96,7 @@ if (BUILD_AS_LIBRARY)
     add_library (
         verovio
         SHARED
+	../emscripten/emscripten_main.cpp
         ${all_SRC}
     )
 else()
