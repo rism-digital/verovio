@@ -5074,10 +5074,28 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             else {
                 Chord *chord = new Chord;
                 setLocationId(chord, layerdata[i]);
-                appendElement(elements, pointers, chord);
+
+                if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
+                    BTrem *btrem = new BTrem;
+                    int slashes = layerdata[i]->getValueInt("auto", "slashes");
+                    switch (slashes) {
+                        case 1: btrem->SetUnitdur(DURATION_8); break;
+                        case 2: btrem->SetUnitdur(DURATION_16); break;
+                        case 3: btrem->SetUnitdur(DURATION_32); break;
+                        case 4: btrem->SetUnitdur(DURATION_64); break;
+                        case 5: btrem->SetUnitdur(DURATION_128); break;
+                    }
+                    appendElement(btrem, chord);
+                    appendElement(elements, pointers, btrem);
+                }
+                else {
+                    appendElement(elements, pointers, chord);
+                }
+
                 elements.push_back("chord");
                 pointers.push_back((void *)chord);
                 processChordSignifiers(chord, layerdata[i], staffindex);
+
                 convertChord(chord, layerdata[i], staffindex);
                 popElementStack(elements, pointers);
                 processSlurs(layerdata[i]);
@@ -5195,6 +5213,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             note = new Note;
             setStemLength(note, layerdata[i]);
             setLocationId(note, layerdata[i]);
+
             if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
                 BTrem *btrem = new BTrem;
                 int slashes = layerdata[i]->getValueInt("auto", "slashes");
@@ -5211,6 +5230,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             else {
                 appendElement(elements, pointers, note);
             }
+
             convertNote(note, layerdata[i], 0, staffindex);
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
@@ -10191,7 +10211,15 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         chord->SetDur(DURATION_8);
     }
 
-    convertRhythm(chord, token);
+    hum::HumNum dur;
+    if (m_hasTremolo && token->getValueBool("auto", "tremolo")) {
+        hum::HumdrumToken newtok(token->getValue("auto", "recip"));
+        dur = convertRhythm(chord, &newtok, 0);
+    }
+    else {
+        dur = convertRhythm(chord, token);
+    }
+
     if (m_setrightstem) {
         m_setrightstem = false;
         chord->SetStemPos(STEMPOSITION_right);
