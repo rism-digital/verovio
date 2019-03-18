@@ -157,6 +157,9 @@ namespace humaux {
         // brackets should be displayed.
         bool suppress_bracket_tuplet;
 
+        // Used for tremolo compression
+        bool tremolo;
+
         // cue_size == keeps track of whether or not the notes in the current
         // staff/layer should be cue sized.  Index 0 is used to control all
         // layers.
@@ -396,6 +399,8 @@ protected:
         std::vector<hum::HTp> &layerdata, int layerindex, bool grace);
     void handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<std::string> &elements,
         std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int layerindex);
+    bool checkForTremolo(
+        std::vector<hum::HTp> &layerdata, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int startindex);
     void handleGroupEnds(
         const humaux::HumdrumBeamAndTuplet &tg, std::vector<std::string> &elements, std::vector<void *> &pointers);
     void handleStaffStateVariables(hum::HTp token);
@@ -736,6 +741,9 @@ private:
     //    *kcancel     = display cancellation key signatures
     //    *Xkcancel    = do not display cancellation key signatures (default)
     bool m_show_cautionary_keysig = false;
+
+    // m_hasTremolo == true if there is a *tremolo found in input data.
+    bool m_hasTremolo = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

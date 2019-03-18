@@ -47,6 +47,7 @@
 #include "beam.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "btrem.h"
 #include "chord.h"
 #include "dir.h"
 #include "dot.h"
@@ -295,6 +296,7 @@ namespace humaux {
         verse = false;
         suppress_beam_tuplet = false;
         suppress_bracket_tuplet = false;
+        tremolo = false;
         righthalfstem = false;
 
         ottavanotestart = ottavanoteend = NULL;
@@ -515,7 +517,7 @@ bool HumdrumInput::convertHumdrum()
 
     infile.analyzeSlurs();
     infile.analyzeKernTies();
-    infile.analyzeKernStems();
+    infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
     infile.analyzeOttavas();
     parseSignifiers(infile);
@@ -4580,6 +4582,67 @@ void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::Hum
 
 //////////////////////////////
 //
+// HumdrumInput::checkForTremolo --
+//
+
+bool HumdrumInput::checkForTremolo(
+    std::vector<hum::HTp> &layerdata, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int startindex)
+{
+    int beamnumber = tgs[startindex].beamstart;
+    std::vector<hum::HTp> notes;
+    for (int i = startindex; i < (int)layerdata.size(); i++) {
+        if (layerdata[i]->isNote()) {
+            notes.push_back(layerdata[i]);
+        }
+        if (tgs[i].beamend == beamnumber) {
+            break;
+        }
+    }
+    if (notes.empty()) {
+        return false;
+    }
+
+    hum::HumNum duration = notes[0]->getDuration();
+    int base40 = hum::Convert::kernToBase40(notes[0]);
+
+    for (int i = 1; i < (int)notes.size(); i++) {
+        hum::HumNum testdur = notes[i]->getDuration();
+        if (testdur != duration) {
+            return false;
+        }
+        int testbase40 = hum::Convert::kernToBase40(notes[i]);
+        if (testbase40 != base40) {
+            return false;
+        }
+    }
+
+    // beam group should be converted into a tremolo
+    hum::HumNum tdur = duration * notes.size();
+    std::string recip = hum::Convert::durationToRecip(tdur);
+
+    int slashes = log(duration.getFloat()) / log(2.0);
+    int noteslash = log(tdur.getFloat()) / log(2.0);
+    if (noteslash < 0) {
+        slashes = slashes - noteslash;
+    }
+    slashes = -slashes;
+    if (slashes <= 0) {
+        return false;
+    }
+
+    notes[0]->setValue("auto", "tremolo", "1");
+    notes[0]->setValue("auto", "recip", recip);
+    notes[0]->setValue("auto", "slashes", slashes);
+    for (int i = 1; i < (int)notes.size(); i++) {
+        notes[i]->setValue("auto", "suppress", "1");
+    }
+
+    return true;
+    ;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::handleGroupStarts --
 //
 
@@ -4591,6 +4654,16 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
     hum::HTp token = layerdata[layerindex];
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     int staffindex = m_currentstaff - 1;
+
+    if (ss[staffindex].tremolo) {
+        if (token->find("L") != std::string::npos) {
+            bool status = checkForTremolo(layerdata, tgs, layerindex);
+            if (status) {
+                // beamed group converted into tremolo
+                return;
+            }
+        }
+    }
 
     if (tg.beamstart || tg.gbeamstart) {
         int direction = 0;
@@ -4968,6 +5041,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
         handleGroupStarts(tg, elements, pointers, layerdata, i);
 
+        if (layerdata[i]->getValueInt("auto", "suppress")) {
+            continue;
+        }
+
         // conversion of **kern data to MEI:
         if (layerdata[i]->isChord()) {
             int chordnotecount = getChordNoteCount(layerdata[i]);
@@ -5118,7 +5195,22 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             note = new Note;
             setStemLength(note, layerdata[i]);
             setLocationId(note, layerdata[i]);
-            appendElement(elements, pointers, note);
+            if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
+                BTrem *btrem = new BTrem;
+                int slashes = layerdata[i]->getValueInt("auto", "slashes");
+                switch (slashes) {
+                    case 1: btrem->SetUnitdur(DURATION_8); break;
+                    case 2: btrem->SetUnitdur(DURATION_16); break;
+                    case 3: btrem->SetUnitdur(DURATION_32); break;
+                    case 4: btrem->SetUnitdur(DURATION_64); break;
+                    case 5: btrem->SetUnitdur(DURATION_128); break;
+                }
+                appendElement(btrem, note);
+                appendElement(elements, pointers, btrem);
+            }
+            else {
+                appendElement(elements, pointers, note);
+            }
             convertNote(note, layerdata[i], 0, staffindex);
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
@@ -9448,6 +9540,8 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 // Controls that this function deals with:
 //    *Xtuplet     = suppress beam and bracket tuplet numbers
 //    *tuplet      = display beam and bracket tuplet numbers
+//    *Xtremolo    = terminal *tremelo contraction
+//    *tremolo     = merge possible beam groups into tremolos
 //    *Xbeamtup    = suppress beam tuplet numbers
 //    *beamtup     = display beam tuplet numbers
 //    *Xbrackettup = suppress tuplet brackets
@@ -9483,6 +9577,7 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     else if (value == "*brackettup") {
         ss[staffindex].suppress_bracket_tuplet = false;
     }
+
     if (value == "*Xtuplet") {
         ss[staffindex].suppress_beam_tuplet = true;
         ss[staffindex].suppress_bracket_tuplet = true;
@@ -9490,6 +9585,14 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     else if (value == "*tuplet") {
         ss[staffindex].suppress_beam_tuplet = false;
         ss[staffindex].suppress_bracket_tuplet = false;
+    }
+
+    if (value == "*Xtremolo") {
+        ss[staffindex].tremolo = false;
+    }
+    else if (value == "*tremolo") {
+        ss[staffindex].tremolo = true;
+        m_hasTremolo = true;
     }
 
     if (value == "*Xcue") {
@@ -10915,7 +11018,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     if (!chordQ) {
-        hum::HumNum dur = convertRhythm(note, token, subtoken);
+        hum::HumNum dur;
+        if (m_hasTremolo && token->getValueBool("auto", "tremolo")) {
+            hum::HumdrumToken newtok(token->getValue("auto", "recip"));
+            dur = convertRhythm(note, &newtok, 0);
+        }
+        else {
+            dur = convertRhythm(note, token, subtoken);
+        }
         if (m_setrightstem) {
             m_setrightstem = false;
             note->SetStemPos(STEMPOSITION_right);
