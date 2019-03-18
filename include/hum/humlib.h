@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Mar 15 12:10:58 PDT 2019
+// Last Modified: Sat Mar 16 13:02:18 EDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1956,7 +1956,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		void  checkForExplicitVerticalRestPositions (void);
 
 		// in HumdrumFileContent-stem.cpp
-		bool analyzeKernStems             (void);
+		bool analyzeKernStemLengths       (void);
 
 		// in HumdrumFileContent-metlev.cpp
 		void  getMetricLevels             (std::vector<double>& output, int track = 0,
@@ -2002,6 +2002,8 @@ class HumdrumFileContent : public HumdrumFileStructure {
 	protected:
 		bool   analyzeKernSlurs           (HTp spinestart, std::vector<HTp>& slurstarts,
 		                                   std::vector<HTp>& slurends,
+		                                   std::vector<std::pair<HTp, HTp>>& labels,
+		                                   std::vector<int>& endings,
 		                                   const std::string& linksig = "");
 		bool   analyzeKernTies            (std::vector<std::pair<HTp, int>>& linkedtiestarts,
 		                                   std::vector<std::pair<HTp, int>>& linkedtieends,
@@ -2021,7 +2023,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		int     getRestPositionBelowNotes (HTp rest, std::vector<int>& vpos);
 		void    setRestOnCenterStaffLine  (HTp rest, int baseline);
 		bool    checkRestForVerticalPositioning(HTp rest, int baseline);
-		bool    analyzeKernStems          (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
+		bool    analyzeKernStemLengths    (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
 		void    getBaselines              (std::vector<std::vector<int>>& centerlines);
 		void    createLinkedTies          (std::vector<std::pair<HTp, int>>& starts, 
 		                                   std::vector<std::pair<HTp, int>>& ends);
@@ -2901,6 +2903,7 @@ class GridStaff : public std::vector<GridVoice*>, public GridSide {
 		void appendTokenLayer    (int layerindex, HTp token, HumNum duration,
 		                          const std::string& spacer = " ");
 		int getMaxVerseCount     (void);
+		string getString         (void);
 };
 
 std::ostream& operator<<(std::ostream& output, GridStaff* staff);
@@ -3107,6 +3110,7 @@ class GridVoice {
 		void   setDurationToPrev  (HumNum dur);
 		void   incrementDuration  (HumNum duration);
 		void   forgetToken        (void);
+		string getString          (void);
 
 	protected:
 		void   setTransfered      (bool state);
@@ -3183,7 +3187,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void transferMerges                (GridStaff* oldstaff,
 		                                    GridStaff* oldlaststaff,
 		                                    GridStaff* newstaff,
-		                                    GridStaff* newlaststaff);
+		                                    GridStaff* newlaststaff, int pindex,
+		                                    int sindex);
 		void transferOtherParts            (GridSlice* oldline, GridSlice* newline, int maxpart);
 		void insertExInterpSides           (HumdrumLine* line, int part,
 		                                    int staff);
@@ -3202,9 +3207,12 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void transferNonDataSlices         (GridMeasure* output, GridMeasure* input);
 		string extractMelody               (GridMeasure* measure);
 		void insertMelodyString            (GridMeasure* measure, const string& melody);
-
+		GridVoice* createVoice             (const string& tok, const string& post, HumNum duration, int pindex, int sindex);
+		HTp createHumdrumToken             (const string& tok, int pindex, int sindex);
 		GridSlice* getNextSpinedLine       (const GridMeasure::iterator& it, int measureindex);
 		void matchVoices                   (GridSlice* current, GridSlice* last);
+		void adjustVoices                  (GridSlice* curr, GridSlice* newmanip, int partsplit);
+		void createMatchedVoiceCount       (GridStaff* snew, GridStaff* sold, int p, int s);
 
 	private:
 		std::vector<GridSlice*>       m_allslices;
