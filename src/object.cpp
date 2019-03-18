@@ -85,7 +85,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
-    m_isReferencObject = object.m_isReferencObject;
+    m_isReferenceObject = object.m_isReferenceObject;
 
     // Also copy attribute classes
     m_attClasses = object.m_attClasses;
@@ -123,7 +123,7 @@ Object &Object::operator=(const Object &object)
         // Flags
         m_isAttribute = object.m_isAttribute;
         m_isModified = true;
-        m_isReferencObject = object.m_isReferencObject;
+        m_isReferenceObject = object.m_isReferenceObject;
 
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
@@ -159,7 +159,7 @@ void Object::Init(std::string classid)
     // Flags
     m_isAttribute = false;
     m_isModified = true;
-    m_isReferencObject = false;
+    m_isReferenceObject = false;
 
     this->GenerateUuid();
 
@@ -177,7 +177,7 @@ void Object::SetAsReferenceObject()
 {
     assert(m_children.empty());
 
-    m_isReferencObject = true;
+    m_isReferenceObject = true;
 }
 
 void Object::Reset()
@@ -263,7 +263,7 @@ void Object::SwapUuid(Object *other)
 
 void Object::ClearChildren()
 {
-    if (m_isReferencObject) {
+    if (m_isReferenceObject) {
         m_children.clear();
         return;
     }
@@ -509,7 +509,9 @@ bool Object::DeleteChild(Object *child)
     auto it = std::find(m_children.begin(), m_children.end(), child);
     if (it != m_children.end()) {
         m_children.erase(it);
-        delete child;
+        if (!m_isReferenceObject) {
+            delete child;
+        }
         this->Modify();
         return true;
     }

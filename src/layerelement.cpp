@@ -1016,12 +1016,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 }
             }
             else if (hasMultipleLayer) {
-                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
-                assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN())
-                    loc += 2;
-                else
-                    loc -= 2;
+                Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+                assert(parentLayer);
+                int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+                if (layerCount > 1) {
+                    Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                    assert(firstLayer);
+                    if (firstLayer->GetN() == layerY->GetN())
+                        loc += 2;
+                    else
+                        loc -= 2;
+                }
             }
         }
         loc = rest->GetRestLocOffset(loc);
@@ -1423,6 +1428,35 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
+{
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
+    assert(params);
+
+    if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
+
+    double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+    double time = m_alignment->GetTime();
+
+    // The event is starting after the end of the element
+    if ((time + duration) <= params->m_time) {
+        return FUNCTOR_CONTINUE;
+    }
+    // The element is starting after the event end - we can stop here
+    else if (time >= (params->m_time + params->m_duration)) {
+        return FUNCTOR_STOP;
+    }
+
+    // Add the layerN to the list of layer element occuring in this time frame
+    if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
+        == params->m_layers.end()) {
+        params->m_layers.push_back(this->GetAlignmentLayerN());
+    }
+
+    // Not need to recurse for chords? Not quite sure about it.
+    return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)

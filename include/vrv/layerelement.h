@@ -266,6 +266,11 @@ public:
     virtual int FindSpannedLayerElements(FunctorParams *functorParams);
 
     /**
+     * See Object::LayerCountInTimeSpan
+     */
+    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
+
+    /**
      * See Object::CalcOnsetOffset
      */
     ///@{

@@ -29,6 +29,7 @@ class StaffDef : public ScoreDefElement,
                  public AttNotationType,
                  public AttScalable,
                  public AttStaffDefLog,
+                 public AttStaffDefVis,
                  public AttTransposition {
 public:
     /**

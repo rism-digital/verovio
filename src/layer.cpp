@@ -214,26 +214,12 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
 {
     assert(element);
 
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
-    assert(measure);
-
-    // First check if there is any <space> in the measure - if not we can return the layer stem direction
-    if (!measure->FindChildByType(SPACE)) {
+    if (this->GetLayerCountForTimeSpanOf(element) < 2) {
+        return STEMDIRECTION_NONE;
+    }
+    else {
         return m_drawingStemDir;
     }
-
-    Alignment *alignment = element->GetAlignment();
-    assert(alignment);
-
-    Layer *layer = NULL;
-    Staff *staff = element->GetCrossStaff(layer);
-    if (!staff) {
-        staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
-    }
-    // At this stage we have the parent or the cross-staff
-    assert(staff);
-
-    return GetDrawingStemDir(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
 }
 
 data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coords)
@@ -251,11 +237,6 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
 
-    // First check if there is any <space> in the measure - if not we can return the layer stem direction
-    if (!measure->FindChildByType(SPACE)) {
-        return m_drawingStemDir;
-    }
-
     Alignment *alignmentFirst = first->GetAlignment();
     assert(alignmentFirst);
     Alignment *alignmentLast = last->GetAlignment();
@@ -269,30 +250,52 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     double duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();
     duration = durRound(duration);
 
-    return GetDrawingStemDir(time, duration, measure, staff->GetN());
+    if (this->GetLayerCountInTimeSpan(time, duration, measure, staff->GetN()) < 2) {
+        return STEMDIRECTION_NONE;
+    }
+    else {
+        return m_drawingStemDir;
+    }
 }
 
-data_STEMDIRECTION Layer::GetDrawingStemDir(double time, double duration, Measure *measure, int staff)
+int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
+{
+    assert(element);
+
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    assert(measure);
+
+    Alignment *alignment = element->GetAlignment();
+    assert(alignment);
+
+    Layer *layer = NULL;
+    Staff *staff = element->GetCrossStaff(layer);
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    }
+    // At this stage we have the parent or the cross-staff
+    assert(staff);
+
+    return this->GetLayerCountInTimeSpan(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+}
+
+int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff)
 {
     assert(measure);
 
-    Functor findSpaceInAlignment(&Object::FindSpaceInReferenceAlignments);
-    FindSpaceInAlignmentParams findSpaceInAlignmentParams(
-        GetCurrentMeterSig(), GetCurrentMensur(), &findSpaceInAlignment);
-    findSpaceInAlignmentParams.m_time = time;
-    findSpaceInAlignmentParams.m_duration = duration;
+    Functor layerCountInTimeSpan(&Object::LayerCountInTimeSpan);
+    LayerCountInTimeSpanParams layerCountInTimeSpanParams(
+        GetCurrentMeterSig(), GetCurrentMensur(), &layerCountInTimeSpan);
+    layerCountInTimeSpanParams.m_time = time;
+    layerCountInTimeSpanParams.m_duration = duration;
 
     ArrayOfComparisons filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.push_back(&matchStaff);
 
-    measure->m_measureAligner.Process(&findSpaceInAlignment, &findSpaceInAlignmentParams, NULL, &filters);
+    measure->m_measureAligner.Process(&layerCountInTimeSpan, &layerCountInTimeSpanParams, NULL, &filters);
 
-    if (findSpaceInAlignmentParams.m_success && (findSpaceInAlignmentParams.m_layerCount < 3)) {
-        return STEMDIRECTION_NONE;
-    }
-
-    return m_drawingStemDir;
+    return (int)layerCountInTimeSpanParams.m_layers.size();
 }
 
 Clef *Layer::GetCurrentClef() const

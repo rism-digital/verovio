@@ -1045,41 +1045,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindSpaceInAlignmentParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the time of the event
- * member 1: the duration of the event
- * member 2: the layer count at that position
- * member 3: the flag indicating whereas the event is aligned with a space
- * member 4: the current meter signature
- * member 5: the current mensur
- * member 6: the functor for redirection
- **/
-
-class FindSpaceInAlignmentParams : public FunctorParams {
-public:
-    FindSpaceInAlignmentParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
-    {
-        m_time = 0.0;
-        m_duration = 0.0;
-        m_layerCount = 1;
-        m_success = false;
-        m_meterSig = meterSig;
-        m_mensur = mensur;
-        m_functor = functor;
-    }
-    double m_time;
-    double m_duration;
-    int m_layerCount;
-    bool m_success;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // FindSpannedLayerElementsParams
 //----------------------------------------------------------------------------
 
@@ -1223,6 +1188,37 @@ public:
     int m_leftBarLineX;
     int m_rightBarLineX;
     int m_systemFullWidth;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// LayerCountInTimeSpanParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the time of the event
+ * member 1: the duration of the event
+ * member 2: the list of layerN found
+ * member 3: the current meter signature
+ * member 4: the current mensur
+ * member 5: the functor for redirection
+ **/
+
+class LayerCountInTimeSpanParams : public FunctorParams {
+public:
+    LayerCountInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
+    {
+        m_time = 0.0;
+        m_duration = 0.0;
+        m_meterSig = meterSig;
+        m_mensur = mensur;
+        m_functor = functor;
+    }
+    double m_time;
+    double m_duration;
+    std::vector<int> m_layers;
+    MeterSig *m_meterSig;
+    Mensur *m_mensur;
     Functor *m_functor;
 };
 
@@ -1682,6 +1678,20 @@ class UnCastOffParams : public FunctorParams {
 public:
     UnCastOffParams(System *currentSystem) { m_currentSystem = currentSystem; }
     System *m_currentSystem;
+};
+
+//----------------------------------------------------------------------------
+// UnsetCurrentScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor to be redirected to Aligner
+ **/
+
+class UnsetCurrentScoreDefParams : public FunctorParams {
+public:
+    UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
+    Functor *m_functor;
 };
 
 } // namespace vrv

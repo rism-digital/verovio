@@ -250,7 +250,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
         Trill *trill = dynamic_cast<Trill *>(object);
         assert(trill);
         if (trill->GetEnd()) {
-            this->AddToDrawingListIfNeccessary(trill);
+            this->AddToDrawingList(trill);
         }
     }
 }
@@ -358,6 +358,7 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
 
     params->m_cumulatedShift
         = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    params->m_staffIdx = 0;
 
     m_systemAligner.Process(params->m_functorEnd, params);
 
