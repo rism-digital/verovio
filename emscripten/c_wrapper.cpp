@@ -20,7 +20,7 @@ extern "C" {
 /** declarations */
 
 void *vrvToolkit_constructor();
-void *vrvToolkit_constructorResroucePath(const char * resourcePath); //alternate constructor which allows user to set custom data path
+void *vrvToolkit_constructorResourcePath(const char * resourcePath); //alternate constructor which allows user to set custom data path
 void vrvToolkit_destructor(Toolkit *tk);
 bool vrvToolkit_edit(Toolkit *tk, const char *editorAction);
 const char *vrvToolkit_getAvailableOptions(Toolkit *tk);
