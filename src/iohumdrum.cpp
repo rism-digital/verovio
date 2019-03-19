@@ -59,6 +59,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
+#include "ftrem.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "instrdef.h"
@@ -4582,7 +4583,9 @@ void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::Hum
 
 //////////////////////////////
 //
-// HumdrumInput::checkForTremolo --
+// HumdrumInput::checkForTremolo --  Check to see if a beamed group of notes
+//    can be converted into a tremolo. (Decision to conver to tremolo is done
+//    outside of this function and is activated by the *tremolo tandem interpretation).
 //
 
 bool HumdrumInput::checkForTremolo(
@@ -4603,42 +4606,126 @@ bool HumdrumInput::checkForTremolo(
     }
 
     hum::HumNum duration = notes[0]->getDuration();
-    int base40 = hum::Convert::kernToBase40(notes[0]);
+    hum::HumNum testdur = duration;
+    std::vector<std::vector<int> > pitches(notes.size());
 
-    for (int i = 1; i < (int)notes.size(); i++) {
-        hum::HumNum testdur = notes[i]->getDuration();
-        if (testdur != duration) {
-            return false;
+    for (int i = 0; i < (int)notes.size(); i++) {
+        if (i > 0) {
+            testdur = notes[i]->getDuration();
+            if (testdur != duration) {
+                // All durations must be the same for a tremolo.
+                return false;
+            }
         }
-        int testbase40 = hum::Convert::kernToBase40(notes[i]);
-        if (testbase40 != base40) {
-            return false;
+        int scount = notes[i]->getSubtokenCount();
+        for (int j = 0; j < scount; j++) {
+            std::string subtok = notes[i]->getSubtoken(j);
+            pitches[i].emplace_back(hum::Convert::kernToBase40(subtok));
+        }
+    }
+    // Should also disallow any case where there is a tie present.
+
+    // Check for <bTrem> case.
+    bool allpequal = true;
+    for (int i = 1; i < (int)pitches.size(); i++) {
+
+        if (pitches[i].size() != pitches[i - 1].size()) {
+            allpequal = false;
+            break;
+        }
+        // Check if each note in the successive chords is the same.
+        // The ordering of notes in each chord is assumed to be the same
+        // (i.e., this function is not going to waste time sorting
+        // the pitches to check if the chords are equivalent).
+        for (int j = 0; j < (int)pitches[i].size(); j++) {
+            if (pitches[i][j] != pitches[i - 1][j]) {
+                allpequal = false;
+                break;
+            }
+        }
+        if (allpequal == false) {
+            break;
         }
     }
 
-    // beam group should be converted into a tremolo
-    hum::HumNum tdur = duration * notes.size();
-    std::string recip = hum::Convert::durationToRecip(tdur);
+    if (allpequal) {
+        // beam group should be converted into a <bTrem> tremolo
+        hum::HumNum tdur = duration * notes.size();
+        std::string recip = hum::Convert::durationToRecip(tdur);
 
-    int slashes = log(duration.getFloat()) / log(2.0);
-    int noteslash = log(tdur.getFloat()) / log(2.0);
-    if (noteslash < 0) {
-        slashes = slashes - noteslash;
+        int slashes = log(duration.getFloat()) / log(2.0);
+        int noteslash = log(tdur.getFloat()) / log(2.0);
+        if (noteslash < 0) {
+            slashes = slashes - noteslash;
+        }
+        slashes = -slashes;
+        if (slashes <= 0) {
+            // something went wrong calculating durations.
+            return false;
+        }
+
+        notes[0]->setValue("auto", "tremolo", "1");
+        notes[0]->setValue("auto", "recip", recip);
+        notes[0]->setValue("auto", "slashes", slashes);
+        for (int i = 1; i < (int)notes.size(); i++) {
+            notes[i]->setValue("auto", "suppress", "1");
+        }
+
+        return true;
     }
-    slashes = -slashes;
-    if (slashes <= 0) {
+
+    // Check for <fTrem> case.
+    // allowing odd-length sequences (3, 5, 7, etc) which can in theory
+    // be represented by fTrem, but I have not see such cases.
+
+    if (pitches.size() < 3) {
+        // fTrem cannot exist on only two notes/chords.
         return false;
     }
 
-    notes[0]->setValue("auto", "tremolo", "1");
+    // check to see that all even notes/chords are the same
+    for (int i = 2; i < (int)pitches.size(); i++) {
+        if (pitches[i].size() != pitches[i - 2].size()) {
+            return false;
+        }
+        // Check if each note in the successive chords is the same.
+        // The ordering of notes in each chord is assumed to be the same
+        // (i.e., this function is not going to waste time sorting
+        // the pitches to check if the chords are equivalent).
+        for (int j = 0; j < (int)pitches[i].size(); j++) {
+            if (pitches[i][j] != pitches[i - 2][j]) {
+                return false;
+            }
+        }
+    }
+
+    // If got to this point, create an fTrem.
+
+    hum::HumNum tdur = duration * notes.size();
+    std::string recip = hum::Convert::durationToRecip(tdur);
+    std::string unitrecip = hum::Convert::durationToRecip(duration);
+
+    // Eventually also allow calculating of beam.float
+    // (mostly for styling half note tremolos).
+    int beams = -log(duration.getFloat()) / log(2.0);
+    if (beams <= 0) {
+        // something went wrong calculating durations.
+        cerr << "PROBLEM WITH TREMOLO2 CALCULATION: " << beams << endl;
+        return false;
+    }
+
+    notes[0]->setValue("auto", "tremolo2", "1");
     notes[0]->setValue("auto", "recip", recip);
-    notes[0]->setValue("auto", "slashes", slashes);
+    notes[0]->setValue("auto", "unit", unitrecip); // problem if dotted...
+    notes[0]->setValue("auto", "beams", beams);
+    notes[1]->setValue("auto", "tremoloAux", "1");
+    notes[1]->setValue("auto", "recip", recip);
+
     for (int i = 1; i < (int)notes.size(); i++) {
         notes[i]->setValue("auto", "suppress", "1");
     }
 
     return true;
-    ;
 }
 
 //////////////////////////////
@@ -5088,6 +5175,41 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     appendElement(btrem, chord);
                     appendElement(elements, pointers, btrem);
                 }
+                else if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo2")) {
+                    FTrem *ftrem = new FTrem;
+                    int beams = layerdata[i]->getValueInt("auto", "beams");
+                    ftrem->SetBeams(beams);
+                    int unit = layerdata[i]->getValueInt("auto", "unit");
+                    switch (unit) {
+                        case 8: ftrem->SetUnitdur(DURATION_8); break;
+                        case 16: ftrem->SetUnitdur(DURATION_16); break;
+                        case 32: ftrem->SetUnitdur(DURATION_32); break;
+                        case 64: ftrem->SetUnitdur(DURATION_64); break;
+                        case 128: ftrem->SetUnitdur(DURATION_128); break;
+                    }
+                    hum::HTp second = NULL;
+                    for (int z = i + 1; z < (int)layerdata.size(); z++) {
+                        if (layerdata[z]->getValueInt("auto", "tremoloAux")) {
+                            second = layerdata[z];
+                            break;
+                        }
+                    }
+                    appendElement(ftrem, chord);
+                    if (second) {
+                        // ignoring slurs, ties, ornaments, articulations
+                        if (second->isChord()) {
+                            Chord *chord2 = new Chord;
+                            appendElement(ftrem, chord2);
+                            convertChord(chord2, second, staffindex);
+                        }
+                        else {
+                            Note *note2 = new Note;
+                            appendElement(ftrem, note2);
+                            convertNote(note2, second, staffindex, 0);
+                        }
+                    }
+                    appendElement(elements, pointers, ftrem);
+                }
                 else {
                     appendElement(elements, pointers, chord);
                 }
@@ -5098,6 +5220,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
                 convertChord(chord, layerdata[i], staffindex);
                 popElementStack(elements, pointers);
+                // maybe an extra pop here for tremolos?
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 assignAutomaticStem(chord, layerdata[i], staffindex);
@@ -5226,6 +5349,41 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 appendElement(btrem, note);
                 appendElement(elements, pointers, btrem);
+            }
+            else if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo2")) {
+                FTrem *ftrem = new FTrem;
+                int beams = layerdata[i]->getValueInt("auto", "beams");
+                ftrem->SetBeams(beams);
+                int unit = layerdata[i]->getValueInt("auto", "unit");
+                switch (unit) {
+                    case 8: ftrem->SetUnitdur(DURATION_8); break;
+                    case 16: ftrem->SetUnitdur(DURATION_16); break;
+                    case 32: ftrem->SetUnitdur(DURATION_32); break;
+                    case 64: ftrem->SetUnitdur(DURATION_64); break;
+                    case 128: ftrem->SetUnitdur(DURATION_128); break;
+                }
+                hum::HTp second = NULL;
+                for (int z = i + 1; z < (int)layerdata.size(); z++) {
+                    if (layerdata[z]->getValueInt("auto", "tremoloAux")) {
+                        second = layerdata[z];
+                        break;
+                    }
+                }
+                appendElement(ftrem, note);
+                if (second) {
+                    // ignoring slurs, ties, ornaments, articulations
+                    if (second->isChord()) {
+                        Chord *chord2 = new Chord;
+                        appendElement(ftrem, chord2);
+                        convertChord(chord2, second, staffindex);
+                    }
+                    else {
+                        Note *note2 = new Note;
+                        appendElement(ftrem, note2);
+                        convertNote(note2, second, staffindex, 0);
+                    }
+                }
+                appendElement(elements, pointers, ftrem);
             }
             else {
                 appendElement(elements, pointers, note);
@@ -10216,6 +10374,14 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         hum::HumdrumToken newtok(token->getValue("auto", "recip"));
         dur = convertRhythm(chord, &newtok, 0);
     }
+    else if (m_hasTremolo && token->getValueBool("auto", "tremolo2")) {
+        hum::HumdrumToken newtok(token->getValue("auto", "recip"));
+        dur = convertRhythm(chord, &newtok, 0);
+    }
+    else if (m_hasTremolo && token->getValueBool("auto", "tremoloAux")) {
+        hum::HumdrumToken newtok(token->getValue("auto", "recip"));
+        dur = convertRhythm(chord, &newtok, 0);
+    }
     else {
         dur = convertRhythm(chord, token);
     }
@@ -11048,6 +11214,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     if (!chordQ) {
         hum::HumNum dur;
         if (m_hasTremolo && token->getValueBool("auto", "tremolo")) {
+            hum::HumdrumToken newtok(token->getValue("auto", "recip"));
+            dur = convertRhythm(note, &newtok, 0);
+        }
+        else if (m_hasTremolo && token->getValueBool("auto", "tremolo2")) {
+            hum::HumdrumToken newtok(token->getValue("auto", "recip"));
+            dur = convertRhythm(note, &newtok, 0);
+        }
+        else if (m_hasTremolo && token->getValueBool("auto", "tremoloAux")) {
             hum::HumdrumToken newtok(token->getValue("auto", "recip"));
             dur = convertRhythm(note, &newtok, 0);
         }
