@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        emscripten_main.cpp
+// Name:        c_wrapper.cpp (previously emscripten_main.cpp)
 // Author:      Rodolfo Zitellini
 // Created:     05/11/2013
 // Copyright (c) Authors and others. All rights reserved.
@@ -20,6 +20,7 @@ extern "C" {
 /** declarations */
 
 void *vrvToolkit_constructor();
+void *vrvToolkit_constructorResourcePath(const char * resourcePath); //alternate constructor which allows user to set custom data path
 void vrvToolkit_destructor(Toolkit *tk);
 bool vrvToolkit_edit(Toolkit *tk, const char *editorAction);
 const char *vrvToolkit_getAvailableOptions(Toolkit *tk);
@@ -49,6 +50,14 @@ void *vrvToolkit_constructor()
 {
     // set the resource path in the js blob
     Resources::SetPath("/data");
+
+    return new Toolkit();
+}
+
+void *vrvToolkit_constructorResourcePath(const char* resourcePath)
+{
+    // set the resource path in the js blob
+    Resources::SetPath(resourcePath);
 
     return new Toolkit();
 }

@@ -243,7 +243,7 @@ exit 0;
 
 sub getSources {
 	my @sources;
-	push @sources, "./emscripten_main.cpp";
+	push @sources, "./c_wrapper.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
 	if ($nohumdrum) {
