@@ -68,7 +68,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -273,11 +273,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             // cast to Dir check in DrawControlElementConnector
             DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        if (element->Is(DYNAM)) {
+        else if (element->Is(DYNAM)) {
             // cast to Dynam check in DrawControlElementConnector
             DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        if (element->Is(FIGURE)) {
+        else if (element->Is(FIGURE)) {
             // cast to Dynam check in DrawFConnector
             DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
