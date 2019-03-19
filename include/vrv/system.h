@@ -168,6 +168,14 @@ public:
     ///@}
 
     /**
+     * See Object::AdjustHarmGrpsSpacing
+     */
+    ///@{
+    virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
+    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * See Object::AdjustSylSpacing
      */
     ///@{

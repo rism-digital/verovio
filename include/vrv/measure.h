@@ -291,6 +291,11 @@ public:
     virtual int AdjustXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustHarmGrpsSpacing
+     */
+    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustSylSpacing
      */
     virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);

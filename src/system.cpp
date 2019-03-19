@@ -414,6 +414,62 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
+{
+    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    assert(params);
+
+    // reset it, but not the current grpId!
+    params->m_currentSystem = this;
+    params->m_overlapingHarm.clear();
+    params->m_previousHarmPositioner = NULL;
+    params->m_previousHarmStart = NULL;
+    params->m_previousMeasure = NULL;
+    params->m_freeSpace = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
+{
+    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    assert(params);
+
+    // End of the first pass - loop over for each group id
+    if (params->m_currentGrp == 0) {
+        for (auto grpId : params->m_grpIds) {
+            params->m_currentGrp = grpId;
+            this->Process(params->m_functor, functorParams, params->m_functorEnd);
+        }
+        // Make sure we reset it for the next system
+        params->m_currentGrp = 0;
+        return FUNCTOR_CONTINUE;
+    }
+
+    /************** End of a system when actually adjusting **************/
+
+    if (!params->m_previousMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Here we also need to handle the last harm of the measure - we check the alignment with the right barline
+    if (params->m_previousHarmPositioner) {
+        int overlap = params->m_previousHarmPositioner->GetContentRight()
+            - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
+
+        if (overlap > 0) {
+            params->m_overlapingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
+                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
+        }
+    }
+
+    // Ajust the postion of the alignment according to what we have collected for this harm group id
+    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
+    params->m_overlapingHarm.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::AdjustSylSpacing(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);

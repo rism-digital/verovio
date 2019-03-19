@@ -66,6 +66,11 @@ public:
      */
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
+    /**
+     * See Object::AdjustHarmGrpsSpacing
+     */
+    virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
+
 protected:
     //
 private:

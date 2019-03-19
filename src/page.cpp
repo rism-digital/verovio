@@ -315,6 +315,11 @@ void Page::LayOutHorizontally()
 
     this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
 
+    Functor adjustHarmGrpsSpacing(&Object::AdjustHarmGrpsSpacing);
+    Functor adjustHarmGrpsSpacingEnd(&Object::AdjustHarmGrpsSpacingEnd);
+    AdjustHarmGrpsSpacingParams adjustHarmGrpsSpacingParams(doc, &adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingEnd);
+    this->Process(&adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingParams, &adjustHarmGrpsSpacingEnd);
+
     // Adjust the arpeg
     Functor adjustArpeg(&Object::AdjustArpeg);
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);

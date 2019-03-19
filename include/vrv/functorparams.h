@@ -237,6 +237,48 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustHarmGrpsSpacingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector of the grpIds of harms in the system
+ * member 1: the current grp id (0 for the first pass)
+ * member 2: a vector adjustment tuples (Aligment start, Aligment end, distance)
+ * member 3: a pointer to the previous harm positioner (if any)
+ * member 4: a pointer to the previous harm start (if any)
+ * member 5: a pointer to the previous measure (if any)
+ * member 6: a pointer to the current system
+ * member 7: the doc
+ * member 8: a pointer to the functor for passing it to the system aligner
+ * member 9: a pointer to the functor end for passing it to the system aligner
+ **/
+
+class AdjustHarmGrpsSpacingParams : public FunctorParams {
+public:
+    AdjustHarmGrpsSpacingParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+        m_currentGrp = 0;
+        m_previousHarmPositioner = NULL;
+        m_previousHarmStart = NULL;
+        m_previousMeasure = NULL;
+        m_currentSystem = NULL;
+    }
+    std::vector<int> m_grpIds;
+    int m_currentGrp;
+    ArrayOfAdjustmentTuples m_overlapingHarm;
+    FloatingPositioner *m_previousHarmPositioner;
+    LayerElement *m_previousHarmStart;
+    Measure *m_previousMeasure;
+    System *m_currentSystem;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
 // AdjustLayersParams
 //----------------------------------------------------------------------------
 
