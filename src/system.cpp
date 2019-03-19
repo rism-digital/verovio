@@ -425,7 +425,6 @@ int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
     params->m_previousHarmPositioner = NULL;
     params->m_previousHarmStart = NULL;
     params->m_previousMeasure = NULL;
-    params->m_freeSpace = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -506,7 +505,7 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
         }
     }
 
-    // Ajust the postion of the alignment according to what we have collected for this verse
+    // Ajust the postion of the alignment according to what we have collected for this harm grp
     params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
     params->m_overlapingSyl.clear();
 
