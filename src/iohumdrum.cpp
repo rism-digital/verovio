@@ -4584,7 +4584,7 @@ void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::Hum
 //////////////////////////////
 //
 // HumdrumInput::checkForTremolo --  Check to see if a beamed group of notes
-//    can be converted into a tremolo. (Decision to conver to tremolo is done
+//    can be converted into a tremolo. (Decision to convert to tremolo is done
 //    outside of this function and is activated by the *tremolo tandem interpretation).
 //
 
