@@ -10884,7 +10884,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     if (!chordQ) {
-        // acc/unacc need to be switched in verovio, so switch also here later:
         if (tstring.find("qq") != string::npos) {
             note->SetGrace(GRACE_acc);
             // set the visual duration to an eighth note if there
@@ -11839,16 +11838,22 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
     if (vstring.empty()) {
         dur = hum::Convert::recipToDurationNoDots(tstring);
         dur /= 4; // duration is now in whole note units;
-        dur *= m_tupletscaling;
+        if (!grace) {
+            dur *= m_tupletscaling;
+        }
     }
     else {
         dur = hum::Convert::recipToDurationNoDots(vstring);
         dur /= 4; // duration is now in whole note units;
-        dur *= m_tupletscaling;
+        if (!grace) {
+            dur *= m_tupletscaling;
+        }
 
         durges = hum::Convert::recipToDurationNoDots(tstring);
         durges /= 4; // duration is now in whole note units;
-        durges *= m_tupletscaling;
+        if (!grace) {
+            durges *= m_tupletscaling;
+        }
     }
 
     if ((!grace) && (dur == 0) && (element)) {
