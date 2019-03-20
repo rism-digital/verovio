@@ -153,6 +153,7 @@ void AbcInput::parseABC(std::istream &infile)
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffDef->SetLines(m_stafflines);
+    staffDef->SetTransSemi(m_transpose);
     staffGrp->AddChild(staffDef);
     if (m_meter) {
         m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
@@ -665,16 +666,11 @@ void AbcInput::parseKey(std::string keyString)
     if (keyString.find("transpose=", i) != std::string::npos) {
         i = int(keyString.find("transpose=", i)) + 10;
         std::string transStr;
-        int trans = 1;
-        if (keyString[i] == '-') {
-            trans = -1;
-            ++i;
-        }
-        while (isdigit(keyString[i])) {
+        while (keyString[i] == '-' || isdigit(keyString[i])) {
             transStr.push_back(keyString[i]);
             ++i;
         }
-        trans = trans * atoi(transStr.c_str());
+        m_transpose = atoi(transStr.c_str());
     }
 
     // stafflines
