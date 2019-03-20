@@ -606,7 +606,7 @@ void AbcInput::parseKey(std::string keyString)
                 c = tolower(c);
             }
 
-            if (modeString == "min" || modeString == "m") {
+            if (modeString == "min" || (modeString[0] == 'm' && !isalpha(modeString[1]))) {
                 mode = MODE_minor;
                 accidNum -= 3;
             }
