@@ -8734,6 +8734,20 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     pointers.push_back((void *)tuplet);
 
     int staff = m_rkern[token->getTrack()];
+    int placement = 0;
+    if (hasAboveParameter(layerdata[layerindex], "TUP")) {
+        placement = +1;
+    }
+    else if (hasBelowParameter(layerdata[layerindex], "TUP")) {
+        placement = -1;
+    }
+    // add head and stem placement in the future.
+    if (placement) {
+        switch (placement) {
+            case -1: tuplet->SetBracketPlace(STAFFREL_basic_below); break;
+            case +1: tuplet->SetBracketPlace(STAFFREL_basic_above); break;
+        }
+    }
     if (ss[staff].verse) {
         // If the music contains lyrics, force the tuplet above the staff.
         tuplet->SetBracketPlace(STAFFREL_basic_above);
@@ -9760,7 +9774,7 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         ss[staffindex].suppress_beam_tuplet = true;
         ss[staffindex].suppress_bracket_tuplet = true;
     }
-    else if (value == "*tuplet") {
+    else if (value.compare(0, 7, "*tuplet") != 0) {
         ss[staffindex].suppress_beam_tuplet = false;
         ss[staffindex].suppress_bracket_tuplet = false;
     }
