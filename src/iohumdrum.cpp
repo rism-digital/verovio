@@ -5537,7 +5537,7 @@ void HumdrumInput::handleColoration(hum::HTp token)
     hum::HTp firstnote = NULL;
     hum::HTp lastnote = NULL;
     while (colend) {
-        if (colend->compare("*Xlig") == 0) {
+        if (colend->compare("*Xcol") == 0) {
             break;
         }
         if (colend->isNote()) {
