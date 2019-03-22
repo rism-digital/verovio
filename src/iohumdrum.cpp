@@ -9774,7 +9774,7 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         ss[staffindex].suppress_beam_tuplet = true;
         ss[staffindex].suppress_bracket_tuplet = true;
     }
-    else if (value.compare(0, 7, "*tuplet") != 0) {
+    else if (value.compare(0, 7, "*tuplet") == 0) {
         ss[staffindex].suppress_beam_tuplet = false;
         ss[staffindex].suppress_bracket_tuplet = false;
     }
