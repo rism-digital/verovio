@@ -451,6 +451,7 @@ public:
     OptionGrp m_general;
 
     OptionBool m_adjustPageHeight;
+    OptionBool m_useSvgViewBox;
     OptionIntMap m_breaks;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;

@@ -165,6 +165,11 @@ public:
      */
     void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
 
+    /**
+     * Setting m_viewBox flag (false by default)
+     */
+    void SetSvgViewBox(bool svgViewBox) { m_viewBox = svgViewBox; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -226,6 +231,9 @@ private:
 
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
+
+    // use viewbox on svg root element
+    bool m_viewBox;
 };
 
 } // namespace vrv
