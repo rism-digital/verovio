@@ -166,7 +166,7 @@ public:
     void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
 
     /**
-     * Setting m_viewBox flag (false by default)
+     * Setting m_svgViewBox flag (false by default)
      */
     void SetSvgViewBox(bool svgViewBox) { m_svgViewBox = svgViewBox; }
 

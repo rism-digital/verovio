@@ -489,10 +489,6 @@ Options::Options()
     m_adjustPageHeight.Init(false);
     this->Register(&m_adjustPageHeight, "adjustPageHeight", &m_general);
 
-    m_useSvgViewBox.SetInfo("Use viewbox on svg root", "Use viewbox on svg root element for easy scaling of document");
-    m_useSvgViewBox.Init(false);
-    this->Register(&m_useSvgViewBox, "useSvgViewBox", &m_general);
-
     m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
