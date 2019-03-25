@@ -113,6 +113,7 @@ private:
     int m_broken = 0;
     int m_gracecount = 0;
     int m_stafflines = 5;
+    int m_transpose = 0;
     /*
      * ABC metadata stacks
      */
