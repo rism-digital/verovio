@@ -83,13 +83,13 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     // take care of width/height once userScale is updated
     if (m_mmOutput) {
         m_svgNode.prepend_attribute("height")
-            = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
+            = StringFormat("%gmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
         m_svgNode.prepend_attribute("width")
-            = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
+            = StringFormat("%gmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
     }
     else {
-        m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)GetHeight() * GetUserScaleY())).c_str();
-        m_svgNode.prepend_attribute("width") = StringFormat("%.2fpx", ((double)GetWidth() * GetUserScaleX())).c_str();
+        m_svgNode.prepend_attribute("height") = StringFormat("%gpx", ((double)GetHeight() * GetUserScaleY())).c_str();
+        m_svgNode.prepend_attribute("width") = StringFormat("%gpx", ((double)GetWidth() * GetUserScaleX())).c_str();
     }
 
     // add the woff VerovioText font if needed

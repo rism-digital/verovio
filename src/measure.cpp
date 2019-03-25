@@ -775,6 +775,21 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
+{
+    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    assert(params);
+
+    // At the end of the measure - pass it along for overlapping verses
+    params->m_previousMeasure = this;
+
+    // Ajust the postion of the alignment according to what we have collected for this harm gpr
+    m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
+    params->m_overlapingHarm.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);

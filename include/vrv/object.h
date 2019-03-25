@@ -632,7 +632,7 @@ public:
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Lay out the X positions of the grace notes looking at the bounding boxes.
+     * @name Lay out the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
      */
@@ -642,12 +642,20 @@ public:
     ///@}
 
     /**
+     * @name Adjust the horizontal position of harms by groups in order to avoid overlapping
+     */
+    ///@{
+    virtual int AdjustHarmGrpsSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    ///@}
+
+    /**
      * Adjust the x position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the x position of a right barline in order to make sure the is no text content
+     * @name Adjust the x position of a right barline in order to make sure the is no text content
      * overlflowing in the right margin
      */
     ///@{

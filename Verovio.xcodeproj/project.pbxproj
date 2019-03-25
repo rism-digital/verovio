@@ -476,6 +476,8 @@
 		4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA95D71A515D0E008AD7E9 /* editorial.cpp */; };
 		4DCA95D91A515D0E008AD7E9 /* editorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA95D71A515D0E008AD7E9 /* editorial.cpp */; };
 		4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DCA95DA1A515D33008AD7E9 /* editorial.h */; };
+		4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
+		4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD11DC32240E78B00A405D8 /* c_wrapper.h */; };
 		4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDBBB551C7AE43E00054AFF /* hairpin.h */; };
 		4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDBBB561C7AE43E00054AFF /* dynam.h */; };
 		4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB591C7AE45900054AFF /* dynam.cpp */; };
@@ -792,7 +794,6 @@
 		4D20B5ED1B873A2B00EA9EC3 /* scoredefinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scoredefinterface.h; path = include/vrv/scoredefinterface.h; sourceTree = "<group>"; };
 		4D22C41818890E6100D0831F /* mrest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mrest.cpp; path = src/mrest.cpp; sourceTree = "<group>"; };
 		4D22C41B18890E9900D0831F /* mrest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mrest.h; path = include/vrv/mrest.h; sourceTree = "<group>"; };
-		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
@@ -924,6 +925,8 @@
 		4DC34BA719BC4A83006175CD /* dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dot.cpp; path = src/dot.cpp; sourceTree = "<group>"; };
 		4DCA95D71A515D0E008AD7E9 /* editorial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = editorial.cpp; path = src/editorial.cpp; sourceTree = "<group>"; };
 		4DCA95DA1A515D33008AD7E9 /* editorial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = editorial.h; path = include/vrv/editorial.h; sourceTree = "<group>"; };
+		4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = c_wrapper.cpp; path = tools/c_wrapper.cpp; sourceTree = "<group>"; };
+		4DD11DC32240E78B00A405D8 /* c_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c_wrapper.h; path = tools/c_wrapper.h; sourceTree = "<group>"; };
 		4DDBBB551C7AE43E00054AFF /* hairpin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hairpin.h; path = include/vrv/hairpin.h; sourceTree = "<group>"; };
 		4DDBBB561C7AE43E00054AFF /* dynam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynam.h; path = include/vrv/dynam.h; sourceTree = "<group>"; };
 		4DDBBB591C7AE45900054AFF /* dynam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynam.cpp; path = src/dynam.cpp; sourceTree = "<group>"; };
@@ -1202,9 +1205,10 @@
 		4D7D8A3C1886E36200D78B62 /* tools */ = {
 			isa = PBXGroup;
 			children = (
+				4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */,
+				4DD11DC32240E78B00A405D8 /* c_wrapper.h */,
 				4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */,
 				4D983004192E959E00320037 /* main.cpp */,
-				4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */,
 			);
 			name = tools;
 			sourceTree = "<group>";
@@ -1664,6 +1668,7 @@
 				4DB3D8E51F83D16600B5FC2B /* elementpart.h in Headers */,
 				4DB3D8D21F83D12000B5FC2B /* octave.h in Headers */,
 				4DB3D8E21F83D15C00B5FC2B /* chord.h in Headers */,
+				4DD11DC52240E78B00A405D8 /* c_wrapper.h in Headers */,
 				403BEFFA206C010100D022D5 /* beatrpt.h in Headers */,
 				8F59293418854BF800FE51AD /* verticalaligner.h in Headers */,
 				4DB3D8E81F83D16E00B5FC2B /* ftrem.h in Headers */,
@@ -2454,6 +2459,7 @@
 				4D1BE7701C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
 				4D422105199805F800963292 /* att.cpp in Sources */,
 				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
+				4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */,
 				4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */,
 				40DA9C3620905CE8006BED92 /* ioabc.cpp in Sources */,
 				4DEC4DC021C828AC00D1D273 /* corr.cpp in Sources */,

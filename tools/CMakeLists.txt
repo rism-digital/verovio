@@ -96,6 +96,7 @@ if (BUILD_AS_LIBRARY)
     add_library (
         verovio
         SHARED
+		./c_wrapper.cpp
         ${all_SRC}
     )
 else()
