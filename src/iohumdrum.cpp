@@ -2908,6 +2908,10 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
 template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, const string &name)
 {
+    if (name.empty()) {
+        // no instrument name to display
+        return;
+    }
     hum::HumRegex hre;
     // "\xc2\xa0" is a non-breaking space
     string newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
@@ -4993,11 +4997,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return true;
     }
 
-    std::vector<humaux::HumdrumBeamAndTuplet> tg;
-    prepareBeamAndTupletGroups(layerdata, tg);
+    std::vector<humaux::HumdrumBeamAndTuplet> tgs;
+    prepareBeamAndTupletGroups(layerdata, tgs);
 
     if (m_debug) {
-        printGroupInfo(tg, layerdata);
+        printGroupInfo(tgs, layerdata);
     }
 
     m_tupletscaling = 1;
@@ -5126,7 +5130,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
 
-        handleGroupStarts(tg, elements, pointers, layerdata, i);
+        handleGroupStarts(tgs, elements, pointers, layerdata, i);
 
         if (layerdata[i]->getValueInt("auto", "suppress")) {
             continue;
@@ -5164,6 +5168,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
                 if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
                     BTrem *btrem = new BTrem;
+                    setBeamLocationId(btrem, tgs, layerdata, i);
                     int slashes = layerdata[i]->getValueInt("auto", "slashes");
                     switch (slashes) {
                         case 1: btrem->SetUnitdur(DURATION_8); break;
@@ -5177,6 +5182,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 else if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo2")) {
                     FTrem *ftrem = new FTrem;
+                    setBeamLocationId(ftrem, tgs, layerdata, i);
                     int beams = layerdata[i]->getValueInt("auto", "beams");
                     ftrem->SetBeams(beams);
                     int unit = layerdata[i]->getValueInt("auto", "unit");
@@ -5199,11 +5205,13 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         // ignoring slurs, ties, ornaments, articulations
                         if (second->isChord()) {
                             Chord *chord2 = new Chord;
+                            setLocationId(chord2, second);
                             appendElement(ftrem, chord2);
                             convertChord(chord2, second, staffindex);
                         }
                         else {
                             Note *note2 = new Note;
+                            setLocationId(note2, second);
                             appendElement(ftrem, note2);
                             convertNote(note2, second, staffindex, 0);
                         }
@@ -5339,6 +5347,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
             if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
                 BTrem *btrem = new BTrem;
+                setBeamLocationId(btrem, tgs, layerdata, i);
                 int slashes = layerdata[i]->getValueInt("auto", "slashes");
                 switch (slashes) {
                     case 1: btrem->SetUnitdur(DURATION_8); break;
@@ -5352,6 +5361,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             else if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo2")) {
                 FTrem *ftrem = new FTrem;
+                setBeamLocationId(ftrem, tgs, layerdata, i);
                 int beams = layerdata[i]->getValueInt("auto", "beams");
                 ftrem->SetBeams(beams);
                 int unit = layerdata[i]->getValueInt("auto", "unit");
@@ -5374,11 +5384,13 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     // ignoring slurs, ties, ornaments, articulations
                     if (second->isChord()) {
                         Chord *chord2 = new Chord;
+                        setLocationId(chord2, second);
                         appendElement(ftrem, chord2);
                         convertChord(chord2, second, staffindex);
                     }
                     else {
                         Note *note2 = new Note;
+                        setLocationId(note2, second);
                         appendElement(ftrem, note2);
                         convertNote(note2, second, staffindex, 0);
                     }
@@ -5408,7 +5420,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDirections(layerdata[i], staffindex);
         }
 
-        handleGroupEnds(tg[i], elements, pointers);
+        handleGroupEnds(tgs[i], elements, pointers);
     }
 
     if (prespace.size() > layerdata.size()) {
