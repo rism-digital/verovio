@@ -1702,7 +1702,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         breath->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         breath->SetPlace(breath->AttPlacement::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
-        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.8);
+        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     }
 
     // Dynamics
