@@ -1,4 +1,4 @@
-Verovio 2.1.0-dev-dec0954
+Verovio 2.1.0-dev-bcef1fd
 
 Example usage:
 
@@ -35,6 +35,7 @@ Input and page layout options
  --page-margin-right <i>           The page right margin (default: 50; min: 0; max: 500)
  --page-margin-top <i>             The page top margin (default: 50; min: 0; max: 500)
  --page-width <i>                  The page width (default: 2100; min: 100; max: 60000)
+ --svg-view-box                    Use viewBox on svg root element for easy scaling of document
  --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
  --use-pg-footer-for-all           Use the pgFooter for all pages
  --use-pg-header-for-all           Use the pgHeader for all pages
