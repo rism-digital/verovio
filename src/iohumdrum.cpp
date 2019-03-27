@@ -8730,6 +8730,47 @@ void HumdrumInput::analyzeLayerBeams(
 
 //////////////////////////////
 //
+// HumdrumInput::shouldHideBeamBracket --
+//
+
+bool HumdrumInput::shouldHideBeamBracket(
+    const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int layerindex)
+{
+    hum::HTp starttok = layerdata[layerindex];
+    if (starttok->find("L") == std::string::npos) {
+        return false;
+    }
+    bool beamedge = false;
+    int targettup = tgs[layerindex].tupletstart;
+    int i = layerindex + 1;
+    hum::HTp endtok = NULL;
+    while (i < (int)layerdata.size()) {
+        if (tgs[i].tupletend == targettup) {
+            endtok = layerdata[i];
+            break;
+        }
+        if (tgs[i].beamstart) {
+            beamedge = true;
+        }
+        if (tgs[i].beamend) {
+            beamedge = true;
+        }
+        i++;
+    }
+    if (!endtok) {
+        return false;
+    }
+    if (beamedge) {
+        return false;
+    }
+    if (endtok->find("J") == std::string::npos) {
+        return false;
+    }
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::insertTuplet --
 //
 
@@ -8774,6 +8815,9 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     tuplet->SetNum(tg.num * scale);
     tuplet->SetNumbase(tg.numbase * scale);
     if (suppress) {
+        tuplet->SetBracketVisible(BOOLEAN_false);
+    }
+    if (shouldHideBeamBracket(tgs, layerdata, layerindex)) {
         tuplet->SetBracketVisible(BOOLEAN_false);
     }
     // Brackets will be displayed automatically, so don't turn on:
