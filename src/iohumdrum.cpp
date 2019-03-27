@@ -3484,10 +3484,12 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
 void HumdrumInput::checkForOmd(int startline, int endline)
 {
-    if (m_omd) {
+    if (m_omd > m_infile[startline].getDurationFromStart()) {
         return;
     }
-    m_omd = true;
+    if (m_omd < 0) {
+        startline = 0;
+    }
 
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     if (staffstarts.size() == 0) {
@@ -3496,7 +3498,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
     hum::HumdrumFile &infile = m_infile;
     std::string key;
     std::string value;
-    for (int i = 0; i < infile.getLineCount(); ++i) {
+    for (int i = startline; i <= endline; ++i) {
         if (infile[i].isData()) {
             break;
         }
@@ -3512,6 +3514,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
             addTextElement(tempo, value);
             tempo->SetTstamp(1.0);
             setStaff(tempo, 1);
+            m_omd = infile[i].getDurationFromStart();
         }
     }
 }

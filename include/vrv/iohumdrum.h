@@ -661,7 +661,7 @@ private:
     hum::HumNum m_tupletscaling = 1;
 
     // m_omd == temporary variable for printing tempo designation.
-    bool m_omd = false;
+    hum::HumNum m_omd = -1;
 
     // m_oclef == temporary variable for printing "original-clef" <app>
     std::vector<std::pair<int, hum::HTp> > m_oclef;
