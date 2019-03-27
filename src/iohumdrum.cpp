@@ -9214,6 +9214,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // bool beamstate = false;
 
     // Go back and link all partial beamed tuplets and non-beamed tuplets.
+	// Need to consider this case: (12,24,12.) where the (12,24) are a power-of-two duration,
+	// and the (12.) is also a power of two.  Maybe also merge single-tuplets into adjacent
+	// tuplets and/or have a preference for grouping at the beat level rather than sub-beat.
     hum::HumNum groupdur;
     bool hasRest = false;
     for (int i = 0; i < (int)poweroftwo.size(); ++i) {
@@ -9242,11 +9245,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 ending = j - 1;
                 break;
             }
-            if (tupletgroups[i]) {
-                ending = j - 1;
-                break;
-            }
-            if (dotlessdur[j] != dotlessdur[i]) {
+            if (tupletgroups[j]) {
                 ending = j - 1;
                 break;
             }
