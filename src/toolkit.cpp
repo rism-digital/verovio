@@ -1045,6 +1045,11 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
         svg.SetMMOutput(true);
     }
 
+    // set the option to use viewbox on svg root
+    if (m_options->m_svgViewBox.GetValue()) {
+        svg.SetSvgViewBox(true);
+    }
+
     // render the page
     RenderToDeviceContext(pageNo, &svg);
 
