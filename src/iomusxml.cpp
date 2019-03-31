@@ -814,7 +814,10 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // ppq
             pugi::xpath_node divisions = it->select_single_node("divisions");
-            if (divisions) m_ppq = divisions.node().text().as_int();
+            if (divisions) {
+                m_ppq = divisions.node().text().as_int();
+                staffDef->SetPpq(m_ppq);
+            }
             // measure style
             pugi::xpath_node measureSlash = it->select_single_node("measure-style/slash");
             if (measureSlash) {
@@ -1463,6 +1466,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             Rest *rest = new Rest();
             element = rest;
             rest->SetDur(ConvertTypeToDur(typeStr));
+            rest->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) rest->SetDots(dots);
             // FIXME MEI 4.0.0
             // if (cue) rest->SetSize(SIZE_cue);
@@ -1544,6 +1548,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
                 Chord *chord = new Chord();
                 chord->SetDur(ConvertTypeToDur(typeStr));
+                chord->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
                 // FIXME MEI 4.0.0
@@ -1575,6 +1580,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // set attributes to the note if we are not in a chord
         if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
             note->SetDur(ConvertTypeToDur(typeStr));
+            note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
             // FIXME MEI 4.0.0
