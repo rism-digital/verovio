@@ -233,7 +233,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         }
 
         // rhythmic values
-        else if (isdigit(incipit[i]) != 0) {
+        else if ((isdigit(incipit[i]) != 0) && (incipit[i-1] != ';')) {
             i += getDurations(incipit, &current_measure, i);
         }
 
