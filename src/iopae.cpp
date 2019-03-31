@@ -674,7 +674,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
         // Triplets are in the form (4ABC)
         // index points to the '(', so we look back
-        // if the resut is a number or dot, it means we have the long format
+        // if the result is a number or dot, it means we have the long format
         // i.e. 4(6ABC;5) or 4.(6ABC;5)
         if ((index != 0) && (isdigit(incipit[index - 1]) || incipit[index - 1] == '.')) {
 
