@@ -2,8 +2,7 @@
 
 ## [Unreleased]
 * Preserve MusicXML `<duration>` on notes, rests, and chords (@rettinghaus)
-* Import MusicXML `<division>` (@rettinghaus)
-* Support for `@ppq` to `<staffDef>` (@rettinghaus)
+* Import MusicXML `<division>` with `@ppq` on `<staffDef>` (@rettinghaus)
 * Support for `@spacing` on `<staffDef>`
 * Support for `@sameas` on `<beam>`, `<chord>`, `<layer>`, `<note>`, `<rest>`, and `<tuplet>`
 * Support for editorial markup in `<label>` and `<labelAbbr>`
