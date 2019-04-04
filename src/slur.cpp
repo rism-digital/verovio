@@ -197,8 +197,6 @@ int Slur::AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements
     bezier[2] = c2;
     bezier[3] = p2;
 
-    int y;
-
     int dist = abs(p2.x - p1.x);
     int currentHeight = abs(c1.y - p1.y);
     int maxHeight = 0;
