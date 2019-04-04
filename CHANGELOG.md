@@ -1,13 +1,14 @@
 # Changelog
 
 ## [Unreleased]
-* Preserve MusicXML `<duration>` on notes, rests, and chords (@rettinghaus)
-* Import MusicXML `<division>` with `@ppq` on `<staffDef>` (@rettinghaus)
+* Support for SMUFL figured bass figures
 * Support for `@spacing` on `<staffDef>`
 * Support for `@sameas` on `<beam>`, `<chord>`, `<layer>`, `<note>`, `<rest>`, and `<tuplet>`
 * Support for editorial markup in `<label>` and `<labelAbbr>`
 * Support of ties and slurs starting or ending with timestamp (but not both)
 * Support for ABC notation import (@rettinghaus)
+* Preserve MusicXML `<duration>` on notes, rests, and chords (@rettinghaus)
+* Import MusicXML `<division>` with `@ppq` on `<staffDef>` (@rettinghaus)
 * Avoid system optimisation when a tempo change occurs
 * Improved tuplets and support for additional attributes
 * Improved slur placement
