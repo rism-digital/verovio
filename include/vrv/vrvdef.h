@@ -388,6 +388,14 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define VRV_TEXT_E551 0xE551
 #define VRV_TEXT_E552 0xE552
 
+/**
+ * SMUFL Symbols used in figured bass included in VerovioText
+ */
+
+#define VRV_TEXT_HARM                                                                                                  \
+    L"\u266D\u266E\u266F\uEA50\uEA51\uEA52\uEA53\uEA54\uEA55\uEA56\uEA57\uEA58\uEA59\uEA5A\uEA5B\uEA5C\uEA5D\uEA5E"    \
+    L"\uEA5F\uEA60\uEA61\uEA62\uECC0"
+
 //----------------------------------------------------------------------------
 // data.LINEWIDTHTERM factors
 //----------------------------------------------------------------------------
