@@ -9,7 +9,7 @@ shopt -s expand_aliases
 fontforge generate_ff.py $font
 
 # base64
-woffFont=${1%.sfd}.woff
+woffFont=${font%.sfd}.woff
 w=$(base64 $woffFont)
 
 # output

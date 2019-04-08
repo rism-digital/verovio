@@ -9,6 +9,7 @@
 #define __VRV_STAFFDEF_H__
 
 #include "atts_mei.h"
+#include "atts_midi.h"
 #include "atts_shared.h"
 #include "scoredef.h"
 
@@ -30,6 +31,7 @@ class StaffDef : public ScoreDefElement,
                  public AttScalable,
                  public AttStaffDefLog,
                  public AttStaffDefVis,
+                 public AttTimeBase,
                  public AttTransposition {
 public:
     /**

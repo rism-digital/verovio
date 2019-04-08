@@ -87,12 +87,12 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     const char *format = "%gpx";
 
     if (m_mmOutput) {
-        height /=  10;
+        height /= 10;
         width /= 10;
         format = "%gmm";
     }
 
-    if(m_svgViewBox) {
+    if (m_svgViewBox) {
         m_svgNode.prepend_attribute("viewBox") = StringFormat("0 0 %g %g", width, height).c_str();
     }
     else {
