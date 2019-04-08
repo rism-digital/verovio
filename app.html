@@ -1,0 +1,47 @@
+---
+layout: verovio
+verovio: false
+title: Verovio App
+active: app
+---
+<div class="row home-row home-row-flex">
+    
+    <div class="col-xs-12">
+        
+        <div class="panel-body">
+            <h3>Description</h3>
+            <p>The Verovio App is the easiest way to embed music rendered with Verovio in a web page. It implements and responsive and a document view. It includes navigation buttons for the responsive view and zooming.</p>
+        </div>
+        
+        {% include app-code.html %}
+        
+                <div class="panel-body">
+                    <h3>Code</h3>
+                    
+                    <p>
+                        Only a few lines of codes are needed to have the example above running in your webpage:
+                    </p>
+                    
+{% highlight html %}
+{% include app-code.html %} 
+{% endhighlight %}
+                    <p>
+                        Some additional options can be passed to the constructor:
+                    </p>
+                    
+{% highlight javascript %}
+const options = {
+    defaultView: 'document', // instead of 'responsive' by default
+    defaultZoom: 4 // 0-7, default is 3
+}
+{% endhighlight %}
+
+                    <p>
+                        It is also possible to disable the responsive or the document view with <code>enableResponsive: false</code> or <code>enableDocument: false</code> respectively. Have a try directly in the following <a href="https://jsfiddle.net/lpugin/rmc18zkw/" target="_blank">JSFiddle</a>.
+                    </p>
+
+                    
+                </div>
+
+    </div>
+</div>

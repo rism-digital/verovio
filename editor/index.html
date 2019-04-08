@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Verovio App</title>
+    <style>
+    html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+    }
+
+    #app {
+        width:100%;
+        height:100%;
+    }
+
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="module">
+        import 'https://www.verovio.org/javascript/app/verovio-app.js';
+        
+        function getParameterByName(name) {
+            var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+            return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+        }
+        
+        var view = getParameterByName("view");
+        if (!view || (['document', 'editor', 'responsive'].includes(view) == false)) {
+            view = 'editor';
+        } 
+        
+        var file = getParameterByName("file");
+        if (!file || (file.length == 0)) {
+            file = "https://www.verovio.org/editor/brahms.mei";
+        }
+        
+        // Create the options
+        
+        const options = {
+            enableEditor: true,
+            defaultZoom: 4,
+            defaultView: view
+        }
+        
+        // Create the app
+        
+        const app = new Verovio.App(document.getElementById("app"), options);
+        
+        // Load the file
+        
+        fetch(file)
+            .then(function(response) {
+                return response.text();
+            })
+            .then(function(text) {
+                app.loadData(text);
+            });
+    </script>
+</body>
+</html>
