@@ -1154,13 +1154,18 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             m_ID = note->GetUuid();
 
             // accidentals
-            if (musicCode[i - 1] == '^' || musicCode[i - 1] == '=' || musicCode[i - 1] == '_') {
-                // todo: double sharps and double flats
+            if (i >= 1 && (musicCode[i - 1] == '^' || musicCode[i - 1] == '=' || musicCode[i - 1] == '_')) {
                 Accid *accid = new Accid();
                 switch (musicCode[i - 1]) {
-                    case '^': accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                    case '^':
+                        musicCode[i - 2] == '^' ? accid->SetAccid(ACCIDENTAL_WRITTEN_x)
+                                                : accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+                        break;
                     case '=': accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
-                    case '_': accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                    case '_':
+                        musicCode[i - 2] == '_' ? accid->SetAccid(ACCIDENTAL_WRITTEN_ff)
+                                                : accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+                        break;
                     default: break;
                 }
                 note->AddChild(accid);
