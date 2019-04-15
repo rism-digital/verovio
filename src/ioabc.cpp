@@ -649,12 +649,11 @@ void AbcInput::parseKey(std::string keyString)
 
         std::string keySig;
         unsigned long pos_start = 0;
-        auto pos_end = static_cast<unsigned long>(accidNum);
+        auto pos_end = static_cast<unsigned long>(abs(accidNum));
 
         if (accidNum < 0) {
             keySig = StringFormat("%df", abs(accidNum));
-            pos_start = pitch.size() - abs(accidNum);
-            pos_end = static_cast<unsigned long>(abs(accidNum));
+            pos_start = pitch.size() - pos_end;
             key_pitch_alter_amount = -1;
         }
         else if (accidNum > 0) {
