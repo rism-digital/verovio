@@ -1192,8 +1192,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     accid = new Accid();
                     note->AddChild(accid);
                     accid->IsAttribute(true);
+                    accid->SetAccidGes((keyPitchAlterAmount < 0) ? ACCIDENTAL_GESTURAL_f : ACCIDENTAL_GESTURAL_s);
                 }
-                accid->SetAccidGes((keyPitchAlterAmount < 0) ? ACCIDENTAL_GESTURAL_f : ACCIDENTAL_GESTURAL_s);
             }
 
             // set pitch name
