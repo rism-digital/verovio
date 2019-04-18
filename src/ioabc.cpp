@@ -70,6 +70,8 @@ char dataValue[MAX_DATA_LEN]; // ditto as above
 
 std::string pitch = "FCGDAEB";
 std::string shorthandDecoration = ".~HLMOPSTuv";
+std::string keyPitchAlter = "";
+int keyPitchAlterAmount = 0;
 
 //----------------------------------------------------------------------------
 // AbcInput
@@ -644,12 +646,24 @@ void AbcInput::parseKey(std::string keyString)
 
     // we need set @key.sig for correct rendering
     if (accidNum != 0) {
+
         std::string keySig;
-        if (accidNum < 0)
+        unsigned long posStart = 0;
+        auto posEnd = static_cast<unsigned long>(abs(accidNum));
+
+        if (accidNum < 0) {
             keySig = StringFormat("%df", abs(accidNum));
-        else if (accidNum > 0)
+            posStart = pitch.size() - posEnd;
+            keyPitchAlterAmount = -1;
+        }
+        else if (accidNum > 0) {
             keySig = StringFormat("%ds", accidNum);
+            keyPitchAlterAmount = 1;
+        }
+
         m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
+        keyPitchAlter = pitch.substr(posStart, posEnd);
+
     }
 
     // set clef
@@ -1169,6 +1183,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     default: break;
                 }
                 note->AddChild(accid);
+            }
+
+            if(keyPitchAlter.find(static_cast<char>(toupper(musicCode[i]))) != std::string::npos) {
+
+                auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                if (!accid) {
+                    accid = new Accid();
+                    note->AddChild(accid);
+                    accid->IsAttribute(true);
+                    accid->SetAccidGes((keyPitchAlterAmount < 0) ? ACCIDENTAL_GESTURAL_f : ACCIDENTAL_GESTURAL_s);
+                }
             }
 
             // set pitch name
