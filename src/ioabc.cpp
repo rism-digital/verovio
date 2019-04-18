@@ -70,8 +70,8 @@ char dataValue[MAX_DATA_LEN]; // ditto as above
 
 std::string pitch = "FCGDAEB";
 std::string shorthandDecoration = ".~HLMOPSTuv";
-std::string key_pitch_alter = "";
-int key_pitch_alter_amount = 0;
+std::string keyPitchAlter = "";
+int keyPitchAlterAmount = 0;
 
 //----------------------------------------------------------------------------
 // AbcInput
@@ -648,21 +648,21 @@ void AbcInput::parseKey(std::string keyString)
     if (accidNum != 0) {
 
         std::string keySig;
-        unsigned long pos_start = 0;
-        auto pos_end = static_cast<unsigned long>(abs(accidNum));
+        unsigned long posStart = 0;
+        auto posEnd = static_cast<unsigned long>(abs(accidNum));
 
         if (accidNum < 0) {
             keySig = StringFormat("%df", abs(accidNum));
-            pos_start = pitch.size() - pos_end;
-            key_pitch_alter_amount = -1;
+            posStart = pitch.size() - posEnd;
+            keyPitchAlterAmount = -1;
         }
         else if (accidNum > 0) {
             keySig = StringFormat("%ds", accidNum);
-            key_pitch_alter_amount = 1;
+            keyPitchAlterAmount = 1;
         }
 
         m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
-        key_pitch_alter = pitch.substr(pos_start, pos_end);
+        keyPitchAlter = pitch.substr(posStart, posEnd);
 
     }
 
@@ -1185,7 +1185,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 note->AddChild(accid);
             }
 
-            if(key_pitch_alter.find(static_cast<char>(toupper(musicCode[i]))) != std::string::npos) {
+            if(keyPitchAlter.find(static_cast<char>(toupper(musicCode[i]))) != std::string::npos) {
 
                 auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
@@ -1193,7 +1193,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     note->AddChild(accid);
                     accid->IsAttribute(true);
                 }
-                accid->SetAccidGes((key_pitch_alter_amount < 0) ? ACCIDENTAL_GESTURAL_f : ACCIDENTAL_GESTURAL_s);
+                accid->SetAccidGes((keyPitchAlterAmount < 0) ? ACCIDENTAL_GESTURAL_f : ACCIDENTAL_GESTURAL_s);
             }
 
             // set pitch name
