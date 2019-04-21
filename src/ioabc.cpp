@@ -663,7 +663,6 @@ void AbcInput::parseKey(std::string keyString)
 
         m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
         keyPitchAlter = pitch.substr(posStart, posEnd);
-
     }
 
     // set clef
@@ -1185,8 +1184,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 note->AddChild(accid);
             }
 
-            if(keyPitchAlter.find(static_cast<char>(toupper(musicCode[i]))) != std::string::npos) {
-
+            if (keyPitchAlter.find(static_cast<char>(toupper(musicCode[i]))) != std::string::npos) {
                 auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
