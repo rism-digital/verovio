@@ -49,16 +49,14 @@ namespace musicxml {
 
     class OpenTie {
     public:
-        OpenTie(int staffN, int layerN, data_PITCHNAME pname, char oct)
+        OpenTie(int staffN, data_PITCHNAME pname, char oct)
         {
             m_staffN = staffN;
-            m_layerN = layerN;
             m_pname = pname;
             m_oct = oct;
         }
 
         int m_staffN;
-        int m_layerN;
         data_PITCHNAME m_pname;
         char m_oct;
     };
@@ -204,8 +202,8 @@ private:
      * supported
      */
     ///@{
-    void OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie);
-    void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
+    void OpenTie(Staff *staff, Note *note, Tie *tie);
+    void CloseTie(Staff *staff, Note *note);
     void OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur);
     void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
     ///@}
