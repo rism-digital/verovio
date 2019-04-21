@@ -670,11 +670,31 @@ void AbcInput::parseKey(std::string keyString)
     // [<line number>] - indicates on which staff line the base clef is written. Defaults are: treble: 2; alto: 3;
     // tenor: 4; bass: 4.
     // [+8 | -8] - draws '8' above or below the staff. The player will transpose the notes one octave higher or lower.
-    if (keyString.find("clef") != std::string::npos) LogWarning("ABC input: 'clef' is not supported yet.");
-
-    // for now only default treble clef
-    m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_G);
-    m_doc->m_scoreDef.SetClefLine(2);
+    if (keyString.find("alto") != std::string::npos) {
+        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
+        i+=4;
+        m_doc->m_scoreDef.SetClefLine(3);
+    }
+    else if (keyString.find("tenor") != std::string::npos) {
+        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
+        i+=5;
+        m_doc->m_scoreDef.SetClefLine(4);
+    }
+    else if (keyString.find("bass") != std::string::npos) {
+        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_F);
+        i+=4;
+        m_doc->m_scoreDef.SetClefLine(4);
+    }
+    else if (keyString.find("perc") != std::string::npos) {
+        LogWarning("ABC Input: Drum clef is not supported");
+    }
+    else if (keyString.find("none") != std::string::npos) {
+        i+=4;
+    }
+    else {
+        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_G);
+        m_doc->m_scoreDef.SetClefLine(2);
+    }
 
     if (keyString.find("transpose=", i) != std::string::npos) {
         i = int(keyString.find("transpose=", i)) + 10;
