@@ -950,65 +950,28 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         return;
     }
 
-    if (dataKey == 'B') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
+    switch (dataKey) {
+        case 'B': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'C': m_composer.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'D': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'F': m_filename = value; break;
+        case 'H': m_history.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'I': parseInstruction(value); break;
+        case 'K': parseKey(value); break;
+        case 'L': parseUnitNoteLength(value); break;
+        case 'M': parseMeter(value); break;
+        case 'N': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'O': m_origin.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'Q': parseTempo(value); break;
+        case 'S': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'T': m_title.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'U': LogWarning("ABC input: User defined sympols are not supported"); break;
+        case 'V': LogWarning("ABC input: Multi-voice music is not supported"); break;
+        case 'W': LogWarning("ABC input: Lyrics are not supported yet"); break;
+        case 'X': parseReferenceNumber(value); break;
+        case 'Z': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        default: LogWarning("ABC input: Information field %c is ignored", dataKey);
     }
-    else if (dataKey == 'C') {
-        m_composer.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'D') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else if (dataKey == 'F') {
-        m_filename = value;
-    }
-    else if (dataKey == 'H') {
-        m_history.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'I') {
-        parseInstruction(value);
-    }
-    else if (dataKey == 'K') {
-        parseKey(value);
-    }
-    else if (dataKey == 'L') {
-        parseUnitNoteLength(value);
-    }
-    else if (dataKey == 'M') {
-        parseMeter(value);
-    }
-    else if (dataKey == 'N') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else if (dataKey == 'O') {
-        m_origin.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'Q') {
-        parseTempo(value);
-    }
-    else if (dataKey == 'S') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else if (dataKey == 'T') {
-        m_title.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'U') {
-        LogWarning("ABC input: User defined sympols are not supported");
-    }
-    else if (dataKey == 'V') {
-        LogWarning("ABC input: Multi-voice music is not supported");
-    }
-    else if (dataKey == 'W') {
-        LogWarning("ABC input: Lyrics are not supported yet");
-    }
-    else if (dataKey == 'X') {
-        parseReferenceNumber(value);
-    }
-    else if (dataKey == 'Z') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else
-        LogWarning("ABC input: Information field %c is ignored", dataKey);
 }
 
 //////////////////////////////
