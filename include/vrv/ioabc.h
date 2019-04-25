@@ -56,7 +56,7 @@ private:
     void parseABC(std::istream &infile);
 
     // parsing functions
-    int SetBarLine(const char *musicCode, int index);
+    int SetBarLine(std::string musicCode, int index);
     void CalcUnitNoteLength();
     void AddAnnot(std::string remark);
     void AddBeam();
@@ -75,7 +75,7 @@ private:
 
     // input functions
     void readInformationField(char dataKey, std::string dataValue);
-    void readMusicCode(const char *musicCode, Section *section);
+    void readMusicCode(std::string musicCode, Section *section);
 
     // decoration functions
     void parseDecoration(std::string decorationString);
