@@ -672,24 +672,24 @@ void AbcInput::parseKey(std::string keyString)
     // [+8 | -8] - draws '8' above or below the staff. The player will transpose the notes one octave higher or lower.
     if (keyString.find("alto") != std::string::npos) {
         m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
-        i+=4;
+        i += 4;
         m_doc->m_scoreDef.SetClefLine(3);
     }
     else if (keyString.find("tenor") != std::string::npos) {
         m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
-        i+=5;
+        i += 5;
         m_doc->m_scoreDef.SetClefLine(4);
     }
     else if (keyString.find("bass") != std::string::npos) {
         m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_F);
-        i+=4;
+        i += 4;
         m_doc->m_scoreDef.SetClefLine(4);
     }
     else if (keyString.find("perc") != std::string::npos) {
         LogWarning("ABC Input: Drum clef is not supported");
     }
     else if (keyString.find("none") != std::string::npos) {
-        i+=4;
+        i += 4;
     }
     else {
         m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_G);
