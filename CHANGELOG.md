@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+* Update pugixml
 * Support for SMUFL figured bass figures
 * Support for `@spacing` on `<staffDef>`
 * Support for `@sameas` on `<beam>`, `<chord>`, `<layer>`, `<note>`, `<rest>`, and `<tuplet>`
