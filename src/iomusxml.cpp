@@ -337,12 +337,6 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
             m_slurStopStack.erase(iter);
             return;
         }
-        // if not in same measure, give up matching // move this to the end
-        if (iter->second.m_measureNum != measure->GetN()) {
-            LogWarning("MusicXML import: Closing slur for element '%s' could not be matched", iter->first->GetUuid().c_str());
-            m_slurStopStack.erase(iter);
-            break;
-        }
     }
     slur->SetStartid(m_ID);
     musicxml::OpenSlur openSlur(number);
@@ -361,8 +355,6 @@ void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *elemen
     }
     musicxml::CloseSlur closeSlur(measure->GetN(), number);
     m_slurStopStack.push_back(std::make_pair(element, closeSlur));
-    LogWarning("MusicXML import: Closing slur for element '%s' added to slurStopStack", element->GetUuid().c_str());
-    // LogWarning("MusicXML import: Closing slur for element '%s' could not be matched", element->GetUuid().c_str());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -601,6 +593,19 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     if (!m_tieStack.empty()) {
         LogWarning("MusicXML import: There are ties left open.");
         m_tieStack.clear();
+    }
+    if (!m_slurStack.empty()) { // There are slurs left open
+        std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
+        for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {            LogWarning("MusicXML import: Slur element '%s' could not be ended.", iter->first->GetUuid().c_str());
+        }
+        m_slurStack.clear();
+    }
+    if (!m_slurStopStack.empty()) { // There are slurs ends without opening
+        std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
+        for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
+            LogWarning("MusicXML import: Slur ending for element '%s' could not be matched to a start element.", iter->first->GetUuid().c_str());
+        }
+        m_slurStopStack.clear();
     }
 
     m_doc->ConvertToPageBasedDoc();
