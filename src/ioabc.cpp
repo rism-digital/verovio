@@ -63,7 +63,7 @@ namespace vrv {
 #ifndef NO_ABC_SUPPORT
 
 // Global variables:
-char abcLine[10001] = { 0 };
+std::string abcLine;
 #define MAX_DATA_LEN 1024 // One line of the abc file would not be that long!
 char dataKey[MAX_DATA_LEN];
 char dataValue[MAX_DATA_LEN]; // ditto as above
@@ -114,7 +114,7 @@ void AbcInput::parseABC(std::istream &infile)
     m_doc->SetType(Raw);
 
     // read file header
-    infile.getline(abcLine, 10000);
+    std::getline(infile, abcLine);
     while (abcLine[0] != 'X') {
         if (infile.eof()) {
             LogError("ABC input: No tune found");
@@ -124,7 +124,7 @@ void AbcInput::parseABC(std::istream &infile)
             LogWarning("ABC input: Stylesheet directives are ignored");
         else if (abcLine[1] == ':')
             readInformationField(abcLine[0], &abcLine[2]);
-        infile.getline(abcLine, 10000);
+        std::getline(infile, abcLine);
         ++m_lineNum;
     }
     CreateHeader();
@@ -132,7 +132,7 @@ void AbcInput::parseABC(std::istream &infile)
     // read tune header
     readInformationField('X', &abcLine[2]);
     while (abcLine[0] != 'K' && !infile.eof()) {
-        infile.getline(abcLine, 10000);
+        std::getline(infile, abcLine);
         ++m_lineNum;
         readInformationField(abcLine[0], &abcLine[2]);
     }
@@ -181,7 +181,7 @@ void AbcInput::parseABC(std::istream &infile)
     m_layer = new Layer();
     m_layer->SetN(1);
     while (!infile.eof()) {
-        infile.getline(abcLine, 10000);
+        std::getline(infile, abcLine);
         ++m_lineNum;
         if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
             // empty lines end tunes
@@ -265,9 +265,9 @@ void AbcInput::parseABC(std::istream &infile)
  BARRENDITION_dbl        ||
  */
 
-int AbcInput::SetBarLine(std::string musicCode, int i)
+int AbcInput::SetBarLine(std::string &musicCode, int i)
 {
-    data_BARRENDITION barLine;
+    data_BARRENDITION barLine = BARRENDITION_NONE;
     if (i >= 1 && musicCode.at(i - 1) == ':')
         barLine = BARRENDITION_rptend;
     else if (i + 1 < musicCode.length()) {
@@ -287,6 +287,8 @@ int AbcInput::SetBarLine(std::string musicCode, int i)
             default: barLine = BARRENDITION_single; break;
         }
     }
+    else
+        barLine = BARRENDITION_single;
     // if the measure is still empty, put the bar line on the left
     if (!m_layer->GetChildCount())
         m_barLines.first = barLine;
@@ -1000,7 +1002,7 @@ void AbcInput::readInformationField(char dataKey, std::string value)
 // parse abc music code
 //
 
-void AbcInput::readMusicCode(std::string musicCode, Section *section)
+void AbcInput::readMusicCode(std::string &musicCode, Section *section)
 {
     assert(section);
 
