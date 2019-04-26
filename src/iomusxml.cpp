@@ -749,12 +749,14 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!staffDetails) {
                 staffDetails = it->select_single_node("staff-details");
             }
-            std::string linesStr = staffDetails.node().select_single_node("staff-lines").node().text().as_string();
-            if (!linesStr.empty()) {
-                staffDef->SetLines(atoi(linesStr.c_str()));
+            int staffLines = staffDetails.node().select_single_node("staff-lines").node().text().as_int();
+            if (staffLines) {
+                LogWarning("%d", staffLines);
+                staffDef->SetLines(staffLines);
             }
-            else
+            else if (!staffDef->HasLines()) {
                 staffDef->SetLines(5);
+            }
             std::string scaleStr = staffDetails.node().select_single_node("staff-size").node().text().as_string();
             if (!scaleStr.empty()) {
                 staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr + "%"));
