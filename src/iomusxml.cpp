@@ -326,26 +326,43 @@ void MusicXmlInput::CloseTie(Staff *staff, Note *note)
     LogWarning("MusicXML import: Note '%s' has tie ending without matching start", note->GetUuid().c_str());
 }
 
-void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur)
+void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
 {
-    // No staff is set as slurs can appear across staves
+    // check whether matching closed slurs are present
+    std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
+    for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
+        if ((iter->second.m_number == number) && (iter->second.m_measureNum == measure->GetN())) {
+            slur->SetStartid(m_ID);
+            slur->SetEndid("#" + iter->first->GetUuid());
+            m_slurStopStack.erase(iter);
+            return;
+        }
+        // if not in same measure, give up matching // move this to the end
+        if (iter->second.m_measureNum != measure->GetN()) {
+            LogWarning("MusicXML import: Closing slur for element '%s' could not be matched", iter->first->GetUuid().c_str());
+            m_slurStopStack.erase(iter);
+            break;
+        }
+    }
     slur->SetStartid(m_ID);
-    musicxml::OpenSlur openSlur(staff->GetN(), layer->GetN(), number);
+    musicxml::OpenSlur openSlur(number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
 }
 
-void MusicXmlInput::CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element)
+void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *element)
 {
     std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
     for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
-            && (iter->second.m_number == number)) {
+        if (iter->second.m_number == number) {
             iter->first->SetEndid("#" + element->GetUuid());
             m_slurStack.erase(iter);
             return;
         }
     }
-    LogWarning("MusicXML import: Closing slur for element '%s' could not be matched", element->GetUuid().c_str());
+    musicxml::CloseSlur closeSlur(measure->GetN(), number);
+    m_slurStopStack.push_back(std::make_pair(element, closeSlur));
+    LogWarning("MusicXML import: Closing slur for element '%s' added to slurStopStack", element->GetUuid().c_str());
+    // LogWarning("MusicXML import: Closing slur for element '%s' could not be matched", element->GetUuid().c_str());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1843,10 +1860,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 meiSlur->AttCurvature::StrToCurvatureCurvedir(slur.attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
-            OpenSlur(staff, layer, slurNumber, meiSlur);
+            OpenSlur(measure, slurNumber, meiSlur);
         }
         else if (HasAttributeWithValue(slur, "type", "stop")) {
-            CloseSlur(staff, layer, slurNumber, element);
+            CloseSlur(measure, slurNumber, element);
         }
     }
 
