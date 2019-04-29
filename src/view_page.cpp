@@ -709,7 +709,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int x1 = x - m_doc->GetDrawingBeamWidth(100, false) - barLineWidth;
     int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
     // optimized for five line staves
-    int dashLength = m_doc->GetDrawingUnit(100) * 8 / 13;
+    int dashLength = m_doc->GetDrawingUnit(100) * 16 / 13;
+    int dotLength = m_doc->GetDrawingUnit(100) * 4 / 13;
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -746,6 +747,9 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     }
     else if (barLine->GetForm() == BARRENDITION_dashed) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
+    }
+    else if (barLine->GetForm() == BARRENDITION_dotted) {
+        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
     }
     else if (barLine->GetForm() == BARRENDITION_rptend) {
         DrawVerticalSegmentedLine(dc, x1, line, barLineWidth);
