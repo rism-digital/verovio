@@ -330,7 +330,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
 void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
     std::string xpath = "//g[@id=\"" + gId + "\"]";
-    pugi::xpath_node selection = m_currentNode.select_single_node(xpath.c_str());
+    pugi::xpath_node selection = m_currentNode.select_node(xpath.c_str());
     if (selection) {
         m_currentNode = selection.node();
     }
