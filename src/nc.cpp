@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "elementpart.h"
 #include "staff.h"

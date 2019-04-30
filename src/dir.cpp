@@ -56,7 +56,7 @@ void Dir::Reset()
 
 void Dir::AddChild(Object *child)
 {
-    if (child->Is({ REND, TEXT })) {
+    if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

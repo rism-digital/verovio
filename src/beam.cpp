@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -283,7 +284,7 @@ void BeamDrawingParams::CalcBeam(
 
     // then check that the stem length reaches the center for the staff
     double minDistToCenter = -VRV_UNSET;
-    
+
     for (i = 0; i < elementCount; ++i) {
         if ((this->m_stemDir == STEMDIRECTION_up)
             && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
@@ -366,7 +367,7 @@ void Beam::AddChild(Object *child)
         assert(dynamic_cast<Beam *>(child));
     }
     else if (child->Is(BTREM)) {
-        assert(dynamic_cast<Chord *>(child));
+        assert(dynamic_cast<BTrem *>(child));
     }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));

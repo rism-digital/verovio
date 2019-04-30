@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -32,8 +32,8 @@
 
 namespace vrv {
 
-std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PES }, { "d", CLIVIS }, 
-    { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS }, 
+std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PES }, { "d", CLIVIS },
+    { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS },
     { "ddu", CLIMACUS_RESUPINUS },{ "udu", TORCULUS_RESUPINUS }, { "dud", PORRECTUS_FLEXUS },
     { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS }, { "uudd", SCANDICUS_SUBPUNCTIS },
     { "dudd", PORRECTUS_SUBPUNCTIS }, { "sd", PRESSUS } };
@@ -42,7 +42,7 @@ std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PE
 // Neume
 //----------------------------------------------------------------------------
 
-Neume::Neume() : LayerElement("neume-"), FacsimileInterface(), ObjectListInterface(), AttColor() 
+Neume::Neume() : LayerElement("neume-"), FacsimileInterface(), ObjectListInterface(), AttColor()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
@@ -95,21 +95,21 @@ bool Neume::IsLastInNeume(LayerElement *element)
 NeumeGroup Neume::GetNeumeGroup()
 {
     ArrayOfObjects children;
-    AttComparison ac(NC);
+    ClassIdComparison ac(NC);
     this->FindAllChildByComparison(&children, &ac);
 
     auto iter = children.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
     if (previous == nullptr) return NEUME_ERROR;
     iter++;
-    
+
     std::string key = "";
-    
+
     for (; iter != children.end(); iter++)
     {
         Nc *current = dynamic_cast<Nc *>(*iter);
         assert(current);
-        
+
         int pitchDifference = current->PitchDifferenceTo(previous);
         if (pitchDifference > 0)
         {
@@ -125,14 +125,14 @@ NeumeGroup Neume::GetNeumeGroup()
         }
         previous = current;
     }
-    return s_neumes[key]; 
+    return s_neumes[key];
 }
 
 std::vector<int> Neume::GetPitchDifferences()
 {
     std::vector<int> pitchDifferences;
     ArrayOfObjects ncChildren;
-    AttComparison ac(NC);
+    ClassIdComparison ac(NC);
     this->FindAllChildByComparison(&ncChildren, &ac);
 
     pitchDifferences.reserve(ncChildren.size() - 1);
@@ -155,7 +155,7 @@ std::vector<int> Neume::GetPitchDifferences()
 bool Neume::GenerateChildMelodic()
 {
     ArrayOfObjects children;
-    AttComparison ac(NC);
+    ClassIdComparison ac(NC);
     this->FindAllChildByComparison(&children, &ac);
 
     // Get the first neume component of the neume
@@ -202,7 +202,7 @@ PitchInterface *Neume::GetHighestPitch()
         assert(pi);
         if (pi->PitchDifferenceTo(max) > 0) {
            max = pi;
-        } 
+        }
     }
     return max;
 }
@@ -221,7 +221,7 @@ PitchInterface *Neume::GetLowestPitch()
         assert(pi);
         if (pi->PitchDifferenceTo(min) < 0) {
            min = pi;
-        } 
+        }
     }
     return min;
 }

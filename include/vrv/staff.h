@@ -56,7 +56,7 @@ public:
      * Overriding CopyReset() method to be called after copy / assignment calls.
      */
     virtual void CopyReset();
-    
+
     virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
 
     /**
@@ -184,6 +184,16 @@ public:
      * exists).
      */
     virtual void SetFromFacsimile(Doc *doc);
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *);
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
 private:
     /**

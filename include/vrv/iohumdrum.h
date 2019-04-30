@@ -18,8 +18,10 @@
 #include "accid.h"
 #include "attdef.h"
 #include "clef.h"
+#include "dir.h"
 #include "ending.h"
 #include "io.h"
+#include "pedal.h"
 #include "runningelement.h"
 #include "section.h"
 #include "verse.h"
@@ -168,6 +170,7 @@ namespace humaux {
         // starting measure of the ottava mark.
         Note *ottavanotestart;
         Note *ottavanoteend;
+        hum::HumNum ottavaendtimestamp;
         Measure *ottavameasure;
 
         // ottavadownnote == keep track of ottava down marks: stores the starting note of
@@ -175,6 +178,7 @@ namespace humaux {
         // starting measure of the ottava down mark.
         Note *ottavadownnotestart;
         Note *ottavadownnoteend;
+        hum::HumNum ottavadownendtimestamp;
         Measure *ottavadownmeasure;
 
         // ottava2note == keep track of ottava2 marks: stores the starting note of
@@ -182,6 +186,7 @@ namespace humaux {
         // starting measure of the ottava2 mark.
         Note *ottava2notestart;
         Note *ottava2noteend;
+        hum::HumNum ottava2endtimestamp;
         Measure *ottava2measure;
 
         // ottava2downnote == keep track of ottava2 down marks: stores the starting note of
@@ -189,6 +194,7 @@ namespace humaux {
         // starting measure of the ottava2 down mark.
         Note *ottava2downnotestart;
         Note *ottava2downnoteend;
+        hum::HumNum ottava2downendtimestamp;
         Measure *ottava2downmeasure;
 
         // meter_bottom == Used to keep track of bottom value of time signature.
@@ -305,6 +311,7 @@ protected:
     void convertNote(vrv::Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
+    void convertMRest(MRest *rest, hum::HTp token, int subtoken, int staffindex);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
@@ -413,8 +420,6 @@ protected:
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
-    void setInstrumentName(vrv::StaffDef *staffdef, const std::string &name);
-    void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const std::string &name);
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
     bool leftmostSystemArpeggio(hum::HTp token);
@@ -422,7 +427,7 @@ protected:
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
-        int staffindex, const std::string &color = "");
+        int staffindex, int justification = 0, const std::string &color = "");
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);
@@ -444,18 +449,30 @@ protected:
         std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
     std::string automaticHeaderRight(
         std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
-    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
     void convertMensuralToken(
         std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
     void initializeSpineColor(hum::HumdrumFile &infile);
-    std::string getLayoutAccidental(hum::HTp token, int subtoken);
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
     void storeExpansionList(Section *section, hum::HTp etok);
     std::string replaceMusicShapes(const std::string input);
     int getStaffAdjustment(hum::HTp token);
-    void calculateNoteIdForSlur(
-        std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
+    void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
+    void promoteInstrumentNamesToGroup();
+    void promoteInstrumentsForStaffGroup(StaffGrp *group);
+    void promoteInstrumentAbbreviationsToGroup();
+    void promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group);
+    std::string getInstrumentName(StaffDef *sd);
+    std::string getInstrumentAbbreviation(StaffDef *sd);
+    void removeInstrumentName(StaffDef *sd);
+    void removeInstrumentAbbreviation(StaffDef *sd);
+    std::string getEndIdForOttava(hum::HTp token);
+    void prepareInitialOttavas(hum::HTp measure);
+    void linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex);
+    bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
+    void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype);
+    bool getNoteState(hum::HTp token, int slurnumber);
+    void assignVerticalGroup(Pedal *ped, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -465,6 +482,7 @@ protected:
         const std::string &key, const std::string &role);
     void getRespPeople(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references);
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
+    void insertPeople(pugi::xml_node &work, std::vector<std::vector<string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
@@ -490,6 +508,8 @@ protected:
     template <class ELEMENT>
     void setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL);
     template <class ELEMENT> void setMensurationSymbol(ELEMENT *element, const std::string &metersig);
+    template <class ELEMENT> void setInstrumentName(ELEMENT *staffdef, const std::string &name);
+    template <class ELEMENT> void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

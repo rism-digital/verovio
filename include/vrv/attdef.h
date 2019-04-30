@@ -27,6 +27,11 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 
 class data_STAFFREL;
 
+/**
+ * MEI virtual unit;
+ */
+typedef double data_VU;
+
 //----------------------------------------------------------------------------
 // Durations
 //----------------------------------------------------------------------------
@@ -157,6 +162,16 @@ enum data_KEYSIGNATURE {
  * MEI data.MEASUREBEAT
  */
 typedef std::pair<int, double> data_MEASUREBEAT;
+
+/**
+ * MEI data.MEASUREMENTABS
+ */
+typedef data_VU data_MEASUREMENTABS;
+
+/**
+ * MEI data.MEASUREMENTREL
+ */
+typedef data_VU data_MEASUREMENTREL;
 
 /**
  * MEI data.MIDIBPM

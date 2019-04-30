@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <utility>
 
 //----------------------------------------------------------------------------
 
@@ -19,6 +20,7 @@
 #include "functorparams.h"
 #include "slur.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -218,12 +220,28 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        positioner = new FloatingPositioner(object, this, spanningType);
-        m_floatingPositioners.push_back(positioner);
+        if (object->Is({ SLUR, TIE })) {
+            positioner = new FloatingCurvePositioner(object, this, spanningType);
+            m_floatingPositioners.push_back(positioner);
+        }
+        else {
+            positioner = new FloatingPositioner(object, this, spanningType);
+            m_floatingPositioners.push_back(positioner);
+        }
     }
     positioner->SetObjectXY(objectX, objectY);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner(positioner);
+}
+
+FloatingPositioner *StaffAlignment::FindFirstFloatingPositioner(ClassId classId)
+{
+    auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
+        [classId](FloatingPositioner *positioner) { return positioner->GetObject()->GetClassId() == classId; });
+    if (item != m_floatingPositioners.end()) {
+        return *item;
+    }
+    return NULL;
 }
 
 FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject *object)
@@ -250,13 +268,65 @@ void StaffAlignment::FindAllIntersectionPoints(
     }
 }
 
+void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
+    const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel)
+{
+    if (grpIdYRel.empty()) {
+        return;
+    }
+
+    std::sort(grpIdYRel.begin(), grpIdYRel.end());
+
+    int yRel;
+    // The initial next position is the original position of the first group. Nothing will happen for it.
+    int nextYRel = grpIdYRel.at(0).second;
+
+    // For each grpId (sorted, see above), loop to find the highest / lowest positon to put the next group
+    // The move the next group (if not already higher or lower)
+    ArrayOfFloatingPositioners::const_iterator iter;
+    for (auto &grp : grpIdYRel) {
+        // Check if the next group it not already higher or lower.
+        if (params->m_place == STAFFREL_basic_above) {
+            yRel = (nextYRel < grp.second) ? nextYRel : grp.second;
+        }
+        else {
+            yRel = (nextYRel > grp.second) ? nextYRel : grp.second;
+        }
+        // Go through all the positioners, but filter by group
+        for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
+            int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
+            // Not the grpId we are processing, skip it.
+            if (currentGrpId != grp.first) continue;
+            // Set its position
+            (*iter)->SetDrawingYRel(yRel);
+            // Then find the highest / lowest position for the next group
+            if (params->m_place == STAFFREL_basic_above) {
+                int iterY = yRel - (*iter)->GetContentY2()
+                    - (params->m_doc->GetTopMargin((*iter)->GetObject()->GetClassId())
+                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                if (nextYRel > iterY) {
+                    nextYRel = iterY;
+                }
+            }
+            else {
+                int iterY = yRel + (*iter)->GetContentY2()
+                    + (params->m_doc->GetBottomMargin((*iter)->GetObject()->GetClassId())
+                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                if (nextYRel < iterY) {
+                    nextYRel = iterY;
+                }
+            }
+        }
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 
-int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
+int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
     int staffSize = this->GetStaffSize();
@@ -289,13 +359,17 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
+            assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
+            FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+            assert(curve);
+
             bool skipAbove = false;
             bool skipBelow = false;
 
             if ((*iter)->GetObject()->Is(SLUR)) {
                 Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
-                slur->GetCrossStaffOverflows(this, (*iter)->m_cuvreDir, skipAbove, skipBelow);
+                slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
 
             int overflowAbove = 0;
@@ -353,9 +427,9 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
+int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionerGrpsParams *params = dynamic_cast<AdjustFloatingPostionerGrpsParams *>(functorParams);
+    AdjustFloatingPositionerGrpsParams *params = dynamic_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);
     assert(params);
 
     ArrayOfFloatingPositioners positioners;
@@ -367,11 +441,16 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             return (
                 (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
                     != params->m_classIds.end())
-                && (positioner->GetObject()->GetDrawingGrpId() != 0));
+                && (positioner->GetObject()->GetDrawingGrpId() != 0)
+                && (positioner->GetDrawingPlace() == params->m_place));
         });
 
+    if (positioners.empty()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     // A vector for storing a pair with the grpId and the min or max YRel
-    std::vector<std::pair<int, int> > grpIdYRel;
+    ArrayOfIntPairs grpIdYRel;
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
@@ -385,7 +464,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         }
         // else, adjust the min or max YRel of the pair if necessary
         else {
-            if ((*iter)->GetDrawingPlace() == STAFFREL_basic_above) {
+            if (params->m_place == STAFFREL_basic_above) {
                 if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
             }
             else {
@@ -394,14 +473,61 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         }
     }
 
-    // Now go through all the positioners again and ajust the YRel with the value of the pair
+    if (std::find(params->m_classIds.begin(), params->m_classIds.end(), HARM) != params->m_classIds.end()) {
+        // Re-adjust the postion in order to make sure the group remain in the right order
+        this->ReAdjustFloatingPositionersGrps(params, positioners, grpIdYRel);
+        // The already move them, so the loop below is not necessary.
+    }
+    else {
+        // Now go through all the positioners again and ajust the YRel with the value of the pair
+        for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
+            int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
+            auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
+                [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
+            // We must have found it
+            assert(i != grpIdYRel.end());
+            (*iter)->SetDrawingYRel((*i).second);
+        }
+    }
+
+    //  Now update the staffAlignment max overflow (above or below)
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
-        int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
-        auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
-            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
-        // We must have found it
-        assert(i != grpIdYRel.end());
-        (*iter)->SetDrawingYRel((*i).second);
+        if (params->m_place == STAFFREL_basic_above) {
+            int overflowAbove = this->CalcOverflowAbove((*iter));
+            this->SetOverflowAbove(overflowAbove);
+        }
+        else {
+            int overflowBelow = this->CalcOverflowBelow((*iter));
+            this->SetOverflowBelow(overflowBelow);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
+{
+    AdjustSlursParams *params = dynamic_cast<AdjustSlursParams *>(functorParams);
+    assert(params);
+
+    ArrayOfFloatingPositioners::iterator iter;
+    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
+        assert((*iter)->GetObject());
+        if (!(*iter)->GetObject()->Is(SLUR)) continue;
+        Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
+        assert(slur);
+
+        assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
+        FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
+        assert(curve);
+
+        // Skip if no content bounding box is available
+        if (!curve->HasContentBB()) continue;
+
+        bool adjusted = slur->AdjustSlur(params->m_doc, curve, this->GetStaff());
+        if (adjusted) {
+            params->m_adjusted = true;
+        }
     }
 
     return FUNCTOR_SIBLINGS;
@@ -453,10 +579,19 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
+    if (params->m_staffIdx > 0) {
+        // Default or staffDef spacing
+        int spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
+        if (this->m_staff && this->m_staff->m_drawingStaffDef && this->m_staff->m_drawingStaffDef->HasSpacing()) {
+            spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
+        }
+        params->m_cumulatedShift += spacing * params->m_doc->GetDrawingUnit(100);
+    }
+
     SetYRel(-params->m_cumulatedShift);
 
-    params->m_cumulatedShift
-        += m_staffHeight + params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift += m_staffHeight;
+    params->m_staffIdx++;
 
     return FUNCTOR_CONTINUE;
 }
@@ -480,9 +615,14 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 
     // Add a margin
     maxOverflowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize());
+    // Default or staffDef spacing
+    int spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
+    if (this->m_staff && this->m_staff->m_drawingStaffDef && this->m_staff->m_drawingStaffDef->HasSpacing()) {
+        spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
+    }
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
-    maxOverflowAbove -= params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    maxOverflowAbove -= spacing * params->m_doc->GetDrawingUnit(100);
     // Is the maximum the overflow (+ overlap) shift, or the default ?
     int shift = std::max(0, maxOverflowAbove);
 

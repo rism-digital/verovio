@@ -8,15 +8,8 @@
 #ifndef __VRV_DC_H__
 #define __VRV_DC_H__
 
-#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
-#include <math.h>
 #include <stack>
 #include <string>
-
-// In case it is not defined before...
-#ifndef M_PI
-#define M_PI (3.14159265358979323846264338327950288)
-#endif
 
 //----------------------------------------------------------------------------
 

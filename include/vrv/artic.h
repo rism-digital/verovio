@@ -145,7 +145,7 @@ public:
      */
     bool AlwaysAbove();
 
-    void AddSlurPositioner(FloatingPositioner *positioner, bool start);
+    void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
     //----------//
     // Functors //
@@ -178,8 +178,8 @@ private:
     ArticPartType m_type;
 
 public:
-    std::vector<FloatingPositioner *> m_startSlurPositioners;
-    std::vector<FloatingPositioner *> m_endSlurPositioners;
+    std::vector<FloatingCurvePositioner *> m_startSlurPositioners;
+    std::vector<FloatingCurvePositioner *> m_endSlurPositioners;
 };
 
 } // namespace vrv

@@ -321,9 +321,9 @@ public:
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
     /**
-     * See Object::FindSpaceInReferenceAlignments
+     * See Object::UnsetCurrentScoreDef
      */
-    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
 private:
     //

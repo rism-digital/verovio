@@ -155,6 +155,7 @@ public:
     int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
+    int GetTextLineHeight(FontInfo *font, bool graceSize) const;
     ///@}
 
     /**
@@ -350,6 +351,11 @@ public:
      */
     virtual int PrepareLyricsEnd(FunctorParams *functorParams);
 
+    /**
+     * See Object::PrepareTimestampsEnd
+     */
+    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
+
 private:
     /**
      * Calculates the music font size according to the m_interlDefin reference value.
@@ -361,6 +367,16 @@ public:
      * A copy of the header tree stored as pugi::xml_document
      */
     pugi::xml_document m_header;
+
+    /**
+     * A copy of the header tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_front;
+
+    /**
+     * A copy of the header tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_back;
 
     /**
      * Holds the top scoreDef.
@@ -444,9 +460,9 @@ private:
     /**
      * A flag to indicate that the MIDI timemap has been calculated.  The
      * timemap needs to be prepared before MIDI files or timemap JSON files
-     * are generated.
+     * are generated. Value is 0.0 when no timemap has been generated.
      */
-    bool m_hasMidiTimemap;
+    double m_MIDITimemapTempo;
 
     /**
      * A flag to indicate whereas the document contains analytical markup to be converted.

@@ -188,6 +188,9 @@ public:
     std::string AccidLogFuncToStr(accidLog_FUNC data) const;
     accidLog_FUNC StrToAccidLogFunc(std::string value, bool logWarning = true) const;
 
+    std::string AnchoredTextLogFuncToStr(anchoredTextLog_FUNC data) const;
+    anchoredTextLog_FUNC StrToAnchoredTextLogFunc(std::string value, bool logWarning = true) const;
+
     std::string ArpegLogOrderToStr(arpegLog_ORDER data) const;
     arpegLog_ORDER StrToArpegLogOrder(std::string value, bool logWarning = true) const;
 
@@ -203,8 +206,14 @@ public:
     std::string BeamingVisBeamrendToStr(beamingVis_BEAMREND data) const;
     beamingVis_BEAMREND StrToBeamingVisBeamrend(std::string value, bool logWarning = true) const;
 
+    std::string BracketSpanLogFuncToStr(bracketSpanLog_FUNC data) const;
+    bracketSpanLog_FUNC StrToBracketSpanLogFunc(std::string value, bool logWarning = true) const;
+
     std::string CurvatureCurvedirToStr(curvature_CURVEDIR data) const;
     curvature_CURVEDIR StrToCurvatureCurvedir(std::string value, bool logWarning = true) const;
+
+    std::string CurveLogFuncToStr(curveLog_FUNC data) const;
+    curveLog_FUNC StrToCurveLogFunc(std::string value, bool logWarning = true) const;
 
     std::string CutoutCutoutToStr(cutout_CUTOUT data) const;
     cutout_CUTOUT StrToCutoutCutout(std::string value, bool logWarning = true) const;
@@ -217,6 +226,12 @@ public:
 
     std::string EpisemaVisFormToStr(episemaVis_FORM data) const;
     episemaVis_FORM StrToEpisemaVisForm(std::string value, bool logWarning = true) const;
+
+    std::string EvidenceEvidenceToStr(evidence_EVIDENCE data) const;
+    evidence_EVIDENCE StrToEvidenceEvidence(std::string value, bool logWarning = true) const;
+
+    std::string ExtSymGlyphauthToStr(extSym_GLYPHAUTH data) const;
+    extSym_GLYPHAUTH StrToExtSymGlyphauth(std::string value, bool logWarning = true) const;
 
     std::string FTremLogFormToStr(fTremLog_FORM data) const;
     fTremLog_FORM StrToFTremLogForm(std::string value, bool logWarning = true) const;
@@ -266,8 +281,14 @@ public:
     std::string HarpPedalLogGToStr(harpPedalLog_G data) const;
     harpPedalLog_G StrToHarpPedalLogG(std::string value, bool logWarning = true) const;
 
+    std::string LineLogFuncToStr(lineLog_FUNC data) const;
+    lineLog_FUNC StrToLineLogFunc(std::string value, bool logWarning = true) const;
+
     std::string LiquescentVisCurveToStr(liquescentVis_CURVE data) const;
     liquescentVis_CURVE StrToLiquescentVisCurve(std::string value, bool logWarning = true) const;
+
+    std::string MeasurementUnitToStr(measurement_UNIT data) const;
+    measurement_UNIT StrToMeasurementUnit(std::string value, bool logWarning = true) const;
 
     std::string MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) const;
     meiVersion_MEIVERSION StrToMeiVersionMeiversion(std::string value, bool logWarning = true) const;
@@ -308,6 +329,9 @@ public:
     std::string NoteGesExtremisToStr(noteGes_EXTREMIS data) const;
     noteGes_EXTREMIS StrToNoteGesExtremis(std::string value, bool logWarning = true) const;
 
+    std::string NoteHeadsHeadauthToStr(noteHeads_HEADAUTH data) const;
+    noteHeads_HEADAUTH StrToNoteHeadsHeadauth(std::string value, bool logWarning = true) const;
+
     std::string OctaveLogCollToStr(octaveLog_COLL data) const;
     octaveLog_COLL StrToOctaveLogColl(std::string value, bool logWarning = true) const;
 
@@ -316,6 +340,9 @@ public:
 
     std::string PedalLogDirToStr(pedalLog_DIR data) const;
     pedalLog_DIR StrToPedalLogDir(std::string value, bool logWarning = true) const;
+
+    std::string PedalLogFuncToStr(pedalLog_FUNC data) const;
+    pedalLog_FUNC StrToPedalLogFunc(std::string value, bool logWarning = true) const;
 
     std::string PedalVisFormToStr(pedalVis_FORM data) const;
     pedalVis_FORM StrToPedalVisForm(std::string value, bool logWarning = true) const;

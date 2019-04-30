@@ -13,13 +13,13 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
@@ -40,6 +40,7 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
+#include "slur.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -137,7 +138,7 @@ bool LayerElement::IsGraceNote()
         return (chord->HasGrace());
     }
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) return child->IsGraceNote();
@@ -471,14 +472,13 @@ double LayerElement::GetAlignmentDuration(
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
     }
-    
+
     if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
         LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
         assert(sameas);
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
-
-    if (this->HasInterface(INTERFACE_DURATION)) {
+    else if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET, MAX_TUPLET_DEPTH));
@@ -526,16 +526,47 @@ double LayerElement::GetAlignmentDuration(
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
+    else if (this->Is({ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
-        return DUR_MAX / meterUnit * meterCount;
+
+        if (this->Is(HALFMRPT)) {
+            return (DUR_MAX / meterUnit * meterCount) / 2;
+        }
+        else {
+            return DUR_MAX / meterUnit * meterCount;
+        }
     }
     else {
         return 0.0;
     }
+}
+
+double LayerElement::GetContentAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+{
+    if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
+        return 0.0;
+    }
+
+    double duration = 0.0;
+
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    assert(sameas);
+
+    for (auto child : *sameas->GetChildren()) {
+        // Skip everything that does not have a duration interface and notes in chords
+        if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstParent(CHORD, MAX_CHORD_DEPTH) != NULL)) {
+            continue;
+        }
+        LayerElement *element = dynamic_cast<LayerElement *>(child);
+        assert(element);
+        duration += element->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+    }
+
+    return duration;
 }
 
 //----------------------------------------------------------------------------
@@ -603,6 +634,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
+        double duration = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        params->m_time += duration;
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(BARLINE)) {
@@ -982,12 +1016,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 }
             }
             else if (hasMultipleLayer) {
-                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
-                assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN())
-                    loc += 2;
-                else
-                    loc -= 2;
+                Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+                assert(parentLayer);
+                int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+                if (layerCount > 1) {
+                    Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                    assert(firstLayer);
+                    if (firstLayer->GetN() == layerY->GetN())
+                        loc += 2;
+                    else
+                        loc -= 2;
+                }
             }
         }
         loc = rest->GetRestLocOffset(loc);
@@ -1143,7 +1182,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // nothing to do when the element has a @sameas attribute
         return FUNCTOR_SIBLINGS;
     }
-    
+
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
@@ -1215,7 +1254,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For tuplet, we also need to look at the first note or chord
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) m_drawingCueSize = child->GetDrawingCueSize();
@@ -1391,13 +1430,59 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
+int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    FindTimeSpanningLayerElementsParams *params = dynamic_cast<FindTimeSpanningLayerElementsParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
-    if ((this->GetDrawingX() > params->m_minPos) && (this->GetDrawingX() < params->m_maxPos)) {
-        params->m_spanningContent.push_back(this);
+    if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
+
+    double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+    double time = m_alignment->GetTime();
+
+    // The event is starting after the end of the element
+    if ((time + duration) <= params->m_time) {
+        return FUNCTOR_CONTINUE;
+    }
+    // The element is starting after the event end - we can stop here
+    else if (time >= (params->m_time + params->m_duration)) {
+        return FUNCTOR_STOP;
+    }
+
+    // Add the layerN to the list of layer element occuring in this time frame
+    if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
+        == params->m_layers.end()) {
+        params->m_layers.push_back(this->GetAlignmentLayerN());
+    }
+
+    // Not need to recurse for chords? Not quite sure about it.
+    return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
+}
+
+int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
+{
+    FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
+    assert(params);
+
+    if (!this->Is(params->m_classIds)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
+        && (this->GetContentLeft() < params->m_maxPos)) {
+
+        // We skip the start or end of the slur
+        if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetStart()->HasChild(this) || this->HasChild(params->m_interface->GetStart())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetEnd()->HasChild(this) || this->HasChild(params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+
+        params->m_elements.push_back(this);
     }
     else if (this->GetDrawingX() > params->m_maxPos) {
         return FUNCTOR_STOP;

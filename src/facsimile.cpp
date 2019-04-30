@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "Comparison.h"
 #include "object.h"
 #include "vrv.h"
 
@@ -46,7 +46,7 @@ Zone *Facsimile::FindZoneByUuid(std::string zoneId)
 
 int Facsimile::GetMaxX()
 {
-    AttComparison ac(SURFACE);
+    ClassIdComparison ac(SURFACE);
     ArrayOfObjects surfaces;
     this->FindAllChildByComparison(&surfaces, &ac);
 
@@ -61,7 +61,7 @@ int Facsimile::GetMaxX()
 
 int Facsimile::GetMaxY()
 {
-    AttComparison ac(SURFACE);
+    ClassIdComparison ac(SURFACE);
     ArrayOfObjects surfaces;
     this->FindAllChildByComparison(&surfaces, &ac);
 
@@ -74,7 +74,7 @@ int Facsimile::GetMaxY()
     return max;
 }
 //----------------------------------------------------------------------------
-// Surface 
+// Surface
 //----------------------------------------------------------------------------
 Surface::Surface() : Object("surface-"), AttTyped(), AttCoordinated()
 {
@@ -110,7 +110,7 @@ int Surface::GetMaxX()
 {
     if (HasLrx()) return GetLrx();
     int max = 0;
-    AttComparison ac(ZONE);
+    ClassIdComparison ac(ZONE);
     ArrayOfObjects zones;
     FindAllChildByComparison(&zones, &ac);
     for (auto iter = zones.begin(); iter!= zones.end(); iter++) {
@@ -121,11 +121,11 @@ int Surface::GetMaxX()
     return max;
 }
 
-int Surface::GetMaxY() 
+int Surface::GetMaxY()
 {
     if (HasLry()) return GetLry();
     int max = 0;
-    AttComparison ac(ZONE);
+    ClassIdComparison ac(ZONE);
     ArrayOfObjects zones;
     FindAllChildByComparison(&zones, &ac);
     for (auto iter = zones.begin(); iter!= zones.end(); iter++) {
@@ -137,9 +137,9 @@ int Surface::GetMaxY()
 }
 
 //----------------------------------------------------------------------------
-// Zone 
+// Zone
 //----------------------------------------------------------------------------
-Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated() 
+Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated()
 {
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_COORDINATED);
