@@ -576,6 +576,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         if (!measure) {
             LogWarning("MusicXML import: Element '%s' could not be added to measure '%s'",
                 iter->second->GetClassName().c_str(), iter->first.c_str());
+            delete iter->second;
             continue;
         }
         measure->AddChild(iter->second);
