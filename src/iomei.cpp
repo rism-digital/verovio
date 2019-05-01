@@ -14,31 +14,42 @@
 
 //----------------------------------------------------------------------------
 
+#include "abbr.h"
 #include "accid.h"
+#include "add.h"
 #include "anchoredtext.h"
 #include "annot.h"
+#include "app.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "boundary.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
+#include "choice.h"
 #include "chord.h"
 #include "clef.h"
+#include "corr.h"
 #include "custos.h"
+#include "damage.h"
+#include "del.h"
 #include "dir.h"
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "expan.h"
 #include "expansion.h"
+#include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
 #include "keysig.h"
@@ -46,6 +57,7 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
+#include "lem.h"
 #include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -63,6 +75,7 @@
 #include "note.h"
 #include "num.h"
 #include "octave.h"
+#include "orig.h"
 #include "page.h"
 #include "pages.h"
 #include "pb.h"
@@ -72,18 +85,23 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "proport.h"
+#include "rdg.h"
 #include "ref.h"
+#include "reg.h"
 #include "rend.h"
 #include "rest.h"
+#include "restore.h"
 #include "sb.h"
 #include "score.h"
 #include "section.h"
+#include "sic.h"
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "subst.h"
+#include "supplied.h"
 #include "svg.h"
 #include "syl.h"
 #include "syllable.h"
@@ -94,6 +112,7 @@
 #include "trill.h"
 #include "tuplet.h"
 #include "turn.h"
+#include "unclear.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -343,6 +362,10 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("arpeg");
         WriteArpeg(m_currentNode, dynamic_cast<Arpeg *>(object));
     }
+    else if (object->Is(BRACKETSPAN)) {
+        m_currentNode = m_currentNode.append_child("bracketSpan");
+        WriteBracketSpan(m_currentNode, dynamic_cast<BracketSpan *>(object));
+    }
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
         WriteBreath(m_currentNode, dynamic_cast<Breath *>(object));
@@ -454,6 +477,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(FTREM)) {
         m_currentNode = m_currentNode.append_child("fTrem");
         WriteFTrem(m_currentNode, dynamic_cast<FTrem *>(object));
+    }
+    else if (object->Is(HALFMRPT)) {
+        m_currentNode = m_currentNode.append_child("halfmRpt");
+        WriteHalfmRpt(m_currentNode, dynamic_cast<HalfmRpt *>(object));
     }
     else if (object->Is(KEYSIG)) {
         m_currentNode = m_currentNode.append_child("keySig");
@@ -725,7 +752,7 @@ void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
     WriteXmlId(currentNode, surface);
     surface->WriteCoordinated(currentNode);
     surface->WriteTyped(currentNode);
-    
+
     for (Object *child = surface->GetFirst(); child != nullptr; child = surface->GetNext()) {
         if (child->GetClassId() == ZONE) {
             pugi::xml_node childNode = currentNode.append_child("zone");
@@ -793,10 +820,19 @@ bool MeiOutput::WriteDoc(Doc *doc)
     if (facs != nullptr && facs->GetChildCount() > 0) {
         pugi::xml_node facsimile = music.append_child("facsimile");
         WriteFacsimile(facsimile, facs);
-        m_nodeStack.push_back(facsimile); 
+        m_nodeStack.push_back(facsimile);
     }
+
+    if (m_doc->m_front.first_child()) {
+        music.append_copy(m_doc->m_front.first_child());
+    }
+
     m_currentNode = music.append_child("body");
     m_nodeStack.push_back(m_currentNode);
+
+    if (m_doc->m_back.first_child()) {
+        music.append_copy(m_doc->m_back.first_child());
+    }
 
     /*
     if (m_scoreBasedMEI) {
@@ -1030,6 +1066,8 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteNotationType(currentNode);
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefLog(currentNode);
+    staffDef->WriteStaffDefVis(currentNode);
+    staffDef->WriteTimeBase(currentNode);
     staffDef->WriteTransposition(currentNode);
 }
 
@@ -1111,6 +1149,18 @@ void MeiOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     arpeg->WriteColor(currentNode);
 }
 
+void MeiOutput::WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan)
+{
+    assert(bracketSpan);
+
+    WriteControlElement(currentNode, bracketSpan);
+    WriteTimeSpanningInterface(currentNode, bracketSpan);
+    bracketSpan->WriteBracketSpanLog(currentNode);
+    bracketSpan->WriteColor(currentNode);
+    bracketSpan->WriteLineRend(currentNode);
+    bracketSpan->WriteLineRendBase(currentNode);
+}
+
 void MeiOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
 {
     assert(breath);
@@ -1184,7 +1234,7 @@ void MeiOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
 
     WriteControlElement(currentNode, mNum);
     WriteTextDirInterface(currentNode, mNum);
-    WriteTimeSpanningInterface(currentNode, mNum);
+    WriteTimePointInterface(currentNode, mNum);
     mNum->WriteColor(currentNode);
     mNum->WriteLang(currentNode);
     mNum->WriteTypography(currentNode);
@@ -1423,7 +1473,7 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
 void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
-    
+
     WriteFacsimileInterface(currentNode, custos);
     WritePitchInterface(currentNode, custos);
     WritePositionInterface(currentNode, custos);
@@ -1446,8 +1496,15 @@ void MeiOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     assert(fTrem);
 
     WriteLayerElement(currentNode, fTrem);
-    fTrem->WriteSlashCount(currentNode);
+    fTrem->WriteFTremVis(currentNode);
     fTrem->WriteTremMeasured(currentNode);
+}
+
+void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
+{
+    assert(halfmRpt);
+
+    WriteLayerElement(currentNode, halfmRpt);
 }
 
 void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
@@ -1457,6 +1514,7 @@ void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
     WriteLayerElement(currentNode, keySig);
     keySig->WriteAccidental(currentNode);
     keySig->WritePitch(currentNode);
+    keySig->WriteKeySigAnl(currentNode);
 }
 
 void MeiOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
@@ -1652,11 +1710,12 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     textElement->WriteTyped(currentNode);
 }
 
-void MeiOutput::WriteF(pugi::xml_node currentNode, F *figure)
+void MeiOutput::WriteF(pugi::xml_node currentNode, F *f)
 {
-    assert(figure);
+    assert(f);
 
-    WriteTextElement(currentNode, figure);
+    WriteTextElement(currentNode, f);
+    WriteTimeSpanningInterface(currentNode, f);
 }
 
 void MeiOutput::WriteFig(pugi::xml_node currentNode, Fig *fig)
@@ -1745,7 +1804,7 @@ void MeiOutput::WriteLinkingInterface(pugi::xml_node element, LinkingInterface *
 
     interface->WriteLinking(element);
 }
-    
+
 void MeiOutput::WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface)
 {
     assert(interface);
@@ -2088,7 +2147,7 @@ bool MeiInput::ImportString(std::string const &mei)
         m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document doc;
-        doc.load(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
+        doc.load_string(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
         return ReadDoc(root);
     }
@@ -2106,10 +2165,11 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
 
     // editorial
     if (IsEditorialElementName(element)) {
-        if (filterParent->Is(LABEL)) {
+        // Because of the Clone issue on annot do not support it in label and labelAbbr
+        if (filterParent->Is(LABEL) && (element == "annot")) {
             return false;
         }
-        else if (filterParent->Is(LABELABBR)) {
+        else if (filterParent->Is(LABELABBR) && (element == "annot")) {
             return false;
         }
         else {
@@ -2119,6 +2179,21 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for annot
     else if (filterParent->Is(ANNOT)) {
         if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for dir
+    else if (filterParent->Is(DIR)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
+            return true;
+        }
+        else if (element == "rend") {
             return true;
         }
         else {
@@ -2201,6 +2276,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for beam
     else if (filterParent->Is(BEAM)) {
         if (element == "beam") {
+            return true;
+        }
+        else if (element == "bTrem") {
             return true;
         }
         else if (element == "chord") {
@@ -2286,6 +2364,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for label
     else if (filterParent->Is(LABELABBR)) {
         if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
             return true;
         }
         else if (element == "rend") {
@@ -2413,9 +2494,11 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     // music
     pugi::xml_node music;
+    pugi::xml_node front;
     pugi::xml_node body;
     pugi::xml_node facsimile;
     pugi::xml_node pages;
+    pugi::xml_node back;
 
     if (std::string(root.name()) == "music") {
         music = root;
@@ -2435,6 +2518,20 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
         m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
     }
+    
+    front = music.child("front");
+    if (!front.empty()) {
+        m_doc->m_front.reset();
+        // copy the complete front into the master document
+        m_doc->m_front.append_copy(front);
+    }
+
+    back = music.child("back");
+    if (!back.empty()) {
+        m_doc->m_back.reset();
+        // copy the complete front into the master document
+        m_doc->m_back.append_copy(back);
+    }
 
     body = music.child("body");
     if (body.empty()) {
@@ -2451,7 +2548,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
     if (!xPathQuery.empty()) {
-        pugi::xpath_node selection = body.select_single_node(xPathQuery.c_str());
+        pugi::xpath_node selection = body.select_node(xPathQuery.c_str());
         if (selection) {
             m_selectedMdiv = selection.node();
         }
@@ -3234,6 +3331,8 @@ bool MeiInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     vrvStaffDef->ReadNotationType(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
     vrvStaffDef->ReadStaffDefLog(staffDef);
+    vrvStaffDef->ReadStaffDefVis(staffDef);
+    vrvStaffDef->ReadTimeBase(staffDef);
     vrvStaffDef->ReadTransposition(staffDef);
 
     if (!vrvStaffDef->HasN()) {
@@ -3352,6 +3451,9 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "arpeg") {
             success = ReadArpeg(parent, current);
         }
+        else if (std::string(current.name()) == "bracketSpan") {
+            success = ReadBracketSpan(parent, current);
+        }
         else if (std::string(current.name()) == "breath") {
             success = ReadBreath(parent, current);
         }
@@ -3447,6 +3549,22 @@ bool MeiInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
 
     parent->AddChild(vrvArpeg);
     ReadUnsupportedAttr(arpeg, vrvArpeg);
+    return true;
+}
+
+bool MeiInput::ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan)
+{
+    BracketSpan *vrvBracketSpan = new BracketSpan();
+    ReadControlElement(bracketSpan, vrvBracketSpan);
+
+    ReadTimeSpanningInterface(bracketSpan, vrvBracketSpan);
+    vrvBracketSpan->ReadBracketSpanLog(bracketSpan);
+    vrvBracketSpan->ReadColor(bracketSpan);
+    vrvBracketSpan->ReadLineRend(bracketSpan);
+    vrvBracketSpan->ReadLineRendBase(bracketSpan);
+
+    parent->AddChild(vrvBracketSpan);
+    ReadUnsupportedAttr(bracketSpan, vrvBracketSpan);
     return true;
 }
 
@@ -3547,7 +3665,7 @@ bool MeiInput::ReadMNum(Object *parent, pugi::xml_node mNum)
     ReadControlElement(mNum, vrvMNum);
 
     ReadTextDirInterface(mNum, vrvMNum);
-    ReadTimeSpanningInterface(mNum, vrvMNum);
+    ReadTimePointInterface(mNum, vrvMNum);
     vrvMNum->ReadColor(mNum);
     vrvMNum->ReadLang(mNum);
     vrvMNum->ReadTypography(mNum);
@@ -3560,6 +3678,10 @@ bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 {
     Mordent *vrvMordent = new Mordent();
     ReadControlElement(mordent, vrvMordent);
+
+    if (m_version < MEI_4_0_0) {
+        UpgradeMordentTo_4_0_0(mordent, vrvMordent);
+    }
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
@@ -3668,6 +3790,10 @@ bool MeiInput::ReadTurn(Object *parent, pugi::xml_node turn)
 {
     Turn *vrvTurn = new Turn();
     ReadControlElement(turn, vrvTurn);
+
+    if (m_version < MEI_4_0_0) {
+        UpgradeTurnTo_4_0_0(turn, vrvTurn);
+    }
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
@@ -3837,6 +3963,9 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "fTrem") {
             success = ReadFTrem(parent, xmlElement);
         }
+        else if (elementName == "halfmRpt") {
+            success = ReadHalfmRpt(parent, xmlElement);
+        }
         else if (elementName == "keySig") {
             success = ReadKeySig(parent, xmlElement);
         }
@@ -3909,7 +4038,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
         element.remove_attribute("ulx");
     } /*else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
         Zone zone = this->m_doc->GetZone(element.attribute("facs").value());
-        AttCoordinated *att = dynamic_cast<AttCoordinated *>(object); 
+        AttCoordinated *att = dynamic_cast<AttCoordinated *>(object);
         assert(att);
         LogMessage("%d, %d, %d, %d", zone.ulx, zone.uly, zone.lrx, zone.lry);
         if (zone.ulx > 0) {
@@ -3925,7 +4054,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
             att->SetLry(zone.lry);
         }
         LogMessage("Set att_coordinated based on zone %s", zone.xmlId.c_str());
-    }*/ 
+    }*/
 
     SetMeiUuid(element, object);
     ReadLinkingInterface(element, object);
@@ -4100,12 +4229,26 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     FTrem *vrvFTrem = new FTrem();
     ReadLayerElement(fTrem, vrvFTrem);
 
-    vrvFTrem->ReadSlashCount(fTrem);
+    if (m_version < MEI_4_0_0) {
+        UpgradeFTremTo_4_0_0(fTrem, vrvFTrem);
+    }
+
+    vrvFTrem->ReadFTremVis(fTrem);
     vrvFTrem->ReadTremMeasured(fTrem);
 
     parent->AddChild(vrvFTrem);
     ReadUnsupportedAttr(fTrem, vrvFTrem);
     return ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
+}
+
+bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
+{
+    HalfmRpt *vrvHalfmRpt = new HalfmRpt();
+    ReadLayerElement(halfmRpt, vrvHalfmRpt);
+
+    parent->AddChild(vrvHalfmRpt);
+    ReadUnsupportedAttr(halfmRpt, vrvHalfmRpt);
+    return true;
 }
 
 bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
@@ -4115,6 +4258,7 @@ bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 
     vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadPitch(keySig);
+    vrvKeySig->ReadKeySigAnl(keySig);
 
     // special processing required
     vrvKeySig->ConvertToInternal();
@@ -4476,6 +4620,8 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
     F *vrvF = new F();
     ReadTextElement(f, vrvF);
 
+    ReadTimeSpanningInterface(f, vrvF);
+
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);
     return ReadTextChildren(vrvF, f);
@@ -4782,12 +4928,13 @@ bool MeiInput::ReadAnnot(Object *parent, pugi::xml_node annot)
 
     parent->AddChild(vrvAnnot);
     ReadUnsupportedAttr(annot, vrvAnnot);
-    return ReadTextChildren(vrvAnnot, annot, vrvAnnot);
+    // For Annot we do not load children because they preserved in Annot::m_content
+    return true;
 }
 
 bool MeiInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef) {
+    if (!m_hasScoreDef && m_useScoreDefForDoc) {
         LogError("<app> before any <scoreDef> is not supported");
         return false;
     }
@@ -4808,8 +4955,8 @@ bool MeiInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
     std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_appXPathQuery.GetValue();
     if (xPathQueries.size() > 0) {
         auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
-            [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
-        if (i != xPathQueries.end()) selectedLemOrRdg = parentNode.select_single_node(i->c_str()).node();
+            [parentNode](std::string &query) { return (parentNode.select_node(query.c_str())); });
+        if (i != xPathQueries.end()) selectedLemOrRdg = parentNode.select_node(i->c_str()).node();
     }
 
     bool success = true;
@@ -4873,9 +5020,9 @@ bool MeiInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
     std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_choiceXPathQuery.GetValue();
     if (xPathQueries.size() > 0) {
         auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
-            [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
+            [parentNode](std::string &query) { return (parentNode.select_node(query.c_str())); });
         if (i != xPathQueries.end()) {
-            selectedChild = parentNode.select_single_node(i->c_str()).node();
+            selectedChild = parentNode.select_node(i->c_str()).node();
         }
     }
 
@@ -5102,9 +5249,9 @@ bool MeiInput::ReadSubstChildren(Object *parent, pugi::xml_node parentNode, Edit
     std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_substXPathQuery.GetValue();
     if (xPathQueries.size() > 0) {
         auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
-            [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
+            [parentNode](std::string &query) { return (parentNode.select_node(query.c_str())); });
         if (i != xPathQueries.end()) {
-            selectedChild = parentNode.select_single_node(i->c_str()).node();
+            selectedChild = parentNode.select_node(i->c_str()).node();
         }
     }
 
@@ -5218,7 +5365,7 @@ bool MeiInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
 bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)
 {
     if (!measure) {
-        LogWarning("Cannot read <tupleSpan> within editorial markup");
+        LogWarning("Cannot read <tupletSpan> within editorial markup");
         return false;
     }
 
@@ -5227,6 +5374,8 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     LayerElement *start = NULL;
     LayerElement *end = NULL;
+
+    AttConverter converter;
 
     // label
     if (tupletSpan.attribute("label")) {
@@ -5239,6 +5388,18 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     }
     if (tupletSpan.attribute("numbase")) {
         tuplet->SetNumbase(atoi(tupletSpan.attribute("numbase").value()));
+    }
+    if (tupletSpan.attribute("num.visible")) {
+        tuplet->SetNumVisible(converter.StrToBoolean(tupletSpan.attribute("num.visible").value()));
+    }
+    if (tupletSpan.attribute("num.place")) {
+        tuplet->SetNumPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("num.place").value()));
+    }
+    if (tupletSpan.attribute("bracket.visible")) {
+        tuplet->SetBracketVisible(converter.StrToBoolean(tupletSpan.attribute("bracket.visible").value()));
+    }
+    if (tupletSpan.attribute("bracket.place")) {
+        tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
     }
 
     // position (pitch)
@@ -5330,6 +5491,31 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     return false;
 }
 
+void MeiInput::UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem)
+{
+    if (fTrem.attribute("slash")) {
+        vrvFTrem->SetBeams(vrvFTrem->AttFTremVis::StrToInt(fTrem.attribute("slash").value()));
+        fTrem.remove_attribute("slash");
+    }
+}
+
+void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent)
+{
+    if (mordent.attribute("form")) {
+        std::string form = std::string(mordent.attribute("form").value());
+        if (form == "inv") {
+            vrvMordent->SetForm(mordentLog_FORM_lower);
+        }
+        else if (form == "norm") {
+            vrvMordent->SetForm(mordentLog_FORM_upper);
+        }
+        else {
+            LogWarning("Unsupported value '%s' for att.mordent.log@form (MEI 3.0)", form.c_str());
+        }
+        mordent.remove_attribute("form");
+    }
+}
+
 void MeiInput::UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef)
 {
     if (scoreDef.attribute("key.sig.show")) {
@@ -5376,6 +5562,10 @@ void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
 
 void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp)
 {
+    if (staffGrp.attribute("barthru")) {
+        vrvStaffGrp->SetBarThru(vrvStaffGrp->AttStaffGrpVis::StrToBoolean(staffGrp.attribute("barthru").value()));
+        staffGrp.remove_attribute("barthru");
+    }
     if (staffGrp.attribute("label")) {
         Text *text = new Text();
         text->SetText(UTF8to16(staffGrp.attribute("label").value()));
@@ -5391,6 +5581,23 @@ void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
         labelAbbr->AddChild(text);
         vrvStaffGrp->AddChild(labelAbbr);
         staffGrp.remove_attribute("label.abbr");
+    }
+}
+
+void MeiInput::UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn)
+{
+    if (turn.attribute("form")) {
+        std::string form = std::string(turn.attribute("form").value());
+        if (form == "inv") {
+            vrvTurn->SetForm(turnLog_FORM_lower);
+        }
+        else if (form == "norm") {
+            vrvTurn->SetForm(turnLog_FORM_lower);
+        }
+        else {
+            LogWarning("Unsupported value '%s' for att.turn.log@form (MEI 3.0)", form.c_str());
+        }
+        turn.remove_attribute("form");
     }
 }
 

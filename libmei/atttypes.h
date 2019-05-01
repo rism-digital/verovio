@@ -1179,6 +1179,15 @@ enum accidLog_FUNC {
 };
 
 /**
+ * MEI att.anchoredText.log@func
+ */
+enum anchoredTextLog_FUNC {
+    anchoredTextLog_FUNC_NONE = 0,
+    anchoredTextLog_FUNC_unknown,
+    anchoredTextLog_FUNC_MAX
+};
+
+/**
  * MEI att.arpeg.log@order
  */
 enum arpegLog_ORDER {
@@ -1233,6 +1242,17 @@ enum beamingVis_BEAMREND {
 };
 
 /**
+ * MEI att.bracketSpan.log@func
+ */
+enum bracketSpanLog_FUNC {
+    bracketSpanLog_FUNC_NONE = 0,
+    bracketSpanLog_FUNC_coloration,
+    bracketSpanLog_FUNC_cross_rhythm,
+    bracketSpanLog_FUNC_ligature,
+    bracketSpanLog_FUNC_MAX
+};
+
+/**
  * MEI att.curvature@curvedir
  */
 enum curvature_CURVEDIR {
@@ -1241,6 +1261,15 @@ enum curvature_CURVEDIR {
     curvature_CURVEDIR_below,
     curvature_CURVEDIR_mixed,
     curvature_CURVEDIR_MAX
+};
+
+/**
+ * MEI att.curve.log@func
+ */
+enum curveLog_FUNC {
+    curveLog_FUNC_NONE = 0,
+    curveLog_FUNC_unknown,
+    curveLog_FUNC_MAX
 };
 
 /**
@@ -1281,6 +1310,26 @@ enum episemaVis_FORM {
     episemaVis_FORM_h,
     episemaVis_FORM_v,
     episemaVis_FORM_MAX
+};
+
+/**
+ * MEI att.evidence@evidence
+ */
+enum evidence_EVIDENCE {
+    evidence_EVIDENCE_NONE = 0,
+    evidence_EVIDENCE_internal,
+    evidence_EVIDENCE_external,
+    evidence_EVIDENCE_conjecture,
+    evidence_EVIDENCE_MAX
+};
+
+/**
+ * MEI att.extSym@glyph.auth
+ */
+enum extSym_GLYPHAUTH {
+    extSym_GLYPHAUTH_NONE = 0,
+    extSym_GLYPHAUTH_smufl,
+    extSym_GLYPHAUTH_MAX
 };
 
 /**
@@ -1455,6 +1504,17 @@ enum harpPedalLog_G {
 };
 
 /**
+ * MEI att.line.log@func
+ */
+enum lineLog_FUNC {
+    lineLog_FUNC_NONE = 0,
+    lineLog_FUNC_coloration,
+    lineLog_FUNC_ligature,
+    lineLog_FUNC_unknown,
+    lineLog_FUNC_MAX
+};
+
+/**
  * MEI att.liquescent.vis@curve
  */
 enum liquescentVis_CURVE {
@@ -1462,6 +1522,31 @@ enum liquescentVis_CURVE {
     liquescentVis_CURVE_a,
     liquescentVis_CURVE_c,
     liquescentVis_CURVE_MAX
+};
+
+/**
+ * MEI att.measurement@unit
+ */
+enum measurement_UNIT {
+    measurement_UNIT_NONE = 0,
+    measurement_UNIT_byte,
+    measurement_UNIT_char,
+    measurement_UNIT_cm,
+    measurement_UNIT_deg,
+    measurement_UNIT_in,
+    measurement_UNIT_issue,
+    measurement_UNIT_ft,
+    measurement_UNIT_m,
+    measurement_UNIT_mm,
+    measurement_UNIT_page,
+    measurement_UNIT_pc,
+    measurement_UNIT_pt,
+    measurement_UNIT_px,
+    measurement_UNIT_rad,
+    measurement_UNIT_record,
+    measurement_UNIT_vol,
+    measurement_UNIT_vu,
+    measurement_UNIT_MAX
 };
 
 /**
@@ -1601,6 +1686,15 @@ enum noteGes_EXTREMIS {
 };
 
 /**
+ * MEI att.noteHeads@head.auth
+ */
+enum noteHeads_HEADAUTH {
+    noteHeads_HEADAUTH_NONE = 0,
+    noteHeads_HEADAUTH_smufl,
+    noteHeads_HEADAUTH_MAX
+};
+
+/**
  * MEI att.octave.log@coll
  */
 enum octaveLog_COLL {
@@ -1629,6 +1723,18 @@ enum pedalLog_DIR {
     pedalLog_DIR_half,
     pedalLog_DIR_bounce,
     pedalLog_DIR_MAX
+};
+
+/**
+ * MEI att.pedal.log@func
+ */
+enum pedalLog_FUNC {
+    pedalLog_FUNC_NONE = 0,
+    pedalLog_FUNC_sustain,
+    pedalLog_FUNC_soft,
+    pedalLog_FUNC_sostenuto,
+    pedalLog_FUNC_silent,
+    pedalLog_FUNC_MAX
 };
 
 /**

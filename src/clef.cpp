@@ -67,7 +67,7 @@ int Clef::GetClefLocOffset() const
         assert(sameas);
         return sameas->GetClefLocOffset();
     }
-    
+
     int offset = 0;
     if (GetShape() == CLEFSHAPE_G)
         offset = -4;

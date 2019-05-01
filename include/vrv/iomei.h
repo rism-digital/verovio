@@ -34,6 +34,7 @@ class BarLine;
 class Beam;
 class BeatRpt;
 class BoundaryEnd;
+class BracketSpan;
 class Breath;
 class BTrem;
 class Choice;
@@ -58,6 +59,7 @@ class Fermata;
 class FloatingElement;
 class FTrem;
 class Hairpin;
+class HalfmRpt;
 class Harm;
 class LinkingInterface;
 class InstrDef;
@@ -246,6 +248,7 @@ private:
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
+    void WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt);
     void WriteKeySig(pugi::xml_node currentNode, KeySig *keySig);
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
@@ -271,6 +274,7 @@ private:
     ///@{
     void WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
+    void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
@@ -490,6 +494,7 @@ private:
     bool ReadCustos(Object *parent, pugi::xml_node custos);
     bool ReadDot(Object *parent, pugi::xml_node dot);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
+    bool ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt);
     bool ReadKeySig(Object *parent, pugi::xml_node keySig);
     bool ReadLigature(Object *parent, pugi::xml_node ligature);
     bool ReadMensur(Object *parent, pugi::xml_node mensur);
@@ -517,6 +522,7 @@ private:
     ///@{
     bool ReadAnchoredText(Object *parent, pugi::xml_node anchoredText);
     bool ReadArpeg(Object *parent, pugi::xml_node arpeg);
+    bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
@@ -641,9 +647,12 @@ private:
      */
     ///@{
     // to MEI 4.0.0
+    void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
+    void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
     void UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp);
+    void UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn);
     // to MEI 3.0.0 (Page-Based MEI only)
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);

@@ -17,6 +17,7 @@
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
+#include "staffgrp.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -33,6 +34,8 @@ StaffDef::StaffDef()
     , AttNotationType()
     , AttScalable()
     , AttStaffDefLog()
+    , AttStaffDefVis()
+    , AttTimeBase()
     , AttTransposition()
 {
     RegisterAttClass(ATT_DISTANCES);
@@ -41,6 +44,8 @@ StaffDef::StaffDef()
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFLOG);
+    RegisterAttClass(ATT_STAFFDEFVIS);
+    RegisterAttClass(ATT_TIMEBASE);
     RegisterAttClass(ATT_TRANSPOSITION);
 
     Reset();
@@ -58,6 +63,8 @@ void StaffDef::Reset()
     ResetNotationType();
     ResetScalable();
     ResetStaffDefLog();
+    ResetStaffDefVis();
+    ResetTimeBase();
     ResetTransposition();
 
     m_drawingVisibility = OPTIMIZATION_NONE;
@@ -82,6 +89,19 @@ void StaffDef::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+
+bool StaffDef::IsInBraceAndBracket()
+{
+    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp *>(this->GetFirstParent(STAFFGRP));
+    if (!staffGrp1 || !staffGrp1->HasSymbol()) {
+        return false;
+    }
+    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp *>(staffGrp1->GetFirstParent(STAFFGRP));
+    if (!staffGrp2 || !staffGrp2->HasSymbol()) {
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------

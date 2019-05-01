@@ -49,31 +49,37 @@ namespace musicxml {
 
     class OpenTie {
     public:
-        OpenTie(int staffN, int layerN, data_PITCHNAME pname, char oct)
+        OpenTie(int staffN, data_PITCHNAME pname, char oct)
         {
             m_staffN = staffN;
-            m_layerN = layerN;
             m_pname = pname;
             m_oct = oct;
         }
 
         int m_staffN;
-        int m_layerN;
         data_PITCHNAME m_pname;
         char m_oct;
     };
 
     class OpenSlur {
     public:
-        OpenSlur(int staffN, int layerN, int number)
+        OpenSlur(int number)
         {
-            m_staffN = staffN;
-            m_layerN = layerN;
             m_number = number;
         }
 
-        int m_staffN;
-        int m_layerN;
+        int m_number;
+    };
+
+    class CloseSlur {
+    public:
+        CloseSlur(std::string measureNum, int number)
+        {
+            m_measureNum = measureNum;
+            m_number = number;
+        }
+        
+        std::string m_measureNum;
         int m_number;
     };
 
@@ -204,10 +210,10 @@ private:
      * supported
      */
     ///@{
-    void OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie);
-    void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
-    void OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur);
-    void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
+    void OpenTie(Staff *staff, Note *note, Tie *tie);
+    void CloseTie(Staff *staff, Note *note);
+    void OpenSlur(Measure *measure, int number, Slur *slur);
+    void CloseSlur(Measure *measure, int number, LayerElement *element);
     ///@}
 
     /*
@@ -274,6 +280,8 @@ private:
     std::vector<LayerElement *> m_elementStack;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
+    /* The stack for slur stops that might come before the slur has been opened */
+    std::vector<std::pair<LayerElement *, musicxml::CloseSlur> > m_slurStopStack;
     /* The stack for open ties */
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
     /* The stack for hairpins */

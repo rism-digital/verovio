@@ -18,7 +18,7 @@ class MidiFile;
 
 namespace vrv {
 
-class AttComparison;
+class ClassIdComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
@@ -42,6 +42,7 @@ class MRpt;
 class Object;
 class Page;
 class ScoreDef;
+class Slur;
 class Staff;
 class StaffAlignment;
 class StaffDef;
@@ -192,7 +193,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPostionersParams
+// AdjustFloatingPositionersParams
 //----------------------------------------------------------------------------
 
 /**
@@ -201,9 +202,9 @@ public:
  * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
-class AdjustFloatingPostionersParams : public FunctorParams {
+class AdjustFloatingPositionersParams : public FunctorParams {
 public:
-    AdjustFloatingPostionersParams(Doc *doc, Functor *functor)
+    AdjustFloatingPositionersParams(Doc *doc, Functor *functor)
     {
         m_classId = OBJECT;
         m_doc = doc;
@@ -212,6 +213,69 @@ public:
     ClassId m_classId;
     Doc *m_doc;
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// AdjustFloatingPositionerGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector of the classId to group
+ * member 1: the doc
+ **/
+
+class AdjustFloatingPositionerGrpsParams : public FunctorParams {
+public:
+    AdjustFloatingPositionerGrpsParams(Doc *doc)
+    {
+        m_doc = doc;
+        m_place = STAFFREL_basic_above;
+    }
+    std::vector<ClassId> m_classIds;
+    data_STAFFREL_basic m_place;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustHarmGrpsSpacingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector of the grpIds of harms in the system
+ * member 1: the current grp id (0 for the first pass)
+ * member 2: a vector adjustment tuples (Aligment start, Aligment end, distance)
+ * member 3: a pointer to the previous harm positioner (if any)
+ * member 4: a pointer to the previous harm start (if any)
+ * member 5: a pointer to the previous measure (if any)
+ * member 6: a pointer to the current system
+ * member 7: the doc
+ * member 8: a pointer to the functor for passing it to the system aligner
+ * member 9: a pointer to the functor end for passing it to the system aligner
+ **/
+
+class AdjustHarmGrpsSpacingParams : public FunctorParams {
+public:
+    AdjustHarmGrpsSpacingParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+        m_currentGrp = 0;
+        m_previousHarmPositioner = NULL;
+        m_previousHarmStart = NULL;
+        m_previousMeasure = NULL;
+        m_currentSystem = NULL;
+    }
+    std::vector<int> m_grpIds;
+    int m_currentGrp;
+    ArrayOfAdjustmentTuples m_overlapingHarm;
+    FloatingPositioner *m_previousHarmPositioner;
+    LayerElement *m_previousHarmStart;
+    Measure *m_previousMeasure;
+    System *m_currentSystem;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -251,19 +315,25 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPostionerGrpsParams
+// AdjustSlursParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a vector of the classId to group
  * member 1: the doc
+ * member 2: a pointer to the functor for passing it to the system aligner
  **/
 
-class AdjustFloatingPostionerGrpsParams : public FunctorParams {
+class AdjustSlursParams : public FunctorParams {
 public:
-    AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
-    std::vector<ClassId> m_classIds;
+    AdjustSlursParams(Doc *doc, Functor *functor)
+    {
+        m_adjusted = false;
+        m_doc = doc;
+        m_functor = functor;
+    }
+    bool m_adjusted;
     Doc *m_doc;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -301,10 +371,16 @@ public:
     AdjustSylSpacingParams(Doc *doc)
     {
         m_previousSyl = NULL;
+        m_previousMeasure = NULL;
+        m_freeSpace = 0;
+        m_staffSize = 100;
         m_doc = doc;
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
     Syl *m_previousSyl;
+    Measure *m_previousMeasure;
+    int m_freeSpace;
+    int m_staffSize;
     Doc *m_doc;
 };
 
@@ -603,12 +679,14 @@ public:
         m_maxCurrentScoreTime = 0.0;
         m_maxCurrentRealTimeSeconds = 0.0;
         m_currentTempo = 120;
+        m_tempoAdjustment = 1.0;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
     double m_maxCurrentScoreTime;
     double m_maxCurrentRealTimeSeconds;
     int m_currentTempo;
+    double m_tempoAdjustment;
 };
 
 //----------------------------------------------------------------------------
@@ -1009,60 +1087,35 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindSpaceInAlignmentParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the time of the event
- * member 1: the duration of the event
- * member 2: the layer count at that position
- * member 3: the flag indicating whereas the event is aligned with a space
- * member 4: the current meter signature
- * member 5: the current mensur
- * member 6: the functor for redirection
- **/
-
-class FindSpaceInAlignmentParams : public FunctorParams {
-public:
-    FindSpaceInAlignmentParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
-    {
-        m_time = 0.0;
-        m_duration = 0.0;
-        m_layerCount = 1;
-        m_success = false;
-        m_meterSig = meterSig;
-        m_mensur = mensur;
-        m_functor = functor;
-    }
-    double m_time;
-    double m_duration;
-    int m_layerCount;
-    bool m_success;
-    MeterSig *m_meterSig;
-    Mensur *m_mensur;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// FindTimeSpanningLayerElementsParams
+// FindSpannedLayerElementsParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: a pointer to the vector of LayerElement pointer to fill
  * member 1: the minimum position
  * member 2: the maximum position
+ * member 3: the timespanning interface
+ * member 4: the class Ids to keep
+ * member 5: the slur for finding ties (too specific, to be refactored)
+ * member 6: the ties we need to consider (too specific, to be refactored)
  **/
 
-class FindTimeSpanningLayerElementsParams : public FunctorParams {
+class FindSpannedLayerElementsParams : public FunctorParams {
 public:
-    FindTimeSpanningLayerElementsParams()
+    FindSpannedLayerElementsParams(TimeSpanningInterface *interface, Slur *slur)
     {
+        m_interface = interface;
         m_minPos = 0;
         m_maxPos = 0;
+        m_slur = slur;
     }
-    std::vector<LayerElement *> m_spanningContent;
+    std::vector<LayerElement *> m_elements;
     int m_minPos;
     int m_maxPos;
+    TimeSpanningInterface *m_interface;
+    std::vector<ClassId> m_classIds;
+    Slur *m_slur;
+    std::vector<FloatingPositioner *> m_ties;
 };
 
 //----------------------------------------------------------------------------
@@ -1181,6 +1234,37 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// LayerCountInTimeSpanParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the time of the event
+ * member 1: the duration of the event
+ * member 2: the list of layerN found
+ * member 3: the current meter signature
+ * member 4: the current mensur
+ * member 5: the functor for redirection
+ **/
+
+class LayerCountInTimeSpanParams : public FunctorParams {
+public:
+    LayerCountInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
+    {
+        m_time = 0.0;
+        m_duration = 0.0;
+        m_meterSig = meterSig;
+        m_mensur = mensur;
+        m_functor = functor;
+    }
+    double m_time;
+    double m_duration;
+    std::vector<int> m_layers;
+    MeterSig *m_meterSig;
+    Mensur *m_mensur;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // OptimizeScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -1199,6 +1283,7 @@ public:
         m_encoded = false;
         m_firstScoreDef = true;
         m_hasFermata = false;
+        m_hasTempo = false;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -1207,6 +1292,7 @@ public:
     bool m_encoded;
     bool m_firstScoreDef;
     bool m_hasFermata;
+    bool m_hasTempo;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
@@ -1637,7 +1723,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ReorderByXPosParams 
+// ReorderByXPosParams
 //----------------------------------------------------------------------------
 
 /**
@@ -1648,6 +1734,18 @@ public:
     int modifications = 0;
 };
 
+// UnsetCurrentScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the functor to be redirected to Aligner
+ **/
+
+class UnsetCurrentScoreDefParams : public FunctorParams {
+public:
+    UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
+    Functor *m_functor;
+};
 } // namespace vrv
 
 #endif

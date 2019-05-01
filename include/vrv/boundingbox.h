@@ -15,6 +15,7 @@
 namespace vrv {
 
 class Doc;
+class FloatingCurvePositioner;
 class Glyph;
 
 //----------------------------------------------------------------------------
@@ -113,6 +114,20 @@ public:
     ///@}
 
     /**
+     * @name Get wrappers
+     */
+    ///@{
+    int GetBottomBy(Accessor type) const { return ((type == SELF) ? GetSelfBottom() : GetContentBottom()); }
+    int GetTopBy(Accessor type) const { return ((type == SELF) ? GetSelfTop() : GetContentTop()); }
+    int GetLeftBy(Accessor type) const { return ((type == SELF) ? GetSelfLeft() : GetContentLeft()); }
+    int GetRightBy(Accessor type) const { return ((type == SELF) ? GetSelfRight() : GetContentRight()); }
+    int GetX1By(Accessor type) const { return ((type == SELF) ? GetSelfX1() : GetContentX1()); }
+    int GetX2By(Accessor type) const { return ((type == SELF) ? GetSelfX2() : GetContentX2()); }
+    int GetY1By(Accessor type) const { return ((type == SELF) ? GetSelfY1() : GetContentY1()); }
+    int GetY2By(Accessor type) const { return ((type == SELF) ? GetSelfY2() : GetContentY2()); }
+    ///@}
+
+    /**
      * @name Return true if the bounding box has a horizontal / vertical overlap with the other one.
      * Makes an overal bounding box overlap calculation without looking at anchor points
      */
@@ -142,7 +157,7 @@ public:
      * Return true if the bounding box intersects with the curve represented by the FloatingPositioner.
      * The Object pointed by the FloatingPositioner is expected to be a SLUR or a TIE
      */
-    int Intersects(FloatingPositioner *curve, int margin = 0) const;
+    int Intersects(FloatingCurvePositioner *curve, Accessor type, int margin = 0) const;
 
     /**
      * Swap values.
@@ -303,7 +318,7 @@ private:
     /**
      * An vector of line segments
      */
-    std::vector<std::pair<int, int> > m_segments;
+    ArrayOfIntPairs m_segments;
 };
 
 } // namespace vrv

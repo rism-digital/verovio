@@ -101,12 +101,14 @@ public:
     ///@{
     std::string DblToStr(double data) const;
     std::string IntToStr(int data) const;
+    std::string VUToStr(data_VU data) const;
     ///@}
 
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
+    data_VU StrToVU(std::string value, bool logWarning = true) const;
     ///@}
 
     /** @name Converters for writing and reading */
@@ -131,6 +133,18 @@ public:
 
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
+
+    std::string MeasurementabsToStr(data_MEASUREMENTABS data) const { return VUToStr(data); }
+    data_MEASUREMENTABS StrToMeasurementabs(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
+
+    std::string MeasurementrelToStr(data_MEASUREMENTREL data) const { return VUToStr(data); }
+    data_MEASUREMENTREL StrToMeasurementrel(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
 
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
     data_MODUSMAIOR StrToModusmaior(std::string value, bool logWarning = true) const;
@@ -197,12 +211,15 @@ public:
     ///@{
     std::string CompassdirectionToStr(data_COMPASSDIRECTION data) const;
     data_COMPASSDIRECTION StrToCompassdirection(std::string value, bool logWarning = true) const;
-    
+
     std::string EventrelToStr(data_EVENTREL data) const;
     data_EVENTREL StrToEventrel(std::string value, bool logWarning = true) const;
-    
+
     std::string FontsizeToStr(data_FONTSIZE data) const;
     data_FONTSIZE StrToFontsize(std::string value, bool logWarning = true) const;
+
+    std::string LinewidthToStr(data_LINEWIDTH data) const;
+    data_LINEWIDTH StrToLinewidth(std::string value, bool logWarning = true) const;
 
     std::string MidivalueNameToStr(data_MIDIVALUE_NAME data) const;
     data_MIDIVALUE_NAME StrToMidivalueName(std::string value, bool logWarning = true) const;
@@ -268,55 +285,6 @@ private:
      * A vector for storing all the MEI att classes grouped in the interface
      */
     std::vector<AttClassId> m_interfaceAttClasses;
-};
-
-//----------------------------------------------------------------------------
-// Comparison
-//----------------------------------------------------------------------------
-
-class Comparison {
-
-public:
-    virtual bool operator()(Object *object) = 0;
-    virtual bool MatchesType(Object *object) = 0;
-};
-
-//----------------------------------------------------------------------------
-// AttComparison
-//----------------------------------------------------------------------------
-
-class AttComparison : public Comparison {
-
-public:
-    AttComparison(ClassId classId) { m_classId = classId; }
-
-    virtual bool operator()(Object *object);
-
-    ClassId GetType() { return m_classId; }
-
-    bool MatchesType(Object *object);
-
-protected:
-    ClassId m_classId;
-};
-
-//----------------------------------------------------------------------------
-// InterfaceComparison
-//----------------------------------------------------------------------------
-
-class InterfaceComparison : public Comparison {
-
-public:
-    InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
-
-    virtual bool operator()(Object *object);
-
-    InterfaceId GetInterface() { return m_interfaceId; }
-
-    bool MatchesType(Object *object);
-
-protected:
-    InterfaceId m_interfaceId;
 };
 
 } // namespace vrv

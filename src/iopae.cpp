@@ -233,7 +233,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         }
 
         // rhythmic values
-        else if (isdigit(incipit[i]) != 0) {
+        else if ((isdigit(incipit[i]) != 0) && ((i <= 0) || incipit[i - 1] != ';')) {
             i += getDurations(incipit, &current_measure, i);
         }
 
@@ -255,7 +255,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
         // beaming ends
         else if (incipit[i] == '}' && in_beam > 0) {
-            current_measure.notes[current_measure.notes.size() - 1].beam = BEAM_TERMINAL;
+            if (!current_measure.notes.empty()) {
+                current_measure.notes.at(current_measure.notes.size() - 1).beam = BEAM_TERMINAL;
+            }
             current_note.beam = 0;
             in_beam--;
         }
@@ -672,7 +674,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
         // Triplets are in the form (4ABC)
         // index points to the '(', so we look back
-        // if the resut is a number or dot, it means we have the long format
+        // if the result is a number or dot, it means we have the long format
         // i.e. 4(6ABC;5) or 4.(6ABC;5)
         if ((index != 0) && (isdigit(incipit[index - 1]) || incipit[index - 1] == '.')) {
 
@@ -1068,7 +1070,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
             i++;
             for (j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
-                measure->notes.push_back(measure->notes[j]);
+                measure->notes.push_back(measure->notes.at(j));
             }
         }
         measure->abbreviation_offset = -1;
@@ -1145,8 +1147,8 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
             LogWarning("Plaine & Easie import: found note before duration was specified");
         }
         else {
-            note->duration = measure->durations[measure->durations_offset];
-            note->dots = measure->dots[measure->durations_offset];
+            note->duration = measure->durations.at(measure->durations_offset);
+            note->dots = measure->dots.at(measure->durations_offset);
         }
     }
     note->pitch = getPitch(incipit[i]);
@@ -1243,7 +1245,7 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     m_nested_objects.clear();
 
     for (unsigned int i = 0; i < measure->notes.size(); ++i) {
-        pae::Note *note = &measure->notes[i];
+        pae::Note *note = &measure->notes.at(i);
         parseNote(note);
     }
 

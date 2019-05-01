@@ -17,6 +17,16 @@
 
 #include "attdef.h"
 
+//----------------------------------------------------------------------------
+
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
+#include <math.h>
+
+// In case it is not defined before...
+#ifndef M_PI
+#define M_PI (3.14159265358979323846264338327950288)
+#endif
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -24,7 +34,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 0
+#define VERSION_MINOR 1
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -48,6 +58,7 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
+    FLOATING_CURVE_POSITIONER,
     // Ids for ungrouped objects
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
@@ -121,6 +132,7 @@ enum ClassId {
     CONTROL_ELEMENT,
     ANCHORED_TEXT,
     ARPEG,
+    BRACKETSPAN,
     BREATH,
     DIR,
     DYNAM,
@@ -147,7 +159,6 @@ enum ClassId {
     BARLINE_ATTR_RIGHT,
     BEAM,
     BEATRPT,
-    BRACKET,
     BTREM,
     CHORD,
     CLEF,
@@ -156,6 +167,7 @@ enum ClassId {
     DOTS,
     FLAG,
     FTREM,
+    HALFMRPT,
     KEYSIG,
     LIGATURE,
     MENSUR,
@@ -168,7 +180,6 @@ enum ClassId {
     NC,
     NOTE,
     NEUME,
-    TUPLET_NUM,
     PROPORT,
     REST,
     SPACE,
@@ -177,6 +188,8 @@ enum ClassId {
     SYLLABLE,
     TIMESTAMP_ATTR,
     TUPLET,
+    TUPLET_BRACKET,
+    TUPLET_NUM,
     VERSE,
     LAYER_ELEMENT_max,
     // Ids for ScoreDefElement child classes
@@ -227,10 +240,11 @@ enum InterfaceId {
 
 class Alignment;
 class Arpeg;
-class AttComparison;
+class ClassIdComparison;
 class BeamElementCoord;
 class BoundingBox;
 class Comparison;
+class CurveSpannedElement;
 class FloatingPositioner;
 class GraceAligner;
 class InterfaceComparison;
@@ -263,11 +277,13 @@ typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmen
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
+typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
+
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 
-typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
+typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
 
@@ -376,6 +392,22 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define VRV_TEXT_E551 0xE551
 #define VRV_TEXT_E552 0xE552
 
+/**
+ * SMUFL Symbols used in figured bass included in VerovioText
+ */
+
+#define VRV_TEXT_HARM                                                                                                  \
+    L"\u266D\u266E\u266F\uEA50\uEA51\uEA52\uEA53\uEA54\uEA55\uEA56\uEA57\uEA58\uEA59\uEA5A\uEA5B\uEA5C\uEA5D\uEA5E"    \
+    L"\uEA5F\uEA60\uEA61\uEA62\uECC0"
+
+//----------------------------------------------------------------------------
+// data.LINEWIDTHTERM factors
+//----------------------------------------------------------------------------
+
+#define LINEWIDTHTERM_factor_narrow 0.5
+#define LINEWIDTHTERM_factor_medium 2.0
+#define LINEWIDTHTERM_factor_wide 4.0
+
 //----------------------------------------------------------------------------
 // Types for editorial element
 //----------------------------------------------------------------------------
@@ -458,6 +490,12 @@ enum {
     POSITION_MIDDLE = 3,
     POSITION_BOTTOM = 6,
 };
+
+//----------------------------------------------------------------------------
+// Bounding box access
+//----------------------------------------------------------------------------
+
+enum Accessor { SELF = 0, CONTENT };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

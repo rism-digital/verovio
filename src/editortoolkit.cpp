@@ -16,6 +16,7 @@
 //--------------------------------------------------------------------------------
 
 #include "clef.h"
+#include "comparison.h"
 #include "custos.h"
 #include "layer.h"
 #include "measure.h"
@@ -278,7 +279,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         // Get components of neume
-        AttComparison ac(NC);
+        ClassIdComparison ac(NC);
         ArrayOfObjects objects;
         neume->FindAllChildByComparison(&objects, &ac);
         for (auto it = objects.begin(); it != objects.end(); ++it) {
@@ -317,13 +318,13 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         //Get components of syllable
-        AttComparison ac(NEUME);
+        ClassIdComparison ac(NEUME);
         ArrayOfObjects neumes;
         syllable->FindAllChildByComparison(&neumes, &ac);
         for (auto it = neumes.begin(); it != neumes.end(); ++it) {
             Neume *neume = dynamic_cast<Neume *>(*it);
             assert(neume);
-            AttComparison ac(NC);
+            ClassIdComparison ac(NC);
             ArrayOfObjects ncs;
             neume->FindAllChildByComparison(&ncs, &ac);
             for (auto it = ncs.begin(); it != ncs.end(); ++it) {
@@ -479,7 +480,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     // Find closest valid staff
     if (staffId == "auto") {
         ArrayOfObjects staves;
-        AttComparison ac(STAFF);
+        ClassIdComparison ac(STAFF);
         m_doc->FindAllChildByComparison(&staves, &ac);
 
         ClosestBB comp;
@@ -523,7 +524,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
         // Find index to insert new staff
         ArrayOfObjects staves;
-        AttComparison ac(STAFF);
+        ClassIdComparison ac(STAFF);
         parent->FindAllChildByComparison(&staves, &ac);
         staves.push_back(newStaff);
         StaffSort staffSort;
@@ -705,7 +706,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
         // Ensure children of this clef keep their position if it is NOT the first clef in the file.
         ArrayOfObjects clefs;
-        AttComparison ac(CLEF);
+        ClassIdComparison ac(CLEF);
         m_doc->GetDrawingPage()->FindAllChildByComparison(&clefs, &ac);
         if (clefs.size() == 0) {
             LogError("Something went wrong. Clef does not appear to be inserted.");
@@ -1361,7 +1362,7 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
     Nc *firstChild, *prevNc;
 
     //Get children of neume. Keep the first child and delete the others.
-    AttComparison ac(NC);
+    ClassIdComparison ac(NC);
     ArrayOfObjects children;
     el->FindAllChildByComparison(&children, &ac);
     for (auto it = children.begin(); it != children.end(); ++it) {

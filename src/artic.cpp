@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
@@ -24,7 +24,8 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
+std::vector<data_ARTICULATION> Artic::s_outStaffArtic
+    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
 
 std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
     = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
@@ -148,7 +149,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             case ARTICULATION_stacciss: return SMUFL_E4A9_articStaccatissimoWedgeBelow;
             case ARTICULATION_marc: return SMUFL_E4AD_articMarcatoBelow;
             // Removed in MEI 4.0
-            //case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
+            // case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
             case ARTICULATION_spicc: return SMUFL_E4A7_articStaccatissimoBelow;
             //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
@@ -156,7 +157,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             //
             // Removed in MEI 4.0
-            //case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
+            // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
             default: return 0; break;
         }
@@ -231,7 +232,7 @@ bool ArticPart::AlwaysAbove()
     return false;
 }
 
-void ArticPart::AddSlurPositioner(FloatingPositioner *positioner, bool start)
+void ArticPart::AddSlurPositioner(FloatingCurvePositioner *positioner, bool start)
 {
     if (start) {
         if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
@@ -470,10 +471,10 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
 
-    std::vector<FloatingPositioner *>::iterator iter;
+    std::vector<FloatingCurvePositioner *>::iterator iter;
     for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); ++iter) {
-        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
-        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        // if (this->Encloses((*iter)->m_points[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), CONTENT, params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
             this->SetDrawingYRel(this->GetDrawingYRel() + shift);
             // this->SetColor("red");
@@ -481,8 +482,8 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
     }
 
     for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); ++iter) {
-        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
-        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        // if (this->Encloses((*iter)->m_points[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), CONTENT, params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
             this->SetDrawingYRel(this->GetDrawingYRel() + shift);
             // this->SetColor("green");

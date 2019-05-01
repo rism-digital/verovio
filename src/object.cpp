@@ -19,6 +19,7 @@
 #include "boundary.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -85,7 +86,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
-    m_isReferencObject = object.m_isReferencObject;
+    m_isReferenceObject = object.m_isReferenceObject;
 
     // Also copy attribute classes
     m_attClasses = object.m_attClasses;
@@ -123,7 +124,7 @@ Object &Object::operator=(const Object &object)
         // Flags
         m_isAttribute = object.m_isAttribute;
         m_isModified = true;
-        m_isReferencObject = object.m_isReferencObject;
+        m_isReferenceObject = object.m_isReferenceObject;
 
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
@@ -159,7 +160,7 @@ void Object::Init(std::string classid)
     // Flags
     m_isAttribute = false;
     m_isModified = true;
-    m_isReferencObject = false;
+    m_isReferenceObject = false;
 
     this->GenerateUuid();
 
@@ -177,7 +178,7 @@ void Object::SetAsReferenceObject()
 {
     assert(m_children.empty());
 
-    m_isReferencObject = true;
+    m_isReferenceObject = true;
 }
 
 void Object::Reset()
@@ -269,7 +270,7 @@ void Object::SwapUuid(Object *other)
 
 void Object::ClearChildren()
 {
-    if (m_isReferencObject) {
+    if (m_isReferenceObject) {
         m_children.clear();
         return;
     }
@@ -293,7 +294,7 @@ int Object::GetChildCount(const ClassId classId) const
 int Object::GetChildCount(const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
-    AttComparison matchClassId(classId);
+    ClassIdComparison matchClassId(classId);
     this->FindAllChildByComparison(&objects, &matchClassId);
     return (int)objects.size();
 }
@@ -361,7 +362,7 @@ Object *Object::GetNext(Object *child, const ClassId classId)
     }
     return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;
 }
-    
+
 Object *Object::GetPrevious(Object *child, const ClassId classId)
 {
     ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
@@ -461,7 +462,7 @@ Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
 
 Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 {
-    AttComparison comparison(classId);
+    ClassIdComparison comparison(classId);
     return FindChildByComparison(&comparison, deepness, direction);
 }
 
@@ -516,7 +517,9 @@ bool Object::DeleteChild(Object *child)
     auto it = std::find(m_children.begin(), m_children.end(), child);
     if (it != m_children.end()) {
         m_children.erase(it);
-        delete child;
+        if (!m_isReferenceObject) {
+            delete child;
+        }
         this->Modify();
         return true;
     }
@@ -602,6 +605,21 @@ int Object::GetChildIndex(const Object *child)
     ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, ++i) {
+        if (child == *iter) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int Object::GetChildIndex(const Object *child, const ClassId classId, int deepth)
+{
+    ArrayOfObjects objects;
+    ClassIdComparison matchClassId(classId);
+    this->FindAllChildByComparison(&objects, &matchClassId);
+    ArrayOfObjects::iterator iter;
+    int i;
+    for (iter = objects.begin(), i = 0; iter != objects.end(); ++iter, ++i) {
         if (child == *iter) {
             return i;
         }
@@ -730,7 +748,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                     // if yes, we will use it (*comparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    AttComparison *attComparison = dynamic_cast<AttComparison *>(*comparisonIter);
+                    ClassIdComparison *attComparison = dynamic_cast<ClassIdComparison *>(*comparisonIter);
                     assert(attComparison);
                     if (o->GetClassId() == attComparison->GetType()) {
                         hasComparison = true;
@@ -893,6 +911,9 @@ std::wstring TextListInterface::GetText(Object *node)
     std::wstring concatText;
     const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
     for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+        if ((*it)->Is(LB)) {
+            continue;
+        }
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
@@ -900,12 +921,32 @@ std::wstring TextListInterface::GetText(Object *node)
     return concatText;
 }
 
+void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &lines)
+{
+    // alternatively we could cache the concatString in the interface and instantiate it in FilterList
+    std::wstring concatText;
+    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+        if ((*it)->Is(LB) && !concatText.empty()) {
+            lines.push_back(concatText);
+            concatText.clear();
+            continue;
+        }
+        Text *text = dynamic_cast<Text *>(*it);
+        assert(text);
+        concatText += text->GetText();
+    }
+    if (!concatText.empty()) {
+        lines.push_back(concatText);
+    }
+}
+
 void TextListInterface::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
     while (iter != childList->end()) {
-        if (!(*iter)->Is(TEXT)) {
-            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+        if (!(*iter)->Is({ LB, TEXT })) {
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
             iter = childList->erase(iter);
             continue;
         }
@@ -1082,11 +1123,11 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         i->first->SetNextLink(this);
         params->m_nextUuidPairs.erase(i);
     }
-    
+
     // @sameas
     std::string sameas = this->GetUuid();
     auto j = std::find_if(params->m_sameasUuidPairs.begin(), params->m_sameasUuidPairs.end(),
-                          [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+        [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
     if (j != params->m_sameasUuidPairs.end()) {
         j->first->SetSameasLink(this);
         params->m_sameasUuidPairs.erase(j);

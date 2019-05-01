@@ -28,8 +28,10 @@
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
+#include "f.h"
 #include "ftrem.h"
 #include "functorparams.h"
+#include "halfmrpt.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -65,7 +67,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     if (element->HasSameas()) {
         dc->StartGraphic(element, "", element->GetUuid());
         element->SetEmptyBB();
@@ -124,6 +126,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(FLAG)) {
         DrawFlag(dc, element, layer, staff, measure);
     }
+    else if (element->Is(HALFMRPT)) {
+        DrawHalfmRpt(dc, element, layer, staff, measure);
+    }
     else if (element->Is(KEYSIG)) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
@@ -180,6 +185,16 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(TUPLET_BRACKET)) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        layer->AddToDrawingList(element);
+    }
+    else if (element->Is(TUPLET_NUM)) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        layer->AddToDrawingList(element);
     }
     else if (element->Is(VERSE)) {
         DrawVerse(dc, element, layer, staff, measure);
@@ -546,17 +561,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
-    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    if (chord->HasCrossStaff()) {
-        SetAlignmentPitchPosParams setAlignmentPitchPosParams(this->m_doc);
-        Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-        chord->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
-
-        CalcStemParams calcStemParams(this->m_doc);
-        Functor calcStem(&Object::CalcStem);
-        chord->Process(&calcStem, &calcStemParams);
-    }
-
     chord->ResetDrawingList();
 
     /************ Draw children (notes, accidentals, etc) ************/
@@ -851,6 +855,27 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     wchar_t code = flag->GetSmuflCode(stem->GetDrawingStemDir());
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    HalfmRpt *halfmRpt = dynamic_cast<HalfmRpt *>(element);
+    assert(halfmRpt);
+
+    int x = halfmRpt->GetDrawingX();
+    x += m_doc->GetGlyphWidth(SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false) / 2;
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    DrawMRptPart(dc, x, SMUFL_E500_repeat1Bar, 0, false, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -1326,9 +1351,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
-    // assert(false);
-    syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1);
     syl->SetDrawingYRel(GetSylYRel(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
@@ -1369,28 +1391,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->ReactivateGraphic();
     dc->EndGraphic(syl, this);
-}
-
-void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert(dc);
-    assert(element);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(element);
-    assert(tuplet);
-
-    dc->StartGraphic(element, "", element->GetUuid());
-
-    // Draw the inner elements
-    DrawLayerChildren(dc, tuplet, layer, staff, measure);
-
-    // Add to the list of postponed element
-    layer->AddToDrawingList(tuplet);
-
-    dc->EndGraphic(element, this);
 }
 
 void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1579,6 +1579,37 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
 //----------------------------------------------------------------------------
 // Calculation or preparation methods
 ///----------------------------------------------------------------------------
+
+int View::GetFYRel(F *f, Staff *staff)
+{
+    assert(f && staff);
+
+    int y = staff->GetDrawingY();
+
+    StaffAlignment *alignment = staff->GetAlignment();
+    // Something must be seriously wrong...
+    if (!alignment) return y;
+
+    y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
+
+    FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
+    // There is no other harm, we use the bottom line.
+    if (!positioner) return y;
+
+    y = positioner->GetDrawingY();
+
+    Object *fb = f->GetFirstParent(FB);
+    assert(fb);
+    int line = fb->GetChildIndex(f, FIGURE, UNLIMITED_DEPTH);
+
+    if (line > 0) {
+        FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        int lineHeight = m_doc->GetTextLineHeight(fFont, false);
+        y -= (line * lineHeight);
+    }
+
+    return y;
+}
 
 int View::GetSylYRel(Syl *syl, Staff *staff)
 {

@@ -40,17 +40,17 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
-    
+
     Staff *beamStaff = staff;
     if (beam->GetBeamWith() == OTHERSTAFF_below) {
-        beamStaff = dynamic_cast<Staff*>(measure->GetNext(staff, STAFF));
+        beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
         if (beamStaff == NULL) {
             LogError("Cannot access staff below for beam '%s'", beam->GetUuid().c_str());
             beamStaff = staff;
         }
     }
     else if (beam->GetBeamWith() == OTHERSTAFF_above) {
-        beamStaff = dynamic_cast<Staff*>(measure->GetPrevious(staff, STAFF));
+        beamStaff = dynamic_cast<Staff *>(measure->GetPrevious(staff, STAFF));
         if (beamStaff == NULL) {
             LogError("Cannot access staff above for beam '%s'", beam->GetUuid().c_str());
             beamStaff = staff;
@@ -360,7 +360,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw
     // only one bar and the others will be drawn separately.
-    fullBars = fTrem->GetSlash();
+    fullBars = fTrem->GetBeams();
 
     // Adjust the x position of the first and last element for taking into account the stem width
     firstElement->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;

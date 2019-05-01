@@ -24,7 +24,21 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MEIHUM, ESAC, MIDI, TIMEMAP };
+enum FileFormat {
+    UNKNOWN = 0,
+    AUTO,
+    MEI,
+    HUMDRUM,
+    PAE,
+    ABC,
+    DARMS,
+    MUSICXML,
+    MUSICXMLHUM,
+    MEIHUM,
+    ESAC,
+    MIDI,
+    TIMEMAP
+};
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -197,6 +211,12 @@ public:
      * Returns 0 if no element is found.
      */
     int GetTimeForElement(const std::string &xmlId);
+
+    /**
+     * Return MIDI values of the element with the ID (xml:id).
+     * RenderToMidi() must be called prior to using this method.
+     */
+    std::string GetMIDIValuesForElement(const std::string &xmlId);
 
     /**
      * @name Set and get the scale
