@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "Comparison.h"
+#include "comparison.h"
 #include "object.h"
 #include "vrv.h"
 
