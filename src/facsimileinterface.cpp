@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        facsimileinterface.cpp
-// Author:      Juliette Regimbal 
+// Author:      Juliette Regimbal
 // Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -63,5 +63,16 @@ int FacsimileInterface::GetSurfaceY() const
     else {
         return surface->GetMaxY();
     }
+}
+
+void FacsimileInterface::SetZone(Zone *zone)
+{
+    if (m_zone != nullptr) {
+        Object *parent = m_zone->GetParent();
+        if (!parent->DeleteChild(m_zone)) {
+            printf("Failed to delete zone with ID %s\n", m_zone->GetUuid().c_str());
+        }
+    }
+    m_zone = zone;
 }
 }

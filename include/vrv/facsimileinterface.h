@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        facsimileinterface.h
-// Author:      Juliette Regimbal 
+// Author:      Juliette Regimbal
 // Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,7 @@ class Zone;
 class View;
 
 //----------------------------------------------------------------------------
-// FacsimileInterface 
+// FacsimileInterface
 //----------------------------------------------------------------------------
 
 class FacsimileInterface : public Interface, public AttFacsimile {
@@ -31,7 +31,7 @@ public:
     virtual void Reset();
     virtual InterfaceId IsInterface() { return INTERFACE_FACSIMILE; }
     ///@}
-    
+
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
 
@@ -39,18 +39,16 @@ public:
 
     /** Check if the object has a facsimile */
     bool HasFacsimile() { return this->HasFacs(); }
-   
+
     /** Set the zone */
-    ///@{
-    void SetZone(Zone *zone) { m_zone = zone; }
-    ///@}
-    
+    void SetZone(Zone *zone);
+
     int GetSurfaceY() const;
-    
+
     /** Get the zone */
     Zone *GetZone() { return m_zone; }
 private:
-    Zone *m_zone;
+    Zone *m_zone = nullptr;
 };
 }
 #endif

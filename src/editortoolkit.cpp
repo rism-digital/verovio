@@ -1096,6 +1096,20 @@ bool EditorToolkit::Remove(std::string elementId)
     Object *parent = obj->GetParent();
     assert(parent);
     m_editInfo = elementId;
+    // Remove Zone for element (if any)
+    InterfaceComparison ic(INTERFACE_FACSIMILE);
+    ArrayOfObjects fiChildren;
+    obj->FindAllChildByComparison(&fiChildren, &ic);
+    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(obj);
+    if (fi != nullptr && fi->HasFacs()) {
+        fi->SetZone(nullptr);
+    }
+    for (auto it = fiChildren.begin(); it != fiChildren.end(); ++it) {
+        fi = dynamic_cast<FacsimileInterface *>(*it);
+        if (fi != nullptr && fi->HasFacs()) {
+            fi->SetZone(nullptr);
+        }
+    }
     result = parent->DeleteChild(obj);
     if (isNeume && result) {
         if (!parent->Is(SYLLABLE)) {
@@ -1107,6 +1121,11 @@ bool EditorToolkit::Remove(std::string elementId)
             obj = parent;
             parent = parent->GetParent();
             if (parent == nullptr) { LogMessage("Null parent!"); return false; }
+            // Remove Zone for element (if any)
+            fi = dynamic_cast<FacsimileInterface *>(obj);
+            if (fi != nullptr && fi->HasFacs()) {
+                fi->SetZone(nullptr);
+            }
             result &= parent->DeleteChild(obj);
         }
     }
