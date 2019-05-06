@@ -1018,8 +1018,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             scoreDef->SetKeySig(KEYSIGNATURE_mixed);
         }
         if (key.node().select_node("mode")) {
-            scoreDef->SetKeyMode(scoreDef->AttKeySigDefaultLog::StrToMode(
-                key.node().select_node("mode").node().text().as_string()));
+            scoreDef->SetKeyMode(
+                scoreDef->AttKeySigDefaultLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
         }
         if (time) {
             std::string symbol = time.node().attribute("symbol").as_string();

@@ -63,10 +63,7 @@ namespace musicxml {
 
     class OpenSlur {
     public:
-        OpenSlur(int number)
-        {
-            m_number = number;
-        }
+        OpenSlur(int number) { m_number = number; }
 
         int m_number;
     };
@@ -78,7 +75,7 @@ namespace musicxml {
             m_measureNum = measureNum;
             m_number = number;
         }
-        
+
         std::string m_measureNum;
         int m_number;
     };
