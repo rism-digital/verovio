@@ -91,6 +91,18 @@ namespace musicxml {
         int m_dirN;
         std::string m_endID;
     };
+    
+    class EndingInfo{
+    public:
+        EndingInfo(std:string endingNumber, std:string endingType)
+        {
+            m_endingNumber = endingNumber;
+            m_endingType = endingType;
+        }
+        
+        std::string m_endingNumber;
+        std::string m_endingType;
+    }
 
 } // namespace musicxml
 
