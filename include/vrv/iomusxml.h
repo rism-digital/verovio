@@ -295,6 +295,8 @@ private:
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
+    /* The stack of endings to be inserted at the end of XML import */
+    std::vector<std::pair<Measure *, musicxml::EndingInfo> > m_endingStack;
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
