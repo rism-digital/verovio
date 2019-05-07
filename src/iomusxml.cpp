@@ -188,6 +188,13 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     else {
         LogWarning("MusicXML import: Measures should be added in the right order");
     }
+    
+    // add this measure to `m_endingStack` if within an ending
+    if (!m_endingStack.empty()) {
+        if (m_endingStack.back().second.m_endingType == "start" && m_endingStack.back().first.back()->GetUuid() != measure->GetUuid()) {
+            m_endingStack.back().first.push_back(measure);
+        }
+    }
 }
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
@@ -589,6 +596,20 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             continue;
         }
         measure->AddChild(iter->second);
+    }
+    
+    // manage endings stack
+    if (!m_endingStack.empty()) {
+        LogMessage("\nMusixXML import for endings: ");
+        std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter;
+        for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
+            LogMessage("Ending number='%s', endType='%s'", iter->second.m_endingNumber.c_str(), iter->second.m_endingType.c_str());
+            std::vector<Measure * > measureList = iter->first;
+            for (std::vector<Measure *>::iterator jter = measureList.begin(); jter != measureList.end(); ++jter) {
+                LogMessage("   Measure number id: '%s'", (*jter)->GetUuid().c_str());
+            }
+        }
+        m_slurStack.clear();
     }
 
     if (!m_tieStack.empty()) {
@@ -1110,9 +1131,35 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             measure->SetRight(barRendition);
         }
     }
+    // parse endings
     pugi::xpath_node ending = node.select_node("ending");
     if (ending) {
-        LogWarning("MusicXML import: Endings not supported");
+        std::string endingNumber = ending.node().attribute("number").as_string();
+        std::string endingType = ending.node().attribute("type").as_string();
+        LogMessage("MusicXML import: Ending number/type: %s/%s.", endingNumber.c_str(), endingType.c_str());
+        if (endingType == "start") {
+            LogMessage("MusicXML import: endingStack size: %d.", m_endingStack.size());
+            if (m_endingStack.empty() || (!m_endingStack.empty() && m_endingStack.end()->second.m_endingNumber != endingNumber)) {
+                musicxml::EndingInfo endingInfo(endingNumber, endingType);
+                std::vector<Measure *> measureList;
+                measureList.push_back(measure);
+                m_endingStack.push_back(std::make_pair(measureList, endingInfo));
+                LogMessage("MusicXML import: Ending line added to endingStack (number/type/measureNo): %s/%s/%d",
+                           m_endingStack.back().second.m_endingNumber.c_str(),
+                           m_endingStack.back().second.m_endingType.c_str(),
+                           m_endingStack.back().first.size());
+            }
+        }
+        else if (endingType == "stop" || endingType == "discontinue") {
+            m_endingStack.back().second.SetEndingType(endingType);
+            if (m_endingStack.back().first.back()->GetUuid() != measure->GetUuid()) {
+                m_endingStack.back().first.push_back(measure);
+            }
+            LogMessage("MusicXML import: Ending line updated in endingStack (number/type/measureNo): %s/%s/%d",
+                       m_endingStack.back().second.m_endingNumber.c_str(),
+                       m_endingStack.back().second.m_endingType.c_str(),
+                       m_endingStack.back().first.size());
+       }
     }
     // fermatas
     pugi::xpath_node xmlFermata = node.select_node("fermata");

@@ -92,18 +92,20 @@ namespace musicxml {
         std::string m_endID;
     };
     
-    class EndingInfo{
+    class EndingInfo {
     public:
-        EndingInfo(std:string endingNumber, std:string endingType)
+        EndingInfo(std::string endingNumber, std::string endingType)
         {
             m_endingNumber = endingNumber;
             m_endingType = endingType;
         }
         
+        void SetEndingType(std::string endingType) { m_endingType = endingType; }
+        
         std::string m_endingNumber;
         std::string m_endingType;
-    }
-
+    };
+   
 } // namespace musicxml
 
 //----------------------------------------------------------------------------
@@ -215,8 +217,7 @@ private:
      * @name Methods for opening and closing ties and slurs.
      * Opened ties and slurs are stacked together with musicxml::OpenTie
      * and musicxml::OpenSlur objects.
-     * For now: only slurs starting and ending on the same staff/voice are
-     * supported
+     * Slur starts and ends are matched based on its number.
      */
     ///@{
     void OpenTie(Staff *staff, Note *note, Tie *tie);
@@ -296,7 +297,7 @@ private:
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
     /* The stack of endings to be inserted at the end of XML import */
-    std::vector<std::pair<Measure *, musicxml::EndingInfo> > m_endingStack;
+    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
