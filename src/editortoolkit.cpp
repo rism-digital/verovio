@@ -1233,10 +1233,12 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                 return false;
             }
         }
-        try {
-            parents.at(el->GetParent()) += 1;
-        } catch (const std::out_of_range e) {
+        auto possibleEntry = parents.find(el->GetParent());
+        if (possibleEntry == parents.end()) {
             parents.emplace(el->GetParent(), 1);
+        }
+        else {
+            possibleEntry->second += 1;
         }
         elements.insert(el);
     }
