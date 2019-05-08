@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "attconverter.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "breath.h"
@@ -24,6 +25,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "ending.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -601,16 +603,27 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // manage endings stack
     if (!m_endingStack.empty()) {
         LogMessage("\nMusixXML import for endings: ");
-        std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter;
-        for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
+        std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter = m_endingStack.begin();
+        Object *section = iter->first.front()->GetParent();
+        LogMessage("Section %s with %d children.", section->GetUuid().c_str(), section->GetChildCount());
+        for ( ; iter != m_endingStack.end(); ++iter) {
             LogMessage("Ending number='%s', endType='%s'", iter->second.m_endingNumber.c_str(), iter->second.m_endingType.c_str());
             std::vector<Measure * > measureList = iter->first;
             std::vector<Measure *>::iterator jter = measureList.begin();
-            Object *section = (*jter)->GetParent();
-            LogMessage("Section %s.", section->GetUuid().c_str());
-            // XXX continue here... Ending ending = Ending();
+            
+            Ending *ending = new Ending();
+            ending->SetN(iter->second.m_endingNumber);
+            //ending->SetLendsym(StrToLinestartendsymbol(iter->second.m_endingType, false));
+            section->ReplaceChild(measureList.front(), ending);
+            ending->AddChild(measureList.front());
             for (; jter != measureList.end(); ++jter) {
                 LogMessage("   Measure id: '%s'", (*jter)->GetUuid().c_str());
+                if ((*jter)->GetUuid() != measureList.front()->GetUuid()) {
+                    int idx = section->GetChildIndex(*jter);
+                    LogMessage("This measure should be moved: %s from section(%d) to ...", (*jter)->GetUuid().c_str(), idx);
+                    section->DetachChild(idx);
+                    ending->AddChild(*jter);
+                }
             }
         }
         m_slurStack.clear();
@@ -1135,7 +1148,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             measure->SetRight(barRendition);
         }
     }
-    // parse endings
+    // parse endings (prima volta, seconda volta...)
     pugi::xpath_node ending = node.select_node("ending");
     if (ending) {
         std::string endingNumber = ending.node().attribute("number").as_string();
