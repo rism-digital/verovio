@@ -605,8 +605,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
             LogMessage("Ending number='%s', endType='%s'", iter->second.m_endingNumber.c_str(), iter->second.m_endingType.c_str());
             std::vector<Measure * > measureList = iter->first;
-            for (std::vector<Measure *>::iterator jter = measureList.begin(); jter != measureList.end(); ++jter) {
-                LogMessage("   Measure number id: '%s'", (*jter)->GetUuid().c_str());
+            std::vector<Measure *>::iterator jter = measureList.begin();
+            Object *section = (*jter)->GetParent();
+            LogMessage("Section %s.", section->GetUuid().c_str());
+            // XXX continue here... Ending ending = Ending();
+            for (; jter != measureList.end(); ++jter) {
+                LogMessage("   Measure id: '%s'", (*jter)->GetUuid().c_str());
             }
         }
         m_slurStack.clear();
