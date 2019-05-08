@@ -100,8 +100,6 @@ namespace musicxml {
             m_endingType = endingType;
         }
 
-        void SetEndingType(std::string endingType) { m_endingType = endingType; }
-
         std::string m_endingNumber;
         std::string m_endingType;
     };

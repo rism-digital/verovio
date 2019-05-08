@@ -626,12 +626,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     section->DetachChild(idx);
                     ending->AddChild(*jter);
                 }
-                if (*jter == measureList.back()) {
-                    logString = logString + ").";
-                }
-                else {
-                    logString = logString + ", ";
-                }
+                logString = logString + ((*jter == measureList.back()) ? ")." : ", ");
             }
             LogMessage(logString.c_str());
         }
@@ -1171,7 +1166,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             }
         }
         else if (endingType == "stop" || endingType == "discontinue") {
-            m_endingStack.back().second.SetEndingType(endingType);
+            m_endingStack.back().second.m_endingType = endingType;
             if (NotInEndingStack(measure->GetN())) {
                 m_endingStack.back().first.push_back(measure);
             }
