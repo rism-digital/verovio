@@ -14,7 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "attconverter.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "breath.h"
@@ -608,11 +607,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         for (; iter != m_endingStack.end(); ++iter) {
             std::string logString = "";
             logString = logString + "MusicXML import: Ending number='" + iter->second.m_endingNumber.c_str()
-                + "', type='" + iter->second.m_endingType.c_str() + "' (";
+                + "', type='" + iter->second.m_endingType.c_str() + "', text='" + iter->second.m_endingText + "' (";
             std::vector<Measure *> measureList = iter->first;
             std::vector<Measure *>::iterator jter = measureList.begin();
             Ending *ending = new Ending();
-            ending->SetN(iter->second.m_endingNumber);
+            if (iter->second.m_endingText.empty()) { // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
+                ending->SetN(iter->second.m_endingNumber);
+            } else {
+                ending->SetN(iter->second.m_endingText);
+            }
             ending->SetLendsym(LINESTARTENDSYMBOL_angledown); // default, does not need to be written
             if (iter->second.m_endingType == "discontinue") {
                 ending->SetLendsym(LINESTARTENDSYMBOL_none); // no ending symbol
@@ -1157,9 +1160,11 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     if (ending) {
         std::string endingNumber = ending.node().attribute("number").as_string();
         std::string endingType = ending.node().attribute("type").as_string();
+        std::string endingText = ending.node().text().as_string();
+        // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(), endingText.c_str());
         if (endingType == "start") {
             if (m_endingStack.empty() || (!m_endingStack.empty() && NotInEndingStack(measure->GetN()))) {
-                musicxml::EndingInfo endingInfo(endingNumber, endingType);
+                musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
                 std::vector<Measure *> measureList;
                 measureList.push_back(measure);
                 m_endingStack.push_back(std::make_pair(measureList, endingInfo));

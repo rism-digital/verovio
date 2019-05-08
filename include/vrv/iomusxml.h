@@ -94,14 +94,16 @@ namespace musicxml {
 
     class EndingInfo {
     public:
-        EndingInfo(std::string endingNumber, std::string endingType)
+        EndingInfo(std::string endingNumber, std::string endingType, std::string endingText)
         {
             m_endingNumber = endingNumber;
             m_endingType = endingType;
+            m_endingText = endingText;
         }
 
         std::string m_endingNumber;
         std::string m_endingType;
+        std::string m_endingText;
     };
 
 } // namespace musicxml
