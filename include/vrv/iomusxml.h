@@ -91,7 +91,7 @@ namespace musicxml {
         int m_dirN;
         std::string m_endID;
     };
-    
+
     class EndingInfo {
     public:
         EndingInfo(std::string endingNumber, std::string endingType)
@@ -99,13 +99,13 @@ namespace musicxml {
             m_endingNumber = endingNumber;
             m_endingType = endingType;
         }
-        
+
         void SetEndingType(std::string endingType) { m_endingType = endingType; }
-        
+
         std::string m_endingNumber;
         std::string m_endingType;
     };
-   
+
 } // namespace musicxml
 
 //----------------------------------------------------------------------------
@@ -203,6 +203,13 @@ private:
     bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
     bool IsElement(pugi::xml_node node, std::string name);
     bool HasContentWithValue(pugi::xml_node node, std::string value);
+    ///@}
+
+    /*
+     * @name Helper method to check whether a ending measure number is already present in m_endingStack.
+     */
+    ///@{
+    bool NotInEndingStack(std::string measureN);
     ///@}
 
     /*

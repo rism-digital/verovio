@@ -190,10 +190,11 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     else {
         LogWarning("MusicXML import: Measures should be added in the right order");
     }
-    
+
     // add this measure to `m_endingStack` if within an ending
     if (!m_endingStack.empty()) {
-        if (m_endingStack.back().second.m_endingType == "start" && m_endingStack.back().first.back()->GetUuid() != measure->GetUuid()) {
+        if (m_endingStack.back().second.m_endingType == "start"
+            && m_endingStack.back().first.back()->GetUuid() != measure->GetUuid()) {
             m_endingStack.back().first.push_back(measure);
         }
     }
@@ -599,28 +600,30 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
         measure->AddChild(iter->second);
     }
-    
+
     // manage endings stack
     if (!m_endingStack.empty()) {
-        LogMessage("\nMusixXML import for endings: ");
+        LogMessage("\nMusicXML import for endings: ");
         std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter = m_endingStack.begin();
         Object *section = iter->first.front()->GetParent();
         LogMessage("Section %s with %d children.", section->GetUuid().c_str(), section->GetChildCount());
-        for ( ; iter != m_endingStack.end(); ++iter) {
-            LogMessage("Ending number='%s', endType='%s'", iter->second.m_endingNumber.c_str(), iter->second.m_endingType.c_str());
-            std::vector<Measure * > measureList = iter->first;
+        for (; iter != m_endingStack.end(); ++iter) {
+            LogMessage("Ending number='%s', endType='%s'", iter->second.m_endingNumber.c_str(),
+                iter->second.m_endingType.c_str());
+            std::vector<Measure *> measureList = iter->first;
             std::vector<Measure *>::iterator jter = measureList.begin();
-            
             Ending *ending = new Ending();
             ending->SetN(iter->second.m_endingNumber);
-            //ending->SetLendsym(StrToLinestartendsymbol(iter->second.m_endingType, false));
+            ending->SetLendsym(LINESTARTENDSYMBOL_angledown); // default, does not need to be written
+            if (iter->second.m_endingType == "discontinue") {
+                ending->SetLendsym(LINESTARTENDSYMBOL_none); // no ending symbol
+            }
             section->ReplaceChild(measureList.front(), ending);
             ending->AddChild(measureList.front());
             for (; jter != measureList.end(); ++jter) {
                 LogMessage("   Measure id: '%s'", (*jter)->GetUuid().c_str());
                 if ((*jter)->GetUuid() != measureList.front()->GetUuid()) {
                     int idx = section->GetChildIndex(*jter);
-                    LogMessage("This measure should be moved: %s from section(%d) to ...", (*jter)->GetUuid().c_str(), idx);
                     section->DetachChild(idx);
                     ending->AddChild(*jter);
                 }
@@ -1153,30 +1156,28 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     if (ending) {
         std::string endingNumber = ending.node().attribute("number").as_string();
         std::string endingType = ending.node().attribute("type").as_string();
-        LogMessage("MusicXML import: Ending number/type: %s/%s.", endingNumber.c_str(), endingType.c_str());
+        LogMessage("MusicXML import: Measure n='%s': <Ending number='%s', type='%s'>.", measure->GetN().c_str(),
+            endingNumber.c_str(), endingType.c_str());
         if (endingType == "start") {
-            LogMessage("MusicXML import: endingStack size: %d.", m_endingStack.size());
-            if (m_endingStack.empty() || (!m_endingStack.empty() && m_endingStack.end()->second.m_endingNumber != endingNumber)) {
+            if (m_endingStack.empty() || (!m_endingStack.empty() && NotInEndingStack(measure->GetN()))) {
                 musicxml::EndingInfo endingInfo(endingNumber, endingType);
                 std::vector<Measure *> measureList;
                 measureList.push_back(measure);
                 m_endingStack.push_back(std::make_pair(measureList, endingInfo));
-                LogMessage("MusicXML import: Ending line added to endingStack (number/type/measureNo): %s/%s/%d",
-                           m_endingStack.back().second.m_endingNumber.c_str(),
-                           m_endingStack.back().second.m_endingType.c_str(),
-                           m_endingStack.back().first.size());
+                LogMessage("MusicXML import: Ending line added to endingStack(%d) (number/type/measureNo): %s/%s/%d",
+                    m_endingStack.size(), m_endingStack.back().second.m_endingNumber.c_str(),
+                    m_endingStack.back().second.m_endingType.c_str(), m_endingStack.back().first.size());
             }
         }
         else if (endingType == "stop" || endingType == "discontinue") {
             m_endingStack.back().second.SetEndingType(endingType);
-            if (m_endingStack.back().first.back()->GetUuid() != measure->GetUuid()) {
+            if (NotInEndingStack(measure->GetN())) {
                 m_endingStack.back().first.push_back(measure);
             }
             LogMessage("MusicXML import: Ending line updated in endingStack (number/type/measureNo): %s/%s/%d",
-                       m_endingStack.back().second.m_endingNumber.c_str(),
-                       m_endingStack.back().second.m_endingType.c_str(),
-                       m_endingStack.back().first.size());
-       }
+                m_endingStack.back().second.m_endingNumber.c_str(), m_endingStack.back().second.m_endingType.c_str(),
+                m_endingStack.back().first.size());
+        }
     }
     // fermatas
     pugi::xpath_node xmlFermata = node.select_node("fermata");
@@ -2227,6 +2228,22 @@ std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
         return "ø";
     else
         return "";
+}
+
+bool MusicXmlInput::NotInEndingStack(std::string measureN_)
+{
+    std::string measureN = measureN_;
+    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter;
+    for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
+        std::vector<Measure *> measureList = iter->first;
+        std::vector<Measure *>::iterator jter;
+        for (jter = measureList.begin(); jter != measureList.end(); ++jter) {
+            if ((*jter)->GetN() == measureN) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 } // namespace vrv
