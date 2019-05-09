@@ -270,7 +270,7 @@ int AbcInput::SetBarLine(std::string &musicCode, int i)
     data_BARRENDITION barLine = BARRENDITION_NONE;
     if (i >= 1 && musicCode.at(i - 1) == ':')
         barLine = BARRENDITION_rptend;
-    else if (i + 1 < musicCode.length()) {
+    else if (i + 1 < (int)musicCode.length()) {
         switch (musicCode.at(i + 1)) {
             case ':':
                 barLine = BARRENDITION_rptstart;
@@ -1012,7 +1012,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
     data_GRACE grace = GRACE_NONE;
     Chord *chord = NULL;
 
-    while (i < musicCode.length()) {
+    while (i < (int)musicCode.length()) {
         // eat the input...
 
         if (musicCode.at(i) == '`') {
@@ -1029,7 +1029,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
         }
 
         // endings
-        else if ((i + 2 < musicCode.length()) && musicCode.at(i) == '[' && isdigit(musicCode.at(i + 1))) {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '[' && isdigit(musicCode.at(i + 1))) {
             ++i;
             // Ending *ending = new Ending;
             // ending->SetN(musicCode.at(i));
@@ -1037,7 +1037,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
         }
 
         // inline fields
-        else if ((i + 2 < musicCode.length()) && musicCode.at(i) == '[' && musicCode.at(i + 2) == ':') {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '[' && musicCode.at(i + 2) == ':') {
             ++i;
             char dataKey = musicCode.at(i);
             ++i;
@@ -1079,7 +1079,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
         }
 
         // tuplets
-        else if ((i + 2 < musicCode.length()) && musicCode.at(i) == '(' && isdigit(musicCode.at(i + 1))) {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '(' && isdigit(musicCode.at(i + 1))) {
             LogWarning("ABC input: Tuplets not supported yet");
             // AddTuplet();
         }
@@ -1096,7 +1096,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
         }
 
         // chords
-        else if ((i + 2 < musicCode.length()) && musicCode.at(i) == '[' && musicCode.at(i + 1) != '|') {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '[' && musicCode.at(i + 1) != '|') {
             // start chord
             chord = new Chord();
 
@@ -1128,7 +1128,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
         }
 
         // grace notes
-        else if ((i + 2 < musicCode.length()) && ((musicCode.at(i) == '{') || (musicCode.at(i) == '}'))) {
+        else if ((i + 2 < (int)musicCode.length()) && ((musicCode.at(i) == '{') || (musicCode.at(i) == '}'))) {
             // !to be refined when graceGrp is added!
             // start grace group
             if (musicCode.at(i) == '{') {
@@ -1188,7 +1188,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
             note->SetPname(note->AttPitch::StrToPitchname(std::string(1, tolower(musicCode.at(i)))));
 
             // set octave
-            while (i + 1 < musicCode.length() && (musicCode.at(i + 1) == '\'' || musicCode.at(i + 1) == ',')) {
+            while (i + 1 < (int)musicCode.length() && (musicCode.at(i + 1) == '\'' || musicCode.at(i + 1) == ',')) {
                 if (musicCode.at(i + 1) == ',')
                     oct -= 1;
                 else
@@ -1205,24 +1205,24 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
                 dots = -m_broken;
                 m_broken = 0;
             }
-            while (i + 1 < musicCode.length() && isdigit(musicCode.at(i + 1))) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
                 numStr.push_back(musicCode.at(i));
             }
-            while (i + 1 < musicCode.length() && musicCode.at(i + 1) == '/') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '/') {
                 ++i;
                 numbase *= 2;
             }
-            while (i + 1 < musicCode.length() && isdigit(musicCode.at(i + 1))) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
                 numbaseStr.push_back(musicCode.at(i));
             }
-            while (i + 1 < musicCode.length() && musicCode.at(i + 1) == '>') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
                 ++i;
                 ++m_broken;
                 ++dots;
             }
-            while (i + 1 < musicCode.length() && musicCode.at(i + 1) == '<') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '<') {
                 ++i;
                 --m_broken;
             }
@@ -1320,19 +1320,19 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             int numbase = 1;
-            while (i + 1 < musicCode.length() && isdigit(musicCode.at(i + 1))) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
                 numStr.push_back(musicCode.at(i));
             }
-            while (i + 1 < musicCode.length() && musicCode.at(i + 1) == '/') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '/') {
                 ++i;
                 numbase *= 2;
             }
-            while (i + 1 < musicCode.length() && isdigit(musicCode.at(i + 1))) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
                 numbaseStr.push_back(musicCode.at(i));
             }
-            if (i + 1 < musicCode.length() && musicCode.at(i + 1) == '>') {
+            if (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
                 ++i;
                 LogWarning("ABC input: Broken rhythms not supported");
             }
@@ -1376,24 +1376,24 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
                 dots = -m_broken;
                 m_broken = 0;
             }
-            while (i + 1 < musicCode.length() && isdigit(musicCode.at(i + 1))) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
                 numStr.push_back(musicCode.at(i));
             }
-            while (i + 1 < musicCode.length() && musicCode.at(i + 1) == '/') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '/') {
                 ++i;
                 numbase *= 2;
             }
-            while (i + 1 < musicCode.length() && isdigit(musicCode.at(i + 1))) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
                 numbaseStr.push_back(musicCode.at(i));
             }
-            while (i + 1 < musicCode.length() && musicCode.at(i + 1) == '>') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
                 ++i;
                 ++m_broken;
                 ++dots;
             }
-            while (i + 1 < musicCode.length() && musicCode.at(i + 1) == '<') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '<') {
                 ++i;
                 --m_broken;
             }
@@ -1428,7 +1428,7 @@ void AbcInput::readMusicCode(std::string &musicCode, Section *section)
         else if (musicCode.at(i) == 'Z') {
             MultiRest *multiRest = new MultiRest();
             std::string numString;
-            while (i + 1 < musicCode.length() && isdigit(musicCode.at(i + 1))) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 numString.push_back(musicCode.at(i + 1));
                 ++i;
             }

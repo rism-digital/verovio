@@ -24,6 +24,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "ending.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -187,6 +188,14 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     // there is a gap, this should not happen
     else {
         LogWarning("MusicXML import: Measures should be added in the right order");
+    }
+
+    // add this measure to `m_endingStack` if within an ending
+    if (!m_endingStack.empty()) {
+        if (m_endingStack.back().second.m_endingType == "start"
+            && m_endingStack.back().first.back()->GetUuid() != measure->GetUuid()) {
+            m_endingStack.back().first.push_back(measure);
+        }
     }
 }
 
@@ -589,6 +598,43 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             continue;
         }
         measure->AddChild(iter->second);
+    }
+
+    // manage endings stack: create new <ending> elements and move the corresponding measures into them
+    if (!m_endingStack.empty()) {
+        std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter;
+        for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
+            std::string logString = "";
+            logString = logString + "MusicXML import: Ending number='" + iter->second.m_endingNumber.c_str()
+                + "', type='" + iter->second.m_endingType.c_str() + "', text='" + iter->second.m_endingText + "' (";
+            std::vector<Measure *> measureList = iter->first;
+            Ending *ending = new Ending();
+            if (iter->second.m_endingText.empty()) { // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
+                ending->SetN(iter->second.m_endingNumber);
+            } else {
+                ending->SetN(iter->second.m_endingText);
+            }
+            ending->SetLendsym(LINESTARTENDSYMBOL_angledown); // default, does not need to be written
+            if (iter->second.m_endingType == "discontinue") {
+                ending->SetLendsym(LINESTARTENDSYMBOL_none); // no ending symbol
+            }
+            // replace first <measure> with <ending> element
+            section->ReplaceChild(measureList.front(), ending);
+            // go through measureList of that ending and remove remaining measures from <section> and add them to <ending>
+            std::vector<Measure *>::iterator jter;
+            for (jter = measureList.begin(); jter != measureList.end(); ++jter) {
+                logString = logString + (*jter)->GetUuid().c_str();
+                // remove other measures from <section> that are not already removed above (first measure)
+                if ((*jter)->GetUuid() != measureList.front()->GetUuid()) {
+                    int idx = section->GetChildIndex(*jter);
+                    section->DetachChild(idx);
+                }
+                ending->AddChild(*jter); // add <measure> to <ending>
+                logString = logString + ((*jter == measureList.back()) ? ")." : ", ");
+            }
+            LogMessage(logString.c_str());
+        }
+        m_endingStack.clear();
     }
 
     if (!m_tieStack.empty()) {
@@ -1018,8 +1064,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             scoreDef->SetKeySig(KEYSIGNATURE_mixed);
         }
         if (key.node().select_node("mode")) {
-            scoreDef->SetKeyMode(scoreDef->AttKeySigDefaultLog::StrToMode(
-                key.node().select_node("mode").node().text().as_string()));
+            scoreDef->SetKeyMode(
+                scoreDef->AttKeySigDefaultLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
         }
         if (time) {
             std::string symbol = time.node().attribute("symbol").as_string();
@@ -1110,9 +1156,27 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             measure->SetRight(barRendition);
         }
     }
+    // parse endings (prima volta, seconda volta...)
     pugi::xpath_node ending = node.select_node("ending");
     if (ending) {
-        LogWarning("MusicXML import: Endings not supported");
+        std::string endingNumber = ending.node().attribute("number").as_string();
+        std::string endingType = ending.node().attribute("type").as_string();
+        std::string endingText = ending.node().text().as_string();
+        // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(), endingText.c_str());
+        if (endingType == "start") {
+            if (m_endingStack.empty() || (!m_endingStack.empty() && NotInEndingStack(measure->GetN()))) {
+                musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
+                std::vector<Measure *> measureList;
+                measureList.push_back(measure);
+                m_endingStack.push_back(std::make_pair(measureList, endingInfo));
+            }
+        }
+        else if (endingType == "stop" || endingType == "discontinue") {
+            m_endingStack.back().second.m_endingType = endingType;
+            if (NotInEndingStack(measure->GetN())) {
+                m_endingStack.back().first.push_back(measure);
+            }
+        }
     }
     // fermatas
     pugi::xpath_node xmlFermata = node.select_node("fermata");
@@ -2163,6 +2227,17 @@ std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
         return "ø";
     else
         return "";
+}
+
+bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
+{
+    for (auto &endingItem : m_endingStack) {
+        for (auto &measure : endingItem.first) {
+            if (measure->GetN() == measureN)
+                return false;
+        }
+    }
+    return true;
 }
 
 } // namespace vrv
