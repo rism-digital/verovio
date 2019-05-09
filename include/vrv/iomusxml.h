@@ -49,7 +49,7 @@ namespace musicxml {
 
     class OpenTie {
     public:
-        OpenTie(int staffN, data_PITCHNAME pname, char oct)
+        OpenTie(const int &staffN, const data_PITCHNAME &pname, const char &oct)
         {
             m_staffN = staffN;
             m_pname = pname;
@@ -63,14 +63,14 @@ namespace musicxml {
 
     class OpenSlur {
     public:
-        OpenSlur(int number) { m_number = number; }
+        OpenSlur(const int &number) { m_number = number; }
 
         int m_number;
     };
 
     class CloseSlur {
     public:
-        CloseSlur(std::string measureNum, int number)
+        CloseSlur(const std::string &measureNum, const int &number)
         {
             m_measureNum = measureNum;
             m_number = number;
@@ -82,7 +82,7 @@ namespace musicxml {
 
     class OpenHairpin {
     public:
-        OpenHairpin(int dirN, std::string endID)
+        OpenHairpin(const int &dirN, const std::string &endID)
         {
             m_dirN = dirN;
             m_endID = endID;
@@ -94,7 +94,7 @@ namespace musicxml {
 
     class EndingInfo {
     public:
-        EndingInfo(std::string const &endingNumber, std::string const &endingType, std::string const &endingText)
+        EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
         {
             m_endingNumber = endingNumber;
             m_endingType = endingType;

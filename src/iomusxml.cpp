@@ -2229,16 +2229,12 @@ std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
         return "";
 }
 
-bool MusicXmlInput::NotInEndingStack(std::string const &measureN)
+bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
 {
-    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter;
-    for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
-        std::vector<Measure *> measureList = iter->first;
-        std::vector<Measure *>::iterator jter;
-        for (jter = measureList.begin(); jter != measureList.end(); ++jter) {
-            if ((*jter)->GetN() == measureN) {
+    for (auto &endingItem : m_endingStack) {
+        for (auto &measure : endingItem.first) {
+            if (measure->GetN() == measureN)
                 return false;
-            }
         }
     }
     return true;
