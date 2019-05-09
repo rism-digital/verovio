@@ -227,6 +227,7 @@ void AbcInput::parseABC(std::istream &infile)
                 continue;
             }
             measure = dynamic_cast<Measure *>(layer->GetFirstParent(MEASURE));
+            assert(measure);
             measure->AddChild(iter->second);
         }
 
