@@ -600,16 +600,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         measure->AddChild(iter->second);
     }
 
-    // manage endings stack
+    // manage endings stack: create new <ending> elements and move the corresponding measures into them
     if (!m_endingStack.empty()) {
-        std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter = m_endingStack.begin();
-        Object *section = iter->first.front()->GetParent();
-        for (; iter != m_endingStack.end(); ++iter) {
+        std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter;
+        for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
             std::string logString = "";
             logString = logString + "MusicXML import: Ending number='" + iter->second.m_endingNumber.c_str()
                 + "', type='" + iter->second.m_endingType.c_str() + "', text='" + iter->second.m_endingText + "' (";
             std::vector<Measure *> measureList = iter->first;
-            std::vector<Measure *>::iterator jter = measureList.begin();
             Ending *ending = new Ending();
             if (iter->second.m_endingText.empty()) { // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
                 ending->SetN(iter->second.m_endingNumber);
@@ -620,20 +618,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             if (iter->second.m_endingType == "discontinue") {
                 ending->SetLendsym(LINESTARTENDSYMBOL_none); // no ending symbol
             }
+            // replace first <measure> with <ending> element
             section->ReplaceChild(measureList.front(), ending);
-            ending->AddChild(measureList.front());
-            for (; jter != measureList.end(); ++jter) {
+            // go through measureList of that ending and remove remaining measures from <section> and add them to <ending>
+            std::vector<Measure *>::iterator jter;
+            for (jter = measureList.begin(); jter != measureList.end(); ++jter) {
                 logString = logString + (*jter)->GetUuid().c_str();
+                // remove other measures from <section> that are not already removed above (first measure)
                 if ((*jter)->GetUuid() != measureList.front()->GetUuid()) {
                     int idx = section->GetChildIndex(*jter);
                     section->DetachChild(idx);
-                    ending->AddChild(*jter);
                 }
+                ending->AddChild(*jter); // add <measure> to <ending>
                 logString = logString + ((*jter == measureList.back()) ? ")." : ", ");
             }
             LogMessage(logString.c_str());
         }
-        m_slurStack.clear();
+        m_endingStack.clear();
     }
 
     if (!m_tieStack.empty()) {
@@ -2228,9 +2229,8 @@ std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
         return "";
 }
 
-bool MusicXmlInput::NotInEndingStack(std::string measureN_)
+bool MusicXmlInput::NotInEndingStack(std::string const &measureN)
 {
-    std::string measureN = measureN_;
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> >::iterator iter;
     for (iter = m_endingStack.begin(); iter != m_endingStack.end(); ++iter) {
         std::vector<Measure *> measureList = iter->first;

@@ -94,7 +94,7 @@ namespace musicxml {
 
     class EndingInfo {
     public:
-        EndingInfo(std::string endingNumber, std::string endingType, std::string endingText)
+        EndingInfo(std::string const &endingNumber, std::string const &endingType, std::string const &endingText)
         {
             m_endingNumber = endingNumber;
             m_endingType = endingType;
@@ -209,7 +209,7 @@ private:
      * @name Helper method to check whether a ending measure number is already present in m_endingStack.
      */
     ///@{
-    bool NotInEndingStack(std::string measureN);
+    bool NotInEndingStack(std::string const &measureN);
     ///@}
 
     /*
