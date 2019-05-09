@@ -223,6 +223,7 @@ void AbcInput::parseABC(std::istream &infile)
             if (!layer) {
                 LogWarning("ABC input: Element '%s' could not be assigned to layer '%s'",
                     iter->second->GetClassName().c_str(), iter->first.c_str());
+                delete iter->second;
                 continue;
             }
             measure = dynamic_cast<Measure *>(layer->GetFirstParent(MEASURE));
@@ -232,6 +233,7 @@ void AbcInput::parseABC(std::istream &infile)
         score->AddChild(section);
 
         m_doc->ConvertToPageBasedDoc();
+        m_controlElements.clear();
         m_composer.clear();
         m_info.clear();
         m_title.clear();
