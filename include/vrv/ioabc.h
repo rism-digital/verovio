@@ -46,7 +46,7 @@ public:
     virtual ~AbcInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &abc);
+    virtual bool ImportString(const std::string &abc);
 
 #ifndef NO_ABC_SUPPORT
 
@@ -56,7 +56,7 @@ private:
     void parseABC(std::istream &infile);
 
     // parsing functions
-    int SetBarLine(std::string &musicCode, int index);
+    int SetBarLine(const std::string &musicCode, int index);
     void CalcUnitNoteLength();
     void AddAnnot(std::string remark);
     void AddBeam();
@@ -75,7 +75,7 @@ private:
 
     // input functions
     void readInformationField(char dataKey, std::string dataValue);
-    void readMusicCode(std::string &musicCode, Section *section);
+    void readMusicCode(const std::string &musicCode, Section *section);
 
     // decoration functions
     void parseDecoration(std::string decorationString);
