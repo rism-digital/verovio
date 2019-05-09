@@ -101,7 +101,7 @@ bool PaeInput::ImportFile()
     return true;
 }
 
-bool PaeInput::ImportString(std::string const &pae)
+bool PaeInput::ImportString(const std::string &pae)
 {
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);

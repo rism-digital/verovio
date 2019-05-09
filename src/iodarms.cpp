@@ -471,7 +471,7 @@ bool DarmsInput::ImportFile()
     return ImportString(data);
 }
 
-bool DarmsInput::ImportString(std::string const &data_str)
+bool DarmsInput::ImportString(const std::string &data_str)
 {
     int len;
     int res;

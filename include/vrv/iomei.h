@@ -408,7 +408,7 @@ public:
     virtual ~MeiInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &mei);
+    virtual bool ImportString(const std::string &mei);
 
 private:
     bool ReadDoc(pugi::xml_node root);
