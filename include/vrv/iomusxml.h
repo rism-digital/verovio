@@ -49,7 +49,7 @@ namespace musicxml {
 
     class OpenTie {
     public:
-        OpenTie(int staffN, data_PITCHNAME pname, char oct)
+        OpenTie(const int &staffN, const data_PITCHNAME &pname, const char &oct)
         {
             m_staffN = staffN;
             m_pname = pname;
@@ -63,14 +63,14 @@ namespace musicxml {
 
     class OpenSlur {
     public:
-        OpenSlur(int number) { m_number = number; }
+        OpenSlur(const int &number) { m_number = number; }
 
         int m_number;
     };
 
     class CloseSlur {
     public:
-        CloseSlur(std::string measureNum, int number)
+        CloseSlur(const std::string &measureNum, const int &number)
         {
             m_measureNum = measureNum;
             m_number = number;
@@ -82,7 +82,7 @@ namespace musicxml {
 
     class OpenHairpin {
     public:
-        OpenHairpin(int dirN, std::string endID)
+        OpenHairpin(const int &dirN, const std::string &endID)
         {
             m_dirN = dirN;
             m_endID = endID;
@@ -90,6 +90,20 @@ namespace musicxml {
 
         int m_dirN;
         std::string m_endID;
+    };
+
+    class EndingInfo {
+    public:
+        EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
+        {
+            m_endingNumber = endingNumber;
+            m_endingType = endingType;
+            m_endingText = endingText;
+        }
+
+        std::string m_endingNumber;
+        std::string m_endingType;
+        std::string m_endingText;
     };
 
 } // namespace musicxml
@@ -192,6 +206,13 @@ private:
     ///@}
 
     /*
+     * @name Helper method to check whether a ending measure number is already present in m_endingStack.
+     */
+    ///@{
+    bool NotInEndingStack(std::string const &measureN);
+    ///@}
+
+    /*
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
@@ -203,8 +224,7 @@ private:
      * @name Methods for opening and closing ties and slurs.
      * Opened ties and slurs are stacked together with musicxml::OpenTie
      * and musicxml::OpenSlur objects.
-     * For now: only slurs starting and ending on the same staff/voice are
-     * supported
+     * Slur starts and ends are matched based on its number.
      */
     ///@{
     void OpenTie(Staff *staff, Note *note, Tie *tie);
@@ -283,6 +303,8 @@ private:
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
+    /* The stack of endings to be inserted at the end of XML import */
+    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
