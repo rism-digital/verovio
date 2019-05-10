@@ -430,7 +430,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
 
 bool EditorToolkit::Insert(std::string elementType, std::string startid, std::string endid)
 {
-    LogMessage("Insert!");
+    //LogMessage("Insert!");
     if (!m_doc->GetDrawingPage()) return false;
     Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
     Object *end = m_doc->GetDrawingPage()->FindChildByUuid(endid);
@@ -905,6 +905,7 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
 // Update the text of a TextElement by its syl
 bool EditorToolkit::SetText(std::string elementId, std::string text)
 {
+    //LogMessage("using setText method");
     m_editInfo = "";
     std::wstring wtext;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
@@ -919,25 +920,48 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
 
     bool success = false;
     if (element->Is(SYL)) {
+        //LogMessage("matched element->Is(SYL)");
         Syl *syl = dynamic_cast<Syl *>(element);
         assert(syl);
-        for (Object *child = syl->GetFirst(); child != nullptr; child = syl->Object::GetNext()) {
-            if (child->Is(TEXT)) {
-                Text *text = dynamic_cast<Text *>(child);
-                text->SetText(wtext);
-                success = true;
-                break;
-            }
-            else if (child->Is(REND)) {
-                Rend *rend = dynamic_cast<Rend *>(child);
-                Object *rendChild = rend->GetFirst();
-                if (rendChild->Is(TEXT)) {
-                    Text *rendText = dynamic_cast<Text *>(rendChild);
-                    rendText->SetText(wtext);
+        Object *child = syl->GetFirst();
+        if(child == nullptr) {
+            //LogMessage("child is nullptr");
+            Text *text = new Text();
+            //LogMessage("made new text");
+            syl->AddChild(text);
+            //LogMessage("added new text to syl");
+            text->SetText(wtext);
+            //LogMessage("pointed *child to syl->GetFirst()");
+            success = true;
+        }
+        else {
+            while(child != nullptr) {
+                //LogMessage("got inside while loop (there's an element in the list");
+                if (child->Is(TEXT)) {
+                    //LogMessage("matched successfully on Is(TEXT)!!");
+                    Text *text = dynamic_cast<Text *>(child);
+                    text->SetText(wtext);
                     success = true;
+                    break;
                 }
+                else if (child->Is(REND)) {
+                    Rend *rend = dynamic_cast<Rend *>(child);
+                    Object *rendChild = rend->GetFirst();
+                    if (rendChild->Is(TEXT)) {
+                        Text *rendText = dynamic_cast<Text *>(rendChild);
+                        rendText->SetText(wtext);
+                        success = true;
+                    }
+                }
+                /*
+                else {
+                    LogMessage("in the for loop but matched on neither");
+                }
+                */
+                child = syl->Object::GetNext();
             }
         }
+        
     }
     else if (element->Is(SYLLABLE)) {
         Syllable *syllable = dynamic_cast<Syllable *>(element);
@@ -1194,11 +1218,9 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
     }
     ClassId elementClass;
     if (groupType == "nc") {
-        printf("groupType is nc!");
         elementClass = NC;
     } else if (groupType == "neume") {
         elementClass = NEUME;
-        printf("groupType is neume!");
     } else {
         LogError("Invalid groupType: %s", groupType.c_str());
         return false;
@@ -1383,11 +1405,11 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
             else if(groupType == "neume"){
                 fparent = el->GetFirstParent(SYLLABLE);
-                assert(fparent && LogError("fparent is not syllable"));
+                assert(fparent);
                 sparent = fparent->GetFirstParent(LAYER);
-                assert(sparent && LogError("sparent is not layer"));
+                assert(sparent);
                 currentParent = dynamic_cast<Syllable *>(fparent);
-                assert(currentParent && LogError("dynamic cast fparent to syllable failed"));
+                assert(currentParent);
                 
             }
             else{
@@ -1396,8 +1418,6 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
         }
         else {
-            //std::cout << "cout test";
-            //LogError("logerror test");
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc*>(el);
                 assert(nc);
@@ -1406,7 +1426,6 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
 
             //if the element is a syl then we want to keep it attached to the first node
             if(el->Is(SYL)) {
-                //printf("reached a syl!");
                 continue;
             }
             Object *newParent = currentParent->Clone();
@@ -1414,6 +1433,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             newParent->ClearChildren();
 
             if(newParent->Is(SYLLABLE)) {
+                //LogMessage("newParent is syllable");
                 Syl *syl = new Syl();
                 newParent->AddChild(syl);
             }

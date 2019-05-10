@@ -4031,20 +4031,24 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 
     //if the current parent is a syllable then we need to make sure that a syl got added
     //if not then add a blank one
-
     
+    //LogMessage("about to do the problem code");
     if (strcmp(parentNode.name(), "syllable") == 0) {
+        //LogMessage("strcmp worked");
         auto testSyl = parent->FindChildByType(SYL);
+        //LogMessage("findchildbytype worked");
         if(testSyl == nullptr) {
-            LogMessage("testSyl == nullptr");
-            printf("testSyl == nullptr (printf)");
+            //LogMessage("if statement worked");
             Syl *syl = new Syl();
+            //LogMessage("making new Syl worked");
             parent->AddChild(syl);
+            //LogMessage("adding syl to parent worked");
         }
+        /*
         else {
-            printf("testSyl == something else");
-            LogMessage("testSyl == something else");
+            LogMessage("in the else branch");
         }
+        */
     }
 
 
@@ -4080,8 +4084,6 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
-
-    LogMessage("used other method");
 
     return true;
 }
