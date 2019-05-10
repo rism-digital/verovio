@@ -21,6 +21,7 @@ namespace vrv {
 
 class BarLine;
 class Beam;
+class Clef;
 class ControlElement;
 class Harm;
 class KeySig;
@@ -96,6 +97,8 @@ public:
 private:
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
+    Clef *m_clef = NULL;
+    KeySig *m_key = NULL;
     MeterSig *m_meter = NULL;
     Layer *m_layer = NULL;
 

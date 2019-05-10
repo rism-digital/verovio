@@ -157,12 +157,19 @@ void AbcInput::parseABC(std::istream &infile)
         // create page head
         PrintInformationFields();
         StaffGrp *staffGrp = new StaffGrp();
-        m_doc->m_scoreDef.AddChild(staffGrp);
+        // create staff
         StaffDef *staffDef = new StaffDef();
         staffDef->SetN(1);
         staffDef->SetLines(m_stafflines);
         staffDef->SetTransSemi(m_transpose);
+        if (m_clef) {
+            staffDef->SetClefShape(m_clef->GetShape());
+            staffDef->SetClefLine(m_clef->GetLine());
+            delete m_clef;
+            m_clef = NULL;
+        }
         staffGrp->AddChild(staffDef);
+        m_doc->m_scoreDef.AddChild(staffGrp);
         if (m_meter) {
             m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
             m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
@@ -559,6 +566,7 @@ void AbcInput::parseKey(std::string keyString)
     m_ID = "";
     short int accidNum = 0;
     data_MODE mode = MODE_NONE;
+    m_clef = new Clef();
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
@@ -662,29 +670,30 @@ void AbcInput::parseKey(std::string keyString)
     // tenor: 4; bass: 4.
     // [+8 | -8] - draws '8' above or below the staff. The player will transpose the notes one octave higher or lower.
     if (keyString.find("alto") != std::string::npos) {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
+        m_clef->SetShape(CLEFSHAPE_C);
         i += 4;
-        m_doc->m_scoreDef.SetClefLine(3);
+        m_clef->SetLine(3);
     }
     else if (keyString.find("tenor") != std::string::npos) {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
+        m_clef->SetShape(CLEFSHAPE_C);
         i += 5;
-        m_doc->m_scoreDef.SetClefLine(4);
+        m_clef->SetLine(4);
     }
     else if (keyString.find("bass") != std::string::npos) {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_F);
+        m_clef->SetShape(CLEFSHAPE_F);
         i += 4;
-        m_doc->m_scoreDef.SetClefLine(4);
+        m_clef->SetLine(4);
     }
     else if (keyString.find("perc") != std::string::npos) {
         LogWarning("ABC Input: Drum clef is not supported");
     }
     else if (keyString.find("none") != std::string::npos) {
         i += 4;
+        m_clef->SetShape(CLEFSHAPE_NONE);
     }
     else {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_G);
-        m_doc->m_scoreDef.SetClefLine(2);
+        m_clef->SetShape(CLEFSHAPE_G);
+        m_clef->SetLine(2);
     }
 
     if (keyString.find("transpose=", i) != std::string::npos) {
@@ -1480,6 +1489,12 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
         }
 
         ++i;
+
+        // check if there is a clef change
+        if (m_clef) {
+          m_noteStack.push_back(m_clef);
+          m_clef = NULL;
+        }
 
         // check if there is a change in meter
         if (m_meter) {
