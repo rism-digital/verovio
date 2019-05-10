@@ -34,7 +34,7 @@ my $VEROVIO_ROOT  = "..";
 # Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
 # This can be disabled in the light version, which uses the default memory settings.
-my $FLAGS = "-O3";
+my $FLAGS = "-Os";
 $FLAGS .= " -DNDEBUG";
 $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++11";
@@ -89,7 +89,7 @@ GetOptions (
 
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
-	$FLAGS = "-O3";
+	$FLAGS = "-Os";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
 	$FLAGS .= " -std=c++11";
@@ -107,7 +107,7 @@ if ($wasmQ) {
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1 -s WASM=0";
+	$FLAGS = "-Os -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1 -s WASM=0";
 	$FLAGS_NAME = "-light";
 }
 

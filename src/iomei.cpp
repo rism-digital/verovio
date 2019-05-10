@@ -4028,6 +4028,20 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             LogWarning("Element '%s' is unknown and will be ignored", xmlElement.name());
         }
     }
+
+    //if the current parent is a syllable then we need to make sure that a syl got added
+    //if not then add a blank one
+
+    
+    if (parentNode.name() == "syllable") {
+        auto testSyl = parent->FindChildByType(SYL);
+        if(testSyl == nullptr) {
+            testSyl = new Syl();
+            parent->AddChild(testSyl);
+        }
+    }
+
+
     return success;
 }
 

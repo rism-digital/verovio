@@ -546,6 +546,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
     if (elementType == "nc" || elementType == "grouping") {
         Syllable *syllable = new Syllable();
+        Syl *syl = new Syl();
         Neume *neume = new Neume();
         Nc *nc = new Nc();
         std::string contour = "";
@@ -557,6 +558,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
         neume->AddChild(nc);
         syllable->AddChild(neume);
+        syllable->AddChild(syl);
         layer->AddChild(syllable);
 
         // Find closest valid clef
@@ -1265,6 +1267,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
         }
         else if (elementClass == NEUME) {
             parent = new Syllable();
+            //
         }
         doubleParent->AddChild(parent);
     }
@@ -1377,12 +1380,15 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 assert(currentParent);
             }
             else if(groupType == "neume"){
+                //also here i need to validate data
+                //to check to see if the first element in the vector is a SYL
                 fparent = el->GetFirstParent(SYLLABLE);
-                assert(fparent);
+                assert(fparent && LogError("fparent is not syllable"));
                 sparent = fparent->GetFirstParent(LAYER);
-                assert(sparent);
+                assert(sparent && LogError("sparent is not layer"));
                 currentParent = dynamic_cast<Syllable *>(fparent);
-                assert(currentParent);
+                assert(currentParent && LogError("dynamic cast fparent to syllable failed"));
+                
             }
             else{
                 LogError("Invalid groupType for ungrouping");
@@ -1390,10 +1396,17 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
         }
         else {
+            std::cout << "cout test";
+            LogError("logerror test");
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc*>(el);
                 assert(nc);
                 if (nc->HasLigated()) continue;
+            }
+
+            //here's where I'm gonna try to validate data
+            if(el->Is(SYL)) {
+                continue;
             }
             Object *newParent = currentParent->Clone();
             assert(newParent);
