@@ -786,6 +786,9 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
     }
     m_doc->AddChild(m_mdiv);
 
+    // reset unit note length
+    m_durDefault = DURATION_NONE;
+
     // reset information fields
     m_composer.clear();
     m_history.clear();
