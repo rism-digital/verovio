@@ -4033,11 +4033,17 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     //if not then add a blank one
 
     
-    if (parentNode.name() == "syllable") {
+    if (strcmp(parentNode.name(), "syllable") == 0) {
         auto testSyl = parent->FindChildByType(SYL);
         if(testSyl == nullptr) {
-            testSyl = new Syl();
-            parent->AddChild(testSyl);
+            LogMessage("testSyl == nullptr");
+            printf("testSyl == nullptr (printf)");
+            Syl *syl = new Syl();
+            parent->AddChild(syl);
+        }
+        else {
+            printf("testSyl == something else");
+            LogMessage("testSyl == something else");
         }
     }
 
@@ -4074,6 +4080,8 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
+
+    LogMessage("used other method");
 
     return true;
 }
@@ -4530,6 +4538,20 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     vrvSyllable->ReadSlashCount(syllable);
 
     parent->AddChild(vrvSyllable);
+
+    /*
+
+    auto syl = parent->FindChildByType(SYL);
+    if(syl == nullptr) {
+        printf("got a syllable without a syl at readsyllable step");
+        syl = new Syl();
+        vrvSyllable->AddChild(syl);
+    }
+    else {
+        printf("testSyl == something else");
+    }
+
+    */
 
     return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }

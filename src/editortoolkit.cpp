@@ -1194,9 +1194,11 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
     }
     ClassId elementClass;
     if (groupType == "nc") {
+        printf("groupType is nc!");
         elementClass = NC;
     } else if (groupType == "neume") {
         elementClass = NEUME;
+        printf("groupType is neume!");
     } else {
         LogError("Invalid groupType: %s", groupType.c_str());
         return false;
@@ -1380,8 +1382,6 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 assert(currentParent);
             }
             else if(groupType == "neume"){
-                //also here i need to validate data
-                //to check to see if the first element in the vector is a SYL
                 fparent = el->GetFirstParent(SYLLABLE);
                 assert(fparent && LogError("fparent is not syllable"));
                 sparent = fparent->GetFirstParent(LAYER);
@@ -1396,21 +1396,28 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
         }
         else {
-            std::cout << "cout test";
-            LogError("logerror test");
+            //std::cout << "cout test";
+            //LogError("logerror test");
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc*>(el);
                 assert(nc);
                 if (nc->HasLigated()) continue;
             }
 
-            //here's where I'm gonna try to validate data
+            //if the element is a syl then we want to keep it attached to the first node
             if(el->Is(SYL)) {
+                //printf("reached a syl!");
                 continue;
             }
             Object *newParent = currentParent->Clone();
             assert(newParent);
             newParent->ClearChildren();
+
+            if(newParent->Is(SYLLABLE)) {
+                Syl *syl = new Syl();
+                newParent->AddChild(syl);
+            }
+            
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
             sparent->AddChild(newParent);
