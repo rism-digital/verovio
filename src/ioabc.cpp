@@ -562,6 +562,7 @@ void AbcInput::parseKey(std::string keyString)
     m_ID = "";
     short int accidNum = 0;
     data_MODE mode = MODE_NONE;
+    // m_key = new KeySig();
     m_clef = new Clef();
     while (isspace(keyString[i])) ++i;
 
@@ -656,6 +657,7 @@ void AbcInput::parseKey(std::string keyString)
             keyPitchAlterAmount = 1;
         }
 
+        // m_doc->m_scoreDef.SetSig(keySig);
         m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
         keyPitchAlter = pitch.substr(posStart, posEnd);
     }
@@ -1488,8 +1490,8 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
 
         // check if there is a clef change
         if (m_clef) {
-          m_noteStack.push_back(m_clef);
-          m_clef = NULL;
+            m_noteStack.push_back(m_clef);
+            m_clef = NULL;
         }
 
         // check if there is a change in meter
