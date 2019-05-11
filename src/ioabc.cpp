@@ -197,11 +197,7 @@ void AbcInput::parseABC(std::istream &infile)
             std::getline(infile, abcLine);
             ++m_lineNum;
             if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
-                // empty lines end tunes
-                break;
-            }
-            else if (abcLine[0] == 'X') {
-                LogDebug("ABC input: Reading only first tune in file");
+                // abc tunes are separated from each other by empty lines
                 break;
             }
             else if (abcLine[0] == '%')
