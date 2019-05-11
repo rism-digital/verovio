@@ -130,10 +130,11 @@ void AbcInput::parseABC(std::istream &infile)
     CreateHeader();
 
     while (!infile.eof()) {
-        while (abcLine[0] != 'X') {
+        while (!(abcLine[0] == 'X' && abcLine[1] == ':') && !infile.eof()) {
             std::getline(infile, abcLine);
             ++m_lineNum;
         }
+        if (infile.eof()) break;
 
         // read tune header
         readInformationField('X', &abcLine[2]);
@@ -142,6 +143,7 @@ void AbcInput::parseABC(std::istream &infile)
             ++m_lineNum;
             readInformationField(abcLine[0], &abcLine[2]);
         }
+        if (infile.eof()) break;
         if (m_title.empty()) {
             LogWarning("ABC input: Title field missing, creating empty title");
             m_title.push_back(std::make_pair("", 0));
