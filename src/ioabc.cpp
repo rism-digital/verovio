@@ -152,31 +152,42 @@ void AbcInput::parseABC(std::istream &infile)
         // create score
         assert(m_mdiv != NULL);
         Score *score = new Score();
-        m_mdiv->AddChild(score);
+        if (!m_doc->m_scoreDef.GetFirst(STAFFGRP)) {
+            m_mdiv->AddChild(score);
 
-        // create page head
-        PrintInformationFields();
-        StaffGrp *staffGrp = new StaffGrp();
-        // create staff
-        StaffDef *staffDef = new StaffDef();
-        staffDef->SetN(1);
-        staffDef->SetLines(m_stafflines);
-        staffDef->SetTransSemi(m_transpose);
-        if (m_clef) {
-            staffDef->SetClefShape(m_clef->GetShape());
-            staffDef->SetClefLine(m_clef->GetLine());
-            delete m_clef;
-            m_clef = NULL;
+            // create page head
+            PrintInformationFields();
+            StaffGrp *staffGrp = new StaffGrp();
+            // create staff
+            StaffDef *staffDef = new StaffDef();
+            staffDef->SetN(1);
+            staffDef->SetLines(m_stafflines);
+            staffDef->SetTransSemi(m_transpose);
+            if (m_clef) {
+                staffDef->SetClefShape(m_clef->GetShape());
+                staffDef->SetClefLine(m_clef->GetLine());
+                delete m_clef;
+                m_clef = NULL;
+            }
+            staffGrp->AddChild(staffDef);
+            m_doc->m_scoreDef.AddChild(staffGrp);
+            if (m_key) {
+                // waiting for fix
+                // m_doc->m_scoreDef.SetKeyMode(m_key->GetMode());
+                // m_doc->m_scoreDef.SetKeyPname(m_key->GetPname());
+                // m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(m_key->GetSig()));
+                delete m_key;
+                m_key = NULL;
+            }
+            if (m_meter) {
+                m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
+                m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
+                m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
+                delete m_meter;
+                m_meter = NULL;
+            }
         }
-        staffGrp->AddChild(staffDef);
-        m_doc->m_scoreDef.AddChild(staffGrp);
-        if (m_meter) {
-            m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
-            m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
-            m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
-            delete m_meter;
-            m_meter = NULL;
-        }
+
         // create section
         Section *section = new Section();
         // start with a new page
@@ -236,12 +247,16 @@ void AbcInput::parseABC(std::istream &infile)
 
         score->AddChild(section);
 
-        m_doc->ConvertToPageBasedDoc();
-        m_controlElements.clear();
-        m_composer.clear();
-        m_info.clear();
-        m_title.clear();
+        // only append first tune in file
+        if (!score->GetFirstParent(MDIV)) delete score;
     }
+
+    m_controlElements.clear();
+    m_composer.clear();
+    m_info.clear();
+    m_title.clear();
+
+    m_doc->ConvertToPageBasedDoc();
 }
 
 /**********************************
