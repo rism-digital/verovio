@@ -430,7 +430,6 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
 
 bool EditorToolkit::Insert(std::string elementType, std::string startid, std::string endid)
 {
-    //LogMessage("Insert!");
     if (!m_doc->GetDrawingPage()) return false;
     Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
     Object *end = m_doc->GetDrawingPage()->FindChildByUuid(endid);
@@ -905,7 +904,6 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
 // Update the text of a TextElement by its syl
 bool EditorToolkit::SetText(std::string elementId, std::string text)
 {
-    //LogMessage("using setText method");
     m_editInfo = "";
     std::wstring wtext;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
@@ -920,25 +918,18 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
 
     bool success = false;
     if (element->Is(SYL)) {
-        //LogMessage("matched element->Is(SYL)");
         Syl *syl = dynamic_cast<Syl *>(element);
         assert(syl);
         Object *child = syl->GetFirst();
         if(child == nullptr) {
-            //LogMessage("child is nullptr");
             Text *text = new Text();
-            //LogMessage("made new text");
             syl->AddChild(text);
-            //LogMessage("added new text to syl");
             text->SetText(wtext);
-            //LogMessage("pointed *child to syl->GetFirst()");
             success = true;
         }
         else {
             while(child != nullptr) {
-                //LogMessage("got inside while loop (there's an element in the list");
                 if (child->Is(TEXT)) {
-                    //LogMessage("matched successfully on Is(TEXT)!!");
                     Text *text = dynamic_cast<Text *>(child);
                     text->SetText(wtext);
                     success = true;
@@ -953,11 +944,6 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
                         success = true;
                     }
                 }
-                /*
-                else {
-                    LogMessage("in the for loop but matched on neither");
-                }
-                */
                 child = syl->Object::GetNext();
             }
         }
@@ -1204,8 +1190,10 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
 {
     m_editInfo = "";
     Object *parent = nullptr, *doubleParent = nullptr;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
+    std::set<Object *> fullParents;
 
     //Get the current drawing page
     if (!m_doc->GetDrawingPage()) {
@@ -1269,7 +1257,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
         elements.insert(el);
     }
 
-    // If any parent has every child being moved, it will be used as the new parent
+    // find parents where all of their children are being grouped
     for (auto it = parents.begin(); it != parents.end(); ++it) {
         auto parentPair = *it;
         Object *par = parentPair.first;
@@ -1280,26 +1268,71 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             expected = par->GetChildCount();
         }
         if (parentPair.second == expected) {
-            // All of this parent's children will be moved, so reuse the parent
-            parent = parentPair.first;
-            break;
+            fullParents.emplace(parentPair.first);
         }
     }
-    if (parent == nullptr) {
+    //if there are no full parents we need to make a new one to attach everything to
+    if (fullParents.empty()) {
         if (elementClass == NC) {
             parent = new Neume();
         }
         else if (elementClass == NEUME) {
             parent = new Syllable();
-            //
+
+            //make sure to add an empty syl
+            Syl *syl = new Syl();
+            parent->AddChild(syl);
+        }
+        for (auto it = elements.begin(); it != elements.end(); ++it) {
+            if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                (*it)->MoveItselfTo(parent);
+            }
         }
         doubleParent->AddChild(parent);
+        Layer *layer = dynamic_cast<Layer *> (parent->GetFirstParent(LAYER));
+        assert(layer);
+        layer->ReorderByXPos();
     }
-    // Move selected children to this parent
-    for (auto it = elements.begin(); it != elements.end(); ++it) {
-        if ((*it)->GetParent() != parent) {
-            (*it)->MoveItselfTo(parent);
+
+    //if there's only one full parent we just add the other elements to it
+    //except don't move syl tags since we want them to stay attached to the first parent
+    else if(fullParents.size() == 1) {
+        auto iter = fullParents.begin();
+        parent = *iter;
+        for (auto it = elements.begin(); it != elements.end(); ++it) {
+            if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                (*it)->MoveItselfTo(parent);
+            }
         }
+    }
+
+    //if there are more than 1 full parent we need to concat syl's
+    else {
+        Syllable *fullSyllable = new Syllable();
+        Syl *fullSyl = new Syl();
+        std::wstring fullString = L"";
+        for(auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+            Object *tempText = (*it)->FindChildByType(SYL)->FindChildByType(TEXT);
+            Text *text = dynamic_cast<Text *> (tempText);
+            if(text != nullptr) {
+                std::wstring currentString = text->GetText();
+                fullString = fullString + currentString;
+            }
+        }
+        Text *text = new Text();
+        text->SetText(fullString);
+        fullSyl->AddChild(text);
+        fullSyllable->AddChild(fullSyl);
+        for (auto it = elements.begin(); it != elements.end(); ++it) {
+            if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
+                (*it)->MoveItselfTo(fullSyllable);
+            }
+        }
+        doubleParent->AddChild(fullSyllable);
+        Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
+        assert(layer);
+        layer->ReorderByXPos();
+
     }
     // Delete any empty parents
     for (auto it = parents.begin(); it != parents.end(); ++it) {
@@ -1310,8 +1343,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
         } else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
             Object *syl;
             while ((syl = obj->FindChildByType(SYL)) != nullptr) {
-                syl->MoveItselfTo(parent);
-                obj->ClearRelinquishedChildren();
+                obj->DeleteChild(syl);
             }
             doubleParent->DeleteChild(obj);
         }
@@ -1328,6 +1360,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
     Nc *firstNc, *secondNc;
     bool success1, success2;
     int ligCount = 0;
+    bool firstIsSyl = false;
 
     //Check if you can get drawing page
     if(!m_doc->GetDrawingPage()) {
@@ -1394,14 +1427,21 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 }
             }
         }
-        if (elementIds.begin() == it){
-            if(groupType == "nc"){
+        if (elementIds.begin() == it || firstIsSyl){
+            //if the element is a syl we want it to stay attached to the first element
+            //we'll still need to initialize all the parents, thus the bool
+            if(el->Is(SYL)) {
+                firstIsSyl = true;
+                continue;
+            }
+            else if(groupType == "nc"){
                 fparent = el->GetFirstParent(NEUME);
                 assert(fparent);
                 sparent = fparent->GetFirstParent(SYLLABLE);
                 assert(sparent);
                 currentParent = dynamic_cast<Neume *>(fparent);
                 assert(currentParent);
+                firstIsSyl = false;
             }
             else if(groupType == "neume"){
                 fparent = el->GetFirstParent(SYLLABLE);
@@ -1410,6 +1450,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 assert(sparent);
                 currentParent = dynamic_cast<Syllable *>(fparent);
                 assert(currentParent);
+                firstIsSyl = false;
                 
             }
             else{
@@ -1425,6 +1466,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
 
             //if the element is a syl then we want to keep it attached to the first node
+
             if(el->Is(SYL)) {
                 continue;
             }
@@ -1433,7 +1475,6 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             newParent->ClearChildren();
 
             if(newParent->Is(SYLLABLE)) {
-                //LogMessage("newParent is syllable");
                 Syl *syl = new Syl();
                 newParent->AddChild(syl);
             }

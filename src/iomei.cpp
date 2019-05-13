@@ -4541,19 +4541,13 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 
     parent->AddChild(vrvSyllable);
 
-    /*
-
     auto syl = parent->FindChildByType(SYL);
+
     if(syl == nullptr) {
-        printf("got a syllable without a syl at readsyllable step");
         syl = new Syl();
         vrvSyllable->AddChild(syl);
     }
-    else {
-        printf("testSyl == something else");
-    }
 
-    */
 
     return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
