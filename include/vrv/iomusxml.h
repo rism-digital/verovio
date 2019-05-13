@@ -47,22 +47,6 @@ class Tie;
 
 namespace musicxml {
 
-    class OpenTie {
-    public:
-        OpenTie(const std::string &measureNum, const double &scoreTimeOnset, const data_PITCHNAME &pname, const char &oct)
-        {
-            m_measureNum = measureNum;
-            m_scoreTimeOnset = scoreTimeOnset;
-            m_pname = pname;
-            m_oct = oct;
-        }
-        
-        std::string m_measureNum;
-        double m_scoreTimeOnset;
-        data_PITCHNAME m_pname;
-        char m_oct;
-    };
-    
     class OpenSlur {
     public:
         OpenSlur(const int &number) { m_number = number; }
@@ -229,8 +213,8 @@ private:
      * Slur starts and ends are matched based on its number.
      */
     ///@{
-    void OpenTie(Measure *measure, Note *note, Tie *tie);
-    void CloseTie(Measure *measure, Note *note);
+    void OpenTie(Note *note, Tie *tie);
+    void CloseTie(Note *note);
     void OpenSlur(Measure *measure, int number, Slur *slur);
     void CloseSlur(Measure *measure, int number, LayerElement *element);
     ///@}
@@ -302,9 +286,9 @@ private:
     /* The stack for slur stops that might come before the slur has been opened */
     std::vector<std::pair<LayerElement *, musicxml::CloseSlur> > m_slurStopStack;
     /* The stack for open ties */
-    std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
+    std::vector<std::pair<Tie *, Note *> > m_tieStack;
     /* The stack for tie stops that might come before that tie was opened */
-    std::vector<musicxml::OpenTie> m_tieStopStack;
+    std::vector<Note *> m_tieStopStack;
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
     /* The stack of endings to be inserted at the end of XML import */

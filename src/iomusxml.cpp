@@ -314,48 +314,21 @@ void MusicXmlInput::GenerateUuid(pugi::xml_node node)
 //////////////////////////////////////////////////////////////////////////////
 // Tie and slurs stack management
 
-void MusicXmlInput::OpenTie(Measure *measure, Note *note, Tie *tie)
+void MusicXmlInput::OpenTie(Note *note, Tie *tie)
 {
-    // try to match open tie with tie stops in that measure
-    std::vector<musicxml::OpenTie>::iterator iter;
-    for (iter = m_tieStopStack.begin(); iter != m_tieStopStack.end(); ++iter) {
-        if ((iter->m_pname == note->GetPname()) && (iter->m_oct == note->GetOct())
-            // TODO: check whether we need a formulation as in CloseTie()
-            && iter->m_scoreTimeOnset > note->GetScoreTimeOnset()) {
-            tie->SetStartid("#" + note->GetUuid());
-            tie->SetEndid("#" + note->GetUuid());
-            m_tieStopStack.erase(iter);
-            LogMessage("OpenTie(): Note %s has been matched reversely.", note->GetUuid().c_str());
-            return;
-        }
-    }
-    // create new open tie otherwise
     tie->SetStartid("#" + note->GetUuid());
-    musicxml::OpenTie openTie(measure->GetN(), note->GetScoreTimeOnset(), note->GetPname(), note->GetOct());
-    m_tieStack.push_back(std::make_pair(tie, openTie));
-    LogMessage("OpenTie(): Note %s. onset: %f, note %d", note->GetUuid().c_str(), note->GetScoreTimeOffset(), note->GetPname());
+    m_tieStack.push_back(std::make_pair(tie, note));
 }
 
-void MusicXmlInput::CloseTie(Measure *measure, Note *note)
+void MusicXmlInput::CloseTie(Note *note)
 {
-    // try to match tie stops to open ties based on pname, oct, and relative scoreTimeOnset
-    std::vector<std::pair<Tie *, musicxml::OpenTie> >::iterator iter;
+    // add all notes with identical pitch/oct to m_tieStopStack
+    std::vector<std::pair<Tie *, Note *> >::iterator iter;
     for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
-        if ((iter->second.m_pname == note->GetPname()) && (iter->second.m_oct == note->GetOct())) {
-            // close, if scoreTime is ascending, but only when within a measure
-            if (((measure->GetN() == iter->second.m_measureNum) && (iter->second.m_scoreTimeOnset < note->GetScoreTimeOnset()))
-                || (measure->GetN() != iter->second.m_measureNum)) {
-                iter->first->SetEndid("#" + note->GetUuid());
-                m_tieStack.erase(iter);
-                LogMessage("CloseTie(): Note %s has been matched.", note->GetUuid().c_str());
-                return;
-            }
+        if (note->GetPname() == iter->second->GetPname() && note->GetOct() == iter->second->GetOct()) {
+            m_tieStopStack.push_back(note);
         }
     }
-    // add to m_tieStopStack, if not able to be closed
-    musicxml::OpenTie closeTie(measure->GetN(), note->GetScoreTimeOnset(), note->GetPname(), note->GetOct());
-    m_tieStopStack.push_back(closeTie);
-    LogWarning("CloseTie(): Note '%s' has tie ending without matching start", note->GetUuid().c_str());
 }
 
 void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
@@ -664,7 +637,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     if (!m_tieStack.empty()) {
-        LogWarning("MusicXML import: There are ties left open.");
+        LogWarning("MusicXML import: There are %d ties left open and %d left unclosed.", m_tieStack.size(), m_tieStopStack.size());
         m_tieStack.clear();
     }
     if (!m_slurStack.empty()) { // There are slurs left open
@@ -1029,6 +1002,42 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
     }
     
+    // match open ties with close ties
+    double lastScoreTimeOnset;
+    bool tieMatched;
+    std::vector<std::pair<Tie *, Note *> >::iterator iter;
+    for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
+        lastScoreTimeOnset = 9999; // __DBL_MAX__;
+        tieMatched = false;
+        LogMessage("\n           MatchTie:  '%s' (%d/%d), onset=%f", iter->second->GetUuid().c_str(), iter->second->GetPname(), iter->second->GetOct(), iter->second->GetScoreTimeOnset());
+        std::vector<Note *>::iterator jter;
+        for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
+            LogMessage(" tieStopStack %s (%d/%d), onset=%f, lastScoreOnset=%f.", (*jter)->GetUuid().c_str(), (*jter)->GetPname(),
+                       (*jter)->GetScoreTimeOnset(), (*jter)->GetOct(), lastScoreTimeOnset);
+            // match tie stop with pitch/oct identity, with first note earlier than second, and with earliest second note.
+            if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
+                && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
+                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                    iter->first->SetEndid("#" + (*jter)->GetUuid());
+                    lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
+                    tieMatched = true;
+                    LogMessage("Matched: %s (%d/%d), ScoreTimeOffset= %f.", iter->second->GetUuid().c_str(),
+                               iter->second->GetPname(), iter->second->GetOct(), lastScoreTimeOnset);
+                }
+        }
+        if (tieMatched) {
+            LogMessage("MatchTie(): %s to %s has been matched.",
+                       iter->first->GetStartid().c_str(),iter->first->GetEndid().c_str());
+            m_tieStack.erase(iter--);
+        } else {
+            iter->second->SetScoreTimeOnset(-1); // scoreTimeOnset small for next measure
+        }
+    }
+    LogMessage("m_tieStopStack (%d) cleared.", m_tieStopStack.size());
+    if (!m_tieStopStack.empty()) {
+        m_tieStopStack.clear();
+    }
+
     return true;
 }
 
@@ -1761,8 +1770,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // ties
         pugi::xpath_node startTie = notations.node().select_node("tied[@type='start']");
         pugi::xpath_node endTie = notations.node().select_node("tied[@type='stop']");
-        if (endTie) {
-            CloseTie(measure, note);
+        if (endTie) { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
+            m_tieStopStack.push_back(note);
+        }
+        else {
+            CloseTie(note);
         }
         if (startTie) {
             Tie *tie = new Tie();
@@ -1774,7 +1786,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
-            OpenTie(measure, note, tie);
+            OpenTie(note, tie);
         }
 
         // articulation
