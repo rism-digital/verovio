@@ -17,29 +17,44 @@
                     <scoreDef>
                         <staffGrp>
                         	<staffGrp symbol="bracket">
-                            	<staffDef n="1" lines="5" clef.line="2" clef.shape="G">
+                                <staffDef n="1" lines="5" clef.line="2" clef.shape="G">
                                 	<label>Canto</label>
                                 </staffDef>
-                           		<staffDef n="2" lines="5" clef.line="4" clef.shape="F">
+                                <staffDef n="2" lines="5" clef.line="2" clef.shape="G">
+                                	<label>Tenor</label>
+                                </staffDef>
+                           		<staffDef n="3" lines="5" clef.line="4" clef.shape="F">
                                 	<label>Basso</label>
                                 </staffDef>
                         	</staffGrp>
                         </staffGrp>
                     </scoreDef>
                     <section>
-                       <staff n="1">
-                          <layer>
-                             <note dur="brevis" oct="4" pname="g"></note>
-                             <note dur="brevis" oct="4" pname="g"></note>
-                             <note dur="brevis" oct="4" pname="g"></note>
-                             <note dur="brevis" oct="4" pname="g"></note>
+                    	<staff n="1">
+                          	<layer>
+                             	<note dur="semibrevis" oct="4" pname="g"></note>
+                            	<note dur="semibrevis" oct="4" pname="g"></note>
+                             	<note dur="semibrevis" oct="4" pname="g"></note>
+                             	<note dur="semibrevis" oct="4" pname="g"></note>
+                                <note dur="semibrevis" oct="4" pname="g"></note>
+                             	<note dur="semibrevis" oct="4" pname="g"></note>
+                                <note dur="semibrevis" oct="4" pname="g"></note>
+                             	<note dur="semibrevis" oct="4" pname="g"></note>
                           </layer>
                        </staff>
                        <staff n="2">
-                          <layer>
-                          	  <note dur="longa" oct="3" pname="c"></note>
-                              <note dur="longa" oct="3" pname="c"></note>
+                          	<layer>
+                            	<note dur="brevis" oct="4" pname="g"></note>
+                             	<note dur="brevis" oct="4" pname="g"></note>
+                             	<note dur="brevis" oct="4" pname="g"></note>
+                             	<note dur="brevis" oct="4" pname="g"></note>
                           </layer>
+                       </staff>
+                       <staff n="3">
+                       		<layer>
+                          		<note dur="longa" oct="3" pname="c"></note>
+                              	<note dur="longa" oct="3" pname="c"></note>
+                          	</layer>
                        </staff>
                     </section>
                 </score>
