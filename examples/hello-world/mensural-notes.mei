@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title></title>
+            </titleStmt>
+            <pubStmt></pubStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                        	<staffGrp symbol="bracket">
+                            	<staffDef n="1" lines="5" clef.line="2" clef.shape="G">
+                                	<label>Canto</label>
+                                </staffDef>
+                           		<staffDef n="2" lines="5" clef.line="4" clef.shape="F">
+                                	<label>Basso</label>
+                                </staffDef>
+                        	</staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                       <staff n="1">
+                          <layer>
+                             <note dur="brevis" oct="4" pname="g"></note>
+                             <note dur="brevis" oct="4" pname="g"></note>
+                             <note dur="brevis" oct="4" pname="g"></note>
+                             <note dur="brevis" oct="4" pname="g"></note>
+                          </layer>
+                       </staff>
+                       <staff n="2">
+                          <layer>
+                          	  <note dur="longa" oct="3" pname="c"></note>
+                              <note dur="longa" oct="3" pname="c"></note>
+                          </layer>
+                       </staff>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
