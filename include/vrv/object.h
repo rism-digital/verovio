@@ -165,6 +165,11 @@ public:
     Object &operator=(const Object &object);
 
     /**
+    * Comparison operator: calls sortByUlx
+    */
+    bool operator<(Object &rhs);
+
+    /**
      * Move all the children of the object passed as parameter to this one.
      * Objects must be of the same type.
      * After this operation, the object passed as parameter has no child anymore.
@@ -1073,6 +1078,8 @@ public:
      * Reorder elements by x-position.
      */
     virtual int ReorderByXPos(FunctorParams *);
+
+    static bool sortByUlx(Object *a, Object *b);
 
 protected:
     //

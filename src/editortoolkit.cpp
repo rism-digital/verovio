@@ -1193,7 +1193,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
-    std::set<Object *> fullParents;
+    std::vector<Object *> fullParents;
 
     //Get the current drawing page
     if (!m_doc->GetDrawingPage()) {
@@ -1268,7 +1268,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             expected = par->GetChildCount();
         }
         if (parentPair.second == expected) {
-            fullParents.emplace(parentPair.first);
+            fullParents.push_back(parentPair.first);
         }
     }
     //if there are no full parents we need to make a new one to attach everything to
@@ -1289,6 +1289,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             }
         }
         doubleParent->AddChild(parent);
+
         Layer *layer = dynamic_cast<Layer *> (parent->GetFirstParent(LAYER));
         assert(layer);
         layer->ReorderByXPos();
@@ -1307,31 +1308,47 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
     }
 
     //if there are more than 1 full parent we need to concat syl's
+    //unless we're just grouping NC's in which case no need to worry about syl's of course
     else {
-        Syllable *fullSyllable = new Syllable();
-        Syl *fullSyl = new Syl();
-        std::wstring fullString = L"";
-        for(auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-            Object *tempText = (*it)->FindChildByType(SYL)->FindChildByType(TEXT);
-            Text *text = dynamic_cast<Text *> (tempText);
-            if(text != nullptr) {
-                std::wstring currentString = text->GetText();
-                fullString = fullString + currentString;
+        if (elementClass == NC) {
+            parent = new Neume();
+            for (auto it = elements.begin(); it != elements.end(); ++it) {
+                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                    (*it)->MoveItselfTo(parent);
+                }
             }
+            doubleParent->AddChild(parent);
         }
-        Text *text = new Text();
-        text->SetText(fullString);
-        fullSyl->AddChild(text);
-        fullSyllable->AddChild(fullSyl);
-        for (auto it = elements.begin(); it != elements.end(); ++it) {
-            if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
-                (*it)->MoveItselfTo(fullSyllable);
+        else {
+            std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
+            Syllable *fullSyllable = new Syllable();
+            Syl *fullSyl = new Syl();
+
+            //construct concatenated string of all the syls
+            std::wstring fullString = L"";
+            for(auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+                Text *text = dynamic_cast<Text *> ((*it)->FindChildByType(SYL)->FindChildByType(TEXT));
+                if(text != nullptr) {
+                    std::wstring currentString = text->GetText();
+                    fullString = fullString + currentString;
+                }
             }
+
+            Text *text = new Text();
+            text->SetText(fullString);
+            fullSyl->AddChild(text);
+            fullSyllable->AddChild(fullSyl);
+            for (auto it = elements.begin(); it != elements.end(); ++it) {
+                if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
+                    (*it)->MoveItselfTo(fullSyllable);
+                }
+            }
+            doubleParent->AddChild(fullSyllable);
+            Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
+            assert(layer);
+            layer->ReorderByXPos();
         }
-        doubleParent->AddChild(fullSyllable);
-        Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
-        assert(layer);
-        layer->ReorderByXPos();
+        
 
     }
     // Delete any empty parents
@@ -1489,7 +1506,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
 }
 
 bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
-{
+{  
     m_editInfo = "";
     //Check if you can get drawing page
     if(!m_doc->GetDrawingPage()) {

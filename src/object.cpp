@@ -46,6 +46,8 @@
 
 namespace vrv {
 
+bool sortByUlx(Object *a, Object *b);
+
 //----------------------------------------------------------------------------
 // Object
 //----------------------------------------------------------------------------
@@ -146,6 +148,45 @@ Object &Object::operator=(const Object &object)
         }
     }
     return *this;
+}
+
+bool Object::operator<(Object &rhs) {
+    Object *b = &rhs;
+    FacsimileInterface *fa = nullptr, *fb = nullptr;
+    InterfaceComparison comp(INTERFACE_FACSIMILE);
+    if (this->GetFacsimileInterface())
+        fa = this->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        this->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fa == nullptr || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+                fa = temp;
+            }
+        }
+    }
+    if (b->GetFacsimileInterface())
+        fb = b->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        b->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fb == nullptr || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+                fb = temp;
+            }
+        }
+    }
+
+    if (fa == nullptr || fb == nullptr) {
+        LogMessage("Null pointer(s) for '%s' and '%s'", this->GetUuid().c_str(), b->GetUuid().c_str());
+        return false;
+    }
+
+    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
 Object::~Object()
@@ -1488,7 +1529,7 @@ int Object::SaveEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-bool sortByUlx(Object *a, Object *b)
+bool Object::sortByUlx( Object *a, Object *b)
 {
     FacsimileInterface *fa = nullptr, *fb = nullptr;
     InterfaceComparison comp(INTERFACE_FACSIMILE);
