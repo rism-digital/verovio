@@ -61,7 +61,7 @@ class OptionGrp;
 // Option defines
 //----------------------------------------------------------------------------
 
-enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_encoded };
+enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_encoded };
 
 enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
 

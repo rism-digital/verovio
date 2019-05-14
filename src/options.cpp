@@ -20,7 +20,7 @@
 namespace vrv {
 
 std::map<int, std::string> Option::s_breaks
-    = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_encoded, "encoded" } };
+    = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_line, "line" }, { BREAKS_encoded, "encoded" } };
 
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
