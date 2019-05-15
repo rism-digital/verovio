@@ -217,7 +217,7 @@ void AbcInput::parseABC(std::istream &infile)
         Layer *layer = NULL;
         Measure *measure = NULL;
         for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-            if (!measure || (layer->GetUuid() != iter->first)) {
+            if (!measure || (layer && layer->GetUuid() != iter->first)) {
                 layer = dynamic_cast<Layer *>(section->FindChildByUuid(iter->first));
             }
             if (!layer) {
