@@ -232,7 +232,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         layerNum = atoi(layerNumStr.c_str());
     }
     if (layerNum < 1) {
-        LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
+        LogWarning("MusicXML import: Layer %d cannot be found", staffNum);
         layerNum = 1;
     }
     return SelectLayer(layerNum, staff);
@@ -1051,7 +1051,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Layer *layer = SelectLayer(staffNum, measure);
+        //Layer *layer = SelectLayer(staffNum, measure);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
         if (clefSign && clefLine) {
@@ -1071,7 +1071,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
+            m_ClefChangeStack(new musicxml::ClefChange(staff,))
             AddLayerElement(layer, meiClef);
+            LogMessage("Measure %s: clef change in staff %d, layer %d.", measureNum.c_str(), staffNum, layer->GetN());
         }
     }
 
@@ -1157,6 +1159,8 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     m_durTotal -= atoi(GetContentOfChild(node, "duration").c_str());
 
     pugi::xpath_node nextNote = node.next_sibling("note");
+    int staff = atoi(GetContentOfChild(nextNote.node(), "staff").c_str());
+    LogMessage("Measure %s: backup %d, position %d. Next note staff: %d.", measureNum.c_str(), atoi(GetContentOfChild(node, "duration").c_str()), m_durTotal, staff);
     if (nextNote && m_durTotal > 0) {
         // We need a <space> if a note follows that starts not at the beginning of the measure
         Layer *layer = new Layer();
@@ -1483,7 +1487,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     assert(staff);
 
     LayerElement *element = NULL;
-
+    
     double onset = m_durTotal; // keep note onsets for later
 
     // add duration to measure time
