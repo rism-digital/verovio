@@ -464,9 +464,9 @@ void Slur::GetControlPoints(
 void Slur::GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
     curvature_CURVEDIR curveDir, int staffSize)
 {
+    /*
     for (auto &spannedElement : *spannedElements) {
         int margin = 1;
-        /*
         // Not sure if it is better to add the margin before or after the rotation...
         // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
@@ -478,8 +478,8 @@ void Slur::GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spann
         else {
             itPoint->second.second.y -= doc->GetDrawingUnit(staffSize) * margin;
         }
-        */
     }
+    */
 }
 
 //----------------------------------------------------------------------------
