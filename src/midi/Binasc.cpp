@@ -610,7 +610,7 @@ int Binasc::getWord(std::string& word, const std::string& input,
 
 int Binasc::getVLV(std::istream& infile, int& trackbytes) {
 	int output = 0;
-	uchar ch;
+	uchar ch = 0;
 	infile.read((char*)&ch, 1);
 	trackbytes++;
 	output = (output << 7) | (0x7f & ch);
@@ -644,7 +644,7 @@ int Binasc::readMidiEvent(std::ostream& out, std::istream& infile,
 	std::string comment;
 
 	int status = 1;
-	uchar ch;
+	uchar ch = 0;
 	char byte1, byte2;
 	infile.read((char*)&ch, 1);
 	trackbytes++;
@@ -978,7 +978,7 @@ std::string Binasc::keyToPitchName(int key) {
 //
 
 int Binasc::outputStyleMidi(std::ostream& out, std::istream& input) {
-	uchar ch;                      // current input byte
+	uchar ch = 0;                      // current input byte
 	std::stringstream tempout;
 	input.read((char*)&ch, 1);
 
@@ -1051,8 +1051,8 @@ int Binasc::outputStyleMidi(std::ostream& out, std::istream& input) {
 	// regular: top bit is 0: number of ticks per quarter note
 	// SMPTE:   top bit is 1: first byte is negative frames, second is
 	//          ticks per frame.
-	uchar byte1;
-	uchar byte2;
+	uchar byte1 = 0;
+	uchar byte2 = 0;
 	input.read((char*)&byte1, 1);
 	input.read((char*)&byte2, 1);
 	if (byte1 & 0x80) {
