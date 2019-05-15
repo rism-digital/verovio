@@ -1538,7 +1538,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 {
     PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
-    auto params_m_currentSyl = params->m_currentSyl;
+    Syl *params_m_currentSyl = params->m_currentSyl;
     if (!params_m_currentSyl) {
         return FUNCTOR_STOP; // early return
     }
@@ -1546,7 +1546,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
         params_m_currentSyl->SetEnd(params->m_lastNote);
     }
     else if (m_options->m_openControlEvents.GetValue()) {
-        auto wordpos = params_m_currentSyl->GetWordpos();
+        sylLog_WORDPOS wordpos = params_m_currentSyl->GetWordpos();
         if (wordpos == sylLog_WORDPOS_i || wordpos == sylLog_WORDPOS_m) {
             Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
             assert(lastMeasure);
