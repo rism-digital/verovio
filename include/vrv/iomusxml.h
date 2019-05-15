@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class Clef;
 class ControlElement;
 class Dir;
 class Dynam;
@@ -94,14 +95,16 @@ namespace musicxml {
     
     class ClefChange {
     public:
-        ClefChange(Staff *staff, Clef *clef, const int &scoreOnset) {
+        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset) {
+            m_measureNum = measureNum;
             m_staff = staff;
             m_clef = clef;
             m_scoreOnset = scoreOnset;
         }
 
-        Staff m_staff;
-        Clef m_clef;
+        std::string m_measureNum;
+        Staff *m_staff;
+        Clef *m_clef;
         int m_scoreOnset; // the score position of clef change
         bool isFirst = true; // make visible to first clef change across layers
     };
