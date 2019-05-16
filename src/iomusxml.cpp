@@ -314,30 +314,26 @@ void MusicXmlInput::GenerateUuid(pugi::xml_node node)
 //////////////////////////////////////////////////////////////////////////////
 // Tie and slurs stack management
 
-void MusicXmlInput::OpenTie(Staff *staff, Note *note, Tie *tie)
+void MusicXmlInput::OpenTie(Note *note, Tie *tie)
 {
     tie->SetStartid("#" + note->GetUuid());
-    musicxml::OpenTie openTie(staff->GetN(), note->GetPname(), note->GetOct());
-    m_tieStack.push_back(std::make_pair(tie, openTie));
+    m_tieStack.push_back(std::make_pair(tie, note));
 }
 
-void MusicXmlInput::CloseTie(Staff *staff, Note *note)
+void MusicXmlInput::CloseTie(Note *note)
 {
-    std::vector<std::pair<Tie *, musicxml::OpenTie> >::iterator iter;
+    // add all notes with identical pitch/oct to m_tieStopStack
+    std::vector<std::pair<Tie *, Note *> >::iterator iter;
     for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
-        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_pname == note->GetPname())
-            && (iter->second.m_oct == note->GetOct())) {
-            iter->first->SetEndid("#" + note->GetUuid());
-            m_tieStack.erase(iter);
-            return;
+        if (note->GetPname() == iter->second->GetPname() && note->GetOct() == iter->second->GetOct()) {
+            m_tieStopStack.push_back(note);
         }
     }
-    LogWarning("MusicXML import: Note '%s' has tie ending without matching start", note->GetUuid().c_str());
 }
 
 void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
 {
-    // check whether matching closed slurs are present
+    // try to match open slur with slur stops within that measure
     std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
     for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
         if ((iter->second.m_number == number) && (iter->second.m_measureNum == measure->GetN())) {
@@ -347,6 +343,7 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
             return;
         }
     }
+    // create new slur otherwise
     slur->SetStartid(m_ID);
     musicxml::OpenSlur openSlur(number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
@@ -354,6 +351,7 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
 
 void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *element)
 {
+    // try to match slur stop to open slurs by slur number
     std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
     for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
         if (iter->second.m_number == number) {
@@ -362,6 +360,7 @@ void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *elemen
             return;
         }
     }
+    // add to m_slurStopStack, if not able to be closed
     musicxml::CloseSlur closeSlur(measure->GetN(), number);
     m_slurStopStack.push_back(std::make_pair(element, closeSlur));
 }
@@ -609,9 +608,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 + "', type='" + iter->second.m_endingType.c_str() + "', text='" + iter->second.m_endingText + "' (";
             std::vector<Measure *> measureList = iter->first;
             Ending *ending = new Ending();
-            if (iter->second.m_endingText.empty()) { // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
+            if (iter->second.m_endingText
+                    .empty()) { // some musicXML exporters tend to ignore the <ending> text, so take @number instead.
                 ending->SetN(iter->second.m_endingNumber);
-            } else {
+            }
+            else {
                 ending->SetN(iter->second.m_endingText);
             }
             ending->SetLendsym(LINESTARTENDSYMBOL_angledown); // default, does not need to be written
@@ -620,7 +621,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
             // replace first <measure> with <ending> element
             section->ReplaceChild(measureList.front(), ending);
-            // go through measureList of that ending and remove remaining measures from <section> and add them to <ending>
+            // go through measureList of that ending and remove remaining measures from <section> and add them to
+            // <ending>
             std::vector<Measure *>::iterator jter;
             for (jter = measureList.begin(); jter != measureList.end(); ++jter) {
                 logString = logString + (*jter)->GetUuid().c_str();
@@ -638,7 +640,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     if (!m_tieStack.empty()) {
-        LogWarning("MusicXML import: There are ties left open.");
+        LogWarning("MusicXML import: There are %d ties left open.", m_tieStack.size());
         m_tieStack.clear();
     }
     if (!m_slurStack.empty()) { // There are slurs left open
@@ -651,7 +653,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     if (!m_slurStopStack.empty()) { // There are slurs ends without opening
         std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
         for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
-            LogWarning("MusicXML import: Slur ending for element '%s' could not be"
+            LogWarning("MusicXML import: Slur ending for element '%s' could not be "
                        "matched to a start element.",
                 iter->first->GetUuid().c_str());
         }
@@ -1003,6 +1005,36 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
     }
 
+    // match open ties with close ties
+    double lastScoreTimeOnset;
+    bool tieMatched;
+    std::vector<std::pair<Tie *, Note *> >::iterator iter;
+    for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
+        lastScoreTimeOnset = 9999; // __DBL_MAX__;
+        tieMatched = false;
+        std::vector<Note *>::iterator jter;
+        for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
+            // match tie stop with pitch/oct identity, with start note earlier than end note,
+            // and with earliest end note.
+            if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
+                && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
+                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                iter->first->SetEndid("#" + (*jter)->GetUuid());
+                lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
+                tieMatched = true;
+            }
+        }
+        if (tieMatched) {
+            m_tieStack.erase(iter--);
+        }
+        else {
+            iter->second->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
+        }
+    }
+    if (!m_tieStopStack.empty()) { // clear m_tieStopStack after each measure
+        m_tieStopStack.clear();
+    }
+
     return true;
 }
 
@@ -1162,7 +1194,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         std::string endingNumber = ending.node().attribute("number").as_string();
         std::string endingType = ending.node().attribute("type").as_string();
         std::string endingText = ending.node().text().as_string();
-        // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(), endingText.c_str());
+        // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
+        // endingText.c_str());
         if (endingType == "start") {
             if (m_endingStack.empty() || (!m_endingStack.empty() && NotInEndingStack(measure->GetN()))) {
                 musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
@@ -1451,6 +1484,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     LayerElement *element = NULL;
 
+    double onset = m_durTotal; // keep note onsets for later
+
     // add duration to measure time
     if (!node.select_node("chord")) m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
 
@@ -1574,6 +1609,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         if (node.attribute("xml:id")) {
             note->SetUuid(node.attribute("xml:id").as_string());
         }
+        note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
 
         // accidental
         pugi::xpath_node accidental = node.select_node("accidental");
@@ -1732,20 +1768,24 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // ties
         pugi::xpath_node startTie = notations.node().select_node("tied[@type='start']");
         pugi::xpath_node endTie = notations.node().select_node("tied[@type='stop']");
-        if (endTie) {
-            CloseTie(staff, note);
+        if (endTie) { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
+            m_tieStopStack.push_back(note);
+        }
+        else {
+            CloseTie(note);
         }
         if (startTie) {
             Tie *tie = new Tie();
             // color
             tie->SetColor(startTie.node().attribute("color").as_string());
             // placement and orientation
-            tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
-            tie->SetCurvedir(
-                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+            tie->SetCurvedir(tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+            if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
+                tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
+            }
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
-            OpenTie(staff, note, tie);
+            OpenTie(note, tie);
         }
 
         // articulation
@@ -2233,8 +2273,7 @@ bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
 {
     for (auto &endingItem : m_endingStack) {
         for (auto &measure : endingItem.first) {
-            if (measure->GetN() == measureN)
-                return false;
+            if (measure->GetN() == measureN) return false;
         }
     }
     return true;
