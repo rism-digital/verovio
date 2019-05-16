@@ -508,7 +508,7 @@ bool HumdrumInput::convertHumdrum()
 
     infile.analyzeSlurs();
     infile.analyzeKernTies();
-    infile.analyzeKernStems();
+    infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
     infile.analyzeOttavas();
     parseSignifiers(infile);
