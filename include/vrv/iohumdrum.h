@@ -269,7 +269,7 @@ public:
     virtual ~HumdrumInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &humdrum);
+    virtual bool ImportString(const std::string &humdrum);
 
 #ifndef NO_HUMDRUM_SUPPORT
 
