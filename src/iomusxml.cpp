@@ -1047,16 +1047,17 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             assert(staff);
             for (auto layer : *staff->GetChildren()) {
                 assert(layer);
-                for (musicxml::ClefChange clefChange : m_ClefChangeStack) {
-                    if (clefChange.m_measureNum == measureNum && clefChange.m_staff == staff
-                        && clefChange.m_scoreOnset == m_durTotal) {
-                        if (clefChange.isFirst) { // add clef when first in staff
-                            layer->AddChild(clefChange.m_clef);
-                            clefChange.isFirst = false;
+                std::vector<musicxml::ClefChange>::iterator iter;
+                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+                    if (iter->m_measureNum == measureNum && iter->m_staff == staff
+                        && iter->m_scoreOnset == m_durTotal) {
+                        if (iter->isFirst) { // add clef when first in staff
+                            layer->AddChild(iter->m_clef);
+                            iter->isFirst = false;
                         }
                         else {
                             Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
-                            sameasClef->SetSameas(clefChange.m_clef->GetUuid().c_str());
+                            sameasClef->SetSameas(iter->m_clef->GetUuid().c_str());
                             layer->AddChild(sameasClef);
                         }
                     }
@@ -1109,6 +1110,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal));
+            LogMessage("Clef change added: measure %s, staff %d, tstamp %d.",
+                       measureNum.c_str(), staff->GetN(), m_durTotal);
         }
     }
 
@@ -1521,17 +1524,19 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
-        for (musicxml::ClefChange clefChange : m_ClefChangeStack) {
-            if (clefChange.m_measureNum == measureNum && clefChange.m_staff == staff
-                && clefChange.m_scoreOnset == m_durTotal) {
-                if (clefChange.isFirst) { // add clef when first in staff
-                    layer->AddChild(clefChange.m_clef);
-                    clefChange.isFirst = false;
+        std::vector<musicxml::ClefChange>::iterator iter;
+        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal) {
+                LogMessage("Clef added: measure %s, staff %d, tstamp %d.",
+                           measureNum.c_str(), staff->GetN(), m_durTotal);
+                if (iter->isFirst) { // add clef when first in staff
+                    AddLayerElement(layer, iter->m_clef);
+                    iter->isFirst = false;
                 }
                 else {
                     Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
-                    sameasClef->SetSameas(clefChange.m_clef->GetUuid().c_str());
-                    layer->AddChild(sameasClef);
+                    sameasClef->SetSameas(iter->m_clef->GetUuid().c_str());
+                    AddLayerElement(layer, sameasClef);
                 }
             }
         }
