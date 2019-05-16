@@ -908,7 +908,6 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
     std::wstring wtext;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     wtext = conv.from_bytes(text);
-
     if (!m_doc->GetDrawingPage()) return false;
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     if (element == nullptr) {
@@ -1190,7 +1189,6 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
 {
     m_editInfo = "";
     Object *parent = nullptr, *doubleParent = nullptr;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
     std::vector<Object *> fullParents;
@@ -1288,6 +1286,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                 (*it)->MoveItselfTo(parent);
             }
         }
+        parent->ReorderByXPos();
         doubleParent->AddChild(parent);
 
         Layer *layer = dynamic_cast<Layer *> (parent->GetFirstParent(LAYER));
@@ -1305,6 +1304,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                 (*it)->MoveItselfTo(parent);
             }
         }
+        parent->ReorderByXPos();
     }
 
     //if there are more than 1 full parent we need to concat syl's
@@ -1347,6 +1347,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
             assert(layer);
             layer->ReorderByXPos();
+            parent = fullSyllable;
         }
         
 
@@ -1454,6 +1455,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             else if(groupType == "nc"){
                 fparent = el->GetFirstParent(NEUME);
                 assert(fparent);
+                m_editInfo = m_editInfo + fparent->GetUuid();
                 sparent = fparent->GetFirstParent(SYLLABLE);
                 assert(sparent);
                 currentParent = dynamic_cast<Neume *>(fparent);
@@ -1463,6 +1465,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             else if(groupType == "neume"){
                 fparent = el->GetFirstParent(SYLLABLE);
                 assert(fparent);
+                m_editInfo = m_editInfo + fparent->GetUuid();
                 sparent = fparent->GetFirstParent(LAYER);
                 assert(sparent);
                 currentParent = dynamic_cast<Syllable *>(fparent);
@@ -1472,6 +1475,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
             else{
                 LogError("Invalid groupType for ungrouping");
+                m_editInfo = "";
                 return false;
             }
         }
@@ -1495,7 +1499,8 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 Syl *syl = new Syl();
                 newParent->AddChild(syl);
             }
-            
+            m_editInfo = m_editInfo + " " + newParent->GetUuid();
+
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
             sparent->AddChild(newParent);

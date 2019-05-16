@@ -4532,7 +4532,7 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 
     //read all of the syllables elements
     //and add an empty <syl> if it doesn't have one
-    if(success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable)) {
+    if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
 
         Object *obj = vrvSyllable->FindChildByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
