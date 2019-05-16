@@ -521,7 +521,7 @@ bool Toolkit::LoadData(const std::string &data)
                 m_doc.CastOffEncodingDoc();
                 // LogElapsedTimeEnd("layout");
             } else if (option == BREAKS_line) {
-                // TODO: Code here.
+                m_doc.CastOffLineDoc();
             }
         } else {
             if (option == BREAKS_encoded) {

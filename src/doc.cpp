@@ -768,6 +768,14 @@ void Doc::OptimizeScoreDefDoc(bool encoded)
 
 void Doc::CastOffDoc()
 {
+    Doc::CastOffDocBase(false, false);
+}
+void Doc::CastOffLineDoc()
+{
+    Doc::CastOffDocBase(true, false);
+}
+void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
+{
     Pages *pages = this->GetPages();
     assert(pages);
 
@@ -794,16 +802,25 @@ void Doc::CastOffDoc()
 
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
-    CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
-    castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
-        - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
-    castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
-    castOffSystemsParams.m_currentScoreDefWidth
-        = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
+    Page *currentPage = new Page();
 
-    Functor castOffSystems(&Object::CastOffSystems);
-    Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
-    contentSystem->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
+    if(useSectionBreaks && !usePageBreaks) {
+        CastOffEncodingParams castOffEncodingParams(this, currentPage, currentSystem, contentSystem, false);
+
+        Functor castOffEncoding(&Object::CastOffEncoding);
+        contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
+    } else {
+        CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
+        castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
+            - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+        castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
+        castOffSystemsParams.m_currentScoreDefWidth
+            = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
+
+        Functor castOffSystems(&Object::CastOffSystems);
+        Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
+        contentSystem->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
+    }
     delete contentSystem;
 
     // Reset the scoreDef at the beginning of each system
@@ -821,7 +838,6 @@ void Doc::CastOffDoc()
     assert(contentPage && !contentPage->GetParent());
     this->ResetDrawingPage();
 
-    Page *currentPage = new Page();
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
     castOffPagesParams.m_pageHeight = this->m_drawingPageHeight - this->m_drawingPageMarginBot;

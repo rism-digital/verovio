@@ -55,9 +55,11 @@ int Pb::CastOffEncoding(FunctorParams *functorParams)
     // is not the one at the beginning of the content. This is not very robust but at least make it
     // work when rendering a <mdiv> that does not start with a <pb> (which we cannot force)
     if (params->m_currentSystem->GetChildCount(MEASURE) > 0) {
-        params->m_currentPage = new Page();
-        assert(params->m_doc->GetPages());
-        params->m_doc->GetPages()->AddChild(params->m_currentPage);
+        if (params->m_usePages) {
+            params->m_currentPage = new Page();
+            assert(params->m_doc->GetPages());
+            params->m_doc->GetPages()->AddChild(params->m_currentPage);
+        }
         params->m_currentSystem = new System();
         params->m_currentPage->AddChild(params->m_currentSystem);
     }
