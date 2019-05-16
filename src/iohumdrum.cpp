@@ -1063,7 +1063,7 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
     xmldata << "</extMeta>\n";
 
     pugi::xml_document tmpdoc;
-    pugi::xml_parse_result result = tmpdoc.load(xmldata.str().c_str());
+    pugi::xml_parse_result result = tmpdoc.load_string(xmldata.str().c_str());
     if (!result) {
         // some sort of error, so give up;
         cerr << "ExtMeta parse error: " << result.description() << endl;
