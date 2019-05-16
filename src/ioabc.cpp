@@ -130,10 +130,11 @@ void AbcInput::parseABC(std::istream &infile)
     CreateHeader();
 
     while (!infile.eof()) {
-        while (abcLine[0] != 'X') {
+        while (!(abcLine[0] == 'X' && abcLine[1] == ':') && !infile.eof()) {
             std::getline(infile, abcLine);
             ++m_lineNum;
         }
+        if (infile.eof()) break;
 
         // read tune header
         readInformationField('X', &abcLine[2]);
@@ -142,6 +143,7 @@ void AbcInput::parseABC(std::istream &infile)
             ++m_lineNum;
             readInformationField(abcLine[0], &abcLine[2]);
         }
+        if (infile.eof()) break;
         if (m_title.empty()) {
             LogWarning("ABC input: Title field missing, creating empty title");
             m_title.push_back(std::make_pair("", 0));
@@ -152,24 +154,42 @@ void AbcInput::parseABC(std::istream &infile)
         // create score
         assert(m_mdiv != NULL);
         Score *score = new Score();
-        m_mdiv->AddChild(score);
+        if (!m_doc->m_scoreDef.GetFirst(STAFFGRP)) {
+            m_mdiv->AddChild(score);
 
-        // create page head
-        PrintInformationFields();
-        StaffGrp *staffGrp = new StaffGrp();
-        m_doc->m_scoreDef.AddChild(staffGrp);
-        StaffDef *staffDef = new StaffDef();
-        staffDef->SetN(1);
-        staffDef->SetLines(m_stafflines);
-        staffDef->SetTransSemi(m_transpose);
-        staffGrp->AddChild(staffDef);
-        if (m_meter) {
-            m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
-            m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
-            m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
-            delete m_meter;
-            m_meter = NULL;
+            // create page head
+            PrintInformationFields();
+            StaffGrp *staffGrp = new StaffGrp();
+            // create staff
+            StaffDef *staffDef = new StaffDef();
+            staffDef->SetN(1);
+            staffDef->SetLines(m_stafflines);
+            staffDef->SetTransSemi(m_transpose);
+            if (m_clef) {
+                staffDef->SetClefShape(m_clef->GetShape());
+                staffDef->SetClefLine(m_clef->GetLine());
+                delete m_clef;
+                m_clef = NULL;
+            }
+            staffGrp->AddChild(staffDef);
+            m_doc->m_scoreDef.AddChild(staffGrp);
+            if (m_key) {
+                // waiting for fix
+                // m_doc->m_scoreDef.SetKeyMode(m_key->GetMode());
+                // m_doc->m_scoreDef.SetKeyPname(m_key->GetPname());
+                // m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(m_key->GetSig()));
+                delete m_key;
+                m_key = NULL;
+            }
+            if (m_meter) {
+                m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
+                m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
+                m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
+                delete m_meter;
+                m_meter = NULL;
+            }
         }
+
         // create section
         Section *section = new Section();
         // start with a new page
@@ -190,11 +210,7 @@ void AbcInput::parseABC(std::istream &infile)
             std::getline(infile, abcLine);
             ++m_lineNum;
             if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
-                // empty lines end tunes
-                break;
-            }
-            else if (abcLine[0] == 'X') {
-                LogDebug("ABC input: Reading only first tune in file");
+                // abc tunes are separated from each other by empty lines
                 break;
             }
             else if (abcLine[0] == '%')
@@ -233,12 +249,16 @@ void AbcInput::parseABC(std::istream &infile)
 
         score->AddChild(section);
 
-        m_doc->ConvertToPageBasedDoc();
-        m_controlElements.clear();
-        m_composer.clear();
-        m_info.clear();
-        m_title.clear();
+        // only append first tune in file
+        if (!score->GetFirstParent(MDIV)) delete score;
     }
+
+    m_controlElements.clear();
+    m_composer.clear();
+    m_info.clear();
+    m_title.clear();
+
+    m_doc->ConvertToPageBasedDoc();
 }
 
 /**********************************
@@ -559,6 +579,8 @@ void AbcInput::parseKey(std::string keyString)
     m_ID = "";
     short int accidNum = 0;
     data_MODE mode = MODE_NONE;
+    // m_key = new KeySig();
+    m_clef = new Clef();
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
@@ -652,6 +674,7 @@ void AbcInput::parseKey(std::string keyString)
             keyPitchAlterAmount = 1;
         }
 
+        // m_doc->m_scoreDef.SetSig(keySig);
         m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
         keyPitchAlter = pitch.substr(posStart, posEnd);
     }
@@ -662,29 +685,30 @@ void AbcInput::parseKey(std::string keyString)
     // tenor: 4; bass: 4.
     // [+8 | -8] - draws '8' above or below the staff. The player will transpose the notes one octave higher or lower.
     if (keyString.find("alto") != std::string::npos) {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
+        m_clef->SetShape(CLEFSHAPE_C);
         i += 4;
-        m_doc->m_scoreDef.SetClefLine(3);
+        m_clef->SetLine(3);
     }
     else if (keyString.find("tenor") != std::string::npos) {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_C);
+        m_clef->SetShape(CLEFSHAPE_C);
         i += 5;
-        m_doc->m_scoreDef.SetClefLine(4);
+        m_clef->SetLine(4);
     }
     else if (keyString.find("bass") != std::string::npos) {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_F);
+        m_clef->SetShape(CLEFSHAPE_F);
         i += 4;
-        m_doc->m_scoreDef.SetClefLine(4);
+        m_clef->SetLine(4);
     }
     else if (keyString.find("perc") != std::string::npos) {
         LogWarning("ABC Input: Drum clef is not supported");
     }
     else if (keyString.find("none") != std::string::npos) {
         i += 4;
+        m_clef->SetShape(CLEFSHAPE_NONE);
     }
     else {
-        m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_G);
-        m_doc->m_scoreDef.SetClefLine(2);
+        m_clef->SetShape(CLEFSHAPE_G);
+        m_clef->SetLine(2);
     }
 
     if (keyString.find("transpose=", i) != std::string::npos) {
@@ -785,6 +809,9 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
         m_mdiv->SetN(std::to_string(mdivNum));
     }
     m_doc->AddChild(m_mdiv);
+
+    // reset unit note length
+    m_durDefault = DURATION_NONE;
 
     // reset information fields
     m_composer.clear();
@@ -1477,6 +1504,12 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
         }
 
         ++i;
+
+        // check if there is a clef change
+        if (m_clef) {
+            m_noteStack.push_back(m_clef);
+            m_clef = NULL;
+        }
 
         // check if there is a change in meter
         if (m_meter) {

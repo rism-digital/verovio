@@ -21,6 +21,7 @@ namespace vrv {
 
 class BarLine;
 class Beam;
+class Clef;
 class ControlElement;
 class Harm;
 class KeySig;
@@ -96,10 +97,12 @@ public:
 private:
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
+    Clef *m_clef = NULL;
+    KeySig *m_key = NULL;
     MeterSig *m_meter = NULL;
     Layer *m_layer = NULL;
 
-    data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
+    data_DURATION m_durDefault; // todo: switch to MEI
     std::string m_ID;
     int m_unitDur;
     std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines
