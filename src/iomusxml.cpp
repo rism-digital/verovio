@@ -639,6 +639,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         m_endingStack.clear();
     }
 
+    if (!m_ClefChangeStack.empty()) {
+        for (musicxml::ClefChange iter : m_ClefChangeStack) {
+            LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted.",
+                iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
+        }
+    }
     if (!m_tieStack.empty()) {
         LogWarning("MusicXML import: There are %d ties left open.", m_tieStack.size());
         m_tieStack.clear();
@@ -1033,6 +1039,35 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
     if (!m_tieStopStack.empty()) { // clear m_tieStopStack after each measure
         m_tieStopStack.clear();
+    }
+
+    // add clef changes that might occur just before a bar line and remove inserted clefs from stack
+    if (!m_ClefChangeStack.empty()) {
+        for (auto staff : *measure->GetChildren()) {
+            assert(staff);
+            for (auto layer : *staff->GetChildren()) {
+                assert(layer);
+                for (musicxml::ClefChange clefChange : m_ClefChangeStack) {
+                    if (clefChange.m_measureNum == measureNum && clefChange.m_staff == staff
+                        && clefChange.m_scoreOnset == m_durTotal) {
+                        if (clefChange.isFirst) { // add clef when first in staff
+                            layer->AddChild(clefChange.m_clef);
+                            clefChange.isFirst = false;
+                        }
+                        else {
+                            Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
+                            sameasClef->SetSameas(clefChange.m_clef->GetUuid().c_str());
+                            layer->AddChild(sameasClef);
+                        }
+                    }
+                }
+            }
+        }
+        std::vector<musicxml::ClefChange>::iterator iter;
+        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+            if (!iter->isFirst) // remove from stack, if already inserted
+                m_ClefChangeStack.erase(iter--);
+        }
     }
 
     return true;
@@ -1483,32 +1518,27 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
     assert(staff);
-    
-    // add clef changes to all layers of a given staff and time stamp
+
+    // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
-        std::vector<musicxml::ClefChange>::iterator iter;
-        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
-            if (iter->m_measureNum == measureNum) {
-                if (iter->m_staff == staff && iter->m_scoreOnset == m_durTotal) {
-                    if (iter->isFirst) {
-                        layer->AddChild(iter->m_clef);
-                        iter->isFirst = false;
-                    } else
-                    {
-                        Clef *sameasClef = new Clef();
-                        sameasClef->SetSameas(iter->m_clef->GetUuid().c_str());
-                        layer->AddChild(sameasClef);
-                    }
+        for (musicxml::ClefChange clefChange : m_ClefChangeStack) {
+            if (clefChange.m_measureNum == measureNum && clefChange.m_staff == staff
+                && clefChange.m_scoreOnset == m_durTotal) {
+                if (clefChange.isFirst) { // add clef when first in staff
+                    layer->AddChild(clefChange.m_clef);
+                    clefChange.isFirst = false;
                 }
-            } else
-            {
-                m_ClefChangeStack.erase(iter--);
+                else {
+                    Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
+                    sameasClef->SetSameas(clefChange.m_clef->GetUuid().c_str());
+                    layer->AddChild(sameasClef);
+                }
             }
         }
     }
 
     LayerElement *element = NULL;
-    
+
     double onset = m_durTotal; // keep note onsets for later
 
     // add duration to measure time
@@ -1804,7 +1834,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             tie->SetColor(startTie.node().attribute("color").as_string());
             // placement and orientation
-            tie->SetCurvedir(tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+            tie->SetCurvedir(
+                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }

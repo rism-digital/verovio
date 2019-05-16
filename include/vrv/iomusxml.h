@@ -106,7 +106,7 @@ namespace musicxml {
         Staff *m_staff;
         Clef *m_clef;
         int m_scoreOnset; // the score position of clef change
-        bool isFirst = true; // make visible to first clef change across layers
+        bool isFirst = true; // insert clef change at first layer, others use @sameas
     };
     
 } // namespace musicxml
@@ -322,7 +322,7 @@ private:
      * end of each measure
      */
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
-    /* stack of clef changes to be inserted to all layers of that staff */
+    /* stack of clef changes to be inserted to all layers of a given staff */
     std::vector<musicxml::ClefChange> m_ClefChangeStack;
 };
 
