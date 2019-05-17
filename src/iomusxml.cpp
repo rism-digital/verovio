@@ -232,7 +232,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         layerNum = atoi(layerNumStr.c_str());
     }
     if (layerNum < 1) {
-        LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
+        LogWarning("MusicXML import: Layer %d cannot be found", staffNum);
         layerNum = 1;
     }
     return SelectLayer(layerNum, staff);
@@ -626,6 +626,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         m_endingStack.clear();
     }
 
+    if (!m_ClefChangeStack.empty()) {
+        for (musicxml::ClefChange iter : m_ClefChangeStack) {
+            if (iter.isFirst)
+                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted.",
+                           iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
+        }
+        m_ClefChangeStack.clear();
+    }
     if (!m_tieStack.empty()) {
         LogWarning("MusicXML import: There are %d ties left open.", m_tieStack.size());
         m_tieStack.clear();
@@ -1019,6 +1027,31 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         m_tieStopStack.clear();
     }
 
+    // add clef changes that might occur just before a bar line and remove inserted clefs from stack
+    if (!m_ClefChangeStack.empty()) {
+        for (auto staff : *measure->GetChildren()) {
+            assert(staff);
+            for (auto layer : *staff->GetChildren()) {
+                assert(layer);
+                std::vector<musicxml::ClefChange>::iterator iter;
+                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+                    if (iter->m_measureNum == measureNum && iter->m_staff == staff
+                        && iter->m_scoreOnset == m_durTotal) {
+                        if (iter->isFirst) { // add clef when first in staff
+                            layer->AddChild(iter->m_clef);
+                            iter->isFirst = false;
+                        }
+                        else {
+                            Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
+                            sameasClef->SetSameas(iter->m_clef->GetUuid().c_str());
+                            layer->AddChild(sameasClef);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return true;
 }
 
@@ -1029,13 +1062,14 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     assert(section);
     assert(measure);
 
-    // read clef changes as MEI clef
+    // read clef changes as MEI clef and add them to the stack
     pugi::xpath_node clef = node.select_node("clef");
     if (clef) {
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Layer *layer = SelectLayer(staffNum, measure);
+        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum-1));
+        assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
         if (clefSign && clefLine) {
@@ -1055,7 +1089,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            AddLayerElement(layer, meiClef);
+            m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal));
         }
     }
 
@@ -1466,6 +1500,24 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
     assert(staff);
 
+    // add clef changes to all layers of a given measure, staff, and time stamp
+    if (!m_ClefChangeStack.empty()) {
+        std::vector<musicxml::ClefChange>::iterator iter;
+        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal) {
+                if (iter->isFirst) { // add clef when first in staff
+                    AddLayerElement(layer, iter->m_clef);
+                    iter->isFirst = false;
+                }
+                else {
+                    Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
+                    sameasClef->SetSameas(iter->m_clef->GetUuid().c_str());
+                    AddLayerElement(layer, sameasClef);
+                }
+            }
+        }
+    }
+
     LayerElement *element = NULL;
 
     double onset = m_durTotal; // keep note onsets for later
@@ -1763,7 +1815,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             tie->SetColor(startTie.node().attribute("color").as_string());
             // placement and orientation
-            tie->SetCurvedir(tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+            tie->SetCurvedir(               tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }
@@ -1940,7 +1992,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
 
     // slur
-    // cross staff slurs won't work
     pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
     for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
         pugi::xml_node slur = it->node();
