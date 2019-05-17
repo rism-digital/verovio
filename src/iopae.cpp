@@ -133,6 +133,27 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
+    
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+    
+    // add minimal scoreDef
+    StaffGrp *staffGrp = new StaffGrp();
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(5);
+    staffGrp->AddChild(staffDef);
+    m_doc->m_scoreDef.AddChild(staffGrp);
 
     // read values
     while (!infile.eof()) {
@@ -400,19 +421,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         current_measure.notes.clear();
     }
 
-    m_doc->Reset();
-    m_doc->SetType(Raw);
-    // The mdiv
-    Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
-    m_doc->AddChild(mdiv);
-    // The score
-    Score *score = new Score();
-    mdiv->AddChild(score);
-    // the section
-    Section *section = new Section();
-    score->AddChild(section);
-
     int measure_count = 1;
 
     std::vector<pae::Measure>::iterator it;
@@ -451,12 +459,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         convertMeasure(&obj);
         measure_count++;
     }
-
-    // add minimal scoreDef
-    StaffGrp *staffGrp = new StaffGrp();
-    StaffDef *staffDef = new StaffDef();
-    staffDef->SetN(1);
-    staffDef->SetLines(5);
+    
     if (m_is_mensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
     }
@@ -489,8 +492,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         delete m_tie;
         m_tie = NULL;
     }
-    staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 }
