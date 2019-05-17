@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class Clef;
 class ControlElement;
 class Dir;
 class Dynam;
@@ -91,7 +92,23 @@ namespace musicxml {
         std::string m_endingType;
         std::string m_endingText;
     };
+    
+    class ClefChange {
+    public:
+        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset) {
+            m_measureNum = measureNum;
+            m_staff = staff;
+            m_clef = clef;
+            m_scoreOnset = scoreOnset;
+        }
 
+        std::string m_measureNum;
+        Staff *m_staff;
+        Clef *m_clef;
+        int m_scoreOnset; // the score position of clef change
+        bool isFirst = true; // insert clef change at first layer, others use @sameas
+    };
+    
 } // namespace musicxml
 
 //----------------------------------------------------------------------------
@@ -305,6 +322,8 @@ private:
      * end of each measure
      */
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
+    /* stack of clef changes to be inserted to all layers of a given staff */
+    std::vector<musicxml::ClefChange> m_ClefChangeStack;
 };
 
 } // namespace vrv
