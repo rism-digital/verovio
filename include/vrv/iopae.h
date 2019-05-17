@@ -239,7 +239,7 @@ public:
     virtual ~PaeInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &pae);
+    virtual bool ImportString(const std::string &pae);
 
 #ifndef NO_PAE_SUPPORT
 

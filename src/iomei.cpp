@@ -2078,7 +2078,7 @@ bool MeiInput::ImportFile()
     }
 }
 
-bool MeiInput::ImportString(std::string const &mei)
+bool MeiInput::ImportString(const std::string &mei)
 {
     try {
         m_doc->Reset();
