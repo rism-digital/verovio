@@ -2518,7 +2518,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
         m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
     }
-    
+
     front = music.child("front");
     if (!front.empty()) {
         m_doc->m_front.reset();
@@ -4038,8 +4038,6 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             parent->AddChild(syl);
         }
     }
-
-
     return success;
 }
 
@@ -4542,10 +4540,6 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
             vrvSyllable->AddChild(syl);
         }
     }
-
-
-
-
     return success;
 }
 

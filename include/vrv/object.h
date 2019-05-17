@@ -165,11 +165,6 @@ public:
     Object &operator=(const Object &object);
 
     /**
-    * Comparison operator: calls sortByUlx
-    */
-    bool operator<(Object &rhs);
-
-    /**
      * Move all the children of the object passed as parameter to this one.
      * Objects must be of the same type.
      * After this operation, the object passed as parameter has no child anymore.
@@ -1073,7 +1068,7 @@ public:
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
-    
+
     /**
      * Reorder elements by x-position.
      */

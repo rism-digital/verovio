@@ -946,7 +946,7 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
                 child = syl->Object::GetNext();
             }
         }
-        
+
     }
     else if (element->Is(SYLLABLE)) {
         Syllable *syllable = dynamic_cast<Syllable *>(element);
@@ -1349,8 +1349,6 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             layer->ReorderByXPos();
             parent = fullSyllable;
         }
-        
-
     }
     // Delete any empty parents
     for (auto it = parents.begin(); it != parents.end(); ++it) {
@@ -1471,7 +1469,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 currentParent = dynamic_cast<Syllable *>(fparent);
                 assert(currentParent);
                 firstIsSyl = false;
-                
+
             }
             else{
                 LogError("Invalid groupType for ungrouping");
@@ -1511,7 +1509,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
 }
 
 bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
-{  
+{
     m_editInfo = "";
     //Check if you can get drawing page
     if(!m_doc->GetDrawingPage()) {

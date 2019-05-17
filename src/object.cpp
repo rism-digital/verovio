@@ -46,8 +46,6 @@
 
 namespace vrv {
 
-bool sortByUlx(Object *a, Object *b);
-
 //----------------------------------------------------------------------------
 // Object
 //----------------------------------------------------------------------------
@@ -81,7 +79,7 @@ Object::Object(const Object &object) : BoundingBox(object)
 {
     ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-    
+
     m_classid = object.m_classid;
     m_parent = NULL;
 
@@ -148,45 +146,6 @@ Object &Object::operator=(const Object &object)
         }
     }
     return *this;
-}
-
-bool Object::operator<(Object &rhs) {
-    Object *b = &rhs;
-    FacsimileInterface *fa = nullptr, *fb = nullptr;
-    InterfaceComparison comp(INTERFACE_FACSIMILE);
-    if (this->GetFacsimileInterface())
-        fa = this->GetFacsimileInterface();
-    else {
-        ArrayOfObjects children;
-        this->FindAllChildByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
-            assert(temp);
-            if (temp->HasFacs() && (fa == nullptr || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
-                fa = temp;
-            }
-        }
-    }
-    if (b->GetFacsimileInterface())
-        fb = b->GetFacsimileInterface();
-    else {
-        ArrayOfObjects children;
-        b->FindAllChildByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
-            assert(temp);
-            if (temp->HasFacs() && (fb == nullptr || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
-                fb = temp;
-            }
-        }
-    }
-
-    if (fa == nullptr || fb == nullptr) {
-        LogMessage("Null pointer(s) for '%s' and '%s'", this->GetUuid().c_str(), b->GetUuid().c_str());
-        return false;
-    }
-
-    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
 
 Object::~Object()
@@ -282,7 +241,7 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
 void Object::SortChildren(Object::binaryComp comp)
 {
     std::stable_sort(m_children.begin(), m_children.end(), comp);
-    this->Modify(); 
+    this->Modify();
 }
 
 void Object::MoveItselfTo(Object *targetParent)
@@ -1529,7 +1488,7 @@ int Object::SaveEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-bool Object::sortByUlx( Object *a, Object *b)
+bool Object::sortByUlx(Object *a, Object *b)
 {
     FacsimileInterface *fa = nullptr, *fb = nullptr;
     InterfaceComparison comp(INTERFACE_FACSIMILE);
@@ -1575,7 +1534,7 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS; // This would have already been reordered.
         }
     }
-    
+
     std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
     this->Modify();
     return FUNCTOR_CONTINUE;
