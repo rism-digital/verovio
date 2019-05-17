@@ -1081,14 +1081,13 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     assert(section);
     assert(measure);
 
-    // read clef changes as MEI clef
+    // read clef changes as MEI clef and add them to the stack
     pugi::xpath_node clef = node.select_node("clef");
     if (clef) {
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        staffNum--; // these three lines could be moved into a new method selectStaff(staffNum, measure)
-        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
+        Staff *staff = dynamic_cast<Staff *>((measure->GetChild(staffNum) - 1));
         assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
@@ -1110,8 +1109,6 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal));
-            LogMessage("Clef change added: measure %s, staff %d, tstamp %d.",
-                       measureNum.c_str(), staff->GetN(), m_durTotal);
         }
     }
 
@@ -1527,8 +1524,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         std::vector<musicxml::ClefChange>::iterator iter;
         for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
             if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal) {
-                LogMessage("Clef added: measure %s, staff %d, tstamp %d.",
-                           measureNum.c_str(), staff->GetN(), m_durTotal);
                 if (iter->isFirst) { // add clef when first in staff
                     AddLayerElement(layer, iter->m_clef);
                     iter->isFirst = false;
