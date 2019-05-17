@@ -495,6 +495,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     partId.c_str());
                 continue;
             }
+            int staves = partFirstMeasure.node().select_node("attributes/staves").node().text().as_int();
+            Label *label = NULL;
+            LabelAbbr *labelAbbr = NULL;
+            InstrDef *instrdef = NULL;
             // part-name should be revised, as soon MEI can suppress labels
             std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
             std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
@@ -504,35 +508,37 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // pugi::xpath_node midiPan = midiInstrument.node().select_node("pan");
             pugi::xpath_node midiProgram = midiInstrument.node().select_node("midi-program");
             pugi::xpath_node midiVolume = midiInstrument.node().select_node("volume");
+            if (!partName.empty()) {
+                label = new Label();
+                Text *text = new Text();
+                text->SetText(UTF8to16(partName));
+                label->AddChild(text);
+            }
+            if (!partAbbr.empty()) {
+                labelAbbr = new LabelAbbr();
+                Text *text = new Text();
+                text->SetText(UTF8to16(partAbbr));
+                labelAbbr->AddChild(text);
+            }
+            if (midiInstrument) {
+                instrdef = new InstrDef;
+                instrdef->SetMidiInstrname(
+                    instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
+                if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
+                // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
+                if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
+                if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
+            }
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
+            if (staves > 1) {
+                if (label) partStaffGrp->AddChild(label);
+                if (labelAbbr) partStaffGrp->AddChild(labelAbbr);
+                if (instrdef) partStaffGrp->AddChild(instrdef);
+            }
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
-                if (!partName.empty()) {
-                    Label *label = new Label();
-                    Text *text = new Text();
-                    text->SetText(UTF8to16(partName));
-                    label->AddChild(text);
-                    partStaffGrp->AddChild(label);
-                }
-                if (!partAbbr.empty()) {
-                    LabelAbbr *labelAbbr = new LabelAbbr();
-                    Text *text = new Text();
-                    text->SetText(UTF8to16(partAbbr));
-                    labelAbbr->AddChild(text);
-                    partStaffGrp->AddChild(labelAbbr);
-                }
-                if (midiInstrument) {
-                    InstrDef *instrdef = new InstrDef;
-                    instrdef->SetMidiInstrname(
-                        instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
-                    if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
-                    // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
-                    if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
-                    if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
-                    partStaffGrp->AddChild(instrdef);
-                }
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
                 partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
@@ -540,28 +546,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             else {
                 StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindChildByType(STAFFDEF));
                 if (staffDef) {
-                    if (!partName.empty()) {
-                        Label *label = new Label();
-                        Text *text = new Text();
-                        text->SetText(UTF8to16(partName));
-                        label->AddChild(text);
-                        staffDef->AddChild(label);
-                    }
-                    if (!partAbbr.empty()) {
-                        LabelAbbr *labelAbbr = new LabelAbbr();
-                        Text *text = new Text();
-                        text->SetText(UTF8to16(partAbbr));
-                        labelAbbr->AddChild(text);
-                        staffDef->AddChild(labelAbbr);
-                    }
-                    if (midiInstrument) {
-                        InstrDef *instrdef = new InstrDef;
-                        if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
-                        // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
-                        if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
-                        if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
-                        staffDef->AddChild(instrdef);
-                    }
+                    if (label) staffDef->AddChild(label);
+                    if (labelAbbr) staffDef->AddChild(labelAbbr);
+                    if (instrdef) staffDef->AddChild(instrdef);
                 }
                 m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
                 delete partStaffGrp;
@@ -728,10 +715,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         // First get the number of staves in the part
         pugi::xpath_node staves = it->select_node("staves");
         if (staves) {
-            if (staves.node().text()) {
-                int values = atoi(staves.node().text().as_string());
-                nbStaves = (values > 0) ? values : 1;
-            }
+            nbStaves = staves.node().text().as_int();
         }
 
         int i;
