@@ -232,6 +232,15 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
         if (initial.find("<opus ") != std::string::npos) {
             return musicxmlDefault;
         }
+        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
+            return musicxmlDefault;
+        }
 
         std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
