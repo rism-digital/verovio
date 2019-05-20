@@ -1434,6 +1434,16 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
     LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
+    
+    // For mRest we do not look at the time span
+    if (this->Is(MREST)) {
+        // Add the layerN to the list of layer element occuring in this time frame
+        if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
+            == params->m_layers.end()) {
+            params->m_layers.push_back(this->GetAlignmentLayerN());
+        }
+        return FUNCTOR_SIBLINGS;
+    }
 
     if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
 
