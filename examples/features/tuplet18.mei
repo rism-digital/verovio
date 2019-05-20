@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Tuplet number with slurs</title>
+            </titleStmt>
+            <pubStmt>
+                <respStmt>
+                    <persName role="encoder" auth.uri="http://d-nb.info/gnd" auth="GND" codedval="1138881465">Werner Goebl</persName>
+                </respStmt>
+            </pubStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv xml:id="mdiv-0000001665096923">
+                <score xml:id="score-0000001424580804">
+                    <scoreDef xml:id="scoredef-0000001268321234" key.sig="1f" meter.count="4" meter.unit="4">
+                        <staffGrp xml:id="staffgrp-0000000634392425">
+                            <staffDef xml:id="staffdef-0000002124663267" clef.shape="G" clef.line="2" n="1" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000002000015636">
+                        <measure xml:id="measure-0000001848751408" n="1">
+                            <staff xml:id="staff-0000001588657242" n="1">
+                                <layer xml:id="layer-0000000898083143" n="1">
+                                    <beam xml:id="beam-0000000221289339">
+                                        <tuplet xml:id="tuplet-0000001698832106" num="3" numbase="2" bracket.visible="false" num.place="below">
+                                            <note xml:id="note-0000001058404577" dur="32" oct="4" pname="g" stem.dir="up"/>
+                                            <note xml:id="note-0000001707708342" dur="32" oct="4" pname="a" stem.dir="up"> </note>
+                                            <note xml:id="note-0000000185008559" dur="32" oct="4" pname="b" stem.dir="up"> </note>
+                                        </tuplet>
+                                    </beam>
+                                    <beam xml:id="beam-0000000221289421">
+                                        <tuplet xml:id="tuplet-0000001698832423" num="5" numbase="4" bracket.visible="false" num.place="below">
+                                            <note xml:id="note-0000001058404572" dur="32" oct="4" pname="g" stem.dir="up"/>
+                                            <note xml:id="note-0000001707708341" dur="32" oct="4" pname="a" stem.dir="up">
+                                                <accid xml:id="accid-0000001058893237" accid="n"/>
+                                            </note>
+                                            <note xml:id="note-0000000185001239" dur="32" oct="4" pname="b" stem.dir="up">
+                                                <accid xml:id="accid-0000004322926178" accid="n"/>
+                                            </note>
+                                            <note xml:id="note-0000000125256439" dur="32" oct="5" pname="c" stem.dir="up"/>
+                                            <note xml:id="note-0000000759612348" dur="32" oct="5" pname="d" stem.dir="up"/>
+                                        </tuplet>
+                                    </beam>
+                                    <beam xml:id="beam-0000000221289412">
+                                        <tuplet xml:id="tuplet-0000001698832645" num="3" numbase="2" bracket.visible="false" num.place="above">
+                                            <note xml:id="note-0000001058405423" dur="32" oct="4" pname="b" stem.dir="down"/>
+                                            <note xml:id="note-0000001707706867" dur="32" oct="5" pname="c" stem.dir="down"> </note>
+                                            <note xml:id="note-0000000185007765" dur="32" oct="5" pname="d" stem.dir="down"> </note>
+                                        </tuplet>
+                                    </beam>
+                                    <beam xml:id="beam-0000000221289423">
+                                        <tuplet xml:id="tuplet-0000001698832136" num="3" numbase="2" bracket.visible="false" num.place="above">
+                                            <note xml:id="note-0000001058405347" dur="32" oct="4" pname="g" stem.dir="up"/>
+                                            <note xml:id="note-0000001707706452" dur="32" oct="4" pname="a" stem.dir="up"> </note>
+                                            <note xml:id="note-0000000185007569" dur="32" oct="4" pname="b" stem.dir="up"> </note>
+                                        </tuplet>
+                                    </beam>
+                                    <beam xml:id="beam-0000000221284123">
+                                        <tuplet xml:id="tuplet-0000001698814323" num="5" numbase="4" bracket.visible="false" num.place="above">
+                                            <note xml:id="note-0000001058404645" dur="32" oct="4" pname="g" stem.dir="up"/>
+                                            <note xml:id="note-0000001707708756" dur="32" oct="4" pname="a" stem.dir="up">
+                                                <accid xml:id="accid-0000001058898677" accid="n"/>
+                                            </note>
+                                            <note xml:id="note-0000000185001534" dur="32" oct="4" pname="b" stem.dir="up">
+                                                <accid xml:id="accid-0000004322926423" accid="n"/>
+                                            </note>
+                                            <note xml:id="note-0000000125256312" dur="32" oct="5" pname="c" stem.dir="up"/>
+                                            <note xml:id="note-0000000759612645" dur="32" oct="5" pname="d" stem.dir="up"/>
+                                        </tuplet>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-0000001904190832" staff="1" startid="#note-0000001058404577" endid="#note-0000000185008559" curvedir="below" layer="1"/>
+                            <slur xml:id="slur-0000001904190865" staff="1" startid="#note-0000001058404572" endid="#note-0000000759612348" curvedir="below" layer="1"/>
+                            <slur xml:id="slur-0000001904190312" staff="1" startid="#note-0000001058405347" endid="#note-0000000185007569" curvedir="above" layer="1"/>
+                            <slur xml:id="slur-0000001904190423" staff="1" startid="#note-0000001058404645" endid="#note-0000000759612645" curvedir="above" layer="1"/>
+                            <slur xml:id="slur-0000001904190321" staff="1" startid="#note-0000001058405423" endid="#note-0000000185007765" curvedir="above" layer="1"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

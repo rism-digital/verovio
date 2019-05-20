@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?> <?xml-model href="http://dme.mozarteum.at/DME/music/schemas/mei-CMN_3.0.0.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>an example</title>
+      </titleStmt>
+      <pubStmt/>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score xml:id="score_01">
+          <scoreDef xml:id="scoreDef_01" n="1" meter.count="4" meter.unit="4" meter.sym="common" key.sig="1f" key.pname="f" key.mode="major">
+            <staffGrp xml:id="staffGrp_02" symbol="bracket" barthru="true">
+              <staffDef xml:id="staffDef_P04" n="4" clef.shape="F" clef.line="4" lines="5" label="Fagotto I, II" label.abbr="Fag. I, II"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure xml:id="m86_k621_023" n="86">
+              <staff xml:id="staff_45387" n="4">
+                <layer xml:id="layer_45393a" n="1">
+                  <note xml:id="note_45399a" pname="b" oct="3" dur="8" tstamp="1" accid.ges="f"/>
+                  <beam xml:id="beam_45405a">
+                    <note xml:id="note_45411a" pname="c" oct="4" dur="8" tstamp="1.5" accid="s"/>
+                    <note xml:id="note_45417a" pname="d" oct="4" dur="8" tstamp="2"/>
+                  </beam>
+                  <beam xml:id="beam_45426a">
+                    <note xml:id="note_45432a" pname="a" oct="3" dur="8" tstamp="2.5"/>
+                    <note xml:id="note_45438a" pname="b" oct="3" dur="8" tstamp="3" accid.ges="f"/>
+                  </beam>
+                  <beam xml:id="beam_45447a">
+                    <note xml:id="note_45453a" pname="e" oct="3" dur="8" tstamp="3.5" accid="n"/>
+                    <note xml:id="note_45459a" pname="f" oct="3" dur="8" tstamp="4"/>
+                  </beam>
+                  <note xml:id="note_45468a" pname="d" oct="3" dur="8" artic="spicc" tstamp="4.5"/>
+                </layer>
+                <layer xml:id="layer_45393b" n="2">
+                  <note xml:id="note_45399b" pname="b" oct="3" dur="8" tstamp="1" accid.ges="f"/>
+                  <!-- A space should not affect stem direction in layer 1 -->
+                  <space dur="4"/>
+                  <!-- A beam with @sames not affect stem direction in layer 1 -->
+                  <beam xml:id="beam_45426b" sameas="#beam_45426a"/>
+                  <beam xml:id="beam_45447b" sameas="#beam_45447a"/>
+                  <!-- A note should affect stem direction in layer 1 -->
+                  <note xml:id="note_45468b" pname="d" oct="2" dur="8" artic="spicc" tstamp="4.5"/>
+                  <!-- <note xml:id="note_45468b" sameas="#note_45468a"/>-->
+                </layer>
+              </staff>
+              <dir xml:id="dir_45903" staff="4" startid="#note_45411a"  place="above">
+                <rend fontstyle="normal" xml:id="rend_45905">a 2</rend>
+              </dir>
+            </measure>
+            <measure xml:id="m88_k621_023" n="88">
+              <staff xml:id="staff_46848" n="4">
+                <layer xml:id="layer_46854" n="1">
+                  <rest xml:id="rest_46860" dur="8" tstamp="1"/>
+                  <beam xml:id="beam_46866">
+                    <note xml:id="note_46872" pname="c" oct="4" dur="8" tstamp="1.5" accid="s"/>
+                    <note xml:id="note_46878" pname="d" oct="4" dur="8" tstamp="2"/>
+                  </beam>
+                  <beam xml:id="beam_46887">
+                    <note xml:id="note_46893" pname="a" oct="3" dur="8" tstamp="2.5"/>
+                    <note xml:id="note_46899" pname="b" oct="3" dur="8" tstamp="3" accid.ges="f"/>
+                  </beam>
+                  <beam xml:id="beam_46908">
+                    <note xml:id="note_46914" pname="f" oct="3" dur="8" tstamp="3.5" accid="s"/>
+                    <note xml:id="note_46920" pname="g" oct="3" dur="8" tstamp="4"/>
+                  </beam>
+                  <note xml:id="note_46929" pname="d" oct="3" dur="8" artic="spicc" tstamp="4.5"/>
+                </layer>
+                <!-- a complete layer with @sameas should not affect stem direction in layer 1 -->
+                <layer xml:id="staff_46948" n="2" sameas="#layer_46854"/>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>
