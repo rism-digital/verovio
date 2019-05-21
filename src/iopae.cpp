@@ -478,6 +478,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
         m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
         m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
+        // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
+        if (scoreDefMeterSig->GetForm() == meterSigVis_FORM_num) {
+            m_doc->m_scoreDef.SetMeterForm(meterSigDefaultVis_METERFORM_num);
+        }
         delete scoreDefMeterSig;
     }
     if (scoreDefMensur) {
@@ -850,6 +854,8 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
             meter->SetCount(std::stoi(timesig_str));
+            meter->SetUnit(1);
+            meter->SetForm(meterSigVis_FORM_num);
         }
         else if (strcmp(timesig_str, "c") == 0) {
             // C

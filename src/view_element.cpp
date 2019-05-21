@@ -1011,7 +1011,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         }
     }
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), SCOREDEF_NONE, staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
