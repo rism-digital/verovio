@@ -230,7 +230,6 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
                 layerNum = 1;
             }
             if (layerNum == dynamic_cast<Layer *>(layer)->GetN()) {
-                LogWarning("SelectLayer finds layer %d in %s.", layerNum, staff->GetUuid().c_str());
                 return SelectLayer(layerNum, staff);
             }
         }
@@ -258,7 +257,6 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
         layerNum = 1;
     }
-    LogWarning("SelectLayer classic: layer %d in %s.", layerNum, staff->GetUuid().c_str());
     return SelectLayer(layerNum, staff);
 }
 
@@ -654,7 +652,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         for (musicxml::ClefChange iter : m_ClefChangeStack) {
             if (iter.isFirst)
                 LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted.",
-                           iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
+                    iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
         }
         m_ClefChangeStack.clear();
     }
@@ -1092,7 +1090,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum-1));
+        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1));
         assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
@@ -1671,11 +1669,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
         note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
         int noteStaffNum = atoi(GetContentOfChild(node, "staff").c_str());
-        LogMessage("MusixXmlInput::Note: %s noteStaffNum: %d, staffOffset: %d, staffNum: %d.",
-                   note->GetUuid().c_str(), noteStaffNum, staffOffset, staff->GetN());
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
-            note->SetStaff(note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
+            note->SetStaff(
+                note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
 
         // accidental
         pugi::xpath_node accidental = node.select_node("accidental");
@@ -1845,7 +1842,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             tie->SetColor(startTie.node().attribute("color").as_string());
             // placement and orientation
-            tie->SetCurvedir(               tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+            tie->SetCurvedir(
+                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }
