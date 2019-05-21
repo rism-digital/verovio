@@ -213,6 +213,29 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
+    int layerNum = 1;
+    // first find if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
+    for (auto item : *measure->GetChildren()) {
+        Staff *staff = dynamic_cast<Staff *>(item);
+        assert(staff);
+        for (auto layer : *staff->GetChildren()) {
+            assert(layer);
+            // Now look for the layer with the corresponding voice
+            std::string layerNumStr = GetContentOfChild(node, "voice");
+            if (!layerNumStr.empty()) {
+                layerNum = atoi(layerNumStr.c_str());
+            }
+            if (layerNum < 1) {
+                LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
+                layerNum = 1;
+            }
+            if (layerNum == dynamic_cast<Layer *>(layer)->GetN()) {
+                LogWarning("SelectLayer finds layer %d in %s.", layerNum, staff->GetUuid().c_str());
+                return SelectLayer(layerNum, staff);
+            }
+        }
+    }
+    // if not, take staff info of node element
     int staffNum = 1;
     std::string staffNumStr = GetContentOfChild(node, "staff");
     if (!staffNumStr.empty()) {
@@ -226,15 +249,16 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
     assert(staff);
     // Now look for the layer with the corresponding voice
-    int layerNum = 1;
+    layerNum = 1;
     std::string layerNumStr = GetContentOfChild(node, "voice");
     if (!layerNumStr.empty()) {
         layerNum = atoi(layerNumStr.c_str());
     }
     if (layerNum < 1) {
-        LogWarning("MusicXML import: Layer %d cannot be found", staffNum);
+        LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
         layerNum = 1;
     }
+    LogWarning("SelectLayer classic: layer %d in %s.", layerNum, staff->GetUuid().c_str());
     return SelectLayer(layerNum, staff);
 }
 
@@ -989,7 +1013,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             ReadMusicXmlHarmony(*it, measure, measureNum);
         }
         else if (IsElement(*it, "note")) {
-            ReadMusicXmlNote(*it, measure, measureNum);
+            ReadMusicXmlNote(*it, measure, measureNum, staffOffset);
         }
         // for now only check first part
         else if (IsElement(*it, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
@@ -1489,7 +1513,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     m_harmStack.push_back(harm);
 }
 
-void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -1646,6 +1670,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             note->SetUuid(node.attribute("xml:id").as_string());
         }
         note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
+        int noteStaffNum = atoi(GetContentOfChild(node, "staff").c_str());
+        LogMessage("MusixXmlInput::Note: %s noteStaffNum: %d, staffOffset: %d, staffNum: %d.",
+                   note->GetUuid().c_str(), noteStaffNum, staffOffset, staff->GetN());
+        // set @staff attribute, if existing and different from parent staff number
+        if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
+            note->SetStaff(note->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(noteStaffNum + staffOffset)));
 
         // accidental
         pugi::xpath_node accidental = node.select_node("accidental");
