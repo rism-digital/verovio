@@ -213,22 +213,23 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
+    // Find voice number of node
     int layerNum = 1;
-    // first find if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
+    std::string layerNumStr = GetContentOfChild(node, "voice");
+    if (!layerNumStr.empty()) {
+        layerNum = atoi(layerNumStr.c_str());
+    }
+    if (layerNum < 1) {
+        LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
+        layerNum = 1;
+    }
+    // Check if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
     for (auto item : *measure->GetChildren()) {
         Staff *staff = dynamic_cast<Staff *>(item);
         assert(staff);
         for (auto layer : *staff->GetChildren()) {
             assert(layer);
             // Now look for the layer with the corresponding voice
-            std::string layerNumStr = GetContentOfChild(node, "voice");
-            if (!layerNumStr.empty()) {
-                layerNum = atoi(layerNumStr.c_str());
-            }
-            if (layerNum < 1) {
-                LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
-                layerNum = 1;
-            }
             if (layerNum == dynamic_cast<Layer *>(layer)->GetN()) {
                 return SelectLayer(layerNum, staff);
             }
@@ -247,16 +248,6 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     staffNum--;
     Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
     assert(staff);
-    // Now look for the layer with the corresponding voice
-    layerNum = 1;
-    std::string layerNumStr = GetContentOfChild(node, "voice");
-    if (!layerNumStr.empty()) {
-        layerNum = atoi(layerNumStr.c_str());
-    }
-    if (layerNum < 1) {
-        LogWarning("MusicXML import: Layer %d cannot be found", layerNum);
-        layerNum = 1;
-    }
     return SelectLayer(layerNum, staff);
 }
 
