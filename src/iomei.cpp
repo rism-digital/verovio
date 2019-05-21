@@ -2145,6 +2145,14 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    else if (filterParent->Is(FIGURE)) {
+        if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     else if (filterParent->Is(NUM)) {
         if (element == "") {
             return true;
@@ -4524,7 +4532,7 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
 
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);
-    return ReadTextChildren(vrvF, f);
+    return ReadTextChildren(vrvF, f, vrvF);
 }
 
 bool MeiInput::ReadFig(Object *parent, pugi::xml_node fig)
