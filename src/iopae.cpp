@@ -448,6 +448,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
                 scoreDef->SetMeterCount(obj.meter->GetCount());
                 scoreDef->SetMeterUnit(obj.meter->GetUnit());
                 scoreDef->SetMeterSym(obj.meter->GetSym());
+                // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
+                if (obj.meter->GetForm() == meterSigVis_FORM_num) {
+                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                }
                 delete obj.meter;
                 obj.meter = NULL;
             }
