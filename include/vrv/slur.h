@@ -59,8 +59,9 @@ public:
 
     int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
         Point &c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
-    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, const ArrayOfCurveSpannedElements *spannedElements,
-        Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, float &angle, bool forceBothSides);
+    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
+        const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
+        curvature_CURVEDIR curveDir, float &angle, bool forceBothSides);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
     void GetControlPoints(

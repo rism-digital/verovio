@@ -60,7 +60,7 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
-    
+
     // Sameas not taken into account for now
     if (!HasDir()) return FUNCTOR_CONTINUE;
 

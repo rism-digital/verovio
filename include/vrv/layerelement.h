@@ -67,7 +67,7 @@ public:
      * It typically set to true for syl or artic.
      */
     virtual bool IsRelativeToStaff() const { return false; }
-    
+
     /**
      * Return itself or the resolved @sameas (if any)
      */
@@ -288,14 +288,14 @@ public:
     ///@{
     virtual int ResolveMIDITies(FunctorParams *);
     ///@}
-    
+
     /**
      * @name See Object::GenerateMIDI
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::GenerateTimemap
      */

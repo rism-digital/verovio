@@ -131,7 +131,7 @@ public:
         }
         return false;
     }
-    
+
 private:
     bool m_reverse;
 };

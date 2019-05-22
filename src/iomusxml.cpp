@@ -630,7 +630,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         for (musicxml::ClefChange iter : m_ClefChangeStack) {
             if (iter.isFirst)
                 LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted.",
-                           iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
+                    iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
         }
         m_ClefChangeStack.clear();
     }
@@ -1010,7 +1010,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -1068,7 +1068,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum-1));
+        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1));
         assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
@@ -1815,7 +1815,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             tie->SetColor(startTie.node().attribute("color").as_string());
             // placement and orientation
-            tie->SetCurvedir(               tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+            tie->SetCurvedir(
+                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }

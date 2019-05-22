@@ -92,10 +92,11 @@ namespace musicxml {
         std::string m_endingType;
         std::string m_endingText;
     };
-    
+
     class ClefChange {
     public:
-        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset) {
+        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset)
+        {
             m_measureNum = measureNum;
             m_staff = staff;
             m_clef = clef;
@@ -108,7 +109,7 @@ namespace musicxml {
         int m_scoreOnset; // the score position of clef change
         bool isFirst = true; // insert clef change at first layer, others use @sameas
     };
-    
+
 } // namespace musicxml
 
 //----------------------------------------------------------------------------

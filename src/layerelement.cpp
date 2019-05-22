@@ -119,15 +119,15 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     }
     return *this;
 }
-    
+
 LayerElement *LayerElement::ThisOrSameasAsLink()
 {
     if (!this->HasSameasLink()) {
         return this;
     }
-    
+
     assert(this->GetSameasLink());
-    
+
     return dynamic_cast<LayerElement *>(this->GetSameasLink());
 }
 
@@ -1445,7 +1445,7 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
     LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
-    
+
     // For mRest we do not look at the time span
     if (this->Is(MREST)) {
         // Add the layerN to the list of layer element occuring in this time frame
@@ -1518,7 +1518,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     assert(params);
 
     LayerElement *element = this->ThisOrSameasAsLink();
-    
+
     double incrementScoreTime;
 
     if (element->Is(REST) || element->Is(SPACE)) {
@@ -1583,7 +1583,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && this->HasSameasLink()) {
-        incrementScoreTime = this->GetContentAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
@@ -1595,30 +1596,30 @@ int LayerElement::ResolveMIDITies(FunctorParams *)
 {
     return FUNCTOR_CONTINUE;
 }
-    
+
 int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
-    
+
     if (this->HasSameasLink()) {
         assert(this->GetSameasLink());
         this->GetSameasLink()->Process(params->m_functor, functorParams);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 {
     GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
-    
+
     if (this->HasSameasLink()) {
         assert(this->GetSameasLink());
         this->GetSameasLink()->Process(params->m_functor, functorParams);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

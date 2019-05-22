@@ -133,7 +133,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
-    
+
     m_doc->Reset();
     m_doc->SetType(Raw);
     // The mdiv
@@ -146,7 +146,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     // the section
     Section *section = new Section();
     score->AddChild(section);
-    
+
     // add minimal scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
@@ -463,7 +463,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         convertMeasure(&obj);
         measure_count++;
     }
-    
+
     if (m_is_mensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
     }

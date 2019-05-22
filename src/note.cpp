@@ -865,7 +865,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
-    
+
     Note *note = dynamic_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
@@ -949,7 +949,7 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
 {
     GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
-    
+
     Note *note = dynamic_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
