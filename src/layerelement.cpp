@@ -179,7 +179,7 @@ bool LayerElement::IsInLigature() const
 
 bool LayerElement::IsInFTrem()
 {
-    if (!this->Is({CHORD, NOTE})) return false;
+    if (!this->Is({ CHORD, NOTE })) return false;
     return (this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
 }
 
@@ -940,7 +940,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     }
                     else if (layerElement->Is(CHORD)) {
                         int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);
-                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY,false);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         leftLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;

@@ -112,7 +112,8 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
 // Static methods
 //----------------------------------------------------------------------------
 
-int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, LayerElement *crossStaffElement, bool topChordNote)
+int PitchInterface::CalcLoc(
+    LayerElement *layerElement, Layer *layer, LayerElement *crossStaffElement, bool topChordNote)
 {
     assert(layerElement);
 
