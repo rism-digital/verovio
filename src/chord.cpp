@@ -639,7 +639,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

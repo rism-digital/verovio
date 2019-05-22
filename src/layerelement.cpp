@@ -179,7 +179,7 @@ bool LayerElement::IsInLigature() const
 
 bool LayerElement::IsInFTrem()
 {
-    if ((!this->Is(NOTE)) || (this->Is(CHORD))) return false;
+    if (!this->Is({CHORD, NOTE})) return false;
     return (this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
 }
 
