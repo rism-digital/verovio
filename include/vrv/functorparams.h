@@ -1132,7 +1132,7 @@ public:
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(smf::MidiFile *midiFile)
+    GenerateMIDIParams(smf::MidiFile *midiFile, Functor *functor)
     {
         m_midiFile = midiFile;
         m_midiChannel = 0;
@@ -1140,6 +1140,7 @@ public:
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120;
+        m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
     int m_midiChannel;
@@ -1147,6 +1148,7 @@ public:
     double m_totalTime;
     int m_transSemi;
     int m_currentTempo;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -1165,11 +1167,12 @@ public:
 
 class GenerateTimemapParams : public FunctorParams {
 public:
-    GenerateTimemapParams()
+    GenerateTimemapParams(Functor *functor)
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
         m_currentTempo = 120;
+        m_functor = functor;
     }
     std::map<int, double> realTimeToScoreTime;
     std::map<int, std::vector<std::string> > realTimeToOnElements;
@@ -1178,6 +1181,7 @@ public:
     double m_scoreTimeOffset;
     int m_realTimeOffsetMilliseconds;
     int m_currentTempo;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------

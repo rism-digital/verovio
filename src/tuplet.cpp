@@ -442,8 +442,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             ArrayOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllChildByComparison(&descendants, &comparison);
-            
-            
+
             // Possible fix for beam above tuplet
             /*
             Object *parentBeam = this->GetFirstParent(BEAM);

@@ -866,21 +866,24 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
+    Note *note = dynamic_cast<Note *>(this->ThisOrSameasAsLink());
+    assert(note);
+
     // If the note is a secondary tied note, then ignore it
-    if (this->GetScoreTimeTiedDuration() < 0.0) {
+    if (note->GetScoreTimeTiedDuration() < 0.0) {
         return FUNCTOR_SIBLINGS;
     }
 
     // For now just ignore grace notes
-    if (this->IsGraceNote()) {
+    if (note->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
     }
 
-    Accid *accid = this->GetDrawingAccid();
+    Accid *accid = note->GetDrawingAccid();
 
     // Create midi this
     int midiBase = 0;
-    data_PITCHNAME pname = this->GetPname();
+    data_PITCHNAME pname = note->GetPname();
     switch (pname) {
         case PITCHNAME_c: midiBase = 0; break;
         case PITCHNAME_d: midiBase = 2; break;
@@ -922,16 +925,17 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     // Adjustment for transposition intruments
     midiBase += params->m_transSemi;
 
-    int oct = this->GetOct();
-    if (this->HasOctGes()) oct = this->GetOctGes();
+    int oct = note->GetOct();
+    if (note->HasOctGes()) oct = note->GetOctGes();
 
     int pitch = midiBase + (oct + 1) * 12;
+    // We do store the MIDIPitch in the note even with a sameas
     this->SetMIDIPitch(pitch);
     int channel = params->m_midiChannel;
     int velocity = 64;
 
-    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
-    double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
+    double starttime = params->m_totalTime + note->GetScoreTimeOnset();
+    double stoptime = params->m_totalTime + note->GetScoreTimeOffset() + note->GetScoreTimeTiedDuration();
 
     int tpq = params->m_midiFile->getTPQ();
 
@@ -946,11 +950,14 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
-    int realTimeStart = params->m_realTimeOffsetMilliseconds + m_realTimeOnsetMilliseconds;
-    double scoreTimeStart = params->m_scoreTimeOffset + m_scoreTimeOnset;
+    Note *note = dynamic_cast<Note *>(this->ThisOrSameasAsLink());
+    assert(note);
 
-    int realTimeEnd = params->m_realTimeOffsetMilliseconds + m_realTimeOffsetMilliseconds;
-    double scoreTimeEnd = params->m_scoreTimeOffset + m_scoreTimeOffset;
+    int realTimeStart = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOnsetMilliseconds();
+    double scoreTimeStart = params->m_scoreTimeOffset + note->GetScoreTimeOnset();
+
+    int realTimeEnd = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOffsetMilliseconds();
+    double scoreTimeEnd = params->m_scoreTimeOffset + note->GetScoreTimeOffset();
 
     // Should check if value for realTimeStart already exists and if so, then
     // ensure that it is equal to scoreTimeStart:

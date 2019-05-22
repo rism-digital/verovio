@@ -313,8 +313,9 @@ int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedEl
     return 0;
 }
 
-void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, const ArrayOfCurveSpannedElements *spannedElements,
-    Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, float &angle, bool forceBothSides)
+void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
+    const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
+    curvature_CURVEDIR curveDir, float &angle, bool forceBothSides)
 {
     Point bezier[4];
     bezier[0] = p1;

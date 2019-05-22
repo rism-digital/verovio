@@ -120,6 +120,17 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     return *this;
 }
 
+LayerElement *LayerElement::ThisOrSameasAsLink()
+{
+    if (!this->HasSameasLink()) {
+        return this;
+    }
+
+    assert(this->GetSameasLink());
+
+    return dynamic_cast<LayerElement *>(this->GetSameasLink());
+}
+
 bool LayerElement::IsGraceNote()
 {
     // For note, we need to look at it or at the parent chord
@@ -1434,7 +1445,7 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
     LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
-    
+
     // For mRest we do not look at the time span
     if (this->Is(MREST)) {
         // Add the layerN to the list of layer element occuring in this time frame
@@ -1506,17 +1517,19 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
+    LayerElement *element = this->ThisOrSameasAsLink();
+
     double incrementScoreTime;
 
-    if (this->Is(REST) || this->Is(SPACE)) {
-        incrementScoreTime = this->GetAlignmentDuration(
+    if (element->Is(REST) || element->Is(SPACE)) {
+        incrementScoreTime = element->GetAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
-    else if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
+    else if (element->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(element);
         assert(note);
 
         // For now just ignore grace notes
@@ -1538,13 +1551,19 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
-        // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
+        // note->GetNoteOrChordDur(element), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
-        note->SetScoreTimeOnset(params->m_currentScoreTime);
-        note->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
-        note->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
-        note->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
+        Note *storeNote = note;
+        // When we have a @sameas, do store the onset / offset values of the pointed note in the pointing note
+        if (this != element) {
+            storeNote = dynamic_cast<Note *>(this);
+        }
+        assert(storeNote);
+        storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
+        storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+        storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+        storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
@@ -1552,8 +1571,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
     }
-    else if (this->Is(BEATRPT)) {
-        BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
+    else if (element->Is(BEATRPT)) {
+        BeatRpt *rpt = dynamic_cast<BeatRpt *>(element);
         assert(rpt);
 
         incrementScoreTime = rpt->GetAlignmentDuration(
@@ -1563,11 +1582,44 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
+    else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && this->HasSameasLink()) {
+        incrementScoreTime = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
+    }
     return FUNCTOR_CONTINUE;
 }
 
 int LayerElement::ResolveMIDITies(FunctorParams *)
 {
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

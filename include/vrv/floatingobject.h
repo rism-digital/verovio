@@ -284,12 +284,12 @@ public:
     int GetThickness() { return m_thickness; }
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
-    
+
     /**
      * Deletes all the CurveSpannedElement objects.
      */
     void ClearSpannedElements();
-    
+
     /**
      * Add a CurveSpannedElement to the FloatingCurvePositioner.
      * The element is owned by the positioner.

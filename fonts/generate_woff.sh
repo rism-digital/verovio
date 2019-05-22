@@ -18,3 +18,8 @@ echo $w >> woff.xml
 cat woff-2.txt >> woff.xml
 
 mv woff.xml ../data
+
+# base64
+ttfFont=${font%.sfd}.ttf
+t=$(base64 $ttfFont)
+echo "var vrvTTF = \"$t\";" > vrv-ttf.js
