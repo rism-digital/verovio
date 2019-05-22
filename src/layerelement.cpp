@@ -835,7 +835,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     }
     else if (this->Is(CHORD)) {
         // The y position is set to the top note one
-        int loc = PitchInterface::CalcLoc(this, layerY, true);
+        int loc = PitchInterface::CalcLoc(this, layerY, layerElementY, true);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -849,7 +849,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Chord *chord = note->IsChordTone();
         int loc = 0;
         if (note->HasPname()) {
-            loc = PitchInterface::CalcLoc(note, layerY);
+            loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
@@ -935,12 +935,12 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     LayerElement *layerElement = dynamic_cast<LayerElement *>(*rit);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
-                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
                         break;
                     }
                     else if (layerElement->Is(CHORD)) {
-                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
-                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY,false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         leftLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
@@ -956,13 +956,13 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     LayerElement *layerElement = dynamic_cast<LayerElement *>(*it);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
-                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
                         break;
                         break;
                     }
                     else if (layerElement->Is(CHORD)) {
-                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
-                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         rightLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
