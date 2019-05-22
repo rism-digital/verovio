@@ -67,6 +67,11 @@ public:
      * It typically set to true for syl or artic.
      */
     virtual bool IsRelativeToStaff() const { return false; }
+    
+    /**
+     * Return itself or the resolved @sameas (if any)
+     */
+    LayerElement *ThisOrSameasAsLink();
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -283,6 +288,18 @@ public:
     ///@{
     virtual int ResolveMIDITies(FunctorParams *);
     ///@}
+    
+    /**
+     * @name See Object::GenerateMIDI
+     */
+    ///@{
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+    ///@}
+    
+    /**
+     * See Object::GenerateTimemap
+     */
+    virtual int GenerateTimemap(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing

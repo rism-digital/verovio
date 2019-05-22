@@ -199,6 +199,18 @@ public:
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
+                  
+    /**
+     * See Object::GenerateTimemap
+     * To be added once Layer implements LinkingInterface
+     */
+    //virtual int GenerateTimemap(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     * To be added once Layer implements LinkingInterface
+     */
+    //virtual int ResetDrawing(FunctorParams *);
 
 private:
     //
