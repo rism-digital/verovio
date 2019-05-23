@@ -69,14 +69,14 @@ namespace musicxml {
 
     class OpenHairpin {
     public:
-        OpenHairpin(const int &dirN, const std::string &endID)
+        OpenHairpin(const int &dirN, const int &lastMeasureCount)
         {
             m_dirN = dirN;
-            m_endID = endID;
+            m_lastMeasureCount = lastMeasureCount;
         }
 
         int m_dirN;
-        std::string m_endID;
+        int m_lastMeasureCount;
     };
 
     class EndingInfo {
@@ -309,6 +309,8 @@ private:
     std::vector<Note *> m_tieStopStack;
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
+    /* The stack for hairpin stops that might occur before a hairpin was started staffNumber, tStamp2, (hairpinNumber, measureCount) */
+    std::vector<std::tuple<int, double, musicxml::OpenHairpin> > m_hairpinStopStack;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
     /* The stacks for ControlElements */
