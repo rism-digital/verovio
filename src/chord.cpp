@@ -460,13 +460,6 @@ int Chord::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // No stem
-    if (this->GetActualDur() < DUR_2) {
-        // Duration is longer than halfnote, there should be no stem
-        assert(!this->GetDrawingStem());
-        return FUNCTOR_SIBLINGS;
-    }
-
     Stem *stem = this->GetDrawingStem();
     assert(stem);
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
@@ -621,22 +614,18 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
-    if (this->GetActualDur() > DUR_1) {
-        if (!currentStem) {
-            currentStem = new Stem();
-            this->AddChild(currentStem);
-        }
-        currentStem->AttGraced::operator=(*this);
-        currentStem->AttStems::operator=(*this);
-        currentStem->AttStemsCmn::operator=(*this);
+    if (!currentStem) {
+        currentStem = new Stem();
+        this->AddChild(currentStem);
     }
-    // This will happen only if the duration has changed
-    else if (currentStem) {
-        if (this->DeleteChild(currentStem)) {
-            currentStem = NULL;
-            // The currentFlag (if any) will have been deleted above
-            currentFlag = NULL;
-        }
+    else {
+        currentStem->Reset();
+    }
+    currentStem->AttGraced::operator=(*this);
+    currentStem->AttStems::operator=(*this);
+    currentStem->AttStemsCmn::operator=(*this);
+    if (this->GetActualDur() < DUR_2) {
+        currentStem->IsVirtual(true);
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem()) {

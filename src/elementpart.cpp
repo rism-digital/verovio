@@ -277,6 +277,7 @@ void Stem::Reset()
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;
+    m_isVirtual = false;
 }
 
 void Stem::AddChild(Object *child)

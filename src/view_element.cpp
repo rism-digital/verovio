@@ -1309,6 +1309,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Stem *stem = dynamic_cast<Stem *>(element);
     assert(stem);
+    
+    // Do not draw virtual (e.g., whole note) stems
+    if (stem->IsVirtual()) return;
 
     dc->StartGraphic(element, "", "");
 

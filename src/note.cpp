@@ -505,13 +505,6 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_interface = NULL;
     params->m_chordStemLength = 0;
 
-    // No stem
-    if (this->GetActualDur() < DUR_2) {
-        // Duration is longer than halfnote, there should be no stem
-        assert(!this->GetDrawingStem());
-        return FUNCTOR_SIBLINGS;
-    }
-
     Stem *stem = this->GetDrawingStem();
     assert(stem);
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
@@ -750,14 +743,20 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
-    if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
+    if (!this->IsChordTone() && !this->IsMensural()) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
         }
+        else {
+            currentStem->Reset();
+        }
         currentStem->AttGraced::operator=(*this);
         currentStem->AttStems::operator=(*this);
         currentStem->AttStemsCmn::operator=(*this);
+        if (this->GetActualDur() < DUR_2) {
+            currentStem->IsVirtual(true);
+        }
     }
     // This will happen only if the duration has changed
     else if (currentStem) {
