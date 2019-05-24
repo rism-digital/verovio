@@ -1023,7 +1023,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -1040,10 +1040,13 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         m_tieStopStack.clear();
     }
 
-    // add clef changes that might occur just before a bar line and remove inserted clefs from stack
-    if (!m_ClefChangeStack.empty()) {
-        for (auto staff : *measure->GetChildren()) {
-            assert(staff);
+    for (auto staff : *measure->GetChildren()) {
+        assert(staff);
+        if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
+            staff->AddChild(new Layer());
+        }
+        // add clef changes that might occur just before a bar line and remove inserted clefs from stack
+        if (!m_ClefChangeStack.empty()) {
             for (auto layer : *staff->GetChildren()) {
                 assert(layer);
                 std::vector<musicxml::ClefChange>::iterator iter;
