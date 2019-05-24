@@ -277,6 +277,7 @@ void Stem::Reset()
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;
+    m_isVirtual = false;
 }
 
 void Stem::AddChild(Object *child)
@@ -448,20 +449,24 @@ int Stem::CalcStem(FunctorParams *functorParams)
         assert(flag);
         Point stemEnd;
         wchar_t flagCode = 0;
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up)
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             stemEnd = flag->GetStemUpSE(params->m_doc, staffSize, drawingCueSize, flagCode);
-        else
+        }
+        else {
             stemEnd = flag->GetStemDownNW(params->m_doc, staffSize, drawingCueSize, flagCode);
+        }
         // Trick for shortening the stem with DUR_8
         flagHeight = stemEnd.y;
     }
 
     int endY = this->GetDrawingY() - this->GetDrawingStemLen() + flagHeight;
     bool adjust = false;
-    if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (endY < params->m_verticalCenter))
+    if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (endY < params->m_verticalCenter)) {
         adjust = true;
-    else if ((this->GetDrawingStemDir() == STEMDIRECTION_down) && (endY > params->m_verticalCenter))
+    }
+    else if ((this->GetDrawingStemDir() == STEMDIRECTION_down) && (endY > params->m_verticalCenter)) {
         adjust = true;
+    }
 
     if (adjust) {
         this->SetDrawingStemLen(this->GetDrawingStemLen() + (endY - params->m_verticalCenter));
