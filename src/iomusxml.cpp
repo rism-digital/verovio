@@ -1527,7 +1527,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 }
                 else {
                     Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
-                    sameasClef->SetSameas(iter->m_clef->GetUuid().c_str());
+                    sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
                     AddLayerElement(layer, sameasClef);
                 }
             }
