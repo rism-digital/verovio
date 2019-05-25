@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.1.0] - 2019-05-25
 * Update pugixml
 * Support for SMUFL figured bass figures
 * Support for `@spacing` on `<staffDef>`
