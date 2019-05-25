@@ -71,9 +71,9 @@ meterSigVis_FORM MeterSig::meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_ME
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSig::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     params->m_meterSig = this;

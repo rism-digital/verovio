@@ -13,12 +13,12 @@
 
 //----------------------------------------------------------------------------
 
-#include "app.h"
 #include "annot.h"
-#include "attcomparison.h"
+#include "app.h"
 #include "beam.h"
 #include "choice.h"
 #include "clef.h"
+#include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
 #include "doc.h"
@@ -328,14 +328,14 @@ void View::DrawStaffGrp(
 
     // adjust the top and bottom according to staffline width
     x += barLineWidth / 2;
-    
+
     // HARDCODED
     int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    
+
     System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-    
+
     this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
 
     // actually draw the line, the brace or the bracket
@@ -396,7 +396,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             ++iter;
             continue;
         }
-        
+
         // HARDCODED
         int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
         if (staffDef->IsInBraceAndBracket()) {
@@ -404,33 +404,34 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         }
         int x = system->GetDrawingX() - space;
         int y = staff->GetDrawingY()
-        - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        
+            - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+
         this->DrawLabels(dc, measure, system, staffDef, x, y, abbreviations, staff->m_drawingStaffSize, space);
 
         ++iter;
     }
 }
-    
-void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
+
+void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
+    bool abbreviations, int staffSize, int space)
 {
     assert(dc);
     assert(measure);
     assert(system);
-    assert(object->Is({STAFFDEF, STAFFGRP}));
-    
+    assert(object->Is({ STAFFDEF, STAFFGRP }));
+
     Label *label = dynamic_cast<Label *>(object->FindChildByType(LABEL, 1));
     LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindChildByType(LABELABBR, 1));
     Object *graphic = label;
-    
+
     std::wstring labelStr = (label) ? label->GetText(label) : L"";
     std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
-    
+
     if (abbreviations) {
         labelStr = labelAbbrStr;
         graphic = labelAbbr;
     }
-    
+
     if (!graphic || (labelStr.length() == 0)) {
         return;
     }
@@ -440,7 +441,7 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
         labelTxt.SetFaceName("Times");
     }
     labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staffSize)->GetPointSize());
-    
+
     int lineCount = graphic->GetChildCount(LB) + 1;
     if (lineCount > 1) {
         y += (m_doc->GetTextLineHeight(&labelTxt, false) * (lineCount - 1) / 2);
@@ -450,18 +451,18 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     params.m_x = x;
     params.m_y = y;
     params.m_pointSize = labelTxt.GetPointSize();
-    
+
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&labelTxt);
-    
+
     dc->StartGraphic(graphic, "", graphic->GetUuid());
-    
+
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
     DrawTextChildren(dc, graphic, params);
     dc->EndText();
-    
+
     dc->EndGraphic(graphic, this);
-    
+
     // keep the widest width for the system - careful: this can be the label OR labelAbbr
     system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
     // also store in the system the maximum width with abbreviations for justification
@@ -476,7 +477,7 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
         }
         system->SetDrawingAbbrLabelsWidth(maxLength + space);
     }
-    
+
     dc->ResetFont();
     dc->ResetBrush();
 }
@@ -708,7 +709,8 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int x1 = x - m_doc->GetDrawingBeamWidth(100, false) - barLineWidth;
     int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
     // optimized for five line staves
-    int dashLength = m_doc->GetDrawingUnit(100) * 8 / 13;
+    int dashLength = m_doc->GetDrawingUnit(100) * 16 / 13;
+    int dotLength = m_doc->GetDrawingUnit(100) * 4 / 13;
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -745,6 +747,9 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     }
     else if (barLine->GetForm() == BARRENDITION_dashed) {
         DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dashLength);
+    }
+    else if (barLine->GetForm() == BARRENDITION_dotted) {
+        DrawVerticalSegmentedLine(dc, x, line, barLineWidth, dotLength);
     }
     else if (barLine->GetForm() == BARRENDITION_rptend) {
         DrawVerticalSegmentedLine(dc, x1, line, barLineWidth);
@@ -873,7 +878,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
 
     Staff *staff = NULL;
     ArrayOfObjects staves;
-    AttComparison matchType(STAFF);
+    ClassIdComparison matchType(STAFF);
     measure->FindAllChildByComparison(&staves, &matchType, 1);
     for (auto &child : staves) {
         staff = dynamic_cast<Staff *>(child);
@@ -960,9 +965,8 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffDefCautionary(dc, staff, measure);
 
-    std::vector<Object *>::iterator iter;
-    for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
-        system->AddToDrawingList(*iter);
+    for (auto &spanningElement : staff->m_timeSpanningElements) {
+        system->AddToDrawingListIfNeccessary(spanningElement);
     }
 
     dc->EndGraphic(staff, this);
@@ -1180,7 +1184,8 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     dc->EndGraphic(layer, this);
 
     // first draw the postponed tuplets
-    DrawLayerList(dc, layer, staff, measure, TUPLET);
+    DrawLayerList(dc, layer, staff, measure, TUPLET_BRACKET);
+    DrawLayerList(dc, layer, staff, measure, TUPLET_NUM);
 }
 
 void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId)
@@ -1194,16 +1199,11 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
     ListOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        if ((*iter)->Is(classId) && (classId == TUPLET)) {
-            Tuplet *tuplet = dynamic_cast<Tuplet *>((*iter));
-            assert(tuplet);
-            dc->ResumeGraphic(tuplet, tuplet->GetUuid());
-            DrawTupletPostponed(dc, tuplet, layer, staff);
-            dc->EndResumedGraphic(tuplet, this);
+        if ((*iter)->Is(classId) && (classId == TUPLET_BRACKET)) {
+            DrawTupletBracket(dc, dynamic_cast<LayerElement *>(*iter), layer, staff, measure);
         }
-        else {
-            // This should never happen
-            LogError("Element '%s' in the layer list cannot be drawn", (*iter)->GetClassName().c_str());
+        if ((*iter)->Is(classId) && (classId == TUPLET_NUM)) {
+            DrawTupletNum(dc, dynamic_cast<LayerElement *>(*iter), layer, staff, measure);
         }
     }
 }
@@ -1250,7 +1250,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(parent);
     assert(measure);
     assert(system);
-    
+
     for (auto current : *parent->GetChildren()) {
         if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff

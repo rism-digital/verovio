@@ -98,8 +98,19 @@ public:
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
     data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
     data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
-    data_STEMDIRECTION GetDrawingStemDir(double time, double duration, Measure *measure, int staff);
     ///@}
+
+    /**
+     * Get the number of layer used for the duration of an element.
+     * Takes into account cross-staff situations.
+     */
+    int GetLayerCountForTimeSpanOf(LayerElement *element);
+
+    /**
+     * Get the number of layer used within a time span.
+     * Takes into account cross-staff situations.
+     */
+    int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
 
     Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig() const;
@@ -183,16 +194,23 @@ public:
     virtual int PrepareRpt(FunctorParams *functorParams);
 
     /**
-     * See Object::CalcStem
-     */
-    virtual int CalcStem(FunctorParams *);
-
-    /**
      * See Object::CalcOnsetOffset
      */
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::GenerateTimemap
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int GenerateTimemap(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int ResetDrawing(FunctorParams *);
 
 private:
     //

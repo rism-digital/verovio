@@ -408,7 +408,7 @@ public:
     virtual ~MeiInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &mei);
+    virtual bool ImportString(const std::string &mei);
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -639,6 +639,7 @@ private:
      */
     ///@{
     // to MEI 4.0.0
+    void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);

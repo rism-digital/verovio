@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class Clef;
 class ControlElement;
 class Dir;
 class Dynam;
@@ -47,39 +48,28 @@ class Tie;
 
 namespace musicxml {
 
-    class OpenTie {
-    public:
-        OpenTie(int staffN, int layerN, data_PITCHNAME pname, char oct)
-        {
-            m_staffN = staffN;
-            m_layerN = layerN;
-            m_pname = pname;
-            m_oct = oct;
-        }
-
-        int m_staffN;
-        int m_layerN;
-        data_PITCHNAME m_pname;
-        char m_oct;
-    };
-
     class OpenSlur {
     public:
-        OpenSlur(int staffN, int layerN, int number)
+        OpenSlur(const int &number) { m_number = number; }
+
+        int m_number;
+    };
+
+    class CloseSlur {
+    public:
+        CloseSlur(const std::string &measureNum, const int &number)
         {
-            m_staffN = staffN;
-            m_layerN = layerN;
+            m_measureNum = measureNum;
             m_number = number;
         }
 
-        int m_staffN;
-        int m_layerN;
+        std::string m_measureNum;
         int m_number;
     };
 
     class OpenHairpin {
     public:
-        OpenHairpin(int dirN, std::string endID)
+        OpenHairpin(const int &dirN, const std::string &endID)
         {
             m_dirN = dirN;
             m_endID = endID;
@@ -87,6 +77,37 @@ namespace musicxml {
 
         int m_dirN;
         std::string m_endID;
+    };
+
+    class EndingInfo {
+    public:
+        EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
+        {
+            m_endingNumber = endingNumber;
+            m_endingType = endingType;
+            m_endingText = endingText;
+        }
+
+        std::string m_endingNumber;
+        std::string m_endingType;
+        std::string m_endingText;
+    };
+
+    class ClefChange {
+    public:
+        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset)
+        {
+            m_measureNum = measureNum;
+            m_staff = staff;
+            m_clef = clef;
+            m_scoreOnset = scoreOnset;
+        }
+
+        std::string m_measureNum;
+        Staff *m_staff;
+        Clef *m_clef;
+        int m_scoreOnset; // the score position of clef change
+        bool isFirst = true; // insert clef change at first layer, others use @sameas
     };
 
 } // namespace musicxml
@@ -140,7 +161,7 @@ private:
     void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     ///@}
 
@@ -189,6 +210,13 @@ private:
     ///@}
 
     /*
+     * @name Helper method to check whether a ending measure number is already present in m_endingStack.
+     */
+    ///@{
+    bool NotInEndingStack(std::string const &measureN);
+    ///@}
+
+    /*
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
@@ -200,14 +228,13 @@ private:
      * @name Methods for opening and closing ties and slurs.
      * Opened ties and slurs are stacked together with musicxml::OpenTie
      * and musicxml::OpenSlur objects.
-     * For now: only slurs starting and ending on the same staff/voice are
-     * supported
+     * Slur starts and ends are matched based on its number.
      */
     ///@{
-    void OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie);
-    void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
-    void OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur);
-    void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
+    void OpenTie(Note *note, Tie *tie);
+    void CloseTie(Note *note);
+    void OpenSlur(Measure *measure, int number, Slur *slur);
+    void CloseSlur(Measure *measure, int number, LayerElement *element);
     ///@}
 
     /*
@@ -274,10 +301,16 @@ private:
     std::vector<LayerElement *> m_elementStack;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
+    /* The stack for slur stops that might come before the slur has been opened */
+    std::vector<std::pair<LayerElement *, musicxml::CloseSlur> > m_slurStopStack;
     /* The stack for open ties */
-    std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
+    std::vector<std::pair<Tie *, Note *> > m_tieStack;
+    /* The stack for tie stops that might come before that tie was opened */
+    std::vector<Note *> m_tieStopStack;
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
+    /* The stack of endings to be inserted at the end of XML import */
+    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
@@ -290,6 +323,8 @@ private:
      * end of each measure
      */
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
+    /* stack of clef changes to be inserted to all layers of a given staff */
+    std::vector<musicxml::ClefChange> m_ClefChangeStack;
 };
 
 } // namespace vrv

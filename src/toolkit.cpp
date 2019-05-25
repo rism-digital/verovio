@@ -13,9 +13,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "custos.h"
 #include "functorparams.h"
+#include "ioabc.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -121,7 +122,10 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
 
 bool Toolkit::SetFormat(std::string const &informat)
 {
-    if (informat == "pae") {
+    if (informat == "abc") {
+        m_format = ABC;
+    }
+    else if (informat == "pae") {
         m_format = PAE;
     }
     else if (informat == "darms") {
@@ -149,7 +153,7 @@ bool Toolkit::SetFormat(std::string const &informat)
         m_format = AUTO;
     }
     else {
-        LogError("Input format can only be: mei, humdrum, pae, musicxml or darms");
+        LogError("Input format can only be: mei, humdrum, pae, abc, musicxml or darms");
         return false;
     }
     return true;
@@ -175,6 +179,9 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
     }
     if (data[0] == '*' || data[0] == '!') {
         return HUMDRUM;
+    }
+    if (data[0] == 'X' || data[0] == '%') {
+        return ABC;
     }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
@@ -223,6 +230,15 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
             return musicxmlDefault;
         }
         if (initial.find("<opus ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
             return musicxmlDefault;
         }
 
@@ -317,8 +333,15 @@ bool Toolkit::LoadData(const std::string &data)
     if (inputFormat == AUTO) {
         inputFormat = IdentifyInputFormat(data);
     }
-
-    if (inputFormat == PAE) {
+    if (inputFormat == ABC) {
+#ifndef NO_ABC_SUPPORT
+        input = new AbcInput(&m_doc, "");
+#else
+        LogError("ABC import is not supported in this build.");
+        return false;
+#endif
+    }
+    else if (inputFormat == PAE) {
 #ifndef NO_PAE_SUPPORT
         input = new PaeInput(&m_doc, "");
 #else
@@ -377,7 +400,7 @@ bool Toolkit::LoadData(const std::string &data)
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
-        xmlfile.load(data.c_str());
+        xmlfile.load_string(data.c_str());
         stringstream conversion;
         bool status = converter.convert(conversion, xmlfile);
         if (!status) {
@@ -407,7 +430,7 @@ bool Toolkit::LoadData(const std::string &data)
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_mei2hum converter;
         pugi::xml_document xmlfile;
-        xmlfile.load(data.c_str());
+        xmlfile.load_string(data.c_str());
         stringstream conversion;
         bool status = converter.convert(conversion, xmlfile);
         if (!status) {
@@ -526,7 +549,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
         LogWarning("No data loaded");
         return "";
     }
-    
+
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
@@ -703,9 +726,9 @@ bool Toolkit::SetOptions(const std::string &json_options)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "inputFormat") {
-                if (json.has<jsonxx::String>("inputFormat")) {
-                    SetFormat(json.get<jsonxx::String>("inputFormat"));
+            if (iter->first == "format") {
+                if (json.has<jsonxx::String>("format")) {
+                    SetFormat(json.get<jsonxx::String>("format"));
                 }
             }
             else if (iter->first == "scale") {
@@ -775,6 +798,12 @@ bool Toolkit::SetOptions(const std::string &json_options)
                     else {
                         opt->SetValue("encoded");
                     }
+                }
+            }
+            else if (iter->first == "inputFormat") {
+                LogWarning("Option inputFormat is deprecated; use format instead");
+                if (json.has<jsonxx::String>("inputFormat")) {
+                    SetFormat(json.get<jsonxx::String>("inputFormat"));
                 }
             }
             else if (iter->first == "noLayout") {
@@ -986,7 +1015,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         LogWarning("Page %d does not exist", pageNo);
         return false;
     }
-    
+
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
@@ -1026,6 +1055,11 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
+    }
+
+    // set the option to use viewbox on svg root
+    if (m_options->m_svgViewBox.GetValue()) {
+        svg.SetSvgViewBox(true);
     }
 
     // render the page
@@ -1186,12 +1220,12 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
-    
+
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
         return 0;
     }
-    
+
     int timeofElement = 0;
     if (element->Is(NOTE)) {
         if (!m_doc.HasMidiTimemap()) {
@@ -1215,12 +1249,12 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
-    
+
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
         return 0;
     }
-    
+
     jsonxx::Object o;
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
@@ -1339,7 +1373,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
 
         // Get components of neume
-        AttComparison ac(NC);
+        ClassIdComparison ac(NC);
         ArrayOfObjects objects;
         neume->FindAllChildByComparison(&objects, &ac);
 

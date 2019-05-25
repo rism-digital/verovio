@@ -11,7 +11,7 @@
 #include "editorial.h"
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // App
 //----------------------------------------------------------------------------
@@ -26,6 +26,7 @@ public:
     App();
     App(EditorialLevel level);
     virtual ~App();
+    virtual Object *Clone() const { return new App(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "App"; }
     virtual ClassId GetClassId() const { return APP; }
@@ -49,7 +50,7 @@ public:
     //
 private:
 };
-    
+
 } // namespace vrv
 
 #endif

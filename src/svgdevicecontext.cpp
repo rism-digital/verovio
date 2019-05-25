@@ -47,6 +47,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_vrvTextFont = false;
 
     m_mmOutput = false;
+    m_svgViewBox = false;
 
     // create the initial SVG element
     // width and height need to be set later; these are taken care of in "commit"
@@ -81,15 +82,22 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // take care of width/height once userScale is updated
+    double height = (double)GetHeight() * GetUserScaleY();
+    double width = (double)GetWidth() * GetUserScaleX();
+    const char *format = "%gpx";
+
     if (m_mmOutput) {
-        m_svgNode.prepend_attribute("height")
-            = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
-        m_svgNode.prepend_attribute("width")
-            = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
+        height /= 10;
+        width /= 10;
+        format = "%gmm";
+    }
+
+    if (m_svgViewBox) {
+        m_svgNode.prepend_attribute("viewBox") = StringFormat("0 0 %g %g", width, height).c_str();
     }
     else {
-        m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)GetHeight() * GetUserScaleY())).c_str();
-        m_svgNode.prepend_attribute("width") = StringFormat("%.2fpx", ((double)GetWidth() * GetUserScaleX())).c_str();
+        m_svgNode.prepend_attribute("height") = StringFormat(format, height).c_str();
+        m_svgNode.prepend_attribute("width") = StringFormat(format, width).c_str();
     }
 
     // add the woff VerovioText font if needed
@@ -322,7 +330,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
 void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
     std::string xpath = "//g[@id=\"" + gId + "\"]";
-    pugi::xpath_node selection = m_currentNode.select_single_node(xpath.c_str());
+    pugi::xpath_node selection = m_currentNode.select_node(xpath.c_str());
     if (selection) {
         m_currentNode = selection.node();
     }
@@ -646,7 +654,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("stroke-opacity") = "1.0";
     rectChild.append_attribute("stroke-width") = "10";
     rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
-     */
+    */
 }
 
 void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)

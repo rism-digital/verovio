@@ -15,8 +15,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "boundary.h"
+#include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
 #include "editorial.h"
@@ -322,7 +322,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     std::vector<int> staffList;
 
     // First get all the staffGrps
-    AttComparison matchType(STAFFGRP);
+    ClassIdComparison matchType(STAFFGRP);
     ArrayOfObjects staffGrps;
     ArrayOfObjects::iterator staffGrpIter;
     scoreDef->FindAllChildByComparison(&staffGrps, &matchType);
@@ -536,10 +536,16 @@ int Measure::SaveEnd(FunctorParams *functorParams)
 
 int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
+    UnsetCurrentScoreDefParams *params = dynamic_cast<UnsetCurrentScoreDefParams *>(functorParams);
+    assert(params);
+
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
         m_drawingScoreDef = NULL;
     }
+
+    // We also need to remove scoreDef elements in the AlignmentReference objects
+    m_measureAligner.Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;
 }
@@ -550,6 +556,7 @@ int Measure::OptimizeScoreDef(FunctorParams *functorParams)
     assert(params);
 
     params->m_hasFermata = (this->FindChildByType(FERMATA));
+    params->m_hasTempo = (this->FindChildByType(TEMPO));
 
     return FUNCTOR_CONTINUE;
 }
@@ -662,7 +669,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, NULL, &filters);
@@ -734,7 +741,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
@@ -768,11 +775,26 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
+{
+    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    assert(params);
+
+    // At the end of the measure - pass it along for overlapping verses
+    params->m_previousMeasure = this;
+
+    // Ajust the postion of the alignment according to what we have collected for this harm gpr
+    m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
+    params->m_overlapingHarm.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-    
+
     // At the end of the measure - pass it along for overlapping verses
     params->m_previousMeasure = this;
 
@@ -1157,7 +1179,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
         }
         params->m_currentTempo = int(mm * 4.0 / mmUnit + 0.5);
     }
-    m_currentTempo = params->m_currentTempo;
+    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
 
     m_realTimeOffsetMilliseconds.clear();
     m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));

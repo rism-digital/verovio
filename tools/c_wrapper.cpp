@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        emscripten_main.cpp
+// Name:        c_wrapper.cpp (previously emscripten_main.cpp)
 // Author:      Rodolfo Zitellini
 // Created:     05/11/2013
 // Copyright (c) Authors and others. All rights reserved.
@@ -13,48 +13,31 @@ using namespace vrv;
 
 extern "C" {
 
+#include "c_wrapper.h"
+    
 /****************************************************************
- * Methods exported to use the Toolkit class from js
+ * Methods exported to use the Toolkit class
  ****************************************************************/
-
-/** declarations */
-
-void *vrvToolkit_constructor();
-void vrvToolkit_destructor(Toolkit *tk);
-bool vrvToolkit_edit(Toolkit *tk, const char *editorAction);
-const char *vrvToolkit_getAvailableOptions(Toolkit *tk);
-const char *vrvToolkit_getElementAttr(Toolkit *tk, const char *xmlId);
-const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec);
-const char *vrvToolkit_getHumdrum(Toolkit *tk);
-const char *vrvToolkit_getLog(Toolkit *tk);
-const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based);
-const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId);
-const char *vrvToolkit_getOptions(Toolkit *tk, bool default_values);
-int vrvToolkit_getPageCount(Toolkit *tk);
-int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId);
-double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId);
-const char *vrvToolkit_getVersion(Toolkit *tk);
-bool vrvToolkit_loadData(Toolkit *tk, const char *data);
-const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options);
-const char *vrvToolkit_renderToSVG(Toolkit *tk, int page_no, const char *c_options);
-const char *vrvToolkit_renderToTimemap(Toolkit *tk);
-void vrvToolkit_redoLayout(Toolkit *tk);
-void vrvToolkit_redoPagePitchPosLayout(Toolkit *tk);
-const char *vrvToolkit_renderData(Toolkit *tk, const char *data, const char *options);
-void vrvToolkit_setOptions(Toolkit *tk, const char *options);
-
-/** implementations */
 
 void *vrvToolkit_constructor()
 {
-    // set the resource path in the js blob
+    // set the default resource path
     Resources::SetPath("/data");
+
+    return new Toolkit();
+}
+
+void *vrvToolkit_constructorResourcePath(const char* resourcePath)
+{
+    // set the resource path
+    Resources::SetPath(resourcePath);
 
     return new Toolkit();
 }
 
 void vrvToolkit_destructor(Toolkit *tk)
 {
+    LogMessage("Deleting toolkit");
     delete tk;
 }
 

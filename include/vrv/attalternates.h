@@ -77,7 +77,7 @@ protected:
     data_COMPASSDIRECTION_basic m_basic;
     data_COMPASSDIRECTION_extended m_extended;
 };
-    
+
 /**
  * MEI data.EVENTREL
  * Since it can contain different subtype we need a dedicated class for it.
@@ -263,7 +263,6 @@ protected:
     data_MEASUREMENTABS m_measurementAbs;
 };
 
-    
 /**
  * MEI data.MIDIVALUE_NAME
  * Since it can contain different subtype we need a dedicated class for it.

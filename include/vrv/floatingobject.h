@@ -189,10 +189,6 @@ public:
 
     data_STAFFREL_basic GetDrawingPlace() const { return m_place; }
 
-    void UpdateCurvePosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
-
-    int CalcXMinMaxY(const Point points[4]);
-
     /**
      * @name Get and set the X and Y drawing relative position.
      * (X is currently used only for Arpeg)
@@ -234,16 +230,119 @@ protected:
     data_STAFFREL_basic m_place;
 
 public:
-    Point m_cuvrePoints[4];
-    float m_cuvreAngle;
-    int m_cuvreThickness;
-    curvature_CURVEDIR m_cuvreDir;
-    int m_cuvreXMinMaxY;
-
     /**
      * The spanning type of the positionner for spanning control elements
      */
     char m_spanningType;
+};
+
+//----------------------------------------------------------------------------
+// FloatingCurvePositioner
+//----------------------------------------------------------------------------
+
+/**
+ * This class represents a basic object for a curve (slur, tie) in the layout domain
+ */
+class FloatingCurvePositioner : public FloatingPositioner {
+public:
+    // constructors and destructors
+    FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
+    virtual ~FloatingCurvePositioner();
+    virtual ClassId GetClassId() const { return FLOATING_CURVE_POSITIONER; }
+
+    virtual void ResetPositioner();
+
+    /**
+     * Reset the curve parameters in FloatingCurvePositioner::FloatingCurvePositioner and in
+     * FloatingCurvePositioner::ResetPositioner
+     */
+    void ResetCurveParams();
+
+    /**
+     * Update the curve parameters.
+     * Stored points are made relative to the curve darwingY.
+     */
+    void UpdateCurveParams(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+
+    /**
+     * Calculate the min or max Y for a set of points
+     */
+    int CalcMinMaxY(const Point points[4]);
+
+    /**
+     * Calculate the adjustment needed for an element for the curve not to overlap with it.
+     * Discard will be true if the element already fits.
+     */
+    int CalcAdjustment(BoundingBox *boundingBox, bool &discard, int margin = 0);
+
+    /**
+     * @name Getters for the current parameters
+     */
+    ///@{
+    void GetPoints(Point points[4]);
+    float GetAngle() { return m_angle; }
+    int GetThickness() { return m_thickness; }
+    curvature_CURVEDIR GetDir() { return m_dir; }
+    ///@}
+
+    /**
+     * Deletes all the CurveSpannedElement objects.
+     */
+    void ClearSpannedElements();
+
+    /**
+     * Add a CurveSpannedElement to the FloatingCurvePositioner.
+     * The element is owned by the positioner.
+     */
+    void AddSpannedElement(CurveSpannedElement *spannedElement) { m_spannedElements.push_back(spannedElement); }
+
+    /**
+     * Return a cont pointer to the spanned elements
+     */
+    const ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
+
+private:
+    //
+public:
+    //
+private:
+    /**
+     * @name Current parameters.
+     * Points are relative to the curve current drawingY.
+     */
+    ///@{
+    Point m_points[4];
+    float m_angle;
+    int m_thickness;
+    curvature_CURVEDIR m_dir;
+    ///@}
+
+    ArrayOfCurveSpannedElements m_spannedElements;
+
+    /** The cached min or max value (depending on the curvature) */
+    int m_cachedMinMaxY;
+};
+
+//----------------------------------------------------------------------------
+// CurveSpannedElement
+//----------------------------------------------------------------------------
+
+class CurveSpannedElement {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    CurveSpannedElement()
+    {
+        m_boundingBox = NULL;
+        m_discarded = false;
+    }
+    virtual ~CurveSpannedElement(){};
+
+    Point m_rotatedPoints[4];
+    BoundingBox *m_boundingBox;
+    bool m_discarded;
 };
 
 } // namespace vrv

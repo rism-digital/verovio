@@ -246,6 +246,34 @@ Note *Chord::GetBottomNote()
     return bottomNote;
 }
 
+int Chord::GetXMin()
+{
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    int x = -VRV_UNSET;
+    ListOfObjects::const_iterator iter = childList->begin();
+    while (iter != childList->end()) {
+        if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
+        ++iter;
+    }
+    return x;
+}
+
+int Chord::GetXMax()
+{
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    int x = VRV_UNSET;
+    ListOfObjects::const_iterator iter = childList->begin();
+    while (iter != childList->end()) {
+        if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
+        ++iter;
+    }
+    return x;
+}
+
 void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
 {
     staffAbove = NULL;
@@ -361,6 +389,25 @@ bool Chord::HasNoteWithDots()
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
+
+    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
+    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+
+    CalcStemParams calcStemParams(params->m_doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
 {
     ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
@@ -410,13 +457,6 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     // if the chord isn't visible, carry on
     if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // No stem
-    if (this->GetActualDur() < DUR_2) {
-        // Duration is longer than halfnote, there should be no stem
-        assert(!this->GetDrawingStem());
         return FUNCTOR_SIBLINGS;
     }
 
@@ -574,25 +614,21 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
-    if (this->GetActualDur() > DUR_1) {
-        if (!currentStem) {
-            currentStem = new Stem();
-            this->AddChild(currentStem);
-        }
-        currentStem->AttGraced::operator=(*this);
-        currentStem->AttStems::operator=(*this);
-        currentStem->AttStemsCmn::operator=(*this);
+    if (!currentStem) {
+        currentStem = new Stem();
+        this->AddChild(currentStem);
     }
-    // This will happen only if the duration has changed
-    else if (currentStem) {
-        if (this->DeleteChild(currentStem)) {
-            currentStem = NULL;
-            // The currentFlag (if any) will have been deleted above
-            currentFlag = NULL;
-        }
+    else {
+        currentStem->Reset();
+    }
+    currentStem->AttGraced::operator=(*this);
+    currentStem->AttStems::operator=(*this);
+    currentStem->AttStemsCmn::operator=(*this);
+    if (this->GetActualDur() < DUR_2) {
+        currentStem->IsVirtual(true);
     }
 
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
@@ -648,8 +684,10 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    double incrementScoreTime
-        = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+    LayerElement *element = this->ThisOrSameasAsLink();
+
+    double incrementScoreTime = element->GetAlignmentDuration(
+        params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
     incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
     double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 

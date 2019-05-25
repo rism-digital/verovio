@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -90,7 +90,7 @@ bool Neume::IsLastInNeume(LayerElement *element)
 bool Neume::GenerateChildMelodic()
 {
     ArrayOfObjects children;
-    AttComparison ac(NC);
+    ClassIdComparison ac(NC);
     this->FindAllChildByComparison(&children, &ac);
 
     // Get the first neume component of the neume

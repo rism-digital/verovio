@@ -16,10 +16,10 @@
 //----------------------------------------------------------------------------
 
 #include "arpeg.h"
-#include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "bracketspan.h"
 #include "breath.h"
+#include "comparison.h"
 #include "devicecontext.h"
 #include "dir.h"
 #include "doc.h"
@@ -68,8 +68,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && !element->Is(DIR)
-        && !element->Is({ DYNAM, FERMATA, HARM, TRILL })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -89,17 +88,13 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dir *dir = dynamic_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
-        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(dir);
     }
     else if (element->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
-        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(dynam);
     }
     else if (element->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(element);
@@ -130,9 +125,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Trill *trill = dynamic_cast<Trill *>(element);
         assert(trill);
         DrawTrill(dc, trill, measure, system);
-        if (trill->GetEnd()) {
-            system->AddToDrawingList(element);
-        }
+        system->AddToDrawingListIfNeccessary(trill);
     }
     else if (element->Is(TURN)) {
         Turn *turn = dynamic_cast<Turn *>(element);
@@ -240,7 +233,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     if ((spanningType == SPANNING_START_END) && end->Is(BARLINE_ATTR_RIGHT)) {
         spanningType = SPANNING_START;
     }
-    
+
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
@@ -277,15 +270,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         }
 
         if (element->Is(DIR)) {
-            // cast to Dir check in DrawDirConnector
+            // cast to Dir check in DrawControlElementConnector
             DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        if (element->Is(DYNAM)) {
-            // cast to Dynam check in DrawDynamConnector
+        else if (element->Is(DYNAM)) {
+            // cast to Dynam check in DrawControlElementConnector
             DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        if (element->Is(FIGURE)) {
-            // cast to Dynam check in DrawDynamConnector
+        else if (element->Is(FIGURE)) {
+            // cast to Dynam check in DrawFConnector
             DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(BRACKETSPAN)) {
@@ -328,22 +321,22 @@ void View::DrawBracketSpan(
 {
     assert(bracketSpan);
     assert(staff);
-    
+
     assert(bracketSpan->GetStart());
     assert(bracketSpan->GetEnd());
-    
+
     if (!bracketSpan->HasFunc()) {
         // we cannot draw a bracketSpan that has no func
         return;
     }
-    
+
     int y = bracketSpan->GetDrawingY();
-    
+
     int startRadius = 0;
     if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
         startRadius = bracketSpan->GetStart()->GetDrawingRadius(m_doc);
     }
-    
+
     int endRadius = 0;
     if (!bracketSpan->GetEnd()->Is(TIMESTAMP_ATTR)) {
         endRadius = bracketSpan->GetEnd()->GetDrawingRadius(m_doc);
@@ -372,10 +365,10 @@ void View::DrawBracketSpan(
     else {
         dc->StartGraphic(bracketSpan, "spanning-bracketspan", "");
     }
-    
+
     int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    
+
     if (bracketSpan->HasLwidth()) {
         if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
             if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
@@ -390,11 +383,12 @@ void View::DrawBracketSpan(
         }
         else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
             if (bracketSpan->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                lineWidth
+                    = bracketSpan->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
         }
     }
-    
+
     // Opening bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
@@ -421,7 +415,8 @@ void View::DrawBracketSpan(
             dc->SetPen(m_currentColour, lineWidth, AxSOLID, bracketSize);
             dc->SetBrush(m_currentColour, AxSOLID);
             int yDotted = y + lineWidth / 2;
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(yDotted), ToDeviceContextX(x2), ToDeviceContextY(yDotted));
+            dc->DrawLine(
+                ToDeviceContextX(x1), ToDeviceContextY(yDotted), ToDeviceContextX(x2), ToDeviceContextY(yDotted));
             dc->ResetPen();
             dc->ResetBrush();
         }
@@ -429,15 +424,18 @@ void View::DrawBracketSpan(
             dc->SetPen(m_currentColour, lineWidth, AxSOLID, lineWidth);
             dc->SetBrush(m_currentColour, AxSOLID);
             // Adjust the start and end because the horizontal line of the was drawn in that case
-            int x1Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
-            int x2Dotted = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
+            int x1Dotted
+                = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
+            int x2Dotted
+                = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
             int yDotted = y + lineWidth / 2;
-            dc->DrawLine(ToDeviceContextX(x1Dotted), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted), ToDeviceContextY(yDotted));
+            dc->DrawLine(ToDeviceContextX(x1Dotted), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted),
+                ToDeviceContextY(yDotted));
             dc->ResetPen();
             dc->ResetBrush();
         }
     }
-    
+
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -445,7 +443,7 @@ void View::DrawBracketSpan(
         dc->EndGraphic(bracketSpan, this);
     }
 }
-    
+
 void View::DrawHairpin(
     DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
@@ -644,7 +642,8 @@ void View::DrawOctave(
             }
             else if (octave->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
                 if (octave->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
-                    lineWidth = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                    lineWidth
+                        = octave->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
                 }
             }
         }
@@ -725,7 +724,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (!parentChord1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
         isShortTie = true;
     }
-    
+
     y1 = staff->GetDrawingY();
     y2 = staff->GetDrawingY();
 
@@ -743,7 +742,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         if (!isShortTie) {
             x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
             x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-            if (note1->GetDots() > 0) {
+            if (note1 && note1->GetDots() > 0) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             }
             else if (parentChord1 && (parentChord1->GetDots() > 0)) {
@@ -882,7 +881,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     bezier[3] = Point(x2, y2);
 
     assert(tie->GetCurrentFloatingPositioner());
-    tie->GetCurrentFloatingPositioner()->UpdateCurvePosition(bezier, 0.0, thickness, drawingCurveDir);
+    FloatingPositioner *positioner = tie->GetCurrentFloatingPositioner();
+    assert(positioner && positioner->Is(FLOATING_CURVE_POSITIONER));
+    FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(positioner);
+    assert(curve);
+    curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
@@ -941,27 +944,33 @@ void View::DrawTrillExtension(
 }
 
 void View::DrawControlElementConnector(
-    DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+    DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
-    assert(dynam);
-    assert(dynam->GetNextLink());
-    if (!dynam->GetNextLink()) return;
+    assert(element);
 
-    int y = dynam->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
+    assert(interface);
+
+    assert(element->GetNextLink() || interface->GetEnd());
+    if (!element->GetNextLink() && !interface->GetEnd()) return;
+
+    int y = element->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
 
     // Adjust the x1
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
-        if (dynam->GetCurrentFloatingPositioner() && dynam->GetCurrentFloatingPositioner()->HasContentBB()) {
-            x1 = dynam->GetCurrentFloatingPositioner()->GetContentRight();
+        if (element->GetCurrentFloatingPositioner() && element->GetCurrentFloatingPositioner()->HasContentBB()) {
+            x1 = element->GetCurrentFloatingPositioner()->GetContentRight();
         }
     }
 
     // Adjust the x2 for extensions with @endid
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
-        FloatingPositioner *nextLink
-            = dynam->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(dynam->GetNextLink()));
-        if (nextLink && nextLink->HasContentBB()) {
-            x2 = nextLink->GetContentLeft();
+        if (element->GetNextLink()) {
+            FloatingPositioner *nextLink
+                = element->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(element->GetNextLink()));
+            if (nextLink && nextLink->HasContentBB()) {
+                x2 = nextLink->GetContentLeft();
+            }
         }
     }
 
@@ -990,12 +999,23 @@ void View::DrawControlElementConnector(
 
     /************** draw it **************/
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
-    else
-        dc->StartGraphic(dynam, "spanning-trill", "");
+    }
+    else {
+        dc->StartGraphic(element, "spanning-element", "");
+    }
 
-    dc->DeactivateGraphic();
+    bool deactivate = true;
+    // If there is no end link and we are not starting the control element, then do not deactivate the element.
+    // The vertical spacing will not be consistent but a least is does not leave the connector un-laidout
+    if (!element->GetNextLink() && (spanningType != SPANNING_START_END) && (spanningType != SPANNING_START)) {
+        deactivate = false;
+    }
+
+    if (deactivate) {
+        dc->DeactivateGraphic();
+    }
 
     int i;
     for (i = 0; i < nbDashes; ++i) {
@@ -1005,18 +1025,21 @@ void View::DrawControlElementConnector(
         DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
     }
 
-    dc->ReactivateGraphic();
+    if (deactivate) {
+        dc->ReactivateGraphic();
+    }
 
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
-        dc->EndGraphic(dynam, this);
+    }
+    else {
+        dc->EndGraphic(element, this);
+    }
 }
-    
-void View::DrawFConnector(
-    DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+
+void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
-    
+
     assert(f);
     assert(f->GetStart() && f->GetEnd());
     if (!f->GetStart() || !f->GetEnd()) return;
@@ -1040,7 +1063,6 @@ void View::DrawFConnector(
         // nothing to adjust
     }
 
-    
     // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
     // object
     // in order not to reset the Syl bounding box.
@@ -1057,9 +1079,9 @@ void View::DrawFConnector(
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
     DrawFilledRectangle(dc, x1, y, x2, y + width);
-    
+
     dc->ReactivateGraphic();
-    
+
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -1076,7 +1098,7 @@ void View::DrawSylConnector(
 
     int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
     TextExtend extend;
-    
+
     // the length of the dash and the space between them
     int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
     // Adjust it proportionally to the lyric size
@@ -1100,9 +1122,9 @@ void View::DrawSylConnector(
             // Return but only if the end is in the first measure of the system...
             Measure *measure = dynamic_cast<Measure *>(syl->GetEnd()->GetFirstParent(MEASURE));
             assert(measure);
-            System *system = dynamic_cast<System*>(measure->GetFirstParent(SYSTEM));
+            System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
             assert(system);
-            if (measure == dynamic_cast<Measure*>(system->FindChildByType(MEASURE))) {
+            if (measure == dynamic_cast<Measure *>(system->FindChildByType(MEASURE))) {
                 return;
             }
         }
@@ -1133,7 +1155,7 @@ void View::DrawSylConnector(
     DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
 
     dc->ReactivateGraphic();
-    
+
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
     }
@@ -1146,7 +1168,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     if (dc->Is(BBOX_DEVICE_CONTEXT)) {
         return;
     }
-    
+
     int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
@@ -1160,7 +1182,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         // Adjust it proportionally to the lyric size
         dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
         int halfDashLength = dashLength / 2;
-        
+
         int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         int dist = x2 - x1;
         int nbDashes = dist / dashSpace;
@@ -1170,7 +1192,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         if (dist < dashLength) {
             LogDebug("Hyphen space under the limit");
         }
-        
+
         if (nbDashes < 2) {
             nbDashes = 1;
         }
@@ -1183,9 +1205,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
-           DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
         }
-        //DrawFilledRectangle(dc, x1, y, x2, y + width);
+        // DrawFilledRectangle(dc, x1, y, x2, y + width);
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
@@ -1431,7 +1453,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
     dc->StartGraphic(fb, "", fb->GetUuid());
 
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    int lineHeight =  m_doc->GetTextLineHeight(fontDim, false);
+    int lineHeight = m_doc->GetTextLineHeight(fontDim, false);
     int startX = params.m_x;
 
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
@@ -1920,7 +1942,8 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             int accidYShit = m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true);
-            DrawSmuflString(dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            DrawSmuflString(
+                dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
         }
         if (turn->HasAccidlower()) {
             int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
@@ -1929,7 +1952,8 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             int accidYShit = -m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
-            DrawSmuflString(dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            DrawSmuflString(
+                dc, x + accidXShift, y + accidYShit, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
         }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));

@@ -13,13 +13,13 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
@@ -40,6 +40,7 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
+#include "slur.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -119,6 +120,17 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     return *this;
 }
 
+LayerElement *LayerElement::ThisOrSameasAsLink()
+{
+    if (!this->HasSameasLink()) {
+        return this;
+    }
+
+    assert(this->GetSameasLink());
+
+    return dynamic_cast<LayerElement *>(this->GetSameasLink());
+}
+
 bool LayerElement::IsGraceNote()
 {
     // For note, we need to look at it or at the parent chord
@@ -137,7 +149,7 @@ bool LayerElement::IsGraceNote()
         return (chord->HasGrace());
     }
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) return child->IsGraceNote();
@@ -167,7 +179,7 @@ bool LayerElement::IsInLigature() const
 
 bool LayerElement::IsInFTrem()
 {
-    if ((!this->Is(NOTE)) || (this->Is(CHORD))) return false;
+    if (!this->Is({ CHORD, NOTE })) return false;
     return (this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
 }
 
@@ -471,14 +483,13 @@ double LayerElement::GetAlignmentDuration(
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
     }
-    
+
     if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
         LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
         assert(sameas);
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
-
-    if (this->HasInterface(INTERFACE_DURATION)) {
+    else if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET, MAX_TUPLET_DEPTH));
@@ -531,7 +542,7 @@ double LayerElement::GetAlignmentDuration(
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
-        
+
         if (this->Is(HALFMRPT)) {
             return (DUR_MAX / meterUnit * meterCount) / 2;
         }
@@ -542,6 +553,31 @@ double LayerElement::GetAlignmentDuration(
     else {
         return 0.0;
     }
+}
+
+double LayerElement::GetContentAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+{
+    if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
+        return 0.0;
+    }
+
+    double duration = 0.0;
+
+    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+    assert(sameas);
+
+    for (auto child : *sameas->GetChildren()) {
+        // Skip everything that does not have a duration interface and notes in chords
+        if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstParent(CHORD, MAX_CHORD_DEPTH) != NULL)) {
+            continue;
+        }
+        LayerElement *element = dynamic_cast<LayerElement *>(child);
+        assert(element);
+        duration += element->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+    }
+
+    return duration;
 }
 
 //----------------------------------------------------------------------------
@@ -609,6 +645,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
+        double duration = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        params->m_time += duration;
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(BARLINE)) {
@@ -796,7 +835,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     }
     else if (this->Is(CHORD)) {
         // The y position is set to the top note one
-        int loc = PitchInterface::CalcLoc(this, layerY, true);
+        int loc = PitchInterface::CalcLoc(this, layerY, layerElementY, true);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -810,7 +849,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Chord *chord = note->IsChordTone();
         int loc = 0;
         if (note->HasPname()) {
-            loc = PitchInterface::CalcLoc(note, layerY);
+            loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
@@ -896,12 +935,12 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     LayerElement *layerElement = dynamic_cast<LayerElement *>(*rit);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
-                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
                         break;
                     }
                     else if (layerElement->Is(CHORD)) {
-                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
-                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         leftLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
@@ -917,13 +956,13 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     LayerElement *layerElement = dynamic_cast<LayerElement *>(*it);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
-                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
                         break;
                         break;
                     }
                     else if (layerElement->Is(CHORD)) {
-                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
-                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         rightLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
@@ -988,12 +1027,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 }
             }
             else if (hasMultipleLayer) {
-                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
-                assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN())
-                    loc += 2;
-                else
-                    loc -= 2;
+                Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+                assert(parentLayer);
+                int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+                if (layerCount > 1) {
+                    Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                    assert(firstLayer);
+                    if (firstLayer->GetN() == layerY->GetN())
+                        loc += 2;
+                    else
+                        loc -= 2;
+                }
             }
         }
         loc = rest->GetRestLocOffset(loc);
@@ -1149,7 +1193,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // nothing to do when the element has a @sameas attribute
         return FUNCTOR_SIBLINGS;
     }
-    
+
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
@@ -1221,7 +1265,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // For tuplet, we also need to look at the first note or chord
     else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
+        ClassIdsComparison matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) m_drawingCueSize = child->GetDrawingCueSize();
@@ -1397,13 +1441,69 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
+int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    FindTimeSpanningLayerElementsParams *params = dynamic_cast<FindTimeSpanningLayerElementsParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
-    if ((this->GetDrawingX() > params->m_minPos) && (this->GetDrawingX() < params->m_maxPos)) {
-        params->m_spanningContent.push_back(this);
+    // For mRest we do not look at the time span
+    if (this->Is(MREST)) {
+        // Add the layerN to the list of layer element occuring in this time frame
+        if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
+            == params->m_layers.end()) {
+            params->m_layers.push_back(this->GetAlignmentLayerN());
+        }
+        return FUNCTOR_SIBLINGS;
+    }
+
+    if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
+
+    double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+    double time = m_alignment->GetTime();
+
+    // The event is starting after the end of the element
+    if ((time + duration) <= params->m_time) {
+        return FUNCTOR_CONTINUE;
+    }
+    // The element is starting after the event end - we can stop here
+    else if (time >= (params->m_time + params->m_duration)) {
+        return FUNCTOR_STOP;
+    }
+
+    // Add the layerN to the list of layer element occuring in this time frame
+    if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
+        == params->m_layers.end()) {
+        params->m_layers.push_back(this->GetAlignmentLayerN());
+    }
+
+    // Not need to recurse for chords? Not quite sure about it.
+    return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
+}
+
+int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
+{
+    FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
+    assert(params);
+
+    if (!this->Is(params->m_classIds)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->HasContentBB() && (this->GetContentRight() > params->m_minPos)
+        && (this->GetContentLeft() < params->m_maxPos)) {
+
+        // We skip the start or end of the slur
+        if ((this == params->m_interface->GetStart()) || (this == params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetStart()->HasChild(this) || this->HasChild(params->m_interface->GetStart())) {
+            return FUNCTOR_CONTINUE;
+        }
+        if (params->m_interface->GetEnd()->HasChild(this) || this->HasChild(params->m_interface->GetEnd())) {
+            return FUNCTOR_CONTINUE;
+        }
+
+        params->m_elements.push_back(this);
     }
     else if (this->GetDrawingX() > params->m_maxPos) {
         return FUNCTOR_STOP;
@@ -1417,17 +1517,19 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
+    LayerElement *element = this->ThisOrSameasAsLink();
+
     double incrementScoreTime;
 
-    if (this->Is(REST) || this->Is(SPACE)) {
-        incrementScoreTime = this->GetAlignmentDuration(
+    if (element->Is(REST) || element->Is(SPACE)) {
+        incrementScoreTime = element->GetAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
-    else if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
+    else if (element->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(element);
         assert(note);
 
         // For now just ignore grace notes
@@ -1449,13 +1551,19 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
-        // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
+        // note->GetNoteOrChordDur(element), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
-        note->SetScoreTimeOnset(params->m_currentScoreTime);
-        note->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
-        note->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
-        note->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
+        Note *storeNote = note;
+        // When we have a @sameas, do store the onset / offset values of the pointed note in the pointing note
+        if (this != element) {
+            storeNote = dynamic_cast<Note *>(this);
+        }
+        assert(storeNote);
+        storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
+        storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+        storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+        storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
@@ -1463,8 +1571,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
     }
-    else if (this->Is(BEATRPT)) {
-        BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
+    else if (element->Is(BEATRPT)) {
+        BeatRpt *rpt = dynamic_cast<BeatRpt *>(element);
         assert(rpt);
 
         incrementScoreTime = rpt->GetAlignmentDuration(
@@ -1474,11 +1582,44 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
+    else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && this->HasSameasLink()) {
+        incrementScoreTime = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
+    }
     return FUNCTOR_CONTINUE;
 }
 
 int LayerElement::ResolveMIDITies(FunctorParams *)
 {
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

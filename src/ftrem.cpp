@@ -28,9 +28,9 @@ namespace vrv {
 // FTrem
 //----------------------------------------------------------------------------
 
-FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttSlashCount(), AttTremMeasured()
+FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttFTremVis(), AttTremMeasured()
 {
-    RegisterAttClass(ATT_SLASHCOUNT);
+    RegisterAttClass(ATT_FTREMVIS);
     RegisterAttClass(ATT_TREMMEASURED);
 
     Reset();
@@ -44,7 +44,7 @@ FTrem::~FTrem()
 void FTrem::Reset()
 {
     LayerElement::Reset();
-    ResetSlashCount();
+    ResetFTremVis();
     ResetTremMeasured();
 }
 
@@ -129,7 +129,7 @@ void FTrem::InitCoords(ListOfObjects *childList)
     this->m_drawingParams.m_hasMultipleStemDir = false;
     this->m_drawingParams.m_cueSize = false;
     // adjust beam->m_drawingParams.m_shortestDur depending on the number of slashes
-    this->m_drawingParams.m_shortestDur = std::max(DUR_8, DUR_1 + this->GetSlash());
+    this->m_drawingParams.m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
     this->m_drawingParams.m_stemDir = STEMDIRECTION_NONE;
 
     if (firstElement->m_element->Is(CHORD)) {

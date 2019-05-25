@@ -383,7 +383,7 @@ bool HumdrumInput::ImportFile()
 // HumdrumInput::ImportString -- Read a Humdrum file from a text string.
 //
 
-bool HumdrumInput::ImportString(std::string const &content)
+bool HumdrumInput::ImportString(const std::string &content)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
@@ -508,7 +508,7 @@ bool HumdrumInput::convertHumdrum()
 
     infile.analyzeSlurs();
     infile.analyzeKernTies();
-    infile.analyzeKernStems();
+    infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
     infile.analyzeOttavas();
     parseSignifiers(infile);
@@ -1063,7 +1063,7 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
     xmldata << "</extMeta>\n";
 
     pugi::xml_document tmpdoc;
-    pugi::xml_parse_result result = tmpdoc.load(xmldata.str().c_str());
+    pugi::xml_parse_result result = tmpdoc.load_string(xmldata.str().c_str());
     if (!result) {
         // some sort of error, so give up;
         cerr << "ExtMeta parse error: " << result.description() << endl;

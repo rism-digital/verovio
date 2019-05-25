@@ -101,7 +101,7 @@ bool PaeInput::ImportFile()
     return true;
 }
 
-bool PaeInput::ImportString(std::string const &pae)
+bool PaeInput::ImportString(const std::string &pae)
 {
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);
@@ -133,6 +133,27 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
+
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
+    // add minimal scoreDef
+    StaffGrp *staffGrp = new StaffGrp();
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(5);
+    staffGrp->AddChild(staffDef);
+    m_doc->m_scoreDef.AddChild(staffGrp);
 
     // read values
     while (!infile.eof()) {
@@ -233,7 +254,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         }
 
         // rhythmic values
-        else if (isdigit(incipit[i]) != 0) {
+        else if ((isdigit(incipit[i]) != 0) && ((i <= 0) || incipit[i - 1] != ';')) {
             i += getDurations(incipit, &current_measure, i);
         }
 
@@ -400,19 +421,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         current_measure.notes.clear();
     }
 
-    m_doc->Reset();
-    m_doc->SetType(Raw);
-    // The mdiv
-    Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
-    m_doc->AddChild(mdiv);
-    // The score
-    Score *score = new Score();
-    mdiv->AddChild(score);
-    // the section
-    Section *section = new Section();
-    score->AddChild(section);
-
     int measure_count = 1;
 
     std::vector<pae::Measure>::iterator it;
@@ -440,6 +448,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
                 scoreDef->SetMeterCount(obj.meter->GetCount());
                 scoreDef->SetMeterUnit(obj.meter->GetUnit());
                 scoreDef->SetMeterSym(obj.meter->GetSym());
+                // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
+                if (obj.meter->GetForm() == meterSigVis_FORM_num) {
+                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                }
                 delete obj.meter;
                 obj.meter = NULL;
             }
@@ -452,11 +464,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         measure_count++;
     }
 
-    // add minimal scoreDef
-    StaffGrp *staffGrp = new StaffGrp();
-    StaffDef *staffDef = new StaffDef();
-    staffDef->SetN(1);
-    staffDef->SetLines(5);
     if (m_is_mensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
     }
@@ -475,6 +482,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
         m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
         m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
+        // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
+        if (scoreDefMeterSig->GetForm() == meterSigVis_FORM_num) {
+            m_doc->m_scoreDef.SetMeterForm(meterSigDefaultVis_METERFORM_num);
+        }
         delete scoreDefMeterSig;
     }
     if (scoreDefMensur) {
@@ -489,8 +500,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         delete m_tie;
         m_tie = NULL;
     }
-    staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 }
@@ -674,7 +683,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
         // Triplets are in the form (4ABC)
         // index points to the '(', so we look back
-        // if the resut is a number or dot, it means we have the long format
+        // if the result is a number or dot, it means we have the long format
         // i.e. 4(6ABC;5) or 4.(6ABC;5)
         if ((index != 0) && (isdigit(incipit[index - 1]) || incipit[index - 1] == '.')) {
 
@@ -849,6 +858,8 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
             meter->SetCount(std::stoi(timesig_str));
+            meter->SetUnit(1);
+            meter->SetForm(meterSigVis_FORM_num);
         }
         else if (strcmp(timesig_str, "c") == 0) {
             // C

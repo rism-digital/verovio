@@ -48,7 +48,7 @@ public:
      * Copy assignment for resetting pointers
      */
     LayerElement &operator=(const LayerElement &element);
-    
+
     /**
      * @name Getter to interfaces
      */
@@ -67,6 +67,11 @@ public:
      * It typically set to true for syl or artic.
      */
     virtual bool IsRelativeToStaff() const { return false; }
+
+    /**
+     * Return itself or the resolved @sameas (if any)
+     */
+    LayerElement *ThisOrSameasAsLink();
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -169,9 +174,16 @@ public:
     ///@}
 
     /**
-     * Returns the duration if the child element has a DurationInterface
+     * Returns the duration if the element has a DurationInterface
      */
     double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
+
+    /**
+     * Returns the duration if the content of the layer element with a @sameas attribute.
+     * Used only on beam, tuplet or ftrem have.
+     */
+    double GetContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     //----------//
@@ -254,9 +266,14 @@ public:
     virtual int SetAlignmentPitchPos(FunctorParams *functorParams);
 
     /**
-     * See Object::FindTimeSpanningLayerElements
+     * See Object::FindSpannedLayerElements
      */
-    virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams);
+    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
+
+    /**
+     * See Object::LayerCountInTimeSpan
+     */
+    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
 
     /**
      * See Object::CalcOnsetOffset
@@ -271,6 +288,18 @@ public:
     ///@{
     virtual int ResolveMIDITies(FunctorParams *);
     ///@}
+
+    /**
+     * @name See Object::GenerateMIDI
+     */
+    ///@{
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::GenerateTimemap
+     */
+    virtual int GenerateTimemap(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing

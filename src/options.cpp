@@ -343,7 +343,7 @@ OptionIntMap::OptionIntMap()
 {
     m_value = 0;
     m_defaultValue = 0;
-    
+
     m_values = NULL;
 }
 
@@ -509,6 +509,10 @@ Options::Options()
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);
 
+    m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
+    m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
+    this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
+
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
@@ -524,7 +528,7 @@ Options::Options()
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_general);
-    
+
     m_openControlEvents.SetInfo("Open control event", "Render open control events");
     m_openControlEvents.Init(false);
     this->Register(&m_openControlEvents, "openControlEvents", &m_general);
@@ -553,9 +557,21 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
+    m_svgViewBox.SetInfo("Use viewbox on svg root", "Use viewBox on svg root element for easy scaling of document");
+    m_svgViewBox.Init(false);
+    this->Register(&m_svgViewBox, "svgViewBox", &m_general);
+
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
+
+    m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
+    m_usePgFooterForAll.Init(false);
+    this->Register(&m_usePgFooterForAll, "usePgFooterForAll", &m_general);
+
+    m_usePgHeaderForAll.SetInfo("Use PgHeader for all", "Use the pgHeader for all pages");
+    m_usePgHeaderForAll.Init(false);
+    this->Register(&m_usePgHeaderForAll, "usePgHeaderForAll", &m_general);
 
     /********* General layout *********/
 
@@ -601,7 +617,7 @@ Options::Options()
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
-    
+
     m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");
     m_lyricHyphenWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_lyricHyphenWidth, "lyricHyphenWidth", &m_generalLayout);
@@ -609,7 +625,7 @@ Options::Options()
     m_lyricNoStartHyphen.SetInfo("Lyric no start hyphen", "Do not show hyphens at the beginning of a system");
     m_lyricNoStartHyphen.Init(false);
     this->Register(&m_lyricNoStartHyphen, "lyricNoStartHyphen", &m_generalLayout);
-    
+
     m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
     m_lyricSize.Init(4.5, 2.0, 8.0);
     this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
@@ -617,7 +633,7 @@ Options::Options()
     m_lyricTopMinMargin.SetInfo("Lyric top min margin", "The minmal margin above the lyrics in MEI units");
     m_lyricTopMinMargin.Init(2.0, 0.0, 8.0);
     this->Register(&m_lyricTopMinMargin, "lyricTopMinMargin", &m_generalLayout);
-    
+
     m_lyricWordSpace.SetInfo("Lyric word space", "The lyric word space length");
     m_lyricWordSpace.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricWordSpace, "lyricWordSpace", &m_generalLayout);
@@ -662,7 +678,7 @@ Options::Options()
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
     m_spacingDurDetection.Init(false);
     this->Register(&m_spacingDurDetection, "spacingDurDetection", &m_generalLayout);
-    
+
     m_spacingLinear.SetInfo("Spacing linear", "Specify the linear spacing factor");
     m_spacingLinear.Init(0.25, 0.0, 1.0);
     this->Register(&m_spacingLinear, "spacingLinear", &m_generalLayout);
@@ -741,6 +757,14 @@ Options::Options()
     m_defaultTopMargin.Init(0.5, 0.0, 6.0);
     this->Register(&m_defaultTopMargin, "defaultTopMargin", &m_elementMargins);
 
+    /// custom bottom
+
+    m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
+    m_bottomMarginHarm.Init(0.5, 0.0, 10.0);
+    this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
+
+    /// custom left
+
     m_leftMarginAccid.SetInfo("Left margin accid", "The margin for accid in MEI units");
     m_leftMarginAccid.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginAccid, "leftMarginAccid", &m_elementMargins);
@@ -805,6 +829,8 @@ Options::Options()
     m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginRightBarLine, "leftMarginRightBarLine", &m_elementMargins);
 
+    /// custom right
+
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
     m_rightMarginAccid.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginAccid, "rightMarginAccid", &m_elementMargins);
@@ -868,6 +894,12 @@ Options::Options()
     m_rightMarginRightBarLine.SetInfo("Right margin right barLine", "The right margin for right barLine in MEI units");
     m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);
     this->Register(&m_rightMarginRightBarLine, "rightMarginRightBarLine", &m_elementMargins);
+
+    /// custom top
+
+    m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
+    m_topMarginHarm.Init(0.5, 0.0, 10.0);
+    this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
 
     /*
     // Example of a staffRel param

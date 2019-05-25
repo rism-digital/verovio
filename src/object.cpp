@@ -19,6 +19,7 @@
 #include "boundary.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -84,7 +85,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
-    m_isReferencObject = object.m_isReferencObject;
+    m_isReferenceObject = object.m_isReferenceObject;
 
     // Also copy attribute classes
     m_attClasses = object.m_attClasses;
@@ -122,7 +123,7 @@ Object &Object::operator=(const Object &object)
         // Flags
         m_isAttribute = object.m_isAttribute;
         m_isModified = true;
-        m_isReferencObject = object.m_isReferencObject;
+        m_isReferenceObject = object.m_isReferenceObject;
 
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
@@ -158,7 +159,7 @@ void Object::Init(std::string classid)
     // Flags
     m_isAttribute = false;
     m_isModified = true;
-    m_isReferencObject = false;
+    m_isReferenceObject = false;
 
     this->GenerateUuid();
 
@@ -176,7 +177,7 @@ void Object::SetAsReferenceObject()
 {
     assert(m_children.empty());
 
-    m_isReferencObject = true;
+    m_isReferenceObject = true;
 }
 
 void Object::Reset()
@@ -262,7 +263,7 @@ void Object::SwapUuid(Object *other)
 
 void Object::ClearChildren()
 {
-    if (m_isReferencObject) {
+    if (m_isReferenceObject) {
         m_children.clear();
         return;
     }
@@ -286,7 +287,7 @@ int Object::GetChildCount(const ClassId classId) const
 int Object::GetChildCount(const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
-    AttComparison matchClassId(classId);
+    ClassIdComparison matchClassId(classId);
     this->FindAllChildByComparison(&objects, &matchClassId);
     return (int)objects.size();
 }
@@ -353,7 +354,7 @@ Object *Object::GetNext(Object *child, const ClassId classId)
     }
     return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;
 }
-    
+
 Object *Object::GetPrevious(Object *child, const ClassId classId)
 {
     ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
@@ -453,7 +454,7 @@ Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
 
 Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 {
-    AttComparison comparison(classId);
+    ClassIdComparison comparison(classId);
     return FindChildByComparison(&comparison, deepness, direction);
 }
 
@@ -508,7 +509,9 @@ bool Object::DeleteChild(Object *child)
     auto it = std::find(m_children.begin(), m_children.end(), child);
     if (it != m_children.end()) {
         m_children.erase(it);
-        delete child;
+        if (!m_isReferenceObject) {
+            delete child;
+        }
         this->Modify();
         return true;
     }
@@ -600,11 +603,11 @@ int Object::GetChildIndex(const Object *child)
     }
     return -1;
 }
-    
+
 int Object::GetChildIndex(const Object *child, const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
-    AttComparison matchClassId(classId);
+    ClassIdComparison matchClassId(classId);
     this->FindAllChildByComparison(&objects, &matchClassId);
     ArrayOfObjects::iterator iter;
     int i;
@@ -737,7 +740,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                     // if yes, we will use it (*comparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    AttComparison *attComparison = dynamic_cast<AttComparison *>(*comparisonIter);
+                    ClassIdComparison *attComparison = dynamic_cast<ClassIdComparison *>(*comparisonIter);
                     assert(attComparison);
                     if (o->GetClassId() == attComparison->GetType()) {
                         hasComparison = true;
@@ -902,7 +905,7 @@ std::wstring TextListInterface::GetText(Object *node)
     }
     return concatText;
 }
-    
+
 void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &lines)
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
@@ -927,7 +930,7 @@ void TextListInterface::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
     while (iter != childList->end()) {
-        if (!(*iter)->Is({LB, TEXT})) {
+        if (!(*iter)->Is({ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
             iter = childList->erase(iter);
             continue;
@@ -1105,11 +1108,11 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         i->first->SetNextLink(this);
         params->m_nextUuidPairs.erase(i);
     }
-    
+
     // @sameas
     std::string sameas = this->GetUuid();
     auto j = std::find_if(params->m_sameasUuidPairs.begin(), params->m_sameasUuidPairs.end(),
-                          [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+        [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
     if (j != params->m_sameasUuidPairs.end()) {
         j->first->SetSameasLink(this);
         params->m_sameasUuidPairs.erase(j);
@@ -1274,7 +1277,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new clef
     if (this->Is(CLEF)) {
-        Clef *clef = dynamic_cast<Clef *>(this);
+        LayerElement *element = dynamic_cast<LayerElement *>(this);
+        assert(element);
+        Clef *clef = dynamic_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
