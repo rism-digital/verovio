@@ -679,31 +679,31 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
         int t = i;
         int t2 = 0;
         int tuplet_val = 3; // triplets are default
+        int tuplet_notes = 0;
         char *buf;
+        
+        // create the buffer so we can convert the tuplet nr to int
+        buf = (char *)malloc(length + 1); // allocate it with space for 0x00
+        memset(buf, 0x00, length + 1); // wipe it up
 
-        // Triplets are in the form (4ABC)
-        // index points to the '(', so we look back
-        // if the result is a number or dot, it means we have the long format
-        // i.e. 4(6ABC;5) or 4.(6ABC;5)
-        if ((index != 0) && (isdigit(incipit[index - 1]) || incipit[index - 1] == '.')) {
+        // move until we find the ;
+        while ((t < length) && (incipit[t] != ';')) {
 
-            // create the buffer so we can convert the tuplet nr to int
-            buf = (char *)malloc(length + 1); // allocate it with space for 0x00
-            memset(buf, 0x00, length + 1); // wipe it up
-
-            // move until we find the ;
-            while ((t < length) && (incipit[t] != ';')) {
-
-                // we should not find any close paren before the ';' !
-                // FIXME find a graceful way to exit signaling this to user
-                if (incipit[t] == ')') {
-                    LogDebug("Plaine & Easie import: You have a ')' before the ';' in a tuplet!");
-                    free(buf);
-                    return i - index;
-                }
-
-                t++;
+            // Triplets are sometimes codes without ';' values
+            if (incipit[t] == ')') {
+                break;
             }
+            
+            // count the notes
+            if ((incipit[t] - 'A' >= 0) && (incipit[t] - 'A' < 7)) {
+                tuplet_notes++;
+            }
+
+            t++;
+        }
+    
+        // We detected a ';', get the value of the tuplet (otherwise 3 by default)
+        if ((t < length) && incipit[t] != ')') {
 
             // t + 1 should point to the number
             t++; // move one char to the number
@@ -720,15 +720,18 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
                 buf[t2] = incipit[t + t2];
                 t2++;
             }
+            
 
             tuplet_val = atoi(buf);
             free(buf); // dispose of the buffer
         }
 
         // this is the first note, the total number of notes = tuplet_val
-        note->tuplet_notes = tuplet_val;
+        note->tuplet_notes = tuplet_notes;
         // but also the note counter
-        note->tuplet_note = tuplet_val;
+        note->tuplet_note = tuplet_notes;
+        // the tuplet val (3 or after ;)
+        note->tuplet_val = tuplet_val;
     }
     else {
         if (note->tuplet_notes > 0) {
@@ -751,7 +754,9 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
     // int length = strlen(incipit);
 
     // TODO: fermatas inside tuplets won't be currently handled correctly
-    note->fermata = false;
+    if (note->tuplet_notes > 0) {
+        note->fermata = false;
+    }
 
     return i - index;
 }
@@ -1388,7 +1393,7 @@ void PaeInput::parseNote(pae::Note *note)
     // which means we are counting a tuplet
     if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
         Tuplet *newTuplet = new Tuplet();
-        newTuplet->SetNum(note->tuplet_notes);
+        newTuplet->SetNum(note->tuplet_val);
         newTuplet->SetNumbase(2);
         pushContainer(newTuplet);
     }

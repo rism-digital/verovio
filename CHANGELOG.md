@@ -1,5 +1,8 @@
 # Changelog
 
+## [unreleased]
+* Improved import of tuplets from PAE
+
 ## [2.1.0] - 2019-05-25
 * Update pugixml
 * Support for SMUFL figured bass figures
