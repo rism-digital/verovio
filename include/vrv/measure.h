@@ -406,6 +406,8 @@ public:
 
     TimestampAligner m_timestampAligner;
 
+    int m_measureCount; // measures counted as they appear one after the other
+
 protected:
     /**
      * The X relative position of the measure.
