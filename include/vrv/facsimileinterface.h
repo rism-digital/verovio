@@ -36,6 +36,7 @@ public:
     virtual int GetDrawingY() const;
 
     int GetWidth() const;
+    int GetHeight() const;
 
     /** Check if the object has a facsimile */
     bool HasFacsimile() { return this->HasFacs(); }

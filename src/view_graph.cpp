@@ -263,10 +263,9 @@ void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int 
     std::wistringstream iss(s);
     std::wstring token;
     while (std::getline(iss, token, L'_')) {
-        dc->DrawText(UTF16to8(token), token);
+        dc->DrawText(UTF16to8(token), token, x, y);
         // no _
         if (iss.eof()) break;
-
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
         dc->SetFont(&vrvTxt);

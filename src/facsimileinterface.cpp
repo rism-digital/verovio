@@ -42,7 +42,7 @@ int FacsimileInterface::GetDrawingX() const
 int FacsimileInterface::GetDrawingY() const
 {
     assert(m_zone);
-    int y = ( m_zone->GetLogicalUly());
+    int y = (m_zone->GetLogicalUly());
     return y;
 }
 
@@ -50,6 +50,12 @@ int FacsimileInterface::GetWidth() const
 {
     assert(m_zone);
     return m_zone->GetLrx() - m_zone->GetUlx();
+}
+
+int FacsimileInterface::GetHeight() const
+{ 
+    assert(m_zone);
+    return m_zone->GetLogicalUly() - m_zone->GetLogicalLry();
 }
 
 int FacsimileInterface::GetSurfaceY() const

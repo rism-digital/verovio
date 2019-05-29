@@ -1366,7 +1366,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     else {
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
     }
-
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
