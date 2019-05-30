@@ -931,7 +931,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         }
         else {
             Measure *measure = new Measure();
-            measure->m_measureCount = i;
+            m_measureCounts[measure] = i;
             ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
             // Add the measure to the system - if already there from a previous part we'll just merge the content
             AddMeasure(section, measure, i);
@@ -1324,7 +1324,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
             for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
                 if (iter->second.m_dirN == hairpinNumber) {
-                    int measureDifference = measure->m_measureCount - iter->second.m_lastMeasureCount;
+                    int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
                     iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                     m_hairpinStack.erase(iter);
                     return;
@@ -1332,11 +1332,11 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             }
             // ...or push on hairpin stop stack, if not matched.
             m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenHairpin>(
-                0, timeStamp, musicxml::OpenHairpin(hairpinNumber, measure->m_measureCount)));
+                0, timeStamp, musicxml::OpenHairpin(hairpinNumber, m_measureCounts.at(measure))));
         }
         else {
             Hairpin *hairpin = new Hairpin();
-            musicxml::OpenHairpin openHairpin(hairpinNumber, measure->m_measureCount);
+            musicxml::OpenHairpin openHairpin(hairpinNumber, m_measureCounts.at(measure));
             if (HasAttributeWithValue(wedge.node(), "type", "crescendo")) {
                 hairpin->SetForm(hairpinLog_FORM_cres);
             }
@@ -1350,7 +1350,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             std::vector<std::tuple<int, double, musicxml::OpenHairpin> >::iterator iter;
             for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
-                    int measureDifference = std::get<2>(*iter).m_lastMeasureCount - measure->m_measureCount;
+                    int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
                     hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
                     assert(staff);

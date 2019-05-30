@@ -328,6 +328,8 @@ private:
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
     std::vector<musicxml::ClefChange> m_ClefChangeStack;
+    /* a map for the measure counts storing the index of each measure created */
+    std::map<Measure *, int> m_measureCounts;
 };
 
 } // namespace vrv
