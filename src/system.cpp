@@ -592,12 +592,13 @@ int System::JustifyX(FunctorParams *functorParams)
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
     }
 
-    // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
-    // Eventually we should make this a parameter
+    // Check if we are on the last page and on the last system:
+    // do not justify it if the non-justified width is less than a specified percent.
     if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
         && (this->GetIdx() == parent->GetChildCount() - 1)) {
-        // HARDCODED
-        if (params->m_justifiableRatio > 1.25) {
+        // TODO: Get this from the option.
+        double minLastJust = 0.8;
+        if (minLastJust > 0 && params->m_justifiableRatio > (1/minLastJust)) {
             return FUNCTOR_STOP;
         }
     }

@@ -457,6 +457,7 @@ public:
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;
+    OptionDbl m_minLastJust;
     OptionBool m_mmOutput;
     OptionBool m_noFooter;
     OptionBool m_noHeader;
