@@ -54,6 +54,7 @@ downloads:
     var pdfOrientation = "portrait";
     var savedOptions = undefined;
     var customOptions = undefined;
+    var target = "";
     var disabledOptions = ["adjustPageHeight", "breaks", "landscape", "pageHeight", "pageWidth", "mmOutput", "noFooter"];
 
     // reload cookies
@@ -138,7 +139,17 @@ downloads:
             else {
                 $("#total_text").html(vrvToolkit.getPageCount());
                 page = 1;
+                var pageTarget = 0;
+                if (target != "") {
+                    pageTarget = vrvToolkit.getPageWithElement(target.substr(1));
+                    if (pageTarget != 0) {
+                        page = pageTarget;
+                    }
+                }
                 load_page();
+                if (pageTarget != 0) {
+                    $(target).attr("fill", "#d00").attr("stroke", "#d00");
+                }
                 $("#play-button").show();
                 $("#pdf-button").show();
                 $("#options-button").show();
@@ -774,6 +785,9 @@ downloads:
         else {
             if (!file || (file.length == 0)) {
                 file = "examples/downloads/Chopin_Etude_op.10_no.9.mei";
+            }
+            else {
+                target = window.location.hash;
             }
             $("#overlay").show();
             $.ajax({
