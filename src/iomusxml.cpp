@@ -1317,7 +1317,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     if (wedge) {
         int hairpinNumber = wedge.node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
-        int offset = wedge.node().attribute("offset").as_int();
+        int offset = node.select_node("offset").node().text().as_int();
         double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
