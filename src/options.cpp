@@ -513,9 +513,9 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
 
-    m_minLastJust.SetInfo("Minimum last-system-justification width", "The last system is only justified if the unjustified width is greater than this percent");
-    m_minLastJust.Init(0.8, 0.0, 1.0);
-    this->Register(&m_minLastJust, "minLastJust", &m_general);
+    m_minLastJustification.SetInfo("Minimum last-system-justification width", "The last system is only justified if the unjustified width is greater than this percent");
+    m_minLastJustification.Init(0.8, 0.0, 1.0);
+    this->Register(&m_minLastJustification, "minLastJustification", &m_general);
 
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);

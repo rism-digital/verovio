@@ -596,9 +596,8 @@ int System::JustifyX(FunctorParams *functorParams)
     // do not justify it if the non-justified width is less than a specified percent.
     if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
         && (this->GetIdx() == parent->GetChildCount() - 1)) {
-        // TODO: Get this from the option.
-        double minLastJust = 0.8;
-        if (minLastJust > 0 && params->m_justifiableRatio > (1/minLastJust)) {
+        double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
+        if ((minLastJust > 0) && (params->m_justifiableRatio > (1/minLastJust))) {
             return FUNCTOR_STOP;
         }
     }
