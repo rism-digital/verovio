@@ -89,6 +89,7 @@ public:
         m_x = 0;
         m_y = 0;
         m_width = 0;
+        m_height = 0;
         m_laidOut = false;
         m_newLine = false;
         m_alignment = HORIZONTALALIGNMENT_left;
@@ -99,6 +100,7 @@ public:
     int m_x;
     int m_y;
     int m_width;
+    int m_height;
     bool m_laidOut;
     bool m_newLine;
     data_HORIZONTALALIGNMENT m_alignment;

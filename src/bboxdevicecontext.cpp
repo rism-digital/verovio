@@ -287,6 +287,24 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
         m_textX -= (extend.m_width / 2);
     }
     UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
+
+}
+
+//to draw text when the bounding box of the text is already defined
+//just use the defined coordinates instead of calculating them based on the contents of the string
+void BBoxDeviceContext::DrawBoundedText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height) {
+
+    assert(m_fontStack.top());
+
+    if((ulx != VRV_UNSET) && (uly != VRV_UNSET) && (lrx != VRV_UNSET) && (lry != VRV_UNSET)) {
+        m_textX = x;
+        m_textY = y;
+        m_textWidth = width;
+        m_textHeight = height;
+        m_textAscent = 0;
+        m_textDescent = 0;
+    }
+    UpdateBB(m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
 }
 
 void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)
