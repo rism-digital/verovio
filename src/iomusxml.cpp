@@ -1578,8 +1578,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-    // bool cue = false;
-    // if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
+     bool cue = false;
+     if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -1660,8 +1660,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             else {
                 MRest *mRest = new MRest();
                 element = mRest;
-                // FIXME MEI 4.0.0
-                // if (cue) mRest->SetSize(SIZE_cue);
+                if (cue) mRest->SetCue(BOOLEAN_true);
                 if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
                 if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
                 AddLayerElement(layer, mRest);
@@ -1673,8 +1672,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             rest->SetDur(ConvertTypeToDur(typeStr));
             rest->SetDurPpq(duration);
             if (dots > 0) rest->SetDots(dots);
-            // FIXME MEI 4.0.0
-            // if (cue) rest->SetSize(SIZE_cue);
+            if (cue) rest->SetCue(BOOLEAN_true);
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
             AddLayerElement(layer, rest);
@@ -1762,8 +1760,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 chord->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
-                // FIXME MEI 4.0.0
-                // if (cue) chord->SetSize(SIZE_cue);
+                if (cue) chord->SetCue(BOOLEAN_true);
                 if (tremSlashNum != 0)
                     chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
                 AddLayerElement(layer, chord);
@@ -1794,8 +1791,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
-            // FIXME MEI 4.0.0
-            // if (cue) note->SetSize(SIZE_cue);
+            if (cue) note->SetCue(BOOLEAN_true);
             if (tremSlashNum != 0)
                 note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
         }
