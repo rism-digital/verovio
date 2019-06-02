@@ -1495,6 +1495,33 @@ data_MENSURATIONSIGN AttConverter::StrToMensurationsign(std::string value, bool 
     return MENSURATIONSIGN_NONE;
 }
 
+std::string AttConverter::MeterformToStr(data_METERFORM data) const
+{
+    std::string value;
+    switch (data) {
+        case METERFORM_num: value = "num"; break;
+        case METERFORM_denomsym: value = "denomsym"; break;
+        case METERFORM_norm: value = "norm"; break;
+        case METERFORM_invis: value = "invis"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.METERFORM", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_METERFORM AttConverter::StrToMeterform(std::string value, bool logWarning) const
+{
+    if (value == "num") return METERFORM_num;
+    if (value == "denomsym") return METERFORM_denomsym;
+    if (value == "norm") return METERFORM_norm;
+    if (value == "invis") return METERFORM_invis;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.METERFORM", value.c_str());
+    return METERFORM_NONE;
+}
+
 std::string AttConverter::MetersignToStr(data_METERSIGN data) const
 {
     std::string value;
@@ -3354,6 +3381,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
     std::string value;
     switch (data) {
         case meiVersion_MEIVERSION_4_0_0: value = "4.0.0"; break;
+        case meiVersion_MEIVERSION_4_0_1: value = "4.0.1"; break;
         default:
             LogWarning("Unknown value '%d' for att.meiVersion@meiversion", data);
             value = "";
@@ -3365,6 +3393,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
 meiVersion_MEIVERSION AttConverter::StrToMeiVersionMeiversion(std::string value, bool logWarning) const
 {
     if (value == "4.0.0") return meiVersion_MEIVERSION_4_0_0;
+    if (value == "4.0.1") return meiVersion_MEIVERSION_4_0_1;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meiVersion@meiversion", value.c_str());
     return meiVersion_MEIVERSION_NONE;
@@ -3439,60 +3468,6 @@ meterConformance_METCON AttConverter::StrToMeterConformanceMetcon(std::string va
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meterConformance@metcon", value.c_str());
     return meterConformance_METCON_NONE;
-}
-
-std::string AttConverter::MeterSigVisFormToStr(meterSigVis_FORM data) const
-{
-    std::string value;
-    switch (data) {
-        case meterSigVis_FORM_num: value = "num"; break;
-        case meterSigVis_FORM_denomsym: value = "denomsym"; break;
-        case meterSigVis_FORM_norm: value = "norm"; break;
-        case meterSigVis_FORM_invis: value = "invis"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.meterSig.vis@form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value, bool logWarning) const
-{
-    if (value == "num") return meterSigVis_FORM_num;
-    if (value == "denomsym") return meterSigVis_FORM_denomsym;
-    if (value == "norm") return meterSigVis_FORM_norm;
-    if (value == "invis") return meterSigVis_FORM_invis;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.meterSig.vis@form", value.c_str());
-    return meterSigVis_FORM_NONE;
-}
-
-std::string AttConverter::MeterSigDefaultVisMeterformToStr(meterSigDefaultVis_METERFORM data) const
-{
-    std::string value;
-    switch (data) {
-        case meterSigDefaultVis_METERFORM_num: value = "num"; break;
-        case meterSigDefaultVis_METERFORM_denomsym: value = "denomsym"; break;
-        case meterSigDefaultVis_METERFORM_norm: value = "norm"; break;
-        case meterSigDefaultVis_METERFORM_invis: value = "invis"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.meterSigDefault.vis@meter.form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-meterSigDefaultVis_METERFORM AttConverter::StrToMeterSigDefaultVisMeterform(std::string value, bool logWarning) const
-{
-    if (value == "num") return meterSigDefaultVis_METERFORM_num;
-    if (value == "denomsym") return meterSigDefaultVis_METERFORM_denomsym;
-    if (value == "norm") return meterSigDefaultVis_METERFORM_norm;
-    if (value == "invis") return meterSigDefaultVis_METERFORM_invis;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.form", value.c_str());
-    return meterSigDefaultVis_METERFORM_NONE;
 }
 
 std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const

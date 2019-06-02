@@ -999,7 +999,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
 
-    if (meterSig->GetForm() == meterSigVis_FORM_invis) {
+    if (meterSig->GetForm() == METERFORM_invis) {
         // just skip
     }
     else if (meterSig->HasSym()) {
@@ -1010,7 +1010,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
             DrawSmuflCode(dc, x, y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
         }
     }
-    else if (meterSig->GetForm() == meterSigVis_FORM_num) {
+    else if (meterSig->GetForm() == METERFORM_num) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {

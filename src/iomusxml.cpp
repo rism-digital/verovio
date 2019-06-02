@@ -856,9 +856,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     if (symbol == "cut" || symbol == "common")
                         staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
                     else if (symbol == "single-number")
-                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                        staffDef->SetMeterForm(METERFORM_num);
                     else
-                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
+                        staffDef->SetMeterForm(METERFORM_norm);
                 }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
@@ -1140,9 +1140,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 if (symbol == "cut" || symbol == "common")
                     scoreDef->SetMeterSym(scoreDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
-                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                    scoreDef->SetMeterForm(METERFORM_num);
                 else
-                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
+                    scoreDef->SetMeterForm(METERFORM_norm);
             }
             if (time.node().select_nodes("beats").size() > 1) {
                 LogWarning("MusicXML import: Compound meter signatures are not supported");

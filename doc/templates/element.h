@@ -29,8 +29,8 @@ public:
     Element();
     virtual ~Element();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Element"; };
-    virtual ClassId GetClassId() { return ELEMENT; };
+    virtual std::string GetClassName() const { return "Element"; };
+    virtual ClassId GetClassId() const { return ELEMENT; };
     ///@}
 
     /**
