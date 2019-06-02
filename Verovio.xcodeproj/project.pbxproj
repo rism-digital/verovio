@@ -189,6 +189,18 @@
 		4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1D733D1A1D08CD001E08F6 /* glyph.h */; };
 		4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
 		4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
+		4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
+		4D2073F622A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
+		4D2073F722A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
+		4D2073F822A3BCE000E0765F /* rhythmglyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* rhythmglyph.cpp */; };
+		4D2073F922A3BCE000E0765F /* rhythmglyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* rhythmglyph.cpp */; };
+		4D2073FA22A3BCE000E0765F /* rhythmglyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F322A3BCDF00E0765F /* rhythmglyph.cpp */; };
+		4D2073FB22A3BCE000E0765F /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
+		4D2073FC22A3BCE000E0765F /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
+		4D2073FD22A3BCE000E0765F /* tabgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F422A3BCDF00E0765F /* tabgrp.cpp */; };
+		4D2073FE22A3BCEC00E0765F /* rhythmglyph.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073EF22A3BCB700E0765F /* rhythmglyph.h */; };
+		4D2073FF22A3BCEF00E0765F /* tabgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F122A3BCB700E0765F /* tabgrp.h */; };
+		4D20740022A3BCF200E0765F /* tuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2073F022A3BCB700E0765F /* tuning.h */; };
 		4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20B5EB1B873A1300EA9EC3 /* scoredefinterface.cpp */; };
 		4D22C41918890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41A18890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
@@ -790,6 +802,12 @@
 		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
+		4D2073EF22A3BCB700E0765F /* rhythmglyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rhythmglyph.h; path = include/vrv/rhythmglyph.h; sourceTree = "<group>"; };
+		4D2073F022A3BCB700E0765F /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuning.h; path = include/vrv/tuning.h; sourceTree = "<group>"; };
+		4D2073F122A3BCB700E0765F /* tabgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabgrp.h; path = include/vrv/tabgrp.h; sourceTree = "<group>"; };
+		4D2073F222A3BCDF00E0765F /* tuning.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tuning.cpp; path = src/tuning.cpp; sourceTree = "<group>"; };
+		4D2073F322A3BCDF00E0765F /* rhythmglyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rhythmglyph.cpp; path = src/rhythmglyph.cpp; sourceTree = "<group>"; };
+		4D2073F422A3BCDF00E0765F /* tabgrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tabgrp.cpp; path = src/tabgrp.cpp; sourceTree = "<group>"; };
 		4D20B5EB1B873A1300EA9EC3 /* scoredefinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scoredefinterface.cpp; path = src/scoredefinterface.cpp; sourceTree = "<group>"; };
 		4D20B5ED1B873A2B00EA9EC3 /* scoredefinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scoredefinterface.h; path = include/vrv/scoredefinterface.h; sourceTree = "<group>"; };
 		4D22C41818890E6100D0831F /* mrest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mrest.cpp; path = src/mrest.cpp; sourceTree = "<group>"; };
@@ -1553,6 +1571,12 @@
 				8F59292B18854BF800FE51AD /* staff.h */,
 				8F086ED7188539540037FD8E /* system.cpp */,
 				8F59292E18854BF800FE51AD /* system.h */,
+				4D2073EF22A3BCB700E0765F /* rhythmglyph.h */,
+				4D2073F122A3BCB700E0765F /* tabgrp.h */,
+				4D2073F022A3BCB700E0765F /* tuning.h */,
+				4D2073F322A3BCDF00E0765F /* rhythmglyph.cpp */,
+				4D2073F422A3BCDF00E0765F /* tabgrp.cpp */,
+				4D2073F222A3BCDF00E0765F /* tuning.cpp */,
 			);
 			name = containers;
 			sourceTree = "<group>";
@@ -1674,6 +1698,7 @@
 				4DB3D8E81F83D16E00B5FC2B /* ftrem.h in Headers */,
 				8F59293618854BF800FE51AD /* barline.h in Headers */,
 				40E1CEE1205060FF0007C8AF /* labelabbr.h in Headers */,
+				4D20740022A3BCF200E0765F /* tuning.h in Headers */,
 				4D50B53A1C1B40C90081D56E /* atttypes.h in Headers */,
 				8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */,
 				8F59293818854BF800FE51AD /* beam.h in Headers */,
@@ -1760,6 +1785,7 @@
 				4DB3D8FE1F83D20100B5FC2B /* horizontalaligner.h in Headers */,
 				4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */,
 				4DB3D8F21F83D1B100B5FC2B /* svg.h in Headers */,
+				4D2073FE22A3BCEC00E0765F /* rhythmglyph.h in Headers */,
 				4DEC4DDC21C8295700D1D273 /* choice.h in Headers */,
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
 				4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */,
@@ -1779,6 +1805,7 @@
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
 				4D766F0820ACAD74006875D8 /* syllable.h in Headers */,
+				4D2073FF22A3BCEF00E0765F /* tabgrp.h in Headers */,
 				4DB3D8F41F83D1C900B5FC2B /* scoredefinterface.h in Headers */,
 				4D64137C2035F67C00BB630E /* mdiv.h in Headers */,
 				403BEFF4206C00DA00D022D5 /* mrpt.h in Headers */,
@@ -1998,6 +2025,7 @@
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
 				4DB3D8981F7C325C00B5FC2B /* lb.cpp in Sources */,
 				4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */,
+				4D2073F922A3BCE000E0765F /* rhythmglyph.cpp in Sources */,
 				4D16940B1E3A44F300569BF4 /* keysig.cpp in Sources */,
 				4DE96E3C21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4D16940C1E3A44F300569BF4 /* atts_midi.cpp in Sources */,
@@ -2070,7 +2098,9 @@
 				4D1694361E3A44F300569BF4 /* tempo.cpp in Sources */,
 				4D1694371E3A44F300569BF4 /* tie.cpp in Sources */,
 				4D1694381E3A44F300569BF4 /* MidiFile.cpp in Sources */,
+				4D2073FC22A3BCE000E0765F /* tabgrp.cpp in Sources */,
 				4DB3D8CE1F83D11500B5FC2B /* mordent.cpp in Sources */,
+				4D2073F622A3BCE000E0765F /* tuning.cpp in Sources */,
 				4D6331FC1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4D1694391E3A44F300569BF4 /* tuplet.cpp in Sources */,
 				4D72A5E0208A37F0009DEC1E /* mnum.cpp in Sources */,
@@ -2177,6 +2207,7 @@
 				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
+				4D2073F822A3BCE000E0765F /* rhythmglyph.cpp in Sources */,
 				4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */,
 				4DEC4D9A21C81E6600D1D273 /* lem.cpp in Sources */,
 				1579B3431B15033100B16F5C /* proport.cpp in Sources */,
@@ -2249,7 +2280,9 @@
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
 				4D1BE7851C6A40A80086DC0E /* pugixml.cpp in Sources */,
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
+				4D2073FB22A3BCE000E0765F /* tabgrp.cpp in Sources */,
 				4DEC4DBA21C8288900D1D273 /* choice.cpp in Sources */,
+				4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
 				403BEFED206C00B500D022D5 /* beatrpt.cpp in Sources */,
 				8F086F08188539540037FD8E /* view_element.cpp in Sources */,
@@ -2422,6 +2455,7 @@
 				4DE96E3D21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4D6331F71F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4DB78743201F9F7300394520 /* svg.cpp in Sources */,
+				4D2073F722A3BCE000E0765F /* tuning.cpp in Sources */,
 				4DB3D8F61F83D1DC00B5FC2B /* view_mensural.cpp in Sources */,
 				4DB3D8E41F83D16400B5FC2B /* elementpart.cpp in Sources */,
 				8F3DD33818854B250051330C /* system.cpp in Sources */,
@@ -2484,8 +2518,10 @@
 				4D4335D11ED4502C003BE1A9 /* atts_visual.cpp in Sources */,
 				4D6331FD1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */,
+				4D2073FD22A3BCE000E0765F /* tabgrp.cpp in Sources */,
 				4D7927D220ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4DB3D8B91F83D0C600B5FC2B /* boundary.cpp in Sources */,
+				4D2073FA22A3BCE000E0765F /* rhythmglyph.cpp in Sources */,
 				4DEC4DB421C826E000D1D273 /* supplied.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
