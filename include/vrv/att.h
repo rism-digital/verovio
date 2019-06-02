@@ -54,6 +54,7 @@ public:
     // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFingering(Object *element, std::string attrType, std::string attrValue);
+    static bool SetFrettab(Object *element, std::string attrType, std::string attrValue);
     static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHeader(Object *element, std::string attrType, std::string attrValue);
@@ -78,6 +79,7 @@ public:
     // static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetFrettab(const Object *element, ArrayOfStrAttr *attributes);
     static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetHarmony(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetHeader(const Object *element, ArrayOfStrAttr *attributes);
