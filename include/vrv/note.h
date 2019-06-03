@@ -120,6 +120,11 @@ public:
      * Return the parent TabGrp is the note is part of one.
      */
     TabGrp *IsTabGrpNote() const;
+                 
+    /**
+     * Return the smufl code to use for a note give the notation type
+     */
+    wchar_t GetTabSmuflCode(data_NOTATIONTYPE notationType);
 
     /**
      * Return true if the note is a unisson.

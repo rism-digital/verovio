@@ -209,7 +209,26 @@ TabGrp *Note::IsTabGrpNote() const
     return dynamic_cast<TabGrp *>(this->GetFirstParent(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-    
+wchar_t Note::GetTabSmuflCode(data_NOTATIONTYPE notationType)
+{
+    if (notationType == NOTATIONTYPE_tab_lute_italian) {
+        switch (this->GetTabFret()) {
+            case 0: return SMUFL_EBE0_luteItalianFret0;
+            case 1: return SMUFL_EBE1_luteItalianFret1;
+            case 2: return SMUFL_EBE2_luteItalianFret2;
+            case 3: return SMUFL_EBE3_luteItalianFret3;
+            case 4: return SMUFL_EBE4_luteItalianFret4;
+            case 5: return SMUFL_EBE5_luteItalianFret5;
+            case 6: return SMUFL_EBE6_luteItalianFret6;
+            case 7: return SMUFL_EBE7_luteItalianFret7;
+            case 8: return SMUFL_EBE8_luteItalianFret8;
+            case 9: return SMUFL_EBE9_luteItalianFret9;
+            default: return SMUFL_EBE0_luteItalianFret0; break;
+        }
+    }
+    return SMUFL_EBE0_luteItalianFret0;
+}
+
 bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
 {
     if (!ignoreAccid) {

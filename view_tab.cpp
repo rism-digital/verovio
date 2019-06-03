@@ -69,15 +69,13 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     TextExtend extend;
     std::wstring notes;
     
-    bool drawingCueSize = true; //tuplet->GetDrawingCueSize();
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize * 0.8, drawingCueSize));
-    notes = IntToTupletFigures((short int)note->GetTabFret());
-    dc->GetSmuflTextExtent(notes, &extend);
+    wchar_t code = note->GetTabSmuflCode(staff->m_drawingNotationType);
     
-    // adjust the baseline (to be improved with slanted brackets
-    y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6 / 5;
+    // For some reason we need it to be cue size? Bravura is too large otherwise
+    bool drawingCueSize = true;
+    y -= (m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize) / 2);
     
-    DrawSmuflString(dc, x, y, notes, false, staff->m_drawingStaffSize * 0.8);
+    DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, drawingCueSize);
     
     // Draw children (nothing yet)
     DrawLayerChildren(dc, note, layer, staff, measure);
@@ -102,17 +100,17 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
+    y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     int drawingDur = tabGrp->GetActualDur();
     
     int symc = 0;
     switch (drawingDur) {
-        case DUR_4: symc = SMUFL_E4E5_restQuarter; break;
-        case DUR_8: symc = SMUFL_E4E6_rest8th; break;
-        case DUR_16: symc = SMUFL_E4E7_rest16th; break;
-        case DUR_32: symc = SMUFL_E4E8_rest32nd; break;
-        case DUR_64: symc = SMUFL_E4E9_rest64th; break;
-        case DUR_128: symc = SMUFL_E4EA_rest128th; break;
-        case DUR_256: symc = SMUFL_E4EB_rest256th; break;
+        case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break;
+        case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break;
+        case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break;
+        case DUR_16: symc = SMUFL_EBAA_luteDuration8th; break;
+        case DUR_32: symc = SMUFL_EBAB_luteDuration16th; break;
+        default: symc = SMUFL_EBA9_luteDurationQuarter;
     }
     
     DrawSmuflCode(dc, x, y, symc, staff->m_drawingStaffSize, true);
