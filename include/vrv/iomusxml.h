@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class Arpeg;
 class Clef;
 class ControlElement;
 class Dir;
@@ -77,6 +78,18 @@ namespace musicxml {
 
         int m_dirN;
         int m_lastMeasureCount;
+    };
+
+    class OpenArpeggio {
+    public:
+        OpenArpeggio(const int &arpegN, const int &timeStamp)
+        {
+            m_arpegN = arpegN;
+            m_timeStamp = timeStamp;
+        }
+
+        int m_arpegN;
+        int m_timeStamp;
     };
 
     class EndingInfo {
@@ -328,6 +341,8 @@ private:
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
     std::vector<musicxml::ClefChange> m_ClefChangeStack;
+    /* stack of new arpeggios that get more notes added. */
+    std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> > m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */
     std::map<Measure *, int> m_measureCounts;
 };
