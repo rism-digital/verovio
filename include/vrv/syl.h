@@ -76,6 +76,8 @@ public:
 
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
+    virtual int GetDrawingWidth() const;
+    virtual int GetDrawingHeight() const;
 
     //----------//
     // Functors //

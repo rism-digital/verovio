@@ -36,7 +36,6 @@ Syl::Syl() : LayerElement("syl-"), FacsimileInterface(), TextListInterface(), Ti
     RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_TYPOGRAPHY);
     RegisterAttClass(ATT_SYLLOG);
-    RegisterAttClass(ATT_COORDINATED); //new
 
     Reset();
 }
@@ -141,6 +140,22 @@ int Syl::GetDrawingY() const
     else {
         return LayerElement::GetDrawingY();
     }
+}
+
+int Syl::GetDrawingWidth() const
+{
+    if(this->HasFacs()) {
+        return FacsimileInterface::GetWidth();
+    } 
+    return 0;
+}
+
+int Syl::GetDrawingHeight() const
+{
+    if(this->HasFacs()) {
+        return FacsimileInterface::GetHeight();
+    }
+    return 0;
 }
 
 //----------------------------------------------------------------------------

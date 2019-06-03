@@ -732,51 +732,13 @@ void SvgDeviceContext::EndText()
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
+//draw text element with optional parameters to specify the bounding box of the text
+//if the bounding box is specified then append a rect child
+void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 
     std::string svgText = text;
-    // Because IE does not support xml:space="preserve", we need to replace the initial
-    // space with a non breakable space
-    if ((svgText.length() > 0) && (svgText[0] == ' ')) {
-        svgText.replace(0, 1, "\xC2\xA0");
-    }
-    if ((svgText.length() > 0) && (svgText[svgText.size() - 1] == ' ')) {
-        svgText.replace(svgText.size() - 1, 1, "\xC2\xA0");
-    }
-
-    std::string currentFaceName
-        = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
-    std::string fontFaceName = m_fontStack.top()->GetFaceName();
-
-    pugi::xml_node textChild = AppendChild("tspan");
-    // We still add @xml::space (No: this seems to create problems with Safari)
-    // textChild.append_attribute("xml:space") = "preserve";
-    // Set the @font-family only if it is not the same as in the parent node
-    if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
-        textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
-        // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
-        if (fontFaceName == "VerovioText") this->VrvTextFont();
-    }
-    if (m_fontStack.top()->GetPointSize() != 0) {
-        textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-    }
-    textChild.append_attribute("class") = "text";
-    textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
-
-    if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
-        textChild.append_attribute("x") = StringFormat("%d", x).c_str();
-        textChild.append_attribute("y") = StringFormat("%d", y).c_str();
-    }
-}
-
-//if the bounding box of the text is defined create a rectangle as a bounding box for the text
-void SvgDeviceContext::DrawBoundedText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height) {
-
-    assert(m_fontStack.top());
-
-    std::string svgText = text;
 
     if ((svgText.length() > 0) && (svgText[0] == ' ')) {
         svgText.replace(0, 1, "\xC2\xA0");
@@ -809,14 +771,14 @@ void SvgDeviceContext::DrawBoundedText(const std::string &text, const std::wstri
         textChild.append_attribute("y") = StringFormat("%d", y).c_str();
     }
 
-    pugi::xml_node rectChild = AppendChild("rect");
-
-    rectChild.append_attribute("class") = "rect";
-    if ((ulx != VRV_UNSET) && (uly != VRV_UNSET) && (lrx != VRV_UNSET) && (lry != VRV_UNSET)) {
-        rectChild.append_attribute("x") = StringFormat("%d", x);
-        rectChild.append_attribute("y") = StringFormat("%d", y);
-        rectChild.append_attribute("width") = StringFormat("%d", width);
-        rectChild.append_attribute("height") = StringFormat("%d", height);
+    if ((x != VRV_UNSET) && (y != VRV_UNSET) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
+        pugi::xml_node g = m_currentNode.parent().parent();
+        pugi::xml_node rectChild = g.append_child("rect");
+        rectChild.append_attribute("class") = "rect";
+        rectChild.append_attribute("x") = StringFormat("%d", x).c_str();
+        rectChild.append_attribute("y") = StringFormat("%d", y).c_str();
+        rectChild.append_attribute("width") = StringFormat("%d", width).c_str();
+        rectChild.append_attribute("height") = StringFormat("%d", height).c_str();
     }
 }
 

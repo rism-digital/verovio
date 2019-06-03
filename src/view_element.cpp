@@ -1369,6 +1369,8 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
+    params.m_width = syl->GetDrawingWidth();
+    params.m_height = syl->GetDrawingHeight();
     assert(dc->GetFont());
     params.m_pointSize = dc->GetFont()->GetPointSize();
 

@@ -12,6 +12,7 @@
 #include "scoredef.h"
 #include "smufl.h"
 #include "vrvdef.h"
+#include "textelement.h"
 
 namespace vrv {
 

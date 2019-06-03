@@ -55,7 +55,7 @@ int FacsimileInterface::GetWidth() const
 int FacsimileInterface::GetHeight() const
 { 
     assert(m_zone);
-    return m_zone->GetLogicalUly() - m_zone->GetLogicalLry();
+    return m_zone->GetLogicalLry() - m_zone->GetLogicalUly();
 }
 
 int FacsimileInterface::GetSurfaceY() const
