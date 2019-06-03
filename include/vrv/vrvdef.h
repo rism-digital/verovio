@@ -369,6 +369,9 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 /** Define the maximum levels between a ligature and its notes **/
 #define MAX_LIGATURE_DEPTH -1
 
+/** Define the maximum levels between a tabGrp and its children **/
+#define MAX_TABGRP_DEPTH -1
+
 /** Define the maximum levels between a tuplet and its notes **/
 #define MAX_TUPLET_DEPTH -1
 

@@ -258,6 +258,7 @@ sub getSources {
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_frettab.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_gestural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_externalsymbols.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";

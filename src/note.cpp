@@ -28,6 +28,7 @@
 #include "smufl.h"
 #include "staff.h"
 #include "syl.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "verse.h"
 #include "vrv.h"
@@ -203,6 +204,12 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
+TabGrp *Note::IsTabGrpNote() const
+{
+    return dynamic_cast<TabGrp *>(this->GetFirstParent(TABGRP, MAX_TABGRP_DEPTH));
+}
+
+    
 bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
 {
     if (!ignoreAccid) {

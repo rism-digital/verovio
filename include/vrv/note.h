@@ -26,11 +26,11 @@ namespace vrv {
 
 class Accid;
 class Chord;
+class Note;
 class Slur;
+class TabGrp;
 class Tie;
 class Verse;
-class Note;
-typedef std::vector<Note *> ChordCluster;
 
 //----------------------------------------------------------------------------
 // Note
@@ -115,6 +115,11 @@ public:
     int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
+                 
+    /**
+     * Return the parent TabGrp is the note is part of one.
+     */
+    TabGrp *IsTabGrpNote() const;
 
     /**
      * Return true if the note is a unisson.

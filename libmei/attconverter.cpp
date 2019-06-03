@@ -2062,6 +2062,10 @@ std::string AttConverter::NotationtypeToStr(data_NOTATIONTYPE data) const
         case NOTATIONTYPE_mensural: value = "mensural"; break;
         case NOTATIONTYPE_mensural_black: value = "mensural.black"; break;
         case NOTATIONTYPE_mensural_white: value = "mensural.white"; break;
+        case NOTATIONTYPE_tab_lute_french: value = "tab.lute.french"; break;
+        case NOTATIONTYPE_tab_lute_italian: value = "tab.lute.italian"; break;
+        case NOTATIONTYPE_tab_lute_german: value = "tab.lute.german"; break;
+        case NOTATIONTYPE_tab_guitar: value = "tab.guitar"; break;
         case NOTATIONTYPE_neume: value = "neume"; break;
         case NOTATIONTYPE_tab: value = "tab"; break;
         default:
@@ -2078,6 +2082,10 @@ data_NOTATIONTYPE AttConverter::StrToNotationtype(std::string value, bool logWar
     if (value == "mensural") return NOTATIONTYPE_mensural;
     if (value == "mensural.black") return NOTATIONTYPE_mensural_black;
     if (value == "mensural.white") return NOTATIONTYPE_mensural_white;
+    if (value == "tab.lute.french") return NOTATIONTYPE_tab_lute_french;
+    if (value == "tab.lute.italian") return NOTATIONTYPE_tab_lute_italian;
+    if (value == "tab.lute.german") return NOTATIONTYPE_tab_lute_german;
+    if (value == "tab.guitar") return NOTATIONTYPE_tab_guitar;
     if (value == "neume") return NOTATIONTYPE_neume;
     if (value == "tab") return NOTATIONTYPE_tab;
     if (logWarning && !value.empty())

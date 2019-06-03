@@ -18,6 +18,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "staffgrp.h"
+#include "tuning.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -80,6 +81,9 @@ void StaffDef::AddChild(Object *child)
     }
     else if (child->Is(LABELABBR)) {
         assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else if (child->Is(TUNING)) {
+        assert(dynamic_cast<Tuning *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());

@@ -45,6 +45,7 @@
 #include "space.h"
 #include "staff.h"
 #include "syl.h"
+#include "tabgrp.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "timestamp.h"
@@ -630,7 +631,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     Note *noteParent = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = dynamic_cast<Rest *>(this->GetFirstParent(REST, MAX_NOTE_DEPTH));
-
+    TabGrp *tabGrpParent = dynamic_cast<TabGrp *>(this->GetFirstParent(TABGRP, MAX_TABGRP_DEPTH));
+    
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
     }
@@ -639,6 +641,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (restParent) {
         m_alignment = restParent->GetAlignment();
+    }
+    else if (tabGrpParent) {
+        m_alignment = tabGrpParent->GetAlignment();
     }
     else if (this->Is({ DOTS, FLAG, STEM })) {
         assert(false);
@@ -848,7 +853,11 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         assert(note);
         Chord *chord = note->IsChordTone();
         int loc = 0;
-        if (note->HasPname()) {
+        TabGrp *tabGrp = note->IsTabGrpNote();
+        if (tabGrp) {
+            loc = (note->GetTabCourse() - 1) * 2;
+        }
+        else if (note->HasPname()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);

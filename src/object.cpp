@@ -20,6 +20,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
+#include "course.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -1259,6 +1260,8 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
+        assert(staff->m_drawingCourse == NULL);
+        staff->m_drawingCourse = dynamic_cast<Course *>(params->m_currentStaffDef->FindChildByType(COURSE));
         staff->m_drawingLines = params->m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
         if (params->m_currentStaffDef->HasScale()) {

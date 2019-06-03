@@ -2418,6 +2418,18 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for tabGrp
+    else if (filterParent->Is(TABGRP)) {
+        if (element == "tabRhythm") {
+            return true;
+        }
+        if (element == "note") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for tuplet
     else if (filterParent->Is(TUPLET)) {
         if (element == "beam") {
@@ -4060,6 +4072,12 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "syllable") {
             success = ReadSyllable(parent, xmlElement);
+        }
+        else if (elementName == "tabGrp") {
+            success = ReadTabGrp(parent, xmlElement);
+        }
+        else if (elementName == "tabRhythm") {
+            success = ReadTabRhythm(parent, xmlElement);
         }
         else if (elementName == "tuplet") {
             success = ReadTuplet(parent, xmlElement);

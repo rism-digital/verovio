@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class Course;
 class DeviceContext;
 class Layer;
 class LedgerLine;
@@ -219,6 +220,8 @@ public:
     int m_yAbs;
 
     StaffDef *m_drawingStaffDef;
+    
+    Course *m_drawingCourse;
 
 private:
     /**

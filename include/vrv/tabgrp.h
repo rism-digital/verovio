@@ -33,6 +33,13 @@ public:
     virtual std::string GetClassName() const { return "TabGrp"; };
     virtual ClassId GetClassId() const { return TABGRP; };
     ///@}
+    
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    ///@}
 
     /**
      * Add an element to a element.

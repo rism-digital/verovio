@@ -449,6 +449,7 @@ protected:
     void DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    ///@}
 
     /**
      * @name Methods for drawing parts of mensural LayerElement child classes.
@@ -460,6 +461,19 @@ protected:
     void DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff);
     void CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
+    ///@}
+    
+    /**
+     * @name Methods for drawing tab LayerElement child classes.
+     * They are base drawing methods that are called directly from DrawLayerElement.
+     * Because some elements draw their children recursively (e.g., Note) they must all
+     * have the same parameters.
+     * Defined in view_tab.cpp
+     */
+    ///@{
+    void DrawTabGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
 
     /**

@@ -209,6 +209,9 @@
 		4D20740A22A4FDFA00E0765F /* course.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740922A4FDFA00E0765F /* course.cpp */; };
 		4D20740B22A4FDFA00E0765F /* course.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740922A4FDFA00E0765F /* course.cpp */; };
 		4D20740C22A4FDFA00E0765F /* course.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740922A4FDFA00E0765F /* course.cpp */; };
+		4D20740E22A5311C00E0765F /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740D22A5311C00E0765F /* view_tab.cpp */; };
+		4D20740F22A5311C00E0765F /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740D22A5311C00E0765F /* view_tab.cpp */; };
+		4D20741022A5311C00E0765F /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740D22A5311C00E0765F /* view_tab.cpp */; };
 		4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20B5EB1B873A1300EA9EC3 /* scoredefinterface.cpp */; };
 		4D22C41918890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41A18890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
@@ -820,6 +823,7 @@
 		4D20740222A46BA900E0765F /* atts_frettab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_frettab.h; path = libmei/atts_frettab.h; sourceTree = "<group>"; };
 		4D20740722A4FDE800E0765F /* course.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = course.h; path = include/vrv/course.h; sourceTree = "<group>"; };
 		4D20740922A4FDFA00E0765F /* course.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = course.cpp; path = src/course.cpp; sourceTree = "<group>"; };
+		4D20740D22A5311C00E0765F /* view_tab.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_tab.cpp; sourceTree = "<group>"; };
 		4D20B5EB1B873A1300EA9EC3 /* scoredefinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scoredefinterface.cpp; path = src/scoredefinterface.cpp; sourceTree = "<group>"; };
 		4D20B5ED1B873A2B00EA9EC3 /* scoredefinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scoredefinterface.h; path = include/vrv/scoredefinterface.h; sourceTree = "<group>"; };
 		4D22C41818890E6100D0831F /* mrest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mrest.cpp; path = src/mrest.cpp; sourceTree = "<group>"; };
@@ -1610,6 +1614,7 @@
 				4DC12A7B1F740FB9000440E9 /* view_running.cpp */,
 				4D7927CF20ECCC6D0002A45D /* view_slur.cpp */,
 				4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */,
+				4D20740D22A5311C00E0765F /* view_tab.cpp */,
 				8F086EDF188539540037FD8E /* view_tuplet.cpp */,
 			);
 			name = view;
@@ -2005,6 +2010,7 @@
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
 				4D89F90F201771AE00A4D336 /* num.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
+				4D20740F22A5311C00E0765F /* view_tab.cpp in Sources */,
 				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
 				4D4FCD131F54570E0009C455 /* staffdef.cpp in Sources */,
 				4D4335D31ED4567F003BE1A9 /* atts_externalsymbols.cpp in Sources */,
@@ -2189,6 +2195,7 @@
 				4DB3D89E1F7E7FAA00B5FC2B /* fig.cpp in Sources */,
 				4D4FCD121F54570E0009C455 /* staffdef.cpp in Sources */,
 				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
+				4D20740E22A5311C00E0765F /* view_tab.cpp in Sources */,
 				4DEC4D9621C81E3B00D1D273 /* expand.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				4DC12A7C1F740FB9000440E9 /* view_running.cpp in Sources */,
@@ -2470,6 +2477,7 @@
 				8F3DD33418854B250051330C /* scoredef.cpp in Sources */,
 				8F3DD33618854B250051330C /* staff.cpp in Sources */,
 				4DB3D8C61F83D0FA00B5FC2B /* breath.cpp in Sources */,
+				4D20741022A5311C00E0765F /* view_tab.cpp in Sources */,
 				4DB3D8CF1F83D11600B5FC2B /* mordent.cpp in Sources */,
 				4DB3D8D71F83D13600B5FC2B /* trill.cpp in Sources */,
 				4D6413802035F68600BB630E /* mdiv.cpp in Sources */,

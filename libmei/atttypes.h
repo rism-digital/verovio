@@ -981,6 +981,10 @@ enum data_NOTATIONTYPE {
     NOTATIONTYPE_mensural,
     NOTATIONTYPE_mensural_black,
     NOTATIONTYPE_mensural_white,
+    NOTATIONTYPE_tab_lute_french,
+    NOTATIONTYPE_tab_lute_italian,
+    NOTATIONTYPE_tab_lute_german,
+    NOTATIONTYPE_tab_guitar,
     NOTATIONTYPE_neume,
     NOTATIONTYPE_tab,
     NOTATIONTYPE_MAX
