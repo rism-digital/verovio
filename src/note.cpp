@@ -53,6 +53,7 @@ Note::Note()
     , AttCue()
     , AttGraced()
     , AttNoteAnlMensural()
+    , AttNoteGesTab()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -66,6 +67,7 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTEANLMENSURAL);
+    RegisterAttClass(ATT_NOTEGESTAB);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -88,6 +90,7 @@ void Note::Reset()
     ResetCue();
     ResetGraced();
     ResetNoteAnlMensural();
+    ResetNoteGesTab();
     ResetStems();
     ResetStemsCmn();
     ResetTiePresent();

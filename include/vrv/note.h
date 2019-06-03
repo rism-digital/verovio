@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "atts_frettab.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
 #include "beam.h"
@@ -48,6 +49,7 @@ class Note : public LayerElement,
              public AttCue,
              public AttGraced,
              public AttNoteAnlMensural,
+             public AttNoteGesTab,
              public AttStems,
              public AttStemsCmn,
              public AttTiePresent,
