@@ -15,7 +15,6 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "course.h"
 #include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
@@ -29,6 +28,7 @@
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
+#include "tuning.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -74,7 +74,7 @@ void Staff::Reset()
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
-    m_drawingCourse = NULL;
+    m_drawingTuning = NULL;
 
     ClearLedgerLines();
 }
@@ -92,7 +92,7 @@ void Staff::CopyReset()
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
-    m_drawingCourse = NULL;
+    m_drawingTuning = NULL;
 }
 
 void Staff::ClearLedgerLines()
@@ -275,7 +275,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
 int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     m_drawingStaffDef = NULL;
-    m_drawingCourse = NULL;
+    m_drawingTuning = NULL;
 
     return FUNCTOR_CONTINUE;
 }

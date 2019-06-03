@@ -56,5 +56,10 @@ void Tuning::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
+    
+int Tuning::CalcPitchPos(int course)
+{
+    return (course - 1) * 2;
+}
 
 } // namespace vrv

@@ -39,6 +39,11 @@ public:
      * Add an element to a element.
      */
     virtual void AddChild(Object *object);
+    
+    /**
+     * Return the line for a the tuning and a given course.
+     */
+    int CalcPitchPos(int course);
 
 protected:
     //

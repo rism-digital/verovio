@@ -13,7 +13,6 @@
 
 namespace vrv {
 
-class Course;
 class DeviceContext;
 class Layer;
 class LedgerLine;
@@ -21,6 +20,7 @@ class StaffAlignment;
 class StaffDef;
 class Syl;
 class TimeSpanningInterface;
+class Tuning;
 
 //----------------------------------------------------------------------------
 // Staff
@@ -221,7 +221,7 @@ public:
 
     StaffDef *m_drawingStaffDef;
     
-    Course *m_drawingCourse;
+    Tuning *m_drawingTuning;
 
 private:
     /**

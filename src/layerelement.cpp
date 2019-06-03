@@ -49,6 +49,7 @@
 #include "tie.h"
 #include "timeinterface.h"
 #include "timestamp.h"
+#include "tuning.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "view.h"
@@ -855,7 +856,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         int loc = 0;
         TabGrp *tabGrp = note->IsTabGrpNote();
         if (tabGrp) {
-            loc = (note->GetTabCourse() - 1) * 2;
+            assert(staffY->m_drawingTuning);
+            loc = staffY->m_drawingTuning->CalcPitchPos(note->GetTabCourse());
         }
         else if (note->HasPname()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);

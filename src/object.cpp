@@ -20,7 +20,6 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
-#include "course.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -43,6 +42,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "textelement.h"
+#include "tuning.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -1260,8 +1260,8 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
-        assert(staff->m_drawingCourse == NULL);
-        staff->m_drawingCourse = dynamic_cast<Course *>(params->m_currentStaffDef->FindChildByType(COURSE));
+        assert(staff->m_drawingTuning == NULL);
+        staff->m_drawingTuning = dynamic_cast<Tuning *>(params->m_currentStaffDef->FindChildByType(TUNING));
         staff->m_drawingLines = params->m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
         if (params->m_currentStaffDef->HasScale()) {

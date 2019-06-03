@@ -63,23 +63,21 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     dc->StartGraphic(note, "", note->GetUuid());
     
-    int noteY = element->GetDrawingY();
-    int noteX = element->GetDrawingX();
-    int drawingDur;
-    wchar_t fontNo;
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
     
-    drawingDur = tabGrp->GetActualDur();
+    TextExtend extend;
+    std::wstring notes;
     
-    /************** Noteheads: **************/
+    bool drawingCueSize = true; //tuplet->GetDrawingCueSize();
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize * 0.8, drawingCueSize));
+    notes = IntToTupletFigures((short int)note->GetTabFret());
+    dc->GetSmuflTextExtent(notes, &extend);
     
-    if (drawingDur == DUR_1) {
-        fontNo = SMUFL_E0FA_noteheadWholeFilled;
-    }
-    else {
-            fontNo = SMUFL_E0A2_noteheadWhole;
-    }
+    // adjust the baseline (to be improved with slanted brackets
+    y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6 / 5;
     
-    DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, false, true);
+    DrawSmuflString(dc, x, y, notes, false, staff->m_drawingStaffSize * 0.8);
     
     // Draw children (nothing yet)
     DrawLayerChildren(dc, note, layer, staff, measure);
@@ -97,7 +95,27 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     TabRhythm *tabRhythm = dynamic_cast<TabRhythm *>(element);
     assert(tabRhythm);
     
+    TabGrp *tabGrp = dynamic_cast<TabGrp *>(tabRhythm->GetFirstParent(TABGRP));
+    assert(tabGrp);
+    
     dc->StartGraphic(tabRhythm, "", tabRhythm->GetUuid());
+    
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
+    int drawingDur = tabGrp->GetActualDur();
+    
+    int symc = 0;
+    switch (drawingDur) {
+        case DUR_4: symc = SMUFL_E4E5_restQuarter; break;
+        case DUR_8: symc = SMUFL_E4E6_rest8th; break;
+        case DUR_16: symc = SMUFL_E4E7_rest16th; break;
+        case DUR_32: symc = SMUFL_E4E8_rest32nd; break;
+        case DUR_64: symc = SMUFL_E4E9_rest64th; break;
+        case DUR_128: symc = SMUFL_E4EA_rest128th; break;
+        case DUR_256: symc = SMUFL_E4EB_rest256th; break;
+    }
+    
+    DrawSmuflCode(dc, x, y, symc, staff->m_drawingStaffSize, true);
     
     // Draw children (nothing yet)
     DrawLayerChildren(dc, tabRhythm, layer, staff, measure);
