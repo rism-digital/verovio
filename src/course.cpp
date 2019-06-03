@@ -38,6 +38,9 @@ void Course::Reset()
 
 void Course::AddChild(Object *child)
 {
+    // Nothing for now
+    assert(false);
+    
     child->SetParent(this);
     m_children.push_back(child);
     Modify();

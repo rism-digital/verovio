@@ -13,6 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
+#include "note.h"
+#include "tabrhythm.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -38,6 +42,20 @@ void TabGrp::Reset()
 
 void TabGrp::AddChild(Object *child)
 {
+    if (child->Is(NOTE)) {
+        assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->Is(TABRHYTHM)) {
+        assert(dynamic_cast<TabRhythm *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+    
     child->SetParent(this);
     m_children.push_back(child);
     Modify();

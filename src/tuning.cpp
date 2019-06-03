@@ -13,6 +13,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "course.h"
+#include "editorial.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -38,6 +41,17 @@ void Tuning::Reset()
 
 void Tuning::AddChild(Object *child)
 {
+    if (child->Is(COURSE)) {
+        assert(dynamic_cast<Course *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+    
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
