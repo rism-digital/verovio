@@ -396,6 +396,16 @@ enum data_COMPASSDIRECTION_extended {
 };
 
 /**
+ * MEI data.COURSETUNING
+ */
+enum data_COURSETUNING {
+    COURSETUNING_NONE = 0,
+    COURSETUNING_guitar_drop_D,
+    COURSETUNING_lute_renaissance_6,
+    COURSETUNING_MAX
+};
+
+/**
  * MEI data.ENCLOSURE
  */
 enum data_ENCLOSURE {

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        tuning.cpp
+// Name:        course.cpp
 // Author:      Laurent Pugin
 // Created:     2019
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "tuning.h"
+#include "course.h"
 
 //----------------------------------------------------------------------------
 
@@ -16,27 +16,27 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Tuning
+// Course
 //----------------------------------------------------------------------------
 
-Tuning::Tuning() : Object("tuning-"), AttCourseLog()
+Course::Course() : Object("course-"), AttNNumberLike()
 {
-    RegisterAttClass(ATT_COURSELOG);
+    RegisterAttClass(ATT_NNUMBERLIKE);
 
     Reset();
 }
 
-Tuning::~Tuning()
+Course::~Course()
 {
 }
 
-void Tuning::Reset()
+void Course::Reset()
 {
     Object::Reset();
-    ResetCourseLog();
+    ResetNNumberLike();
 }
 
-void Tuning::AddChild(Object *child)
+void Course::AddChild(Object *child)
 {
     child->SetParent(this);
     m_children.push_back(child);

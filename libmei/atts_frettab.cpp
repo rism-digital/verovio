@@ -27,6 +27,52 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttCourseLog
+//----------------------------------------------------------------------------
+
+AttCourseLog::AttCourseLog() : Att()
+{
+    ResetCourseLog();
+}
+
+AttCourseLog::~AttCourseLog()
+{
+}
+
+void AttCourseLog::ResetCourseLog()
+{
+    m_tuningStandard = COURSETUNING_NONE;
+}
+
+bool AttCourseLog::ReadCourseLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("tuning.standard")) {
+        this->SetTuningStandard(StrToCoursetuning(element.attribute("tuning.standard").value()));
+        element.remove_attribute("tuning.standard");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCourseLog::WriteCourseLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasTuningStandard()) {
+        element.append_attribute("tuning.standard") = CoursetuningToStr(this->GetTuningStandard()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCourseLog::HasTuningStandard() const
+{
+    return (m_tuningStandard != COURSETUNING_NONE);
+}
+
+/* include <atttuning.standard> */
+
+//----------------------------------------------------------------------------
 // AttNoteGesTab
 //----------------------------------------------------------------------------
 
@@ -89,6 +135,14 @@ bool AttNoteGesTab::HasTabFret() const
 
 bool Att::SetFrettab(Object *element, std::string attrType, std::string attrValue)
 {
+    if (element->HasAttClass(ATT_COURSELOG)) {
+        AttCourseLog *att = dynamic_cast<AttCourseLog *>(element);
+        assert(att);
+        if (attrType == "tuning.standard") {
+            att->SetTuningStandard(att->StrToCoursetuning(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_NOTEGESTAB)) {
         AttNoteGesTab *att = dynamic_cast<AttNoteGesTab *>(element);
         assert(att);
@@ -107,6 +161,13 @@ bool Att::SetFrettab(Object *element, std::string attrType, std::string attrValu
 
 void Att::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_COURSELOG)) {
+        const AttCourseLog *att = dynamic_cast<const AttCourseLog *>(element);
+        assert(att);
+        if (att->HasTuningStandard()) {
+            attributes->push_back(std::make_pair("tuning.standard", att->CoursetuningToStr(att->GetTuningStandard())));
+        }
+    }
     if (element->HasAttClass(ATT_NOTEGESTAB)) {
         const AttNoteGesTab *att = dynamic_cast<const AttNoteGesTab *>(element);
         assert(att);

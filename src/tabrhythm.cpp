@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        rhythmglyph.cpp
+// Name:        tabrhythm.cpp
 // Author:      Laurent Pugin
 // Created:     2019
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "rhythmglyph.h"
+#include "tabrhythm.h"
 
 //----------------------------------------------------------------------------
 
@@ -16,27 +16,27 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// RhythmGlyph
+// TabRhythm
 //----------------------------------------------------------------------------
 
-RhythmGlyph::RhythmGlyph() : LayerElement("element-"), AttNNumberLike()
+TabRhythm::TabRhythm() : LayerElement("tabrhythm-"), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
 
     Reset();
 }
 
-RhythmGlyph::~RhythmGlyph()
+TabRhythm::~TabRhythm()
 {
 }
 
-void RhythmGlyph::Reset()
+void TabRhythm::Reset()
 {
     LayerElement::Reset();
     ResetNNumberLike();
 }
 
-void RhythmGlyph::AddChild(Object *child)
+void TabRhythm::AddChild(Object *child)
 {
     child->SetParent(this);
     m_children.push_back(child);

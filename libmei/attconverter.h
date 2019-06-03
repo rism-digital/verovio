@@ -71,6 +71,9 @@ public:
     std::string CompassdirectionExtendedToStr(data_COMPASSDIRECTION_extended data) const;
     data_COMPASSDIRECTION_extended StrToCompassdirectionExtended(std::string value, bool logWarning = true) const;
 
+    std::string CoursetuningToStr(data_COURSETUNING data) const;
+    data_COURSETUNING StrToCoursetuning(std::string value, bool logWarning = true) const;
+
     std::string EnclosureToStr(data_ENCLOSURE data) const;
     data_ENCLOSURE StrToEnclosure(std::string value, bool logWarning = true) const;
 

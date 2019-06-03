@@ -822,6 +822,29 @@ data_COMPASSDIRECTION_extended AttConverter::StrToCompassdirectionExtended(std::
     return COMPASSDIRECTION_extended_NONE;
 }
 
+std::string AttConverter::CoursetuningToStr(data_COURSETUNING data) const
+{
+    std::string value;
+    switch (data) {
+        case COURSETUNING_guitar_drop_D: value = "guitar-drop-D"; break;
+        case COURSETUNING_lute_renaissance_6: value = "lute-renaissance-6"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.COURSETUNING", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_COURSETUNING AttConverter::StrToCoursetuning(std::string value, bool logWarning) const
+{
+    if (value == "guitar-drop-D") return COURSETUNING_guitar_drop_D;
+    if (value == "lute-renaissance-6") return COURSETUNING_lute_renaissance_6;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.COURSETUNING", value.c_str());
+    return COURSETUNING_NONE;
+}
+
 std::string AttConverter::EnclosureToStr(data_ENCLOSURE data) const
 {
     std::string value;

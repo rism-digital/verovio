@@ -19,9 +19,9 @@ namespace vrv {
 // TabGrp
 //----------------------------------------------------------------------------
 
-TabGrp::TabGrp() : LayerElement("element-"), AttNNumberLike()
+TabGrp::TabGrp() : LayerElement("tabgrp-"), DurationInterface()
 {
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
 
     Reset();
 }
@@ -33,7 +33,7 @@ TabGrp::~TabGrp()
 void TabGrp::Reset()
 {
     LayerElement::Reset();
-    ResetNNumberLike();
+    DurationInterface::Reset();
 }
 
 void TabGrp::AddChild(Object *child)

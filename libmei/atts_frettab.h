@@ -26,6 +26,42 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttCourseLog
+//----------------------------------------------------------------------------
+
+class AttCourseLog : public Att {
+public:
+    AttCourseLog();
+    virtual ~AttCourseLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetCourseLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadCourseLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteCourseLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTuningStandard(data_COURSETUNING tuningStandard_) { m_tuningStandard = tuningStandard_; }
+    data_COURSETUNING GetTuningStandard() const { return m_tuningStandard; }
+    bool HasTuningStandard() const;
+    ///@}
+
+private:
+    /** Indicates a tuning standard for the course. **/
+    data_COURSETUNING m_tuningStandard;
+
+    /* include <atttuning.standard> */
+};
+
+//----------------------------------------------------------------------------
 // AttNoteGesTab
 //----------------------------------------------------------------------------
 

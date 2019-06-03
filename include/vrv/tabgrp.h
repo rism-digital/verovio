@@ -8,7 +8,7 @@
 #ifndef __VRV_TABGRP_H__
 #define __VRV_TABGRP_H__
 
-#include "atts_shared.h"
+#include "durationinterface.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <tabGrp> element.
  */
-class TabGrp : public LayerElement, public AttNNumberLike {
+class TabGrp : public LayerElement, public DurationInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
