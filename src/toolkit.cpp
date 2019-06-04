@@ -42,7 +42,9 @@
 #include "unchecked.h"
 
 #ifdef USE_EMSCRIPTEN
-#include "editortoolkit.h"
+#include "editortoolkit_cmn.h"
+#include "editortoolkit_mensural.h"
+#include "editortoolkit_neume.h"
 #endif
 
 namespace vrv {
@@ -74,7 +76,8 @@ Toolkit::Toolkit(bool initFont)
     m_options = m_doc.GetOptions();
 
 #ifdef USE_EMSCRIPTEN
-    m_editorToolkit = new EditorToolkit(&m_doc, &m_view);
+    // Initialize editortoolkit later based on input.
+    m_editorToolkit = nullptr;
 #endif
 }
 
@@ -88,6 +91,12 @@ Toolkit::~Toolkit()
         free(m_cString);
         m_cString = NULL;
     }
+#ifdef USE_EMSCRIPTEN
+    if (m_editorToolkit) {
+        delete m_editorToolkit;
+        m_editorToolkit = nullptr;
+    }
+#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -538,6 +547,23 @@ bool Toolkit::LoadData(const std::string &data)
 
     delete input;
     m_view.SetDoc(&m_doc);
+
+#ifdef USE_EMSCRIPTEN
+    // Create editor toolkit based on notation type.
+    if (m_editorToolkit != nullptr) {
+        delete m_editorToolkit;
+    }
+    switch(m_doc.m_notationType) {
+        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
+        case NOTATIONTYPE_mensural:
+        case NOTATIONTYPE_mensural_black:
+        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+        default:
+            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
+            m_editorToolkit = nullptr;
+    }
+#endif
 
     return true;
 }

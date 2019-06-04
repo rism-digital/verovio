@@ -3341,6 +3341,8 @@ bool MeiInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
 
     ReadScoreDefInterface(staffDef, vrvStaffDef);
 
+    m_doc->m_notationType = vrvStaffDef->GetNotationtype();
+
     parent->AddChild(vrvStaffDef);
     ReadUnsupportedAttr(staffDef, vrvStaffDef);
     return ReadStaffDefChildren(vrvStaffDef, staffDef);

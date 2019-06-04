@@ -82,6 +82,7 @@ void Doc::Reset()
     Object::Reset();
 
     m_type = Raw;
+    m_notationType = NOTATIONTYPE_NONE;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageMarginBottom = 0;

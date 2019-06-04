@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        editortoolkit.cpp
 // Author:      Laurent Pugin, Juliette Regimbal, Zoe McLennan
-// Created:     16/05/2018
+// Created:     04/06/2019
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "editortoolkit.h"
+#include "editortoolkit_neume.h"
 
 //--------------------------------------------------------------------------------
 
@@ -19,12 +19,10 @@
 #include "comparison.h"
 #include "custos.h"
 #include "layer.h"
-#include "measure.h"
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
 #include "rend.h"
-#include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "syl.h"
@@ -39,7 +37,7 @@
 namespace vrv {
 
 #ifdef USE_EMSCRIPTEN
-bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool isChain)
+bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction, bool isChain)
 {
     jsonxx::Object json;
 
@@ -74,10 +72,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
         std::string elementType, startId, endId, staffId;
         int ulx, uly, lrx, lry;
         std::vector<std::pair<std::string, std::string>> attributes;
-        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startId, &endId)) {
-            return this->Insert(elementType, startId, endId);
-        }
-        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly,
+        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly,
                     &lrx, &lry, &attributes)) {
             return this->Insert(elementType, staffId, ulx, uly, lrx, lry, attributes);
         }
@@ -177,7 +172,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
     return false;
 }
 
-bool EditorToolkit::Chain(jsonxx::Array actions)
+bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
     bool status = true;
     std::string info = "[";
@@ -214,7 +209,7 @@ bool EditorToolkit::Chain(jsonxx::Array actions)
     return status;
 }
 
-bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
+bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
 {
     m_editInfo = "";
     if (!m_doc->GetDrawingPage()) {
@@ -428,40 +423,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
     return true;
 }
 
-bool EditorToolkit::Insert(std::string elementType, std::string startid, std::string endid)
-{
-    if (!m_doc->GetDrawingPage()) return false;
-    Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
-    Object *end = m_doc->GetDrawingPage()->FindChildByUuid(endid);
-    // Check if both start and end elements exist
-    if (!start || !end) {
-        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
-        return false;
-    }
-    // Check if it is a LayerElement
-    if (!dynamic_cast<LayerElement *>(start)) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
-        return false;
-    }
-    if (!dynamic_cast<LayerElement *>(end)) {
-        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str());
-        return false;
-    }
-
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
-    assert(measure);
-    if (elementType == "slur") {
-        Slur *slur = new Slur();
-        slur->SetStartid(startid);
-        slur->SetEndid(endid);
-        measure->AddChild(slur);
-        m_doc->PrepareDrawing();
-        return true;
-    }
-    return false;
-}
-
-bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly,
+bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly,
         int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -800,7 +762,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     return true;
 }
 
-bool EditorToolkit::Merge(std::vector<std::string> elementIds)
+bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
     m_editInfo = "";
     if (!m_doc->GetDrawingPage()) return false;
@@ -863,7 +825,7 @@ bool EditorToolkit::Merge(std::vector<std::string> elementIds)
     return true;
 }
 
-bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string attrValue)
+bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
     if (!m_doc->GetDrawingPage()) return false;
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
@@ -902,7 +864,7 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
 }
 
 // Update the text of a TextElement by its syl
-bool EditorToolkit::SetText(std::string elementId, std::string text)
+bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 {
     m_editInfo = "";
     std::wstring wtext;
@@ -971,7 +933,7 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
     return success;
 }
 
-bool EditorToolkit::SetClef(std::string elementId, std::string shape)
+bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1026,7 +988,7 @@ bool EditorToolkit::SetClef(std::string elementId, std::string shape)
     return true;
 }
 
-bool EditorToolkit::Split(std::string elementId, int x)
+bool EditorToolkitNeume::Split(std::string elementId, int x)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
@@ -1094,7 +1056,7 @@ bool EditorToolkit::Split(std::string elementId, int x)
     return true;
 }
 
-bool EditorToolkit::Remove(std::string elementId)
+bool EditorToolkitNeume::Remove(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1143,7 +1105,7 @@ bool EditorToolkit::Remove(std::string elementId)
     return result;
 }
 
-bool EditorToolkit::Resize(std::string elementId, int ulx, int uly, int lrx, int lry)
+bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx, int lry)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1180,12 +1142,7 @@ bool EditorToolkit::Resize(std::string elementId, int ulx, int uly, int lrx, int
     return true;
 }
 
-std::string EditorToolkit::EditInfo()
-{
-    return m_editInfo;
-}
-
-bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elementIds)
+bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> elementIds)
 {
     m_editInfo = "";
     Object *parent = nullptr, *doubleParent = nullptr;
@@ -1369,7 +1326,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
     return true;
 }
 
-bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elementIds)
+bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
     m_editInfo = "";
     Object *fparent, *sparent, *currentParent;
@@ -1508,7 +1465,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
     return true;
 }
 
-bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
+bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
 {
     m_editInfo = "";
     //Check if you can get drawing page
@@ -1602,7 +1559,7 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
     return true;
 }
 
-bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
+bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
 {
     m_editInfo = "";
     bool success1 = false;
@@ -1687,7 +1644,7 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
     return success1 && success2;
 }
 
-bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
+bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
@@ -1698,7 +1655,7 @@ bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId
     return true;
 }
 
-bool EditorToolkit::ParseInsertAction(
+bool EditorToolkitNeume::ParseInsertAction(
     jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
@@ -1710,7 +1667,7 @@ bool EditorToolkit::ParseInsertAction(
     return true;
 }
 
-bool EditorToolkit::ParseInsertAction(
+bool EditorToolkitNeume::ParseInsertAction(
     jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
     int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes)
 {
@@ -1747,7 +1704,7 @@ bool EditorToolkit::ParseInsertAction(
     return true;
 }
 
-bool EditorToolkit::ParseMergeAction(
+bool EditorToolkitNeume::ParseMergeAction(
     jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
@@ -1758,7 +1715,7 @@ bool EditorToolkit::ParseMergeAction(
     return true;
 }
 
-bool EditorToolkit::ParseSplitAction(
+bool EditorToolkitNeume::ParseSplitAction(
     jsonxx::Object param, std::string *elementId, int *x)
 {
     if (!param.has<jsonxx::String>("elementId")) {
@@ -1776,7 +1733,7 @@ bool EditorToolkit::ParseSplitAction(
     return true;
 }
 
-bool EditorToolkit::ParseSetAction(
+bool EditorToolkitNeume::ParseSetAction(
     jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
     if (!param.has<jsonxx::String>("elementId")) {
@@ -1797,7 +1754,7 @@ bool EditorToolkit::ParseSetAction(
     return true;
 }
 
-bool EditorToolkit::ParseSetTextAction(
+bool EditorToolkitNeume::ParseSetTextAction(
     jsonxx::Object param, std::string *elementId, std::string *text)
 {
     if (!param.has<jsonxx::String>("elementId")) {
@@ -1813,7 +1770,7 @@ bool EditorToolkit::ParseSetTextAction(
     return true;
 }
 
-bool EditorToolkit::ParseSetClefAction(
+bool EditorToolkitNeume::ParseSetClefAction(
     jsonxx::Object param, std::string *elementId, std::string *shape)
 {
     if(!param.has<jsonxx::String>("elementId")) {
@@ -1829,7 +1786,7 @@ bool EditorToolkit::ParseSetClefAction(
     return true;
 }
 
-bool EditorToolkit::ParseRemoveAction(
+bool EditorToolkitNeume::ParseRemoveAction(
     jsonxx::Object param, std::string *elementId)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -1837,7 +1794,7 @@ bool EditorToolkit::ParseRemoveAction(
     return true;
 }
 
-bool EditorToolkit::ParseResizeAction(
+bool EditorToolkitNeume::ParseResizeAction(
     jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry)
 {
     if(!param.has<jsonxx::String>("elementId")) return false;
@@ -1853,7 +1810,7 @@ bool EditorToolkit::ParseResizeAction(
     return true;
 }
 
-bool EditorToolkit::ParseGroupAction(
+bool EditorToolkitNeume::ParseGroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
@@ -1867,7 +1824,7 @@ bool EditorToolkit::ParseGroupAction(
     return true;
 }
 
-bool EditorToolkit::ParseUngroupAction(
+bool EditorToolkitNeume::ParseUngroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
@@ -1881,7 +1838,7 @@ bool EditorToolkit::ParseUngroupAction(
     return true;
 }
 
-bool EditorToolkit::ParseChangeGroupAction(
+bool EditorToolkitNeume::ParseChangeGroupAction(
     jsonxx::Object param, std::string *elementId, std::string *contour)
 {
     if(!param.has<jsonxx::String>("elementId")) return false;
@@ -1891,7 +1848,7 @@ bool EditorToolkit::ParseChangeGroupAction(
     return true;
 }
 
-bool EditorToolkit::ParseToggleLigatureAction(
+bool EditorToolkitNeume::ParseToggleLigatureAction(
     jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature)
 {
     if(!param.has<jsonxx::Array>("elementIds")) return false;

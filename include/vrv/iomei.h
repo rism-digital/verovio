@@ -179,7 +179,7 @@ public:
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
 
-    
+
 
 private:
     bool WriteDoc(Doc *doc);
@@ -657,7 +657,7 @@ private:
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
     ///@}
-    
+
     void ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
     void ReadSurface(Facsimile *parent, pugi::xml_node surface);
     void ReadZone(Surface *parent, pugi::xml_node zone);

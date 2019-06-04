@@ -339,8 +339,8 @@ public:
     Facsimile *GetFacsimile() { return m_facsimile; }
     bool HasFacsimile() const { return m_facsimile != nullptr; }
     ///@}
-    
-    void SetChildZones(); 
+
+    void SetChildZones();
 
     //----------//
     // Functors //
@@ -400,6 +400,9 @@ public:
     float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
+
+    /** Record notation type for document */
+    data_NOTATIONTYPE m_notationType;
 
 private:
     /**
