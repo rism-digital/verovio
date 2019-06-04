@@ -1309,6 +1309,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
 
     //if there are more than 1 full parent we need to concat syl's
     //unless we're just grouping NC's in which case no need to worry about syl's of course
+    //also in this case we need to make sure that the facsimile of the resulting syl is correct
     else {
         if (elementClass == NC) {
             parent = new Neume();
@@ -1322,21 +1323,39 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
             Syllable *fullSyllable = new Syllable();
-            Syl *fullSyl = new Syl();
+            Syl *fullSyl;
 
             //construct concatenated string of all the syls
             std::wstring fullString = L"";
-            for(auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                Text *text = dynamic_cast<Text *> ((*it)->FindChildByType(SYL)->FindChildByType(TEXT));
-                if(text != nullptr) {
+            for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+                Syl *syl = dynamic_cast<Syl *> ((*it)->FindChildByType(SYL));
+                if (fullSyl == nullptr && syl != nullptr) {
+                    fullSyl = syl;
+                }
+                Text *text = dynamic_cast<Text *> (syl->FindChildByType(TEXT));
+                if (text != nullptr) {
                     std::wstring currentString = text->GetText();
                     fullString = fullString + currentString;
                 }
             }
-
-            Text *text = new Text();
+            int ulx = -1, uly = -1, lrx = -1, lry = -1;
+            for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *> ((*it)->FindChildByType(SYL)->GetFacsimileInterface());
+                if (facsInter != nullptr) {
+                    if (ulx == -1) {
+                        ulx = facsInter->GetDrawingX();
+                        uly = facsInter->GetDrawingY();
+                        lrx = facsInter->GetWidth() + ulx;
+                        lry = facsInter->GetHeight() + uly;
+                    }
+                    else {
+                        lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
+                        lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                    }
+                }
+            }
+            Text *text = dynamic_cast<Text *> (fullSyl->FindChildByType(TEXT));
             text->SetText(fullString);
-            fullSyl->AddChild(text);
             fullSyllable->AddChild(fullSyl);
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
@@ -1346,6 +1365,14 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             doubleParent->AddChild(fullSyllable);
             Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
             assert(layer);
+            if (ulx != -1) {
+                FacsimileInterface *facsInter = dynamic_cast <FacsimileInterface *> (fullSyl->GetFacsimileInterface());
+                Zone *zone = dynamic_cast <Zone *> (facsInter->GetZone());
+                zone->SetUlx(ulx);
+                zone->SetUly(uly);
+                zone->SetLrx(lrx);
+                zone->SetLry(lry);
+            }
             layer->ReorderByXPos();
             parent = fullSyllable;
         }
