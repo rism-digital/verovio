@@ -80,6 +80,15 @@ public:
      * Looks for the parent system and its current drawing scoreDef
      */
     bool DrawingIsVisible();
+    
+    /**
+     * @name Get notation type
+     */
+    ///@{
+    bool IsMensural();
+    bool IsNeume();
+    bool IsTablature();
+    ///@}
 
     /**
      * Return the index position of the staff in its measure parent

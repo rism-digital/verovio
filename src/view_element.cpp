@@ -588,10 +588,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int y = staff->GetDrawingY();
     int x = element->GetDrawingX();
     int sym = 0;
-    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-    bool isNeume = staff->m_drawingNotationType == NOTATIONTYPE_neume;
+    bool isMensural = staff->IsMensural();
+    bool isNeume = staff->IsNeume();
 
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
 

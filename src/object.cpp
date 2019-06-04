@@ -1267,6 +1267,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         if (params->m_currentStaffDef->HasScale()) {
             staff->m_drawingStaffSize = params->m_currentStaffDef->GetScale();
         }
+        if (staff->IsTablature()) {
+            staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
+        }
         return FUNCTOR_CONTINUE;
     }
 

@@ -510,11 +510,17 @@ enum Accessor { SELF = 0, CONTENT };
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
-
+    
 #define OCTAVE_OFFSET 4
 
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7
+    
+//----------------------------------------------------------------------------
+// Temporary - to be made an option?
+//----------------------------------------------------------------------------
+    
+#define TABLATURE_STAFF_RATIO 1.3
 
 } // namespace vrv
 

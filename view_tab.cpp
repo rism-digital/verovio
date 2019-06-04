@@ -66,16 +66,15 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
-    TextExtend extend;
-    std::wstring notes;
-    
     wchar_t code = note->GetTabSmuflCode(staff->m_drawingNotationType);
     
     // For some reason we need it to be cue size? Bravura is too large otherwise
-    bool drawingCueSize = true;
-    y -= (m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize) / 2);
+    bool drawingCueSize = false;
+    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    y -= (m_doc->GetGlyphHeight(code, glyphSize, drawingCueSize) / 2);
+    x -= (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
     
-    DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, drawingCueSize);
+    DrawSmuflCode(dc, x, y, code, glyphSize, drawingCueSize);
     
     // Draw children (nothing yet)
     DrawLayerChildren(dc, note, layer, staff, measure);
