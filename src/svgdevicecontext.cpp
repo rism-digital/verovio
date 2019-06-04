@@ -648,7 +648,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }
 
-    pugi::xml_node rectChild = AppendChild("rect");
+    pugi::xml_node rectChild = AppendChild("sylTextRect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
     rectChild.append_attribute("height") = height;
@@ -776,7 +776,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     if ((x != VRV_UNSET) && (y != VRV_UNSET) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
         pugi::xml_node g = m_currentNode.parent().parent();
         pugi::xml_node rectChild = g.append_child("rect");
-        rectChild.append_attribute("class") = "rect";
+        rectChild.append_attribute("class") = "sylTextRect";
         rectChild.append_attribute("x") = StringFormat("%d", x).c_str();
         rectChild.append_attribute("y") = StringFormat("%d", y).c_str();
         rectChild.append_attribute("width") = StringFormat("%d", width).c_str();
