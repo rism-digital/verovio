@@ -187,8 +187,12 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
-    dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph);
-//    dc->DrawMusicText(str, x, y, setBBGlyph);
+    if (m_doc->GetType() == Facs) {
+        dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph);
+    }
+    else {
+        dc->DrawMusicText(str, x, y, setBBGlyph);
+    }
 
     dc->ResetFont();
     dc->ResetBrush();

@@ -139,13 +139,17 @@ void Staff::AddChild(Object *child)
 
 int Staff::GetDrawingX() const
 {
-    if (this->HasFacs()) return FacsimileInterface::GetDrawingX();
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) return FacsimileInterface::GetDrawingX();
     return Object::GetDrawingX();
 }
 
 int Staff::GetDrawingY() const
 {
-    if (this->HasFacs()) return FacsimileInterface::GetDrawingY();
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) return FacsimileInterface::GetDrawingY();
 
     if (m_yAbs != VRV_UNSET) return m_yAbs;
 

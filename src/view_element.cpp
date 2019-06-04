@@ -713,7 +713,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLine = clef->GetLine();
 
     int x,y;
-    if (custos->HasFacs()) {
+    if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());
     }

@@ -124,7 +124,9 @@ int Syl::CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params)
 
 int Syl::GetDrawingX() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingX();
     }
     else {
@@ -134,7 +136,9 @@ int Syl::GetDrawingX() const
 
 int Syl::GetDrawingY() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingY();
     }
     else {

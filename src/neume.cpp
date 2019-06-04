@@ -228,7 +228,9 @@ PitchInterface *Neume::GetLowestPitch()
 
 int Neume::GetDrawingX() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingX();
     }
     else {
@@ -238,7 +240,9 @@ int Neume::GetDrawingX() const
 
 int Neume::GetDrawingY() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingY();
     }
     else {

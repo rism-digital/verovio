@@ -56,7 +56,9 @@ void Nc::Reset()
 
 int Nc::GetDrawingX() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingX();
     }
     else {
@@ -66,7 +68,9 @@ int Nc::GetDrawingX() const
 
 int Nc::GetDrawingY() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingY();
     }
     else {

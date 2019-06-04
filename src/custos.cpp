@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "custos.h"
+#include "doc.h"
 
 //----------------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-Custos::Custos() : LayerElement("custos-"), FacsimileInterface(), PitchInterface(), PositionInterface(), AttColor() 
+Custos::Custos() : LayerElement("custos-"), FacsimileInterface(), PitchInterface(), PositionInterface(), AttColor()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
@@ -38,7 +39,9 @@ void Custos::Reset()
 
 int Custos::GetDrawingX() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingX();
     }
     else {
@@ -48,7 +51,9 @@ int Custos::GetDrawingX() const
 
 int Custos::GetDrawingY() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingY();
     }
     else {

@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "scoredefinterface.h"
 
 namespace vrv {
@@ -94,7 +95,9 @@ int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, dat
 
 int Clef::GetDrawingX() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingX();
     }
     else {
@@ -104,7 +107,9 @@ int Clef::GetDrawingX() const
 
 int Clef::GetDrawingY() const
 {
-    if (this->HasFacs()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (this->HasFacs() && doc->GetType() == Facs) {
         return FacsimileInterface::GetDrawingY();
     }
     else {
