@@ -1687,6 +1687,8 @@ void MeiOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     WriteLayerElement(currentNode, syl);
+    WriteFacsimileInterface(currentNode, syl);
+    
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
