@@ -48,6 +48,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
 
     m_mmOutput = false;
     m_svgViewBox = false;
+    m_facsimile = false;
 
     // create the initial SVG element
     // width and height need to be set later; these are taken care of in "commit"
