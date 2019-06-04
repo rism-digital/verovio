@@ -1498,6 +1498,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         ArrayOfObjects children;
         a->FindAllChildByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
+            if((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
             if (temp->HasFacs() && (fa == nullptr || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
@@ -1511,6 +1512,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         ArrayOfObjects children;
         b->FindAllChildByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
+            if((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
             if (temp->HasFacs() && (fb == nullptr || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
