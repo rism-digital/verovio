@@ -2764,12 +2764,12 @@
             <!--<glyph glyph-code="EBA4" smufl-name="luteBarlineEndRepeat"/>-->
             <!--<glyph glyph-code="EBA5" smufl-name="luteBarlineFinal"/>-->
             <!--<glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole"/>-->
-            <!--<glyph glyph-code="EBA7" smufl-name="luteDurationWhole"/>-->
-            <!--<glyph glyph-code="EBA8" smufl-name="luteDurationHalf"/>-->
-            <!--<glyph glyph-code="EBA9" smufl-name="luteDurationQuarter"/>-->
-            <!--<glyph glyph-code="EBAA" smufl-name="luteDuration8th"/>-->
-            <!--<glyph glyph-code="EBAB" smufl-name="luteDuration16th"/>-->
-            <!--<glyph glyph-code="EBAC" smufl-name="luteDuration32nd"/>-->
+            <glyph glyph-code="EBA7" smufl-name="luteDurationWhole"/>
+            <glyph glyph-code="EBA8" smufl-name="luteDurationHalf"/>
+            <glyph glyph-code="EBA9" smufl-name="luteDurationQuarter"/>
+            <glyph glyph-code="EBAA" smufl-name="luteDuration8th"/>
+            <glyph glyph-code="EBAB" smufl-name="luteDuration16th"/>
+            <glyph glyph-code="EBAC" smufl-name="luteDuration32nd"/>
             <!--<glyph glyph-code="EBAD" smufl-name="luteFingeringRHThumb"/>-->
             <!--<glyph glyph-code="EBAE" smufl-name="luteFingeringRHFirst"/>-->
             <!--<glyph glyph-code="EBAF" smufl-name="luteFingeringRHSecond"/>-->
@@ -2806,16 +2806,16 @@
         </frenchAndEnglishRenaissanceLuteTablature>
         <italianAndSpanishRenaissanceLuteTablature>
             <description>Italian and Spanish Renaissance lute tablature</description>
-            <!--<glyph glyph-code="EBE0" smufl-name="luteItalianFret0"/>-->
-            <!--<glyph glyph-code="EBE1" smufl-name="luteItalianFret1"/>-->
-            <!--<glyph glyph-code="EBE2" smufl-name="luteItalianFret2"/>-->
-            <!--<glyph glyph-code="EBE3" smufl-name="luteItalianFret3"/>-->
-            <!--<glyph glyph-code="EBE4" smufl-name="luteItalianFret4"/>-->
-            <!--<glyph glyph-code="EBE5" smufl-name="luteItalianFret5"/>-->
-            <!--<glyph glyph-code="EBE6" smufl-name="luteItalianFret6"/>-->
-            <!--<glyph glyph-code="EBE7" smufl-name="luteItalianFret7"/>-->
-            <!--<glyph glyph-code="EBE8" smufl-name="luteItalianFret8"/>-->
-            <!--<glyph glyph-code="EBE9" smufl-name="luteItalianFret9"/>-->
+            <glyph glyph-code="EBE0" smufl-name="luteItalianFret0"/>
+            <glyph glyph-code="EBE1" smufl-name="luteItalianFret1"/>
+            <glyph glyph-code="EBE2" smufl-name="luteItalianFret2"/>
+            <glyph glyph-code="EBE3" smufl-name="luteItalianFret3"/>
+            <glyph glyph-code="EBE4" smufl-name="luteItalianFret4"/>
+            <glyph glyph-code="EBE5" smufl-name="luteItalianFret5"/>
+            <glyph glyph-code="EBE6" smufl-name="luteItalianFret6"/>
+            <glyph glyph-code="EBE7" smufl-name="luteItalianFret7"/>
+            <glyph glyph-code="EBE8" smufl-name="luteItalianFret8"/>
+            <glyph glyph-code="EBE9" smufl-name="luteItalianFret9"/>
             <!--<glyph glyph-code="EBEA" smufl-name="luteItalianTempoFast"/>-->
             <!--<glyph glyph-code="EBEB" smufl-name="luteItalianTempoSomewhatFast"/>-->
             <!--<glyph glyph-code="EBEC" smufl-name="luteItalianTempoNeitherFastNorSlow"/>-->
