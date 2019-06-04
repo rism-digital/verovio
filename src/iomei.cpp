@@ -2512,7 +2512,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     facsimile = music.child("facsimile");
-    if (!facsimile.empty()) {
+    if (!facsimile.empty() && m_doc->GetOptions()->m_useFacsimile.GetValue()) {
         ReadFacsimile(m_doc, facsimile);
         m_doc->SetType(Facs);
         m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
