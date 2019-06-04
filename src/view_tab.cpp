@@ -71,8 +71,9 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     // For some reason we need it to be cue size? Bravura is too large otherwise
     bool drawingCueSize = false;
     int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    int radius =  m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
     y -= (m_doc->GetGlyphHeight(code, glyphSize, drawingCueSize) / 2);
-    x -= (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
+    x += radius - (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
     
     DrawSmuflCode(dc, x, y, code, glyphSize, drawingCueSize);
     
@@ -102,6 +103,8 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
     int drawingDur = tabGrp->GetActualDur();
     int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
+    int radius =  m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
+    x += radius;
     
     int symc = 0;
     switch (drawingDur) {
@@ -114,6 +117,17 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
     
     DrawSmuflCode(dc, x, y, symc, glyphSize, true);
+    
+    int i;
+    if (tabGrp->HasDots()) {
+        y += m_doc->GetDrawingUnit(glyphSize) * 0.5;
+        x += m_doc->GetDrawingUnit(glyphSize);
+        for (i = 0; i < tabGrp->GetDots(); ++i) {
+            DrawDot(dc, x, y, glyphSize / 2);
+            // HARDCODED
+            x += m_doc->GetDrawingUnit(glyphSize) * 0.75;
+        }
+    }
     
     // Draw children (nothing yet)
     DrawLayerChildren(dc, tabRhythm, layer, staff, measure);
