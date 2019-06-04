@@ -739,7 +739,9 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     assert(m_fontStack.top());
 
     std::string svgText = text;
-
+    
+    // Because IE does not support xml:space="preserve", we need to replace the initial
+    // space with a non breakable space
     if ((svgText.length() > 0) && (svgText[0] == ' ')) {
         svgText.replace(0, 1, "\xC2\xA0");
     }
