@@ -99,8 +99,9 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
-    y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+    y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
     int drawingDur = tabGrp->GetActualDur();
+    int glyphSize = staff->m_drawingStaffSize / TABLATURE_STAFF_RATIO;
     
     int symc = 0;
     switch (drawingDur) {
@@ -112,7 +113,7 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
         default: symc = SMUFL_EBA9_luteDurationQuarter;
     }
     
-    DrawSmuflCode(dc, x, y, symc, staff->m_drawingStaffSize, true);
+    DrawSmuflCode(dc, x, y, symc, glyphSize, true);
     
     // Draw children (nothing yet)
     DrawLayerChildren(dc, tabRhythm, layer, staff, measure);
