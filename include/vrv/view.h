@@ -12,6 +12,7 @@
 #include "scoredef.h"
 #include "smufl.h"
 #include "vrvdef.h"
+#include "textelement.h"
 
 namespace vrv {
 
@@ -487,7 +488,7 @@ protected:
         wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100,
         bool dimin = false, bool setBBGlyph = false);
-    void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
+    void DrawLyricString(DeviceContext *dc, TextDrawingParams &params, std::wstring s, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);

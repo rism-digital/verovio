@@ -276,13 +276,14 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
     else if (text->GetFirstParent(SYL)) {
-        DrawLyricString(dc, params.m_x, params.m_y, text->GetText());
+        DrawLyricString(dc, params, text->GetText());
     }
 
     else {
         if (params.m_laidOut && params.m_newLine) {
             dc->DrawText(
-                UTF16to8(text->GetText()), text->GetText(), ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
+                UTF16to8(text->GetText()), text->GetText(), ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y),
+                params.m_width, params.m_height);
             params.m_newLine = false;
         }
         else {

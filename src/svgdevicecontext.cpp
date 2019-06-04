@@ -648,7 +648,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }
 
-    pugi::xml_node rectChild = AppendChild("rect");
+    pugi::xml_node rectChild = AppendChild("sylTextRect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
     rectChild.append_attribute("height") = height;
@@ -732,11 +732,14 @@ void SvgDeviceContext::EndText()
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
+//draw text element with optional parameters to specify the bounding box of the text
+//if the bounding box is specified then append a rect child
+void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 
     std::string svgText = text;
+    
     // Because IE does not support xml:space="preserve", we need to replace the initial
     // space with a non breakable space
     if ((svgText.length() > 0) && (svgText[0] == ' ')) {
@@ -768,6 +771,16 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
         textChild.append_attribute("x") = StringFormat("%d", x).c_str();
         textChild.append_attribute("y") = StringFormat("%d", y).c_str();
+    }
+
+    if ((x != VRV_UNSET) && (y != VRV_UNSET) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
+        pugi::xml_node g = m_currentNode.parent().parent();
+        pugi::xml_node rectChild = g.append_child("rect");
+        rectChild.append_attribute("class") = "sylTextRect";
+        rectChild.append_attribute("x") = StringFormat("%d", x).c_str();
+        rectChild.append_attribute("y") = StringFormat("%d", y).c_str();
+        rectChild.append_attribute("width") = StringFormat("%d", width).c_str();
+        rectChild.append_attribute("height") = StringFormat("%d", height).c_str();
     }
 }
 

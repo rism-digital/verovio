@@ -142,6 +142,22 @@ int Syl::GetDrawingY() const
     }
 }
 
+int Syl::GetDrawingWidth() const
+{
+    if(this->HasFacs()) {
+        return FacsimileInterface::GetWidth();
+    } 
+    return 0;
+}
+
+int Syl::GetDrawingHeight() const
+{
+    if(this->HasFacs()) {
+        return FacsimileInterface::GetHeight();
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------

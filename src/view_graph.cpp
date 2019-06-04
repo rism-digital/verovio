@@ -256,23 +256,42 @@ void View::DrawSmuflString(
     dc->ResetBrush();
 }
 
-void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize)
+void View::DrawLyricString(DeviceContext *dc, TextDrawingParams &params, std::wstring s, int staffSize)
 {
     assert(dc);
 
     std::wistringstream iss(s);
     std::wstring token;
     while (std::getline(iss, token, L'_')) {
-        dc->DrawText(UTF16to8(token), token);
+        if ((params.m_x != VRV_UNSET) && (params.m_y != VRV_UNSET)) {
+            if ((params.m_width != VRV_UNSET) && (params.m_height != VRV_UNSET)) {
+                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
+            }
+            else {
+                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y);
+            }
+        }
+        else {
+            dc->DrawText(UTF16to8(token), token);
+        }
         // no _
         if (iss.eof()) break;
-
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str), str);
+        if ((params.m_x != VRV_UNSET) && (params.m_y != VRV_UNSET)) {
+            if ((params.m_width != VRV_UNSET) && (params.m_height != VRV_UNSET)) {
+                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
+            }
+            else {
+                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y);
+            }
+        }
+        else {
+            dc->DrawText(UTF16to8(token), token);
+        }
         dc->ResetFont();
     }
 }

@@ -4512,6 +4512,8 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
 
+    ReadFacsimileInterface(syl, vrvSyl);
+
     parent->AddChild(vrvSyl);
     ReadUnsupportedAttr(syl, vrvSyl);
     return ReadTextChildren(vrvSyl, syl, vrvSyl);
