@@ -366,12 +366,12 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            GenerateMIDIParams generateMIDIParams(midiFile);
+            Functor generateMIDI(&Object::GenerateMIDI);
+            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
-            Functor generateMIDI(&Object::GenerateMIDI);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, NULL, &filters);
@@ -390,8 +390,8 @@ bool Doc::ExportTimemap(std::string &output)
         output = "";
         return false;
     }
-    GenerateTimemapParams generateTimemapParams;
     Functor generateTimemap(&Object::GenerateTimemap);
+    GenerateTimemapParams generateTimemapParams(&generateTimemap);
     this->Process(&generateTimemap, &generateTimemapParams);
 
     PrepareJsonTimemap(output, generateTimemapParams.realTimeToScoreTime, generateTimemapParams.realTimeToOnElements,
@@ -1542,13 +1542,15 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 {
     PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
-
-    if ((params->m_currentSyl && params->m_lastNote) && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
+    if (!params->m_currentSyl) {
+        return FUNCTOR_STOP; // early return
+    }
+    if (params->m_lastNote && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
         params->m_currentSyl->SetEnd(params->m_lastNote);
     }
     else if (m_options->m_openControlEvents.GetValue()) {
-        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i)
-            || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
+        sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();
+        if ((wordpos == sylLog_WORDPOS_i) || (wordpos == sylLog_WORDPOS_m)) {
             Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
             assert(lastMeasure);
             params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());

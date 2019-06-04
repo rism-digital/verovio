@@ -1292,7 +1292,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new clef
     if (this->Is(CLEF)) {
-        Clef *clef = dynamic_cast<Clef *>(this);
+        LayerElement *element = dynamic_cast<LayerElement *>(this);
+        assert(element);
+        Clef *clef = dynamic_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());

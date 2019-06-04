@@ -247,7 +247,7 @@ class FloatingCurvePositioner : public FloatingPositioner {
 public:
     // constructors and destructors
     FloatingCurvePositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
-    virtual ~FloatingCurvePositioner(){};
+    virtual ~FloatingCurvePositioner();
     virtual ClassId GetClassId() const { return FLOATING_CURVE_POSITIONER; }
 
     virtual void ResetPositioner();
@@ -285,7 +285,21 @@ public:
     curvature_CURVEDIR GetDir() { return m_dir; }
     ///@}
 
-    ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
+    /**
+     * Deletes all the CurveSpannedElement objects.
+     */
+    void ClearSpannedElements();
+
+    /**
+     * Add a CurveSpannedElement to the FloatingCurvePositioner.
+     * The element is owned by the positioner.
+     */
+    void AddSpannedElement(CurveSpannedElement *spannedElement) { m_spannedElements.push_back(spannedElement); }
+
+    /**
+     * Return a cont pointer to the spanned elements
+     */
+    const ArrayOfCurveSpannedElements *GetSpannedElements() { return &m_spannedElements; }
 
 private:
     //

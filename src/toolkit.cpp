@@ -249,6 +249,15 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
         if (initial.find("<opus ") != std::string::npos) {
             return musicxmlDefault;
         }
+        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
+            return musicxmlDefault;
+        }
 
         std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
@@ -755,9 +764,9 @@ bool Toolkit::SetOptions(const std::string &json_options)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "inputFormat") {
-                if (json.has<jsonxx::String>("inputFormat")) {
-                    SetFormat(json.get<jsonxx::String>("inputFormat"));
+            if (iter->first == "format") {
+                if (json.has<jsonxx::String>("format")) {
+                    SetFormat(json.get<jsonxx::String>("format"));
                 }
             }
             else if (iter->first == "scale") {
@@ -827,6 +836,12 @@ bool Toolkit::SetOptions(const std::string &json_options)
                     else {
                         opt->SetValue("encoded");
                     }
+                }
+            }
+            else if (iter->first == "inputFormat") {
+                LogWarning("Option inputFormat is deprecated; use format instead");
+                if (json.has<jsonxx::String>("inputFormat")) {
+                    SetFormat(json.get<jsonxx::String>("inputFormat"));
                 }
             }
             else if (iter->first == "noLayout") {

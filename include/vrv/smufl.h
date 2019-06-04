@@ -293,10 +293,26 @@ enum {
     SMUFL_EAAA_wiggleArpeggiatoDown = 0xEAAA,
     SMUFL_EAAD_wiggleArpeggiatoUpArrow = 0xEAAD,
     SMUFL_EAAE_wiggleArpeggiatoDownArrow = 0xEAAE,
+    SMUFL_EBA7_luteDurationWhole = 0xEBA7,
+    SMUFL_EBA8_luteDurationHalf = 0xEBA8,
+    SMUFL_EBA9_luteDurationQuarter = 0xEBA9,
+    SMUFL_EBAA_luteDuration8th = 0xEBAA,
+    SMUFL_EBAB_luteDuration16th = 0xEBAB,
+    SMUFL_EBAC_luteDuration32nd = 0xEBAC,
+    SMUFL_EBE0_luteItalianFret0 = 0xEBE0,
+    SMUFL_EBE1_luteItalianFret1 = 0xEBE1,
+    SMUFL_EBE2_luteItalianFret2 = 0xEBE2,
+    SMUFL_EBE3_luteItalianFret3 = 0xEBE3,
+    SMUFL_EBE4_luteItalianFret4 = 0xEBE4,
+    SMUFL_EBE5_luteItalianFret5 = 0xEBE5,
+    SMUFL_EBE6_luteItalianFret6 = 0xEBE6,
+    SMUFL_EBE7_luteItalianFret7 = 0xEBE7,
+    SMUFL_EBE8_luteItalianFret8 = 0xEBE8,
+    SMUFL_EBE9_luteItalianFret9 = 0xEBE9,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 271
+#define SMUFL_COUNT 283
 
 } // vrv namespace
 

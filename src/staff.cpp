@@ -324,15 +324,17 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
 
     staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
+    // Ignore layers that are empty (or with @sameas)
     ArrayOfObjects layers;
-    ClassIdComparison matchTypeLayer(LAYER);
+    IsEmptyComparison matchTypeLayer(LAYER, true);
     this->FindAllChildByComparison(&layers, &matchTypeLayer);
 
     ArrayOfObjects mRests;
     ClassIdComparison matchTypeMRest(MREST);
     this->FindAllChildByComparison(&mRests, &matchTypeMRest);
 
-    if (mRests.size() != layers.size()) {
+    // Show the staff only if no layer with content or only mRests
+    if (layers.empty() || (mRests.size() != layers.size())) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
 
