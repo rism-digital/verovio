@@ -1199,7 +1199,17 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_SIBLINGS;
     }
-
+    
+    // If we have a list of types to excludes and it is one of them, stop it
+    if (!params->m_excludes.empty() && this->Is(params->m_excludes)) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // If we have a list of types to include and it is not one of them, stop it
+    if (!params->m_includes.empty() && !this->Is(params->m_includes)) {
+        return FUNCTOR_CONTINUE;
+    }
+    
     if (this->HasSameasLink()) {
         // nothing to do when the element has a @sameas attribute
         return FUNCTOR_SIBLINGS;
