@@ -1110,7 +1110,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
 
     int j, x1, x2, y;
 
-    if (staff->HasFacs() && m_doc->GetType() == Facs) {
+    if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();
         y = ToLogicalY(staff->GetDrawingY());
