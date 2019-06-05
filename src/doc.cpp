@@ -1560,29 +1560,6 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     return FUNCTOR_STOP;
 }
 
-void Doc::SetChildZones() {
-    if (this->GetType() != Facs) return;
-
-    InterfaceComparison ic(INTERFACE_FACSIMILE);
-    ArrayOfObjects children;
-
-    this->FindAllChildByComparison(&children, &ic);
-
-    for (auto iter = children.begin(); iter != children.end(); iter++) {
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*iter)->GetFacsimileInterface());
-        assert(fi);
-        if (fi->HasFacs()) {
-            fi->SetZone(m_facsimile->FindZoneByUuid(fi->GetFacs()));
-        }
-        /*
-        else {
-            LogError("If facsimilies are present then element %s should have it.", (*iter)->GetClassName().c_str());
-            assert(false);
-        }
-        */
-    }
-}
-
 int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
 {
     PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);

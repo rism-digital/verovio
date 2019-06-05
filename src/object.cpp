@@ -797,6 +797,8 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
+
+
 //----------------------------------------------------------------------------
 // ObjectListInterface
 //----------------------------------------------------------------------------
@@ -1540,6 +1542,27 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
     std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
     this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::SetChildZones(FunctorParams *functorParams)
+{
+    SetChildZonesParams *params = dynamic_cast<SetChildZonesParams *>(functorParams);
+    assert(params);
+
+    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(this->GetFacsimileInterface());
+    if (fi != NULL) {
+        if (fi->HasFacs()) {
+            assert(params->m_doc);
+            assert(params->m_doc->GetFacsimile());
+            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(fi->GetFacs());
+            if (zone == NULL) {
+                LogError("Could not find a zone of UUID %s", fi->GetFacs().c_str());
+                return FUNCTOR_STOP;
+            }
+            fi->SetZone(zone);
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 

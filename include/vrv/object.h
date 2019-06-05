@@ -1075,6 +1075,11 @@ public:
      */
     virtual int ReorderByXPos(FunctorParams *);
 
+    /**
+     * Associate child objects with zones.
+     */
+    virtual int SetChildZones(FunctorParams *);
+
     static bool sortByUlx(Object *a, Object *b);
 
 protected:

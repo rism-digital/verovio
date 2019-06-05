@@ -340,8 +340,6 @@ public:
     bool HasFacsimile() const { return m_facsimile != NULL; }
     ///@}
 
-    void SetChildZones();
-
     //----------//
     // Functors //
     //----------//
