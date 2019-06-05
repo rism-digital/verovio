@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        facsimile.h
+// Name:        zone.h
 // Author:      Juliette Regimbal
-// Created:     2018
+// Created:     05/06/2019
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_FACSIMILE_H__
-#define __VRV_FACSIMILE_H__
+#ifndef __VRV_ZONE_H__
+#define __VRV_ZONE_H__
 
 #include <assert.h>
 
@@ -15,38 +15,38 @@
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "object.h"
-#include "view.h"
 #include "vrvdef.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Facsimile
+// Zone
 //----------------------------------------------------------------------------
 /**
- * Implements the facsimile element
+ * Implements the zone element
  * in MEI
  */
 
-class Facsimile : public Object {
+class Zone : public Object, public AttTyped, public AttCoordinated {
 public:
     /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method resets all attribute classes
+     * @name Constructors, destructors, reset, and class name methods
      */
     ///@{
-    Facsimile();
-    virtual ~Facsimile();
+    Zone();
+    virtual ~Zone();
     virtual void Reset();
-    virtual ClassId GetClassId() const { return FACSIMILE; }
-    virtual std::string GetClassName() const { return "facsimile"; }
+    ClassId GetClassId() const { return ZONE; }
     ///@}
-    virtual void AddChild(Object *object);
-
-    Zone *FindZoneByUuid(std::string zoneId);
-    int GetMaxY();
-    int GetMaxX();
+    void ShiftByXY(int xDiff, int yDiff);
+    int GetLogicalUly();
+    int GetLogicalLry();
+protected:
+    //
+private:
+    //
 };
 
-}
+}   // namespace vrv
+
 #endif

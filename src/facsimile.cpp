@@ -17,6 +17,7 @@
 #include "object.h"
 #include "surface.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -75,37 +76,4 @@ int Facsimile::GetMaxY()
     return max;
 }
 
-//----------------------------------------------------------------------------
-// Zone
-//----------------------------------------------------------------------------
-Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated()
-{
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_COORDINATED);
-    Reset();
-}
-Zone::~Zone() {}
-void Zone::Reset()
-{
-    ResetTyped();
-    ResetCoordinated();
-}
-
-void Zone::ShiftByXY(int xDiff, int yDiff)
-{
-    this->SetUlx(this->GetUlx() + xDiff);
-    this->SetLrx(this->GetLrx() + xDiff);
-    this->SetUly(this->GetUly() + yDiff);
-    this->SetLry(this->GetLry() + yDiff);
-}
-
-int Zone::GetLogicalUly()
-{
-    return (this->GetUly());
-}
-
-int Zone::GetLogicalLry()
-{
-    return (this->GetLry());
-}
-}
+} // namespace vrv

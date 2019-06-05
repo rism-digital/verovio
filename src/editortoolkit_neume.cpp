@@ -25,6 +25,7 @@
 #include "rend.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "surface.h"
 #include "syl.h"
 #include "syllable.h"
 #include "text.h"

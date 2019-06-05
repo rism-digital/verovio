@@ -17,6 +17,7 @@
 #include "surface.h"
 #include "view.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 

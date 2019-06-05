@@ -37,6 +37,7 @@ class StemmedDrawingInterface;
 class TextDirInterface;
 class TimePointInterface;
 class TimeSpanningInterface;
+class Zone;
 
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true

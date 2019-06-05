@@ -43,6 +43,7 @@
 #include "text.h"
 #include "textelement.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 

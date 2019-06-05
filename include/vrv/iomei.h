@@ -136,6 +136,7 @@ class Turn;
 class Tuplet;
 class Unclear;
 class Verse;
+class Zone;
 
 
 //----------------------------------------------------------------------------

@@ -30,6 +30,7 @@
 #include "timeinterface.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
