@@ -740,49 +740,6 @@ void MeiOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
     currentNode.append_attribute("xml:id") = UuidToMeiStr(object).c_str();
 }
 
-void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
-{
-    assert(zone);
-    WriteXmlId(currentNode, zone);
-    zone->WriteCoordinated(currentNode);
-    zone->WriteTyped(currentNode);
-}
-
-void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
-{
-    assert(surface);
-    WriteXmlId(currentNode, surface);
-    surface->WriteCoordinated(currentNode);
-    surface->WriteTyped(currentNode);
-
-    for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
-        if (child->GetClassId() == ZONE) {
-            pugi::xml_node childNode = currentNode.append_child("zone");
-            WriteZone(childNode, dynamic_cast<Zone *>(child));
-        }
-        else {
-            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
-        }
-    }
-}
-
-void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
-{
-    assert(facsimile);
-    WriteXmlId(currentNode, facsimile);
-
-    // Write Surface(s)
-    for (Object *child = facsimile->GetFirst(); child != NULL; child = facsimile->GetNext()) {
-        if (child->GetClassId() == SURFACE) {
-            pugi::xml_node childNode = currentNode.append_child("surface");
-            WriteSurface(childNode, dynamic_cast<Surface *>(child));
-        }
-        else {
-            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
-        }
-    }
-}
-
 bool MeiOutput::WriteDoc(Doc *doc)
 {
     assert(doc);
@@ -819,7 +776,7 @@ bool MeiOutput::WriteDoc(Doc *doc)
 
     pugi::xml_node music = m_mei.append_child("music");
     Facsimile *facs = doc->GetFacsimile();
-    if (facs != NULL && facs->GetChildCount() > 0) {
+    if ((facs != NULL) && (facs->GetChildCount() > 0)) {
         pugi::xml_node facsimile = music.append_child("facsimile");
         WriteFacsimile(facsimile, facs);
         m_nodeStack.push_back(facsimile);
@@ -1703,6 +1660,49 @@ void MeiOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
     syllable->WriteSlashCount(currentNode);
 }
 
+void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
+{
+    assert(facsimile);
+    WriteXmlId(currentNode, facsimile);
+
+    // Write Surface(s)
+    for (Object *child = facsimile->GetFirst(); child != NULL; child = facsimile->GetNext()) {
+        if (child->GetClassId() == SURFACE) {
+            pugi::xml_node childNode = currentNode.append_child("surface");
+            WriteSurface(childNode, dynamic_cast<Surface *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
+        }
+    }
+}
+
+void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
+{
+    assert(surface);
+    WriteXmlId(currentNode, surface);
+    surface->WriteCoordinated(currentNode);
+    surface->WriteTyped(currentNode);
+
+    for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
+        if (child->GetClassId() == ZONE) {
+            pugi::xml_node childNode = currentNode.append_child("zone");
+            WriteZone(childNode, dynamic_cast<Zone *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
+        }
+    }
+}
+
+void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
+{
+    assert(zone);
+    WriteXmlId(currentNode, zone);
+    zone->WriteCoordinated(currentNode);
+    zone->WriteTyped(currentNode);
+}
+
 void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textElement)
 {
     assert(textElement);
@@ -2522,7 +2522,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     facsimile = music.child("facsimile");
-    if (!facsimile.empty() && m_doc->GetOptions()->m_useFacsimile.GetValue()) {
+    if ((!facsimile.empty()) && (m_doc->GetOptions()->m_useFacsimile.GetValue())) {
         ReadFacsimile(m_doc, facsimile);
         m_doc->SetType(Facs);
         m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
