@@ -5664,7 +5664,7 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
-void MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
+bool MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
 {
     assert(parent);
     Surface *vrvSurface = new Surface();
@@ -5681,9 +5681,10 @@ void MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
         }
     }
     parent->AddChild(vrvSurface);
+    return true;
 }
 
-void MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
+bool MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
 {
     assert(parent);
     Zone *vrvZone = new Zone();
@@ -5691,9 +5692,10 @@ void MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
     vrvZone->ReadCoordinated(zone);
     vrvZone->ReadTyped(zone);
     parent->AddChild(vrvZone);
+    return true;
 }
 
-void MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
+bool MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
 {
     assert(doc);
     Facsimile *vrvFacsimile = new Facsimile();
@@ -5709,6 +5711,7 @@ void MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
         }
     }
     doc->SetFacsimile(vrvFacsimile);
+    return true;
 }
 
 } // namespace vrv
