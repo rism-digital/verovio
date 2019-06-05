@@ -1638,11 +1638,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
     }
 
+    int duration = atoi(GetContentOfChild(node, "duration").c_str());
     pugi::xpath_node rest = node.select_node("rest");
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
         std::string octaveStr = GetContentOfChild(rest.node(), "display-octave");
-        int duration = atoi(GetContentOfChild(node, "duration").c_str());
         if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
@@ -2032,6 +2032,36 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         m_controlElements.push_back(std::make_pair(measureNum, turn));
         turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         turn->SetStartid(m_ID);
+        // color
+        turn->SetColor(xmlTurnInv.node().attribute("color").as_string());
+        // form
+        turn->SetForm(turnLog_FORM_upper);
+        // place
+        turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurnInv.node().attribute("placement").as_string()));
+    }
+    pugi::xpath_node xmlDelayedTurn = notations.node().select_node("ornaments/delayed-turn");
+    if (xmlDelayedTurn) {
+        Turn *turn = new Turn();
+        m_controlElements.push_back(std::make_pair(measureNum, turn));
+        turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        turn->SetTstamp((double)(onset + duration / 2) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        // delayed attribute
+        turn->SetDelayed(BOOLEAN_true);
+        // color
+        turn->SetColor(xmlTurn.node().attribute("color").as_string());
+        // form
+        turn->SetForm(turnLog_FORM_lower);
+        // place
+        turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
+    }
+    pugi::xpath_node xmlDelayedTurnInv = notations.node().select_node("ornaments/delayed-inverted-turn");
+    if (xmlDelayedTurnInv) {
+        Turn *turn = new Turn();
+        m_controlElements.push_back(std::make_pair(measureNum, turn));
+        turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        turn->SetTstamp((double)(onset + duration / 2) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        // delayed attribute
+        turn->SetDelayed(BOOLEAN_true);
         // color
         turn->SetColor(xmlTurnInv.node().attribute("color").as_string());
         // form
