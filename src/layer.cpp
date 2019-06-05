@@ -199,6 +199,15 @@ Clef *Layer::GetClef(LayerElement *test)
         assert(clef);
         return clef;
     }
+    Clef *facsClef = this->GetClefFacs(test);
+    if (facsClef != NULL) {
+        return facsClef;
+    }
+    return GetCurrentClef();
+}
+
+Clef *Layer::GetClefFacs(LayerElement *test)
+{
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     assert(doc);
     if (doc->GetType() == Facs) {
@@ -209,7 +218,7 @@ Clef *Layer::GetClef(LayerElement *test)
             return dynamic_cast<Clef *>(*clefs.rbegin());
         }
     }
-    return GetCurrentClef();
+    return NULL;
 }
 
 int Layer::GetClefLocOffset(LayerElement *test)
