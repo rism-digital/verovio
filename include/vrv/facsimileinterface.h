@@ -48,7 +48,7 @@ public:
     /** Get the zone */
     Zone *GetZone() { return m_zone; }
 private:
-    Zone *m_zone = nullptr;
+    Zone *m_zone = NULL;
 };
 }
 #endif

@@ -337,7 +337,7 @@ public:
     ///@{
     void SetFacsimile(Facsimile *facsimile) { m_facsimile = facsimile; }
     Facsimile *GetFacsimile() { return m_facsimile; }
-    bool HasFacsimile() const { return m_facsimile != nullptr; }
+    bool HasFacsimile() const { return m_facsimile != NULL; }
     ///@}
 
     void SetChildZones();
@@ -494,7 +494,7 @@ private:
     int m_pageMarginTop;
 
     /** Facsimile information */
-    Facsimile *m_facsimile = nullptr;
+    Facsimile *m_facsimile = NULL;
 };
 
 } // namespace vrv

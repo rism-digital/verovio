@@ -276,7 +276,7 @@ protected:
     bool m_isDeactivatedX;
     bool m_isDeactivatedY;
 
-    Zone *m_facsimile = nullptr;
+    Zone *m_facsimile = NULL;
 
 private:
     /** stores the width and height of the device context */

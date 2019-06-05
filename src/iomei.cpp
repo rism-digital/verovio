@@ -753,7 +753,7 @@ void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
     surface->WriteCoordinated(currentNode);
     surface->WriteTyped(currentNode);
 
-    for (Object *child = surface->GetFirst(); child != nullptr; child = surface->GetNext()) {
+    for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
         if (child->GetClassId() == ZONE) {
             pugi::xml_node childNode = currentNode.append_child("zone");
             WriteZone(childNode, dynamic_cast<Zone *>(child));
@@ -770,7 +770,7 @@ void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
     WriteXmlId(currentNode, facsimile);
 
     // Write Surface(s)
-    for (Object *child = facsimile->GetFirst(); child != nullptr; child = facsimile->GetNext()) {
+    for (Object *child = facsimile->GetFirst(); child != NULL; child = facsimile->GetNext()) {
         if (child->GetClassId() == SURFACE) {
             pugi::xml_node childNode = currentNode.append_child("surface");
             WriteSurface(childNode, dynamic_cast<Surface *>(child));
@@ -817,7 +817,7 @@ bool MeiOutput::WriteDoc(Doc *doc)
 
     pugi::xml_node music = m_mei.append_child("music");
     Facsimile *facs = doc->GetFacsimile();
-    if (facs != nullptr && facs->GetChildCount() > 0) {
+    if (facs != NULL && facs->GetChildCount() > 0) {
         pugi::xml_node facsimile = music.append_child("facsimile");
         WriteFacsimile(facsimile, facs);
         m_nodeStack.push_back(facsimile);
@@ -4043,7 +4043,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     //if not then add a blank one
     if (strcmp(parentNode.name(), "syllable") == 0) {
         auto testSyl = parent->FindChildByType(SYL);
-        if(testSyl == nullptr) {
+        if(testSyl == NULL) {
             Syl *syl = new Syl();
             parent->AddChild(syl);
         }
@@ -4545,7 +4545,7 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
         Object *obj = vrvSyllable->FindChildByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
 
-        if(syl == nullptr) {
+        if(syl == NULL) {
             syl = new Syl();
             vrvSyllable->AddChild(syl);
         }

@@ -1492,7 +1492,7 @@ int Object::SaveEnd(FunctorParams *functorParams)
 
 bool Object::sortByUlx(Object *a, Object *b)
 {
-    FacsimileInterface *fa = nullptr, *fb = nullptr;
+    FacsimileInterface *fa = NULL, *fb = NULL;
     InterfaceComparison comp(INTERFACE_FACSIMILE);
     if (a->GetFacsimileInterface())
         fa = a->GetFacsimileInterface();
@@ -1502,7 +1502,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
-            if (temp->HasFacs() && (fa == nullptr || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
                 fa = temp;
             }
         }
@@ -1515,13 +1515,13 @@ bool Object::sortByUlx(Object *a, Object *b)
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
-            if (temp->HasFacs() && (fb == nullptr || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;
             }
         }
     }
 
-    if (fa == nullptr || fb == nullptr) {
+    if (fa == NULL || fb == NULL) {
         LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
         return false;
     }
@@ -1531,7 +1531,7 @@ bool Object::sortByUlx(Object *a, Object *b)
 
 int Object::ReorderByXPos(FunctorParams *functorParams)
 {
-    if (this->GetFacsimileInterface() != nullptr) {
+    if (this->GetFacsimileInterface() != NULL) {
         if (this->GetFacsimileInterface()->HasFacs()) {
             return FUNCTOR_SIBLINGS; // This would have already been reordered.
         }

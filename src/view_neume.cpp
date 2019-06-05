@@ -93,7 +93,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         bool isFirst;
         // Check if this is the first or second part of a ligature
         Object *nextSibling = neume->GetChild(position + 1);
-        if (nextSibling != nullptr) {
+        if (nextSibling != NULL) {
             Nc *nextNc = dynamic_cast<Nc*>(nextSibling);
             assert(nextNc);
             if (nextNc->GetLigated() == BOOLEAN_true) { //first part of the ligature

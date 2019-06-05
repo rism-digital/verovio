@@ -77,7 +77,7 @@ Toolkit::Toolkit(bool initFont)
 
 #ifdef USE_EMSCRIPTEN
     // Initialize editortoolkit later based on input.
-    m_editorToolkit = nullptr;
+    m_editorToolkit = NULL;
 #endif
 }
 
@@ -94,7 +94,7 @@ Toolkit::~Toolkit()
 #ifdef USE_EMSCRIPTEN
     if (m_editorToolkit) {
         delete m_editorToolkit;
-        m_editorToolkit = nullptr;
+        m_editorToolkit = NULL;
     }
 #endif
 }
@@ -559,7 +559,7 @@ bool Toolkit::LoadData(const std::string &data)
 
 #ifdef USE_EMSCRIPTEN
     // Create editor toolkit based on notation type.
-    if (m_editorToolkit != nullptr) {
+    if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
     }
     switch(m_doc.m_notationType) {
@@ -570,7 +570,7 @@ bool Toolkit::LoadData(const std::string &data)
         case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
         default:
             LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
-            m_editorToolkit = nullptr;
+            m_editorToolkit = NULL;
     }
 #endif
 
@@ -584,7 +584,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
         return "";
     }
 
-    int initialPageNo = (m_doc.GetDrawingPage() == nullptr) ? -1 : m_doc.GetDrawingPage()->GetIdx();
+    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
@@ -1068,7 +1068,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 {
-    int initialPageNo = (m_doc.GetDrawingPage() == nullptr) ? -1 : m_doc.GetDrawingPage()->GetIdx();
+    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;

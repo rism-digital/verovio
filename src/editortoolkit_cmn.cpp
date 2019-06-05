@@ -170,7 +170,7 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {
                 Object *child = dynamic_cast<Object *>(*it);
-                if (child == nullptr) continue;
+                if (child == NULL) continue;
                 PitchInterface *pi = child->GetPitchInterface();
                 assert(pi);
                 pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
