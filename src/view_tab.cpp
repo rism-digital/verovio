@@ -58,8 +58,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
     
-    TabGrp *tabGrp = note->IsTabGrpNote();
-    assert(tabGrp);
+    //TabGrp *tabGrp = note->IsTabGrpNote();
+    //assert(tabGrp);
     
     dc->StartGraphic(note, "", note->GetUuid());
     

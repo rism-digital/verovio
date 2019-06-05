@@ -733,12 +733,12 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
                 minX = x - barLineWidth / 2;
                 maxX = x2 + barLineWidth / 2;
             }
-            Object lines;
-            lines.SetParent(system);
-            lines.UpdateContentBBoxX(minX, maxX);
-            lines.UpdateContentBBoxY(yTop, yBottom);
+            Object fullLine;
+            fullLine.SetParent(system);
+            fullLine.UpdateContentBBoxX(minX, maxX);
+            fullLine.UpdateContentBBoxY(yTop, yBottom);
             int margin = m_doc->GetDrawingUnit(100) / 2;
-            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
+            system->m_systemAligner.FindAllIntersectionPoints(line, fullLine, { DIR, DYNAM, TEMPO }, margin);
         }
     }
 
@@ -991,8 +991,25 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
-        // For drawing rectangles instead of lines
+
+        SegmentedLine line(x1, x2);
+        // We do not need to do this during layout calculation - and only with tablature
+        if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature()) {
+            Object fullLine;
+            fullLine.SetParent(system);
+            fullLine.UpdateContentBBoxY(y + (lineWidth / 2), y - (lineWidth / 2));
+            fullLine.UpdateContentBBoxX(x1, x2);
+            int margin = m_doc->GetDrawingUnit(100) / 2;
+            ArrayOfObjects notes;
+            ClassIdComparison matchClassId(NOTE);
+            staff->FindAllChildByComparison(&notes, &matchClassId);
+            for (auto &note : notes) {
+                if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
+                    line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+                }
+            }
+        }
+        DrawHorizontalSegmentedLine(dc, y, line, lineWidth);
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
 
