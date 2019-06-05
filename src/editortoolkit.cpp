@@ -1338,6 +1338,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                     fullString = fullString + currentString;
                 }
             }
+            //find the new boundingbox comprising all of the text
             int ulx = -1, uly = -1, lrx = -1, lry = -1;
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *> ((*it)->FindChildByType(SYL)->GetFacsimileInterface());
@@ -1355,6 +1356,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                 }
             }
             Text *text = dynamic_cast<Text *> (fullSyl->FindChildByType(TEXT));
+            assert(text);
             text->SetText(fullString);
             fullSyllable->AddChild(fullSyl);
             for (auto it = elements.begin(); it != elements.end(); ++it) {
@@ -1365,12 +1367,18 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             doubleParent->AddChild(fullSyllable);
             Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
             assert(layer);
-            if (ulx != -1) {
+            if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
                 FacsimileInterface *facsInter = dynamic_cast <FacsimileInterface *> (fullSyl->GetFacsimileInterface());
+                assert(facsInter);
                 Zone *zone = dynamic_cast <Zone *> (facsInter->GetZone());
+                assert(zone);
+                assert(ulx >= 0);
                 zone->SetUlx(ulx);
+                assert(uly >= 0);
                 zone->SetUly(uly);
+                assert(lrx >= 0);
                 zone->SetLrx(lrx);
+                assert(lry >= 0);
                 zone->SetLry(lry);
             }
             layer->ReorderByXPos();
