@@ -118,6 +118,7 @@ class Space;
 class Staff;
 class Subst;
 class Supplied;
+class Surface;
 class Svg;
 class Syl;
 class Syllable;

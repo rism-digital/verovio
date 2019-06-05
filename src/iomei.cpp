@@ -102,6 +102,7 @@
 #include "staffgrp.h"
 #include "subst.h"
 #include "supplied.h"
+#include "surface.h"
 #include "svg.h"
 #include "syl.h"
 #include "syllable.h"

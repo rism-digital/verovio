@@ -14,6 +14,7 @@
 //---------------------------------------------------------------------------
 
 #include "facsimile.h"
+#include "surface.h"
 #include "view.h"
 #include "vrv.h"
 

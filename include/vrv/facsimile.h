@@ -60,7 +60,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Facsimile(); 
+    Facsimile();
     virtual ~Facsimile();
     virtual void Reset();
     virtual ClassId GetClassId() const { return FACSIMILE; }
@@ -71,32 +71,6 @@ public:
     Zone *FindZoneByUuid(std::string zoneId);
     int GetMaxY();
     int GetMaxX();
-};
-
-//----------------------------------------------------------------------------
-// Surface 
-//----------------------------------------------------------------------------
-/**
- * Implements the surface element
- * in MEI
- */
-
-class Surface : public Object, public AttTyped, public AttCoordinated {
-public:
-    /**
-     * @name Constructors, destructors, reset, and class name methods
-     */
-    ///@{
-    Surface();
-    virtual ~Surface();
-    virtual void Reset();
-    ClassId GetClassId() const { return SURFACE; }
-    ///@}
-    virtual void AddChild(Object *object); 
-
-    int GetMaxX();
-    int GetMaxY();
-private:
 };
 
 }
