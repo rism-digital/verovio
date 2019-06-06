@@ -72,7 +72,7 @@ public:
     ///@}
 
     /**
-     * @name Get the Y drawing position
+     * @name Get the X and Y drawing position
      */
     ///@{
     virtual int GetDrawingY() const;

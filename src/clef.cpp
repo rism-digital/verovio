@@ -22,12 +22,12 @@ namespace vrv {
 // Clef
 //----------------------------------------------------------------------------
 
-Clef::Clef() : LayerElement("clef-"), FacsimileInterface(), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement()
+Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement()
 {
     Init();
 }
 
-Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-"), FacsimileInterface()
+Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-")
 {
     Init();
 
@@ -40,7 +40,6 @@ Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-"), Facsimile
 
 void Clef::Init()
 {
-    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LINELOC);
@@ -54,7 +53,6 @@ Clef::~Clef() {}
 void Clef::Reset()
 {
     LayerElement::Reset();
-    FacsimileInterface::Reset();
     ResetClefShape();
     ResetColor();
     ResetLineLoc();
@@ -93,27 +91,4 @@ int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, dat
     return place << 24 | octaveDis << 16 | line << 8 | shape;
 }
 
-int Clef::GetDrawingX() const
-{
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    assert(doc);
-    if (this->HasFacs() && doc->GetType() == Facs) {
-        return FacsimileInterface::GetDrawingX();
-    }
-    else {
-        return LayerElement::GetDrawingX();
-    }
-}
-
-int Clef::GetDrawingY() const
-{
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    assert(doc);
-    if (this->HasFacs() && doc->GetType() == Facs) {
-        return FacsimileInterface::GetDrawingY();
-    }
-    else {
-        return LayerElement::GetDrawingY();
-    }
-}
 } // namespace vrv

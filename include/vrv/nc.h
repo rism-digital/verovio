@@ -17,7 +17,6 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
-#include "facsimileinterface.h"
 #include "pitchinterface.h"
 #include "positioninterface.h"
 
@@ -33,7 +32,6 @@ namespace vrv {
 
 class Nc : public LayerElement,
            public DurationInterface,
-           public FacsimileInterface,
            public PitchInterface,
            public PositionInterface,
            public AttColor,
@@ -57,12 +55,8 @@ public:
      */
     ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
-    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
     virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
     ///@}
-    
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
 
 private:
 };

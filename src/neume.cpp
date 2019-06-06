@@ -42,10 +42,9 @@ std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PE
 // Neume
 //----------------------------------------------------------------------------
 
-Neume::Neume() : LayerElement("neume-"), FacsimileInterface(), ObjectListInterface(), AttColor()
+Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     Reset();
 }
 
@@ -54,7 +53,6 @@ Neume::~Neume() {}
 void Neume::Reset()
 {
     LayerElement::Reset();
-    FacsimileInterface::Reset();
     ResetColor();
 }
 
@@ -224,30 +222,6 @@ PitchInterface *Neume::GetLowestPitch()
         }
     }
     return min;
-}
-
-int Neume::GetDrawingX() const
-{
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    assert(doc);
-    if (this->HasFacs() && doc->GetType() == Facs) {
-        return FacsimileInterface::GetDrawingX();
-    }
-    else {
-        return LayerElement::GetDrawingX();
-    }
-}
-
-int Neume::GetDrawingY() const
-{
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    assert(doc);
-    if (this->HasFacs() && doc->GetType() == Facs) {
-        return FacsimileInterface::GetDrawingY();
-    }
-    else {
-        return LayerElement::GetDrawingY();
-    }
 }
 
 } // namespace vrv

@@ -142,7 +142,7 @@ int Staff::GetDrawingX() const
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     assert(doc);
-    if (this->HasFacs() && doc->GetType() == Facs) return FacsimileInterface::GetDrawingX();
+    if (this->HasFacs() && (doc->GetType() == Facs)) return FacsimileInterface::GetDrawingX();
     return Object::GetDrawingX();
 }
 
@@ -150,7 +150,7 @@ int Staff::GetDrawingY() const
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     assert(doc);
-    if (this->HasFacs() && doc->GetType() == Facs) return FacsimileInterface::GetDrawingY();
+    if (this->HasFacs() && (doc->GetType() == Facs)) return FacsimileInterface::GetDrawingY();
 
     if (m_yAbs != VRV_UNSET) return m_yAbs;
 

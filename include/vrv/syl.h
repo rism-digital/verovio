@@ -30,7 +30,6 @@ class TextElement;
  */
 
 class Syl : public LayerElement,
-            public FacsimileInterface,
             public TextListInterface,
             public TimeSpanningInterface,
             public AttLang,
@@ -56,7 +55,6 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
@@ -73,9 +71,6 @@ public:
      * Called from Syl::AdjustSylSpacing and System::AdjustSylSpacingEnd
      */
     int CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params);
-
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
 
     //----------//
     // Functors //
