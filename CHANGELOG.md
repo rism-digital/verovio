@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Support for `<turn>` in MusicXML import (@wergo)
+* Support for `<arpgeg>` in MusicXML import (@wergo)
 * Improved import of tuplets from PAE
 
 ## [2.1.0] - 2019-05-25
