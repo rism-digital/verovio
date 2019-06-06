@@ -23,6 +23,7 @@
 
 namespace vrv {
 
+class Arpeg;
 class Clef;
 class ControlElement;
 class Dir;
@@ -69,14 +70,26 @@ namespace musicxml {
 
     class OpenHairpin {
     public:
-        OpenHairpin(const int &dirN, const std::string &endID)
+        OpenHairpin(const int &dirN, const int &lastMeasureCount)
         {
             m_dirN = dirN;
-            m_endID = endID;
+            m_lastMeasureCount = lastMeasureCount;
         }
 
         int m_dirN;
-        std::string m_endID;
+        int m_lastMeasureCount;
+    };
+
+    class OpenArpeggio {
+    public:
+        OpenArpeggio(const int &arpegN, const int &timeStamp)
+        {
+            m_arpegN = arpegN;
+            m_timeStamp = timeStamp;
+        }
+
+        int m_arpegN;
+        int m_timeStamp;
     };
 
     class EndingInfo {
@@ -309,6 +322,9 @@ private:
     std::vector<Note *> m_tieStopStack;
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
+    /* The stack for hairpin stops that might occur before a hairpin was started staffNumber, tStamp2, (hairpinNumber,
+     * measureCount) */
+    std::vector<std::tuple<int, double, musicxml::OpenHairpin> > m_hairpinStopStack;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
     /* The stacks for ControlElements */
@@ -325,6 +341,10 @@ private:
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
     std::vector<musicxml::ClefChange> m_ClefChangeStack;
+    /* stack of new arpeggios that get more notes added. */
+    std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> > m_ArpeggioStack;
+    /* a map for the measure counts storing the index of each measure created */
+    std::map<Measure *, int> m_measureCounts;
 };
 
 } // namespace vrv

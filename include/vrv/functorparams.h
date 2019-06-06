@@ -1216,11 +1216,12 @@ public:
  * member 2: the non justifiable margin
  * member 3: the system full width (without system margins)
  * member 4: the functor to be redirected to the MeasureAligner
+ * member 5: the doc
  **/
 
 class JustifyXParams : public FunctorParams {
 public:
-    JustifyXParams(Functor *functor)
+    JustifyXParams(Functor *functor, Doc *doc)
     {
         m_measureXRel = 0;
         m_justifiableRatio = 1.0;
@@ -1228,6 +1229,7 @@ public:
         m_rightBarLineX = 0;
         m_systemFullWidth = 0;
         m_functor = functor;
+        m_doc = doc;
     }
     int m_measureXRel;
     double m_justifiableRatio;
@@ -1235,6 +1237,7 @@ public:
     int m_rightBarLineX;
     int m_systemFullWidth;
     Functor *m_functor;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
