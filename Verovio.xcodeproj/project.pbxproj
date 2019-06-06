@@ -732,7 +732,6 @@
 		BB4C4A8722A9321F001F6AF0 /* atts_visual.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4335C51ECF2310003BE1A9 /* atts_visual.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4A8822A93225001F6AF0 /* c_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DD11DC22240E78B00A405D8 /* c_wrapper.cpp */; };
 		BB4C4A8922A93225001F6AF0 /* c_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DD11DC32240E78B00A405D8 /* c_wrapper.h */; };
-		BB4C4A8A22A93225001F6AF0 /* git_commit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */; };
 		BB4C4A8C22A9328F001F6AF0 /* att.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D422103199805F700963292 /* att.cpp */; };
 		BB4C4A8D22A9328F001F6AF0 /* att.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4220FF199805E400963292 /* att.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4A8E22A9328F001F6AF0 /* attalternates.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4335CC1ED2BACB003BE1A9 /* attalternates.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2461,6 +2460,7 @@
 				BB4C4A4E22A930A3001F6AF0 /* Sources */,
 				BB4C4A4F22A930A3001F6AF0 /* Frameworks */,
 				BB4C4A5022A930A3001F6AF0 /* Resources */,
+				BBBC56AE22A958A000CFF6FD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -2529,7 +2529,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh";
+			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh\n";
 		};
 		4D9C5F361ADBADDA005D3031 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2542,7 +2542,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh";
+			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh\n";
+		};
+		BBBC56AE22A958A000CFF6FD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
