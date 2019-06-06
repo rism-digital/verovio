@@ -208,8 +208,16 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
     if (m_elementStack.empty()) {
         layer->AddChild(element);
     }
-    else
-        (m_elementStack.back()->AddChild(element));
+    else {
+        if (element->Is(CLEF)) {
+            std::vector<LayerElement *>::reverse_iterator riter;
+            for (riter = m_elementStack.rbegin(); riter != m_elementStack.rend(); ++riter) {
+                if (!(*riter)->Is(CHORD)) (*riter)->AddChild(element);
+            }
+        }
+        else
+            (m_elementStack.back()->AddChild(element));
+    }
 }
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
