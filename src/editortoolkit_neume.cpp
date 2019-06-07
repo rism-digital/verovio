@@ -1369,7 +1369,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
                     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-                    if (Att::SetVisual(firstNc, "ligature", "false")) success1 = true;
+                    if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
                     int ligUlx = firstNc->GetZone()->GetUlx();
                     int ligUly = firstNc->GetZone()->GetUly();
@@ -1388,7 +1388,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     secondNc->ResetFacsimile();
                     secondNc->SetFacs(zone->GetUuid());
 
-                    if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;
+                    if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
                     if(success1 && success2){
                         ligCount = 0;
                         firstNc = NULL;
@@ -1584,7 +1584,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     Zone *zone = new Zone();
     //set ligature to false and update zone of second Nc
     if(isLigature == "true"){
-        if (Att::SetVisual(firstNc, "ligature", "false")) success1 = true;
+        if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
         int ligUlx = firstNc->GetZone()->GetUlx();
         int ligUly = firstNc->GetZone()->GetUly();
@@ -1609,11 +1609,11 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         secondNc->ResetFacsimile();
         secondNc->SetFacs(zone->GetUuid());
 
-        if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;
+        if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
     }
     //set ligature to true and update zones to be the same
     else if (isLigature == "false"){
-        if (Att::SetVisual(firstNc, "ligature", "true")) success1 = true;
+        if (Att::SetNeumes(firstNc, "ligated", "true")) success1 = true;
 
         zone->SetUlx(firstNc->GetZone()->GetUlx());
         zone->SetUly(firstNc->GetZone()->GetUly());
@@ -1627,7 +1627,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         secondNc->ResetFacsimile();
         secondNc->SetFacs(zone->GetUuid());
 
-        if (Att::SetVisual(secondNc, "ligature", "true")) success2 = true;
+        if (Att::SetNeumes(secondNc, "ligated", "true")) success2 = true;
     }
     else {
         LogWarning("isLigature is invalid!");
