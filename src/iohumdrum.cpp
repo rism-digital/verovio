@@ -3083,8 +3083,8 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 
     InstrDef *idef = new InstrDef;
     staffdef->AddChild(idef);
-    int offset = 1; // currently 1, should be 0 in MEI 4
-    idef->SetMidiInstrnum(gmpc + offset); // offset from 1 in MEI
+    int offset = 0; // 1 in MEI 3, and 0 in MEI 4
+    idef->SetMidiInstrnum(gmpc + offset);
     data_MIDINAMES idval = (data_MIDINAMES)(gmpc + 1);
     idef->SetMidiInstrname(idval);
 }
@@ -9214,9 +9214,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // bool beamstate = false;
 
     // Go back and link all partial beamed tuplets and non-beamed tuplets.
-	// Need to consider this case: (12,24,12.) where the (12,24) are a power-of-two duration,
-	// and the (12.) is also a power of two.  Maybe also merge single-tuplets into adjacent
-	// tuplets and/or have a preference for grouping at the beat level rather than sub-beat.
+    // Need to consider this case: (12,24,12.) where the (12,24) are a power-of-two duration,
+    // and the (12.) is also a power of two.  Maybe also merge single-tuplets into adjacent
+    // tuplets and/or have a preference for grouping at the beat level rather than sub-beat.
     hum::HumNum groupdur;
     bool hasRest = false;
     for (int i = 0; i < (int)poweroftwo.size(); ++i) {
@@ -9409,12 +9409,12 @@ if (tupletendboolean[i]) {
         tupletscale[i] = 1;
     }
     else {
-                        hum::HumNum newval = groupdur / 4 / dotlessdur[i] / tuptop[i];
-                        if (newval.isInteger()) {
-                                tupletscale[i] = newval.getNumerator();
-                        } else {
-                                tupletscale[i] = value;
-                        }
+        hum::HumNum newval = groupdur / 4 / dotlessdur[i] / tuptop[i];
+        if (newval.isInteger()) {
+            tupletscale[i] = newval.getNumerator();
+        } else {
+            tupletscale[i] = value;
+        }
     }
 }
         */
