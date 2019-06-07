@@ -2544,23 +2544,6 @@
 			shellPath = /bin/sh;
 			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh\n";
 		};
-		BBBC56AE22A958A000CFF6FD /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
