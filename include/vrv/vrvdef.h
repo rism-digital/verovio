@@ -34,7 +34,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 1
+#define VERSION_MINOR 2
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -387,6 +387,21 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define VRV_TEXT_E550 0xE550
 #define VRV_TEXT_E551 0xE551
 #define VRV_TEXT_E552 0xE552
+
+/**
+ * SMUFL Symbols used in figured bass included in VerovioText
+ * Text accidentals (266D to 266F)
+ * SMuFL accidentals (E260 to E264)
+ * SMuFL figured-bass figures (EA50 to EA62)
+ * SMuFL figured-bass supplement (ECC0)
+ */
+
+#define VRV_TEXT_HARM                                                                                                  \
+    L"\u266D\u266E\u266F"                                                                                              \
+    L"\uE260\uE261\uE262\uE263\uE264"                                                                                  \
+    L"\uEA50\uEA51\uEA52\uEA53\uEA54\uEA55\uEA56\uEA57\uEA58\uEA59\uEA5A\uEA5B\uEA5C\uEA5D\uEA5E"                      \
+    L"\uEA5F\uEA60\uEA61\uEA62"                                                                                        \
+    L"\uECC0"
 
 //----------------------------------------------------------------------------
 // data.LINEWIDTHTERM factors

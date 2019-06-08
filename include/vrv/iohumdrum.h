@@ -317,7 +317,7 @@ public:
     virtual ~HumdrumInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &humdrum);
+    virtual bool ImportString(const std::string &humdrum);
 
     void parseEmbeddedOptions(vrv::Doc &doc);
 
@@ -589,6 +589,7 @@ protected:
     std::wstring cleanHarmString3(const std::string &content);
     std::wstring cleanStringString(const std::string &content);
     std::vector<std::wstring> cleanFBString(const std::string &content);
+    std::wstring convertFBNumber(const string &input);
 
 private:
     // m_filename == Filename to read/was read.

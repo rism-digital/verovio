@@ -64,7 +64,7 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
     int toDcY = ToDeviceContextY(params.m_y);
 
     std::size_t prevPos = 0, pos;
-    while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prevPos)) != std::wstring::npos) {
+    while ((pos = s.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
             std::wstring substr = s.substr(prevPos, pos - prevPos);
@@ -89,7 +89,7 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
                 smuflAccid.push_back(SMUFL_E262_accidentalSharp);
             }
             else {
-                smuflAccid.push_back(0xE26D);
+                smuflAccid += accid;
             }
 
             FontInfo vrvTxt;

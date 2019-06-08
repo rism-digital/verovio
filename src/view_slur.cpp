@@ -511,12 +511,8 @@ float View::CalcInitialSlur(
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
 
-    ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    spannedElements->clear();
+    curve->ClearSpannedElements();
     for (auto &element : findSpannedLayerElementsParams.m_elements) {
-
-        CurveSpannedElement *spannedElement = new CurveSpannedElement;
-        spannedElement->m_boundingBox = element;
 
         Point pRotated;
         Point pLeft;
@@ -532,18 +528,21 @@ float View::CalcInitialSlur(
         //    spannedElements->push_back(spannedElement);
         //}
         if (((pLeft.x > p1.x) && (pLeft.x < p2.x)) || ((pRight.x > p1.x) && (pRight.x < p2.x))) {
-            spannedElements->push_back(spannedElement);
+            CurveSpannedElement *spannedElement = new CurveSpannedElement;
+            spannedElement->m_boundingBox = element;
+            curve->AddSpannedElement(spannedElement);
         }
     }
 
     for (auto &positioner : findSpannedLayerElementsParams.m_ties) {
         CurveSpannedElement *spannedElement = new CurveSpannedElement;
         spannedElement->m_boundingBox = positioner;
-        spannedElements->push_back(spannedElement);
+        curve->AddSpannedElement(spannedElement);
     }
 
     /************** angle **************/
 
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
     float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spannedElements->size() > 0));
     Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(p2, -slurAngle, p1);
 

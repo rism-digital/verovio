@@ -57,15 +57,16 @@ public:
 
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
-    int AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
+    int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
         Point &c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
-    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfCurveSpannedElements *spannedElements,
-        Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, float &angle, bool forceBothSides);
+    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
+        const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
+        curvature_CURVEDIR curveDir, float &angle, bool forceBothSides);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
     void GetControlPoints(
         Doc *doc, Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, int height, int staffSize);
-    void GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
+    void GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
         curvature_CURVEDIR curveDir, int staffSize);
 
     //----------//

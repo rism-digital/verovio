@@ -393,7 +393,7 @@ bool HumdrumInput::ImportFile()
 // HumdrumInput::ImportString -- Read a Humdrum file from a text string.
 //
 
-bool HumdrumInput::ImportString(std::string const &content)
+bool HumdrumInput::ImportString(const std::string &content)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
@@ -1173,7 +1173,7 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
     xmldata << "</extMeta>\n";
 
     pugi::xml_document tmpdoc;
-    pugi::xml_parse_result result = tmpdoc.load(xmldata.str().c_str());
+    pugi::xml_parse_result result = tmpdoc.load_string(xmldata.str().c_str());
     if (!result) {
         // some sort of error, so give up;
         cerr << "ExtMeta parse error: " << result.description() << endl;
@@ -4070,29 +4070,175 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
 std::vector<std::wstring> HumdrumInput::cleanFBString(const std::string &content)
 {
+    hum::HumRegex hre;
+    std::vector<std::string> pieces;
+    hre.split(pieces, content, " ");
+    std::vector<std::wstring> output(pieces.size());
+    for (int i = 0; i < (int)pieces.size(); i++) {
+        output[i] = convertFBNumber(pieces[i]);
+    }
+    return output;
+}
 
-    std::vector<std::wstring> output(1);
+//////////////////////////////
+//
+// HumdrumInput::convertFBNumber -- only allowing one digit at the moment.
+//
 
-    for (int i = 0; i < (int)content.size(); ++i) {
-        if (content[i] == ' ') {
-            output.resize(output.size() + 1);
-            continue;
-        }
-        if (content[i] == '-') {
-            output.back() += L"\u266D"; // unicode flat
-        }
-        else if (content[i] == '#') {
-            output.back() += L"\u266F"; // unicode sharp
-        }
-        else if (content[i] == 'n') {
-            output.back() += L"\u266E"; // unicode natural
-        }
-        else {
-            string tdee;
-            tdee = content[i];
-            output.back() += UTF8to16(tdee);
+std::wstring HumdrumInput::convertFBNumber(const string &input)
+{
+    std::wstring output;
+
+    int digit = -1;
+    for (int i = 0; i < (int)input.size(); i++) {
+        if (isdigit(input[i])) {
+            digit = input[i] - '0';
+            break;
         }
     }
+    int accidental = 0;
+    // accidental = 1 :: double-flat
+    // accidental = 2 :: flat
+    // accidental = 3 :: natural
+    // accidental = 4 :: sharp
+    // accidental = 5 :: double-sharp
+    // also allow "+" later
+    if (input.find("--") != std::string::npos) {
+        accidental = 1;
+    }
+    else if (input.find("##") != std::string::npos) {
+        accidental = 5;
+    }
+    else if (input.find("-") != std::string::npos) {
+        accidental = 2;
+    }
+    else if (input.find("#") != std::string::npos) {
+        accidental = 4;
+    }
+    else if (input.find("n") != std::string::npos) {
+        accidental = 3;
+    }
+    int slash = 0;
+    // slash = 1 :: forward slash
+    // slash = 2 :: back slash
+    // slash = 3 :: vertical slash
+    if (input.find("/") != std::string::npos) {
+        slash = 1;
+    }
+    else if (input.find("\\") != std::string::npos) {
+        slash = 2;
+    }
+    else if (input.find("|") != std::string::npos) {
+        slash = 3;
+    }
+
+    // accidental forced always in front of digit for now.
+    if (!slash) {
+        switch (accidental) {
+            case 1:
+                output = L"\uE264"; // SMUFL double-flat
+                break;
+            case 2:
+                // output = L"\u266D"; // unicode flat
+                output = L"\uE260"; // SMUFL flat
+                break;
+            case 3:
+                // output = L"\u266E"; // unicode natural
+                output = L"\uE261"; // SMUFL natural
+                break;
+            case 4:
+                // output = L"\u266F"; // unicode sharp
+                output = L"\uE262"; // SMUFL sharp
+                break;
+            case 5:
+                output = L"\uE263"; // SMUFL double-sharp
+                break;
+        }
+    }
+
+    if ((accidental > 0) && !slash) {
+        // j/J editorial alteration of accidental:
+        if (input.find("j") != std::string::npos) {
+            output = L"(" + output + L")";
+        }
+        else if (input.find("J") != std::string::npos) {
+            output = L"[" + output + L"]";
+        }
+    }
+
+    if (!slash || (slash && (accidental == 0))) {
+        // print regular number, slashed number must have accidental qualifier
+        switch (digit) {
+            case 0: output += L"\uEA50"; break;
+            case 1: output += L"\uEA51"; break;
+            case 2: output += L"\uEA52"; break;
+            case 3: output += L"\uEA54"; break;
+            case 4: output += L"\uEA55"; break;
+            case 5: output += L"\uEA57"; break;
+            case 6: output += L"\uEA5B"; break;
+            case 7: output += L"\uEA5D"; break;
+            case 8: output += L"\uEA60"; break;
+            case 9: output += L"\uEA61"; break;
+        }
+    }
+    else {
+        // slash should be drawn on number (but some numbers
+        // do not has slashes available).
+        switch (digit) {
+            case 0: output += L"\uEA50"; break; // draw without slash
+            case 1: output += L"\uEA51"; break; // draw without slash
+            case 2: output += L"\uEA53"; break; // only one style of slash
+            case 3: output += L"\uEA54"; break; // draw without slash
+            case 4: output += L"\uEA56"; break; // only one style of slash
+            case 5:
+                switch (slash) {
+                    case 1: output += L"\uEA5A"; break; // 5/
+                    case 2: output += L"\uEA59"; break; // 5\ .
+                    case 3: output += L"\uEA58"; break; // 5|
+                    default: output += L"\uEA57"; break; // 5
+                }
+                break;
+            case 6:
+                switch (slash) {
+                    case 2: output += L"\uEA6f"; break; // 6\ .
+                    case 1: // 6/
+                    case 3: output += L"\uEA5C"; break; // 6|
+                    default: output += L"\uEA5B"; break; // 6
+                }
+                break;
+            case 7:
+                switch (slash) {
+                    case 1: output += L"\uECC0"; break; // 7/
+                    case 2: output += L"\uEA5F"; break; // 7\ .
+                    case 3: output += L"\uEA5E"; break; // 7|
+                    default: output += L"\uEA5D"; break; // 7
+                }
+                break;
+            case 8: output += L"\uEA60"; break; // draw without slash
+            case 9: output += L"\uEA62"; break; // only one style of slash
+        }
+    }
+
+    if (input.find("i") != std::string::npos) {
+        output = L"(" + output + L")";
+    }
+    else if (input.find("I") != std::string::npos) {
+        output = L"[" + output + L"]";
+    }
+    else if (slash) {
+        if (input.find("j") != std::string::npos) {
+            output = L"(" + output + L")";
+        }
+        else if (input.find("J") != std::string::npos) {
+            output = L"[" + output + L"]";
+        }
+    }
+
+    /*
+		To convert a free-form string to UTF16:
+                string tdee;
+                output.back() += UTF8to16(tdee);
+    */
 
     return output;
 }

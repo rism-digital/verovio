@@ -20686,7 +20686,7 @@ HumNum HumdrumLine::getBeat(HumNum beatdur) const {
 }
 
 
-HumNum HumdrumLine::getBeat(string beatrecip) const {
+HumNum HumdrumLine::getBeatStr(string beatrecip) const {
 	HumNum beatdur = Convert::recipToDuration(beatrecip);
 	if (beatdur.isZero()) {
 		return beatdur;
@@ -25053,7 +25053,7 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 //
 
 bool MxmlEvent::hasChild(const char* query) const {
-	xpath_node result = m_node.select_single_node(query);
+	xpath_node result = m_node.select_node(query);
 	return !result.node().empty();
 }
 
@@ -26396,12 +26396,12 @@ int MxmlEvent::getDotCount(void) const {
 //
 
 string MxmlEvent::getRestPitch(void) const {
-	xpath_node rest = m_node.select_single_node("./rest");
+	xpath_node rest = m_node.select_node("./rest");
 	if (rest.node().empty()) {
 		// not a rest, so no pitch information.
 		return "";
 	}
-	xpath_node step = rest.node().select_single_node("./display-step");
+	xpath_node step = rest.node().select_node("./display-step");
 	if (step.node().empty()) {
 		// no vertical positioning information
 	}
@@ -26409,7 +26409,7 @@ string MxmlEvent::getRestPitch(void) const {
 	if (steptext.empty()) {
 		return "";
 	}
-	xpath_node octave = rest.node().select_single_node("./display-octave");
+	xpath_node octave = rest.node().select_node("./display-octave");
 	if (octave.node().empty()) {
 		// not enough vertical positioning information
 	}
@@ -42699,7 +42699,7 @@ bool Tool_mei2hum::convert(ostream& out, istream& input) {
 
 bool Tool_mei2hum::convert(ostream& out, const char* input) {
 	xml_document doc;
-	auto result = doc.load(input);
+	auto result = doc.load_string(input);
 	if (!result) {
 		cout << "\nXML content has syntax errors\n";
 		cout << "Error description:\t" << result.description() << "\n";
@@ -47530,7 +47530,7 @@ bool Tool_musicxml2hum::convert(ostream& out, istream& input) {
 
 bool Tool_musicxml2hum::convert(ostream& out, const char* input) {
 	xml_document doc;
-	auto result = doc.load(input);
+	auto result = doc.load_string(input);
 	if (!result) {
 		cout << "\nXML content has syntax errors\n";
 		cout << "Error description:\t" << result.description() << "\n";
@@ -47843,7 +47843,7 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 
 	// Sibelius method
 	xpath = "/score-partwise/work/work-title";
-	string worktitle = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
+	string worktitle = cleanSpaces(doc.select_node(xpath.c_str()).node().child_value());
 	bool worktitleQ = false;
 	if ((worktitle != "") && (worktitle != "Title")) {
 		string otl_record = "!!!OTL:\t";
@@ -47853,7 +47853,7 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 	}
 
 	xpath = "/score-partwise/movement-title";
-	string mtitle = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
+	string mtitle = cleanSpaces(doc.select_node(xpath.c_str()).node().child_value());
 	if (mtitle != "") {
 		string otl_record = "!!!OTL:\t";
 		if (worktitleQ) {
@@ -47866,7 +47866,7 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 	// COM: composer /////////////////////////////////////////////////////////
 	// CDT: composer's dates
 	xpath = "/score-partwise/identification/creator[@type='composer']";
-	string composer = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
+	string composer = cleanSpaces(doc.select_node(xpath.c_str()).node().child_value());
 	string cdt_record;
 	if (composer != "") {
 		if (hre.search(composer, R"(\((.*?\d.*?)\))")) {
@@ -47915,7 +47915,7 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 void Tool_musicxml2hum::addFooterRecords(HumdrumFile& outfile, xml_document& doc) {
 
 	// YEM: copyright
-	string copy = doc.select_single_node("/score-partwise/identification/rights").node().child_value();
+	string copy = doc.select_node("/score-partwise/identification/rights").node().child_value();
 	bool validcopy = true;
 	if (copy == "") {
 		validcopy = false;
@@ -51086,12 +51086,12 @@ bool Tool_musicxml2hum::getPartInfo(map<string, xml_node>& partinfo,
 
 string Tool_musicxml2hum::getChildElementText(xml_node root,
 		const char* xpath) {
-	return root.select_single_node(xpath).node().child_value();
+	return root.select_node(xpath).node().child_value();
 }
 
 string Tool_musicxml2hum::getChildElementText(xpath_node root,
 		const char* xpath) {
-	return root.node().select_single_node(xpath).node().child_value();
+	return root.node().select_node(xpath).node().child_value();
 }
 
 
@@ -54334,6 +54334,223 @@ bool Tool_phrase::hasPhraseMarks(HTp start) {
 		current = current->getNextToken();
 	}
 	return false;
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_gridtest::Tool_pnum -- Set the recognized options for the tool.
+//
+
+Tool_pnum::Tool_pnum(void) {
+	define("b|base=i:midi",      "numeric base of pitch to extract");
+	define("D|no-duration=b",    "do not include duration");
+	define("c|pitch-class=b",    "give numeric pitch-class rather than pitch");
+	define("o|octave=b",         "give octave rather than pitch");
+	define("r|rest=s:0",         "representation string for rests");
+	define("R|no-rests=b",       "do not include rests in conversion");
+	define("x|attacks-only=b",   "only mark lines with note attacks");
+}
+
+
+
+///////////////////////////////
+//
+// Tool_pnum::run -- Primary interfaces to the tool.
+//
+
+bool Tool_pnum::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_pnum::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	out << infile;
+	return status;
+}
+
+
+bool Tool_pnum::run(HumdrumFile& infile) {
+   initialize(infile);
+	processFile(infile);
+	infile.createLinesFromTokens();
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pnum::initialize --
+//
+
+void Tool_pnum::initialize(HumdrumFile& infile) {
+	m_midiQ = false;
+	if (getString("base") == "midi") {
+		m_base = 12;
+		m_midiQ = true;
+	} else {
+		// check base for valid numbers, but for now default to 12 if unknown
+		m_base = getInteger("base");
+	}
+
+	m_durationQ = !getBoolean("no-duration");
+	m_classQ    =  getBoolean("pitch-class");
+	m_octaveQ   =  getBoolean("octave");
+	m_attacksQ  =  getBoolean("attacks-only");
+	m_rest      =  getString("rest");
+	m_restQ     = !getBoolean("no-rests");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pnum::processFile --
+//
+
+void Tool_pnum::processFile(HumdrumFile& infile) {
+	vector<HTp> kex;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (*token == "**kern") {
+				kex.push_back(token);
+				continue;
+			}
+			if (!token->isData()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			convertTokenToBase(token);
+		}
+	}
+
+	string newex;
+	for (int i=0; i<(int)kex.size(); i++) {
+		if (m_midiQ) {
+			newex = "**pmid";
+		} else {
+			newex = "**b" + to_string(m_base);
+		}
+		kex[i]->setText(newex);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pnum::convertTokenToBase --
+//
+
+void Tool_pnum::convertTokenToBase(HTp token) {
+	string output;
+	int scount = token->getSubtokenCount();
+	for (int i=0; i<scount; i++) {
+		string subtok = token->getSubtoken(i);
+		output += convertSubtokenToBase(subtok);
+		if (i < scount - 1) {
+			output += " ";
+		}
+	}
+	token->setText(output);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pnum::convertSubtokenToBase --
+//
+
+string Tool_pnum::convertSubtokenToBase(const string& text) {
+	int pitch = 0;
+	if (text.find("r") == string::npos) {
+		switch (m_base) {
+			case 7:
+				pitch = Convert::kernToBase7(text);
+				break;
+			case 40:
+				pitch = Convert::kernToBase40(text);
+				break;
+			default:
+				pitch = Convert::kernToBase12(text);
+		}
+	} else if (!m_restQ) {
+		return ".";
+	}
+	string recip;
+	if (m_durationQ) {
+		HumRegex hre;
+		if (hre.search(text, "(\\d+%?\\d*\\.*)")) {
+			recip = hre.getMatch(1);
+		}
+	}
+
+	string output;
+
+	int pc = pitch % m_base;
+	int oct = pitch / m_base;
+
+	if (m_midiQ) {
+		// MIDI numbers use 5 for middle-C octave.
+		pitch += 12;
+	}
+
+	int tie = 1;
+	if (text.find("_") != string::npos) {
+		tie = -1;
+	}
+	if (text.find("]") != string::npos) {
+		tie = -1;
+	}
+	pitch *= tie;
+	if (m_attacksQ && pitch < 0) {
+		return ".";
+	}
+
+	if (m_durationQ) {
+		output += recip;
+		output += "/";
+	}
+	
+	if (text.find("r") != string::npos) {
+		output += m_rest;
+	} else {
+		if (!m_octaveQ && !m_classQ) {
+			output += to_string(pitch);
+		} else {
+			if (m_classQ) {
+				if (pitch < 0) {
+					output += "-";
+				}
+				output += to_string(pc);
+			}
+			if (m_classQ && m_octaveQ) {
+				output += ":";
+			}
+			if (m_octaveQ) {
+				output += to_string(oct);
+			}
+		}
+	}
+
+	return output;
 }
 
 

@@ -21,6 +21,7 @@ namespace vrv {
 
 class BarLine;
 class Beam;
+class Clef;
 class ControlElement;
 class Harm;
 class KeySig;
@@ -46,7 +47,7 @@ public:
     virtual ~AbcInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &abc);
+    virtual bool ImportString(const std::string &abc);
 
 #ifndef NO_ABC_SUPPORT
 
@@ -56,7 +57,7 @@ private:
     void parseABC(std::istream &infile);
 
     // parsing functions
-    int SetBarLine(const char *musicCode, int index);
+    int SetBarLine(const std::string &musicCode, int index);
     void CalcUnitNoteLength();
     void AddAnnot(std::string remark);
     void AddBeam();
@@ -75,7 +76,7 @@ private:
 
     // input functions
     void readInformationField(char dataKey, std::string dataValue);
-    void readMusicCode(const char *musicCode, Section *section);
+    void readMusicCode(const std::string &musicCode, Section *section);
 
     // decoration functions
     void parseDecoration(std::string decorationString);
@@ -96,10 +97,12 @@ public:
 private:
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
+    Clef *m_clef = NULL;
+    KeySig *m_key = NULL;
     MeterSig *m_meter = NULL;
     Layer *m_layer = NULL;
 
-    data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
+    data_DURATION m_durDefault; // todo: switch to MEI
     std::string m_ID;
     int m_unitDur;
     std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines

@@ -35,6 +35,7 @@ StaffDef::StaffDef()
     , AttScalable()
     , AttStaffDefLog()
     , AttStaffDefVis()
+    , AttTimeBase()
     , AttTransposition()
 {
     RegisterAttClass(ATT_DISTANCES);
@@ -44,6 +45,7 @@ StaffDef::StaffDef()
     RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFLOG);
     RegisterAttClass(ATT_STAFFDEFVIS);
+    RegisterAttClass(ATT_TIMEBASE);
     RegisterAttClass(ATT_TRANSPOSITION);
 
     Reset();
@@ -62,6 +64,7 @@ void StaffDef::Reset()
     ResetScalable();
     ResetStaffDefLog();
     ResetStaffDefVis();
+    ResetTimeBase();
     ResetTransposition();
 
     m_drawingVisibility = OPTIMIZATION_NONE;

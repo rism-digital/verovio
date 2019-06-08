@@ -1048,8 +1048,8 @@ class HumdrumLine : public std::string, public HumHash {
 		int      getKernNoteAttacks     (void);
 		int      addLinkedParameter     (HTp token);
 
-		HumNum   getBeat                (HumNum beatdur = "1") const;
-		HumNum   getBeat                (std::string beatrecip = "4") const;
+		HumNum   getBeat                (HumNum beatdur = 1) const;
+		HumNum   getBeatStr             (std::string beatrecip = "4") const;
 		HTp      getTrackStart          (int track) const;
 		void     setLineFromCsv         (const char* csv,
 		                                 const std::string& separator = ",");
@@ -5471,6 +5471,35 @@ class Tool_phrase : public HumTool {
 		bool                      m_remove2Q;
 		bool                      m_averageQ;
 		string                    m_color;
+
+};
+
+
+
+class Tool_pnum : public HumTool {
+	public:
+		      Tool_pnum               (void);
+		     ~Tool_pnum               () {};
+
+		bool  run                      (HumdrumFile& infile);
+		bool  run                      (const string& indata, ostream& out);
+		bool  run                      (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  initialize               (HumdrumFile& infile);
+		void  processFile              (HumdrumFile& infile);
+		std::string convertSubtokenToBase(const std::string& text);
+		void  convertTokenToBase       (HTp token);
+
+	private:
+		int  m_base = 12;
+		int  m_midiQ;
+		bool m_durationQ;
+		bool m_classQ;
+		bool m_octaveQ;
+		bool m_attacksQ;
+		std::string m_rest;
+		bool m_restQ;
 
 };
 

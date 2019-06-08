@@ -70,7 +70,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
     }
 
     // composer
-    node = header.select_single_node("//fileDesc/titleStmt/respStmt/persName[@role=\"composer\"]");
+    node = header.select_node("//fileDesc/titleStmt/respStmt/persName[@role=\"composer\"]");
     if (node) {
         Rend *composerRend = new Rend();
         composerRend->SetHalign(HORIZONTALALIGNMENT_right);
@@ -84,7 +84,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
     }
 
     // lyricist
-    node = header.select_single_node("//fileDesc/titleStmt/respStmt/persName[@role=\"lyricist\"]");
+    node = header.select_node("//fileDesc/titleStmt/respStmt/persName[@role=\"lyricist\"]");
     if (node) {
         Rend *lyricistRend = new Rend();
         lyricistRend->SetHalign(HORIZONTALALIGNMENT_left);

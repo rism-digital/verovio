@@ -47,10 +47,11 @@ class MidiEvent : public MidiMessage {
 		void       linkEvents            (MidiEvent* mev);
 		void       linkEvent             (MidiEvent& mev);
 		void       linkEvents            (MidiEvent& mev);
-		int        isLinked              (void);
+		int        isLinked              (void) const;
 		MidiEvent* getLinkedEvent        (void);
-		int        getTickDuration       (void);
-		double     getDurationInSeconds  (void);
+		const MidiEvent* getLinkedEvent  (void) const;
+		int        getTickDuration       (void) const;
+		double     getDurationInSeconds  (void) const;
 
 		int        tick;     // delta or absolute MIDI ticks
 		int        track;    // [original] track number of event in MIDI file

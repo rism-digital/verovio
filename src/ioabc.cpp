@@ -63,13 +63,15 @@ namespace vrv {
 #ifndef NO_ABC_SUPPORT
 
 // Global variables:
-char abcLine[10001] = { 0 };
+std::string abcLine;
 #define MAX_DATA_LEN 1024 // One line of the abc file would not be that long!
 char dataKey[MAX_DATA_LEN];
 char dataValue[MAX_DATA_LEN]; // ditto as above
 
 std::string pitch = "FCGDAEB";
 std::string shorthandDecoration = ".~HLMOPSTuv";
+std::string keyPitchAlter = "";
+int keyPitchAlterAmount = 0;
 
 //----------------------------------------------------------------------------
 // AbcInput
@@ -93,7 +95,7 @@ bool AbcInput::ImportFile()
     return true;
 }
 
-bool AbcInput::ImportString(std::string const &abc)
+bool AbcInput::ImportString(const std::string &abc)
 {
     std::istringstream in_stream(abc);
     parseABC(in_stream);
@@ -112,7 +114,7 @@ void AbcInput::parseABC(std::istream &infile)
     m_doc->SetType(Raw);
 
     // read file header
-    infile.getline(abcLine, 10000);
+    std::getline(infile, abcLine);
     while (abcLine[0] != 'X') {
         if (infile.eof()) {
             LogError("ABC input: No tune found");
@@ -122,132 +124,141 @@ void AbcInput::parseABC(std::istream &infile)
             LogWarning("ABC input: Stylesheet directives are ignored");
         else if (abcLine[1] == ':')
             readInformationField(abcLine[0], &abcLine[2]);
-        infile.getline(abcLine, 10000);
+        std::getline(infile, abcLine);
         ++m_lineNum;
     }
     CreateHeader();
 
-    // read tune header
-    readInformationField('X', &abcLine[2]);
-    while (abcLine[0] != 'K' && !infile.eof()) {
-        infile.getline(abcLine, 10000);
-        ++m_lineNum;
-        readInformationField(abcLine[0], &abcLine[2]);
-    }
-    if (m_title.empty()) {
-        LogWarning("ABC input: Title field missing, creating empty title");
-        m_title.push_back(std::make_pair("", 0));
-    }
-    // add work entry to meiHead
-    CreateWorkEntry();
-
-    // create score
-    assert(m_mdiv != NULL);
-    Score *score = new Score();
-    m_mdiv->AddChild(score);
-
-    // create page head
-    PrintInformationFields();
-    StaffGrp *staffGrp = new StaffGrp();
-    m_doc->m_scoreDef.AddChild(staffGrp);
-    StaffDef *staffDef = new StaffDef();
-    staffDef->SetN(1);
-    staffDef->SetLines(m_stafflines);
-    staffDef->SetTransSemi(m_transpose);
-    staffGrp->AddChild(staffDef);
-    if (m_meter) {
-        m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
-        m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
-        m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
-        delete m_meter;
-        m_meter = NULL;
-    }
-    // create section
-    Section *section = new Section();
-    // start with a new page
-    if (m_linebreak != '\0') {
-        Pb *pb = new Pb();
-        pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
-        section->AddChild(pb);
-    }
-    // calculate default unit note length
-    if (m_durDefault == DURATION_NONE) {
-        CalcUnitNoteLength();
-    }
-
-    // read music code
-    m_layer = new Layer();
-    m_layer->SetN(1);
     while (!infile.eof()) {
-        infile.getline(abcLine, 10000);
-        ++m_lineNum;
-        if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
-            // empty lines end tunes
-            break;
+        while (!(abcLine[0] == 'X' && abcLine[1] == ':') && !infile.eof()) {
+            std::getline(infile, abcLine);
+            ++m_lineNum;
         }
-        else if (abcLine[0] == 'X') {
-            LogDebug("ABC input: Reading only first tune in file");
-            break;
+        if (infile.eof()) break;
+
+        // read tune header
+        readInformationField('X', &abcLine[2]);
+        while (abcLine[0] != 'K' && !infile.eof()) {
+            std::getline(infile, abcLine);
+            ++m_lineNum;
+            readInformationField(abcLine[0], &abcLine[2]);
         }
-        else if (abcLine[0] == '%')
-            // skipping comments and stylesheet directives
-            continue;
-        else if (abcLine[1] == ':' && abcLine[0] != '|') {
-            if (abcLine[0] != 'K') {
-                readInformationField(abcLine[0], &abcLine[2]);
+        if (infile.eof()) break;
+        if (m_title.empty()) {
+            LogWarning("ABC input: Title field missing, creating empty title");
+            m_title.push_back(std::make_pair("", 0));
+        }
+        // add work entry to meiHead
+        CreateWorkEntry();
+
+        // create score
+        assert(m_mdiv != NULL);
+        Score *score = new Score();
+        if (!m_doc->m_scoreDef.GetFirst(STAFFGRP)) {
+            m_mdiv->AddChild(score);
+
+            // create page head
+            PrintInformationFields();
+            StaffGrp *staffGrp = new StaffGrp();
+            // create staff
+            StaffDef *staffDef = new StaffDef();
+            staffDef->SetN(1);
+            staffDef->SetLines(m_stafflines);
+            staffDef->SetTransSemi(m_transpose);
+            if (m_clef) {
+                staffDef->SetClefShape(m_clef->GetShape());
+                staffDef->SetClefLine(m_clef->GetLine());
+                delete m_clef;
+                m_clef = NULL;
+            }
+            staffGrp->AddChild(staffDef);
+            m_doc->m_scoreDef.AddChild(staffGrp);
+            if (m_key) {
+                // waiting for fix
+                // m_doc->m_scoreDef.SetKeyMode(m_key->GetMode());
+                // m_doc->m_scoreDef.SetKeyPname(m_key->GetPname());
+                // m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(m_key->GetSig()));
+                delete m_key;
+                m_key = NULL;
+            }
+            if (m_meter) {
+                m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
+                m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
+                m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
+                delete m_meter;
+                m_meter = NULL;
+            }
+        }
+
+        // create section
+        Section *section = new Section();
+        // start with a new page
+        if (m_linebreak != '\0') {
+            Pb *pb = new Pb();
+            pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
+            section->AddChild(pb);
+        }
+        // calculate default unit note length
+        if (m_durDefault == DURATION_NONE) {
+            CalcUnitNoteLength();
+        }
+
+        // read music code
+        m_layer = new Layer();
+        m_layer->SetN(1);
+        while (!infile.eof()) {
+            std::getline(infile, abcLine);
+            ++m_lineNum;
+            if (std::string(abcLine).find_first_not_of(' ') == std::string::npos) {
+                // abc tunes are separated from each other by empty lines
+                break;
+            }
+            else if (abcLine[0] == '%')
+                // skipping comments and stylesheet directives
+                continue;
+            else if (abcLine[1] == ':' && abcLine[0] != '|') {
+                if (abcLine[0] != 'K') {
+                    readInformationField(abcLine[0], &abcLine[2]);
+                }
+                else {
+                    LogWarning("ABC input: Key changes not supported", abcLine[0]);
+                }
             }
             else {
-                LogWarning("ABC input: Key changes not supported", abcLine[0]);
+                readMusicCode(abcLine, section);
             }
         }
-        else {
-            readMusicCode(abcLine, section);
+
+        // add ornaments, ties, and slur
+        Layer *layer = NULL;
+        Measure *measure = NULL;
+        for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
+            if (!measure || (layer && layer->GetUuid() != iter->first)) {
+                layer = dynamic_cast<Layer *>(section->FindChildByUuid(iter->first));
+            }
+            if (!layer) {
+                LogWarning("ABC input: Element '%s' could not be assigned to layer '%s'",
+                    iter->second->GetClassName().c_str(), iter->first.c_str());
+                delete iter->second;
+                continue;
+            }
+            measure = dynamic_cast<Measure *>(layer->GetFirstParent(MEASURE));
+            assert(measure);
+            measure->AddChild(iter->second);
         }
+
+        score->AddChild(section);
+
+        // only append first tune in file
+        if (!score->GetFirstParent(MDIV)) delete score;
     }
 
-    // add ornaments, ties, and slur
-    Layer *layer = NULL;
-    Measure *measure = NULL;
-    for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-        if (!measure || (layer->GetUuid() != iter->first)) {
-            layer = dynamic_cast<Layer *>(section->FindChildByUuid(iter->first));
-        }
-        if (!layer) {
-            LogWarning("ABC input: Element '%s' could not be assigned to layer '%s'",
-                iter->second->GetClassName().c_str(), iter->first.c_str());
-            continue;
-        }
-        measure = dynamic_cast<Measure *>(layer->GetFirstParent(MEASURE));
-        measure->AddChild(iter->second);
-    }
-
-    score->AddChild(section);
-
-    m_doc->ConvertToPageBasedDoc();
+    m_controlElements.clear();
     m_composer.clear();
     m_info.clear();
     m_title.clear();
 
-    /* check other tunes
-    while (!infile.eof()) {
-        infile.getline(abcLine, 10000);
-        ++m_lineNum;
-        if (abcLine[0] == 'X') {
-            readInformationField('X', &abcLine[2]);
-            while (abcLine[0] != 'K') {
-                infile.getline(abcLine, 10000);
-                ++m_lineNum;
-                readInformationField(abcLine[0], &abcLine[2]);
-            }
-            if (m_title.empty()) {
-                LogWarning("ABC input: Title field missing, creating empty title");
-                m_title.push_back(std::make_pair("", 0));
-            }
-            // add work entry to meiHead
-            CreateWorkEntry();
-        }
-    }
-    */
+    m_doc->ConvertToPageBasedDoc();
 }
 
 /**********************************
@@ -263,13 +274,13 @@ void AbcInput::parseABC(std::istream &infile)
  BARRENDITION_dbl        ||
  */
 
-int AbcInput::SetBarLine(const char *musicCode, int i)
+int AbcInput::SetBarLine(const std::string &musicCode, int i)
 {
-    data_BARRENDITION barLine;
-    if (musicCode[i - 1] == ':')
+    data_BARRENDITION barLine = BARRENDITION_NONE;
+    if (i >= 1 && musicCode.at(i - 1) == ':')
         barLine = BARRENDITION_rptend;
-    else {
-        switch (musicCode[i + 1]) {
+    else if (i + 1 < (int)musicCode.length()) {
+        switch (musicCode.at(i + 1)) {
             case ':':
                 barLine = BARRENDITION_rptstart;
                 ++i;
@@ -285,6 +296,8 @@ int AbcInput::SetBarLine(const char *musicCode, int i)
             default: barLine = BARRENDITION_single; break;
         }
     }
+    else
+        barLine = BARRENDITION_single;
     // if the measure is still empty, put the bar line on the left
     if (!m_layer->GetChildCount())
         m_barLines.first = barLine;
@@ -566,6 +579,8 @@ void AbcInput::parseKey(std::string keyString)
     m_ID = "";
     short int accidNum = 0;
     data_MODE mode = MODE_NONE;
+    // m_key = new KeySig();
+    m_clef = new Clef();
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
@@ -644,12 +659,24 @@ void AbcInput::parseKey(std::string keyString)
 
     // we need set @key.sig for correct rendering
     if (accidNum != 0) {
+
         std::string keySig;
-        if (accidNum < 0)
+        unsigned long posStart = 0;
+        auto posEnd = static_cast<unsigned long>(abs(accidNum));
+
+        if (accidNum < 0) {
             keySig = StringFormat("%df", abs(accidNum));
-        else if (accidNum > 0)
+            posStart = pitch.size() - posEnd;
+            keyPitchAlterAmount = -1;
+        }
+        else if (accidNum > 0) {
             keySig = StringFormat("%ds", accidNum);
+            keyPitchAlterAmount = 1;
+        }
+
+        // m_doc->m_scoreDef.SetSig(keySig);
         m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
+        keyPitchAlter = pitch.substr(posStart, posEnd);
     }
 
     // set clef
@@ -657,11 +684,32 @@ void AbcInput::parseKey(std::string keyString)
     // [<line number>] - indicates on which staff line the base clef is written. Defaults are: treble: 2; alto: 3;
     // tenor: 4; bass: 4.
     // [+8 | -8] - draws '8' above or below the staff. The player will transpose the notes one octave higher or lower.
-    if (keyString.find("clef") != std::string::npos) LogWarning("ABC input: 'clef' is not supported yet.");
-
-    // for now only default treble clef
-    m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_G);
-    m_doc->m_scoreDef.SetClefLine(2);
+    if (keyString.find("alto") != std::string::npos) {
+        m_clef->SetShape(CLEFSHAPE_C);
+        i += 4;
+        m_clef->SetLine(3);
+    }
+    else if (keyString.find("tenor") != std::string::npos) {
+        m_clef->SetShape(CLEFSHAPE_C);
+        i += 5;
+        m_clef->SetLine(4);
+    }
+    else if (keyString.find("bass") != std::string::npos) {
+        m_clef->SetShape(CLEFSHAPE_F);
+        i += 4;
+        m_clef->SetLine(4);
+    }
+    else if (keyString.find("perc") != std::string::npos) {
+        LogWarning("ABC Input: Drum clef is not supported");
+    }
+    else if (keyString.find("none") != std::string::npos) {
+        i += 4;
+        m_clef->SetShape(CLEFSHAPE_NONE);
+    }
+    else {
+        m_clef->SetShape(CLEFSHAPE_G);
+        m_clef->SetLine(2);
+    }
 
     if (keyString.find("transpose=", i) != std::string::npos) {
         i = int(keyString.find("transpose=", i)) + 10;
@@ -761,6 +809,9 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
         m_mdiv->SetN(std::to_string(mdivNum));
     }
     m_doc->AddChild(m_mdiv);
+
+    // reset unit note length
+    m_durDefault = DURATION_NONE;
 
     // reset information fields
     m_composer.clear();
@@ -937,65 +988,28 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         return;
     }
 
-    if (dataKey == 'B') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
+    switch (dataKey) {
+        case 'B': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'C': m_composer.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'D': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'F': m_filename = value; break;
+        case 'H': m_history.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'I': parseInstruction(value); break;
+        case 'K': parseKey(value); break;
+        case 'L': parseUnitNoteLength(value); break;
+        case 'M': parseMeter(value); break;
+        case 'N': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'O': m_origin.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'Q': parseTempo(value); break;
+        case 'S': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        case 'T': m_title.push_back(std::make_pair(value, m_lineNum)); break;
+        case 'U': LogWarning("ABC input: User defined sympols are not supported"); break;
+        case 'V': LogWarning("ABC input: Multi-voice music is not supported"); break;
+        case 'W': LogWarning("ABC input: Lyrics are not supported yet"); break;
+        case 'X': parseReferenceNumber(value); break;
+        case 'Z': m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey)); break;
+        default: LogWarning("ABC input: Information field %c is ignored", dataKey);
     }
-    else if (dataKey == 'C') {
-        m_composer.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'D') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else if (dataKey == 'F') {
-        m_filename = value;
-    }
-    else if (dataKey == 'H') {
-        m_history.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'I') {
-        parseInstruction(value);
-    }
-    else if (dataKey == 'K') {
-        parseKey(value);
-    }
-    else if (dataKey == 'L') {
-        parseUnitNoteLength(value);
-    }
-    else if (dataKey == 'M') {
-        parseMeter(value);
-    }
-    else if (dataKey == 'N') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else if (dataKey == 'O') {
-        m_origin.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'Q') {
-        parseTempo(value);
-    }
-    else if (dataKey == 'S') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else if (dataKey == 'T') {
-        m_title.push_back(std::make_pair(value, m_lineNum));
-    }
-    else if (dataKey == 'U') {
-        LogWarning("ABC input: User defined sympols are not supported");
-    }
-    else if (dataKey == 'V') {
-        LogWarning("ABC input: Multi-voice music is not supported");
-    }
-    else if (dataKey == 'W') {
-        LogWarning("ABC input: Lyrics are not supported yet");
-    }
-    else if (dataKey == 'X') {
-        parseReferenceNumber(value);
-    }
-    else if (dataKey == 'Z') {
-        m_info.push_back(std::make_pair(std::make_pair(value, m_lineNum), dataKey));
-    }
-    else
-        LogWarning("ABC input: Information field %c is ignored", dataKey);
 }
 
 //////////////////////////////
@@ -1004,7 +1018,7 @@ void AbcInput::readInformationField(char dataKey, std::string value)
 // parse abc music code
 //
 
-void AbcInput::readMusicCode(const char *musicCode, Section *section)
+void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
 {
     assert(section);
 
@@ -1014,39 +1028,39 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     data_GRACE grace = GRACE_NONE;
     Chord *chord = NULL;
 
-    while (i < int(strlen(musicCode))) {
+    while (i < (int)musicCode.length()) {
         // eat the input...
 
-        if (musicCode[i] == '`') {
+        if (musicCode.at(i) == '`') {
             // keeps a beam
         }
-        if (isspace(musicCode[i])) {
+        if (isspace(musicCode.at(i))) {
             // always ends a beam
             AddBeam();
         }
 
         // comments
-        else if (musicCode[i] == '%') {
+        else if (musicCode.at(i) == '%') {
             break;
         }
 
         // endings
-        else if (musicCode[i] == '[' && isdigit(musicCode[i + 1])) {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '[' && isdigit(musicCode.at(i + 1))) {
             ++i;
             // Ending *ending = new Ending;
-            // ending->SetN(musicCode[i]);
+            // ending->SetN(musicCode.at(i));
             ++i;
         }
 
         // inline fields
-        else if (musicCode[i] == '[' && musicCode[i + 2] == ':') {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '[' && musicCode.at(i + 2) == ':') {
             ++i;
-            char dataKey = musicCode[i];
+            char dataKey = musicCode.at(i);
             ++i;
             ++i;
             std::string information;
-            while (musicCode[i] != ']') {
-                information.push_back(musicCode[i]);
+            while (musicCode.at(i) != ']') {
+                information.push_back(musicCode.at(i));
                 ++i;
             }
             if (dataKey == 'r')
@@ -1056,23 +1070,24 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // linebreaks
-        else if (musicCode[i] == m_linebreak) {
+        else if (musicCode.at(i) == m_linebreak) {
+            AddBeam();
             Sb *sb = new Sb();
             section->AddChild(sb);
         }
 
         // decorations
-        else if (shorthandDecoration.find(musicCode[i]) != std::string::npos) {
+        else if (shorthandDecoration.find(musicCode.at(i)) != std::string::npos) {
             std::string shorthandDecorationString;
-            shorthandDecorationString.push_back(musicCode[i]);
+            shorthandDecorationString.push_back(musicCode.at(i));
             parseDecoration(shorthandDecorationString);
         }
-        else if (musicCode[i] == m_decoration) {
+        else if (musicCode.at(i) == m_decoration) {
             ++i;
-            if (!isspace(musicCode[i])) {
+            if (!isspace(musicCode.at(i))) {
                 std::string decorationString;
-                while (musicCode[i] != m_decoration) {
-                    decorationString.push_back(musicCode[i]);
+                while (musicCode.at(i) != m_decoration) {
+                    decorationString.push_back(musicCode.at(i));
                     ++i;
                 }
                 parseDecoration(decorationString);
@@ -1080,24 +1095,24 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // tuplets
-        else if (musicCode[i] == '(' && isdigit(musicCode[i + 1])) {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '(' && isdigit(musicCode.at(i + 1))) {
             LogWarning("ABC input: Tuplets not supported yet");
             // AddTuplet();
         }
 
         // slurs and ties
-        else if (musicCode[i] == '(') {
+        else if (musicCode.at(i) == '(') {
             StartSlur();
         }
-        else if (musicCode[i] == ')') {
+        else if (musicCode.at(i) == ')') {
             EndSlur();
         }
-        else if (musicCode[i] == '-') {
+        else if (musicCode.at(i) == '-') {
             AddTie();
         }
 
         // chords
-        else if (musicCode[i] == '[' && musicCode[i + 1] != '|') {
+        else if ((i + 2 < (int)musicCode.length()) && musicCode.at(i) == '[' && musicCode.at(i + 1) != '|') {
             // start chord
             chord = new Chord();
 
@@ -1116,7 +1131,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 AddFermata(chord);
             }
         }
-        else if (musicCode[i] == ']' && musicCode[i - 1] != '|') {
+        else if (i >= 1 && musicCode.at(i) == ']' && musicCode.at(i - 1) != '|') {
             // end chord
             if (chord->GetDur() < DURATION_8) {
                 // if chord cannot be beamed, write it directly to the layer
@@ -1129,12 +1144,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // grace notes
-        else if ((musicCode[i] == '{') || (musicCode[i] == '}')) {
+        else if ((i + 2 < (int)musicCode.length()) && ((musicCode.at(i) == '{') || (musicCode.at(i) == '}'))) {
             // !to be refined when graceGrp is added!
             // start grace group
-            if ((musicCode[i] == '{')) {
+            if (musicCode.at(i) == '{') {
                 grace = GRACE_acc;
-                if ((musicCode[i + 1] == '/')) {
+                if (musicCode.at(i + 1) == '/') {
                     grace = GRACE_unacc;
                     ++i;
                 }
@@ -1148,34 +1163,49 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // note
-        else if (pitch.find(toupper(musicCode[i])) != std::string::npos) {
+        else if (pitch.find(toupper(musicCode.at(i))) != std::string::npos) {
             int oct = 0;
             Note *note = new Note;
             m_ID = note->GetUuid();
 
             // accidentals
-            if (musicCode[i - 1] == '^' || musicCode[i - 1] == '=' || musicCode[i - 1] == '_') {
-                // todo: double sharps and double flats
+            if (i >= 1) {
                 Accid *accid = new Accid();
-                switch (musicCode[i - 1]) {
-                    case '^': accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                switch (musicCode.at(i - 1)) {
+                    case '^':
+                        i > 1 && musicCode.at(i - 2) == '^' ? accid->SetAccid(ACCIDENTAL_WRITTEN_x)
+                                                            : accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+                        break;
                     case '=': accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
-                    case '_': accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                    case '_':
+                        i > 1 && musicCode.at(i - 2) == '_' ? accid->SetAccid(ACCIDENTAL_WRITTEN_ff)
+                                                            : accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+                        break;
                     default: break;
                 }
                 note->AddChild(accid);
             }
 
+            if (keyPitchAlter.find(static_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
+                auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                if (!accid) {
+                    accid = new Accid();
+                    note->AddChild(accid);
+                    accid->IsAttribute(true);
+                    accid->SetAccidGes((keyPitchAlterAmount < 0) ? ACCIDENTAL_GESTURAL_f : ACCIDENTAL_GESTURAL_s);
+                }
+            }
+
             // set pitch name
-            if (isupper(musicCode[i]))
+            if (isupper(musicCode.at(i)))
                 oct = 4;
             else
                 oct = 5;
-            note->SetPname(note->AttPitch::StrToPitchname(std::string(1, tolower(musicCode[i]))));
+            note->SetPname(note->AttPitch::StrToPitchname(std::string(1, tolower(musicCode.at(i)))));
 
             // set octave
-            while (musicCode[i + 1] == '\'' || musicCode[i + 1] == ',') {
-                if (musicCode[i + 1] == ',')
+            while (i + 1 < (int)musicCode.length() && (musicCode.at(i + 1) == '\'' || musicCode.at(i + 1) == ',')) {
+                if (musicCode.at(i + 1) == ',')
                     oct -= 1;
                 else
                     oct += 1;
@@ -1191,24 +1221,24 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 dots = -m_broken;
                 m_broken = 0;
             }
-            while (isdigit(musicCode[i + 1])) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
-                numStr.push_back(musicCode[i]);
+                numStr.push_back(musicCode.at(i));
             }
-            while (musicCode[i + 1] == '/') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '/') {
                 ++i;
                 numbase *= 2;
             }
-            while (isdigit(musicCode[i + 1])) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
-                numbaseStr.push_back(musicCode[i]);
+                numbaseStr.push_back(musicCode.at(i));
             }
-            while (musicCode[i + 1] == '>') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
                 ++i;
                 ++m_broken;
                 ++dots;
             }
-            while (musicCode[i + 1] == '<') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '<') {
                 ++i;
                 --m_broken;
             }
@@ -1298,7 +1328,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // spaces
-        else if (musicCode[i] == 'x') {
+        else if (musicCode.at(i) == 'x') {
             Space *space = new Space();
             m_ID = space->GetUuid();
 
@@ -1306,19 +1336,19 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             int numbase = 1;
-            while (isdigit(musicCode[i + 1])) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
-                numStr.push_back(musicCode[i]);
+                numStr.push_back(musicCode.at(i));
             }
-            while (musicCode[i + 1] == '/') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '/') {
                 ++i;
                 numbase *= 2;
             }
-            while (isdigit(musicCode[i + 1])) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
-                numbaseStr.push_back(musicCode[i]);
+                numbaseStr.push_back(musicCode.at(i));
             }
-            if (musicCode[i + 1] == '>') {
+            if (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
                 ++i;
                 LogWarning("ABC input: Broken rhythms not supported");
             }
@@ -1335,17 +1365,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // spaces cannot be beamed
             AddBeam();
-            m_noteStack.push_back(space);
+            m_layer->AddChild(space);
         }
 
         // padding
-        else if (musicCode[i] == 'y') {
+        else if (musicCode.at(i) == 'y') {
             // Pad *pad = new Pad;
             LogWarning("ABC input: Extra space not supported");
         }
 
         // rests
-        else if (musicCode[i] == 'z') {
+        else if (musicCode.at(i) == 'z') {
             Rest *rest = new Rest();
             m_ID = rest->GetUuid();
 
@@ -1362,24 +1392,24 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 dots = -m_broken;
                 m_broken = 0;
             }
-            while (isdigit(musicCode[i + 1])) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
-                numStr.push_back(musicCode[i]);
+                numStr.push_back(musicCode.at(i));
             }
-            while (musicCode[i + 1] == '/') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '/') {
                 ++i;
                 numbase *= 2;
             }
-            while (isdigit(musicCode[i + 1])) {
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
                 ++i;
-                numbaseStr.push_back(musicCode[i]);
+                numbaseStr.push_back(musicCode.at(i));
             }
-            while (musicCode[i + 1] == '>') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '>') {
                 ++i;
                 ++m_broken;
                 ++dots;
             }
-            while (musicCode[i + 1] == '<') {
+            while (i + 1 < (int)musicCode.length() && musicCode.at(i + 1) == '<') {
                 ++i;
                 --m_broken;
             }
@@ -1407,15 +1437,15 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // rests cannot be beamed
             AddBeam();
-            m_noteStack.push_back(rest);
+            m_layer->AddChild(rest);
         }
 
         // multi-measure rests
-        else if (musicCode[i] == 'Z') {
+        else if (musicCode.at(i) == 'Z') {
             MultiRest *multiRest = new MultiRest();
             std::string numString;
-            while (isdigit(musicCode[i + 1])) {
-                numString.push_back(musicCode[i + 1]);
+            while (i + 1 < (int)musicCode.length() && isdigit(musicCode.at(i + 1))) {
+                numString.push_back(musicCode.at(i + 1));
                 ++i;
             }
             multiRest->SetNum(atoi(numString.c_str()));
@@ -1423,16 +1453,16 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // text elements
-        else if (musicCode[i] == '\"') {
+        else if (musicCode.at(i) == '\"') {
             ++i;
-            if (musicCode[i] == '^' || musicCode[i] == '_' || musicCode[i] == '<' || musicCode[i] == '>'
-                || musicCode[i] == '@') {
+            if (musicCode.at(i) == '^' || musicCode.at(i) == '_' || musicCode.at(i) == '<' || musicCode.at(i) == '>'
+                || musicCode.at(i) == '@') {
                 LogWarning("ABC input: Annotations are not fully support yet");
                 ++i;
             }
             std::string chordSymbol;
-            while (musicCode[i] != '\"') {
-                chordSymbol.push_back(musicCode[i]);
+            while (musicCode.at(i) != '\"') {
+                chordSymbol.push_back(musicCode.at(i));
                 ++i;
             }
             Harm *harm = new Harm();
@@ -1444,12 +1474,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // suppressing score line-breaks
-        else if (musicCode[i] == '\\') {
+        else if (musicCode.at(i) == '\\') {
             sysBreak = false;
         }
 
         // barLine
-        else if (musicCode[i] == '|') {
+        else if (musicCode.at(i) == '|') {
             // add stacked elements to layer
             AddBeam();
             i = SetBarLine(musicCode, i);
@@ -1475,6 +1505,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         ++i;
 
+        // check if there is a clef change
+        if (m_clef) {
+            m_noteStack.push_back(m_clef);
+            m_clef = NULL;
+        }
+
         // check if there is a change in meter
         if (m_meter) {
             // todo: apply meter changes to staves
@@ -1489,8 +1525,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     }
 
     // by default, line-breaks in the code generate line-breaks in the score
+    // Verovio does not support line-breaks within a layer
     // has to be refined later
-    if (sysBreak && (m_linebreak != '\0')) {
+    if (sysBreak && (m_linebreak != '\0') && !(section->GetLast())->Is(SB)) {
+        AddBeam();
         Sb *sb = new Sb();
         sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(sb);
