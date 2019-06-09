@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Mar 16 13:02:18 EDT 2019
+// Last Modified: Sun Jun  9 11:53:17 CEST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2818,6 +2818,7 @@ class MxmlPart {
 		int           getStaffIndex        (int voicenum);
 		bool          hasEditorialAccidental(void) const;
 		bool          hasDynamics          (void) const;
+		bool          hasFiguredBass       (void) const;
 		void          parsePartInfo        (xml_node partdeclaration);
 		string        getPartName          (void) const;
 		string        getPartAbbr          (void) const;
@@ -2832,6 +2833,7 @@ class MxmlPart {
 		void          receiveHarmonyCount         (int count);
 		void          receiveEditorialAccidental  (void);
 		void          receiveDynamic              (void);
+		void          receiveFiguredBass          (void);
 		void          receiveCaesura              (const string& letter);
 		void          receiveOrnament             (void);
 
@@ -2845,6 +2847,7 @@ class MxmlPart {
 		bool                 m_editorialAccidental;
 		bool                 m_stems = false;
 		bool                 m_has_dynamics = false;
+		bool                 m_has_figured_bass = false;
 		string               m_partname;
 		string               m_partabbr;
 		string               m_caesura;
@@ -2885,9 +2888,16 @@ class GridSide {
 		void  detachDynamics    (void);
 		HTp   getDynamics       (void);
 
+		int   getFiguredBassCount (void);
+		void  setFiguredBass      (HTp token);
+		void  setFiguredBass      (const std::string& token);
+		void  detachFiguredBass   (void);
+		HTp   getFiguredBass      (void);
+
 	private:
 		std::vector<HumdrumToken*> m_verses;
 		HumdrumToken* m_dynamics = NULL;
+		HumdrumToken* m_figured_bass = NULL;
 		HumdrumToken* m_harmony = NULL;
 };
 
@@ -2983,6 +2993,7 @@ class GridMeasure : public std::list<GridSlice*> {
 		                  { return m_style == MeasureStyle::RepeatBoth; }
 		void         addLayoutParameter(GridSlice* slice, int partindex, const std::string& locomment);
 		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
+		void         addFiguredBassLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
 		bool         isInvisible(void);
 		bool         isSingleChordMeasure(void);
 		bool         isMonophonicMeasure(void);
@@ -3060,14 +3071,15 @@ class GridSlice : public std::vector<GridPart*> {
 
 		void transferSides        (HumdrumLine& line, GridStaff& sides,
 		                           const std::string& empty, int maxvcount,
-		                           int maxhcount);
+		                           int maxhcount, int maxfcount);
 		void transferSides        (HumdrumLine& line, GridPart& sides,
 		                           int partindex, const std::string& empty,
 		                           int maxvcount, int maxhcount,
-		                           int maxdcount);
+		                           int maxdcount, int maxfcount);
 		int getVerseCount         (int partindex, int staffindex);
 		int getHarmonyCount       (int partindex, int staffindex = -1);
 		int getDynamicsCount      (int partindex, int staffindex = -1);
+		int getFiguredBassCount   (int partindex, int staffindex = -1);
 		void addToken             (const std::string& tok, int parti, int staffi, int voicei);
 
 	protected:
@@ -3110,7 +3122,7 @@ class GridVoice {
 		void   setDurationToPrev  (HumNum dur);
 		void   incrementDuration  (HumNum duration);
 		void   forgetToken        (void);
-		string getString          (void);
+		std::string getString          (void);
 
 	protected:
 		void   setTransfered      (bool state);
@@ -3137,9 +3149,12 @@ class HumGrid : public std::vector<GridMeasure*> {
 		bool transferTokens             (HumdrumFile& outfile, int startbarnum = 0);
 		int  getHarmonyCount            (int partindex);
 		int  getDynamicsCount           (int partindex);
+		int  getFiguredBassCount        (int partindex);
 		int  getVerseCount              (int partindex, int staffindex);
 		bool hasDynamics                (int partindex);
+		bool hasFiguredBass             (int partindex);
 		void setDynamicsPresent         (int partindex);
+		void setFiguredBassPresent      (int partindex);
 		void setHarmonyPresent          (int partindex);
 		void setVerseCount              (int partindex, int staffindex, int count);
 		void setHarmonyCount            (int partindex, int count);
@@ -3220,6 +3235,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 		std::vector<int>              m_harmonyCount;
 		bool                          m_pickup;
 		std::vector<bool>             m_dynamics;
+		std::vector<bool>             m_figured_bass;
 		std::vector<bool>             m_harmony;
 
 		// options:
@@ -3320,6 +3336,7 @@ class MxmlEvent {
 		void               reportMeasureStyleToOwner  (MeasureStyle style);
 		void               reportEditorialAccidentalToOwner(void);
 		void               reportDynamicToOwner       (void);
+		void               reportFiguredBassToOwner   (void);
 		void               reportCaesuraToOwner       (const std::string& letter = "Z") const;
 		void               reportOrnamentToOwner      (void) const;
       void               makeDummyRest      (MxmlMeasure* owner,
@@ -3334,7 +3351,9 @@ class MxmlEvent {
 		void               setTexts           (std::vector<std::pair<int, xml_node>>& nodes);
 		std::vector<std::pair<int, xml_node>>&  getTexts           (void);
 		void               setDynamics        (xml_node node);
+		void               setFiguredBass     (xml_node node);
 		xml_node           getDynamics        (void);
+		xml_node           getFiguredBass     (void);
 		std::string        getRestPitch       (void) const;
 
 	protected:
@@ -3356,6 +3375,7 @@ class MxmlEvent {
 		bool               m_stems;      // for preserving stems
 
 		xml_node          m_dynamics;    // dynamics <direction> starting just before note
+		xml_node          m_figured_bass;// fb starting just before note
 		std::vector<std::pair<int, xml_node>>  m_text;   // text <direction> starting just before note
 
 	private:
@@ -3454,6 +3474,7 @@ class MxmlMeasure {
 		void  reportHarmonyCountToOwner           (int count);
 		void  reportEditorialAccidentalToOwner    (void);
 		void  reportDynamicToOwner                (void);
+		void  reportFiguredBassToOwner            (void);
 		void  reportCaesuraToOwner                (const string& letter);
 		void  reportOrnamentToOwner               (void);
 
@@ -5204,6 +5225,7 @@ class Tool_musicxml2hum : public HumTool {
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
 		int  addHarmony        (GridPart* oart, MxmlEvent* event, HumNum nowtime, int partindex);
 		void addDynamic        (GridPart* part, MxmlEvent* event);
+		void addFiguredBass    (GridPart* part, MxmlEvent* event);
 		void addTexts          (GridSlice* slice, GridMeasure* measure, int partindex,
 		                        int staffindex, int voiceindex, MxmlEvent* event);
 		void addText           (GridSlice* slice, GridMeasure* measure, int partindex,
@@ -5212,6 +5234,9 @@ class Tool_musicxml2hum : public HumTool {
 		std::string getHarmonyString(pugi::xml_node hnode);
 		std::string getDynamicString(pugi::xml_node element);
 		std::string getDynamicsParameters(pugi::xml_node element);
+		std::string getFiguredBassString(pugi::xml_node element);
+		std::string getFiguredBassParameters(pugi::xml_node element);
+		std::string convertFiguredBassNumber(const xml_node& figure);
 		std::string getHairpinString(pugi::xml_node element);
 		std::string cleanSpaces     (const std::string& input);
 		void checkForDummyRests(MxmlMeasure* measure);
@@ -5250,6 +5275,7 @@ class Tool_musicxml2hum : public HumTool {
 		std::string m_systemDecoration;
 
 		pugi::xml_node m_current_dynamic = pugi::xml_node(NULL);
+		pugi::xml_node m_current_figured_bass = pugi::xml_node(NULL);
 		std::vector<std::pair<int, pugi::xml_node>> m_current_text;
 
 		bool m_hasTransposition = false;
