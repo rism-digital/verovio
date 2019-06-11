@@ -597,7 +597,7 @@ int System::JustifyX(FunctorParams *functorParams)
     if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
         && (this->GetIdx() == parent->GetChildCount() - 1)) {
         double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
-        if ((minLastJust > 0) && (params->m_justifiableRatio > (1/minLastJust))) {
+        if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_STOP;
         }
     }
