@@ -1047,7 +1047,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             for (auto layer : *staff->GetChildren()) {
                 assert(layer);
                 std::vector<musicxml::ClefChange>::iterator iter;
-                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
                     if (iter->m_measureNum == measureNum && iter->m_staff == staff
                         && iter->m_scoreOnset == m_durTotal) {
                         if (iter->isFirst) { // add clef when first in staff
