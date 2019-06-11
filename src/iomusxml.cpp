@@ -1465,7 +1465,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
             fb->AddChild(f);
         }
         harm->AddChild(fb);
-        measure->AddChild(harm);
+        m_harmStack.push_back(harm);
     }
 }
 
