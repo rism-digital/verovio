@@ -1449,6 +1449,8 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
+    int durOffset = 0;
+
     if (!HasAttributeWithValue(node, "print-object", "no")) {
         Harm *harm = new Harm();
         Fb *fb = new Fb();
@@ -1465,6 +1467,8 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
             fb->AddChild(f);
         }
         harm->AddChild(fb);
+        harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        m_controlElements.push_back(std::make_pair(measureNum, harm));
         m_harmStack.push_back(harm);
     }
 }
