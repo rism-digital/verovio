@@ -1545,11 +1545,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
     assert(staff);
 
+    pugi::xpath_node isChord = node.select_node("chord");
+
     // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
         std::vector<musicxml::ClefChange>::iterator iter;
         for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
-            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal) {
+            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal
+                && !isChord) {
                 if (iter->isFirst) { // add clef when first in staff
                     AddLayerElement(layer, iter->m_clef);
                     iter->isFirst = false;
@@ -2072,7 +2075,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     // arpeggio
     pugi::xpath_node xmlArpeggiate = notations.node().select_node("arpeggiate");
-    pugi::xpath_node isChord = node.select_node("chord");
     if (xmlArpeggiate) {
         int arpegN = xmlArpeggiate.node().attribute("number").as_int();
         arpegN = (arpegN < 1) ? 1 : arpegN;
