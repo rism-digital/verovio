@@ -1506,7 +1506,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
         if (fermata->GetForm() == fermataVis_FORM_inv
             || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                && !(fermata->GetForm() == fermataVis_FORM_norm)))
+                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
@@ -1514,7 +1514,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
         if (fermata->GetForm() == fermataVis_FORM_inv
             || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                && !(fermata->GetForm() == fermataVis_FORM_norm)))
+                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;

@@ -176,7 +176,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
-    else if (section->GetChildCount(MEASURE) > i) {
+    else {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
@@ -185,10 +185,6 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
             assert(staff);
             existingMeasure->AddChild(staff);
         }
-    }
-    // there is a gap, this should not happen
-    else {
-        LogWarning("MusicXML import: Measures should be added in the right order");
     }
 
     // add this measure to `m_endingStack` if within an ending
@@ -1013,19 +1009,17 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // match open ties with close ties
-    double lastScoreTimeOnset;
-    bool tieMatched;
     std::vector<std::pair<Tie *, Note *> >::iterator iter;
     for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
-        lastScoreTimeOnset = 9999; // __DBL_MAX__;
-        tieMatched = false;
+        double lastScoreTimeOnset = 9999; // __DBL_MAX__;
+        bool tieMatched = false;
         std::vector<Note *>::iterator jter;
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -1052,7 +1046,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             for (auto layer : *staff->GetChildren()) {
                 assert(layer);
                 std::vector<musicxml::ClefChange>::iterator iter;
-                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
                     if (iter->m_measureNum == measureNum && iter->m_staff == staff
                         && iter->m_scoreOnset == m_durTotal) {
                         if (iter->isFirst) { // add clef when first in staff
@@ -1236,7 +1230,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
         // endingText.c_str());
         if (endingType == "start") {
-            if (m_endingStack.empty() || (!m_endingStack.empty() && NotInEndingStack(measure->GetN()))) {
+            if (m_endingStack.empty() || NotInEndingStack(measure->GetN())) {
                 musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
                 std::vector<Measure *> measureList;
                 measureList.push_back(measure);
@@ -1550,7 +1544,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
         std::vector<musicxml::ClefChange>::iterator iter;
-        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
             if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal
                 && !isChord) {
                 if (iter->isFirst) { // add clef when first in staff

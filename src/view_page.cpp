@@ -627,7 +627,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         StaffDef *firstDef = NULL;
         ListOfObjects::const_iterator iter;
-        for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+        for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -638,7 +638,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         StaffDef *lastDef = NULL;
         ListOfObjects::const_reverse_iterator riter;
-        for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+        for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
