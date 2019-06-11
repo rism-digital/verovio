@@ -312,10 +312,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     // Are we contained in a beam?
     if (beamParent) {
-        // is only the tuplet beamed and no other tuplet contained?
-        if ((beamParent->GetChildCount() == 1) && (this->GetChildCount(TUPLET) == 0)) {
-            m_bracketAlignedBeam = beamParent;
-        }
+        m_bracketAlignedBeam = beamParent;
     }
     Beam *beamChild = dynamic_cast<Beam *>(this->FindChildByType(BEAM));
     // Do we contain a beam?
@@ -445,6 +442,14 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             ArrayOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllChildByComparison(&descendants, &comparison);
+
+            // Possible fix for beam above tuplet
+            /*
+            Object *parentBeam = this->GetFirstParent(BEAM);
+            if (parentBeam) {
+                descendants.push_back(parentBeam);
+            }
+            */
 
             for (auto &descendant : descendants) {
                 if (!descendant->HasSelfBB()) continue;

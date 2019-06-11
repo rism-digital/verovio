@@ -461,7 +461,7 @@ void Page::JustifyHorizontally()
 
     // Justify X position
     Functor justifyX(&Object::JustifyX);
-    JustifyXParams justifyXParams(&justifyX);
+    JustifyXParams justifyXParams(&justifyX, doc);
     justifyXParams.m_systemFullWidth
         = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyX, &justifyXParams);

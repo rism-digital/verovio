@@ -37,6 +37,7 @@ void *vrvToolkit_constructorResourcePath(const char* resourcePath)
 
 void vrvToolkit_destructor(Toolkit *tk)
 {
+    LogMessage("Deleting toolkit");
     delete tk;
 }
 
