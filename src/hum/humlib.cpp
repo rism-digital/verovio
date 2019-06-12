@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun  9 11:53:17 CEST 2019
+// Last Modified: Wed Jun 12 15:39:33 CEST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -21069,7 +21069,8 @@ int HumdrumLine::createTokensFromLine(void) {
 	}
 	m_tokens.resize(0);
 	HTp token;
-	char ch;
+	char ch = 0;
+	char lastch = 0;
 	string tstring;
 
 	if (this->size() == 0) {
@@ -21082,12 +21083,17 @@ int HumdrumLine::createTokensFromLine(void) {
 		m_tokens.push_back(token);
 	} else {
 		for (int i=0; i<(int)size(); i++) {
+			lastch = ch;
 			ch = getChar(i);
 			if (ch == '\t') {
-				token = new HumdrumToken(tstring);
-				token->setOwner(this);
-				m_tokens.push_back(token);
-				tstring.clear();
+				// Parser now allows multiple tab characters in a 
+				// row to represent a single tab.
+				if (lastch != '\t') {
+					token = new HumdrumToken(tstring);
+					token->setOwner(this);
+					m_tokens.push_back(token);
+					tstring.clear();
+				}
 			} else {
 				tstring += ch;
 			}
@@ -41819,6 +41825,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
 		} else if (commands[i].first == "slur") {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
+		} else if (commands[i].first == "tabber") {
+			RUNTOOL(tabber, infile, commands[i].second, status);
 		} else if (commands[i].first == "tassoize") {
 			RUNTOOL(tassoize, infile, commands[i].second, status);
 		} else if (commands[i].first == "tasso") {
@@ -49619,15 +49627,15 @@ string Tool_musicxml2hum::convertFiguredBassNumber(const xml_node& figure) {
 	} else if (prefix == "natural") {
 		accidental = "n";
 	} else if (suffix == "flat-flat") {
-		accidental = "--";
+		accidental = "--r";
 	} else if (suffix == "flat") {
-		accidental = "-";
+		accidental = "-r";
 	} else if (suffix == "double-sharp") {
-		accidental = "##";
+		accidental = "##r";
 	} else if (suffix == "sharp") {
-		accidental = "#";
+		accidental = "#r";
 	} else if (suffix == "natural") {
-		accidental = "n";
+		accidental = "nr";
 	}
 
 	// If suffix is "cross", "slash" or "backslash",  then an accidental
@@ -49663,7 +49671,8 @@ string Tool_musicxml2hum::convertFiguredBassNumber(const xml_node& figure) {
 
 //////////////////////////////
 //
-// Tool_musicxml2hum::getDynanmicsParameters --  Already presumed to be a dynamic.
+// Tool_musicxml2hum::getDynanmicsParameters --  Already presumed to be
+//     a dynamic.
 //
 
 string Tool_musicxml2hum::getDynamicsParameters(xml_node element) {
@@ -49712,7 +49721,8 @@ string Tool_musicxml2hum::getDynamicsParameters(xml_node element) {
 
 //////////////////////////////
 //
-// Tool_musicxml2hum::getFiguredBassParameters --  Already presumed to be figured bass.
+// Tool_musicxml2hum::getFiguredBassParameters --  Already presumed to be
+//     figured bass.
 //
 
 string Tool_musicxml2hum::getFiguredBassParameters(xml_node element) {
@@ -57052,6 +57062,125 @@ void Tool_slurcheck::processFile(HumdrumFile& infile) {
 	infile.createLinesFromTokens();
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_gridtest::Tool_tabber -- Set the recognized options for the tool.
+//
+
+Tool_tabber::Tool_tabber(void) {
+	// do nothing for now.
+}
+
+
+
+///////////////////////////////
+//
+// Tool_tabber::run -- Primary interfaces to the tool.
+//
+
+bool Tool_tabber::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_tabber::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	out << m_free_text.str();
+	return status;
+}
+
+
+bool Tool_tabber::run(HumdrumFile& infile) {
+   initialize(infile);
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tabber::initialize --
+//
+
+void Tool_tabber::initialize(HumdrumFile& infile) {
+	// do nothing for now
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tabber::processFile --
+//
+
+void Tool_tabber::processFile(HumdrumFile& infile) {
+	vector<int> trackWidths = getTrackWidths(infile);
+	vector<int> local(trackWidths.size());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			m_free_text << infile[i] << "\n";
+			continue;
+		}
+		fill(local.begin(), local.end(), 0);
+		int lasttrack = 0;
+		int track = 0;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			lasttrack = track;
+			HTp token = infile.token(i, j);
+			track = token->getTrack();
+			if ((track != lasttrack) && (lasttrack > 0)) {
+				int diff = trackWidths[lasttrack] - local[lasttrack];
+				if (diff > 0) {
+					for (int k=0; k<diff; k++) {
+						m_free_text << '\t';
+					}
+				}
+			}
+			if (j > 0) {
+				m_free_text << '\t';
+			}
+			local[track]++;
+			m_free_text << token;
+		}
+		m_free_text << '\n';
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tabber::getTrackWidths
+//
+
+vector<int> Tool_tabber::getTrackWidths(HumdrumFile& infile) {
+	vector<int> output(infile.getTrackCount() + 1, 1);
+	output[0] = 0;
+	vector<int> local(infile.getTrackCount() + 1);
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		fill(local.begin(), local.end(), 0);
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			local[track]++;
+		}
+		for (int j=1; j<(int)local.size(); j++) {
+			if (local[j] > output[j]) {
+				output[j] = local[j];
+			}
+		}
+	}
+	return output;
+}
 
 
 
