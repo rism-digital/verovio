@@ -361,7 +361,7 @@ Object *Object::GetPrevious(Object *child, const ClassId classId)
     riteratorEnd = m_children.rend();
     riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
     if (riteratorCurrent != riteratorEnd) {
-        riteratorCurrent++;
+        ++riteratorCurrent;
         riteratorCurrent = std::find_if(riteratorCurrent, riteratorEnd, ObjectComparison(classId));
     }
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;

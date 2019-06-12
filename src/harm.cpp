@@ -112,7 +112,7 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
     if (!this->HasContentBB()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     int currentGrpId = this->GetDrawingGrpId();
 
     // No group ID, nothing to do - should probably never happen
