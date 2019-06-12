@@ -958,7 +958,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     if (layerElement->Is(NOTE)) {
                         rightLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
                         break;
-                        break;
                     }
                     else if (layerElement->Is(CHORD)) {
                         int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);

@@ -414,7 +414,7 @@ std::string ExtractUuidFragment(std::string refUuid)
     return refUuid;
 }
 
-std::string UTF16to8(const std::wstring in)
+std::string UTF16to8(const std::wstring &in)
 {
     std::string out;
 
@@ -423,7 +423,7 @@ std::string UTF16to8(const std::wstring in)
     return out;
 }
 
-std::wstring UTF8to16(const std::string in)
+std::wstring UTF8to16(const std::string &in)
 {
     std::wstring out;
     std::stringstream sin(in.c_str());
