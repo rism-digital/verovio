@@ -588,8 +588,13 @@ protected:
     std::wstring cleanHarmString2(const std::string &content);
     std::wstring cleanHarmString3(const std::string &content);
     std::wstring cleanStringString(const std::string &content);
-    std::vector<std::wstring> cleanFBString(const std::string &content);
-    std::wstring convertFBNumber(const string &input);
+    std::vector<std::wstring> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
+    std::wstring cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
+    std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
+    std::wstring getVisualFBAccidental(int accidental);
+    std::wstring convertFBNumber(const string &input, hum::HTp token);
+    void checkForLineContinuations(hum::HTp token);
+    std::wstring convertNumberToWstring(int number);
 
 private:
     // m_filename == Filename to read/was read.
@@ -747,6 +752,33 @@ private:
 
     // m_hasTremolo == true if there is a *tremolo found in input data.
     bool m_hasTremolo = false;
+
+    // m_placement == placement above/below state for a particular spine of information
+    // currently used for **fb, but expand to other spine types as needed (such as **harm).
+    // +1 = *above marker encountered in spine.
+    // -1 = *below marker encountered in spine.
+    // 0 = *auto neither above or below explicitly given (leave up to renderer).
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_placement;
+
+    // m_reverse == placement reversed or not reversed.  currently used for **fb,
+    // might be useful for other types of spines in the fugure.
+    // +1 = *reverse marker encountered in spine.
+    // 0 = *Xreverse marker encountered in spine. (or default)
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_reverse;
+
+    // m_absolute == use relative or absolute accidentals in **fb.
+    // +1 = *absolute marker encountered in spine.
+    // 0 = *Xabsolute marker encountered in spine. (default)
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_absolute;
+
+    // m_slash == display accidentals as slashes or as accidentals in **fb.
+    // +1 = *slash marker encountered in spine. (default)
+    // 0 = *Xslash marker encountered in spine.
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_slash;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

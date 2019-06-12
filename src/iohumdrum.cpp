@@ -344,6 +344,14 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
 
 #ifndef NO_HUMDRUM_SUPPORT
     m_filename = filename;
+    m_placement.resize(1000);
+    std::fill(m_placement.begin(), m_placement.end(), 0);
+    m_reverse.resize(1000);
+    std::fill(m_reverse.begin(), m_reverse.end(), 0);
+    m_absolute.resize(1000);
+    std::fill(m_absolute.begin(), m_absolute.end(), 0);
+    m_slash.resize(1000);
+    std::fill(m_slash.begin(), m_slash.end(), 1);
 #endif /* NO_HUMDRUM_SUPPORT */
 }
 
@@ -3469,6 +3477,18 @@ bool HumdrumInput::convertSystemMeasure(int &line)
         line = endline;
     }
 
+    bool founddatabefore = false;
+    for (int q = startline; q >= 0; q--) {
+        if (m_infile[q].isData()) {
+            founddatabefore = true;
+            ;
+            break;
+        }
+    }
+    if (!founddatabefore) {
+        startline = 0;
+    }
+
     setupSystemMeasure(startline, endline);
 
     storeStaffLayerTokensForMeasure(startline, endline);
@@ -3673,6 +3693,89 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
 //////////////////////////////
 //
+// checkForLineContinuations -- Temporary code until fb line
+//      extensions are implemented.  If the previous **fb token
+//      contains a line extension for this null token, then add
+//      underscores.
+//
+
+void HumdrumInput::checkForLineContinuations(hum::HTp token)
+{
+    if (!token->isNull()) {
+        return;
+    }
+    hum::HTp resolved = token->resolveNull();
+    if (resolved->find("_") == std::string::npos) {
+        return;
+    }
+
+    int spinetrack = token->getTrack();
+    Harm *harm = new Harm;
+    Fb *fb = new Fb;
+
+    if (token->isDataType("**fba")) {
+        if (m_placement[spinetrack] == 0) {
+            setPlace(harm, "above");
+        }
+        else if (m_placement[spinetrack] == -1) {
+            setPlace(harm, "below");
+        }
+        else if (m_placement[spinetrack] == +1) {
+            setPlace(harm, "above");
+        }
+    }
+    else {
+        if (m_placement[spinetrack] == -1) {
+            setPlace(harm, "below");
+        }
+        else if (m_placement[spinetrack] == +1) {
+            setPlace(harm, "above");
+        }
+    }
+    harm->AddChild(fb);
+
+    hum::HumRegex hre;
+    std::vector<std::string> pieces;
+    hre.split(pieces, *resolved, " ");
+    for (int i = 0; i < (int)pieces.size(); i++) {
+        if (pieces[i].find("_") != std::string::npos) {
+            F *f = new F();
+            Text *text = new Text();
+            std::wstring wtext = L"_";
+            text->SetText(wtext);
+            f->AddChild(text);
+            fb->AddChild(f);
+        }
+        else {
+            // place holder
+            F *f = new F();
+            fb->AddChild(f);
+        }
+    }
+
+    int kerntrack = -1;
+    hum::HTp current = token;
+    while (current) {
+        if (current->isKern()) {
+            kerntrack = current->getTrack();
+        }
+        current = current->getPreviousFieldToken();
+    }
+
+    m_measure->AddChild(harm);
+    int staffindex = 0;
+    if (kerntrack >= 0) {
+        staffindex = m_rkern[kerntrack];
+    }
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    harm->SetTstamp(tstamp.getFloat());
+    setStaff(harm, staffindex + 1);
+    setLocationId(harm, token);
+    setLocationId(fb, token);
+}
+
+//////////////////////////////
+//
 // HumdrumInput::addFiguredBassForMeasure --
 //
 
@@ -3683,40 +3786,126 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
     }
     hum::HumdrumFile &infile = m_infile;
     for (int i = startline; i < endline; ++i) {
+        if (infile[i].isInterpretation()) {
+            for (int j = 0; j < infile[i].getFieldCount(); ++j) {
+                if (j >= 999) {
+                    break;
+                }
+                hum::HTp token = infile.token(i, j);
+                if (!(token->isDataType("**fb") || token->isDataType("**fba") || token->isDataType("**Bnum"))) {
+                    continue;
+                }
+                int track = token->getTrack();
+                if (token->compare("*above") == 0) {
+                    m_placement[track] = +1;
+                }
+                else if (token->compare("*below") == 0) {
+                    m_placement[track] = -1;
+                }
+                else if (token->compare("*auto") == 0) {
+                    m_placement[track] = 0;
+                }
+                else if (token->compare("*reverse") == 0) {
+                    m_reverse[track] = +1;
+                }
+                else if (token->compare("*Xreverse") == 0) {
+                    m_reverse[track] = 0;
+                }
+                else if (token->compare("*absolute") == 0) {
+                    m_absolute[track] = +1;
+                }
+                else if (token->compare("*Xabsolute") == 0) {
+                    m_absolute[track] = 0;
+                }
+                else if (token->compare("*slash") == 0) {
+                    m_slash[track] = +1;
+                }
+                else if (token->compare("*Xslash") == 0) {
+                    m_slash[track] = 0;
+                }
+            }
+            continue;
+        }
+
         if (!infile[i].isData()) {
             continue;
         }
-        int track = 0;
+        int kerntrack = 0;
+        int spinetrack = 0;
+
         for (int j = 0; j < infile[i].getFieldCount(); ++j) {
             hum::HTp token = infile.token(i, j);
             if (token->isDataType("**kern")) {
-                track = token->getTrack();
-            }
-            if (token->isNull()) {
-                continue;
+                kerntrack = token->getTrack();
             }
             if (!(token->isDataType("**fb") || token->isDataType("**fba") || token->isDataType("**Bnum"))) {
                 continue;
             }
+            if (token->isNull()) {
+                checkForLineContinuations(token);
+                continue;
+            }
+            if (token->compare("_") == 0) {
+                continue;
+            }
+            spinetrack = token->getTrack();
             Harm *harm = new Harm;
             Fb *fb = new Fb;
-            string datatype = token->getDataType();
+
             if (token->isDataType("**fba")) {
-                setPlace(harm, "above");
+                if (m_placement[spinetrack] == 0) {
+                    setPlace(harm, "above");
+                }
+                else if (m_placement[spinetrack] == -1) {
+                    setPlace(harm, "below");
+                }
+                else if (m_placement[spinetrack] == +1) {
+                    setPlace(harm, "above");
+                }
             }
             else {
-                setPlace(harm, "below");
+                if (m_placement[spinetrack] == -1) {
+                    setPlace(harm, "below");
+                }
+                else if (m_placement[spinetrack] == +1) {
+                    setPlace(harm, "above");
+                }
             }
             harm->AddChild(fb);
 
-            std::vector<std::wstring> content = cleanFBString(*token);
+            std::vector<std::string> pieces = splitFBString(*token, " ");
+            std::vector<std::wstring> content = cleanFBString(pieces, token);
+            if (content.empty()) {
+                // do not include an empty fb see issue #1096
+                continue;
+            }
 
             for (int k = 0; k < (int)content.size(); ++k) {
                 F *f = new F();
-                Text *text = new Text();
-                text->SetText(content[k]);
-                f->AddChild(text);
+                if ((pieces[k] == "x") || (pieces[k] == "X")) {
+                    // suppress contents of <f>
+                }
+                else {
+                    Text *text = new Text();
+                    auto pos = pieces[k].find(":");
+                    if (pos != std::string::npos) {
+                        std::vector<std::string> subpieces = splitFBString(pieces[k], ":");
+                        std::wstring newtext = cleanFBString2(subpieces, token);
+                        text->SetText(newtext);
+                    }
+                    else {
+                        text->SetText(content[k]);
+                    }
+                    f->AddChild(text);
+                }
                 fb->AddChild(f);
+                if (pieces[k].find("_") != std::string::npos) {
+                    // Does not display anything at the moment
+                    // so a "_" character was added to content[k].
+                    // This can be removed when extenders are
+                    // implemented.
+                    // f->SetExtender(BOOLEAN_true);
+                }
                 if (content.size() == 1) {
                     setLocationId(f, token);
                 }
@@ -3726,7 +3915,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             }
 
             m_measure->AddChild(harm);
-            int staffindex = m_rkern[track];
+            int staffindex = m_rkern[kerntrack];
             hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
             harm->SetTstamp(tstamp.getFloat());
             setStaff(harm, staffindex + 1);
@@ -4065,59 +4254,100 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
 //////////////////////////////
 //
-// HumdrumInput::cleanFBString --
+// HumdrumInput::splitFBString --
+//    default value: separator = " "
 //
 
-std::vector<std::wstring> HumdrumInput::cleanFBString(const std::string &content)
+std::vector<std::string> HumdrumInput::splitFBString(const std::string &content, const string &separator)
 {
     hum::HumRegex hre;
     std::vector<std::string> pieces;
-    hre.split(pieces, content, " ");
+    hre.split(pieces, content, separator);
+    return pieces;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::cleanFBString --
+//
+
+std::vector<std::wstring> HumdrumInput::cleanFBString(std::vector<std::string> &pieces, hum::HTp token)
+{
+    std::vector<bool> todelete(pieces.size(), false);
     std::vector<std::wstring> output(pieces.size());
     for (int i = 0; i < (int)pieces.size(); i++) {
-        output[i] = convertFBNumber(pieces[i]);
+        output[i] = convertFBNumber(pieces[i], token);
+        if ((pieces[i].find("K") != std::string::npos)
+            && ((pieces[i].find("x") == std::string::npos) && (pieces[i].find("X") == std::string::npos))) {
+            // this figure slot needs to be deleted
+            todelete[i] = true;
+        }
+    }
+    // delete unwanted slots.
+    for (int i = (int)todelete.size() - 1; i >= 0; i--) {
+        if (!todelete[i]) {
+            continue;
+        }
+        output.erase(output.begin() + i);
     }
     return output;
 }
 
 //////////////////////////////
 //
-// HumdrumInput::convertFBNumber -- only allowing one digit at the moment.
+// HumdrumInput::cleanFBString2 -- Used to concantenate multiple figures
+//   together with hyphens.
 //
 
-std::wstring HumdrumInput::convertFBNumber(const string &input)
+std::wstring HumdrumInput::cleanFBString2(std::vector<std::string> &pieces, hum::HTp token)
+{
+    std::wstring output;
+    for (int i = 0; i < (int)pieces.size(); i++) {
+        output += convertFBNumber(pieces[i], token);
+        if (i < (int)pieces.size() - 1) {
+            if (pieces[i + 1] == "") {
+                output += L" ";
+            }
+            output += L"-";
+        }
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertFBNumber --
+//
+
+std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
 {
     std::wstring output;
 
-    int digit = -1;
+    int track = token->getTrack();
+    int reverse = m_reverse[track];
+
+    if (input.find("K") != std::string::npos) {
+        return output;
+    }
+
+    bool found = false;
+    int digit = 0;
     for (int i = 0; i < (int)input.size(); i++) {
         if (isdigit(input[i])) {
-            digit = input[i] - '0';
-            break;
+            // digits have to be adjacent
+            found = true;
+            if ((i > 0) && isdigit(input[i - 1])) {
+                digit = 10 * digit + (input[i] - '0');
+            }
+            else {
+                digit = input[i] - '0';
+            }
         }
     }
-    int accidental = 0;
-    // accidental = 1 :: double-flat
-    // accidental = 2 :: flat
-    // accidental = 3 :: natural
-    // accidental = 4 :: sharp
-    // accidental = 5 :: double-sharp
-    // also allow "+" later
-    if (input.find("--") != std::string::npos) {
-        accidental = 1;
+    if (!found) {
+        digit = -1;
     }
-    else if (input.find("##") != std::string::npos) {
-        accidental = 5;
-    }
-    else if (input.find("-") != std::string::npos) {
-        accidental = 2;
-    }
-    else if (input.find("#") != std::string::npos) {
-        accidental = 4;
-    }
-    else if (input.find("n") != std::string::npos) {
-        accidental = 3;
-    }
+
     int slash = 0;
     // slash = 1 :: forward slash
     // slash = 2 :: back slash
@@ -4132,54 +4362,74 @@ std::wstring HumdrumInput::convertFBNumber(const string &input)
         slash = 3;
     }
 
-    // accidental forced always in front of digit for now.
+    if (!m_slash[track]) {
+        // disable slashes
+        slash = 0;
+    }
+
+    if (digit > 9) {
+        // Don't allow slashes on multi-digit numbers.
+        // Maybe allow in the future.
+        slash = 0;
+    }
+
+    int accidental = 0;
+    // accidental = 1 :: double-flat
+    // accidental = 2 :: flat (or lower)
+    // accidental = 3 :: natural
+    // accidental = 4 :: sharp (or raise)
+    // accidental = 5 :: double-sharp
+    // accidental = 6 :: plus (sharp or raise))
+    // also allow "+" later
+    if (input.find("+") != std::string::npos) {
+        accidental = 6;
+    }
+    else if (input.find("--") != std::string::npos) {
+        accidental = 1;
+    }
+    else if (input.find("##") != std::string::npos) {
+        accidental = 5;
+    }
+    else if (input.find("-") != std::string::npos) {
+        accidental = 2;
+    }
+    else if (input.find("#") != std::string::npos) {
+        accidental = 4;
+    }
+    else if (input.find("n") != std::string::npos) {
+        // other accidentals have priority over "n"
+        // since they would be visual accidentals in the
+        // case where "n" is also present.
+        accidental = 3;
+    }
+
+    // Override visual accidentals if m_absolute is true:
+    if (m_absolute[track]) {
+        if (input.find("n") != std::string::npos) {
+            accidental = 3;
+        }
+    }
+
+    if (input.find("k") != std::string::npos) {
+        // suppress display of accidental if "k" signifier is present.
+        accidental = 0;
+    }
+
+    // accidental in front of number unless an "r" is present:
+    if ((!slash) && (input.find("r") == std::string::npos) && (!reverse)) {
+        std::wstring accid = getVisualFBAccidental(accidental);
+        if (accidental && (input.find("i") != std::string::npos)) {
+            accid = L"[" + accid + L"]";
+        }
+        else if (accidental && (input.find("j") != std::string::npos)) {
+            accid = L"(" + accid + L")";
+        }
+        output += accid;
+    }
+
     if (!slash) {
-        switch (accidental) {
-            case 1:
-                output = L"\uE264"; // SMUFL double-flat
-                break;
-            case 2:
-                // output = L"\u266D"; // unicode flat
-                output = L"\uE260"; // SMUFL flat
-                break;
-            case 3:
-                // output = L"\u266E"; // unicode natural
-                output = L"\uE261"; // SMUFL natural
-                break;
-            case 4:
-                // output = L"\u266F"; // unicode sharp
-                output = L"\uE262"; // SMUFL sharp
-                break;
-            case 5:
-                output = L"\uE263"; // SMUFL double-sharp
-                break;
-        }
-    }
-
-    if ((accidental > 0) && !slash) {
-        // j/J editorial alteration of accidental:
-        if (input.find("j") != std::string::npos) {
-            output = L"(" + output + L")";
-        }
-        else if (input.find("J") != std::string::npos) {
-            output = L"[" + output + L"]";
-        }
-    }
-
-    if (!slash || (slash && (accidental == 0))) {
         // print regular number, slashed number must have accidental qualifier
-        switch (digit) {
-            case 0: output += L"\uEA50"; break;
-            case 1: output += L"\uEA51"; break;
-            case 2: output += L"\uEA52"; break;
-            case 3: output += L"\uEA54"; break;
-            case 4: output += L"\uEA55"; break;
-            case 5: output += L"\uEA57"; break;
-            case 6: output += L"\uEA5B"; break;
-            case 7: output += L"\uEA5D"; break;
-            case 8: output += L"\uEA60"; break;
-            case 9: output += L"\uEA61"; break;
-        }
+        output += convertNumberToWstring(digit);
     }
     else {
         // slash should be drawn on number (but some numbers
@@ -4187,7 +4437,10 @@ std::wstring HumdrumInput::convertFBNumber(const string &input)
         switch (digit) {
             case 0: output += L"\uEA50"; break; // draw without slash
             case 1: output += L"\uEA51"; break; // draw without slash
-            case 2: output += L"\uEA53"; break; // only one style of slash
+            case 2:
+                output += L"\uEA53";
+                break;
+                cerr << "GOT HERE 2 slash" << endl; // only one style of slash
             case 3: output += L"\uEA54"; break; // draw without slash
             case 4: output += L"\uEA56"; break; // only one style of slash
             case 5:
@@ -4219,7 +4472,19 @@ std::wstring HumdrumInput::convertFBNumber(const string &input)
         }
     }
 
-    if (input.find("i") != std::string::npos) {
+    // accidental after number if an "r" is present:
+    if ((!slash) && ((input.find("r") != std::string::npos) || reverse)) {
+        std::wstring accid = getVisualFBAccidental(accidental);
+        if (accidental && (input.find("i") != std::string::npos)) {
+            accid = L"[" + accid + L"]";
+        }
+        else if (accidental && (input.find("j") != std::string::npos)) {
+            accid = L"(" + accid + L")";
+        }
+        output += accid;
+    }
+
+    if (input.find("J") != std::string::npos) {
         output = L"(" + output + L")";
     }
     else if (input.find("I") != std::string::npos) {
@@ -4229,17 +4494,94 @@ std::wstring HumdrumInput::convertFBNumber(const string &input)
         if (input.find("j") != std::string::npos) {
             output = L"(" + output + L")";
         }
-        else if (input.find("J") != std::string::npos) {
+        else if (input.find("i") != std::string::npos) {
             output = L"[" + output + L"]";
         }
     }
 
+    // extension lines are not yet available for figured bass,
+    // so display an underscore after the figure to indicate
+    // that one should be added in the future:
+    if (input.find("_") != std::string::npos) {
+        output += L" _";
+    }
+    // A "=" character indicates that there is a the figure (should be
+    // centered between current figure and next one, but not available yet).
+    // Technically this is a sort of extender, but f@extension is
+    // boolean, so various styles cannot be encoded in it.
+    if (input.find("=") != std::string::npos) {
+        output += L" -";
+    }
+
     /*
-		To convert a free-form string to UTF16:
+                To convert a free-form string to UTF16:
                 string tdee;
                 output.back() += UTF8to16(tdee);
     */
 
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertNumberToWstring --
+//
+
+std::wstring HumdrumInput::convertNumberToWstring(int number)
+{
+    if (number < 0) {
+        return L"";
+    }
+    std::string value = to_string(number);
+    std::wstring output;
+    for (int i = 0; i < (int)value.size(); i++) {
+        switch (value[i]) {
+            case '0': output += L"\uEA50"; break;
+            case '1': output += L"\uEA51"; break;
+            case '2': output += L"\uEA52"; break;
+            case '3': output += L"\uEA54"; break;
+            case '4': output += L"\uEA55"; break;
+            case '5': output += L"\uEA57"; break;
+            case '6': output += L"\uEA5B"; break;
+            case '7': output += L"\uEA5D"; break;
+            case '8': output += L"\uEA60"; break;
+            case '9': output += L"\uEA61"; break;
+        }
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getVisualFBAccidental --
+//
+
+std::wstring HumdrumInput::getVisualFBAccidental(int accidental)
+{
+    std::wstring output;
+    switch (accidental) {
+        case 1:
+            output = L"\uE264"; // SMUFL double-flat
+            break;
+        case 2:
+            // output = L"\u266D"; // unicode flat
+            output = L"\uE260"; // SMUFL flat
+            break;
+        case 3:
+            // output = L"\u266E"; // unicode natural
+            output = L"\uE261"; // SMUFL natural
+            break;
+        case 4:
+            // output = L"\u266F"; // unicode sharp
+            output = L"\uE262"; // SMUFL sharp
+            break;
+        case 5:
+            output = L"\uE263"; // SMUFL double-sharp
+            break;
+        case 6:
+            output = L"+"; // UTF-7 +
+            break;
+    }
     return output;
 }
 
@@ -8016,6 +8358,14 @@ void HumdrumInput::addTextElement(ELEMENT *element, const std::string &content, 
 {
     Text *text = new Text;
     std::string data = content;
+    if (element->GetClassName() == "Syl") {
+        // Approximate centering of single-letter text on noteheads.
+        // currently the text is left justified to the left edge of the notehead.
+        if (content.size() == 1) {
+            data = "&#160;" + data;
+        }
+    }
+
     if (data.find("[") != std::string::npos) {
         data = replaceMusicShapes(data);
     }
