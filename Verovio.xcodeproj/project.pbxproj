@@ -561,6 +561,7 @@
 		4DEF8A6421B7AAF90093A76B /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
 		4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
 		4DEF8A6621B7AAF90093A76B /* f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF8A6321B7AAF90093A76B /* f.cpp */; };
+		4DF21D1322B3D17D009821DE /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
 		4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF289FC1A7545CC00BA9F7D /* timeinterface.h */; };
 		4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
 		4DF28A001A7545E500BA9F7D /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
@@ -2593,6 +2594,7 @@
 				4D1694061E3A44F300569BF4 /* iomei.cpp in Sources */,
 				4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */,
 				4D7927D120ECCC6D0002A45D /* view_slur.cpp in Sources */,
+				4DF21D1322B3D17D009821DE /* ioabc.cpp in Sources */,
 				4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */,
 				4D1694091E3A44F300569BF4 /* atts_critapp.cpp in Sources */,
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
