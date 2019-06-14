@@ -108,6 +108,11 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
     AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
     assert(params);
 
+    // If the harm is empty, do not adjust spacing
+    if (!this->HasContentBB()) {
+        return FUNCTOR_CONTINUE;
+    }
+
     int currentGrpId = this->GetDrawingGrpId();
 
     // No group ID, nothing to do - should probably never happen
