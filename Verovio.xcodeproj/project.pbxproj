@@ -1049,6 +1049,7 @@
 		BB4C4BC622A93317001F6AF0 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C530E1B52E4AE0003C6EC /* core.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4BC722A93317001F6AF0 /* unchecked.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C530F1B52E4AE0003C6EC /* unchecked.h */; };
 		BB4C4BCB22A941F9001F6AF0 /* data in Resources */ = {isa = PBXBuildFile; fileRef = BB4C4BCA22A941F9001F6AF0 /* data */; };
+		BBC19FBF22B37CA000100F42 /* all.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FBE22B37CA000100F42 /* all.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1446,6 +1447,7 @@
 		BB4C4A5422A930A3001F6AF0 /* VerovioFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VerovioFramework.h; path = ../bindings/iOS/VerovioFramework.h; sourceTree = "<group>"; };
 		BB4C4A5522A930A3001F6AF0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../bindings/iOS/Info.plist; sourceTree = "<group>"; };
 		BB4C4BCA22A941F9001F6AF0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = SOURCE_ROOT; };
+		BBC19FBE22B37CA000100F42 /* all.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = all.h; path = bindings/iOS/all.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2023,6 +2025,7 @@
 				BB4C4BCA22A941F9001F6AF0 /* data */,
 				BB4C4A5422A930A3001F6AF0 /* VerovioFramework.h */,
 				BB4C4A5522A930A3001F6AF0 /* Info.plist */,
+				BBC19FBE22B37CA000100F42 /* all.h */,
 			);
 			path = VerovioFramework;
 			sourceTree = "<group>";
@@ -2389,6 +2392,7 @@
 				BB4C4B7C22A932D7001F6AF0 /* tuplet.h in Headers */,
 				BB4C4B4422A932D7001F6AF0 /* beatrpt.h in Headers */,
 				BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */,
+				BBC19FBF22B37CA000100F42 /* all.h in Headers */,
 				BB4C4B5822A932D7001F6AF0 /* layerelement.h in Headers */,
 				BB4C4A7722A9321F001F6AF0 /* atts_gestural.h in Headers */,
 				BB4C4B9422A932E5001F6AF0 /* areaposinterface.h in Headers */,
