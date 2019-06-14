@@ -26,7 +26,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "cd ${SRCROOT}/tools&#10;./create_ios_framework_headers.sh&#10;">
+               scriptText = "cd ${SRCROOT}/bindings/iOS&#10;sh create_ios_framework_headers.sh&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"

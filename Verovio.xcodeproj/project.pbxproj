@@ -699,7 +699,6 @@
 		8F7DD0551EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		8F7DD0561EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		8F7DD0571EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
-		BB4C4A5622A930A3001F6AF0 /* VerovioFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4C4A5422A930A3001F6AF0 /* VerovioFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4A5A22A9318B001F6AF0 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
 		BB4C4A5B22A9318E001F6AF0 /* humlib.h in Headers */ = {isa = PBXBuildFile; fileRef = 40CA064C1E351125009CFDD7 /* humlib.h */; };
 		BB4C4A5C22A9321F001F6AF0 /* attclasses.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2951C1B3F0A0069E8C8 /* attclasses.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1050,6 +1049,7 @@
 		BB4C4BC722A93317001F6AF0 /* unchecked.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C530F1B52E4AE0003C6EC /* unchecked.h */; };
 		BB4C4BCB22A941F9001F6AF0 /* data in Resources */ = {isa = PBXBuildFile; fileRef = BB4C4BCA22A941F9001F6AF0 /* data */; };
 		BBC19FBF22B37CA000100F42 /* all.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FBE22B37CA000100F42 /* all.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC19FC222B38C1400100F42 /* VerovioFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1444,10 +1444,10 @@
 		8F59293318854BF800FE51AD /* vrvdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrvdef.h; path = include/vrv/vrvdef.h; sourceTree = "<group>"; };
 		8F7DD0531EAF3682001B072A /* fb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fb.cpp; path = src/fb.cpp; sourceTree = "<group>"; };
 		BB4C4A5222A930A3001F6AF0 /* VerovioFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VerovioFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB4C4A5422A930A3001F6AF0 /* VerovioFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VerovioFramework.h; path = ../bindings/iOS/VerovioFramework.h; sourceTree = "<group>"; };
-		BB4C4A5522A930A3001F6AF0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../bindings/iOS/Info.plist; sourceTree = "<group>"; };
+		BB4C4A5522A930A3001F6AF0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = bindings/iOS/Info.plist; sourceTree = "<group>"; };
 		BB4C4BCA22A941F9001F6AF0 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = SOURCE_ROOT; };
 		BBC19FBE22B37CA000100F42 /* all.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = all.h; path = bindings/iOS/all.h; sourceTree = SOURCE_ROOT; };
+		BBC19FC222B38C1400100F42 /* VerovioFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VerovioFramework.h; path = ../bindings/iOS/VerovioFramework.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2022,8 +2022,8 @@
 		BB4C4A5322A930A3001F6AF0 /* VerovioFramework */ = {
 			isa = PBXGroup;
 			children = (
+				BBC19FC222B38C1400100F42 /* VerovioFramework.h */,
 				BB4C4BCA22A941F9001F6AF0 /* data */,
-				BB4C4A5422A930A3001F6AF0 /* VerovioFramework.h */,
 				BB4C4A5522A930A3001F6AF0 /* Info.plist */,
 				BBC19FBE22B37CA000100F42 /* all.h */,
 			);
@@ -2234,6 +2234,7 @@
 				BB4C4B2422A932CF001F6AF0 /* dynam.h in Headers */,
 				BB4C4AD022A932B6001F6AF0 /* score.h in Headers */,
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
+				BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */,
 				BB4C4B8E22A932DF001F6AF0 /* svg.h in Headers */,
 				BB4C4B3822A932CF001F6AF0 /* trill.h in Headers */,
 				BB4C4B6422A932D7001F6AF0 /* mrpt2.h in Headers */,
@@ -2267,7 +2268,6 @@
 				BB4C4B8422A932DF001F6AF0 /* fig.h in Headers */,
 				BB4C4AA522A9328F001F6AF0 /* vrvdef.h in Headers */,
 				BB4C4BA022A932E5001F6AF0 /* positioninterface.h in Headers */,
-				BB4C4A5622A930A3001F6AF0 /* VerovioFramework.h in Headers */,
 				BB4C4AE622A932BC001F6AF0 /* corr.h in Headers */,
 				BB4C4B5422A932D7001F6AF0 /* halfmrpt.h in Headers */,
 				BB4C4A6522A9321F001F6AF0 /* atts_cmnornaments.h in Headers */,

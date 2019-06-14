@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 cd ..
+cd ..
 output="./bindings/iOS/all.h"
 
 echo "#ifndef all_h" > $output
@@ -12,9 +13,3 @@ done
 
 echo "#endif /* all_h */" >> $output
 echo "" >> $output
-
-#ifndef all_h
-#define all_h
-
-
-#endif /* all_h */
