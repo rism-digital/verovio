@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
   <meiHead>
         <fileDesc>
             <titleStmt>
@@ -43,7 +43,7 @@
                 </layer>
               </staff>
             </measure>
-            <scoreDef n="1" meter.count="3" meter.unit="8" meter.rend="num"/>
+            <scoreDef n="1" meter.count="3" meter.unit="8" meter.form="num" />
             <measure n="1">
               <staff n="1">
                 <layer n="1">
@@ -55,7 +55,8 @@
                 </layer>
               </staff>
             </measure>
-            <scoreDef n="1" meter.count="3" meter.unit="8" meter.rend="invis"/>
+            <scoreDef n="1" meter.count="3" meter.unit="8" meter.form="invis" />
+            </scoreDef>
             <measure n="1" right="end">
               <staff n="1">
                 <layer n="1">
