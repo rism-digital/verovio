@@ -988,7 +988,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             ReadMusicXmlBarLine(*it, measure, measureNum);
         }
         else if (IsElement(*it, "direction")) {
-            ReadMusicXmlDirection(*it, measure, measureNum);
+            ReadMusicXmlDirection(*it, measure, measureNum, staffOffset);
         }
         else if (IsElement(*it, "figured-bass")) {
             ReadMusicXmlFigures(*it, measure, measureNum);
@@ -1019,7 +1019,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -1275,7 +1275,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     }
 }
 
-void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlDirection(
+    pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -1283,6 +1284,8 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     pugi::xpath_node type = node.select_node("direction-type");
     std::string placeStr = node.attribute("placement").as_string();
     pugi::xpath_node_set words = type.node().select_nodes("words");
+    int offset = node.select_node("offset").node().text().as_int();
+    double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
     // Directive
     if (words.size() != 0 && !node.select_node("sound[@tempo]")) {
@@ -1315,8 +1318,6 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     if (wedge) {
         int hairpinNumber = wedge.node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
-        int offset = node.select_node("offset").node().text().as_int();
-        double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
             std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
@@ -1406,13 +1407,25 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     // Pedal
     pugi::xpath_node xmlPedal = type.node().select_node("pedal");
     if (xmlPedal) {
-        Pedal *pedal = new Pedal();
-        if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
         std::string pedalType = xmlPedal.node().attribute("type").as_string();
-        if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
-        if (pedalType == "stop") pedal->SetStartid(m_ID);
-        m_controlElements.push_back(std::make_pair(measureNum, pedal));
-        m_pedalStack.push_back(pedal);
+        std::string pedalLine = xmlPedal.node().attribute("line").as_string();
+        // do not import pedal start lines until engraving supported, but import stops anyway
+        if (pedalLine != "yes" || pedalType == "stop") {
+            Pedal *pedal = new Pedal();
+            pedal->SetTstamp(timeStamp);
+            if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            pugi::xpath_node staffNode = node.select_node("staff");
+            if (staffNode)
+                pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            int defaultY = xmlPedal.node().attribute("default-y").as_int();
+            // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
+            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+            pedal->SetVgrp(defaultY);
+            m_controlElements.push_back(std::make_pair(measureNum, pedal));
+            m_pedalStack.push_back(pedal);
+        }
     }
 
     // Tempo
@@ -2191,8 +2204,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     if (!m_pedalStack.empty()) {
         std::vector<Pedal *>::iterator iter;
         for (iter = m_pedalStack.begin(); iter != m_pedalStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            (*iter)->SetStartid(m_ID);
+            if (!(*iter)->HasStaff())
+                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_pedalStack.clear();
     }
