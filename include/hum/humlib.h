@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 12 15:39:33 CEST 2019
+// Last Modified: Fri Jun 14 15:20:39 DST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1026,6 +1026,8 @@ class HumdrumLine : public std::string, public HumHash {
 		std::string   getXmlId             (const std::string& prefix = "") const;
 		std::string   getXmlIdPrefix       (void) const;
 		void          createLineFromTokens (void);
+		void          removeExtraTabs      (void);
+		void          addExtraTabs         (std::vector<int>& trackWidths);
 		int           getLineIndex         (void) const;
 		int           getLineNumber        (void) const;
 		HumdrumFile*  getOwner             (void);
@@ -1116,6 +1118,11 @@ class HumdrumLine : public std::string, public HumHash {
 		// The contents of this vector should be deleted when deconstructing
 		// a HumdrumLine object.
 		std::vector<HumdrumToken*> m_tokens;
+
+		// m_tabs: Used to store a count of the number of tabs between
+		// each token on a line.  This is the number of tabs after the
+		// token at the given index (so no tabs before the first token).
+		std::vector<int> m_tabs;
 
 		// m_duration: This is the "duration" of a line.  The duration is
 		// equal to the minimum time unit of all durational tokens on the
@@ -1622,7 +1629,9 @@ class HumdrumFileBase : public HumHash {
 		int           getTrackEndCount         (int track) const;
 		HTp           getTrackEnd              (int track, int subtrack) const;
 		void          createLinesFromTokens    (void);
-
+		void          removeExtraTabs          (void);
+		void          addExtraTabs             (void);
+		std::vector<int> getTrackWidths        (void);
 		void          appendLine               (const char* line);
 		void          appendLine               (const std::string& line);
 		void          appendLine               (HumdrumLine* line);
@@ -5753,6 +5762,25 @@ class Tool_slurcheck : public HumTool {
 };
 
 
+class Tool_spinetrace : public HumTool {
+	public:
+		      Tool_spinetrace          (void);
+		     ~Tool_spinetrace          () {};
+
+		bool  run                      (HumdrumFile& infile);
+		bool  run                      (const string& indata, ostream& out);
+		bool  run                      (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  initialize               (HumdrumFile& infile);
+		void  processFile              (HumdrumFile& infile);
+
+	private:
+
+};
+
+
+
 class Tool_tabber : public HumTool {
 	public:
 		      Tool_tabber              (void);
@@ -5765,7 +5793,6 @@ class Tool_tabber : public HumTool {
 	protected:
 		void  initialize               (HumdrumFile& infile);
 		void  processFile              (HumdrumFile& infile);
-		vector<int> getTrackWidths(HumdrumFile& infile);
 
 	private:
 

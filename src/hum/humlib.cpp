@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 12 15:39:33 CEST 2019
+// Last Modified: Fri Jun 14 15:20:39 DST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -6722,7 +6722,7 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 				}
 			} else {
 				if (voicecount > 1) {
-					for (int j=newstaff->size(); j<voicecount; j++) {
+					for (int j=(int)newstaff->size(); j<voicecount; j++) {
 						// GridVoice* vdata = createVoice("*", "F", 0, p, s);
 						// newstaff->push_back(vdata);
 					}
@@ -7001,7 +7001,7 @@ void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 GridVoice* HumGrid::createVoice(const string& tok, const string& post, HumNum duration, int pindex, int sindex) {
 	//std::string token = tok;
 	//token += ":" + post + ":" + to_string(pindex) + "," + to_string(sindex);
-	GridVoice* gv = gv = new GridVoice(tok.c_str(), 0);
+	GridVoice* gv = new GridVoice(tok.c_str(), 0);
 	return gv;
 }
 
@@ -7902,7 +7902,7 @@ void HumGrid::addNullTokens(void) {
 	int s; // staff index
 	int v; // voice index
 
-	if (0) {
+	if ((0)) {
 		cerr << "SLICE TIMESTAMPS: " << endl;
 		for (int x=0; x<(int)m_allslices.size(); x++) {
 			cerr << "\tTIMESTAMP " << x << "= "
@@ -8021,7 +8021,7 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 	HumNum slicedur = nextts - currts;
 	HumNum timeleft = tokendur - slicedur;
 
-	if (0) {
+	if ((0)) {
 		cerr << "===================" << endl;
 		cerr << "EXTENDING TOKEN    " << token      << endl;
 		cerr << "\tTOKEN DUR:       " << tokendur   << endl;
@@ -13979,6 +13979,68 @@ bool HumdrumFileBase::analyzeTokens(void) {
 		m_lines[i]->createTokensFromLine();
 	}
 	return isValid();
+}
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::removeExtraTabs --
+//
+
+void HumdrumFileBase::removeExtraTabs(void) {
+	for (int i=0; i<(int)m_lines.size(); i++) {
+		m_lines[i]->removeExtraTabs();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::addExtraTabs --
+//
+
+void HumdrumFileBase::addExtraTabs(void) {
+	vector<int> trackWidths = getTrackWidths();
+
+	HumdrumFileBase& infile = *this;
+	vector<int> local(trackWidths.size());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		infile[i].addExtraTabs(trackWidths);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getTrackWidths -- Return a list of the maximum
+//    subspine count for each track in the file.  The 0th track is
+//    not used, so it will be zero and ignored.
+//
+
+vector<int> HumdrumFileBase::getTrackWidths(void) {
+	HumdrumFileBase& infile = *this;
+	vector<int> output(infile.getTrackCount() + 1, 1);
+	output[0] = 0;
+	vector<int> local(infile.getTrackCount() + 1);
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		fill(local.begin(), local.end(), 0);
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			local[track]++;
+		}
+		for (int j=1; j<(int)local.size(); j++) {
+			if (local[j] > output[j]) {
+				output[j] = local[j];
+			}
+		}
+	}
+	return output;
 }
 
 
@@ -20192,6 +20254,10 @@ HumdrumLine::HumdrumLine(HumdrumLine& line)  : string((string)line) {
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		m_tokens[i] = new HumdrumToken(*line.m_tokens[i], this);
 	}
+	m_tabs.resize(line.m_tabs.size());
+	for (int i=0; i<(int)m_tabs.size(); i++) {
+		m_tabs.at(i) = line.m_tabs.at(i);
+	}
 	m_owner = NULL;
 }
 
@@ -20205,6 +20271,10 @@ HumdrumLine::HumdrumLine(HumdrumLine& line, void* owner) : string((string)line) 
 	m_tokens.resize(line.m_tokens.size());
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		m_tokens[i] = new HumdrumToken(*line.m_tokens[i], this);
+	}
+	m_tabs.resize(line.m_tabs.size());
+	for (int i=0; i<(int)m_tabs.size(); i++) {
+		m_tabs.at(i) = line.m_tabs.at(i);
 	}
 	m_owner = owner;
 }
@@ -20225,6 +20295,10 @@ HumdrumLine& HumdrumLine::operator=(HumdrumLine& line) {
 	m_tokens.resize(line.m_tokens.size());
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		m_tokens[i] = new HumdrumToken(*line.m_tokens[i], this);
+	}
+	m_tabs.resize(line.m_tabs.size());
+	for (int i=0; i<(int)m_tabs.size(); i++) {
+		m_tabs.at(i) = line.m_tabs.at(i);
 	}
 	m_owner = NULL;
 	return *this;
@@ -20345,6 +20419,8 @@ void HumdrumLine::clear(void) {
 			m_tokens[i] = NULL;
 		}
 	}
+	m_tokens.clear();
+	m_tabs.clear();
 }
 
 
@@ -21067,7 +21143,8 @@ int HumdrumLine::createTokensFromLine(void) {
 		delete m_tokens[i];
 		m_tokens[i] = NULL;
 	}
-	m_tokens.resize(0);
+	m_tokens.clear();
+	m_tabs.clear();
 	HTp token;
 	char ch = 0;
 	char lastch = 0;
@@ -21077,10 +21154,12 @@ int HumdrumLine::createTokensFromLine(void) {
 		token = new HumdrumToken();
 		token->setOwner(this);
 		m_tokens.push_back(token);
+		m_tokens.push_back(0);
 	} else if (this->compare(0, 2, "!!") == 0) {
 		token = new HumdrumToken(this->c_str());
 		token->setOwner(this);
 		m_tokens.push_back(token);
+		m_tabs.push_back(0);
 	} else {
 		for (int i=0; i<(int)size(); i++) {
 			lastch = ch;
@@ -21092,7 +21171,15 @@ int HumdrumLine::createTokensFromLine(void) {
 					token = new HumdrumToken(tstring);
 					token->setOwner(this);
 					m_tokens.push_back(token);
+					if (m_tabs.size() > 0) {
+						m_tabs.back()++;
+					}
+					m_tabs.push_back(1);
 					tstring.clear();
+				} else {
+					if (m_tabs.size() > 0) {
+						m_tabs[m_tabs.size() - 1]++;
+					}
 				}
 			} else {
 				tstring += ch;
@@ -21103,6 +21190,7 @@ int HumdrumLine::createTokensFromLine(void) {
 		token = new HumdrumToken(tstring);
 		token->setOwner(this);
 		m_tokens.push_back(token);
+		m_tabs.push_back(0);
 		tstring.clear();
 	}
 
@@ -21126,8 +21214,63 @@ void HumdrumLine::createLineFromTokens(void) {
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		iline += (string)(*m_tokens[i]);
 		if (i < (int)m_tokens.size() - 1) {
-			iline += '\t';
+			if (m_tabs[i] == 0) {
+				m_tabs[i] = 1;
+			}
+			for (int j=0; j<m_tabs[i]; j++) {
+				iline += '\t';
+			}
 		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::removeExtraTabs -- Allow only for one tab between spine fields.
+//    The tab counts are set to 0, but the line creation function knows to use
+//    a minimum of one tab between fields.  The HumdrumFile::createLinesFromtTokens()
+//    function should be called after running this function and before printing
+//    the data so that the tabs in the text line can be updated.
+//
+
+void HumdrumLine::removeExtraTabs(void) {
+	fill(m_tabs.begin(), m_tabs.end(), 0);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::addExtraTabs -- Adds extra tabs between primary spines so that the
+//    first token of a spine is vertically aligned.  The input array to this
+//    function is a list of maximum widths.  This is typically caluclated by
+//    HumdrumFileBase::getTrackWidths().  The first indexed value is unused,
+//    since there is no track 0.
+//
+
+void HumdrumLine::addExtraTabs(vector<int>& trackWidths) {
+	if (!this->hasSpines()) {
+		return;
+	}
+
+	fill(m_tabs.begin(), m_tabs.end(), 1);
+	vector<int> local(trackWidths.size(), 0);
+
+	int lasttrack = 0;
+	int track = 0;
+	for (int j=0; j<getFieldCount(); j++) {
+		lasttrack = track;
+		HTp token = this->token(j);
+		track = token->getTrack();
+		if ((track != lasttrack) && (lasttrack > 0)) {
+			int diff = trackWidths.at(lasttrack) - local.at(lasttrack);
+			if ((diff > 0) && (j > 0)) {
+				m_tabs.at(j-1) += diff;
+			}
+		}
+		local.at(track)++;
 	}
 }
 
@@ -41825,6 +41968,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
 		} else if (commands[i].first == "slur") {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
+		} else if (commands[i].first == "spinetrace") {
+			RUNTOOL(spinetrace, infile, commands[i].second, status);
 		} else if (commands[i].first == "tabber") {
 			RUNTOOL(tabber, infile, commands[i].second, status);
 		} else if (commands[i].first == "tassoize") {
@@ -57068,11 +57213,116 @@ void Tool_slurcheck::processFile(HumdrumFile& infile) {
 
 /////////////////////////////////
 //
+// Tool_gridtest::Tool_spinetrace -- Set the recognized options for the tool.
+//
+
+Tool_spinetrace::Tool_spinetrace(void) {
+	define("a|append=b", "append analysis to input data lines");
+	define("p|prepend=b", "prepend analysis to input data lines");
+}
+
+
+
+///////////////////////////////
+//
+// Tool_spinetrace::run -- Primary interfaces to the tool.
+//
+
+bool Tool_spinetrace::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_spinetrace::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	return status;
+}
+
+
+bool Tool_spinetrace::run(HumdrumFile& infile) {
+   initialize(infile);
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_spinetrace::initialize --
+//
+
+void Tool_spinetrace::initialize(HumdrumFile& infile) {
+	// do nothing for now
+}
+
+
+
+//////////////////////////////
+//
+// Tool_spinetrace::processFile --
+//
+
+void Tool_spinetrace::processFile(HumdrumFile& infile) {
+	bool appendQ = getBoolean("append");
+	bool prependQ = getBoolean("prepend");
+
+	int linecount = infile.getLineCount();
+	for (int i=0; i<linecount; i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		if (appendQ) {
+			m_humdrum_text << infile[i] << "\t";
+		}
+
+		if (!infile[i].isData()) {
+			if (infile[i].isInterpretation()) {
+				int fieldcount = infile[i].getFieldCount();
+				for (int j=0; j<fieldcount; j++) {
+					HTp token = infile.token(i, j);
+					if (token->compare(0, 2, "**") == 0) {
+						m_humdrum_text << "**spine";
+					} else {
+						m_humdrum_text << token;
+					}
+					if (j < fieldcount - 1) {
+						m_humdrum_text << "\t";
+					}
+				}
+			} else {
+				m_humdrum_text << infile[i];
+			}
+		} else {
+			int fieldcount = infile[i].getFieldCount();
+			for (int j=0; j<fieldcount; j++) {
+				m_humdrum_text << infile[i].token(j)->getSpineInfo();
+				if (j < fieldcount - 1) {
+					m_humdrum_text << '\t';
+				}
+			}
+		}
+
+		if (prependQ) {
+			m_humdrum_text << "\t" << infile[i];
+		}
+		m_humdrum_text << "\n";
+	}
+}
+
+
+
+
+/////////////////////////////////
+//
 // Tool_gridtest::Tool_tabber -- Set the recognized options for the tool.
 //
 
 Tool_tabber::Tool_tabber(void) {
 	// do nothing for now.
+	define("r|remove=b",    "remove any extra tabs");
 }
 
 
@@ -57120,66 +57370,12 @@ void Tool_tabber::initialize(HumdrumFile& infile) {
 //
 
 void Tool_tabber::processFile(HumdrumFile& infile) {
-	vector<int> trackWidths = getTrackWidths(infile);
-	vector<int> local(trackWidths.size());
-	for (int i=0; i<infile.getLineCount(); i++) {
-		if (!infile[i].hasSpines()) {
-			m_free_text << infile[i] << "\n";
-			continue;
-		}
-		fill(local.begin(), local.end(), 0);
-		int lasttrack = 0;
-		int track = 0;
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			lasttrack = track;
-			HTp token = infile.token(i, j);
-			track = token->getTrack();
-			if ((track != lasttrack) && (lasttrack > 0)) {
-				int diff = trackWidths[lasttrack] - local[lasttrack];
-				if (diff > 0) {
-					for (int k=0; k<diff; k++) {
-						m_free_text << '\t';
-					}
-				}
-			}
-			if (j > 0) {
-				m_free_text << '\t';
-			}
-			local[track]++;
-			m_free_text << token;
-		}
-		m_free_text << '\n';
+	if (getBoolean("remove")) {
+		infile.removeExtraTabs();
+	} else {
+		infile.addExtraTabs();
 	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_tabber::getTrackWidths
-//
-
-vector<int> Tool_tabber::getTrackWidths(HumdrumFile& infile) {
-	vector<int> output(infile.getTrackCount() + 1, 1);
-	output[0] = 0;
-	vector<int> local(infile.getTrackCount() + 1);
-	for (int i=0; i<infile.getLineCount(); i++) {
-		if (!infile[i].hasSpines()) {
-			continue;
-		}
-		fill(local.begin(), local.end(), 0);
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			HTp token = infile.token(i, j);
-			int track = token->getTrack();
-			local[track]++;
-		}
-		for (int j=1; j<(int)local.size(); j++) {
-			if (local[j] > output[j]) {
-				output[j] = local[j];
-			}
-		}
-	}
-	return output;
+	infile.createLinesFromTokens();
 }
 
 
