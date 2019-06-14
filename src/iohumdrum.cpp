@@ -454,6 +454,7 @@ bool HumdrumInput::ImportString(const std::string &content)
         if (!result) {
             return false;
         }
+
         return convertHumdrum();
     }
     catch (char *str) {
@@ -4440,7 +4441,6 @@ std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
             case 2:
                 output += L"\uEA53";
                 break;
-                cerr << "GOT HERE 2 slash" << endl; // only one style of slash
             case 3: output += L"\uEA54"; break; // draw without slash
             case 4: output += L"\uEA56"; break; // only one style of slash
             case 5:
@@ -8727,7 +8727,7 @@ bool HumdrumInput::getNoteState(hum::HTp token, int slurnumber)
 
 void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index)
 {
-    int notecount = sortednotes.size();
+    int notecount = (int)sortednotes.size();
     hum::HumRegex hre;
     if (notecount == 1) {
         hre.replaceDestructive(idstring, "note-", "chord-");
