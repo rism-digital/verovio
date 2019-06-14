@@ -1019,7 +1019,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -1407,19 +1407,20 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Pedal
     pugi::xpath_node xmlPedal = type.node().select_node("pedal");
     if (xmlPedal) {
-        std::string line = xmlPedal.node().attribute("line").as_string();
-        if (line != "yes") { // import pedal lines when engraving supported
+        std::string pedalType = xmlPedal.node().attribute("type").as_string();
+        std::string pedalLine = xmlPedal.node().attribute("line").as_string();
+        // do not import pedal start lines until engraving supported, but import stops anyway
+        if (pedalLine != "yes" || pedalType == "stop") {
             Pedal *pedal = new Pedal();
             pedal->SetTstamp(timeStamp);
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
-            std::string pedalType = xmlPedal.node().attribute("type").as_string();
             if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode)
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
-            // parse the default_< attribute and transform to vgrp value
+            // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             pedal->SetVgrp(defaultY);
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
