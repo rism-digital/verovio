@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jun 14 15:20:39 DST 2019
+// Last Modified: Sat Jun 15 09:21:06 CEST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -24210,7 +24210,6 @@ string HumdrumToken::getVisualDurationNote(int subtokenindex) {
 
 std::string HumdrumToken::getLayoutParameter(const std::string& category,
 		const std::string& keyname, int subtokenindex) {
-	std::string output;
 
 	// First check for any local layout parameter:
 	std::string testoutput = this->getValue("LO", category, keyname);
@@ -24225,6 +24224,7 @@ std::string HumdrumToken::getLayoutParameter(const std::string& category,
 		}
 	}
 
+	std::string output;
 	int lcount = this->getLinkedParameterCount();
 	if (lcount == 0) {
 		return output;
@@ -24242,34 +24242,60 @@ std::string HumdrumToken::getLayoutParameter(const std::string& category,
 		if (hps->getNamespace2() != category) {
 			continue;
 		}
+
+		output = "";
 		for (int q = 0; q < hps->getCount(); ++q) {
 			string key = hps->getParameterName(q);
+			if (key == keyname) {
+				output = hps->getParameterValue(q);
+				if (subtokenindex < 0) {
+					return output;
+				}
+			}
 			if (key == "n") {
 				nparam = hps->getParameterValue(q);
 			}
-			if (key == keyname) {
-				output = hps->getParameterValue(q);
+		}
+		if (nparam.empty()) {
+			// No subtoken selection for this parameter,
+			// so return if not empty:
+			if (!output.empty()) {
+				return output;
+			}
+		} else if (subtokenindex < 0) {
+			// No subtoken selection so return output if not empty
+			if (!output.empty()) {
+				return output;
+			}
+		} else {
+			// There is a subtoken selection number, so
+			// return output if n matches it (minus one)
+
+			// currently @n requires a single value
+			// (should allow a range or multiple values
+			// later).  Also not checking validity of
+			// string first (needs to start with a digit);
+
+			int n = stoi(nparam);
+			if (n == subtokenindex + 1) {
+				return output;
+			} else {
+				// not the output that is required,
+				// so suppress for end of loop:
+				output = "";
 			}
 		}
 	}
-	if (subtokenindex < 0) {
-		// do not filter by n parameter
-		return output;
-	} else if (nparam.empty()) {
-		// parameter is not qualified by a note number, so applies to whole token
-		return output;
-	}
 
-	// currently @n requires a single value (should allow a range or multiple values later)
-	// also not checking validity of string first (needs to start with a digit);
-	int n = stoi(nparam);
-	if (n == subtokenindex + 1) {
-		return output;
-	} else {
-		return "";
-	}
+	return output;
 }
 
+
+
+//////////////////////////////
+//
+// HumdrumToken::getSlurLayoutParameter --
+//
 
 std::string HumdrumToken::getSlurLayoutParameter(const std::string& keyname,
 		int subtokenindex) {
