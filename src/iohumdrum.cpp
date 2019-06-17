@@ -7610,7 +7610,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool forceAboveQ = false;
     bool forceBelowQ = false;
     int forcebelowadj = 0;
-    int forceaboveadj = 0;
+    // int forceaboveadj = 0;
     int trackdiff = 0;
     int belowadj = 0;
     // int aboveadj = 0;
@@ -7619,7 +7619,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     if (ss[staffindex].m_dynampos > 0) {
         forceQ = true;
         forceAboveQ = true;
-        forceaboveadj = -(ss[staffindex].m_dynampos - 1);
+        // forceaboveadj = -(ss[staffindex].m_dynampos - 1);
     }
     else if (ss[staffindex].m_dynampos < 0) {
         forceQ = true;
