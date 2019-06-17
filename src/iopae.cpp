@@ -677,11 +677,10 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
     if (is_tuplet) {
         int t = i;
-        int t2 = 0;
         int tuplet_val = 3; // triplets are default
         int tuplet_notes = 0;
         char *buf;
-        
+
         // create the buffer so we can convert the tuplet nr to int
         buf = (char *)malloc(length + 1); // allocate it with space for 0x00
         memset(buf, 0x00, length + 1); // wipe it up
@@ -693,7 +692,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
             if (incipit[t] == ')') {
                 break;
             }
-            
+
             // count the notes
             if ((incipit[t] - 'A' >= 0) && (incipit[t] - 'A' < 7)) {
                 tuplet_notes++;
@@ -701,10 +700,10 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
             t++;
         }
-    
+
         // We detected a ';', get the value of the tuplet (otherwise 3 by default)
         if ((t < length) && incipit[t] != ')') {
-
+            int t2 = 0;
             // t + 1 should point to the number
             t++; // move one char to the number
             while (((t + t2) < length) && (incipit[t + t2] != ')')) {
@@ -720,10 +719,8 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
                 buf[t2] = incipit[t + t2];
                 t2++;
             }
-            
 
             tuplet_val = atoi(buf);
-            free(buf); // dispose of the buffer
         }
 
         // this is the first note, the total number of notes = tuplet_val
@@ -732,6 +729,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
         note->tuplet_note = tuplet_notes;
         // the tuplet val (3 or after ;)
         note->tuplet_val = tuplet_val;
+        free(buf); // dispose of the buffer
     }
     else {
         if (note->tuplet_notes > 0) {
@@ -1076,7 +1074,6 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 {
     int length = (int)strlen(incipit);
     int i = index;
-    int j;
 
     if (measure->abbreviation_offset == -1) { // start
         measure->abbreviation_offset = (int)measure->notes.size();
@@ -1085,7 +1082,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
         int abbreviation_stop = (int)measure->notes.size();
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
             i++;
-            for (j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
+            for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
             }
         }

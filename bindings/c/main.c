@@ -11,10 +11,8 @@ typedef void Toolkit;
 int main()
 {
     printf("Calling constructor\n");
-    void* pointer = NULL;
-    pointer = vrvToolkit_constructorResourcePath("../../data");
+    void* pointer = vrvToolkit_constructorResourcePath("../../data");
     printf("Pointer value %p\n",pointer);
-    const char * options = NULL;
-    options = vrvToolkit_getAvailableOptions(pointer);
+    const char * options = vrvToolkit_getAvailableOptions(pointer);
     printf("%s", options);
 }
