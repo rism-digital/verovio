@@ -335,60 +335,6 @@ void View::DrawStaffGrp(
 
     // adjust the top and bottom according to staffline width
     x += barLineWidth / 2;
-    // yTop += m_doc->GetDrawingStaffLineWidth(last->m_drawingStaffSize) / 1;
-    // yBottom -= m_doc->GetDrawingStaffLineWidth(last->m_drawingStaffSize) / 4;
-
-    Label *label = dynamic_cast<Label *>(staffGrp->FindChildByType(LABEL, 1));
-    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffGrp->FindChildByType(LABELABBR, 1));
-    Object *graphic = label;
-
-    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
-    std::wstring labelStr = (label) ? label->GetText(label) : L"";
-
-    if (abbreviations) {
-        labelStr = labelAbbrStr;
-        graphic = labelAbbr;
-    }
-
-    if (graphic && (labelStr.length() != 0)) {
-        // HARDCODED
-        int space = 4 * m_doc->GetDrawingBeamWidth(last->m_drawingStaffSize, false);
-        int xLabel = x - space;
-        int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(last->m_drawingStaffSize);
-
-        dc->SetBrush(m_currentColour, AxSOLID);
-
-        FontInfo grpTxt;
-        if (!dc->UseGlobalStyling()) {
-            grpTxt.SetFaceName("Times");
-        }
-
-        TextDrawingParams params;
-        params.m_x = xLabel;
-        params.m_y = yLabel;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(last->m_drawingStaffSize)->GetPointSize();
-
-        grpTxt.SetPointSize(params.m_pointSize);
-        dc->SetFont(&grpTxt);
-
-        dc->GetTextExtent(labelStr, &extend, true);
-
-        dc->StartGraphic(graphic, "", graphic->GetUuid());
-
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
-        DrawTextChildren(dc, graphic, params);
-        dc->EndText();
-
-        dc->EndGraphic(graphic, this);
-
-        // keep the widest width for the system
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-        if (system) {
-            system->SetDrawingLabelsWidth(extend.m_width + space);
-        }
-        dc->ResetFont();
-        dc->ResetBrush();
-    }
 
     // HARDCODED
     int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
@@ -721,7 +667,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         StaffDef *firstDef = NULL;
         ListOfObjects::const_iterator iter;
-        for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+        for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -732,7 +678,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         StaffDef *lastDef = NULL;
         ListOfObjects::const_reverse_iterator riter;
-        for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+        for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
             assert(staffDef);
             if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
