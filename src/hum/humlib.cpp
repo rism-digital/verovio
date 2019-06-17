@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jun 17 16:34:19 CEST 2019
+// Last Modified: Mon Jun 17 18:29:46 CEST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -11751,7 +11751,7 @@ int HumRegex::search(const string& input, const string& exp) {
 		return 0;
 	} else {
 		// return the char+1 position of the first match
-		return m_matches.position(0) + 1;
+		return (int)m_matches.position(0) + 1;
 	}
 }
 
@@ -11767,7 +11767,7 @@ int HumRegex::search(const string& input, int startindex,
 	} else if (m_matches.size() < 1) {
 		return 0;
 	} else {
-		return m_matches.position(0) + 1;
+		return (int)m_matches.position(0) + 1;
 	}
 }
 
@@ -11794,7 +11794,7 @@ int HumRegex::search(const string& input, const string& exp,
 	} else if (m_matches.size() < 1) {
 		return 0;
 	} else {
-		return m_matches.position(0) + 1;
+		return (int)m_matches.position(0) + 1;
 	}
 }
 
@@ -11810,7 +11810,7 @@ int HumRegex::search(const string& input, int startindex, const string& exp,
 	} else if (m_matches.size() < 1) {
 		return 0;
 	} else {
-		return m_matches.position(0) + 1;
+		return (int)m_matches.position(0) + 1;
 	}
 }
 
@@ -40555,7 +40555,7 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 		vector<int>& subfield, vector<int>& model, const string& astring,
 		HumdrumFile& infile) {
 
-	int finitsize = field.size();
+	int finitsize = (int)field.size();
 	int maxtrack = infile.getMaxTrack();
 
 	vector<HTp> ktracks;
@@ -50038,7 +50038,7 @@ int Tool_musicxml2hum::addHarmony(GridPart* part, MxmlEvent* event, HumNum nowti
 	} else {
 		MusicXmlHarmonyInfo hinfo;
 		hinfo.timestamp = offset;
-		hinfo.timestamp /= event->getQTicks();
+		hinfo.timestamp /= (int)event->getQTicks();
 		hinfo.timestamp += nowtime;
 		hinfo.partindex = partindex;
 		hinfo.token = htok;
@@ -54546,7 +54546,7 @@ void Tool_periodicity::printSvgAnalysis(ostream& out, vector<vector<double>>& an
 
 	int maxrow = getInteger("max-rows");
 	if (maxrow <= 0) {
-		maxrow = analysis.back().size();
+		maxrow = (int)analysis.back().size();
 	}
 
 

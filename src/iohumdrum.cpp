@@ -5145,7 +5145,7 @@ bool HumdrumInput::checkForTremolo(
 
     if (allpequal) {
         // beam group should be converted into a <bTrem> tremolo
-        hum::HumNum tdur = duration * notes.size();
+        hum::HumNum tdur = duration * (int)notes.size();
         std::string recip = hum::Convert::durationToRecip(tdur);
 
         int slashes = log(duration.getFloat()) / log(2.0);
@@ -5196,7 +5196,7 @@ bool HumdrumInput::checkForTremolo(
 
     // If got to this point, create an fTrem.
 
-    hum::HumNum tdur = duration * notes.size();
+    hum::HumNum tdur = duration * (int)notes.size();
     std::string recip = hum::Convert::durationToRecip(tdur);
     std::string unitrecip = hum::Convert::durationToRecip(duration);
 
