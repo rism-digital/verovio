@@ -6,6 +6,7 @@
 * Support iOS Framework build (@Noroxs)
 * Improved support for pedal marks in MusicXML import (@wergo)
 * Improved import of tuplets from PAE
+* Option to set minimum width for justification (--min-last-justification) (@earboxer).
 
 ### Changed
 * Method getMIDIValuesForElement (JS) return a JSON object
