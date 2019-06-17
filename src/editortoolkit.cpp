@@ -1513,9 +1513,6 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
         }
         else {
-            if(strcmp(m_editInfo, "") == 0) {
-                m_editInfo = fparent->GetUuid();
-            }
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc*>(el);
                 assert(nc);
