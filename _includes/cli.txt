@@ -1,4 +1,4 @@
-Verovio 2.2.0-dev-af4e03d
+Verovio 2.2.0-dev-39168e3
 
 Example usage:
 
@@ -24,6 +24,7 @@ Input and page layout options
  --hum-type                        Include type attributes when importing from Humdrum
  --landscape                       The landscape paper orientation flag
  --mensural-to-measure             Convert mensural sections to measure-based MEI
+ --min-last-justification <f>      The last system is only justified if the unjustified width is greater than this percent (default: 0.80; min: 0.00; max: 1.00)
  --mm-output                       Specify that the output in the SVG is given in mm (default is px)
  --no-footer                       Do not add any footer
  --no-header                       Do not add any header
