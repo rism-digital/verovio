@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jun 14 15:20:39 DST 2019
+// Last Modified: Mon Jun 17 16:34:19 CEST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1059,20 +1059,20 @@ class HumdrumLine : public std::string, public HumHash {
 		                                 const std::string& separator = ",");
 
 		// low-level editing functions (need to re-analyze structure after using)
-		void     appendToken            (HTp token);
-		void     appendToken            (const HumdrumToken& token);
-		void     appendToken            (const std::string& token);
-		void     appendToken            (const char* token);
+		void     appendToken            (HTp token, int tabcount = 1);
+		void     appendToken            (const HumdrumToken& token, int tabcount = 1);
+		void     appendToken            (const std::string& token, int tabcount = 1);
+		void     appendToken            (const char* token, int tabcount = 1);
 
-		void     appendToken            (int index, HTp token);
-		void     appendToken            (int index, const HumdrumToken& token);
-		void     appendToken            (int index, const std::string& token);
-		void     appendToken            (int index, const char* token);
+		void     appendToken            (int index, HTp token, int tabcount = 1);
+		void     appendToken            (int index, const HumdrumToken& token, int tabcount = 1);
+		void     appendToken            (int index, const std::string& token, int tabcount = 1);
+		void     appendToken            (int index, const char* token, int tabcount = 1);
 
-		void     insertToken            (int index, HTp token);
-		void     insertToken            (int index, const HumdrumToken& token);
-		void     insertToken            (int index, const std::string& token);
-		void     insertToken            (int index, const char* token);
+		void     insertToken            (int index, HTp token, int tabcount = 1);
+		void     insertToken            (int index, const HumdrumToken& token, int tabcount = 1);
+		void     insertToken            (int index, const std::string& token, int tabcount = 1);
+		void     insertToken            (int index, const char* token, int tabcount = 1);
 
 		void     setDuration            (HumNum aDur);
 		void     setDurationFromStart   (HumNum dur);
