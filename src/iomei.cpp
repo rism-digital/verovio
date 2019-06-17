@@ -5429,6 +5429,11 @@ void MeiInput::UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvSco
             vrvScoreDef->AttKeySigDefaultVis::StrToBoolean(scoreDef.attribute("key.sig.showchange").value()));
         scoreDef.remove_attribute("key.sig.showchange");
     }
+    if (scoreDef.attribute("meter.rend")) {
+        vrvScoreDef->SetMeterForm(vrvScoreDef->AttMeterSigDefaultVis::StrToMeterSigDefaultVisMeterform(
+            scoreDef.attribute("meter.rend").value()));
+        scoreDef.remove_attribute("meter.rend");
+    }
 }
 
 void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef)
@@ -5458,6 +5463,11 @@ void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
         labelAbbr->AddChild(text);
         vrvStaffDef->AddChild(labelAbbr);
         staffDef.remove_attribute("label.abbr");
+    }
+    if (staffDef.attribute("meter.rend")) {
+        vrvStaffDef->SetMeterForm(vrvStaffDef->AttMeterSigDefaultVis::StrToMeterSigDefaultVisMeterform(
+            staffDef.attribute("meter.rend").value()));
+        staffDef.remove_attribute("meter.rend");
     }
 }
 

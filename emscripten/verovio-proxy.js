@@ -118,7 +118,7 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 };
 
 verovio.toolkit.prototype.getMIDIValuesForElement = function (xmlId) {
-	return verovio.vrvToolkit.getMIDIValuesForElement(this.ptr, xmlId);
+	return JSON.parse(verovio.vrvToolkit.getMIDIValuesForElement(this.ptr, xmlId));
 };
 
 verovio.toolkit.prototype.getOptions = function (defaultValues) {

@@ -3,7 +3,13 @@
 ## [unreleased]
 * Support for `<turn>` in MusicXML import (@wergo)
 * Support for `<arpgeg>` in MusicXML import (@wergo)
+* Support iOS Framework build (@Noroxs)
+* Improved support for pedal marks in MusicXML import (@wergo)
 * Improved import of tuplets from PAE
+* Option to set minimum width for justification (--min-last-justification) (@earboxer).
+
+### Changed
+* Method getMIDIValuesForElement (JS) return a JSON object
 
 ## [2.1.0] - 2019-05-25
 * Update pugixml

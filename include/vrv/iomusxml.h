@@ -170,7 +170,7 @@ private:
     void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, std::string measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset);
     void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
