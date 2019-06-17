@@ -383,6 +383,9 @@ bool Toolkit::LoadData(const std::string &data)
         MeiOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
+
+        // Read embedded options from input Humdrum file:
+        tempinput->parseEmbeddedOptions(m_doc);
         delete tempinput;
 
         input = new MeiInput(&m_doc, "");

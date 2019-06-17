@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 16 06:34:09 PDT 2019
+// Last Modified: Fri Jun 14 15:20:39 DST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3853,6 +3853,58 @@ void GridMeasure::addDynamicsLayoutParameters(GridSlice* slice, int partindex,
 
 //////////////////////////////
 //
+// GridMeasure::addFiguredBassLayoutParameters --
+//
+
+void GridMeasure::addFiguredBassLayoutParameters(GridSlice* slice, int partindex,
+		const string& locomment) {
+	auto iter = this->rbegin();
+	if (iter == this->rend()) {
+		// something strange happened: expecting at least one item in measure.
+		return;
+	}
+	GridPart* part;
+
+	while ((iter != this->rend()) && (*iter != slice)) {
+		iter++;
+	}
+
+	if (*iter != slice) {
+		// cannot find owning line.
+		return;
+	}
+
+	auto previous = iter;
+	previous++;
+	while (previous != this->rend()) {
+		if ((*previous)->isLayoutSlice()) {
+			part = (*previous)->at(partindex);
+			if ((part->getFiguredBass() == NULL) || (*part->getFiguredBass() == "!")) {
+				HTp token = new HumdrumToken(locomment);
+				part->setFiguredBass(token);
+				return;
+			} else {
+				previous++;
+				continue;
+			}
+		} else {
+			break;
+		}
+	}
+
+	auto insertpoint = previous.base();
+	GridSlice* newslice = new GridSlice(this, (*iter)->getTimestamp(), SliceType::Layouts);
+	newslice->initializeBySlice(*iter);
+	this->insert(insertpoint, newslice);
+
+	HTp newtoken = new HumdrumToken(locomment);
+	newslice->at(partindex)->setFiguredBass(newtoken);
+}
+
+
+
+//////////////////////////////
+//
 // GridMeasure::isMonophonicMeasure --  One part starts with note/rest, the others
 //     with invisible rest.
 //
@@ -4267,6 +4319,27 @@ void GridSide::setDynamics(const string& token) {
 
 
 
+//////////////////////////////
+//
+// GridSide::setFiguredBass --
+//
+
+void GridSide::setFiguredBass(HTp token) {
+	if (m_figured_bass) {
+		delete m_figured_bass;
+		m_figured_bass = NULL;
+	}
+	m_figured_bass = token;
+}
+
+
+void GridSide::setFiguredBass(const string& token) {
+	HTp newtoken = new HumdrumToken(token);
+	setFiguredBass(newtoken);
+}
+
+
+
 ///////////////////////////
 //
 // GridSide::detachHarmony --
@@ -4285,6 +4358,17 @@ void GridSide::detachHarmony(void) {
 
 void GridSide::detachDynamics(void) {
 	m_dynamics = NULL;
+}
+
+
+
+///////////////////////////
+//
+// GridSide::detachFiguredBass --
+//
+
+void GridSide::detachFiguredBass(void) {
+	m_figured_bass = NULL;
 }
 
 
@@ -4318,6 +4402,32 @@ HTp GridSide::getDynamics(void) {
 
 int GridSide::getDynamicsCount(void) {
 	if (m_dynamics == NULL) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridSide::getFiguredBass --
+//
+
+HTp GridSide::getFiguredBass(void) {
+	return m_figured_bass;
+}
+
+
+
+//////////////////////////////
+//
+// GridSide::getFiguredBassCount --
+//
+
+int GridSide::getFiguredBassCount(void) {
+	if (m_figured_bass == NULL) {
 		return 0;
 	} else {
 		return 1;
@@ -4692,8 +4802,9 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 
 			int maxvcount = getVerseCount(p, s);
 			int maxhcount = getHarmonyCount(p, s);
+			int maxfcount = getFiguredBassCount(p, s);
 			if (hasSpines()) {
-				transferSides(*line, staff, empty, maxvcount, maxhcount);
+				transferSides(*line, staff, empty, maxvcount, maxhcount, maxfcount);
 			}
 		}
 
@@ -4701,9 +4812,10 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		int maxhcount = getHarmonyCount(p);
 		int maxvcount = getVerseCount(p, -1);
 		int maxdcount = getDynamicsCount(p);
+		int maxfcount = getFiguredBassCount(p);
 
 		if (hasSpines()) {
-			transferSides(*line, part, p, empty, maxvcount, maxhcount, maxdcount);
+			transferSides(*line, part, p, empty, maxvcount, maxhcount, maxdcount, maxfcount);
 		}
 	}
 
@@ -4803,13 +4915,34 @@ int GridSlice::getDynamicsCount(int partindex, int staffindex) {
 
 //////////////////////////////
 //
+// GridSlice::getFiguredBassCount -- Return 0 if no figured bass; otherwise,
+//     typically returns 1.
+//
+
+int GridSlice::getFiguredBassCount(int partindex, int staffindex) {
+	HumGrid* grid = getOwner();
+	if (!grid) {
+		return 0;
+	}
+	if (staffindex >= 0) {
+		// ignoring staff-level figured bass
+		return 0;
+	} else {
+		return grid->getFiguredBassCount(partindex);
+	}
+}
+
+
+
+//////////////////////////////
+//
 // GridSlice::transferSides --
 //
 
 // this version is used to transfer Sides from the Part
 void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
 		int partindex, const string& empty, int maxvcount, int maxhcount,
-		int maxdcount) {
+		int maxdcount, int maxfcount) {
 
 	int hcount = sides.getHarmonyCount();
 	int vcount = sides.getVerseCount();
@@ -4843,6 +4976,17 @@ void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
 		}
 	}
 
+	if (maxfcount > 0) {
+		HTp figuredbass = sides.getFiguredBass();
+		if (figuredbass) {
+			line.appendToken(figuredbass);
+			sides.detachFiguredBass();
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
 	for (int i=0; i<hcount; i++) {
 		HTp harmony = sides.getHarmony();
 		if (harmony) {
@@ -4863,10 +5007,12 @@ void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
 
 // this version is used to transfer Sides from the Staff
 void GridSlice::transferSides(HumdrumLine& line, GridStaff& sides,
-		const string& empty, int maxvcount, int maxhcount) {
+		const string& empty, int maxvcount, int maxhcount, int maxfcount) {
 
 	// existing verses:
 	int vcount = sides.getVerseCount();
+
+	int fcount = sides.getFiguredBassCount();
 
 	// there should not be any harony attached to staves
 	// (only to parts, so hcount should only be zero):
@@ -4902,12 +5048,31 @@ void GridSlice::transferSides(HumdrumLine& line, GridStaff& sides,
 		}
 	}
 
+	for (int i=0; i<fcount; i++) {
+		HTp figuredbass = sides.getFiguredBass();
+		if (figuredbass) {
+			line.appendToken(figuredbass);
+			sides.detachFiguredBass();
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
 	if (hcount < maxhcount) {
 		for (int i=hcount; i<maxhcount; i++) {
 			newtoken = new HumdrumToken(empty);
 			line.appendToken(newtoken);
 		}
 	}
+
+	if (fcount < maxfcount) {
+		for (int i=fcount; i<maxfcount; i++) {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
 }
 
 
@@ -5969,7 +6134,9 @@ HumGrid::HumGrid(void) {
 	m_verseCount.resize(100);
 	m_harmonyCount.resize(100);
 	m_dynamics.resize(100);
+	m_figured_bass.resize(100);
 	fill(m_dynamics.begin(), m_dynamics.end(), false);
+	fill(m_figured_bass.begin(), m_figured_bass.end(), false);
 	fill(m_harmonyCount.begin(), m_harmonyCount.end(), 0);
 
 	// default options
@@ -6093,6 +6260,20 @@ int HumGrid::getDynamicsCount(int partindex) {
 
 //////////////////////////////
 //
+// HumGrid::getFiguredBassCount --
+//
+
+int HumGrid::getFiguredBassCount(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_figured_bass.size())) {
+		return 0;
+	}
+	return m_figured_bass[partindex];
+}
+
+
+
+//////////////////////////////
+//
 // HumGrid::getVerseCount --
 //
 
@@ -6127,6 +6308,20 @@ bool HumGrid::hasDynamics(int partindex) {
 
 //////////////////////////////
 //
+// HumGrid::hasFiguredBass -- Return true if there is any figured bass for the part.
+//
+
+bool HumGrid::hasFiguredBass(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_figured_bass.size())) {
+		return false;
+	}
+	return m_figured_bass[partindex];
+}
+
+
+
+//////////////////////////////
+//
 // HumGrid::setDynamicsPresent -- Indicate that part needs a **dynam spine.
 //
 
@@ -6135,6 +6330,20 @@ void HumGrid::setDynamicsPresent(int partindex) {
 		return;
 	}
 	m_dynamics[partindex] = true;
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::setFiguredBassPresent -- Indicate that part needs a **fb spine.
+//
+
+void HumGrid::setFiguredBassPresent(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_figured_bass.size())) {
+		return;
+	}
+	m_figured_bass[partindex] = true;
 }
 
 
@@ -6513,7 +6722,7 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 				}
 			} else {
 				if (voicecount > 1) {
-					for (int j=newstaff->size(); j<voicecount; j++) {
+					for (int j=(int)newstaff->size(); j<voicecount; j++) {
 						// GridVoice* vdata = createVoice("*", "F", 0, p, s);
 						// newstaff->push_back(vdata);
 					}
@@ -6792,7 +7001,7 @@ void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 GridVoice* HumGrid::createVoice(const string& tok, const string& post, HumNum duration, int pindex, int sindex) {
 	//std::string token = tok;
 	//token += ":" + post + ":" + to_string(pindex) + "," + to_string(sindex);
-	GridVoice* gv = gv = new GridVoice(tok.c_str(), 0);
+	GridVoice* gv = new GridVoice(tok.c_str(), 0);
 	return gv;
 }
 
@@ -7693,7 +7902,7 @@ void HumGrid::addNullTokens(void) {
 	int s; // staff index
 	int v; // voice index
 
-	if (0) {
+	if ((0)) {
 		cerr << "SLICE TIMESTAMPS: " << endl;
 		for (int x=0; x<(int)m_allslices.size(); x++) {
 			cerr << "\tTIMESTAMP " << x << "= "
@@ -7812,7 +8021,7 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 	HumNum slicedur = nextts - currts;
 	HumNum timeleft = tokendur - slicedur;
 
-	if (0) {
+	if ((0)) {
 		cerr << "===================" << endl;
 		cerr << "EXTENDING TOKEN    " << token      << endl;
 		cerr << "\tTOKEN DUR:       " << tokendur   << endl;
@@ -8056,6 +8265,11 @@ void HumGrid::insertExInterpSides(HumdrumLine* line, int part, int staff) {
 		line->appendToken(token);
 	}
 
+	if ((staff < 0) && hasFiguredBass(part)) {
+		HTp token = new HumdrumToken("**fb");
+		line->appendToken(token);
+	}
+
 	if (staff < 0) {
 		int harmonyCount = getHarmonyCount(part);
 		for (int i=0; i<harmonyCount; i++) {
@@ -8123,6 +8337,12 @@ void HumGrid::insertSidePartInfo(HumdrumLine* line, int part, int staff) {
 	if (staff < 0) {
 
 		if (hasDynamics(part)) {
+			text = "*part" + to_string(part+1);
+			token = new HumdrumToken(text);
+			line->appendToken(token);
+		}
+
+		if (hasFiguredBass(part)) {
 			text = "*part" + to_string(part+1);
 			token = new HumdrumToken(text);
 			line->appendToken(token);
@@ -8216,6 +8436,11 @@ void HumGrid::insertSideStaffInfo(HumdrumLine* line, int part, int staff,
 			line->appendToken(token);
 		}
 
+		if (hasFiguredBass(part)) {
+			token = new HumdrumToken("*");
+			line->appendToken(token);
+		}
+
 		int harmcount = getHarmonyCount(part);
 		for (int i=0; i<harmcount; i++) {
 			token = new HumdrumToken("*");
@@ -8292,6 +8517,11 @@ void HumGrid::insertSideTerminals(HumdrumLine* line, int part, int staff) {
 	if (staff < 0) {
 
 		if (hasDynamics(part)) {
+			token = new HumdrumToken("*-");
+			line->appendToken(token);
+		}
+
+		if (hasFiguredBass(part)) {
 			token = new HumdrumToken("*-");
 			line->appendToken(token);
 		}
@@ -13749,6 +13979,68 @@ bool HumdrumFileBase::analyzeTokens(void) {
 		m_lines[i]->createTokensFromLine();
 	}
 	return isValid();
+}
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::removeExtraTabs --
+//
+
+void HumdrumFileBase::removeExtraTabs(void) {
+	for (int i=0; i<(int)m_lines.size(); i++) {
+		m_lines[i]->removeExtraTabs();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::addExtraTabs --
+//
+
+void HumdrumFileBase::addExtraTabs(void) {
+	vector<int> trackWidths = getTrackWidths();
+
+	HumdrumFileBase& infile = *this;
+	vector<int> local(trackWidths.size());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		infile[i].addExtraTabs(trackWidths);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getTrackWidths -- Return a list of the maximum
+//    subspine count for each track in the file.  The 0th track is
+//    not used, so it will be zero and ignored.
+//
+
+vector<int> HumdrumFileBase::getTrackWidths(void) {
+	HumdrumFileBase& infile = *this;
+	vector<int> output(infile.getTrackCount() + 1, 1);
+	output[0] = 0;
+	vector<int> local(infile.getTrackCount() + 1);
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		fill(local.begin(), local.end(), 0);
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			local[track]++;
+		}
+		for (int j=1; j<(int)local.size(); j++) {
+			if (local[j] > output[j]) {
+				output[j] = local[j];
+			}
+		}
+	}
+	return output;
 }
 
 
@@ -19962,6 +20254,10 @@ HumdrumLine::HumdrumLine(HumdrumLine& line)  : string((string)line) {
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		m_tokens[i] = new HumdrumToken(*line.m_tokens[i], this);
 	}
+	m_tabs.resize(line.m_tabs.size());
+	for (int i=0; i<(int)m_tabs.size(); i++) {
+		m_tabs.at(i) = line.m_tabs.at(i);
+	}
 	m_owner = NULL;
 }
 
@@ -19975,6 +20271,10 @@ HumdrumLine::HumdrumLine(HumdrumLine& line, void* owner) : string((string)line) 
 	m_tokens.resize(line.m_tokens.size());
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		m_tokens[i] = new HumdrumToken(*line.m_tokens[i], this);
+	}
+	m_tabs.resize(line.m_tabs.size());
+	for (int i=0; i<(int)m_tabs.size(); i++) {
+		m_tabs.at(i) = line.m_tabs.at(i);
 	}
 	m_owner = owner;
 }
@@ -19995,6 +20295,10 @@ HumdrumLine& HumdrumLine::operator=(HumdrumLine& line) {
 	m_tokens.resize(line.m_tokens.size());
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		m_tokens[i] = new HumdrumToken(*line.m_tokens[i], this);
+	}
+	m_tabs.resize(line.m_tabs.size());
+	for (int i=0; i<(int)m_tabs.size(); i++) {
+		m_tabs.at(i) = line.m_tabs.at(i);
 	}
 	m_owner = NULL;
 	return *this;
@@ -20115,6 +20419,8 @@ void HumdrumLine::clear(void) {
 			m_tokens[i] = NULL;
 		}
 	}
+	m_tokens.clear();
+	m_tabs.clear();
 }
 
 
@@ -20837,27 +21143,44 @@ int HumdrumLine::createTokensFromLine(void) {
 		delete m_tokens[i];
 		m_tokens[i] = NULL;
 	}
-	m_tokens.resize(0);
+	m_tokens.clear();
+	m_tabs.clear();
 	HTp token;
-	char ch;
+	char ch = 0;
+	char lastch = 0;
 	string tstring;
 
 	if (this->size() == 0) {
 		token = new HumdrumToken();
 		token->setOwner(this);
 		m_tokens.push_back(token);
+		m_tokens.push_back(0);
 	} else if (this->compare(0, 2, "!!") == 0) {
 		token = new HumdrumToken(this->c_str());
 		token->setOwner(this);
 		m_tokens.push_back(token);
+		m_tabs.push_back(0);
 	} else {
 		for (int i=0; i<(int)size(); i++) {
+			lastch = ch;
 			ch = getChar(i);
 			if (ch == '\t') {
-				token = new HumdrumToken(tstring);
-				token->setOwner(this);
-				m_tokens.push_back(token);
-				tstring.clear();
+				// Parser now allows multiple tab characters in a 
+				// row to represent a single tab.
+				if (lastch != '\t') {
+					token = new HumdrumToken(tstring);
+					token->setOwner(this);
+					m_tokens.push_back(token);
+					if (m_tabs.size() > 0) {
+						m_tabs.back()++;
+					}
+					m_tabs.push_back(1);
+					tstring.clear();
+				} else {
+					if (m_tabs.size() > 0) {
+						m_tabs[m_tabs.size() - 1]++;
+					}
+				}
 			} else {
 				tstring += ch;
 			}
@@ -20867,6 +21190,7 @@ int HumdrumLine::createTokensFromLine(void) {
 		token = new HumdrumToken(tstring);
 		token->setOwner(this);
 		m_tokens.push_back(token);
+		m_tabs.push_back(0);
 		tstring.clear();
 	}
 
@@ -20890,8 +21214,63 @@ void HumdrumLine::createLineFromTokens(void) {
 	for (int i=0; i<(int)m_tokens.size(); i++) {
 		iline += (string)(*m_tokens[i]);
 		if (i < (int)m_tokens.size() - 1) {
-			iline += '\t';
+			if (m_tabs[i] == 0) {
+				m_tabs[i] = 1;
+			}
+			for (int j=0; j<m_tabs[i]; j++) {
+				iline += '\t';
+			}
 		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::removeExtraTabs -- Allow only for one tab between spine fields.
+//    The tab counts are set to 0, but the line creation function knows to use
+//    a minimum of one tab between fields.  The HumdrumFile::createLinesFromtTokens()
+//    function should be called after running this function and before printing
+//    the data so that the tabs in the text line can be updated.
+//
+
+void HumdrumLine::removeExtraTabs(void) {
+	fill(m_tabs.begin(), m_tabs.end(), 0);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::addExtraTabs -- Adds extra tabs between primary spines so that the
+//    first token of a spine is vertically aligned.  The input array to this
+//    function is a list of maximum widths.  This is typically caluclated by
+//    HumdrumFileBase::getTrackWidths().  The first indexed value is unused,
+//    since there is no track 0.
+//
+
+void HumdrumLine::addExtraTabs(vector<int>& trackWidths) {
+	if (!this->hasSpines()) {
+		return;
+	}
+
+	fill(m_tabs.begin(), m_tabs.end(), 1);
+	vector<int> local(trackWidths.size(), 0);
+
+	int lasttrack = 0;
+	int track = 0;
+	for (int j=0; j<getFieldCount(); j++) {
+		lasttrack = track;
+		HTp token = this->token(j);
+		track = token->getTrack();
+		if ((track != lasttrack) && (lasttrack > 0)) {
+			int diff = trackWidths.at(lasttrack) - local.at(lasttrack);
+			if ((diff > 0) && (j > 0)) {
+				m_tabs.at(j-1) += diff;
+			}
+		}
+		local.at(track)++;
 	}
 }
 
@@ -24845,6 +25224,18 @@ void MxmlEvent::reportDynamicToOwner(void) {
 
 //////////////////////////////
 //
+// MxmlEvent::reportFiguredBassToOwner -- inform the owner that there is a dynamic
+//    that needs a spine to store it in.
+//
+
+void MxmlEvent::reportFiguredBassToOwner(void) {
+	m_owner->reportFiguredBassToOwner();
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::reportCaesuraToOwner -- inform the owner that there is a caesura
 //    that needs an RDF marker.
 // default value: letter = "Z"
@@ -26594,11 +26985,33 @@ void MxmlEvent::setDynamics(xml_node node) {
 
 //////////////////////////////
 //
+// MxmlEvent::setFiguredBass --
+//
+
+void MxmlEvent::setFiguredBass(xml_node node) {
+	m_figured_bass = node;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::getDynamics --
 //
 
 xml_node MxmlEvent::getDynamics(void) {
 	return m_dynamics;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getFiguredBass --
+//
+
+xml_node MxmlEvent::getFiguredBass(void) {
+	return m_figured_bass;
 }
 
 
@@ -26937,6 +27350,17 @@ void MxmlMeasure::reportHarmonyCountToOwner(int count) {
 
 void MxmlMeasure::reportDynamicToOwner(void) {
 	m_owner->receiveDynamic();
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::reportFiguredBassToOwner --
+//
+
+void MxmlMeasure::reportFiguredBassToOwner(void) {
+	m_owner->receiveFiguredBass();
 }
 
 
@@ -27703,6 +28127,17 @@ bool MxmlPart::hasDynamics(void) const {
 
 //////////////////////////////
 //
+// MxmlPart::hasFiguredBass --
+//
+
+bool MxmlPart::hasFiguredBass(void) const {
+	return m_has_figured_bass;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlPart::getVerseCount -- Return the number of verses in the part.
 //
 
@@ -27756,6 +28191,17 @@ void MxmlPart::receiveHarmonyCount(int count) {
 
 void MxmlPart::receiveDynamic(void) {
 	m_has_dynamics = true;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::receiveFiguredBass --
+//
+
+void MxmlPart::receiveFiguredBass(void) {
+	m_has_figured_bass = true;
 }
 
 
@@ -41522,6 +41968,10 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
 		} else if (commands[i].first == "slur") {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
+		} else if (commands[i].first == "spinetrace") {
+			RUNTOOL(spinetrace, infile, commands[i].second, status);
+		} else if (commands[i].first == "tabber") {
+			RUNTOOL(tabber, infile, commands[i].second, status);
 		} else if (commands[i].first == "tassoize") {
 			RUNTOOL(tassoize, infile, commands[i].second, status);
 		} else if (commands[i].first == "tasso") {
@@ -47622,6 +48072,15 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		}
 	}
 
+	// transfer figured bass boolean for part to HumGrid
+	for (int p=0; p<(int)partdata.size(); p++) {
+		bool fbstate = partdata[p].hasFiguredBass();
+		if (fbstate) {
+			outdata.setFiguredBassPresent(p);
+			break;
+		}
+	}
+
 
 	if (m_recipQ || m_forceRecipQ) {
 		outdata.enableRecipSpine();
@@ -48880,6 +49339,22 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 			}
 		}
 	}
+
+	if (m_current_figured_bass) {
+		event->setFiguredBass(m_current_figured_bass);
+		string fparam = getFiguredBassParameters(m_current_figured_bass);
+		m_current_figured_bass = xml_node(NULL);
+		event->reportFiguredBassToOwner();
+		addFiguredBass(slice->at(partindex), event);
+		if (fparam != "") {
+			GridMeasure *gm = slice->getMeasure();
+			string fullparam = "!LO:FB" + fparam;
+			if (gm) {
+				gm->addFiguredBassLayoutParameters(slice, partindex, fullparam);
+			}
+		}
+	}
+
 }
 
 
@@ -49185,7 +49660,164 @@ void Tool_musicxml2hum::addDynamic(GridPart* part, MxmlEvent* event) {
 
 //////////////////////////////
 //
-// Tool_musicxml2hum::getDynanmicsParameters --  Already presumed to be a dynamic.
+// Tool_musicxml2hum::addFiguredBass -- extract any figured bass for the event
+// ggg: still need to implement
+//
+// Such as:
+//
+//      <figured-bass>
+//        <figure>
+//          <figure-number>0</figure-number>
+//        </figure>
+//      </figured-bass>
+// or:
+//      <figured-bass>
+//        <figure>
+//          <figure-number>5</figure-number>
+//          <suffix>backslash</suffix>
+//        </figure>
+//        <figure>
+//          <figure-number>2</figure-number>
+//          <suffix>cross</suffix>
+//        </figure>
+//      </figured-bass>
+//
+//      <figured-bass parentheses="yes">
+//        <figure>
+//          <prefix>flat</prefix>
+//        </figure>
+//      </figured-bass>
+//
+//      <figured-bass>
+//        <figure>
+//          <figure-number>6</figure-number>
+//          <extend type="start" />
+//        </figure>
+//      <figured-bass>
+//
+//
+
+void Tool_musicxml2hum::addFiguredBass(GridPart* part, MxmlEvent* event) {
+	xml_node fbroot = event->getFiguredBass();
+	if (!fbroot) {
+		return;
+	}
+	string fbstring;
+
+	// Parentheses can only enclose an entire figure stack, not
+	// individual numbers or accidentals on numbers in MusicXML,
+	// so apply an editorial mark for parentheses.
+	string editorial;
+	xml_attribute pattr = fbroot.attribute("parentheses");
+	if (pattr) {
+		string pval = pattr.value();
+		if (pval == "yes") {
+			editorial = "i";
+		}
+	}
+	// There is no bracket for FB in musicxml (3.0).
+
+	auto children = fbroot.select_nodes("figure");
+	for (int i=0; i<(int)children.size(); i++) {
+		fbstring += convertFiguredBassNumber(children[i].node());
+		fbstring += editorial;
+		if (i < (int)children.size() - 1) {
+			fbstring += " ";
+		}
+	}
+
+	HTp fbtok = new HumdrumToken(fbstring);
+	part->setFiguredBass(fbtok);
+}
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::convertFiguredBassNumber --
+//
+
+string Tool_musicxml2hum::convertFiguredBassNumber(const xml_node& figure) {
+	string output;
+	xml_node fnum = figure.select_node("figure-number").node();
+	// assuming one each of prefix/suffix:
+	xml_node prefixelement = figure.select_node("prefix").node();
+	xml_node suffixelement = figure.select_node("suffix").node();
+
+	string prefix;
+	if (prefixelement) {
+		prefix = prefixelement.child_value();
+	}
+
+	string suffix;
+	if (suffixelement) {
+		suffix = suffixelement.child_value();
+	}
+
+	string number;
+	if (fnum) {
+		number = fnum.child_value();
+	}
+
+	string accidental;
+	string slash;
+
+	if (prefix == "flat-flat") {
+		accidental = "--";
+	} else if (prefix == "flat") {
+		accidental = "-";
+	} else if (prefix == "double-sharp") {
+		accidental = "##";
+	} else if (prefix == "sharp") {
+		accidental = "#";
+	} else if (prefix == "natural") {
+		accidental = "n";
+	} else if (suffix == "flat-flat") {
+		accidental = "--r";
+	} else if (suffix == "flat") {
+		accidental = "-r";
+	} else if (suffix == "double-sharp") {
+		accidental = "##r";
+	} else if (suffix == "sharp") {
+		accidental = "#r";
+	} else if (suffix == "natural") {
+		accidental = "nr";
+	}
+
+	// If suffix is "cross", "slash" or "backslash",  then an accidental
+	// should be given (probably either a natural or a sharp in general, but
+	// could be a flat).  At the moment do not assign the accidental, but
+	// in the future assign an accidental to the slashed figure, probably
+	// with a post-processing tool.
+	if (suffix == "cross" || prefix == "cross") {
+		slash = "|";
+	} else if ((suffix == "backslash") || (prefix == "backslash")) {
+		slash = "\\";
+	} else if ((suffix == "slash") || (prefix == "slash")) {
+		slash = "/";
+	}
+
+	string editorial;
+	string extension;
+
+	xml_node extendelement = figure.select_node("extend").node();
+	if (extendelement) {
+		string typestring = extendelement.attribute("type").value();
+		if (typestring == "start") {
+			extension = "_";
+		}
+	}
+
+	output += accidental + number + slash + editorial + extension;
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getDynanmicsParameters --  Already presumed to be
+//     a dynamic.
 //
 
 string Tool_musicxml2hum::getDynamicsParameters(xml_node element) {
@@ -49227,6 +49859,22 @@ string Tool_musicxml2hum::getDynamicsParameters(xml_node element) {
 		output = "";
 	}
 
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getFiguredBassParameters --  Already presumed to be
+//     figured bass.
+//
+
+string Tool_musicxml2hum::getFiguredBassParameters(xml_node element) {
+	string output;
+	if (!nodeType(element, "figured-bass")) {
+		return output;
+	}
 	return output;
 }
 
@@ -49820,7 +50468,8 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 						m_current_dynamic = element;
 					}
 				}
-
+			} else if (nodeType(element, "figured-bass")) {
+				m_current_figured_bass = element;
 			} else if (nodeType(element, "note")) {
 				if (foundnongrace) {
 					addEventToList(graceafter, nowevents[i]->zerodur[j]);
@@ -56558,6 +57207,176 @@ void Tool_slurcheck::processFile(HumdrumFile& infile) {
 	infile.createLinesFromTokens();
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_gridtest::Tool_spinetrace -- Set the recognized options for the tool.
+//
+
+Tool_spinetrace::Tool_spinetrace(void) {
+	define("a|append=b", "append analysis to input data lines");
+	define("p|prepend=b", "prepend analysis to input data lines");
+}
+
+
+
+///////////////////////////////
+//
+// Tool_spinetrace::run -- Primary interfaces to the tool.
+//
+
+bool Tool_spinetrace::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_spinetrace::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	return status;
+}
+
+
+bool Tool_spinetrace::run(HumdrumFile& infile) {
+   initialize(infile);
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_spinetrace::initialize --
+//
+
+void Tool_spinetrace::initialize(HumdrumFile& infile) {
+	// do nothing for now
+}
+
+
+
+//////////////////////////////
+//
+// Tool_spinetrace::processFile --
+//
+
+void Tool_spinetrace::processFile(HumdrumFile& infile) {
+	bool appendQ = getBoolean("append");
+	bool prependQ = getBoolean("prepend");
+
+	int linecount = infile.getLineCount();
+	for (int i=0; i<linecount; i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		if (appendQ) {
+			m_humdrum_text << infile[i] << "\t";
+		}
+
+		if (!infile[i].isData()) {
+			if (infile[i].isInterpretation()) {
+				int fieldcount = infile[i].getFieldCount();
+				for (int j=0; j<fieldcount; j++) {
+					HTp token = infile.token(i, j);
+					if (token->compare(0, 2, "**") == 0) {
+						m_humdrum_text << "**spine";
+					} else {
+						m_humdrum_text << token;
+					}
+					if (j < fieldcount - 1) {
+						m_humdrum_text << "\t";
+					}
+				}
+			} else {
+				m_humdrum_text << infile[i];
+			}
+		} else {
+			int fieldcount = infile[i].getFieldCount();
+			for (int j=0; j<fieldcount; j++) {
+				m_humdrum_text << infile[i].token(j)->getSpineInfo();
+				if (j < fieldcount - 1) {
+					m_humdrum_text << '\t';
+				}
+			}
+		}
+
+		if (prependQ) {
+			m_humdrum_text << "\t" << infile[i];
+		}
+		m_humdrum_text << "\n";
+	}
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_gridtest::Tool_tabber -- Set the recognized options for the tool.
+//
+
+Tool_tabber::Tool_tabber(void) {
+	// do nothing for now.
+	define("r|remove=b",    "remove any extra tabs");
+}
+
+
+
+///////////////////////////////
+//
+// Tool_tabber::run -- Primary interfaces to the tool.
+//
+
+bool Tool_tabber::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_tabber::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	out << m_free_text.str();
+	return status;
+}
+
+
+bool Tool_tabber::run(HumdrumFile& infile) {
+   initialize(infile);
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tabber::initialize --
+//
+
+void Tool_tabber::initialize(HumdrumFile& infile) {
+	// do nothing for now
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tabber::processFile --
+//
+
+void Tool_tabber::processFile(HumdrumFile& infile) {
+	if (getBoolean("remove")) {
+		infile.removeExtraTabs();
+	} else {
+		infile.addExtraTabs();
+	}
+	infile.createLinesFromTokens();
+}
 
 
 
