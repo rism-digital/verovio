@@ -565,6 +565,19 @@ Options::Options()
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
 
+    m_useFacsimile.SetInfo("Use facsimile for layout", "Use information in the <facsimile> element to control the layout");
+    m_useFacsimile.Init(false);
+    this->Register(&m_useFacsimile, "useFacsimile", &m_general);
+
+    m_useSylBBox.SetInfo("Use syl bounding boxes", "Use information in the in the <facsimile> element to display syl text bounding boxes");
+    m_useSylBBox.Init(false);
+    this->Register(&m_useSylBBox, "useSylBBox", &m_general);
+
+    m_createDefaultSylBBox.SetInfo("Make default syl bounding boxes",
+        "When no facsimile data is provided for a syl, make a default element with coordinates similar to that of its syllable");
+    m_createDefaultSylBBox.Init(false);
+    this->Register(&m_createDefaultSylBBox, "createDefaultSylBBox", &m_general);
+
     m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
     m_usePgFooterForAll.Init(false);
     this->Register(&m_usePgFooterForAll, "usePgFooterForAll", &m_general);
