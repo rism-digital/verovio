@@ -55,6 +55,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_svgNode.append_attribute("version") = "1.1";
     m_svgNode.append_attribute("xmlns") = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute("xmlns:xlink") = "http://www.w3.org/1999/xlink";
+    m_svgNode.append_attribute("xmlns:mei") = "http://www.music-encoding.org/ns/mei";
     m_svgNode.append_attribute("overflow") = "visible";
 
     // start the stack
@@ -245,6 +246,17 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
             else if (att->GetVisible() == BOOLEAN_false) {
                 m_currentNode.append_attribute("visibility") = "hidden";
             }
+        }
+    }
+
+    if (object->HasAttClass(ATT_LINKING)) {
+        AttLinking *att = dynamic_cast<AttLinking *>(object);
+        assert(att);
+        if (att->HasFollows()) {
+            m_currentNode.append_attribute("mei:follows") = att->GetFollows().c_str();
+        }
+        if (att->HasPrecedes()) {
+            m_currentNode.append_attribute("mei:precedes") = att->GetPrecedes().c_str();
         }
     }
 
