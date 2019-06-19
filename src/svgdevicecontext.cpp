@@ -736,6 +736,7 @@ void SvgDeviceContext::EndText()
 //if the bounding box is specified then append a rect child
 void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
+    LogMessage("svgdevicecontext::Drawtext");
     assert(m_fontStack.top());
 
     std::string svgText = text;
@@ -768,12 +769,8 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     textChild.append_attribute("class") = "text";
     textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
 
-    if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
-        textChild.append_attribute("x") = StringFormat("%d", x).c_str();
-        textChild.append_attribute("y") = StringFormat("%d", y).c_str();
-    }
-
-    if ((x != VRV_UNSET) && (y != VRV_UNSET) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
+    if ((x != 0) && (y != 0) && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
+        LogMessage("%d, %d", width, height);
         pugi::xml_node g = m_currentNode.parent().parent();
         pugi::xml_node rectChild = g.append_child("rect");
         rectChild.append_attribute("class") = "sylTextRect";
@@ -782,6 +779,24 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         rectChild.append_attribute("width") = StringFormat("%d", width).c_str();
         rectChild.append_attribute("height") = StringFormat("%d", height).c_str();
     }
+    else if (true) {
+        //TEMP FIX LATER 
+        //should be m_doc->GetOptions->m_createDefaultSylBBox->GetValue() or similar
+        LogMessage("if true: %d, %d", width, height);
+        pugi::xml_node g = m_currentNode.parent().parent();
+        pugi::xml_node rectChild = g.append_child("rect");
+        rectChild.append_attribute("class") = "sylTextRect";
+        rectChild.append_attribute("x") = StringFormat("%d", x).c_str();
+        rectChild.append_attribute("y") = StringFormat("%d", y).c_str();
+        rectChild.append_attribute("width") = StringFormat("%d", x + 100).c_str();
+        rectChild.append_attribute("height") = StringFormat("%d", y + 100).c_str();
+    }
+    else {
+        textChild.append_attribute("x") = StringFormat("%d", x).c_str();
+        textChild.append_attribute("y") = StringFormat("%d", y).c_str();
+    }
+
+    
 }
 
 void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)
