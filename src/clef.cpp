@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "scoredefinterface.h"
 
 namespace vrv {

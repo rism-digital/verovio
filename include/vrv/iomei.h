@@ -119,6 +119,7 @@ class Space;
 class Staff;
 class Subst;
 class Supplied;
+class Surface;
 class Svg;
 class Syl;
 class Syllable;
@@ -139,6 +140,8 @@ class Turn;
 class Tuplet;
 class Unclear;
 class Verse;
+class Zone;
+
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -181,6 +184,8 @@ public:
      * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+
+
 
 private:
     bool WriteDoc(Doc *doc);
@@ -341,6 +346,9 @@ private:
     ///@{
     void WriteVerse(pugi::xml_node currentNode, Verse *verse);
     void WriteSyl(pugi::xml_node currentNode, Syl *syl);
+    void WriteZone(pugi::xml_node currentNode, Zone *zone);
+    void WriteSurface(pugi::xml_node currentNode, Surface *surface);
+    void WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile);
     ///@}
 
     /**
@@ -364,6 +372,7 @@ private:
     void WriteAreaPosInterface(pugi::xml_node currentNode, AreaPosInterface *interface);
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
+    void WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -604,6 +613,7 @@ private:
     bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
+    bool ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
@@ -617,7 +627,10 @@ private:
      * @name Methods for reading other MEI elements.
      */
     ///@{
+    bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
+    bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
+    bool ReadZone(Surface *parent, pugi::xml_node zone);
     ///@}
 
     /**

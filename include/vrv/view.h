@@ -370,8 +370,7 @@ protected:
      */
     ///@{
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
-        wchar_t fontNo = SMUFL_E990_chantPunctum, int xOffset = 0, int yOffset = 0);
+    void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
     /**
@@ -568,7 +567,7 @@ public:
     Staff *m_currentStaff;
     System *m_currentSystem;
     Page *m_currentPage;
-    ///@}m
+    ///@}
 
 protected:
     /**

@@ -44,6 +44,7 @@
 #include "textelement.h"
 #include "tuning.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -83,6 +84,7 @@ Object::Object(const Object &object) : BoundingBox(object)
 
     m_classid = object.m_classid;
     m_parent = NULL;
+
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
@@ -238,6 +240,12 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
     this->Modify();
 }
 
+void Object::SortChildren(Object::binaryComp comp)
+{
+    std::stable_sort(m_children.begin(), m_children.end(), comp);
+    this->Modify();
+}
+
 void Object::MoveItselfTo(Object *targetParent)
 {
     assert(targetParent);
@@ -307,6 +315,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
+    Att::GetNeumes(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);
@@ -362,7 +371,7 @@ Object *Object::GetPrevious(Object *child, const ClassId classId)
     riteratorEnd = m_children.rend();
     riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
     if (riteratorCurrent != riteratorEnd) {
-        riteratorCurrent++;
+        ++riteratorCurrent;
         riteratorCurrent = std::find_if(riteratorCurrent, riteratorEnd, ObjectComparison(classId));
     }
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
@@ -781,6 +790,15 @@ int Object::Save(FileOutputStream *output)
 
     return true;
 }
+
+void Object::ReorderByXPos()
+{
+    ReorderByXPosParams params;
+    Functor reorder(&Object::ReorderByXPos);
+    this->Process(&reorder, &params);
+}
+
+
 
 //----------------------------------------------------------------------------
 // ObjectListInterface
@@ -1477,6 +1495,79 @@ int Object::SaveEnd(FunctorParams *functorParams)
 
     if (!params->m_output->WriteObjectEnd(this)) {
         return FUNCTOR_STOP;
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+bool Object::sortByUlx(Object *a, Object *b)
+{
+    FacsimileInterface *fa = NULL, *fb = NULL;
+    InterfaceComparison comp(INTERFACE_FACSIMILE);
+    if (a->GetFacsimileInterface())
+        fa = a->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        a->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+                fa = temp;
+            }
+        }
+    }
+    if (b->GetFacsimileInterface())
+        fb = b->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        b->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+                fb = temp;
+            }
+        }
+    }
+
+    if (fa == NULL || fb == NULL) {
+        LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
+        return false;
+    }
+
+    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+}
+
+int Object::ReorderByXPos(FunctorParams *functorParams)
+{
+    if (this->GetFacsimileInterface() != NULL) {
+        if (this->GetFacsimileInterface()->HasFacs()) {
+            return FUNCTOR_SIBLINGS; // This would have already been reordered.
+        }
+    }
+
+    std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::SetChildZones(FunctorParams *functorParams)
+{
+    SetChildZonesParams *params = dynamic_cast<SetChildZonesParams *>(functorParams);
+    assert(params);
+
+    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(this->GetFacsimileInterface());
+    if (fi != NULL) {
+        if (fi->HasFacs()) {
+            assert(params->m_doc);
+            assert(params->m_doc->GetFacsimile());
+            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(fi->GetFacs());
+            if (zone == NULL) {
+                LogError("Could not find a zone of UUID %s", fi->GetFacs().c_str());
+                return FUNCTOR_STOP;
+            }
+            fi->SetZone(zone);
+        }
     }
     return FUNCTOR_CONTINUE;
 }

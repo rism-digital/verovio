@@ -540,7 +540,7 @@ void AbcInput::parseDecoration(std::string decorationString)
         || !strcmp(decorationString.c_str(), "pp") || !strcmp(decorationString.c_str(), "p")
         || !strcmp(decorationString.c_str(), "mp") || !strcmp(decorationString.c_str(), "mf")
         || !strcmp(decorationString.c_str(), "f") || !strcmp(decorationString.c_str(), "ff")
-        || !strcmp(decorationString.c_str(), "ffff") || !strcmp(decorationString.c_str(), "ffff")
+        || !strcmp(decorationString.c_str(), "fff") || !strcmp(decorationString.c_str(), "ffff")
         || !strcmp(decorationString.c_str(), "sfz"))
         m_dynam.push_back(decorationString);
     else

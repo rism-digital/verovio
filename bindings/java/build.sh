@@ -40,11 +40,11 @@ FILES="$SRCFILES \
 CXXOPTS="-g -fpic -std=c++11 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/midi -I../../include/pugi -I../../include/utf8 -I../../libmei -I/opt/local/include/ "
 
 PATHS=""
-unamestr=`uname`
+unamestr=$(uname)
 if [[ "$unamestr" == 'Linux' ]]; then
     PATHS="-I$JAVA_HOME/include -I$JAVA_HOME/include/linux " # paths to java libraries
 elif [[ "$unamestr" == 'Darwin' ]]; then
-    JAVA_HOME=`/usr/libexec/java_home`
+    JAVA_HOME=$(/usr/libexec/java_home)
     PATHS="-I$JAVA_HOME/include -I$JAVA_HOME/include/darwin"
 fi
 

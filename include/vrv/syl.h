@@ -9,6 +9,7 @@
 #define __VRV_SYL_H__
 
 #include "atts_shared.h"
+#include "facsimileinterface.h"
 #include "layerelement.h"
 #include "timeinterface.h"
 

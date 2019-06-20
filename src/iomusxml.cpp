@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "arpeg.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "breath.h"
@@ -175,7 +176,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
-    else if (section->GetChildCount(MEASURE) > i) {
+    else {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
@@ -184,10 +185,6 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
             assert(staff);
             existingMeasure->AddChild(staff);
         }
-    }
-    // there is a gap, this should not happen
-    else {
-        LogWarning("MusicXML import: Measures should be added in the right order");
     }
 
     // add this measure to `m_endingStack` if within an ending
@@ -991,7 +988,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             ReadMusicXmlBarLine(*it, measure, measureNum);
         }
         else if (IsElement(*it, "direction")) {
-            ReadMusicXmlDirection(*it, measure, measureNum);
+            ReadMusicXmlDirection(*it, measure, measureNum, staffOffset);
         }
         else if (IsElement(*it, "figured-bass")) {
             ReadMusicXmlFigures(*it, measure, measureNum);
@@ -1012,12 +1009,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // match open ties with close ties
-    double lastScoreTimeOnset;
-    bool tieMatched;
     std::vector<std::pair<Tie *, Note *> >::iterator iter;
     for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
-        lastScoreTimeOnset = 9999; // __DBL_MAX__;
-        tieMatched = false;
+        double lastScoreTimeOnset = 9999; // __DBL_MAX__;
+        bool tieMatched = false;
         std::vector<Note *>::iterator jter;
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
             // match tie stop with pitch/oct identity, with start note earlier than end note,
@@ -1051,7 +1046,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             for (auto layer : *staff->GetChildren()) {
                 assert(layer);
                 std::vector<musicxml::ClefChange>::iterator iter;
-                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
+                for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
                     if (iter->m_measureNum == measureNum && iter->m_staff == staff
                         && iter->m_scoreOnset == m_durTotal) {
                         if (iter->isFirst) { // add clef when first in staff
@@ -1068,6 +1063,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             }
         }
     }
+
+    // clear arpeggio stack so no other notes may be added.
+    if (!m_ArpeggioStack.empty()) m_ArpeggioStack.clear();
 
     return true;
 }
@@ -1232,7 +1230,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         // LogMessage("ending number/type/text: %s/%s/%s.", endingNumber.c_str(), endingType.c_str(),
         // endingText.c_str());
         if (endingType == "start") {
-            if (m_endingStack.empty() || (!m_endingStack.empty() && NotInEndingStack(measure->GetN()))) {
+            if (m_endingStack.empty() || NotInEndingStack(measure->GetN())) {
                 musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
                 std::vector<Measure *> measureList;
                 measureList.push_back(measure);
@@ -1277,7 +1275,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     }
 }
 
-void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlDirection(
+    pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -1285,6 +1284,8 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     pugi::xpath_node type = node.select_node("direction-type");
     std::string placeStr = node.attribute("placement").as_string();
     pugi::xpath_node_set words = type.node().select_nodes("words");
+    int offset = node.select_node("offset").node().text().as_int();
+    double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
     // Directive
     if (words.size() != 0 && !node.select_node("sound[@tempo]")) {
@@ -1317,8 +1318,6 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     if (wedge) {
         int hairpinNumber = wedge.node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
-        int offset = node.select_node("offset").node().text().as_int();
-        double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
             std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
@@ -1408,13 +1407,25 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     // Pedal
     pugi::xpath_node xmlPedal = type.node().select_node("pedal");
     if (xmlPedal) {
-        Pedal *pedal = new Pedal();
-        if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
         std::string pedalType = xmlPedal.node().attribute("type").as_string();
-        if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
-        if (pedalType == "stop") pedal->SetStartid(m_ID);
-        m_controlElements.push_back(std::make_pair(measureNum, pedal));
-        m_pedalStack.push_back(pedal);
+        std::string pedalLine = xmlPedal.node().attribute("line").as_string();
+        // do not import pedal start lines until engraving supported, but import stops anyway
+        if (pedalLine != "yes" || pedalType == "stop") {
+            Pedal *pedal = new Pedal();
+            pedal->SetTstamp(timeStamp);
+            if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            pugi::xpath_node staffNode = node.select_node("staff");
+            if (staffNode)
+                pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            int defaultY = xmlPedal.node().attribute("default-y").as_int();
+            // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
+            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+            pedal->SetVgrp(defaultY);
+            m_controlElements.push_back(std::make_pair(measureNum, pedal));
+            m_pedalStack.push_back(pedal);
+        }
     }
 
     // Tempo
@@ -1445,6 +1456,8 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
+    int durOffset = 0;
+
     if (!HasAttributeWithValue(node, "print-object", "no")) {
         Harm *harm = new Harm();
         Fb *fb = new Fb();
@@ -1461,7 +1474,9 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
             fb->AddChild(f);
         }
         harm->AddChild(fb);
-        measure->AddChild(harm);
+        harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        m_controlElements.push_back(std::make_pair(measureNum, harm));
+        m_harmStack.push_back(harm);
     }
 }
 
@@ -1541,11 +1556,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
     assert(staff);
 
+    pugi::xpath_node isChord = node.select_node("chord");
+
     // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
         std::vector<musicxml::ClefChange>::iterator iter;
-        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); iter++) {
-            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal) {
+        for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
+            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal
+                && !isChord) {
                 if (iter->isFirst) { // add clef when first in staff
                     AddLayerElement(layer, iter->m_clef);
                     iter->isFirst = false;
@@ -1561,10 +1579,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     LayerElement *element = NULL;
 
+    bool nextIsChord = false;
     double onset = m_durTotal; // keep note onsets for later
-
-    // add duration to measure time
-    if (!node.select_node("chord")) m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
 
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
@@ -1578,8 +1594,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-     bool cue = false;
-     if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
+    bool cue = false;
+    if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -1636,11 +1652,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
     }
 
+    int duration = atoi(GetContentOfChild(node, "duration").c_str());
     pugi::xpath_node rest = node.select_node("rest");
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
         std::string octaveStr = GetContentOfChild(rest.node(), "display-octave");
-        int duration = atoi(GetContentOfChild(node, "duration").c_str());
         if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
@@ -1750,7 +1766,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
         // look at the next note to see if we are starting or ending a chord
         pugi::xpath_node nextNote = node.select_node("./following-sibling::note");
-        bool nextIsChord = false;
         if (nextNote.node().select_node("chord")) nextIsChord = true;
         // create the chord if we are starting a new chord
         if (nextIsChord) {
@@ -1911,6 +1926,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
     }
 
+    // add duration to measure time
+    if (!nextIsChord) m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
+
     m_ID = "#" + element->GetUuid();
 
     // breath marks
@@ -2035,6 +2053,74 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // place
         turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurnInv.node().attribute("placement").as_string()));
     }
+    pugi::xpath_node xmlDelayedTurn = notations.node().select_node("ornaments/delayed-turn");
+    if (xmlDelayedTurn) {
+        Turn *turn = new Turn();
+        m_controlElements.push_back(std::make_pair(measureNum, turn));
+        turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        turn->SetTstamp((double)(onset + duration / 2) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        // delayed attribute
+        turn->SetDelayed(BOOLEAN_true);
+        // color
+        turn->SetColor(xmlTurn.node().attribute("color").as_string());
+        // form
+        turn->SetForm(turnLog_FORM_lower);
+        // place
+        turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
+    }
+    pugi::xpath_node xmlDelayedTurnInv = notations.node().select_node("ornaments/delayed-inverted-turn");
+    if (xmlDelayedTurnInv) {
+        Turn *turn = new Turn();
+        m_controlElements.push_back(std::make_pair(measureNum, turn));
+        turn->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        turn->SetTstamp((double)(onset + duration / 2) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        // delayed attribute
+        turn->SetDelayed(BOOLEAN_true);
+        // color
+        turn->SetColor(xmlTurnInv.node().attribute("color").as_string());
+        // form
+        turn->SetForm(turnLog_FORM_upper);
+        // place
+        turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurnInv.node().attribute("placement").as_string()));
+    }
+
+    // arpeggio
+    pugi::xpath_node xmlArpeggiate = notations.node().select_node("arpeggiate");
+    if (xmlArpeggiate) {
+        int arpegN = xmlArpeggiate.node().attribute("number").as_int();
+        arpegN = (arpegN < 1) ? 1 : arpegN;
+        std::string direction = xmlArpeggiate.node().attribute("direction").as_string();
+        bool added = false;
+        if (!m_ArpeggioStack.empty()) { // check existing arpeggios
+            std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> >::iterator iter;
+            for (iter = m_ArpeggioStack.begin(); iter != m_ArpeggioStack.end(); ++iter) {
+                if (iter->second.m_arpegN == arpegN && onset == iter->second.m_timeStamp) {
+                    // don't add other chord notes, because the chord is already referenced.
+                    if (!isChord) iter->first->GetPlistInterface()->AddRef("#" + element->GetUuid());
+                    added = true; // so that no new Arpeg gets created below
+                    break;
+                }
+            }
+        }
+        if (!added) {
+            Arpeg *arpeggio = new Arpeg();
+            arpeggio->GetPlistInterface()->AddRef("#" + element->GetUuid());
+            // color
+            arpeggio->SetColor(xmlArpeggiate.node().attribute("color").as_string());
+            // direction (up/down) and in MEI arrow
+            if (!direction.empty()) {
+                arpeggio->SetArrow(BOOLEAN_true);
+                if (direction == "up")
+                    arpeggio->SetOrder(arpegLog_ORDER_up);
+                else if (direction == "down")
+                    arpeggio->SetOrder(arpegLog_ORDER_down);
+                else
+                    arpeggio->SetOrder(arpegLog_ORDER_NONE);
+            }
+            m_ArpeggioStack.push_back(std::make_pair(arpeggio, musicxml::OpenArpeggio(arpegN, onset)));
+            m_controlElements.push_back(std::make_pair(measureNum, arpeggio));
+        }
+    }
 
     // slur
     pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
@@ -2118,8 +2204,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     if (!m_pedalStack.empty()) {
         std::vector<Pedal *>::iterator iter;
         for (iter = m_pedalStack.begin(); iter != m_pedalStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            (*iter)->SetStartid(m_ID);
+            if (!(*iter)->HasStaff())
+                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_pedalStack.clear();
     }
@@ -2204,14 +2290,15 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     if (value == "dashed") return BARRENDITION_dashed;
     if (value == "dotted") return BARRENDITION_dotted;
     if (value == "light-light") return BARRENDITION_dbl;
-    if (value == "regular") return BARRENDITION_dbldashed;
-    if (value == "regular") return BARRENDITION_dbldotted;
+    // if (value == "heavy-heavy") return; // TODO: Support Double thick barlines.
     if ((value == "light-heavy") && !repeat) return BARRENDITION_end;
     if (value == "none") return BARRENDITION_invis;
     if ((value == "heavy-light") && repeat) return BARRENDITION_rptstart;
     // if (value == "") return BARRENDITION_rptboth;
     if ((value == "light-heavy") && repeat) return BARRENDITION_rptend;
     if (value == "regular") return BARRENDITION_single;
+    // if (value == "short") return; // TODO: Support 'short' barlines.
+    // if (value == "tick") return; // TODO: Support 'tick' barlines.
     LogWarning("MusicXML import: Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;
 }

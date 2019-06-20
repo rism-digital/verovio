@@ -34,7 +34,24 @@ class Neume;
 // Note
 //----------------------------------------------------------------------------
 
-enum NeumeGroup { NEUME_ERROR = 0, PUNCTUM, CLIVIS, PES, CLIMACUS, PORRECTUS, SCANDICUS, TORCULUS };
+enum NeumeGroup {
+    NEUME_ERROR = 0,
+    PUNCTUM,
+    CLIVIS,
+    PES,
+    PRESSUS,
+    CLIMACUS,
+    PORRECTUS,
+    SCANDICUS,
+    TORCULUS,
+    SCANDICUS_FLEXUS,
+    PORRECTUS_FLEXUS,
+    TORCULUS_RESUPINUS,
+    CLIMACUS_RESUPINUS,
+    PES_SUBPUNCTIS,
+    PORRECTUS_SUBPUNCTIS,
+    SCANDICUS_SUBPUNCTIS
+};
 
 /**
  * This class models the MEI <neume> element.
@@ -53,6 +70,8 @@ public:
 
     virtual void Reset();
 
+    virtual Object *Clone() const { return new Neume(*this); }
+
     virtual std::string GetClassName() const { return "Neume"; }
 
     virtual ClassId GetClassId() const { return NEUME; }
@@ -69,6 +88,13 @@ public:
 
     bool GenerateChildMelodic();
 
+    NeumeGroup GetNeumeGroup();
+
+    std::vector<int> GetPitchDifferences();
+
+    PitchInterface *GetHighestPitch();
+    PitchInterface *GetLowestPitch();
+
 private:
     //
 public:
@@ -76,6 +102,8 @@ public:
      * String keys come from the contours of neume groupings as defined in MEI4
      */
     static std::map<std::string, NeumeGroup> s_neumes;
+
+    static std::string NeumeGroupToString(NeumeGroup group);
 
 private:
 };

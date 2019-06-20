@@ -31,6 +31,7 @@
 #include "tuning.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -38,12 +39,12 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
-
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     // owned pointers need to be set to NULL;
     m_ledgerLinesAbove = NULL;
     m_ledgerLinesBelow = NULL;
@@ -62,6 +63,7 @@ Staff::~Staff()
 void Staff::Reset()
 {
     Object::Reset();
+    FacsimileInterface::Reset();
     ResetNInteger();
     ResetTyped();
     ResetVisibility();
@@ -139,8 +141,28 @@ void Staff::AddChild(Object *child)
     Modify();
 }
 
+int Staff::GetDrawingX() const
+{
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingX();
+        }
+    }
+    return Object::GetDrawingX();
+}
+
 int Staff::GetDrawingY() const
 {
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(DOC);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingY();
+        }
+    }
+
     if (m_yAbs != VRV_UNSET) return m_yAbs;
 
     if (!m_staffAlignment) return 0;
@@ -231,6 +253,15 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
     for (i = 0; i < count; ++i) {
         lines->at(i).AddDash(left, right);
     }
+}
+
+void Staff::SetFromFacsimile(Doc *doc)
+{
+    if(!this->HasFacs()) return;
+    assert(doc);
+    Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
+    assert(zone);
+    m_drawingStaffSize = 100 * (zone->GetLry() - zone->GetUly()) / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
 }
 
 //----------------------------------------------------------------------------

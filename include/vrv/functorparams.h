@@ -1732,6 +1732,18 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ReorderByXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current object whose children we (may) reorder
+ **/
+class ReorderByXPosParams : public FunctorParams {
+public:
+    int modifications = 0;
+};
+
+//----------------------------------------------------------------------------
 // UnsetCurrentScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -1743,6 +1755,19 @@ class UnsetCurrentScoreDefParams : public FunctorParams {
 public:
     UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// SetChildZonesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the Doc for the children operated on
+ */
+class SetChildZonesParams : public FunctorParams {
+public:
+    SetChildZonesParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
 };
 
 } // namespace vrv

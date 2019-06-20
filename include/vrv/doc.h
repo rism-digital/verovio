@@ -9,6 +9,7 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
+#include "facsimile.h"
 #include "options.h"
 #include "scoredef.h"
 
@@ -25,7 +26,7 @@ class Pages;
 class Page;
 class Score;
 
-enum DocType { Raw = 0, Rendering, Transcription };
+enum DocType { Raw = 0, Rendering, Transcription, Facs };
 
 //----------------------------------------------------------------------------
 // Doc
@@ -330,6 +331,15 @@ public:
     bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
     ///@}
 
+    /**
+     * @name Setter and getter for facsimile
+     */
+    ///@{
+    void SetFacsimile(Facsimile *facsimile) { m_facsimile = facsimile; }
+    Facsimile *GetFacsimile() { return m_facsimile; }
+    bool HasFacsimile() const { return m_facsimile != NULL; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -388,6 +398,9 @@ public:
     float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
+
+    /** Record notation type for document */
+    data_NOTATIONTYPE m_notationType;
 
 private:
     /**
@@ -477,6 +490,9 @@ private:
     int m_pageMarginRight;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
     int m_pageMarginTop;
+
+    /** Facsimile information */
+    Facsimile *m_facsimile = NULL;
 };
 
 } // namespace vrv

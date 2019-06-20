@@ -29,6 +29,7 @@ class FileOutputStream;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
+class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class ScoreDefInterface;
@@ -36,6 +37,7 @@ class StemmedDrawingInterface;
 class TextDirInterface;
 class TimePointInterface;
 class TimeSpanningInterface;
+class Zone;
 
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true
@@ -132,6 +134,7 @@ public:
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual LinkingInterface *GetLinkingInterface() { return NULL; }
+    virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
@@ -176,6 +179,14 @@ public:
      * The currentChild is not deleted by the methods.
      */
     void ReplaceChild(Object *currentChild, Object *replacingChild);
+
+    /**
+     * Sort children by a function that takes two arguments and
+     * returns true if the first argument is less than the second.
+     * If the order of children changes, this returns true.
+     */
+    typedef bool (*binaryComp)(Object *, Object *);
+    void SortChildren(binaryComp comp);
 
     /**
      * Move an object to another parent.
@@ -453,6 +464,7 @@ public:
      */
     virtual int Save(FileOutputStream *output);
 
+    virtual void ReorderByXPos();
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -1057,6 +1069,18 @@ public:
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
+
+    /**
+     * Reorder elements by x-position.
+     */
+    virtual int ReorderByXPos(FunctorParams *);
+
+    /**
+     * Associate child objects with zones.
+     */
+    virtual int SetChildZones(FunctorParams *);
+
+    static bool sortByUlx(Object *a, Object *b);
 
 protected:
     //

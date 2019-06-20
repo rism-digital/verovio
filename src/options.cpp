@@ -513,7 +513,8 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
 
-    m_minLastJustification.SetInfo("Minimum last-system-justification width", "The last system is only justified if the unjustified width is greater than this percent");
+    m_minLastJustification.SetInfo("Minimum last-system-justification width",
+        "The last system is only justified if the unjustified width is greater than this percent");
     m_minLastJustification.Init(0.8, 0.0, 1.0);
     this->Register(&m_minLastJustification, "minLastJustification", &m_general);
 
@@ -568,6 +569,10 @@ Options::Options()
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
+
+    m_useFacsimile.SetInfo("Use facsimile for layout", "Use information in the <facsimile> element to control the layout");
+    m_useFacsimile.Init(false);
+    this->Register(&m_useFacsimile, "useFacsimile", &m_general);
 
     m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
     m_usePgFooterForAll.Init(false);
