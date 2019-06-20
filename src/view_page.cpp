@@ -744,17 +744,20 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     assert(barLine);
 
     Staff *staff = dynamic_cast<Staff *>(barLine->GetFirstParent(STAFF));
-    assert(staff);
 
     int x = barLine->GetDrawingX();
     int barLineWidth, barLineThickWidth, x1, x2;
-    if (m_doc->GetType() == Facs) {
-        barLineWidth = m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-        barLineThickWidth = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false);
-        x1 = x - m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) - barLineWidth;
-        x2 = x + m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) + barLineWidth;
-    }
-    else {
+    switch (m_doc->GetType()) {
+        case Facs:
+            staff = dynamic_cast<Staff *>(barLine->GetFirstParent(STAFF));
+            if (staff != NULL) {
+                barLineWidth = m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+                barLineThickWidth = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false);
+                x1 = x - m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) - barLineWidth;
+                x2 = x + m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) + barLineWidth;
+                break;
+            }
+        default:
         barLineWidth = m_doc->GetDrawingBarLineWidth(100);
         barLineThickWidth = m_doc->GetDrawingBeamWidth(100, false);
         x1 = x - m_doc->GetDrawingBeamWidth(100, false) - barLineWidth;
