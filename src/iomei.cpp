@@ -102,6 +102,7 @@
 #include "staffgrp.h"
 #include "subst.h"
 #include "supplied.h"
+#include "surface.h"
 #include "svg.h"
 #include "syl.h"
 #include "syllable.h"
@@ -115,6 +116,7 @@
 #include "unclear.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -773,6 +775,12 @@ bool MeiOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
+    Facsimile *facs = doc->GetFacsimile();
+    if ((facs != NULL) && (facs->GetChildCount() > 0)) {
+        pugi::xml_node facsimile = music.append_child("facsimile");
+        WriteFacsimile(facsimile, facs);
+        m_nodeStack.push_back(facsimile);
+    }
 
     if (m_doc->m_front.first_child()) {
         music.append_copy(m_doc->m_front.first_child());
@@ -1243,6 +1251,7 @@ void MeiOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     assert(staff);
 
     WriteXmlId(currentNode, staff);
+    staff->WriteFacsimile(currentNode);
     staff->WriteNInteger(currentNode);
     staff->WriteTyped(currentNode);
     staff->WriteVisibility(currentNode);
@@ -1413,6 +1422,7 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     assert(clef);
 
     WriteLayerElement(currentNode, clef);
+    WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
     clef->WriteLineLoc(currentNode);
@@ -1423,6 +1433,7 @@ void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
 
+    WriteFacsimileInterface(currentNode, custos);
     WritePitchInterface(currentNode, custos);
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
@@ -1545,10 +1556,12 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 
     WriteLayerElement(currentNode, nc);
     WriteDurationInterface(currentNode, nc);
+    WriteFacsimileInterface(currentNode, nc);
     WritePitchInterface(currentNode, nc);
     WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
     nc->WriteIntervalMelodic(currentNode);
+    nc->WriteNcForm(currentNode);
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
@@ -1556,6 +1569,7 @@ void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
     assert(neume);
 
     WriteLayerElement(currentNode, neume);
+    WriteFacsimileInterface(currentNode, neume);
     neume->WriteColor(currentNode);
 }
 
@@ -1644,6 +1658,49 @@ void MeiOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
     WriteLayerElement(currentNode, syllable);
     syllable->WriteColor(currentNode);
     syllable->WriteSlashCount(currentNode);
+}
+
+void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
+{
+    assert(facsimile);
+    WriteXmlId(currentNode, facsimile);
+
+    // Write Surface(s)
+    for (Object *child = facsimile->GetFirst(); child != NULL; child = facsimile->GetNext()) {
+        if (child->GetClassId() == SURFACE) {
+            pugi::xml_node childNode = currentNode.append_child("surface");
+            WriteSurface(childNode, dynamic_cast<Surface *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
+        }
+    }
+}
+
+void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
+{
+    assert(surface);
+    WriteXmlId(currentNode, surface);
+    surface->WriteCoordinated(currentNode);
+    surface->WriteTyped(currentNode);
+
+    for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
+        if (child->GetClassId() == ZONE) {
+            pugi::xml_node childNode = currentNode.append_child("zone");
+            WriteZone(childNode, dynamic_cast<Zone *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
+        }
+    }
+}
+
+void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
+{
+    assert(zone);
+    WriteXmlId(currentNode, zone);
+    zone->WriteCoordinated(currentNode);
+    zone->WriteTyped(currentNode);
 }
 
 void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textElement)
@@ -1748,6 +1805,13 @@ void MeiOutput::WriteLinkingInterface(pugi::xml_node element, LinkingInterface *
     assert(interface);
 
     interface->WriteLinking(element);
+}
+
+void MeiOutput::WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteFacsimile(element);
 }
 
 void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
@@ -2034,6 +2098,7 @@ std::string MeiOutput::DocTypeToStr(DocType type)
         case Raw: value = "raw"; break;
         case Rendering: value = "rendering"; break;
         case Transcription: value = "transcription"; break;
+        case Facs: value = "facsimile"; break;
         default:
             LogWarning("Unknown document type '%d'", type);
             value = "";
@@ -2441,6 +2506,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     pugi::xml_node music;
     pugi::xml_node front;
     pugi::xml_node body;
+    pugi::xml_node facsimile;
     pugi::xml_node pages;
     pugi::xml_node back;
 
@@ -2453,6 +2519,14 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     if (music.empty()) {
         LogError("No <music> element found in the MEI data");
         return false;
+    }
+
+    facsimile = music.child("facsimile");
+    if ((!facsimile.empty()) && (m_doc->GetOptions()->m_useFacsimile.GetValue())) {
+        ReadFacsimile(m_doc, facsimile);
+        m_doc->SetType(Facs);
+        m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
+        m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
     }
 
     front = music.child("front");
@@ -2526,6 +2600,12 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     if (success && !m_hasScoreDef) {
         LogWarning("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
+    }
+
+    if (success && m_doc->GetType() == Facs) {
+        Functor setChildZones(&Object::SetChildZones);
+        SetChildZonesParams setChildZonesParams(m_doc);
+        m_doc->Process(&setChildZones, &setChildZonesParams);
     }
 
     return success;
@@ -3273,6 +3353,8 @@ bool MeiInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
 
     ReadScoreDefInterface(staffDef, vrvStaffDef);
 
+    m_doc->m_notationType = vrvStaffDef->GetNotationtype();
+
     parent->AddChild(vrvStaffDef);
     ReadUnsupportedAttr(staffDef, vrvStaffDef);
     return ReadStaffDefChildren(vrvStaffDef, staffDef);
@@ -3776,6 +3858,7 @@ bool MeiInput::ReadStaff(Object *parent, pugi::xml_node staff)
     Staff *vrvStaff = new Staff();
     SetMeiUuid(staff, vrvStaff);
 
+    vrvStaff->ReadFacsimile(staff);
     vrvStaff->ReadNInteger(staff);
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
@@ -3959,6 +4042,16 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             LogWarning("Element '%s' is unknown and will be ignored", xmlElement.name());
         }
     }
+
+    //if the current parent is a syllable then we need to make sure that a syl got added
+    //if not then add a blank one
+    if (strcmp(parentNode.name(), "syllable") == 0) {
+        auto testSyl = parent->FindChildByType(SYL);
+        if(testSyl == NULL) {
+            Syl *syl = new Syl();
+            parent->AddChild(syl);
+        }
+    }
     return success;
 }
 
@@ -3967,7 +4060,25 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
-    }
+    } /*else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
+        Zone zone = this->m_doc->GetZone(element.attribute("facs").value());
+        AttCoordinated *att = dynamic_cast<AttCoordinated *>(object);
+        assert(att);
+        LogMessage("%d, %d, %d, %d", zone.ulx, zone.uly, zone.lrx, zone.lry);
+        if (zone.ulx > 0) {
+            att->SetUlx(zone.ulx);
+        }
+        if (zone.uly > 0) {
+            att->SetUly(zone.uly);
+        }
+        if (zone.lrx > 0) {
+            att->SetLrx(zone.lrx);
+        }
+        if (zone.lry > 0) {
+            att->SetLry(zone.lry);
+        }
+        LogMessage("Set att_coordinated based on zone %s", zone.xmlId.c_str());
+    }*/
 
     SetMeiUuid(element, object);
     ReadLinkingInterface(element, object);
@@ -4096,6 +4207,7 @@ bool MeiInput::ReadClef(Object *parent, pugi::xml_node clef)
 {
     Clef *vrvClef = new Clef();
     ReadLayerElement(clef, vrvClef);
+    ReadFacsimileInterface(clef, vrvClef);
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
@@ -4112,6 +4224,7 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     Custos *vrvCustos = new Custos();
     ReadLayerElement(custos, vrvCustos);
 
+    ReadFacsimileInterface(custos, vrvCustos);
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
@@ -4293,10 +4406,12 @@ bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
     ReadLayerElement(nc, vrvNc);
 
     ReadDurationInterface(nc, vrvNc);
+    ReadFacsimileInterface(nc, vrvNc);
     ReadPitchInterface(nc, vrvNc);
     ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
     vrvNc->ReadIntervalMelodic(nc);
+    vrvNc->ReadNcForm(nc);
 
     parent->AddChild(vrvNc);
     return ReadLayerChildren(vrvNc, nc, vrvNc);
@@ -4306,6 +4421,7 @@ bool MeiInput::ReadNeume(Object *parent, pugi::xml_node neume)
 {
     Neume *vrvNeume = new Neume();
     ReadLayerElement(neume, vrvNeume);
+    ReadFacsimileInterface(neume, vrvNeume);
 
     vrvNeume->ReadColor(neume);
 
@@ -4417,6 +4533,7 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
 
 bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 {
+    bool success;
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
 
@@ -4425,7 +4542,19 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 
     parent->AddChild(vrvSyllable);
 
-    return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
+    //read all of the syllables elements
+    //and add an empty <syl> if it doesn't have one
+    if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
+
+        Object *obj = vrvSyllable->FindChildByType(SYL);
+        Syl *syl = dynamic_cast<Syl *>(obj);
+
+        if(syl == NULL) {
+            syl = new Syl();
+            vrvSyllable->AddChild(syl);
+        }
+    }
+    return success;
 }
 
 bool MeiInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
@@ -4650,6 +4779,12 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 bool MeiInput::ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface)
 {
     interface->ReadLinking(element);
+    return true;
+}
+
+bool MeiInput::ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface)
+{
+    interface->ReadFacsimile(element);
     return true;
 }
 
@@ -5365,6 +5500,7 @@ DocType MeiInput::StrToDocType(std::string type)
     if (type == "raw") return Raw;
     if (type == "rendering") return Rendering;
     if (type == "transcription") return Transcription;
+    if (type == "facsimile") return Facs;
     LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
 }
@@ -5538,6 +5674,56 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
 
     page->m_PPUFactor = (25.0 / 2.0 / doc->GetOptions()->m_unit.GetDefault());
     // LogDebug("PPUFactor: %f", m_PPUFactor);
+}
+
+bool MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
+{
+    assert(parent);
+    Surface *vrvSurface = new Surface();
+    SetMeiUuid(surface, vrvSurface);
+    vrvSurface->ReadCoordinated(surface);
+    vrvSurface->ReadTyped(surface);
+
+    for (pugi::xml_node child = surface.first_child(); child; child = child.next_sibling()) {
+        if (strcmp(child.name(), "zone") == 0) {
+            ReadZone(vrvSurface, child);
+        }
+        else {
+            LogWarning("Unsupported element '%s' in <surface>", child.name());
+        }
+    }
+    parent->AddChild(vrvSurface);
+    return true;
+}
+
+bool MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
+{
+    assert(parent);
+    Zone *vrvZone = new Zone();
+    SetMeiUuid(zone, vrvZone);
+    vrvZone->ReadCoordinated(zone);
+    vrvZone->ReadTyped(zone);
+    parent->AddChild(vrvZone);
+    return true;
+}
+
+bool MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
+{
+    assert(doc);
+    Facsimile *vrvFacsimile = new Facsimile();
+    // Read xmlId (if present)
+    SetMeiUuid(facsimile, vrvFacsimile);
+    // Read children
+    for (pugi::xml_node child = facsimile.first_child(); child; child = child.next_sibling()) {
+        if (strcmp(child.name(), "surface") == 0) {
+            ReadSurface(vrvFacsimile, child);
+        }
+        else {
+            LogWarning("Unsupported element '%s' in <facsimile>", child.name());
+        }
+    }
+    doc->SetFacsimile(vrvFacsimile);
+    return true;
 }
 
 } // namespace vrv

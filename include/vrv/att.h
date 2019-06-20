@@ -51,7 +51,7 @@ public:
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
     // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
     static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
+    static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFingering(Object *element, std::string attrType, std::string attrValue);
     static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
@@ -60,6 +60,7 @@ public:
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
     static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
     static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
+    static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
     static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
     static bool SetShared(Object *element, std::string attrType, std::string attrValue);
@@ -75,7 +76,7 @@ public:
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetEdittrans(const Object *element, ArrayOfStrAttr *attributes);
     static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
     static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
@@ -84,6 +85,7 @@ public:
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetNeumes(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);

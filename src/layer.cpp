@@ -199,8 +199,26 @@ Clef *Layer::GetClef(LayerElement *test)
         assert(clef);
         return clef;
     }
-
+    Clef *facsClef = this->GetClefFacs(test);
+    if (facsClef != NULL) {
+        return facsClef;
+    }
     return GetCurrentClef();
+}
+
+Clef *Layer::GetClefFacs(LayerElement *test)
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (doc->GetType() == Facs) {
+        ArrayOfObjects clefs;
+        ClassIdComparison ac(CLEF);
+        doc->FindAllChildBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
+        if (clefs.size() > 0) {
+            return dynamic_cast<Clef *>(*clefs.rbegin());
+        }
+    }
+    return NULL;
 }
 
 int Layer::GetClefLocOffset(LayerElement *test)

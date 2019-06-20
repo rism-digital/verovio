@@ -62,8 +62,8 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     mordentLog_FORM m_form;
     /**
-     * When set to 'true', a double or long mordent, sometimes called a "pincé double",
-     * consisting of 5 notes, is indicated.
+     * When set to 'true', a double or long mordent, sometimes called a "pincé
+     * double", consisting of 5 notes, is indicated.
      **/
     data_BOOLEAN m_long;
 

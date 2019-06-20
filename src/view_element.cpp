@@ -578,9 +578,15 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = dynamic_cast<Clef *>(element);
     assert(clef);
-
-    int y = staff->GetDrawingY();
-    int x = element->GetDrawingX();
+    int x,y;
+    if (m_doc->GetType() == Facs && clef->HasFacs()) {
+        y = ToLogicalY(staff->GetDrawingY());
+        x = clef->GetDrawingX();
+    }
+    else {
+        y = staff->GetDrawingY();
+        x = element->GetDrawingX();
+    }
     int sym = 0;
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
@@ -657,12 +663,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         clef->SetEmptyBB();
         return;
     }
-
     y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
 
     bool cueSize = false;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
-        if (m_doc->GetType() != Transcription) {
+        if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
             cueSize = true;
             // HARDCODED
             x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
@@ -707,8 +712,15 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    int x = element->GetDrawingX();
-    int y = staff->GetDrawingY();
+    int x,y;
+    if (custos->HasFacs() && m_doc->GetType() == Facs) {
+        x = custos->GetDrawingX();
+        y = ToLogicalY(staff->GetDrawingY());
+    }
+    else {
+        x = element->GetDrawingX();
+        y = staff->GetDrawingY();
+    }
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset;
@@ -1335,7 +1347,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = dynamic_cast<Syl *>(element);
     assert(syl);
 
-    if (!syl->GetStart()) {
+    bool isNeume = (staff->m_drawingNotationType == NOTATIONTYPE_neume);
+
+    if (!syl->GetStart() && !isNeume) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }

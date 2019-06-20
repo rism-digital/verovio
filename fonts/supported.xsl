@@ -2281,16 +2281,16 @@
             <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
             <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->
             <!--<glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>-->
-            <!--<glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>-->
+            <glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>
             <!--<glyph glyph-code="E997" smufl-name="chantPunctumVirgaReversed"/>-->
             <!--<glyph glyph-code="E998" smufl-name="chantPunctumCavum"/>-->
             <!--<glyph glyph-code="E999" smufl-name="chantPunctumLinea"/>-->
             <!--<glyph glyph-code="E99A" smufl-name="chantPunctumLineaCavum"/>-->
-            <!--<glyph glyph-code="E99B" smufl-name="chantQuilisma"/>-->
+            <glyph glyph-code="E99B" smufl-name="chantQuilisma"/>
             <!--<glyph glyph-code="E99C" smufl-name="chantOriscusAscending"/>-->
             <!--<glyph glyph-code="E99D" smufl-name="chantOriscusDescending"/>-->
-            <!--<glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>-->
-            <!--<glyph glyph-code="E99F" smufl-name="chantStrophicus"/>-->
+            <glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>
+            <glyph glyph-code="E99F" smufl-name="chantStrophicus"/>
             <!--<glyph glyph-code="E9A0" smufl-name="chantStrophicusAuctus"/>-->
             <!--<glyph glyph-code="E9A1" smufl-name="chantPunctumDeminutum"/>-->
             <range_end>U+E9AF</range_end>
@@ -2311,10 +2311,10 @@
             <glyph glyph-code="E9BA" smufl-name="chantLigaturaDesc3rd"/>
             <glyph glyph-code="E9BB" smufl-name="chantLigaturaDesc4th"/>
             <glyph glyph-code="E9BC" smufl-name="chantLigaturaDesc5th"/>
-            <glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>
-            <glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>
-            <glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>
-            <glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>
+            <!--<glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>-->
+            <!--<glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>-->
+            <!--<glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>-->
+            <!--<glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>-->
             <!--<glyph glyph-code="E9C1" smufl-name="chantConnectingLineAsc6th"/>-->
             <!--<glyph glyph-code="E9C2" smufl-name="chantStrophicusLiquescens2nd"/>-->
             <!--<glyph glyph-code="E9C3" smufl-name="chantStrophicusLiquescens3rd"/>-->

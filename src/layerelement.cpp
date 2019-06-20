@@ -59,8 +59,9 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -68,8 +69,9 @@ LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(),
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement(std::string classid) : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -80,6 +82,7 @@ LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterf
 void LayerElement::Reset()
 {
     Object::Reset();
+    FacsimileInterface::Reset();
     LinkingInterface::Reset();
     ResetLabelled();
     ResetTyped();
@@ -240,6 +243,15 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
+    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingX
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingX();
+        }
+    }
+
     // Since m_xAbs is the left position, we adjust the XRel accordingly in AdjustXRelForTranscription
     if (m_xAbs != VRV_UNSET) return m_xAbs + this->GetDrawingXRel();
 
@@ -278,6 +290,15 @@ int LayerElement::GetDrawingX() const
 
 int LayerElement::GetDrawingY() const
 {
+    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingY
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingY();
+        }
+    }
+
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
