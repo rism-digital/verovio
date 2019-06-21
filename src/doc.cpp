@@ -1620,8 +1620,9 @@ void Doc::SetChildZones() {
                 }
             }
 
+            zone->SetUly(zone->GetUly() + 100);
             zone->SetLrx(zone->GetLrx() + 100);
-            zone->SetLry(zone->GetLry() + 100);
+            zone->SetLry(zone->GetLry() + 200);
 
             m_facsimile->FindChildByType(SURFACE)->AddChild(zone);
             fi->SetZone(zone);
