@@ -101,7 +101,7 @@ bool PaeInput::ImportFile()
     return true;
 }
 
-bool PaeInput::ImportString(std::string const &pae)
+bool PaeInput::ImportString(const std::string &pae)
 {
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);
@@ -133,6 +133,27 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
+
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
+    // add minimal scoreDef
+    StaffGrp *staffGrp = new StaffGrp();
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(5);
+    staffGrp->AddChild(staffDef);
+    m_doc->m_scoreDef.AddChild(staffGrp);
 
     // read values
     while (!infile.eof()) {
@@ -400,19 +421,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         current_measure.notes.clear();
     }
 
-    m_doc->Reset();
-    m_doc->SetType(Raw);
-    // The mdiv
-    Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
-    m_doc->AddChild(mdiv);
-    // The score
-    Score *score = new Score();
-    mdiv->AddChild(score);
-    // the section
-    Section *section = new Section();
-    score->AddChild(section);
-
     int measure_count = 1;
 
     std::vector<pae::Measure>::iterator it;
@@ -440,6 +448,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
                 scoreDef->SetMeterCount(obj.meter->GetCount());
                 scoreDef->SetMeterUnit(obj.meter->GetUnit());
                 scoreDef->SetMeterSym(obj.meter->GetSym());
+                // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
+                if (obj.meter->GetForm() == meterSigVis_FORM_num) {
+                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                }
                 delete obj.meter;
                 obj.meter = NULL;
             }
@@ -452,11 +464,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         measure_count++;
     }
 
-    // add minimal scoreDef
-    StaffGrp *staffGrp = new StaffGrp();
-    StaffDef *staffDef = new StaffDef();
-    staffDef->SetN(1);
-    staffDef->SetLines(5);
     if (m_is_mensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
     }
@@ -475,6 +482,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
         m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
         m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
+        // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
+        if (scoreDefMeterSig->GetForm() == meterSigVis_FORM_num) {
+            m_doc->m_scoreDef.SetMeterForm(meterSigDefaultVis_METERFORM_num);
+        }
         delete scoreDefMeterSig;
     }
     if (scoreDefMensur) {
@@ -489,8 +500,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         delete m_tie;
         m_tie = NULL;
     }
-    staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 }
@@ -668,34 +677,33 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
     if (is_tuplet) {
         int t = i;
-        int t2 = 0;
         int tuplet_val = 3; // triplets are default
+        int tuplet_notes = 0;
         char *buf;
 
-        // Triplets are in the form (4ABC)
-        // index points to the '(', so we look back
-        // if the result is a number or dot, it means we have the long format
-        // i.e. 4(6ABC;5) or 4.(6ABC;5)
-        if ((index != 0) && (isdigit(incipit[index - 1]) || incipit[index - 1] == '.')) {
+        // create the buffer so we can convert the tuplet nr to int
+        buf = (char *)malloc(length + 1); // allocate it with space for 0x00
+        memset(buf, 0x00, length + 1); // wipe it up
 
-            // create the buffer so we can convert the tuplet nr to int
-            buf = (char *)malloc(length + 1); // allocate it with space for 0x00
-            memset(buf, 0x00, length + 1); // wipe it up
+        // move until we find the ;
+        while ((t < length) && (incipit[t] != ';')) {
 
-            // move until we find the ;
-            while ((t < length) && (incipit[t] != ';')) {
-
-                // we should not find any close paren before the ';' !
-                // FIXME find a graceful way to exit signaling this to user
-                if (incipit[t] == ')') {
-                    LogDebug("Plaine & Easie import: You have a ')' before the ';' in a tuplet!");
-                    free(buf);
-                    return i - index;
-                }
-
-                t++;
+            // Triplets are sometimes codes without ';' values
+            if (incipit[t] == ')') {
+                break;
             }
 
+            // count the notes
+            if ((incipit[t] - 'A' >= 0) && (incipit[t] - 'A' < 7)) {
+                tuplet_notes++;
+            }
+
+            t++;
+        }
+
+        // We detected a ';', get the value of the tuplet (otherwise 3 by default)
+        if ((t < length) && incipit[t] != ')') {
+            int t2 = 0;
             // t + 1 should point to the number
             t++; // move one char to the number
             while (((t + t2) < length) && (incipit[t + t2] != ')')) {
@@ -713,13 +721,15 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
             }
 
             tuplet_val = atoi(buf);
-            free(buf); // dispose of the buffer
         }
 
         // this is the first note, the total number of notes = tuplet_val
-        note->tuplet_notes = tuplet_val;
+        note->tuplet_notes = tuplet_notes;
         // but also the note counter
-        note->tuplet_note = tuplet_val;
+        note->tuplet_note = tuplet_notes;
+        // the tuplet val (3 or after ;)
+        note->tuplet_val = tuplet_val;
+        free(buf); // dispose of the buffer
     }
     else {
         if (note->tuplet_notes > 0) {
@@ -742,7 +752,9 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
     // int length = strlen(incipit);
 
     // TODO: fermatas inside tuplets won't be currently handled correctly
-    note->fermata = false;
+    if (note->tuplet_notes > 0) {
+        note->fermata = false;
+    }
 
     return i - index;
 }
@@ -849,6 +861,8 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
             meter->SetCount(std::stoi(timesig_str));
+            meter->SetUnit(1);
+            meter->SetForm(meterSigVis_FORM_num);
         }
         else if (strcmp(timesig_str, "c") == 0) {
             // C
@@ -1060,7 +1074,6 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 {
     int length = (int)strlen(incipit);
     int i = index;
-    int j;
 
     if (measure->abbreviation_offset == -1) { // start
         measure->abbreviation_offset = (int)measure->notes.size();
@@ -1069,7 +1082,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
         int abbreviation_stop = (int)measure->notes.size();
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
             i++;
-            for (j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
+            for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
             }
         }
@@ -1377,7 +1390,7 @@ void PaeInput::parseNote(pae::Note *note)
     // which means we are counting a tuplet
     if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
         Tuplet *newTuplet = new Tuplet();
-        newTuplet->SetNum(note->tuplet_notes);
+        newTuplet->SetNum(note->tuplet_val);
         newTuplet->SetNumbase(2);
         pushContainer(newTuplet);
     }

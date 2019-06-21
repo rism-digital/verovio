@@ -118,6 +118,7 @@ class Space;
 class Staff;
 class Subst;
 class Supplied;
+class Surface;
 class Svg;
 class Syl;
 class Syllable;
@@ -135,6 +136,7 @@ class Turn;
 class Tuplet;
 class Unclear;
 class Verse;
+class Zone;
 
 
 //----------------------------------------------------------------------------
@@ -179,7 +181,7 @@ public:
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
 
-    
+
 
 private:
     bool WriteDoc(Doc *doc);
@@ -415,7 +417,7 @@ public:
     virtual ~MeiInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &mei);
+    virtual bool ImportString(const std::string &mei);
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -612,7 +614,10 @@ private:
      * @name Methods for reading other MEI elements.
      */
     ///@{
+    bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
+    bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
+    bool ReadZone(Surface *parent, pugi::xml_node zone);
     ///@}
 
     /**
@@ -657,10 +662,6 @@ private:
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
     ///@}
-    
-    void ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
-    void ReadSurface(Facsimile *parent, pugi::xml_node surface);
-    void ReadZone(Surface *parent, pugi::xml_node zone);
 
 public:
     //

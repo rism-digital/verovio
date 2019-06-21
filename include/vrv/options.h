@@ -457,6 +457,7 @@ public:
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;
+    OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
     OptionBool m_noFooter;
     OptionBool m_noHeader;
@@ -470,6 +471,7 @@ public:
     OptionInt m_pageWidth;
     OptionBool m_svgViewBox;
     OptionInt m_unit;
+    OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
 

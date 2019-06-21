@@ -43,6 +43,7 @@
 #include "text.h"
 #include "textelement.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -369,7 +370,7 @@ Object *Object::GetPrevious(Object *child, const ClassId classId)
     riteratorEnd = m_children.rend();
     riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
     if (riteratorCurrent != riteratorEnd) {
-        riteratorCurrent++;
+        ++riteratorCurrent;
         riteratorCurrent = std::find_if(riteratorCurrent, riteratorEnd, ObjectComparison(classId));
     }
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
@@ -795,6 +796,8 @@ void Object::ReorderByXPos()
     Functor reorder(&Object::ReorderByXPos);
     this->Process(&reorder, &params);
 }
+
+
 
 //----------------------------------------------------------------------------
 // ObjectListInterface
@@ -1292,7 +1295,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new clef
     if (this->Is(CLEF)) {
-        Clef *clef = dynamic_cast<Clef *>(this);
+        LayerElement *element = dynamic_cast<LayerElement *>(this);
+        assert(element);
+        Clef *clef = dynamic_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
@@ -1490,7 +1495,7 @@ int Object::SaveEnd(FunctorParams *functorParams)
 
 bool Object::sortByUlx(Object *a, Object *b)
 {
-    FacsimileInterface *fa = nullptr, *fb = nullptr;
+    FacsimileInterface *fa = NULL, *fb = NULL;
     InterfaceComparison comp(INTERFACE_FACSIMILE);
     if (a->GetFacsimileInterface())
         fa = a->GetFacsimileInterface();
@@ -1501,7 +1506,7 @@ bool Object::sortByUlx(Object *a, Object *b)
             if((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
-            if (temp->HasFacs() && (fa == nullptr || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
                 fa = temp;
             }
         }
@@ -1515,13 +1520,13 @@ bool Object::sortByUlx(Object *a, Object *b)
             if((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
-            if (temp->HasFacs() && (fb == nullptr || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;
             }
         }
     }
 
-    if (fa == nullptr || fb == nullptr) {
+    if (fa == NULL || fb == NULL) {
         LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
         return false;
     }
@@ -1531,7 +1536,7 @@ bool Object::sortByUlx(Object *a, Object *b)
 
 int Object::ReorderByXPos(FunctorParams *functorParams)
 {
-    if (this->GetFacsimileInterface() != nullptr) {
+    if (this->GetFacsimileInterface() != NULL) {
         if (this->GetFacsimileInterface()->HasFacs()) {
             return FUNCTOR_SIBLINGS; // This would have already been reordered.
         }
@@ -1539,6 +1544,27 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
     std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
     this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::SetChildZones(FunctorParams *functorParams)
+{
+    SetChildZonesParams *params = dynamic_cast<SetChildZonesParams *>(functorParams);
+    assert(params);
+
+    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(this->GetFacsimileInterface());
+    if (fi != NULL) {
+        if (fi->HasFacs()) {
+            assert(params->m_doc);
+            assert(params->m_doc->GetFacsimile());
+            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(fi->GetFacs());
+            if (zone == NULL) {
+                LogError("Could not find a zone of UUID %s", fi->GetFacs().c_str());
+                return FUNCTOR_STOP;
+            }
+            fi->SetZone(zone);
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 

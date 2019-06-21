@@ -2,7 +2,7 @@
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Fri Nov 26 14:12:01 PST 1999
 // Last Modified: Sat Apr 21 10:52:19 PDT 2018 Removed using namespace std;
-// Filename:      midifile/src-library/MidiFile.cpp
+// Filename:      midifile/src/MidiFile.cpp
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
 // vim:           ts=3 noexpandtab
@@ -93,7 +93,7 @@ MidiFile::~MidiFile() {
 
 //////////////////////////////
 //
-// MidiFile::operator= -- Copying another 
+// MidiFile::operator= -- Copying another
 //
 
 MidiFile& MidiFile::operator=(const MidiFile& other) {
@@ -333,7 +333,6 @@ bool MidiFile::read(std::istream& input) {
 	uchar runningCommand;
 	MidiEvent event;
 	std::vector<uchar> bytes;
-	int absticks;
 	int xstatus;
 	// int barline;
 
@@ -408,7 +407,7 @@ bool MidiFile::read(std::istream& input) {
 		m_events[i]->clear();
 
 		// process the track
-		absticks = 0;
+		int absticks = 0;
 		// barline = 1;
 		while (!input.eof()) {
 			longdata = readVLValue(input);
@@ -582,7 +581,7 @@ bool MidiFile::write(std::ostream& out) {
 	}
 
 	if (oldTimeState == TIME_STATE_ABSOLUTE) {
-		absoluteTicks();
+		makeAbsoluteTicks();
 	}
 
 	return true;
@@ -618,16 +617,15 @@ bool MidiFile::writeHex(const std::string& filename, int width) {
 bool MidiFile::writeHex(std::ostream& out, int width) {
 	std::stringstream tempstream;
 	MidiFile::write(tempstream);
-	int value = 0;
 	int len = (int)tempstream.str().length();
 	int wordcount = 1;
 	int linewidth = width >= 0 ? width : 25;
 	for (int i=0; i<len; i++) {
-		value = (unsigned char)tempstream.str()[i];
+		int value = (unsigned char)tempstream.str()[i];
 		out << std::hex << std::setw(2) << std::setfill('0') << value;
 		if (linewidth) {
 			if (i < len - 1) {
-				out << (wordcount % linewidth ? ' ' : '\n');
+				out << ((wordcount % linewidth) ? ' ' : '\n');
 			}
 			wordcount++;
 		} else {
@@ -870,6 +868,7 @@ void MidiFile::joinTracks(void) {
 		return;
 	}
 	if (getNumTracks() == 1) {
+		m_theTrackState = TRACK_STATE_JOINED;
 		return;
 	}
 
@@ -886,7 +885,7 @@ void MidiFile::joinTracks(void) {
 
 	int oldTimeState = getTickState();
 	if (oldTimeState == TIME_STATE_DELTA) {
-		absoluteTicks();
+		makeAbsoluteTicks();
 	}
 	for (i=0; i<length; i++) {
 		for (j=0; j<(int)m_events[i]->size(); j++) {
@@ -921,7 +920,7 @@ void MidiFile::splitTracks(void) {
 	}
 	int oldTimeState = getTickState();
 	if (oldTimeState == TIME_STATE_DELTA) {
-		absoluteTicks();
+		makeAbsoluteTicks();
 	}
 
 	int maxTrack = 0;
@@ -945,9 +944,8 @@ void MidiFile::splitTracks(void) {
 		m_events[i] = new MidiEventList;
 	}
 
-	int trackValue = 0;
 	for (i=0; i<length; i++) {
-		trackValue = (*olddata)[i].track;
+		int trackValue = (*olddata)[i].track;
 		m_events[trackValue]->push_back_no_copy(&(*olddata)[i]);
 	}
 
@@ -977,7 +975,7 @@ void MidiFile::splitTracksByChannel(void) {
 
 	int oldTimeState = getTickState();
 	if (oldTimeState == TIME_STATE_DELTA) {
-		absoluteTicks();
+		makeAbsoluteTicks();
 	}
 
 	int maxTrack = 0;
@@ -1010,9 +1008,8 @@ void MidiFile::splitTracksByChannel(void) {
 		m_events[i] = new MidiEventList;
 	}
 
-	int trackValue = 0;
 	for (i=0; i<length; i++) {
-		trackValue = 0;
+		int trackValue = 0;
 		if ((eventlist[i][0] & 0xf0) == 0xf0) {
 			trackValue = 0;
 		} else if (eventlist[i].size() > 0) {
@@ -1039,7 +1036,7 @@ void MidiFile::splitTracksByChannel(void) {
 //     is being used: either TRACK_STATE_JOINED or TRACK_STATE_SPLIT.
 //
 
-int MidiFile::getTrackState(void) {
+int MidiFile::getTrackState(void) const {
 	return m_theTrackState;
 }
 
@@ -1051,7 +1048,7 @@ int MidiFile::getTrackState(void) {
 //    are in a joined state.
 //
 
-int MidiFile::hasJoinedTracks(void) {
+int MidiFile::hasJoinedTracks(void) const {
 	return m_theTrackState == TRACK_STATE_JOINED;
 }
 
@@ -1063,7 +1060,7 @@ int MidiFile::hasJoinedTracks(void) {
 //     are in a split state.
 //
 
-int MidiFile::hasSplitTracks(void) {
+int MidiFile::hasSplitTracks(void) const {
 	return m_theTrackState == TRACK_STATE_SPLIT;
 }
 
@@ -1078,7 +1075,7 @@ int MidiFile::hasSplitTracks(void) {
 //   MidiFile is converted to the joined-track state.
 //
 
-int MidiFile::getSplitTrack(int track, int index) {
+int MidiFile::getSplitTrack(int track, int index) const {
 	if (hasSplitTracks()) {
 		return track;
 	} else {
@@ -1090,7 +1087,7 @@ int MidiFile::getSplitTrack(int track, int index) {
 // When the parameter is void, assume track 0:
 //
 
-int MidiFile::getSplitTrack(int index) {
+int MidiFile::getSplitTrack(int index) const {
 	if (hasSplitTracks()) {
 		return 0;
 	} else {
@@ -1204,7 +1201,7 @@ void MidiFile::absoluteTicks(void) {
 //   being used: either TIME_STATE_ABSOLUTE or TIME_STATE_DELTA.
 //
 
-int MidiFile::getTickState(void) {
+int MidiFile::getTickState(void) const {
 	return m_theTimeState;
 }
 
@@ -1216,8 +1213,8 @@ int MidiFile::getTickState(void) {
 //    variables are in delta time mode.
 //
 
-int MidiFile::isDeltaTicks(void) {
-	return m_theTimeState == TIME_STATE_DELTA ? 1 : 0;
+bool MidiFile::isDeltaTicks(void) const {
+	return m_theTimeState == TIME_STATE_DELTA ? true : false;
 }
 
 
@@ -1228,27 +1225,90 @@ int MidiFile::isDeltaTicks(void) {
 //    variables are in absolute time mode.
 //
 
-int MidiFile::isAbsoluteTicks(void) {
-	return m_theTimeState == TIME_STATE_ABSOLUTE ? 1 : 0;
+bool MidiFile::isAbsoluteTicks(void) const {
+	return m_theTimeState == TIME_STATE_ABSOLUTE ? true : false;
 }
 
 
 
 //////////////////////////////
 //
-// MidiFile::getMaxTick -- Returns the largest tick value
-//    in any track.  Note that the tick values must be in
-//    absolute states not delta states.  And the tracks
-//    must be sorted before calling this function.
+// MidiFile::getFileDurationInTicks -- Returns the largest
+//    tick value in any track.  The tracks must be sorted
+//    before calling this function, since this function
+//    assumes that the last MidiEvent in the track has the
+//    highest tick timestamp.  The file state can be in delta
+//    ticks since this function will temporarily go to absolute
+//    tick mode for the calculation of the max tick.
 //
 
-int MidiFile::getMaxTick(void) {
-	MidiFile& mf = *this;
+int MidiFile::getFileDurationInTicks(void) {
+	bool revertToDelta = false;
+	if (isDeltaTicks()) {
+		makeAbsoluteTicks();
+		revertToDelta = true;
+	}
+	const MidiFile& mf = *this;
 	int output = 0;
 	for (int i=0; i<mf.getTrackCount(); i++) {
 		if (mf[i].back().tick > output) {
 			output = mf[i].back().tick;
 		}
+	}
+	if (revertToDelta) {
+		deltaTicks();
+	}
+	return output;
+}
+
+
+
+///////////////////////////////
+//
+// MidiFile::getFileDurationInQuarters -- Returns the Duration of the MidiFile
+//    in units of quarter notes.  If the MidiFile is in delta tick mode,
+//    then temporarily got into absolute tick mode to do the calculations.
+//    Note that this is expensive, so you should normally call this function
+//    while in aboslute tick (default) mode.
+//
+
+double MidiFile::getFileDurationInQuarters(void) {
+	return (double)getFileDurationInTicks() / (double)getTicksPerQuarterNote();
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::getFileDurationInSeconds -- returns the duration of the
+//    logest track in the file.  The tracks must be sorted before
+//    calling this function, since this function assumes that the
+//    last MidiEvent in the track has the highest timestamp.
+//    The file state can be in delta ticks since this function
+//    will temporarily go to absolute tick mode for the calculation
+//    of the max time.
+
+double MidiFile::getFileDurationInSeconds(void) {
+	if (m_timemapvalid == 0) {
+		buildTimeMap();
+		if (m_timemapvalid == 0) {
+			return -1.0;    // something went wrong
+		}
+	}
+	bool revertToDelta = false;
+	if (isDeltaTicks()) {
+		makeAbsoluteTicks();
+		revertToDelta = true;
+	}
+	const MidiFile& mf = *this;
+	double output = 0.0;
+	for (int i=0; i<mf.getTrackCount(); i++) {
+		if (mf[i].back().seconds > output) {
+			output = mf[i].back().seconds;
+		}
+	}
+	if (revertToDelta) {
+		deltaTicks();
 	}
 	return output;
 }
@@ -1351,74 +1411,6 @@ double MidiFile::getAbsoluteTickTime(double starttime) {
 
 
 
-//////////////////////////////
-//
-// MidiFile::getTotalTimeInSeconds -- Returns the duration of the MidiFile
-//    event list in seconds.  If doTimeAnalysis() is not called before this
-//    function is called, it will be called automatically.
-//
-
-double MidiFile::getTotalTimeInSeconds(void) {
-	if (m_timemapvalid == 0) {
-		buildTimeMap();
-		if (m_timemapvalid == 0) {
-			return -1.0;    // something went wrong
-		}
-	}
-	double output = 0.0;
-	for (int i=0; i<(int)m_events.size(); i++) {
-		if (m_events[i]->last().seconds > output) {
-			output = m_events[i]->last().seconds;
-		}
-	}
-	return output;
-}
-
-
-
-///////////////////////////////
-//
-// MidiFile::getTotalTimeInTicks -- Returns the absolute tick value for the
-//    latest event in any track.  If the MidiFile is in TIME_STATE_DELTA,
-//    then temporarily got into TIME_STATE_ABSOLUTE to do the calculations.
-//    Note that this is expensive, so you should normally call this function
-//    while in aboslute tick mode.
-//
-
-int MidiFile::getTotalTimeInTicks(void) {
-	int oldTimeState = getTickState();
-	if (oldTimeState == TIME_STATE_DELTA) {
-		absoluteTicks();
-	}
-	if (oldTimeState == TIME_STATE_DELTA) {
-		deltaTicks();
-	}
-	int output = 0;
-	for (int i=0; i<(int)m_events.size(); i++) {
-		if (m_events[i]->last().tick > output) {
-			output = m_events[i]->last().tick;
-		}
-	}
-	return output;
-}
-
-
-
-///////////////////////////////
-//
-// MidiFile::getTotalTimeInQuarters -- Returns the Duration of the MidiFile
-//    in units of quarter notes.  If the MidiFile is in TIME_STATE_DELTA,
-//    then temporarily got into TIME_STATE_ABSOLUTE to do the calculations.
-//    Note that this is expensive, so you should normally call this function
-//    while in aboslute tick mode.
-//
-
-double MidiFile::getTotalTimeInQuarters(void) {
-	double totalTicks = getTotalTimeInTicks();
-	return totalTicks / getTicksPerQuarterNote();
-}
-
-
 ///////////////////////////////////////////////////////////////////////////
 //
 // note-analysis functions --
@@ -1481,7 +1473,7 @@ void MidiFile::setFilename(const std::string& aname) {
 //    structure (if the data was read from a file).
 //
 
-const char* MidiFile::getFilename(void) {
+const char* MidiFile::getFilename(void) const {
 	return m_readFileName.c_str();
 }
 
@@ -1515,8 +1507,24 @@ MidiEvent* MidiFile::addEvent(MidiEvent& mfevent) {
 		m_events[0]->push_back(mfevent);
 		return &m_events[0]->back();
 	} else {
-		m_events[mfevent.track]->push_back(mfevent);
-		return &m_events[mfevent.track]->back();
+		m_events.at(mfevent.track)->push_back(mfevent);
+		return &m_events.at(mfevent.track)->back();
+	}
+}
+
+//
+// Variant where the track is an input parameter:
+//
+
+MidiEvent* MidiFile::addEvent(int aTrack, MidiEvent& mfevent) {
+	if (getTrackState() == TRACK_STATE_JOINED) {
+		m_events[0]->push_back(mfevent);
+      m_events[0]->back().track = aTrack;
+		return &m_events[0]->back();
+	} else {
+		m_events.at(aTrack)->push_back(mfevent);
+		m_events.at(aTrack)->back().track = aTrack;
+		return &m_events.at(aTrack)->back();
 	}
 }
 
@@ -2065,7 +2073,7 @@ void MidiFile::deleteTrack(int aTrack) {
 		m_events[i] = m_events[i+1];
 	}
 
-	m_events[length] = NULL;
+	m_events[length-1] = NULL;
 	m_events.resize(length-1);
 }
 
@@ -2105,6 +2113,11 @@ void MidiFile::erase(void) {
 //
 
 MidiEvent& MidiFile::getEvent(int aTrack, int anIndex) {
+	return (*m_events[aTrack])[anIndex];
+}
+
+
+const MidiEvent& MidiFile::getEvent(int aTrack, int anIndex) const {
 	return (*m_events[aTrack])[anIndex];
 }
 
@@ -2170,14 +2183,13 @@ void MidiFile::mergeTracks(int aTrack1, int aTrack2) {
 	mergedTrack = new MidiEventList;
 	int oldTimeState = getTickState();
 	if (oldTimeState == TIME_STATE_DELTA) {
-		absoluteTicks();
+		makeAbsoluteTicks();
 	}
-	int i, j;
 	int length = getNumTracks();
-	for (i=0; i<(int)m_events[aTrack1]->size(); i++) {
+	for (int i=0; i<(int)m_events[aTrack1]->size(); i++) {
 		mergedTrack->push_back((*m_events[aTrack1])[i]);
 	}
-	for (j=0; j<(int)m_events[aTrack2]->size(); j++) {
+	for (int j=0; j<(int)m_events[aTrack2]->size(); j++) {
 		(*m_events[aTrack2])[j].track = aTrack1;
 		mergedTrack->push_back((*m_events[aTrack2])[j]);
 	}
@@ -2188,11 +2200,14 @@ void MidiFile::mergeTracks(int aTrack1, int aTrack2) {
 
 	m_events[aTrack1] = mergedTrack;
 
-	for (i=aTrack2; i<length-1; i++) {
+	for (int i=aTrack2; i<length-1; i++) {
 		m_events[i] = m_events[i+1];
+		for (int j=0; j<(int)m_events[i]->size(); j++) {
+			(*m_events[i])[j].track = i;
+		}
 	}
 
-	m_events[length] = NULL;
+	m_events[length-1] = NULL;
 	m_events.resize(length-1);
 
 	if (oldTimeState == TIME_STATE_DELTA) {
@@ -2487,7 +2502,7 @@ void MidiFile::buildTimeMap(void) {
 	int trackstate = getTrackState();
 	int timestate  = getTickState();
 
-	absoluteTicks();
+	makeAbsoluteTicks();
 	joinTracks();
 
 	int allocsize = getNumEvents(0);
@@ -2497,7 +2512,6 @@ void MidiFile::buildTimeMap(void) {
 	_TickTime value;
 
 	int lasttick = 0;
-	int curtick;
 	int tickinit = 0;
 
 	int i;
@@ -2509,7 +2523,7 @@ void MidiFile::buildTimeMap(void) {
 	double cursec = 0.0;
 
 	for (i=0; i<getNumEvents(0); i++) {
-		curtick = getEvent(0, i).tick;
+		int curtick = getEvent(0, i).tick;
 		getEvent(0, i).seconds = cursec;
 		if ((curtick > lasttick) || !tickinit) {
 			tickinit = 1;
@@ -2590,7 +2604,6 @@ int MidiFile::extractMidiData(std::istream& input, std::vector<uchar>& array,
 		array.push_back(byte);
 	}
 
-	int i;
 	switch (runningCommand & 0xf0) {
 		case 0x80:        // note off (2 more bytes)
 		case 0x90:        // note on (2 more bytes)
@@ -2696,7 +2709,7 @@ int MidiFile::extractMidiData(std::istream& input, std::vector<uchar>& array,
 				case 0xf0:   // System Exclusive message
 					{         // (complete, or start of message).
 					int length = (int)readVLValue(input);
-					for (i=0; i<length; i++) {
+					for (int i=0; i<length; i++) {
 						byte = readByte(input);
 						if (!status()) { return m_rwstatus; }
 						array.push_back(byte);
@@ -2755,7 +2768,7 @@ ulong MidiFile::readVLValue(std::istream& input) {
 ulong MidiFile::unpackVLV(uchar a, uchar b, uchar c, uchar d, uchar e) {
 	uchar bytes[5] = {a, b, c, d, e};
 	int count = 0;
-	while (bytes[count] > 0x7f && count < 5) {
+	while ((count < 5) && (bytes[count] > 0x7f)) {
 		count++;
 	}
 	count++;

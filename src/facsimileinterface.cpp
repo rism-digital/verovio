@@ -14,8 +14,10 @@
 //---------------------------------------------------------------------------
 
 #include "facsimile.h"
+#include "surface.h"
 #include "view.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -30,7 +32,7 @@ FacsimileInterface::~FacsimileInterface() {}
 void FacsimileInterface::Reset()
 {
     ResetFacsimile();
-    this->SetZone(nullptr);
+    this->SetZone(NULL);
 }
 
 int FacsimileInterface::GetDrawingX() const
@@ -73,7 +75,7 @@ int FacsimileInterface::GetSurfaceY() const
 
 void FacsimileInterface::SetZone(Zone *zone)
 {
-    if (m_zone != nullptr) {
+    if (m_zone != NULL) {
         Object *parent = m_zone->GetParent();
         if (!parent->DeleteChild(m_zone)) {
             printf("Failed to delete zone with ID %s\n", m_zone->GetUuid().c_str());

@@ -713,7 +713,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLine = clef->GetLine();
 
     int x,y;
-    if (custos->HasFacs()) {
+    if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());
     }
@@ -1023,7 +1023,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         }
     }
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), SCOREDEF_NONE, staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
@@ -1321,6 +1321,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Stem *stem = dynamic_cast<Stem *>(element);
     assert(stem);
+
+    // Do not draw virtual (e.g., whole note) stems
+    if (stem->IsVirtual()) return;
 
     dc->StartGraphic(element, "", "");
 

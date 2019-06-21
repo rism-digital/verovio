@@ -229,7 +229,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
 
-    if (object->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
+    if (object->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, SYL, TIE })) {
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {
@@ -592,12 +592,12 @@ int System::JustifyX(FunctorParams *functorParams)
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
     }
 
-    // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
-    // Eventually we should make this a parameter
+    // Check if we are on the last page and on the last system:
+    // do not justify it if the non-justified width is less than a specified percent.
     if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
         && (this->GetIdx() == parent->GetChildCount() - 1)) {
-        // HARDCODED
-        if (params->m_justifiableRatio > 1.25) {
+        double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
+        if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_STOP;
         }
     }

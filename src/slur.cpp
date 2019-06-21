@@ -120,7 +120,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     curvature_CURVEDIR curveDir = curve->GetDir();
     Point points[4];
     curve->GetPoints(points);
-    ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
     Point p1 = points[0];
     Point rotatedC1 = BoundingBox::CalcPositionAfterRotation(points[1], -slurAngle, p1);
@@ -188,7 +188,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     return adjusted;
 }
 
-int Slur::AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
+int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
     Point &c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio)
 {
     Point bezier[4];
@@ -313,8 +313,9 @@ int Slur::AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements
     return 0;
 }
 
-void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfCurveSpannedElements *spannedElements,
-    Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, float &angle, bool forceBothSides)
+void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
+    const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
+    curvature_CURVEDIR curveDir, float &angle, bool forceBothSides)
 {
     Point bezier[4];
     bezier[0] = p1;
@@ -461,12 +462,12 @@ void Slur::GetControlPoints(
     }
 }
 
-void Slur::GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
+void Slur::GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
     curvature_CURVEDIR curveDir, int staffSize)
 {
+    /*
     for (auto &spannedElement : *spannedElements) {
         int margin = 1;
-        /*
         // Not sure if it is better to add the margin before or after the rotation...
         // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
@@ -478,8 +479,8 @@ void Slur::GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spann
         else {
             itPoint->second.second.y -= doc->GetDrawingUnit(staffSize) * margin;
         }
-        */
     }
+    */
 }
 
 //----------------------------------------------------------------------------

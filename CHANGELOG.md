@@ -1,6 +1,17 @@
 # Changelog
 
-## [Unreleased]
+## [unreleased]
+* Support for `<turn>` in MusicXML import (@wergo)
+* Support for `<arpgeg>` in MusicXML import (@wergo)
+* Support iOS Framework build (@Noroxs)
+* Improved support for pedal marks in MusicXML import (@wergo)
+* Improved import of tuplets from PAE
+* Option to set minimum width for justification (--min-last-justification) (@earboxer).
+
+### Changed
+* Method getMIDIValuesForElement (JS) return a JSON object
+
+## [2.1.0] - 2019-05-25
 * Update pugixml
 * Support for SMUFL figured bass figures
 * Support for `@spacing` on `<staffDef>`
@@ -8,15 +19,24 @@
 * Support for editorial markup in `<label>` and `<labelAbbr>`
 * Support of ties and slurs starting or ending with timestamp (but not both)
 * Support for ABC notation import (@rettinghaus)
+* Improved cross-staff MusicXML import (@wergo)
+* Improved clef changes in MusicXML import (@wergo)
+* Improved hairpin MusicXML import (@wergo)
+* Improved slur MusicXML import (@wergo)
+* Support for `<ending>` in MusicXML import (@wergo)
 * Preserve MusicXML `<duration>` on notes, rests, and chords (@rettinghaus)
 * Import MusicXML `<division>` with `@ppq` on `<staffDef>` (@rettinghaus)
 * Avoid system optimisation when a tempo change occurs
 * Improved tuplets and support for additional attributes
 * Improved slur placement
+* Option to use svg viewBox on root node (@dchisolm)
 * Option for adjusting MIDI tempo output (--midi-tempo-adjustment)
 * Option for top/bottom margin `<harm>` (--top/bottom-margin-harm)
 * Option to use first footer / header for all pages (--use-pg-footer/header-for-all)
 * Embedding of Petaluma font (1.055) from Steinberg
+
+### Changed
+* Option inputFormat (JS) deprecated (use input instead)
 
 ## [2.0.2] - 2019-02-06
 * Fix issue with <app> and multiple <mdiv>

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        editortoolkit.cpp
 // Author:      Laurent Pugin, Juliette Regimbal, Zoe McLennan
-// Created:     16/05/2018
+// Created:     04/06/2019
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "editortoolkit.h"
+#include "editortoolkit_neume.h"
 
 //--------------------------------------------------------------------------------
 
@@ -19,14 +19,13 @@
 #include "comparison.h"
 #include "custos.h"
 #include "layer.h"
-#include "measure.h"
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
 #include "rend.h"
-#include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "surface.h"
 #include "syl.h"
 #include "syllable.h"
 #include "text.h"
@@ -39,7 +38,7 @@
 namespace vrv {
 
 #ifdef USE_EMSCRIPTEN
-bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool isChain)
+bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction, bool isChain)
 {
     jsonxx::Object json;
 
@@ -74,10 +73,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
         std::string elementType, startId, endId, staffId;
         int ulx, uly, lrx, lry;
         std::vector<std::pair<std::string, std::string>> attributes;
-        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startId, &endId)) {
-            return this->Insert(elementType, startId, endId);
-        }
-        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly,
+        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly,
                     &lrx, &lry, &attributes)) {
             return this->Insert(elementType, staffId, ulx, uly, lrx, lry, attributes);
         }
@@ -177,7 +173,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
     return false;
 }
 
-bool EditorToolkit::Chain(jsonxx::Array actions)
+bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
     bool status = true;
     std::string info = "[";
@@ -201,7 +197,7 @@ bool EditorToolkit::Chain(jsonxx::Array actions)
     m_editInfo = info;
     if (status && runReorder) {
         Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(id);
-        Layer *layer = nullptr;
+        Layer *layer = NULL;
         assert(obj);
         if (obj->Is(STAFF)) {
             layer = dynamic_cast<Layer *>(obj->GetFirst(LAYER));
@@ -214,7 +210,7 @@ bool EditorToolkit::Chain(jsonxx::Array actions)
     return status;
 }
 
-bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
+bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
 {
     m_editInfo = "";
     if (!m_doc->GetDrawingPage()) {
@@ -251,7 +247,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
                 if (nc->GetLigated() == BOOLEAN_true) {
                     Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
                     Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
-                    if (nextNc != nullptr && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone())
+                    if (nextNc != NULL && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone())
                         ignoreFacs = true;
                 }
             }
@@ -295,9 +291,9 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         }
         else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
             std::set<Zone *> childZones;    // Sets do not contain duplicate entries
-            for (Object *child = neume->GetFirst(); child != nullptr; child = neume->Object::GetNext()) {
+            for (Object *child = neume->GetFirst(); child != NULL; child = neume->Object::GetNext()) {
                 FacsimileInterface *fi = child->GetFacsimileInterface();
-                if (fi != nullptr) {
+                if (fi != NULL) {
                     childZones.insert(fi->GetZone());
                 }
             }
@@ -339,9 +335,9 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             }
             else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
                 std::set<Zone *> childZones;
-                for (Object *child = neume->GetFirst(); child != nullptr; child = neume->Object::GetNext()) {
+                for (Object *child = neume->GetFirst(); child != NULL; child = neume->Object::GetNext()) {
                     FacsimileInterface *fi = child->GetFacsimileInterface();
-                    if (fi != nullptr) {
+                    if (fi != NULL) {
                         childZones.insert(fi->GetZone());
                     }
                 }
@@ -371,12 +367,12 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
 
             Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
             m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
-                    (nextClef != nullptr) ? nextClef : m_doc->GetDrawingPage()->GetLast());
+                    (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {
                 Object *child = dynamic_cast<Object *>(*it);
-                if (child == nullptr || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
+                if (child == NULL || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
                 PitchInterface *pi = child->GetPitchInterface();
                 assert(pi);
                 pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
@@ -405,7 +401,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             assert(fi);
-            if (fi->GetZone() != nullptr)
+            if (fi->GetZone() != NULL)
                 zones.insert(fi->GetZone());
         }
         for (auto it = zones.begin(); it != zones.end(); ++it) {
@@ -428,40 +424,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
     return true;
 }
 
-bool EditorToolkit::Insert(std::string elementType, std::string startid, std::string endid)
-{
-    if (!m_doc->GetDrawingPage()) return false;
-    Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
-    Object *end = m_doc->GetDrawingPage()->FindChildByUuid(endid);
-    // Check if both start and end elements exist
-    if (!start || !end) {
-        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
-        return false;
-    }
-    // Check if it is a LayerElement
-    if (!dynamic_cast<LayerElement *>(start)) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
-        return false;
-    }
-    if (!dynamic_cast<LayerElement *>(end)) {
-        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str());
-        return false;
-    }
-
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
-    assert(measure);
-    if (elementType == "slur") {
-        Slur *slur = new Slur();
-        slur->SetStartid(startid);
-        slur->SetEndid(endid);
-        measure->AddChild(slur);
-        m_doc->PrepareDrawing();
-        return true;
-    }
-    return false;
-}
-
-bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly,
+bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly,
         int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -561,9 +524,9 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         layer->AddChild(syllable);
 
         // Find closest valid clef
-        Clef *clef = nullptr;
+        Clef *clef = NULL;
         clef = layer->GetClef(nc);
-        if (clef == nullptr) {
+        if (clef == NULL) {
             LogError("There is no valid clef available.");
             delete syllable;
             delete neume;
@@ -713,10 +676,10 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
             LogError("Something went wrong. Clef does not appear to be inserted.");
         } else if (clefs.size() > 1) {
             Clef *previousClef = dynamic_cast<Clef *>(clefs.at(0));
-            Clef *temp = nullptr;
+            Clef *temp = NULL;
             for (auto it = clefs.begin(); it != clefs.end(); ++it) {
                 temp = dynamic_cast<Clef *>(*it);
-                if (temp == nullptr) {
+                if (temp == NULL) {
                     LogWarning("Null clef!");
                     continue;
                 }
@@ -763,9 +726,9 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         custos->SetFacs(zone->GetUuid());
         layer->AddChild(custos);
         // Find closest valid clef
-        Clef *clef = nullptr;
+        Clef *clef = NULL;
         clef = layer->GetClef(custos);
-        if (clef == nullptr) {
+        if (clef == NULL) {
             LogError("There is no valid clef available.");
             delete custos;
             return false;
@@ -800,7 +763,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     return true;
 }
 
-bool EditorToolkit::Merge(std::vector<std::string> elementIds)
+bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
     m_editInfo = "";
     if (!m_doc->GetDrawingPage()) return false;
@@ -810,7 +773,7 @@ bool EditorToolkit::Merge(std::vector<std::string> elementIds)
     // Get the staves by element ID and fail if a staff does not exist.
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        if (obj != nullptr && obj->Is(STAFF)) {
+        if (obj != NULL && obj->Is(STAFF)) {
             staves.push_back(obj);
             Zone *zone = obj->GetFacsimileInterface()->GetZone();
             ulx = ulx < zone->GetUlx() ? ulx : zone->GetUlx();
@@ -863,7 +826,7 @@ bool EditorToolkit::Merge(std::vector<std::string> elementIds)
     return true;
 }
 
-bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string attrValue)
+bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
     if (!m_doc->GetDrawingPage()) return false;
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
@@ -902,7 +865,7 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
 }
 
 // Update the text of a TextElement by its syl
-bool EditorToolkit::SetText(std::string elementId, std::string text)
+bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 {
     m_editInfo = "";
     std::wstring wtext;
@@ -910,7 +873,7 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
     wtext = conv.from_bytes(text);
     if (!m_doc->GetDrawingPage()) return false;
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
-    if (element == nullptr) {
+    if (element == NULL) {
         LogWarning("No element with ID '%s' exists", elementId.c_str());
         return false;
     }
@@ -920,14 +883,14 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
         Syl *syl = dynamic_cast<Syl *>(element);
         assert(syl);
         Object *child = syl->GetFirst();
-        if(child == nullptr) {
+        if(child == NULL) {
             Text *text = new Text();
             syl->AddChild(text);
             text->SetText(wtext);
             success = true;
         }
         else {
-            while(child != nullptr) {
+            while(child != NULL) {
                 if (child->Is(TEXT)) {
                     Text *text = dynamic_cast<Text *>(child);
                     text->SetText(wtext);
@@ -952,7 +915,7 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
         Syllable *syllable = dynamic_cast<Syllable *>(element);
         assert(syllable);
         Object *syl = syllable->GetFirst(SYL);
-        if (syl == nullptr) {
+        if (syl == NULL) {
             syl = new Syl();
             syllable->AddChild(syl);
             Text *textChild = new Text();
@@ -971,7 +934,7 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
     return success;
 }
 
-bool EditorToolkit::SetClef(std::string elementId, std::string shape)
+bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1008,12 +971,12 @@ bool EditorToolkit::SetClef(std::string elementId, std::string shape)
         InterfaceComparison ic(INTERFACE_PITCH);
 
         m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
-            (nextClef != nullptr) ? nextClef : m_doc->GetDrawingPage()->GetLast());
+            (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         // Adjust all elements who are positioned relative to clef by pitch
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Object *child = dynamic_cast<Object *>(*it);
-            if (child == nullptr || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
+            if (child == NULL || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
             PitchInterface *pi = child->GetPitchInterface();
             assert(pi);
             pi->AdjustPitchByOffset(shift);
@@ -1026,7 +989,7 @@ bool EditorToolkit::SetClef(std::string elementId, std::string shape)
     return true;
 }
 
-bool EditorToolkit::Split(std::string elementId, int x)
+bool EditorToolkitNeume::Split(std::string elementId, int x)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
@@ -1034,7 +997,7 @@ bool EditorToolkit::Split(std::string elementId, int x)
     }
     Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
     // Validate parameters
-    if (staff == nullptr) {
+    if (staff == NULL) {
         LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
         return false;
     }
@@ -1055,7 +1018,7 @@ bool EditorToolkit::Split(std::string elementId, int x)
     }
     Staff *splitStaff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(m_editInfo));
     assert(splitStaff);
-    if (splitStaff == nullptr) {
+    if (splitStaff == NULL) {
         LogMessage("Split staff is null");
     }
 
@@ -1064,11 +1027,11 @@ bool EditorToolkit::Split(std::string elementId, int x)
     Layer *splitLayer = dynamic_cast<Layer *>(splitStaff->GetFirst(LAYER));
 
     // Move any elements that should be on the second staff there.
-    for (Object *child = layer->GetFirst(); child != nullptr; child = layer->GetNext()) {
+    for (Object *child = layer->GetFirst(); child != NULL; child = layer->GetNext()) {
         assert(child);
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(child);
-        if (fi == nullptr || !fi->HasFacs()) {
-            fi = nullptr;
+        if (fi == NULL || !fi->HasFacs()) {
+            fi = NULL;
             ArrayOfObjects facsimileInterfaces;
             InterfaceComparison ic(INTERFACE_FACSIMILE);
             child->FindAllChildByComparison(&facsimileInterfaces, &ic);
@@ -1076,13 +1039,13 @@ bool EditorToolkit::Split(std::string elementId, int x)
             for (auto it = facsimileInterfaces.begin(); it != facsimileInterfaces.end(); ++it) {
                 FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
                 assert(temp);
-                if (temp->HasFacs() && (fi == nullptr || temp->GetZone()->GetUlx() < fi->GetZone()->GetUlx())) {
+                if (temp->HasFacs() && (fi == NULL || temp->GetZone()->GetUlx() < fi->GetZone()->GetUlx())) {
                     fi = temp;
                 }
             }
         }
 
-        if (fi == nullptr) {
+        if (fi == NULL) {
             continue;
         }
         else if (fi->GetZone()->GetUlx() > x) {
@@ -1094,7 +1057,7 @@ bool EditorToolkit::Split(std::string elementId, int x)
     return true;
 }
 
-bool EditorToolkit::Remove(std::string elementId)
+bool EditorToolkitNeume::Remove(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1112,30 +1075,30 @@ bool EditorToolkit::Remove(std::string elementId)
     ArrayOfObjects fiChildren;
     obj->FindAllChildByComparison(&fiChildren, &ic);
     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(obj);
-    if (fi != nullptr && fi->HasFacs()) {
-        fi->SetZone(nullptr);
+    if (fi != NULL && fi->HasFacs()) {
+        fi->SetZone(NULL);
     }
     for (auto it = fiChildren.begin(); it != fiChildren.end(); ++it) {
         fi = dynamic_cast<FacsimileInterface *>(*it);
-        if (fi != nullptr && fi->HasFacs()) {
-            fi->SetZone(nullptr);
+        if (fi != NULL && fi->HasFacs()) {
+            fi->SetZone(NULL);
         }
     }
     result = parent->DeleteChild(obj);
     if (isNeume && result) {
         if (!parent->Is(SYLLABLE)) {
             parent = parent->GetFirstParent(SYLLABLE);
-            if (parent == nullptr) { LogMessage("Failed to get syllable parent!"); return false; }
+            if (parent == NULL) { LogMessage("Failed to get syllable parent!"); return false; }
         }
         assert(parent->Is(SYLLABLE));
-        if (parent->FindChildByType(NC) == nullptr) {
+        if (parent->FindChildByType(NC) == NULL) {
             obj = parent;
             parent = parent->GetParent();
-            if (parent == nullptr) { LogMessage("Null parent!"); return false; }
+            if (parent == NULL) { LogMessage("Null parent!"); return false; }
             // Remove Zone for element (if any)
             fi = dynamic_cast<FacsimileInterface *>(obj);
-            if (fi != nullptr && fi->HasFacs()) {
-                fi->SetZone(nullptr);
+            if (fi != NULL && fi->HasFacs()) {
+                fi->SetZone(NULL);
             }
             result &= parent->DeleteChild(obj);
         }
@@ -1143,7 +1106,7 @@ bool EditorToolkit::Remove(std::string elementId)
     return result;
 }
 
-bool EditorToolkit::Resize(std::string elementId, int ulx, int uly, int lrx, int lry)
+bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx, int lry)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1155,7 +1118,7 @@ bool EditorToolkit::Resize(std::string elementId, int ulx, int uly, int lrx, int
     }
 
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
-    if (obj == nullptr) {
+    if (obj == NULL) {
         LogError("Object with ID '%s' not found.", elementId.c_str());
         return false;
     }
@@ -1180,15 +1143,10 @@ bool EditorToolkit::Resize(std::string elementId, int ulx, int uly, int lrx, int
     return true;
 }
 
-std::string EditorToolkit::EditInfo()
-{
-    return m_editInfo;
-}
-
-bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elementIds)
+bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> elementIds)
 {
     m_editInfo = "";
-    Object *parent = nullptr, *doubleParent = nullptr;
+    Object *parent = NULL, *doubleParent = NULL;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
     std::vector<Object *> fullParents;
@@ -1216,7 +1174,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         // Verify that the children are of the same type
         Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        if (el == nullptr) {
+        if (el == NULL) {
             LogError("Could not get element with ID %s", it->c_str());
             return false;
         }
@@ -1228,13 +1186,13 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
 
         // Get a set of parents and the number of children they have
         Object *par = el->GetParent();
-        if (par == nullptr) {
+        if (par == NULL) {
             LogError("Parent of %s is null!", el->GetUuid().c_str());
             return false;
         }
-        if (doubleParent == nullptr) {
+        if (doubleParent == NULL) {
             doubleParent = par->GetParent();
-            if (doubleParent == nullptr) {
+            if (doubleParent == NULL) {
                 LogError("No second level parent!");
                 return false;
             }
@@ -1328,7 +1286,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             std::wstring fullString = L"";
             for(auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Text *text = dynamic_cast<Text *> ((*it)->FindChildByType(SYL)->FindChildByType(TEXT));
-                if(text != nullptr) {
+                if(text != NULL) {
                     std::wstring currentString = text->GetText();
                     fullString = fullString + currentString;
                 }
@@ -1358,7 +1316,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             doubleParent->DeleteChild(obj);
         } else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
             Object *syl;
-            while ((syl = obj->FindChildByType(SYL)) != nullptr) {
+            while ((syl = obj->FindChildByType(SYL)) != NULL) {
                 obj->DeleteChild(syl);
             }
             doubleParent->DeleteChild(obj);
@@ -1369,7 +1327,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
     return true;
 }
 
-bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elementIds)
+bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
     m_editInfo = "";
     Object *fparent, *sparent, *currentParent;
@@ -1411,7 +1369,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
                     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-                    if (Att::SetVisual(firstNc, "ligature", "false")) success1 = true;
+                    if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
                     int ligUlx = firstNc->GetZone()->GetUlx();
                     int ligUly = firstNc->GetZone()->GetUly();
@@ -1430,11 +1388,11 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                     secondNc->ResetFacsimile();
                     secondNc->SetFacs(zone->GetUuid());
 
-                    if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;
+                    if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
                     if(success1 && success2){
                         ligCount = 0;
-                        firstNc = nullptr;
-                        secondNc = nullptr;
+                        firstNc = NULL;
+                        secondNc = NULL;
                     }
                     else{
                         LogWarning("Unable to toggle ligature within ungroup ncs!");
@@ -1508,7 +1466,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
     return true;
 }
 
-bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
+bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
 {
     m_editInfo = "";
     //Check if you can get drawing page
@@ -1517,7 +1475,7 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
         return false;
     }
     Neume *el = dynamic_cast<Neume *> (m_doc->GetDrawingPage()->FindChildByUuid(elementId));
-    if(el == nullptr){
+    if(el == NULL){
         LogError("Unable to find neume with id %s", elementId.c_str());
         return false;
     }
@@ -1602,7 +1560,7 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
     return true;
 }
 
-bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
+bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
 {
     m_editInfo = "";
     bool success1 = false;
@@ -1626,7 +1584,7 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
     Zone *zone = new Zone();
     //set ligature to false and update zone of second Nc
     if(isLigature == "true"){
-        if (Att::SetVisual(firstNc, "ligature", "false")) success1 = true;
+        if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
         int ligUlx = firstNc->GetZone()->GetUlx();
         int ligUly = firstNc->GetZone()->GetUly();
@@ -1651,11 +1609,11 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
         secondNc->ResetFacsimile();
         secondNc->SetFacs(zone->GetUuid());
 
-        if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;
+        if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
     }
     //set ligature to true and update zones to be the same
     else if (isLigature == "false"){
-        if (Att::SetVisual(firstNc, "ligature", "true")) success1 = true;
+        if (Att::SetNeumes(firstNc, "ligated", "true")) success1 = true;
 
         zone->SetUlx(firstNc->GetZone()->GetUlx());
         zone->SetUly(firstNc->GetZone()->GetUly());
@@ -1669,7 +1627,7 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
         secondNc->ResetFacsimile();
         secondNc->SetFacs(zone->GetUuid());
 
-        if (Att::SetVisual(secondNc, "ligature", "true")) success2 = true;
+        if (Att::SetNeumes(secondNc, "ligated", "true")) success2 = true;
     }
     else {
         LogWarning("isLigature is invalid!");
@@ -1687,7 +1645,7 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
     return success1 && success2;
 }
 
-bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
+bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
@@ -1698,7 +1656,7 @@ bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId
     return true;
 }
 
-bool EditorToolkit::ParseInsertAction(
+bool EditorToolkitNeume::ParseInsertAction(
     jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
@@ -1710,7 +1668,7 @@ bool EditorToolkit::ParseInsertAction(
     return true;
 }
 
-bool EditorToolkit::ParseInsertAction(
+bool EditorToolkitNeume::ParseInsertAction(
     jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
     int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes)
 {
@@ -1747,7 +1705,7 @@ bool EditorToolkit::ParseInsertAction(
     return true;
 }
 
-bool EditorToolkit::ParseMergeAction(
+bool EditorToolkitNeume::ParseMergeAction(
     jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
@@ -1758,7 +1716,7 @@ bool EditorToolkit::ParseMergeAction(
     return true;
 }
 
-bool EditorToolkit::ParseSplitAction(
+bool EditorToolkitNeume::ParseSplitAction(
     jsonxx::Object param, std::string *elementId, int *x)
 {
     if (!param.has<jsonxx::String>("elementId")) {
@@ -1776,7 +1734,7 @@ bool EditorToolkit::ParseSplitAction(
     return true;
 }
 
-bool EditorToolkit::ParseSetAction(
+bool EditorToolkitNeume::ParseSetAction(
     jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
     if (!param.has<jsonxx::String>("elementId")) {
@@ -1797,7 +1755,7 @@ bool EditorToolkit::ParseSetAction(
     return true;
 }
 
-bool EditorToolkit::ParseSetTextAction(
+bool EditorToolkitNeume::ParseSetTextAction(
     jsonxx::Object param, std::string *elementId, std::string *text)
 {
     if (!param.has<jsonxx::String>("elementId")) {
@@ -1813,7 +1771,7 @@ bool EditorToolkit::ParseSetTextAction(
     return true;
 }
 
-bool EditorToolkit::ParseSetClefAction(
+bool EditorToolkitNeume::ParseSetClefAction(
     jsonxx::Object param, std::string *elementId, std::string *shape)
 {
     if(!param.has<jsonxx::String>("elementId")) {
@@ -1829,7 +1787,7 @@ bool EditorToolkit::ParseSetClefAction(
     return true;
 }
 
-bool EditorToolkit::ParseRemoveAction(
+bool EditorToolkitNeume::ParseRemoveAction(
     jsonxx::Object param, std::string *elementId)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -1837,7 +1795,7 @@ bool EditorToolkit::ParseRemoveAction(
     return true;
 }
 
-bool EditorToolkit::ParseResizeAction(
+bool EditorToolkitNeume::ParseResizeAction(
     jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry)
 {
     if(!param.has<jsonxx::String>("elementId")) return false;
@@ -1853,7 +1811,7 @@ bool EditorToolkit::ParseResizeAction(
     return true;
 }
 
-bool EditorToolkit::ParseGroupAction(
+bool EditorToolkitNeume::ParseGroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
@@ -1867,7 +1825,7 @@ bool EditorToolkit::ParseGroupAction(
     return true;
 }
 
-bool EditorToolkit::ParseUngroupAction(
+bool EditorToolkitNeume::ParseUngroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
@@ -1881,7 +1839,7 @@ bool EditorToolkit::ParseUngroupAction(
     return true;
 }
 
-bool EditorToolkit::ParseChangeGroupAction(
+bool EditorToolkitNeume::ParseChangeGroupAction(
     jsonxx::Object param, std::string *elementId, std::string *contour)
 {
     if(!param.has<jsonxx::String>("elementId")) return false;
@@ -1891,7 +1849,7 @@ bool EditorToolkit::ParseChangeGroupAction(
     return true;
 }
 
-bool EditorToolkit::ParseToggleLigatureAction(
+bool EditorToolkitNeume::ParseToggleLigatureAction(
     jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature)
 {
     if(!param.has<jsonxx::Array>("elementIds")) return false;

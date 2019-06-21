@@ -13,12 +13,12 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "editortoolkit.h"
 #include "view.h"
 
 //----------------------------------------------------------------------------
 
 #ifdef USE_EMSCRIPTEN
+#include "editortoolkit.h"
 #include "jsonxx.h"
 #endif
 

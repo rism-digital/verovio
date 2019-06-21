@@ -176,7 +176,7 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDIEnd
+     * See Object::CalcOnsetOffsetEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
 

@@ -30,6 +30,7 @@
 #include "timeinterface.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -139,13 +140,25 @@ void Staff::AddChild(Object *child)
 
 int Staff::GetDrawingX() const
 {
-    if (this->HasFacs()) return FacsimileInterface::GetDrawingX();
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingX();
+        }
+    }
     return Object::GetDrawingX();
 }
 
 int Staff::GetDrawingY() const
 {
-    if (this->HasFacs()) return FacsimileInterface::GetDrawingY();
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(DOC);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingY();
+        }
+    }
 
     if (m_yAbs != VRV_UNSET) return m_yAbs;
 
@@ -320,15 +333,17 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
 
     staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
+    // Ignore layers that are empty (or with @sameas)
     ArrayOfObjects layers;
-    ClassIdComparison matchTypeLayer(LAYER);
+    IsEmptyComparison matchTypeLayer(LAYER, true);
     this->FindAllChildByComparison(&layers, &matchTypeLayer);
 
     ArrayOfObjects mRests;
     ClassIdComparison matchTypeMRest(MREST);
     this->FindAllChildByComparison(&mRests, &matchTypeMRest);
 
-    if (mRests.size() != layers.size()) {
+    // Show the staff only if no layer with content or only mRests
+    if (layers.empty() || (mRests.size() != layers.size())) {
         staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
 

@@ -15,7 +15,9 @@
 
 #include "comparison.h"
 #include "object.h"
+#include "surface.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -73,100 +75,5 @@ int Facsimile::GetMaxY()
     }
     return max;
 }
-//----------------------------------------------------------------------------
-// Surface
-//----------------------------------------------------------------------------
-Surface::Surface() : Object("surface-"), AttTyped(), AttCoordinated()
-{
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_COORDINATED);
-    Reset();
-}
-Surface::~Surface() {}
-void Surface::Reset()
-{
-    ResetTyped();
-    ResetCoordinated();
-}
 
-void Surface::AddChild(Object *object)
-{
-    //TODO Add support for graphic tag
-    if (object->Is(ZONE)) {
-        object->SetParent(this);
-        this->m_children.push_back(object);
-        Modify();
-    }
-    else if (object->GetClassName() == "graphic") {
-        LogWarning("The graphic element is currently not supported.");
-    }
-    else {
-        LogError("Unsupported child '%s' of surface", object->GetClassName().c_str());
-        assert(false);
-    }
-}
-
-int Surface::GetMaxX()
-{
-    if (HasLrx()) return GetLrx();
-    int max = 0;
-    ClassIdComparison ac(ZONE);
-    ArrayOfObjects zones;
-    FindAllChildByComparison(&zones, &ac);
-    for (auto iter = zones.begin(); iter!= zones.end(); iter++) {
-        Zone *zone = dynamic_cast<Zone *>(*iter);
-        assert(zone);
-        max = (zone->GetLrx() > max) ? zone->GetLrx() : max;
-    }
-    return max;
-}
-
-int Surface::GetMaxY()
-{
-    if (HasLry()) return GetLry();
-    int max = 0;
-    ClassIdComparison ac(ZONE);
-    ArrayOfObjects zones;
-    FindAllChildByComparison(&zones, &ac);
-    for (auto iter = zones.begin(); iter!= zones.end(); iter++) {
-        Zone *zone = dynamic_cast<Zone *>(*iter);
-        assert(zone);
-        max = (zone->GetLry() > max) ? zone->GetLry() : max;
-    }
-    return max;
-}
-
-//----------------------------------------------------------------------------
-// Zone
-//----------------------------------------------------------------------------
-Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated()
-{
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_COORDINATED);
-    Reset();
-}
-Zone::~Zone() {}
-void Zone::Reset()
-{
-    ResetTyped();
-    ResetCoordinated();
-}
-
-void Zone::ShiftByXY(int xDiff, int yDiff)
-{
-    this->SetUlx(this->GetUlx() + xDiff);
-    this->SetLrx(this->GetLrx() + xDiff);
-    this->SetUly(this->GetUly() + yDiff);
-    this->SetLry(this->GetLry() + yDiff);
-}
-
-int Zone::GetLogicalUly()
-{
-    return (this->GetUly());
-}
-
-int Zone::GetLogicalLry()
-{
-    return (this->GetLry());
-}
-}
+} // namespace vrv

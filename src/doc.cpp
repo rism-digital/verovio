@@ -82,6 +82,7 @@ void Doc::Reset()
     Object::Reset();
 
     m_type = Raw;
+    m_notationType = NOTATIONTYPE_NONE;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageMarginBottom = 0;
@@ -365,12 +366,12 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            GenerateMIDIParams generateMIDIParams(midiFile);
+            Functor generateMIDI(&Object::GenerateMIDI);
+            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
             generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
-            Functor generateMIDI(&Object::GenerateMIDI);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, NULL, &filters);
@@ -389,8 +390,8 @@ bool Doc::ExportTimemap(std::string &output)
         output = "";
         return false;
     }
-    GenerateTimemapParams generateTimemapParams;
     Functor generateTimemap(&Object::GenerateTimemap);
+    GenerateTimemapParams generateTimemapParams(&generateTimemap);
     this->Process(&generateTimemap, &generateTimemapParams);
 
     PrepareJsonTimemap(output, generateTimemapParams.realTimeToScoreTime, generateTimemapParams.realTimeToOnElements,
@@ -1029,7 +1030,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     if (!m_isMensuralMusicOnly) return;
 
     // Do not convert transcription files
-    if (this->GetType() == Transcription || this->GetType() == Facs) return;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) return;
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1517,7 +1518,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription || this->GetType() == Facs) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
 
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
@@ -1527,7 +1528,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription || this->GetType() == Facs) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
@@ -1541,13 +1542,15 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 {
     PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
-
-    if ((params->m_currentSyl && params->m_lastNote) && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
+    if (!params->m_currentSyl) {
+        return FUNCTOR_STOP; // early return
+    }
+    if (params->m_lastNote && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
         params->m_currentSyl->SetEnd(params->m_lastNote);
     }
     else if (m_options->m_openControlEvents.GetValue()) {
-        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i)
-            || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
+        sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();
+        if ((wordpos == sylLog_WORDPOS_i) || (wordpos == sylLog_WORDPOS_m)) {
             Measure *lastMeasure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
             assert(lastMeasure);
             params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
@@ -1555,29 +1558,6 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     }
 
     return FUNCTOR_STOP;
-}
-
-void Doc::SetChildZones() {
-    if (this->GetType() != Facs) return;
-
-    InterfaceComparison ic(INTERFACE_FACSIMILE);
-    ArrayOfObjects children;
-
-    this->FindAllChildByComparison(&children, &ic);
-
-    for (auto iter = children.begin(); iter != children.end(); iter++) {
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*iter)->GetFacsimileInterface());
-        assert(fi);
-        if (fi->HasFacs()) {
-            fi->SetZone(m_facsimile->FindZoneByUuid(fi->GetFacs()));
-        }
-        /*
-        else {
-            LogError("If facsimilies are present then element %s should have it.", (*iter)->GetClassName().c_str());
-            assert(false);
-        }
-        */
-    }
 }
 
 int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
