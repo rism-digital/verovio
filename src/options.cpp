@@ -569,9 +569,9 @@ Options::Options()
     m_useFacsimile.Init(false);
     this->Register(&m_useFacsimile, "useFacsimile", &m_general);
 
-    m_useSylBBox.SetInfo("Use syl bounding boxes", "Use information in the in the <facsimile> element to display syl text bounding boxes");
-    m_useSylBBox.Init(false);
-    this->Register(&m_useSylBBox, "useSylBBox", &m_general);
+    m_createDefaultSyl.SetInfo("Add default syls to syllables", "Add empty syl elements to syllables if it doesn't have one");
+    m_createDefaultSyl.Init(false);
+    this->Register(&m_createDefaultSyl, "createDefaultSyl", &m_general);
 
     m_createDefaultSylBBox.SetInfo("Make default syl bounding boxes",
         "When no facsimile data is provided for a syl, make a default element with coordinates similar to that of its syllable");

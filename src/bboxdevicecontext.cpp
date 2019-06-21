@@ -265,7 +265,7 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
     LogMessage("BBoxDeviceContext::DrawText, %s, %d, %d", text.c_str(), x, y);
     assert(m_fontStack.top());
 
-    if ((x != 0) && (y != 0) && (x != VRV_UNEST) && (y != VRV_UNSET) 
+    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) 
         && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
         m_textX = x;
         m_textY = y;

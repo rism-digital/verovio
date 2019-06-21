@@ -1569,8 +1569,69 @@ void Doc::SetChildZones() {
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*iter)->GetFacsimileInterface());
         assert(fi);
         if (fi->HasFacs()) {
+            //LogMessage("Doc::SetChildZones: %s, %s", (*iter)->GetClassName().c_str(), fi->GetFacs().c_str());
             fi->SetZone(m_facsimile->FindZoneByUuid(fi->GetFacs()));
         }
+        
+        else if (!fi->HasFacs() && (*iter)->Is(SYL) && this->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+            //LogMessage("inside!");
+            Zone *zone = new Zone();
+
+            FacsimileInterface *syllableFi = nullptr;
+            if ((*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
+                LogMessage("first parent syllable has facs");
+                syllableFi = (*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
+                Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
+                zone->SetUlx(tempZone->GetUlx());
+                zone->SetUly(tempZone->GetUly());
+                zone->SetLrx(tempZone->GetLrx());
+                zone->SetLry(tempZone->GetLry());
+            }
+            else {
+                LogMessage("in else branch");
+                ArrayOfObjects children;
+                InterfaceComparison comp(INTERFACE_FACSIMILE);
+                (*iter)->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
+                for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
+                    FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
+                    assert(temp);
+                    Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
+                    assert(tempzone);
+                    if (temp->HasFacs()) {
+                        if (syllableFi == nullptr) {
+                            zone->SetUlx(tempZone->GetUlx());
+                            zone->SetUly(tempZone->GetUly());
+                            zone->SetLrx(tempZone->GetLrx());
+                            zone->SetLry(tempZone->GetLry());
+                        }
+                        else {
+                            if (tempZone->GetUlx() < zone->GetUlx()) {
+                                zone->SetUlx(tempZone->GetUlx());
+                            }
+                            if (tempZone->GetUly() < zone->GetUly()) {
+                                zone->SetUly(tempZone->GetUly());
+                            }
+                            if (tempZone->GetLrx() > zone->GetLrx()) {
+                                zone->SetLrx(tempZone->GetLrx());
+                            }
+                            if (tempZone->GetLry() > zone->GetLry()) {
+                                zone->SetLry(tempZone->GetLry());
+                            }
+                        }
+                    }
+                }
+            }
+
+            zone->SetLrx(zone->GetLrx() + 100);
+            zone->SetLry(zone->GetLry() + 100);
+
+            LogMessage("New Zone: %d %d %d %d", zone->GetUlx(), zone->GetUly(), zone->GetLrx(), zone->GetLry());
+            LogMessage("Surface: %s", m_facsimile->FindChildByType(SURFACE)->GetUuid().c_str());
+            m_facsimile->FindChildByType(SURFACE)->AddChild(zone);
+            LogMessage("Zone has been added to m_facs. ulx: %d", m_facsimile->FindZoneByUuid(zone->GetUuid())->GetUlx());
+            fi->SetZone(zone);
+        }
+        
         /*
         else {
             LogError("If facsimilies are present then element %s should have it.", (*iter)->GetClassName().c_str());

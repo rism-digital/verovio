@@ -1687,9 +1687,7 @@ void MeiOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     WriteLayerElement(currentNode, syl);
-    if (m_doc ->GetOptions()->m_useSylBBox.GetValue()) {
-        WriteFacsimileInterface(currentNode, syl);
-    }
+    WriteFacsimileInterface(currentNode, syl);
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
@@ -4036,7 +4034,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     //if not then add a blank one
     if (strcmp(parentNode.name(), "syllable") == 0) {
         auto testSyl = parent->FindChildByType(SYL);
-        if(testSyl == nullptr) {
+        if(testSyl == nullptr && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
             Syl *syl = new Syl();
             parent->AddChild(syl);
         }
@@ -4510,12 +4508,13 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
 {
     Syl *vrvSyl = new Syl();
     ReadLayerElement(syl, vrvSyl);
+    ReadFacsimileInterface(syl, vrvSyl);
 
     vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
-
-    ReadFacsimileInterface(syl, vrvSyl);
+    
+    //LogMessage("MeiInput::ReadSyl: %s", vrvSyl->GetFacs().c_str());
 
     parent->AddChild(vrvSyl);
     ReadUnsupportedAttr(syl, vrvSyl);
@@ -4524,6 +4523,7 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
 
 bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 {
+    LogMessage("MeiInput::ReadSyllable");
     bool success;
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
@@ -4537,10 +4537,18 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     //and add an empty <syl> if it doesn't have one
     if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
 
+        LogMessage("successfully read layer childern");
         Object *obj = vrvSyllable->FindChildByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
-
-        if(syl == nullptr) {
+        if (syl == nullptr) {
+            LogMessage("syl is nullptr, should add default");
+        }
+        else {
+            LogMessage("syl: %s", syl->GetUuid().c_str());
+        }
+        //LogMessage("m_createDefaultSyl: %s", m_doc->GetOptions()->m_createDefaultSyl.GetValue().c_str());
+        if (syl == nullptr && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
+            LogMessage("adding default syl");
             syl = new Syl();
             vrvSyllable->AddChild(syl);
         }
