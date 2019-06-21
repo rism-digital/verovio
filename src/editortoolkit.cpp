@@ -1598,6 +1598,9 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             assert(newParent);
             newParent->ClearChildren();
 
+            el->MoveItselfTo(newParent);
+            fparent->ClearRelinquishedChildren();
+
             if (newParent->Is(SYLLABLE) && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
                 Syl *syl = new Syl();
                 Text *text = new Text();
@@ -1670,8 +1673,6 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
             m_editInfo = m_editInfo + " " + newParent->GetUuid();
 
-            el->MoveItselfTo(newParent);
-            fparent->ClearRelinquishedChildren();
             sparent->AddChild(newParent);
             sparent->ReorderByXPos();
         }
