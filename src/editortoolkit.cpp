@@ -1276,82 +1276,89 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
         }
         else if (elementClass == NEUME) {
             parent = new Syllable();
-
-            //make sure to add an empty syl
-            Syl *syl = new Syl();
-            Text *text = new Text();
-            syl->AddChild(text);
-            parent->AddChild(syl);
-
+            
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
                     (*it)->MoveItselfTo(parent);
                 }
             }
 
-            //add a default bounding box if you need to 
-            if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
-                Zone *zone = new Zone();
+            //make sure to add an empty syl if the option is provided
+            if (m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
+                Syl *syl = new Syl();
+                Text *text = new Text();
+                syl->AddChild(text);
+                parent->AddChild(syl);
 
-                // if it's syllable parent has position values just use those
-                FacsimileInterface *syllableFi = nullptr;
-                if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
-                    syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
-                    Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
-                    zone->SetUlx(tempZone->GetUlx());
-                    zone->SetUly(tempZone->GetUly());
-                    zone->SetLrx(tempZone->GetLrx());
-                    zone->SetLry(tempZone->GetLry());
-                }
-                // otherwise get a boundingbox that comprises all the neumes in the syllable
-                else {
-                    ArrayOfObjects children;
-                    InterfaceComparison comp(INTERFACE_FACSIMILE);
-                    syl->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
-                    for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
-                        FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
-                        assert(temp);
-                        Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
-                        assert(tempzone);
-                        if (temp->HasFacs()) {
-                            if (syllableFi == nullptr) {
-                                zone->SetUlx(tempZone->GetUlx());
-                                zone->SetUly(tempZone->GetUly());
-                                zone->SetLrx(tempZone->GetLrx());
-                                zone->SetLry(tempZone->GetLry());
-                            }
-                            else {
-                                if (tempZone->GetUlx() < zone->GetUlx()) {
+                //add a default bounding box if you need to 
+                if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+                    Zone *zone = new Zone();
+
+                    // if it's syllable parent has position values just use those
+                    FacsimileInterface *syllableFi = nullptr;
+                    if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
+                        syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
+                        Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
+                        zone->SetUlx(tempZone->GetUlx());
+                        zone->SetUly(tempZone->GetUly());
+                        zone->SetLrx(tempZone->GetLrx());
+                        zone->SetLry(tempZone->GetLry());
+                    }
+                    // otherwise get a boundingbox that comprises all the neumes in the syllable
+                    else {
+                        ArrayOfObjects children;
+                        InterfaceComparison comp(INTERFACE_FACSIMILE);
+                        syl->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
+                        for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
+                            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
+                            assert(temp);
+                            Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
+                            assert(tempzone);
+                            if (temp->HasFacs()) {
+                                if (syllableFi == nullptr) {
                                     zone->SetUlx(tempZone->GetUlx());
-                                }
-                                if (tempZone->GetUly() < zone->GetUly()) {
                                     zone->SetUly(tempZone->GetUly());
-                                }
-                                if (tempZone->GetLrx() > zone->GetLrx()) {
                                     zone->SetLrx(tempZone->GetLrx());
-                                }
-                                if (tempZone->GetLry() > zone->GetLry()) {
                                     zone->SetLry(tempZone->GetLry());
                                 }
-                            }
+                                else {
+                                    if (tempZone->GetUlx() < zone->GetUlx()) {
+                                        zone->SetUlx(tempZone->GetUlx());
+                                    }
+                                    if (tempZone->GetUly() < zone->GetUly()) {
+                                        zone->SetUly(tempZone->GetUly());
+                                    }
+                                    if (tempZone->GetLrx() > zone->GetLrx()) {
+                                        zone->SetLrx(tempZone->GetLrx());
+                                    }
+                                    if (tempZone->GetLry() > zone->GetLry()) {
+                                        zone->SetLry(tempZone->GetLry());
+                                    }
+                                }  
+                            }   
                         }
                     }
+
+                    //make the bounding box a little bigger and lower so it's easier to edit
+                    zone->SetUly(zone->GetUly() + 100);
+                    zone->SetLrx(zone->GetLrx() + 100);
+                    zone->SetLry(zone->GetLry() + 200);
+
+                    assert(m_doc->GetFacsimile());
+                    m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
+                    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
+                    assert(fi);
+                    fi->SetZone(zone);
+
+                    syl->ResetFacsimile();
+                    syl->SetFacs(zone->GetUuid());
                 }
-
-                //make the bounding box a little bigger and lower so it's easier to edit
-                zone->SetUly(zone->GetUly() + 100);
-                zone->SetLrx(zone->GetLrx() + 100);
-                zone->SetLry(zone->GetLry() + 200);
-
-                assert(m_doc->GetFacsimile());
-                m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
-                FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
-                assert(fi);
-                fi->SetZone(zone);
-
-                syl->ResetFacsimile();
-                syl->SetFacs(zone->GetUuid());
             }
+           
+
+            
+
+            
             
         }
 
