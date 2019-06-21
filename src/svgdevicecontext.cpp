@@ -736,7 +736,6 @@ void SvgDeviceContext::EndText()
 //if the bounding box is specified then append a rect child
 void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
-    LogMessage("svgdevicecontext::Drawtext: %s", text.c_str());
     assert(m_fontStack.top());
 
     std::string svgText = text;
@@ -771,7 +770,6 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) 
         && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
-        //LogMessage("%d, %d", width, height);
         pugi::xml_node g = m_currentNode.parent().parent();
         pugi::xml_node rectChild = g.append_child("rect");
         rectChild.append_attribute("class") = "sylTextRect";

@@ -1579,7 +1579,6 @@ void Doc::SetChildZones() {
 
             FacsimileInterface *syllableFi = nullptr;
             if ((*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
-                LogMessage("first parent syllable has facs");
                 syllableFi = (*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
                 Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
                 zone->SetUlx(tempZone->GetUlx());
@@ -1588,7 +1587,6 @@ void Doc::SetChildZones() {
                 zone->SetLry(tempZone->GetLry());
             }
             else {
-                LogMessage("in else branch");
                 ArrayOfObjects children;
                 InterfaceComparison comp(INTERFACE_FACSIMILE);
                 (*iter)->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
@@ -1625,11 +1623,11 @@ void Doc::SetChildZones() {
             zone->SetLrx(zone->GetLrx() + 100);
             zone->SetLry(zone->GetLry() + 100);
 
-            LogMessage("New Zone: %d %d %d %d", zone->GetUlx(), zone->GetUly(), zone->GetLrx(), zone->GetLry());
-            LogMessage("Surface: %s", m_facsimile->FindChildByType(SURFACE)->GetUuid().c_str());
             m_facsimile->FindChildByType(SURFACE)->AddChild(zone);
-            LogMessage("Zone has been added to m_facs. ulx: %d", m_facsimile->FindZoneByUuid(zone->GetUuid())->GetUlx());
             fi->SetZone(zone);
+            Syl *syl = dynamic_cast<Syl *>(*iter);
+            syl->ResetFacsimile();
+            syl->SetFacs(zone->GetUuid());
         }
         
         /*

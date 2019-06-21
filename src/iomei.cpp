@@ -4036,6 +4036,8 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         auto testSyl = parent->FindChildByType(SYL);
         if(testSyl == nullptr && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
             Syl *syl = new Syl();
+            Text *text = new Text();
+            syl->AddChild(text);
             parent->AddChild(syl);
         }
     }
@@ -4513,8 +4515,6 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
     vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
-    
-    //LogMessage("MeiInput::ReadSyl: %s", vrvSyl->GetFacs().c_str());
 
     parent->AddChild(vrvSyl);
     ReadUnsupportedAttr(syl, vrvSyl);
@@ -4523,7 +4523,6 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
 
 bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 {
-    LogMessage("MeiInput::ReadSyllable");
     bool success;
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
@@ -4536,20 +4535,12 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     //read all of the syllables elements
     //and add an empty <syl> if it doesn't have one
     if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
-
-        LogMessage("successfully read layer childern");
         Object *obj = vrvSyllable->FindChildByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
-        if (syl == nullptr) {
-            LogMessage("syl is nullptr, should add default");
-        }
-        else {
-            LogMessage("syl: %s", syl->GetUuid().c_str());
-        }
-        //LogMessage("m_createDefaultSyl: %s", m_doc->GetOptions()->m_createDefaultSyl.GetValue().c_str());
         if (syl == nullptr && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
-            LogMessage("adding default syl");
             syl = new Syl();
+            Text *text = new Text();
+            syl->AddChild(text);
             vrvSyllable->AddChild(syl);
         }
     }

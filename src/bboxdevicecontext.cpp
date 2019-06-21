@@ -262,7 +262,6 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
 
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
-    LogMessage("BBoxDeviceContext::DrawText, %s, %d, %d", text.c_str(), x, y);
     assert(m_fontStack.top());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) 
