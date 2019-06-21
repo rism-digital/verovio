@@ -1569,14 +1569,14 @@ void Doc::SetChildZones() {
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*iter)->GetFacsimileInterface());
         assert(fi);
         if (fi->HasFacs()) {
-            //LogMessage("Doc::SetChildZones: %s, %s", (*iter)->GetClassName().c_str(), fi->GetFacs().c_str());
             fi->SetZone(m_facsimile->FindZoneByUuid(fi->GetFacs()));
         }
-        
+
+        // add default boundingboxes to the syls if the option is true
         else if (!fi->HasFacs() && (*iter)->Is(SYL) && this->GetOptions()->m_createDefaultSylBBox.GetValue()) {
-            //LogMessage("inside!");
             Zone *zone = new Zone();
 
+            // if it's syllable parent has position values just use those
             FacsimileInterface *syllableFi = nullptr;
             if ((*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
                 syllableFi = (*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
@@ -1586,6 +1586,8 @@ void Doc::SetChildZones() {
                 zone->SetLrx(tempZone->GetLrx());
                 zone->SetLry(tempZone->GetLry());
             }
+
+            // otherwise get a boundingbox that comprises all the neumes in the syllable
             else {
                 ArrayOfObjects children;
                 InterfaceComparison comp(INTERFACE_FACSIMILE);
@@ -1620,6 +1622,7 @@ void Doc::SetChildZones() {
                 }
             }
 
+            //make the bounding box a little bigger and lower so it's easier to edit
             zone->SetUly(zone->GetUly() + 100);
             zone->SetLrx(zone->GetLrx() + 100);
             zone->SetLry(zone->GetLry() + 200);
