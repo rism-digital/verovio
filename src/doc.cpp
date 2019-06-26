@@ -1621,8 +1621,11 @@ void Doc::SetChildZones() {
                     }
                 }
             }
-
-            //make the bounding box a little bigger and lower so it's easier to edit
+            if ((zone->GetUlx() == 0) || (zone->GetUly() == 0) || (zone->GetLrx() == 0) || (zone->GetLry() == 0)) {
+                LogWarning("Tried to create default Syl BBox, but its syllable had no neumes with coordinates");
+            }
+            else {
+                //make the bounding box a little bigger and lower so it's easier to edit
             zone->SetUly(zone->GetUly() + 100);
             zone->SetLrx(zone->GetLrx() + 100);
             zone->SetLry(zone->GetLry() + 200);
@@ -1632,14 +1635,8 @@ void Doc::SetChildZones() {
             Syl *syl = dynamic_cast<Syl *>(*iter);
             syl->ResetFacsimile();
             syl->SetFacs(zone->GetUuid());
+            }
         }
-        
-        /*
-        else {
-            LogError("If facsimilies are present then element %s should have it.", (*iter)->GetClassName().c_str());
-            assert(false);
-        }
-        */
     }
 }
 
