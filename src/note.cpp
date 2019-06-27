@@ -52,6 +52,7 @@ Note::Note()
     , AttColoration()
     , AttCue()
     , AttGraced()
+    , AttMidiVelocity()
     , AttNoteAnlMensural()
     , AttStems()
     , AttStemsCmn()
@@ -66,6 +67,7 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTEANLMENSURAL);
+    RegisterAttClass(ATT_MIDIVELOCITY);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -88,6 +90,7 @@ void Note::Reset()
     ResetCue();
     ResetGraced();
     ResetNoteAnlMensural();
+    ResetMidiVelocity();
     ResetStems();
     ResetStemsCmn();
     ResetTiePresent();
@@ -932,7 +935,8 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     // We do store the MIDIPitch in the note even with a sameas
     this->SetMIDIPitch(pitch);
     int channel = params->m_midiChannel;
-    int velocity = 64;
+    int velocity = MIDI_VELOCITY;
+    if (note->HasVel()) velocity = note->GetVel();
 
     double starttime = params->m_totalTime + note->GetScoreTimeOnset();
     double stoptime = params->m_totalTime + note->GetScoreTimeOffset() + note->GetScoreTimeTiedDuration();
