@@ -2044,11 +2044,6 @@ bool EditorToolkit::ParseRemoveAction(
 bool EditorToolkit::ParseResizeAction(
     jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry)
 {
-    LogMessage(param.get<jsonxx::String>("elementId").c_str());
-    LogMessage(std::to_string(param.get<jsonxx::Number>("ulx")).c_str());
-    LogMessage(std::to_string(param.get<jsonxx::Number>("uly")).c_str());
-    LogMessage(std::to_string(param.get<jsonxx::Number>("lrx")).c_str());
-    LogMessage(std::to_string(param.get<jsonxx::Number>("lry")).c_str());
     if(!param.has<jsonxx::String>("elementId")) return false;
     *elementId = param.get<jsonxx::String>("elementId");
     if(!param.has<jsonxx::Number>("ulx")) return false;
