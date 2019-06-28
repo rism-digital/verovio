@@ -229,6 +229,10 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
     if (!element) {
         element = m_doc->FindChildByUuid(elementId);
     }
+    if (!element) {
+        LogWarning("element is null");
+    }
+    assert(element);
     // Use relative x and y for now on
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
@@ -416,6 +420,18 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         //TODO Reorder by left-to-right, top-to-bottom
 
         return true; // Can't reorder by layer since staves contain layers
+    }
+    else if (element->Is(SYL)) {
+        Syl *syl = dynamic_cast<Syl *>(element);
+        if (!syl->HasFacs()) {
+            LogError("Syl (boundingbox) dragging is only supported for syls with facsimiles!");
+            return false;
+        }
+        FacsimileInterface *fi = (*syl).GetFacsimileInterface();
+        assert(fi);
+        if (fi->GetZone() != nullptr) {
+            fi->GetZone()->ShiftByXY(x, -y);
+        }
     }
     else {
         LogWarning("Unsupported element for dragging.");
@@ -1167,6 +1183,22 @@ bool EditorToolkit::Resize(std::string elementId, int ulx, int uly, int lrx, int
             return false;
         }
         Zone *zone = staff->GetZone();
+        assert(zone);
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(lrx);
+        zone->SetLry(lry);
+        zone->Modify();
+    }
+    else if (obj->Is(SYL)) {
+        Syl *syl = dynamic_cast<Syl *>(obj);
+        assert(syl);
+        if (!syl->HasFacs()) {
+            LogError("This syl (bounding box) does not have a facsimile");
+            return false;
+        }
+        Zone *zone = syl->GetZone();
+        assert(zone);
         zone->SetUlx(ulx);
         zone->SetUly(uly);
         zone->SetLrx(lrx);
@@ -2012,6 +2044,11 @@ bool EditorToolkit::ParseRemoveAction(
 bool EditorToolkit::ParseResizeAction(
     jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry)
 {
+    LogMessage(param.get<jsonxx::String>("elementId").c_str());
+    LogMessage(std::to_string(param.get<jsonxx::Number>("ulx")).c_str());
+    LogMessage(std::to_string(param.get<jsonxx::Number>("uly")).c_str());
+    LogMessage(std::to_string(param.get<jsonxx::Number>("lrx")).c_str());
+    LogMessage(std::to_string(param.get<jsonxx::Number>("lry")).c_str());
     if(!param.has<jsonxx::String>("elementId")) return false;
     *elementId = param.get<jsonxx::String>("elementId");
     if(!param.has<jsonxx::Number>("ulx")) return false;
