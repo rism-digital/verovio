@@ -383,7 +383,6 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
         std::string textStr = textNode.text().as_string();
-        LogMessage("TextRendition: textStr: %s.", textStr.c_str());
         std::string textAlign = textNode.attribute("halign").as_string();
         std::string textColor = textNode.attribute("color").as_string();
         std::string textFont = textNode.attribute("font-family").as_string();
@@ -1285,13 +1284,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     pugi::xpath_node type = node.select_node("direction-type");
     std::string placeStr = node.attribute("placement").as_string();
-    pugi::xpath_node_set words = type.node().select_nodes("words");
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
-    std::string dynamStr = "";
-    int defaultY = 0;
 
     // Directive
+    std::string dynamStr = ""; // string containing dynamics information
+    int defaultY = 0; // y position attribute, only for directives and dynamics
+    pugi::xpath_node_set words = type.node().select_nodes("words");
     if (words.size() != 0 && !node.select_node("sound[@tempo]")) {
         defaultY = words.first().node().attribute("default-y").as_int();
         std::string wordStr = words.first().node().text().as_string();
@@ -1334,7 +1333,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dynam->SetVgrp(defaultY);
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         m_dynamStack.push_back(dynam);
-        LogMessage("Dynamics: staff %d, place: %s", staffNode.node().text().as_int() + staffOffset, placeStr.c_str());
     }
 
     // Hairpins
@@ -2207,7 +2205,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         for (iter = m_dirStack.begin(); iter != m_dirStack.end(); ++iter) {
             if (!(*iter)->HasStaff())
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            //(*iter)->SetStartid(m_ID);
         }
         m_dirStack.clear();
     }
@@ -2216,7 +2213,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         for (iter = m_dynamStack.begin(); iter != m_dynamStack.end(); ++iter) {
             if (!(*iter)->HasStaff())
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            //(*iter)->SetStartid(m_ID);
         }
         m_dynamStack.clear();
     }
