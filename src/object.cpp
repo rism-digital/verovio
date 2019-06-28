@@ -1497,7 +1497,7 @@ bool Object::sortByUlx(Object *a, Object *b)
 {
     FacsimileInterface *fa = NULL, *fb = NULL;
     InterfaceComparison comp(INTERFACE_FACSIMILE);
-    if (a->GetFacsimileInterface())
+    if (a->GetFacsimileInterface() && a->GetFacsimileInterface()->HasFacs())
         fa = a->GetFacsimileInterface();
     else {
         ArrayOfObjects children;
@@ -1511,7 +1511,7 @@ bool Object::sortByUlx(Object *a, Object *b)
             }
         }
     }
-    if (b->GetFacsimileInterface())
+    if (b->GetFacsimileInterface() && b->GetFacsimileInterface()->HasFacs())
         fb = b->GetFacsimileInterface();
     else {
         ArrayOfObjects children;
