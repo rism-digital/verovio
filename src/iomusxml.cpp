@@ -2036,7 +2036,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // color
         turn->SetColor(xmlTurn.node().attribute("color").as_string());
         // form
-        turn->SetForm(turnLog_FORM_lower);
+        turn->SetForm(turnLog_FORM_upper);
         // place
         turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
     }
@@ -2049,7 +2049,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // color
         turn->SetColor(xmlTurnInv.node().attribute("color").as_string());
         // form
-        turn->SetForm(turnLog_FORM_upper);
+        turn->SetForm(turnLog_FORM_lower);
         // place
         turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurnInv.node().attribute("placement").as_string()));
     }
@@ -2064,7 +2064,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // color
         turn->SetColor(xmlTurn.node().attribute("color").as_string());
         // form
-        turn->SetForm(turnLog_FORM_lower);
+        turn->SetForm(turnLog_FORM_upper);
         // place
         turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
     }
@@ -2079,7 +2079,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // color
         turn->SetColor(xmlTurnInv.node().attribute("color").as_string());
         // form
-        turn->SetForm(turnLog_FORM_upper);
+        turn->SetForm(turnLog_FORM_lower);
         // place
         turn->SetPlace(turn->AttPlacement::StrToStaffrel(xmlTurnInv.node().attribute("placement").as_string()));
     }
