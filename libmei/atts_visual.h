@@ -1403,8 +1403,8 @@ public:
     data_BOOLEAN GetLinesVisible() const { return m_linesVisible; }
     bool HasLinesVisible() const;
     //
-    void SetSpacing(std::string spacing_) { m_spacing = spacing_; }
-    std::string GetSpacing() const { return m_spacing; }
+    void SetSpacing(data_MEASUREMENTREL spacing_) { m_spacing = spacing_; }
+    data_MEASUREMENTREL GetSpacing() const { return m_spacing; }
     bool HasSpacing() const;
     ///@}
 
@@ -1424,7 +1424,7 @@ private:
     /** Records whether all staff lines are visible. **/
     data_BOOLEAN m_linesVisible;
     /** Records the absolute distance (as opposed to the relative distances recorded in **/
-    std::string m_spacing;
+    data_MEASUREMENTREL m_spacing;
 
     /* include <attspacing> */
 };

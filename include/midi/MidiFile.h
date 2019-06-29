@@ -39,7 +39,7 @@ class _TickTime {
 class MidiFile {
 	public:
 		               MidiFile                    (void);
-		               MidiFile                    (const std::string& aFile);
+		               MidiFile                    (const std::string& filename);
 		               MidiFile                    (std::istream& input);
 		               MidiFile                    (const MidiFile& other);
 		               MidiFile                    (MidiFile&& other);
@@ -77,20 +77,19 @@ class MidiFile {
 		void             deltaTicks                (void);
 		void             makeAbsoluteTicks         (void);
 		void             absoluteTicks             (void);
-		int              getTickState              (void);
-		int              isDeltaTicks              (void);
-		int              isAbsoluteTicks           (void);
-		int              getMaxTick                (void);
+		int              getTickState              (void) const;
+		bool             isDeltaTicks              (void) const;
+		bool             isAbsoluteTicks           (void) const;
 
 		// join/split track functionality:
 		void             joinTracks                (void);
 		void             splitTracks               (void);
 		void             splitTracksByChannel      (void);
-		int              getTrackState             (void);
-		int              hasJoinedTracks           (void);
-		int              hasSplitTracks            (void);
-		int              getSplitTrack             (int track, int index);
-		int              getSplitTrack             (int index);
+		int              getTrackState             (void) const;
+		int              hasJoinedTracks           (void) const;
+		int              hasSplitTracks            (void) const;
+		int              getSplitTrack             (int track, int index) const;
+		int              getSplitTrack             (int index) const;
 
 		// track sorting funcionality:
 		void             sortTrack                 (int track);
@@ -120,9 +119,9 @@ class MidiFile {
 		double           getTimeInSeconds          (int aTrack, int anIndex);
 		double           getTimeInSeconds          (int tickvalue);
 		double           getAbsoluteTickTime       (double starttime);
-		double           getTotalTimeInSeconds     (void);
-		int              getTotalTimeInTicks       (void);
-		double           getTotalTimeInQuarters    (void);
+		int              getFileDurationInTicks    (void);
+		double           getFileDurationInQuarters (void);
+		double           getFileDurationInSeconds  (void);
 
 		// note-analysis functions:
 		int              linkNotePairs             (void);
@@ -131,13 +130,15 @@ class MidiFile {
 
 		// filename functions:
 		void             setFilename               (const std::string& aname);
-		const char*      getFilename               (void);
+		const char*      getFilename               (void) const;
 
 		// event functionality:
 		MidiEvent*       addEvent                  (int aTrack, int aTick,
 		                                            std::vector<uchar>& midiData);
 		MidiEvent*       addEvent                  (MidiEvent& mfevent);
+		MidiEvent*       addEvent                  (int aTrack, MidiEvent& mfevent);
 		MidiEvent&       getEvent                  (int aTrack, int anIndex);
+		const MidiEvent& getEvent                  (int aTrack, int anIndex) const;
 		int              getEventCount             (int aTrack) const;
 		int              getNumEvents              (int aTrack) const;
 		void             allocateEvents            (int track, int aSize);
@@ -179,38 +180,38 @@ class MidiFile {
 		                                           int aChannel);
 
 		// Meta-event adding convenience functions:
-		MidiEvent*      addMetaEvent              (int aTrack, int aTick,
+		MidiEvent*         addMetaEvent           (int aTrack, int aTick,
 		                                           int aType,
 		                                           std::vector<uchar>& metaData);
-		MidiEvent*      addMetaEvent              (int aTrack, int aTick,
+		MidiEvent*         addMetaEvent           (int aTrack, int aTick,
 		                                           int aType,
 		                                           const std::string& metaData);
-		MidiEvent*      addText                   (int aTrack, int aTick,
+		MidiEvent*         addText                (int aTrack, int aTick,
 		                                           const std::string& text);
-		MidiEvent*      addCopyright              (int aTrack, int aTick,
+		MidiEvent*         addCopyright           (int aTrack, int aTick,
 		                                           const std::string& text);
-		MidiEvent*      addTrackName              (int aTrack, int aTick,
+		MidiEvent*         addTrackName           (int aTrack, int aTick,
 		                                           const std::string& name);
-		MidiEvent*      addInstrumentName         (int aTrack, int aTick,
+		MidiEvent*         addInstrumentName      (int aTrack, int aTick,
 		                                           const std::string& name);
-		MidiEvent*      addLyric                  (int aTrack, int aTick,
+		MidiEvent*         addLyric               (int aTrack, int aTick,
 		                                           const std::string& text);
-		MidiEvent*      addMarker                 (int aTrack, int aTick,
+		MidiEvent*         addMarker              (int aTrack, int aTick,
 		                                           const std::string& text);
-		MidiEvent*      addCue                    (int aTrack, int aTick,
+		MidiEvent*         addCue                 (int aTrack, int aTick,
 		                                           const std::string& text);
-		MidiEvent*      addTempo                  (int aTrack, int aTick,
+		MidiEvent*         addTempo               (int aTrack, int aTick,
 		                                           double aTempo);
-		MidiEvent*      addTimeSignature          (int aTrack, int aTick,
+		MidiEvent*         addTimeSignature       (int aTrack, int aTick,
 		                                           int top, int bottom,
 		                                           int clocksPerClick = 24,
 		                                           int num32dsPerQuarter = 8);
-		MidiEvent*      addCompoundTimeSignature  (int aTrack, int aTick,
+		MidiEvent*         addCompoundTimeSignature(int aTrack, int aTick,
 		                                           int top, int bottom,
 		                                           int clocksPerClick = 36,
 		                                           int num32dsPerQuarter = 8);
 
-		uchar           readByte                  (std::istream& input);
+		uchar              readByte               (std::istream& input);
 
 		// static functions:
 		static ushort        readLittleEndian2Bytes  (std::istream& input);
@@ -269,7 +270,7 @@ class MidiFile {
 		// m_timemapvalid ==
 		bool m_timemapvalid = false;
 
-		// m_timemap == 
+		// m_timemap ==
 		std::vector<_TickTime> m_timemap;
 
 		// m_rwstatus == True if last read was successful, false if a problem.

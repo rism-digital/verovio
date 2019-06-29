@@ -41,7 +41,7 @@ public:
     virtual ~DarmsInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &data);
+    virtual bool ImportString(const std::string &data);
 
 private:
     int do_Note(int pos, const char *data, bool rest);

@@ -9,7 +9,7 @@ shopt -s expand_aliases
 fontforge generate_ff.py $font
 
 # base64
-woffFont=${1%.sfd}.woff
+woffFont=${font%.sfd}.woff
 w=$(base64 $woffFont)
 
 # output
@@ -18,3 +18,8 @@ echo $w >> woff.xml
 cat woff-2.txt >> woff.xml
 
 mv woff.xml ../data
+
+# base64
+ttfFont=${font%.sfd}.ttf
+t=$(base64 $ttfFont)
+echo "var vrvTTF = \"$t\";" > vrv-ttf.js

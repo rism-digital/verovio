@@ -26,6 +26,7 @@ public:
     ///@{
     Choice();
     Choice(EditorialLevel level);
+    virtual Object *Clone() const { return new Choice(*this); }
     virtual ~Choice();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Choice"; }

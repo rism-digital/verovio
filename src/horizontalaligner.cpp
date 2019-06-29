@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "arpeg.h"
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
@@ -179,8 +179,8 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         Alignment *end = std::get<1>(*iter);
         assert(end);
         int dist = std::get<2>(*iter);
-        if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
-            LogDebug("Trying to adjust alignment at the same position or with a distance of 0;");
+        if (dist == 0) {
+            LogDebug("Trying to adjust alignment with a distance of 0;");
             continue;
         }
         // We need to store them because they are going to be changed in the loop below
@@ -342,7 +342,7 @@ void GraceAligner::AlignStack()
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
         element->SetGraceAlignment(alignment);
 
-        AttComparisonAny matchType({ ACCID, FLAG, NOTE, STEM });
+        ClassIdsComparison matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
         element->FindAllChildByComparison(&children, &matchType);
@@ -636,13 +636,17 @@ void AlignmentReference::AddChild(Object *child)
     LayerElement *childElement = dynamic_cast<LayerElement *>(child);
     assert(childElement);
 
-    ArrayOfObjects::iterator childrenIter;
-    // Check if the we will have a reference with multiple layers
-    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
-        LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
-        if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) break;
+    if (!childElement->HasSameas()) {
+        ArrayOfObjects::iterator childrenIter;
+        // Check if the we will have a reference with multiple layers
+        for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
+            LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
+            if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) {
+                break;
+            }
+        }
+        if (childrenIter == m_children.end()) m_layerCount++;
     }
-    if (childrenIter == m_children.end()) m_layerCount++;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
@@ -1122,18 +1126,24 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int AlignmentReference::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+int AlignmentReference::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
-    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
-    assert(params);
+    Alignment *alignment = dynamic_cast<Alignment *>(this->GetParent());
+    assert(alignment);
 
-    if (!this->HasMultipleLayer()) {
-        return FUNCTOR_SIBLINGS;
+    switch (alignment->GetType()) {
+        case ALIGNMENT_SCOREDEF_CLEF:
+        case ALIGNMENT_SCOREDEF_KEYSIG:
+        case ALIGNMENT_SCOREDEF_MENSUR:
+        case ALIGNMENT_SCOREDEF_METERSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_CLEF:
+        case ALIGNMENT_SCOREDEF_CAUTION_KEYSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_MENSUR:
+        case ALIGNMENT_SCOREDEF_CAUTION_METERSIG: this->ClearChildren(); break;
+        default: break;
     }
 
-    params->m_layerCount = this->m_layerCount;
-
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

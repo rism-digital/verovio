@@ -13,9 +13,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "custos.h"
 #include "functorparams.h"
+#include "ioabc.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -39,6 +40,12 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
+
+#ifdef USE_EMSCRIPTEN
+#include "editortoolkit_cmn.h"
+#include "editortoolkit_mensural.h"
+#include "editortoolkit_neume.h"
+#endif
 
 namespace vrv {
 
@@ -67,6 +74,11 @@ Toolkit::Toolkit(bool initFont)
     }
 
     m_options = m_doc.GetOptions();
+
+#ifdef USE_EMSCRIPTEN
+    // Initialize editortoolkit later based on input.
+    m_editorToolkit = NULL;
+#endif
 }
 
 Toolkit::~Toolkit()
@@ -79,6 +91,12 @@ Toolkit::~Toolkit()
         free(m_cString);
         m_cString = NULL;
     }
+#ifdef USE_EMSCRIPTEN
+    if (m_editorToolkit) {
+        delete m_editorToolkit;
+        m_editorToolkit = NULL;
+    }
+#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -121,7 +139,10 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
 
 bool Toolkit::SetFormat(std::string const &informat)
 {
-    if (informat == "pae") {
+    if (informat == "abc") {
+        m_format = ABC;
+    }
+    else if (informat == "pae") {
         m_format = PAE;
     }
     else if (informat == "darms") {
@@ -149,7 +170,7 @@ bool Toolkit::SetFormat(std::string const &informat)
         m_format = AUTO;
     }
     else {
-        LogError("Input format can only be: mei, humdrum, pae, musicxml or darms");
+        LogError("Input format can only be: mei, humdrum, pae, abc, musicxml or darms");
         return false;
     }
     return true;
@@ -175,6 +196,9 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
     }
     if (data[0] == '*' || data[0] == '!') {
         return HUMDRUM;
+    }
+    if (data[0] == 'X' || data[0] == '%') {
+        return ABC;
     }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
@@ -223,6 +247,15 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
             return musicxmlDefault;
         }
         if (initial.find("<opus ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
             return musicxmlDefault;
         }
 
@@ -317,8 +350,15 @@ bool Toolkit::LoadData(const std::string &data)
     if (inputFormat == AUTO) {
         inputFormat = IdentifyInputFormat(data);
     }
-
-    if (inputFormat == PAE) {
+    if (inputFormat == ABC) {
+#ifndef NO_ABC_SUPPORT
+        input = new AbcInput(&m_doc, "");
+#else
+        LogError("ABC import is not supported in this build.");
+        return false;
+#endif
+    }
+    else if (inputFormat == PAE) {
 #ifndef NO_PAE_SUPPORT
         input = new PaeInput(&m_doc, "");
 #else
@@ -360,6 +400,9 @@ bool Toolkit::LoadData(const std::string &data)
         MeiOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
+
+        // Read embedded options from input Humdrum file:
+        tempinput->parseEmbeddedOptions(m_doc);
         delete tempinput;
 
         input = new MeiInput(&m_doc, "");
@@ -377,7 +420,7 @@ bool Toolkit::LoadData(const std::string &data)
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
-        xmlfile.load(data.c_str());
+        xmlfile.load_string(data.c_str());
         stringstream conversion;
         bool status = converter.convert(conversion, xmlfile);
         if (!status) {
@@ -407,7 +450,7 @@ bool Toolkit::LoadData(const std::string &data)
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_mei2hum converter;
         pugi::xml_document xmlfile;
-        xmlfile.load(data.c_str());
+        xmlfile.load_string(data.c_str());
         stringstream conversion;
         bool status = converter.convert(conversion, xmlfile);
         if (!status) {
@@ -498,7 +541,7 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    if ((m_doc.GetType() != Transcription) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
+    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
         if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
@@ -517,6 +560,23 @@ bool Toolkit::LoadData(const std::string &data)
     delete input;
     m_view.SetDoc(&m_doc);
 
+#ifdef USE_EMSCRIPTEN
+    // Create editor toolkit based on notation type.
+    if (m_editorToolkit != NULL) {
+        delete m_editorToolkit;
+    }
+    switch(m_doc.m_notationType) {
+        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
+        case NOTATIONTYPE_mensural:
+        case NOTATIONTYPE_mensural_black:
+        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+        default:
+            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
+            m_editorToolkit = NULL;
+    }
+#endif
+
     return true;
 }
 
@@ -526,13 +586,17 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
         LogWarning("No data loaded");
         return "";
     }
-    
+
+    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
     MeiOutput meioutput(&m_doc, "");
     meioutput.SetScoreBasedMEI(scoreBased);
-    return meioutput.GetOutput(pageNo);
+    std::string output = meioutput.GetOutput(pageNo);
+    if (initialPageNo >= 0)
+        m_doc.SetDrawingPage(initialPageNo);
+    return output;
 }
 
 bool Toolkit::SaveFile(const std::string &filename)
@@ -703,9 +767,9 @@ bool Toolkit::SetOptions(const std::string &json_options)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "inputFormat") {
-                if (json.has<jsonxx::String>("inputFormat")) {
-                    SetFormat(json.get<jsonxx::String>("inputFormat"));
+            if (iter->first == "format") {
+                if (json.has<jsonxx::String>("format")) {
+                    SetFormat(json.get<jsonxx::String>("format"));
                 }
             }
             else if (iter->first == "scale") {
@@ -775,6 +839,12 @@ bool Toolkit::SetOptions(const std::string &json_options)
                     else {
                         opt->SetValue("encoded");
                     }
+                }
+            }
+            else if (iter->first == "inputFormat") {
+                LogWarning("Option inputFormat is deprecated; use format instead");
+                if (json.has<jsonxx::String>("inputFormat")) {
+                    SetFormat(json.get<jsonxx::String>("inputFormat"));
                 }
             }
             else if (iter->first == "noLayout") {
@@ -887,46 +957,22 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 bool Toolkit::Edit(const std::string &json_editorAction)
 {
 #ifdef USE_EMSCRIPTEN
-
-    jsonxx::Object json;
-
-    // Read JSON actions
-    if (!json.parse(json_editorAction)) {
-        LogError("Can not parse JSON std::string.");
-        return false;
-    }
-
-    if (json.has<jsonxx::String>("action") && json.has<jsonxx::Object>("param")) {
-        if (json.get<jsonxx::String>("action") == "drag") {
-            std::string elementId;
-            int x, y;
-            if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
-                return this->Drag(elementId, x, y);
-            }
-        }
-        else if (json.get<jsonxx::String>("action") == "insert") {
-            LogMessage("insert...");
-            std::string elementType, startid, endid;
-            if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startid, &endid)) {
-                return this->Insert(elementType, startid, endid);
-            }
-            else {
-                LogMessage("Insert!!!! %s %s %s", elementType.c_str(), startid.c_str(), endid.c_str());
-            }
-        }
-        else if (json.get<jsonxx::String>("action") == "set") {
-            std::string elementId, attrType, attrValue;
-            if (this->ParseSetAction(json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue)) {
-                return this->Set(elementId, attrType, attrValue);
-            }
-        }
-    }
-    LogError("Does not understand action.");
-    return false;
-
+    return m_editorToolkit->ParseEditorAction(json_editorAction);
 #else
     // The non-js version of the app should not use this function.
+    LogError("This function should not be accessed through the non-js version of the app.");
     return false;
+#endif
+}
+
+std::string Toolkit::EditInfo()
+{
+#ifdef USE_EMSCRIPTEN
+    return m_editorToolkit->EditInfo();
+#else
+    // The non-js version of the app should not use this function.
+    LogError("This function should not be accessed through the non-js version of the app.");
+    return "";
 #endif
 }
 
@@ -959,7 +1005,7 @@ void Toolkit::ResetLogBuffer()
 
 void Toolkit::RedoLayout()
 {
-    if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription)) {
+    if ((GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -986,7 +1032,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         LogWarning("Page %d does not exist", pageNo);
         return false;
     }
-    
+
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
@@ -1012,6 +1058,11 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     double userScale = m_view.GetPPUFactor() * m_scale / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
+    if (m_doc.GetType() == Facs) {
+        deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
+        deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
+    }
+
     // render the page
     m_view.DrawCurrentPage(deviceContext, false);
 
@@ -1020,6 +1071,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 {
+    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
@@ -1028,10 +1080,21 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
         svg.SetMMOutput(true);
     }
 
+    if (m_doc.GetType() == Facs) {
+        svg.SetFacsimile(true);
+    }
+
+    // set the option to use viewbox on svg root
+    if (m_options->m_svgViewBox.GetValue()) {
+        svg.SetSvgViewBox(true);
+    }
+
     // render the page
     RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
+    if (initialPageNo >= 0)
+        m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }
 
@@ -1186,12 +1249,12 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
-    
+
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
         return 0;
     }
-    
+
     int timeofElement = 0;
     if (element->Is(NOTE)) {
         if (!m_doc.HasMidiTimemap()) {
@@ -1215,12 +1278,12 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
-    
+
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
         return 0;
     }
-    
+
     jsonxx::Object o;
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
@@ -1300,203 +1363,6 @@ const char *Toolkit::GetHumdrumBuffer()
         return "[empty]";
     }
 }
-
-bool Toolkit::Drag(std::string elementId, int x, int y)
-{
-    if (!m_doc.GetDrawingPage()) return false;
-
-    // Try to get the element on the current drawing page
-    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-
-    // If it wasn't there, go back up to the whole doc
-    if (!element) {
-        element = m_doc.FindChildByUuid(elementId);
-    }
-    // For elements whose y-position corresponds to a certain pitch
-    if (element->HasInterface(INTERFACE_PITCH)) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-        if (!layer) return false;
-        int oct;
-        data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), element->GetDrawingX(), &oct);
-        element->GetPitchInterface()->SetPname(pname);
-        element->GetPitchInterface()->SetOct(oct);
-        if (element->HasAttClass(ATT_COORDINATED)) {
-            AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
-            att->SetUlx(x);
-        }
-        return true;
-    }
-    if (element->Is(NEUME)) {
-        // Requires a relative x and y
-        Neume *neume = dynamic_cast<Neume *>(element);
-        assert(neume);
-        Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
-        if (!layer) return false;
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
-        assert(staff);
-        // Calculate difference in pitch based on y difference
-        int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
-
-        // Get components of neume
-        AttComparison ac(NC);
-        ArrayOfObjects objects;
-        neume->FindAllChildByComparison(&objects, &ac);
-
-        for (auto it = objects.begin(); it != objects.end(); ++it) {
-            Nc *nc = dynamic_cast<Nc *>(*it);
-            // Update the neume component
-            nc->AdjustPitchByOffset(pitchDifference);
-            //// Temporarily removing ULX attributes for coordinate refactor
-            // nc->SetUlx(nc->GetUlx() - x);
-        }
-        return true;
-    }
-    if (element->Is(CLEF)) {
-        Clef *clef = dynamic_cast<Clef *>(element);
-        assert(clef);
-        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
-        if (!layer) return false;
-
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
-        assert(staff);
-        // Note that y param is relative to initial position for clefs
-        int initialClefLine = clef->GetLine();
-        int clefLine
-            = round((double)y / (double)m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
-        clef->SetLine(clefLine);
-        //// Temporarily removing ULX attributes for coordinate refactor
-        // clef->SetUlx(x);
-
-        if (initialClefLine != clefLine) { // adjust notes so they stay in the same position
-            int lineDiff = clefLine - initialClefLine;
-            ArrayOfObjects objects;
-            InterfaceComparison ic(INTERFACE_PITCH);
-
-            layer->FindAllChildByComparison(&objects, &ic);
-
-            // Adjust all elements who are positioned relative to clef by pitch
-            for (auto it = objects.begin(); it != objects.end(); ++it) {
-                Object *child = dynamic_cast<Object *>(*it);
-                if (child == nullptr) continue;
-                PitchInterface *pi = child->GetPitchInterface();
-                assert(pi);
-                pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
-            }
-        }
-
-        return true;
-    }
-    return false;
-}
-
-bool Toolkit::Insert(std::string elementType, std::string startid, std::string endid)
-{
-    LogMessage("Insert!");
-    if (!m_doc.GetDrawingPage()) return false;
-    Object *start = m_doc.GetDrawingPage()->FindChildByUuid(startid);
-    Object *end = m_doc.GetDrawingPage()->FindChildByUuid(endid);
-    // Check if both start and end elements exist
-    if (!start || !end) {
-        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
-        return false;
-    }
-    // Check if it is a LayerElement
-    if (!dynamic_cast<LayerElement *>(start)) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
-        return false;
-    }
-    if (!dynamic_cast<LayerElement *>(end)) {
-        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str());
-        return false;
-    }
-
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
-    assert(measure);
-    if (elementType == "slur") {
-        Slur *slur = new Slur();
-        slur->SetStartid(startid);
-        slur->SetEndid(endid);
-        measure->AddChild(slur);
-        m_doc.PrepareDrawing();
-        return true;
-    }
-    return false;
-}
-
-bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrValue)
-{
-    if (!m_doc.GetDrawingPage()) return false;
-    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    bool success = false;
-    if (Att::SetAnalytical(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetCmn(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetCmnornaments(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetCritapp(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetExternalsymbols(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetGestural(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetMei(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetMensural(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetMidi(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetPagebased(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetShared(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetVisual(element, attrType, attrValue))
-        success = true;
-    if (success) {
-        m_doc.PrepareDrawing();
-        m_doc.GetDrawingPage()->LayOut(true);
-        return true;
-    }
-    return false;
-}
-
-#ifdef USE_EMSCRIPTEN
-bool Toolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
-{
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    (*elementId) = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::Number>("x")) return false;
-    (*x) = param.get<jsonxx::Number>("x");
-    if (!param.has<jsonxx::Number>("y")) return false;
-    (*y) = param.get<jsonxx::Number>("y");
-    return true;
-}
-
-bool Toolkit::ParseInsertAction(
-    jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid)
-{
-    if (!param.has<jsonxx::String>("elementType")) return false;
-    (*elementType) = param.get<jsonxx::String>("elementType");
-    if (!param.has<jsonxx::String>("startid")) return false;
-    (*startid) = param.get<jsonxx::String>("startid");
-    if (!param.has<jsonxx::String>("endid")) return false;
-    (*endid) = param.get<jsonxx::String>("endid");
-    return true;
-}
-
-bool Toolkit::ParseSetAction(
-    jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
-{
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    (*elementId) = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::String>("attrType")) return false;
-    (*attrType) = param.get<jsonxx::String>("attrType");
-    if (!param.has<jsonxx::String>("attrValue")) return false;
-    (*attrValue) = param.get<jsonxx::String>("attrValue");
-    return true;
-}
-#endif
 
 void Toolkit::SetCString(const std::string &data)
 {

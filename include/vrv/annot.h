@@ -29,6 +29,8 @@ public:
     ///@{
     Annot();
     virtual ~Annot();
+    // This fails because of the copy contructor in ObjectListInterface (TextListInterface parent)
+    // virtual Object *Clone() const { return new Annot(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Annot"; }
     virtual ClassId GetClassId() const { return ANNOT; }
@@ -39,7 +41,7 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
-    
+
     //----------//
     // Functors //
     //----------//

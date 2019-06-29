@@ -13,9 +13,11 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "boundary.h"
+#include "comparison.h"
+#include "dir.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
@@ -26,6 +28,7 @@
 #include "section.h"
 #include "staff.h"
 #include "syl.h"
+#include "trill.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -179,7 +182,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
 bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 {
-    AttComparisonAny matchType({ CHORD, NOTE });
+    ClassIdsComparison matchType({ CHORD, NOTE });
     ArrayOfObjects children;
     ArrayOfObjects::iterator childrenIter;
     this->FindAllChildBetween(&children, &matchType, start, end);
@@ -218,6 +221,38 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     }
 
     return false;
+}
+
+void System::AddToDrawingListIfNeccessary(Object *object)
+{
+    assert(object);
+
+    if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
+
+    if (object->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, SYL, TIE })) {
+        this->AddToDrawingList(object);
+    }
+    else if (object->Is(DIR)) {
+        Dir *dir = dynamic_cast<Dir *>(object);
+        assert(dir);
+        if (dir->GetEnd() || (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true))) {
+            this->AddToDrawingList(dir);
+        }
+    }
+    else if (object->Is(DYNAM)) {
+        Dynam *dynam = dynamic_cast<Dynam *>(object);
+        assert(dynam);
+        if (dynam->GetEnd() || (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true))) {
+            this->AddToDrawingList(dynam);
+        }
+    }
+    else if (object->Is(TRILL)) {
+        Trill *trill = dynamic_cast<Trill *>(object);
+        assert(trill);
+        if (trill->GetEnd()) {
+            this->AddToDrawingList(trill);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -323,6 +358,7 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
 
     params->m_cumulatedShift
         = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    params->m_staffIdx = 0;
 
     m_systemAligner.Process(params->m_functorEnd, params);
 
@@ -378,6 +414,61 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
+{
+    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    assert(params);
+
+    // reset it, but not the current grpId!
+    params->m_currentSystem = this;
+    params->m_overlapingHarm.clear();
+    params->m_previousHarmPositioner = NULL;
+    params->m_previousHarmStart = NULL;
+    params->m_previousMeasure = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
+{
+    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
+    assert(params);
+
+    // End of the first pass - loop over for each group id
+    if (params->m_currentGrp == 0) {
+        for (auto grpId : params->m_grpIds) {
+            params->m_currentGrp = grpId;
+            this->Process(params->m_functor, functorParams, params->m_functorEnd);
+        }
+        // Make sure we reset it for the next system
+        params->m_currentGrp = 0;
+        return FUNCTOR_CONTINUE;
+    }
+
+    /************** End of a system when actually adjusting **************/
+
+    if (!params->m_previousMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Here we also need to handle the last harm of the measure - we check the alignment with the right barline
+    if (params->m_previousHarmPositioner) {
+        int overlap = params->m_previousHarmPositioner->GetContentRight()
+            - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
+
+        if (overlap > 0) {
+            params->m_overlapingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
+                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
+        }
+    }
+
+    // Ajust the postion of the alignment according to what we have collected for this harm group id
+    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
+    params->m_overlapingHarm.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::AdjustSylSpacing(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
@@ -389,31 +480,32 @@ int System::AdjustSylSpacing(FunctorParams *functorParams)
     params->m_previousMeasure = NULL;
     params->m_freeSpace = 0;
     params->m_staffSize = 100;
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-    
+
     if (!params->m_previousMeasure) {
         return FUNCTOR_CONTINUE;
     }
 
     // Here we also need to handle the last syl of the measure - we check the alignment with the right barline
     if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetContentRight() - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
+        int overlap = params->m_previousSyl->GetContentRight()
+            - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
         params->m_previousSyl->CalcHorizontalAdjustment(overlap, params);
-        
+
         if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(
-                params->m_previousSyl->GetAlignment(), params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
+            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(),
+                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
         }
     }
 
-    // Ajust the postion of the alignment according to what we have collected for this verse
+    // Ajust the postion of the alignment according to what we have collected for this harm grp
     params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
     params->m_overlapingSyl.clear();
 
@@ -424,6 +516,10 @@ int System::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
     assert(params);
+
+    // We need to call this explicitly because changing the YRel of the StaffAligner (below in the functor)
+    // will not trigger it
+    this->ResetCachedDrawingY();
 
     params->m_previousOverflowBelow = 0;
     params->m_previousVerseCount = 0;
@@ -496,12 +592,12 @@ int System::JustifyX(FunctorParams *functorParams)
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
     }
 
-    // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
-    // Eventually we should make this a parameter
+    // Check if we are on the last page and on the last system:
+    // do not justify it if the non-justified width is less than a specified percent.
     if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
         && (this->GetIdx() == parent->GetChildCount() - 1)) {
-        // HARDCODED
-        if (params->m_justifiableRatio > 1.25) {
+        double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
+        if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
             return FUNCTOR_STOP;
         }
     }
@@ -520,13 +616,13 @@ int System::AdjustStaffOverlap(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AdjustFloatingPostioners(FunctorParams *functorParams)
+int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
-    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
+    AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
 
-    AdjustFloatingPostionerGrpsParams adjustFloatingPostionerGrpsParams(params->m_doc);
-    Functor adjustFloatingPostionerGrps(&Object::AdjustFloatingPostionerGrps);
+    AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
+    Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
@@ -549,17 +645,17 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+
     params->m_classId = BRACKETSPAN;
     m_systemAligner.Process(params->m_functor, params);
-    
+
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
 
@@ -572,12 +668,12 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DIR);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DIR);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
@@ -585,35 +681,45 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(PEDAL);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(PEDAL);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(HARM);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
 
-    adjustFloatingPostionerGrpsParams.m_classIds.clear();
-    adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_above;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
-    adjustFloatingPostionerGrpsParams.m_place = STAFFREL_basic_below;
-    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_classIds.clear();
+    adjustFloatingPositionerGrpsParams.m_classIds.push_back(ENDING);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_above;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_basic_below;
+    m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
+    m_systemAligner.Process(params->m_functor, params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int System::AdjustSlurs(FunctorParams *functorParams)
+{
+    AdjustSlursParams *params = dynamic_cast<AdjustSlursParams *>(functorParams);
+    assert(params);
+
     m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;

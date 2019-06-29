@@ -73,27 +73,31 @@ void Syl::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 int Syl::CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params)
 {
     sylLog_WORDPOS pos = this->GetWordpos();
     int nextFreeSpace = 0;
-    
+
     // We have a word connector - the space have to be wide enough
     if ((pos == sylLog_WORDPOS_i) || (pos == sylLog_WORDPOS_m)) {
-        int hyphen = params->m_doc->GetDrawingUnit(params->m_staffSize) * params->m_doc->GetOptions()->m_lyricHyphenLength.GetValue();
+        int hyphen = params->m_doc->GetDrawingUnit(params->m_staffSize)
+            * params->m_doc->GetOptions()->m_lyricHyphenLength.GetValue();
         // Adjust it proportionally to the lyric size
-        hyphen *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
+        hyphen *= params->m_doc->GetOptions()->m_lyricSize.GetValue()
+            / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
         overlap += (2 * hyphen);
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
-        int wordSpace = params->m_doc->GetDrawingUnit(params->m_staffSize) * params->m_doc->GetOptions()->m_lyricWordSpace.GetValue();
+        int wordSpace = params->m_doc->GetDrawingUnit(params->m_staffSize)
+            * params->m_doc->GetOptions()->m_lyricWordSpace.GetValue();
         // Adjust it proportionally to the lyric size
-        wordSpace *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
+        wordSpace *= params->m_doc->GetOptions()->m_lyricSize.GetValue()
+            / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
         overlap += wordSpace;
     }
-    
+
     if (overlap > 0) {
         // We have enough space to absorb the overla completely
         if (params->m_freeSpace > overlap) {
@@ -112,7 +116,7 @@ int Syl::CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params)
     else {
         nextFreeSpace = std::min(-overlap, 3 * params->m_doc->GetDrawingUnit(100));
     }
-    
+
     return nextFreeSpace;
 }
 
@@ -181,13 +185,14 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
         LogDebug("Syl %s is skipped in alignment - it is probably empty", this->GetUuid().c_str());
         return FUNCTOR_CONTINUE;
     }
-    
+
     int shift = params->m_doc->GetDrawingUnit(params->m_staffSize);
     // Adjust it proportionally to the lyric size
-    shift *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
-    
+    shift
+        *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
+
     this->SetDrawingXRel(-1 * shift);
-    
+
     // Not much to do when we hit the first syllable of the system
     if (params->m_previousSyl == NULL) {
         params->m_previousSyl = this;
@@ -198,29 +203,32 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
     }
 
     int xShift = 0;
-    
-    // We have a previous syllable from the previous measure - we need to add the measure with because the measures are not aligned yet
+
+    // We have a previous syllable from the previous measure - we need to add the measure with because the measures are
+    // not aligned yet
     if (params->m_previousMeasure) {
         xShift = params->m_previousMeasure->GetWidth();
     }
-    
+
     int overlap = params->m_previousSyl->GetContentRight() - (this->GetContentLeft() + xShift);
     int nextFreeSpace = params->m_previousSyl->CalcHorizontalAdjustment(overlap, params);
-    
+
     if (overlap > 0) {
         // We are adjusting syl in two different measures - move only the to right barline of the first measure
         if (params->m_previousMeasure) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(), params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
+            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(),
+                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
             // Do it now
             params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
             params->m_overlapingSyl.clear();
         }
         else {
             // Normal case, both in the same measure
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));
+            params->m_overlapingSyl.push_back(
+                std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));
         }
     }
-    
+
     params->m_previousSyl = this;
     params->m_freeSpace = nextFreeSpace;
     params->m_previousMeasure = NULL;
@@ -232,7 +240,7 @@ int Syl::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     m_nextWordSyl = NULL;
 
     // Pass it to the pseudo functor of the interface

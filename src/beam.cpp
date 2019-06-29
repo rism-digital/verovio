@@ -285,7 +285,7 @@ void BeamDrawingParams::CalcBeam(
 
     // then check that the stem length reaches the center for the staff
     double minDistToCenter = -VRV_UNSET;
-    
+
     for (i = 0; i < elementCount; ++i) {
         if ((this->m_stemDir == STEMDIRECTION_up)
             && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {

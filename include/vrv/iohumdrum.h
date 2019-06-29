@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "ending.h"
 #include "io.h"
+#include "options.h"
 #include "pedal.h"
 #include "runningelement.h"
 #include "section.h"
@@ -156,10 +157,57 @@ namespace humaux {
         // brackets should be displayed.
         bool suppress_bracket_tuplet;
 
+        // Used for tremolo compression
+        bool tremolo;
+
         // cue_size == keeps track of whether or not the notes in the current
         // staff/layer should be cue sized.  Index 0 is used to control all
         // layers.
         vector<bool> cue_size;
+
+        // stem_type == keeps track of what type of stem to automatically
+        // add to a note/chord.  The states are:
+        // '\' == down stem
+        // '/' == up stem
+        // 'x' == no stem
+        // 'X' == no automatic assignments (assignment will be done automatically by verovio).
+        vector<char> stem_type;
+
+        // ligature_recta == true if in a recta ligature
+        bool ligature_recta = false;
+        // ligature_obliqua == true if in a obliqua ligature
+        bool ligature_obliqua = false;
+
+        // last_clef == keep track of last clef on staff to avoid duplications.
+        std::string last_clef;
+
+        // acclev == In **mens data, controls the accidental level conversion
+        // from gestural to editorial.
+        // *acclev:0 == no editorial acccidentals visible (all converted to gestural)
+        // *acclev:1 == accidentals marked with YY are displayed as editorial accidentals (above notes)
+        // *acclev:2 == accidentals marked with Y are displayed as editorial accidentals (above notes)
+        // *acclev:3 == accidentals marked with yy are displayed as editorial accidentals (above notes)
+        // *acclev:4 == accidentals marked with y are displayed as editorial accidentals (above notes)
+        // meaning of the accidental marks:
+        // y = algorithmic interpretation of an implicit accidental, primarily used for notes
+        //     with accidentals not shown but assigned by the key signature.
+        // yy = a cautionary type of accidental, such as returning to the accidental within the
+        //     key signature (such as a b-flat coming after a b-natural in a 1-flat key signature).
+        // Y = a performance interpretation accidental (musica ficta) that is not indicated or
+        //     directly implied in the source, but is needed due to performance practice.
+        // YY = an accidental that should be added due to what the editor thinks is an error.
+        //
+        // Equivalences to numbers:
+        // *Xacclev            == *acclev:0  all levels are mapped to @accid.ges
+        // *acclev             == *acclev:0  all levels are mapped to @accid.ges
+        // *acclev:            == *acclev:0  all levels are mapped to @accid.ges
+        // *acclev:YY          == *acclev:1  levels 2-4 are mapped to @accid.ges and level 1    to @accd+@edit
+        // *acclev:Y           == *acclev:2  levels 3-4 are mapped to @accid.ges and levels 1-2 to @accd+@edit
+        // *acclev:yy          == *acclev:3  level    4 is  mapped to @accid.ges and levels 1-3 to @accd+@edit
+        // *acclev:y           == *acclev:4  all levels are mapped to @accid+@edit
+        //
+        // The default level is *acclev:1 (YY will show as editorial accidental, y, yy, and Y will be @accid.ges)
+        int acclev = 1;
 
         // righthalfstem == true means to place half-note stems always on right side
         // of noteheads.  False is standard modern style.
@@ -269,7 +317,9 @@ public:
     virtual ~HumdrumInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &humdrum);
+    virtual bool ImportString(const std::string &humdrum);
+
+    void parseEmbeddedOptions(vrv::Doc &doc);
 
 #ifndef NO_HUMDRUM_SUPPORT
 
@@ -329,6 +379,8 @@ protected:
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HTp token, Note *note);
     void handlePedalMark(hum::HTp token);
+    void handleLigature(hum::HTp token);
+    void handleColoration(hum::HTp token);
     void prepareBeamAndTupletGroups(
         const std::vector<hum::HTp> &layerdata, std::vector<humaux::HumdrumBeamAndTuplet> &hg);
     void printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
@@ -347,6 +399,8 @@ protected:
         std::vector<hum::HTp> &layerdata, int layerindex, bool grace);
     void handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<std::string> &elements,
         std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int layerindex);
+    bool checkForTremolo(
+        std::vector<hum::HTp> &layerdata, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int startindex);
     void handleGroupEnds(
         const humaux::HumdrumBeamAndTuplet &tg, std::vector<std::string> &elements, std::vector<void *> &pointers);
     void handleStaffStateVariables(hum::HTp token);
@@ -473,6 +527,12 @@ protected:
     void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype);
     bool getNoteState(hum::HTp token, int slurnumber);
     void assignVerticalGroup(Pedal *ped, hum::HTp token);
+    void storeAcclev(const std::string value, int staffindex);
+    void storeStemInterpretation(const std::string &value, int staffindex, int layernumber);
+    bool getBooleanParameter(hum::HTp token, const string &category, const string &key);
+    std::string getStringParameter(hum::HTp token, const string &category, const string &key);
+    bool shouldHideBeamBracket(
+        const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int layerindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -495,6 +555,7 @@ protected:
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
     template <class ELEMENT> void setN(ELEMENT element, int nvalue);
+    template <class ELEMENT> void assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
@@ -518,6 +579,7 @@ protected:
     static hum::HumNum removeFactorsOfTwo(hum::HumNum value, int &tcount, int &bcount);
     static int getDotPowerOfTwo(hum::HumNum value);
     static int nextLowerPowerOfTwo(int x);
+    static hum::HumNum nextHigherPowerOfTwo(hum::HumNum x);
     static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
@@ -526,10 +588,17 @@ protected:
     std::wstring cleanHarmString2(const std::string &content);
     std::wstring cleanHarmString3(const std::string &content);
     std::wstring cleanStringString(const std::string &content);
-    std::vector<std::wstring> cleanFBString(const std::string &content);
+    std::vector<std::wstring> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
+    std::wstring cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
+    std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
+    std::wstring getVisualFBAccidental(int accidental);
+    std::wstring convertFBNumber(const string &input, hum::HTp token);
+    void checkForLineContinuations(hum::HTp token);
+    std::wstring convertNumberToWstring(int number);
 
 private:
-    std::string m_filename; // Filename to read/was read.
+    // m_filename == Filename to read/was read.
+    std::string m_filename;
 
     // m_debug == mostly for printing MEI data to standard input.
     int m_debug = 0;
@@ -600,7 +669,7 @@ private:
     hum::HumNum m_tupletscaling = 1;
 
     // m_omd == temporary variable for printing tempo designation.
-    bool m_omd = false;
+    hum::HumNum m_omd = -1;
 
     // m_oclef == temporary variable for printing "original-clef" <app>
     std::vector<std::pair<int, hum::HTp> > m_oclef;
@@ -680,6 +749,36 @@ private:
     //    *kcancel     = display cancellation key signatures
     //    *Xkcancel    = do not display cancellation key signatures (default)
     bool m_show_cautionary_keysig = false;
+
+    // m_hasTremolo == true if there is a *tremolo found in input data.
+    bool m_hasTremolo = false;
+
+    // m_placement == placement above/below state for a particular spine of information
+    // currently used for **fb, but expand to other spine types as needed (such as **harm).
+    // +1 = *above marker encountered in spine.
+    // -1 = *below marker encountered in spine.
+    // 0 = *auto neither above or below explicitly given (leave up to renderer).
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_placement;
+
+    // m_reverse == placement reversed or not reversed.  currently used for **fb,
+    // might be useful for other types of spines in the fugure.
+    // +1 = *reverse marker encountered in spine.
+    // 0 = *Xreverse marker encountered in spine. (or default)
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_reverse;
+
+    // m_absolute == use relative or absolute accidentals in **fb.
+    // +1 = *absolute marker encountered in spine.
+    // 0 = *Xabsolute marker encountered in spine. (default)
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_absolute;
+
+    // m_slash == display accidentals as slashes or as accidentals in **fb.
+    // +1 = *slash marker encountered in spine. (default)
+    // 0 = *Xslash marker encountered in spine.
+    // Up to 1000 spines can be processed (see constructor).
+    std::vector<int> m_slash;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

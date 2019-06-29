@@ -165,6 +165,14 @@ public:
      */
     void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
 
+    void SetFacsimile(bool facsimile) { m_facsimile = facsimile; }
+    bool GetFacsimile() { return m_facsimile; }
+    /**
+     * Setting m_svgViewBox flag (false by default)
+     */
+    void SetSvgViewBox(bool svgViewBox) { m_svgViewBox = svgViewBox; }
+
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -226,6 +234,9 @@ private:
 
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
+    bool m_facsimile;
+    // use viewbox on svg root element
+    bool m_svgViewBox;
 };
 
 } // namespace vrv

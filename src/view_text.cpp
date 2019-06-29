@@ -44,7 +44,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     dc->StartTextGraphic(f, "", f->GetUuid());
 
     DrawTextChildren(dc, f, params);
-    
+
     if (f->GetStart() && f->GetEnd()) {
         System *currentSystem = dynamic_cast<System *>(f->GetFirstParent(SYSTEM));
         // Postpone the drawing of the end of the system; this will call DrawFConnector
@@ -64,7 +64,7 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
     int toDcY = ToDeviceContextY(params.m_y);
 
     std::size_t prevPos = 0, pos;
-    while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prevPos)) != std::wstring::npos) {
+    while ((pos = s.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
             std::wstring substr = s.substr(prevPos, pos - prevPos);
@@ -89,7 +89,7 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
                 smuflAccid.push_back(SMUFL_E262_accidentalSharp);
             }
             else {
-                smuflAccid.push_back(0xE26D);
+                smuflAccid += accid;
             }
 
             FontInfo vrvTxt;
@@ -109,7 +109,7 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
         std::wstring substr = s.substr(prevPos, std::wstring::npos);
         dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
     }
-    
+
     // Disable x for what is comming next as child of <f>
     // The value is reset in DrawFb
     params.m_x = VRV_UNSET;

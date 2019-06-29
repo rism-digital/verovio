@@ -362,10 +362,10 @@ void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel l
     logBuffer.push_back(message);
 
     switch (level) {
-        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(Pointer_stringify($0)); }, message.c_str()); break;
-        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(Pointer_stringify($0)); }, message.c_str()); break;
-        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(Pointer_stringify($0)); }, message.c_str()); break;
-        default: EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
+        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
+        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
+        default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
     }
 }
 
@@ -414,7 +414,7 @@ std::string ExtractUuidFragment(std::string refUuid)
     return refUuid;
 }
 
-std::string UTF16to8(const std::wstring in)
+std::string UTF16to8(const std::wstring &in)
 {
     std::string out;
 
@@ -423,7 +423,7 @@ std::string UTF16to8(const std::wstring in)
     return out;
 }
 
-std::wstring UTF8to16(const std::string in)
+std::wstring UTF8to16(const std::string &in)
 {
     std::wstring out;
     std::stringstream sin(in.c_str());

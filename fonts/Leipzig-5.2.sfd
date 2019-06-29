@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.33
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names+AAoA-Version 5.2.23 - adding anchor points to all accidentals+AAoA-Version 5.2.24 - changing 8th flags+AAoA-Version 5.2.25 - reviewing mensural clefs+AAoA-Version 5.2.26 - revising position of some rests+AAoA-Version 5.2.27 - adding some anchor points to note heads+AAoA-Version 5.2.28 - correcting anchor points+AAoA-Version 5.2.29 - adding plus time signature symbols+AAoA-Version 5.2.30 - adding some combining strokes for trills+AAoA-Version 5.2.31 - adding some arpegio glyphs (Mulit-segment lines)+AAoA-Version 5.2.32 - adding pedal sostenuto glyph+AAoA-Version 5.2.33 - adding mensural prolations"
-Version: 5.2.33
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.34
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names+AAoA-Version 5.2.23 - adding anchor points to all accidentals+AAoA-Version 5.2.24 - changing 8th flags+AAoA-Version 5.2.25 - reviewing mensural clefs+AAoA-Version 5.2.26 - revising position of some rests+AAoA-Version 5.2.27 - adding some anchor points to note heads+AAoA-Version 5.2.28 - correcting anchor points+AAoA-Version 5.2.29 - adding plus time signature symbols+AAoA-Version 5.2.30 - adding some combining strokes for trills+AAoA-Version 5.2.31 - adding some arpegio glyphs (Mulit-segment lines)+AAoA-Version 5.2.32 - adding pedal sostenuto glyph+AAoA-Version 5.2.33 - adding mensural prolations+AAoA-Version 5.2.34 - adding some tablature glyphs"
+Version: 5.2.34
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1525775690
+ModificationTime: 1559636392
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,12 +50,12 @@ NameList: Adobe Glyph List
 DisplaySize: -128
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 59653 11 6
+WinInfo: 60357 11 6
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
 AnchorClass2: "cutOutNW"""  "cutOutSW"""  "cutOutSE"""  "cutOutNE""" 
-BeginChars: 1114115 259
+BeginChars: 1114115 275
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -83,6 +83,7 @@ SplineSet
  314 -43 208 -132 96 -132 c 0,26,27
  32 -132 0 -100 0 -36 c 0,28,29
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE080
@@ -459,6 +460,7 @@ SplineSet
  259 -101 272 -91 280 -76 c 128
  288 -61 293 -42 293 -21 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE0A4
@@ -474,9 +476,10 @@ SplineSet
 0 -39 m 0
  0 29 73 133 200 133 c 0
  266 133 314 96 314 38 c 0
- 314 -46 208 -133 96 -133 c 0
+ 314 -46 208 -133 96 -133 c 4
  32 -133 0 -103 0 -39 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE05C
@@ -1711,6 +1714,7 @@ SplineSet
  136 96 l 1
  60 73 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE261
@@ -1738,6 +1742,7 @@ SplineSet
  18 74 l 1
  18 -100 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE260
@@ -1771,6 +1776,7 @@ SplineSet
  105 104 l 1
  90 106 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE264
@@ -1822,6 +1828,7 @@ SplineSet
  105 104 l 1
  90 106 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE266
@@ -1891,6 +1898,7 @@ SplineSet
  105 104 l 1
  90 106 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE267
@@ -1939,6 +1947,7 @@ SplineSet
  285 104 l 1
  270 106 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE263
@@ -2058,6 +2067,7 @@ SplineSet
  0 49 l 1
  0 120 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE268
@@ -2120,6 +2130,7 @@ SplineSet
  316 96 l 1
  240 73 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE269
@@ -2203,6 +2214,7 @@ SplineSet
  351 96 l 1
  275 73 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE26A
@@ -2355,6 +2367,7 @@ SplineSet
  161 -679 l 134
  162.172413793 -676.068965517 174.764380825 -654.188863739 179 -646 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE241
@@ -2382,6 +2395,7 @@ SplineSet
  161 679 l 134
  162.172851562 676.069335938 174.764648438 654.188476562 179 646 c 4
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE08B
@@ -2431,6 +2445,7 @@ SplineSet
  28 -126 22 -112 16 -96 c 4
  5 -67 0 -35 0 -0 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE08A
@@ -2466,6 +2481,7 @@ SplineSet
  283 153 300 163 326 168 c 4
  333 170 340 175 340 179 c 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4E5
@@ -2515,6 +2531,7 @@ SplineSet
  87 105 125 166 125 224 c 0
  125 251 118 272 107 292 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4E6
@@ -2546,6 +2563,7 @@ SplineSet
  75 57 68 60 55 63 c 4
  18 72 0 91 0 123 c 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4E7
@@ -2582,6 +2600,7 @@ SplineSet
  99 -170 91 -169 81 -166 c 5
  112 -161 133 -144 133 -111 c 5
 EndSplineSet
+Validated: 41
 EndChar
 
 StartChar: uniE4E8
@@ -2634,6 +2653,7 @@ SplineSet
  204 101 208 111 208 122 c 0
  208 155 179 179 145 179 c 0
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE4E9
@@ -2695,6 +2715,7 @@ SplineSet
  322 317 334 327 335 366 c 1
  326 398 310 413 270 413 c 0
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE4EA
@@ -2761,6 +2782,7 @@ SplineSet
  463 572 434 562 406 562 c 4
  394 562 392 564 379 567 c 5
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE880
@@ -2788,6 +2810,7 @@ SplineSet
  184 204 l 5
  189 225 191 247 191 268 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE881
@@ -2815,6 +2838,7 @@ SplineSet
  145 311 l 5
  207 311 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE882
@@ -2866,6 +2890,7 @@ SplineSet
  78 191 66 204 66 219 c 4
  66 267 118 311 166 311 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE883
@@ -2906,6 +2931,7 @@ SplineSet
  97 224 79 238 79 255 c 4
  79 294 122 326 161 326 c 4
 EndSplineSet
+Validated: 33
 EndChar
 
 StartChar: uniE884
@@ -2946,6 +2972,7 @@ SplineSet
  204 110 l 5
  259 110 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE885
@@ -3001,6 +3028,7 @@ SplineSet
  219 90 206 60 178 35 c 4
  150 11 118 0 84 0 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE886
@@ -3046,6 +3074,7 @@ SplineSet
  63 99 l 5
  60 84 58 71 58 58 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE887
@@ -3090,6 +3119,7 @@ SplineSet
  217 288 221 303 224 311 c 5
  243 311 l 5
 EndSplineSet
+Validated: 33
 EndChar
 
 StartChar: uniE888
@@ -3140,6 +3170,7 @@ SplineSet
  170 37 176 45 176 56 c 5
  175 62 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE889
@@ -3178,6 +3209,7 @@ SplineSet
  123 147 151 190 161 224 c 132
  164 236 166 249 167 264 c 4
 EndSplineSet
+Validated: 33
 EndChar
 
 StartChar: uniE566
@@ -3245,6 +3277,7 @@ SplineSet
  173 41 189 66 189 98 c 4
  189 118 180 141 162 167 c 5
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE56C
@@ -3286,6 +3319,7 @@ SplineSet
  75 107 71 105 68 102 c 6
  0 21 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE56D
@@ -3337,6 +3371,7 @@ SplineSet
  77 109 71 105 63 96 c 2
  0 21 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE004
@@ -3355,6 +3390,7 @@ SplineSet
  62 -112 0 -111 0 -111 c 5
  0 -74 0 -37 0 0 c 5
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE003
@@ -3373,6 +3409,7 @@ SplineSet
  62 112 0 111 0 111 c 5
  -0 74 0 37 0 -0 c 5
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE88A
@@ -3402,6 +3439,7 @@ SplineSet
  80 171 71 174 64 181 c 0
  57 188 53 196 53 207 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE522
@@ -3465,6 +3503,7 @@ SplineSet
  -70.6641 -150.667 -75.3301 -157.667 -80 -165 c 132
  -84.6641 -172.333 -88.3301 -177 -91 -179 c 5
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE521
@@ -3516,6 +3555,7 @@ SplineSet
  238 262 249 243 252 221 c 5
  274 238 301 262 337 262 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE520
@@ -3578,6 +3618,7 @@ SplineSet
  248.667 210.333 239.333 215 226 215 c 4
  212 215 202.333 210.333 197 201 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE523
@@ -3611,6 +3652,7 @@ SplineSet
  206 259 225 240 225 219 c 4
  225 189 215 174 194 174 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE524
@@ -3655,6 +3697,7 @@ SplineSet
  45 41 56 33 68 33 c 134
  81 33 l 6
 EndSplineSet
+Validated: 33
 EndChar
 
 StartChar: uniE525
@@ -3690,6 +3733,7 @@ SplineSet
  152 62 145 70 143 85 c 5
  143 102 156 115 173 115 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE650
@@ -3811,6 +3855,7 @@ SplineSet
  646.333 13.333 644 19.667 644 27 c 0
  644 42.333 653 50 671 50 c 0
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE655
@@ -3906,6 +3951,7 @@ SplineSet
  151.3 262.65 136 273.7 104.55 273.7 c 0
  68 273.7 48.4502 288.15 44.2002 317.9 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE046
@@ -3997,6 +4043,7 @@ SplineSet
  894 -1 886.667 2 882 8 c 1
  876 12.6667 872.333 19.3333 871 28 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE045
@@ -4075,6 +4122,7 @@ SplineSet
  848 61 860 49 860 28 c 0
  860 10 845 -1 829 -1 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE047
@@ -4125,6 +4173,7 @@ SplineSet
  411 300 394 286 374 286 c 4
  351 286 337 303 337 322 c 4
 EndSplineSet
+Validated: 33
 EndChar
 
 StartChar: uniE048
@@ -4198,6 +4247,7 @@ SplineSet
  169 133 182 88 204 61 c 1
  219 45 235 37 251 37 c 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE04B
@@ -4321,6 +4371,7 @@ SplineSet
  84 698 92 689 100 684 c 2
  161 649 l 1
 EndSplineSet
+Validated: 33
 EndChar
 
 StartChar: uniE500
@@ -4355,6 +4406,7 @@ SplineSet
  397 -166 385.333 -162 376 -154 c 128
  366.667 -146 361.667 -135 361 -121 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE220
@@ -4371,6 +4423,7 @@ SplineSet
  163 39 l 1
  -163 -124 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE222
@@ -4397,6 +4450,7 @@ SplineSet
  162 -11 l 1
  162 -95 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE223
@@ -4428,6 +4482,7 @@ SplineSet
  162 326 l 1
  162 242 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE224
@@ -4464,6 +4519,7 @@ SplineSet
  162 259 l 1
  162 175 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE221
@@ -4485,6 +4541,7 @@ SplineSet
  163 110 l 1
  -163 -57 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE530
@@ -4582,6 +4639,7 @@ SplineSet
  319 -159 317 -148 317 -136 c 1
  321 -99 332 -79 363 -69 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE52F
@@ -4652,6 +4710,7 @@ SplineSet
  342.448 343.061 407.109 442 506 442 c 0
  541.726 442 552.923 411.294 555 376 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE531
@@ -4772,6 +4831,7 @@ SplineSet
  110 -223 87 -183 87 -136 c 0
  87 -97 105 -83 132 -69 c 1
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE532
@@ -4920,6 +4980,7 @@ SplineSet
  866 -99.9207 852.382 -69 831 -69 c 4
  797.321 -69 782 -108.183 782 -140 c 4
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: NameMe.58897
@@ -4940,6 +5001,7 @@ SplineSet
  0 265 l 5
  0 -2 l 5
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: NameMe.58898
@@ -4958,6 +5020,7 @@ SplineSet
  130 0 l 5
  0 418 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: NameMe.58899
@@ -4976,6 +5039,7 @@ SplineSet
  130 0 l 5
  0 418 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4A0
@@ -4994,6 +5058,7 @@ SplineSet
  0 203 l 1
  0 236 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4A1
@@ -5012,6 +5077,7 @@ SplineSet
  0 -203 l 1
  0 -236 l 1
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE4A8
@@ -5032,6 +5098,7 @@ SplineSet
  76 0 l 1
  153 224 l 5
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4A9
@@ -5052,6 +5119,7 @@ SplineSet
  76 0 l 1
  153 -224 l 5
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4AA
@@ -5068,6 +5136,7 @@ SplineSet
  0 240 l 25
  0 0 l 25
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE4AB
@@ -5084,6 +5153,7 @@ SplineSet
  0 -240 l 25
  0 0 l 25
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE568
@@ -5134,6 +5204,7 @@ SplineSet
  414.494 1 440.733 32.4674 456 63 c 132
  464.667 80.333 468.667 101.333 468 126 c 4
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE567
@@ -5184,6 +5255,7 @@ SplineSet
  414.493 243 440.732 211.532 456 181 c 132
  464.667 163.667 468.667 142.667 468 118 c 4
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE56E
@@ -5240,6 +5312,7 @@ SplineSet
  710 181 l 1
  710 134 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE56A
@@ -5290,6 +5363,7 @@ SplineSet
  1 414.493 32.4678 440.732 63 456 c 132
  80.333 464.667 101.333 468.667 126 468 c 4
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE569
@@ -5298,6 +5372,8 @@ Width: 248
 VWidth: 2048
 Flags: HW
 LayerCount: 2
+Fore
+Validated: 1
 EndChar
 
 StartChar: uniE4AC
@@ -5316,6 +5392,7 @@ SplineSet
  137 265 l 1
  273 0 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4AD
@@ -5334,6 +5411,7 @@ SplineSet
  137 -265 l 1
  1 0 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE56B
@@ -5384,6 +5462,7 @@ SplineSet
  243 414.493 211.532 440.732 181 456 c 132
  163.667 464.667 142.667 468.667 118 468 c 4
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE938
@@ -5400,6 +5479,7 @@ SplineSet
  0 0 l 5
  155 194 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE939
@@ -5421,6 +5501,7 @@ SplineSet
  246 -40 l 5
  125 111 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE93C
@@ -5442,6 +5523,7 @@ SplineSet
  246 -40 l 5
  125 111 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE93D
@@ -5458,6 +5540,7 @@ SplineSet
  0 0 l 1
  155 194 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE101
@@ -5474,6 +5557,7 @@ SplineSet
  362 242 l 1
  508 242 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE501
@@ -5513,6 +5597,7 @@ SplineSet
  639 -166 627.333 -162 618 -154 c 128
  608.667 -146 603.667 -135 603 -121 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE502
@@ -5562,6 +5647,7 @@ SplineSet
  1123 -166 1111.33 -162 1102 -154 c 128
  1092.67 -146 1087.67 -135 1087 -121 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE901
@@ -5618,6 +5704,7 @@ SplineSet
  105.211914062 538.384765625 126 509.099609375 144 487.5 c 1
  170.099609375 511.799804688 220.774519488 591.440419402 226 645 c 0
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE904
@@ -5669,6 +5756,7 @@ SplineSet
  266 209 l 1
  266 -808 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE909
@@ -5718,6 +5806,7 @@ SplineSet
  6.37943217472 -391.144544189 4.400390625 -375.099609375 4.400390625 -375.099609375 c 1
  3.7236328125 -348.99609375 0.1025390625 -117.15625 1.6025390625 206.19921875 c 2
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE526
@@ -5761,6 +5850,7 @@ SplineSet
  33 209 -9 130 -17 115 c 1
  -39 115 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE527
@@ -5990,6 +6080,7 @@ SplineSet
  252 91 254 90 258 130 c 0
  260 148 261 161 262 169 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE52B
@@ -6101,6 +6192,7 @@ SplineSet
  36 151 l 5
  23 124 l 5
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE52A
@@ -6222,6 +6314,7 @@ SplineSet
  507 31 521 42 532 58 c 1
  552 91 554 90 558 130 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE529
@@ -6379,6 +6472,7 @@ SplineSet
  252 91 254 90 258 130 c 0
  260 148 261 161 262 169 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE528
@@ -6572,6 +6666,7 @@ SplineSet
  252 91 254 90 258 130 c 0
  260 148 261 161 262 169 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE533
@@ -6750,6 +6845,7 @@ SplineSet
  1098 -99.9207 1084.38 -69 1063 -69 c 0
  1029.32 -69 1014 -108.183 1014 -140 c 0
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE52C
@@ -6836,6 +6932,7 @@ SplineSet
  656.524 90.5408 658.559 90.0317 663 130 c 0
  665 148 666.333 161 667 169 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE52D
@@ -6920,6 +7017,7 @@ SplineSet
  238 262 249 243 252 221 c 1
  274 238 301 262 337 262 c 0
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE52E
@@ -7002,6 +7100,7 @@ SplineSet
  251.524 90.5412 253.559 90.0315 258 130 c 128
  260 148 261.333 161 262 169 c 0
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE534
@@ -7084,6 +7183,7 @@ SplineSet
  -116.617 -223 -143 -186.317 -143 -140 c 0
  -143 -108.178 -127.689 -69 -94 -69 c 0
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE535
@@ -7152,6 +7252,7 @@ SplineSet
  -116.617 -223 -143 -186.317 -143 -140 c 4
  -143 -108.178 -127.689 -69 -94 -69 c 4
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE536
@@ -7225,6 +7326,7 @@ SplineSet
  45 41 56 33 68 33 c 6
  81 33 l 6
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE537
@@ -7336,6 +7438,7 @@ SplineSet
  45 41 56 33 68 33 c 2
  81 33 l 2
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE538
@@ -7482,6 +7585,7 @@ SplineSet
  45 41 56 33 68 33 c 2
  81 33 l 2
 EndSplineSet
+Validated: 33
 EndChar
 
 StartChar: uniE53B
@@ -7612,6 +7716,7 @@ SplineSet
  45 41 56 33 68 33 c 2
  81 33 l 2
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE539
@@ -7709,6 +7814,7 @@ SplineSet
  45 41 56 33 68 33 c 6
  81 33 l 6
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE53A
@@ -7844,6 +7950,7 @@ SplineSet
  45 41 56 33 68 33 c 2
  81 33 l 2
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE53C
@@ -7910,6 +8017,7 @@ SplineSet
  206 259 225 240 225 219 c 0
  225 189 215 174 194 174 c 0
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE53D
@@ -8000,6 +8108,7 @@ SplineSet
  206 259 225 240 225 219 c 0
  225 189 215 174 194 174 c 0
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE510
@@ -8042,6 +8151,7 @@ SplineSet
  123 259 l 5
  130.333 237 151.667 210.667 187 180 c 5
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE514
@@ -8104,6 +8214,7 @@ SplineSet
  265 179 258 174 245 162 c 5
  242 149 238 137 224 137 c 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE517
@@ -8193,6 +8304,7 @@ SplineSet
  322 191 310 204 310 219 c 4
  310 267 362 311 410 311 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE515
@@ -8345,6 +8457,7 @@ SplineSet
  265 179 258 174 245 162 c 1
  242 149 238 137 224 137 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE516
@@ -8497,6 +8610,7 @@ SplineSet
  265 179 258 174 245 162 c 1
  242 149 238 137 224 137 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE518
@@ -8677,6 +8791,7 @@ SplineSet
  322 191 310 204 310 219 c 0
  310 267 362 311 410 311 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE519
@@ -8857,6 +8972,7 @@ SplineSet
  322 191 310 204 310 219 c 0
  310 267 362 311 410 311 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE511
@@ -9001,6 +9117,7 @@ SplineSet
  123 259 l 1
  130.333 237 151.667 210.667 187 180 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE512
@@ -9145,6 +9262,7 @@ SplineSet
  123 259 l 1
  130.333 237 151.667 210.667 187 180 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE513
@@ -9268,6 +9386,7 @@ SplineSet
  123 259 l 1
  130.333 237 151.667 210.667 187 180 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE504
@@ -9276,6 +9395,8 @@ Width: 991
 VWidth: 2048
 Flags: HW
 LayerCount: 2
+Fore
+Validated: 1
 EndChar
 
 StartChar: uniE069
@@ -9297,6 +9418,7 @@ SplineSet
  0 -250 l 29
  0 250 l 29
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE06A
@@ -9318,6 +9440,7 @@ SplineSet
  215 311 l 1
  41 311 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE902
@@ -9374,6 +9497,7 @@ SplineSet
  123.333333333 -61 142 -64.6666666667 154 -72 c 0
  172 -82.6666666667 181 -102.333333333 181 -131 c 0
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE906
@@ -9410,6 +9534,7 @@ SplineSet
  123.333333333 -61 142 -64.6666666667 154 -72 c 4
  172 -82.6666666667 181 -102.333333333 181 -131 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4A2
@@ -9430,6 +9555,7 @@ SplineSet
  36 0 24.3330078125 4 15 12 c 132
  5.6669921875 20 0.6669921875 31 0 45 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4A3
@@ -9450,6 +9576,7 @@ SplineSet
  36 0 24.3330078125 -4 15 -12 c 128
  5.6669921875 -20 0.6669921875 -31 0 -45 c 0
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4A4
@@ -9466,6 +9593,7 @@ SplineSet
  347 0 l 25
  0 0 l 25
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4A5
@@ -9482,6 +9610,7 @@ SplineSet
  347 0 l 25
  0 0 l 25
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE4A6
@@ -9502,6 +9631,7 @@ SplineSet
  55 0 l 1
  110 224 l 5
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4A7
@@ -9522,6 +9652,7 @@ SplineSet
  55 0 l 1
  110 -224 l 5
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4AE
@@ -9549,6 +9680,7 @@ SplineSet
  123 0 111.333007812 4 102 12 c 128
  92.6669921875 20 87.6669921875 31 87 45 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4AF
@@ -9576,6 +9708,7 @@ SplineSet
  137 -375 l 1
  1 -110 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4B0
@@ -9603,6 +9736,7 @@ SplineSet
  0 313 l 1
  0 346 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4B1
@@ -9630,6 +9764,7 @@ SplineSet
  0 -313 l 1
  0 -346 l 1
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4B2
@@ -9655,6 +9790,7 @@ SplineSet
  347 140 l 25
  0 140 l 25
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4B3
@@ -9680,6 +9816,7 @@ SplineSet
  347 -140 l 25
  0 -140 l 25
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4B4
@@ -9703,6 +9840,7 @@ SplineSet
  347 0 l 25
  0 0 l 25
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4B5
@@ -9726,6 +9864,7 @@ SplineSet
  347 0 l 25
  0 0 l 25
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE4B6
@@ -9746,6 +9885,7 @@ SplineSet
  0 0 l 5
  190.211914062 112.4296875 l 5
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4B7
@@ -9766,6 +9906,7 @@ SplineSet
  0 0 l 1
  190.211914062 -112.4296875 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4B8
@@ -9790,6 +9931,7 @@ SplineSet
  0 157.666992188 0.6669921875 164.333007812 2 167 c 5
  3.3330078125 166.333007812 4.3330078125 166 5 166 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4B9
@@ -9814,6 +9956,7 @@ SplineSet
  0 -157.666992188 0.6669921875 -164.333007812 2 -167 c 5
  3.3330078125 -166.333007812 4.3330078125 -166 5 -166 c 4
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4BA
@@ -9838,6 +9981,7 @@ SplineSet
  1.2626953125 79.6328125 -1.3330078125 93.3330078125 0 96 c 5
  1.3330078125 95.3330078125 14.5673828125 77.5078125 15 77 c 4
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE4BB
@@ -9862,6 +10006,7 @@ SplineSet
  1.2626953125 -79.6328125 -1.3330078125 -93.3330078125 0 -96 c 1
  1.3330078125 -95.3330078125 14.5673828125 -77.5078125 15 -77 c 0
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE4C6
@@ -9907,6 +10052,7 @@ SplineSet
  411 204 426.666992188 198.333007812 438 187 c 4
  449.333007812 175.666992188 455.333007812 162.666992188 456 148 c 4
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE4C7
@@ -9952,6 +10098,7 @@ SplineSet
  411 -204 426.666992188 -198.333007812 438 -187 c 0
  449.333007812 -175.666992188 455.333007812 -162.666992188 456 -148 c 0
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4BC
@@ -9975,6 +10122,7 @@ SplineSet
  174 350 l 1
  310 85 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4BD
@@ -9998,6 +10146,7 @@ SplineSet
  173 -350 l 1
  37 -85 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE610
@@ -10018,6 +10167,7 @@ SplineSet
  0 0 l 29
  0 240 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE612
@@ -10036,6 +10186,7 @@ SplineSet
  246 338 l 5
  283 338 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE613
@@ -10054,6 +10205,7 @@ SplineSet
  246 0 l 5
  283 0 l 5
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE611
@@ -10074,6 +10226,7 @@ SplineSet
  0 240 l 29
  0 0 l 5
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE614
@@ -10095,6 +10248,7 @@ SplineSet
  178 144 144 178 103 178 c 0
  62 178 28 144 28 103 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE4C8
@@ -10163,6 +10317,7 @@ SplineSet
  411 204 426.666992188 198.333007812 438 187 c 4
  449.333007812 175.666992188 455.333007812 162.666992188 456 148 c 4
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4C9
@@ -10231,6 +10386,7 @@ SplineSet
  411 -204 426.666992188 -198.333007812 438 -187 c 0
  449.333007812 -175.666992188 455.333007812 -162.666992188 456 -148 c 0
 EndSplineSet
+Validated: 524297
 EndChar
 
 StartChar: uniE4C4
@@ -10265,6 +10421,7 @@ SplineSet
  410 160 426.666992188 154.333007812 438 143 c 4
  449.333007812 131.666992188 455.333007812 118.666992188 456 104 c 4
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE4C2
@@ -10313,6 +10470,7 @@ SplineSet
  410 160 426.666992188 154.333007812 438 143 c 4
  449.333007812 131.666992188 455.333007812 118.666992188 456 104 c 4
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE4C3
@@ -10361,6 +10519,7 @@ SplineSet
  410 -160 426.666992188 -154.333007812 438 -143 c 4
  449.333007812 -131.666992188 455.333007812 -118.666992188 456 -104 c 4
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE4C5
@@ -10395,6 +10554,7 @@ SplineSet
  410 -160 426.666992188 -154.333007812 438 -143 c 4
  449.333007812 -131.666992188 455.333007812 -118.666992188 456 -104 c 4
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE4CE
@@ -10422,6 +10582,7 @@ SplineSet
  100.333333333 81 107 101.666666667 107 123 c 4
  107 143 101.333333333 157.333333333 90 166 c 5
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE93E
@@ -10438,6 +10599,7 @@ SplineSet
  0 0 l 1
  0 760 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE93F
@@ -10454,6 +10616,7 @@ SplineSet
  0 0 l 1
  0 -760 l 1
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE949
@@ -10475,6 +10638,7 @@ SplineSet
  0 0 l 1
  0 760 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE94B
@@ -10501,6 +10665,7 @@ SplineSet
  0 0 l 5
  0 760 l 5
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE94A
@@ -10522,6 +10687,7 @@ SplineSet
  0 0 l 1
  0 -760 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE94C
@@ -10548,6 +10714,7 @@ SplineSet
  0 0 l 1
  0 -760 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE9F3
@@ -10564,6 +10731,7 @@ SplineSet
  0 0 l 5
  0 250 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE9F2
@@ -10580,6 +10748,7 @@ SplineSet
  0 -250 l 1
  0 250 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE9F1
@@ -10596,6 +10765,7 @@ SplineSet
  0 -500 l 5
  0 -333.333007812 0 333.333333333 0 500 c 5
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE9F0
@@ -10617,6 +10787,7 @@ SplineSet
  90 -500 l 1
  90 -333.333007812 90 333.333007812 90 500 c 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE9F4
@@ -10633,6 +10804,7 @@ SplineSet
  0 110 l 5
  0 250 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE9F5
@@ -10649,6 +10821,7 @@ SplineSet
  0 0 l 5
  0 140 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE9F6
@@ -10668,6 +10841,7 @@ SplineSet
  70 71 l 5
  40 96 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE9F7
@@ -10687,6 +10861,7 @@ SplineSet
  48 71 l 5
  78 96 l 5
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE9F8
@@ -10710,6 +10885,7 @@ SplineSet
  48 71 l 5
  78 96 l 5
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE9F9
@@ -10718,6 +10894,8 @@ Width: 1000
 VWidth: 0
 Flags: HW
 LayerCount: 2
+Fore
+Validated: 1
 EndChar
 
 StartChar: uniE26C
@@ -10738,6 +10916,7 @@ SplineSet
  0 -260 l 5
  0 260 l 5
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE26D
@@ -10758,6 +10937,7 @@ SplineSet
  90 -260 l 1
  90 260 l 1
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE270
@@ -10804,6 +10984,7 @@ SplineSet
  146 81 145.333333333 86.3333333333 144 91 c 128
  142.666666667 95.6666666667 139.666666667 100.666666667 135 106 c 1
 EndSplineSet
+Validated: 524293
 EndChar
 
 StartChar: uniE271
@@ -10854,6 +11035,7 @@ SplineSet
  146 81 145.333333333 86.3333333333 144 91 c 128,-1,44
  142.666666667 95.6666666667 139.666666667 100.666666667 135 106 c 1,28,-1
 EndSplineSet
+Validated: 524293
 EndChar
 
 StartChar: uniE272
@@ -10889,6 +11071,7 @@ SplineSet
  -20 324 l 1
  -46 324 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE273
@@ -10924,6 +11107,7 @@ SplineSet
  18 -108 l 1
  140 -89 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE274
@@ -10980,6 +11164,7 @@ SplineSet
  2 300 l 1
  -24 300 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE275
@@ -11036,6 +11221,7 @@ SplineSet
  136 103 l 1
  60 78 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE280
@@ -11069,6 +11255,7 @@ SplineSet
  93 104 l 1
  108 106 l 1
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE281
@@ -11124,6 +11311,7 @@ SplineSet
  93 104 l 1
  108 106 l 1
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE282
@@ -11160,6 +11348,7 @@ SplineSet
  60 165 l 1
  106 179 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE283
@@ -11228,6 +11417,7 @@ SplineSet
  149 68 l 1
  106 54 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE242
@@ -11262,6 +11452,7 @@ SplineSet
  97 -288 91 -282 154 -341 c 0
  189.626291689 -374.327821258 224.592212588 -414.589535817 247.893402859 -462.544065045 c 1
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE244
@@ -11306,6 +11497,7 @@ SplineSet
  97 -98 91 -92 154 -151 c 0
  188.98736519 -183.730115823 223.337833542 -223.147648447 246.628551416 -269.971415363 c 1
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE246
@@ -11360,6 +11552,7 @@ SplineSet
  97 -98 91 -92 154 -151 c 4
  188.98736519 -183.730115823 223.337833542 -223.147648447 246.628551416 -269.971415363 c 5
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE248
@@ -11424,6 +11617,7 @@ SplineSet
  255 -111 175 -43 87 -16 c 4
  75.6068756864 -12.8352432462 59.8068498362 -10.0711139049 39.5999224482 -6.69330133545 c 5
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE24A
@@ -11498,6 +11692,7 @@ SplineSet
  97 -98 91 -92 154 -151 c 4
  188.98736519 -183.730115823 223.337833542 -223.147648447 246.628551416 -269.971415363 c 5
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE243
@@ -11532,6 +11727,7 @@ SplineSet
  97 288 91 282 154 341 c 0
  189.625976562 374.328125 224.591796875 414.58984375 247.893554688 462.543945312 c 1
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE245
@@ -11576,6 +11772,7 @@ SplineSet
  97 98 91 92 154 151 c 0
  188.987304688 183.73046875 223.337890625 223.147460938 246.62890625 269.971679688 c 1
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE247
@@ -11630,6 +11827,7 @@ SplineSet
  97 98 91 92 154 151 c 0
  188.987304688 183.73046875 223.337890625 223.147460938 246.62890625 269.971679688 c 1
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE249
@@ -11694,6 +11892,7 @@ SplineSet
  255 111 175 43 87 16 c 0
  75.6064453125 12.8349609375 59.806640625 10.0712890625 39.599609375 6.693359375 c 1
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE24B
@@ -11768,6 +11967,7 @@ SplineSet
  97 98 91 92 154 151 c 0
  188.987304688 183.73046875 223.337890625 223.147460938 246.62890625 269.971679688 c 1
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE4EB
@@ -11845,6 +12045,7 @@ SplineSet
  97 -633 89 -632 79 -629 c 5
  110 -624 131 -607 131 -574 c 5
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE4EC
@@ -11853,6 +12054,8 @@ Width: 642
 VWidth: 2048
 Flags: HW
 LayerCount: 2
+Fore
+Validated: 1
 EndChar
 
 StartChar: uniE4ED
@@ -11861,6 +12064,8 @@ Width: 180
 VWidth: 2048
 Flags: HW
 LayerCount: 2
+Fore
+Validated: 1
 EndChar
 
 StartChar: uniE08D
@@ -11885,6 +12090,7 @@ SplineSet
  252.799804688 28.7998046875 l 5
  252.799804688 -28 l 5
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE08C
@@ -11909,6 +12115,7 @@ SplineSet
  341.279296875 38.87890625 l 1
  341.279296875 -37.7998046875 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE59E
@@ -11937,6 +12144,7 @@ SplineSet
  77 84 71 80 68 77.599609375 c 2
  0 16.7998046875 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE59D
@@ -11963,6 +12171,7 @@ SplineSet
  77 84 71 80 68 77.599609375 c 2
  0 16.7998046875 l 1
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniEAAA
@@ -12001,6 +12210,7 @@ SplineSet
  5 65 0 68 0 68 c 5
  0 44 l 1
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniEAA9
@@ -12039,6 +12249,7 @@ SplineSet
  5 47 0 44 0 44 c 5
  0 68 l 5
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniEAAD
@@ -12081,6 +12292,7 @@ SplineSet
  192 64 194 66 196 67 c 0,42,43
  193 91 174 155 174 155 c 1,1,-1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniEAAE
@@ -12123,6 +12335,7 @@ SplineSet
  192 48 194 46 196 45 c 0,42,43
  193 21 174 -43 174 -43 c 1,1,-1
 EndSplineSet
+Validated: 9
 EndChar
 
 StartChar: uniE659
@@ -12246,6 +12459,7 @@ SplineSet
  664.240234375 108.299804688 l 2
  658.825195312 114.618164062 653.01953125 116.421875 651.21484375 116.421875 c 0
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE910
@@ -12272,6 +12486,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 0
  108 -240 0 -132 0 0 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE911
@@ -12293,6 +12508,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 4
  108 -240 0 -132 0 0 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE912
@@ -12319,6 +12535,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 0
  108 -240 0 -132 0 0 c 0
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE913
@@ -12350,6 +12567,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 0
  108 -240 0 -132 0 0 c 0
 EndSplineSet
+Validated: 5
 EndChar
 
 StartChar: uniE91B
@@ -12376,6 +12594,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 0
  108 -240 0 -132 0 0 c 0
 EndSplineSet
+Validated: 524293
 EndChar
 
 StartChar: uniE91C
@@ -12402,6 +12621,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 0
  108 -240 0 -132 0 0 c 0
 EndSplineSet
+Validated: 524293
 EndChar
 
 StartChar: uniE914
@@ -12429,6 +12649,7 @@ SplineSet
  303 -35 275 -63 240 -63 c 0
  205 -63 177 -35 177 0 c 0
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE917
@@ -12461,6 +12682,7 @@ SplineSet
  303 -35 275 -63 240 -63 c 0
  205 -63 177 -35 177 0 c 0
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE91E
@@ -12493,6 +12715,7 @@ SplineSet
  303 35 275 63 240 63 c 0
  205 63 177 35 177 0 c 0
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE920
@@ -12509,6 +12732,7 @@ SplineSet
  126 -35 98 -63 63 -63 c 0
  28 -63 0 -35 0 0 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE921
@@ -12529,6 +12753,7 @@ SplineSet
  129.25 25.5 150.25 46.5 175.75 46.5 c 0
  202 46.5 223 25.5 223 0 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE922
@@ -12554,6 +12779,7 @@ SplineSet
  106 22 124 40 146 40 c 4
  168 40 186 22 186 0 c 4
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE923
@@ -12579,6 +12805,7 @@ SplineSet
  116 70 134 88 156 88 c 0
  178 88 196 70 196 48 c 0
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE924
@@ -12600,6 +12827,7 @@ SplineSet
  263.6796875 -72.3203125 204.799804688 -130.560546875 131.83984375 -130.560546875 c 0
  58.8798828125 -130.560546875 0 -72.3203125 0 0 c 0
 EndSplineSet
+Validated: 524289
 EndChar
 
 StartChar: uniE925
@@ -12616,6 +12844,7 @@ SplineSet
  0 -408 l 5
  0 408 l 1
 EndSplineSet
+Validated: 1
 EndChar
 
 StartChar: uniE918
@@ -12643,6 +12872,7 @@ SplineSet
  258 408 l 5
  222 408 l 5
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE915
@@ -12665,6 +12895,7 @@ SplineSet
  36 113 127 204 240 204 c 4
  319.931994365 204 375 173 421 96 c 5
 EndSplineSet
+Validated: 524329
 EndChar
 
 StartChar: uniE916
@@ -12687,6 +12918,7 @@ SplineSet
  444 113 353 204 240 204 c 4
  160.068359375 204 105 173 59 96 c 5
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE919
@@ -12714,6 +12946,7 @@ SplineSet
  444 113 353 204 240 204 c 0
  160.068359375 204 105 173 59 96 c 1
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE91A
@@ -12741,6 +12974,7 @@ SplineSet
  444 113 353 204 240 204 c 0
  160.068359375 204 105 173 59 96 c 1
 EndSplineSet
+Validated: 524321
 EndChar
 
 StartChar: uniE91F
@@ -12768,6 +13002,7 @@ SplineSet
  150.620117188 240 77 195 30.9501953125 117.528320312 c 1
  47 105 40 110 59 96 c 1
 EndSplineSet
+Validated: 524325
 EndChar
 
 StartChar: uniE91D
@@ -12794,6 +13029,798 @@ SplineSet
  -0.416015625 -265.872070312 l 5
  -25.8720703125 -240.416015625 l 5
  480.416015625 265.872070312 l 5
+EndSplineSet
+Validated: 524325
+EndChar
+
+StartChar: uniEBE0
+Encoding: 60384 60384 259
+Width: 315
+VWidth: 2048
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.0595703125 153.559570312 m 128
+ -0.0595703125 203.719726562 24.8271484375 242.853515625 49.599609375 267.959960938 c 1
+ 85.787109375 294.360351562 101.759765625 307.559570312 158.51953125 307.559570312 c 0
+ 214.986328125 307.559570312 230.740234375 295.360351562 265.780273438 268.959960938 c 1
+ 295.553710938 242.853515625 314.440429688 203.719726562 314.440429688 153.559570312 c 128
+ 314.440429688 103.400390625 290.955078125 62.576171875 266.780273438 39.16015625 c 0
+ 236.3671875 9.7021484375 209.653320312 -0.1279296875 153.51953125 0 c 0
+ 100.721679688 0.1201171875 74.9228515625 10.9755859375 45.599609375 39.16015625 c 0
+ 21.236328125 62.5771484375 -0.0595703125 103.400390625 -0.0595703125 153.559570312 c 128
+48 152 m 0
+ 48 111.520507812 62.3056640625 79.326171875 80 59 c 0
+ 97.7470703125 38.61328125 115.80078125 19 156 19 c 0
+ 195.907226562 19 219.326171875 43.61328125 237 64 c 128
+ 254.673828125 84.38671875 267 114.374023438 267 155 c 0
+ 267 195.920898438 255.74609375 230.614257812 238 251 c 128
+ 220.252929688 271.38671875 200 288 158 288 c 0
+ 115.80078125 288 89.578125 262.532226562 72 242 c 0
+ 54.546875 221.614257812 48 192.920898438 48 152 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE1
+Encoding: 60385 60385 260
+Width: 135
+VWidth: 1905
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0.80078125 254.1796875 m 0
+ 0.80078125 257.369140625 6.734375 261.260742188 18.6005859375 265.854492188 c 0
+ 26.6396484375 268.7890625 34.16796875 271.66015625 41.185546875 274.467773438 c 1
+ 51.138671875 279.252929688 l 1
+ 63.6435546875 286.270507812 72.2568359375 289.779296875 76.9775390625 289.779296875 c 0
+ 82.46484375 289.779296875 97.2080078125 284.038085938 97.2080078125 272.553710938 c 0
+ 97.2080078125 263.111328125 96.79296875 248.596679688 95.9638671875 229.010742188 c 128
+ 95.134765625 209.423828125 94.7197265625 194.654296875 94.7197265625 184.701171875 c 2
+ 94.7197265625 175.322265625 l 1
+ 96.44140625 53.783203125 l 2
+ 96.757409693 50.4837727833 96.4853515625 47.4167899873 96.4853515625 42.8740234375 c 0
+ 96.4853515625 33.1767578125 97.1708984375 27.19140625 98 25 c 0
+ 99.7861328125 20.279296875 100.700084077 17.8984979256 104 17 c 2
+ 120.04296875 12.6318359375 l 2
+ 130.261603068 9.84951603821 136.120117188 8.4853515625 136.120117188 4.78515625 c 0
+ 136.120117188 1.33984375 129.166015625 -0.318359375 115.2578125 -0.19140625 c 2
+ 110.28125 -0.19140625 l 2
+ 102.2421875 0.0634765625 87.6962890625 0.19140625 66.6416015625 0.19140625 c 0
+ 65.3662109375 0.19140625 56.115234375 -0.0634765625 38.8896484375 -0.57421875 c 2
+ 23.576171875 -0.95703125 l 2
+ 15.5380859375 -0.95703125 11.5185546875 0.57421875 11.5185546875 3.63671875 c 0
+ 11.5185546875 7.3369140625 16.0478515625 10.0810546875 25.1083984375 11.8662109375 c 2
+ 47.291015625 15.8857421875 l 5
+ 51.7578125 17.927734375 54.5009765625 22.904296875 55.521484375 30.8154296875 c 4
+ 56.0322265625 35.5361328125 56.287109375 41.7890625 56.287109375 49.5732421875 c 6
+ 56.287109375 56.654296875 l 5
+ 55.138671875 236.188476562 l 5
+ 55.138671875 240.015625 l 6
+ 55.3935546875 240.270507812 55.521484375 240.653320312 55.521484375 241.1640625 c 4
+ 55.521484375 252.6484375 48.203125 258.389648438 41.568359375 258.389648438 c 0
+ 37.8681640625 258.389648438 32.1259765625 257.241210938 24.3427734375 254.9453125 c 0
+ 17.0693359375 252.903320312 11.19921875 251.881835938 6.734375 251.881835938 c 2
+ 2.140625 251.881835938 l 2
+ 1.2470703125 252.265625 0.80078125 253.030273438 0.80078125 254.1796875 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE2
+Encoding: 60386 60386 261
+Width: 149
+VWidth: 1905
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0.8349609375 4.263671875 m 0
+ 0.8349609375 8.21875 -3.7401008732 15.9319546508 1.8935546875 24.3603515625 c 0
+ 7 32 20.107421875 47.7236328125 21 49 c 0
+ 52.3896484375 89.44921875 62.2890625 103.85546875 70.37109375 116.040039062 c 4
+ 95.5087890625 153.938476562 107.077148438 185.072265625 107.077148438 209.444335938 c 0
+ 107.077148438 226.415039062 104.356445312 237.76953125 94.9140625 249.508789062 c 128
+ 85.4716796875 261.248046875 80.859375 259.118164062 67.0791015625 259.118164062 c 0
+ 47.68359375 259.118164062 38 251 21.1240234375 232.430664062 c 0
+ 17.5146484375 228.458984375 15.9560546875 229.349609375 13.2763671875 229.349609375 c 0
+ 10.0869140625 229.349609375 8.5546875 231.455078125 8.6826171875 235.665039062 c 0
+ 8.6826171875 239.366210938 11.681640625 245.36328125 17.6787109375 253.657226562 c 0
+ 35.669921875 278.283203125 56.2138671875 290.596679688 79.3095703125 290.596679688 c 0
+ 98.7041015625 290.596679688 115.291992188 284.026367188 129.073242188 270.883789062 c 0
+ 143.4921875 256.46484375 150.637695312 237.770507812 150.509765625 214.803710938 c 0
+ 150.509765625 199.108398438 145.40625 182.137695312 135.198242188 163.890625 c 0
+ 129.966796875 153.938476562 120.205078125 139.965820312 105.9140625 121.974609375 c 1
+ 66.6767578125 74.8896484375 l 2
+ 47.1718851159 51.4837041117 45.4329639869 50.7318559475 45 49 c 0
+ 44 45 46 43 46 43 c 2
+ 66 42 l 1
+ 112.61328125 43.5283203125 l 2
+ 125.613239909 43.95455293 132.901367188 44.4208984375 134.431640625 46.20703125 c 1
+ 139.600585938 55.96875 l 2
+ 142.53515625 60.4345703125 144.384765625 62.66796875 145.150390625 62.66796875 c 0
+ 148.340820312 62.412109375 149.872070312 60.0517578125 149.744140625 55.5859375 c 2
+ 149.744140625 54.4384765625 l 1
+ 147.830078125 7.1337890625 l 2
+ 147.448242188 4.8369140625 146.681640625 3.2421875 145.534179688 2.349609375 c 0
+ 144.512695312 1.328125 141.323242188 0.818359375 135.963867188 0.818359375 c 2
+ 132.901367188 0.818359375 l 2
+ 122.948242188 0.818359375 115.8984375 0.9453125 111.751953125 1.2001953125 c 128
+ 107.604492188 1.455078125 100.5546875 1.583984375 90.6015625 1.583984375 c 0
+ 57.42578125 1.583984375 29.8642578125 1.0732421875 7.9169921875 0.0517578125 c 1
+ 6.0029296875 0.0517578125 l 2
+ 3.7060546875 0.0517578125 2.23828125 0.3076171875 1.6005859375 0.818359375 c 0
+ 1.08984375 2.349609375 0.8349609375 3.4970703125 0.8349609375 4.263671875 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE3
+Encoding: 60387 60387 262
+Width: 151
+VWidth: 1536
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0.044921875 15.67578125 m 0
+ 0.044921875 23.375 4.5546875 27.224609375 13.57421875 27.224609375 c 0
+ 18.3046875 27.224609375 24.080078125 27.1904296875 30.900390625 23.1201171875 c 0
+ 38.16015625 18.609375 40.669921875 19.3544921875 42.4296875 19.3544921875 c 0
+ 49.1396484375 19.3544921875 60.78515625 26.26953125 69.365234375 32.099609375 c 0
+ 75.634765625 36.3896484375 76.57421875 36.4501953125 82.185546875 42.2802734375 c 0
+ 103.084960938 64.830078125 109.58984375 84.259765625 109.69921875 108.5703125 c 0
+ 109.69921875 127.490234375 103.907226562 141.3046875 95.03515625 151.615234375 c 0
+ 83.0234375 165.575195312 67.6279296875 165.345703125 51.46484375 161.4453125 c 0
+ 42.6923828125 159.328125 27.435546875 153.709960938 27.435546875 153.709960938 c 2
+ 13.92578125 148.469726562 l 1
+ 10.955078125 148.469726562 7.4697265625 153.28515625 7.4697265625 156.915039062 c 0
+ 7.4697265625 160.325195312 13.0244140625 165.384765625 24.134765625 172.094726562 c 2
+ 38.32421875 181.004882812 l 1
+ 76.384765625 207.405273438 88.4150390625 228.264648438 90.4150390625 251.584960938 c 0
+ 91.3737476072 262.763652366 89.7021484375 269.797851562 83.27734375 276.5625 c 128
+ 76.3602415267 283.845486335 71.8046875 287.709960938 61.134765625 287.709960938 c 0
+ 49.14453125 287.709960938 43.9896034361 286.264622369 28.8046875 275.219726562 c 2
+ 22.6796875 270.764648438 l 2
+ 18.279296875 266.03515625 12.2548828125 263.669921875 10.6044921875 263.669921875 c 0
+ 9.724609375 263.669921875 8.8994140625 264.165039062 8.1298828125 265.155273438 c 0
+ 7.25 266.03515625 6.810546875 266.915039062 6.810546875 267.794921875 c 0
+ 6.810546875 273.185546875 10.990234375 280.280273438 19.349609375 289.080078125 c 0
+ 32.2197265625 302.610351562 47.6748046875 309.375 65.71484375 309.375 c 0
+ 79.46484375 309.375 98.2900390625 305.415039062 108.189453125 297.495117188 c 0
+ 119.41015625 288.254882812 130.020507812 274.4296875 130.020507812 260.020507812 c 0
+ 130.020507812 239.779296875 116.83984375 216.39453125 86.4794921875 191.865234375 c 1
+ 106.720703125 190.325195312 120 181 128.474609375 171.91015625 c 0
+ 141.94921875 157.458007812 150.759765625 142.560546875 150.759765625 121.110351562 c 0
+ 150.759765625 94.05078125 139 57 111.615234375 32.4052734375 c 0
+ 92.013671875 14.80078125 88 14 72.3349609375 7.375 c 4
+ 56.201171875 0.5517578125 39.7548828125 0.1650390625 25.125 0.1650390625 c 0
+ 8.4052734375 0.1650390625 0.044921875 5.3349609375 0.044921875 15.67578125 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE4
+Encoding: 60388 60388 263
+Width: 248
+VWidth: 1781
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-1.095703125 93.2294921875 m 0
+ -1.095703125 96.6748046875 2.923828125 103.245117188 10.9619140625 112.943359375 c 2
+ 188.198242188 319.846679688 l 2
+ 192.6640625 325.078125 197.896484375 327.694335938 203.893554688 327.694335938 c 0
+ 213.080078125 327.694335938 218.673828125 324.6953125 218.673828125 318.698242188 c 0
+ 218.673828125 318.188476562 218.078125 310.083007812 214.889648438 306.381835938 c 2
+ 37.82421875 116.771484375 l 2
+ 36.486328125 115.326171875 33 110.807617188 33 108 c 0
+ 33 105.448242188 37.0830078125 106.310546875 42.0595703125 106.310546875 c 2
+ 132.883789062 106.310546875 l 1
+ 133.649414062 106.501953125 l 2
+ 134.16015625 106.629882812 134.95703125 106.7578125 136.041992188 106.884765625 c 128
+ 137.125976562 107.012695312 138.1796875 107.076171875 139.200195312 107.076171875 c 0
+ 140.4765625 107.33203125 142.326171875 107.459960938 144.750976562 107.459960938 c 0
+ 152.7890625 107.459960938 157.19140625 107.650390625 157.95703125 108.034179688 c 0
+ 161.147460938 109.564453125 162.7421875 112.435546875 162.7421875 116.646484375 c 2
+ 162.7421875 114.857421875 l 1
+ 163.5078125 217.639648438 l 2
+ 163.5078125 227.591796875 172.50390625 232.568359375 190.495117188 232.568359375 c 0
+ 198.0234375 232.568359375 210.8515625 228.995117188 210.979492188 221.849609375 c 2
+ 210.979492188 210.940429688 l 1
+ 211.745117188 117.646484375 l 2
+ 211.745117188 110.62890625 211.384765625 106.668945312 218.654296875 106.928710938 c 4
+ 229.349609375 107.310546875 222.062711081 106.207210868 229.349609375 105.310546875 c 0
+ 240 104 248.106445312 102.525390625 248.106445312 98.951171875 c 0
+ 248.106445312 94.23046875 246.3203125 87.1044921875 242.747070312 85.5732421875 c 0
+ 240.450195312 84.8076171875 236.112304688 84.361328125 229.731445312 84.2333984375 c 0
+ 226.287109375 84.2333984375 223.798828125 84.361328125 222.267578125 84.6162109375 c 128
+ 220.736328125 84.8720703125 227.375976562 84.9990234375 224.185546875 84.9990234375 c 0
+ 216.146484375 84.9990234375 212.127929688 81.3623046875 212.127929688 74.0888671875 c 2
+ 212.127929688 45.9541015625 l 1
+ 213.1484375 30.2587890625 215.891601562 21.3271484375 220.358398438 19.1572265625 c 0
+ 222.399414062 18.13671875 220.544921875 16.0947265625 232.794921875 13.033203125 c 0
+ 243.002929688 10.7353515625 248.106445312 8.5029296875 248.106445312 6.333984375 c 0
+ 248.106445312 2.3779296875 245.235351562 0.400390625 239.494140625 0.400390625 c 0
+ 210.2734375 1.6767578125 192.409179688 2.314453125 185.901367188 2.314453125 c 0
+ 180.032226562 2.314453125 171.35546875 1.931640625 159.87109375 1.166015625 c 0
+ 155.405273438 1.166015625 151.162109375 1.1015625 147.142578125 0.974609375 c 128
+ 143.123046875 0.8466796875 140.061523438 0.7197265625 137.956054688 0.591796875 c 128
+ 135.850585938 0.4638671875 134.541992188 0.400390625 134.032226562 0.400390625 c 0
+ 130.842773438 0.400390625 128.80078125 0.783203125 127.907226562 1.548828125 c 0
+ 126.631835938 2.314453125 125.9296875 3.654296875 125.801757812 5.568359375 c 0
+ 125.801757812 7.6103515625 129.7578125 10.224609375 137.668945312 13.4150390625 c 2
+ 153.364257812 19.1572265625 l 2
+ 158.33984375 21.1982421875 161.337890625 23.9423828125 162.359375 27.3876953125 c 1
+ 162.870117188 31.3427734375 162.998046875 35.1708984375 162.7421875 38.87109375 c 2
+ 162.359375 86.3388671875 l 1
+ 26.65625 85.5732421875 l 2
+ 24.3603515625 85.5732421875 22.701171875 85.3818359375 21.6806640625 84.9990234375 c 2
+ 16.5126953125 84.9990234375 l 2
+ 4.7734375 84.9990234375 -1.095703125 87.7421875 -1.095703125 93.2294921875 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE5
+Encoding: 60389 60389 264
+Width: 136
+VWidth: 1781
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.3134765625 230.741210938 m 0
+ -0.3134765625 232.783203125 1.537109375 239.737304688 5.2373046875 251.604492188 c 0
+ 10.46875 270.361328125 13.595703125 282.483398438 14.6162109375 287.969726562 c 0
+ 16.40234375 296.008789062 18.125 300.474609375 19.7841796875 301.368164062 c 0
+ 22.3349609375 302.643554688 25.8447265625 303.537109375 30.310546875 304.047851562 c 0
+ 31.841796875 304.430664062 44.79296875 306.408203125 69.1650390625 309.98046875 c 0
+ 83.8388671875 312.533203125 96.7265625 313.873046875 107.828125 314 c 0
+ 111.783203125 314 113.760742188 311.51171875 113.760742188 306.536132812 c 0
+ 113.760742188 292.1171875 110.25390625 275.26953125 97.23828125 273.994140625 c 0
+ 93.5380859375 273.483398438 91.0498046875 273.099609375 89.7744140625 272.844726562 c 2
+ 46.134765625 266.911132812 l 2
+ 37.203125 265.635742188 31.4599609375 265.041015625 28.9091796875 263.126953125 c 0
+ 23.421875 259.9375 22.6787109375 260.194335938 21.6787109375 250.900390625 c 0
+ 21.1191582262 245.699938327 23.419921875 244.650390625 34.904296875 241.842773438 c 0
+ 41.6669921875 240.311523438 47.6005859375 238.588867188 52.705078125 236.674804688 c 0
+ 75.162109375 227.743164062 95.6435546875 215.875976562 108.1484375 201.07421875 c 0
+ 123.587890625 182.827148438 135.307617188 161.0078125 135.307617188 135.615234375 c 0
+ 135.307617188 96.0595703125 118.973632812 62.521484375 92.3046875 37.0009765625 c 0
+ 82.0966796875 26.79296875 65.65625 16.0537109375 50.9814453125 8.7802734375 c 0
+ 34.77734375 0.7412109375 20.931640625 -0.3427734375 9.4482421875 -0.4697265625 c 0
+ 3.7060546875 -0.4697265625 0.8349609375 2.0185546875 0.8349609375 6.9951171875 c 0
+ 0.8349609375 8.78125 7.0234375 12.03515625 19.400390625 16.755859375 c 0
+ 35.6064453125 23.5185546875 43.8369140625 26.900390625 44.091796875 26.900390625 c 0
+ 62.59375 38.6396484375 73.1826171875 51.4638671875 81.859375 65.37109375 c 0
+ 92.068359375 81.83203125 97.107421875 101.1640625 96.98046875 123.366210938 c 0
+ 96.98046875 146.844726562 90.8134765625 164.538085938 80.4765625 178.446289062 c 0
+ 71.03515625 190.6953125 60.3603515625 201.393554688 40.455078125 208.5390625 c 0
+ 38.66796875 209.3046875 32.671875 211.346679688 22.4638671875 214.6640625 c 0
+ 7.2783203125 219.385742188 -0.3134765625 224.744140625 -0.3134765625 230.741210938 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE6
+Encoding: 60390 60390 265
+Width: 160
+VWidth: 1638
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0.3203125 108.736328125 m 0
+ 0.3203125 158.250976562 17.5625 204.127929688 56.0478515625 246.368164062 c 0
+ 68.015625 259.861328125 83.2158203125 272.240234375 97.6474609375 283.50390625 c 0
+ 116.65625 297.701171875 131.674804688 304.799804688 142.704101562 304.799804688 c 0
+ 145.637695312 304.799804688 147.103515625 303.392578125 147.103515625 300.576171875 c 0
+ 147.103515625 298.229492188 147.517578125 294.411132812 146.34375 293.120117188 c 0
+ 145.875 292.650390625 143.642578125 289.947265625 141.647460938 289.0078125 c 0
+ 124.400390625 279.62109375 108.856445312 266.65625 93.015625 250.111328125 c 0
+ 51.94921875 207.637695312 36.357421875 161.360351562 36.240234375 103.279296875 c 0
+ 36.240234375 79.8134765625 37.876953125 68.6318359375 45.15234375 51.736328125 c 0
+ 54.0693359375 30.146484375 63.38671875 19.3525390625 81.103515625 19.3525390625 c 0
+ 96.240234375 19.3525390625 103.302429006 22.0212305115 116.479492188 34.8154296875 c 0
+ 123.16796875 41.3095703125 124.51171875 64.912109375 124.51171875 84.6240234375 c 0
+ 124.51171875 103.631835938 121.432814465 120.506380833 113.184570312 131.439453125 c 0
+ 104.205078125 143.341796875 97 148.791992188 82.568359375 148.791992188 c 0
+ 78.9306640625 148.791992188 76.970703125 147.94140625 72.6884765625 146.240234375 c 128
+ 68.4052734375 144.538085938 67.0322265625 144.688476562 64.568359375 144.688476562 c 0
+ 61.634765625 144.688476562 57.2265625 150.037109375 57.34375 152.736328125 c 0
+ 57.34375 157.546875 62.388671875 161.770507812 72.4794921875 165.408203125 c 0
+ 80.693359375 168.341796875 87.439453125 169.749023438 92.720703125 169.631835938 c 0
+ 111.258789062 169.631835938 131.866210938 162.064453125 142.543945312 146.927734375 c 0
+ 153.573242188 132.026367188 160.146484375 113.6640625 160.263671875 91.83984375 c 0
+ 160.263671875 66.1435546875 157.166015625 42.37890625 142.967773438 24.5439453125 c 1
+ 129.474609375 6.708984375 101.05078125 -0.1494140625 79.6962890625 -0.0322265625 c 0
+ 55.642578125 -0.0322265625 36.166015625 10.998046875 21.263671875 33.056640625 c 0
+ 7.3017578125 53.70703125 0.3203125 78.93359375 0.3203125 108.736328125 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE7
+Encoding: 60391 60391 266
+Width: 147
+VWidth: 1781
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.03515625 278.880859375 m 4
+ 0.0546875 286.154296875 0.466796875 294.68359375 1.49609375 296.470703125 c 4
+ 3.494140625 299.940429688 6.4736328125 303.020507812 11.83203125 303.020507812 c 0
+ 15.4052734375 303.020507812 20.5087890625 302.638671875 27.14453125 301.873046875 c 0
+ 33.9072265625 301.106445312 38.8193359375 300.724609375 41.8818359375 300.724609375 c 0
+ 61.9150390625 300.724609375 82.7138671875 301.106445312 104.278320312 301.873046875 c 2
+ 137.581054688 303.404296875 l 2
+ 141.537109375 303.404296875 144.153320312 302.765625 145.4296875 301.490234375 c 128
+ 146.705078125 300.213867188 147.34375 297.470703125 147.34375 293.259765625 c 0
+ 147.34375 291.983398438 144.727539062 283.498046875 139.49609375 267.803710938 c 0
+ 135.795898438 255.553710938 132.668945312 245.984375 130.1171875 239.09375 c 2
+ 61.2138671875 16.4951171875 l 2
+ 57.5126953125 5.7763671875 50.2587890625 0.41796875 47.451171875 0.41796875 c 0
+ 42.73046875 0.41796875 34.3701171875 3.033203125 34.3701171875 8.2646484375 c 0
+ 34.3701171875 9.0302734375 34.0078125 11.646484375 35.2841796875 16.1123046875 c 2
+ 106.973632812 247.424804688 l 1
+ 106.973632812 248.573242188 l 1
+ 107.994140625 250.615234375 108.50390625 255.84765625 108.50390625 258.271484375 c 0
+ 108.50390625 260.313476562 107.994140625 258.845703125 106.973632812 259.865234375 c 0
+ 105.82421875 261.396484375 104.67578125 262.163085938 103.528320312 262.163085938 c 2
+ 11.83203125 261.780273438 l 2
+ 6.728515625 261.780273438 3.6015625 262.2265625 2.4541015625 263.120117188 c 0
+ 0.7939453125 264.139648438 -0.103515625 273.39453125 -0.03515625 278.880859375 c 4
+EndSplineSet
+EndChar
+
+StartChar: uniEBE8
+Encoding: 60392 60392 267
+Width: 171
+VWidth: 391
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.0869140625 69.7841796875 m 0
+ -0.0869140625 91.986328125 11.546875 108.807617188 30.814453125 124.247070312 c 0
+ 32.0908203125 125.012695312 43.3212890625 131.990234375 52.509765625 135.180664062 c 0
+ 58.76171875 137.4765625 61.9521484375 140.858398438 62.0791015625 145.325195312 c 0
+ 62.0791015625 147.111328125 59.0166015625 150.237304688 52.8916015625 154.704101562 c 2
+ 40.451171875 164.08203125 l 1
+ 23.4794921875 180.287109375 9.9951171875 199.36328125 9.9951171875 221.310546875 c 0
+ 9.9951171875 244.0234375 21.9697265625 263.58984375 37.919921875 278.008789062 c 0
+ 53.1044921875 291.533203125 71.0751953125 297.360351562 89.83203125 297.48828125 c 0
+ 109.482421875 297.48828125 128.432617188 292.383789062 140.681640625 282.17578125 c 0
+ 154.590820312 270.69140625 162.481445312 253.40234375 162.353515625 230.306640625 c 0
+ 162.353515625 207.848632812 153.463867188 192.64453125 133.686523438 176.6953125 c 0
+ 131.772460938 175.1640625 124.028320312 169.6328125 120.456054688 168.1015625 c 0
+ 115.734375 166.059570312 113.374023438 163.572265625 113.374023438 160.63671875 c 0
+ 113.374023438 160.126953125 116.245117188 157.765625 121.987304688 153.5546875 c 0
+ 128.240234375 149.344726562 134.875976562 146.728515625 135.896484375 145.708007812 c 0
+ 147.63671875 135.5 158.356445312 126.758789062 162.056640625 119.485351562 c 0
+ 167.033203125 109.533203125 170.521484375 97.091796875 170.521484375 82.1630859375 c 0
+ 170.521484375 56.2607421875 160.036132812 34.6533203125 143.065429688 19.3408203125 c 0
+ 128.135742188 6.0703125 104.315429688 0.37109375 81.6015625 0.244140625 c 0
+ 60.67578125 0.244140625 41.705078125 2.8583984375 28.689453125 14.0869140625 c 0
+ 13.505859375 26.974609375 -0.0869140625 45.5400390625 -0.0869140625 69.7841796875 c 0
+33.369140625 70.8701171875 m 0
+ 33.369140625 53.388671875 40.05859375 39.162109375 49.4375 28.1884765625 c 128
+ 58.81640625 17.21484375 68.841796875 13.7275390625 83.515625 13.7275390625 c 0
+ 98.9560546875 13.7275390625 108.524414062 18.8955078125 118.221679688 29.23046875 c 0
+ 128.4296875 39.94921875 136.534179688 52.623046875 136.534179688 71.2529296875 c 0
+ 136.534179688 85.1611328125 132.810546875 94.412109375 129.366210938 99.005859375 c 0
+ 127.32421875 101.302734375 126.708007812 104.365234375 123.518554688 108.193359375 c 128
+ 120.328125 112.021484375 116.947265625 114.913085938 113.374023438 118.869140625 c 1
+ 107.908203125 122.569335938 103.360351562 124.369140625 95.3828125 126.778320312 c 0
+ 85.5986328125 129.733398438 84.1552734375 129.711914062 79.05078125 129.711914062 c 0
+ 71.8642578125 129.711914062 59.974609375 123.140625 47.384765625 109.998046875 c 0
+ 38.048828125 100.251953125 33.369140625 91.2861328125 33.369140625 70.8701171875 c 0
+44.9814453125 230.794921875 m 0
+ 44.9814453125 215.865234375 48.724609375 200.275390625 60.208984375 188.026367188 c 0
+ 74.7548828125 172.331054688 81.0888671875 171.484375 93.2109375 171.484375 c 0
+ 104.440429688 171.484375 116.1796875 178.204101562 125.432617188 193.643554688 c 0
+ 132.765625 205.87890625 133.280273438 216.630859375 133.280273438 230.794921875 c 0
+ 133.280273438 247 128.260742188 258.142578125 121.221679688 269.223632812 c 1
+ 112.544921875 278.920898438 101.5390625 284.76953125 88.2060546875 284.76953125 c 128
+ 74.87109375 284.76953125 63.9296875 278.79296875 55.3798828125 268.83984375 c 0
+ 46.4482421875 258.504882812 44.9814453125 246.489257812 44.9814453125 230.794921875 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBE9
+Encoding: 60393 60393 268
+Width: 163
+VWidth: 360
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.015625 213.50390625 m 0
+ -0.015625 238.49609375 8.0830078125 256.909179688 22.279296875 274.744140625 c 0
+ 36.7119140625 292.813476562 60.1357421875 304.7890625 80.552734375 304.671875 c 0
+ 104.135742188 304.671875 129.143554688 294.642578125 143.576171875 272.583984375 c 0
+ 157.303710938 252.40234375 163.109375 226.411132812 162.9921875 196.607421875 c 0
+ 162.9921875 189.919921875 162.466796875 175.362304688 159.416015625 158.935546875 c 0
+ 156.482421875 143.095703125 152.845703125 130.896484375 148.50390625 120.3359375 c 0
+ 134.306640625 86.4267578125 110.833984375 57.2109375 82.087890625 32.6884765625 c 4
+ 67.4208984375 20.2509765625 48.28515625 10.3359375 32.6796875 2.943359375 c 0
+ 25.2880859375 -0.458984375 20.7119140625 -0.16015625 18.9521484375 -0.16015625 c 0
+ 15.314453125 -0.16015625 13.49609375 5.130859375 13.49609375 7.7119140625 c 0
+ 13.49609375 11.349609375 18.189453125 18.04296875 27.576171875 23.7919921875 c 0
+ 30.978515625 25.904296875 35.4375 29.013671875 40.9521484375 33.1201171875 c 0
+ 67.8212890625 53.06640625 87.05859375 70.70703125 102.6640625 100.040039062 c 0
+ 119.443359375 131.485351562 127.890625 167.27734375 128.0078125 203.416015625 c 0
+ 128.0078125 226.530273438 125.370117188 238.711914062 118.095703125 255.959960938 c 0
+ 108.474609375 277.548828125 96.275390625 288.34375 79.49609375 288.34375 c 0
+ 63.890625 288.34375 51.8642578125 281.955078125 43.416015625 265.17578125 c 0
+ 36.962890625 251.799804688 33.736328125 239.845703125 33.736328125 219.311523438 c 0
+ 33.736328125 202.767578125 36.611328125 193.21875 42.3603515625 180.6640625 c 1
+ 50.103515625 165.29296875 58.9599609375 157.607421875 70.927734375 157.607421875 c 0
+ 75.50390625 157.607421875 80.431640625 158.458984375 85.7119140625 160.16015625 c 128
+ 90.9921875 161.861328125 95.568359375 162.711914062 99.439453125 162.711914062 c 0
+ 101.317382812 162.711914062 102.255859375 161.59765625 102.255859375 159.368164062 c 0
+ 102.255859375 154.322265625 98.0927734375 145.040039062 87.767578125 141.520507812 c 0
+ 79.3203125 138.586914062 72.8076171875 137.120117188 68.232421875 137.120117188 c 0
+ 49.693359375 137.120117188 28.9677734375 142.3359375 18.056640625 156.767578125 c 0
+ 6.6748046875 171.434570312 -0.015625 191.6796875 -0.015625 213.50390625 c 0
+EndSplineSet
+EndChar
+
+StartChar: uniEBA7
+Encoding: 60327 60327 269
+Width: 527
+VWidth: 1433
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-74.6474609375 557.249023438 m 5
+ -63.9423828125 560.865234375 -42.6044921875 565.205078125 -10.6328125 570.268554688 c 4
+ 24.0869140625 575.62109375 44.3408203125 579.021484375 50.126953125 580.467773438 c 4
+ 56.63671875 581.915039062 60.6875 582.637695312 62.2783203125 582.637695312 c 4
+ 68.5 582.637695312 72.623046875 579.81640625 74.6474609375 574.174804688 c 4
+ 76.6728515625 569.111328125 77.6865234375 559.202148438 77.6865234375 544.446289062 c 4
+ 77.6865234375 523.758789062 77.251953125 506.25390625 76.3837890625 491.931640625 c 4
+ 75.515625 481.515625 74.3583984375 420.5390625 72.912109375 309.000976562 c 4
+ 71.7548828125 232.038085938 71.17578125 175.98046875 71.17578125 140.826171875 c 4
+ 71.17578125 123.321289062 71.3203125 111.024414062 71.609375 103.936523438 c 4
+ 71.609375 75.1474609375 71.7548828125 56.8466796875 72.0439453125 49.03515625 c 4
+ 72.623046875 27.7685546875 75.298828125 11.421875 80.072265625 -0.0068359375 c 5
+ 25.388671875 -0.0068359375 l 5
+ 17.7216796875 140.75390625 12.080078125 314.859375 8.462890625 522.3125 c 4
+ 8.173828125 523.469726562 7.7392578125 528.60546875 7.1611328125 537.71875 c 4
+ 6.7275390625 540.901367188 5.3525390625 542.275390625 3.0380859375 541.841796875 c 4
+ -6.076171875 540.974609375 -20.1083984375 537.57421875 -39.0595703125 531.643554688 c 5
+ -59.16796875 526.000976562 -70.30859375 523.180664062 -72.478515625 523.180664062 c 5
+ -73.9248046875 544.735351562 -74.6474609375 556.091796875 -74.6474609375 557.249023438 c 5
+EndSplineSet
+EndChar
+
+StartChar: uniEBA8
+Encoding: 60328 60328 270
+Width: 978
+VWidth: 1644
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.083984375 -0.146484375 m 1
+ 8.37890625 564.26953125 l 2
+ 8.37890625 572.515625 8.9580078125 578.447265625 10.115234375 582.063476562 c 1
+ 11.8505859375 584.95703125 15.3955078125 586.404296875 20.748046875 586.404296875 c 0
+ 21.037109375 586.404296875 31.8876953125 585.24609375 53.2978515625 582.931640625 c 0
+ 125.052734375 574.107421875 177.421875 566.657226562 210.40625 560.581054688 c 0
+ 287.368164062 546.404296875 339.521484375 529.405273438 366.86328125 509.5859375 c 1
+ 356.158203125 484.703125 348.779296875 472.26171875 344.728515625 472.26171875 c 0
+ 344.150390625 472.26171875 343.571289062 472.55078125 342.993164062 473.129882812 c 2
+ 248.380859375 503.29296875 l 1
+ 187.041992188 521.665039062 137.059570312 530.852539062 98.43359375 530.852539062 c 0
+ 86.2822265625 530.852539062 75.359375 529.984375 65.6669921875 528.248046875 c 1
+ 63.0625 493.817382812 60.9658203125 432.478515625 59.3740234375 344.231445312 c 0
+ 57.6376953125 250.053710938 51.8515625 135.9375 42.013671875 -0.9169921875 c 1
+ -0.083984375 -0.146484375 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniEBAA
+Encoding: 60330 60330 271
+Width: 358
+VWidth: 1644
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.083984375 -0.0068359375 m 1
+ 7.0771484375 535.983398438 l 2
+ 7.3662109375 537.71875 8.37890625 547.484375 10.115234375 565.278320312 c 0
+ 10.404296875 570.630859375 13.6591796875 573.306640625 19.8798828125 573.306640625 c 0
+ 22.484375 573.306640625 30.658203125 572.438476562 44.400390625 570.703125 c 0
+ 189.646484375 550.883789062 286.934570312 522.166992188 336.265625 484.553710938 c 1
+ 343.93359375 465.602539062 347.766601562 445.1328125 347.766601562 423.143554688 c 0
+ 347.766601562 403.034179688 343.499023438 387.771484375 334.963867188 377.356445312 c 1
+ 333.228515625 378.224609375 327.44140625 380.900390625 317.603515625 385.384765625 c 0
+ 312.830078125 387.69921875 310.443359375 389.797851562 310.443359375 391.677734375 c 0
+ 313.3359375 405.56640625 314.85546875 416.77734375 315 425.3125 c 0
+ 315 444.553710938 305.668945312 459.670898438 287.006835938 470.666015625 c 0
+ 265.017578125 483.975585938 224.727539062 497.4296875 166.137695312 511.028320312 c 1
+ 60.2412109375 521.444335938 l 1
+ 62.62890625 441.37109375 l 1
+ 65.95703125 441.66015625 69.5009765625 441.805664062 73.26171875 441.805664062 c 0
+ 105.5234375 441.805664062 155.288085938 429.942382812 222.55859375 406.216796875 c 0
+ 296.626953125 380.177734375 339.59375 357.391601562 351.456054688 337.862304688 c 1
+ 353.770507812 332.798828125 354.927734375 326.578125 354.927734375 319.200195312 c 0
+ 354.927734375 311.533203125 353.481445312 301.260742188 350.587890625 288.38671875 c 0
+ 345.669921875 268.856445312 343.137695312 259.090820312 342.993164062 259.090820312 c 0
+ 337.49609375 259.090820312 332.504882812 259.958984375 328.01953125 261.694335938 c 128
+ 323.53515625 263.430664062 320.31640625 265.239257812 318.36328125 267.120117188 c 128
+ 316.41015625 269.000976562 315.43359375 270.51953125 315.43359375 271.677734375 c 0
+ 315.43359375 272.255859375 315.579101562 272.834960938 315.868164062 273.413085938 c 0
+ 319.484375 284.119140625 321.220703125 293.3046875 321.076171875 300.971679688 c 0
+ 321.076171875 313.702148438 316.374023438 322.888671875 306.970703125 328.53125 c 1
+ 273.263671875 343.865234375 233.408203125 358.04296875 187.404296875 371.0625 c 1
+ 134.311523438 386.831054688 95.32421875 394.715820312 70.44140625 394.715820312 c 0
+ 68.4150390625 394.715820312 64.4375 394.426757812 58.505859375 393.84765625 c 0
+ 56.76953125 393.26953125 55.90234375 390.592773438 55.90234375 385.819335938 c 0
+ 55.90234375 385.529296875 55.9736328125 384.481445312 56.119140625 382.671875 c 128
+ 56.263671875 380.864257812 56.552734375 377.75390625 56.9873046875 373.341796875 c 128
+ 57.4208984375 368.9296875 57.783203125 364.76953125 58.072265625 360.86328125 c 0
+ 59.80859375 347.265625 60.67578125 336.6328125 60.67578125 328.96484375 c 0
+ 60.67578125 318.837890625 59.6630859375 310.809570312 57.6376953125 304.877929688 c 1
+ 60.2412109375 305.0234375 62.845703125 305.094726562 65.4501953125 305.094726562 c 0
+ 104.220703125 305.094726562 151.092773438 295.8359375 206.06640625 277.319335938 c 1
+ 296.337890625 244.118164062 l 1
+ 336.700195312 236.161132812 356.80859375 214.822265625 356.6640625 180.103515625 c 0
+ 356.6640625 169.9765625 355.505859375 157.6796875 353.19140625 143.212890625 c 1
+ 351.745117188 141.766601562 349.9375 140.970703125 347.766601562 140.826171875 c 0
+ 345.163085938 140.826171875 341.184570312 142.634765625 335.83203125 146.250976562 c 0
+ 329.901367188 150.157226562 326.06640625 152.109375 324.331054688 152.109375 c 1
+ 325.19921875 159.48828125 325.6328125 165.853515625 325.6328125 171.206054688 c 0
+ 325.6328125 184.225585938 323.1015625 192.182617188 318.038085938 195.076171875 c 0
+ 307.043945312 201.5859375 276.229492188 212.436523438 225.595703125 227.625976562 c 0
+ 163.678710938 245.999023438 115.359375 255.184570312 80.640625 255.184570312 c 0
+ 70.224609375 255.184570312 62.267578125 254.606445312 56.76953125 253.44921875 c 1
+ 52.57421875 220.3203125 49.4638671875 180.854492188 47.4384765625 128.05078125 c 0
+ 44.5458984375 61.9384765625 42.013671875 19.1171875 39.84375 -0.4130859375 c 1
+ -0.083984375 -0.0068359375 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniEBA9
+Encoding: 60329 60329 272
+Width: 354
+VWidth: 1644
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.083984375 -0.0068359375 m 1
+ 7.0771484375 535.983398438 l 1
+ 7.0771484375 568.966796875 l 2
+ 7.3662109375 574.609375 9.970703125 577.430664062 14.888671875 577.430664062 c 1
+ 46.13671875 572.873046875 l 1
+ 119.048828125 564.41015625 l 1
+ 152.466796875 559.92578125 185.016601562 552.40234375 216.69921875 541.841796875 c 0
+ 258.5078125 527.954101562 298.36328125 508.858398438 336.265625 484.553710938 c 1
+ 343.93359375 465.602539062 347.766601562 445.1328125 347.766601562 423.143554688 c 0
+ 347.766601562 403.034179688 343.499023438 387.771484375 334.963867188 377.356445312 c 1
+ 333.228515625 378.224609375 327.44140625 380.900390625 317.603515625 385.384765625 c 0
+ 312.830078125 387.69921875 310.443359375 389.797851562 310.443359375 391.677734375 c 0
+ 313.3359375 405.56640625 314.85546875 416.77734375 315 425.3125 c 0
+ 315 444.553710938 305.668945312 459.670898438 287.006835938 470.666015625 c 0
+ 265.017578125 483.975585938 224.727539062 497.4296875 166.137695312 511.028320312 c 1
+ 60.2412109375 521.444335938 l 1
+ 62.62890625 441.37109375 l 1
+ 65.95703125 441.66015625 69.5009765625 441.805664062 73.26171875 441.805664062 c 0
+ 105.5234375 441.805664062 155.288085938 429.942382812 222.55859375 406.216796875 c 0
+ 296.626953125 380.177734375 339.59375 357.391601562 351.456054688 337.862304688 c 1
+ 353.770507812 332.798828125 354.927734375 326.578125 354.927734375 319.200195312 c 0
+ 354.927734375 311.533203125 353.481445312 301.260742188 350.587890625 288.38671875 c 0
+ 345.669921875 268.856445312 343.137695312 259.090820312 342.993164062 259.090820312 c 0
+ 337.49609375 259.090820312 332.504882812 259.958984375 328.01953125 261.694335938 c 128
+ 323.53515625 263.430664062 320.31640625 265.239257812 318.36328125 267.120117188 c 128
+ 316.41015625 269.000976562 315.43359375 270.51953125 315.43359375 271.677734375 c 0
+ 315.43359375 272.255859375 315.579101562 272.834960938 315.868164062 273.413085938 c 0
+ 319.484375 284.119140625 321.220703125 293.3046875 321.076171875 300.971679688 c 0
+ 321.076171875 313.702148438 316.374023438 322.888671875 306.970703125 328.53125 c 1
+ 273.263671875 343.865234375 233.408203125 358.04296875 187.404296875 371.0625 c 1
+ 134.311523438 386.831054688 95.32421875 394.715820312 70.44140625 394.715820312 c 0
+ 68.4150390625 394.715820312 64.4375 394.426757812 58.505859375 393.84765625 c 0
+ 57.0595703125 393.26953125 54.23828125 336.487304688 50.04296875 223.502929688 c 0
+ 45.84765625 94.60546875 42.447265625 23 39.84375 0.287109375 c 1
+ -0.083984375 -0.0068359375 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniEBAB
+Encoding: 60331 60331 273
+Width: 357
+VWidth: 654
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+-0.083984375 0.693359375 m 1
+ 7.0771484375 536.68359375 l 1
+ 7.9443359375 540.299804688 8.37890625 544.278320312 8.37890625 548.618164062 c 0
+ 8.37890625 548.907226562 8.08984375 552.958007812 7.51171875 560.76953125 c 0
+ 6.6435546875 566.123046875 6.13671875 569.233398438 5.9921875 570.100585938 c 0
+ 5.9921875 575.454101562 9.8974609375 578.129882812 17.7099609375 578.129882812 c 0
+ 26.2451171875 578.129882812 45.1962890625 575.01953125 74.5634765625 568.798828125 c 1
+ 153.552734375 554.04296875 l 2
+ 187.259765625 547.533203125 219.591796875 539.359375 250.55078125 529.521484375 c 0
+ 285.849609375 517.659179688 314.276367188 503.626953125 335.83203125 487.423828125 c 1
+ 343.7890625 468.76171875 347.766601562 449.666015625 347.766601562 430.13671875 c 0
+ 347.766601562 412.631835938 343.499023438 398.670898438 334.963867188 388.254882812 c 1
+ 329.033203125 391.58203125 323.24609375 394.403320312 317.603515625 396.717773438 c 0
+ 315 397.875 313.083007812 398.887695312 311.853515625 399.755859375 c 128
+ 310.624023438 400.624023438 310.154296875 401.708984375 310.443359375 403.01171875 c 0
+ 312.178710938 412.4140625 313.119140625 420.37109375 313.263671875 426.880859375 c 0
+ 313.263671875 446.700195312 303.137695312 462.107421875 282.883789062 473.102539062 c 0
+ 264.80078125 482.939453125 225.885742188 495.959960938 166.137695312 512.162109375 c 1
+ 60.2412109375 522.143554688 l 1
+ 62.62890625 446.844726562 l 1
+ 66.24609375 447.134765625 70.0791015625 447.3515625 74.1298828125 447.49609375 c 0
+ 107.981445312 447.49609375 156.734375 435.922851562 220.387695312 412.775390625 c 0
+ 293.010742188 386.157226562 334.891601562 363.155273438 346.03125 343.76953125 c 0
+ 348.634765625 338.416992188 350.009765625 332.486328125 350.154296875 325.975585938 c 0
+ 350.154296875 319.754882812 348.490234375 310.423828125 345.163085938 297.983398438 c 0
+ 340.967773438 283.516601562 338.436523438 274.185546875 337.568359375 269.990234375 c 1
+ 332.215820312 271.147460938 326.573242188 273.100585938 320.641601562 275.849609375 c 0
+ 313.842773438 279.321289062 310.443359375 282.287109375 310.443359375 284.74609375 c 0
+ 310.443359375 291.401367188 310.768554688 297.62109375 311.418945312 303.408203125 c 128
+ 312.0703125 309.1953125 312.7578125 313.245117188 313.481445312 315.559570312 c 2
+ 314.56640625 319.249023438 l 1
+ 314.56640625 319.249023438 314.56640625 319.249023438 314.56640625 319.032226562 c 1
+ 314.56640625 326.12109375 312.46875 331.256835938 308.272460938 334.438476562 c 1
+ 304.3671875 338.344726562 296.193359375 342.250976562 283.751953125 346.157226562 c 1
+ 251.491210938 360.334960938 215.975585938 372.630859375 177.205078125 383.046875 c 0
+ 133.37109375 394.909179688 99.0126953125 400.768554688 74.1298828125 400.624023438 c 0
+ 66.751953125 400.624023438 61.5439453125 400.333984375 58.505859375 399.755859375 c 0
+ 56.76953125 399.176757812 55.90234375 397.296875 55.90234375 394.11328125 c 0
+ 55.90234375 393.82421875 55.9736328125 392.9921875 56.119140625 391.618164062 c 128
+ 56.263671875 390.244140625 56.552734375 388.001953125 56.9873046875 384.891601562 c 128
+ 57.4208984375 381.78125 57.783203125 378.634765625 58.072265625 375.452148438 c 0
+ 59.80859375 364.3125 60.67578125 355.415039062 60.67578125 348.76171875 c 0
+ 60.67578125 339.936523438 59.6630859375 332.486328125 57.6376953125 326.41015625 c 1
+ 60.53125 326.5546875 63.4248046875 326.626953125 66.318359375 326.626953125 c 0
+ 106.390625 326.626953125 154.78125 315.487304688 211.491210938 293.208984375 c 1
+ 306.970703125 253.28125 l 1
+ 334.168945312 246.192382812 347.766601562 231.219726562 347.766601562 208.362304688 c 0
+ 347.766601562 200.405273438 344.51171875 182.901367188 338.001953125 155.84765625 c 0
+ 337.350585938 155.84765625 337.350585938 155.84765625 336.916992188 155.84765625 c 0
+ 333.87890625 155.84765625 329.828125 157.150390625 324.765625 159.75390625 c 0
+ 318.254882812 163.37109375 313.625976562 165.32421875 310.876953125 165.61328125 c 1
+ 311.745117188 171.254882812 312.576171875 176.680664062 313.372070312 181.887695312 c 128
+ 314.16796875 187.095703125 314.7109375 190.640625 315 192.521484375 c 2
+ 315.43359375 195.341796875 l 1
+ 315.43359375 202.430664062 313.625976562 207.205078125 310.008789062 209.6640625 c 0
+ 296.41015625 217.62109375 266.537109375 229.627929688 220.387695312 245.686523438 c 0
+ 158.759765625 266.373046875 111.454101562 276.716796875 78.4697265625 276.716796875 c 0
+ 68.921875 276.716796875 61.6884765625 276.138671875 56.76953125 274.981445312 c 1
+ 56.3359375 272.232421875 56.046875 266.952148438 55.90234375 259.140625 c 0
+ 55.90234375 254.220703125 56.046875 247.638671875 56.3359375 239.393554688 c 0
+ 56.76953125 218.416015625 56.9873046875 207.494140625 56.9873046875 206.625976562 c 0
+ 56.9873046875 204.166992188 56.9150390625 202.6484375 56.76953125 202.069335938 c 1
+ 60.53125 202.213867188 64.29296875 202.286132812 68.0537109375 202.286132812 c 0
+ 107.11328125 202.286132812 152.973632812 194.040039062 205.631835938 177.547851562 c 1
+ 295.904296875 144.78125 l 1
+ 336.5546875 133.786132812 356.80859375 110.639648438 356.6640625 75.3408203125 c 0
+ 356.6640625 66.5166015625 355.505859375 55.16015625 353.19140625 41.271484375 c 0
+ 352.7578125 41.126953125 352.1796875 40.982421875 351.456054688 40.837890625 c 0
+ 348.99609375 40.837890625 344.65625 42.140625 338.436523438 44.744140625 c 0
+ 330.768554688 47.6376953125 325.77734375 49.083984375 323.462890625 49.083984375 c 1
+ 324.331054688 56.4619140625 324.765625 62.8994140625 324.765625 68.396484375 c 0
+ 324.765625 81.4169921875 322.233398438 89.5185546875 317.169921875 92.701171875 c 0
+ 305.307617188 99.7900390625 274.494140625 110.784179688 224.727539062 125.684570312 c 0
+ 162.810546875 144.057617188 114.491210938 153.244140625 79.771484375 153.244140625 c 0
+ 72.68359375 153.244140625 64.7265625 152.448242188 55.90234375 150.856445312 c 1
+ 54.7451171875 131.327148438 52.357421875 104.708007812 48.7412109375 71.0009765625 c 2
+ 39.84375 0.287109375 l 1
+ -0.083984375 0.693359375 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniEBAC
+Encoding: 60332 60332 274
+Width: 347
+VWidth: 654
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0.6162109375 -0.419921875 m 1
+ 2.7861328125 614.340820312 l 1
+ 3.6533203125 626.782226562 4.232421875 633.1484375 4.521484375 633.4375 c 0
+ 5.96875 637.053710938 9.369140625 638.862304688 14.720703125 638.862304688 c 1
+ 15.5888671875 638.427734375 l 2
+ 16.16796875 638.283203125 16.818359375 638.2109375 17.5419921875 638.2109375 c 2
+ 19.4951171875 637.994140625 l 2
+ 20.796875 637.848632812 22.931640625 637.559570312 25.896484375 637.125976562 c 128
+ 28.8623046875 636.69140625 32.40625 636.2578125 36.529296875 635.82421875 c 128
+ 40.65234375 635.390625 45.751953125 634.811523438 51.828125 634.087890625 c 128
+ 57.9033203125 633.364257812 64.486328125 632.569335938 71.5751953125 631.701171875 c 0
+ 115.987304688 626.348632812 158.51953125 618.174804688 199.170898438 607.180664062 c 0
+ 258.7734375 590.543945312 303.692382812 570.868164062 333.927734375 548.15625 c 1
+ 340.4375 531.80859375 343.693359375 517.125 343.693359375 504.10546875 c 0
+ 343.693359375 487.178710938 339.063476562 473.21875 329.805664062 462.224609375 c 1
+ 323.874023438 465.1171875 317.942382812 467.79296875 312.01171875 470.252929688 c 0
+ 309.407226562 471.41015625 307.526367188 472.53125 306.369140625 473.616210938 c 128
+ 305.211914062 474.701171875 304.77734375 475.823242188 305.06640625 476.98046875 c 0
+ 308.39453125 495.063476562 309.986328125 505.913085938 309.840820312 509.530273438 c 0
+ 309.840820312 523.41796875 300.509765625 534.340820312 281.84765625 542.296875 c 0
+ 266.513671875 548.517578125 226.947265625 559.3671875 163.149414062 574.846679688 c 1
+ 57.9033203125 584.612304688 l 1
+ 57.0361328125 526.672851562 l 1
+ 60.65234375 526.962890625 64.486328125 527.1796875 68.537109375 527.32421875 c 0
+ 101.086914062 527.32421875 150.708007812 516.329101562 217.399414062 494.33984375 c 0
+ 291.178710938 469.45703125 334 447.541015625 345.86328125 428.588867188 c 1
+ 348.177734375 422.079101562 349.334960938 415.713867188 349.334960938 409.493164062 c 0
+ 349.334960938 402.983398438 347.743164062 392.711914062 344.561523438 378.678710938 c 0
+ 339.787109375 359.438476562 337.254882812 349.818359375 336.965820312 349.818359375 c 0
+ 331.46875 349.818359375 326.549804688 350.686523438 322.209960938 352.421875 c 128
+ 317.870117188 354.158203125 314.759765625 355.966796875 312.87890625 357.846679688 c 128
+ 310.998046875 359.727539062 310.05859375 361.173828125 310.05859375 362.1875 c 0
+ 310.05859375 362.765625 310.129882812 363.416992188 310.275390625 364.140625 c 0
+ 313.6015625 373.9765625 315.265625 383.018554688 315.265625 391.265625 c 0
+ 315.265625 403.99609375 310.63671875 413.181640625 301.377929688 418.82421875 c 1
+ 265.500976562 434.592773438 225.64453125 448.915039062 181.811523438 461.790039062 c 0
+ 130.020507812 477.124023438 91.25 484.864257812 65.4990234375 485.008789062 c 0
+ 58.41015625 485.008789062 54.720703125 484.864257812 54.431640625 484.575195312 c 0
+ 51.1044921875 483.99609375 49.44140625 481.75390625 49.44140625 477.84765625 c 0
+ 49.44140625 475.823242188 49.875 471.555664062 50.7431640625 465.044921875 c 0
+ 50.7431640625 462.73046875 50.8154296875 460.198242188 50.9599609375 457.450195312 c 128
+ 51.1044921875 454.701171875 51.2490234375 452.67578125 51.3935546875 451.374023438 c 128
+ 51.5390625 450.072265625 51.611328125 448.987304688 51.611328125 448.119140625 c 0
+ 51.611328125 440.162109375 50.4541015625 431.41015625 48.138671875 421.862304688 c 1
+ 50.7431640625 422.005859375 53.419921875 422.079101562 56.16796875 422.079101562 c 0
+ 96.5302734375 422.079101562 147.30859375 409.854492188 208.501953125 385.40625 c 1
+ 314.397460938 339.184570312 l 1
+ 338.991210938 331.228515625 351.288085938 317.1953125 351.288085938 297.086914062 c 1
+ 351.071289062 295.350585938 l 2
+ 350.92578125 294.337890625 350.600585938 292.494140625 350.094726562 289.817382812 c 128
+ 349.588867188 287.141601562 349.045898438 284.03125 348.466796875 280.486328125 c 128
+ 347.888671875 276.942382812 347.165039062 272.529296875 346.296875 267.25 c 128
+ 345.428710938 261.96875 344.561523438 256.36328125 343.693359375 250.431640625 c 1
+ 342.24609375 248.985351562 340.329101562 248.225585938 337.942382812 248.153320312 c 128
+ 335.555664062 248.081054688 331.685546875 249.853515625 326.333007812 253.469726562 c 0
+ 320.69140625 257.086914062 316.857421875 258.823242188 314.83203125 258.677734375 c 1
+ 314.83203125 277.1953125 314.904296875 286.454101562 315.048828125 286.454101562 c 0
+ 315.483398438 286.454101562 315.700195312 283.922851562 315.700195312 278.859375 c 1
+ 315.12109375 288.407226562 312.87890625 294.483398438 308.97265625 297.086914062 c 0
+ 291.7578125 306.923828125 260.076171875 320.233398438 213.927734375 337.015625 c 0
+ 149.984375 360.740234375 100.797851562 372.603515625 66.3671875 372.603515625 c 0
+ 57.8310546875 372.603515625 51.3212890625 372.024414062 46.8369140625 370.8671875 c 1
+ 45.96875 364.646484375 45.53515625 358.71484375 45.53515625 353.072265625 c 0
+ 45.53515625 351.336914062 45.96875 345.984375 46.8369140625 337.015625 c 0
+ 47.271484375 327.756835938 47.48828125 321.608398438 47.48828125 318.569335938 c 0
+ 47.48828125 316.254882812 47.4150390625 314.23046875 47.271484375 312.494140625 c 1
+ 50.1640625 312.638671875 53.1298828125 312.7109375 56.16796875 312.7109375 c 0
+ 93.2021484375 312.7109375 138.844726562 302.874023438 193.094726562 283.19921875 c 1
+ 285.970703125 246.743164062 l 1
+ 326.622070312 239.365234375 346.875976562 218.170898438 346.731445312 183.162109375 c 0
+ 346.731445312 175.495117188 345.428710938 163.342773438 342.825195312 146.706054688 c 1
+ 341.088867188 144.969726562 339.13671875 144.102539062 336.965820312 144.102539062 c 0
+ 334.651367188 144.102539062 330.817382812 145.874023438 325.46484375 149.418945312 c 128
+ 320.112304688 152.962890625 316.133789062 154.734375 313.530273438 154.734375 c 1
+ 314.54296875 162.546875 314.9765625 169.345703125 314.83203125 175.1328125 c 0
+ 314.83203125 187.864257812 312.444335938 195.458984375 307.670898438 197.91796875 c 0
+ 293.783203125 206.1640625 262.6796875 218.026367188 214.361328125 233.505859375 c 0
+ 152.154296875 253.325195312 103.545898438 263.234375 68.537109375 263.234375 c 0
+ 57.2529296875 263.234375 49.73046875 262.80078125 45.96875 261.93359375 c 1
+ 45.1005859375 214.41015625 l 1
+ 47.4150390625 214.5546875 49.658203125 214.5546875 51.828125 214.41015625 c 0
+ 91.9013671875 214.41015625 139.857421875 203.705078125 195.69921875 182.293945312 c 1
+ 287.70703125 144.969726562 l 1
+ 328.069335938 137.013671875 348.177734375 115.8203125 348.033203125 81.388671875 c 0
+ 348.033203125 72.853515625 346.731445312 60.412109375 344.126953125 44.0654296875 c 1
+ 341.8125 42.619140625 339.859375 41.89453125 338.268554688 41.89453125 c 0
+ 336.09765625 41.89453125 332.120117188 43.703125 326.333007812 47.3193359375 c 0
+ 320.98046875 51.2255859375 317.291015625 53.1064453125 315.265625 52.9619140625 c 1
+ 316.279296875 60.62890625 316.712890625 67.2119140625 316.568359375 72.708984375 c 0
+ 316.568359375 85.294921875 314.036132812 93.1064453125 308.97265625 96.14453125 c 0
+ 295.229492188 104.1015625 263.692382812 116.109375 214.361328125 132.166992188 c 0
+ 149.405273438 152.854492188 100.07421875 163.197265625 66.3671875 163.197265625 c 0
+ 59.5673828125 163.197265625 52.1171875 162.474609375 44.015625 161.028320312 c 1
+ 43.4375 65.2587890625 42.2802734375 13.49609375 40.5439453125 -1.259765625 c 1
+ 0.6162109375 -0.419921875 l 1
 EndSplineSet
 EndChar
 EndChars

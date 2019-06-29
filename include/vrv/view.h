@@ -34,6 +34,7 @@ class Ending;
 class F;
 class Fb;
 class Fig;
+class FloatingCurvePositioner;
 class Fermata;
 class Hairpin;
 class Harm;
@@ -71,6 +72,8 @@ class Tie;
 class Trill;
 class Turn;
 class Tuplet;
+class TupletBracket;
+class TupletNum;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -185,7 +188,8 @@ protected:
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false);
-    void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
+    void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
+        bool abbreviations, int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
@@ -366,8 +370,7 @@ protected:
      */
     ///@{
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
-        wchar_t fontNo = SMUFL_E990_chantPunctum, int xOffset = 0, int yOffset = 0);
+    void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
     /**
@@ -397,10 +400,10 @@ protected:
      * Called fomr DrawTimeSpanningElement
      */
     ///@{
-    void DrawControlElementConnector(DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff,
+    void DrawControlElementConnector(DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
-    void DrawBracketSpan(
-        DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawBracketSpan(DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType,
+        Object *graphic = NULL);
     void DrawFConnector(
         DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHairpin(
@@ -460,11 +463,11 @@ protected:
 
     /**
      * @name Method for drawing Tuplet.
-     * Called from the the layer postponed drawing list.
      * Defined in view_tuplet.cpp
      */
     ///@{
-    void DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff);
+    void DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
 
     /**
      * @name Low level drawing methods
@@ -507,7 +510,6 @@ private:
     std::wstring IntToTupletFigures(unsigned short number);
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
-    bool OneBeamInTuplet(Tuplet *tuplet);
     int NestedTuplets(Object *object);
     int GetSylYRel(Syl *syl, Staff *staff);
     int GetFYRel(F *f, Staff *staff);
@@ -516,16 +518,9 @@ private:
     /**
      * @name Internal methods used for calculating slurs
      */
-    float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4]);
-    int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-        Point *c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
-    void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-        Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides);
-    float GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveDir, bool withPoints);
-    void GetControlPoints(
-        Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize);
-    void GetSpanningPointPositions(ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle,
-        curvature_CURVEDIR curveDir, int staffSize);
+    void DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
+    float CalcInitialSlur(FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN,
+        curvature_CURVEDIR curveDir, Point points[4]);
     ///@}
 
     /**
@@ -558,7 +553,7 @@ public:
     Staff *m_currentStaff;
     System *m_currentSystem;
     Page *m_currentPage;
-    ///@}m
+    ///@}
 
 protected:
     /**

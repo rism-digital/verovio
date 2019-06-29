@@ -26,6 +26,7 @@ public:
     ///@{
     Corr();
     virtual ~Corr();
+    virtual Object *Clone() const { return new Corr(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Corr"; }
     virtual ClassId GetClassId() const { return CORR; }

@@ -47,7 +47,7 @@ void LinkingInterface::SetNextLink(Object *next)
     assert(!m_next);
     m_next = next;
 }
-    
+
 void LinkingInterface::SetSameasLink(Object *sameas)
 {
     assert(!m_sameas);
@@ -92,7 +92,6 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
     if (!m_sameasUuid.empty()) {
         params->m_sameasUuidPairs.push_back(std::make_pair(this, m_sameasUuid));
     }
-    
 
     return FUNCTOR_CONTINUE;
 }

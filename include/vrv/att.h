@@ -51,7 +51,7 @@ public:
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
     // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
     static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
+    static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFingering(Object *element, std::string attrType, std::string attrValue);
     static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
@@ -60,6 +60,7 @@ public:
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
     static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
     static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
+    static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
     static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
     static bool SetShared(Object *element, std::string attrType, std::string attrValue);
@@ -75,7 +76,7 @@ public:
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetEdittrans(const Object *element, ArrayOfStrAttr *attributes);
     static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
     static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
@@ -84,6 +85,7 @@ public:
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetNeumes(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
@@ -128,13 +130,22 @@ public:
 
     std::string KeysignatureToStr(data_KEYSIGNATURE data) const;
     data_KEYSIGNATURE StrToKeysignature(std::string value, bool logWarning = true) const;
-    
+
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
 
     std::string MeasurementabsToStr(data_MEASUREMENTABS data) const { return VUToStr(data); }
-    data_MEASUREMENTABS StrToMeasurementabs(std::string value, bool logWarning = true) const { return StrToVU(value, logWarning); }
-    
+    data_MEASUREMENTABS StrToMeasurementabs(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
+
+    std::string MeasurementrelToStr(data_MEASUREMENTREL data) const { return VUToStr(data); }
+    data_MEASUREMENTREL StrToMeasurementrel(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
+
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
     data_MODUSMAIOR StrToModusmaior(std::string value, bool logWarning = true) const;
 
@@ -200,16 +211,16 @@ public:
     ///@{
     std::string CompassdirectionToStr(data_COMPASSDIRECTION data) const;
     data_COMPASSDIRECTION StrToCompassdirection(std::string value, bool logWarning = true) const;
-    
+
     std::string EventrelToStr(data_EVENTREL data) const;
     data_EVENTREL StrToEventrel(std::string value, bool logWarning = true) const;
-    
+
     std::string FontsizeToStr(data_FONTSIZE data) const;
     data_FONTSIZE StrToFontsize(std::string value, bool logWarning = true) const;
 
     std::string LinewidthToStr(data_LINEWIDTH data) const;
     data_LINEWIDTH StrToLinewidth(std::string value, bool logWarning = true) const;
-    
+
     std::string MidivalueNameToStr(data_MIDIVALUE_NAME data) const;
     data_MIDIVALUE_NAME StrToMidivalueName(std::string value, bool logWarning = true) const;
 
@@ -274,55 +285,6 @@ private:
      * A vector for storing all the MEI att classes grouped in the interface
      */
     std::vector<AttClassId> m_interfaceAttClasses;
-};
-
-//----------------------------------------------------------------------------
-// Comparison
-//----------------------------------------------------------------------------
-
-class Comparison {
-
-public:
-    virtual bool operator()(Object *object) = 0;
-    virtual bool MatchesType(Object *object) = 0;
-};
-
-//----------------------------------------------------------------------------
-// AttComparison
-//----------------------------------------------------------------------------
-
-class AttComparison : public Comparison {
-
-public:
-    AttComparison(ClassId classId) { m_classId = classId; }
-
-    virtual bool operator()(Object *object);
-
-    ClassId GetType() { return m_classId; }
-
-    bool MatchesType(Object *object);
-
-protected:
-    ClassId m_classId;
-};
-
-//----------------------------------------------------------------------------
-// InterfaceComparison
-//----------------------------------------------------------------------------
-
-class InterfaceComparison : public Comparison {
-
-public:
-    InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
-
-    virtual bool operator()(Object *object);
-
-    InterfaceId GetInterface() { return m_interfaceId; }
-
-    bool MatchesType(Object *object);
-
-protected:
-    InterfaceId m_interfaceId;
 };
 
 } // namespace vrv

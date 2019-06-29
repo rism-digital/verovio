@@ -88,6 +88,14 @@ public:
     ///@}
 
     /**
+     * Return min or max note X position
+     */
+    ///@{
+    int GetXMin();
+    int GetXMax();
+    ///@}
+
+    /**
      * Return the cross staff above or below (if  any).
      */
     void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
@@ -140,6 +148,11 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustCrossStaffYPos
+     */
+    virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertAnalyticalMarkup
      */
     ///@{
@@ -163,7 +176,7 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDIEnd
+     * See Object::CalcOnsetOffsetEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
 

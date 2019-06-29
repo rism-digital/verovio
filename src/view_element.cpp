@@ -67,7 +67,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     if (element->HasSameas()) {
         dc->StartGraphic(element, "", element->GetUuid());
         element->SetEmptyBB();
@@ -185,6 +185,16 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(TUPLET_BRACKET)) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        layer->AddToDrawingList(element);
+    }
+    else if (element->Is(TUPLET_NUM)) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        layer->AddToDrawingList(element);
     }
     else if (element->Is(VERSE)) {
         DrawVerse(dc, element, layer, staff, measure);
@@ -551,17 +561,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
-    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    if (chord->HasCrossStaff()) {
-        SetAlignmentPitchPosParams setAlignmentPitchPosParams(this->m_doc);
-        Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-        chord->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
-
-        CalcStemParams calcStemParams(this->m_doc);
-        Functor calcStem(&Object::CalcStem);
-        chord->Process(&calcStem, &calcStemParams);
-    }
-
     chord->ResetDrawingList();
 
     /************ Draw children (notes, accidentals, etc) ************/
@@ -579,9 +578,15 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = dynamic_cast<Clef *>(element);
     assert(clef);
-
-    int y = staff->GetDrawingY();
-    int x = element->GetDrawingX();
+    int x,y;
+    if (m_doc->GetType() == Facs && clef->HasFacs()) {
+        y = ToLogicalY(staff->GetDrawingY());
+        x = clef->GetDrawingX();
+    }
+    else {
+        y = staff->GetDrawingY();
+        x = element->GetDrawingX();
+    }
     int sym = 0;
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
@@ -658,12 +663,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         clef->SetEmptyBB();
         return;
     }
-
     y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
 
     bool cueSize = false;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
-        if (m_doc->GetType() != Transcription) {
+        if (m_doc->GetType() != Transcription && m_doc->GetType() != Facs) {
             cueSize = true;
             // HARDCODED
             x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
@@ -708,8 +712,15 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    int x = element->GetDrawingX();
-    int y = staff->GetDrawingY();
+    int x,y;
+    if (custos->HasFacs() && m_doc->GetType() == Facs) {
+        x = custos->GetDrawingX();
+        y = ToLogicalY(staff->GetDrawingY());
+    }
+    else {
+        x = element->GetDrawingX();
+        y = staff->GetDrawingY();
+    }
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset;
@@ -847,7 +858,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->EndGraphic(element, this);
 }
-    
+
 void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -1012,7 +1023,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         }
     }
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
-        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), SCOREDEF_NONE, staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
@@ -1311,6 +1322,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Stem *stem = dynamic_cast<Stem *>(element);
     assert(stem);
 
+    // Do not draw virtual (e.g., whole note) stems
+    if (stem->IsVirtual()) return;
+
     dc->StartGraphic(element, "", "");
 
     DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
@@ -1333,7 +1347,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = dynamic_cast<Syl *>(element);
     assert(syl);
 
-    if (!syl->GetStart()) {
+    bool isNeume = (staff->m_drawingNotationType == NOTATIONTYPE_neume);
+
+    if (!syl->GetStart() && !isNeume) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
@@ -1378,28 +1394,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->ReactivateGraphic();
     dc->EndGraphic(syl, this);
-}
-
-void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert(dc);
-    assert(element);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(element);
-    assert(tuplet);
-
-    dc->StartGraphic(element, "", element->GetUuid());
-
-    // Draw the inner elements
-    DrawLayerChildren(dc, tuplet, layer, staff, measure);
-
-    // Add to the list of postponed element
-    layer->AddToDrawingList(tuplet);
-
-    dc->EndGraphic(element, this);
 }
 
 void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1594,33 +1588,32 @@ int View::GetFYRel(F *f, Staff *staff)
     assert(f && staff);
 
     int y = staff->GetDrawingY();
-    
+
     StaffAlignment *alignment = staff->GetAlignment();
     // Something must be seriously wrong...
     if (!alignment) return y;
-    
+
     y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
-    
+
     FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
     // There is no other harm, we use the bottom line.
     if (!positioner) return y;
-    
+
     y = positioner->GetDrawingY();
-    
+
     Object *fb = f->GetFirstParent(FB);
     assert(fb);
     int line = fb->GetChildIndex(f, FIGURE, UNLIMITED_DEPTH);
-    
+
     if (line > 0) {
         FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int lineHeight = m_doc->GetTextLineHeight(fFont, false);
         y -= (line * lineHeight);
     }
-    
+
     return y;
 }
 
-    
 int View::GetSylYRel(Syl *syl, Staff *staff)
 {
     assert(syl && staff);
