@@ -247,7 +247,7 @@ void Doc::CalculateMidiTimemap()
         page->LayOutHorizontally();
     }
 
-    int tempo = 120;
+    int tempo = MIDI_TEMPO;
 
     // Set tempo
     if (m_scoreDef.HasMidiBpm()) {
@@ -285,7 +285,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
     }
 
-    int tempo = 120;
+    int tempo = MIDI_TEMPO;
 
     // set MIDI tempo
     if (m_scoreDef.HasMidiBpm()) {

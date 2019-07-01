@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@vel` on `<note>` in MIDI playback (@rettinghaus)
 * Support for `<turn>` in MusicXML import (@wergo)
 * Support for `<arpgeg>` in MusicXML import (@wergo)
 * Support iOS Framework build (@Noroxs)
