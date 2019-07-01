@@ -1361,6 +1361,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     if (iter->first->Is(DIR))
                         dynamic_cast<Dir *>(iter->first)
                             ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    m_openDashesStack.erase(iter--);
                 }
             }
         }
@@ -1370,14 +1371,22 @@ void MusicXmlInput::ReadMusicXmlDirection(
             std::vector<std::pair<std::string, ControlElement *> >::reverse_iterator riter;
             for (riter = m_controlElements.rbegin(); riter != m_controlElements.rend(); ++riter) {
                 if (riter->second->Is(DYNAM)) {
-                    controlElement = (*riter).second;
-                    dynamic_cast<Dynam *>(controlElement)->SetExtender(BOOLEAN_true);
-                    break;
+                    Dynam *dynam = dynamic_cast<Dynam * >(riter->second);
+                    std::vector<int> staffAttr = dynam->GetStaff();
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end() && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())) {
+                        dynam->SetExtender(BOOLEAN_true);
+                        controlElement = dynam;
+                        break;
+                    }
                 }
                 else if (riter->second->Is(DIR)) {
-                    controlElement = (*riter).second;
-                    dynamic_cast<Dir *>(controlElement)->SetExtender(BOOLEAN_true);
-                    break;
+                    Dir *dir = dynamic_cast<Dir * >(riter->second);
+                    std::vector<int> staffAttr = dir->GetStaff();
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end() && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())) {
+                        dir->SetExtender(BOOLEAN_true);
+                        controlElement = dir;
+                        break;
+                    }
                 }
             }
             musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
