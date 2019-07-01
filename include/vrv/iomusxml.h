@@ -123,6 +123,20 @@ namespace musicxml {
         bool isFirst = true; // insert clef change at first layer, others use @sameas
     };
 
+    class OpenDashes {
+    public:
+        OpenDashes(const int &dirN, int &staffNum, const int &measureCount)
+        {
+            m_dirN = dirN;
+            m_staffNum = staffNum;
+            m_measureCount = measureCount;
+        }
+
+        int m_dirN; // direction number
+        int m_staffNum;
+        int m_measureCount; // measure number of dashes start
+    };
+
 } // namespace musicxml
 
 //----------------------------------------------------------------------------
@@ -327,6 +341,8 @@ private:
     std::vector<std::tuple<int, double, musicxml::OpenHairpin> > m_hairpinStopStack;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
+    /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */
+    std::vector<std::pair<ControlElement *, musicxml::OpenDashes> > m_openDashesStack;
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;

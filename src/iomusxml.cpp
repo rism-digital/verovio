@@ -1339,6 +1339,53 @@ void MusicXmlInput::ReadMusicXmlDirection(
         m_dynamStack.push_back(dynam);
     }
 
+    // Dashes (to be connected with previous <dir> or <dynam> as @extender attribute
+    pugi::xpath_node dashes = type.node().select_node("dashes");
+    if (dashes) {
+        int dashesNumber = dashes.node().attribute("number").as_int();
+        dashesNumber = (dashesNumber < 1) ? 1 : dashesNumber;
+        int staffNum = 1;
+        pugi::xpath_node staffNode = node.select_node("staff");
+        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+        if (HasAttributeWithValue(dashes.node(), "type", "stop")) {
+            LogMessage("Dashes stop: %s number=%d, staff=%d, ", measureNum.c_str(), dashesNumber, staffNum);
+            std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
+            for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+                int measureDifference = m_measureCounts.at(measure) - iter->second.m_measureCount;
+                LogMessage("Dashes stop: %s number=%d/%d, staff=%d/%d, measureDiff=%d", measureNum.c_str(),
+                    iter->second.m_dirN, dashesNumber, iter->second.m_staffNum, staffNum, measureDifference);
+                if (iter->second.m_dirN == dashesNumber && iter->second.m_staffNum == staffNum) {
+                    if (iter->first->Is(DYNAM))
+                        dynamic_cast<Dynam *>(iter->first)
+                            ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    if (iter->first->Is(DIR))
+                        dynamic_cast<Dir *>(iter->first)
+                            ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                }
+            }
+        }
+        else {
+            ControlElement *controlElement = nullptr;
+            // find last ControlElement of type dynam or dir and activate extender
+            std::vector<std::pair<std::string, ControlElement *> >::reverse_iterator riter;
+            for (riter = m_controlElements.rbegin(); riter != m_controlElements.rend(); ++riter) {
+                if (riter->second->Is(DYNAM)) {
+                    controlElement = (*riter).second;
+                    dynamic_cast<Dynam *>(controlElement)->SetExtender(BOOLEAN_true);
+                    break;
+                }
+                else if (riter->second->Is(DIR)) {
+                    controlElement = (*riter).second;
+                    dynamic_cast<Dir *>(controlElement)->SetExtender(BOOLEAN_true);
+                    break;
+                }
+            }
+            musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
+            m_openDashesStack.push_back(std::make_pair(controlElement, openDashes));
+            LogMessage("Dashes start: %s number=%d, staff=%d, ", measureNum.c_str(), dashesNumber, staffNum);
+        }
+    }
+
     // Hairpins
     pugi::xpath_node wedge = type.node().select_node("wedge");
     if (wedge) {
@@ -1480,7 +1527,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !metronome && !xmlShift && !xmlPedal && !wedge) {
+    if (words.size() == 0 && !dynamics && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
