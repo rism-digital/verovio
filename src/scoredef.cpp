@@ -404,6 +404,13 @@ PgHead2 *ScoreDef::GetPgHead2()
 {
     return dynamic_cast<PgHead2 *>(this->FindChildByType(PGHEAD2));
 }
+    
+int ScoreDef::GetMaxStaffSize()
+{
+    StaffGrp *staffGrp = dynamic_cast<StaffGrp*>(this->FindChildByType(STAFFGRP));
+    return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
+}
+
 
 //----------------------------------------------------------------------------
 // ScoreDef functor methods

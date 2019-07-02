@@ -10,7 +10,6 @@
 
 #include "atts_analytical.h"
 #include "atts_shared.h"
-#include "facsimileinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
 #include "positioninterface.h"
@@ -21,7 +20,7 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-class Custos : public LayerElement, public FacsimileInterface, public PitchInterface, public PositionInterface, public AttColor {
+class Custos : public LayerElement, public PitchInterface, public PositionInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -39,15 +38,11 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
     virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
-
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
 
     //----------//
     // Functors //

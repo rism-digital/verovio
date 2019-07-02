@@ -31,8 +31,11 @@ class MidiEventList {
 		const MidiEvent& operator[]         (int index) const;
 
 		MidiEvent&       back               (void);
+		const MidiEvent& back               (void) const;
 		MidiEvent&       last               (void);
+		const MidiEvent& last               (void) const;
 		MidiEvent&       getEvent           (int index);
+		const MidiEvent& getEvent           (int index) const;
 		void             clear              (void);
 		void             reserve            (int rsize);
 		int              getEventCount      (void) const;

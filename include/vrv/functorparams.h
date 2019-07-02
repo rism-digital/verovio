@@ -1132,7 +1132,7 @@ public:
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(smf::MidiFile *midiFile)
+    GenerateMIDIParams(smf::MidiFile *midiFile, Functor *functor)
     {
         m_midiFile = midiFile;
         m_midiChannel = 0;
@@ -1140,6 +1140,7 @@ public:
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120;
+        m_functor = functor;
     }
     smf::MidiFile *m_midiFile;
     int m_midiChannel;
@@ -1147,6 +1148,7 @@ public:
     double m_totalTime;
     int m_transSemi;
     int m_currentTempo;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -1165,11 +1167,12 @@ public:
 
 class GenerateTimemapParams : public FunctorParams {
 public:
-    GenerateTimemapParams()
+    GenerateTimemapParams(Functor *functor)
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;
         m_currentTempo = 120;
+        m_functor = functor;
     }
     std::map<int, double> realTimeToScoreTime;
     std::map<int, std::vector<std::string> > realTimeToOnElements;
@@ -1178,6 +1181,7 @@ public:
     double m_scoreTimeOffset;
     int m_realTimeOffsetMilliseconds;
     int m_currentTempo;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -1212,11 +1216,12 @@ public:
  * member 2: the non justifiable margin
  * member 3: the system full width (without system margins)
  * member 4: the functor to be redirected to the MeasureAligner
+ * member 5: the doc
  **/
 
 class JustifyXParams : public FunctorParams {
 public:
-    JustifyXParams(Functor *functor)
+    JustifyXParams(Functor *functor, Doc *doc)
     {
         m_measureXRel = 0;
         m_justifiableRatio = 1.0;
@@ -1224,6 +1229,7 @@ public:
         m_rightBarLineX = 0;
         m_systemFullWidth = 0;
         m_functor = functor;
+        m_doc = doc;
     }
     int m_measureXRel;
     double m_justifiableRatio;
@@ -1231,6 +1237,7 @@ public:
     int m_rightBarLineX;
     int m_systemFullWidth;
     Functor *m_functor;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1727,13 +1734,14 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the current object whose children we (may) reorder 
+ * member 0: a pointer to the current object whose children we (may) reorder
  **/
 class ReorderByXPosParams : public FunctorParams {
 public:
     int modifications = 0;
 };
 
+//----------------------------------------------------------------------------
 // UnsetCurrentScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -1746,6 +1754,20 @@ public:
     UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
 };
+
+//----------------------------------------------------------------------------
+// SetChildZonesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the Doc for the children operated on
+ */
+class SetChildZonesParams : public FunctorParams {
+public:
+    SetChildZonesParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
 } // namespace vrv
 
 #endif

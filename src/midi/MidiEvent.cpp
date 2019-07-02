@@ -2,7 +2,7 @@
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Feb 14 21:40:14 PST 2015
 // Last Modified: Sat Apr 21 10:52:19 PDT 2018 Removed using namespace std;
-// Filename:      midifile/src-library/MidiEvent.cpp
+// Filename:      midifile/src/MidiEvent.cpp
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
 // vim:           ts=3 noexpandtab
@@ -215,6 +215,11 @@ MidiEvent* MidiEvent::getLinkedEvent(void) {
 }
 
 
+const MidiEvent* MidiEvent::getLinkedEvent(void) const {
+	return m_eventlink;
+}
+
+
 
 //////////////////////////////
 //
@@ -222,7 +227,7 @@ MidiEvent* MidiEvent::getLinkedEvent(void) {
 //   NULL.  This function is similar to getLinkedEvent().
 //
 
-int MidiEvent::isLinked(void) {
+int MidiEvent::isLinked(void) const {
 	return m_eventlink == NULL ? 0 : 1;
 }
 
@@ -236,8 +241,8 @@ int MidiEvent::isLinked(void) {
 //    delta tick mode.  Returns 0 if not linked.
 //
 
-int MidiEvent::getTickDuration(void) {
-	MidiEvent* mev = getLinkedEvent();
+int MidiEvent::getTickDuration(void) const {
+	const MidiEvent* mev = getLinkedEvent();
 	if (mev == NULL) {
 		return 0;
 	}
@@ -259,8 +264,8 @@ int MidiEvent::getTickDuration(void) {
 //     reported as zero.
 //
 
-double MidiEvent::getDurationInSeconds(void) {
-	MidiEvent* mev = getLinkedEvent();
+double MidiEvent::getDurationInSeconds(void) const {
+	const MidiEvent* mev = getLinkedEvent();
 	if (mev == NULL) {
 		return 0;
 	}

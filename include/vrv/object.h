@@ -37,6 +37,7 @@ class StemmedDrawingInterface;
 class TextDirInterface;
 class TimePointInterface;
 class TimeSpanningInterface;
+class Zone;
 
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true
@@ -1073,6 +1074,11 @@ public:
      * Reorder elements by x-position.
      */
     virtual int ReorderByXPos(FunctorParams *);
+
+    /**
+     * Associate child objects with zones.
+     */
+    virtual int SetChildZones(FunctorParams *);
 
     static bool sortByUlx(Object *a, Object *b);
 

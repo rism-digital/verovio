@@ -199,6 +199,15 @@ Clef *Layer::GetClef(LayerElement *test)
         assert(clef);
         return clef;
     }
+    Clef *facsClef = this->GetClefFacs(test);
+    if (facsClef != NULL) {
+        return facsClef;
+    }
+    return GetCurrentClef();
+}
+
+Clef *Layer::GetClefFacs(LayerElement *test)
+{
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     assert(doc);
     if (doc->GetType() == Facs) {
@@ -209,7 +218,7 @@ Clef *Layer::GetClef(LayerElement *test)
             return dynamic_cast<Clef *>(*clefs.rbegin());
         }
     }
-    return GetCurrentClef();
+    return NULL;
 }
 
 int Layer::GetClefLocOffset(LayerElement *test)
@@ -592,5 +601,33 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+
+/*
+int Layer::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+ }
+ */
 
 } // namespace vrv

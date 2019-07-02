@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Dec 31 13:18:53 EST 2018
+// Last Modified: Mon Jun 17 18:29:46 CEST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -967,6 +967,8 @@ class HumInstrument {
 
 
 
+typedef HumdrumLine* HLp;
+
 class HumdrumLine : public std::string, public HumHash {
 	public:
 		            HumdrumLine            (void);
@@ -1024,6 +1026,8 @@ class HumdrumLine : public std::string, public HumHash {
 		std::string   getXmlId             (const std::string& prefix = "") const;
 		std::string   getXmlIdPrefix       (void) const;
 		void          createLineFromTokens (void);
+		void          removeExtraTabs      (void);
+		void          addExtraTabs         (std::vector<int>& trackWidths);
 		int           getLineIndex         (void) const;
 		int           getLineNumber        (void) const;
 		HumdrumFile*  getOwner             (void);
@@ -1046,8 +1050,8 @@ class HumdrumLine : public std::string, public HumHash {
 		int      getKernNoteAttacks     (void);
 		int      addLinkedParameter     (HTp token);
 
-		HumNum   getBeat                (HumNum beatdur = "1") const;
-		HumNum   getBeat                (std::string beatrecip = "4") const;
+		HumNum   getBeat                (HumNum beatdur = 1) const;
+		HumNum   getBeatStr             (std::string beatrecip = "4") const;
 		HTp      getTrackStart          (int track) const;
 		void     setLineFromCsv         (const char* csv,
 		                                 const std::string& separator = ",");
@@ -1055,20 +1059,20 @@ class HumdrumLine : public std::string, public HumHash {
 		                                 const std::string& separator = ",");
 
 		// low-level editing functions (need to re-analyze structure after using)
-		void     appendToken            (HTp token);
-		void     appendToken            (const HumdrumToken& token);
-		void     appendToken            (const std::string& token);
-		void     appendToken            (const char* token);
+		void     appendToken            (HTp token, int tabcount = 1);
+		void     appendToken            (const HumdrumToken& token, int tabcount = 1);
+		void     appendToken            (const std::string& token, int tabcount = 1);
+		void     appendToken            (const char* token, int tabcount = 1);
 
-		void     appendToken            (int index, HTp token);
-		void     appendToken            (int index, const HumdrumToken& token);
-		void     appendToken            (int index, const std::string& token);
-		void     appendToken            (int index, const char* token);
+		void     appendToken            (int index, HTp token, int tabcount = 1);
+		void     appendToken            (int index, const HumdrumToken& token, int tabcount = 1);
+		void     appendToken            (int index, const std::string& token, int tabcount = 1);
+		void     appendToken            (int index, const char* token, int tabcount = 1);
 
-		void     insertToken            (int index, HTp token);
-		void     insertToken            (int index, const HumdrumToken& token);
-		void     insertToken            (int index, const std::string& token);
-		void     insertToken            (int index, const char* token);
+		void     insertToken            (int index, HTp token, int tabcount = 1);
+		void     insertToken            (int index, const HumdrumToken& token, int tabcount = 1);
+		void     insertToken            (int index, const std::string& token, int tabcount = 1);
+		void     insertToken            (int index, const char* token, int tabcount = 1);
 
 		void     setDuration            (HumNum aDur);
 		void     setDurationFromStart   (HumNum dur);
@@ -1114,6 +1118,11 @@ class HumdrumLine : public std::string, public HumHash {
 		// The contents of this vector should be deleted when deconstructing
 		// a HumdrumLine object.
 		std::vector<HumdrumToken*> m_tokens;
+
+		// m_tabs: Used to store a count of the number of tabs between
+		// each token on a line.  This is the number of tabs after the
+		// token at the given index (so no tabs before the first token).
+		std::vector<int> m_tabs;
 
 		// m_duration: This is the "duration" of a line.  The duration is
 		// equal to the minimum time unit of all durational tokens on the
@@ -1236,7 +1245,12 @@ class HumdrumToken : public std::string, public HumHash {
 		int      hasVisibleAccidental      (int subtokenIndex) const;
 		int      hasCautionaryAccidental   (int subtokenIndex) const;
 		bool     hasLigatureBegin          (void);
+		bool     hasRectaLigatureBegin     (void);
+		bool     hasObliquaLigatureBegin   (void);
 		bool     hasLigatureEnd            (void);
+		bool     hasRectaLigatureEnd       (void);
+		bool     hasObliquaLigatureEnd     (void);
+		char     hasStemDirection          (void);
 
 		HumNum   getDuration               (void) const;
 		HumNum   getDuration               (HumNum scale) const;
@@ -1615,7 +1629,9 @@ class HumdrumFileBase : public HumHash {
 		int           getTrackEndCount         (int track) const;
 		HTp           getTrackEnd              (int track, int subtrack) const;
 		void          createLinesFromTokens    (void);
-
+		void          removeExtraTabs          (void);
+		void          addExtraTabs             (void);
+		std::vector<int> getTrackWidths        (void);
 		void          appendLine               (const char* line);
 		void          appendLine               (const std::string& line);
 		void          appendLine               (HumdrumLine* line);
@@ -1949,7 +1965,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		void  checkForExplicitVerticalRestPositions (void);
 
 		// in HumdrumFileContent-stem.cpp
-		bool analyzeKernStems             (void);
+		bool analyzeKernStemLengths       (void);
 
 		// in HumdrumFileContent-metlev.cpp
 		void  getMetricLevels             (std::vector<double>& output, int track = 0,
@@ -1995,6 +2011,8 @@ class HumdrumFileContent : public HumdrumFileStructure {
 	protected:
 		bool   analyzeKernSlurs           (HTp spinestart, std::vector<HTp>& slurstarts,
 		                                   std::vector<HTp>& slurends,
+		                                   std::vector<std::pair<HTp, HTp>>& labels,
+		                                   std::vector<int>& endings,
 		                                   const std::string& linksig = "");
 		bool   analyzeKernTies            (std::vector<std::pair<HTp, int>>& linkedtiestarts,
 		                                   std::vector<std::pair<HTp, int>>& linkedtieends,
@@ -2014,7 +2032,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		int     getRestPositionBelowNotes (HTp rest, std::vector<int>& vpos);
 		void    setRestOnCenterStaffLine  (HTp rest, int baseline);
 		bool    checkRestForVerticalPositioning(HTp rest, int baseline);
-		bool    analyzeKernStems          (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
+		bool    analyzeKernStemLengths    (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
 		void    getBaselines              (std::vector<std::vector<int>>& centerlines);
 		void    createLinkedTies          (std::vector<std::pair<HTp, int>>& starts, 
 		                                   std::vector<std::pair<HTp, int>>& ends);
@@ -2639,7 +2657,11 @@ class Convert {
 		static bool    isMensRest           (const std::string& mensdata);
 		static bool    isMensNote           (const std::string& mensdata);
 		static bool    hasLigatureBegin     (const std::string& mensdata);
+		static bool    hasRectaLigatureBegin(const std::string& mensdata);
+		static bool    hasObliquaLigatureBegin(const std::string& mensdata);
 		static bool    hasLigatureEnd       (const std::string& mensdata);
+		static bool    hasRectaLigatureEnd  (const std::string& mensdata);
+		static bool    hasObliquaLigatureEnd(const std::string& mensdata);
 		static bool    getMensStemDirection (const std::string& mensdata);
 		static HumNum  mensToDuration       (const std::string& mensdata,
 		                                     HumNum scale = 4,
@@ -2675,6 +2697,7 @@ class Convert {
 		static bool hasKernSlurEnd          (const std::string& kerndata);
 		static int  getKernSlurStartElisionLevel(const std::string& kerndata, int index);
 		static int  getKernSlurEndElisionLevel  (const std::string& kerndata, int index);
+		static char hasKernStemDirection    (const std::string& kerndata);
 
 		static bool isKernSecondaryTiedNote (const std::string& kerndata);
 		static std::string getKernPitchAttributes(const std::string& kerndata);
@@ -2708,6 +2731,7 @@ class Convert {
 		static double  significantDigits    (double value, int digits);
 		static bool    isNaN                (double value);
 		static double  pearsonCorrelation   (const std::vector<double> &x, const std::vector<double> &y);
+		static double  standardDeviation    (const std::vector<double>& x);
 		static int     romanNumeralToInteger(const std::string& roman);
 
 };
@@ -2730,6 +2754,7 @@ enum class SliceType {
 		_Measure,
 				Clefs,
 				Transpositions,
+				KeyDesignations,
 				KeySigs,
 				TimeSigs,
 				MeterSigs,
@@ -2802,6 +2827,7 @@ class MxmlPart {
 		int           getStaffIndex        (int voicenum);
 		bool          hasEditorialAccidental(void) const;
 		bool          hasDynamics          (void) const;
+		bool          hasFiguredBass       (void) const;
 		void          parsePartInfo        (xml_node partdeclaration);
 		string        getPartName          (void) const;
 		string        getPartAbbr          (void) const;
@@ -2816,6 +2842,7 @@ class MxmlPart {
 		void          receiveHarmonyCount         (int count);
 		void          receiveEditorialAccidental  (void);
 		void          receiveDynamic              (void);
+		void          receiveFiguredBass          (void);
 		void          receiveCaesura              (const string& letter);
 		void          receiveOrnament             (void);
 
@@ -2829,6 +2856,7 @@ class MxmlPart {
 		bool                 m_editorialAccidental;
 		bool                 m_stems = false;
 		bool                 m_has_dynamics = false;
+		bool                 m_has_figured_bass = false;
 		string               m_partname;
 		string               m_partabbr;
 		string               m_caesura;
@@ -2859,6 +2887,7 @@ class GridSide {
 
 		int   getHarmonyCount   (void);
 		void  setHarmony        (HTp token);
+		void  setHarmony        (const std::string& token);
 		void  detachHarmony     (void);
 		HTp   getHarmony        (void);
 
@@ -2868,9 +2897,16 @@ class GridSide {
 		void  detachDynamics    (void);
 		HTp   getDynamics       (void);
 
+		int   getFiguredBassCount (void);
+		void  setFiguredBass      (HTp token);
+		void  setFiguredBass      (const std::string& token);
+		void  detachFiguredBass   (void);
+		HTp   getFiguredBass      (void);
+
 	private:
 		std::vector<HumdrumToken*> m_verses;
 		HumdrumToken* m_dynamics = NULL;
+		HumdrumToken* m_figured_bass = NULL;
 		HumdrumToken* m_harmony = NULL;
 };
 
@@ -2886,6 +2922,7 @@ class GridStaff : public std::vector<GridVoice*>, public GridSide {
 		void appendTokenLayer    (int layerindex, HTp token, HumNum duration,
 		                          const std::string& spacer = " ");
 		int getMaxVerseCount     (void);
+		string getString         (void);
 };
 
 std::ostream& operator<<(std::ostream& output, GridStaff* staff);
@@ -2965,6 +3002,7 @@ class GridMeasure : public std::list<GridSlice*> {
 		                  { return m_style == MeasureStyle::RepeatBoth; }
 		void         addLayoutParameter(GridSlice* slice, int partindex, const std::string& locomment);
 		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
+		void         addFiguredBassLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
 		bool         isInvisible(void);
 		bool         isSingleChordMeasure(void);
 		bool         isMonophonicMeasure(void);
@@ -2999,25 +3037,26 @@ class GridSlice : public std::vector<GridPart*> {
 		          GridSlice* slice);
 		~GridSlice();
 
-		bool isNoteSlice(void)        { return m_type == SliceType::Notes;            }
-		bool isGraceSlice(void)       { return m_type == SliceType::GraceNotes;       }
-		bool isMeasureSlice(void)     { return m_type == SliceType::Measures;         }
-		bool isClefSlice(void)        { return m_type == SliceType::Clefs;            }
-		bool isLabelSlice(void)       { return m_type == SliceType::Labels;           }
-		bool isLabelAbbrSlice(void)   { return m_type == SliceType::LabelAbbrs;       }
-		bool isTransposeSlice(void)   { return m_type == SliceType::Transpositions;   }
-		bool isKeySigSlice(void)      { return m_type == SliceType::KeySigs;          }
-		bool isTimeSigSlice(void)     { return m_type == SliceType::TimeSigs;         }
-		bool isTempoSlice(void)       { return m_type == SliceType::Tempos;           }
-		bool isMeterSigSlice(void)    { return m_type == SliceType::MeterSigs;        }
-		bool isManipulatorSlice(void) { return m_type==SliceType::Manipulators;       }
-		bool isLayoutSlice(void)      { return m_type ==  SliceType::Layouts;         }
-		bool isLocalLayoutSlice(void) { return m_type ==  SliceType::Layouts;         }
-		bool isInvalidSlice(void)     { return m_type == SliceType::Invalid;          }
-		bool isGlobalComment(void)    { return m_type == SliceType::GlobalComments;   }
-		bool isGlobalLayout(void)     { return m_type == SliceType::GlobalLayouts;    }
-		bool isReferenceRecord(void)  { return m_type == SliceType::ReferenceRecords; }
-		bool isOttavaRecord(void)     { return m_type == SliceType::Ottavas; }
+		bool isNoteSlice(void)          { return m_type == SliceType::Notes;            }
+		bool isGraceSlice(void)         { return m_type == SliceType::GraceNotes;       }
+		bool isMeasureSlice(void)       { return m_type == SliceType::Measures;         }
+		bool isClefSlice(void)          { return m_type == SliceType::Clefs;            }
+		bool isLabelSlice(void)         { return m_type == SliceType::Labels;           }
+		bool isLabelAbbrSlice(void)     { return m_type == SliceType::LabelAbbrs;       }
+		bool isTransposeSlice(void)     { return m_type == SliceType::Transpositions;   }
+		bool isKeySigSlice(void)        { return m_type == SliceType::KeySigs;          }
+		bool isKeyDesignationSlice(void){ return m_type == SliceType::KeyDesignations;  }
+		bool isTimeSigSlice(void)       { return m_type == SliceType::TimeSigs;         }
+		bool isTempoSlice(void)         { return m_type == SliceType::Tempos;           }
+		bool isMeterSigSlice(void)      { return m_type == SliceType::MeterSigs;        }
+		bool isManipulatorSlice(void)   { return m_type==SliceType::Manipulators;       }
+		bool isLayoutSlice(void)        { return m_type ==  SliceType::Layouts;         }
+		bool isLocalLayoutSlice(void)   { return m_type ==  SliceType::Layouts;         }
+		bool isInvalidSlice(void)       { return m_type == SliceType::Invalid;          }
+		bool isGlobalComment(void)      { return m_type == SliceType::GlobalComments;   }
+		bool isGlobalLayout(void)       { return m_type == SliceType::GlobalLayouts;    }
+		bool isReferenceRecord(void)    { return m_type == SliceType::ReferenceRecords; }
+		bool isOttavaRecord(void)       { return m_type == SliceType::Ottavas;          }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		bool hasSpines(void);
@@ -3041,14 +3080,15 @@ class GridSlice : public std::vector<GridPart*> {
 
 		void transferSides        (HumdrumLine& line, GridStaff& sides,
 		                           const std::string& empty, int maxvcount,
-		                           int maxhcount);
+		                           int maxhcount, int maxfcount);
 		void transferSides        (HumdrumLine& line, GridPart& sides,
 		                           int partindex, const std::string& empty,
 		                           int maxvcount, int maxhcount,
-		                           int maxdcount);
+		                           int maxdcount, int maxfcount);
 		int getVerseCount         (int partindex, int staffindex);
 		int getHarmonyCount       (int partindex, int staffindex = -1);
 		int getDynamicsCount      (int partindex, int staffindex = -1);
+		int getFiguredBassCount   (int partindex, int staffindex = -1);
 		void addToken             (const std::string& tok, int parti, int staffi, int voicei);
 
 	protected:
@@ -3091,6 +3131,7 @@ class GridVoice {
 		void   setDurationToPrev  (HumNum dur);
 		void   incrementDuration  (HumNum duration);
 		void   forgetToken        (void);
+		std::string getString          (void);
 
 	protected:
 		void   setTransfered      (bool state);
@@ -3117,9 +3158,13 @@ class HumGrid : public std::vector<GridMeasure*> {
 		bool transferTokens             (HumdrumFile& outfile, int startbarnum = 0);
 		int  getHarmonyCount            (int partindex);
 		int  getDynamicsCount           (int partindex);
+		int  getFiguredBassCount        (int partindex);
 		int  getVerseCount              (int partindex, int staffindex);
 		bool hasDynamics                (int partindex);
+		bool hasFiguredBass             (int partindex);
 		void setDynamicsPresent         (int partindex);
+		void setFiguredBassPresent      (int partindex);
+		void setHarmonyPresent          (int partindex);
 		void setVerseCount              (int partindex, int staffindex, int count);
 		void setHarmonyCount            (int partindex, int count);
 		void removeRedundantClefChanges (void);
@@ -3166,7 +3211,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void transferMerges                (GridStaff* oldstaff,
 		                                    GridStaff* oldlaststaff,
 		                                    GridStaff* newstaff,
-		                                    GridStaff* newlaststaff);
+		                                    GridStaff* newlaststaff, int pindex,
+		                                    int sindex);
 		void transferOtherParts            (GridSlice* oldline, GridSlice* newline, int maxpart);
 		void insertExInterpSides           (HumdrumLine* line, int part,
 		                                    int staff);
@@ -3185,8 +3231,12 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void transferNonDataSlices         (GridMeasure* output, GridMeasure* input);
 		string extractMelody               (GridMeasure* measure);
 		void insertMelodyString            (GridMeasure* measure, const string& melody);
-
+		GridVoice* createVoice             (const string& tok, const string& post, HumNum duration, int pindex, int sindex);
+		HTp createHumdrumToken             (const string& tok, int pindex, int sindex);
 		GridSlice* getNextSpinedLine       (const GridMeasure::iterator& it, int measureindex);
+		void matchVoices                   (GridSlice* current, GridSlice* last);
+		void adjustVoices                  (GridSlice* curr, GridSlice* newmanip, int partsplit);
+		void createMatchedVoiceCount       (GridStaff* snew, GridStaff* sold, int p, int s);
 
 	private:
 		std::vector<GridSlice*>       m_allslices;
@@ -3194,6 +3244,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		std::vector<int>              m_harmonyCount;
 		bool                          m_pickup;
 		std::vector<bool>             m_dynamics;
+		std::vector<bool>             m_figured_bass;
+		std::vector<bool>             m_harmony;
 
 		// options:
 		bool m_recip;               // include **recip spine in output
@@ -3293,6 +3345,7 @@ class MxmlEvent {
 		void               reportMeasureStyleToOwner  (MeasureStyle style);
 		void               reportEditorialAccidentalToOwner(void);
 		void               reportDynamicToOwner       (void);
+		void               reportFiguredBassToOwner   (void);
 		void               reportCaesuraToOwner       (const std::string& letter = "Z") const;
 		void               reportOrnamentToOwner      (void) const;
       void               makeDummyRest      (MxmlMeasure* owner,
@@ -3304,10 +3357,12 @@ class MxmlEvent {
 		void               forceInvisible     (void);
 		bool               isInvisible        (void);
 		void               setBarlineStyle    (xml_node node);
-		void               setTexts           (std::vector<xml_node>& nodes);
-		std::vector<xml_node>&  getTexts           (void);
+		void               setTexts           (std::vector<std::pair<int, xml_node>>& nodes);
+		std::vector<std::pair<int, xml_node>>&  getTexts           (void);
 		void               setDynamics        (xml_node node);
+		void               setFiguredBass     (xml_node node);
 		xml_node           getDynamics        (void);
+		xml_node           getFiguredBass     (void);
 		std::string        getRestPitch       (void) const;
 
 	protected:
@@ -3316,7 +3371,7 @@ class MxmlEvent {
 		measure_event_type m_eventtype;  // enumeration type of event
 		xml_node           m_node;       // pointer to event in XML structure
 		MxmlMeasure*       m_owner;      // measure that contains this event
-		std::vector<MxmlEvent*> m_links;      // list of secondary chord notes
+		std::vector<MxmlEvent*> m_links; // list of secondary chord notes
 		bool               m_linked;     // true if a secondary chord note
 		int                m_sequence;   // ordering of event in XML file
 		static int         m_counter;    // counter for sequence variable
@@ -3329,7 +3384,8 @@ class MxmlEvent {
 		bool               m_stems;      // for preserving stems
 
 		xml_node          m_dynamics;    // dynamics <direction> starting just before note
-		std::vector<xml_node>  m_text;        // text <direction> starting just before note
+		xml_node          m_figured_bass;// fb starting just before note
+		std::vector<std::pair<int, xml_node>>  m_text;   // text <direction> starting just before note
 
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
@@ -3427,6 +3483,7 @@ class MxmlMeasure {
 		void  reportHarmonyCountToOwner           (int count);
 		void  reportEditorialAccidentalToOwner    (void);
 		void  reportDynamicToOwner                (void);
+		void  reportFiguredBassToOwner            (void);
 		void  reportCaesuraToOwner                (const string& letter);
 		void  reportOrnamentToOwner               (void);
 
@@ -4200,10 +4257,10 @@ class Tool_dissonant : public HumTool {
 		void    findYs             (vector<vector<string> >& results,
 		                            NoteGrid& grid,
 		                            vector<NoteCell*>& attacks, int vindex);
-		void	findCadentialVoiceFunctions(vector<vector<string> >& results,
-									NoteGrid& grid,	vector<NoteCell*>& attacks,
-									vector<vector<string> >& voiceFuncs,
-									int vindex);
+		void    findCadentialVoiceFunctions(vector<vector<string> >& results,
+		                            NoteGrid& grid, vector<NoteCell*>& attacks,
+		                            vector<vector<string> >& voiceFuncs,
+		                            int vindex);
 
 		void    printColorLegend   (HumdrumFile& infile);
 		int     getNextPitchAttackIndex(NoteGrid& grid, int voicei,
@@ -4227,14 +4284,21 @@ class Tool_dissonant : public HumTool {
 		void    changeDurationOfNote(HTp note, HumNum dur);
 		void    changePitch        (HTp note2, HTp note1);
 		void    simplePreviousMerge(HTp pnote, HTp cnote);
-		void    simpleNextMerge	   (HTp cnote, HTp nnote);
+		void    simpleNextMerge    (HTp cnote, HTp nnote);
 		void    changePitchOfTieGroupFollowing(HTp note, const string& pitch);
 		void    mergeWithPreviousNoteViaTies(HTp pnote, HTp cnote);
 		void    mergeWithPreviousNote(HumdrumFile& infile, NoteCell* cell);
-		void    mergeWithNextNote(HumdrumFile& infile, NoteCell* cell);
+		void    mergeWithNextNote    (HumdrumFile& infile, NoteCell* cell);
+		void    adjustColorization   (HumdrumFile& infile);
+		void    adjustColorForVoice  (HTp spinestart, vector<string>& labels);
+		void    removeAgentColor     (HTp disslabel, const string& marker, const string& query);
+		void    addLabelToSuspensions(HTp disslabel, const string& marker);
+		bool    isSuspension         (HTp token);
+		void    addSuspensionMarkToNote(HTp start, const string& marks);
+		void    adjustSuspensionColors(HTp speinstart);
 
 	private:
-	 	vector<HTp> m_kernspines;
+		vector<HTp> m_kernspines;
 		bool diss2Q = false;
 		bool diss7Q = false;
 		bool diss4Q = false;
@@ -4273,28 +4337,28 @@ class Tool_dissonant : public HumTool {
 		const int THIRD_Q_PASS_DOWN    = 19; // dissonant third quarter
 		const int THIRD_Q_UPPER_NEI    = 20; // dissonant third quarter
 		const int THIRD_Q_LOWER_NEI    = 21; // dissonant third quarter
-		const int ACC_PASSING_UP	   = 22; // appoggiatura
-		const int ACC_PASSING_DOWN	   = 23; // appoggiatura
-		const int ACC_UP_NEI		   = 24; // appoggiatura
-		const int ACC_LO_NEI		   = 25; // appoggiatura
+		const int ACC_PASSING_UP       = 22; // appoggiatura
+		const int ACC_PASSING_DOWN     = 23; // appoggiatura
+		const int ACC_UP_NEI           = 24; // appoggiatura
+		const int ACC_LO_NEI           = 25; // appoggiatura
 		const int APP_UPPER            = 26; // appoggiatura
 		const int APP_LOWER            = 27; // appoggiatura
-		const int SUS_BIN  	           = 28; // binary suspension
-		const int SUS_TERN  	       = 29; // ternary suspension
-		const int AGENT_BIN		       = 30; // binary agent
-		const int AGENT_TERN		   = 31; // ternary agent
+		const int SUS_BIN              = 28; // binary suspension
+		const int SUS_TERN             = 29; // ternary suspension
+		const int AGENT_BIN            = 30; // binary agent
+		const int AGENT_TERN           = 31; // ternary agent
 		const int SUSPENSION_REP       = 32; // suspension repeated note
 		const int FAKE_SUSPENSION_LEAP = 33; // fake suspension approached by leap
 		const int FAKE_SUSPENSION_STEP = 34; // fake suspension approached by step or anticipation
 		const int SUS_NO_AGENT_LEAP    = 35; // suspension missing a normal agent approached by leap
 		const int SUS_NO_AGENT_STEP    = 36; // suspension missing a normal agent approached by step or anticipation
 		const int CHANSON_IDIOM        = 37; // chanson idiom
-		const int ORNAMENTAL_SUS	   = 38; // purely ornamental suspension
+		const int ORNAMENTAL_SUS       = 38; // purely ornamental suspension
 
 		// unknown dissonances:
 		const int PARALLEL_UP          = 39; // moves in parallel with known dissonant, approached from below
 		const int PARALLEL_DOWN        = 40; // moves in parallel with known dissonant, approached from above
-		const int RES_PITCH			   = 41; // note of resolution of a suspension against suspension dissonance
+		const int RES_PITCH            = 41; // note of resolution of a suspension against suspension dissonance
 
 		const int ONLY_WITH_VALID_UP   = 42; // only dissonant with identifiable dissonances, approached from below
 		const int ONLY_WITH_VALID_DOWN = 43; // only dissonant with identifiable dissonances, approached from above
@@ -4560,6 +4624,21 @@ class Tool_hproof : public HumTool {
 
 
 
+class Tool_humsort : public HumTool {
+	public:
+		         Tool_humsort      (void);
+		        ~Tool_humsort      () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void    processFile        (HumdrumFile& infile);
+
+};
+
+
 class Tool_imitation : public HumTool {
 	public:
 		         Tool_imitation    (void);
@@ -4756,6 +4835,7 @@ class Tool_mei2hum : public HumTool {
 		HumNum parseTuplet          (xml_node note, HumNum starttime);
 		void   parseClef            (xml_node clef, HumNum starttime);
 		void   parseDynam           (xml_node dynam, HumNum starttime);
+		void   parseHarm            (xml_node harm, HumNum starttime);
 		void   parseTempo           (xml_node tempo, HumNum starttime);
 		void   parseDir             (xml_node dir, HumNum starttime);
 		HumNum getDuration          (xml_node element);
@@ -4847,6 +4927,7 @@ class Tool_mei2hum : public HumTool {
 		vector<int>    m_maxverse;
 		vector<HumNum> m_measureDuration;
 		vector<bool>   m_hasDynamics;
+		vector<bool>   m_hasHarm;
 		const int      m_maxstaff = 1000;
 
 		bool           m_fermata = false;     // set priority of note/fermata over note@fermata
@@ -5077,13 +5158,14 @@ class Tool_musicxml2hum : public HumTool {
 		                              HumNum nowtime,
 		                              std::vector<MxmlPart>& partdata);
 		void   addGraceLines         (GridMeasure* outdata,
-		                              std::vector<std::vector<std::vector<std::vector<MxmlEvent*> > > >& notes,
+		                              std::vector<std::vector<std::vector<std::vector<MxmlEvent*>>>>& notes,
 		                              std::vector<MxmlPart>& partdata, HumNum nowtime);
-		void   addEventToList        (std::vector<std::vector<std::vector<std::vector<MxmlEvent*> > > >& list,
+		void   addEventToList        (std::vector<std::vector<std::vector<std::vector<MxmlEvent*>>>>& list,
 		                              MxmlEvent* event);
 		void   addHeaderRecords      (HumdrumFile& outfile, pugi::xml_document& doc);
 		void   addFooterRecords      (HumdrumFile& outfile, pugi::xml_document& doc);
 		std::string& cleanSpaces     (std::string& input);
+		std::string cleanSpacesAndColons(const std::string& input);
 		void setEditorialAccidental  (int accidental, GridSlice* slice,
 		                              int partindex, int staffindex, int voiceindex);
 
@@ -5111,9 +5193,9 @@ class Tool_musicxml2hum : public HumTool {
 		void processPrintElement(GridMeasure* outdata, pugi::xml_node element, HumNum timestamp);
 		void insertOffsetHarmonyIntoMeasure(GridMeasure* gm);
 
-		void addClefLine       (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& clefs,
+		void addClefLine       (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node>>& clefs,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
-		void addOttavaLine     (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& ottavas,
+		void addOttavaLine     (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node>>& ottavas,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartClefs   (pugi::xml_node clef, GridPart& part);
 		void insertPartOttavas (pugi::xml_node ottava, GridPart& part, int partindex, int partstaffindex, int staffcount);
@@ -5121,15 +5203,20 @@ class Tool_musicxml2hum : public HumTool {
 		pugi::xml_node convertOttavaToHumdrum(pugi::xml_node ottava, HTp& token, int& staffindex,
 		                        int partindex, int partstaffindex, int staffcount);
 
-		void addTranspositionLine(GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& transpositions,
+		void addTranspositionLine(GridMeasure* outdata, std::vector<std::vector<pugi::xml_node>>& transpositions,
 		                       std::vector<MxmlPart>& partdata, HumNum nowtime);
-		void addKeySigLine    (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& keysigs,
+		void addKeySigLine    (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node>>& keysigs,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
+		void addKeyDesignationLine(GridMeasure* outdata, vector<vector<xml_node>>& keydesigs, 
+		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartKeySigs (pugi::xml_node keysig, GridPart& part);
+		void insertPartKeyDesignations(xml_node keydeg, GridPart& part);
 		pugi::xml_node convertKeySigToHumdrum(pugi::xml_node keysig,
 		                        HTp& token, int& staffindex);
+		pugi::xml_node convertKeySigToHumdrumKeyDesignation(xml_node keysig,
+		                        HTp& token, int& staffindex);
 
-		void addTimeSigLine    (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& timesigs,
+		void addTimeSigLine    (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node>>& timesigs,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
 		bool insertPartTimeSigs (pugi::xml_node timesig, GridPart& part);
 		void insertPartMensurations(pugi::xml_node timesig, GridPart& part);
@@ -5147,6 +5234,7 @@ class Tool_musicxml2hum : public HumTool {
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
 		int  addHarmony        (GridPart* oart, MxmlEvent* event, HumNum nowtime, int partindex);
 		void addDynamic        (GridPart* part, MxmlEvent* event);
+		void addFiguredBass    (GridPart* part, MxmlEvent* event);
 		void addTexts          (GridSlice* slice, GridMeasure* measure, int partindex,
 		                        int staffindex, int voiceindex, MxmlEvent* event);
 		void addText           (GridSlice* slice, GridMeasure* measure, int partindex,
@@ -5155,6 +5243,9 @@ class Tool_musicxml2hum : public HumTool {
 		std::string getHarmonyString(pugi::xml_node hnode);
 		std::string getDynamicString(pugi::xml_node element);
 		std::string getDynamicsParameters(pugi::xml_node element);
+		std::string getFiguredBassString(pugi::xml_node element);
+		std::string getFiguredBassParameters(pugi::xml_node element);
+		std::string convertFiguredBassNumber(const xml_node& figure);
 		std::string getHairpinString(pugi::xml_node element);
 		std::string cleanSpaces     (const std::string& input);
 		void checkForDummyRests(MxmlMeasure* measure);
@@ -5193,7 +5284,9 @@ class Tool_musicxml2hum : public HumTool {
 		std::string m_systemDecoration;
 
 		pugi::xml_node m_current_dynamic = pugi::xml_node(NULL);
-		std::vector<pugi::xml_node> m_current_text;
+		pugi::xml_node m_current_figured_bass = pugi::xml_node(NULL);
+		std::vector<std::pair<int, pugi::xml_node>> m_current_text;
+
 		bool m_hasTransposition = false;
 
 		// m_forceRecipQ is used to force the display of the **recip spint
@@ -5413,6 +5506,35 @@ class Tool_phrase : public HumTool {
 		bool                      m_remove2Q;
 		bool                      m_averageQ;
 		string                    m_color;
+
+};
+
+
+
+class Tool_pnum : public HumTool {
+	public:
+		      Tool_pnum               (void);
+		     ~Tool_pnum               () {};
+
+		bool  run                      (HumdrumFile& infile);
+		bool  run                      (const string& indata, ostream& out);
+		bool  run                      (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  initialize               (HumdrumFile& infile);
+		void  processFile              (HumdrumFile& infile);
+		std::string convertSubtokenToBase(const std::string& text);
+		void  convertTokenToBase       (HTp token);
+
+	private:
+		int  m_base = 12;
+		int  m_midiQ;
+		bool m_durationQ;
+		bool m_classQ;
+		bool m_octaveQ;
+		bool m_attacksQ;
+		std::string m_rest;
+		bool m_restQ;
 
 };
 
@@ -5638,6 +5760,44 @@ class Tool_slurcheck : public HumTool {
 	private:
 
 };
+
+
+class Tool_spinetrace : public HumTool {
+	public:
+		      Tool_spinetrace          (void);
+		     ~Tool_spinetrace          () {};
+
+		bool  run                      (HumdrumFile& infile);
+		bool  run                      (const string& indata, ostream& out);
+		bool  run                      (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  initialize               (HumdrumFile& infile);
+		void  processFile              (HumdrumFile& infile);
+
+	private:
+
+};
+
+
+
+class Tool_tabber : public HumTool {
+	public:
+		      Tool_tabber              (void);
+		     ~Tool_tabber              () {};
+
+		bool  run                      (HumdrumFile& infile);
+		bool  run                      (const string& indata, ostream& out);
+		bool  run                      (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  initialize               (HumdrumFile& infile);
+		void  processFile              (HumdrumFile& infile);
+
+	private:
+
+};
+
 
 
 class Tool_tassoize : public HumTool {

@@ -398,11 +398,24 @@ FloatingCurvePositioner::FloatingCurvePositioner(FloatingObject *object, StaffAl
     ResetCurveParams();
 }
 
+FloatingCurvePositioner::~FloatingCurvePositioner()
+{
+    ClearSpannedElements();
+}
+
 void FloatingCurvePositioner::ResetPositioner()
 {
     FloatingPositioner::ResetPositioner();
 
     ResetCurveParams();
+}
+
+void FloatingCurvePositioner::ClearSpannedElements()
+{
+    for (auto &spannedElement : m_spannedElements) {
+        delete spannedElement;
+    }
+    m_spannedElements.clear();
 }
 
 void FloatingCurvePositioner::ResetCurveParams()
@@ -415,6 +428,7 @@ void FloatingCurvePositioner::ResetCurveParams()
     m_thickness = 0;
     m_dir = curvature_CURVEDIR_NONE;
     m_cachedMinMaxY = VRV_UNSET;
+    ClearSpannedElements();
 }
 
 void FloatingCurvePositioner::UpdateCurveParams(

@@ -188,7 +188,6 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
     dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph);
-//    dc->DrawMusicText(str, x, y, setBBGlyph);
 
     dc->ResetFont();
     dc->ResetBrush();

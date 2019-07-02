@@ -118,14 +118,22 @@ protected:
 class IsEmptyComparison : public ClassIdComparison {
 
 public:
-    IsEmptyComparison(ClassId ClassId) : ClassIdComparison(ClassId) {}
+    IsEmptyComparison(ClassId ClassId, bool reverse = false) : ClassIdComparison(ClassId) { m_reverse = reverse; }
 
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        if (object->GetChildCount() == 0) return true;
+        if (object->GetChildCount() == 0) {
+            if (!m_reverse) return true;
+        }
+        else {
+            if (m_reverse) return true;
+        }
         return false;
     }
+
+private:
+    bool m_reverse;
 };
 
 //----------------------------------------------------------------------------

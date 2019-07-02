@@ -42,7 +42,9 @@
 #include "unchecked.h"
 
 #ifdef USE_EMSCRIPTEN
-#include "editortoolkit.h"
+#include "editortoolkit_cmn.h"
+#include "editortoolkit_mensural.h"
+#include "editortoolkit_neume.h"
 #endif
 
 namespace vrv {
@@ -74,7 +76,8 @@ Toolkit::Toolkit(bool initFont)
     m_options = m_doc.GetOptions();
 
 #ifdef USE_EMSCRIPTEN
-    m_editorToolkit = new EditorToolkit(&m_doc, &m_view);
+    // Initialize editortoolkit later based on input.
+    m_editorToolkit = NULL;
 #endif
 }
 
@@ -88,6 +91,12 @@ Toolkit::~Toolkit()
         free(m_cString);
         m_cString = NULL;
     }
+#ifdef USE_EMSCRIPTEN
+    if (m_editorToolkit) {
+        delete m_editorToolkit;
+        m_editorToolkit = NULL;
+    }
+#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -240,6 +249,15 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
         if (initial.find("<opus ") != std::string::npos) {
             return musicxmlDefault;
         }
+        if (initial.find("<!DOCTYPE score-partwise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE score-timewise ") != std::string::npos) {
+            return musicxmlDefault;
+        }
+        if (initial.find("<!DOCTYPE opus ") != std::string::npos) {
+            return musicxmlDefault;
+        }
 
         std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
@@ -382,6 +400,9 @@ bool Toolkit::LoadData(const std::string &data)
         MeiOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
+
+        // Read embedded options from input Humdrum file:
+        tempinput->parseEmbeddedOptions(m_doc);
         delete tempinput;
 
         input = new MeiInput(&m_doc, "");
@@ -539,6 +560,23 @@ bool Toolkit::LoadData(const std::string &data)
     delete input;
     m_view.SetDoc(&m_doc);
 
+#ifdef USE_EMSCRIPTEN
+    // Create editor toolkit based on notation type.
+    if (m_editorToolkit != NULL) {
+        delete m_editorToolkit;
+    }
+    switch(m_doc.m_notationType) {
+        case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
+        case NOTATIONTYPE_mensural:
+        case NOTATIONTYPE_mensural_black:
+        case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
+        case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
+        default:
+            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
+            m_editorToolkit = NULL;
+    }
+#endif
+
     return true;
 }
 
@@ -549,7 +587,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
         return "";
     }
 
-    int initialPageNo = (m_doc.GetDrawingPage() == nullptr) ? -1 : m_doc.GetDrawingPage()->GetIdx();
+    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
@@ -729,9 +767,9 @@ bool Toolkit::SetOptions(const std::string &json_options)
     for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
-            if (iter->first == "inputFormat") {
-                if (json.has<jsonxx::String>("inputFormat")) {
-                    SetFormat(json.get<jsonxx::String>("inputFormat"));
+            if (iter->first == "format") {
+                if (json.has<jsonxx::String>("format")) {
+                    SetFormat(json.get<jsonxx::String>("format"));
                 }
             }
             else if (iter->first == "scale") {
@@ -801,6 +839,12 @@ bool Toolkit::SetOptions(const std::string &json_options)
                     else {
                         opt->SetValue("encoded");
                     }
+                }
+            }
+            else if (iter->first == "inputFormat") {
+                LogWarning("Option inputFormat is deprecated; use format instead");
+                if (json.has<jsonxx::String>("inputFormat")) {
+                    SetFormat(json.get<jsonxx::String>("inputFormat"));
                 }
             }
             else if (iter->first == "noLayout") {
@@ -1027,7 +1071,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 {
-    int initialPageNo = (m_doc.GetDrawingPage() == nullptr) ? -1 : m_doc.GetDrawingPage()->GetIdx();
+    int initialPageNo = (m_doc.GetDrawingPage() == NULL) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;

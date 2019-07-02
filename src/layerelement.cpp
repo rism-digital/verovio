@@ -59,8 +59,9 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -68,8 +69,9 @@ LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(),
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement(std::string classid) : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -80,6 +82,7 @@ LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterf
 void LayerElement::Reset()
 {
     Object::Reset();
+    FacsimileInterface::Reset();
     LinkingInterface::Reset();
     ResetLabelled();
     ResetTyped();
@@ -118,6 +121,17 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
         m_beamElementCoord = NULL;
     }
     return *this;
+}
+
+LayerElement *LayerElement::ThisOrSameasAsLink()
+{
+    if (!this->HasSameasLink()) {
+        return this;
+    }
+
+    assert(this->GetSameasLink());
+
+    return dynamic_cast<LayerElement *>(this->GetSameasLink());
 }
 
 bool LayerElement::IsGraceNote()
@@ -168,7 +182,7 @@ bool LayerElement::IsInLigature() const
 
 bool LayerElement::IsInFTrem()
 {
-    if ((!this->Is(NOTE)) || (this->Is(CHORD))) return false;
+    if (!this->Is({ CHORD, NOTE })) return false;
     return (this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
 }
 
@@ -229,6 +243,15 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
+    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingX
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingX();
+        }
+    }
+
     // Since m_xAbs is the left position, we adjust the XRel accordingly in AdjustXRelForTranscription
     if (m_xAbs != VRV_UNSET) return m_xAbs + this->GetDrawingXRel();
 
@@ -267,6 +290,15 @@ int LayerElement::GetDrawingX() const
 
 int LayerElement::GetDrawingY() const
 {
+    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingY
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingY();
+        }
+    }
+
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
@@ -824,7 +856,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     }
     else if (this->Is(CHORD)) {
         // The y position is set to the top note one
-        int loc = PitchInterface::CalcLoc(this, layerY, true);
+        int loc = PitchInterface::CalcLoc(this, layerY, layerElementY, true);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -838,7 +870,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Chord *chord = note->IsChordTone();
         int loc = 0;
         if (note->HasPname()) {
-            loc = PitchInterface::CalcLoc(note, layerY);
+            loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
@@ -924,12 +956,12 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     LayerElement *layerElement = dynamic_cast<LayerElement *>(*rit);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
-                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
                         break;
                     }
                     else if (layerElement->Is(CHORD)) {
-                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
-                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         leftLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
@@ -945,13 +977,12 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     LayerElement *layerElement = dynamic_cast<LayerElement *>(*it);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
-                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY);
-                        break;
+                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
                         break;
                     }
                     else if (layerElement->Is(CHORD)) {
-                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
-                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         rightLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
@@ -1435,6 +1466,16 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
     LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
+    // For mRest we do not look at the time span
+    if (this->Is(MREST)) {
+        // Add the layerN to the list of layer element occuring in this time frame
+        if (std::find(params->m_layers.begin(), params->m_layers.end(), this->GetAlignmentLayerN())
+            == params->m_layers.end()) {
+            params->m_layers.push_back(this->GetAlignmentLayerN());
+        }
+        return FUNCTOR_SIBLINGS;
+    }
+
     if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
 
     double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
@@ -1496,17 +1537,19 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
+    LayerElement *element = this->ThisOrSameasAsLink();
+
     double incrementScoreTime;
 
-    if (this->Is(REST) || this->Is(SPACE)) {
-        incrementScoreTime = this->GetAlignmentDuration(
+    if (element->Is(REST) || element->Is(SPACE)) {
+        incrementScoreTime = element->GetAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
-    else if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
+    else if (element->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(element);
         assert(note);
 
         // For now just ignore grace notes
@@ -1528,13 +1571,19 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
-        // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
+        // note->GetNoteOrChordDur(element), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
-        note->SetScoreTimeOnset(params->m_currentScoreTime);
-        note->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
-        note->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
-        note->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
+        Note *storeNote = note;
+        // When we have a @sameas, do store the onset / offset values of the pointed note in the pointing note
+        if (this != element) {
+            storeNote = dynamic_cast<Note *>(this);
+        }
+        assert(storeNote);
+        storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
+        storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+        storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+        storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
@@ -1542,8 +1591,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
     }
-    else if (this->Is(BEATRPT)) {
-        BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
+    else if (element->Is(BEATRPT)) {
+        BeatRpt *rpt = dynamic_cast<BeatRpt *>(element);
         assert(rpt);
 
         incrementScoreTime = rpt->GetAlignmentDuration(
@@ -1553,11 +1602,44 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
+    else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && this->HasSameasLink()) {
+        incrementScoreTime = this->GetContentAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
+    }
     return FUNCTOR_CONTINUE;
 }
 
 int LayerElement::ResolveMIDITies(FunctorParams *)
 {
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

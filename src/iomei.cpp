@@ -102,6 +102,7 @@
 #include "staffgrp.h"
 #include "subst.h"
 #include "supplied.h"
+#include "surface.h"
 #include "svg.h"
 #include "syl.h"
 #include "syllable.h"
@@ -115,6 +116,7 @@
 #include "unclear.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -738,49 +740,6 @@ void MeiOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
     currentNode.append_attribute("xml:id") = UuidToMeiStr(object).c_str();
 }
 
-void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
-{
-    assert(zone);
-    WriteXmlId(currentNode, zone);
-    zone->WriteCoordinated(currentNode);
-    zone->WriteTyped(currentNode);
-}
-
-void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
-{
-    assert(surface);
-    WriteXmlId(currentNode, surface);
-    surface->WriteCoordinated(currentNode);
-    surface->WriteTyped(currentNode);
-
-    for (Object *child = surface->GetFirst(); child != nullptr; child = surface->GetNext()) {
-        if (child->GetClassId() == ZONE) {
-            pugi::xml_node childNode = currentNode.append_child("zone");
-            WriteZone(childNode, dynamic_cast<Zone *>(child));
-        }
-        else {
-            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
-        }
-    }
-}
-
-void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
-{
-    assert(facsimile);
-    WriteXmlId(currentNode, facsimile);
-
-    // Write Surface(s)
-    for (Object *child = facsimile->GetFirst(); child != nullptr; child = facsimile->GetNext()) {
-        if (child->GetClassId() == SURFACE) {
-            pugi::xml_node childNode = currentNode.append_child("surface");
-            WriteSurface(childNode, dynamic_cast<Surface *>(child));
-        }
-        else {
-            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
-        }
-    }
-}
-
 bool MeiOutput::WriteDoc(Doc *doc)
 {
     assert(doc);
@@ -817,7 +776,7 @@ bool MeiOutput::WriteDoc(Doc *doc)
 
     pugi::xml_node music = m_mei.append_child("music");
     Facsimile *facs = doc->GetFacsimile();
-    if (facs != nullptr && facs->GetChildCount() > 0) {
+    if ((facs != NULL) && (facs->GetChildCount() > 0)) {
         pugi::xml_node facsimile = music.append_child("facsimile");
         WriteFacsimile(facsimile, facs);
         m_nodeStack.push_back(facsimile);
@@ -1702,6 +1661,49 @@ void MeiOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
     syllable->WriteSlashCount(currentNode);
 }
 
+void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
+{
+    assert(facsimile);
+    WriteXmlId(currentNode, facsimile);
+
+    // Write Surface(s)
+    for (Object *child = facsimile->GetFirst(); child != NULL; child = facsimile->GetNext()) {
+        if (child->GetClassId() == SURFACE) {
+            pugi::xml_node childNode = currentNode.append_child("surface");
+            WriteSurface(childNode, dynamic_cast<Surface *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
+        }
+    }
+}
+
+void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
+{
+    assert(surface);
+    WriteXmlId(currentNode, surface);
+    surface->WriteCoordinated(currentNode);
+    surface->WriteTyped(currentNode);
+
+    for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
+        if (child->GetClassId() == ZONE) {
+            pugi::xml_node childNode = currentNode.append_child("zone");
+            WriteZone(childNode, dynamic_cast<Zone *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
+        }
+    }
+}
+
+void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
+{
+    assert(zone);
+    WriteXmlId(currentNode, zone);
+    zone->WriteCoordinated(currentNode);
+    zone->WriteTyped(currentNode);
+}
+
 void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textElement)
 {
     assert(textElement);
@@ -2142,7 +2144,7 @@ bool MeiInput::ImportFile()
     }
 }
 
-bool MeiInput::ImportString(std::string const &mei)
+bool MeiInput::ImportString(const std::string &mei)
 {
     try {
         m_doc->Reset();
@@ -2203,6 +2205,14 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     }
     else if (filterParent->Is(FIG)) {
         if (element == "svg") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (filterParent->Is(FIGURE)) {
+        if (element == "") {
             return true;
         }
         else {
@@ -2513,7 +2523,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     facsimile = music.child("facsimile");
-    if (!facsimile.empty()) {
+    if ((!facsimile.empty()) && (m_doc->GetOptions()->m_useFacsimile.GetValue())) {
         ReadFacsimile(m_doc, facsimile);
         m_doc->SetType(Facs);
         m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
@@ -2594,7 +2604,9 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     if (success && m_doc->GetType() == Facs) {
-        m_doc->SetChildZones();
+        Functor setChildZones(&Object::SetChildZones);
+        SetChildZonesParams setChildZonesParams(m_doc);
+        m_doc->Process(&setChildZones, &setChildZonesParams);
     }
 
     return success;
@@ -3341,6 +3353,8 @@ bool MeiInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     }
 
     ReadScoreDefInterface(staffDef, vrvStaffDef);
+
+    m_doc->m_notationType = vrvStaffDef->GetNotationtype();
 
     parent->AddChild(vrvStaffDef);
     ReadUnsupportedAttr(staffDef, vrvStaffDef);
@@ -4651,7 +4665,7 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
 
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);
-    return ReadTextChildren(vrvF, f);
+    return ReadTextChildren(vrvF, f, vrvF);
 }
 
 bool MeiInput::ReadFig(Object *parent, pugi::xml_node fig)
@@ -5555,6 +5569,11 @@ void MeiInput::UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvSco
             vrvScoreDef->AttKeySigDefaultVis::StrToBoolean(scoreDef.attribute("key.sig.showchange").value()));
         scoreDef.remove_attribute("key.sig.showchange");
     }
+    if (scoreDef.attribute("meter.rend")) {
+        vrvScoreDef->SetMeterForm(vrvScoreDef->AttMeterSigDefaultVis::StrToMeterSigDefaultVisMeterform(
+            scoreDef.attribute("meter.rend").value()));
+        scoreDef.remove_attribute("meter.rend");
+    }
 }
 
 void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef)
@@ -5584,6 +5603,11 @@ void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
         labelAbbr->AddChild(text);
         vrvStaffDef->AddChild(labelAbbr);
         staffDef.remove_attribute("label.abbr");
+    }
+    if (staffDef.attribute("meter.rend")) {
+        vrvStaffDef->SetMeterForm(vrvStaffDef->AttMeterSigDefaultVis::StrToMeterSigDefaultVisMeterform(
+            staffDef.attribute("meter.rend").value()));
+        staffDef.remove_attribute("meter.rend");
     }
 }
 
@@ -5656,7 +5680,7 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
-void MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
+bool MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
 {
     assert(parent);
     Surface *vrvSurface = new Surface();
@@ -5673,9 +5697,10 @@ void MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
         }
     }
     parent->AddChild(vrvSurface);
+    return true;
 }
 
-void MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
+bool MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
 {
     assert(parent);
     Zone *vrvZone = new Zone();
@@ -5683,9 +5708,10 @@ void MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
     vrvZone->ReadCoordinated(zone);
     vrvZone->ReadTyped(zone);
     parent->AddChild(vrvZone);
+    return true;
 }
 
-void MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
+bool MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
 {
     assert(doc);
     Facsimile *vrvFacsimile = new Facsimile();
@@ -5701,6 +5727,7 @@ void MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
         }
     }
     doc->SetFacsimile(vrvFacsimile);
+    return true;
 }
 
 } // namespace vrv

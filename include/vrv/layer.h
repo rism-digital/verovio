@@ -85,6 +85,13 @@ public:
     Clef *GetClef(LayerElement *test);
 
     /**
+     * Get the current clef based on facsimile for the test element.
+     * This goes back by facsimile position until a clef is found.
+     * Returns NULL if a clef cannot be found via this method.
+     */
+     Clef *GetClefFacs(LayerElement *test);
+
+    /**
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */
@@ -199,6 +206,18 @@ public:
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::GenerateTimemap
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int GenerateTimemap(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int ResetDrawing(FunctorParams *);
 
 private:
     //

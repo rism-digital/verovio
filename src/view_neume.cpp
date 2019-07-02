@@ -93,7 +93,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         bool isFirst;
         // Check if this is the first or second part of a ligature
         Object *nextSibling = neume->GetChild(position + 1);
-        if (nextSibling != nullptr) {
+        if (nextSibling != NULL) {
             Nc *nextNc = dynamic_cast<Nc*>(nextSibling);
             assert(nextNc);
             if (nextNc->GetLigated() == BOOLEAN_true) { //first part of the ligature
@@ -145,12 +145,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     int noteY, noteX;
     int yValue;
-    if (nc->HasFacs()) {
+    if (nc->HasFacs() && m_doc->GetType() == Facs) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = nc->GetDrawingX();
         params.at(0).xOffset = 0;
     }
-    else if (neume->HasFacs()) {
+    else if (neume->HasFacs() && m_doc->GetType() == Facs) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = neume->GetDrawingX() + position * noteWidth;
     }

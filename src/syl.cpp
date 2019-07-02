@@ -29,9 +29,8 @@ namespace vrv {
 // Syl
 //----------------------------------------------------------------------------
 
-Syl::Syl() : LayerElement("syl-"), FacsimileInterface(), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
+Syl::Syl() : LayerElement("syl-"), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
 {
-    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_TYPOGRAPHY);
@@ -45,7 +44,6 @@ Syl::~Syl() {}
 void Syl::Reset()
 {
     LayerElement::Reset();
-    FacsimileInterface::Reset();
     TimeSpanningInterface::Reset();
     ResetLang();
     ResetTypography();
@@ -120,26 +118,6 @@ int Syl::CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params)
     }
 
     return nextFreeSpace;
-}
-
-int Syl::GetDrawingX() const
-{
-    if (this->HasFacs()) {
-        return FacsimileInterface::GetDrawingX();
-    }
-    else {
-        return LayerElement::GetDrawingX();
-    }
-}
-
-int Syl::GetDrawingY() const
-{
-    if (this->HasFacs()) {
-        return FacsimileInterface::GetDrawingY();
-    }
-    else {
-        return LayerElement::GetDrawingY();
-    }
 }
 
 int Syl::GetDrawingWidth() const
