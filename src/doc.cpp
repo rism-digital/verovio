@@ -1560,6 +1560,8 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     return FUNCTOR_STOP;
 }
 
+/*
+
 void Doc::SetChildZones() {
     if (this->GetType() != Facs) return;
 
@@ -1644,6 +1646,7 @@ void Doc::SetChildZones() {
         }
     }
 }
+*/
 
 int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
 {
