@@ -4048,7 +4048,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     //if not then add a blank one
     if (strcmp(parentNode.name(), "syllable") == 0) {
         auto testSyl = parent->FindChildByType(SYL);
-        if(testSyl == nullptr && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
+        if(testSyl == NULL && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
             Syl *syl = new Syl();
             Text *text = new Text();
             syl->AddChild(text);
@@ -4524,7 +4524,6 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
 {
     Syl *vrvSyl = new Syl();
     ReadLayerElement(syl, vrvSyl);
-    ReadFacsimileInterface(syl, vrvSyl);
 
     vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
@@ -4551,7 +4550,7 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
         Object *obj = vrvSyllable->FindChildByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
-        if (syl == nullptr && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
+        if (syl == NULL && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
             syl = new Syl();
             Text *text = new Text();
             syl->AddChild(text);

@@ -1580,7 +1580,7 @@ void Doc::SetChildZones() {
             Zone *zone = new Zone();
 
             // if it's syllable parent has position values just use those
-            FacsimileInterface *syllableFi = nullptr;
+            FacsimileInterface *syllableFi = NULL;
             if ((*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
                 syllableFi = (*iter)->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
                 Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
@@ -1594,14 +1594,16 @@ void Doc::SetChildZones() {
             else {
                 ArrayOfObjects children;
                 InterfaceComparison comp(INTERFACE_FACSIMILE);
-                (*iter)->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
+                Syllable *parentSyllable = dynamic_cast<Syllable *>((*iter)->GetFirstParent(SYLLABLE));
+                assert(parentSyllable);
+                parentSyllable->FindAllChildByComparison(&children, &comp);
                 for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
                     FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
                     assert(temp);
                     Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
                     assert(tempzone);
                     if (temp->HasFacs()) {
-                        if (syllableFi == nullptr) {
+                        if (syllableFi == NULL) {
                             zone->SetUlx(tempZone->GetUlx());
                             zone->SetUly(tempZone->GetUly());
                             zone->SetLrx(tempZone->GetLrx());
@@ -1629,15 +1631,15 @@ void Doc::SetChildZones() {
             }
             else {
                 //make the bounding box a little bigger and lower so it's easier to edit
-            zone->SetUly(zone->GetUly() + 100);
-            zone->SetLrx(zone->GetLrx() + 100);
-            zone->SetLry(zone->GetLry() + 200);
+                zone->SetUly(zone->GetUly() + 100);
+                zone->SetLrx(zone->GetLrx() + 100);
+                zone->SetLry(zone->GetLry() + 200);
 
-            m_facsimile->FindChildByType(SURFACE)->AddChild(zone);
-            fi->SetZone(zone);
-            Syl *syl = dynamic_cast<Syl *>(*iter);
-            syl->ResetFacsimile();
-            syl->SetFacs(zone->GetUuid());
+                m_facsimile->FindChildByType(SURFACE)->AddChild(zone);
+                fi->SetZone(zone);
+                Syl *syl = dynamic_cast<Syl *>(*iter);
+                syl->ResetFacsimile();
+                syl->SetFacs(zone->GetUuid());
             }
         }
     }

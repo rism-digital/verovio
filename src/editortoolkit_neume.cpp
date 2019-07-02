@@ -425,7 +425,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         }
         FacsimileInterface *fi = (*syl).GetFacsimileInterface();
         assert(fi);
-        if (fi->GetZone() != nullptr) {
+        if (fi->GetZone() != NULL) {
             fi->GetZone()->ShiftByXY(x, -y);
         }
     }
@@ -1285,7 +1285,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     Zone *zone = new Zone();
 
                     // if it's syllable parent has position values just use those
-                    FacsimileInterface *syllableFi = nullptr;
+                    FacsimileInterface *syllableFi = NULL;
                     if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
                         syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
                         Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
@@ -1303,9 +1303,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
                             assert(temp);
                             Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
-                            assert(tempzone);
+                            assert(tempZone);
                             if (temp->HasFacs()) {
-                                if (syllableFi == nullptr) {
+                                if (syllableFi == NULL) {
                                     zone->SetUlx(tempZone->GetUlx());
                                     zone->SetUly(tempZone->GetUly());
                                     zone->SetLrx(tempZone->GetLrx());
@@ -1389,11 +1389,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::wstring fullString = L"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *> ((*it)->FindChildByType(SYL));
-                if (fullSyl == nullptr && syl != nullptr) {
+                if (fullSyl == NULL && syl != NULL) {
                     fullSyl = syl;
                 }
                 Text *text = dynamic_cast<Text *> (syl->FindChildByType(TEXT));
-                if (text != nullptr) {
+                if (text != NULL) {
                     std::wstring currentString = text->GetText();
                     fullString = fullString + currentString;
                 }
@@ -1402,7 +1402,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             int ulx = -1, uly = -1, lrx = -1, lry = -1;
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *> ((*it)->FindChildByType(SYL)->GetFacsimileInterface());
-                if (facsInter != nullptr) {
+                if (facsInter != NULL) {
                     if (ulx == -1) {
                         ulx = facsInter->GetDrawingX();
                         uly = facsInter->GetDrawingY();
@@ -1602,7 +1602,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     Zone *zone = new Zone();
 
                     // if it's syllable parent has position values just use those
-                    FacsimileInterface *syllableFi = nullptr;
+                    FacsimileInterface *syllableFi = NULL;
                     if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
                         syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
                         Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
@@ -1622,7 +1622,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                             Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
                             assert(tempzone);
                             if (temp->HasFacs()) {
-                                if (syllableFi == nullptr) {
+                                if (syllableFi == NULL) {
                                     zone->SetUlx(tempZone->GetUlx());
                                     zone->SetUly(tempZone->GetUly());
                                     zone->SetLrx(tempZone->GetLrx());
