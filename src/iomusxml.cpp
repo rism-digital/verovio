@@ -935,6 +935,15 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         }
         m_slurStopStack.clear();
     }
+    if (!m_openDashesStack.empty()) { // open dashes without ending
+        std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
+        for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+            LogWarning("MusicXML import: Dashes ending for element '%s' could not be "
+                       "matched to a start element.",
+                iter->first->GetUuid().c_str());
+        }
+        m_openDashesStack.clear();
+    }
 
     return false;
 }
@@ -1339,7 +1348,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         m_dynamStack.push_back(dynam);
     }
 
-    // Dashes (to be connected with previous <dir> or <dynam> as @extender attribute
+    // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
     pugi::xpath_node dashes = type.node().select_node("dashes");
     if (dashes) {
         int dashesNumber = dashes.node().attribute("number").as_int();
@@ -1348,12 +1357,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
         pugi::xpath_node staffNode = node.select_node("staff");
         if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
         if (HasAttributeWithValue(dashes.node(), "type", "stop")) {
-            LogMessage("Dashes stop: %s number=%d, staff=%d, ", measureNum.c_str(), dashesNumber, staffNum);
             std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
             for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
                 int measureDifference = m_measureCounts.at(measure) - iter->second.m_measureCount;
-                LogMessage("Dashes stop: %s number=%d/%d, staff=%d/%d, measureDiff=%d", measureNum.c_str(),
-                    iter->second.m_dirN, dashesNumber, iter->second.m_staffNum, staffNum, measureDifference);
                 if (iter->second.m_dirN == dashesNumber && iter->second.m_staffNum == staffNum) {
                     if (iter->first->Is(DYNAM))
                         dynamic_cast<Dynam *>(iter->first)
@@ -1371,18 +1377,20 @@ void MusicXmlInput::ReadMusicXmlDirection(
             std::vector<std::pair<std::string, ControlElement *> >::reverse_iterator riter;
             for (riter = m_controlElements.rbegin(); riter != m_controlElements.rend(); ++riter) {
                 if (riter->second->Is(DYNAM)) {
-                    Dynam *dynam = dynamic_cast<Dynam * >(riter->second);
+                    Dynam *dynam = dynamic_cast<Dynam *>(riter->second);
                     std::vector<int> staffAttr = dynam->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end() && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())) {
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
+                        && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())) {
                         dynam->SetExtender(BOOLEAN_true);
                         controlElement = dynam;
                         break;
                     }
                 }
                 else if (riter->second->Is(DIR)) {
-                    Dir *dir = dynamic_cast<Dir * >(riter->second);
+                    Dir *dir = dynamic_cast<Dir *>(riter->second);
                     std::vector<int> staffAttr = dir->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end() && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())) {
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
+                        && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())) {
                         dir->SetExtender(BOOLEAN_true);
                         controlElement = dir;
                         break;
@@ -1391,7 +1399,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
             m_openDashesStack.push_back(std::make_pair(controlElement, openDashes));
-            LogMessage("Dashes start: %s number=%d, staff=%d, ", measureNum.c_str(), dashesNumber, staffNum);
         }
     }
 
