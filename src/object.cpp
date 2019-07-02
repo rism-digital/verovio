@@ -38,6 +38,8 @@
 #include "plistinterface.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "syl.h"
+#include "syllable.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
@@ -1626,7 +1628,7 @@ int Object::SetChildZones(FunctorParams *functorParams)
             zone->SetLrx(zone->GetLrx() + 100);
             zone->SetLry(zone->GetLry() + 200);
 
-            m_facsimile->FindChildByType(SURFACE)->AddChild(zone);
+            params->m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
             fi->SetZone(zone);
             Syl *syl = dynamic_cast<Syl *>(this);
             syl->ResetFacsimile();
