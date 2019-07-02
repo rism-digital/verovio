@@ -938,8 +938,8 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     if (!m_openDashesStack.empty()) { // open dashes without ending
         std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
         for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
-            LogWarning("MusicXML import: Dashes/extender lines for '%s' could not be closed.",
-                iter->first->GetUuid().c_str());
+            LogWarning(
+                "MusicXML import: Dashes/extender lines for '%s' could not be closed.", iter->first->GetUuid().c_str());
         }
         m_openDashesStack.clear();
     }
@@ -1379,7 +1379,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     Dynam *dynam = dynamic_cast<Dynam *>(riter->second);
                     std::vector<int> staffAttr = dynam->GetStaff();
                     if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
-                        && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())) {
+                        && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())
+                        && riter->first == measureNum) {
                         dynam->SetExtender(BOOLEAN_true);
                         controlElement = dynam;
                         break;
@@ -1389,15 +1390,22 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     Dir *dir = dynamic_cast<Dir *>(riter->second);
                     std::vector<int> staffAttr = dir->GetStaff();
                     if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
-                        && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())) {
+                        && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())
+                        && riter->first == measureNum) {
                         dir->SetExtender(BOOLEAN_true);
                         controlElement = dir;
                         break;
                     }
                 }
             }
-            musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
-            m_openDashesStack.push_back(std::make_pair(controlElement, openDashes));
+            if (controlElement != nullptr) {
+                musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
+                m_openDashesStack.push_back(std::make_pair(controlElement, openDashes));
+            }
+            else {
+                LogMessage("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
+                    measureNum.c_str());
+            }
         }
     }
 
