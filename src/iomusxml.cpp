@@ -938,8 +938,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     if (!m_openDashesStack.empty()) { // open dashes without ending
         std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
         for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
-            LogWarning("MusicXML import: Dashes ending for element '%s' could not be "
-                       "matched to a start element.",
+            LogWarning("MusicXML import: Dashes/extender lines for '%s' could not be closed.",
                 iter->first->GetUuid().c_str());
         }
         m_openDashesStack.clear();
