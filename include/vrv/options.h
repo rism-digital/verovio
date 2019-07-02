@@ -472,6 +472,8 @@ public:
     OptionBool m_svgViewBox;
     OptionInt m_unit;
     OptionBool m_useFacsimile;
+    OptionBool m_createDefaultSyl;
+    OptionBool m_createDefaultSylBBox;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
 

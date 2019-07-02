@@ -781,12 +781,8 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     textChild.append_attribute("class") = "text";
     textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
 
-    if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
-        textChild.append_attribute("x") = StringFormat("%d", x).c_str();
-        textChild.append_attribute("y") = StringFormat("%d", y).c_str();
-    }
-
-    if ((x != VRV_UNSET) && (y != VRV_UNSET) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
+    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) 
+        && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
         pugi::xml_node g = m_currentNode.parent().parent();
         pugi::xml_node rectChild = g.append_child("rect");
         rectChild.append_attribute("class") = "sylTextRect";
@@ -795,6 +791,11 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         rectChild.append_attribute("width") = StringFormat("%d", width).c_str();
         rectChild.append_attribute("height") = StringFormat("%d", height).c_str();
     }
+    else if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET)) {
+        textChild.append_attribute("x") = StringFormat("%d", x).c_str();
+        textChild.append_attribute("y") = StringFormat("%d", y).c_str();
+    }
+ 
 }
 
 void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)

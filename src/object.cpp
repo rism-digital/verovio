@@ -38,6 +38,8 @@
 #include "plistinterface.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "syl.h"
+#include "syllable.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
@@ -1563,6 +1565,74 @@ int Object::SetChildZones(FunctorParams *functorParams)
                 return FUNCTOR_STOP;
             }
             fi->SetZone(zone);
+        }
+
+        else if (!fi->HasFacs() && this->Is(SYL) && params->m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+            Zone *zone = new Zone();
+
+            // if the syl's syllable parent has facs then use that as the bounding box
+            FacsimileInterface *syllableFi = NULL;
+            if (this->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
+                syllableFi = (this)->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
+                Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
+                zone->SetUlx(tempZone->GetUlx());
+                zone->SetUly(tempZone->GetUly());
+                zone->SetLrx(tempZone->GetLrx());
+                zone->SetLry(tempZone->GetLry());
+            }
+
+            // otherwise get a boundingbox that comprises all the neumes in the syllable
+            else {
+                ArrayOfObjects children;
+                InterfaceComparison comp(INTERFACE_FACSIMILE);
+                Syllable *parentSyllable = dynamic_cast<Syllable *>((this)->GetFirstParent(SYLLABLE));
+                assert(parentSyllable);
+                parentSyllable->FindAllChildByComparison(&children, &comp);
+                for (auto iter = children.begin(); iter != children.end(); ++iter) {
+                    FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter);
+                    assert(temp);
+                    Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
+                    assert(tempzone);
+                    if (temp->HasFacs()) {
+                        if (syllableFi == NULL) {
+                            zone->SetUlx(tempZone->GetUlx());
+                            zone->SetUly(tempZone->GetUly());
+                            zone->SetLrx(tempZone->GetLrx());
+                            zone->SetLry(tempZone->GetLry());
+                        }
+                        else {
+                            if (tempZone->GetUlx() < zone->GetUlx()) {
+                                zone->SetUlx(tempZone->GetUlx());
+                            }
+                            if (tempZone->GetUly() < zone->GetUly()) {
+                                zone->SetUly(tempZone->GetUly());
+                            }
+                            if (tempZone->GetLrx() > zone->GetLrx()) {
+                                zone->SetLrx(tempZone->GetLrx());
+                            }
+                            if (tempZone->GetLry() > zone->GetLry()) {
+                                zone->SetLry(tempZone->GetLry());
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ((zone->GetUlx() == 0) || (zone->GetUly() == 0) || (zone->GetLrx() == 0) || (zone->GetLry() == 0)) {
+                LogWarning("Tried to create default Syl BBox, but its syllable had no neumes with coordinates");
+                return FUNCTOR_STOP;
+            }
+
+            //make the bounding box a little bigger and lower so it's easier to edit
+            zone->SetUly(zone->GetUly() + 100);
+            zone->SetLrx(zone->GetLrx() + 100);
+            zone->SetLry(zone->GetLry() + 200);
+
+            params->m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
+            fi->SetZone(zone);
+            Syl *syl = dynamic_cast<Syl *>(this);
+            syl->ResetFacsimile();
+            syl->SetFacs(zone->GetUuid());
         }
     }
     return FUNCTOR_CONTINUE;

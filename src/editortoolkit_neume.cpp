@@ -225,6 +225,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
     if (!element) {
         element = m_doc->FindChildByUuid(elementId);
     }
+    if (!element) {
+        LogWarning("element is null");
+    }
+    assert(element);
     // Use relative x and y for now on
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
@@ -412,6 +416,18 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         //TODO Reorder by left-to-right, top-to-bottom
 
         return true; // Can't reorder by layer since staves contain layers
+    }
+    else if (element->Is(SYL)) {
+        Syl *syl = dynamic_cast<Syl *>(element);
+        if (!syl->HasFacs()) {
+            LogError("Syl (boundingbox) dragging is only supported for syls with facsimiles!");
+            return false;
+        }
+        FacsimileInterface *fi = (*syl).GetFacsimileInterface();
+        assert(fi);
+        if (fi->GetZone() != NULL) {
+            fi->GetZone()->ShiftByXY(x, -y);
+        }
     }
     else {
         LogWarning("Unsupported element for dragging.");
@@ -1130,6 +1146,22 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             return false;
         }
         Zone *zone = staff->GetZone();
+        assert(zone);
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(lrx);
+        zone->SetLry(lry);
+        zone->Modify();
+    }
+    else if (obj->Is(SYL)) {
+        Syl *syl = dynamic_cast<Syl *>(obj);
+        assert(syl);
+        if (!syl->HasFacs()) {
+            LogError("This syl (bounding box) does not have a facsimile");
+            return false;
+        }
+        Zone *zone = syl->GetZone();
+        assert(zone);
         zone->SetUlx(ulx);
         zone->SetUly(uly);
         zone->SetLrx(lrx);
@@ -1234,16 +1266,86 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
         else if (elementClass == NEUME) {
             parent = new Syllable();
-
-            //make sure to add an empty syl
-            Syl *syl = new Syl();
-            parent->AddChild(syl);
-        }
-        for (auto it = elements.begin(); it != elements.end(); ++it) {
-            if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
-                (*it)->MoveItselfTo(parent);
+            
+            for (auto it = elements.begin(); it != elements.end(); ++it) {
+                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                    (*it)->MoveItselfTo(parent);
+                }
             }
+
+            //make sure to add an empty syl if the option is provided
+            if (m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
+                Syl *syl = new Syl();
+                Text *text = new Text();
+                syl->AddChild(text);
+                parent->AddChild(syl);
+
+                //add a default bounding box if you need to 
+                if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+                    Zone *zone = new Zone();
+
+                    // if it's syllable parent has position values just use those
+                    FacsimileInterface *syllableFi = NULL;
+                    if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
+                        syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
+                        Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
+                        zone->SetUlx(tempZone->GetUlx());
+                        zone->SetUly(tempZone->GetUly());
+                        zone->SetLrx(tempZone->GetLrx());
+                        zone->SetLry(tempZone->GetLry());
+                    }
+                    // otherwise get a boundingbox that comprises all the neumes in the syllable
+                    else {
+                        ArrayOfObjects children;
+                        InterfaceComparison comp(INTERFACE_FACSIMILE);
+                        syl->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
+                        for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
+                            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
+                            assert(temp);
+                            Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
+                            assert(tempZone);
+                            if (temp->HasFacs()) {
+                                if (syllableFi == NULL) {
+                                    zone->SetUlx(tempZone->GetUlx());
+                                    zone->SetUly(tempZone->GetUly());
+                                    zone->SetLrx(tempZone->GetLrx());
+                                    zone->SetLry(tempZone->GetLry());
+                                }
+                                else {
+                                    if (tempZone->GetUlx() < zone->GetUlx()) {
+                                        zone->SetUlx(tempZone->GetUlx());
+                                    }
+                                    if (tempZone->GetUly() < zone->GetUly()) {
+                                        zone->SetUly(tempZone->GetUly());
+                                    }
+                                    if (tempZone->GetLrx() > zone->GetLrx()) {
+                                        zone->SetLrx(tempZone->GetLrx());
+                                    }
+                                    if (tempZone->GetLry() > zone->GetLry()) {
+                                        zone->SetLry(tempZone->GetLry());
+                                    }
+                                }  
+                            }   
+                        }
+                    }
+
+                    //make the bounding box a little bigger and lower so it's easier to edit
+                    zone->SetUly(zone->GetUly() + 100);
+                    zone->SetLrx(zone->GetLrx() + 100);
+                    zone->SetLry(zone->GetLry() + 200);
+
+                    assert(m_doc->GetFacsimile());
+                    m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
+                    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
+                    assert(fi);
+                    fi->SetZone(zone);
+
+                    syl->ResetFacsimile();
+                    syl->SetFacs(zone->GetUuid());
+                }
+            }   
         }
+
         parent->ReorderByXPos();
         doubleParent->AddChild(parent);
 
@@ -1267,6 +1369,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     //if there are more than 1 full parent we need to concat syl's
     //unless we're just grouping NC's in which case no need to worry about syl's of course
+    //also in this case we need to make sure that the facsimile of the resulting syl is correct
     else {
         if (elementClass == NC) {
             parent = new Neume();
@@ -1280,21 +1383,41 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
             Syllable *fullSyllable = new Syllable();
-            Syl *fullSyl = new Syl();
+            Syl *fullSyl;
 
             //construct concatenated string of all the syls
             std::wstring fullString = L"";
-            for(auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                Text *text = dynamic_cast<Text *> ((*it)->FindChildByType(SYL)->FindChildByType(TEXT));
-                if(text != NULL) {
+            for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+                Syl *syl = dynamic_cast<Syl *> ((*it)->FindChildByType(SYL));
+                if (fullSyl == NULL && syl != NULL) {
+                    fullSyl = syl;
+                }
+                Text *text = dynamic_cast<Text *> (syl->FindChildByType(TEXT));
+                if (text != NULL) {
                     std::wstring currentString = text->GetText();
                     fullString = fullString + currentString;
                 }
             }
-
-            Text *text = new Text();
+            //find the new boundingbox comprising all of the text
+            int ulx = -1, uly = -1, lrx = -1, lry = -1;
+            for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
+                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *> ((*it)->FindChildByType(SYL)->GetFacsimileInterface());
+                if (facsInter != NULL) {
+                    if (ulx == -1) {
+                        ulx = facsInter->GetDrawingX();
+                        uly = facsInter->GetDrawingY();
+                        lrx = facsInter->GetWidth() + ulx;
+                        lry = facsInter->GetHeight() + uly;
+                    }
+                    else {
+                        lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
+                        lry = facsInter->GetHeight() + facsInter->GetDrawingY();
+                    }
+                }
+            }
+            Text *text = dynamic_cast<Text *> (fullSyl->FindChildByType(TEXT));
+            assert(text);
             text->SetText(fullString);
-            fullSyl->AddChild(text);
             fullSyllable->AddChild(fullSyl);
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
@@ -1304,6 +1427,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             doubleParent->AddChild(fullSyllable);
             Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
             assert(layer);
+            if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
+                FacsimileInterface *facsInter = dynamic_cast <FacsimileInterface *> (fullSyl->GetFacsimileInterface());
+                assert(facsInter);
+                Zone *zone = dynamic_cast <Zone *> (facsInter->GetZone());
+                assert(zone);
+                assert(ulx >= 0);
+                zone->SetUlx(ulx);
+                assert(uly >= 0);
+                zone->SetUly(uly);
+                assert(lrx >= 0);
+                zone->SetLrx(lrx);
+                assert(lry >= 0);
+                zone->SetLry(lry);
+            }
             layer->ReorderByXPos();
             parent = fullSyllable;
         }
@@ -1337,7 +1474,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     bool firstIsSyl = false;
 
     //Check if you can get drawing page
-    if(!m_doc->GetDrawingPage()) {
+    if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         return false;
     }
@@ -1404,11 +1541,11 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         if (elementIds.begin() == it || firstIsSyl){
             //if the element is a syl we want it to stay attached to the first element
             //we'll still need to initialize all the parents, thus the bool
-            if(el->Is(SYL)) {
+            if (el->Is(SYL)) {
                 firstIsSyl = true;
                 continue;
             }
-            else if(groupType == "nc"){
+            else if (groupType == "nc"){
                 fparent = el->GetFirstParent(NEUME);
                 assert(fparent);
                 m_editInfo = m_editInfo + fparent->GetUuid();
@@ -1418,7 +1555,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 assert(currentParent);
                 firstIsSyl = false;
             }
-            else if(groupType == "neume"){
+            else if (groupType == "neume"){
                 fparent = el->GetFirstParent(SYLLABLE);
                 assert(fparent);
                 m_editInfo = m_editInfo + fparent->GetUuid();
@@ -1444,21 +1581,88 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
             //if the element is a syl then we want to keep it attached to the first node
 
-            if(el->Is(SYL)) {
+            if (el->Is(SYL)) {
                 continue;
             }
             Object *newParent = currentParent->Clone();
             assert(newParent);
             newParent->ClearChildren();
 
-            if(newParent->Is(SYLLABLE)) {
+            el->MoveItselfTo(newParent);
+            fparent->ClearRelinquishedChildren();
+
+            if (newParent->Is(SYLLABLE) && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
                 Syl *syl = new Syl();
+                Text *text = new Text();
+                syl->AddChild(text);
                 newParent->AddChild(syl);
+
+                //add a default bounding box if you need to 
+                if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+                    Zone *zone = new Zone();
+
+                    // if it's syllable parent has position values just use those
+                    FacsimileInterface *syllableFi = NULL;
+                    if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
+                        syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
+                        Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
+                        zone->SetUlx(tempZone->GetUlx());
+                        zone->SetUly(tempZone->GetUly());
+                        zone->SetLrx(tempZone->GetLrx());
+                        zone->SetLry(tempZone->GetLry());
+                    }
+                    // otherwise get a boundingbox that comprises all the neumes in the syllable
+                    else {
+                        ArrayOfObjects children;
+                        InterfaceComparison comp(INTERFACE_FACSIMILE);
+                        syl->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
+                        for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
+                            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
+                            assert(temp);
+                            Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
+                            assert(tempzone);
+                            if (temp->HasFacs()) {
+                                if (syllableFi == NULL) {
+                                    zone->SetUlx(tempZone->GetUlx());
+                                    zone->SetUly(tempZone->GetUly());
+                                    zone->SetLrx(tempZone->GetLrx());
+                                    zone->SetLry(tempZone->GetLry());
+                                }
+                                else {
+                                    if (tempZone->GetUlx() < zone->GetUlx()) {
+                                        zone->SetUlx(tempZone->GetUlx());
+                                    }
+                                    if (tempZone->GetUly() < zone->GetUly()) {
+                                        zone->SetUly(tempZone->GetUly());
+                                    }
+                                    if (tempZone->GetLrx() > zone->GetLrx()) {
+                                        zone->SetLrx(tempZone->GetLrx());
+                                    }
+                                    if (tempZone->GetLry() > zone->GetLry()) {
+                                        zone->SetLry(tempZone->GetLry());
+                                    }
+                                }  
+                            }   
+                        }
+                    }
+
+                    //make the bounding box a little bigger and lower so it's easier to edit
+                    zone->SetUly(zone->GetUly() + 100);
+                    zone->SetLrx(zone->GetLrx() + 100);
+                    zone->SetLry(zone->GetLry() + 200);
+
+                    assert(m_doc->GetFacsimile());
+                    m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
+                    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
+                    assert(fi);
+                    fi->SetZone(zone);
+
+                    syl->ResetFacsimile();
+                    syl->SetFacs(zone->GetUuid());
+                }
             }
             m_editInfo = m_editInfo + " " + newParent->GetUuid();
 
-            el->MoveItselfTo(newParent);
-            fparent->ClearRelinquishedChildren();
             sparent->AddChild(newParent);
             sparent->ReorderByXPos();
         }

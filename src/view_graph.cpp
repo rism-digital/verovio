@@ -259,20 +259,12 @@ void View::DrawLyricString(DeviceContext *dc, TextDrawingParams &params, std::ws
 {
     assert(dc);
 
+    bool hasText = false;
     std::wistringstream iss(s);
     std::wstring token;
     while (std::getline(iss, token, L'_')) {
-        if ((params.m_x != VRV_UNSET) && (params.m_y != VRV_UNSET)) {
-            if ((params.m_width != VRV_UNSET) && (params.m_height != VRV_UNSET)) {
-                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
-            }
-            else {
-                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y);
-            }
-        }
-        else {
-            dc->DrawText(UTF16to8(token), token);
-        }
+        hasText = true;
+        dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
         // no _
         if (iss.eof()) break;
         FontInfo vrvTxt;
@@ -280,18 +272,12 @@ void View::DrawLyricString(DeviceContext *dc, TextDrawingParams &params, std::ws
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
-        if ((params.m_x != VRV_UNSET) && (params.m_y != VRV_UNSET)) {
-            if ((params.m_width != VRV_UNSET) && (params.m_height != VRV_UNSET)) {
-                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
-            }
-            else {
-                dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y);
-            }
-        }
-        else {
-            dc->DrawText(UTF16to8(token), token);
-        }
+        dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
         dc->ResetFont();
+    }
+
+    if (!hasText) {
+        dc->DrawText("", L"", params.m_x, params.m_y, params.m_width, params.m_height);
     }
 }
 

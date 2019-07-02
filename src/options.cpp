@@ -574,6 +574,15 @@ Options::Options()
     m_useFacsimile.Init(false);
     this->Register(&m_useFacsimile, "useFacsimile", &m_general);
 
+    m_createDefaultSyl.SetInfo("Add default syls to syllables", "Add empty syl elements to syllables if it doesn't have one");
+    m_createDefaultSyl.Init(false);
+    this->Register(&m_createDefaultSyl, "createDefaultSyl", &m_general);
+
+    m_createDefaultSylBBox.SetInfo("Make default syl bounding boxes",
+        "When no facsimile data is provided for a syl, make a default element with coordinates similar to that of its syllable");
+    m_createDefaultSylBBox.Init(false);
+    this->Register(&m_createDefaultSylBBox, "createDefaultSylBBox", &m_general);
+
     m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
     m_usePgFooterForAll.Init(false);
     this->Register(&m_usePgFooterForAll, "usePgFooterForAll", &m_general);
