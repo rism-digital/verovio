@@ -1620,7 +1620,7 @@ int Object::SetChildZones(FunctorParams *functorParams)
 
             if ((zone->GetUlx() == 0) || (zone->GetUly() == 0) || (zone->GetLrx() == 0) || (zone->GetLry() == 0)) {
                 LogWarning("Tried to create default Syl BBox, but its syllable had no neumes with coordinates");
-                return FUNCTOR_STOP;
+                return FUNCTOR_CONTINUE;
             }
 
             //make the bounding box a little bigger and lower so it's easier to edit
