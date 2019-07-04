@@ -680,6 +680,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
+        Clef *layerClef = layer->GetCurrentClef();
         layer->AddChild(clef);
         m_editInfo = clef->GetUuid();
         layer->ReorderByXPos();
@@ -706,7 +707,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     break;
                 }
             }
-            if (previousClef != clef) { // if the new clef is the first clef we do nothing
+            if (previousClef == clef) {
+                previousClef = layerClef;
+            }
+            if (previousClef != clef) {
                 // Get difference to shift pitches by
                 int pitchDifference = (previousClef->GetLine() - clefLine) * 2;
                 // Account for clef shape
@@ -1266,7 +1270,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
         else if (elementClass == NEUME) {
             parent = new Syllable();
-            
+
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
                     (*it)->MoveItselfTo(parent);
@@ -1280,7 +1284,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 syl->AddChild(text);
                 parent->AddChild(syl);
 
-                //add a default bounding box if you need to 
+                //add a default bounding box if you need to
                 if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
                     Zone *zone = new Zone();
 
@@ -1324,8 +1328,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                                     if (tempZone->GetLry() > zone->GetLry()) {
                                         zone->SetLry(tempZone->GetLry());
                                     }
-                                }  
-                            }   
+                                }
+                            }
                         }
                     }
 
@@ -1343,7 +1347,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     syl->ResetFacsimile();
                     syl->SetFacs(zone->GetUuid());
                 }
-            }   
+            }
         }
 
         parent->ReorderByXPos();
@@ -1597,7 +1601,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 syl->AddChild(text);
                 newParent->AddChild(syl);
 
-                //add a default bounding box if you need to 
+                //add a default bounding box if you need to
                 if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
                     Zone *zone = new Zone();
 
@@ -1641,8 +1645,8 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                                     if (tempZone->GetLry() > zone->GetLry()) {
                                         zone->SetLry(tempZone->GetLry());
                                     }
-                                }  
-                            }   
+                                }
+                            }
                         }
                     }
 
