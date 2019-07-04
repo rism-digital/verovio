@@ -45,7 +45,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
 
 BBoxDeviceContext::~BBoxDeviceContext() {}
 
-void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
+void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend)
 {
     // add the object object
     object->BoundingBox::ResetBoundingBox();

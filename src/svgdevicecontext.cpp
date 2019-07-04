@@ -47,6 +47,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_vrvTextFont = false;
 
     m_mmOutput = false;
+    m_svgBoundingBoxes = false;
     m_svgViewBox = false;
     m_facsimile = false;
 
@@ -150,7 +151,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     m_committed = true;
 }
 
-void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
+void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend)
 {
     std::string baseClass = object->GetClassName();
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
@@ -166,7 +167,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
-    m_currentNode = m_currentNode.append_child("g");
+    m_currentNode = (prepend) ? m_currentNode.prepend_child("g") : m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
     if (gId.length() > 0) {
@@ -340,9 +341,9 @@ void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 
 void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
+    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
-    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndCustomGraphic()
@@ -355,14 +356,13 @@ void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
-    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
 {
+    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
-    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::RotateGraphic(Point const &orig, double angle)
@@ -385,6 +385,8 @@ void SvgDeviceContext::StartPage()
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.append_child(pugi::node_pcdata)
             .set_value("g.page-margin{font-family:Times;} "
+                       //"g.bounding-box{stroke:red; stroke-width:10} "
+                       //"g.content-bounding-box{stroke:blue; stroke-width:10} "
                        "g.tempo{font-weight:bold;} g.dir, g.dynam, "
                        "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
@@ -655,13 +657,6 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("height") = height;
     rectChild.append_attribute("width") = width;
     if (radius != 0) rectChild.append_attribute("rx") = radius;
-    // for empty rectangles with bounding boxes
-    /*
-    rectChild.append_attribute("fill-opacity") = "0.0";
-    rectChild.append_attribute("stroke-opacity") = "1.0";
-    rectChild.append_attribute("stroke-width") = "10";
-    rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
-    */
 }
 
 void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
@@ -866,11 +861,37 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
 
     return m_outdata.str();
 }
+    
+void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int height)
+{
+    std::string s;
+    
+    // negative heights or widths are not allowed in SVG
+    if (height < 0) {
+        height = -height;
+        y -= height;
+    }
+    if (width < 0) {
+        width = -width;
+        x -= width;
+    }
+    
+    pugi::xml_node rectChild = AppendChild("rect");
+    rectChild.append_attribute("x") = x;
+    rectChild.append_attribute("y") = y;
+    rectChild.append_attribute("height") = height;
+    rectChild.append_attribute("width") = width;
+    
+    rectChild.append_attribute("fill") = "transparent";
+}
 
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
-    bool drawBoundingBox = false;
-    if (drawBoundingBox && view) {
+    bool groupInPage = false;
+    bool drawAnchors = false;
+    bool drawContentBB = false;
+    
+    if (m_svgBoundingBoxes && view) {
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
         if (object->IsFloatingObject()) {
@@ -882,13 +903,16 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             if (!box) return;
         }
 
-        SetPen(AxRED, 10, AxDOT_DASH);
-        // SetBrush(AxWHITE, AxTRANSPARENT);
+        
         pugi::xml_node currentNode = m_currentNode;
-        m_currentNode = m_pageNode;
-        StartGraphic(object, "self-bounding-box", "bbox-" + object->GetUuid());
+        if (groupInPage) {
+            m_currentNode = m_pageNode;
+        }
+        
+        StartGraphic(object, "bounding-box", "bbox-" + object->GetUuid(), true);
+        
         if (box->HasSelfBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
+            this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
                 view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
                 view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX2())
                     - view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
@@ -896,64 +920,62 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     - view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()));
         }
 
-        SetPen(AxBLACK, 1, AxSOLID);
-        SetBrush(AxBLACK, AxSOLID);
+        if (drawAnchors) {
+            std::vector<SMuFLGlyphAnchor> anchors = { SMUFL_cutOutNE, SMUFL_cutOutNW, SMUFL_cutOutSE, SMUFL_cutOutSW };
+            std::vector<SMuFLGlyphAnchor>::iterator iter;
 
-        std::vector<SMuFLGlyphAnchor> anchors = { SMUFL_cutOutNE, SMUFL_cutOutNW, SMUFL_cutOutSE, SMUFL_cutOutSW };
-        std::vector<SMuFLGlyphAnchor>::iterator iter;
+            for (iter = anchors.begin(); iter != anchors.end(); ++iter) {
+                if (object->GetBoundingBoxGlyph() != 0) {
+                    Glyph *glyph = Resources::GetGlyph(object->GetBoundingBoxGlyph());
+                    assert(glyph);
 
-        for (iter = anchors.begin(); iter != anchors.end(); ++iter) {
-            if (object->GetBoundingBoxGlyph() != 0) {
-                Glyph *glyph = Resources::GetGlyph(object->GetBoundingBoxGlyph());
-                assert(glyph);
+                    if (glyph->HasAnchor(*iter)) {
+                        const Point *fontPoint = glyph->GetAnchor(*iter);
+                        assert(fontPoint);
+                        Point p;
+                        int x, y, w, h;
+                        glyph->GetBoundingBox(x, y, w, h);
+                        int smuflGlyphFontSize = object->GetBoundingBoxGlyphFontSize();
 
-                if (glyph->HasAnchor(*iter)) {
-                    const Point *fontPoint = glyph->GetAnchor(*iter);
-                    assert(fontPoint);
-                    Point p;
-                    int x, y, w, h;
-                    glyph->GetBoundingBox(x, y, w, h);
-                    int smuflGlyphFontSize = object->GetBoundingBoxGlyphFontSize();
+                        p.x = object->GetSelfLeft() - x * smuflGlyphFontSize / glyph->GetUnitsPerEm();
+                        p.x += (fontPoint->x * smuflGlyphFontSize / glyph->GetUnitsPerEm());
+                        p.y = object->GetSelfBottom() - y * smuflGlyphFontSize / glyph->GetUnitsPerEm();
+                        p.y += (fontPoint->y * smuflGlyphFontSize / glyph->GetUnitsPerEm());
 
-                    p.x = object->GetSelfLeft() - x * smuflGlyphFontSize / glyph->GetUnitsPerEm();
-                    p.x += (fontPoint->x * smuflGlyphFontSize / glyph->GetUnitsPerEm());
-                    p.y = object->GetSelfBottom() - y * smuflGlyphFontSize / glyph->GetUnitsPerEm();
-                    p.y += (fontPoint->y * smuflGlyphFontSize / glyph->GetUnitsPerEm());
-
-                    SetPen(AxGREEN, 10, AxSOLID);
-                    SetBrush(AxGREEN, AxSOLID);
-                    this->DrawCircle(view->ToDeviceContextX(p.x), view->ToDeviceContextY(p.y), 5);
-                    SetPen(AxBLACK, 1, AxSOLID);
-                    SetBrush(AxBLACK, AxSOLID);
+                        SetPen(AxGREEN, 10, AxSOLID);
+                        SetBrush(AxGREEN, AxSOLID);
+                        this->DrawCircle(view->ToDeviceContextX(p.x), view->ToDeviceContextY(p.y), 5);
+                        SetPen(AxBLACK, 1, AxSOLID);
+                        SetBrush(AxBLACK, AxSOLID);
+                    }
                 }
             }
         }
 
         EndGraphic(object, NULL);
 
-        m_currentNode = m_pageNode;
-
-        // Rend *rend = dynamic_cast<Rend *>(object);
-        // if (rend && rend->HasHalign()) {
-        if (object->IsTextElement()) {
-
-            SetPen(AxBLUE, 20, AxDOT_DASH);
-            StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid());
-            if (object->HasContentBB()) {
-                this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
-                    view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
-                        - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
-                        - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
-            }
-            EndGraphic(object, NULL);
+        if (groupInPage) {
+            m_currentNode = m_pageNode;
         }
 
-        m_currentNode = currentNode;
+        if (drawContentBB) {
+            if (object->HasContentBB()) {
+                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid(), true);
+                if (object->HasContentBB()) {
+                    this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                        view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
+                        view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
+                            - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                        view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
+                            - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
+                }
+                EndGraphic(object, NULL);
+            }
+        }
 
-        SetPen(AxBLACK, 1, AxSOLID);
-        SetBrush(AxBLACK, AxSOLID);
+        if (groupInPage) {
+            m_currentNode = currentNode;
+        }
     }
 }
 

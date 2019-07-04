@@ -1085,6 +1085,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     }
 
     // set the option to use viewbox on svg root
+    if (m_options->m_svgBoundingBoxes.GetValue()) {
+        svg.SetSvgBoundingBoxes(true);
+    }
+
     if (m_options->m_svgViewBox.GetValue()) {
         svg.SetSvgViewBox(true);
     }

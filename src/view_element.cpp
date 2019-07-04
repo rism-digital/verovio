@@ -1325,7 +1325,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Do not draw virtual (e.g., whole note) stems
     if (stem->IsVirtual()) return;
 
-    dc->StartGraphic(element, "", "");
+    dc->StartGraphic(element, "", element->GetUuid());
 
     DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
