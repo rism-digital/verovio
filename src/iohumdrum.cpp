@@ -4438,9 +4438,7 @@ std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
         switch (digit) {
             case 0: output += L"\uEA50"; break; // draw without slash
             case 1: output += L"\uEA51"; break; // draw without slash
-            case 2:
-                output += L"\uEA53";
-                break;
+            case 2: output += L"\uEA53"; break;
             case 3: output += L"\uEA54"; break; // draw without slash
             case 4: output += L"\uEA56"; break; // only one style of slash
             case 5:
@@ -7630,6 +7628,15 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         forceAboveQ = true;
     }
 
+    int justification = 0;
+    if (token->getLayoutParameter("DY", "rj") == "true") {
+        justification = 1;
+    }
+
+    std::string dcolor = token->getLayoutParameter("DY", "color");
+
+    bool needsrend = justification || dcolor.size();
+
     // Handle "z" for sforzando (sf), or "zz" for sfz:
 
     bool aboveQ = false;
@@ -7681,12 +7688,36 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         Dynam *dynam = new Dynam;
         m_measure->AddChild(dynam);
         setStaff(dynam, m_currentstaff + belowadj);
-        if (token->find("zz") != string::npos) {
-            addTextElement(dynam, "sfz");
+
+        if (needsrend) {
+            Rend *rend = new Rend;
+            dynam->AddChild(rend);
+            rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+            data_FONTSIZE fs;
+            fs.SetTerm(FONTSIZETERM_large);
+            rend->SetFontsize(fs);
+            if (token->find("zz") != string::npos) {
+                addTextElement(rend, "sfz&#160;");
+            }
+            else {
+                addTextElement(rend, "sf&#160;");
+            }
+            if (!dcolor.empty()) {
+                rend->SetColor(dcolor);
+            }
+            if (justification == 1) {
+                rend->SetHalign(HORIZONTALALIGNMENT_right);
+            }
         }
         else {
-            addTextElement(dynam, "sf");
+            if (token->find("zz") != string::npos) {
+                addTextElement(dynam, "sfz");
+            }
+            else {
+                addTextElement(dynam, "sf");
+            }
         }
+
         setLocationId(dynam, token, -1);
         hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
         dynam->SetTstamp(barstamp.getFloat());
@@ -7834,14 +7865,42 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             // string postfix = " bbb";
             // See https://github.com/music-encoding/music-encoding/issues/540
 
+            int justification = 0;
+            if (line->token(i)->getLayoutParameter("DY", "rj") == "true") {
+                justification = 1;
+            }
+
+            std::string dcolor = line->token(i)->getLayoutParameter("DY", "color");
+            int needsrend = justification || dcolor.size();
+
             Dynam *dynam = new Dynam;
             m_measure->AddChild(dynam);
             setStaff(dynam, m_currentstaff + belowadj);
             setLocationId(dynam, line->token(i), -1);
 
-            // addTextElement(dynam, prefix);
-            addTextElement(dynam, dynamic);
-            // addTextElement(dynam, postfix);
+            if (needsrend) {
+                Rend *rend = new Rend;
+                dynam->AddChild(rend);
+                rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+                data_FONTSIZE fs;
+                fs.SetTerm(FONTSIZETERM_large);
+                rend->SetFontsize(fs);
+                // addTextElement(rend, prefix);
+                std::string newtext = dynamic + "&#160;";
+                addTextElement(rend, newtext);
+                // addTextElement(rend, postfix);
+                if (!dcolor.empty()) {
+                    rend->SetColor(dcolor);
+                }
+                if (justification == 1) {
+                    rend->SetHalign(HORIZONTALALIGNMENT_right);
+                }
+            }
+            else {
+                // addTextElement(dynam, prefix);
+                addTextElement(dynam, dynamic);
+                // addTextElement(dynam, postfix);
+            }
 
             hum::HumNum linedur = line->getDuration();
             if (linedur == 0) {
