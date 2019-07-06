@@ -560,7 +560,7 @@ bool Toolkit::LoadData(const std::string &data)
     delete input;
     m_view.SetDoc(&m_doc);
 
-#ifdef USE_EMSCRIPTEN
+#if defined USE_EMSCRIPTEN && defined NO_HUMDRUM_SUPPORT
     // Create editor toolkit based on notation type.
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
@@ -572,8 +572,8 @@ bool Toolkit::LoadData(const std::string &data)
         case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
         case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
         default:
-            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
             m_editorToolkit = NULL;
+            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
     }
 #endif
 
