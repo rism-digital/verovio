@@ -1624,9 +1624,13 @@ int Object::SetChildZones(FunctorParams *functorParams)
             }
 
             //make the bounding box a little bigger and lower so it's easier to edit
-            zone->SetUly(zone->GetUly() + 100);
-            zone->SetLrx(zone->GetLrx() + 100);
-            zone->SetLry(zone->GetLry() + 200);
+            int offSetUly = 100;
+            int offSetLrx = 100;
+            int offSetLry = 200;
+
+            zone->SetUly(zone->GetUly() + offSetUly);
+            zone->SetLrx(zone->GetLrx() + offSetLrx);
+            zone->SetLry(zone->GetLry() + offSetLry);
 
             params->m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
             fi->SetZone(zone);
