@@ -530,6 +530,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         std::string contour = "";
         nc->SetZone(zone);
         nc->SetFacs(zone->GetUuid());
+
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         surface->AddChild(zone);
         zone->SetUlx(ulx);
@@ -538,6 +539,23 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         syllable->AddChild(neume);
         syllable->AddChild(syl);
         layer->AddChild(syllable);
+
+        // add syl bounding box if the option is true
+        if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+            FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(syl->GetFacsimileInterface());
+            assert(fi);
+            Text *text = new Text();
+            syl->AddChild(text);
+            Zone *sylZone = new Zone();
+            sylZone->SetUlx(ulx + 150);
+            sylZone->SetUly(uly + 50);
+            sylZone->SetLrx(ulx + 350);
+            sylZone->SetLry(uly + 250);
+            surface->AddChild(sylZone);
+            fi->SetZone(sylZone);
+            syl->SetFacs(zone->GetUuid());
+
+        }
 
         // Find closest valid clef
         Clef *clef = NULL;
