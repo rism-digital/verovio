@@ -547,10 +547,17 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             Text *text = new Text();
             syl->AddChild(text);
             Zone *sylZone = new Zone();
-            sylZone->SetUlx(ulx + 150);
-            sylZone->SetUly(uly + 50);
-            sylZone->SetLrx(ulx + 350);
-            sylZone->SetLry(uly + 250);
+
+            // these constants are just to improve visibility of the default boundingbox
+            int offSetUlx = 150;
+            int offSetUly = 50;
+            int offSetLrx = 350;
+            int offSetLry = 250;
+
+            sylZone->SetUlx(ulx + offSetUlx);
+            sylZone->SetUly(uly + offSetUly);
+            sylZone->SetLrx(ulx + offSetLrx);
+            sylZone->SetLry(uly + offSetLry);
             surface->AddChild(sylZone);
             fi->SetZone(sylZone);
             syl->SetFacs(zone->GetUuid());
@@ -1352,9 +1359,13 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     }
 
                     //make the bounding box a little bigger and lower so it's easier to edit
-                    zone->SetUly(zone->GetUly() + 100);
-                    zone->SetLrx(zone->GetLrx() + 100);
-                    zone->SetLry(zone->GetLry() + 200);
+                    int offSetUly = 100;
+                    int offSetLrx = 100;
+                    int offSetLry = 200;
+
+                    zone->SetUly(zone->GetUly() + offSetUly);
+                    zone->SetLrx(zone->GetLrx() + offSetLrx);
+                    zone->SetLry(zone->GetLry() + offSetLry);
 
                     assert(m_doc->GetFacsimile());
                     m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
