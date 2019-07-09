@@ -560,7 +560,7 @@ bool Toolkit::LoadData(const std::string &data)
     delete input;
     m_view.SetDoc(&m_doc);
 
-#ifdef USE_EMSCRIPTEN
+#if defined USE_EMSCRIPTEN && defined NO_HUMDRUM_SUPPORT
     // Create editor toolkit based on notation type.
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
