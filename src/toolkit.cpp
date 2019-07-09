@@ -572,8 +572,7 @@ bool Toolkit::LoadData(const std::string &data)
         case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
         case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
         default:
-            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
-            m_editorToolkit = NULL;
+             m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
     }
 #endif
 
