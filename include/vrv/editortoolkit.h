@@ -30,7 +30,6 @@ public:
     EditorToolkit(Doc *doc, View *view) { m_doc = doc; m_view = view; m_editInfo = ""; }
     virtual ~EditorToolkit() {}
 
-#ifdef USE_EMSCRIPTEN
     /**
      * In child classes, this parses the provided editor action and then performs the correct action.
      */
@@ -39,8 +38,6 @@ public:
      * Get information on the last editor function used
      */
     std::string EditInfo() { return m_editInfo; }
-
-#endif
 
 protected:
     Doc *m_doc;

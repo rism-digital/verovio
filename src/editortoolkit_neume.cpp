@@ -37,7 +37,6 @@
 
 namespace vrv {
 
-#ifdef USE_EMSCRIPTEN
 bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction, bool isChain)
 {
     jsonxx::Object json;
@@ -1863,6 +1862,4 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
     return true;
 }
 
-#endif
-// USE_EMSCRIPTEN
 }// namespace vrv

@@ -29,9 +29,20 @@ namespace vrv {
 class EditorToolkitCMN : public EditorToolkit {
 public:
     EditorToolkitCMN(Doc * doc, View *view) : EditorToolkit(doc, view) {}
-#ifdef USE_EMSCRIPTEN
     bool ParseEditorAction(const std::string &json_editorAction, bool isChain=false);
 
+protected:
+
+    /**
+     * Parse JSON instructions for experimental editor functions.
+     */
+    ///@{
+    bool Chain(jsonxx::Array actions);
+    bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
+    bool ParseInsertAction(jsonxx::Object param, std::string &elementType, std::string &startId, std::string &endId);
+    bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attrType, std::string &attrValue);
+    ///@}
+    
     /**
      * Experimental editor functions.
      */
@@ -40,20 +51,11 @@ public:
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
-#endif
-
+    
+public:
+    //
 protected:
-
-#ifdef USE_EMSCRIPTEN
-    /**
-     * Parse JSON instructions for experimental editor functions.
-     */
-    ///@{
-    bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
-    bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
-    bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
-    ///@}
-#endif
+    std::string m_chainedId;
 };
 } // namespace vrv
 
