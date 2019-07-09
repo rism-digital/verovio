@@ -465,28 +465,43 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         comp.x = ulx;
         comp.y = uly;
 
-        std::sort(staves.begin(), staves.end(), comp);
-        staff = dynamic_cast<Staff *>(staves.at(0));
+        if (staves.size() > 0) {
+            std::sort(staves.begin(), staves.end(), comp);
+            staff = dynamic_cast<Staff *>(staves.at(0));
+        }
+        else {
+            staff = NULL;
+        }
     }
     else {
         staff = dynamic_cast<Staff *>(m_doc->FindChildByUuid(staffId));
     }
 
-    assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    assert(layer);
     Facsimile *facsimile = m_doc->GetFacsimile();
     Zone *zone = new Zone();
 
 
     if (elementType == "staff") {
-        Object *parent = staff->GetParent();
-        assert(parent);
-        int n = parent->GetChildCount() + 1;
-        Staff *newStaff = new Staff(n);
-        newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
-        newStaff->m_drawingNotationType = staff->m_drawingNotationType;
-        newStaff->m_drawingLines = staff->m_drawingLines;
+        Object *parent;
+        Staff *newStaff;
+        // Use closest existing staff (if there is one)
+        if (staff) {
+            parent = staff->GetParent();
+            assert(parent);
+            int n = parent->GetChildCount() + 1;
+            newStaff = new Staff(n);
+            newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
+            newStaff->m_drawingNotationType = staff->m_drawingNotationType;
+            newStaff->m_drawingLines = staff->m_drawingLines;
+        }
+        else {
+            parent = m_doc->GetDrawingPage()->FindChildByType(MEASURE);
+            assert(parent);
+            newStaff = new Staff(1);
+            newStaff->m_drawingStaffDef = dynamic_cast<StaffDef *>(m_doc->m_scoreDef.FindChildByType(STAFFDEF));
+            newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
+            newStaff->m_drawingLines = 4;
+        }
         newStaff->m_drawingStaffSize = (uly - lry) / (newStaff->m_drawingLines - 1);
         zone->SetUlx(ulx);
         zone->SetUly(uly);
@@ -518,9 +533,18 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
         LogMessage("Failed to insert newStaff into staff");
         parent->AddChild(newStaff);
+        parent->Modify();
         m_editInfo = newStaff->GetUuid();
         return true;
     }
+
+    if (staff == NULL) {
+        LogError("A staff must exist in the page to add a non-staff element.");
+        delete zone;
+        return false;
+    }
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    assert(layer);
 
     if (elementType == "nc" || elementType == "grouping") {
         Syllable *syllable = new Syllable();
