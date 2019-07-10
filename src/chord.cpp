@@ -620,6 +620,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     }
     else {
         currentStem->Reset();
+        currentFlag = NULL;
     }
     currentStem->AttGraced::operator=(*this);
     currentStem->AttStems::operator=(*this);

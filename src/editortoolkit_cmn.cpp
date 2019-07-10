@@ -152,7 +152,6 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
 
     // Try to get the element on the current drawing page
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
-
     // If it wasn't there, try on the whole doc
     if (!element) {
         element = m_doc->FindChildByUuid(elementId);
@@ -160,6 +159,7 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
     if (!element) {
         return false;
     }
+    
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
@@ -234,7 +234,17 @@ bool EditorToolkitCMN::Set(std::string elementId, std::string attrType, std::str
     }
     
     if (!m_doc->GetDrawingPage()) return false;
+    
+    // Try to get the element on the current drawing page
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    // If it wasn't there, try on the whole doc
+    if (!element) {
+        element = m_doc->FindChildByUuid(elementId);
+    }
+    if (!element) {
+        return false;
+    }
+    
     bool success = false;
     if (Att::SetAnalytical(element, attrType, attrValue))
         success = true;
