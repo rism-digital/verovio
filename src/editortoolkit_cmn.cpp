@@ -46,12 +46,22 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         return false;
     }
 
-    if (!json.has<jsonxx::String>("action") ||
-            (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param"))) {
+    
+    if (!json.has<jsonxx::String>("action")) {
         LogWarning("Incorrectly formatted JSON action.");
     }
-
+    
     std::string action = json.get<jsonxx::String>("action");
+    
+    // Action without parameter
+    if (action == "commit") {
+        m_doc->PrepareDrawing();
+        return true;
+    }
+    
+    if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
+        LogWarning("Incorrectly formatted JSON param.");
+    }
 
     if (action == "chain") {
         if (!json.has<jsonxx::Array>("param")) {
@@ -60,6 +70,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         }
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
+
     else if (action == "drag") {
         std::string elementId;
         int x,y;
@@ -217,7 +228,6 @@ bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std:
     measure->AddChild(element);
     interface->SetStartid(startid);
     interface->SetEndid(endid);
-    m_doc->PrepareDrawing();
     
     this->m_chainedId = element->GetUuid();
     
@@ -275,8 +285,6 @@ bool EditorToolkitCMN::Set(std::string elementId, std::string attrType, std::str
     else if (Att::SetVisual(element, attrType, attrValue))
         success = true;
     if (success) {
-        m_doc->PrepareDrawing();
-        //m_doc->GetDrawingPage()->LayOut(true);
         return true;
     }
     return false;

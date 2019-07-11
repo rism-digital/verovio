@@ -189,6 +189,11 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
 int FTrem::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    
+    this->m_drawingParams.Reset();
+    
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
     return FUNCTOR_CONTINUE;

@@ -618,10 +618,6 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         currentStem = new Stem();
         this->AddChild(currentStem);
     }
-    else {
-        currentStem->Reset();
-        currentFlag = NULL;
-    }
     currentStem->AttGraced::operator=(*this);
     currentStem->AttStems::operator=(*this);
     currentStem->AttStemsCmn::operator=(*this);
@@ -700,6 +696,9 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 
 int Chord::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
     return FUNCTOR_CONTINUE;
