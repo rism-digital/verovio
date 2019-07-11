@@ -166,8 +166,13 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
             baseClass.append(" " + att->GetType());
         }
     }
-
-    m_currentNode = (prepend) ? m_currentNode.prepend_child("g") : m_currentNode = m_currentNode.append_child("g");
+    
+    if (prepend) {
+        m_currentNode = m_currentNode.prepend_child("g");
+    }
+    else {
+        m_currentNode =  m_currentNode.append_child("g");
+    }
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
     if (gId.length() > 0) {
