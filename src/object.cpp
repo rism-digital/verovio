@@ -1592,7 +1592,7 @@ int Object::SetChildZones(FunctorParams *functorParams)
                     FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter);
                     assert(temp);
                     Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
-                    assert(tempzone);
+                    assert(tempZone);
                     if (temp->HasFacs()) {
                         if (syllableFi == NULL) {
                             zone->SetUlx(tempZone->GetUlx());
