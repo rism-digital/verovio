@@ -29,6 +29,7 @@ FILES="$SRCFILES \
  ../../libmei/atts_critapp.cpp \
  ../../libmei/atts_gestural.cpp \
  ../../libmei/atts_externalsymbols.cpp \
+ ../../libmei/atts_facsimile.cpp \
  ../../libmei/atts_mei.cpp \
  ../../libmei/atts_mensural.cpp \
  ../../libmei/atts_midi.cpp \
