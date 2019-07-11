@@ -1135,7 +1135,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(obj);
     bool result, isNeume;
-    isNeume = (obj->Is(NC) || obj->Is(NEUME) || obj->Is(SYLLABLE));
+    isNeume = (obj->Is(NC) || obj->Is(NEUME));
     Object *parent = obj->GetParent();
     assert(parent);
     m_editInfo = elementId;
