@@ -1863,9 +1863,6 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         zone->SetLrx(ligLrx + noteWidth);
         zone->SetLry(ligLry + noteHeight);
 
-        Zone *origZoneUuid = secondNc->GetZone();
-        surface->DeleteChild(origZoneUuid);
-
         secondNc->SetZone(zone);
         secondNc->ResetFacsimile();
         secondNc->SetFacs(zone->GetUuid());
@@ -1880,9 +1877,6 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         zone->SetUly(firstNc->GetZone()->GetUly());
         zone->SetLrx(firstNc->GetZone()->GetLrx());
         zone->SetLry(firstNc->GetZone()->GetLry());
-
-        Zone *origZoneUuid = secondNc->GetZone();
-        surface->DeleteChild(origZoneUuid);
 
         secondNc->SetZone(zone);
         secondNc->ResetFacsimile();
