@@ -9,7 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
-#include <limits>
+#include <limits.h>
 #include <locale>
 #include <codecvt>
 #include <set>
