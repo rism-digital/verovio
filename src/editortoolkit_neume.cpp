@@ -9,6 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include <limits>
 #include <locale>
 #include <codecvt>
 #include <set>
@@ -178,7 +179,7 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
     std::string info = "[";
     bool runReorder = false;
     std::string id = "";
-    for (int i = 0; i < actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); i++) {
         if (!actions.has<jsonxx::Object>(i)) {
             LogError("Action %d was not an object", i);
             return false;
@@ -490,7 +491,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         staves.push_back(newStaff);
         StaffSort staffSort;
         std::stable_sort(staves.begin(), staves.end(), staffSort);
-        for (int i = 0; i < staves.size(); i++) {
+        for (int i = 0; i < (int)staves.size(); i++) {
             if (staves.at(i) == newStaff) {
                 newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
@@ -1709,7 +1710,7 @@ bool EditorToolkitNeume::ParseMergeAction(
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
     return true;
@@ -1817,7 +1818,7 @@ bool EditorToolkitNeume::ParseGroupAction(
     (*groupType) = param.get<jsonxx::String>("groupType");
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
 
@@ -1831,7 +1832,7 @@ bool EditorToolkitNeume::ParseUngroupAction(
     (*groupType) = param.get<jsonxx::String>("groupType");
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
 
@@ -1853,7 +1854,7 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
 {
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
     if(!param.has<jsonxx::String>("isLigature")) return false;

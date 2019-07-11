@@ -143,7 +143,7 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
 {
     bool status = true;
     m_chainedId = "";
-    for (int i = 0; i < actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); i++) {
         if (status) status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
         m_editInfo = m_chainedId;
     }
