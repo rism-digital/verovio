@@ -1330,8 +1330,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
     m_editInfo = "";
-    Object *fparent, *sparent, *currentParent;
-    Nc *firstNc, *secondNc;
+    Object *fparent = NULL;
+    Object *sparent = NULL;
+    Object *currentParent = NULL;
+    Nc *firstNc = NULL;
+    Nc *secondNc = NULL;
     bool success1, success2;
     int ligCount = 0;
     bool firstIsSyl = false;
@@ -1479,7 +1482,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         LogError("Unable to find neume with id %s", elementId.c_str());
         return false;
     }
-    Nc *firstChild, *prevNc;
+    Nc *firstChild = NULL;
+    Nc *prevNc = NULL;
 
     //Get children of neume. Keep the first child and delete the others.
     ClassIdComparison ac(NC);
