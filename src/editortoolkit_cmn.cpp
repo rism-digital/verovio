@@ -79,17 +79,26 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         }
         LogWarning("Could not parse the drag action");
     }
+    else if (action == "keyDown") {
+        std::string elementId;
+        int key;
+        bool shiftKey, ctrlKey;
+        if (this->ParseKeyDownAction(json.get<jsonxx::Object>("param"), elementId, key, shiftKey, ctrlKey)) {
+            return this->KeyDown(elementId, key, shiftKey, ctrlKey);
+        }
+        LogWarning("Could not parse the keyDown action");
+    }
     else if (action == "insert") {
-        std::string elementType, startId, endId;
-        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startId, endId)) {
-            return this->Insert(elementType, startId, endId);
+        std::string elementType, startid, endid;
+        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startid, endid)) {
+            return this->Insert(elementType, startid, endid);
         }
         LogWarning("Could not parse the insert action");
     }
     else if (action == "set") {
-        std::string elementId, attrType, attrValue;
-        if (this->ParseSetAction(json.get<jsonxx::Object>("param"), elementId, attrType, attrValue)) {
-            return this->Set(elementId, attrType, attrValue);
+        std::string elementId, attribute, value;
+        if (this->ParseSetAction(json.get<jsonxx::Object>("param"), elementId, attribute, value)) {
+            return this->Set(elementId, attribute, value);
         }
         LogWarning("Could not parse the set action");
     }
@@ -126,16 +135,37 @@ bool EditorToolkitCMN::ParseInsertAction(
     }
     return true;
 }
-
+    
+bool EditorToolkitCMN::ParseKeyDownAction(
+    jsonxx::Object param, std::string &elementId, int &key, bool &shiftKey, bool &ctrlKey)
+{
+    // assign optional member
+    shiftKey = false;
+    ctrlKey = false;
+    
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::Number>("key")) return false;
+    key = param.get<jsonxx::Number>("key");
+    // optional
+    if (param.has<jsonxx::Boolean>("shiftKey")) {
+        shiftKey = param.get<jsonxx::Boolean>("shiftKey");
+    }
+    if (param.has<jsonxx::Boolean>("ctrlKey")) {
+        ctrlKey = param.get<jsonxx::Boolean>("ctrlKey");
+    }
+    return true;
+}
+    
 bool EditorToolkitCMN::ParseSetAction(
-    jsonxx::Object param, std::string &elementId, std::string &attrType, std::string &attrValue)
+    jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::String>("attrType")) return false;
-    attrType = param.get<jsonxx::String>("attrType");
-    if (!param.has<jsonxx::String>("attrValue")) return false;
-    attrValue = param.get<jsonxx::String>("attrValue");
+    if (!param.has<jsonxx::String>("attribute")) return false;
+    attribute = param.get<jsonxx::String>("attribute");
+    if (!param.has<jsonxx::String>("value")) return false;
+    value = param.get<jsonxx::String>("value");
     return true;
 }
     
@@ -152,24 +182,8 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
 
 bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
 {
-    if (elementId == CHAINED_ID) {
-        elementId = this->m_chainedId;
-    }
-    else {
-        this->m_chainedId = elementId;
-    }
-    
-    if (!m_doc->GetDrawingPage()) return false;
-
-    // Try to get the element on the current drawing page
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
-    // If it wasn't there, try on the whole doc
-    if (!element) {
-        element = m_doc->FindChildByUuid(elementId);
-    }
-    if (!element) {
-        return false;
-    }
+    Object *element = this->GetElement(elementId);
+    if (!element) return false;
     
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
@@ -185,11 +199,32 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
     }
     return false;
 }
+    
+bool EditorToolkitCMN::KeyDown(std::string elementId, int key, bool shiftKey, bool ctrlKey)
+{
+    Object *element = this->GetElement(elementId);
+    if (!element) return false;
+    
+    // For elements whose y-position corresponds to a certain pitch
+    if (element->HasInterface(INTERFACE_PITCH)) {
+        PitchInterface *interface = element->GetPitchInterface();
+        assert(interface);
+        int step;
+        switch (key) {
+            case KEY_UP: step = 1; break;
+            case KEY_DOWN: step = -1; break;
+            default: step = 0;
+        }
+        interface->AdjustPitchByOffset(step);
+        return true;
+    }
+    return false;
+}
 
 bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std::string endid)
 {
-    LogMessage("Insert!");
     if (!m_doc->GetDrawingPage()) return false;
+    
     Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
     Object *end = m_doc->GetDrawingPage()->FindChildByUuid(endid);
     // Check if both start and end elements exist
@@ -234,7 +269,47 @@ bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std:
     return true;
 }
 
-bool EditorToolkitCMN::Set(std::string elementId, std::string attrType, std::string attrValue)
+bool EditorToolkitCMN::Set(std::string elementId, std::string attribute, std::string value)
+{
+    Object *element = this->GetElement(elementId);
+    if (!element) return false;
+
+    bool success = false;
+    if (Att::SetAnalytical(element, attribute, value))
+        success = true;
+    else if (Att::SetCmn(element, attribute, value))
+        success = true;
+    else if (Att::SetCmnornaments(element, attribute, value))
+        success = true;
+    else if (Att::SetCritapp(element, attribute, value))
+        success = true;
+    else if (Att::SetExternalsymbols(element, attribute, value))
+        success = true;
+    else if (Att::SetFacsimile(element, attribute, value))
+        success = true;
+    else if (Att::SetGestural(element, attribute, value))
+        success = true;
+    else if (Att::SetMei(element, attribute, value))
+        success = true;
+    else if (Att::SetMensural(element, attribute, value))
+        success = true;
+    else if (Att::SetMidi(element, attribute, value))
+        success = true;
+    else if (Att::SetNeumes(element, attribute, value))
+        success = true;
+    else if (Att::SetPagebased(element, attribute, value))
+        success = true;
+    else if (Att::SetShared(element, attribute, value))
+        success = true;
+    else if (Att::SetVisual(element, attribute, value))
+        success = true;
+    if (success) {
+        return true;
+    }
+    return false;
+}
+    
+Object *EditorToolkitCMN::GetElement(std::string &elementId)
 {
     if (elementId == CHAINED_ID) {
         elementId = this->m_chainedId;
@@ -243,7 +318,7 @@ bool EditorToolkitCMN::Set(std::string elementId, std::string attrType, std::str
         this->m_chainedId = elementId;
     }
     
-    if (!m_doc->GetDrawingPage()) return false;
+    if (!m_doc->GetDrawingPage()) return NULL;
     
     // Try to get the element on the current drawing page
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
@@ -251,43 +326,7 @@ bool EditorToolkitCMN::Set(std::string elementId, std::string attrType, std::str
     if (!element) {
         element = m_doc->FindChildByUuid(elementId);
     }
-    if (!element) {
-        return false;
-    }
-    
-    bool success = false;
-    if (Att::SetAnalytical(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetCmn(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetCmnornaments(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetCritapp(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetExternalsymbols(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetFacsimile(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetGestural(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetMei(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetMensural(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetMidi(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetNeumes(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetPagebased(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetShared(element, attrType, attrValue))
-        success = true;
-    else if (Att::SetVisual(element, attrType, attrValue))
-        success = true;
-    if (success) {
-        return true;
-    }
-    return false;
+    return element;
 }
 
 }// namespace vrv

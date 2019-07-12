@@ -39,8 +39,9 @@ protected:
     ///@{
     bool Chain(jsonxx::Array actions);
     bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
-    bool ParseInsertAction(jsonxx::Object param, std::string &elementType, std::string &startId, std::string &endId);
-    bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attrType, std::string &attrValue);
+    bool ParseKeyDownAction(jsonxx::Object param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
+    bool ParseInsertAction(jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid);
+    bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
     ///@}
     
     /**
@@ -48,9 +49,12 @@ protected:
      */
     ///@{
     bool Drag(std::string elementId, int x, int y);
-    bool Insert(std::string elementType, std::string startId, std::string endId);
-    bool Set(std::string elementId, std::string attrType, std::string attrValue);
+    bool KeyDown(std::string elementId, int key, bool shiftKey, bool ctrlKey);
+    bool Insert(std::string elementType, std::string startid, std::string endid);
+    bool Set(std::string elementId, std::string attribute, std::string value);
     ///@}
+    
+    Object *GetElement(std::string &elementId);
     
 public:
     //
