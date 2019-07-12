@@ -23,7 +23,7 @@
                         <measure n="1">
                             <staff n="1">
                                 <layer>
-                                    <note pname="c" dur="4" oct="5"></note>
+                                    <note pname="c" dur="8" oct="5"></note>
                                 </layer>
                             </staff>
                         </measure>
