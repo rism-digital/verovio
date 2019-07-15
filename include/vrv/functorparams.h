@@ -1768,6 +1768,32 @@ public:
     Doc *m_doc;
 };
 
+//----------------------------------------------------------------------------
+// FindNextOfTypeParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the attComparison text
+ * member 1: the matching object
+ * member 2: the start object range
+ * member 3: the end object range
+ */
+
+class FindNextOfTypeParams : public FunctorParams {
+public:
+    FindNextOfTypeParams(Comparison *comparison, Object *start, Object *end)
+    {
+        m_comparison = comparison;
+        m_element = NULL;
+        m_start = start;
+        m_end = end;
+    }
+    Comparison *m_comparison
+    Object *m_element;
+    Object *m_start;
+    Object *m_end;
+};
+
 } // namespace vrv
 
 #endif

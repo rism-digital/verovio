@@ -364,12 +364,15 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         int clefLine = round((double) y / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
         clef->SetLine(clefLine);
 
-        if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
+        // when moving a clef up or down to a new staff line:
+        // the notes associated with that clef will have to change pitch values in order to stay in the same position
+        if (initialClefLine != clefLine) {  
             int lineDiff = clefLine - initialClefLine;
             ArrayOfObjects objects;
             InterfaceComparison ic(INTERFACE_PITCH);
 
             Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
+            LogMessage(nextClef->GetUuid().c_str());
             m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
                     (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
@@ -1134,8 +1137,9 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(obj);
-    bool result, isNeume;
+    bool result, isNeume, isClef;
     isNeume = (obj->Is(NC) || obj->Is(NEUME));
+    isClef = obj->Is(CLEF);
     Object *parent = obj->GetParent();
     assert(parent);
     m_editInfo = elementId;
@@ -1171,6 +1175,48 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             }
             result &= parent->DeleteChild(obj);
         }
+    }
+    else if (isClef && result) {
+
+        // y position of pitched elements (like neumes) is determined by their pitches
+        // so when deleting a clef, the position on a page that a pitch value is associated with could change
+        // so we need to change the pitch value of any elements whose clef is going to change
+        LogMessage("starting isClef branch");
+        Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+        assert(clef);
+        Object *nClef = (m_doc->GetDrawingPage()->GetNext(clef, CLEF));
+        Object *pClef = (m_doc->GetDrawingPage()->GetPrevious(clef, CLEF));
+        LogMessage("%s, %s, %s", clef->GetUuid().c_str(), nClef->GetUuid().c_str(), pClef->GetUuid().c_str());
+        Clef *nextClef = dynamic_cast<Clef *>(nClef);
+        Clef *previousClef = dynamic_cast<Clef *>(pClef);
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+        assert(layer);
+        if (previousClef == NULL) {
+            LogMessage("previousclef == null");
+            // if there is no previous clef, get the default one from the staff def
+            previousClef = layer->GetCurrentClef();
+        }
+        if (clef->GetLine() != previousClef->GetLine() || clef->GetShape() != previousClef->GetShape()) {
+            LogMessage("previous not null");
+            int lineDiff = previousClef->PitchDistanceTo(clef);
+            ArrayOfObjects clefChanging;
+            InterfaceComparison ic(INTERFACE_PITCH);
+
+            LogMessage("about to populate clefChanging");
+            m_doc->GetDrawingPage()->FindAllChildBetween(&clefChanging, &ic, 
+                (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast(), clef);
+
+            for (auto it = clefChanging.begin(); it != clefChanging.end(); ++it) {
+                LogMessage("clefchanging loop: %s", (*it)->GetUuid().c_str());
+                Object *child = dynamic_cast<Object *>(*it);
+                if (child == NULL || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
+                PitchInterface *pi = child->GetPitchInterface();
+                assert(pi);
+                pi->AdjustPitchByOffset(2 * lineDiff); // One line -> 2 pitches
+            }
+        }
+
+
     }
     return result;
 }

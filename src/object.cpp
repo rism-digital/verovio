@@ -1642,4 +1642,32 @@ int Object::SetChildZones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::FindNextOfType(FunctorParams *functorparams) 
+{
+    FindAllBetweenParams *params = dynamic_cast<FindAllBetweenParams *>(functorparams);
+    assert(params);
+
+    // we are reaching the start of the range
+    if (params->m_start == this) {
+        // setting m_start to be null tells us that we're in the range
+        params->m_start = NULL;
+    }
+
+    else if (params->m_start) {
+        //we're not yet in the range
+        return FUNCTOR_CONTINUE;
+    }
+
+    if ((*params->m_comparison)(this)) {
+        params->m_element = this;
+        return FUNCTOR_STOP;
+    }
+
+    if (params->m_end == this) {
+        return FUNCTOR_STOP;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
