@@ -413,7 +413,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
             (*it)->ShiftByXY(x, -y);
         }
 
-        //TODO Reorder by left-to-right, top-to-bottom
+        staff->GetParent()->StableSort(StaffSort());
 
         return true; // Can't reorder by layer since staves contain layers
     }
