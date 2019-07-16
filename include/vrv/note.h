@@ -14,6 +14,7 @@
 
 #include "accid.h"
 #include "atts_mensural.h"
+#include "atts_midi.h"
 #include "atts_shared.h"
 #include "beam.h"
 #include "chord.h"
@@ -47,6 +48,7 @@ class Note : public LayerElement,
              public AttColoration,
              public AttCue,
              public AttGraced,
+             public AttMidiVelocity,
              public AttNoteAnlMensural,
              public AttStems,
              public AttStemsCmn,
