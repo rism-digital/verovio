@@ -1529,7 +1529,12 @@ bool Object::sortByUlx(Object *a, Object *b)
     }
 
     if (fa == NULL || fb == NULL) {
-        LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
+        if (fa == NULL) {
+            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
+        }
+        if (fb == NULL) {
+            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
+        }
         return false;
     }
 
