@@ -1134,8 +1134,9 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(obj);
-    bool result, isNeume;
-    isNeume = (obj->Is(NC) || obj->Is(NEUME));
+    bool result, isNeumeOrNc, isNc;
+    isNeumeOrNc = (obj->Is(NC) || obj->Is(NEUME));
+    isNc = obj->Is(NC);
     Object *parent = obj->GetParent();
     assert(parent);
     m_editInfo = elementId;
@@ -1154,25 +1155,34 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         }
     }
     result = parent->DeleteChild(obj);
-    if (isNeume && result) {
-        if (!parent->Is(SYLLABLE)) {
-            parent = parent->GetFirstParent(SYLLABLE);
-            if (parent == NULL) {
-                LogMessage("Failed to get syllable parent of %s", elementId.c_str());
-                return false;
+    if (!result) {
+        LogError("Failed to delete the desired element (%s)", elementId.c_str());
+    }
+    // Check if this leaves any containers empty and delete them
+    if (isNc && result) {
+        assert(parent->Is(NEUME));
+        obj = parent;
+        parent = parent->GetParent();
+        if (obj->FindChildByType(NC) == NULL) {
+            // Delete the empty neume
+            std::string neumeId = obj->GetUuid();
+            result &= parent->DeleteChild(obj);
+            if (!result) {
+                LogError("Failed to delete empty neume (%s)", neumeId.c_str());
             }
         }
+    }
+    if (isNeumeOrNc && result) {
         assert(parent->Is(SYLLABLE));
-        if (parent->FindChildByType(NC) == NULL) {
-            obj = parent;
-            parent = parent->GetParent();
-            if (parent == NULL) { LogMessage("Null parent!"); return false; }
-            // Remove Zone for element (if any)
-            fi = dynamic_cast<FacsimileInterface *>(obj);
-            if (fi != NULL && fi->HasFacs()) {
-                fi->SetZone(NULL);
-            }
+        obj = parent;
+        parent = parent->GetParent();
+        if (obj->FindChildByType(NC) == NULL) {
+            // Delete the syllable empty of neumes
+            std::string syllableId = obj->GetUuid();
             result &= parent->DeleteChild(obj);
+            if (!result) {
+                LogError("Failed to delete empty syllable (%s)", syllableId.c_str());
+            }
         }
     }
     return result;
