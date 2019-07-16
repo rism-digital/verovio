@@ -799,6 +799,14 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
+void Object::FindNextChildOfType(Object *object, Comparison *comp, Object *start, Object *end)
+{
+    assert(objects);
+    Functor findNextOfType(&Object::FindNextOfType);
+    FindNextOfTypeParams findNextOfTypeParams(object, comparison, start, end);
+    this->Process(&findNextOfType, &findAllBetween);
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -1644,7 +1652,7 @@ int Object::SetChildZones(FunctorParams *functorParams)
 
 int Object::FindNextOfType(FunctorParams *functorparams) 
 {
-    FindAllBetweenParams *params = dynamic_cast<FindAllBetweenParams *>(functorparams);
+    FindNextOfTypeParams *params = dynamic_cast<FindNextOfTypeParams *>(functorparams);
     assert(params);
 
     // we are reaching the start of the range
