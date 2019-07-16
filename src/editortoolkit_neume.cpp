@@ -1680,7 +1680,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
                             assert(temp);
                             Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
-                            assert(tempzone);
+                            assert(tempZone);
                             if (temp->HasFacs()) {
                                 if (syllableFi == NULL) {
                                     zone->SetUlx(tempZone->GetUlx());
