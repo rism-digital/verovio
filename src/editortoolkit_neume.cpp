@@ -732,7 +732,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
-        Clef *layerClef = layer->GetCurrentClef();
         layer->AddChild(clef);
         m_editInfo = clef->GetUuid();
         layer->ReorderByXPos();
@@ -748,20 +747,14 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             previousClef = layer->GetCurrentClef();
         }
 
-        LogMessage(previousClef->GetUuid().c_str());
-        LogMessage(nextClef->GetUuid().c_str());
-
         // adjust pitched elements whose clef is changing
         ArrayOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
-
-        LogMessage("about to populate elements");
 
         m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, 
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
-            LogMessage((*it)->GetUuid().c_str());
             PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
             pi->AdjustPitchForNewClef(previousClef, clef);
@@ -1135,6 +1128,36 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             fi->SetZone(NULL);
         }
     }
+    if (isClef) {
+        // y position of pitched elements (like neumes) is determined by their pitches
+        // so when deleting a clef, the position on a page that a pitch value is associated with could change
+        // so we need to change the pitch value of any elements whose clef is going to change
+        Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+        assert(clef);
+        ClassIdComparison ac(CLEF);
+        Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
+        Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
+
+        if (previousClef == NULL) {
+            // if there is no previous clef, get the default one from the staff def
+            Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+            previousClef = layer->GetCurrentClef();
+        }
+
+        ArrayOfObjects elements;
+        InterfaceComparison ic(INTERFACE_PITCH);
+
+        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, 
+            (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
+
+        for (auto it = elements.begin(); it != elements.end(); ++it) {
+            PitchInterface *pi = (*it)->GetPitchInterface();
+            assert(pi);
+            // removing the current clef, and so the new clef for all of these elements is previousClef
+            pi->AdjustPitchForNewClef(clef, previousClef);
+        }
+
+    }
     result = parent->DeleteChild(obj);
     if (isNeume && result) {
         if (!parent->Is(SYLLABLE)) {
@@ -1154,48 +1177,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             result &= parent->DeleteChild(obj);
         }
     }
-    else if (isClef && result) {
-
-        // y position of pitched elements (like neumes) is determined by their pitches
-        // so when deleting a clef, the position on a page that a pitch value is associated with could change
-        // so we need to change the pitch value of any elements whose clef is going to change
-        LogMessage("starting isClef branch");
-        Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
-        assert(clef);
-        Object *nClef = (m_doc->GetDrawingPage()->GetNext(clef, CLEF));
-        Object *pClef = (m_doc->GetDrawingPage()->GetPrevious(clef, CLEF));
-        LogMessage("%s, %s, %s", clef->GetUuid().c_str(), nClef->GetUuid().c_str(), pClef->GetUuid().c_str());
-        Clef *nextClef = dynamic_cast<Clef *>(nClef);
-        Clef *previousClef = dynamic_cast<Clef *>(pClef);
-        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
-        assert(layer);
-        if (previousClef == NULL) {
-            LogMessage("previousclef == null");
-            // if there is no previous clef, get the default one from the staff def
-            previousClef = layer->GetCurrentClef();
-        }
-        if (clef->GetLine() != previousClef->GetLine() || clef->GetShape() != previousClef->GetShape()) {
-            LogMessage("previous not null");
-            int lineDiff = previousClef->PitchDistanceTo(clef);
-            ArrayOfObjects clefChanging;
-            InterfaceComparison ic(INTERFACE_PITCH);
-
-            LogMessage("about to populate clefChanging");
-            m_doc->GetDrawingPage()->FindAllChildBetween(&clefChanging, &ic, 
-                (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast(), clef);
-
-            for (auto it = clefChanging.begin(); it != clefChanging.end(); ++it) {
-                LogMessage("clefchanging loop: %s", (*it)->GetUuid().c_str());
-                Object *child = dynamic_cast<Object *>(*it);
-                if (child == NULL || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
-                PitchInterface *pi = child->GetPitchInterface();
-                assert(pi);
-                pi->AdjustPitchByOffset(2 * lineDiff); // One line -> 2 pitches
-            }
-        }
-
-
-    }
+    
     return result;
 }
 
