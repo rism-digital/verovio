@@ -799,18 +799,18 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
-void Object::FindNextChildOfType(Comparison *comp, Object *start)
+Object *Object::FindNextChildOfType(Comparison *comp, Object *start)
 {
     Functor findNextOfType(&Object::FindNextOfType);
-    FindByTypeParams params(comparison, start);
+    FindByTypeParams params(comp, start);
     this->Process(&findNextOfType, &params);
     return params.m_element;
 }
 
-void Object::FindPreviousChildOfType(Comparison *comp, Object *start)
+Object *Object::FindPreviousChildOfType(Comparison *comp, Object *start)
 {
     Functor findPreviousOfType(&Object::FindPreviousOfType);
-    FindByTypeParams params(comparison, start);
+    FindByTypeParams params(comp, start);
     this->Process(&findPreviousOfType, &params);
     return params.m_element;
 }
@@ -1682,8 +1682,10 @@ int Object::FindNextOfType(FunctorParams *functorparams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindPreviousOfType(FunctorParams *params)
+int Object::FindPreviousOfType(FunctorParams *functorparams)
 {
+    FindByTypeParams *params = dynamic_cast<FindByTypeParams *>(functorparams);
+    assert(params);
     // this guy works by going from the start and replacing the return element with every nearer element
     // until you get to the 'start' element 
     if (params->m_start == this) {

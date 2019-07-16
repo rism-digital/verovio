@@ -1787,7 +1787,7 @@ public:
         m_element = NULL;
         m_start = start;
     }
-    Comparison *m_comparison
+    Comparison *m_comparison;
     Object *m_element;
     Object *m_start;
 };

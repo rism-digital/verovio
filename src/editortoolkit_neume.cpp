@@ -740,8 +740,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         // ensure pitched elements associated with this clef keep their x,y positions
 
         ClassIdComparison ac(CLEF);
-        Clef *previousClef = m_doc->GetDrawingPage()->FindPreviousChildByType(&ac, &clef);
-        Clef *nextClef = m_doc->GetDrawingPage()->FindNextChildByType(&ac, &clef);
+        Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
+        Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
 
         if (previousClef == NULL) {
             // if there is no previous clef, get the default one from the staff def
@@ -752,18 +752,14 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         ArrayOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        m_doc->GetDrawingPage()->FindAllChildrenBetween(&elements, &ic, &clef, 
-            (nextClef != NULL) ? &NextClef : m_doc->GetDrawingPage()->GetLast());
+        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, 
+            ((nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast()));
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
             PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
-            pi->AdjustPitchForNewClef(&previousClef, &clef);
+            pi->AdjustPitchForNewClef(previousClef, clef);
         }
-
-
-
-
     }
     else if (elementType == "custos") {
         Custos *custos = new Custos();

@@ -466,9 +466,9 @@ public:
 
     virtual void ReorderByXPos();
 
-    virtual void FindNextChildOfType();
+    Object *FindNextChildOfType(Comparison *comp, Object *start);
 
-    virtual void FindPreviousChildOfType();
+    Object *FindPreviousChildOfType(Comparison *comp, Object *start);
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -1086,7 +1086,7 @@ public:
 
     static bool sortByUlx(Object *a, Object *b);
 
-    virtual int FindNextOfType(Functorparams *);
+    virtual int FindNextOfType(FunctorParams *);
 
     virtual int FindPreviousOfType(FunctorParams *);
 
