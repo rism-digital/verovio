@@ -239,6 +239,12 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         }
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
+        ClassIdComparison ac(CLEF);
+        Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, element));
+        if (clef == NULL) {
+            clef = layer->GetCurrentClef();
+        }
+
         // Calculate pitch difference based on y difference
         int pitchDifference = round( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
@@ -263,6 +269,16 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
                 zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
             }
         }
+
+        Layer *clone = layer->Clone();
+        clone->ReorderByXPos();
+        Clef *newClef = dynamic_cast<Clef *>(clone->FindPreviousChildOfType(&ac, element));
+
+        if (newClef == NULL) {
+            newClef = layer->GetCurrentClef();
+        }
+
+        element->GetPitchInterface()->AdjustPitchForNewClef(clef, newClef);
     }
     // TODO Make more generic
     else if (element->Is(NEUME)) {
