@@ -799,12 +799,13 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
-void Object::FindNextChildOfType(Object *object, Comparison *comp, Object *start, Object *end)
+void Object::FindNextChildOfType(Comparison *comp, Object *start, Object *end)
 {
     assert(objects);
     Functor findNextOfType(&Object::FindNextOfType);
-    FindNextOfTypeParams findNextOfTypeParams(object, comparison, start, end);
+    FindNextOfTypeParams findNextOfTypeParams(comparison, start, end);
     this->Process(&findNextOfType, &findAllBetween);
+    return findNextOfTypeParams.m_element;
 }
 
 
