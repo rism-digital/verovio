@@ -1667,6 +1667,7 @@ int Object::FindNextOfType(FunctorParams *functorparams)
     if (params->m_start == this) {
         // setting m_start to be null tells us that we're in the range
         params->m_start = NULL;
+        return FUNCTOR_CONTINUE;
     }
 
     else if (params->m_start) {
@@ -1697,7 +1698,7 @@ int Object::FindPreviousOfType(FunctorParams *functorparams)
         params->m_element = this;
     }
 
-    FUNCTOR_CONTINUE;
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

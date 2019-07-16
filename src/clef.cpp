@@ -93,18 +93,18 @@ int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, dat
 
 int Clef::PitchDistanceTo(Clef *clef) 
 {
-    int result = this->GetLine() - clef->GetLine();
+    int result = -2 * (clef->GetLine() - this->GetLine());
     if (this->GetShape() == CLEFSHAPE_F) {
-        result += 3;
-    }
-    else if (this->GetShape() == CLEFSHAPE_G) {
-        result += 4;
-    }
-    if (clef->GetShape() == CLEFSHAPE_F) {
         result -= 3;
     }
-    else if (clef->GetShape() == CLEFSHAPE_G) {
+    else if (this->GetShape() == CLEFSHAPE_G) {
         result -= 4;
+    }
+    if (clef->GetShape() == CLEFSHAPE_F) {
+        result += 3;
+    }
+    else if (clef->GetShape() == CLEFSHAPE_G) {
+        result += 4;
     }
     return result;
 }

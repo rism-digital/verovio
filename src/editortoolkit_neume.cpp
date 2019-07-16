@@ -748,14 +748,20 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             previousClef = layer->GetCurrentClef();
         }
 
-        // Adjust elements with a relative position to clef by pitch
+        LogMessage(previousClef->GetUuid().c_str());
+        LogMessage(nextClef->GetUuid().c_str());
+
+        // adjust pitched elements whose clef is changing
         ArrayOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
+        LogMessage("about to populate elements");
+
         m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, 
-            ((nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast()));
+            (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
+            LogMessage((*it)->GetUuid().c_str());
             PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
             pi->AdjustPitchForNewClef(previousClef, clef);

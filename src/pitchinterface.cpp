@@ -116,7 +116,7 @@ void PitchInterface::AdjustPitchForNewClef(Clef *oldClef, Clef *newClef)
 
     int lineDiff = oldClef->PitchDistanceTo(newClef);
 
-    this->AdjustPitchByOffset(2 * lineDiff);
+    this->AdjustPitchByOffset(lineDiff);
 }
 
 //----------------------------------------------------------------------------
