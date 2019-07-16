@@ -1554,6 +1554,28 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+bool Object::GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry)
+{
+    ArrayOfObjects childrenWithFacsimileInterface;
+    InterfaceComparison ic(INTERFACE_FACSIMILE);
+    this->FindAllChildByComparison(&childrenWithFacsimileInterface, &ic);
+    bool result = false;
+    for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
+        assert(fi);
+        if (fi->HasFacs()) {
+            Zone *zone = fi->GetZone();
+            assert(zone);
+            *ulx = std::min(*ulx, zone->GetUlx());
+            *uly = std::min(*uly, zone->GetUly());
+            *lrx = std::max(*lrx, zone->GetLrx());
+            *lry = std::max(*lrx, zone->GetLry());
+            result |= true;
+        }
+    }
+    return result;
+}
+
 int Object::SetChildZones(FunctorParams *functorParams)
 {
     SetChildZonesParams *params = dynamic_cast<SetChildZonesParams *>(functorParams);
