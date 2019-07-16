@@ -382,30 +382,59 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
 
         // when moving a clef up or down to a new staff line:
         // the notes associated with that clef will have to change pitch values in order to stay in the same position
-        if (initialClefLine != clefLine) {  
-            int lineDiff = clefLine - initialClefLine;
-            ArrayOfObjects objects;
-            InterfaceComparison ic(INTERFACE_PITCH);
+        // when moving a clef horizontally:
+        // the notes associated with that clef will be different, 
+        // so those that are newly associated will have to have new pitches to stay in the same position
+        int lineDiff = clefLine - initialClefLine;
+        ArrayOfObjects withThisClefBefore;
+        ArrayOfObjects withPreviousClefBefore;
+        ClassIdComparison ac(CLEF);
+        InterfaceComparison ic(INTERFACE_PITCH);
+        Clef *previousClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
+        Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
 
-            Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
-            LogMessage(nextClef->GetUuid().c_str());
-            m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
-                    (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
-            // Adjust all elements who are positioned relative to clef by pitch
-            for (auto it = objects.begin(); it != objects.end(); ++it) {
-                Object *child = dynamic_cast<Object *>(*it);
-                if (child == NULL || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
-                PitchInterface *pi = child->GetPitchInterface();
-                assert(pi);
-                pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
-            }
+        if (previousClefBefore == NULL) {
+            previousClefBefore == layer->GetCurrentClef();
         }
+
+        m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefBefore, &ic, clef,
+            (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+
+        m_doc->GetDrawingPage()->FindAllChildBetween(&withPreviousClefBefore, &ic, previousClefBefore, clef);
 
         if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
             Zone *zone = clef->GetZone();
             assert(zone);
             zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize);
+        }
+
+        Layer *clone = layer->Clone();
+        clone->ReorderByXPos();
+        Clef *previousClefAfter = dynamic_cast<Clef *>(layer->FindPreviousChildOfType(&ac, clef));
+        Clef *nextClefAfter = dynamic_cast<Clef *>(layer->FindNextChildOfType(&ac, clef));
+
+        if (previousClefAfter == NULL) {
+            previousClefAfter == layer->GetCurrentClef();
+        }
+
+        // case 1
+        if (previousClefAfter == previousClefBefore && nextClefAfter == nextClefBefore) {
+            ArrayOfObjects withThisClefAfter;
+            ArrayOfObjects withPreviousClefAfter;
+            layer->FindAllChildBetween(&withThisClefAfter, &ic, clef, 
+                (nextClefAfter != NULL) ? nextClefAfter : layer->GetLast());
+
+            layer->FindAllChildBetween(&withPreviousClefAfter, &ic, previousClefBefore, clef);
+
+            ArrayOfObjects diffThisClef;
+            ArrayOfObjects diffPreviousClef;
+
+
+        }
+        // case 2
+        else {
+
         }
     }
     else if (element->Is(STAFF)) {
