@@ -60,6 +60,12 @@ public:
     int PitchDifferenceTo(PitchInterface *pi);
 
     /**
+     * adjust the pitch value so that it stays in the same x,y position
+     * given it's new and old clefs
+     */
+    void AdjustPitchForNewClef(Clef *oldClef, Clef *newClef);
+
+    /**
      * Calculate the loc for a note, rest or chord considering its position in the layer.
      * By default for chord takes the top note, but the bottom note otherwise.
      * E.g., return 0 for and C4 with clef C1, -2 with clef G2.

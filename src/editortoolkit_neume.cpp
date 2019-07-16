@@ -737,57 +737,33 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         m_editInfo = clef->GetUuid();
         layer->ReorderByXPos();
 
-        // Ensure children of this clef keep their position if it is NOT the first clef in the file.
-        ArrayOfObjects clefs;
-        ClassIdComparison ac(CLEF);
-        m_doc->GetDrawingPage()->FindAllChildByComparison(&clefs, &ac);
-        if (clefs.size() == 0) {
-            LogError("Something went wrong. Clef does not appear to be inserted.");
-        } else if (clefs.size() > 1) {
-            Clef *previousClef = dynamic_cast<Clef *>(clefs.at(0));
-            Clef *temp = NULL;
-            for (auto it = clefs.begin(); it != clefs.end(); ++it) {
-                temp = dynamic_cast<Clef *>(*it);
-                if (temp == NULL) {
-                    LogWarning("Null clef!");
-                    continue;
-                }
-                if (temp != clef) {
-                    previousClef = temp;
-                } else {
-                    temp = dynamic_cast<Clef *>(*(it+1));
-                    break;
-                }
-            }
-            if (previousClef == clef) {
-                previousClef = layerClef;
-            }
-            if (previousClef != clef) {
-                // Get difference to shift pitches by
-                int pitchDifference = (previousClef->GetLine() - clefLine) * 2;
-                // Account for clef shape
-                if (previousClef->GetShape() != clefShape) {
-                    if (previousClef->GetShape() == CLEFSHAPE_F) {
-                        // Assume this clef is C
-                        pitchDifference -= 3;
-                    }
-                    else if (previousClef->GetShape() ==CLEFSHAPE_C) {
-                        // Assume this clef is F
-                        pitchDifference += 3;
-                    }
-                }
+        // ensure pitched elements associated with this clef keep their x,y positions
 
-                // Adjust elements with a relative position to clef by pitch
-                ArrayOfObjects elements;
-                InterfaceComparison ic(INTERFACE_PITCH);
-                m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, (temp != clefs.back()) ? temp : m_doc->GetDrawingPage()->GetLast());
-                for (auto it = elements.begin(); it != elements.end(); ++it) {
-                    PitchInterface *pi = (*it)->GetPitchInterface();
-                    assert(pi);
-                    pi->AdjustPitchByOffset(pitchDifference);
-                }
-            }
+        ClassIdComparison ac(CLEF);
+        Clef *previousClef = m_doc->GetDrawingPage()->FindPreviousChildByType(&ac, &clef);
+        Clef *nextClef = m_doc->GetDrawingPage()->FindNextChildByType(&ac, &clef);
+
+        if (previousClef == NULL) {
+            // if there is no previous clef, get the default one from the staff def
+            previousClef = layer->GetCurrentClef();
         }
+
+        // Adjust elements with a relative position to clef by pitch
+        ArrayOfObjects elements;
+        InterfaceComparison ic(INTERFACE_PITCH);
+
+        m_doc->GetDrawingPage()->FindAllChildrenBetween(&elements, &ic, &clef, 
+            (nextClef != NULL) ? &NextClef : m_doc->GetDrawingPage()->GetLast());
+
+        for (auto it = elements.begin(); it != elements.end(); ++it) {
+            PitchInterface *pi = (*it)->GetPitchInterface();
+            assert(pi);
+            pi->AdjustPitchForNewClef(&previousClef, &clef);
+        }
+
+
+
+
     }
     else if (elementType == "custos") {
         Custos *custos = new Custos();

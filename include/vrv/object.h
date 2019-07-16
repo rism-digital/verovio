@@ -465,6 +465,10 @@ public:
     virtual int Save(FileOutputStream *output);
 
     virtual void ReorderByXPos();
+
+    virtual void FindNextChildOfType();
+
+    virtual void FindPreviousChildOfType();
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -1081,6 +1085,10 @@ public:
     virtual int SetChildZones(FunctorParams *);
 
     static bool sortByUlx(Object *a, Object *b);
+
+    virtual int FindNextOfType(Functorparams *);
+
+    virtual int FindPreviousOfType(FunctorParams *);
 
 protected:
     //

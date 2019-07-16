@@ -799,13 +799,20 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
-void Object::FindNextChildOfType(Comparison *comp, Object *start, Object *end)
+void Object::FindNextChildOfType(Comparison *comp, Object *start)
 {
-    assert(objects);
     Functor findNextOfType(&Object::FindNextOfType);
-    FindNextOfTypeParams findNextOfTypeParams(comparison, start, end);
-    this->Process(&findNextOfType, &findAllBetween);
-    return findNextOfTypeParams.m_element;
+    FindByTypeParams params(comparison, start);
+    this->Process(&findNextOfType, &params);
+    return params.m_element;
+}
+
+void Object::FindPreviousChildOfType(Comparison *comp, Object *start)
+{
+    Functor findPreviousOfType(&Object::FindPreviousOfType);
+    FindByTypeParams params(comparison, start);
+    this->Process(&findPreviousOfType, &params);
+    return params.m_element;
 }
 
 
@@ -1653,7 +1660,7 @@ int Object::SetChildZones(FunctorParams *functorParams)
 
 int Object::FindNextOfType(FunctorParams *functorparams) 
 {
-    FindNextOfTypeParams *params = dynamic_cast<FindNextOfTypeParams *>(functorparams);
+    FindByTypeParams *params = dynamic_cast<FindByTypeParams *>(functorparams);
     assert(params);
 
     // we are reaching the start of the range
@@ -1672,11 +1679,23 @@ int Object::FindNextOfType(FunctorParams *functorparams)
         return FUNCTOR_STOP;
     }
 
-    if (params->m_end == this) {
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindPreviousOfType(FunctorParams *params)
+{
+    // this guy works by going from the start and replacing the return element with every nearer element
+    // until you get to the 'start' element 
+    if (params->m_start == this) {
+        // we've reached the end element, so stop
         return FUNCTOR_STOP;
     }
 
-    return FUNCTOR_CONTINUE;
+    if ((*params->m_comparison)(this)) {
+        params->m_element = this;
+    }
+
+    FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

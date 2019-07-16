@@ -1779,19 +1779,17 @@ public:
  * member 3: the end object range
  */
 
-class FindNextOfTypeParams : public FunctorParams {
+class FindByTypeParams : public FunctorParams {
 public:
-    FindNextOfTypeParams(Comparison *comparison, Object *start, Object *end)
+    FindByTypeParams(Comparison *comparison, Object *start)
     {
         m_comparison = comparison;
         m_element = NULL;
         m_start = start;
-        m_end = end;
     }
     Comparison *m_comparison
     Object *m_element;
     Object *m_start;
-    Object *m_end;
 };
 
 } // namespace vrv
