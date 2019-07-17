@@ -34,6 +34,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "nc.h"
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
@@ -1526,6 +1527,20 @@ bool Object::sortByUlx(Object *a, Object *b)
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;
+            }
+        }
+    }
+
+    // Preserve ordering of neume components in ligature
+    if (a->Is(NC) && b->Is(NC)) {
+        Nc *nca = dynamic_cast<Nc *>(a);
+        Nc *ncb = dynamic_cast<Nc *>(b);
+        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+            Object *parent = a->GetParent();
+            assert(parent);
+            if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
+                // Return nc with higher pitch
+                return nca->PitchDifferenceTo(ncb) > 0; // If object a has the higher pitch
             }
         }
     }
