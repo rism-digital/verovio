@@ -38,7 +38,7 @@
 
 namespace vrv {
 
-bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction, bool isChain)
+bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 {
     jsonxx::Object json;
 
@@ -65,7 +65,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction,
         std::string elementId;
         int x,y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
-            return this->Drag(elementId, x, y, isChain);
+            return this->Drag(elementId, x, y);
         }
         LogWarning("Could not parse the drag action");
     }
@@ -177,40 +177,23 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
     bool status = true;
     std::string info = "[";
-    bool runReorder = false;
     std::string id = "";
     for (int i = 0; i < (int)actions.size(); i++) {
         if (!actions.has<jsonxx::Object>(i)) {
             LogError("Action %d was not an object", i);
             return false;
         }
-        if (actions.get<jsonxx::Object>(i).get<jsonxx::String>("action") == "drag") {
-            runReorder = true;
-            id = actions.get<jsonxx::Object>(i).get<jsonxx::Object>("param").get<jsonxx::String>("elementId");
-        }
-        status |= this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), true);
+        status |= this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
         if (i != 0)
             info += ", ";
         info += "\"" + m_editInfo + "\"";
     }
     info += "]";
     m_editInfo = info;
-    if (status && runReorder) {
-        Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(id);
-        Layer *layer = NULL;
-        assert(obj);
-        if (obj->Is(STAFF)) {
-            layer = dynamic_cast<Layer *>(obj->GetFirst(LAYER));
-        } else {
-            layer = dynamic_cast<Layer *>(obj->GetFirstParent(LAYER));
-        }
-        assert(layer);
-        layer->ReorderByXPos();
-    }
     return status;
 }
 
-bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
+bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 {
     m_editInfo = "";
     if (!m_doc->GetDrawingPage()) {
@@ -433,10 +416,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         LogWarning("Unsupported element for dragging.");
         return false;
     }
-    if (!isChain) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-        layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
-    }
+    Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+    layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
     return true;
 }
 

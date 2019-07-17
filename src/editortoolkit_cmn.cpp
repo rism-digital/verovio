@@ -36,7 +36,7 @@
 
 namespace vrv {
 
-bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool isChain)
+bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction)
 {
     jsonxx::Object json;
 
@@ -46,19 +46,19 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         return false;
     }
 
-    
+
     if (!json.has<jsonxx::String>("action")) {
         LogWarning("Incorrectly formatted JSON action.");
     }
-    
+
     std::string action = json.get<jsonxx::String>("action");
-    
+
     // Action without parameter
     if (action == "commit") {
         m_doc->PrepareDrawing();
         return true;
     }
-    
+
     if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
         LogWarning("Incorrectly formatted JSON param.");
     }
@@ -124,7 +124,7 @@ bool EditorToolkitCMN::ParseInsertAction(
 {
     // assign optional member
     endid = "";
-    
+
     if (!param.has<jsonxx::String>("elementType")) return false;
     elementType = param.get<jsonxx::String>("elementType");
     if (!param.has<jsonxx::String>("startid")) return false;
@@ -135,14 +135,14 @@ bool EditorToolkitCMN::ParseInsertAction(
     }
     return true;
 }
-    
+
 bool EditorToolkitCMN::ParseKeyDownAction(
     jsonxx::Object param, std::string &elementId, int &key, bool &shiftKey, bool &ctrlKey)
 {
     // assign optional member
     shiftKey = false;
     ctrlKey = false;
-    
+
     if (!param.has<jsonxx::String>("elementId")) return false;
     elementId = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("key")) return false;
@@ -156,7 +156,7 @@ bool EditorToolkitCMN::ParseKeyDownAction(
     }
     return true;
 }
-    
+
 bool EditorToolkitCMN::ParseSetAction(
     jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value)
 {
@@ -168,7 +168,7 @@ bool EditorToolkitCMN::ParseSetAction(
     value = param.get<jsonxx::String>("value");
     return true;
 }
-    
+
 bool EditorToolkitCMN::Chain(jsonxx::Array actions)
 {
     bool status = true;
@@ -184,7 +184,7 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-    
+
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
@@ -194,17 +194,17 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
             = (data_PITCHNAME)m_view->CalculatePitchCode(layer, m_view->ToLogicalY(y), element->GetDrawingX(), &oct);
         element->GetPitchInterface()->SetPname(pname);
         element->GetPitchInterface()->SetOct(oct);
-        
+
         return true;
     }
     return false;
 }
-    
+
 bool EditorToolkitCMN::KeyDown(std::string elementId, int key, bool shiftKey, bool ctrlKey)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-    
+
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         PitchInterface *interface = element->GetPitchInterface();
@@ -224,7 +224,7 @@ bool EditorToolkitCMN::KeyDown(std::string elementId, int key, bool shiftKey, bo
 bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std::string endid)
 {
     if (!m_doc->GetDrawingPage()) return false;
-    
+
     Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
     Object *end = m_doc->GetDrawingPage()->FindChildByUuid(endid);
     // Check if both start and end elements exist
@@ -244,7 +244,7 @@ bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std:
 
     Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
     assert(measure);
-    
+
     ControlElement *element = NULL;
     if (elementType == "slur") {
         element = new Slur();
@@ -256,16 +256,16 @@ bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std:
         LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
         return false;
     }
-    
+
     assert(element);
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
     interface->SetStartid(startid);
     interface->SetEndid(endid);
-    
+
     this->m_chainedId = element->GetUuid();
-    
+
     return true;
 }
 
@@ -308,7 +308,7 @@ bool EditorToolkitCMN::Set(std::string elementId, std::string attribute, std::st
     }
     return false;
 }
-    
+
 Object *EditorToolkitCMN::GetElement(std::string &elementId)
 {
     if (elementId == CHAINED_ID) {
@@ -317,9 +317,9 @@ Object *EditorToolkitCMN::GetElement(std::string &elementId)
     else {
         this->m_chainedId = elementId;
     }
-    
+
     if (!m_doc->GetDrawingPage()) return NULL;
-    
+
     // Try to get the element on the current drawing page
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     // If it wasn't there, try on the whole doc
