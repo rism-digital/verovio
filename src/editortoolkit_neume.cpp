@@ -368,6 +368,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         }
     }
     else if (element->Is(CLEF)) {
+        LogMessage("element->Is(CLEF)");
         Clef *clef = dynamic_cast<Clef *>(element);
         assert(clef);
         Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
@@ -397,7 +398,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
 
         if (previousClefBefore == NULL) {
-            previousClefBefore == layer->GetCurrentClef();
+            previousClefBefore = layer->GetCurrentClef();
         }
 
         m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefBefore, &ic, clef,
@@ -418,11 +419,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         Clef *nextClefAfter = dynamic_cast<Clef *>(layer->FindNextChildOfType(&ac, clef));
 
         if (previousClefAfter == NULL) {
-            previousClefAfter == layer->GetCurrentClef();
+            previousClefAfter = layer->GetCurrentClef();
         }
 
         // case 1
         if (previousClefAfter == previousClefBefore && nextClefAfter == nextClefBefore) {
+            LogMessage("case 1");
+            LogMessage(previousClefAfter->GetUuid().c_str());
             ArrayOfObjects withThisClefAfter;
             ArrayOfObjects withPreviousClefAfter;
 
@@ -440,13 +443,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
                 std::set_difference(withThisClefAfter.begin(), withThisClefAfter.end(),
                     withThisClefBefore.begin(), withThisClefBefore.end(), diffThisClef.begin());
 
-                for (auto iter = diffPreviousClef.begin(), iter != diffPreviousClef.end(), ++iter) {
-                    iter->GetPitchInterface()->AdjustPitchForNewClef(previousClefBefore, clef);
+                for (auto iter = diffPreviousClef.begin(); iter != diffPreviousClef.end(); ++iter) {
+                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(previousClefBefore, clef);
                 }
 
                 if (lineDiff != 0) {
-                    for (auto iter = diffThisClef.begin(), iter != diffThisClef.end(), ++iter) {
-                        iter->GetPitchInterface()->AdjustPitchByOffset(lineDiff);
+                    for (auto iter = diffThisClef.begin(); iter != diffThisClef.end(); ++iter) {
+                        (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff);
                     }
                 }
             } 
@@ -457,19 +460,20 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
                 std::set_difference(withThisClefBefore.begin(), withThisClefBefore.end(),
                     withThisClefAfter.begin(), withThisClefAfter.end(), diffThisClef.begin());
 
-                for (auto iter = diffPreviousClef.begin(), iter != diffPreviousClef.end(), ++iter) {
-                    iter->GetPitchInterface()->AdjustPitchForNewClef(clef, previousClefBefore);
+                for (auto iter = diffPreviousClef.begin(); iter != diffPreviousClef.end(); ++iter) {
+                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(clef, previousClefBefore);
                 }
 
                 if (lineDiff != 0) {
-                    for (auto iter = diffThisClef.begin(), iter != diffThisClef.end(), ++iter) {
-                        iter->GetPitchInterface()->AdjustPitchByOffset(lineDiff);
+                    for (auto iter = diffThisClef.begin(); iter != diffThisClef.end(); ++iter) {
+                        (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff);
                     }
                 }
             }
         }
         // case 2
         else {
+            LogMessage("Case 2");
             ArrayOfObjects withOldPreviousClefAfter;
             ArrayOfObjects withNewPreviousClefBefore;
             ArrayOfObjects withPreviousClefAfter;
@@ -491,11 +495,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
                 withPreviousClefAfter.begin(), withPreviousClefAfter.end(), newPreviousDiff.begin());
 
             for (auto iter = oldPreviousDiff.begin(); iter != oldPreviousDiff.end(); ++iter) {
-                iter->GetPitchInterface()->AdjustPitchForNewClef(clef, previousClefBefore);
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(clef, previousClefBefore);
             }
 
             for (auto iter = newPreviousDiff.begin(); iter != newPreviousDiff.end(); ++iter) {
-                iter->GetPitchInterface()->AdjustPitchForNewClef(previousClefAfter, clef);
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(previousClefAfter, clef);
             }
 
         }
