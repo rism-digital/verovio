@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <climits>
 #include <iostream>
 #include <math.h>
 #include <sstream>
