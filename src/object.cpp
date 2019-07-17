@@ -1556,6 +1556,11 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
 
 bool Object::GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry)
 {
+    // Set integers to extremes
+    *ulx = INT_MAX;
+    *uly = INT_MAX;
+    *lrx = INT_MIN;
+    *lry = INT_MIN;
     ArrayOfObjects childrenWithFacsimileInterface;
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     this->FindAllChildByComparison(&childrenWithFacsimileInterface, &ic);
