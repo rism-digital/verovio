@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        editortoolkit.cpp
+// Name:        editortoolkit_neume.cpp
 // Author:      Laurent Pugin, Juliette Regimbal, Zoe McLennan
 // Created:     04/06/2019
 // Copyright (c) Authors and others. All rights reserved.
@@ -386,13 +386,15 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         // the notes associated with that clef will be different, 
         // so those that are newly associated will have to have new pitches to stay in the same position
         int lineDiff = clefLine - initialClefLine;
+
         ArrayOfObjects withThisClefBefore;
         ArrayOfObjects withPreviousClefBefore;
+
         ClassIdComparison ac(CLEF);
         InterfaceComparison ic(INTERFACE_PITCH);
+
         Clef *previousClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
         Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
-
 
         if (previousClefBefore == NULL) {
             previousClefBefore == layer->GetCurrentClef();
@@ -411,6 +413,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
 
         Layer *clone = layer->Clone();
         clone->ReorderByXPos();
+
         Clef *previousClefAfter = dynamic_cast<Clef *>(layer->FindPreviousChildOfType(&ac, clef));
         Clef *nextClefAfter = dynamic_cast<Clef *>(layer->FindNextChildOfType(&ac, clef));
 
@@ -422,18 +425,78 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         if (previousClefAfter == previousClefBefore && nextClefAfter == nextClefBefore) {
             ArrayOfObjects withThisClefAfter;
             ArrayOfObjects withPreviousClefAfter;
-            layer->FindAllChildBetween(&withThisClefAfter, &ic, clef, 
-                (nextClefAfter != NULL) ? nextClefAfter : layer->GetLast());
 
-            layer->FindAllChildBetween(&withPreviousClefAfter, &ic, previousClefBefore, clef);
+            clone->FindAllChildBetween(&withThisClefAfter, &ic, clef, 
+                (nextClefAfter != NULL) ? nextClefAfter : clone->GetLast());
+            clone->FindAllChildBetween(&withPreviousClefAfter, &ic, previousClefBefore, clef);
 
             ArrayOfObjects diffThisClef;
             ArrayOfObjects diffPreviousClef;
 
+            if (withPreviousClefBefore.size() > withPreviousClefAfter.size()) {
+                std::set_difference(withPreviousClefBefore.begin(), withPreviousClefBefore.end(),
+                    withPreviousClefAfter.begin(), withPreviousClefAfter.end(), diffPreviousClef.begin());
 
+                std::set_difference(withThisClefAfter.begin(), withThisClefAfter.end(),
+                    withThisClefBefore.begin(), withThisClefBefore.end(), diffThisClef.begin());
+
+                for (auto iter = diffPreviousClef.begin(), iter != diffPreviousClef.end(), ++iter) {
+                    iter->GetPitchInterface()->AdjustPitchForNewClef(previousClefBefore, clef);
+                }
+
+                if (lineDiff != 0) {
+                    for (auto iter = diffThisClef.begin(), iter != diffThisClef.end(), ++iter) {
+                        iter->GetPitchInterface()->AdjustPitchByOffset(lineDiff);
+                    }
+                }
+            } 
+            else if (withPreviousClefBefore.size() < withPreviousClefAfter.size()) {
+                std::set_difference(withPreviousClefAfter.begin(), withPreviousClefAfter.end(),
+                    withPreviousClefBefore.begin(), withPreviousClefBefore.end(), diffPreviousClef.begin());
+
+                std::set_difference(withThisClefBefore.begin(), withThisClefBefore.end(),
+                    withThisClefAfter.begin(), withThisClefAfter.end(), diffThisClef.begin());
+
+                for (auto iter = diffPreviousClef.begin(), iter != diffPreviousClef.end(), ++iter) {
+                    iter->GetPitchInterface()->AdjustPitchForNewClef(clef, previousClefBefore);
+                }
+
+                if (lineDiff != 0) {
+                    for (auto iter = diffThisClef.begin(), iter != diffThisClef.end(), ++iter) {
+                        iter->GetPitchInterface()->AdjustPitchByOffset(lineDiff);
+                    }
+                }
+            }
         }
         // case 2
         else {
+            ArrayOfObjects withOldPreviousClefAfter;
+            ArrayOfObjects withNewPreviousClefBefore;
+            ArrayOfObjects withPreviousClefAfter;
+            ArrayOfObjects oldPreviousDiff;
+            ArrayOfObjects newPreviousDiff;
+
+            clone->FindAllChildBetween(&withOldPreviousClefAfter, &ic, previousClefBefore, 
+                (nextClefBefore != NULL) ? nextClefBefore : clone->GetLast());
+
+            layer->FindAllChildBetween(&withNewPreviousClefBefore, &ic, previousClefAfter, 
+                (nextClefAfter != NULL) ? nextClefAfter : layer->GetLast());
+
+            clone->FindAllChildBetween(&withPreviousClefAfter, &ic, previousClefAfter, clef);
+
+            std::set_difference(withOldPreviousClefAfter.begin(), withOldPreviousClefAfter.end(),
+                withPreviousClefBefore.begin(), withPreviousClefBefore.end(), oldPreviousDiff.begin());
+
+            std::set_difference(withNewPreviousClefBefore.begin(), withNewPreviousClefBefore.end(),
+                withPreviousClefAfter.begin(), withPreviousClefAfter.end(), newPreviousDiff.begin());
+
+            for (auto iter = oldPreviousDiff.begin(); iter != oldPreviousDiff.end(); ++iter) {
+                iter->GetPitchInterface()->AdjustPitchForNewClef(clef, previousClefBefore);
+            }
+
+            for (auto iter = newPreviousDiff.begin(); iter != newPreviousDiff.end(); ++iter) {
+                iter->GetPitchInterface()->AdjustPitchForNewClef(previousClefAfter, clef);
+            }
 
         }
     }
