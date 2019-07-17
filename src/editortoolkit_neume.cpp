@@ -380,7 +380,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         int clefLine = round((double) y / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
-        // The rest of this this branch (element->Is(CLEF)) is dedicated to ensuring that pitched elements
+        // The rest of this if branch (element->Is(CLEF)) is dedicated to ensuring that pitched elements
         // retain their position on the staves by adjusting their pitch position to match their new clefs.
         // With the respect to to this goal there are two main cases. In this explanation "this clef" 
         // refers to the clef being dragged.
@@ -392,7 +392,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         //      with this clef before and after the drag need to have their pitch changed only if the line
         //      of the clef changed during the drag.
         //  Case 2:
-        //      The clef you're dragging moves accross other clefs. In other words the preceding and 
+        //      The clef you're dragging moves across other clefs. In other words the preceding and 
         //      subsequent clefs are different before and after the drag. In this case elements that were
         //      associated with this clef before the drag need to be reassociated to the clef that preceded
         //      this clef before the drag. Elements that become newly associated with the clef after the drag
@@ -417,9 +417,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         // this clef at what time, while the new/old part refers to the time of the clef having the 
         // preceding/next relationship to this clef. Let's take withNewPrecedingClefBefore as an example. 
         // Let's say the order of the clefs before the drag is:
+        //
         //          A B C D
+        //
         // with C being the clef we're dragging. And after the drag action the order of the clefs is:
+        //
         //          A C B D
+        //
         // withNewPrecedingClefBefore would refer to the elements between A and B, since A is the 
         // new preceding clef (it becomes the clef that precedes this clef after the drag action)
         // and before the drag action all the elements between A and B were associated with A.
@@ -433,6 +437,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         //
         // The algorithm is implemented by finding all of the aforementioned clefs and the elements between 
         // them, and then using std::set_difference to find the elements whose pitch values may need to change.
+        // For example: in case 2 noLongerWithThisClef is found by taking the difference between 
+        // withOldPrecedingClefAfter and withPrecedingClefBefore, since that difference is the stuff that
+        // became associated with the clef that used to preceed this clef, meaning the stuff that was associated
+        // with clef, but no longer is.
+        //
+        // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
+        // that these calls are so oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
+        // So if we're changing an element's pitch from this clef to something else, we need the line of 
+        // this clef to be what it was before the drag. On the other hand, if we're reassociating an element
+        // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
+        // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
         //
         // Good luck!
         //////////////////////////////////////////////////////////////////////////////////////////////////////
