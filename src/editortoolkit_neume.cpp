@@ -511,7 +511,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         assert(surface);
         surface->AddChild(zone);
         newStaff->SetZone(zone);
-        newStaff->SetFacs(zone->GetUuid());
         Layer *newLayer = new Layer();
         newStaff->AddChild(newLayer);
 
@@ -553,7 +552,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Nc *nc = new Nc();
         std::string contour = "";
         nc->SetZone(zone);
-        nc->SetFacs(zone->GetUuid());
 
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         surface->AddChild(zone);
@@ -725,7 +723,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLrx(ulx + staffSize / 1.4);
         zone->SetLry(uly + staffSize / 2);
         clef->SetZone(zone);
-        clef->SetFacs(zone->GetUuid());
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
@@ -1002,7 +999,6 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                     Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindChildByType(SURFACE));
                     surface->AddChild(zone);
                     syl->SetZone(zone);
-                    syl->SetFacs(zone->GetUuid());
                 }
                 else {
                     LogWarning("Could not create bounding box for syl.");
@@ -1616,7 +1612,6 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
                     secondNc->SetZone(zone);
                     secondNc->ResetFacsimile();
-                    secondNc->SetFacs(zone->GetUuid());
 
                     if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
                     if(success1 && success2){
@@ -1840,7 +1835,6 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         zone->SetLry(newLry);
 
         newNc->SetZone(zone);
-        newNc->SetFacs(zone->GetUuid());
 
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         assert(surface);

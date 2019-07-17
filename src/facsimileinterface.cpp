@@ -55,7 +55,7 @@ int FacsimileInterface::GetWidth() const
 }
 
 int FacsimileInterface::GetHeight() const
-{ 
+{
     assert(m_zone);
     return m_zone->GetLogicalLry() - m_zone->GetLogicalUly();
 }
@@ -82,5 +82,6 @@ void FacsimileInterface::SetZone(Zone *zone)
         }
     }
     m_zone = zone;
+    this->SetFacs(m_zone->GetUuid());
 }
 }

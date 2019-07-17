@@ -1620,7 +1620,6 @@ int Object::SetChildZones(FunctorParams *functorParams)
                 assert(surface);
                 surface->AddChild(zone);
                 fi->SetZone(zone);
-                fi->SetFacs(zone->GetUuid());
             }
 
             // otherwise get a boundingbox that comprises all the neumes in the syllable
@@ -1643,7 +1642,6 @@ int Object::SetChildZones(FunctorParams *functorParams)
                     assert(surface);
                     surface->AddChild(zone);
                     fi->SetZone(zone);
-                    fi->SetFacs(zone->GetUuid());
                 }
                 else {
                     LogWarning("Failed to create zone for %s of type %s", this->GetUuid().c_str(), this->GetClassName().c_str());
