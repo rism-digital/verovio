@@ -983,13 +983,33 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
     else if (element->Is(SYLLABLE)) {
         Syllable *syllable = dynamic_cast<Syllable *>(element);
         assert(syllable);
-        Object *syl = syllable->GetFirst(SYL);
+        Syl *syl = dynamic_cast<Syl *>(syllable->GetFirst(SYL));
         if (syl == NULL) {
             syl = new Syl();
             syllable->AddChild(syl);
             Text *textChild = new Text();
             textChild->SetText(wtext);
             syl->AddChild(textChild);
+            if (m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+                // Create a default bounding box
+                Zone *zone = new Zone();
+                int ulx, uly, lrx, lry;
+                if (syllable->GenerateBoundingBox(&ulx, &uly, &lrx, &lry)) {
+                    zone->SetUlx(ulx);
+                    zone->SetUly(uly);
+                    zone->SetLrx(lrx);
+                    zone->SetLry(lry);
+                    Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindChildByType(SURFACE));
+                    surface->AddChild(zone);
+                    syl->SetZone(zone);
+                    syl->SetFacs(zone->GetUuid());
+                }
+                else {
+                    LogWarning("Could not create bounding box for syl.");
+                    delete zone;
+                }
+                assert(syl->HasFacs());
+            }
             success = true;
         }
         else {
