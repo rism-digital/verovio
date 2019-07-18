@@ -30,15 +30,14 @@ namespace vrv {
 class EditorToolkitNeume : public EditorToolkit {
 public:
     EditorToolkitNeume(Doc * doc, View *view) : EditorToolkit(doc, view) {}
-#ifdef USE_EMSCRIPTEN
-    bool ParseEditorAction(const std::string &json_editorAction, bool isChain=false);
+    bool ParseEditorAction(const std::string &json_editorAction);
 
     /**
      * Experimental editor functions.
      */
     ///@{
     bool Chain(jsonxx::Array actions);
-    bool Drag(std::string elementId, int x, int y, bool isChain=false);
+    bool Drag(std::string elementId, int x, int y);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly,
         int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes);
     bool Merge(std::vector<std::string> elementIds);
@@ -59,11 +58,8 @@ public:
      */
     std::string EditInfo();
 
-#endif
-
 protected:
 
-#ifdef USE_EMSCRIPTEN
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -84,7 +80,6 @@ protected:
     bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature);
     ///@}
-#endif
 };
 
 //--------------------------------------------------------------------------------

@@ -464,6 +464,12 @@ public:
      */
     virtual int Save(FileOutputStream *output);
 
+    /**
+     * Sort the child elements using std::stable_sort
+     */
+    template <class Compare>
+    void StableSort(Compare comp) { std::stable_sort(m_children.begin(), m_children.end(), comp); }
+
     virtual void ReorderByXPos();
 
     Object *FindNextChildOfType(Comparison *comp, Object *start);
@@ -1078,6 +1084,12 @@ public:
      * Reorder elements by x-position.
      */
     virtual int ReorderByXPos(FunctorParams *);
+
+    /**
+     * Get bounding box using child elements with facsimile interface
+     * Returns true if a bounding box could be constructed, false otherwise.
+     */
+    bool GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry);
 
     /**
      * Associate child objects with zones.

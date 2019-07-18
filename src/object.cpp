@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <climits>
 #include <iostream>
 #include <math.h>
 #include <sstream>
@@ -33,11 +34,13 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "nc.h"
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "surface.h"
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
@@ -1544,8 +1547,27 @@ bool Object::sortByUlx(Object *a, Object *b)
         }
     }
 
+    // Preserve ordering of neume components in ligature
+    if (a->Is(NC) && b->Is(NC)) {
+        Nc *nca = dynamic_cast<Nc *>(a);
+        Nc *ncb = dynamic_cast<Nc *>(b);
+        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+            Object *parent = a->GetParent();
+            assert(parent);
+            if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
+                // Return nc with higher pitch
+                return nca->PitchDifferenceTo(ncb) > 0; // If object a has the higher pitch
+            }
+        }
+    }
+
     if (fa == NULL || fb == NULL) {
-        LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
+        if (fa == NULL) {
+            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
+        }
+        if (fb == NULL) {
+            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
+        }
         return false;
     }
 
@@ -1563,6 +1585,33 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
     std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
     this->Modify();
     return FUNCTOR_CONTINUE;
+}
+
+bool Object::GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry)
+{
+    // Set integers to extremes
+    *ulx = INT_MAX;
+    *uly = INT_MAX;
+    *lrx = INT_MIN;
+    *lry = INT_MIN;
+    ArrayOfObjects childrenWithFacsimileInterface;
+    InterfaceComparison ic(INTERFACE_FACSIMILE);
+    this->FindAllChildByComparison(&childrenWithFacsimileInterface, &ic);
+    bool result = false;
+    for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
+        assert(fi);
+        if (fi->HasFacs()) {
+            Zone *zone = fi->GetZone();
+            assert(zone);
+            *ulx = std::min(*ulx, zone->GetUlx());
+            *uly = std::min(*uly, zone->GetUly());
+            *lrx = std::max(*lrx, zone->GetLrx());
+            *lry = std::max(*lrx, zone->GetLry());
+            result |= true;
+        }
+    }
+    return result;
 }
 
 int Object::SetChildZones(FunctorParams *functorParams)
@@ -1588,71 +1637,47 @@ int Object::SetChildZones(FunctorParams *functorParams)
 
             // if the syl's syllable parent has facs then use that as the bounding box
             FacsimileInterface *syllableFi = NULL;
+            const int offsetUly = 100;
+            const int offsetLrx = 100;
+            const int offsetLry = 200;
             if (this->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
                 syllableFi = (this)->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
                 Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
                 zone->SetUlx(tempZone->GetUlx());
-                zone->SetUly(tempZone->GetUly());
-                zone->SetLrx(tempZone->GetLrx());
-                zone->SetLry(tempZone->GetLry());
+                zone->SetUly(tempZone->GetUly() + offsetUly);
+                zone->SetLrx(tempZone->GetLrx() + offsetLrx);
+                zone->SetLry(tempZone->GetLry() + offsetLry);
+                Surface *surface = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindChildByType(SURFACE));
+                assert(surface);
+                surface->AddChild(zone);
+                fi->SetZone(zone);
             }
 
             // otherwise get a boundingbox that comprises all the neumes in the syllable
             else {
-                ArrayOfObjects children;
-                InterfaceComparison comp(INTERFACE_FACSIMILE);
                 Syllable *parentSyllable = dynamic_cast<Syllable *>((this)->GetFirstParent(SYLLABLE));
                 assert(parentSyllable);
-                parentSyllable->FindAllChildByComparison(&children, &comp);
-                for (auto iter = children.begin(); iter != children.end(); ++iter) {
-                    FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter);
-                    assert(temp);
-                    Zone *tempZone = dynamic_cast<Zone *>(temp->GetZone());
-                    assert(tempZone);
-                    if (temp->HasFacs()) {
-                        if (syllableFi == NULL) {
-                            zone->SetUlx(tempZone->GetUlx());
-                            zone->SetUly(tempZone->GetUly());
-                            zone->SetLrx(tempZone->GetLrx());
-                            zone->SetLry(tempZone->GetLry());
-                        }
-                        else {
-                            if (tempZone->GetUlx() < zone->GetUlx()) {
-                                zone->SetUlx(tempZone->GetUlx());
-                            }
-                            if (tempZone->GetUly() < zone->GetUly()) {
-                                zone->SetUly(tempZone->GetUly());
-                            }
-                            if (tempZone->GetLrx() > zone->GetLrx()) {
-                                zone->SetLrx(tempZone->GetLrx());
-                            }
-                            if (tempZone->GetLry() > zone->GetLry()) {
-                                zone->SetLry(tempZone->GetLry());
-                            }
-                        }
+                int ulx, uly, lrx, lry;
+                if (parentSyllable->GenerateBoundingBox(&ulx, &uly, &lrx, &lry)) {
+                    if (ulx == 0 || uly == 0 || lrx == 0 || lry == 0) {
+                        LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)",
+                            parentSyllable->GetUuid().c_str(), ulx, uly, lrx, lry);
                     }
+
+                    Zone *zone = new Zone();
+                    zone->SetUlx(ulx);
+                    zone->SetUly(uly + offsetUly);
+                    zone->SetLrx(lrx + offsetLrx);
+                    zone->SetLry(lry + offsetLry);
+                    Surface *surface = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindChildByType(SURFACE));
+                    assert(surface);
+                    surface->AddChild(zone);
+                    fi->SetZone(zone);
+                }
+                else {
+                    LogWarning("Failed to create zone for %s of type %s", this->GetUuid().c_str(), this->GetClassName().c_str());
                 }
             }
-
-            if ((zone->GetUlx() == 0) || (zone->GetUly() == 0) || (zone->GetLrx() == 0) || (zone->GetLry() == 0)) {
-                LogWarning("Tried to create default Syl BBox, but its syllable had no neumes with coordinates");
-                return FUNCTOR_CONTINUE;
-            }
-
-            //make the bounding box a little bigger and lower so it's easier to edit
-            int offSetUly = 100;
-            int offSetLrx = 100;
-            int offSetLry = 200;
-
-            zone->SetUly(zone->GetUly() + offSetUly);
-            zone->SetLrx(zone->GetLrx() + offSetLrx);
-            zone->SetLry(zone->GetLry() + offSetLry);
-
-            params->m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
-            fi->SetZone(zone);
-            Syl *syl = dynamic_cast<Syl *>(this);
-            syl->ResetFacsimile();
-            syl->SetFacs(zone->GetUuid());
         }
     }
     return FUNCTOR_CONTINUE;

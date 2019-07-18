@@ -1916,7 +1916,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
 
     // set norm as default
     int code = SMUFL_E567_ornamentTurn;
-    if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
+    if (turn->GetForm() == turnLog_FORM_lower) code = SMUFL_E568_ornamentTurnInverted;
 
     bool centered = true;
     // center the turn only with @startid
