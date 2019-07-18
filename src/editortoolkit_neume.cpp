@@ -382,12 +382,12 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         // The rest of this if branch (element->Is(CLEF)) is dedicated to ensuring that pitched elements
         // retain their position on the staves by adjusting their pitch position to match their new clefs.
-        // With the respect to to this goal there are two main cases. In this explanation "this clef" 
+        // With the respect to to this goal there are two main cases. Throughout this comment "this clef" 
         // refers to the clef being dragged.
         //
         //  Case 1:
-        //      The clef you're dragging stays between the same two bounding clefs. In this case:
-        //      Elements that are newly associated to this clef need to have their pitch changed from
+        //      The clef you're dragging stays between the same two bounding clefs. In this case
+        //      elements that are newly associated to this clef need to have their pitch changed from
         //      the clef preceding this clef (previousClef) to this clef. The elements that are associated
         //      with this clef before and after the drag need to have their pitch changed only if the line
         //      of the clef changed during the drag.
@@ -410,7 +410,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         // There are also ArrayOfObjects which refer to which elements
         // were associated to different clefs at different times. with{ClefName} just refers to the pitched
         // elements that were associated to that clef at that time. For example withThisClefBefore refers
-        // to the elements who were associated with this clef before the drag action took place. 
+        // to the elements that were associated with this clef before the drag action took place. 
         //
         // There are also some slightly trickier array names like withNewPrecedingClefBefore.
         // In this case the the before/after part refers to what elements were associated to
@@ -432,7 +432,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         //
         // The final piece of the naming scheme is the naming of the arrays whose pitch values actually
         // need to be changed. These should be pretty clear. stillWithThisClef for example, refers to
-        // the elements who were associated with this clef before and after the drag action, and thus whose
+        // the elements that were associated with this clef before and after the drag action, and thus whose
         // pitch values only needs to be changed if the line of this clef changed.
         //
         // The algorithm is implemented by finding all of the aforementioned clefs and the elements between 
@@ -443,13 +443,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         // with clef, but no longer is.
         //
         // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
-        // that these calls are so oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
+        // that these calls are oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
         // So if we're changing an element's pitch from this clef to something else, we need the line of 
         // this clef to be what it was before the drag. On the other hand, if we're reassociating an element
         // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
         // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
-        //
-        // Good luck!
         //////////////////////////////////////////////////////////////////////////////////////////////////////
 
         int lineDiff = clefLine - initialClefLine;
@@ -499,8 +497,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
             if (withPrecedingClefBefore.size() > withPrecedingClefAfter.size()) {
                 ArrayOfObjects newlyWithThisClef; 
 
-                LogMessage("first");
-
                 clef->SetLine(clefLine);
 
                 std::set_difference(withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
@@ -518,25 +514,18 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
                 }
             } 
             else if (withPrecedingClefBefore.size() < withPrecedingClefAfter.size()) {
-                LogMessage("second");
-
                 ArrayOfObjects noLongerWithThisClef;
-                ArrayOfObjects stillWithThisClef;
 
                 std::set_difference(withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(),
                     withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
                     std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
-
-                std::set_difference(withThisClefBefore.begin(), withThisClefBefore.begin(),
-                    noLongerWithThisClef.begin(), noLongerWithThisClef.end(),
-                    std::inserter(stillWithThisClef, stillWithThisClef.begin()));
 
                 for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
                     (*iter)->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClefBefore);
                 }
 
                 if (lineDiff != 0) {
-                    for (auto iter = withThisClefBefore.begin(); iter != withThisClefBefore.end(); ++iter) {
+                    for (auto iter = withThisClefAfter.begin(); iter != withThisClefAfter.end(); ++iter) {
                         (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
                     }
                 }
