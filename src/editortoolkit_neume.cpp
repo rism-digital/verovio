@@ -1614,7 +1614,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         parent->ReorderByXPos();
     }
 
-    //if there are more than 1 full parent we need to concat syl's
+    //if there is more than 1 full parent we need to concat syl's
     //unless we're just grouping NC's in which case no need to worry about syl's of course
     //also in this case we need to make sure that the facsimile of the resulting syl is correct
     else {
