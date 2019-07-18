@@ -1289,7 +1289,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(obj);
-    bool result, isNeumeOrNc, isNc;
+    bool result, isNeumeOrNc, isNc, isClef;
     isNeumeOrNc = (obj->Is(NC) || obj->Is(NEUME));
     isNc = obj->Is(NC);
     isClef = obj->Is(CLEF);
