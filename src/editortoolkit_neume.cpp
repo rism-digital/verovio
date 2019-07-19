@@ -212,27 +212,35 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         LogWarning("element is null");
     }
     assert(element);
-    // Use relative x and y for now on
-    // For elements whose y-position corresponds to a certain pitch
-    if (element->HasInterface(INTERFACE_PITCH)) {
+    
+    if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-        if(!layer) {
+        if (!layer) {
             LogError("Element does not have Layer parent. This should not happen.");
             return false;
         }
+
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
+
+        // clef association is done at the syllable level because of MEI structure
+        Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element)) : 
+            dynamic_cast<Syllable *>(element->GetFirstParent(SYLLABLE)));
+
         ClassIdComparison ac(CLEF);
-        Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, element));
-        if (clef == NULL) {
-            clef = layer->GetCurrentClef();
+        InterfaceComparison ic(INTERFACE_FACSIMILE);
+
+        int pitchDifference = round ( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+
+        Clef *clefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, 
+            (syllable != NULL) ? syllable : element));
+
+        if (clefBefore == NULL) {
+            clefBefore = layer->GetCurrentClef();
         }
 
-        // Calculate pitch difference based on y difference
-        int pitchDifference = round( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
-
-        if (element->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *fi = element->GetFacsimileInterface();
+        if (fi && fi->HasFacs()) {
             bool ignoreFacs = false;
             // Dont adjust the same facsimile twice. NCs in a ligature share a single zone.
             if (element->Is(NC)) {
@@ -251,104 +259,60 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 assert(zone);
                 zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
             }
+            layer->ReorderByXPos();
         }
-
-        Layer *clone = layer->Clone();
-        clone->ReorderByXPos();
-        Clef *newClef = dynamic_cast<Clef *>(clone->FindPreviousChildOfType(&ac, element));
-
-        if (newClef == NULL) {
-            newClef = layer->GetCurrentClef();
-        }
-
-        element->GetPitchInterface()->AdjustPitchForNewClef(clef, newClef);
-    }
-    // TODO Make more generic
-    else if (element->Is(NEUME)) {
-        Neume *neume = dynamic_cast<Neume *>(element);
-        assert(neume);
-        Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
-        if (!layer) {
-            LogError("Element does not have Layer parent. This should not occur.");
-            return false;
-        }
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
-        assert(staff);
-        // Calculate difference in pitch based on y difference
-        int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-
-        // Get components of neume
-        ClassIdComparison ac(NC);
-        ArrayOfObjects objects;
-        neume->FindAllChildByComparison(&objects, &ac);
-        for (auto it = objects.begin(); it != objects.end(); ++it) {
-            Nc *nc = dynamic_cast<Nc *>(*it);
-            // Update the neume component
-            nc->AdjustPitchByOffset(pitchDifference);
-        }
-
-        if (neume->HasFacs()) {
-            Zone *zone = neume->GetZone();
-            assert(zone);
-            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
-        }
-        else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
-            std::set<Zone *> childZones;    // Sets do not contain duplicate entries
-            for (Object *child = neume->GetFirst(); child != NULL; child = neume->Object::GetNext()) {
-                FacsimileInterface *fi = child->GetFacsimileInterface();
-                if (fi != NULL) {
-                    childZones.insert(fi->GetZone());
+        else {
+            ArrayOfObjects facsChildren;
+            element->FindAllChildByComparison(&facsChildren, &ic);
+            for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
+                // dont change the text bbox position
+                if ((*it)->Is(SYL)) {
+                    continue;
                 }
+                (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
             }
-            for (auto it = childZones.begin(); it != childZones.end(); it++) {
-                (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
-            }
-        }
-    }
-    else if(element->Is(SYLLABLE)) {
-        Syllable *syllable = dynamic_cast<Syllable *>(element);
-        assert(syllable);
-        Layer *layer = dynamic_cast<Layer *>(syllable->GetFirstParent(LAYER));
-        if (!layer) return false;
 
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
-        assert(staff);
+        } 
 
-        int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, 
+            (syllable != NULL) ? syllable : element));
 
-        //Get components of syllable
-        ClassIdComparison ac(NEUME);
-        ArrayOfObjects neumes;
-        syllable->FindAllChildByComparison(&neumes, &ac);
-        for (auto it = neumes.begin(); it != neumes.end(); ++it) {
-            Neume *neume = dynamic_cast<Neume *>(*it);
-            assert(neume);
-            ClassIdComparison ac(NC);
-            ArrayOfObjects ncs;
-            neume->FindAllChildByComparison(&ncs, &ac);
-            for (auto it = ncs.begin(); it != ncs.end(); ++it) {
-                Nc *nc = dynamic_cast<Nc *>(*it);
-                // Update the neume component
-                nc->AdjustPitchByOffset(pitchDifference);
-            }
-            if (neume->HasFacs()) {
-            Zone *zone = neume->GetZone();
-            assert(zone);
-            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
-            }
-            else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
-                std::set<Zone *> childZones;
-                for (Object *child = neume->GetFirst(); child != NULL; child = neume->Object::GetNext()) {
-                    FacsimileInterface *fi = child->GetFacsimileInterface();
-                    if (fi != NULL) {
-                        childZones.insert(fi->GetZone());
+        if (element->HasInterface(INTERFACE_PITCH)) {
+            element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
+            element->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
+
+            if (syllable != NULL) {
+                ArrayOfObjects siblings;
+                syllable->FindAllChildByComparison(&siblings, &ic);
+                for (auto it = siblings.begin(); it != siblings.end(); ++it) {
+                    if (*it == element) {
+                        continue;
                     }
-                }
-                for (auto it = childZones.begin(); it != childZones.end(); it++) {
-                    (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+                    (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
                 }
             }
         }
+        else {
+            ArrayOfObjects pitchChildren;
+            element->FindAllChildByComparison(&pitchChildren, &ic);
+
+            for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
+                (*it)->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
+                (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
+            }
+
+            if (!(element->Is(SYLLABLE)) && (syllable != NULL)) {
+                ArrayOfObjects siblingChildren;
+                syllable->FindAllChildByComparison(&siblingChildren, &ic);
+                for (auto it = siblingChildren.begin(); it != siblingChildren.end(); ++it) {
+                    if (*it == element) {
+                        continue;
+                    }
+                    (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
+                }
+            }
+        }
+          
     }
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
