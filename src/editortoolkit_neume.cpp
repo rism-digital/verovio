@@ -296,7 +296,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ArrayOfObjects pitchChildren;
             element->FindAllChildByComparison(&pitchChildren, &ic);
 
+            LogMessage("%d", pitchChildren.size());
+
+            LogMessage(element->GetClassName().c_str());
+
             for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
+                LogMessage((*it)->GetUuid().c_str());
+                LogMessage((*it)->GetClassName().c_str());
                 (*it)->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
                 (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
             }
@@ -304,10 +310,14 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             if (!(element->Is(SYLLABLE)) && (syllable != NULL)) {
                 ArrayOfObjects siblingChildren;
                 syllable->FindAllChildByComparison(&siblingChildren, &ic);
-                for (auto it = siblingChildren.begin(); it != siblingChildren.end(); ++it) {
-                    if (*it == element) {
-                        continue;
-                    }
+
+                ArrayOfObjects notBeenAdjusted;
+                std::set_difference(siblingChildren.begin(), siblingChildren.end(), 
+                    pitchChildren.begin(), pitchChildren.end(), std::inserter(notBeenAdjusted, notBeenAdjusted.begin()));
+
+                LogMessage("%d, %d", siblingChildren.size(), notBeenAdjusted.size());
+
+                for (auto it = notBeenAdjusted.begin(); it != notBeenAdjusted.end(); ++it) {
                     (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
                 }
             }
