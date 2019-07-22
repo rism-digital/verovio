@@ -224,11 +224,14 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         assert(staff);
 
         // clef association is done at the syllable level because of MEI structure
+        // also note this will initialize syllable as null in the case of custos
+        // which is why all the references to syllable are ternary
         Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element)) : 
             dynamic_cast<Syllable *>(element->GetFirstParent(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
-        InterfaceComparison ic(INTERFACE_FACSIMILE);
+        InterfaceComparison facsIC(INTERFACE_FACSIMILE);
+        InterfaceComparison pitchIC(INTERFACE_PITCH);
 
         int pitchDifference = round ( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
@@ -248,8 +251,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 if (nc->GetLigated() == BOOLEAN_true) {
                     Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
                     Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
-                    if (nextNc != NULL && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone())
+                    if (nextNc != NULL && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone()) {
                         ignoreFacs = true;
+                    }
                 }
             }
             if (!ignoreFacs) {
@@ -258,12 +262,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 Zone *zone = fi->GetZone();
                 assert(zone);
                 zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
-            }
-            layer->ReorderByXPos();
+            }  
         }
         else {
             ArrayOfObjects facsChildren;
-            element->FindAllChildByComparison(&facsChildren, &ic);
+            element->FindAllChildByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
                 // dont change the text bbox position
                 if ((*it)->Is(SYL)) {
@@ -271,8 +274,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 }
                 (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
             }
+        }
 
-        } 
+        layer->ReorderByXPos(); 
 
         Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, 
             (syllable != NULL) ? syllable : element));
@@ -283,7 +287,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
             if (syllable != NULL) {
                 ArrayOfObjects siblings;
-                syllable->FindAllChildByComparison(&siblings, &ic);
+                syllable->FindAllChildByComparison(&siblings, &pitchIC);
                 for (auto it = siblings.begin(); it != siblings.end(); ++it) {
                     if (*it == element) {
                         continue;
@@ -294,35 +298,26 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
         else {
             ArrayOfObjects pitchChildren;
-            element->FindAllChildByComparison(&pitchChildren, &ic);
-
-            LogMessage("%d", pitchChildren.size());
-
-            LogMessage(element->GetClassName().c_str());
+            element->FindAllChildByComparison(&pitchChildren, &pitchIC);
 
             for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
-                LogMessage((*it)->GetUuid().c_str());
-                LogMessage((*it)->GetClassName().c_str());
                 (*it)->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
                 (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
             }
 
             if (!(element->Is(SYLLABLE)) && (syllable != NULL)) {
                 ArrayOfObjects siblingChildren;
-                syllable->FindAllChildByComparison(&siblingChildren, &ic);
+                syllable->FindAllChildByComparison(&siblingChildren, &pitchIC);
 
                 ArrayOfObjects notBeenAdjusted;
                 std::set_difference(siblingChildren.begin(), siblingChildren.end(), 
                     pitchChildren.begin(), pitchChildren.end(), std::inserter(notBeenAdjusted, notBeenAdjusted.begin()));
-
-                LogMessage("%d, %d", siblingChildren.size(), notBeenAdjusted.size());
 
                 for (auto it = notBeenAdjusted.begin(); it != notBeenAdjusted.end(); ++it) {
                     (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
                 }
             }
         }
-          
     }
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
