@@ -460,6 +460,7 @@ protected:
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
+    bool analyzeBreaks(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
     void prepareSections();
     int getDirection(const std::string &token, const std::string &target);
@@ -781,6 +782,9 @@ private:
     // 0 = *Xslash marker encountered in spine.
     // Up to 1000 spines can be processed (see constructor).
     std::vector<int> m_slash;
+
+    // m_breaks == true if the music contains encoded page/system breaks
+    bool m_breaks = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

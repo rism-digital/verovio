@@ -79,11 +79,13 @@
 #include "num.h"
 #include "octave.h"
 #include "page.h"
+#include "pb.h"
 #include "pedal.h"
 #include "pghead.h"
 #include "rdg.h"
 #include "rend.h"
 #include "rest.h"
+#include "sb.h"
 #include "score.h"
 #include "section.h"
 #include "slur.h"
@@ -524,6 +526,7 @@ bool HumdrumInput::convertHumdrum()
     }
 
     m_multirest = analyzeMultiRest(infile);
+    m_breaks = analyzeBreaks(infile);
 
     infile.analyzeSlurs();
     infile.analyzeKernTies();
@@ -611,6 +614,27 @@ bool HumdrumInput::convertHumdrum()
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
         m_measureIndex++;
         status &= convertSystemMeasure(line);
+        if ((line < infile.getLineCount() - 1) && (infile[line + 1].isGlobalComment())) {
+            // Check for page/system break, and add <sb/> if found.
+            // (currently mapping page breaks to system breaks.)
+            hum::HTp token = infile.token(line + 1, 0);
+            if (token->compare(0, 12, "!!linebreak:") == 0) {
+                Sb *sb = new Sb;
+                m_sections.back()->AddChild(sb);
+                if (token->find("original")) {
+                    // maybe allow other types of system breaks here
+                    sb->SetType("original");
+                }
+            }
+            else if (token->compare(0, 12, "!!pagebreak:") == 0) {
+                Sb *sb = new Sb;
+                m_sections.back()->AddChild(sb);
+                if (token->find("original")) {
+                    // maybe allow other types of page breaks here
+                    sb->SetType("original");
+                }
+            }
+        }
     }
 
     createHeader();
@@ -3482,7 +3506,6 @@ bool HumdrumInput::convertSystemMeasure(int &line)
     for (int q = startline; q >= 0; q--) {
         if (m_infile[q].isData()) {
             founddatabefore = true;
-            ;
             break;
         }
     }
@@ -14246,6 +14269,13 @@ void HumdrumInput::setupMeiDocument()
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());
     m_leftbarstyle = BARRENDITION_NONE;
+    if (m_breaks) {
+        // An initial page break is required in order for the system
+        // breaks encoded in the file to be activated, so adding a
+        // dummy page break here:
+        Pb *pb = new Pb;
+        section->AddChild(pb);
+    }
 }
 
 //////////////////////////////
@@ -14258,6 +14288,7 @@ void HumdrumInput::clear()
 {
     m_filename = "";
     m_tupletscaling = 1;
+    m_breaks = false;
 }
 
 //////////////////////////////
@@ -15137,6 +15168,29 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeBreaks -- Returns true if there are page or
+//   system breaks in the data.
+//
+
+bool HumdrumInput::analyzeBreaks(hum::HumdrumFile &infile)
+{
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isGlobalComment()) {
+            continue;
+        }
+        hum::HTp token = infile.token(i, 0);
+        if (token->compare(0, 12, "!!pagebreak:") == 0) {
+            return true;
+        }
+        if (token->compare(0, 12, "!!linebreak:") == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////
