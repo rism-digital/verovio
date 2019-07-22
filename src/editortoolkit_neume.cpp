@@ -9,6 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include <limits.h>
 #include <locale>
 #include <codecvt>
 #include <set>
@@ -37,7 +38,6 @@
 
 namespace vrv {
 
-#ifdef USE_EMSCRIPTEN
 bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction, bool isChain)
 {
     jsonxx::Object json;
@@ -179,7 +179,7 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
     std::string info = "[";
     bool runReorder = false;
     std::string id = "";
-    for (int i = 0; i < actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); i++) {
         if (!actions.has<jsonxx::Object>(i)) {
             LogError("Action %d was not an object", i);
             return false;
@@ -491,7 +491,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         staves.push_back(newStaff);
         StaffSort staffSort;
         std::stable_sort(staves.begin(), staves.end(), staffSort);
-        for (int i = 0; i < staves.size(); i++) {
+        for (int i = 0; i < (int)staves.size(); i++) {
             if (staves.at(i) == newStaff) {
                 newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
@@ -1330,8 +1330,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
     m_editInfo = "";
-    Object *fparent, *sparent, *currentParent;
-    Nc *firstNc, *secondNc;
+    Object *fparent = NULL;
+    Object *sparent = NULL;
+    Object *currentParent = NULL;
+    Nc *firstNc = NULL;
+    Nc *secondNc = NULL;
     bool success1, success2;
     int ligCount = 0;
     bool firstIsSyl = false;
@@ -1479,7 +1482,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         LogError("Unable to find neume with id %s", elementId.c_str());
         return false;
     }
-    Nc *firstChild, *prevNc;
+    Nc *firstChild = NULL;
+    Nc *prevNc = NULL;
 
     //Get children of neume. Keep the first child and delete the others.
     ClassIdComparison ac(NC);
@@ -1710,7 +1714,7 @@ bool EditorToolkitNeume::ParseMergeAction(
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
     return true;
@@ -1818,7 +1822,7 @@ bool EditorToolkitNeume::ParseGroupAction(
     (*groupType) = param.get<jsonxx::String>("groupType");
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
 
@@ -1832,7 +1836,7 @@ bool EditorToolkitNeume::ParseUngroupAction(
     (*groupType) = param.get<jsonxx::String>("groupType");
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
 
@@ -1854,7 +1858,7 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
 {
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
     if(!param.has<jsonxx::String>("isLigature")) return false;
@@ -1863,6 +1867,4 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
     return true;
 }
 
-#endif
-// USE_EMSCRIPTEN
 }// namespace vrv

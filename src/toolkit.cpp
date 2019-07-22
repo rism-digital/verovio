@@ -15,6 +15,9 @@
 
 #include "comparison.h"
 #include "custos.h"
+#include "editortoolkit_cmn.h"
+#include "editortoolkit_mensural.h"
+#include "editortoolkit_neume.h"
 #include "functorparams.h"
 #include "ioabc.h"
 #include "iodarms.h"
@@ -40,12 +43,6 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
-
-#ifdef USE_EMSCRIPTEN
-#include "editortoolkit_cmn.h"
-#include "editortoolkit_mensural.h"
-#include "editortoolkit_neume.h"
-#endif
 
 namespace vrv {
 
@@ -75,10 +72,7 @@ Toolkit::Toolkit(bool initFont)
 
     m_options = m_doc.GetOptions();
 
-#ifdef USE_EMSCRIPTEN
-    // Initialize editortoolkit later based on input.
     m_editorToolkit = NULL;
-#endif
 }
 
 Toolkit::~Toolkit()
@@ -91,12 +85,10 @@ Toolkit::~Toolkit()
         free(m_cString);
         m_cString = NULL;
     }
-#ifdef USE_EMSCRIPTEN
     if (m_editorToolkit) {
         delete m_editorToolkit;
         m_editorToolkit = NULL;
     }
-#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -560,7 +552,7 @@ bool Toolkit::LoadData(const std::string &data)
     delete input;
     m_view.SetDoc(&m_doc);
 
-#if defined USE_EMSCRIPTEN && defined NO_HUMDRUM_SUPPORT
+#if defined NO_HUMDRUM_SUPPORT
     // Create editor toolkit based on notation type.
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
@@ -572,8 +564,7 @@ bool Toolkit::LoadData(const std::string &data)
         case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
         case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
         default:
-            m_editorToolkit = NULL;
-            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
+             m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
     }
 #endif
 
@@ -956,24 +947,12 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 
 bool Toolkit::Edit(const std::string &json_editorAction)
 {
-#ifdef USE_EMSCRIPTEN
     return m_editorToolkit->ParseEditorAction(json_editorAction);
-#else
-    // The non-js version of the app should not use this function.
-    LogError("This function should not be accessed through the non-js version of the app.");
-    return false;
-#endif
 }
 
 std::string Toolkit::EditInfo()
 {
-#ifdef USE_EMSCRIPTEN
     return m_editorToolkit->EditInfo();
-#else
-    // The non-js version of the app should not use this function.
-    LogError("This function should not be accessed through the non-js version of the app.");
-    return "";
-#endif
 }
 
 std::string Toolkit::GetLog()
