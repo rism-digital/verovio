@@ -1403,7 +1403,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     Object *parent = NULL, *doubleParent = NULL;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
+    ArrayOfObjects sortedElements;
     std::vector<Object *> fullParents;
+    std::map<Syllable *, Clef *> clefsBefore;
 
     //Get the current drawing page
     if (!m_doc->GetDrawingPage()) {
@@ -1467,6 +1469,32 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         elements.insert(el);
     }
 
+    std::copy(elements.begin(), elements.end(), std::back_inserter(sortedElements));
+    std::stable_sort(sortedElements.begin(), sortedElements.end(), Object::sortByUlx);
+
+    ArrayOfObjects clefs;
+    ArrayOfObjects syllables;
+    ClassIdComparison clefComp(CLEF);
+    InterfaceComparison pitchComp(INTERFACE_PITCH);
+    Clef newClef;
+
+    m_doc->GetDrawingPage()->FindAllChildBetween(&clefs, &clefComp, 
+        sortedElements.front()->GetFirstParent(SYLLABLE), sortedElements.back()->GetFirstParent(SYLLABLE));
+
+    // if there are clefs between the elements getting grouped
+    // some elements will need their pitch adjusted for the new clef
+    // clefsBefore maps the syllable parent to its clef before the group
+    // so we can reassociate any pitched children from their old clef to the new one
+    if (clefs.size() != 0) {
+        for (auto it = sortedElements.begin(); it != sortedElements.end(); ++it) {
+            syllables.push_back((*it)->GetFirstParent(SYLLABLE));
+        }
+        for (auto it = syllables.begin(); it != syllables.end(); ++it) {
+            clefsBefore.insert(std::pair<Syllable *, Clef *>((*it), m_doc->GetDrawingPage()->FindPreviousChildOfType(&clefComp, (*it))));
+        }
+        newClef = clefsBefore[syllables.front()];
+    }
+
     // find parents where all of their children are being grouped
     for (auto it = parents.begin(); it != parents.end(); ++it) {
         auto parentPair = *it;
@@ -1481,7 +1509,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             fullParents.push_back(parentPair.first);
         }
     }
-    //if there are no full parents we need to make a new one to attach everything to
+    // if there are no full parents we need to make a new one to attach everything to
     if (fullParents.empty()) {
         if (elementClass == NC) {
             parent = new Neume();
@@ -1580,8 +1608,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         layer->ReorderByXPos();
     }
 
-    //if there's only one full parent we just add the other elements to it
-    //except don't move syl tags since we want them to stay attached to the first parent
+    // if there's only one full parent we just add the other elements to it
+    // except don't move syl tags since we want them to stay attached to the first parent
     else if(fullParents.size() == 1) {
         auto iter = fullParents.begin();
         parent = *iter;
@@ -1593,9 +1621,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         parent->ReorderByXPos();
     }
 
-    //if there is more than 1 full parent we need to concat syl's
-    //unless we're just grouping NC's in which case no need to worry about syl's of course
-    //also in this case we need to make sure that the facsimile of the resulting syl is correct
+    // if there is more than 1 full parent we need to concat syl's
+    // unless we're just grouping NC's in which case no need to worry about syl's of course
+    // also in this case we need to make sure that the facsimile of the resulting syl is correct
     else {
         if (elementClass == NC) {
             parent = new Neume();
@@ -1683,6 +1711,17 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 obj->DeleteChild(syl);
             }
             doubleParent->DeleteChild(obj);
+        }
+    }
+
+    // change the pitch of any pitched elements whose clef may have changed
+    ArrayOfObjects pitchedChildren;
+    for (auto it = syllables.begin(); it != syllables.end(); ++it) {
+        if (clefsBefore[(*it)] != newClef) {
+            (*it)->FindAllChildByComparison(&pitchedChildren, &pitchComp);
+            for (auto child = pitchedChildren.begin(); child != pitchedChildren.end(); ++child) {
+                child->GetPitchInterface()->AdjustPitchForNewClef(clefsBefore[(*it)], newClef);
+            }
         }
     }
 
