@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul 13 22:58:44 CEST 2019
+// Last Modified: Sun Jul 14 18:08:23 CEST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1034,24 +1034,24 @@ class HumdrumLine : public std::string, public HumHash {
 		void          setText              (const std::string& text);
 		std::string   getText              (void);
 
-		HumNum   getDuration            (void) const;
-		HumNum   getDurationFromStart   (void) const;
-		HumNum   getDurationToEnd       (void) const;
-		HumNum   getDurationFromBarline (void) const;
-		HumNum   getDurationToBarline   (void) const;
-		HumNum   getBarlineDuration     (void) const;
+		HumNum      getDuration            (void);
+		HumNum      getDurationFromStart   (void);
+		HumNum      getDurationToEnd       (void);
+		HumNum      getDurationFromBarline (void);
+		HumNum      getDurationToBarline   (void);
+		HumNum      getBarlineDuration     (void);
 
-		HumNum   getDuration            (HumNum scale) const;
-		HumNum   getDurationFromStart   (HumNum scale) const;
-		HumNum   getDurationToEnd       (HumNum scale) const;
-		HumNum   getDurationFromBarline (HumNum scale) const;
-		HumNum   getDurationToBarline   (HumNum scale) const;
-		HumNum   getBarlineDuration     (HumNum scale) const;
-		int      getKernNoteAttacks     (void);
-		int      addLinkedParameter     (HTp token);
+		HumNum      getDuration            (HumNum scale);
+		HumNum      getDurationFromStart   (HumNum scale);
+		HumNum      getDurationToEnd       (HumNum scale);
+		HumNum      getDurationFromBarline (HumNum scale);
+		HumNum      getDurationToBarline   (HumNum scale);
+		HumNum      getBarlineDuration     (HumNum scale);
+		int         getKernNoteAttacks     (void);
+		int         addLinkedParameter     (HTp token);
 
-		HumNum   getBeat                (HumNum beatdur = 1) const;
-		HumNum   getBeatStr             (std::string beatrecip = "4") const;
+		HumNum   getBeat                (HumNum beatdur = 1);
+		HumNum   getBeatStr             (std::string beatrecip = "4");
 		HTp      getTrackStart          (int track) const;
 		void     setLineFromCsv         (const char* csv,
 		                                 const std::string& separator = ",");
@@ -1154,6 +1154,10 @@ class HumdrumLine : public std::string, public HumHash {
 		// (mostly only layout parameters at the moment)
 		std::vector<HTp> m_linkedParameters;
 
+		// m_rhythm_analyzed: True if duration information from HumdrumFile
+		// has been added to line.
+		bool m_rhythm_analyzed = false;
+
 		// owner: This is the HumdrumFile which manages the given line.
 		void* m_owner;
 
@@ -1252,28 +1256,28 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     hasObliquaLigatureEnd     (void);
 		char     hasStemDirection          (void);
 
-		HumNum   getDuration               (void) const;
-		HumNum   getDuration               (HumNum scale) const;
+		HumNum   getDuration               (void);
+		HumNum   getDuration               (HumNum scale);
 		HumNum   getTiedDuration           (void);
 		HumNum   getTiedDuration           (HumNum scale);
-		HumNum   getDurationNoDots         (void) const;
-		HumNum   getDurationNoDots         (HumNum scale) const;
+		HumNum   getDurationNoDots         (void);
+		HumNum   getDurationNoDots         (HumNum scale);
 		int      getDots                   (char separator = ' ') const;
 
-		HumNum   getDurationFromStart      (void) const;
-		HumNum   getDurationFromStart      (HumNum scale) const;
+		HumNum   getDurationFromStart      (void);
+		HumNum   getDurationFromStart      (HumNum scale);
 
-		HumNum   getDurationToEnd          (void) const;
-		HumNum   getDurationToEnd          (HumNum scale) const;
+		HumNum   getDurationToEnd          (void);
+		HumNum   getDurationToEnd          (HumNum scale);
 
-		HumNum   getDurationFromBarline    (void) const;
-		HumNum   getDurationFromBarline    (HumNum scale) const;
+		HumNum   getDurationFromBarline    (void);
+		HumNum   getDurationFromBarline    (HumNum scale);
 
-		HumNum   getDurationToBarline      (void) const;
-		HumNum   getDurationToBarline      (HumNum scale) const;
+		HumNum   getDurationToBarline      (void);
+		HumNum   getDurationToBarline      (HumNum scale);
 
-		HumNum   getBarlineDuration        (void) const;
-		HumNum   getBarlineDuration        (HumNum scale) const;
+		HumNum   getBarlineDuration        (void);
+		HumNum   getBarlineDuration        (HumNum scale);
 
 		HumdrumLine* getOwner              (void) const;
 		HumdrumLine* getLine               (void) const { return getOwner(); }
@@ -1390,7 +1394,7 @@ class HumdrumToken : public std::string, public HumHash {
 		void     setDuration               (const HumNum& dur);
 		void     setStrandIndex            (int index);
 
-		bool     analyzeDuration           (std::string& err);
+		bool     analyzeDuration           (void);
 		std::ostream& printXmlBaseInfo     (std::ostream& out = std::cout, int level = 0,
 		                                    const std::string& indent = "\t");
 		std::ostream& printXmlContentInfo  (std::ostream& out = std::cout, int level = 0,
@@ -1456,6 +1460,9 @@ class HumdrumToken : public std::string, public HumHash {
 		// m_linkedParameter: A single parameter encoded in the text of the
 		// token.
 		HumParamSet* m_linkedParameter = NULL;
+
+		// m_rhythm_analyzed: Set to true when HumdrumFile assigned duration
+		bool m_rhythm_analyzed = false;
 
 	friend class HumdrumLine;
 	friend class HumdrumFileBase;
@@ -1555,6 +1562,9 @@ class HumdrumFileBase : public HumHash {
 		void          setQuietParsing          (void);
 		void          setNoisyParsing          (void);
 		void          clear                    (void);
+		bool          isStructureAnalyzed      (void);
+		bool          isRhythmAnalyzed         (void);
+		bool          areStrandsAnalyzed       (void);
 
 		bool          parse                    (std::istream& contents)
 		                                    { return read(contents); }
@@ -1788,6 +1798,18 @@ class HumdrumFileBase : public HumHash {
 		// m_signifiers: Used to keep track of !!!RDF records.
 		HumSignifiers m_signifiers;
 
+		// m_structure_analyzed: Used to keep track of whether or not
+		// file structure has been analyzed.
+		bool m_structure_analyzed = false;
+
+		// m_rhythm_analyzed: Used to keep track of whether or not
+		// rhythm structure has been analyzed.
+		bool m_rhythm_analyzed = false;
+
+		// m_strands_analyzed: Used to keep track of whether or not
+		// file strands have been analyzed.
+		bool m_strands_analyzed = false;
+
 	public:
 		// Dummy functions to allow the HumdrumFile class's inheritance
 		// to be shifted between HumdrumFileContent (the top-level default),
@@ -1877,17 +1899,17 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		int           tpq                          (void);
 
 		// strand functionality:
-		HTp           getStrandStart               (int index) const;
-		HTp           getStrandEnd                 (int index) const;
-		HTp           getStrandStart               (int sindex, int index) const;
-		HTp           getStrandEnd                 (int sindex, int index) const;
-		int           getStrandCount               (void) const;
-		int           getStrandCount               (int spineindex) const;
+		HTp           getStrandStart               (int index);
+		HTp           getStrandEnd                 (int index);
+		HTp           getStrandStart               (int sindex, int index);
+		HTp           getStrandEnd                 (int sindex, int index);
+		int           getStrandCount               (void);
+		int           getStrandCount               (int spineindex);
 		void          resolveNullTokens            (void);
 
-		HTp           getStrand                    (int index) const
+		HTp           getStrand                    (int index)
 		                                        { return getStrandStart(index); }
-		HTp           getStrand                    (int sindex, int index) const
+		HTp           getStrand                    (int sindex, int index)
 		                                { return getStrandStart(sindex, index); }
 
 		// barline/measure functionality:
@@ -1898,6 +1920,8 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		HumNum        getBarlineDurationToEnd      (int index) const;
 
 		bool          analyzeStructure             (void);
+		bool          analyzeStructureNoRhythm     (void);
+		bool          analyzeRhythmStructure       (void);
 		bool          analyzeStrands               (void);
 
 		// signifier access
@@ -1940,6 +1964,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		void          analyzeSpineStrands          (std::vector<TokenPair>& ends,
 		                                            HTp starttok);
 		void          analyzeSignifiers            (void);
+		void          setLineRhythmAnalyzed        (void);
 };
 
 
@@ -3737,31 +3762,31 @@ class HumTool : public Options {
 //
 //
 
-#define BASIC_INTERFACE(CLASS)                 \
-using namespace std;                           \
-using namespace hum;                           \
-int main(int argc, char** argv) {              \
-	CLASS interface;                            \
-	if (!interface.process(argc, argv)) {       \
-		interface.getError(cerr);                \
-		return -1;                               \
-	}                                           \
-	HumdrumFile infile;                         \
-	if (interface.getArgCount() > 0) {          \
-		infile.read(interface.getArgument(1));   \
-	} else {                                    \
-		infile.read(cin);                        \
-	}                                           \
-	int status = interface.run(infile, cout);   \
-	if (interface.hasWarning()) {               \
-		interface.getWarning(cerr);              \
-		return 0;                                \
-	}                                           \
-	if (interface.hasError()) {                 \
-		interface.getError(cerr);                \
-		return -1;                               \
-	}                                           \
-	return !status;                             \
+#define BASIC_INTERFACE(CLASS)                         \
+using namespace std;                                   \
+using namespace hum;                                   \
+int main(int argc, char** argv) {                      \
+	CLASS interface;                                    \
+	if (!interface.process(argc, argv)) {               \
+		interface.getError(cerr);                        \
+		return -1;                                       \
+	}                                                   \
+	HumdrumFile infile;                                 \
+	if (interface.getArgCount() > 0) {                  \
+		infile.readNoRhythm(interface.getArgument(1));   \
+	} else {                                            \
+		infile.readNoRhythm(cin);                        \
+	}                                                   \
+	int status = interface.run(infile, cout);           \
+	if (interface.hasWarning()) {                       \
+		interface.getWarning(cerr);                      \
+		return 0;                                        \
+	}                                                   \
+	if (interface.hasError()) {                         \
+		interface.getError(cerr);                        \
+		return -1;                                       \
+	}                                                   \
+	return !status;                                     \
 }
 
 
@@ -5576,6 +5601,30 @@ class Tool_recip : public HumTool {
 
 };
 
+
+
+class Tool_restfill : public HumTool {
+	public:
+		         Tool_restfill         (void);
+		        ~Tool_restfill         () {};
+
+		bool        run                (HumdrumFile& infile);
+		bool        run                (const string& indata, ostream& out);
+		bool        run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void        processFile        (HumdrumFile& infile);
+		void        initialize         (void);
+		bool        hasBlankMeasure    (HTp start);
+		void        fillInRests        (HTp start);
+		void        addRest            (HTp cell, HumNum duration);
+		HumNum      getNextTime        (HTp token);
+
+	private:
+		bool        m_hiddenQ  = false;
+		std::string m_exinterp = "**kern";
+
+};
 
 
 class Tool_ruthfix : public HumTool {
