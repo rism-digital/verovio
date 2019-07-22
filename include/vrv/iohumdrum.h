@@ -533,6 +533,8 @@ protected:
     std::string getStringParameter(hum::HTp token, const string &category, const string &key);
     bool shouldHideBeamBracket(
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int layerindex);
+    void checkBeamWith(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
+        std::vector<hum::HTp> &layerdata, int startindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

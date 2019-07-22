@@ -5285,6 +5285,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
     }
     else if (tg.beamstart) {
         beam = insertBeam(elements, pointers, tg);
+        checkBeamWith(beam, tgs, layerdata, layerindex);
         setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
     else if (tg.tupletstart) {
@@ -5295,6 +5296,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         // Grace note beams should not interact with
         // regular beams or tuplets.
         beam = insertGBeam(elements, pointers, tg);
+        checkBeamWith(beam, tgs, layerdata, layerindex);
         setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
 }
@@ -14673,6 +14675,72 @@ void HumdrumInput::setLocationIdNSuffix(Object *object, hum::HTp token, int numb
     id += "F" + to_string(field);
     id += "N" + to_string(number);
     object->SetUuid(id);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::checkBeamWith -- If all notes of a beam are not on the home staff,
+//    then use beam@beam.width="below|above" to move it to the adjacent staff (it
+//    will not be moved there automatically by verovio).
+//
+
+void HumdrumInput::checkBeamWith(
+    Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int startindex)
+{
+    if (!(m_signifiers.above || m_signifiers.below)) {
+        return;
+    }
+    hum::HumRegex hre;
+    int targetEnd = tgs[startindex].beamstart;
+    bool isAbove = true;
+    bool isBelow = true;
+    bool foundAbove = false;
+    bool foundBelow = false;
+    string aboveSearch = "[A-Ga-gn#-]";
+    string belowSearch = "[A-Ga-gn#-]";
+    aboveSearch += m_signifiers.above;
+    belowSearch += m_signifiers.below;
+    for (int i = startindex; i < (int)layerdata.size(); i++) {
+        if (!(layerdata[i]->isNote() || layerdata[i]->isRest())) {
+            continue;
+        }
+        if (isAbove) {
+            if (hre.search(layerdata[i], aboveSearch)) {
+                foundAbove = true;
+            }
+            else {
+                foundAbove = false;
+            }
+        }
+        if (isBelow) {
+            if (hre.search(layerdata[i], belowSearch)) {
+                foundBelow = true;
+            }
+            else {
+                foundBelow = false;
+            }
+        }
+        isAbove &= foundAbove;
+        isBelow &= foundBelow;
+        if (!(isAbove || isBelow)) {
+            break;
+        }
+        if (tgs[i].beamend == targetEnd) {
+            break;
+        }
+    }
+    if (!(isAbove || isBelow)) {
+        return;
+    }
+    if (isAbove && isBelow) {
+        // something strange happened
+    }
+    if (isAbove) {
+        beam->SetBeamWith(OTHERSTAFF_above);
+    }
+    if (isBelow) {
+        beam->SetBeamWith(OTHERSTAFF_below);
+    }
 }
 
 /////////////////////////////
