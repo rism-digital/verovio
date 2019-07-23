@@ -14264,7 +14264,8 @@ void HumdrumInput::setupMeiDocument()
     hum::HTp starting = m_infile.getTrackStart(1);
     if (starting) {
         section->SetUuid(getLocationId(section, starting, -1));
-        storeExpansionLists(section, starting);
+		// Disable temporarily: https://github.com/rism-ch/verovio/issues/1125
+        // storeExpansionLists(section, starting);
     }
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());
