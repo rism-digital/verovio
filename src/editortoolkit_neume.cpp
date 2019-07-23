@@ -1473,10 +1473,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     std::stable_sort(sortedElements.begin(), sortedElements.end(), Object::sortByUlx);
 
     ArrayOfObjects clefs;
-    ArrayOfObjects syllables;
+    std::set<Object *> syllables;
+    ArrayOfObjects sortedSyllables;
     ClassIdComparison clefComp(CLEF);
     InterfaceComparison pitchComp(INTERFACE_PITCH);
-    Clef newClef;
+    Clef *newClef;
 
     m_doc->GetDrawingPage()->FindAllChildBetween(&clefs, &clefComp, 
         sortedElements.front()->GetFirstParent(SYLLABLE), sortedElements.back()->GetFirstParent(SYLLABLE));
@@ -1487,12 +1488,19 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // so we can reassociate any pitched children from their old clef to the new one
     if (clefs.size() != 0) {
         for (auto it = sortedElements.begin(); it != sortedElements.end(); ++it) {
-            syllables.push_back((*it)->GetFirstParent(SYLLABLE));
+            if ((*it)->Is(SYLLABLE)) {
+                syllables.insert(dynamic_cast<Object *>(*it));
+            }
+            else {
+                syllables.insert((*it)->GetFirstParent(SYLLABLE));
+            }
         }
-        for (auto it = syllables.begin(); it != syllables.end(); ++it) {
-            clefsBefore.insert(std::pair<Syllable *, Clef *>((*it), m_doc->GetDrawingPage()->FindPreviousChildOfType(&clefComp, (*it))));
+        std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
+        for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
+            clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it), 
+                dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&clefComp, (*it)))));
         }
-        newClef = clefsBefore[syllables.front()];
+        newClef = clefsBefore[dynamic_cast<Syllable *>(sortedSyllables.front())];
     }
 
     // find parents where all of their children are being grouped
@@ -1699,6 +1707,23 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             parent = fullSyllable;
         }
     }
+
+    // change the pitch of any pitched elements whose clef may have changed
+    ArrayOfObjects pitchedChildren;
+    // LogMessage("%d", sortedSyllables.size());
+    if (sortedSyllables.size()) {
+        for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
+            LogMessage((*it)->GetClassName().c_str());
+            Syllable *syllable = dynamic_cast<Syllable *>(*it);
+            if (clefsBefore[syllable] != newClef) {
+                syllable->FindAllChildByComparison(&pitchedChildren, &pitchComp);
+                for (auto child = pitchedChildren.begin(); child != pitchedChildren.end(); ++child) {
+                    (*child)->GetPitchInterface()->AdjustPitchForNewClef(clefsBefore[(syllable)], newClef);
+                }
+            }
+        }
+    }
+
     // Delete any empty parents
     for (auto it = parents.begin(); it != parents.end(); ++it) {
         Object *obj = (*it).first;
@@ -1711,17 +1736,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 obj->DeleteChild(syl);
             }
             doubleParent->DeleteChild(obj);
-        }
-    }
-
-    // change the pitch of any pitched elements whose clef may have changed
-    ArrayOfObjects pitchedChildren;
-    for (auto it = syllables.begin(); it != syllables.end(); ++it) {
-        if (clefsBefore[(*it)] != newClef) {
-            (*it)->FindAllChildByComparison(&pitchedChildren, &pitchComp);
-            for (auto child = pitchedChildren.begin(); child != pitchedChildren.end(); ++child) {
-                child->GetPitchInterface()->AdjustPitchForNewClef(clefsBefore[(*it)], newClef);
-            }
         }
     }
 
