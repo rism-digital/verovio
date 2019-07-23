@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 14 18:08:23 CEST 2019
+// Last Modified: Tue Jul 23 20:13:45 CEST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -20241,8 +20241,16 @@ void HumdrumFileStructure::analyzeSpineStrands(vector<TokenPair>& ends,
 	HTp tok = starttok;
 	while (tok != NULL) {
 		if ((tok->getSubtrack() > 1) && (tok->isMerge())) {
-			ends[index].last = tok;
-			return;
+			// check to the left: if the left primary/sub spine also has
+			// a *v, then this is the end of this strand; otherwise, the
+			// strand continues.
+			if (tok->getPreviousFieldToken()->isMerge()) {
+				ends[index].last = tok;
+				return;
+			} else {
+				tok = tok->getNextToken();
+				continue;
+			}
 		}
 		if (tok->isTerminator()) {
 			ends[index].last = tok;
