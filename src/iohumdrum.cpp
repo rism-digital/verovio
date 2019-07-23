@@ -4231,6 +4231,8 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             else {
                 harm->AddChild(text);
             }
+            string tracktext = getTrackText(token);
+            harm->SetN(tracktext);
 
             int staffindex = m_rkern[track];
 
@@ -4274,6 +4276,31 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             setLocationId(harm, token);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getTrackText --
+//
+
+std::string HumdrumInput::getTrackText(hum::HTp token)
+{
+    std::string trackinfo = token->getSpineInfo();
+    int track = token->getTrack();
+    std::string output = to_string(track);
+    std::string extension = "";
+    for (int i = 0; i < (int)trackinfo.size(); i++) {
+        if (trackinfo[i] == 'a') {
+            extension += 'a';
+        }
+        else if (trackinfo[i] == 'b') {
+            extension += 'b';
+        }
+    }
+    if (extension != "a") {
+        output += extension;
+    }
+    return output;
 }
 
 //////////////////////////////
@@ -14264,7 +14291,7 @@ void HumdrumInput::setupMeiDocument()
     hum::HTp starting = m_infile.getTrackStart(1);
     if (starting) {
         section->SetUuid(getLocationId(section, starting, -1));
-		// Disable temporarily: https://github.com/rism-ch/verovio/issues/1125
+        // Disable temporarily: https://github.com/rism-ch/verovio/issues/1125
         // storeExpansionLists(section, starting);
     }
     m_sections.push_back(section);

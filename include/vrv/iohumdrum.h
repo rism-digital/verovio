@@ -536,6 +536,7 @@ protected:
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int layerindex);
     void checkBeamWith(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int startindex);
+    std::string getTrackText(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
