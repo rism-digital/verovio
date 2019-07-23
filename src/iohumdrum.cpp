@@ -14752,8 +14752,8 @@ void HumdrumInput::checkBeamWith(
     bool isBelow = true;
     bool foundAbove = false;
     bool foundBelow = false;
-    string aboveSearch = "[A-Ga-gn#-]";
-    string belowSearch = "[A-Ga-gn#-]";
+    string aboveSearch = "[A-Ga-gn#-][XxYy]?";
+    string belowSearch = "[A-Ga-gn#-][XxYy]?";
     aboveSearch += m_signifiers.above;
     belowSearch += m_signifiers.below;
     for (int i = startindex; i < (int)layerdata.size(); i++) {
