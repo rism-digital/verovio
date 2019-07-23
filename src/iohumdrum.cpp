@@ -642,8 +642,8 @@ bool HumdrumInput::convertHumdrum()
     // calculateLayout();
 
     m_doc->ConvertToPageBasedDoc();
-    promoteInstrumentNamesToGroup();
     promoteInstrumentAbbreviationsToGroup();
+    promoteInstrumentNamesToGroup();
 
     if (m_debug) {
         cout << GetMeiString();
@@ -1541,7 +1541,7 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
 void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
 {
     int count = group->GetChildCount();
-    std::vector<std::string> names(count);
+    std::vector<std::string> names;
     string name;
     vector<StaffDef *> sds;
     sds.clear();
@@ -1557,7 +1557,7 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
         StaffDef *sd = (StaffDef *)obj;
         sds.push_back(sd);
         std::string label = getInstrumentName(sd);
-        names[i] = label;
+        names.push_back(label);
     }
     bool allsame = true;
     if (names.size() <= 1) {
@@ -1618,7 +1618,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
 {
     int count = group->GetChildCount();
-    std::vector<std::string> names(count);
+    std::vector<std::string> names;
     string name;
     vector<StaffDef *> sds;
     sds.clear();
@@ -1634,7 +1634,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
         StaffDef *sd = (StaffDef *)obj;
         sds.push_back(sd);
         std::string label = getInstrumentAbbreviation(sd);
-        names[i] = label;
+        names.push_back(label);
     }
     bool allsame = true;
     if (names.size() <= 1) {
@@ -1657,16 +1657,13 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
             break;
         }
     }
-    // An irrational bug prevents moving the instrument abbreviation for now.
-    // After adding/removing the abbreviation, the full name dissappears for some
-    // unknown reason.
     if (allsame) {
-        // setInstrumentAbbreviation(group, nonempty);
+        setInstrumentAbbreviation(group, nonempty);
         for (int i = 0; i < (int)sds.size(); i++) {
-            if (names[i].empty()) {
+            if (names.at(i).empty()) {
                 continue;
             }
-            // removeInstrumentAbbreviation(sds[i]);
+            removeInstrumentAbbreviation(sds[i]);
         }
     }
 }
