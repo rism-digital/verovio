@@ -1754,6 +1754,9 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     bool success1, success2;
     int ligCount = 0;
     bool firstIsSyl = false;
+    Clef *oldClef;
+    ClassIdComparison ac(CLEF);
+    ArrayOfObjects syllables;
 
     //Check if you can get drawing page
     if (!m_doc->GetDrawingPage()) {
@@ -1762,9 +1765,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     }
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        //Check for ligatures and toggle them before ungrouping
-        //only if the ligature is the entire selection
-        if(groupType == "nc" && elementIds.size() == 2){
+
+        // Check for ligatures and toggle them before ungrouping
+        // only if the ligature is the entire selection
+        if (groupType == "nc" && elementIds.size() == 2) {
             Nc *nc = dynamic_cast<Nc *> (el);
             if(nc->HasLigated() && nc->GetLigated() == BOOLEAN_true){
                 nc->SetLigated(BOOLEAN_false);
@@ -1819,9 +1823,9 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 }
             }
         }
-        if (elementIds.begin() == it || firstIsSyl){
-            //if the element is a syl we want it to stay attached to the first element
-            //we'll still need to initialize all the parents, thus the bool
+        if (elementIds.begin() == it || firstIsSyl) {
+            // if the element is a syl we want it to stay attached to the first element
+            // we'll still need to initialize all the parents, thus the bool
             if (el->Is(SYL)) {
                 firstIsSyl = true;
                 continue;
@@ -1845,7 +1849,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 currentParent = dynamic_cast<Syllable *>(fparent);
                 assert(currentParent);
                 firstIsSyl = false;
-
+                oldClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, currentParent));
             }
             else{
                 LogError("Invalid groupType for ungrouping");
@@ -1871,6 +1875,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
+
+            if (newParent->Is(SYLLABLE)) {
+                syllables.push_back(newParent);
+            }
 
             if (newParent->Is(SYLLABLE) && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
                 Syl *syl = new Syl();
@@ -1948,6 +1956,22 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             sparent->ReorderByXPos();
         }
     }
+    if (syllables.size() != 0) {
+        Clef *currentClef;
+        ArrayOfObjects pitchedChildren;
+        InterfaceComparison ic(INTERFACE_PITCH);
+        std::stable_sort(syllables.begin(), syllables.end(), Object::sortByUlx);
+        for (auto it = syllables.begin(); it != syllables.end(); ++it) {
+            currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, (*it)));
+            if (currentClef != oldClef) {
+                (*it)->FindAllChildByComparison(&pitchedChildren, &ic);
+                for (auto pChild = pitchedChildren.begin(); pChild != pitchedChildren.end(); ++pChild) {
+                    (*pChild)->GetPitchInterface()->AdjustPitchForNewClef(oldClef, currentClef);
+                }
+            }
+        }
+    }
+    
     return true;
 }
 
