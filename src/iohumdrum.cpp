@@ -3577,9 +3577,22 @@ template <class ELEMENT> void HumdrumInput::setStaff(ELEMENT element, int staffn
 // HumdrumInput::setN --
 //
 
-template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue)
+template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue, hum::HTp tok)
 {
-    element->SetN(to_string(nvalue));
+    std::string name = element->GetClassName();
+    if (tok && (name == "Ending")) {
+        // Check if there is a LO:TX text to replace number.
+        std::string textlabel = tok->getLayoutParameter("TX", "t");
+        if (!textlabel.empty()) {
+            element->SetN(textlabel);
+        }
+        else {
+            element->SetN(to_string(nvalue));
+        }
+    }
+    else {
+        element->SetN(to_string(nvalue));
+    }
 }
 
 //////////////////////////////
@@ -14002,40 +14015,40 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     string previoussection = m_lastsection;
-    string currentsection = m_sectionlabels[startline];
+    string currentsection = *m_sectionlabels[startline];
 
     m_measure = new Measure();
 
     int endnum = 0;
     bool ending = false;
     bool newsection = false;
-    if (isdigit(m_sectionlabels[startline].back())) {
+    if (isdigit((*m_sectionlabels[startline]).back())) {
         ending = true;
         std::smatch matches;
-        if (regex_search(m_sectionlabels[startline], matches, regex("(\\d+)$"))) {
+        if (regex_search(*m_sectionlabels[startline], matches, regex("(\\d+)$"))) {
             endnum = stoi(matches[1]);
         }
         else {
             endnum = 0;
         }
     }
-    else if (m_sectionlabels[startline] != m_lastsection) {
+    else if (*m_sectionlabels[startline] != m_lastsection) {
         newsection = true;
-        if (m_lastsection != m_sectionlabels[startline]) {
+        if (m_lastsection != *m_sectionlabels[startline]) {
             if (m_sections.size() > 1) {
                 // keep movement-level section in stack.
                 m_sections.pop_back();
             }
         }
-        m_lastsection = m_sectionlabels[startline];
+        m_lastsection = *m_sectionlabels[startline];
     }
 
     if (ending && (m_endingnum != endnum)) {
         // create a new ending
         m_currentending = new Ending;
-        setN(m_currentending, endnum);
+        setN(m_currentending, endnum, m_sectionlabels[startline]);
         // sanitize id if not valid:
-        m_currentending->SetUuid(m_sectionlabels[startline]);
+        m_currentending->SetUuid(*m_sectionlabels[startline]);
         if (m_sections.size() > 1) {
             // assuming the ending does not start at beginning
             // of music.
@@ -14044,7 +14057,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
-    else if (isdigit(m_sectionlabels[startline].back())) {
+    else if (isdigit((*m_sectionlabels[startline]).back())) {
         // inside a current ending
         m_currentending->AddChild(m_measure);
     }
@@ -15443,11 +15456,14 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 
 void HumdrumInput::prepareSections()
 {
-    std::vector<string> &sectionlabels = m_sectionlabels;
+    std::vector<hum::HTp> &sectionlabels = m_sectionlabels;
     hum::HumdrumFile &infile = m_infile;
 
     sectionlabels.resize(infile.getLineCount());
-    string secname;
+    for (int i = 0; i < (int)sectionlabels.size(); i++) {
+        sectionlabels[i] = NULL;
+    }
+    hum::HTp secname = NULL;
 
     for (int i = 0; i < infile.getLineCount(); ++i) {
         sectionlabels[i] = secname;
@@ -15472,7 +15488,7 @@ void HumdrumInput::prepareSections()
         //            ending[i] = endnum;
         //        }
 
-        secname = infile.token(i, 0)->substr(2);
+        secname = infile.token(i, 0);
         sectionlabels[i] = secname;
         for (int j = i - 1; j >= 0; j--) {
             if (infile[j].isData()) {

@@ -558,7 +558,7 @@ protected:
     template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
-    template <class ELEMENT> void setN(ELEMENT element, int nvalue);
+    template <class ELEMENT> void setN(ELEMENT element, int nvalue, hum::HTp tok = NULL);
     template <class ELEMENT> void assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex);
 
     template <class CHILD>
@@ -730,7 +730,7 @@ private:
     std::vector<int> m_multirest;
 
     // m_sections == keep track of thru sections and 1st/second endings.
-    std::vector<std::string> m_sectionlabels;
+    std::vector<hum::HTp> m_sectionlabels;
 
     // m_endingnum == keep track of current ending.
     int m_endingnum = 0;
