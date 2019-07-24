@@ -5322,11 +5322,13 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         if (tg.priority == 'T') {
             insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_beam_tuplet);
             beam = insertBeam(elements, pointers, tg);
+            checkBeamWith(beam, tgs, layerdata, layerindex);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
         }
         else {
             beam = insertBeam(elements, pointers, tg);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
+            checkBeamWith(beam, tgs, layerdata, layerindex);
             insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_beam_tuplet);
         }
     }
