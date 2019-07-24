@@ -9416,6 +9416,9 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     if (scale == 0.0) {
         scale = 1.0;
     }
+    if (scale < 0) {
+        scale = -scale;
+    }
     tuplet->SetNum(tg.num * scale);
     tuplet->SetNumbase(tg.numbase * scale);
     if (suppress) {
@@ -10031,6 +10034,7 @@ if (tupletendboolean[i]) {
             tg[i].bracket = -1;
             tg[i].num = -1;
             tg[i].numbase = -1;
+            tg[i].numscale = 1;
             tg[i].beamstart = 0;
             tg[i].beamend = 0;
             tg[i].gbeamstart = gbeamstart[i];
@@ -10053,9 +10057,21 @@ if (tupletendboolean[i]) {
             if (tg[i].group > 0) {
                 // tg[i].numscale = tupletscale[tg[i].group - 1];
                 tg[i].numscale = tupletscale[i];
+                if (tg[i].numscale == 0) {
+                    tg[i].numscale = 1;
+                }
+                else if (tg[i].numscale < 0) {
+                    tg[i].numscale *= -1;
+                }
             }
             else {
                 tg[i].numscale = 1;
+                if (tg[i].numscale == 0) {
+                    tg[i].numscale = 1;
+                }
+                else if (tg[i].numscale < 0) {
+                    tg[i].numscale *= -1;
+                }
             }
             if (tg[i].group > 0) {
                 if (tg[i].group < (int)adjustcount.size()) {
@@ -10064,6 +10080,9 @@ if (tupletendboolean[i]) {
                     }
                     if (tg[i].numscale == 0) {
                         tg[i].numscale = 1;
+                    }
+                    else if (tg[i].numscale < 0) {
+                        tg[i].numscale *= -1;
                     }
                 }
             }
@@ -10811,7 +10830,12 @@ std::string HumdrumInput::getEndIdForOttava(hum::HTp token)
 
     std::string prefix = "note";
     if (target->isRest()) {
-        prefix = "rest";
+        if (target->find("yy")) {
+            prefix = "space";
+        }
+        else {
+            prefix = "rest";
+        }
     }
     else if (target->isChord()) {
         prefix = "chord";
