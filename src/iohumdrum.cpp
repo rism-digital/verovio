@@ -9967,6 +9967,12 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         tupletgroups[i] += correction;
     }
 
+    for (int i = 0; i < (int)tuptop.size(); i++) {
+        if (tuptop[i] < 0) {
+            tuptop[i] = -tuptop[i];
+        }
+    }
+
     // tupletscale == 3 for three triplets, 6 for six sextuplets.
     // int xmin = 0;
     // int state = 0;
@@ -9975,71 +9981,10 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     hum::HumNum vdur;
     hum::HumNum val2;
     std::vector<int> tupletscale(tupletstartboolean.size(), 1);
+
     for (int i = 0; i < (int)tupletstartboolean.size(); ++i) {
         hum::HumNum xx = groupdur / 4 / dotlessdur[i] / tuptop[i];
         tupletscale[i] = xx.getNumerator();
-        continue;
-        /*
-if (tupletstartboolean[i]) {
-    state = 1;
-    xmin = twocountbot[i];
-    starti = i;
-    if (tupletendboolean[i]) {
-        // Tuplet also ends on the same note so process and then continue
-        state = 0;
-        value = (1 << xmin);
-        vdur = dursum[i] - dursum[starti] + fulldur[i];
-        if (vdur < 1) {
-            val2 = vdur * value;
-            if (val2.isInteger()) {
-                tupletscale[i] = val2.getNumerator();
-            }
-            else {
-                tupletscale[i] = value;
-            }
-        }
-        else if (vdur / 3 * 2 == 1) {
-            tupletscale[i] = 1;
-        }
-        else {
-            tupletscale[i] = value;
-        }
-    }
-    continue;
-}
-if (!state) {
-    continue;
-}
-if (twocountbot[i] < xmin) {
-    xmin = twocountbot[i];
-}
-if (tupletendboolean[i]) {
-    state = 0;
-    value = (1 << xmin);
-    vdur = dursum[i] - dursum[starti] + fulldur[i];
-
-    if (vdur < 1) {
-        val2 = vdur * value;
-        if (val2.isInteger()) {
-            tupletscale[i] = val2.getNumerator();
-        }
-        else {
-            tupletscale[i] = value;
-        }
-    }
-    else if (vdur / 3 * 2 == 1) {
-        tupletscale[i] = 1;
-    }
-    else {
-        hum::HumNum newval = groupdur / 4 / dotlessdur[i] / tuptop[i];
-        if (newval.isInteger()) {
-            tupletscale[i] = newval.getNumerator();
-        } else {
-            tupletscale[i] = value;
-        }
-    }
-}
-        */
     }
 
     tg.resize(layerdata.size());
@@ -10059,19 +10004,19 @@ if (tupletendboolean[i]) {
             tg[i].priority = ' ';
         }
         else {
-            tg[i].group = tupletgroups[indexmapping2[i]];
-            tg[i].bracket = tupletbracket[indexmapping2[i]];
-            tg[i].num = tuptop[indexmapping2[i]];
-            tg[i].numbase = tupbot[indexmapping2[i]];
-            tg[i].beamstart = beamstartboolean[indexmapping2[i]];
-            tg[i].beamend = beamendboolean[indexmapping2[i]];
-            tg[i].gbeamstart = gbeamstart[i];
-            tg[i].gbeamend = gbeamend[i];
-            tg[i].tupletstart = tupletstartboolean[indexmapping2[i]];
-            tg[i].tupletend = tupletendboolean[indexmapping2[i]];
+            tg[i].group = tupletgroups.at(indexmapping2[i]);
+            tg[i].bracket = tupletbracket.at(indexmapping2[i]);
+            tg[i].num = tuptop.at(indexmapping2[i]);
+            tg[i].numbase = tupbot.at(indexmapping2[i]);
+            tg[i].beamstart = beamstartboolean.at(indexmapping2[i]);
+            tg[i].beamend = beamendboolean.at(indexmapping2[i]);
+            tg[i].gbeamstart = gbeamstart.at(i);
+            tg[i].gbeamend = gbeamend.at(i);
+            tg[i].tupletstart = tupletstartboolean.at(indexmapping2[i]);
+            tg[i].tupletend = tupletendboolean.at(indexmapping2[i]);
+            tg[i].numscale = 1; // initialize numscale
             if (tg[i].group > 0) {
-                // tg[i].numscale = tupletscale[tg[i].group - 1];
-                tg[i].numscale = tupletscale[i];
+                tg[i].numscale = tupletscale.at(indexmapping2[i]);
                 if (tg[i].numscale == 0) {
                     tg[i].numscale = 1;
                 }
@@ -14015,32 +13960,43 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     string previoussection = m_lastsection;
-    string currentsection = *m_sectionlabels[startline];
+    string currentsection;
+    if (m_sectionlabels[startline]) {
+        currentsection = *m_sectionlabels[startline];
+    }
+    else {
+        currentsection = "";
+    }
 
     m_measure = new Measure();
 
     int endnum = 0;
     bool ending = false;
     bool newsection = false;
-    if (isdigit((*m_sectionlabels[startline]).back())) {
+    if (isdigit(currentsection.back())) {
         ending = true;
         std::smatch matches;
-        if (regex_search(*m_sectionlabels[startline], matches, regex("(\\d+)$"))) {
+        if (regex_search(currentsection, matches, regex("(\\d+)$"))) {
             endnum = stoi(matches[1]);
         }
         else {
             endnum = 0;
         }
     }
-    else if (*m_sectionlabels[startline] != m_lastsection) {
+    else if (currentsection != m_lastsection) {
         newsection = true;
-        if (m_lastsection != *m_sectionlabels[startline]) {
+        if (m_lastsection != currentsection) {
             if (m_sections.size() > 1) {
                 // keep movement-level section in stack.
                 m_sections.pop_back();
             }
         }
-        m_lastsection = *m_sectionlabels[startline];
+        if (m_sectionlabels[startline]) {
+            m_lastsection = currentsection;
+        }
+        else {
+            m_lastsection = "";
+        }
     }
 
     if (ending && (m_endingnum != endnum)) {
@@ -14057,7 +14013,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
-    else if (isdigit((*m_sectionlabels[startline]).back())) {
+    else if (isdigit(currentsection.back())) {
         // inside a current ending
         m_currentending->AddChild(m_measure);
     }
