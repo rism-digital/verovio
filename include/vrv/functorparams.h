@@ -1774,9 +1774,7 @@ public:
 
 /**
  * member 0: the attComparison text
- * member 1: the matching object
- * member 2: the start object range
- * member 3: the end object range
+ * member 1: the start object range
  */
 
 class FindByTypeParams : public FunctorParams {
