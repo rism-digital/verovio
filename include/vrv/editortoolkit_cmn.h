@@ -29,7 +29,7 @@ namespace vrv {
 class EditorToolkitCMN : public EditorToolkit {
 public:
     EditorToolkitCMN(Doc * doc, View *view) : EditorToolkit(doc, view) {}
-    bool ParseEditorAction(const std::string &json_editorAction, bool isChain=false);
+    bool ParseEditorAction(const std::string &json_editorAction, bool commitOnly = false);
 
 protected:
 
@@ -48,11 +48,14 @@ protected:
      * Experimental editor functions.
      */
     ///@{
-    bool Drag(std::string elementId, int x, int y);
-    bool KeyDown(std::string elementId, int key, bool shiftKey, bool ctrlKey);
-    bool Insert(std::string elementType, std::string startid, std::string endid);
-    bool Set(std::string elementId, std::string attribute, std::string value);
+    bool Drag(std::string &elementId, int x, int y);
+    bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
+    bool Insert(std::string &elementType, std::string const &startid, std::string const &endid);
+    bool Insert(std::string &elementType, std::string const &startid);
+    bool Set(std::string &elementId, std::string const &attribute, std::string const &value);
     ///@}
+    
+    bool InsertNote(Object *object);
     
     Object *GetElement(std::string &elementId);
     

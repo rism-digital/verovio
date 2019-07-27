@@ -20,8 +20,10 @@
 #include "hairpin.h"
 #include "layer.h"
 #include "measure.h"
+#include "note.h"
 #include "page.h"
 #include "rend.h"
+#include "rest.h"
 #include "slur.h"
 #include "staff.h"
 #include "vrv.h"
@@ -36,7 +38,7 @@
 
 namespace vrv {
 
-bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool isChain)
+bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
 {
     jsonxx::Object json;
 
@@ -57,6 +59,11 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
     if (action == "commit") {
         m_doc->PrepareDrawing();
         return true;
+    }
+    
+    if (commitOnly) {
+        // Only process commit actions
+        return false;
     }
     
     if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
@@ -91,7 +98,13 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
     else if (action == "insert") {
         std::string elementType, startid, endid;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startid, endid)) {
-            return this->Insert(elementType, startid, endid);
+            if (endid == "") {
+                return this->Insert(elementType, startid);
+            }
+            else {
+                return this->Insert(elementType, startid, endid);
+            }
+            
         }
         LogWarning("Could not parse the insert action");
     }
@@ -174,13 +187,13 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
     bool status = true;
     m_chainedId = "";
     for (int i = 0; i < (int)actions.size(); i++) {
-        if (status) status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
+        status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
         m_editInfo = m_chainedId;
     }
     return status;
 }
 
-bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
+bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
@@ -200,7 +213,7 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
     return false;
 }
     
-bool EditorToolkitCMN::KeyDown(std::string elementId, int key, bool shiftKey, bool ctrlKey)
+bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
@@ -221,7 +234,7 @@ bool EditorToolkitCMN::KeyDown(std::string elementId, int key, bool shiftKey, bo
     return false;
 }
 
-bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std::string endid)
+bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid, std::string const &endid)
 {
     if (!m_doc->GetDrawingPage()) return false;
     
@@ -269,7 +282,55 @@ bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std:
     return true;
 }
 
-bool EditorToolkitCMN::Set(std::string elementId, std::string attribute, std::string value)
+bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid)
+{
+    if (!m_doc->GetDrawingPage()) return false;
+    
+    Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
+    // Check if both start and end elements exist
+    if (!start) {
+        LogMessage("Element start id '%s' could not be found", startid.c_str());
+        return false;
+    }
+    if (elementType == "note") {
+        return this->InsertNote(start);
+    }
+    // Check if it is a LayerElement
+    if (!dynamic_cast<LayerElement *>(start)) {
+        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
+        return false;
+    }
+    
+    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
+    assert(measure);
+    
+    /*
+    ControlElement *element = NULL;
+    if (elementType == "dynam") {
+        element = new Slur();
+    }
+    else if (elementType == "hairpin") {
+        element = new Hairpin();
+    }
+    else {
+        LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
+        return false;
+    }
+    
+    assert(element);
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
+    assert(interface);
+    measure->AddChild(element);
+    interface->SetStartid(startid);
+    interface->SetEndid(endid);
+    
+    this->m_chainedId = element->GetUuid();
+    */
+    
+    return true;
+}
+    
+bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute, std::string const &value)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
@@ -318,15 +379,106 @@ Object *EditorToolkitCMN::GetElement(std::string &elementId)
         this->m_chainedId = elementId;
     }
     
-    if (!m_doc->GetDrawingPage()) return NULL;
+    Object *element = NULL;
     
     // Try to get the element on the current drawing page
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    if (m_doc->GetDrawingPage()) {
+        element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    }
     // If it wasn't there, try on the whole doc
     if (!element) {
         element = m_doc->FindChildByUuid(elementId);
     }
+    
     return element;
+}
+    
+bool EditorToolkitCMN::InsertNote(Object *object)
+{
+    assert(object);
+    
+    if (!object->Is({CHORD, NOTE, REST})) {
+        LogMessage("Inserting a note is possible only in a chord, note or rest");
+        return false;
+    }
+    
+    if (object->Is(CHORD)) {
+        Chord *currentChord = dynamic_cast<Chord *>(object);
+        assert(currentChord);
+        Note *note = new Note();
+        currentChord->AddChild(note);
+        this->m_chainedId = note->GetUuid();
+        return true;
+    }
+    else if (object->Is(NOTE)) {
+        Note *currentNote = dynamic_cast<Note *>(object);
+        assert(currentNote);
+        
+        Chord *currentChord = currentNote->IsChordTone();
+        if (currentChord) {
+            Note *note = new Note();
+            currentChord->AddChild(note);
+            this->m_chainedId = note->GetUuid();
+            return true;
+        }
+        
+        ArrayOfObjects editorial;
+        IsEditorialElementComparison editorialComparison;
+        currentNote->FindAllChildByComparison(&editorial, &editorialComparison);
+        if (!editorial.empty()) {
+            LogMessage("Inserting a note where a note has editorial content is not possible");
+            return false;
+        }
+        ArrayOfObjects lyric;
+        ClassIdsComparison lyricsComparison({VERSE, SYL});
+        currentNote->FindAllChildByComparison(&lyric, &lyricsComparison);
+        if (!lyric.empty()) {
+            LogMessage("Inserting a note where a note has lyric content is not possible");
+            return false;
+        }
+        Chord *chord = new Chord();
+        chord->DurationInterface::operator=(*currentNote);
+        chord->AttCue::operator=(*currentNote);
+        chord->AttGraced::operator=(*currentNote);
+        chord->AttStems::operator=(*currentNote);
+        chord->AttStemsCmn::operator=(*currentNote);
+        currentNote->DurationInterface::Reset();
+        currentNote->ResetCue();
+        currentNote->ResetGraced();
+        currentNote->ResetStems();
+        currentNote->ResetStemsCmn();
+        Object *parent = currentNote->GetParent();
+        assert(parent);
+        parent->ReplaceChild(currentNote, chord);
+        chord->AddChild(currentNote);
+       
+        Note *note = new Note();
+        chord->AddChild(note);
+        
+        ArrayOfObjects artics;
+        ClassIdComparison articComparison(ARTIC);
+        currentNote->FindAllChildByComparison(&artics, &articComparison);
+        for (auto &artic : artics) {
+            artic->MoveItselfTo(chord);
+        }
+        currentNote->ClearRelinquishedChildren();
+        
+        this->m_chainedId = note->GetUuid();
+        return true;
+    }
+    else if (object->Is(REST)) {
+        Rest *rest = dynamic_cast<Rest *>(object);
+        assert(rest);
+        Note *note = new Note();
+        note->DurationInterface::operator=(*rest);
+        Object *parent = rest->GetParent();
+        assert(parent);
+        parent->ReplaceChild(rest, note);
+        delete rest;
+        this->m_chainedId = note->GetUuid();
+        return true;
+    }
+    return false;
 }
 
 }// namespace vrv
