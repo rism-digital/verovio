@@ -537,6 +537,8 @@ protected:
     void checkBeamWith(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int startindex);
     std::string getTrackText(hum::HTp token);
+    void checkForLayoutBreak(int line);
+    std::string removeCommas(const std::string &input);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

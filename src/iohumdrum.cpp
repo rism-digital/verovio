@@ -3515,7 +3515,68 @@ bool HumdrumInput::convertSystemMeasure(int &line)
     storeStaffLayerTokensForMeasure(startline, endline);
 
     auto status = convertMeasureStaves(startline, endline);
+
+    if (m_breaks) {
+        checkForLayoutBreak(endline);
+    }
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForLayoutBreak --
+//
+
+void HumdrumInput::checkForLayoutBreak(int line)
+{
+    if (line >= m_infile.getLineCount()) {
+        return;
+    }
+    if (!m_infile[line].isBarline()) {
+        return;
+    }
+    hum::HTp token = m_infile.token(line, 0);
+    string group;
+
+    group = token->getLayoutParameter("LB", "g");
+    if (!group.empty()) {
+        std::string tstring = removeCommas(group);
+        Sb *sb = new Sb;
+        m_sections.back()->AddChild(sb);
+        sb->SetType(tstring);
+        return;
+    }
+
+    group = token->getLayoutParameter("PB", "g");
+    if (!group.empty()) {
+        std::string tstring = removeCommas(group);
+        Sb *sb = new Sb;
+        m_sections.back()->AddChild(sb);
+        sb->SetType(tstring);
+        return;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::removeCommas --
+//
+
+std::string HumdrumInput::removeCommas(const std::string &input)
+{
+    std::string output = input;
+    for (int i = 0; i < (int)output.size(); i++) {
+        if (output[i] == ',') {
+            output[i] = ' ';
+        }
+        else if (output[i] == ';') {
+            output[i] = ' ';
+        }
+        else if (output[i] == ':') {
+            output[i] = ' ';
+        }
+    }
+    return output;
 }
 
 //////////////////////////////
@@ -10790,7 +10851,7 @@ std::string HumdrumInput::getEndIdForOttava(hum::HTp token)
 
     std::string prefix = "note";
     if (target->isRest()) {
-        if (target->find("yy")) {
+        if (target->find("yy") != std::string::npos) {
             prefix = "space";
         }
         else {
@@ -15198,6 +15259,10 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
 
 bool HumdrumInput::analyzeBreaks(hum::HumdrumFile &infile)
 {
+
+    // check for informal breaking markers such as:
+    // !!pagebreak:original
+    // !!linebreak:original
     for (int i = 0; i < infile.getLineCount(); i++) {
         if (!infile[i].isGlobalComment()) {
             continue;
@@ -15210,6 +15275,25 @@ bool HumdrumInput::analyzeBreaks(hum::HumdrumFile &infile)
             return true;
         }
     }
+
+    // check for formal breaking markers such as:
+    // !!LO:PB:g=original
+    // !!LO:LB:g=original
+    // !LO:PB:g=original
+    // !LO:LB:g=original
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isComment()) {
+            continue;
+        }
+        hum::HTp token = infile.token(i, 0);
+        if (token->find("!LO:LB") != std::string::npos) {
+            return true;
+        }
+        if (token->find("!LO:PB") != std::string::npos) {
+            return true;
+        }
+    }
+
     return false;
 }
 
