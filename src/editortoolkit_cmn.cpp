@@ -607,6 +607,15 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             return true;
         }
     }
+    else {
+        Rest *rest = new Rest();
+        rest->DurationInterface::operator=(*note);
+        Object *parent = note->GetParent();
+        assert(parent);
+        parent->ReplaceChild(note, rest);
+        delete note;
+        return true;
+    }
     return false;
 }
 
