@@ -15,6 +15,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "chord.h"
 #include "clef.h"
 #include "comparison.h"
 #include "hairpin.h"
@@ -77,10 +78,16 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         }
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
-
+    else if (action == "delete") {
+        std::string elementId;
+        if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
+            return this->Delete(elementId);
+        }
+        LogWarning("Could not parse the delete action");
+    }
     else if (action == "drag") {
         std::string elementId;
-        int x,y;
+        int x, y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), elementId, x, y)) {
             return this->Drag(elementId, x, y);
         }
@@ -119,6 +126,13 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
     return false;
+}
+
+bool EditorToolkitCMN::ParseDeleteAction(jsonxx::Object param, std::string &elementId)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    return true;
 }
 
 bool EditorToolkitCMN::ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y)
@@ -191,6 +205,17 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
         m_editInfo = m_chainedId;
     }
     return status;
+}
+    
+bool EditorToolkitCMN::Delete(std::string &elementId)
+{
+    Object *element = this->GetElement(elementId);
+    if (!element) return false;
+    
+    if (element->Is(NOTE)) {
+        return this->DeleteNote(dynamic_cast<Note *>(element));
+    }
+    return false;
 }
 
 bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
@@ -422,13 +447,11 @@ bool EditorToolkitCMN::InsertNote(Object *object)
             return true;
         }
         
-        ArrayOfObjects editorial;
-        IsEditorialElementComparison editorialComparison;
-        currentNote->FindAllChildByComparison(&editorial, &editorialComparison);
-        if (!editorial.empty()) {
+        if (currentNote->HasEditorialContent()) {
             LogMessage("Inserting a note where a note has editorial content is not possible");
             return false;
         }
+        
         ArrayOfObjects lyric;
         ClassIdsComparison lyricsComparison({VERSE, SYL});
         currentNote->FindAllChildByComparison(&lyric, &lyricsComparison);
@@ -479,6 +502,63 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         return true;
     }
     return false;
+}
+    
+bool EditorToolkitCMN::DeleteNote(Note *note)
+{
+    assert(note);
+    
+    Chord *chord = note->IsChordTone();
+    Beam *beam = note->IsInBeam();
+    
+    if (chord) {
+        if (chord->HasEditorialContent()) {
+            LogMessage("Deleting a note in a chord that has editorial content is not possible");
+            return false;
+        }
+        int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);
+        if (count == 2) {
+            Note *otherNote = chord->GetTopNote();
+            if (note == otherNote) {
+                otherNote = chord->GetBottomNote();
+            }
+            assert(otherNote && (otherNote != note));
+            otherNote->DurationInterface::operator=(*chord);
+            otherNote->AttCue::operator=(*chord);
+            otherNote->AttGraced::operator=(*chord);
+            otherNote->AttStems::operator=(*chord);
+            otherNote->AttStemsCmn::operator=(*chord);
+            Object *parent = chord->GetParent();
+            assert(parent);
+            chord->DetachChild(otherNote->GetIdx());
+            parent->ReplaceChild(chord, otherNote);
+            
+            ArrayOfObjects artics;
+            ClassIdComparison articComparison(ARTIC);
+            chord->FindAllChildByComparison(&artics, &articComparison, 1);
+            for (auto &artic : artics) {
+                artic->MoveItselfTo(otherNote);
+            }
+            delete chord;
+            return true;
+        }
+        else if (count > 2) {
+            chord->DeleteChild(note);
+            return true;
+        }
+        // Handle cases of chords with one single note
+        else {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*chord);
+            Object *parent = chord->GetParent();
+            assert(parent);
+            parent->ReplaceChild(chord, rest);
+            delete chord;
+            return true;
+        }
+    }
+    return false;
+    
 }
 
 }// namespace vrv

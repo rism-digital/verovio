@@ -457,6 +457,11 @@ public:
     bool IsAttribute() const { return m_isAttribute; }
     void IsAttribute(bool isAttribute) { m_isAttribute = isAttribute; }
     ///@}
+    
+    /**
+     * Return true if the object contains any editorial content
+     */
+    bool HasEditorialContent();
 
     /**
      * Saves the object (and its children) using the specified output stream.

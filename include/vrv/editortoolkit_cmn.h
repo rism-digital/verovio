@@ -38,6 +38,7 @@ protected:
      */
     ///@{
     bool Chain(jsonxx::Array actions);
+    bool ParseDeleteAction(jsonxx::Object param, std::string &elementId);
     bool ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y);
     bool ParseKeyDownAction(jsonxx::Object param, std::string &elementid, int &key, bool &shiftKey, bool &ctrlKey);
     bool ParseInsertAction(jsonxx::Object param, std::string &elementType, std::string &startid, std::string &endid);
@@ -48,6 +49,7 @@ protected:
      * Experimental editor functions.
      */
     ///@{
+    bool Delete(std::string &elementId);
     bool Drag(std::string &elementId, int x, int y);
     bool KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey);
     bool Insert(std::string &elementType, std::string const &startid, std::string const &endid);
@@ -56,6 +58,9 @@ protected:
     ///@}
     
     bool InsertNote(Object *object);
+    
+    bool DeleteNote(Note *note);
+    
     
     Object *GetElement(std::string &elementId);
     

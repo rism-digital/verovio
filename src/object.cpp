@@ -685,6 +685,14 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
         return (m_parent->GetLastParentNot(classId, maxDepth - 1));
     }
 }
+    
+bool Object::HasEditorialContent()
+{
+    ArrayOfObjects editorial;
+    IsEditorialElementComparison editorialComparison;
+    this->FindAllChildByComparison(&editorial, &editorialComparison);
+    return (!editorial.empty());    
+}
 
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
     int deepness, bool direction)
