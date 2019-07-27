@@ -557,8 +557,57 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             return true;
         }
     }
+    else if (beam) {
+        if ((int)beam->GetElementCoords()->size() == 2) {
+            bool insertBefore = true;
+            LayerElement *otherElement = beam->GetElementCoords()->back()->m_element;
+            if (note == otherElement) {
+                insertBefore = false;
+                otherElement = beam->GetElementCoords()->front()->m_element;
+            }
+            assert(otherElement && (otherElement != note));
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            Object *parent = beam->GetParent();
+            assert(parent);
+            if (insertBefore) {
+                parent->InsertBefore(beam, rest);
+            }
+            else {
+                parent->InsertAfter(beam, rest);
+            }
+            beam->DetachChild(otherElement->GetIdx());
+            parent->ReplaceChild(beam, otherElement);
+            delete beam;
+            return true;
+        }
+        if (beam->IsFirstInBeam(note)) {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            Object *parent = beam->GetParent();
+            assert(parent);
+            parent->InsertBefore(beam, rest);
+            beam->DeleteChild(note);
+            return true;
+        }
+        else if (beam->IsLastInBeam(note)) {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            Object *parent = beam->GetParent();
+            assert(parent);
+            parent->InsertAfter(beam, rest);
+            beam->DeleteChild(note);
+            return true;
+        }
+        else {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            beam->ReplaceChild( note, rest);
+            delete note;
+            return true;
+        }
+    }
     return false;
-    
 }
 
 }// namespace vrv

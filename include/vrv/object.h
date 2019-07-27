@@ -179,6 +179,14 @@ public:
      * The currentChild is not deleted by the methods.
      */
     void ReplaceChild(Object *currentChild, Object *replacingChild);
+    
+    /**
+     * @name Insert an object before or after a given child
+     */
+    ///@{
+    void InsertBefore(Object *child, Object *newChild);
+    void InsertAfter(Object *child, Object *newChild);
+    ///@}
 
     /**
      * Sort children by a function that takes two arguments and

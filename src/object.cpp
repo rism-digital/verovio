@@ -238,6 +238,30 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
     replacingChild->SetParent(this);
     this->Modify();
 }
+    
+void Object::InsertBefore(Object *child, Object *newChild)
+{
+    assert(this->GetChildIndex(child) != -1);
+    assert(this->GetChildIndex(newChild) == -1);
+    
+    int idx = this->GetChildIndex(child);
+    newChild->SetParent(this);
+    this->InsertChild(newChild, idx);
+
+    this->Modify();
+}
+    
+void Object::InsertAfter(Object *child, Object *newChild)
+{
+    assert(this->GetChildIndex(child) != -1);
+    assert(this->GetChildIndex(newChild) == -1);
+    
+    int idx = this->GetChildIndex(child);
+    newChild->SetParent(this);
+    this->InsertChild(newChild, idx + 1);
+    
+    this->Modify();
+}
 
 void Object::SortChildren(Object::binaryComp comp)
 {
