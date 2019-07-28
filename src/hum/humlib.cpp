@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 28 10:36:08 CEST 2019
+// Last Modified: Sun Jul 28 13:57:19 CEST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -15695,6 +15695,10 @@ int HumdrumFileBase::getMeasureNumber(int line) {
 //
 
 bool HumdrumFileContent::analyzeKernAccidentals(void) {
+
+	// ottava marks must be analyzed first:
+	this->analyzeOttavas();
+	
 	HumdrumFileContent& infile = *this;
 	int i, j, k;
 	int kindex;
@@ -15817,9 +15821,12 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 
 			int rindex = rtracks[track];
 			for (k=0; k<subcount; k++) {
-				string subtok = infile[i].token(j)->getSubtoken(k);
+				HTp token = infile[i].token(j);
+				string subtok = token->getSubtoken(k);
 				int b40 = Convert::kernToBase40(subtok);
 				int diatonic = Convert::kernToBase7(subtok);
+				int octaveadjust = token->getValueInt("auto", "ottava");
+				diatonic -= octaveadjust * 7;
 				if (diatonic < 0) {
 					// Deal with extra-low notes later.
 					continue;

@@ -532,7 +532,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernTies();
     infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
-    infile.analyzeOttavas();
+    infile.analyzeKernAccidentals();
     parseSignifiers(infile);
     checkForColorSpine(infile);
     infile.analyzeRScale();
