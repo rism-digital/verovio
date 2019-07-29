@@ -802,19 +802,19 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
-Object *Object::FindNextChildOfType(Comparison *comp, Object *start)
+Object *Object::FindNextChild(Comparison *comp, Object *start)
 {
-    Functor findNextOfType(&Object::FindNextOfType);
-    FindByTypeParams params(comp, start);
-    this->Process(&findNextOfType, &params);
+    Functor findNextChildByComparison(&Object::FindNextChildByComparison);
+    FindChildByComparisonParams params(comp, start);
+    this->Process(&findNextChildByComparison, &params);
     return params.m_element;
 }
 
-Object *Object::FindPreviousChildOfType(Comparison *comp, Object *start)
+Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 {
-    Functor findPreviousOfType(&Object::FindPreviousOfType);
-    FindByTypeParams params(comp, start);
-    this->Process(&findPreviousOfType, &params);
+    Functor findPreviousChildByComparison(&Object::FindPreviousChildByComparison);
+    FindChildByComparisonParams params(comp, start);
+    this->Process(&findPreviousChildByComparison, &params);
     return params.m_element;
 }
 
@@ -1683,9 +1683,9 @@ int Object::SetChildZones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindNextOfType(FunctorParams *functorparams) 
+int Object::FindNextChildByComparison(FunctorParams *functorparams) 
 {
-    FindByTypeParams *params = dynamic_cast<FindByTypeParams *>(functorparams);
+    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
 
     // we are reaching the start of the range
@@ -1708,9 +1708,9 @@ int Object::FindNextOfType(FunctorParams *functorparams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindPreviousOfType(FunctorParams *functorparams)
+int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
 {
-    FindByTypeParams *params = dynamic_cast<FindByTypeParams *>(functorparams);
+    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
     // this guy works by going from the start and replacing the return element with every nearer element
     // until you get to the 'start' element 

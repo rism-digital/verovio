@@ -472,9 +472,9 @@ public:
 
     virtual void ReorderByXPos();
 
-    Object *FindNextChildOfType(Comparison *comp, Object *start);
+    Object *FindNextChild(Comparison *comp, Object *start);
 
-    Object *FindPreviousChildOfType(Comparison *comp, Object *start);
+    Object *FindPreviousChild(Comparison *comp, Object *start);
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -1085,6 +1085,10 @@ public:
      */
     virtual int ReorderByXPos(FunctorParams *);
 
+    virtual int FindNextChildByComparison(FunctorParams *);
+
+    virtual int FindPreviousChildByComparison(FunctorParams *);
+
     /**
      * Get bounding box using child elements with facsimile interface
      * Returns true if a bounding box could be constructed, false otherwise.
@@ -1097,10 +1101,6 @@ public:
     virtual int SetChildZones(FunctorParams *);
 
     static bool sortByUlx(Object *a, Object *b);
-
-    virtual int FindNextOfType(FunctorParams *);
-
-    virtual int FindPreviousOfType(FunctorParams *);
 
 protected:
     //

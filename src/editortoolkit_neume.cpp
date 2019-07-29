@@ -235,8 +235,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         int pitchDifference = round ( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
-        Clef *clefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, 
-            (syllable != NULL) ? syllable : element));
+        Clef *clefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, 
+            ((syllable != NULL) ? syllable : element)));
 
         if (clefBefore == NULL) {
             clefBefore = layer->GetCurrentClef();
@@ -262,7 +262,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 Zone *zone = fi->GetZone();
                 assert(zone);
                 zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
-            }  
+            }
         }
         else {
             ArrayOfObjects facsChildren;
@@ -278,7 +278,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         layer->ReorderByXPos(); 
 
-        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, 
+        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, 
             (syllable != NULL) ? syllable : element));
 
         if (element->HasInterface(INTERFACE_PITCH)) {
@@ -410,8 +410,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         ClassIdComparison ac(CLEF);
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
-        Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
+        Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
+        Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
         if (precedingClefBefore == NULL) {
             precedingClefBefore = layer->GetCurrentClef();
@@ -430,8 +430,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         layer->ReorderByXPos();
 
-        Clef *precedingClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
-        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
+        Clef *precedingClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
+        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
         if (precedingClefAfter == NULL) {
             precedingClefAfter = layer->GetCurrentClef();
@@ -870,8 +870,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         // ensure pitched elements associated with this clef keep their x,y positions
 
         ClassIdComparison ac(CLEF);
-        Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
-        Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
+        Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
+        Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
         if (previousClef == NULL) {
             // if there is no previous clef, get the default one from the staff def
@@ -1286,8 +1286,8 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
         assert(clef);
         ClassIdComparison ac(CLEF);
-        Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, clef));
-        Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChildOfType(&ac, clef));
+        Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
+        Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
         if (previousClef == NULL) {
             // if there is no previous clef, get the default one from the staff def
@@ -1498,7 +1498,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
             clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it), 
-                dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&clefComp, (*it)))));
+                dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)))));
         }
         newClef = clefsBefore[dynamic_cast<Syllable *>(sortedSyllables.front())];
     }
@@ -1849,7 +1849,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 currentParent = dynamic_cast<Syllable *>(fparent);
                 assert(currentParent);
                 firstIsSyl = false;
-                oldClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, currentParent));
+                oldClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, currentParent));
             }
             else{
                 LogError("Invalid groupType for ungrouping");
@@ -1962,7 +1962,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         InterfaceComparison ic(INTERFACE_PITCH);
         std::stable_sort(syllables.begin(), syllables.end(), Object::sortByUlx);
         for (auto it = syllables.begin(); it != syllables.end(); ++it) {
-            currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChildOfType(&ac, (*it)));
+            currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
             if (currentClef != oldClef) {
                 (*it)->FindAllChildByComparison(&pitchedChildren, &ic);
                 for (auto pChild = pitchedChildren.begin(); pChild != pitchedChildren.end(); ++pChild) {

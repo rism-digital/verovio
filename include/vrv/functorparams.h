@@ -1769,17 +1769,17 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindNextOfTypeParams
+// FindChildByComparisonParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the attComparison text
- * member 1: the start object range
+ * member 0: the comparison
+ * member 1: the start object
  */
 
-class FindByTypeParams : public FunctorParams {
+class FindChildByComparisonParams : public FunctorParams {
 public:
-    FindByTypeParams(Comparison *comparison, Object *start)
+    FindChildByComparisonParams(Comparison *comparison, Object *start)
     {
         m_comparison = comparison;
         m_element = NULL;
