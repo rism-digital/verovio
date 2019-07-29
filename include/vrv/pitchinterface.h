@@ -10,6 +10,7 @@
 
 #include "atts_gestural.h"
 #include "atts_shared.h"
+#include "clef.h"
 
 namespace vrv {
 
@@ -58,6 +59,12 @@ public:
      * Returns calling pitch minus parameter pitch.
      */
     int PitchDifferenceTo(PitchInterface *pi);
+
+    /**
+     * adjust the pitch value so that it stays in the same x,y position
+     * given it's new and old clefs
+     */
+    void AdjustPitchForNewClef(Clef *oldClef, Clef *newClef);
 
     /**
      * Calculate the loc for a note, rest or chord considering its position in the layer.

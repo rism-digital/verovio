@@ -18,6 +18,7 @@
 #include "note.h"
 #include "rest.h"
 #include "vrv.h"
+#include "clef.h"
 
 namespace vrv {
 
@@ -106,6 +107,16 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
     pitchDifference += 7 * (this->GetOct() - pi->GetOct());
 
     return pitchDifference;
+}
+
+void PitchInterface::AdjustPitchForNewClef(Clef *oldClef, Clef *newClef)
+{
+    assert(oldClef);
+    assert(newClef);
+
+    int pitchDiff = oldClef->PitchDistanceTo(newClef);
+
+    this->AdjustPitchByOffset(pitchDiff);
 }
 
 //----------------------------------------------------------------------------
