@@ -432,8 +432,8 @@ public:
     int GetBeamsFloat() const { return m_beamsFloat; }
     bool HasBeamsFloat() const;
     //
-    void SetFloatGap(data_MEASUREMENTABS floatGap_) { m_floatGap = floatGap_; }
-    data_MEASUREMENTABS GetFloatGap() const { return m_floatGap; }
+    void SetFloatGap(std::string floatGap_) { m_floatGap = floatGap_; }
+    std::string GetFloatGap() const { return m_floatGap; }
     bool HasFloatGap() const;
     ///@}
 
@@ -443,7 +443,7 @@ private:
     /** Captures the number of "floating" beams, i.e., those not attached to stems. **/
     int m_beamsFloat;
     /** Records the amount of separation between floating beams and stems. **/
-    data_MEASUREMENTABS m_floatGap;
+    std::string m_floatGap;
 
     /* include <attfloat.gap> */
 };
@@ -550,8 +550,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOpening(data_MEASUREMENTABS opening_) { m_opening = opening_; }
-    data_MEASUREMENTABS GetOpening() const { return m_opening; }
+    void SetOpening(std::string opening_) { m_opening = opening_; }
+    std::string GetOpening() const { return m_opening; }
     bool HasOpening() const;
     ///@}
 
@@ -560,7 +560,7 @@ private:
      * Specifies the distance between the lines at the open end of a hairpin dynamic
      * mark.
      **/
-    data_MEASUREMENTABS m_opening;
+    std::string m_opening;
 
     /* include <attopening> */
 };
