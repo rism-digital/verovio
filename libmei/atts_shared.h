@@ -835,6 +835,10 @@ public:
     void SetLry(int lry_) { m_lry = lry_; }
     int GetLry() const { return m_lry; }
     bool HasLry() const;
+    //
+    void SetSkew(double skew_) { m_skew = skew_; }
+    double GetSkew() const { return m_skew; }
+    bool HasSkew() const;
     ///@}
 
 private:
@@ -846,8 +850,10 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
+    /** Indicates the skew of the bounding box. **/
+    double m_skew;
 
-    /* include <attlry> */
+    /* include <attskew> */
 };
 
 //----------------------------------------------------------------------------
@@ -973,18 +979,16 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
-    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
-    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
+    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
+    std::string GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
-    /** Getter for reference (for alternate type only) */
-    data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
     ///@}
 
 private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
     /** Width of a curved line. **/
-    data_LINEWIDTH m_lwidth;
+    std::string m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -1145,29 +1149,29 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDynamDist(data_MEASUREMENTREL dynamDist_) { m_dynamDist = dynamDist_; }
-    data_MEASUREMENTREL GetDynamDist() const { return m_dynamDist; }
+    void SetDynamDist(std::string dynamDist_) { m_dynamDist = dynamDist_; }
+    std::string GetDynamDist() const { return m_dynamDist; }
     bool HasDynamDist() const;
     //
-    void SetHarmDist(data_MEASUREMENTREL harmDist_) { m_harmDist = harmDist_; }
-    data_MEASUREMENTREL GetHarmDist() const { return m_harmDist; }
+    void SetHarmDist(std::string harmDist_) { m_harmDist = harmDist_; }
+    std::string GetHarmDist() const { return m_harmDist; }
     bool HasHarmDist() const;
     //
-    void SetTextDist(data_MEASUREMENTREL textDist_) { m_textDist = textDist_; }
-    data_MEASUREMENTREL GetTextDist() const { return m_textDist; }
+    void SetTextDist(std::string textDist_) { m_textDist = textDist_; }
+    std::string GetTextDist() const { return m_textDist; }
     bool HasTextDist() const;
     ///@}
 
 private:
     /** Records the default distance from the staff for dynamic marks. **/
-    data_MEASUREMENTREL m_dynamDist;
+    std::string m_dynamDist;
     /**
      * Records the default distance from the staff of harmonic indications, such as
      * guitar chord grids or functional labels.
      **/
-    data_MEASUREMENTREL m_harmDist;
+    std::string m_harmDist;
     /** Determines how far from the staff to render text elements. **/
-    data_MEASUREMENTREL m_textDist;
+    std::string m_textDist;
 
     /* include <atttext.dist> */
 };
@@ -1764,14 +1768,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHeight(data_MEASUREMENTABS height_) { m_height = height_; }
-    data_MEASUREMENTABS GetHeight() const { return m_height; }
+    void SetHeight(std::string height_) { m_height = height_; }
+    std::string GetHeight() const { return m_height; }
     bool HasHeight() const;
     ///@}
 
 private:
     /** Measurement of the vertical dimension of an entity. **/
-    data_MEASUREMENTABS m_height;
+    std::string m_height;
 
     /* include <attheight> */
 };
@@ -2247,11 +2251,9 @@ public:
     int GetLsegs() const { return m_lsegs; }
     bool HasLsegs() const;
     //
-    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
-    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
+    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
+    std::string GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
-    /** Getter for reference (for alternate type only) */
-    data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
     ///@}
 
 private:
@@ -2266,7 +2268,7 @@ private:
      **/
     int m_lsegs;
     /** Width of a curved line. **/
-    data_LINEWIDTH m_lwidth;
+    std::string m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -2385,8 +2387,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLyricAlign(data_MEASUREMENTREL lyricAlign_) { m_lyricAlign = lyricAlign_; }
-    data_MEASUREMENTREL GetLyricAlign() const { return m_lyricAlign; }
+    void SetLyricAlign(std::string lyricAlign_) { m_lyricAlign = lyricAlign_; }
+    std::string GetLyricAlign() const { return m_lyricAlign; }
     bool HasLyricAlign() const;
     //
     void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; }
@@ -2414,7 +2416,7 @@ public:
 
 private:
     /** Describes the alignment of lyric syllables associated with a note or chord. **/
-    data_MEASUREMENTREL m_lyricAlign;
+    std::string m_lyricAlign;
     /** Sets the font family default value for lyrics. **/
     std::string m_lyricFam;
     /** Sets the font name default value for lyrics. **/
@@ -3228,8 +3230,8 @@ public:
     std::string GetHeadMod() const { return m_headMod; }
     bool HasHeadMod() const;
     //
-    void SetHeadRotation(std::string headRotation_) { m_headRotation = headRotation_; }
-    std::string GetHeadRotation() const { return m_headRotation; }
+    void SetHeadRotation(double headRotation_) { m_headRotation = headRotation_; }
+    double GetHeadRotation() const { return m_headRotation; }
     bool HasHeadRotation() const;
     //
     void SetHeadShape(data_HEADSHAPE_list headShape_) { m_headShape = headShape_; }
@@ -3265,7 +3267,7 @@ private:
      * A positive value rotates the notehead in a counter-clockwise fashion, while
      * negative values produce clockwise rotation.
      **/
-    std::string m_headRotation;
+    double m_headRotation;
     /** Used to override the head shape normally used for the given duration. **/
     data_HEADSHAPE_list m_headShape;
     /**
@@ -3664,28 +3666,28 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPageHeight(data_MEASUREMENTABS pageHeight_) { m_pageHeight = pageHeight_; }
-    data_MEASUREMENTABS GetPageHeight() const { return m_pageHeight; }
+    void SetPageHeight(std::string pageHeight_) { m_pageHeight = pageHeight_; }
+    std::string GetPageHeight() const { return m_pageHeight; }
     bool HasPageHeight() const;
     //
-    void SetPageWidth(data_MEASUREMENTABS pageWidth_) { m_pageWidth = pageWidth_; }
-    data_MEASUREMENTABS GetPageWidth() const { return m_pageWidth; }
+    void SetPageWidth(std::string pageWidth_) { m_pageWidth = pageWidth_; }
+    std::string GetPageWidth() const { return m_pageWidth; }
     bool HasPageWidth() const;
     //
-    void SetPageTopmar(data_MEASUREMENTABS pageTopmar_) { m_pageTopmar = pageTopmar_; }
-    data_MEASUREMENTABS GetPageTopmar() const { return m_pageTopmar; }
+    void SetPageTopmar(std::string pageTopmar_) { m_pageTopmar = pageTopmar_; }
+    std::string GetPageTopmar() const { return m_pageTopmar; }
     bool HasPageTopmar() const;
     //
-    void SetPageBotmar(data_MEASUREMENTABS pageBotmar_) { m_pageBotmar = pageBotmar_; }
-    data_MEASUREMENTABS GetPageBotmar() const { return m_pageBotmar; }
+    void SetPageBotmar(std::string pageBotmar_) { m_pageBotmar = pageBotmar_; }
+    std::string GetPageBotmar() const { return m_pageBotmar; }
     bool HasPageBotmar() const;
     //
-    void SetPageLeftmar(data_MEASUREMENTABS pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
-    data_MEASUREMENTABS GetPageLeftmar() const { return m_pageLeftmar; }
+    void SetPageLeftmar(std::string pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
+    std::string GetPageLeftmar() const { return m_pageLeftmar; }
     bool HasPageLeftmar() const;
     //
-    void SetPageRightmar(data_MEASUREMENTABS pageRightmar_) { m_pageRightmar = pageRightmar_; }
-    data_MEASUREMENTABS GetPageRightmar() const { return m_pageRightmar; }
+    void SetPageRightmar(std::string pageRightmar_) { m_pageRightmar = pageRightmar_; }
+    std::string GetPageRightmar() const { return m_pageRightmar; }
     bool HasPageRightmar() const;
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; }
@@ -3702,20 +3704,20 @@ private:
      * Specifies the height of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    data_MEASUREMENTABS m_pageHeight;
+    std::string m_pageHeight;
     /**
      * Describes the width of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    data_MEASUREMENTABS m_pageWidth;
+    std::string m_pageWidth;
     /** Indicates the amount of whitespace at the top of a page. **/
-    data_MEASUREMENTABS m_pageTopmar;
+    std::string m_pageTopmar;
     /** Indicates the amount of whitespace at the bottom of a page. **/
-    data_MEASUREMENTABS m_pageBotmar;
+    std::string m_pageBotmar;
     /** Indicates the amount of whitespace at the left side of a page. **/
-    data_MEASUREMENTABS m_pageLeftmar;
+    std::string m_pageLeftmar;
     /** Indicates the amount of whitespace at the right side of a page. **/
-    data_MEASUREMENTABS m_pageRightmar;
+    std::string m_pageRightmar;
     /** Indicates the number of logical pages to be rendered on a single physical page. **/
     std::string m_pagePanels;
     /** Indicates how the page should be scaled when rendered. **/
@@ -4325,12 +4327,12 @@ public:
     double GetSpacingPackfact() const { return m_spacingPackfact; }
     bool HasSpacingPackfact() const;
     //
-    void SetSpacingStaff(data_MEASUREMENTREL spacingStaff_) { m_spacingStaff = spacingStaff_; }
-    data_MEASUREMENTREL GetSpacingStaff() const { return m_spacingStaff; }
+    void SetSpacingStaff(std::string spacingStaff_) { m_spacingStaff = spacingStaff_; }
+    std::string GetSpacingStaff() const { return m_spacingStaff; }
     bool HasSpacingStaff() const;
     //
-    void SetSpacingSystem(data_MEASUREMENTREL spacingSystem_) { m_spacingSystem = spacingSystem_; }
-    data_MEASUREMENTREL GetSpacingSystem() const { return m_spacingSystem; }
+    void SetSpacingSystem(std::string spacingSystem_) { m_spacingSystem = spacingSystem_; }
+    std::string GetSpacingSystem() const { return m_spacingSystem; }
     bool HasSpacingSystem() const;
     ///@}
 
@@ -4344,14 +4346,14 @@ private:
      * system; measured from the bottom line of the staff above to the top line of the
      * staff below.
      **/
-    data_MEASUREMENTREL m_spacingStaff;
+    std::string m_spacingStaff;
     /**
      * Describes the space between adjacent systems; a pair of space-separated values
      * (minimum and maximum, respectively) provides a range between which a rendering
      * system-supplied value may fall, while a single value indicates a fixed amount of
      * space; that is, the minimum and maximum values are equal.
      **/
-    data_MEASUREMENTREL m_spacingSystem;
+    std::string m_spacingSystem;
 
     /* include <attspacing.system> */
 };
@@ -4904,16 +4906,16 @@ public:
     data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; }
     bool HasSystemLeftline() const;
     //
-    void SetSystemLeftmar(data_MEASUREMENTABS systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
-    data_MEASUREMENTABS GetSystemLeftmar() const { return m_systemLeftmar; }
+    void SetSystemLeftmar(std::string systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
+    std::string GetSystemLeftmar() const { return m_systemLeftmar; }
     bool HasSystemLeftmar() const;
     //
-    void SetSystemRightmar(data_MEASUREMENTABS systemRightmar_) { m_systemRightmar = systemRightmar_; }
-    data_MEASUREMENTABS GetSystemRightmar() const { return m_systemRightmar; }
+    void SetSystemRightmar(std::string systemRightmar_) { m_systemRightmar = systemRightmar_; }
+    std::string GetSystemRightmar() const { return m_systemRightmar; }
     bool HasSystemRightmar() const;
     //
-    void SetSystemTopmar(data_MEASUREMENTABS systemTopmar_) { m_systemTopmar = systemTopmar_; }
-    data_MEASUREMENTABS GetSystemTopmar() const { return m_systemTopmar; }
+    void SetSystemTopmar(std::string systemTopmar_) { m_systemTopmar = systemTopmar_; }
+    std::string GetSystemTopmar() const { return m_systemTopmar; }
     bool HasSystemTopmar() const;
     ///@}
 
@@ -4928,17 +4930,17 @@ private:
      * Describes the amount of whitespace at the left system margin relative to
      * page.leftmar.
      **/
-    data_MEASUREMENTABS m_systemLeftmar;
+    std::string m_systemLeftmar;
     /**
      * Describes the amount of whitespace at the right system margin relative to
      * page.rightmar.
      **/
-    data_MEASUREMENTABS m_systemRightmar;
+    std::string m_systemRightmar;
     /**
      * Describes the distance from page's top edge to the first system; used for first
      * page only.
      **/
-    data_MEASUREMENTABS m_systemTopmar;
+    std::string m_systemTopmar;
 
     /* include <attsystem.topmar> */
 };
@@ -5294,8 +5296,8 @@ private:
      **/
     double m_transDiat;
     /**
-     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ =
-     * 1, necessary to calculate the sounded pitch from the written one.
+     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ = 1,
+     * necessary to calculate the sounded pitch from the written one.
      **/
     double m_transSemi;
 
@@ -5581,8 +5583,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHo(data_MEASUREMENTREL ho_) { m_ho = ho_; }
-    data_MEASUREMENTREL GetHo() const { return m_ho; }
+    void SetHo(std::string ho_) { m_ho = ho_; }
+    std::string GetHo() const { return m_ho; }
     bool HasHo() const;
     ///@}
 
@@ -5592,7 +5594,7 @@ private:
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
-    data_MEASUREMENTREL m_ho;
+    std::string m_ho;
 
     /* include <attho> */
 };
@@ -5660,8 +5662,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVo(data_MEASUREMENTREL vo_) { m_vo = vo_; }
-    data_MEASUREMENTREL GetVo() const { return m_vo; }
+    void SetVo(std::string vo_) { m_vo = vo_; }
+    std::string GetVo() const { return m_vo; }
     bool HasVo() const;
     ///@}
 
@@ -5671,7 +5673,7 @@ private:
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
-    data_MEASUREMENTREL m_vo;
+    std::string m_vo;
 
     /* include <attvo> */
 };
@@ -5700,12 +5702,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStartho(data_MEASUREMENTREL startho_) { m_startho = startho_; }
-    data_MEASUREMENTREL GetStartho() const { return m_startho; }
+    void SetStartho(std::string startho_) { m_startho = startho_; }
+    std::string GetStartho() const { return m_startho; }
     bool HasStartho() const;
     //
-    void SetEndho(data_MEASUREMENTREL endho_) { m_endho = endho_; }
-    data_MEASUREMENTREL GetEndho() const { return m_endho; }
+    void SetEndho(std::string endho_) { m_endho = endho_; }
+    std::string GetEndho() const { return m_endho; }
     bool HasEndho() const;
     ///@}
 
@@ -5714,12 +5716,12 @@ private:
      * Records the horizontal adjustment of a feature's programmatically-determined
      * start point.
      **/
-    data_MEASUREMENTREL m_startho;
+    std::string m_startho;
     /**
      * Records the horizontal adjustment of a feature's programmatically-determined end
      * point.
      **/
-    data_MEASUREMENTREL m_endho;
+    std::string m_endho;
 
     /* include <attendho> */
 };
@@ -5796,12 +5798,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStartvo(data_MEASUREMENTREL startvo_) { m_startvo = startvo_; }
-    data_MEASUREMENTREL GetStartvo() const { return m_startvo; }
+    void SetStartvo(std::string startvo_) { m_startvo = startvo_; }
+    std::string GetStartvo() const { return m_startvo; }
     bool HasStartvo() const;
     //
-    void SetEndvo(data_MEASUREMENTREL endvo_) { m_endvo = endvo_; }
-    data_MEASUREMENTREL GetEndvo() const { return m_endvo; }
+    void SetEndvo(std::string endvo_) { m_endvo = endvo_; }
+    std::string GetEndvo() const { return m_endvo; }
     bool HasEndvo() const;
     ///@}
 
@@ -5810,12 +5812,12 @@ private:
      * Records a vertical adjustment of a feature's programmatically-determined start
      * point.
      **/
-    data_MEASUREMENTREL m_startvo;
+    std::string m_startvo;
     /**
      * Records a vertical adjustment of a feature's programmatically-determined end
      * point.
      **/
-    data_MEASUREMENTREL m_endvo;
+    std::string m_endvo;
 
     /* include <attendvo> */
 };
@@ -5916,14 +5918,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetWidth(data_MEASUREMENTABS width_) { m_width = width_; }
-    data_MEASUREMENTABS GetWidth() const { return m_width; }
+    void SetWidth(std::string width_) { m_width = width_; }
+    std::string GetWidth() const { return m_width; }
     bool HasWidth() const;
     ///@}
 
 private:
     /** Measurement of the horizontal dimension of an entity. **/
-    data_MEASUREMENTABS m_width;
+    std::string m_width;
 
     /* include <attwidth> */
 };
