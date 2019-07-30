@@ -77,7 +77,7 @@ public:
     ///@{
     virtual int GetDrawingY() const;
     virtual int GetDrawingX() const;
-    virtual int GetDrawingSkew() const;
+    virtual double GetDrawingSkew() const;
     /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef

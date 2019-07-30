@@ -173,7 +173,7 @@ int Staff::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-int Staff::GetDrawingSkew() const
+double Staff::GetDrawingSkew() const
 {
     if (this->HasFacs()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));

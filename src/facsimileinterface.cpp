@@ -60,7 +60,7 @@ int FacsimileInterface::GetHeight() const
     return m_zone->GetLogicalLry() - m_zone->GetLogicalUly();
 }
 
-int FacsimileInterface::GetDrawingSkew() const
+double FacsimileInterface::GetDrawingSkew() const
 {
     assert(m_zone);
     return m_zone->GetSkew();
