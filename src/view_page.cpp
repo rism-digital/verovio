@@ -993,7 +993,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     int j, x1, x2, y1, y2, d;
 
     if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
-        d = staff->GetDrawingAngle();
+        d = staff->GetDrawingSkew();
+
+        // if the staff has a skew angle we need to render it skewed
         if (d != VRV_UNSET) {
             x1 = staff->GetDrawingX();
             x2 = x1 + staff->GetWidth();

@@ -38,7 +38,7 @@ public:
     int GetWidth() const;
     int GetHeight() const;
 
-    int GetDrawingAngle() const;
+    int GetDrawingSkew() const;
 
     /** Check if the object has a facsimile */
     bool HasFacsimile() { return this->HasFacs(); }

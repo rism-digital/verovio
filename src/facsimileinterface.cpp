@@ -60,10 +60,10 @@ int FacsimileInterface::GetHeight() const
     return m_zone->GetLogicalLry() - m_zone->GetLogicalUly();
 }
 
-int FacsimileInterface::GetDrawingAngle() const
+int FacsimileInterface::GetDrawingSkew() const
 {
     assert(m_zone);
-    return m_zone->GetRotationDegrees();
+    return m_zone->GetSkew();
 }
 
 int FacsimileInterface::GetSurfaceY() const

@@ -173,13 +173,13 @@ int Staff::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-int Staff::GetDrawingAngle() const
+int Staff::GetDrawingSkew() const
 {
     if (this->HasFacs()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
         assert(DOC);
         if (doc->GetType() == Facs) {
-            return FacsimileInterface::GetDrawingAngle();
+            return FacsimileInterface::GetSkew();
         }
     }
 }
