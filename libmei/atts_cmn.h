@@ -1165,18 +1165,16 @@ public:
     data_LINEFORM GetSlurLform() const { return m_slurLform; }
     bool HasSlurLform() const;
     //
-    void SetSlurLwidth(data_LINEWIDTH slurLwidth_) { m_slurLwidth = slurLwidth_; }
-    data_LINEWIDTH GetSlurLwidth() const { return m_slurLwidth; }
+    void SetSlurLwidth(std::string slurLwidth_) { m_slurLwidth = slurLwidth_; }
+    std::string GetSlurLwidth() const { return m_slurLwidth; }
     bool HasSlurLwidth() const;
-    /** Getter for reference (for alternate type only) */
-    data_LINEWIDTH *GetSlurLwidthAlternate() { return &m_slurLwidth; }
     ///@}
 
 private:
     /** --- **/
     data_LINEFORM m_slurLform;
     /** --- **/
-    data_LINEWIDTH m_slurLwidth;
+    std::string m_slurLwidth;
 
     /* include <attslur.lwidth> */
 };
@@ -1249,18 +1247,16 @@ public:
     data_LINEFORM GetTieLform() const { return m_tieLform; }
     bool HasTieLform() const;
     //
-    void SetTieLwidth(data_LINEWIDTH tieLwidth_) { m_tieLwidth = tieLwidth_; }
-    data_LINEWIDTH GetTieLwidth() const { return m_tieLwidth; }
+    void SetTieLwidth(std::string tieLwidth_) { m_tieLwidth = tieLwidth_; }
+    std::string GetTieLwidth() const { return m_tieLwidth; }
     bool HasTieLwidth() const;
-    /** Getter for reference (for alternate type only) */
-    data_LINEWIDTH *GetTieLwidthAlternate() { return &m_tieLwidth; }
     ///@}
 
 private:
     /** --- **/
     data_LINEFORM m_tieLform;
     /** --- **/
-    data_LINEWIDTH m_tieLwidth;
+    std::string m_tieLwidth;
 
     /* include <atttie.lwidth> */
 };
