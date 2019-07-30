@@ -80,7 +80,7 @@ protected:
     bool ParseUngroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
     bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature);
-    bool ParseChangeSkewAction(jsonxx::Object param, std::string *elementId, double deg);
+    bool ParseChangeSkewAction(jsonxx::Object param, std::string *elementId, double *deg);
     ///@}
 };
 
