@@ -173,6 +173,17 @@ int Staff::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
+int Staff::GetDrawingAngle() const
+{
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(DOC);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingAngle();
+        }
+    }
+}
+
 bool Staff::DrawingIsVisible()
 {
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));

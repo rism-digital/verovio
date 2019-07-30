@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -989,17 +990,42 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     assert(measure);
     assert(system);
 
-    int j, x1, x2, y;
+    int j, x1, x2, y1, y2, d;
 
     if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
-        x1 = staff->GetDrawingX();
-        x2 = x1 + staff->GetWidth();
-        y = ToLogicalY(staff->GetDrawingY());
+        d = staff->GetDrawingAngle();
+        if (d != VRV_UNSET) {
+            x1 = staff->GetDrawingX();
+            x2 = x1 + staff->GetWidth();
+            y1 = ToLogicalY(staff->GetDrawingY());
+            y2 = y1 + ToLogicalY(staff->GetHeight());
+
+            int adj = x2 - x1;
+            int hyp = adj * cos(d * M_PI / 180.0);
+            int opp = adj * tan(d * M_PI / 180.0);
+
+            for (j = 0; j < staff->m_drawingLines; ++j) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2 + opp));
+                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            }
+            
+            dc->ResetPen();
+            dc->ResetBrush();
+            return;
+        }
+        else {
+            x1 = staff->GetDrawingX();
+            x2 = x1 + staff->GetWidth();
+            y1 = ToLogicalY(staff->GetDrawingY());
+            y2 = y1;
+        }
     }
     else {
         x1 = measure->GetDrawingX();
         x2 = x1 + measure->GetWidth();
-        y = staff->GetDrawingY();
+        y1 = staff->GetDrawingY();
+        y2 = y1;
     }
 
     int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
@@ -1007,9 +1033,10 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
         // For drawing rectangles instead of lines
-        y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
 
     dc->ResetPen();
