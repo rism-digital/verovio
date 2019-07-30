@@ -664,6 +664,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
     y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
+    if (staff->GetDrawingSkew() != 0) {
+        double deg = staff->GetDrawingSkew();
+        int xDiff = x - staff->GetDrawingX();
+        y -= int(xDiff * tan(deg * M_PI / 180.0));
+    }
 
     bool cueSize = false;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
@@ -725,6 +730,15 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset;
     int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
+    int skewOffset;
+    if (staff->GetDrawingSkew() != 0) {
+        double deg = staff->GetDrawingSkew();
+        int xDiff = noteX - staff->GetDrawingX();
+        skewOffset =  int(xDiff * tan(deg * M_PI / 180.0));
+    }
+    else {
+        skewOffset = 0;
+    }
 
     if (clef->GetShape() == CLEFSHAPE_C) {
         pitchOffset = (custos->GetPname() - PITCHNAME_c) * (staffSize / 2);
@@ -737,7 +751,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         pitchOffset = 0;
     }
 
-    int actualY = clefY + pitchOffset + octaveOffset;
+    int actualY = clefY + pitchOffset + octaveOffset + skewOffset;
 
     DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
 

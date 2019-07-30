@@ -162,14 +162,14 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset = 0;
     int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
-    double skewOffset;
+    int skewOffset;
     if (staff->GetDrawingSkew() != 0) {
         double deg = staff->GetDrawingSkew();
         int xDiff = noteX - staff->GetDrawingX();
-        skewOffset =  xDiff * tan(deg * M_PI / 180.0);
+        skewOffset =  int(xDiff * tan(deg * M_PI / 180.0));
     }
     else {
-        skewOffset = 0.0;
+        skewOffset = 0;
     }
 
     if (clef->GetShape() == CLEFSHAPE_C) {
