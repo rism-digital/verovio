@@ -835,6 +835,10 @@ public:
     void SetLry(int lry_) { m_lry = lry_; }
     int GetLry() const { return m_lry; }
     bool HasLry() const;
+    //
+    void SetSkew(double skew) { m_skew = skew; }
+    double GetSkew() const { return m_skew; }
+    bool HasSkew() const;
     ///@}
 
 private:
@@ -846,6 +850,8 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
+    /** Indicates the skew of the bounding box. **/
+    double m_skew;
 
     /* include <attlry> */
 };
