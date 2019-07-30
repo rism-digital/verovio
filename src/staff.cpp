@@ -182,6 +182,8 @@ double Staff::GetDrawingSkew() const
             return FacsimileInterface::GetDrawingSkew();
         }
     }
+    LogWarning("This staff doesn't have facsimile data, so it doesn't have a skew");
+    return 0;
 }
 
 bool Staff::DrawingIsVisible()
