@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 28 13:57:19 CEST 2019
+// Last Modified: Tue Jul 30 15:07:46 CEST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1242,6 +1242,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isKeySignature            (void);
 		bool     isKeyDesignation          (void);
 		bool     isTimeSignature           (void);
+		bool     isTempo                   (void);
 		bool     isMensurationSymbol       (void);
 
 		bool     hasSlurStart              (void);
@@ -3920,6 +3921,40 @@ class HumdrumFileStream {
 
 
 
+///////////////////////////////////////////////////////////////////////////
+
+class HumdrumFileSet {
+   public:
+                            HumdrumFileSet   (void);
+                            HumdrumFileSet   (Options& options);
+                           ~HumdrumFileSet   ();
+
+      void                  clear            (void);
+      int                   getSize          (void);
+      int                   getCount         (void) { return getSize(); }
+      HumdrumFile&          operator[]       (int index);
+
+      int                   readFile         (const string& filename);
+      int                   readString       (const string& contents);
+      int                   read             (std::istream& inStream);
+      int                   read             (Options& options);
+      int                   read             (HumdrumFileStream& instream);
+
+      int                   readAppendFile   (const string& filename);
+      int                   readAppendString (const string& contents);
+      int                   readAppend       (std::istream& inStream);
+      int                   readAppend       (Options& options);
+      int                   readAppend       (HumdrumFileStream& instream);
+
+   protected:
+      vector<HumdrumFile*>  data;
+
+      void                  appendHumdrumFileContent(const std::string& filename, 
+                                               std::stringstream& inbuffer);
+};
+
+
+
 class Tool_autobeam : public HumTool {
 	public:
 		         Tool_autobeam   (void);
@@ -4258,6 +4293,25 @@ class Tool_cint : public HumTool {
 		char      NoteMarker   = '\0';   // used with -N option
 		string    SearchString;
 		string Spacer;
+
+};
+
+
+class Tool_composite : public HumTool {
+	public:
+		       	   Tool_composite      (void);
+		       	  ~Tool_composite      () {};
+
+		bool        run                (HumdrumFile& infile);
+		bool        run                (const string& indata, ostream& out);
+		bool        run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void        processFile        (HumdrumFile& infile);
+		void        initialize         (void);
+
+	private:
+		string      m_pitch = "e";
 
 };
 
