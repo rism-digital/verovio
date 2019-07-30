@@ -471,6 +471,10 @@ public:
     void StableSort(Compare comp) { std::stable_sort(m_children.begin(), m_children.end(), comp); }
 
     virtual void ReorderByXPos();
+
+    Object *FindNextChild(Comparison *comp, Object *start);
+
+    Object *FindPreviousChild(Comparison *comp, Object *start);
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -1080,6 +1084,10 @@ public:
      * Reorder elements by x-position.
      */
     virtual int ReorderByXPos(FunctorParams *);
+
+    virtual int FindNextChildByComparison(FunctorParams *);
+
+    virtual int FindPreviousChildByComparison(FunctorParams *);
 
     /**
      * Get bounding box using child elements with facsimile interface

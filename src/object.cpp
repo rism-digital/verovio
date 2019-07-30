@@ -802,6 +802,22 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
+Object *Object::FindNextChild(Comparison *comp, Object *start)
+{
+    Functor findNextChildByComparison(&Object::FindNextChildByComparison);
+    FindChildByComparisonParams params(comp, start);
+    this->Process(&findNextChildByComparison, &params);
+    return params.m_element;
+}
+
+Object *Object::FindPreviousChild(Comparison *comp, Object *start)
+{
+    Functor findPreviousChildByComparison(&Object::FindPreviousChildByComparison);
+    FindChildByComparisonParams params(comp, start);
+    this->Process(&findPreviousChildByComparison, &params);
+    return params.m_element;
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -1664,6 +1680,49 @@ int Object::SetChildZones(FunctorParams *functorParams)
             }
         }
     }
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindNextChildByComparison(FunctorParams *functorparams) 
+{
+    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
+    assert(params);
+
+    // we are reaching the start of the range
+    if (params->m_start == this) {
+        // setting m_start to be null tells us that we're in the range
+        params->m_start = NULL;
+        return FUNCTOR_CONTINUE;
+    }
+
+    else if (params->m_start) {
+        //we're not yet in the range
+        return FUNCTOR_CONTINUE;
+    }
+
+    if ((*params->m_comparison)(this)) {
+        params->m_element = this;
+        return FUNCTOR_STOP;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
+{
+    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
+    assert(params);
+    // this guy works by going from the start and replacing the return element with every nearer element
+    // until you get to the 'start' element 
+    if (params->m_start == this) {
+        // we've reached the end element, so stop
+        return FUNCTOR_STOP;
+    }
+
+    if ((*params->m_comparison)(this)) {
+        params->m_element = this;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

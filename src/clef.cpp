@@ -91,4 +91,22 @@ int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, dat
     return place << 24 | octaveDis << 16 | line << 8 | shape;
 }
 
+int Clef::PitchDistanceTo(Clef *clef) 
+{
+    int result = -2 * (clef->GetLine() - this->GetLine());
+    if (this->GetShape() == CLEFSHAPE_F) {
+        result -= 3;
+    }
+    else if (this->GetShape() == CLEFSHAPE_G) {
+        result -= 4;
+    }
+    if (clef->GetShape() == CLEFSHAPE_F) {
+        result += 3;
+    }
+    else if (clef->GetShape() == CLEFSHAPE_G) {
+        result += 4;
+    }
+    return result;
+}
+
 } // namespace vrv
