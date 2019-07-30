@@ -167,6 +167,15 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse toggle ligature action");
     }
+
+    else if (action == "changeSkew"){
+        std::string elementId;
+        double deg;
+        if(this->ParseChangeSkewAction(json.get<jsonxx::Object>("param"), &elementId, &deg)) {
+            return this->ChangeSkew(elementId, deg);
+        }
+        LogWarning("Could not parse change skew action");
+    }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
@@ -2145,6 +2154,11 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     return success1 && success2;
 }
 
+bool EditorToolkitNeume::ChangeSkew(std::string elementId, double deg) 
+{
+    
+}
+
 bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -2361,6 +2375,12 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
     (*isLigature) = param.get<jsonxx::String>("isLigature");
 
     return true;
+}
+
+bool EditorToolkitNeume::ParseChangeSkewAction(
+    jsonxx::Object param, std::string *elementId, double *deg)
+{
+
 }
 
 }// namespace vrv
