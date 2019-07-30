@@ -733,7 +733,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int skewOffset;
     if (staff->GetDrawingSkew() != 0) {
         double deg = staff->GetDrawingSkew();
-        int xDiff = noteX - staff->GetDrawingX();
+        int xDiff = x - staff->GetDrawingX();
         skewOffset =  int(xDiff * tan(deg * M_PI / 180.0));
     }
     else {

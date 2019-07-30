@@ -179,7 +179,7 @@ double Staff::GetDrawingSkew() const
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
         assert(DOC);
         if (doc->GetType() == Facs) {
-            return FacsimileInterface::GetSkew();
+            return FacsimileInterface::GetDrawingSkew();
         }
     }
 }

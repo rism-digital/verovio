@@ -994,19 +994,21 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
 
     if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
         d = staff->GetDrawingSkew();
+        LogMessage("%d", d);
 
         // if the staff has a skew angle we need to render it skewed
-        if (d != VRV_UNSET) {
+        if (d != 0) {
             x1 = staff->GetDrawingX();
             x2 = x1 + staff->GetWidth();
             y1 = ToLogicalY(staff->GetDrawingY());
-            y2 = y1 + ToLogicalY(staff->GetHeight());
+            y2 = y1;
 
             int adj = x2 - x1;
             int hyp = adj * cos(d * M_PI / 180.0);
             int opp = adj * tan(d * M_PI / 180.0);
 
             for (j = 0; j < staff->m_drawingLines; ++j) {
+                LogMessage("d != 0: %d, %d, %d, %d", x1, y1, x2, y2);
                 dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2 + opp));
                 y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -1035,6 +1037,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
+        LogMessage("normal: %d, %d, %d, %d", x1, y1, x2, y2);
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
         // For drawing rectangles instead of lines
         y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
