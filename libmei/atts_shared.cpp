@@ -1009,7 +1009,7 @@ void AttCoordinated::ResetCoordinated()
     m_uly = 0;
     m_lrx = 0;
     m_lry = 0;
-    m_skew = 0.0;
+    m_skew = 0;
 }
 
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
@@ -1091,10 +1091,10 @@ bool AttCoordinated::HasLry() const
 
 bool AttCoordinated::HasSkew() const
 {
-    return (m_skew != 0.0);
+    return (m_skew != 0);
 }
 
-/* include <attskew> */
+/* include <attlry> */
 
 //----------------------------------------------------------------------------
 // AttCue
@@ -1492,26 +1492,26 @@ AttDistances::~AttDistances()
 
 void AttDistances::ResetDistances()
 {
-    m_dynamDist = VRV_UNSET;
-    m_harmDist = VRV_UNSET;
-    m_textDist = VRV_UNSET;
+    m_dynamDist = "";
+    m_harmDist = "";
+    m_textDist = "";
 }
 
 bool AttDistances::ReadDistances(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("dynam.dist")) {
-        this->SetDynamDist(StrToMeasurementrel(element.attribute("dynam.dist").value()));
+        this->SetDynamDist(StrToStr(element.attribute("dynam.dist").value()));
         element.remove_attribute("dynam.dist");
         hasAttribute = true;
     }
     if (element.attribute("harm.dist")) {
-        this->SetHarmDist(StrToMeasurementrel(element.attribute("harm.dist").value()));
+        this->SetHarmDist(StrToStr(element.attribute("harm.dist").value()));
         element.remove_attribute("harm.dist");
         hasAttribute = true;
     }
     if (element.attribute("text.dist")) {
-        this->SetTextDist(StrToMeasurementrel(element.attribute("text.dist").value()));
+        this->SetTextDist(StrToStr(element.attribute("text.dist").value()));
         element.remove_attribute("text.dist");
         hasAttribute = true;
     }
@@ -1522,15 +1522,15 @@ bool AttDistances::WriteDistances(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasDynamDist()) {
-        element.append_attribute("dynam.dist") = MeasurementrelToStr(this->GetDynamDist()).c_str();
+        element.append_attribute("dynam.dist") = StrToStr(this->GetDynamDist()).c_str();
         wroteAttribute = true;
     }
     if (this->HasHarmDist()) {
-        element.append_attribute("harm.dist") = MeasurementrelToStr(this->GetHarmDist()).c_str();
+        element.append_attribute("harm.dist") = StrToStr(this->GetHarmDist()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTextDist()) {
-        element.append_attribute("text.dist") = MeasurementrelToStr(this->GetTextDist()).c_str();
+        element.append_attribute("text.dist") = StrToStr(this->GetTextDist()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1538,17 +1538,17 @@ bool AttDistances::WriteDistances(pugi::xml_node element)
 
 bool AttDistances::HasDynamDist() const
 {
-    return (m_dynamDist != VRV_UNSET);
+    return (m_dynamDist != "");
 }
 
 bool AttDistances::HasHarmDist() const
 {
-    return (m_harmDist != VRV_UNSET);
+    return (m_harmDist != "");
 }
 
 bool AttDistances::HasTextDist() const
 {
-    return (m_textDist != VRV_UNSET);
+    return (m_textDist != "");
 }
 
 /* include <atttext.dist> */
@@ -3111,7 +3111,7 @@ AttLyricStyle::~AttLyricStyle()
 
 void AttLyricStyle::ResetLyricStyle()
 {
-    m_lyricAlign = VRV_UNSET;
+    m_lyricAlign = "";
     m_lyricFam = "";
     m_lyricName = "";
     m_lyricSize = data_FONTSIZE();
@@ -3123,7 +3123,7 @@ bool AttLyricStyle::ReadLyricStyle(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("lyric.align")) {
-        this->SetLyricAlign(StrToMeasurementrel(element.attribute("lyric.align").value()));
+        this->SetLyricAlign(StrToStr(element.attribute("lyric.align").value()));
         element.remove_attribute("lyric.align");
         hasAttribute = true;
     }
@@ -3159,7 +3159,7 @@ bool AttLyricStyle::WriteLyricStyle(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasLyricAlign()) {
-        element.append_attribute("lyric.align") = MeasurementrelToStr(this->GetLyricAlign()).c_str();
+        element.append_attribute("lyric.align") = StrToStr(this->GetLyricAlign()).c_str();
         wroteAttribute = true;
     }
     if (this->HasLyricFam()) {
@@ -3187,7 +3187,7 @@ bool AttLyricStyle::WriteLyricStyle(pugi::xml_node element)
 
 bool AttLyricStyle::HasLyricAlign() const
 {
-    return (m_lyricAlign != VRV_UNSET);
+    return (m_lyricAlign != "");
 }
 
 bool AttLyricStyle::HasLyricFam() const
@@ -5705,8 +5705,8 @@ void AttSpacing::ResetSpacing()
 {
     m_spacingPackexp = 0.0;
     m_spacingPackfact = 0.0;
-    m_spacingStaff = VRV_UNSET;
-    m_spacingSystem = VRV_UNSET;
+    m_spacingStaff = "";
+    m_spacingSystem = "";
 }
 
 bool AttSpacing::ReadSpacing(pugi::xml_node element)
@@ -5723,12 +5723,12 @@ bool AttSpacing::ReadSpacing(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("spacing.staff")) {
-        this->SetSpacingStaff(StrToMeasurementrel(element.attribute("spacing.staff").value()));
+        this->SetSpacingStaff(StrToStr(element.attribute("spacing.staff").value()));
         element.remove_attribute("spacing.staff");
         hasAttribute = true;
     }
     if (element.attribute("spacing.system")) {
-        this->SetSpacingSystem(StrToMeasurementrel(element.attribute("spacing.system").value()));
+        this->SetSpacingSystem(StrToStr(element.attribute("spacing.system").value()));
         element.remove_attribute("spacing.system");
         hasAttribute = true;
     }
@@ -5747,11 +5747,11 @@ bool AttSpacing::WriteSpacing(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasSpacingStaff()) {
-        element.append_attribute("spacing.staff") = MeasurementrelToStr(this->GetSpacingStaff()).c_str();
+        element.append_attribute("spacing.staff") = StrToStr(this->GetSpacingStaff()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSpacingSystem()) {
-        element.append_attribute("spacing.system") = MeasurementrelToStr(this->GetSpacingSystem()).c_str();
+        element.append_attribute("spacing.system") = StrToStr(this->GetSpacingSystem()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5769,7 +5769,7 @@ bool AttSpacing::HasSpacingPackfact() const
 
 bool AttSpacing::HasSpacingStaff() const
 {
-    return (m_spacingStaff != VRV_UNSET);
+    return (m_spacingStaff != "");
 }
 
 bool AttSpacing::HasSpacingSystem() const
@@ -8144,10 +8144,6 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             att->SetLry(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "skew") {
-            att->SetSkew(att->StrToDbl(attrValue));
-            return true;
-        }
     }
     if (element->HasAttClass(ATT_CUE)) {
         AttCue *att = dynamic_cast<AttCue *>(element);
@@ -9652,9 +9648,6 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasLry()) {
             attributes->push_back(std::make_pair("lry", att->IntToStr(att->GetLry())));
-        }
-        if (att->HasSkew()) {
-            attributes->push_back(std::make_pair("skew", att->DblToStr(att->GetSkew())));
         }
     }
     if (element->HasAttClass(ATT_CUE)) {

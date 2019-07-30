@@ -836,7 +836,7 @@ public:
     int GetLry() const { return m_lry; }
     bool HasLry() const;
     //
-    void SetSkew(double skew_) { m_skew = skew_; }
+    void SetSkew(double skew) { m_skew = skew; }
     double GetSkew() const { return m_skew; }
     bool HasSkew() const;
     ///@}
@@ -853,7 +853,7 @@ private:
     /** Indicates the skew of the bounding box. **/
     double m_skew;
 
-    /* include <attskew> */
+    /* include <attlry> */
 };
 
 //----------------------------------------------------------------------------
