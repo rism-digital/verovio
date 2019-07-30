@@ -170,9 +170,10 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
     else if (action == "changeSkew"){
         std::string elementId;
-        double deg;
-        if(this->ParseChangeSkewAction(json.get<jsonxx::Object>("param"), &elementId, &deg)) {
-            return this->ChangeSkew(elementId, deg);
+        int dy;
+        bool rightSide;
+        if(this->ParseChangeSkewAction(json.get<jsonxx::Object>("param"), &elementId, &dy, &rightSide)) {
+            return this->ChangeSkew(elementId, dy, rightSide);
         }
         LogWarning("Could not parse change skew action");
     }
@@ -2154,9 +2155,47 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     return success1 && success2;
 }
 
-bool EditorToolkitNeume::ChangeSkew(std::string elementId, double deg) 
+bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSide) 
 {
-    
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page");
+        return false;
+    }
+    if (m_doc->GetType() != Facs) {
+        LogWarning("Resizing is only available in facsimile mode.");
+        return false;
+    }
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    assert(staff);
+    if (staff == NULL) {
+        LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
+        return false;
+    }
+    if (!staff->HasFacs()) {
+        LogError("This staff does not have a facsimile.");
+        return false;
+    }
+    Zone *zone = staff->GetZone();
+    assert(zone);
+
+    // ~~ magic triangles ~~
+
+    int adj = zone->GetLrx() - zone->GetUlx();
+    double currentSkew = zone->GetSkew();
+    double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + dy) / adj)) * 180.0 / M_PI;
+    zone->SetSkew( rightSide ? newSkew : -1 * newSkew);
+
+    if (rightSide) { 
+        zone->SetLry(zone->GetLry() + dy); 
+    }
+    else { 
+        zone->SetUly(zone->GetUly() + dy); 
+    }
+
+    zone->Modify();
+
+    return true;
+
 }
 
 bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
@@ -2378,9 +2417,16 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
 }
 
 bool EditorToolkitNeume::ParseChangeSkewAction(
-    jsonxx::Object param, std::string *elementId, double *deg)
+    jsonxx::Object param, std::string *elementId, int *dy, bool *rightSide)
 {
+    if(!param.has<jsonxx::String>("elementIds")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    if(!param.has<jsonxx::Number>("dy")) return false;
+    (*dy) = param.get<jsonxx::Number>("dy");
+    if(!param.has<jsonxx::Boolean>("rightSide")) return false;
+    (*rightSide) = param.get<jsonxx::Boolean>("rightSide");
 
+    return true;
 }
 
 }// namespace vrv
