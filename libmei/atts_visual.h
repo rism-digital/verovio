@@ -962,14 +962,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_METERFORM form_) { m_form = form_; }
-    data_METERFORM GetForm() const { return m_form; }
+    void SetForm(meterSigVis_FORM form_) { m_form = form_; }
+    meterSigVis_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
-    data_METERFORM m_form;
+    meterSigVis_FORM m_form;
 
     /* include <attform> */
 };
@@ -998,8 +998,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterForm(data_METERFORM meterForm_) { m_meterForm = meterForm_; }
-    data_METERFORM GetMeterForm() const { return m_meterForm; }
+    void SetMeterForm(meterSigDefaultVis_METERFORM meterForm_) { m_meterForm = meterForm_; }
+    meterSigDefaultVis_METERFORM GetMeterForm() const { return m_meterForm; }
     bool HasMeterForm() const;
     //
     void SetMeterShowchange(data_BOOLEAN meterShowchange_) { m_meterShowchange = meterShowchange_; }
@@ -1009,7 +1009,7 @@ public:
 
 private:
     /** Contains an indication of how the meter signature should be rendered. **/
-    data_METERFORM m_meterForm;
+    meterSigDefaultVis_METERFORM m_meterForm;
     /**
      * Determines whether the old meter signature should be displayed when the meter
      * signature changes.
@@ -1399,8 +1399,8 @@ public:
     data_BOOLEAN GetLinesVisible() const { return m_linesVisible; }
     bool HasLinesVisible() const;
     //
-    void SetSpacing(std::string spacing_) { m_spacing = spacing_; }
-    std::string GetSpacing() const { return m_spacing; }
+    void SetSpacing(data_MEASUREMENTREL spacing_) { m_spacing = spacing_; }
+    data_MEASUREMENTREL GetSpacing() const { return m_spacing; }
     bool HasSpacing() const;
     ///@}
 
@@ -1420,7 +1420,7 @@ private:
     /** Records whether all staff lines are visible. **/
     data_BOOLEAN m_linesVisible;
     /** Records the absolute distance (as opposed to the relative distances recorded in **/
-    std::string m_spacing;
+    data_MEASUREMENTREL m_spacing;
 
     /* include <attspacing> */
 };

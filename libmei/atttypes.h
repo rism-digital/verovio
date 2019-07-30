@@ -340,7 +340,6 @@ enum data_COLORNAMES {
     COLORNAMES_plum,
     COLORNAMES_powderblue,
     COLORNAMES_purple,
-    COLORNAMES_rebeccapurple,
     COLORNAMES_red,
     COLORNAMES_rosybrown,
     COLORNAMES_royalblue,
@@ -702,18 +701,6 @@ enum data_MENSURATIONSIGN {
     MENSURATIONSIGN_C,
     MENSURATIONSIGN_O,
     MENSURATIONSIGN_MAX
-};
-
-/**
- * MEI data.METERFORM
- */
-enum data_METERFORM {
-    METERFORM_NONE = 0,
-    METERFORM_num,
-    METERFORM_denomsym,
-    METERFORM_norm,
-    METERFORM_invis,
-    METERFORM_MAX
 };
 
 /**
@@ -1568,7 +1555,6 @@ enum measurement_UNIT {
 enum meiVersion_MEIVERSION {
     meiVersion_MEIVERSION_NONE = 0,
     meiVersion_MEIVERSION_4_0_0,
-    meiVersion_MEIVERSION_4_0_1,
     meiVersion_MEIVERSION_MAX
 };
 
@@ -1601,6 +1587,30 @@ enum meterConformance_METCON {
     meterConformance_METCON_i,
     meterConformance_METCON_o,
     meterConformance_METCON_MAX
+};
+
+/**
+ * MEI att.meterSig.vis@form
+ */
+enum meterSigVis_FORM {
+    meterSigVis_FORM_NONE = 0,
+    meterSigVis_FORM_num,
+    meterSigVis_FORM_denomsym,
+    meterSigVis_FORM_norm,
+    meterSigVis_FORM_invis,
+    meterSigVis_FORM_MAX
+};
+
+/**
+ * MEI att.meterSigDefault.vis@meter.form
+ */
+enum meterSigDefaultVis_METERFORM {
+    meterSigDefaultVis_METERFORM_NONE = 0,
+    meterSigDefaultVis_METERFORM_num,
+    meterSigDefaultVis_METERFORM_denomsym,
+    meterSigDefaultVis_METERFORM_norm,
+    meterSigDefaultVis_METERFORM_invis,
+    meterSigDefaultVis_METERFORM_MAX
 };
 
 /**

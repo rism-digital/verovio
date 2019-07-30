@@ -1381,14 +1381,14 @@ AttMeterSigVis::~AttMeterSigVis()
 
 void AttMeterSigVis::ResetMeterSigVis()
 {
-    m_form = METERFORM_NONE;
+    m_form = meterSigVis_FORM_NONE;
 }
 
 bool AttMeterSigVis::ReadMeterSigVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToMeterform(element.attribute("form").value()));
+        this->SetForm(StrToMeterSigVisForm(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
@@ -1399,7 +1399,7 @@ bool AttMeterSigVis::WriteMeterSigVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = MeterformToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = MeterSigVisFormToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1407,7 +1407,7 @@ bool AttMeterSigVis::WriteMeterSigVis(pugi::xml_node element)
 
 bool AttMeterSigVis::HasForm() const
 {
-    return (m_form != METERFORM_NONE);
+    return (m_form != meterSigVis_FORM_NONE);
 }
 
 /* include <attform> */
@@ -1427,7 +1427,7 @@ AttMeterSigDefaultVis::~AttMeterSigDefaultVis()
 
 void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
 {
-    m_meterForm = METERFORM_NONE;
+    m_meterForm = meterSigDefaultVis_METERFORM_NONE;
     m_meterShowchange = BOOLEAN_NONE;
 }
 
@@ -1435,7 +1435,7 @@ bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("meter.form")) {
-        this->SetMeterForm(StrToMeterform(element.attribute("meter.form").value()));
+        this->SetMeterForm(StrToMeterSigDefaultVisMeterform(element.attribute("meter.form").value()));
         element.remove_attribute("meter.form");
         hasAttribute = true;
     }
@@ -1451,7 +1451,7 @@ bool AttMeterSigDefaultVis::WriteMeterSigDefaultVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMeterForm()) {
-        element.append_attribute("meter.form") = MeterformToStr(this->GetMeterForm()).c_str();
+        element.append_attribute("meter.form") = MeterSigDefaultVisMeterformToStr(this->GetMeterForm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMeterShowchange()) {
@@ -1463,7 +1463,7 @@ bool AttMeterSigDefaultVis::WriteMeterSigDefaultVis(pugi::xml_node element)
 
 bool AttMeterSigDefaultVis::HasMeterForm() const
 {
-    return (m_meterForm != METERFORM_NONE);
+    return (m_meterForm != meterSigDefaultVis_METERFORM_NONE);
 }
 
 bool AttMeterSigDefaultVis::HasMeterShowchange() const
@@ -1906,7 +1906,7 @@ void AttStaffDefVis::ResetStaffDefVis()
     m_layerscheme = LAYERSCHEME_NONE;
     m_linesColor = "";
     m_linesVisible = BOOLEAN_NONE;
-    m_spacing = "";
+    m_spacing = VRV_UNSET;
 }
 
 bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element)
@@ -1933,7 +1933,7 @@ bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("spacing")) {
-        this->SetSpacing(StrToStr(element.attribute("spacing").value()));
+        this->SetSpacing(StrToMeasurementrel(element.attribute("spacing").value()));
         element.remove_attribute("spacing");
         hasAttribute = true;
     }
@@ -1960,7 +1960,7 @@ bool AttStaffDefVis::WriteStaffDefVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasSpacing()) {
-        element.append_attribute("spacing") = StrToStr(this->GetSpacing()).c_str();
+        element.append_attribute("spacing") = MeasurementrelToStr(this->GetSpacing()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1988,7 +1988,7 @@ bool AttStaffDefVis::HasLinesVisible() const
 
 bool AttStaffDefVis::HasSpacing() const
 {
-    return (m_spacing != "");
+    return (m_spacing != VRV_UNSET);
 }
 
 /* include <attspacing> */
@@ -2408,7 +2408,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         AttMeterSigVis *att = dynamic_cast<AttMeterSigVis *>(element);
         assert(att);
         if (attrType == "form") {
-            att->SetForm(att->StrToMeterform(attrValue));
+            att->SetForm(att->StrToMeterSigVisForm(attrValue));
             return true;
         }
     }
@@ -2416,7 +2416,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis *>(element);
         assert(att);
         if (attrType == "meter.form") {
-            att->SetMeterForm(att->StrToMeterform(attrValue));
+            att->SetMeterForm(att->StrToMeterSigDefaultVisMeterform(attrValue));
             return true;
         }
         if (attrType == "meter.showchange") {
@@ -2516,7 +2516,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "spacing") {
-            att->SetSpacing(att->StrToStr(attrValue));
+            att->SetSpacing(att->StrToMeasurementrel(attrValue));
             return true;
         }
     }
@@ -2782,14 +2782,14 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttMeterSigVis *att = dynamic_cast<const AttMeterSigVis *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->MeterformToStr(att->GetForm())));
+            attributes->push_back(std::make_pair("form", att->MeterSigVisFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_METERSIGDEFAULTVIS)) {
         const AttMeterSigDefaultVis *att = dynamic_cast<const AttMeterSigDefaultVis *>(element);
         assert(att);
         if (att->HasMeterForm()) {
-            attributes->push_back(std::make_pair("meter.form", att->MeterformToStr(att->GetMeterForm())));
+            attributes->push_back(std::make_pair("meter.form", att->MeterSigDefaultVisMeterformToStr(att->GetMeterForm())));
         }
         if (att->HasMeterShowchange()) {
             attributes->push_back(std::make_pair("meter.showchange", att->BooleanToStr(att->GetMeterShowchange())));
@@ -2874,7 +2874,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lines.visible", att->BooleanToStr(att->GetLinesVisible())));
         }
         if (att->HasSpacing()) {
-            attributes->push_back(std::make_pair("spacing", att->StrToStr(att->GetSpacing())));
+            attributes->push_back(std::make_pair("spacing", att->MeasurementrelToStr(att->GetSpacing())));
         }
     }
     if (element->HasAttClass(ATT_STAFFGRPVIS)) {
