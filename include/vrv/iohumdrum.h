@@ -539,6 +539,7 @@ protected:
     std::string getTrackText(hum::HTp token);
     void checkForLayoutBreak(int line);
     std::string removeCommas(const std::string &input);
+    void extractNullInformation(vector<bool> &nulls, hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -788,6 +789,14 @@ private:
 
     // m_breaks == true if the music contains encoded page/system breaks
     bool m_breaks = false;
+
+    // m_nulls == true if the line only contains null data.
+    std::vector<bool> m_nulls;
+
+    // m_duradj == duration adjustments due to the presence of a full
+    // null data line.  Add this value when calculating the prespace
+    // variable in fillContentsOfLayer().
+    std::vector<hum::HumNum> m_duradj;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

@@ -542,6 +542,8 @@ bool HumdrumInput::convertHumdrum()
 
     bool status = true; // for keeping track of problems in conversion process.
 
+    extractNullInformation(m_nulls, infile);
+
     prepareTimeSigDur();
     setupMeiDocument();
 
@@ -657,6 +659,58 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::extractNullInformation --
+//
+
+void HumdrumInput::extractNullInformation(vector<bool> &nulls, hum::HumdrumFile &infile)
+{
+    nulls.resize(infile.getLineCount());
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isData()) {
+            // only keeping track of data null-lines.
+            nulls[i] = false;
+            continue;
+        }
+        // Maybe create an HumdrumLine::isAllKernNull() function for this one.
+        // But this is probably not a good idea, since there is still a need to
+        // place dynamics at fractional positions in relation to the notes sometimes.
+        nulls[i] = infile[i].isAllNull();
+    }
+
+    m_duradj.resize(infile.getLineCount());
+    for (int i = 0; i < (int)m_duradj.size(); i++) {
+        m_duradj[i] = 0;
+    }
+    hum::HumNum sum = 0;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (infile[i].isBarline()) {
+            // Probably suppress null corrections across barlines...
+            sum = 0;
+            continue;
+        }
+        if (!infile[i].isData()) {
+            continue;
+        }
+        if (infile[i].getDuration() == 0) {
+            continue;
+        }
+        if (m_nulls[i]) {
+            // A null line: collect the duration and move to the next
+            // data line that is not null or has 0 duration.
+            sum += infile[i].getDuration();
+        }
+        else if (sum > 0) {
+            // A non-null line that precedes some null data lines: store the
+            // accumulated duration of the null lines for prespace analysis in
+            // fillContentsOfLayer().
+            m_duradj[i] = sum;
+            sum = 0;
+        }
+    }
 }
 
 //////////////////////////////
@@ -5882,7 +5936,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                     else {
                         // normal space
-
                         Space *irest = new Space;
                         if (m_doc->GetOptions()->m_humType.GetValue()) {
                             embedQstampInClass(irest, layerdata[i], *layerdata[i]);
@@ -11175,6 +11228,7 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
     }
     for (int i = 1; i < (int)layerdata.size(); ++i) {
         prespace[i] = startdur[i] - startdur[i - 1] - duration[i - 1];
+        prespace[i] -= m_duradj[layerdata[i]->getLineIndex()];
         if (prespace[i] < 0) {
             correction += prespace[i];
             prespace[i] = 0;
@@ -14370,6 +14424,8 @@ void HumdrumInput::clear()
     m_filename = "";
     m_tupletscaling = 1;
     m_breaks = false;
+    m_duradj.clear();
+    m_nulls.clear();
 }
 
 //////////////////////////////
