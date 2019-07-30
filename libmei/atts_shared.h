@@ -835,6 +835,10 @@ public:
     void SetLry(int lry_) { m_lry = lry_; }
     int GetLry() const { return m_lry; }
     bool HasLry() const;
+    //
+    void SetSkew(double skew_) { m_skew = skew_; }
+    double GetSkew() const { return m_skew; }
+    bool HasSkew() const;
     ///@}
 
 private:
@@ -846,8 +850,10 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
+    /** Indicates the skew of the bounding box. **/
+    double m_skew;
 
-    /* include <attlry> */
+    /* include <attskew> */
 };
 
 //----------------------------------------------------------------------------
@@ -1764,14 +1770,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHeight(data_MEASUREMENTABS height_) { m_height = height_; }
-    data_MEASUREMENTABS GetHeight() const { return m_height; }
+    void SetHeight(std::string height_) { m_height = height_; }
+    std::string GetHeight() const { return m_height; }
     bool HasHeight() const;
     ///@}
 
 private:
     /** Measurement of the vertical dimension of an entity. **/
-    data_MEASUREMENTABS m_height;
+    std::string m_height;
 
     /* include <attheight> */
 };
@@ -3664,28 +3670,28 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPageHeight(data_MEASUREMENTABS pageHeight_) { m_pageHeight = pageHeight_; }
-    data_MEASUREMENTABS GetPageHeight() const { return m_pageHeight; }
+    void SetPageHeight(std::string pageHeight_) { m_pageHeight = pageHeight_; }
+    std::string GetPageHeight() const { return m_pageHeight; }
     bool HasPageHeight() const;
     //
-    void SetPageWidth(data_MEASUREMENTABS pageWidth_) { m_pageWidth = pageWidth_; }
-    data_MEASUREMENTABS GetPageWidth() const { return m_pageWidth; }
+    void SetPageWidth(std::string pageWidth_) { m_pageWidth = pageWidth_; }
+    std::string GetPageWidth() const { return m_pageWidth; }
     bool HasPageWidth() const;
     //
-    void SetPageTopmar(data_MEASUREMENTABS pageTopmar_) { m_pageTopmar = pageTopmar_; }
-    data_MEASUREMENTABS GetPageTopmar() const { return m_pageTopmar; }
+    void SetPageTopmar(std::string pageTopmar_) { m_pageTopmar = pageTopmar_; }
+    std::string GetPageTopmar() const { return m_pageTopmar; }
     bool HasPageTopmar() const;
     //
-    void SetPageBotmar(data_MEASUREMENTABS pageBotmar_) { m_pageBotmar = pageBotmar_; }
-    data_MEASUREMENTABS GetPageBotmar() const { return m_pageBotmar; }
+    void SetPageBotmar(std::string pageBotmar_) { m_pageBotmar = pageBotmar_; }
+    std::string GetPageBotmar() const { return m_pageBotmar; }
     bool HasPageBotmar() const;
     //
-    void SetPageLeftmar(data_MEASUREMENTABS pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
-    data_MEASUREMENTABS GetPageLeftmar() const { return m_pageLeftmar; }
+    void SetPageLeftmar(std::string pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
+    std::string GetPageLeftmar() const { return m_pageLeftmar; }
     bool HasPageLeftmar() const;
     //
-    void SetPageRightmar(data_MEASUREMENTABS pageRightmar_) { m_pageRightmar = pageRightmar_; }
-    data_MEASUREMENTABS GetPageRightmar() const { return m_pageRightmar; }
+    void SetPageRightmar(std::string pageRightmar_) { m_pageRightmar = pageRightmar_; }
+    std::string GetPageRightmar() const { return m_pageRightmar; }
     bool HasPageRightmar() const;
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; }
@@ -3702,20 +3708,20 @@ private:
      * Specifies the height of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    data_MEASUREMENTABS m_pageHeight;
+    std::string m_pageHeight;
     /**
      * Describes the width of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    data_MEASUREMENTABS m_pageWidth;
+    std::string m_pageWidth;
     /** Indicates the amount of whitespace at the top of a page. **/
-    data_MEASUREMENTABS m_pageTopmar;
+    std::string m_pageTopmar;
     /** Indicates the amount of whitespace at the bottom of a page. **/
-    data_MEASUREMENTABS m_pageBotmar;
+    std::string m_pageBotmar;
     /** Indicates the amount of whitespace at the left side of a page. **/
-    data_MEASUREMENTABS m_pageLeftmar;
+    std::string m_pageLeftmar;
     /** Indicates the amount of whitespace at the right side of a page. **/
-    data_MEASUREMENTABS m_pageRightmar;
+    std::string m_pageRightmar;
     /** Indicates the number of logical pages to be rendered on a single physical page. **/
     std::string m_pagePanels;
     /** Indicates how the page should be scaled when rendered. **/
@@ -4904,16 +4910,16 @@ public:
     data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; }
     bool HasSystemLeftline() const;
     //
-    void SetSystemLeftmar(data_MEASUREMENTABS systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
-    data_MEASUREMENTABS GetSystemLeftmar() const { return m_systemLeftmar; }
+    void SetSystemLeftmar(std::string systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
+    std::string GetSystemLeftmar() const { return m_systemLeftmar; }
     bool HasSystemLeftmar() const;
     //
-    void SetSystemRightmar(data_MEASUREMENTABS systemRightmar_) { m_systemRightmar = systemRightmar_; }
-    data_MEASUREMENTABS GetSystemRightmar() const { return m_systemRightmar; }
+    void SetSystemRightmar(std::string systemRightmar_) { m_systemRightmar = systemRightmar_; }
+    std::string GetSystemRightmar() const { return m_systemRightmar; }
     bool HasSystemRightmar() const;
     //
-    void SetSystemTopmar(data_MEASUREMENTABS systemTopmar_) { m_systemTopmar = systemTopmar_; }
-    data_MEASUREMENTABS GetSystemTopmar() const { return m_systemTopmar; }
+    void SetSystemTopmar(std::string systemTopmar_) { m_systemTopmar = systemTopmar_; }
+    std::string GetSystemTopmar() const { return m_systemTopmar; }
     bool HasSystemTopmar() const;
     ///@}
 
@@ -4928,17 +4934,17 @@ private:
      * Describes the amount of whitespace at the left system margin relative to
      * page.leftmar.
      **/
-    data_MEASUREMENTABS m_systemLeftmar;
+    std::string m_systemLeftmar;
     /**
      * Describes the amount of whitespace at the right system margin relative to
      * page.rightmar.
      **/
-    data_MEASUREMENTABS m_systemRightmar;
+    std::string m_systemRightmar;
     /**
      * Describes the distance from page's top edge to the first system; used for first
      * page only.
      **/
-    data_MEASUREMENTABS m_systemTopmar;
+    std::string m_systemTopmar;
 
     /* include <attsystem.topmar> */
 };
@@ -5294,8 +5300,8 @@ private:
      **/
     double m_transDiat;
     /**
-     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ =
-     * 1, necessary to calculate the sounded pitch from the written one.
+     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ = 1,
+     * necessary to calculate the sounded pitch from the written one.
      **/
     double m_transSemi;
 
@@ -5916,14 +5922,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetWidth(data_MEASUREMENTABS width_) { m_width = width_; }
-    data_MEASUREMENTABS GetWidth() const { return m_width; }
+    void SetWidth(std::string width_) { m_width = width_; }
+    std::string GetWidth() const { return m_width; }
     bool HasWidth() const;
     ///@}
 
 private:
     /** Measurement of the horizontal dimension of an entity. **/
-    data_MEASUREMENTABS m_width;
+    std::string m_width;
 
     /* include <attwidth> */
 };

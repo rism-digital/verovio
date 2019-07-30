@@ -591,7 +591,7 @@ void AttFTremVis::ResetFTremVis()
 {
     m_beams = 0;
     m_beamsFloat = 0;
-    m_floatGap = VRV_UNSET;
+    m_floatGap = "";
 }
 
 bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
@@ -608,7 +608,7 @@ bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("float.gap")) {
-        this->SetFloatGap(StrToMeasurementabs(element.attribute("float.gap").value()));
+        this->SetFloatGap(StrToStr(element.attribute("float.gap").value()));
         element.remove_attribute("float.gap");
         hasAttribute = true;
     }
@@ -627,7 +627,7 @@ bool AttFTremVis::WriteFTremVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasFloatGap()) {
-        element.append_attribute("float.gap") = MeasurementabsToStr(this->GetFloatGap()).c_str();
+        element.append_attribute("float.gap") = StrToStr(this->GetFloatGap()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -645,7 +645,7 @@ bool AttFTremVis::HasBeamsFloat() const
 
 bool AttFTremVis::HasFloatGap() const
 {
-    return (m_floatGap != VRV_UNSET);
+    return (m_floatGap != "");
 }
 
 /* include <attfloat.gap> */
@@ -772,14 +772,14 @@ AttHairpinVis::~AttHairpinVis()
 
 void AttHairpinVis::ResetHairpinVis()
 {
-    m_opening = VRV_UNSET;
+    m_opening = "";
 }
 
 bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("opening")) {
-        this->SetOpening(StrToMeasurementabs(element.attribute("opening").value()));
+        this->SetOpening(StrToStr(element.attribute("opening").value()));
         element.remove_attribute("opening");
         hasAttribute = true;
     }
@@ -790,7 +790,7 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOpening()) {
-        element.append_attribute("opening") = MeasurementabsToStr(this->GetOpening()).c_str();
+        element.append_attribute("opening") = StrToStr(this->GetOpening()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -798,7 +798,7 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
 
 bool AttHairpinVis::HasOpening() const
 {
-    return (m_opening != VRV_UNSET);
+    return (m_opening != "");
 }
 
 /* include <attopening> */
@@ -2256,7 +2256,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "float.gap") {
-            att->SetFloatGap(att->StrToMeasurementabs(attrValue));
+            att->SetFloatGap(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -2284,7 +2284,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
         assert(att);
         if (attrType == "opening") {
-            att->SetOpening(att->StrToMeasurementabs(attrValue));
+            att->SetOpening(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -2656,7 +2656,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("beams.float", att->IntToStr(att->GetBeamsFloat())));
         }
         if (att->HasFloatGap()) {
-            attributes->push_back(std::make_pair("float.gap", att->MeasurementabsToStr(att->GetFloatGap())));
+            attributes->push_back(std::make_pair("float.gap", att->StrToStr(att->GetFloatGap())));
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
@@ -2680,7 +2680,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
         assert(att);
         if (att->HasOpening()) {
-            attributes->push_back(std::make_pair("opening", att->MeasurementabsToStr(att->GetOpening())));
+            attributes->push_back(std::make_pair("opening", att->StrToStr(att->GetOpening())));
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
