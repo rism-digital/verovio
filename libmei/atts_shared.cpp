@@ -1009,6 +1009,7 @@ void AttCoordinated::ResetCoordinated()
     m_uly = 0;
     m_lrx = 0;
     m_lry = 0;
+    m_skew = 0;
 }
 
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
@@ -1034,6 +1035,11 @@ bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
         element.remove_attribute("lry");
         hasAttribute = true;
     }
+    if (element.attribute("skew")) {
+        this->SetSkew(StrToDbl(element.attribute("skew").value()));
+        element.remove_attribute("skew");
+        hasAttribute = true;
+    }
     return hasAttribute;
 }
 
@@ -1054,6 +1060,10 @@ bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
     }
     if (this->HasLry()) {
         element.append_attribute("lry") = IntToStr(this->GetLry()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSkew()) {
+        element.append_attribute("skew") = DblToStr(this->GetSkew()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1077,6 +1087,11 @@ bool AttCoordinated::HasLrx() const
 bool AttCoordinated::HasLry() const
 {
     return (m_lry != 0);
+}
+
+bool AttCoordinated::HasSkew() const
+{
+    return (m_skew != 0);
 }
 
 /* include <attlry> */
