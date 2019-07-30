@@ -289,14 +289,14 @@ private:
     /**
      * The time in milliseconds since the start of the measure element that contains the note.
      */
-    int m_realTimeOnsetMilliseconds;
+    double m_realTimeOnsetMilliseconds;
 
     /**
      * The time in milliseconds since the start of the measure element to end of printed note.
      * The real-time duration of a tied group is not currently tracked (this gets complicated
      * if there is a tempo change during a note sustain, which is currently not supported).
      */
-    int m_realTimeOffsetMilliseconds;
+    double m_realTimeOffsetMilliseconds;
 
     /**
      * If the note is the first in a tied group, then m_scoreTimeTiedDuration contains the
