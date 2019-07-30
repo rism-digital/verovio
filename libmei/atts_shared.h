@@ -835,10 +835,6 @@ public:
     void SetLry(int lry_) { m_lry = lry_; }
     int GetLry() const { return m_lry; }
     bool HasLry() const;
-    //
-    void SetSkew(double skew_) { m_skew = skew_; }
-    double GetSkew() const { return m_skew; }
-    bool HasSkew() const;
     ///@}
 
 private:
@@ -850,10 +846,8 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
-    /** Indicates the skew of the bounding box. **/
-    double m_skew;
 
-    /* include <attskew> */
+    /* include <attlry> */
 };
 
 //----------------------------------------------------------------------------
@@ -979,8 +973,8 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
-    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
-    std::string GetLwidth() const { return m_lwidth; }
+    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
+    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
     ///@}
 
@@ -988,7 +982,7 @@ private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
     /** Width of a curved line. **/
-    std::string m_lwidth;
+    data_LINEWIDTH m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -2251,8 +2245,8 @@ public:
     int GetLsegs() const { return m_lsegs; }
     bool HasLsegs() const;
     //
-    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
-    std::string GetLwidth() const { return m_lwidth; }
+    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
+    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
     ///@}
 
@@ -2268,7 +2262,7 @@ private:
      **/
     int m_lsegs;
     /** Width of a curved line. **/
-    std::string m_lwidth;
+    data_LINEWIDTH m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -3230,8 +3224,8 @@ public:
     std::string GetHeadMod() const { return m_headMod; }
     bool HasHeadMod() const;
     //
-    void SetHeadRotation(double headRotation_) { m_headRotation = headRotation_; }
-    double GetHeadRotation() const { return m_headRotation; }
+    void SetHeadRotation(std::string headRotation_) { m_headRotation = headRotation_; }
+    std::string GetHeadRotation() const { return m_headRotation; }
     bool HasHeadRotation() const;
     //
     void SetHeadShape(data_HEADSHAPE_list headShape_) { m_headShape = headShape_; }
@@ -3267,7 +3261,7 @@ private:
      * A positive value rotates the notehead in a counter-clockwise fashion, while
      * negative values produce clockwise rotation.
      **/
-    double m_headRotation;
+    std::string m_headRotation;
     /** Used to override the head shape normally used for the given duration. **/
     data_HEADSHAPE_list m_headShape;
     /**

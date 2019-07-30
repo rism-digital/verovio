@@ -1009,7 +1009,6 @@ void AttCoordinated::ResetCoordinated()
     m_uly = 0;
     m_lrx = 0;
     m_lry = 0;
-    m_skew = 0.0;
 }
 
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
@@ -1035,11 +1034,6 @@ bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
         element.remove_attribute("lry");
         hasAttribute = true;
     }
-    if (element.attribute("skew")) {
-        this->SetSkew(StrToDbl(element.attribute("skew").value()));
-        element.remove_attribute("skew");
-        hasAttribute = true;
-    }
     return hasAttribute;
 }
 
@@ -1060,10 +1054,6 @@ bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
     }
     if (this->HasLry()) {
         element.append_attribute("lry") = IntToStr(this->GetLry()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSkew()) {
-        element.append_attribute("skew") = DblToStr(this->GetSkew()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1089,12 +1079,7 @@ bool AttCoordinated::HasLry() const
     return (m_lry != 0);
 }
 
-bool AttCoordinated::HasSkew() const
-{
-    return (m_skew != 0.0);
-}
-
-/* include <attskew> */
+/* include <attlry> */
 
 //----------------------------------------------------------------------------
 // AttCue
@@ -1234,7 +1219,7 @@ AttCurveRend::~AttCurveRend()
 void AttCurveRend::ResetCurveRend()
 {
     m_lform = LINEFORM_NONE;
-    m_lwidth = "";
+    m_lwidth = data_LINEWIDTH();
 }
 
 bool AttCurveRend::ReadCurveRend(pugi::xml_node element)
@@ -1246,7 +1231,7 @@ bool AttCurveRend::ReadCurveRend(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("lwidth")) {
-        this->SetLwidth(StrToStr(element.attribute("lwidth").value()));
+        this->SetLwidth(StrToLinewidth(element.attribute("lwidth").value()));
         element.remove_attribute("lwidth");
         hasAttribute = true;
     }
@@ -1261,7 +1246,7 @@ bool AttCurveRend::WriteCurveRend(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasLwidth()) {
-        element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
+        element.append_attribute("lwidth") = LinewidthToStr(this->GetLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1274,7 +1259,7 @@ bool AttCurveRend::HasLform() const
 
 bool AttCurveRend::HasLwidth() const
 {
-    return (m_lwidth != "");
+    return (m_lwidth.HasValue());
 }
 
 /* include <attlwidth> */
@@ -2886,7 +2871,7 @@ void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
     m_lsegs = 0;
-    m_lwidth = "";
+    m_lwidth = data_LINEWIDTH();
 }
 
 bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element)
@@ -2903,7 +2888,7 @@ bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("lwidth")) {
-        this->SetLwidth(StrToStr(element.attribute("lwidth").value()));
+        this->SetLwidth(StrToLinewidth(element.attribute("lwidth").value()));
         element.remove_attribute("lwidth");
         hasAttribute = true;
     }
@@ -2922,7 +2907,7 @@ bool AttLineRendBase::WriteLineRendBase(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasLwidth()) {
-        element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
+        element.append_attribute("lwidth") = LinewidthToStr(this->GetLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2940,7 +2925,7 @@ bool AttLineRendBase::HasLsegs() const
 
 bool AttLineRendBase::HasLwidth() const
 {
-    return (m_lwidth != "");
+    return (m_lwidth.HasValue());
 }
 
 /* include <attlwidth> */
@@ -4200,7 +4185,7 @@ void AttNoteHeads::ResetNoteHeads()
     m_headFill = FILL_NONE;
     m_headFillcolor = "";
     m_headMod = "";
-    m_headRotation = 0.0;
+    m_headRotation = "";
     m_headShape = HEADSHAPE_list_NONE;
     m_headVisible = BOOLEAN_NONE;
 }
@@ -4239,7 +4224,7 @@ bool AttNoteHeads::ReadNoteHeads(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("head.rotation")) {
-        this->SetHeadRotation(StrToDbl(element.attribute("head.rotation").value()));
+        this->SetHeadRotation(StrToStr(element.attribute("head.rotation").value()));
         element.remove_attribute("head.rotation");
         hasAttribute = true;
     }
@@ -4284,7 +4269,7 @@ bool AttNoteHeads::WriteNoteHeads(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasHeadRotation()) {
-        element.append_attribute("head.rotation") = DblToStr(this->GetHeadRotation()).c_str();
+        element.append_attribute("head.rotation") = StrToStr(this->GetHeadRotation()).c_str();
         wroteAttribute = true;
     }
     if (this->HasHeadShape()) {
@@ -4330,7 +4315,7 @@ bool AttNoteHeads::HasHeadMod() const
 
 bool AttNoteHeads::HasHeadRotation() const
 {
-    return (m_headRotation != 0.0);
+    return (m_headRotation != "");
 }
 
 bool AttNoteHeads::HasHeadShape() const
@@ -8144,10 +8129,6 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             att->SetLry(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "skew") {
-            att->SetSkew(att->StrToDbl(attrValue));
-            return true;
-        }
     }
     if (element->HasAttClass(ATT_CUE)) {
         AttCue *att = dynamic_cast<AttCue *>(element);
@@ -8181,7 +8162,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "lwidth") {
-            att->SetLwidth(att->StrToStr(attrValue));
+            att->SetLwidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -8493,7 +8474,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "lwidth") {
-            att->SetLwidth(att->StrToStr(attrValue));
+            att->SetLwidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -8773,7 +8754,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "head.rotation") {
-            att->SetHeadRotation(att->StrToDbl(attrValue));
+            att->SetHeadRotation(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "head.shape") {
@@ -9653,9 +9634,6 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasLry()) {
             attributes->push_back(std::make_pair("lry", att->IntToStr(att->GetLry())));
         }
-        if (att->HasSkew()) {
-            attributes->push_back(std::make_pair("skew", att->DblToStr(att->GetSkew())));
-        }
     }
     if (element->HasAttClass(ATT_CUE)) {
         const AttCue *att = dynamic_cast<const AttCue *>(element);
@@ -9684,7 +9662,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lform", att->LineformToStr(att->GetLform())));
         }
         if (att->HasLwidth()) {
-            attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));
+            attributes->push_back(std::make_pair("lwidth", att->LinewidthToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass(ATT_CUSTOSLOG)) {
@@ -9949,7 +9927,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lsegs", att->IntToStr(att->GetLsegs())));
         }
         if (att->HasLwidth()) {
-            attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));
+            attributes->push_back(std::make_pair("lwidth", att->LinewidthToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass(ATT_LINKING)) {
@@ -10179,7 +10157,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("head.mod", att->StrToStr(att->GetHeadMod())));
         }
         if (att->HasHeadRotation()) {
-            attributes->push_back(std::make_pair("head.rotation", att->DblToStr(att->GetHeadRotation())));
+            attributes->push_back(std::make_pair("head.rotation", att->StrToStr(att->GetHeadRotation())));
         }
         if (att->HasHeadShape()) {
             attributes->push_back(std::make_pair("head.shape", att->HeadshapeListToStr(att->GetHeadShape())));
