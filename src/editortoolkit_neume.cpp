@@ -2389,7 +2389,7 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
 bool EditorToolkitNeume::ParseChangeSkewAction(
     jsonxx::Object param, std::string *elementId, int *dy, bool *rightSide)
 {
-    if(!param.has<jsonxx::String>("elementIds")) return false;
+    if(!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     if(!param.has<jsonxx::Number>("dy")) return false;
     (*dy) = param.get<jsonxx::Number>("dy");
