@@ -942,7 +942,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly)) / (double) (staffSize));
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly) +
+            - ((ulx - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
 
         custos->AdjustPitchByOffset(pitchDifference);
         ulx -= noteWidth / 2;
