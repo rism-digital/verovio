@@ -173,10 +173,10 @@ public:
     void SetScoreTimeTiedDuration(double timeInSeconds);
     void SetMIDIPitch(char pitch);
     double GetScoreTimeOnset();
-    int GetRealTimeOnsetMilliseconds();
+    double GetRealTimeOnsetMilliseconds();
     double GetScoreTimeOffset();
     double GetScoreTimeTiedDuration();
-    int GetRealTimeOffsetMilliseconds();
+    double GetRealTimeOffsetMilliseconds();
     double GetScoreTimeDuration();
     char GetMIDIPitch();
     ///@}

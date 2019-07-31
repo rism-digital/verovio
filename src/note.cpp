@@ -391,7 +391,7 @@ double Note::GetScoreTimeOnset()
     return m_scoreTimeOnset;
 }
 
-int Note::GetRealTimeOnsetMilliseconds()
+double Note::GetRealTimeOnsetMilliseconds()
 {
     return m_realTimeOnsetMilliseconds;
 }
@@ -401,7 +401,7 @@ double Note::GetScoreTimeOffset()
     return m_scoreTimeOffset;
 }
 
-int Note::GetRealTimeOffsetMilliseconds()
+double Note::GetRealTimeOffsetMilliseconds()
 {
     return m_realTimeOffsetMilliseconds;
 }
