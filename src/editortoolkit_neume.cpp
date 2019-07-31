@@ -225,7 +225,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
     Staff *staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
     assert(staff);
-    
+
     if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if (!layer) {
@@ -239,17 +239,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
-        Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element)) : 
+        Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element)) :
             dynamic_cast<Syllable *>(element->GetFirstParent(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
         InterfaceComparison pitchIC(INTERFACE_PITCH);
 
-        int pitchDifference = round ( ((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0)) 
+        int pitchDifference = round ( ((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0))
             / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
-        Clef *clefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, 
+        Clef *clefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac,
             ((syllable != NULL) ? syllable : element)));
 
         if (clefBefore == NULL) {
@@ -292,9 +292,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             }
         }
 
-        layer->ReorderByXPos(); 
+        layer->ReorderByXPos();
 
-        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, 
+        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac,
             (syllable != NULL) ? syllable : element));
 
         if (element->HasInterface(INTERFACE_PITCH)) {
@@ -326,7 +326,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 syllable->FindAllChildByComparison(&siblingChildren, &pitchIC);
 
                 ArrayOfObjects notBeenAdjusted;
-                std::set_difference(siblingChildren.begin(), siblingChildren.end(), 
+                std::set_difference(siblingChildren.begin(), siblingChildren.end(),
                     pitchChildren.begin(), pitchChildren.end(), std::inserter(notBeenAdjusted, notBeenAdjusted.begin()));
 
                 for (auto it = notBeenAdjusted.begin(); it != notBeenAdjusted.end(); ++it) {
@@ -345,13 +345,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         assert(staff);
         // Note that y param is relative to initial position for clefs
         int initialClefLine = clef->GetLine();
-        int clefLine = round(((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0)) 
+        int clefLine = round(((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0))
             / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         // The rest of this if branch (element->Is(CLEF)) is dedicated to ensuring that pitched elements
         // retain their position on the staves by adjusting their pitch position to match their new clefs.
-        // With the respect to to this goal there are two main cases. Throughout this comment "this clef" 
+        // With the respect to to this goal there are two main cases. Throughout this comment "this clef"
         // refers to the clef being dragged.
         //
         //  Case 1:
@@ -361,30 +361,30 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         //      with this clef before and after the drag need to have their pitch changed only if the line
         //      of the clef changed during the drag.
         //  Case 2:
-        //      The clef you're dragging moves across other clefs. In other words the preceding and 
+        //      The clef you're dragging moves across other clefs. In other words the preceding and
         //      subsequent clefs are different before and after the drag. In this case elements that were
         //      associated with this clef before the drag need to be reassociated to the clef that preceded
         //      this clef before the drag. Elements that become newly associated with the clef after the drag
         //      need to be reassociated from the clef that preceeds this clef after the drag to this clef.
         //
         // Extracting the exact elements that need to have their pitch modified in each of these cases is
-        // tricky, and required some dicey naming. 
+        // tricky, and required some dicey naming.
         //
         // The clefs we're interested are named precedingClefBefore
-        // (meaning the clef that preceded this clef before the drag action), precedingClefAfter (meaning the 
-        // clef that preceded this clef after the drag action), nextClefBefore (meaning the clef that came 
+        // (meaning the clef that preceded this clef before the drag action), precedingClefAfter (meaning the
+        // clef that preceded this clef after the drag action), nextClefBefore (meaning the clef that came
         // after this clef before the drag action), and nextClefAfter. And of course clef just refers to
-        // this clef, the clef being dragged. 
-        // 
+        // this clef, the clef being dragged.
+        //
         // There are also ArrayOfObjects which refer to which elements
         // were associated to different clefs at different times. with{ClefName} just refers to the pitched
         // elements that were associated to that clef at that time. For example withThisClefBefore refers
-        // to the elements that were associated with this clef before the drag action took place. 
+        // to the elements that were associated with this clef before the drag action took place.
         //
         // There are also some slightly trickier array names like withNewPrecedingClefBefore.
         // In this case the the before/after part refers to what elements were associated to
-        // this clef at what time, while the new/old part refers to the time of the clef having the 
-        // preceding/next relationship to this clef. Let's take withNewPrecedingClefBefore as an example. 
+        // this clef at what time, while the new/old part refers to the time of the clef having the
+        // preceding/next relationship to this clef. Let's take withNewPrecedingClefBefore as an example.
         // Let's say the order of the clefs before the drag is:
         //
         //          A B C D
@@ -393,7 +393,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         //
         //          A C B D
         //
-        // withNewPrecedingClefBefore would refer to the elements between A and B, since A is the 
+        // withNewPrecedingClefBefore would refer to the elements between A and B, since A is the
         // new preceding clef (it becomes the clef that precedes this clef after the drag action)
         // and before the drag action all the elements between A and B were associated with A.
         // By comparison, withPrecedingClefAfter (or withNewPrecedingClefAfter) would refer to only
@@ -404,16 +404,16 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // the elements that were associated with this clef before and after the drag action, and thus whose
         // pitch values only needs to be changed if the line of this clef changed.
         //
-        // The algorithm is implemented by finding all of the aforementioned clefs and the elements between 
+        // The algorithm is implemented by finding all of the aforementioned clefs and the elements between
         // them, and then using std::set_difference to find the elements whose pitch values may need to change.
-        // For example: in case 2 noLongerWithThisClef is found by taking the difference between 
+        // For example: in case 2 noLongerWithThisClef is found by taking the difference between
         // withOldPrecedingClefAfter and withPrecedingClefBefore, since that difference is the stuff that
         // became associated with the clef that used to preceed this clef, meaning the stuff that was associated
         // with clef, but no longer is.
         //
         // One other aspect that might seem confusing is exactly when clef->SetLine() gets called. The reason
         // that these calls are oddly placed is that AdjustPitchForNewClef() uses the line of the clef.
-        // So if we're changing an element's pitch from this clef to something else, we need the line of 
+        // So if we're changing an element's pitch from this clef to something else, we need the line of
         // this clef to be what it was before the drag. On the other hand, if we're reassociating an element
         // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
         // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
@@ -442,7 +442,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
             Zone *zone = clef->GetZone();
             assert(zone);
-            zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize + 
+            zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize +
                 x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
         }
 
@@ -460,17 +460,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ArrayOfObjects withThisClefAfter;
             ArrayOfObjects withPrecedingClefAfter;
 
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefAfter, &ic, clef, 
+            m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefAfter, &ic, clef,
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);   
+            m_doc->GetDrawingPage()->FindAllChildBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
 
             if (withPrecedingClefBefore.size() > withPrecedingClefAfter.size()) {
-                ArrayOfObjects newlyWithThisClef; 
+                ArrayOfObjects newlyWithThisClef;
 
                 clef->SetLine(clefLine);
 
                 std::set_difference(withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
-                    withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(), 
+                    withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(),
                     std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
 
                 for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
@@ -482,7 +482,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                         (*iter)->GetPitchInterface()->AdjustPitchByOffset(lineDiff * -2);
                     }
                 }
-            } 
+            }
             else if (withPrecedingClefBefore.size() < withPrecedingClefAfter.size()) {
                 ArrayOfObjects noLongerWithThisClef;
 
@@ -515,23 +515,23 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ArrayOfObjects withOldPrecedingClefAfter;
             ArrayOfObjects withNewPrecedingClefBefore;
             ArrayOfObjects withNewPrecedingClefAfter;
-            ArrayOfObjects noLongerWithThisClef; 
-            ArrayOfObjects newlyWithThisClef; 
+            ArrayOfObjects noLongerWithThisClef;
+            ArrayOfObjects newlyWithThisClef;
 
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore, 
+            m_doc->GetDrawingPage()->FindAllChildBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
                 (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter, 
+            m_doc->GetDrawingPage()->FindAllChildBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
 
             m_doc->GetDrawingPage()->FindAllChildBetween(&withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
 
             std::set_difference(withOldPrecedingClefAfter.begin(), withOldPrecedingClefAfter.end(),
-                withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(), 
+                withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
                 std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
 
             std::set_difference(withNewPrecedingClefBefore.begin(), withNewPrecedingClefBefore.end(),
-                withNewPrecedingClefAfter.begin(), withNewPrecedingClefAfter.end(), 
+                withNewPrecedingClefAfter.begin(), withNewPrecedingClefAfter.end(),
                 std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
 
             for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
@@ -782,7 +782,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly)) / (double) (staffSize));
+        // Two pitches per difference in lines between total staff lines and clef position. Convert to vu. Find difference between
+        // top staff position and note position, then apply offset due to skew. Divide by staffSize to go from vu to pitches.
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly)
+            - ((ulx - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
 
         nc->AdjustPitchByOffset(pitchDifference);
         ulx -= noteWidth / 2;
@@ -820,6 +823,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     LogMessage("Unsupported character in contour.");
                     return false;
                 }
+
+                // Apply offset due to skew
+                newUly += (newUlx - ulx) * tan(staff->GetDrawingSkew() * M_PI / 180.0);
                 newZone->SetUlx(newUlx);
                 newZone->SetUly(newUly);;
                 newZone->SetLrx(newUlx + noteWidth);
@@ -869,6 +875,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         clef->SetShape(clefShape);
         const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         int yDiff = -staff->GetZone()->GetUly() + uly;
+        yDiff += ((ulx - staff->GetZone()->GetUlx())) * tan(staff->GetDrawingSkew() * M_PI / 180.0); // Subtract distance due to skew.
         int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
         clef->SetLine(clefLine);
 
@@ -900,7 +907,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         ArrayOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, 
+        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef,
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
@@ -1278,7 +1285,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         ArrayOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, 
+        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef,
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
@@ -1320,7 +1327,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             }
         }
     }
-    
+
     return result;
 }
 
@@ -1459,7 +1466,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     InterfaceComparison pitchComp(INTERFACE_PITCH);
     Clef *newClef;
 
-    m_doc->GetDrawingPage()->FindAllChildBetween(&clefs, &clefComp, 
+    m_doc->GetDrawingPage()->FindAllChildBetween(&clefs, &clefComp,
         sortedElements.front()->GetFirstParent(SYLLABLE), sortedElements.back()->GetFirstParent(SYLLABLE));
 
     // if there are clefs between the elements getting grouped
@@ -1477,7 +1484,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
         std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
-            clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it), 
+            clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it),
                 dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)))));
         }
         newClef = clefsBefore[dynamic_cast<Syllable *>(sortedSyllables.front())];
@@ -1951,7 +1958,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             }
         }
     }
-    
+
     return true;
 }
 
@@ -2125,7 +2132,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     return success1 && success2;
 }
 
-bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSide) 
+bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSide)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
@@ -2155,11 +2162,11 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + dy) / adj)) * 180.0 / M_PI;
     zone->SetSkew( rightSide ? newSkew : -1 * newSkew);
 
-    if (rightSide) { 
-        zone->SetLry(zone->GetLry() + dy); 
+    if (rightSide) {
+        zone->SetLry(zone->GetLry() + dy);
     }
-    else { 
-        zone->SetUly(zone->GetUly() + dy); 
+    else {
+        zone->SetUly(zone->GetUly() + dy);
     }
 
     zone->Modify();
