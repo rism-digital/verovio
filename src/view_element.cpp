@@ -667,7 +667,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (staff->GetDrawingSkew() != 0) {
         double deg = staff->GetDrawingSkew();
         int xDiff = x - staff->GetDrawingX();
-        y -= int(xDiff * tan(deg * M_PI / 180.0));
+        y += int(xDiff * tan(deg * M_PI / 180.0));
     }
 
     bool cueSize = false;

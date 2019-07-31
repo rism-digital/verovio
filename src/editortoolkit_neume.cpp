@@ -222,6 +222,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         LogWarning("element is null");
     }
     assert(element);
+
+    Staff *staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    assert(staff);
     
     if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
@@ -243,7 +246,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
         InterfaceComparison pitchIC(INTERFACE_PITCH);
 
-        int pitchDifference = round ( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        int pitchDifference = round ( ((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0)) 
+            / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         Clef *clefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, 
             ((syllable != NULL) ? syllable : element)));
@@ -271,7 +275,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 assert(fi);
                 Zone *zone = fi->GetZone();
                 assert(zone);
-                zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+                zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
+                    + x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
             }
         }
         else {
@@ -282,7 +287,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 if ((*it)->Is(SYL)) {
                     continue;
                 }
-                (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+                (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
+                    + x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
             }
         }
 
@@ -339,7 +345,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         assert(staff);
         // Note that y param is relative to initial position for clefs
         int initialClefLine = clef->GetLine();
-        int clefLine = round((double) y / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
+        int clefLine = round(((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0)) 
+            / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         // The rest of this if branch (element->Is(CLEF)) is dedicated to ensuring that pitched elements
@@ -435,7 +442,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
             Zone *zone = clef->GetZone();
             assert(zone);
-            zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize);
+            zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize + 
+                x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
         }
 
         layer->ReorderByXPos();
@@ -900,44 +908,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             assert(pi);
             pi->AdjustPitchForNewClef(previousClef, clef);
         }
-    }
-    else if (elementType == "custos") {
-        Custos *custos = new Custos();
-        zone->SetUlx(ulx);
-        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
-        surface->AddChild(zone);
-        custos->SetZone(zone);
-        custos->SetFacs(zone->GetUuid());
-        layer->AddChild(custos);
-        // Find closest valid clef
-        Clef *clef = NULL;
-        clef = layer->GetClef(custos);
-        if (clef == NULL) {
-            LogError("There is no valid clef available.");
-            delete custos;
-            return false;
-        }
-
-        custos->SetOct(3);
-        if (clef->GetShape() == CLEFSHAPE_C)
-            custos->SetPname(PITCHNAME_c);
-        else if (clef->GetShape() == CLEFSHAPE_F)
-            custos->SetPname(PITCHNAME_f);
-
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly)) / (double) (staffSize));
-
-        custos->AdjustPitchByOffset(pitchDifference);
-        ulx -= noteWidth / 2;
-        uly -= noteHeight / 2;
-
-        zone->SetUlx(ulx);
-        zone->SetUly(uly);
-        zone->SetLrx(ulx + noteWidth);
-        zone->SetLry(uly + noteHeight);
-        m_editInfo = custos->GetUuid();
     }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
