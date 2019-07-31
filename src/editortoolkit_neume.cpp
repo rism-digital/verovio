@@ -909,6 +909,44 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             pi->AdjustPitchForNewClef(previousClef, clef);
         }
     }
+    else if (elementType == "custos") {
+        Custos *custos = new Custos();
+        zone->SetUlx(ulx);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        surface->AddChild(zone);
+        custos->SetZone(zone);
+        custos->SetFacs(zone->GetUuid());
+        layer->AddChild(custos);
+        // Find closest valid clef
+        Clef *clef = NULL;
+        clef = layer->GetClef(custos);
+        if (clef == NULL) {
+            LogError("There is no valid clef available.");
+            delete custos;
+            return false;
+        }
+
+        custos->SetOct(3);
+        if (clef->GetShape() == CLEFSHAPE_C)
+            custos->SetPname(PITCHNAME_c);
+        else if (clef->GetShape() == CLEFSHAPE_F)
+            custos->SetPname(PITCHNAME_f);
+
+        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly)) / (double) (staffSize));
+
+        custos->AdjustPitchByOffset(pitchDifference);
+        ulx -= noteWidth / 2;
+        uly -= noteHeight / 2;
+
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth);
+        zone->SetLry(uly + noteHeight);
+        m_editInfo = custos->GetUuid();
+    }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
         return false;
