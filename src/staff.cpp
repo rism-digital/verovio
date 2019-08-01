@@ -194,7 +194,7 @@ void Staff::AdjustDrawingStaffSize()
         if (doc->GetType() == Facs) {
             double skew = this->GetDrawingSkew();
             Zone *zone = this->GetZone();
-            int yDiff = (zone->GetLry() - zone->GetUly()) -
+            int yDiff = zone->GetLry() - zone->GetUly() +
                 (zone->GetLrx() - zone->GetUlx()) * tan(skew * M_PI / 180.0);
             this->m_drawingStaffSize = 100 * yDiff /
                 (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));

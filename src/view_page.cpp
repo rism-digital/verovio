@@ -990,38 +990,16 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     assert(measure);
     assert(system);
 
-    int j, x1, x2, y1, y2, d;
+    int j, x1, x2, y1, y2;
+    double d;
 
     if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
         d = staff->GetDrawingSkew();
-
-        // if the staff has a skew angle we need to render it skewed
-        if (d != 0) {
-            x1 = staff->GetDrawingX();
-            x2 = x1 + staff->GetWidth();
-            y1 = ToLogicalY(staff->GetDrawingY());
-            y2 = y1;
-
-            int adj = x2 - x1;
-            int opp = adj * tan(d * M_PI / 180.0);
-            staff->AdjustDrawingStaffSize();
-
-            for (j = 0; j < staff->m_drawingLines; ++j) {
-                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2 + opp));
-                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-                y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            }
-
-            dc->ResetPen();
-            dc->ResetBrush();
-            return;
-        }
-        else {
-            x1 = staff->GetDrawingX();
-            x2 = x1 + staff->GetWidth();
-            y1 = ToLogicalY(staff->GetDrawingY());
-            y2 = y1;
-        }
+        x1 = staff->GetDrawingX();
+        x2 = x1 + staff->GetWidth();
+        y1 = ToLogicalY(staff->GetDrawingY());
+        staff->AdjustDrawingStaffSize();
+        y2 = y1 + staff->GetWidth() * tan(d * M_PI / 180.0);
     }
     else {
         x1 = measure->GetDrawingX();
