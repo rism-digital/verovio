@@ -475,6 +475,7 @@ public:
     OptionBool m_useFacsimile;
     OptionBool m_createDefaultSyl;
     OptionBool m_createDefaultSylBBox;
+    OptionBool m_useSkew;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
 

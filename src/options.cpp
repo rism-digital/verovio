@@ -587,6 +587,11 @@ Options::Options()
     m_createDefaultSylBBox.Init(false);
     this->Register(&m_createDefaultSylBBox, "createDefaultSylBBox", &m_general);
 
+    m_useSkew.SetInfo("Whether to consider skew values in facsimile mode", 
+        "When zones in the MEI facsimile have a skew value, take those values into account when rendering");
+    m_useSkew.Init(false);
+    this->Register(&m_useSkew, "useSkew", &m_general);
+
     m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
     m_usePgFooterForAll.Init(false);
     this->Register(&m_usePgFooterForAll, "usePgFooterForAll", &m_general);
