@@ -177,13 +177,29 @@ double Staff::GetDrawingSkew() const
 {
     if (this->HasFacs()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-        assert(DOC);
+        assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingSkew();
         }
     }
     LogWarning("This staff doesn't have facsimile data, so it doesn't have a skew");
     return 0;
+}
+
+void Staff::AdjustDrawingStaffSize()
+{
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            double skew = this->GetDrawingSkew();
+            Zone *zone = this->GetZone();
+            int yDiff = (zone->GetLry() - zone->GetUly()) -
+                (zone->GetLrx() - zone->GetUlx()) * tan(skew * M_PI / 180.0);
+            this->m_drawingStaffSize = 100 * yDiff /
+                (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+        }
+    }
 }
 
 bool Staff::DrawingIsVisible()
@@ -247,7 +263,7 @@ void Staff::SetFromFacsimile(Doc *doc)
     assert(doc);
     Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
     assert(zone);
-    m_drawingStaffSize = 100 * (zone->GetLry() - zone->GetUly()) / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+    this->AdjustDrawingStaffSize();
 }
 
 //----------------------------------------------------------------------------

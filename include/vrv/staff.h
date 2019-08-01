@@ -78,6 +78,13 @@ public:
     virtual int GetDrawingY() const;
     virtual int GetDrawingX() const;
     virtual double GetDrawingSkew() const;
+    ///@}
+
+    /**
+     * Adjust drawingStaffSize based on skew angle
+     */
+    void AdjustDrawingStaffSize();
+
     /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef

@@ -714,7 +714,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int barLineThickWidth = m_doc->GetDrawingBeamWidth(staffSize, false);
     int x1 = x - m_doc->GetDrawingBeamWidth(staffSize, false) - barLineWidth;
     int x2 = x + m_doc->GetDrawingBeamWidth(staffSize, false) + barLineWidth;
-    
+
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(staffSize) * 16 / 13;
     int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
@@ -1003,15 +1003,15 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
             y2 = y1;
 
             int adj = x2 - x1;
-            int hyp = adj * cos(d * M_PI / 180.0);
             int opp = adj * tan(d * M_PI / 180.0);
+            staff->AdjustDrawingStaffSize();
 
             for (j = 0; j < staff->m_drawingLines; ++j) {
                 dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2 + opp));
                 y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             }
-            
+
             dc->ResetPen();
             dc->ResetBrush();
             return;
