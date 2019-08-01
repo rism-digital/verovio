@@ -2194,7 +2194,7 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     zone->SetSkew(newSkew);
 
     if (rightSide) { 
-        zone->SetLry(zone->GetLry() + dy); 
+        zone->SetLry(zone->GetLry() - dy); 
     }
     else { 
         zone->SetUly(zone->GetUly() + dy); 
