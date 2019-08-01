@@ -2198,11 +2198,11 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
 
     int adj = zone->GetLrx() - zone->GetUlx();
     double currentSkew = zone->GetSkew();
-    double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + dy) / adj)) * 180.0 / M_PI;
-    zone->SetSkew( rightSide ? newSkew : -1 * newSkew);
+    double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + (rightSide ? -dy : dy)) / adj)) * 180.0 / M_PI;
+    zone->SetSkew(newSkew);
 
-    if (rightSide) {
-        zone->SetLry(zone->GetLry() + dy);
+    if (rightSide) { 
+        zone->SetLry(zone->GetLry() - dy); 
     }
     else {
         zone->SetUly(zone->GetUly() + dy);
