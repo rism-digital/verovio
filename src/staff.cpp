@@ -175,20 +175,20 @@ int Staff::GetDrawingY() const
 
 double Staff::GetDrawingSkew() const
 {
-    if (this->HasFacs()) {
+    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstParent(DOC))->GetOptions()->m_useSkew.GetValue()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingSkew();
         }
     }
-    LogWarning("This staff doesn't have facsimile data, so it doesn't have a skew");
+    LogWarning("This staff (or its doc) doesn't have facsimile data, or you haven't enabled the useSkew option.");
     return 0;
 }
 
 void Staff::AdjustDrawingStaffSize()
 {
-    if (this->HasFacs()) {
+    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstParent(DOC))->GetOptions()->m_useSkew.GetValue()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {

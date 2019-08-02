@@ -62,6 +62,10 @@ int FacsimileInterface::GetHeight() const
 
 double FacsimileInterface::GetDrawingSkew() const
 {
+    // this method should only be called in staff->GetDrawingSkew()
+    // since this method cannot validate the m_useSkew option
+    // while the staff->GetDrawingSkew() method can
+    
     assert(m_zone);
     return m_zone->GetSkew();
 }
