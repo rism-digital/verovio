@@ -57,6 +57,7 @@
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -683,6 +684,17 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
 
+    if (element->HasFacs()) {
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        fi->GetZone()->SetUlx(x);
+        fi->GetZone()->SetUly(y);
+        fi->GetZone()->SetLrx(x + noteWidth);
+        fi->GetZone()->SetLry(y - noteHeight);
+    }
+
     dc->EndGraphic(element, this);
 }
 
@@ -754,6 +766,17 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int actualY = clefY + pitchOffset + octaveOffset + skewOffset;
 
     DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
+
+    if (element->HasFacs()) {
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        fi->GetZone()->SetUlx(x);
+        fi->GetZone()->SetUly(actualY);
+        fi->GetZone()->SetLrx(x + noteWidth);
+        fi->GetZone()->SetLry(actualY - noteHeight);
+    }
 
     dc->EndGraphic(element, this);
 }

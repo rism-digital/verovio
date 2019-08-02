@@ -27,6 +27,7 @@
 #include "staff.h"
 #include "syllable.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -184,6 +185,15 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     for (auto it = params.begin(); it != params.end(); it++) {
         DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
                it->fontNo, staff->m_drawingStaffSize, false, true);
+    }
+
+    // adjust facsimile values of element based on where it is rendered if necessary
+    if (element->HasFacs()) {
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);       
+        fi->GetZone()->SetUlx(noteX);
+        fi->GetZone()->SetUly(yValue);
+        fi->GetZone()->SetLrx(noteX + noteWidth);
+        fi->GetZone()->SetLry(yValue - noteHeight);
     }
 
     // Draw the children
