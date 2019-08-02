@@ -752,7 +752,7 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
     // int length = strlen(incipit);
 
     // TODO: fermatas inside tuplets won't be currently handled correctly
-    if (note->tuplet_notes > 0) {
+    if (note->tuplet_notes != 1) {
         note->fermata = false;
     }
 
