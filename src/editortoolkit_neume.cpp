@@ -223,9 +223,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     assert(element);
 
-    Staff *staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
-    assert(staff);
-
     if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if (!layer) {
