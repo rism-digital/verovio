@@ -2173,6 +2173,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
 
 bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSide)
 {
+    m_editInfo = "";
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
         return false;
@@ -2210,8 +2211,8 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
 
     zone->Modify();
 
+    m_editInfo = std::to_string(newSkew);
     return true;
-
 }
 
 bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
