@@ -179,6 +179,14 @@ public:
      * The currentChild is not deleted by the methods.
      */
     void ReplaceChild(Object *currentChild, Object *replacingChild);
+    
+    /**
+     * @name Insert an object before or after a given child
+     */
+    ///@{
+    void InsertBefore(Object *child, Object *newChild);
+    void InsertAfter(Object *child, Object *newChild);
+    ///@}
 
     /**
      * Sort children by a function that takes two arguments and
@@ -457,6 +465,11 @@ public:
     bool IsAttribute() const { return m_isAttribute; }
     void IsAttribute(bool isAttribute) { m_isAttribute = isAttribute; }
     ///@}
+    
+    /**
+     * Return true if the object contains any editorial content
+     */
+    bool HasEditorialContent();
 
     /**
      * Saves the object (and its children) using the specified output stream.

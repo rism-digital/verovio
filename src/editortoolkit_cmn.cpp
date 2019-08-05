@@ -15,13 +15,16 @@
 
 //--------------------------------------------------------------------------------
 
+#include "chord.h"
 #include "clef.h"
 #include "comparison.h"
 #include "hairpin.h"
 #include "layer.h"
 #include "measure.h"
+#include "note.h"
 #include "page.h"
 #include "rend.h"
+#include "rest.h"
 #include "slur.h"
 #include "staff.h"
 #include "vrv.h"
@@ -35,8 +38,13 @@
 #define CHAINED_ID "[chained-id]"
 
 namespace vrv {
+    
+std::string EditorToolkitCMN::EditInfo()
+{
+    return m_chainedId;
+}
 
-bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction)
+bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
 {
     jsonxx::Object json;
 
@@ -58,7 +66,12 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction)
         m_doc->PrepareDrawing();
         return true;
     }
-
+    
+    if (commitOnly) {
+        // Only process commit actions
+        return false;
+    }
+    
     if (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param")) {
         LogWarning("Incorrectly formatted JSON param.");
     }
@@ -70,10 +83,16 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction)
         }
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
-
+    else if (action == "delete") {
+        std::string elementId;
+        if (this->ParseDeleteAction(json.get<jsonxx::Object>("param"), elementId)) {
+            return this->Delete(elementId);
+        }
+        LogWarning("Could not parse the delete action");
+    }
     else if (action == "drag") {
         std::string elementId;
-        int x,y;
+        int x, y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), elementId, x, y)) {
             return this->Drag(elementId, x, y);
         }
@@ -91,7 +110,13 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "insert") {
         std::string elementType, startid, endid;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), elementType, startid, endid)) {
-            return this->Insert(elementType, startid, endid);
+            if (endid == "") {
+                return this->Insert(elementType, startid);
+            }
+            else {
+                return this->Insert(elementType, startid, endid);
+            }
+            
         }
         LogWarning("Could not parse the insert action");
     }
@@ -106,6 +131,13 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction)
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
     return false;
+}
+
+bool EditorToolkitCMN::ParseDeleteAction(jsonxx::Object param, std::string &elementId)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    elementId = param.get<jsonxx::String>("elementId");
+    return true;
 }
 
 bool EditorToolkitCMN::ParseDragAction(jsonxx::Object param, std::string &elementId, int &x, int &y)
@@ -174,13 +206,24 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
     bool status = true;
     m_chainedId = "";
     for (int i = 0; i < (int)actions.size(); i++) {
-        if (status) status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
+        status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
         m_editInfo = m_chainedId;
     }
     return status;
 }
+    
+bool EditorToolkitCMN::Delete(std::string &elementId)
+{
+    Object *element = this->GetElement(elementId);
+    if (!element) return false;
+    
+    if (element->Is(NOTE)) {
+        return this->DeleteNote(dynamic_cast<Note *>(element));
+    }
+    return false;
+}
 
-bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
+bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
@@ -199,8 +242,8 @@ bool EditorToolkitCMN::Drag(std::string elementId, int x, int y)
     }
     return false;
 }
-
-bool EditorToolkitCMN::KeyDown(std::string elementId, int key, bool shiftKey, bool ctrlKey)
+    
+bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, bool ctrlKey)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
@@ -221,7 +264,7 @@ bool EditorToolkitCMN::KeyDown(std::string elementId, int key, bool shiftKey, bo
     return false;
 }
 
-bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std::string endid)
+bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid, std::string const &endid)
 {
     if (!m_doc->GetDrawingPage()) return false;
 
@@ -269,7 +312,55 @@ bool EditorToolkitCMN::Insert(std::string elementType, std::string startid, std:
     return true;
 }
 
-bool EditorToolkitCMN::Set(std::string elementId, std::string attribute, std::string value)
+bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &startid)
+{
+    if (!m_doc->GetDrawingPage()) return false;
+    
+    Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
+    // Check if both start and end elements exist
+    if (!start) {
+        LogMessage("Element start id '%s' could not be found", startid.c_str());
+        return false;
+    }
+    if (elementType == "note") {
+        return this->InsertNote(start);
+    }
+    // Check if it is a LayerElement
+    if (!dynamic_cast<LayerElement *>(start)) {
+        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
+        return false;
+    }
+    
+    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
+    assert(measure);
+    
+    /*
+    ControlElement *element = NULL;
+    if (elementType == "dynam") {
+        element = new Slur();
+    }
+    else if (elementType == "hairpin") {
+        element = new Hairpin();
+    }
+    else {
+        LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
+        return false;
+    }
+    
+    assert(element);
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
+    assert(interface);
+    measure->AddChild(element);
+    interface->SetStartid(startid);
+    interface->SetEndid(endid);
+    
+    this->m_chainedId = element->GetUuid();
+    */
+    
+    return true;
+}
+    
+bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute, std::string const &value)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
@@ -317,16 +408,227 @@ Object *EditorToolkitCMN::GetElement(std::string &elementId)
     else {
         this->m_chainedId = elementId;
     }
-
-    if (!m_doc->GetDrawingPage()) return NULL;
-
+    
+    Object *element = NULL;
+    
     // Try to get the element on the current drawing page
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    if (m_doc->GetDrawingPage()) {
+        element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    }
     // If it wasn't there, try on the whole doc
     if (!element) {
         element = m_doc->FindChildByUuid(elementId);
     }
+    
     return element;
+}
+    
+bool EditorToolkitCMN::InsertNote(Object *object)
+{
+    assert(object);
+    
+    if (!object->Is({CHORD, NOTE, REST})) {
+        LogMessage("Inserting a note is possible only in a chord, note or rest");
+        return false;
+    }
+    
+    if (object->Is(CHORD)) {
+        Chord *currentChord = dynamic_cast<Chord *>(object);
+        assert(currentChord);
+        Note *note = new Note();
+        currentChord->AddChild(note);
+        this->m_chainedId = note->GetUuid();
+        return true;
+    }
+    else if (object->Is(NOTE)) {
+        Note *currentNote = dynamic_cast<Note *>(object);
+        assert(currentNote);
+        
+        Chord *currentChord = currentNote->IsChordTone();
+        if (currentChord) {
+            Note *note = new Note();
+            currentChord->AddChild(note);
+            this->m_chainedId = note->GetUuid();
+            return true;
+        }
+        
+        if (currentNote->HasEditorialContent()) {
+            LogMessage("Inserting a note where a note has editorial content is not possible");
+            return false;
+        }
+        
+        ArrayOfObjects lyric;
+        ClassIdsComparison lyricsComparison({VERSE, SYL});
+        currentNote->FindAllChildByComparison(&lyric, &lyricsComparison);
+        if (!lyric.empty()) {
+            LogMessage("Inserting a note where a note has lyric content is not possible");
+            return false;
+        }
+        Chord *chord = new Chord();
+        chord->DurationInterface::operator=(*currentNote);
+        chord->AttCue::operator=(*currentNote);
+        chord->AttGraced::operator=(*currentNote);
+        chord->AttStems::operator=(*currentNote);
+        chord->AttStemsCmn::operator=(*currentNote);
+        currentNote->DurationInterface::Reset();
+        currentNote->ResetCue();
+        currentNote->ResetGraced();
+        currentNote->ResetStems();
+        currentNote->ResetStemsCmn();
+        Object *parent = currentNote->GetParent();
+        assert(parent);
+        parent->ReplaceChild(currentNote, chord);
+        chord->AddChild(currentNote);
+       
+        Note *note = new Note();
+        chord->AddChild(note);
+        
+        ArrayOfObjects artics;
+        ClassIdComparison articComparison(ARTIC);
+        currentNote->FindAllChildByComparison(&artics, &articComparison);
+        for (auto &artic : artics) {
+            artic->MoveItselfTo(chord);
+        }
+        currentNote->ClearRelinquishedChildren();
+        
+        this->m_chainedId = note->GetUuid();
+        return true;
+    }
+    else if (object->Is(REST)) {
+        Rest *rest = dynamic_cast<Rest *>(object);
+        assert(rest);
+        Note *note = new Note();
+        note->DurationInterface::operator=(*rest);
+        Object *parent = rest->GetParent();
+        assert(parent);
+        parent->ReplaceChild(rest, note);
+        delete rest;
+        this->m_chainedId = note->GetUuid();
+        return true;
+    }
+    return false;
+}
+    
+bool EditorToolkitCMN::DeleteNote(Note *note)
+{
+    assert(note);
+    
+    Chord *chord = note->IsChordTone();
+    Beam *beam = note->IsInBeam();
+    
+    if (chord) {
+        if (chord->HasEditorialContent()) {
+            LogMessage("Deleting a note in a chord that has editorial content is not possible");
+            return false;
+        }
+        int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);
+        if (count == 2) {
+            Note *otherNote = chord->GetTopNote();
+            if (note == otherNote) {
+                otherNote = chord->GetBottomNote();
+            }
+            assert(otherNote && (otherNote != note));
+            otherNote->DurationInterface::operator=(*chord);
+            otherNote->AttCue::operator=(*chord);
+            otherNote->AttGraced::operator=(*chord);
+            otherNote->AttStems::operator=(*chord);
+            otherNote->AttStemsCmn::operator=(*chord);
+            Object *parent = chord->GetParent();
+            assert(parent);
+            chord->DetachChild(otherNote->GetIdx());
+            parent->ReplaceChild(chord, otherNote);
+            
+            ArrayOfObjects artics;
+            ClassIdComparison articComparison(ARTIC);
+            chord->FindAllChildByComparison(&artics, &articComparison, 1);
+            for (auto &artic : artics) {
+                artic->MoveItselfTo(otherNote);
+            }
+            delete chord;
+            this->m_chainedId = chord->GetUuid();
+            return true;
+        }
+        else if (count > 2) {
+            chord->DeleteChild(note);
+            this->m_chainedId = chord->GetUuid();
+            return true;
+        }
+        // Handle cases of chords with one single note
+        else {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*chord);
+            Object *parent = chord->GetParent();
+            assert(parent);
+            parent->ReplaceChild(chord, rest);
+            delete chord;
+            return true;
+        }
+    }
+    else if (beam) {
+        if ((int)beam->GetElementCoords()->size() == 2) {
+            bool insertBefore = true;
+            LayerElement *otherElement = beam->GetElementCoords()->back()->m_element;
+            if (note == otherElement) {
+                insertBefore = false;
+                otherElement = beam->GetElementCoords()->front()->m_element;
+            }
+            assert(otherElement && (otherElement != note));
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            Object *parent = beam->GetParent();
+            assert(parent);
+            if (insertBefore) {
+                parent->InsertBefore(beam, rest);
+            }
+            else {
+                parent->InsertAfter(beam, rest);
+            }
+            beam->DetachChild(otherElement->GetIdx());
+            parent->ReplaceChild(beam, otherElement);
+            delete beam;
+            this->m_chainedId = rest->GetUuid();
+            return true;
+        }
+        if (beam->IsFirstInBeam(note)) {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            Object *parent = beam->GetParent();
+            assert(parent);
+            parent->InsertBefore(beam, rest);
+            beam->DeleteChild(note);
+            this->m_chainedId = rest->GetUuid();
+            return true;
+        }
+        else if (beam->IsLastInBeam(note)) {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            Object *parent = beam->GetParent();
+            assert(parent);
+            parent->InsertAfter(beam, rest);
+            beam->DeleteChild(note);
+            this->m_chainedId = rest->GetUuid();
+            return true;
+        }
+        else {
+            Rest *rest = new Rest();
+            rest->DurationInterface::operator=(*note);
+            beam->ReplaceChild( note, rest);
+            delete note;
+            this->m_chainedId = rest->GetUuid();
+            return true;
+        }
+    }
+    else {
+        Rest *rest = new Rest();
+        rest->DurationInterface::operator=(*note);
+        Object *parent = note->GetParent();
+        assert(parent);
+        parent->ReplaceChild(note, rest);
+        delete note;
+        this->m_chainedId = rest->GetUuid();
+        return true;
+    }
+    return false;
 }
 
 }// namespace vrv

@@ -485,6 +485,12 @@ bool Beam::IsLastInBeam(LayerElement *element)
     if (position == (size - 1)) return true;
     return false;
 }
+    
+const ArrayOfBeamElementCoords *Beam::GetElementCoords()
+{
+    this->GetList(this);
+    return &m_beamElementCoords;
+}
 
 void Beam::InitCoords(ListOfObjects *childList)
 {

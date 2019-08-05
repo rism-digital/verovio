@@ -53,12 +53,6 @@ public:
     bool ToggleLigature(std::vector<std::string> elementIds, std::string isLigature);
     bool ChangeSkew(std::string elementId, int dy, bool rightSide);
     ///@}
-
-    /**
-     * Get information on the last editor function used
-     */
-    std::string EditInfo();
-
 protected:
 
     /**
