@@ -31,6 +31,7 @@ class EditorToolkitNeume : public EditorToolkit {
 public:
     EditorToolkitNeume(Doc * doc, View *view) : EditorToolkit(doc, view) {}
     bool ParseEditorAction(const std::string &json_editorAction);
+    virtual std::string EditInfo() { return m_infoObject.json(); };
 
     /**
      * Experimental editor functions.
@@ -76,6 +77,9 @@ protected:
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature);
     bool ParseChangeSkewAction(jsonxx::Object param, std::string *elementId, int *dy, bool *rightSide);
     ///@}
+
+private:
+    jsonxx::Object m_infoObject;
 };
 
 //--------------------------------------------------------------------------------

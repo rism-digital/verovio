@@ -186,28 +186,30 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
     bool status = true;
-    std::string info = "[";
-    std::string id = "";
+    jsonxx::Object results;
     for (int i = 0; i < (int)actions.size(); i++) {
         if (!actions.has<jsonxx::Object>(i)) {
             LogError("Action %d was not an object", i);
+            m_infoObject.reset();
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Action " + std::to_string(i) + " was not an object.");
             return false;
         }
         status |= this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
-        if (i != 0)
-            info += ", ";
-        info += "\"" + m_editInfo + "\"";
+        results.import(std::to_string(i), m_infoObject);
     }
-    info += "]";
-    m_editInfo = info;
+    m_infoObject = results;
     return status;
 }
 
 bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 {
-    m_editInfo = "";
+    m_infoObject.reset();
+    std::string status = "OK", message = "";
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get drawing page.");
         return false;
     }
 
@@ -220,6 +222,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     if (!element) {
         LogWarning("element is null");
+        status = "WARNING";
+        message += "Element is null. ";
     }
     assert(element);
 
@@ -227,6 +231,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if (!layer) {
             LogError("Element does not have Layer parent. This should not happen.");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Element does not have Layer parent.");
             return false;
         }
 
@@ -547,6 +553,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Staff *staff = dynamic_cast<Staff *>(element);
         if (!staff->HasFacs()) {
             LogError("Staff dragging is only supported for staves with facsimiles!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Staff dragging is only supported for staves with facsimiles.");
             return false;
         }
 
@@ -575,6 +583,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Syl *syl = dynamic_cast<Syl *>(element);
         if (!syl->HasFacs()) {
             LogError("Syl (boundingbox) dragging is only supported for syls with facsimiles!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Syl dragging is only supported for syls with facsimiles.");
             return false;
         }
         FacsimileInterface *fi = (*syl).GetFacsimileInterface();
@@ -585,26 +595,37 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     else {
         LogWarning("Unsupported element for dragging.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Unsupported element for dragging.");
         return false;
     }
     Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
     layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
+    m_infoObject.import("status", status);
+    m_infoObject.import("message", message);
     return true;
 }
 
 bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly,
         int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes)
 {
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get drawing page.");
         return false;
     }
     if (m_doc->GetType() != Facs) {
         LogError("Drawing page without facsimile");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Drawing page without facsimile is unsupported.");
         return false;
     }
 
     Staff *staff;
+
+    std::string status = "OK", message = "";
 
 
     // Find closest valid staff
@@ -678,20 +699,30 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
                 parent->Modify();
-                m_editInfo = newStaff->GetUuid();
+
+                m_infoObject.import("uuid", newStaff->GetUuid());
+                m_infoObject.import("status", status);
+                m_infoObject.import("message", message);
+
                 return true;
             }
         }
         LogMessage("Failed to insert newStaff into staff");
+        message += "Failed to insert newStaff into staves.";
         parent->AddChild(newStaff);
         parent->Modify();
-        m_editInfo = newStaff->GetUuid();
+
+        m_infoObject.import("uuid", newStaff->GetUuid());
+        m_infoObject.import("status", status);
+        m_infoObject.import("message", message);
         return true;
     }
 
     if (staff == NULL) {
         LogError("A staff must exist in the page to add a non-staff element.");
         delete zone;
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "A staff must exist in the page to add a non-staff element.");
         return false;
     }
     Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
@@ -746,6 +777,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             delete syllable;
             delete neume;
             delete nc;
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "There is no valid clef available.");
             return false;
         }
 
@@ -817,7 +851,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     newUly = uly;
                 }
                 else{
-                    LogMessage("Unsupported character in contour.");
+                    LogError("Unsupported character in contour.");
+                    m_infoObject.import("status", "FAILURE");
+                    m_infoObject.import("message", "Unsupported character in contour.");
                     return false;
                 }
 
@@ -841,11 +877,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 prevNc = newNc;
             }
         }
-        if(elementType == "nc"){
-            m_editInfo = nc->GetUuid();
+        if(elementType == "nc") {
+            m_infoObject.import("uuid", nc->GetUuid());
         }
-        else{
-            m_editInfo = neume->GetUuid();
+        else {
+            m_infoObject.import("uuid", neume->GetUuid());
         }
     }
     else if (elementType == "clef") {
@@ -867,6 +903,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (clefShape == CLEFSHAPE_NONE) {
             LogError("A clef shape must be specified.");
             delete clef;
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "A clef shape must be specified.");
             return false;
         }
         clef->SetShape(clefShape);
@@ -886,7 +925,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         assert(surface);
         surface->AddChild(zone);
         layer->AddChild(clef);
-        m_editInfo = clef->GetUuid();
+        m_infoObject.import("uuid", clef->GetUuid());
         layer->ReorderByXPos();
 
         // ensure pitched elements associated with this clef keep their x,y positions
@@ -927,6 +966,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (clef == NULL) {
             LogError("There is no valid clef available.");
             delete custos;
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "There is no valid clef available.");
             return false;
         }
 
@@ -950,19 +992,23 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
-        m_editInfo = custos->GetUuid();
+        m_infoObject.import("uuid", custos->GetUuid());
     }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Unsupported type '" + elementType + "' for insertion.");
         return false;
     }
     layer->ReorderByXPos();
+    m_infoObject.import("status", status);
+    m_infoObject.import("message", message);
     return true;
 }
 
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
-    m_editInfo = "";
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     ArrayOfObjects staves;
     int ulx = INT_MAX, uly = 0, lrx = 0, lry = 0;
@@ -979,12 +1025,16 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
             lry += zone->GetLry();
         }
         else {
-            LogWarning("Staff with ID '%s' does not exist!", it->c_str());
+            LogError("Staff with ID '%s' does not exist!", it->c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Staff with ID '" + *it + "' does not exist.");
             return false;
         }
     }
     if (staves.size() < 2) {
-        LogWarning("At least two staves must be provided.");
+        LogError("At least two staves must be provided.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "At least two staves must be provided.");
         return false;
     }
 
@@ -1016,7 +1066,9 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     fillLayer->ReorderByXPos();
 
-    m_editInfo = fillStaff->GetUuid();
+    m_infoObject.import("uuid", fillStaff->GetUuid());
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
 
     // TODO change zones for staff children
 
@@ -1025,6 +1077,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
 bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     bool success = false;
@@ -1058,20 +1111,29 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
         m_doc->PrepareDrawing();
         m_doc->GetDrawingPage()->LayOut(true);
     }
+    m_infoObject.import("status", success ? "OK" : "FAILURE");
+    m_infoObject.import("message", success ? "" : "Could not set attribute '" + attrType + "' to '" + attrValue + "'.");
     return success;
 }
 
 // Update the text of a TextElement by its syl
 bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 {
-    m_editInfo = "";
+    m_infoObject.reset();
+    std::string status = "OK", message = "";
     std::wstring wtext;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     wtext = conv.from_bytes(text);
-    if (!m_doc->GetDrawingPage()) return false;
+    if (!m_doc->GetDrawingPage()) {
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not find drawing page.");
+        return false;
+    }
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     if (element == NULL) {
         LogWarning("No element with ID '%s' exists", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No element with ID '" + elementId + "' exists.");
         return false;
     }
 
@@ -1133,6 +1195,8 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                 }
                 else {
                     LogWarning("Could not create bounding box for syl.");
+                    message += "Could not create bounding box for syl. ";
+                    status = "WARNING";
                     delete zone;
                 }
                 assert(syl->HasFacs());
@@ -1144,16 +1208,23 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
         }
     }
     else {
-        LogWarning("Element type '%s' is unsupported for SetText", element->GetClassName().c_str());
+        LogError("Element type '%s' is unsupported for SetText", element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Element type '" + element->GetClassName() + "' is unsupported for SetText.");
         return false;
     }
+    m_infoObject.import("status", success ? status : "FAILURE");
+    m_infoObject.import("message", success ? message : "SetText method failed.");
     return success;
 }
 
 bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
 {
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     ArrayOfObjects objects;
@@ -1175,7 +1246,9 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
     if(clef->GetShape() != clefShape){
         success = Att::SetShared(clef, "shape", shape);
         if(!success){
-            LogWarning("Unable to set clef shape");
+            LogError("Unable to set clef shape");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Unable to set clef shape.");
             return false;
         }
 
@@ -1202,24 +1275,33 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
         m_doc->PrepareDrawing();
         m_doc->GetDrawingPage()->LayOut(true);
     }
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
     return true;
 }
 
 bool EditorToolkitNeume::Split(std::string elementId, int x)
 {
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
     // Validate parameters
     if (staff == NULL) {
         LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Either no element exists with ID '" + elementId + "' or it is not a staff.");
         return false;
     }
 
     if (staff->GetZone()->GetUlx() > x || staff->GetZone()->GetLrx() < x) {
         LogError("The 'x' parameter is not within the bounds of the original staff.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "The 'x' parameter is not within bounds of the original staff.");
         return false;
     }
 
@@ -1230,12 +1312,19 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
 
     if (!this->Insert("staff", "auto", newUlx, staff->GetZone()->GetUly(), newLrx, staff->GetZone()->GetLry(), v)) {
         LogError("Failed to create a second staff.");
+        m_infoObject.reset();
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Failed to create a second staff.");
         return false;
     }
-    Staff *splitStaff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(m_editInfo));
+    Staff *splitStaff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(m_infoObject.get<jsonxx::String>("uuid")));
     assert(splitStaff);
     if (splitStaff == NULL) {
-        LogMessage("Split staff is null");
+        LogError("Split staff is null");
+        m_infoObject.reset();
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Split staff is null.");
+        return false;
     }
 
     staff->GetZone()->SetLrx(x);
@@ -1269,14 +1358,19 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         }
     }
     layer->ClearRelinquishedChildren();
-    m_editInfo = splitStaff->GetUuid();
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    m_infoObject.import("uuid", splitStaff->GetUuid());
     return true;
 }
 
 bool EditorToolkitNeume::Remove(std::string elementId)
 {
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
@@ -1287,7 +1381,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     isClef = obj->Is(CLEF);
     Object *parent = obj->GetParent();
     assert(parent);
-    m_editInfo = elementId;
+    m_infoObject.import("uuid", elementId);
     // Remove Zone for element (if any)
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     ArrayOfObjects fiChildren;
@@ -1335,6 +1429,10 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     result = parent->DeleteChild(obj);
     if (!result) {
         LogError("Failed to delete the desired element (%s)", elementId.c_str());
+        m_infoObject.reset();
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Failed to delete the desired element (" + elementId + ").");
+        return false;
     }
     // Check if this leaves any containers empty and delete them
     if (isNc && result) {
@@ -1347,6 +1445,10 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             result &= parent->DeleteChild(obj);
             if (!result) {
                 LogError("Failed to delete empty neume (%s)", neumeId.c_str());
+                m_infoObject.reset();
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to delete empty neume (" + neumeId + ").");
+                return false;
             }
         }
     }
@@ -1360,27 +1462,40 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             result &= parent->DeleteChild(obj);
             if (!result) {
                 LogError("Failed to delete empty syllable (%s)", syllableId.c_str());
+                m_infoObject.reset();
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to delete empty syllable (" + syllableId + ").");
+                return false;
             }
         }
     }
 
-    return result;
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    return true;
 }
 
 bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx, int lry)
 {
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     if (m_doc->GetType() != Facs) {
         LogWarning("Resizing is only available in facsimile mode.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Resizing is only available in facsimile mode.");
         return false;
     }
 
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     if (obj == NULL) {
         LogError("Object with ID '%s' not found.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Object with ID '" + elementId + "' could not be found.");
         return false;
     }
     if (obj->Is(STAFF)) {
@@ -1388,6 +1503,8 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         assert(staff);
         if (!staff->HasFacs()) {
             LogError("This staff does not have a facsimile.");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "This staff does not have a facsimile.");
             return false;
         }
         Zone *zone = staff->GetZone();
@@ -1403,6 +1520,8 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         assert(syl);
         if (!syl->HasFacs()) {
             LogError("This syl (bounding box) does not have a facsimile");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "This syl does not have a facsimile.");
             return false;
         }
         Zone *zone = syl->GetZone();
@@ -1415,14 +1534,18 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
     }
     else {
         LogMessage("Element of type '%s' is unsupported.", obj->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Element of type '" + obj->GetClassName() + "' is unsupported.");
         return false;
     }
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
     return true;
 }
 
 bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> elementIds)
 {
-    m_editInfo = "";
+    m_infoObject.reset();
     Object *parent = NULL, *doubleParent = NULL;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
@@ -1430,13 +1553,21 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     std::vector<Object *> fullParents;
     std::map<Syllable *, Clef *> clefsBefore;
 
+    std::string status = "OK", message = "";
+
     //Get the current drawing page
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     if (elementIds.size() == 0) {
         LogWarning("No element IDs to group!");
+        status = "WARNING";
+        message = "No element IDs to group!";
+        m_infoObject.import("status", status);
+        m_infoObject.import("message", message);
         return true;
     }
     ClassId elementClass;
@@ -1446,6 +1577,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         elementClass = NEUME;
     } else {
         LogError("Invalid groupType: %s", groupType.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Invalid groupType: " + groupType);
         return false;
     }
 
@@ -1455,11 +1588,16 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
         if (el == NULL) {
             LogError("Could not get element with ID %s", it->c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Could not get element with ID " + *it);
             return false;
         }
         if (el->GetClassId() != elementClass) {
             LogError("Element %s was of class %s. Expected class %s",
                 el->GetUuid().c_str(), el->GetClassName().c_str(), groupType.c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Element " + el->GetUuid() + " was of class " +
+                el->GetClassName() + " but expected class " + groupType + ".");
             return false;
         }
 
@@ -1467,18 +1605,24 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *par = el->GetParent();
         if (par == NULL) {
             LogError("Parent of %s is null!", el->GetUuid().c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Parent of " + el->GetUuid() + " is null.");
             return false;
         }
         if (doubleParent == NULL) {
             doubleParent = par->GetParent();
             if (doubleParent == NULL) {
                 LogError("No second level parent!");
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "No second level parent.");
                 return false;
             }
         }
         else {
             if (par->GetParent() != doubleParent) {
                 LogError("No shared second level parent!");
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "No shared second level parent.");
                 return false;
             }
         }
@@ -1762,13 +1906,15 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
     }
 
-    m_editInfo = parent->GetUuid();
+    m_infoObject.import("uuid", parent->GetUuid());
+    m_infoObject.import("status", status);
+    m_infoObject.import("message", message);
     return true;
 }
 
 bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
-    m_editInfo = "";
+    m_infoObject.reset();
     Object *fparent = NULL;
     Object *sparent = NULL;
     Object *currentParent = NULL;
@@ -1781,9 +1927,13 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     ClassIdComparison ac(CLEF);
     ArrayOfObjects syllables;
 
+    jsonxx::Array uuidArray;
+
     //Check if you can get drawing page
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
@@ -1840,7 +1990,9 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                         secondNc = NULL;
                     }
                     else{
-                        LogWarning("Unable to toggle ligature within ungroup ncs!");
+                        LogError("Unable to toggle ligature within ungroup ncs!");
+                        m_infoObject.import("status", "FAILURE");
+                        m_infoObject.import("message", "Unable to toggle ligature within ungroup ncs.");
                         return false;
                     }
                 }
@@ -1856,7 +2008,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             else if (groupType == "nc"){
                 fparent = el->GetFirstParent(NEUME);
                 assert(fparent);
-                m_editInfo = m_editInfo + fparent->GetUuid();
+                uuidArray << fparent->GetUuid();
                 sparent = fparent->GetFirstParent(SYLLABLE);
                 assert(sparent);
                 currentParent = dynamic_cast<Neume *>(fparent);
@@ -1866,7 +2018,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             else if (groupType == "neume"){
                 fparent = el->GetFirstParent(SYLLABLE);
                 assert(fparent);
-                m_editInfo = m_editInfo + fparent->GetUuid();
+                uuidArray << fparent->GetUuid();
                 sparent = fparent->GetFirstParent(LAYER);
                 assert(sparent);
                 currentParent = dynamic_cast<Syllable *>(fparent);
@@ -1876,7 +2028,8 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             }
             else{
                 LogError("Invalid groupType for ungrouping");
-                m_editInfo = "";
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Invalid groupType for ungrouping.");
                 return false;
             }
         }
@@ -1973,7 +2126,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     syl->SetFacs(zone->GetUuid());
                 }
             }
-            m_editInfo = m_editInfo + " " + newParent->GetUuid();
+            uuidArray << newParent->GetUuid();
 
             sparent->AddChild(newParent);
             sparent->ReorderByXPos();
@@ -1995,20 +2148,27 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         }
     }
 
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    m_infoObject.import("uuid", uuidArray);
     return true;
 }
 
 bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
 {
-    m_editInfo = "";
+    m_infoObject.reset();
     //Check if you can get drawing page
     if(!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     Neume *el = dynamic_cast<Neume *> (m_doc->GetDrawingPage()->FindChildByUuid(elementId));
     if(el == NULL){
         LogError("Unable to find neume with id %s", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Unable to find neume with id " + elementId + ".");
         return false;
     }
     Nc *firstChild = NULL;
@@ -2067,6 +2227,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         }
         else{
             LogMessage("Unsupported character in contour.");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Unsupported character in contour.");
             return false;
         }
         zone->SetUlx(newUlx);
@@ -2088,14 +2250,16 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         initialLry = newLry;
         prevNc = newNc;
     }
-    m_editInfo = el->GetUuid();
+    m_infoObject.import("uuid", el->GetUuid());
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
     return true;
 }
 
 bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
 {
     assert(elementIds.size() == 2);
-    m_editInfo = "";
+    m_infoObject.reset();
     bool success1 = false;
     bool success2 = false;
     Facsimile *facsimile = m_doc->GetFacsimile();
@@ -2107,6 +2271,8 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     //Check if you can get drawing page
     if(!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
 
@@ -2153,15 +2319,21 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         if (Att::SetNeumes(secondNc, "ligated", "true")) success2 = true;
     }
     else {
-        LogWarning("isLigature is invalid!");
+        LogError("isLigature is invalid!");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "isLigature value '" + isLigature + "' is invalid.");
         return false;
     }
     if (success1 && success2 && m_doc->GetType() != Facs) {
         m_doc->PrepareDrawing();
         m_doc->GetDrawingPage()->LayOut(true);
     }
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
     if(!(success1 && success2)){
         LogWarning("Unable to update ligature attribute");
+        m_infoObject.import("message", "Unable to update ligature attribute.");
+        m_infoObject.import("status", "WARNING");
     }
 
     surface->AddChild(zone);
@@ -2170,23 +2342,32 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
 
 bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSide)
 {
-    m_editInfo = "";
+    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
     if (m_doc->GetType() != Facs) {
         LogWarning("Resizing is only available in facsimile mode.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Resizing is only available in facsimile mode.");
         return false;
     }
     Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
     assert(staff);
     if (staff == NULL) {
         LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Either no element exists with ID '" +
+            elementId + "' or it is not a staff.");
         return false;
     }
     if (!staff->HasFacs()) {
         LogError("This staff does not have a facsimile.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "This staff does not have a facsimile.");
         return false;
     }
     Zone *zone = staff->GetZone();
@@ -2208,7 +2389,9 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
 
     zone->Modify();
 
-    m_editInfo = std::to_string(newSkew);
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    m_infoObject.import("skew", newSkew);
     return true;
 }
 
