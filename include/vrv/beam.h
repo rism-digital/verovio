@@ -103,7 +103,7 @@ public:
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+    const ArrayOfBeamElementCoords *GetElementCoords();
 
     //----------//
     // Functors //
