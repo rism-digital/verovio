@@ -38,6 +38,11 @@
 #define CHAINED_ID "[chained-id]"
 
 namespace vrv {
+    
+std::string EditorToolkitCMN::EditInfo()
+{
+    return m_chainedId;
+}
 
 bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
 {
@@ -540,10 +545,12 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
                 artic->MoveItselfTo(otherNote);
             }
             delete chord;
+            this->m_chainedId = chord->GetUuid();
             return true;
         }
         else if (count > 2) {
             chord->DeleteChild(note);
+            this->m_chainedId = chord->GetUuid();
             return true;
         }
         // Handle cases of chords with one single note
@@ -579,6 +586,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             beam->DetachChild(otherElement->GetIdx());
             parent->ReplaceChild(beam, otherElement);
             delete beam;
+            this->m_chainedId = rest->GetUuid();
             return true;
         }
         if (beam->IsFirstInBeam(note)) {
@@ -588,6 +596,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             assert(parent);
             parent->InsertBefore(beam, rest);
             beam->DeleteChild(note);
+            this->m_chainedId = rest->GetUuid();
             return true;
         }
         else if (beam->IsLastInBeam(note)) {
@@ -597,6 +606,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             assert(parent);
             parent->InsertAfter(beam, rest);
             beam->DeleteChild(note);
+            this->m_chainedId = rest->GetUuid();
             return true;
         }
         else {
@@ -604,6 +614,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             rest->DurationInterface::operator=(*note);
             beam->ReplaceChild( note, rest);
             delete note;
+            this->m_chainedId = rest->GetUuid();
             return true;
         }
     }
@@ -614,6 +625,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         assert(parent);
         parent->ReplaceChild(note, rest);
         delete note;
+        this->m_chainedId = rest->GetUuid();
         return true;
     }
     return false;

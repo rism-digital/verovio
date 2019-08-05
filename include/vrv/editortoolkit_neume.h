@@ -52,12 +52,6 @@ public:
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds, std::string isLigature);
     ///@}
-
-    /**
-     * Get information on the last editor function used
-     */
-    std::string EditInfo();
-
 protected:
 
     /**

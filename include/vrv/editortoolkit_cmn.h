@@ -30,6 +30,7 @@ class EditorToolkitCMN : public EditorToolkit {
 public:
     EditorToolkitCMN(Doc * doc, View *view) : EditorToolkit(doc, view) {}
     bool ParseEditorAction(const std::string &json_editorAction, bool commitOnly = false);
+    virtual std::string EditInfo();
 
 protected:
 
