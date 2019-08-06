@@ -331,10 +331,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         return false;
     }
     
+    /*
     Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
     assert(measure);
     
-    /*
     ControlElement *element = NULL;
     if (elementType == "dynam") {
         element = new Slur();
