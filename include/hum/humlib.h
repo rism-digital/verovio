@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 30 15:07:46 CEST 2019
+// Last Modified: Mon Aug  5 08:02:51 EDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -983,11 +983,19 @@ class HumdrumLine : public std::string, public HumHash {
 		bool        isCommentLocal         (void) const;
 		bool        isLocalComment         (void) const { return isCommentLocal(); }
 		bool        isCommentGlobal        (void) const;
+		bool        isCommentUniversal     (void) const;
 		bool        isReference            (void) const;
+		bool        isGlobalReference      (void) const;
+		bool        isUniversalReference   (void) const;
 		bool        isSignifier            (void) const;
 		std::string getReferenceKey        (void) const;
 		std::string getReferenceValue      (void) const;
-		bool        isGlobalComment         (void) const { return isCommentGlobal(); }
+		std::string getGlobalReferenceKey      (void) const;
+		std::string getGlobalReferenceValue    (void) const;
+		std::string getUniversalReferenceKey   (void) const;
+		std::string getUniversalReferenceValue (void) const;
+		bool        isUniversalComment     (void) const { return isCommentUniversal(); }
+		bool        isGlobalComment        (void) const { return isCommentGlobal(); }
 		bool        isExclusive            (void) const;
 		bool        isExclusiveInterpretation (void) const { return isExclusive(); }
 		bool        isTerminator           (void) const;
@@ -1668,6 +1676,8 @@ class HumdrumFileBase : public HumHash {
 
 
 		std::vector<HumdrumLine*> getReferenceRecords(void);
+		std::vector<HumdrumLine*> getGlobalReferenceRecords(void);
+		std::vector<HumdrumLine*> getUniversalReferenceRecords(void);
 
 		// spine analysis functionality:
 		void          getTrackSequence         (std::vector<std::vector<HTp> >& sequence,
@@ -1850,6 +1860,8 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		              HumdrumFileStructure         (std::istream& contents);
 		             ~HumdrumFileStructure         ();
 		bool          hasFilters                   (void);
+		bool          hasGlobalFilters             (void);
+		bool          hasUniversalFilters          (void);
 
 		// TSV reading functions:
 		bool          read                         (std::istream& contents);
@@ -2747,6 +2759,10 @@ class Convert {
 		static void    makeBooleanTrackList(std::vector<bool>& spinelist,
 		                                     const std::string& spinestring,
 		                                     int maxtrack);
+		static std::vector<int> extractIntegerList(const std::string& input, int maximum);
+		// private functions for extractIntegerList:
+		static void processSegmentEntry(std::vector<int>& field, const std::string& astring, int maximum);
+		static void removeDollarsFromString(std::string& buffer, int maximum);
 
 		// Mathematical processing, defined in Convert-math.cpp
 		static int     getLcm               (const std::vector<int>& numbers);
@@ -3794,13 +3810,8 @@ int main(int argc, char** argv) {                      \
 
 //////////////////////////////
 //
-// STREAM_INTERFACE -- Expects one Humdurm file, either from the
-//    first command-line argument (left over after options have been
-//    parsed out), or from standard input.
-//
-// function call that the interface must implement:
-//  .run(HumdrumFile& infile, ostream& out)
-//
+// STREAM_INTERFACE -- Use HumdrumFileStream (low-memory
+//    usage implementation).
 //
 
 #define STREAM_INTERFACE(CLASS)                                  \
@@ -3812,11 +3823,11 @@ int main(int argc, char** argv) {                                \
 		interface.getError(cerr);                                  \
 		return -1;                                                 \
 	}                                                             \
-	HumdrumFileStream streamer(static_cast<Options&>(interface)); \
-	HumdrumFile infile;                                           \
+	HumdrumFileStream instream(static_cast<Options&>(interface)); \
+	HumdrumFileSet infiles;                                       \
 	bool status = true;                                           \
-	while (streamer.read(infile)) {                               \
-		status &= interface.run(infile);                           \
+	while (instream.readSingleSegment(infiles)) {                 \
+		status &= interface.run(infiles);                          \
 		if (interface.hasWarning()) {                              \
 			interface.getWarning(cerr);                             \
 		}                                                          \
@@ -3828,7 +3839,9 @@ int main(int argc, char** argv) {                                \
          return -1;                                              \
 		}                                                          \
 		if (!interface.hasAnyText()) {                             \
-			cout << infile;                                         \
+			for (int i=0; i<infiles.getCount(); i++) {              \
+				cout << infiles[i];                                  \
+			}                                                       \
 		}                                                          \
 		interface.clearOutput();                                   \
 	}                                                             \
@@ -3839,16 +3852,12 @@ int main(int argc, char** argv) {                                \
 
 //////////////////////////////
 //
-// STREAM_INTERFACE2 -- Expects two Humdurm files, either from the
-//    first two command-line arguments (left over after options have
-//    been parsed out), or from standard input.
-//
-// function call that the interface must implement:
-//  .run(HumdrumFile& infile1, HumdrumFile& infile2, ostream& out)
-//
+// RAW_STREAM_INTERFACE -- Use HumdrumFileStream but send the
+//    HumdrumFileStream object to the filter rather than individual
+//    Humdrum files.
 //
 
-#define STREAM_INTERFACE2(CLASS)                                 \
+#define RAW_STREAM_INTERFACE(CLASS)                              \
 using namespace std;                                             \
 using namespace hum;                                             \
 int main(int argc, char** argv) {                                \
@@ -3857,13 +3866,43 @@ int main(int argc, char** argv) {                                \
 		interface.getError(cerr);                                  \
 		return -1;                                                 \
 	}                                                             \
-	HumdrumFileStream streamer(static_cast<Options&>(interface)); \
-	HumdrumFile infile1;                                          \
-	HumdrumFile infile2;                                          \
-	bool status = true;                                           \
-	streamer.read(infile1);                                       \
-	streamer.read(infile2);                                       \
-	status &= interface.run(infile1, infile2);                    \
+	HumdrumFileStream instream(static_cast<Options&>(interface)); \
+	bool status = interface.run(instream);                        \
+	if (interface.hasWarning()) {                                 \
+		interface.getWarning(cerr);                                \
+	}                                                             \
+	if (interface.hasAnyText()) {                                 \
+	   interface.getAllText(cout);                                \
+	}                                                             \
+	if (interface.hasError()) {                                   \
+		interface.getError(cerr);                                  \
+        return -1;                                               \
+	}                                                             \
+	interface.clearOutput();                                      \
+	return !status;                                               \
+}
+
+
+
+//////////////////////////////
+//
+// SET_INTERFACE -- Use HumdrumFileSet (multiple file high-memory
+//    usage implementation).
+//
+
+#define SET_INTERFACE(CLASS)                                     \
+using namespace std;                                             \
+using namespace hum;                                             \
+int main(int argc, char** argv) {                                \
+	CLASS interface;                                              \
+	if (!interface.process(argc, argv)) {                         \
+		interface.getError(cerr);                                  \
+		return -1;                                                 \
+	}                                                             \
+	HumdrumFileStream instream(static_cast<Options&>(interface)); \
+	HumdrumFileSet infiles;                                       \
+	instream.read(infiles);                                       \
+	bool status = interface.run(infiles);                         \
 	if (interface.hasWarning()) {                                 \
 		interface.getWarning(cerr);                                \
 	}                                                             \
@@ -3875,14 +3914,17 @@ int main(int argc, char** argv) {                                \
         return -1;                                               \
 	}                                                             \
 	if (!interface.hasAnyText()) {                                \
-		cout << infile1;                                           \
-		cout << infile2;                                           \
+		for (int i=0; i<infiles.getCount(); i++) {                 \
+			cout << infiles[i];                                     \
+		}                                                          \
 	}                                                             \
 	interface.clearOutput();                                      \
 	return !status;                                               \
 }
 
 
+
+class HumdrumFileSet;
 
 class HumdrumFileStream {
 	public:
@@ -3892,6 +3934,8 @@ class HumdrumFileStream {
 		                HumdrumFileStream  (Options& options);
 		                HumdrumFileStream  (const string& datastream);
 
+		void            loadString         (const string& data);
+
 		int             setFileList        (char** list);
 		int             setFileList        (const std::vector<std::string>& list);
 
@@ -3900,6 +3944,8 @@ class HumdrumFileStream {
 
 		int             getFile            (HumdrumFile& infile);
 		int             read               (HumdrumFile& infile);
+		int             read               (HumdrumFileSet& infiles);
+		int             readSingleSegment  (HumdrumFileSet& infiles);
 
 	protected:
 		std::stringstream m_stringbuffer;   // used to read files from a string
@@ -3927,31 +3973,43 @@ class HumdrumFileSet {
    public:
                             HumdrumFileSet   (void);
                             HumdrumFileSet   (Options& options);
+                            HumdrumFileSet   (const std::string& contents);
                            ~HumdrumFileSet   ();
 
       void                  clear            (void);
+      void                  clearNoFree      (void);
       int                   getSize          (void);
       int                   getCount         (void) { return getSize(); }
       HumdrumFile&          operator[]       (int index);
+		bool                  swap             (int index1, int index2);
+		bool                  hasFilters       (void);
+		bool                  hasGlobalFilters    (void);
+		bool                  hasUniversalFilters (void);
+		std::vector<HumdrumLine*> getUniversalReferenceRecords(void);
 
-      int                   readFile         (const string& filename);
-      int                   readString       (const string& contents);
+      int                   readFile         (const std::string& filename);
+      int                   readString       (const std::string& contents);
+      int                   readStringCsv    (const std::string& contents);
       int                   read             (std::istream& inStream);
       int                   read             (Options& options);
       int                   read             (HumdrumFileStream& instream);
 
-      int                   readAppendFile   (const string& filename);
-      int                   readAppendString (const string& contents);
+      int                   readAppendFile   (const std::string& filename);
+      int                   readAppendString (const std::string& contents);
+      int                   readAppendStringCsv (const std::string& contents);
       int                   readAppend       (std::istream& inStream);
       int                   readAppend       (Options& options);
       int                   readAppend       (HumdrumFileStream& instream);
+      int                   readAppendHumdrum(HumdrumFile& infile);
+		int                   appendHumdrumPointer(HumdrumFile* infile);
 
    protected:
-      vector<HumdrumFile*>  data;
+      vector<HumdrumFile*>  m_data;
 
       void                  appendHumdrumFileContent(const std::string& filename, 
                                                std::stringstream& inbuffer);
 };
+
 
 
 
@@ -3961,6 +4019,7 @@ class Tool_autobeam : public HumTool {
 		        ~Tool_autobeam   () {};
 
 		bool     run             (HumdrumFile& infile);
+		bool     run             (HumdrumFileSet& infiles);
 		bool     run             (const string& indata, ostream& out);
 		bool     run             (HumdrumFile& infile, ostream& out);
 
@@ -3996,6 +4055,7 @@ class Tool_autostem : public HumTool {
 		         Tool_autostem         (void);
 		        ~Tool_autostem         () {};
 
+		bool     run                   (HumdrumFileSet& infiles);
 		bool     run                   (HumdrumFile& infile);
 		bool     run                   (const string& indata, ostream& out);
 		bool     run                   (HumdrumFile& infile, ostream& out);
@@ -4074,6 +4134,7 @@ class Tool_binroll : public HumTool {
 		         Tool_binroll      (void);
 		        ~Tool_binroll      () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -4091,11 +4152,36 @@ class Tool_binroll : public HumTool {
 };
 
 
+class Tool_chooser : public HumTool {
+	public:
+		       	   Tool_chooser       (void);
+		       	  ~Tool_chooser       () {};
+
+		bool        run                (HumdrumFileSet& infiles);
+		bool        run                (const string& indata);
+		bool        run                (HumdrumFileStream& instream);
+
+	protected:
+		void        processFiles       (HumdrumFileSet& infiles);
+		void        initialize         (void);
+
+		void        expandSegmentList  (vector<int>& field, string& fieldstring,
+		                                int maximum);
+		void        processSegmentEntry(vector<int>& field,
+		                                const string& astring, int maximum);
+		void        removeDollarsFromString(string& buffer, int maximum);
+
+	private:
+
+};
+
+
 class Tool_chord : public HumTool {
 	public:
 		         Tool_chord      (void);
 		        ~Tool_chord      () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -4152,6 +4238,7 @@ class Tool_cint : public HumTool {
 		         Tool_cint    (void);
 		        ~Tool_cint    () {};
 
+		bool     run                    (HumdrumFileSet& infiles);
 		bool     run                    (HumdrumFile& infile);
 		bool     run                    (const string& indata, ostream& out);
 		bool     run                    (HumdrumFile& infile, ostream& out);
@@ -4302,6 +4389,7 @@ class Tool_composite : public HumTool {
 		       	   Tool_composite      (void);
 		       	  ~Tool_composite      () {};
 
+		bool        run                (HumdrumFileSet& infiles);
 		bool        run                (HumdrumFile& infile);
 		bool        run                (const string& indata, ostream& out);
 		bool        run                (HumdrumFile& infile, ostream& out);
@@ -4321,6 +4409,7 @@ class Tool_dissonant : public HumTool {
 		         Tool_dissonant    (void);
 		        ~Tool_dissonant    () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -4557,9 +4646,10 @@ class Tool_esac2hum : public HumTool {
 
 class Tool_extract : public HumTool {
 	public:
-		         Tool_extract  (void);
-		        ~Tool_extract  () {};
+		         Tool_extract           (void);
+		        ~Tool_extract           () {};
 
+		bool     run                    (HumdrumFileSet& infiles);
 		bool     run                    (HumdrumFile& infile);
 		bool     run                    (const string& indata, ostream& out);
 		bool     run                    (HumdrumFile& infile, ostream& out);
@@ -4674,15 +4764,20 @@ class Tool_filter : public HumTool {
 		         Tool_filter        (void);
 		        ~Tool_filter        () {};
 
+		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata, ostream& out);
-		bool     run                (HumdrumFile& infile, ostream& out);
+		bool     run                (const string& indata);
+
+		bool     runUniversal       (HumdrumFileSet& infiles);
 
 	protected:
 		void     getCommandList     (vector<pair<string, string> >& commands,
 		                             HumdrumFile& infile);
+		void     getUniversalCommandList(std::vector<std::pair<std::string, std::string> >& commands,
+		                             HumdrumFileSet& infiles);
 		void     initialize         (HumdrumFile& infile);
-		void     removeFilterLines  (HumdrumFile& infile);
+		void     removeGlobalFilterLines    (HumdrumFile& infile);
+		void     removeUniversalFilterLines (HumdrumFileSet& infiles);
 
 	private:
 		string   m_variant;        // used with -v option.
@@ -4696,6 +4791,7 @@ class Tool_hproof : public HumTool {
 		      Tool_hproof      (void);
 		     ~Tool_hproof      () {};
 
+		bool  run              (HumdrumFileSet& infiles);
 		bool  run              (HumdrumFile& infile);
 		bool  run              (const string& indata, ostream& out);
 		bool  run              (HumdrumFile& infile, ostream& out);
@@ -4714,11 +4810,111 @@ class Tool_hproof : public HumTool {
 
 
 
+// A TimePoint records the event times in a file.  These are positions of note attacks
+// in the file.  The "index" variable keeps track of the line in the original file 
+// (for the first position in index), and other positions in index keep track of the
+// equivalent line position of the timepoint in other file(s) that are being compared.
+class TimePoint {
+	public:
+		// file: pointers to the file in which the index refers to
+		vector<HumdrumFile*> file;
+
+		// index :: A list of indexes for the lines at which the given timestamp
+		// occurs in each file.  The first index is for the reference work.
+		vector<int> index;
+
+		// timestamp :: The duration from the start of the score to given time in score.
+		HumNum timestamp = -1;
+
+		// measure :: The measure number in which the timestamp occurs.
+		int measure = -1;
+
+		void clear(void) {
+			file.clear();
+			index.clear();
+			timestamp = -1;
+			measure = -1;
+		}
+};
+
+
+// NotePoint is a note from a score that will be matches hopefully to an
+// equivalent note in another score.
+class NotePoint {
+	public:
+		HTp         token          = NULL;   // Humdrum token that contains note
+		string      subtoken;                // string that represents not (token may be chord)
+		int         subindex       = -1;     // subtoken index of note (in chord)
+		int         measure        = -1;     // measure number that note is found
+		HumNum      measurequarter = -1;     // distance from start of measure to note
+		int         track          = -1;     // track that note is from
+		int         layer          = -1;     // layer that note is in
+		HumNum      duration       = -1;     // duration (tied) of note
+		int         b40            = -1;     // b40 pitch of note
+		int         processed      = 0;      // has note been processed/matched
+		int         sourceindex    = -1;     // source file index for note
+		int         tpindex        = -1;     // timepoint index of note in source
+		vector<int> matched;       // indexes to the location of the note in TimePoint list.
+		                           // the index indicate which score the match is related to,
+		                           // and a value of -1 means there is no equivalent timepoint.
+		void clear(void) {
+			token = NULL;
+			subtoken = "";
+			subindex = -1;
+			measure = -1;
+			measurequarter = -1;
+			track = -1;
+			layer = -1;
+			duration = -1;
+			b40 = -1;
+			processed = 0;
+			sourceindex = -1;
+			tpindex = -1;
+			matched.clear();
+		}
+};
+
+
+// Function declarations:
+
+class Tool_humdiff : public HumTool {
+	public:
+		         Tool_humdiff       (void);
+
+		bool     run                (HumdrumFileSet& infiles);
+		bool     run                (const string& indata1, const string& indata2, ostream& out);
+		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2, ostream& out);
+		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2);
+		void     processFile        (HumdrumFile& infile1, HumdrumFile& infile2);
+
+		void     compareFiles       (HumdrumFileSet& humset);
+		ostream& compareTimePoints  (ostream& out, vector<vector<TimePoint>>& timepoints, HumdrumFileSet& humset);
+		void     extractTimePoints  (vector<TimePoint>& points, HumdrumFile& infile);
+		ostream& printTimePoints    (ostream& out, vector<TimePoint>& timepoints);
+		void     compareLines       (HumNum minval, vector<int>& indexes, vector<vector<TimePoint>>& timepoints, HumdrumFileSet& humset);
+		void     getNoteList        (vector<NotePoint>& notelist, HumdrumFile& infile, int line, int measure, int sourceindex, int tpindex);
+		int      findNoteInList     (NotePoint& np, vector<NotePoint>& nps);
+		void     printNotePoints    (vector<NotePoint>& notelist);
+		void     markNote           (NotePoint& np);
+
+
+int m_marked = 0;
+
+
+
+};
+
+ostream& operator<<(ostream& out, TimePoint& tp);
+ostream& operator<<(ostream& out, NotePoint& np);
+
+
+
 class Tool_humsort : public HumTool {
 	public:
 		         Tool_humsort      (void);
 		        ~Tool_humsort      () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -4734,6 +4930,7 @@ class Tool_imitation : public HumTool {
 		         Tool_imitation    (void);
 		        ~Tool_imitation    () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -4776,6 +4973,7 @@ class Tool_kern2mens : public HumTool {
 		         Tool_kern2mens           (void);
 		        ~Tool_kern2mens           () {};
 
+		bool     run                      (HumdrumFileSet& infiles);
 		bool     run                      (HumdrumFile& infile);
 		bool     run                      (const string& indata, ostream& out);
 		bool     run                      (HumdrumFile& infile, ostream& out);
@@ -5038,6 +5236,7 @@ class Tool_metlev : public HumTool {
 		      Tool_metlev      (void);
 		     ~Tool_metlev      () {};
 
+		bool  run              (HumdrumFileSet& infiles);
 		bool  run              (HumdrumFile& infile);
 		bool  run              (const string& indata, ostream& out);
 		bool  run              (HumdrumFile& infile, ostream& out);
@@ -5158,6 +5357,7 @@ class Tool_msearch : public HumTool {
 		         Tool_msearch      (void);
 		        ~Tool_msearch      () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -5470,6 +5670,7 @@ class Tool_myank : public HumTool {
 		         Tool_myank            (void);
 		        ~Tool_myank            () {};
 
+		bool     run                   (HumdrumFileSet& infiles);
 		bool     run                   (HumdrumFile& infile);
 		bool     run                   (const string& indata, ostream& out);
 		bool     run                   (HumdrumFile& infile, ostream& out);
@@ -5549,6 +5750,7 @@ class Tool_periodicity : public HumTool {
 		         Tool_periodicity   (void);
 		        ~Tool_periodicity   () {};
 
+		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
 		bool     run                (const string& indata, ostream& out);
 		bool     run                (HumdrumFile& infile, ostream& out);
@@ -5574,6 +5776,7 @@ class Tool_phrase : public HumTool {
 		     Tool_phrase          (void);
 		    ~Tool_phrase          () {};
 
+		bool  run                 (HumdrumFileSet& infiles);
 		bool  run                 (HumdrumFile& infile);
 		bool  run                 (const string& indata, ostream& out);
 		bool  run                 (HumdrumFile& infile, ostream& out);
@@ -5608,15 +5811,16 @@ class Tool_pnum : public HumTool {
 		      Tool_pnum               (void);
 		     ~Tool_pnum               () {};
 
-		bool  run                      (HumdrumFile& infile);
-		bool  run                      (const string& indata, ostream& out);
-		bool  run                      (HumdrumFile& infile, ostream& out);
+		bool  run                     (HumdrumFileSet& infiles);
+		bool  run                     (HumdrumFile& infile);
+		bool  run                     (const string& indata, ostream& out);
+		bool  run                     (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void  initialize               (HumdrumFile& infile);
-		void  processFile              (HumdrumFile& infile);
+		void  initialize              (HumdrumFile& infile);
+		void  processFile             (HumdrumFile& infile);
 		std::string convertSubtokenToBase(const std::string& text);
-		void  convertTokenToBase       (HTp token);
+		void  convertTokenToBase      (HTp token);
 
 	private:
 		int  m_base = 12;
@@ -5637,6 +5841,7 @@ class Tool_recip : public HumTool {
 		      Tool_recip               (void);
 		     ~Tool_recip               () {};
 
+		bool  run                      (HumdrumFileSet& infiles);
 		bool  run                      (HumdrumFile& infile);
 		bool  run                      (const string& indata, ostream& out);
 		bool  run                      (HumdrumFile& infile, ostream& out);
@@ -5662,6 +5867,7 @@ class Tool_restfill : public HumTool {
 		         Tool_restfill         (void);
 		        ~Tool_restfill         () {};
 
+		bool        run                (HumdrumFileSet& infiles);
 		bool        run                (HumdrumFile& infile);
 		bool        run                (const string& indata, ostream& out);
 		bool        run                (HumdrumFile& infile, ostream& out);
@@ -5686,6 +5892,7 @@ class Tool_ruthfix : public HumTool {
 		         Tool_ruthfix      (void);
 		        ~Tool_ruthfix      () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -5703,6 +5910,7 @@ class Tool_satb2gs : public HumTool {
 		         Tool_satb2gs    (void);
 		        ~Tool_satb2gs    () {};
 
+		bool     run             (HumdrumFileSet& infiles);
 		bool     run             (HumdrumFile& infile);
 		bool     run             (const string& indata, ostream& out);
 		bool     run             (HumdrumFile& infile, ostream& out);
@@ -5844,6 +6052,7 @@ class Tool_simat : public HumTool {
 		         Tool_simat         (void);
 		        ~Tool_simat         () {};
 
+		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2);
 		bool     run                (const string& indata1, const string& indata2, ostream& out);
 		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2, ostream& out);
@@ -5865,6 +6074,7 @@ class Tool_slurcheck : public HumTool {
 		         Tool_slurcheck    (void);
 		        ~Tool_slurcheck    () {};
 
+		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
@@ -5883,6 +6093,7 @@ class Tool_spinetrace : public HumTool {
 		      Tool_spinetrace          (void);
 		     ~Tool_spinetrace          () {};
 
+		bool  run                      (HumdrumFileSet& infiles);
 		bool  run                      (HumdrumFile& infile);
 		bool  run                      (const string& indata, ostream& out);
 		bool  run                      (HumdrumFile& infile, ostream& out);
@@ -5902,6 +6113,7 @@ class Tool_tabber : public HumTool {
 		      Tool_tabber              (void);
 		     ~Tool_tabber              () {};
 
+		bool  run                      (HumdrumFileSet& infiles);
 		bool  run                      (HumdrumFile& infile);
 		bool  run                      (const string& indata, ostream& out);
 		bool  run                      (HumdrumFile& infile, ostream& out);
@@ -5921,6 +6133,7 @@ class Tool_tassoize : public HumTool {
 		         Tool_tassoize   (void);
 		        ~Tool_tassoize   () {};
 
+		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
 		bool     run                (const string& indata, ostream& out);
 		bool     run                (HumdrumFile& infile, ostream& out);
@@ -5952,6 +6165,7 @@ class Tool_transpose : public HumTool {
 		         Tool_transpose  (void);
 		        ~Tool_transpose  () {};
 
+		bool     run             (HumdrumFileSet& infiles);
 		bool     run             (HumdrumFile& infile);
 		bool     run             (const string& indata, ostream& out);
 		bool     run             (HumdrumFile& infile, ostream& out);
@@ -6058,6 +6272,7 @@ class Tool_trillspell : public HumTool {
 		      Tool_trillspell     (void);
 		     ~Tool_trillspell     () {};
 
+		bool  run                 (HumdrumFileSet& infiles);
 		bool  run                 (HumdrumFile& infile);
 		bool  run                 (const string& indata, ostream& out);
 		bool  run                 (HumdrumFile& infile, ostream& out);

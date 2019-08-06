@@ -666,8 +666,8 @@ private:
     // m_rkern == reverse mapping of Humdrum track to staff number..
     std::vector<int> m_rkern;
 
-    // m_infile == Humdrum file used for conversion.
-    hum::HumdrumFile m_infile;
+    // m_infiles == Humdrum file used for conversion.
+    hum::HumdrumFileSet m_infiles;
 
     // m_timesigdurs == Prevailing time signature duration of measure
     std::vector<hum::HumNum> m_timesigdurs;

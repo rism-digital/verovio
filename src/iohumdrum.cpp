@@ -381,8 +381,8 @@ bool HumdrumInput::ImportFile()
 #ifndef NO_HUMDRUM_SUPPORT
     try {
         m_doc->Reset();
-        hum::HumdrumFile &infile = m_infile;
-        bool result = infile.read(m_filename);
+        hum::HumdrumFileSet &infiles = m_infiles;
+        bool result = infiles.readFile(m_filename);
         if (!result) {
             return false;
         }
@@ -400,7 +400,7 @@ bool HumdrumInput::ImportFile()
 
 //////////////////////////////
 //
-// HumdrumInput::ImportString -- Read a Humdrum file from a text string.
+// HumdrumInput::ImportString -- Read a Humdrum file set from a text string.
 //
 
 bool HumdrumInput::ImportString(const std::string &content)
@@ -409,7 +409,6 @@ bool HumdrumInput::ImportString(const std::string &content)
 #ifndef NO_HUMDRUM_SUPPORT
     try {
         m_doc->Reset();
-        hum::HumdrumFile &infile = m_infile;
 
         // Auto-detect CSV Humdrum file. Maybe later move to the humlib parser.
         std::string exinterp;
@@ -447,10 +446,10 @@ bool HumdrumInput::ImportString(const std::string &content)
 
         bool result;
         if (comma <= tab) {
-            result = infile.readString(content);
+            result = m_infiles.readString(content);
         }
         else {
-            result = infile.readStringCsv(content);
+            result = m_infiles.readStringCsv(content);
         }
 
         if (!result) {
@@ -485,7 +484,9 @@ bool HumdrumInput::ImportString(const std::string &content)
 string HumdrumInput::GetHumdrumString()
 {
     stringstream tempout;
-    tempout << m_infile;
+    for (int i = 0; i < m_infiles.getCount(); i++) {
+        tempout << m_infiles[i];
+    }
     return tempout.str();
 }
 
@@ -502,28 +503,38 @@ string HumdrumInput::GetHumdrumString()
 
 bool HumdrumInput::convertHumdrum()
 {
-    hum::HumdrumFile &infile = m_infile;
-
     if (GetOutputFormat() == "humdrum") {
-        // allow for filtering in toolkit.
+        // allow for filtering within toolkit.
         return true;
+    }
+    if (m_infiles.getCount() == 0) {
+        return false;
     }
 
     // apply Humdrum tools if there are any filters in the file.
-    if (infile.hasFilters()) {
-        hum::Tool_filter filter;
-        filter.run(infile);
-        if (filter.hasHumdrumText()) {
-            infile.readString(filter.getHumdrumText());
-        }
-        else {
-            // humdrum structure not always correct in output from tools
-            // yet, so reload.
-            stringstream tempdata;
-            tempdata << infile;
-            infile.readString(tempdata.str());
+    hum::Tool_filter filter;
+    for (int i = 0; i < m_infiles.getCount(); i++) {
+        if (m_infiles[i].hasGlobalFilters()) {
+            filter.run(m_infiles[i]);
+            if (filter.hasHumdrumText()) {
+                m_infiles[i].readString(filter.getHumdrumText());
+            }
+            else {
+                // should have auto updated itself in the filter.
+            }
         }
     }
+
+    // Apply Humdrum tools to the entire set if they are
+    // at the universal level.
+    if (m_infiles.hasUniversalFilters()) {
+        filter.runUniversal(m_infiles);
+        if (filter.hasHumdrumText()) {
+            m_infiles.readString(filter.getHumdrumText());
+        }
+    }
+
+    hum::HumdrumFile &infile = m_infiles[0];
 
     m_multirest = analyzeMultiRest(infile);
     m_breaks = analyzeBreaks(infile);
@@ -724,7 +735,10 @@ void HumdrumInput::parseEmbeddedOptions(Doc &doc)
     if (!opts) {
         return;
     }
-    hum::HumdrumFile &infile = m_infile;
+    if (m_infiles.getCount() == 0) {
+        return;
+    }
+    hum::HumdrumFile &infile = m_infiles[0];
     hum::HumRegex hre;
     // find the last !!!verovio-parameter-groups: entry in the file
     // (only the last one will be read).
@@ -876,7 +890,7 @@ void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
 
 void HumdrumInput::createHeader()
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     std::vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
     std::vector<std::vector<string> > respPeople;
     getRespPeople(respPeople, references);
@@ -1420,7 +1434,7 @@ void HumdrumInput::prepareVerses()
 void HumdrumInput::prepareTimeSigDur()
 {
     std::vector<hum::HumNum> &sigdurs = m_timesigdurs;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     std::vector<hum::HTp> spinestarts;
 
     sigdurs.resize(infile.getLineCount());
@@ -1493,7 +1507,7 @@ void HumdrumInput::prepareTimeSigDur()
 void HumdrumInput::calculateReverseKernIndex()
 {
     std::vector<int> &rkern = m_rkern;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     rkern.resize(infile.getSpineCount() + 1);
@@ -1999,7 +2013,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
 void HumdrumInput::prepareHeaderFooter()
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     std::vector<std::pair<string, string> > biblist;
 
     std::vector<hum::HumdrumLine *> records = infile.getReferenceRecords();
@@ -2720,7 +2734,7 @@ int HumdrumInput::getStaffNumberLabel(hum::HTp spinestart)
 
 string HumdrumInput::getSystemDecoration(const string &tag)
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     for (int i = 0; i < infile.getLineCount(); ++i) {
         if (!infile[i].isReference()) {
             continue;
@@ -2786,7 +2800,7 @@ void HumdrumInput::addDefaultTempo(ScoreDef &m_scoreDef)
 {
     double sum = 0.0;
     int count = 0;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     for (int i = 0; i < infile.getLineCount(); ++i) {
         if (infile[i].getDuration() == 0) {
             continue;
@@ -3535,6 +3549,7 @@ void HumdrumInput::setClef(StaffDef *part, const std::string &clef)
 
 bool HumdrumInput::convertSystemMeasure(int &line)
 {
+    hum::HumdrumFile &infile = m_infiles[0];
     int startline = line;
     int endline = getMeasureEndLine(startline);
     if (endline < 0) {
@@ -3555,7 +3570,7 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
     bool founddatabefore = false;
     for (int q = startline; q >= 0; q--) {
-        if (m_infile[q].isData()) {
+        if (infile[q].isData()) {
             founddatabefore = true;
             break;
         }
@@ -3583,13 +3598,14 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
 void HumdrumInput::checkForLayoutBreak(int line)
 {
-    if (line >= m_infile.getLineCount()) {
+    hum::HumdrumFile &infile = m_infiles[0];
+    if (line >= infile.getLineCount()) {
         return;
     }
-    if (!m_infile[line].isBarline()) {
+    if (!infile[line].isBarline()) {
         return;
     }
-    hum::HTp token = m_infile.token(line, 0);
+    hum::HTp token = infile.token(line, 0);
     string group;
 
     group = token->getLayoutParameter("LB", "g");
@@ -3640,7 +3656,8 @@ std::string HumdrumInput::removeCommas(const std::string &input)
 
 void HumdrumInput::checkForOmd(int startline, int endline)
 {
-    if (m_omd > m_infile[startline].getDurationFromStart()) {
+    hum::HumdrumFile &infile = m_infiles[0];
+    if (m_omd > infile[startline].getDurationFromStart()) {
         return;
     }
     if (m_omd < 0) {
@@ -3651,7 +3668,6 @@ void HumdrumInput::checkForOmd(int startline, int endline)
     if (staffstarts.size() == 0) {
         return;
     }
-    hum::HumdrumFile &infile = m_infile;
     std::string key;
     std::string value;
     for (int i = startline; i <= endline; ++i) {
@@ -3718,7 +3734,7 @@ template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue, hu
 
 void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     const std::vector<int> &rkern = m_rkern;
     std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
@@ -3933,7 +3949,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
     if (!m_measure) {
         return;
     }
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     for (int i = startline; i < endline; ++i) {
         if (infile[i].isInterpretation()) {
             for (int j = 0; j < infile[i].getFieldCount(); ++j) {
@@ -4085,7 +4101,7 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
         return;
     }
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     bool aboveQ = true;
     hum::HumRegex hre;
     vector<std::string> nums;
@@ -4254,7 +4270,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
     }
     int xstaffindex;
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     for (int i = startline; i < endline; ++i) {
         if (!infile[i].isData()) {
             continue;
@@ -4313,7 +4329,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
     hum::HumRegex hre;
     int xstaffindex;
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     for (int i = startline; i < endline; ++i) {
         if (infile[i].isInterpretation()) {
             for (int j = 0; j < infile[i].getFieldCount(); j++) {
@@ -5517,7 +5533,7 @@ void HumdrumInput::handleGroupEnds(
 
 bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, int layerindex)
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     std::vector<hum::HumNum> &timesigdurs = m_timesigdurs;
     std::vector<int> &rkern = m_rkern;
     int staffindex = rkern[track];
@@ -7111,9 +7127,9 @@ void HumdrumInput::colorRest(Rest *rest, const std::string &token, int line, int
 
 string HumdrumInput::getSpineColor(int line, int field)
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     std::string output;
-    int track = m_infile.token(line, field)->getTrack();
+    int track = infile.token(line, field)->getTrack();
     if (!m_spine_color[track].empty()) {
         if ((m_spine_color[track] != "black") && (m_spine_color[track] != "#000000")
             && (m_spine_color[track] != "#000")) {
@@ -9077,7 +9093,7 @@ void HumdrumInput::insertMeterSigElement(
 void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
 
     hum::HTp keysig = NULL;
     hum::HTp timesig = NULL;
@@ -14066,11 +14082,13 @@ std::vector<int> HumdrumInput::getStaffLayerCounts()
 
 void HumdrumInput::setupSystemMeasure(int startline, int endline)
 {
+    hum::HumdrumFile &infile = m_infiles[0];
+
     if (m_oclef.size() || m_omet.size()) {
         storeOriginalClefMensurationApp();
     }
 
-    if (m_infile[startline].getDurationFromStart() > 0) {
+    if (infile[startline].getDurationFromStart() > 0) {
         addSystemKeyTimeChange(startline, endline);
     }
 
@@ -14275,7 +14293,7 @@ void HumdrumInput::storeOriginalClefMensurationApp()
 
 void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
 
     std::string endbar = infile[endline].getTokenString(0);
     std::string startbar = infile[startline].getTokenString(0);
@@ -14352,7 +14370,7 @@ void HumdrumInput::setNextLeftBarStyle(data_BARRENDITION style)
 
 int HumdrumInput::getMeasureEndLine(int startline)
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
     int endline = infile.getLineCount() - 1;
     bool foundDataQ = false;
     int i = startline + 1;
@@ -14384,6 +14402,7 @@ int HumdrumInput::getMeasureEndLine(int startline)
 
 void HumdrumInput::setupMeiDocument()
 {
+    hum::HumdrumFile &infile = m_infiles[0];
     m_doc->Reset();
     m_doc->SetType(Raw);
     // The mdiv
@@ -14395,7 +14414,7 @@ void HumdrumInput::setupMeiDocument()
     mdiv->AddChild(m_score);
     // the section
     Section *section = new Section();
-    hum::HTp starting = m_infile.getTrackStart(1);
+    hum::HTp starting = infile.getTrackStart(1);
     if (starting) {
         section->SetUuid(getLocationId(section, starting, -1));
         // Disable temporarily: https://github.com/rism-ch/verovio/issues/1125
@@ -14437,7 +14456,7 @@ void HumdrumInput::clear()
 
 int HumdrumInput::getMeasureNumber(int startline, int endline)
 {
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
 
     if (infile[startline].getTokenString(0).compare(0, 2, "**") == 0) {
         // create hum::HumdrumFile.hasPickup() function and uncomment out below:
@@ -15553,7 +15572,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 void HumdrumInput::prepareSections()
 {
     std::vector<hum::HTp> &sectionlabels = m_sectionlabels;
-    hum::HumdrumFile &infile = m_infile;
+    hum::HumdrumFile &infile = m_infiles[0];
 
     sectionlabels.resize(infile.getLineCount());
     for (int i = 0; i < (int)sectionlabels.size(); i++) {
