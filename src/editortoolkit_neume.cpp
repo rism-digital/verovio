@@ -177,6 +177,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse change skew action");
     }
+    else if (action == "changeStaff") {
+        std::string elementId;
+        if(this->ParseChangeStaffAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->ChangeStaff(elementId);
+        }
+        LogWarning("Could not parse change staff action");
+    }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
@@ -2395,7 +2402,7 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     return true;
 }
 
-bool EditorToolkitNeume::ChangeStaff(std::string elementId, std::string newStaffId)
+bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 {
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
@@ -2405,22 +2412,19 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId, std::string newStaff
         return false;
     }
 
+    if (m_doc->GetType() != Facs) {
+        LogWarning("Resizing is only available in facsimile mode.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Resizing is only available in facsimile mode.");
+        return false;
+    }
+
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(element);
     if (element == NULL) {
         LogError("No element exists with ID '%s'.", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "No element exists with ID" + elementId + ".")
-        return false;
-    }
-
-    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(newStaffId));
-    assert(staff);
-    if (staff == NULL) {
-        LogError("Either no element exists with ID '%s' or it is not a staff.", newStaffId.c_str());
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Either no element exists with ID '" +
-            newStaffId + "' or it is not a staff.");
+        m_infoObject.import("message", "No element exists with ID" + elementId + ".");
         return false;
     }
 
@@ -2432,7 +2436,54 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId, std::string newStaff
         return false;
     }
 
-    Staff *parent = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    ArrayOfObjects staves;
+    ClassIdComparison ac(STAFF);
+    m_doc->FindAllChildByComparison(&staves, &ac);
+
+    ClosestBB comp;
+    
+
+    if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
+        comp.x = element->GetFacsimileInterface()->GetZone()->GetUlx();
+        comp.y = element->GetFacsimileInterface()->GetZone()->GetUly();
+    }
+
+    else if (element->Is(SYLLABLE)) {
+        int ulx, uly, lrx, lry;
+        if (!element->GenerateBoundingBox(&ulx, &uly, &lrx, &lry)) {
+            LogError("Couldn't generate bounding box for syllable.");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Couldn't generate bounding box for syllable.");
+            return false;
+        }
+        comp.x = (lrx + ulx) / 2;
+        comp.y = (uly + lry) / 2;
+    }
+
+    else {
+        LogError("This element does not have a facsimile.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "This element does not have a facsimile.");
+        return false;
+    }
+
+    Staff *staff;
+
+    if (staves.size() > 0) {
+        LogMessage("Number of staves: %d", staves.size());
+        LogMessage("comp.x and comp.y: (%d, %d)", comp.x, comp.y);
+        std::sort(staves.begin(), staves.end(), comp);
+        staff = dynamic_cast<Staff *>(staves.at(0));
+        LogMessage("Staff UUID: %s", staff->GetUuid().c_str());
+    }
+    else {
+        LogError("Could not find any staves. This should not happen");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not find any staves. This should not happen");
+        return false;
+    }
+
+    Layer *parent = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
     assert(parent);
     if (parent == NULL) {
         LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
@@ -2441,7 +2492,16 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId, std::string newStaff
         return false;
     }
 
-    element->MoveItselfTo(staff);
+    Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
+    assert(LAYER);
+    if (layer == NULL) {
+        LogError("Couldn't find layer child of staff. This should not happen");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Couldn't find layer child of staff. This should not happen");
+        return false;
+    }
+
+    element->MoveItselfTo(layer);
     staff->ReorderByXPos();
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
@@ -2449,7 +2509,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId, std::string newStaff
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
     m_infoObject.import("elementId", elementId);
-    m_infoObject.import("newStaffId", newStaffId);
+    m_infoObject.import("newStaffId", staff->GetUuid());
     return true;
 }
 
@@ -2685,12 +2745,10 @@ bool EditorToolkitNeume::ParseChangeSkewAction(
 }
 
 bool EditorToolkitNeume::ParseChangeStaffAction(
-    jsonxx::Object param, std::string *elementId, std::string *newStaffId)
+    jsonxx::Object param, std::string *elementId)
 {
     if(!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
-    if(!param.has<jsonxx::String>("newStaffId")) return false;
-    (*newStaffId) = param.get<jsonxx::String>("newStaffId");
 
     return true;
 }
