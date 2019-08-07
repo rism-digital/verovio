@@ -69,7 +69,8 @@ class Beam : public LayerElement,
              public ObjectListInterface,
              public DrawingListInterface,
              public AttColor,
-             public AttBeamedWith {
+             public AttBeamedWith,
+             public AttBeamRend {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

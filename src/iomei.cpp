@@ -1383,6 +1383,7 @@ void MeiOutput::WriteBeam(pugi::xml_node currentNode, Beam *beam)
     WriteLayerElement(currentNode, beam);
     beam->WriteColor(currentNode);
     beam->WriteBeamedWith(currentNode);
+    beam->WriteBeamRend(currentNode);
 }
 
 void MeiOutput::WriteBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
@@ -4141,6 +4142,7 @@ bool MeiInput::ReadBeam(Object *parent, pugi::xml_node beam)
 
     vrvBeam->ReadColor(beam);
     vrvBeam->ReadBeamedWith(beam);
+    vrvBeam->ReadBeamRend(beam);
 
     parent->AddChild(vrvBeam);
     ReadUnsupportedAttr(beam, vrvBeam);
