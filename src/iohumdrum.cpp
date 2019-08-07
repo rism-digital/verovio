@@ -15521,6 +15521,9 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     // Expand backwards to include a whole-measure rest with a
     // measure that has text.
     for (int i = 0; i < (int)wholerest.size() - 1; i++) {
+        if (bardur[i] != bardur[i + 1]) {
+            continue;
+        }
         if ((textrest[i] == 1) && (wholerest[i + 1] >= 1)) {
             wholerest[i] = wholerest[i + 1] + 1;
             wholerest[i + 1] = -1;
@@ -15540,8 +15543,8 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     }
 
     // for (int i = 0; i < infile.getLineCount(); ++i) {
-    //     cout << infile[i] << "\t" << output[i] << "\n";
-    // }
+    //    cout << infile[i] << "\t" << output[i] << "\n";
+    //}
     // Example analysis, with measure 4 staring a rest with num="6".
     // Measures 5-9 marked as whole-measure rests which will be merged into
     // the multi rest.
