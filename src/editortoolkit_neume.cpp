@@ -2395,6 +2395,64 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     return true;
 }
 
+bool EditorToolkitNeume::ChangeStaff(std::string elementId, std::string newStaffId)
+{
+    m_infoObject.reset();
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    assert(element);
+    if (element == NULL) {
+        LogError("No element exists with ID '%s'.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No element exists with ID" + elementId + ".")
+        return false;
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(newStaffId));
+    assert(staff);
+    if (staff == NULL) {
+        LogError("Either no element exists with ID '%s' or it is not a staff.", newStaffId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Either no element exists with ID '" +
+            newStaffId + "' or it is not a staff.");
+        return false;
+    }
+
+    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
+        LogError("Element is of type %s, but only Syllables, Custos, and Clefs can change staves.", element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Element is of type " + element->GetClassName() + 
+            ", but only Syllables, Custos, and Clefs can change staves.");
+        return false;
+    }
+
+    Staff *parent = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    assert(parent);
+    if (parent == NULL) {
+        LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Couldn't find staff parent of element with id " + elementId);
+        return false;
+    }
+
+    element->MoveItselfTo(staff);
+    staff->ReorderByXPos();
+    parent->ClearRelinquishedChildren();
+    parent->ReorderByXPos();
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    m_infoObject.import("elementId", elementId);
+    m_infoObject.import("newStaffId", newStaffId);
+    return true;
+}
+
 bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -2622,6 +2680,17 @@ bool EditorToolkitNeume::ParseChangeSkewAction(
     (*dy) = param.get<jsonxx::Number>("dy");
     if(!param.has<jsonxx::Boolean>("rightSide")) return false;
     (*rightSide) = param.get<jsonxx::Boolean>("rightSide");
+
+    return true;
+}
+
+bool EditorToolkitNeume::ParseChangeStaffAction(
+    jsonxx::Object param, std::string *elementId, std::string *newStaffId)
+{
+    if(!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    if(!param.has<jsonxx::String>("newStaffId")) return false;
+    (*newStaffId) = param.get<jsonxx::String>("newStaffId");
 
     return true;
 }
