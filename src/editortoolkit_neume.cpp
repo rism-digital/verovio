@@ -783,12 +783,25 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             return false;
         }
 
-        nc->SetOct(3);
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            nc->SetPname(PITCHNAME_c);
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            nc->SetPname(PITCHNAME_f);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        ulx -= noteWidth / 2;
+        uly -= noteHeight / 2;
+        // Set up facsimile
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth);
+        zone->SetLry(uly + noteHeight);
+
+        if (!AdjustPitchFromPosition(nc, clef)) {
+            delete syllable;
+            delete neume;
+            delete nc;
+            LogError("Failed to set pitch.");
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to set pitch.");
+            return false;
         }
 
         // Set as inclinatum or virga (if necessary), or get contour for grouping
@@ -809,23 +822,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 contour = it->second;
             }
         }
-
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-        // Two pitches per difference in lines between total staff lines and clef position. Convert to vu. Find difference between
-        // top staff position and note position, then apply offset due to skew. Divide by staffSize to go from vu to pitches.
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly)
-            - ((ulx - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
-
-        nc->AdjustPitchByOffset(pitchDifference);
-        ulx -= noteWidth / 2;
-        uly -= noteHeight / 2;
-        // Set up facsimile
-        zone->SetUlx(ulx);
-        zone->SetUly(uly);
-        zone->SetLrx(ulx + noteWidth);
-        zone->SetLry(uly + noteHeight);
 
         //If inserting grouping, add the remaining nc children to the neume.
         if(contour != ""){
@@ -2623,6 +2619,55 @@ bool EditorToolkitNeume::ParseChangeSkewAction(
     if(!param.has<jsonxx::Boolean>("rightSide")) return false;
     (*rightSide) = param.get<jsonxx::Boolean>("rightSide");
 
+    return true;
+}
+
+bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef = NULL) {
+    Staff *staff = dynamic_cast<Staff *>(obj->GetFirstParent(STAFF));
+    assert(staff);
+    if (clef == NULL) {
+        Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+        clef = layer->GetClef(obj);
+    }
+    assert(clef);
+
+    // Check interfaces
+    if ((obj->GetPitchInterface() == NULL) || (obj->GetFacsimileInterface() == NULL)) {
+        return false;
+    }
+    PitchInterface *pi = obj->GetPitchInterface();
+    FacsimileInterface *fi = obj->GetFacsimileInterface();
+
+    // Check for facsimile
+    if (!fi->HasFacs() || !staff->HasFacs()) {
+        return false;
+    }
+
+    // Reset pitch to be "on clef"
+    if (clef->GetShape() == CLEFSHAPE_C) {
+        pi->SetPname(PITCHNAME_c);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_F) {
+        pi->SetPname(PITCHNAME_f);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_G) {
+        pi ->SetPname(PITCHNAME_g);
+    }
+    else {
+        return false;
+    }
+    pi->SetOct(3);
+
+    int centerY = (fi->GetZone()->GetUly() + fi->GetZone()->GetLry()) / 2;
+    int centerX = (fi->GetZone()->GetUlx() + fi->GetZone()->GetLrx()) / 2;
+
+    const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int pitchDifference = round((double) (staff->GetZone()->GetUly() +
+        (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
+        centerY - ((centerX - staff->GetZone()->GetUlx()) *
+        tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
+
+    pi->AdjustPitchByOffset(pitchDifference);
     return true;
 }
 
