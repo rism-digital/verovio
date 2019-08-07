@@ -96,7 +96,7 @@ struct ClosestBB {
 
     int distanceToBB(int ulx, int uly, int lrx, int lry, double skew = 0)
     {
-        int offset = (ulx - x) * tan(skew * M_PI / 180.0);
+        int offset = (x - ulx) * tan(skew * M_PI / 180.0);
         uly = uly - offset;
         lry = lry - offset;
         int xDiff = std::max(

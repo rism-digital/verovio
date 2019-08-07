@@ -1639,7 +1639,7 @@ bool Object::GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry)
             *ulx = std::min(*ulx, zone->GetUlx());
             *uly = std::min(*uly, zone->GetUly());
             *lrx = std::max(*lrx, zone->GetLrx());
-            *lry = std::max(*lrx, zone->GetLry());
+            *lry = std::max(*lry, zone->GetLry());
             result |= true;
         }
     }
