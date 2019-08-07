@@ -11085,20 +11085,25 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         int staffnum = staffindex + 1 + staffadj;
         setStaff(chord, staffnum);
     }
-    string tstring;
     int k;
     bool isnote = false;
     bool isrest = false;
     bool isrecip = false;
     bool allinvis = true;
+
+    std::vector<std::string> tstrings = token->getSubtokens();
+    for (int i = 0; i < (int)tstrings.size(); i++) {
+        if (tstrings[i].find("yy") == std::string::npos) {
+            allinvis = false;
+            break;
+        }
+    }
+
     for (int j = 0; j < scount; ++j) {
         isnote = false;
         isrest = false;
         isrecip = false;
-        tstring = token->getSubtoken(j);
-        if (token->find("yy") == std::string::npos) {
-            allinvis = false;
-        }
+        std::string tstring = tstrings[j];
         if (tstring == "") {
             continue;
         }
@@ -11129,6 +11134,14 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         if (isrecip && !isnote) {
             // <space> not allowed in <chord>
             // (but chords are allowed in <space>es somehow...)
+            continue;
+        }
+
+        // Suppress conversion of invisible notes.  This is becuase
+        // verovio keeps the the stem visible for the invisible notes
+        // in a chord.  Maybe allow when stems portions are also
+        // invisible.
+        if ((!allinvis) && (tstrings[j].find("yy") != std::string::npos)) {
             continue;
         }
 
