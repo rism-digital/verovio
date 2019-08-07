@@ -690,9 +690,9 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
         fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(y);
+        fi->GetZone()->SetUly(ToDeviceContextY(y));
         fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(y - noteHeight);
+        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
     }
 
     dc->EndGraphic(element, this);
@@ -773,9 +773,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
         fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(actualY);
+        fi->GetZone()->SetUly(ToDeviceContextY(actualY));
         fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(actualY - noteHeight);
+        fi->GetZone()->SetLry(ToDeviceContextY(actualY - noteHeight));
     }
 
     dc->EndGraphic(element, this);
