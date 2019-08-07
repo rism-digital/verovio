@@ -2431,7 +2431,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
         LogError("Element is of type %s, but only Syllables, Custos, and Clefs can change staves.", element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Element is of type " + element->GetClassName() + 
+        m_infoObject.import("message", "Element is of type " + element->GetClassName() +
             ", but only Syllables, Custos, and Clefs can change staves.");
         return false;
     }
@@ -2441,7 +2441,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     m_doc->FindAllChildByComparison(&staves, &ac);
 
     ClosestBB comp;
-    
+
 
     if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
         comp.x = element->GetFacsimileInterface()->GetZone()->GetUlx();
@@ -2501,10 +2501,52 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
+    if (layer == parent) {
+        m_infoObject.import("status", "WARNING");
+        m_infoObject.import("message", "Moving to the same staff as before.");
+        m_infoObject.import("elementId", elementId);
+        m_infoObject.import("newStaffId", staff->GetUuid());
+        return true;
+    }
+
+    LogMessage("Initial: %d", layer->GetChildCount());
     element->MoveItselfTo(layer);
     staff->ReorderByXPos();
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
+    LogMessage("Final: %d", layer->GetChildCount());
+
+    // Adjust pitch/staff line.
+    if (element->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(element);
+        assert(custos);
+        Clef *clef = layer->GetClef(custos);
+        if (clef == NULL) {
+
+        }
+        custos->SetOct(3);
+        if (clef->GetShape() == CLEFSHAPE_C) {
+            custos->SetPname(PITCHNAME_c);
+        }
+        else if (clef->GetShape() == CLEFSHAPE_F) {
+            custos->SetPname(PITCHNAME_f);
+        }
+
+        // Calculate pitch offset
+        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (comp.y) +
+            - ((comp.x - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
+        custos->AdjustPitchByOffset(pitchDifference);
+    } else if (element->Is(CLEF)) {
+        /*
+        int yDiff = comp.y - staff->GetZone()->GetUly();
+        yDiff += ((comp.x - staff->GetZone()->GetUlx())) * tan(staff->GetDrawingSkew() * M_PI / 180.0);
+        int clefLine = staff->m_drawingLines - round((double) yDiff / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
+        dynamic_cast<Clef *>(element)->SetLine(clefLine);
+        */
+    } else if (element->Is(SYLLABLE)) {
+        // Apply pitch interface changes to children
+    }
 
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
