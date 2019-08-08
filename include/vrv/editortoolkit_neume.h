@@ -85,6 +85,7 @@ protected:
      */
     ///@{
     bool AdjustPitchFromPosition(LayerElement *obj, Clef *clef = NULL);
+    bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
     ///@}
 
 private:

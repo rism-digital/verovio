@@ -297,9 +297,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
                     continue;
                 }
-                Zone *zone = (*it)->GetFacsimileInterface()->GetZone();
-                int yShift = pitchDifference * staff->m_drawingStaffSize
-                    + x * tan(staff->GetDrawingSkew() * M_PI / 180.0);
                 (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
                     + x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
             }
@@ -2516,12 +2513,13 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     }
 
     // for pitch modification if the element is a clef
+    ClassIdComparison cic(CLEF);
 
-    Clef *previousClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, element));
+    Clef *previousClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, element));
     if (previousClefBefore == NULL) {
         previousClefBefore = layer->GetCurrentClef();
     }
-    Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, element));
+    Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
 
     element->MoveItselfTo(layer);
     layer->ReorderByXPos();
@@ -2541,37 +2539,43 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             m_infoObject.import("newStaffId", staff->GetUuid());
             return false;
         }
-    } 
+    }
     else if (element->Is(CLEF)) {
-        // apply pitch interface changes to any elements whose clef may have changed
+        // Adjust clefline
+        if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to set clef line from facsimile.");
+            return false;
+        }
 
+        // apply pitch interface changes to any elements whose clef may have changed
         ArrayOfObjects pitchChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
-        Clef *previousClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, element));
+        Clef *previousClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, element));
         if (previousClefAfter == NULL) {
             previousClefAfter = layer->GetCurrentClef();
         }
-        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, element));
+        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
 
         int indexDiff = staff->GetIdx() - sParent->GetIdx();
 
         if (indexDiff < 0) {
-            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefAfter, 
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefAfter,
                 (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
         }
         else {
-            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefBefore, 
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefBefore,
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
         }
         for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
+            LogMessage("%s", (*it)->GetUuid().c_str());
             if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
                 m_infoObject.import("status", "FAILURE");
                 m_infoObject.import("message", "Failed to properly set pitch.");
                 return false;
             }
         }
-
-    } 
+    }
     else if (element->Is(SYLLABLE)) {
         // Apply pitch interface changes to children
         ArrayOfObjects pitchChildren;
@@ -2847,6 +2851,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
     }
     assert(clef);
 
+    LogMessage("Clef %s", clef->GetUuid().c_str());
+
     // Check interfaces
     if ((obj->GetPitchInterface() == NULL) || (obj->GetFacsimileInterface() == NULL)) {
         return false;
@@ -2886,5 +2892,27 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
     pi->AdjustPitchByOffset(pitchDifference);
     return true;
 }
+bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
+{
+    assert(clef);
+
+    if (staff == NULL) {
+        staff = dynamic_cast<Staff *>(clef->GetFirstParent(STAFF));
+    }
+    assert(staff);
+
+    if (!clef->HasFacs() || !staff->HasFacs()) {
+        return false;
+    }
+
+    const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
+        + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
+        tan(staff->GetDrawingSkew() * M_PI / 180.0);
+    int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
+    clef->SetLine(clefLine);
+    return true;
+}
+
 
 }// namespace vrv
