@@ -2568,7 +2568,6 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
         }
         for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
-            LogMessage("%s", (*it)->GetUuid().c_str());
             if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
                 m_infoObject.import("status", "FAILURE");
                 m_infoObject.import("message", "Failed to properly set pitch.");
@@ -2851,8 +2850,6 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
     }
     assert(clef);
 
-    LogMessage("Clef %s", clef->GetUuid().c_str());
-
     // Check interfaces
     if ((obj->GetPitchInterface() == NULL) || (obj->GetFacsimileInterface() == NULL)) {
         return false;
@@ -2880,8 +2877,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
     }
     pi->SetOct(3);
 
-    int centerY = (fi->GetZone()->GetUly() + fi->GetZone()->GetLry()) / 2;
-    int centerX = (fi->GetZone()->GetUlx() + fi->GetZone()->GetLrx()) / 2;
+    int centerY = fi->GetZone()->GetUly();
+    int centerX = fi->GetZone()->GetUlx();
 
     const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int pitchDifference = round((double) (staff->GetZone()->GetUly() +
