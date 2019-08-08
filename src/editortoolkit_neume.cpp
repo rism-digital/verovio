@@ -2517,22 +2517,14 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         Custos *custos = dynamic_cast<Custos *>(element);
         assert(custos);
         Clef *clef = layer->GetClef(custos);
-        if (clef == NULL) {
 
+        if (!AdjustPitchFromPosition(custos, clef)) {
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to properly set pitch.");
+            m_infoObject.import("elementId", custos->GetUuid());
+            m_infoObject.import("newStaffId", staff->GetUuid());
+            return false;
         }
-        custos->SetOct(3);
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            custos->SetPname(PITCHNAME_c);
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            custos->SetPname(PITCHNAME_f);
-        }
-
-        // Calculate pitch offset
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (comp.y) +
-            - ((comp.x - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
-        custos->AdjustPitchByOffset(pitchDifference);
     } else if (element->Is(CLEF)) {
         /*
         int yDiff = comp.y - staff->GetZone()->GetUly();
