@@ -80,6 +80,13 @@ protected:
     bool ParseChangeStaffAction(jsonxx::Object param, std::string *elementId);
     ///@}
 
+    /**
+     * Helper functions for editor actions.
+     */
+    ///@{
+    bool AdjustPitchFromPosition(LayerElement *obj, Clef *clef);
+    ///@}
+
 private:
     jsonxx::Object m_infoObject;
 };
