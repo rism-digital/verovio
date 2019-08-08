@@ -2489,15 +2489,16 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     }
 
     Layer *parent = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+    Staff *sParent = dynamic_cast<Staff *>(parent->GetFirstParent(STAFF));
     assert(parent);
-    if (parent == NULL) {
+    if (parent == NULL || sParent == NULL) {
         LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Couldn't find staff parent of element with id " + elementId);
         return false;
     }
 
-    Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     assert(LAYER);
     if (layer == NULL) {
         LogError("Couldn't find layer child of staff. This should not happen");
@@ -2514,8 +2515,16 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return true;
     }
 
+    // for pitch modification if the element is a clef
+
+    Clef *previousClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, element));
+    if (previousClefBefore == NULL) {
+        previousClefBefore = layer->GetCurrentClef();
+    }
+    Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, element));
+
     element->MoveItselfTo(layer);
-    staff->ReorderByXPos();
+    layer->ReorderByXPos();
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
 
@@ -2532,13 +2541,38 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             m_infoObject.import("newStaffId", staff->GetUuid());
             return false;
         }
-    } else if (element->Is(CLEF)) {
+    } 
+    else if (element->Is(CLEF)) {
         // apply pitch interface changes to any elements whose clef may have changed
-        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, element));
-        ArrayOfObjects needChange;
-        ArrayOfObjects pitchChildren;
 
-    } else if (element->Is(SYLLABLE)) {
+        ArrayOfObjects pitchChildren;
+        InterfaceComparison ic(INTERFACE_PITCH);
+        Clef *previousClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, element));
+        if (previousClefAfter == NULL) {
+            previousClefAfter = layer->GetCurrentClef();
+        }
+        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, element));
+
+        int indexDiff = staff->GetIdx() - sParent->GetIdx();
+
+        if (indexDiff < 0) {
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefAfter, 
+                (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+        }
+        else {
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefBefore, 
+                (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
+        }
+        for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
+            if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to properly set pitch.");
+                return false;
+            }
+        }
+
+    } 
+    else if (element->Is(SYLLABLE)) {
         // Apply pitch interface changes to children
         ArrayOfObjects pitchChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
