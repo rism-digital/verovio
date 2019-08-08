@@ -294,11 +294,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             element->FindAllChildByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
                 // dont change the text bbox position
-                if ((*it)->Is(SYL)) {
+                if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
                     continue;
                 }
+                Zone *zone = (*it)->GetFacsimileInterface()->GetZone();
+                LogMessage("%s (%s): InitialLry: %d", zone->GetUuid().c_str(), (*it)->GetClassName().c_str(), zone->GetLry());
+                int yShift = pitchDifference * staff->m_drawingStaffSize
+                    + x * tan(staff->GetDrawingSkew() * M_PI / 180.0);
                 (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
                     + x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
+                LogMessage("yShift is %d", yShift);
+                LogMessage("%s: FinalLry: %d", zone->GetUuid().c_str(), zone->GetLry());
             }
         }
 
