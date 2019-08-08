@@ -298,13 +298,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                     continue;
                 }
                 Zone *zone = (*it)->GetFacsimileInterface()->GetZone();
-                LogMessage("%s (%s): InitialLry: %d", zone->GetUuid().c_str(), (*it)->GetClassName().c_str(), zone->GetLry());
                 int yShift = pitchDifference * staff->m_drawingStaffSize
                     + x * tan(staff->GetDrawingSkew() * M_PI / 180.0);
                 (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
                     + x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
-                LogMessage("yShift is %d", yShift);
-                LogMessage("%s: FinalLry: %d", zone->GetUuid().c_str(), zone->GetLry());
             }
         }
 
@@ -956,9 +953,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
-            PitchInterface *pi = (*it)->GetPitchInterface();
-            assert(pi);
-            pi->AdjustPitchForNewClef(previousClef, clef);
+            if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to properly set pitch.");
+                return false;
+            }
         }
     }
     else if (elementType == "custos") {
@@ -1428,6 +1427,14 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
+            if (m_doc->GetType() == Facs) {
+                if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                    m_infoObject.import("status", "FAILURE");
+                    m_infoObject.import("message", "Failed to properly set pitch.");
+                    return false;
+                }
+                continue;
+            }
             PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
             // removing the current clef, and so the new clef for all of these elements is previousClef
@@ -1889,7 +1896,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // LogMessage("%d", sortedSyllables.size());
     if (sortedSyllables.size()) {
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
-            LogMessage((*it)->GetClassName().c_str());
             Syllable *syllable = dynamic_cast<Syllable *>(*it);
             if (clefsBefore[syllable] != newClef) {
                 syllable->FindAllChildByComparison(&pitchedChildren, &pitchComp);
@@ -2472,11 +2478,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     Staff *staff;
 
     if (staves.size() > 0) {
-        LogMessage("Number of staves: %d", staves.size());
-        LogMessage("comp.x and comp.y: (%d, %d)", comp.x, comp.y);
         std::sort(staves.begin(), staves.end(), comp);
         staff = dynamic_cast<Staff *>(staves.at(0));
-        LogMessage("Staff UUID: %s", staff->GetUuid().c_str());
     }
     else {
         LogError("Could not find any staves. This should not happen");
@@ -2511,12 +2514,10 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return true;
     }
 
-    LogMessage("Initial: %d", layer->GetChildCount());
     element->MoveItselfTo(layer);
     staff->ReorderByXPos();
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
-    LogMessage("Final: %d", layer->GetChildCount());
 
     // Adjust pitch/staff line.
     if (element->Is(CUSTOS)) {
@@ -2532,14 +2533,24 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             return false;
         }
     } else if (element->Is(CLEF)) {
-        /*
-        int yDiff = comp.y - staff->GetZone()->GetUly();
-        yDiff += ((comp.x - staff->GetZone()->GetUlx())) * tan(staff->GetDrawingSkew() * M_PI / 180.0);
-        int clefLine = staff->m_drawingLines - round((double) yDiff / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-        dynamic_cast<Clef *>(element)->SetLine(clefLine);
-        */
+        // apply pitch interface changes to any elements whose clef may have changed
+        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, element));
+        ArrayOfObjects needChange;
+        ArrayOfObjects pitchChildren;
+
     } else if (element->Is(SYLLABLE)) {
         // Apply pitch interface changes to children
+        ArrayOfObjects pitchChildren;
+        InterfaceComparison ic(INTERFACE_PITCH);
+        element->FindAllChildByComparison(&pitchChildren, &ic);
+
+        for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
+            if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to properly set pitch.");
+                return false;
+            }
+        }
     }
 
     m_infoObject.import("status", "OK");
@@ -2789,12 +2800,16 @@ bool EditorToolkitNeume::ParseChangeStaffAction(
     return true;
 }
 
-bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef = NULL) {
+bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) {
     Staff *staff = dynamic_cast<Staff *>(obj->GetFirstParent(STAFF));
     assert(staff);
     if (clef == NULL) {
-        Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-        clef = layer->GetClef(obj);
+        ClassIdComparison ac(CLEF);
+        clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+        if (clef == NULL) {
+            Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+            clef = layer->GetClef(obj);
+        }
     }
     assert(clef);
 

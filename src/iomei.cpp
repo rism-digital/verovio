@@ -5711,8 +5711,6 @@ bool MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
     vrvZone->ReadCoordinated(zone);
     vrvZone->ReadTyped(zone);
     parent->AddChild(vrvZone);
-    LogMessage("%s: %d, %d, %d, %d", vrvZone->GetUuid().c_str(), vrvZone->GetUlx(),
-        vrvZone->GetUly(), vrvZone->GetLrx(), vrvZone->GetLry());
     return true;
 }
 
