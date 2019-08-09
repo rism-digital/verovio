@@ -307,6 +307,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac,
             (syllable != NULL) ? syllable : element));
 
+        if (clefAfter == NULL) {
+            clefAfter = layer->GetCurrentClef();
+        }
+
         if (element->HasInterface(INTERFACE_PITCH)) {
             element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
             element->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
@@ -315,7 +319,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 ArrayOfObjects siblings;
                 syllable->FindAllChildByComparison(&siblings, &pitchIC);
                 for (auto it = siblings.begin(); it != siblings.end(); ++it) {
-                    if (*it == element) {
+                    if ((*it)->GetUuid() == element->GetUuid()) {
                         continue;
                     }
                     (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
@@ -440,12 +444,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
         Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
-        if (precedingClefBefore == NULL) {
-            precedingClefBefore = layer->GetCurrentClef();
-        }
-
         m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefBefore, &ic, clef,
-            (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+            (nextClefBefore != layer->GetCurrentClef()) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
         m_doc->GetDrawingPage()->FindAllChildBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
 
@@ -460,10 +460,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         Clef *precedingClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
         Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
-
-        if (precedingClefAfter == NULL) {
-            precedingClefAfter = layer->GetCurrentClef();
-        }
 
         // case 1
         if (precedingClefAfter == precedingClefBefore && nextClefAfter == nextClefBefore) {
@@ -484,7 +480,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                     std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
 
                 for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
-                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(precedingClefBefore, clef);
+                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                        (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef(), clef);
                 }
 
                 if (lineDiff != 0) {
@@ -501,7 +498,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                     std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
 
                 for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
-                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClefBefore);
+                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                        clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
                 }
 
                 if (lineDiff != 0) {
@@ -545,13 +543,15 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
 
             for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
-                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClefBefore);
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                    clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
             }
 
             clef->SetLine(clefLine);
 
             for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
-                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(precedingClefAfter, clef);
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                    (precedingClefAfter != NULL) ? precedingClefAfter : layer->GetCurrentClef(), clef);
             }
 
         }
@@ -1380,7 +1380,8 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(obj);
-    bool result, isNeumeOrNc, isNc, isClef;
+    bool result = false;
+    bool isNeumeOrNc, isNc, isClef;
     isNeumeOrNc = (obj->Is(NC) || obj->Is(NEUME));
     isNc = obj->Is(NC);
     isClef = obj->Is(CLEF);
@@ -1423,8 +1424,17 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef,
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
+        result = parent->DeleteChild(obj);
+
+        if (!result) {
+            LogError("Failed to delete the desired element (%s)", elementId.c_str());
+            m_infoObject.reset();
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to delete the desired element (" + elementId + ").");
+            return false;
+        }   
+
         for (auto it = elements.begin(); it != elements.end(); ++it) {
-            LogMessage((*it)->GetUuid().c_str());
             if (m_doc->GetType() == Facs) {
                 if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
                     m_infoObject.import("status", "FAILURE");
@@ -1440,7 +1450,11 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         }
 
     }
-    result = parent->DeleteChild(obj);
+
+    if (!result) {
+        result = parent->DeleteChild(obj);
+    }
+
     if (!result) {
         LogError("Failed to delete the desired element (%s)", elementId.c_str());
         m_infoObject.reset();
@@ -2531,9 +2545,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     if (element->Is(CUSTOS)) {
         Custos *custos = dynamic_cast<Custos *>(element);
         assert(custos);
-        Clef *clef = layer->GetClef(custos);
 
-        if (!AdjustPitchFromPosition(custos, clef)) {
+        if (!AdjustPitchFromPosition(custos)) {
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to properly set pitch.");
             m_infoObject.import("elementId", custos->GetUuid());
@@ -2561,11 +2574,13 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         int indexDiff = staff->GetIdx() - sParent->GetIdx();
 
         if (indexDiff < 0) {
-            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefAfter,
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, 
+                (previousClefAfter != layer->GetCurrentClef()) ? previousClefAfter : NULL,
                 (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
         }
         else {
-            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, previousClefBefore,
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, 
+                (previousClefBefore != layer->GetCurrentClef()) ? previousClefBefore : NULL,
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
         }
         for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
