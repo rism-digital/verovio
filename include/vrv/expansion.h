@@ -36,6 +36,13 @@ public:
     virtual std::string GetClassName() const { return "Expansion"; }
     virtual ClassId GetClassId() const { return EXPANSION; }
     ///@}
+    
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
+    ////@}
 
     //----------//
     // Functors //
