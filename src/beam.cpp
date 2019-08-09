@@ -339,10 +339,11 @@ void BeamDrawingParams::CalcBeam(
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttBeamedWith()
+Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
+    RegisterAttClass(ATT_BEAMREND);
 
     Reset();
 }
@@ -357,6 +358,7 @@ void Beam::Reset()
     LayerElement::Reset();
     ResetColor();
     ResetBeamedWith();
+    ResetBeamRend();
 
     ClearCoords();
 }
@@ -484,6 +486,12 @@ bool Beam::IsLastInBeam(LayerElement *element)
     // this is the last one
     if (position == (size - 1)) return true;
     return false;
+}
+    
+const ArrayOfBeamElementCoords *Beam::GetElementCoords()
+{
+    this->GetList(this);
+    return &m_beamElementCoords;
 }
 
 void Beam::InitCoords(ListOfObjects *childList)

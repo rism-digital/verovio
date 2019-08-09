@@ -37,7 +37,7 @@ public:
     /**
      * Get information on the last editor function used
      */
-    std::string EditInfo() { return m_editInfo; }
+    virtual std::string EditInfo() { return m_editInfo; }
 
 protected:
     Doc *m_doc;
