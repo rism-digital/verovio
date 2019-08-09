@@ -121,6 +121,11 @@ public:
     bool GetMidiExportDone() const;
 
     /**
+     * WG: process recursion
+     */
+    void process(const vrv::ArrayOfObjects * array, int index, std::string indent);
+
+    /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
     ///@{

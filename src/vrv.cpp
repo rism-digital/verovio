@@ -300,7 +300,7 @@ void LogError(const char *fmt, ...)
 #endif
 }
 
-void LogMessage(const char *fmt, ...)
+void    LogMessage(const char *fmt, ...)
 {
     if (noLog) return;
 #ifdef EMSCRIPTEN

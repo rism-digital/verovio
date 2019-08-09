@@ -122,8 +122,13 @@ public:
      * This is used only for Emscripten-based compilation.
      */
     void ResetLogBuffer();
-
+    
     /**
+     * Render the expansion element plist information
+     */
+    bool RenderExpansion();
+    
+     /**
      * Render the page to the deviceContext.
      * Page number is 1-based.
      */

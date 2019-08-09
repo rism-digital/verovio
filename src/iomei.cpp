@@ -2592,7 +2592,11 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     success = ReadMdivChildren(m_doc, body, false);
-
+    
+    // WG
+    const vrv::ArrayOfObjects * mdivs = m_doc->GetChildren();
+    m_doc->process(mdivs, 0, "");
+    
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
         m_doc->ConvertAnalyticalMarkupDoc();

@@ -1004,7 +1004,15 @@ void Toolkit::RedoPagePitchPosLayout()
 
     page->LayOutPitchPos();
 }
-
+    
+bool Toolkit::RenderExpansion()
+{
+    const vrv::ArrayOfObjects * mdivs = m_doc.GetChildren();
+    LogMessage("DocType %d: \n", m_doc.GetType());
+    m_doc.process(mdivs, 0, "");
+    return true;
+}
+    
 bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
     if (pageNo > GetPageCount()) {
