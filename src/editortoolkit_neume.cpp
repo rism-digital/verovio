@@ -1424,6 +1424,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
+            LogMessage((*it)->GetUuid().c_str());
             if (m_doc->GetType() == Facs) {
                 if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
                     m_infoObject.import("status", "FAILURE");
