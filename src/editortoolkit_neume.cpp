@@ -2846,7 +2846,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
         clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
         if (clef == NULL) {
             Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-            clef = layer->GetClef(obj);
+            clef = layer->GetCurrentClef();
         }
     }
     assert(clef);
