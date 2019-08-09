@@ -2658,8 +2658,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef =
     }
     pi->SetOct(3);
 
-    int centerY = (fi->GetZone()->GetUly() + fi->GetZone()->GetLry()) / 2;
-    int centerX = (fi->GetZone()->GetUlx() + fi->GetZone()->GetLrx()) / 2;
+    int centerY = fi->GetZone()->GetUly();
+    int centerX = fi->GetZone()->GetUlx();
 
     const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int pitchDifference = round((double) (staff->GetZone()->GetUly() +
