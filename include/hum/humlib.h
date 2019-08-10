@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Aug  7 06:55:50 EDT 2019
+// Last Modified: Fri Aug  9 22:21:56 EDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4718,6 +4718,11 @@ class Tool_extract : public HumTool {
 		void    fillFieldDataByGrep     (vector<int>& field, vector<int>& subfield,
 		                                 vector<int>& model, const string& grepString,
 		                                 HumdrumFile& infile, int state);
+		vector<int> getNullDataTracks(HumdrumFile& infile);
+		void fillFieldDataByEmpty       (vector<int>& field, vector<int>& subfield,
+				                           vector<int>& model, HumdrumFile& infile, int negate);
+		void fillFieldDataByNoEmpty     (vector<int>& field, vector<int>& subfield,
+				                           vector<int>& model, HumdrumFile& infile, int negate);
 
 	private:
 
@@ -4754,6 +4759,9 @@ class Tool_extract : public HumTool {
 		int         grepQ       = 0;       // used with -g option
 		string      grepString  = "";      // used with -g option
 		string      blankName   = "**blank"; // used with -n option
+		int         noEmptyQ    = 0;       // used with --no-empty option
+		int         emptyQ      = 0;       // used with --empty option
+		int         spineListQ  = 0;       // used with --spine option
 
 };
 
@@ -4782,6 +4790,44 @@ class Tool_filter : public HumTool {
 	private:
 		string   m_variant;        // used with -v option.
 		bool     m_debugQ = false; // used with --debug option
+
+};
+
+
+class HPNote {
+	public:
+		int track = -1;
+		int line = -1;
+		int field = -1;
+		int subfield = -1;
+		HTp token = NULL;
+		std::string text;
+		bool attack = false;
+		bool nullQ = false;
+};
+
+class Tool_homophonic : public HumTool {
+	public:
+		            Tool_homophonic    (void);
+		           ~Tool_homophonic    () {};
+
+		bool        run                (HumdrumFileSet& infiles);
+		bool        run                (HumdrumFile& infile);
+		bool        run                (const string& indata, ostream& out);
+		bool        run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void        processFile        (HumdrumFile& infile);
+		void        analyzeLine        (HumdrumFile& infile, int line);
+		void        initialize         (void);
+		void        markHomophonicNotes(void);
+
+	private:
+		std::vector<std::string> m_homophonic;
+		std::vector<int> m_notecount;
+		std::vector<int> m_attacks;
+		std::vector<std::vector<HPNote>> m_notes;
+		int m_count = 4;
 
 };
 

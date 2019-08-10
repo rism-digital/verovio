@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Aug  7 06:55:50 EDT 2019
+// Last Modified: Fri Aug  9 22:21:56 EDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -41574,6 +41574,9 @@ Tool_extract::Tool_extract(void) {
 	define("Y|no-editoral-rests=b",
 			"do not display yy marks on interpreted rests");
 	define("n|name|b|blank=s:**blank", "Name if exinterp added with 0");
+	define("no-empty|no-empties=b", "Suppress spines with only null data tokens");
+	define("empty|empties=b", "Only keep spines with only null data tokens");
+	define("spine-list=b", "Show spine list and then exit");
 
 	define("debug=b", "print debugging information");
 	define("author=b");              // author of program
@@ -41651,11 +41654,27 @@ void Tool_extract::processFile(HumdrumFile& infile) {
 				interpstate);
 	} else if (reverseQ) {
 		reverseSpines(field, subfield, model, infile, reverseInterp);
-	} else if (fieldQ || excludeQ) {
-		fillFieldData(field, subfield, model, fieldstring, infile);
 	} else if (grepQ) {
 		fillFieldDataByGrep(field, subfield, model, grepString, infile,
 			interpstate);
+	} else if (emptyQ) {
+		fillFieldDataByEmpty(field, subfield, model, infile, interpstate);
+	} else if (noEmptyQ) {
+		fillFieldDataByNoEmpty(field, subfield, model, infile, interpstate);
+	} else if (fieldQ || excludeQ) {
+		fillFieldData(field, subfield, model, fieldstring, infile);
+	}
+
+	if (spineListQ) {
+		m_free_text << "-s ";
+		for (int i=0; i<(int)field.size(); i++) {
+			m_free_text << field[i];
+			if (i < (int)field.size() - 1) {
+				m_free_text << ",";
+			}
+		}
+		m_free_text << endl;
+		return;
 	}
 
 	if (debugQ && !traceQ) {
@@ -41684,6 +41703,113 @@ void Tool_extract::processFile(HumdrumFile& infile) {
 		extractTrace(infile, tracefile);
 	} else {
 		m_humdrum_text << infile;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_extract::getNullDataTracks --
+//
+
+vector<int> Tool_extract::getNullDataTracks(HumdrumFile& infile) {
+	vector<int> output(infile.getMaxTrack() + 1, 1);
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			if (!output[track]) {
+				continue;
+			}
+			if (!token->isNull()) {
+				output[track] = 0;
+			}
+		}
+		// maybe exit here if all tracks are non-null
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_extract::fillFieldDataByEmpty -- Only keep the spines which contain only
+//    null data tokens.
+//
+
+void Tool_extract::fillFieldDataByEmpty(vector<int>& field, vector<int>& subfield,
+		vector<int>& model, HumdrumFile& infile, int negate) {
+
+	field.reserve(infile.getMaxTrack()+1);
+	subfield.reserve(infile.getMaxTrack()+1);
+	model.reserve(infile.getMaxTrack()+1);
+	field.resize(0);
+	subfield.resize(0);
+	model.resize(0);
+	vector<int> nullTrack = getNullDataTracks(infile);
+
+	int zero = 0;
+	for (int i=1; i<(int)nullTrack.size(); i++) {
+		if (negate) {
+			if (!nullTrack[i]) {
+				field.push_back(i);
+				subfield.push_back(zero);
+				model.push_back(zero);
+			}
+		} else {
+			if (nullTrack[i]) {
+				field.push_back(i);
+				subfield.push_back(zero);
+				model.push_back(zero);
+			}
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_extract::fillFieldDataByNoEmpty -- Only keep spines which are not all 
+//   null data tokens.
+//
+
+void Tool_extract::fillFieldDataByNoEmpty(vector<int>& field, vector<int>& subfield,
+		vector<int>& model, HumdrumFile& infile, int negate) {
+
+	field.reserve(infile.getMaxTrack()+1);
+	subfield.reserve(infile.getMaxTrack()+1);
+	model.reserve(infile.getMaxTrack()+1);
+	field.resize(0);
+	subfield.resize(0);
+	model.resize(0);
+	vector<int> nullTrack = getNullDataTracks(infile);
+	for (int i=1; i<(int)nullTrack.size(); i++) {
+		nullTrack[i] = !nullTrack[i];
+	}
+
+	int zero = 0;
+	for (int i=1; i<(int)nullTrack.size(); i++) {
+		if (negate) {
+			if (!nullTrack[i]) {
+				field.push_back(i);
+				subfield.push_back(zero);
+				model.push_back(zero);
+			}
+		} else {
+			if (nullTrack[i]) {
+				field.push_back(i);
+				subfield.push_back(zero);
+				model.push_back(zero);
+			}
+		}
 	}
 }
 
@@ -43310,6 +43436,8 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 		}
 	}
 
+	noEmptyQ    = getBoolean("no-empty");
+	emptyQ      = getBoolean("empty");
 	fieldQ      = getBoolean("f");
 	debugQ      = getBoolean("debug");
 	countQ      = getBoolean("count");
@@ -43326,6 +43454,14 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	}
 
 	if (interpQ) {
+		fieldQ = 1;
+	}
+
+	if (emptyQ) {
+		fieldQ = 1;
+	}
+
+	if (noEmptyQ) {
 		fieldQ = 1;
 	}
 
@@ -43354,6 +43490,7 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 		fieldQ = 1;
 	}
 
+	spineListQ = getBoolean("spine-list");
 	grepQ = getBoolean("grep");
 	grepString = getString("grep");
 
@@ -43498,6 +43635,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(composite, infile, commands[i].second, status);
 		} else if (commands[i].first == "dissonant") {
 			RUNTOOL(dissonant, infile, commands[i].second, status);
+		} else if (commands[i].first == "homophonic") {
+			RUNTOOL(homophonic, infile, commands[i].second, status);
 		} else if (commands[i].first == "hproof") {
 			RUNTOOL(hproof, infile, commands[i].second, status);
 		} else if (commands[i].first == "imitation") {
@@ -43681,6 +43820,267 @@ void Tool_filter::initialize(HumdrumFile& infile) {
 	m_debugQ = getBoolean("debug");
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_homophonic::Tool_homophonic -- Set the recognized options for the tool.
+//
+
+Tool_homophonic::Tool_homophonic(void) {
+	define("a|append=b", "Append analysis to end of input data");
+	define("p|prepend=b", "Prepend analysis to end of input data");
+	define("M|no-marks=b", "Do not mark homophonic section notes");
+	define("n=i:4", "number of sonorities in a row required to define homophonic");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_homophonic::run -- Do the main work of the tool.
+//
+
+bool Tool_homophonic::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_homophonic::run(const string& indata, ostream& out) {
+	HumdrumFile infile;
+	infile.readStringNoRhythm(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_homophonic::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_homophonic::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+
+	infile.createLinesFromTokens();
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_homophonic::markHomophonicNotes --
+//
+
+void Tool_homophonic::markHomophonicNotes(void) {
+	
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_homophonic::initialize --
+//
+
+void Tool_homophonic::initialize(void) {
+	m_count = getInteger("n");
+	if (m_count < 1) {
+		m_count = 1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_homophonic::processFile --
+//
+
+void Tool_homophonic::processFile(HumdrumFile& infile) {
+	vector<int> data;
+	data.reserve(infile.getLineCount());
+
+	m_homophonic.clear();
+	m_homophonic.resize(infile.getLineCount());
+
+	m_notecount.clear();
+	m_notecount.resize(infile.getLineCount());
+	fill(m_notecount.begin(), m_notecount.end(), 0);
+
+	m_attacks.clear();
+	m_attacks.resize(infile.getLineCount());
+	fill(m_attacks.begin(), m_attacks.end(), 0);
+
+	m_notes.clear();
+	m_notes.resize(infile.getLineCount());
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		data.push_back(i);
+		analyzeLine(infile, i);
+	}
+
+	// change Y N Y patterns to Y Y Y
+	for (int i=1; i<data.size() - 1; i++) {
+		if (m_homophonic[data[i]] == "Y") {
+			continue;
+		}
+		if (m_homophonic[data[i+1]] == "N") {
+			continue;
+		}
+		if (m_homophonic[data[i-1]] == "N") {
+			continue;
+		}
+		m_homophonic[data[i]] = "NY";
+	}
+
+	vector<double> score(infile.getLineCount(), 0);
+
+	double sum;
+	for (int i=0; i<(int)data.size(); i++) {
+		if (m_homophonic[data[i]].find("Y") != string::npos) {
+			if (m_homophonic[data[i]].find("N") != string::npos) {
+				sum += 0.5;
+			} else {
+				sum += 1;
+			}
+		} else {
+			sum = 0;
+		}
+		score[data[i]] = sum;
+	}
+
+	for (int i=(int)data.size()-2; i>=0; i--) {
+		if (score[data[i]] == 0) {
+			continue;
+		}
+		if (score[data[i+1]] > score[data[i]]) {
+			score[data[i]] = score[data[i+1]];
+		}
+	}
+
+	for (int i=0; i<(int)data.size(); i++) {
+		if (score[data[i]] > m_count) {
+			if (m_attacks[data[i]] < (int)m_notes[data[i]].size() - 1) {
+				m_homophonic[data[i]] = "chartreuse";
+			} else {
+				m_homophonic[data[i]] = "red";
+			}
+		} else {
+			m_homophonic[data[i]] = "black";
+		}
+	}
+	
+	//if (getBoolean("append")) {
+		infile.appendDataSpine(m_homophonic, "", "**color");
+	//} else if (getBoolean("prepend")) {
+	//	infile.prependDataSpine(m_homophonic, "", "**color");
+	//}
+	//if (!getBoolean("no-marks")) {
+	//	markHomophonicNotes();
+	//}
+}
+
+
+//////////////////////////////
+//
+// Tool_homophonic::analyzeLine --
+//
+
+void Tool_homophonic::analyzeLine(HumdrumFile& infile, int line) {
+	m_notes[line].reserve(10);
+	HPNote note;
+	if (!infile[line].isData()) {
+		return;
+	}
+	int nullQ = 0;
+	for (int i=0; i<infile[line].getFieldCount(); i++) {
+		HTp token = infile.token(line, i);
+		if (!token->isKern()) {
+			continue;
+		}
+		if (token->isRest()) {
+			continue;
+		}
+		if (token->isNull()) {
+			nullQ = 1;
+			token = token->resolveNull();
+			if (!token) {
+				continue;
+			}
+			if (token->isRest()) {
+				continue;
+			}
+		} else {
+			nullQ = 0;
+		}
+		int track = token->getTrack();
+		vector<string> subtokens = token->getSubtokens();
+		for (int j=0; j<(int)subtokens.size(); j++) {
+			note.track = track;
+			note.line = token->getLineIndex();
+			note.field = token->getFieldIndex();
+			note.subfield = j;
+			note.token = token;
+			note.text = subtokens[j];
+			if (nullQ) {
+				note.attack = false;
+				note.nullQ = true;
+			} else {
+				note.nullQ = false;
+				if ((note.text.find("_") != string::npos) || 
+				    (note.text.find("]") != string::npos)) {
+					note.attack = false;
+				} else {
+					note.attack = true;
+				}
+			}
+			m_notes[line].push_back(note);
+		}
+	}
+
+	// There must be at least notecount - 1 attacks to be considered homophonic
+	for (int i=0; i<(int)m_notes[line].size(); i++) {
+		if (m_notes[line][i].attack) {
+			m_attacks[line]++;
+		}
+	}
+	if ((int)m_attacks[line] >= (int)m_notes[line].size() - 1) {
+		string value = "Y";
+		// value += to_string(m_attacks[line]);
+		m_homophonic[line] = value;
+	} else {
+		string value = "N";
+		// value += to_string(m_attacks[line]);
+		m_homophonic[line] = value;
+	}
+	if (m_notes[line].size() <= 2) {
+		m_homophonic[line] = "N";
+	}
+}
 
 
 
