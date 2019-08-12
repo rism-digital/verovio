@@ -452,12 +452,12 @@ void Beam::AddChild(Object *child)
     Modify();
 }
 
-void Beam::FilterList(ListOfObjects *childList)
+void Beam::FilterList(ArrayOfObjects *childList)
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->IsLayerElement()) {
@@ -544,7 +544,7 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
     return &m_beamElementCoords;
 }
 
-void Beam::InitCoords(ListOfObjects *childList)
+void Beam::InitCoords(ArrayOfObjects *childList)
 {
     ClearCoords();
 
@@ -579,7 +579,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
     int elementCount = 0;
 
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
@@ -692,7 +692,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ListOfObjects *beamChildren = this->GetList(this);
+    const ArrayOfObjects *beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (beamChildren->empty()) {

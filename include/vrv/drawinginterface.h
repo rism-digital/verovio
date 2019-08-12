@@ -52,7 +52,7 @@ public:
      * Return the drawing list.
      * This is used when actually drawing the list (see View::DrawLayerList)
      */
-    ListOfObjects *GetDrawingList();
+    ArrayOfObjects *GetDrawingList();
 
     /**
      * Reset the drawing list.
@@ -66,7 +66,7 @@ public:
     //
 private:
     /** The list of object for which drawing is postponed */
-    ListOfObjects m_drawingList;
+    ArrayOfObjects m_drawingList;
 };
 
 //----------------------------------------------------------------------------

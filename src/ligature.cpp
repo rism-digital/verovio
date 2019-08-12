@@ -65,10 +65,10 @@ void Ligature::AddChild(Object *child)
     Modify();
 }
 
-void Ligature::FilterList(ListOfObjects *childList)
+void Ligature::FilterList(ArrayOfObjects *childList)
 {
     // Retain only note children of ligatures
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->IsLayerElement()) {
@@ -109,7 +109,7 @@ int Ligature::PositionInLigature(Note *note)
 
 Note *Ligature::GetFirstNote()
 {
-    const ListOfObjects *list = this->GetList(this);
+    const ArrayOfObjects *list = this->GetList(this);
     if (list->empty()) {
         return NULL;
     }
@@ -118,7 +118,7 @@ Note *Ligature::GetFirstNote()
 
 Note *Ligature::GetLastNote()
 {
-    const ListOfObjects *list = this->GetList(this);
+    const ArrayOfObjects *list = this->GetList(this);
     if (list->empty()) {
         return NULL;
     }

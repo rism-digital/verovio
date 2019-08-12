@@ -114,8 +114,8 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     // longest key signature of the staffDefs
-    const ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
+    const ArrayOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
@@ -191,8 +191,8 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     assert(dc);
     assert(system);
 
-    ListOfObjects *drawingList = system->GetDrawingList();
-    ListOfObjects::iterator iter;
+    ArrayOfObjects *drawingList = system->GetDrawingList();
+    ArrayOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if ((*iter)->Is(classId) && (classId == BRACKETSPAN)) {
@@ -275,13 +275,13 @@ void View::DrawStaffGrp(
 
     TextExtend extend;
 
-    const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+    const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
     if (staffDefs->empty()) {
         return;
     }
 
     StaffDef *firstDef = NULL;
-    ListOfObjects::const_iterator iter;
+    ArrayOfObjects::const_iterator iter;
     for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
@@ -292,7 +292,7 @@ void View::DrawStaffGrp(
     }
 
     StaffDef *lastDef = NULL;
-    ListOfObjects::const_reverse_iterator riter;
+    ArrayOfObjects::const_reverse_iterator riter;
     for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
         assert(staffDef);
@@ -372,8 +372,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
     assert(measure);
     assert(scoreDef);
 
-    const ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
-    ListOfObjects::const_iterator iter = scoreDefChildren->begin();
+    const ArrayOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
+    ArrayOfObjects::const_iterator iter = scoreDefChildren->begin();
     while (iter != scoreDefChildren->end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
 
@@ -622,13 +622,13 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
     }
     else {
-        const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+        const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
         if (staffDefs->empty()) {
             return;
         }
 
         StaffDef *firstDef = NULL;
-        ListOfObjects::const_iterator iter;
+        ArrayOfObjects::const_iterator iter;
         for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
             assert(staffDef);
@@ -639,7 +639,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         StaffDef *lastDef = NULL;
-        ListOfObjects::const_reverse_iterator riter;
+        ArrayOfObjects::const_reverse_iterator riter;
         for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
             assert(staffDef);
@@ -682,8 +682,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
             StaffDef *childStaffDef = NULL;
-            const ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); ++it) {
+            const ArrayOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ArrayOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); ++it) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
@@ -1211,8 +1211,8 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
     assert(staff);
     assert(measure);
 
-    ListOfObjects *drawingList = layer->GetDrawingList();
-    ListOfObjects::iterator iter;
+    ArrayOfObjects *drawingList = layer->GetDrawingList();
+    ArrayOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if ((*iter)->Is(classId) && (classId == TUPLET_BRACKET)) {
