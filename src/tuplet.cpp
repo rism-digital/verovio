@@ -114,11 +114,11 @@ void Tuplet::AddChild(Object *child)
     Modify();
 }
 
-void Tuplet::FilterList(ListOfObjects *childList)
+void Tuplet::FilterList(ArrayOfObjects *childList)
 {
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->IsLayerElement() || !(*iter)->HasInterface(INTERFACE_DURATION)) {
@@ -150,7 +150,7 @@ void Tuplet::CalcDrawingBracketAndNumPos()
         return;
     }
 
-    const ListOfObjects *tupletChildren = this->GetList(this);
+    const ArrayOfObjects *tupletChildren = this->GetList(this);
 
     // There are unbeamed notes of two different beams
     // treat all the notes as unbeamed
@@ -158,7 +158,7 @@ void Tuplet::CalcDrawingBracketAndNumPos()
 
     // The first step is to calculate all the stem directions
     // cycle into the elements and count the up and down dirs
-    ListOfObjects::const_iterator iter = tupletChildren->begin();
+    ArrayOfObjects::const_iterator iter = tupletChildren->begin();
     while (iter != tupletChildren->end()) {
         if ((*iter)->Is(CHORD)) {
             Chord *currentChord = dynamic_cast<Chord *>(*iter);

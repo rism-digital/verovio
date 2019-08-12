@@ -661,7 +661,7 @@ void Object::Modify(bool modified)
     m_isModified = modified;
 }
 
-void Object::FillFlatList(ListOfObjects *flatList)
+void Object::FillFlatList(ArrayOfObjects *flatList)
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
@@ -863,7 +863,7 @@ void ObjectListInterface::ResetList(Object *node)
     this->FilterList(&m_list);
 }
 
-const ListOfObjects *ObjectListInterface::GetList(Object *node)
+const ArrayOfObjects *ObjectListInterface::GetList(Object *node)
 {
     ResetList(node);
     return &m_list;
@@ -871,7 +871,7 @@ const ListOfObjects *ObjectListInterface::GetList(Object *node)
 
 int ObjectListInterface::GetListIndex(const Object *listElement)
 {
-    ListOfObjects::iterator iter;
+    ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -883,7 +883,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
-    ListOfObjects::iterator it = m_list.begin();
+    ArrayOfObjects::iterator it = m_list.begin();
     int idx = GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
@@ -893,18 +893,18 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
-    ListOfObjects::iterator it = m_list.begin();
+    ArrayOfObjects::iterator it = m_list.begin();
     int idx = GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
-    ListOfObjects::reverse_iterator rit(it);
+    ArrayOfObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
 }
 
 Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
-    ListOfObjects::iterator iter;
+    ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -921,7 +921,7 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
 
 Object *ObjectListInterface::GetListNext(Object *listElement)
 {
-    ListOfObjects::reverse_iterator iter;
+    ArrayOfObjects::reverse_iterator iter;
     int i;
     for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -944,8 +944,8 @@ std::wstring TextListInterface::GetText(Object *node)
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         if ((*it)->Is(LB)) {
             continue;
         }
@@ -960,8 +960,8 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         if ((*it)->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
@@ -976,9 +976,9 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
     }
 }
 
-void TextListInterface::FilterList(ListOfObjects *childList)
+void TextListInterface::FilterList(ArrayOfObjects *childList)
 {
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
     while (iter != childList->end()) {
         if (!(*iter)->Is({ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)

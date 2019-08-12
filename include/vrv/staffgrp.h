@@ -77,7 +77,7 @@ protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    virtual void FilterList(ListOfObjects *childList);
+    virtual void FilterList(ArrayOfObjects *childList);
 
 private:
     //

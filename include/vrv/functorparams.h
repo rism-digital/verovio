@@ -88,13 +88,13 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the ListOfObjects
+ * member 0: the ArrayOfObjects
  **/
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
-    AddLayerElementToFlatListParams(ListOfObjects *flatList) { m_flatList = flatList; }
-    ListOfObjects *m_flatList;
+    AddLayerElementToFlatListParams(ArrayOfObjects *flatList) { m_flatList = flatList; }
+    ArrayOfObjects *m_flatList;
 };
 
 //----------------------------------------------------------------------------

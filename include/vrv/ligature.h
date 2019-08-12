@@ -79,7 +79,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ListOfObjects *childlist);
+    virtual void FilterList(ArrayOfObjects *childlist);
 
 public:
 };
