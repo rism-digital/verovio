@@ -96,7 +96,6 @@ void LayerElement::Reset()
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
-    m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
@@ -104,10 +103,6 @@ void LayerElement::Reset()
 
 LayerElement::~LayerElement()
 {
-    // set the pointer of the m_beamElementCoord to NULL;
-    if (m_beamElementCoord) {
-        m_beamElementCoord->m_element = NULL;
-    }
 }
 
 LayerElement &LayerElement::operator=(const LayerElement &element)
@@ -118,7 +113,6 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
         ResetParent();
         m_alignment = NULL;
         m_graceAlignment = NULL;
-        m_beamElementCoord = NULL;
     }
     return *this;
 }

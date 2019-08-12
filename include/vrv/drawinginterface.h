@@ -70,6 +70,28 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// BeamDrawingInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for MEI beam elements (beam, beamSpan).
+ * It stores stem drawing values.
+ */
+class BeamDrawingInterface {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    BeamDrawingInterface();
+    virtual ~BeamDrawingInterface();
+    virtual void Reset();
+    ///@}
+
+protected:
+};
+
+//----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
 

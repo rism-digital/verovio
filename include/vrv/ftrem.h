@@ -82,7 +82,7 @@ protected:
 
 public:
     /** */
-    BeamDrawingParams m_drawingParams;
+    BeamSegment m_drawingParams;
 
 private:
     /**

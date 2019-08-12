@@ -62,6 +62,22 @@ void DrawingListInterface::ResetDrawingList()
 }
 
 //----------------------------------------------------------------------------
+// BeamDrawingInterface
+//----------------------------------------------------------------------------
+
+BeamDrawingInterface::BeamDrawingInterface()
+{
+    Reset();
+}
+
+BeamDrawingInterface::~BeamDrawingInterface() {}
+
+void BeamDrawingInterface::Reset()
+{
+    
+}
+
+//----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
 

@@ -29,19 +29,19 @@ enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
  * This could be turned into a BeamDrawingInterface
  */
 
-class BeamDrawingParams {
+class BeamSegment {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamDrawingParams();
-    virtual ~BeamDrawingParams() {}
+    BeamSegment();
+    virtual ~BeamSegment() {}
 
     void Reset();
 
     void CalcBeam(
-        Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount);
+        Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, data_BEAMPLACE place = BEAMPLACE_NONE);
 
     // values to be set before calling CalcBeam
     bool m_changingDur;
@@ -51,6 +51,7 @@ public:
     bool m_crossStaff;
     int m_shortestDur;
     data_STEMDIRECTION m_stemDir;
+    data_BEAMPLACE m_beamPlace;
 
     // values set by CalcBeam
     int m_beamWidth;
@@ -68,6 +69,7 @@ public:
 class Beam : public LayerElement,
              public ObjectListInterface,
              public DrawingListInterface,
+             public BeamDrawingInterface,
              public AttColor,
              public AttBeamedWith,
              public AttBeamRend {
@@ -147,7 +149,7 @@ private:
     //
 public:
     /** */
-    BeamDrawingParams m_drawingParams;
+    BeamSegment m_beamSegment;
 
 private:
     /**
@@ -166,7 +168,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamElementCoord() { m_element = NULL; }
+    BeamElementCoord() { m_element = NULL; m_stem = NULL; }
     virtual ~BeamElementCoord();
 
     int m_x;
@@ -178,6 +180,7 @@ public:
     int m_breaksec;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     LayerElement *m_element;
+    Stem *m_stem; // a pointer to the stem in order to avoid to have to re-cast it
 };
 
 } // namespace vrv

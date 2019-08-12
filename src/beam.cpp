@@ -34,12 +34,12 @@ namespace vrv {
 // BeamDrawingParams
 //----------------------------------------------------------------------------
 
-BeamDrawingParams::BeamDrawingParams()
+BeamSegment::BeamSegment()
 {
     Reset();
 }
 
-void BeamDrawingParams::Reset()
+void BeamSegment::Reset()
 {
     m_changingDur = false;
     m_beamHasChord = false;
@@ -48,6 +48,7 @@ void BeamDrawingParams::Reset()
     m_crossStaff = false;
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
+    m_beamPlace = BEAMPLACE_NONE;
 
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
@@ -57,8 +58,8 @@ void BeamDrawingParams::Reset()
     m_beamSlope = 0.0;
 }
 
-void BeamDrawingParams::CalcBeam(
-    Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount)
+void BeamSegment::CalcBeam(
+    Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, data_BEAMPLACE place)
 {
     assert(layer);
     assert(staff);
@@ -153,16 +154,65 @@ void BeamDrawingParams::CalcBeam(
     if (elementCount != nbRests) {
         avgY /= (elementCount - nbRests);
     }
-
-    // If we have one stem direction in the beam, then don't look at the layer
-    // We probably do not want to call this if we have a cross-staff situation
-    if (!this->m_crossStaff && (this->m_stemDir == STEMDIRECTION_NONE)) {
-        this->m_stemDir = layer->GetDrawingStemDir(beamElementCoords); // force layer direction if it exists
+    
+    // Beam@place has precedence in all cases
+    if (place != BEAMPLACE_NONE) {
+        if (this->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
+            LogDebug("Stem directions (mixed) contradict beam placement (below or above)");
+        }
+        else if ((this->m_stemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
+            LogDebug("Stem directions (up) contradict beam placement (below)");
+        }
+        else if ((this->m_stemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
+            LogDebug("Stem directions (down) contradict beam placement (above)");
+        }
+        this->m_beamPlace = place;
     }
-
-    // Automatic stem direction if nothing in the notes or in the layer
-    if (this->m_stemDir == STEMDIRECTION_NONE) {
-        this->m_stemDir = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down;
+    // Default with cross-staff
+    else if (this->m_crossStaff) {
+        this->m_beamPlace = BEAMPLACE_mixed;
+    }
+    else if (this->m_hasMultipleStemDir) {
+        this->m_beamPlace = BEAMPLACE_mixed;
+    }
+    else {
+        // force layer direction if it exists and nothing in the notes
+        if (this->m_stemDir == STEMDIRECTION_NONE) {
+            this->m_stemDir = layer->GetDrawingStemDir(beamElementCoords);
+        }
+        // Now look at the stem direction
+        if (this->m_stemDir == STEMDIRECTION_up) {
+            this->m_beamPlace = BEAMPLACE_above;
+        }
+        else if (this->m_stemDir == STEMDIRECTION_down) {
+            this->m_beamPlace = BEAMPLACE_below;
+        }
+        else {
+            this->m_beamPlace = (avgY < verticalCenter) ? BEAMPLACE_below : BEAMPLACE_below;
+        }
+    }
+    assert(this->m_beamPlace != BEAMPLACE_NONE);
+    
+    for (i = 0; i < elementCount; ++i) {
+        if (!(*beamElementCoords).at(i)->m_stem) continue;
+        
+        if (this->m_beamPlace == BEAMPLACE_above) {
+            (*beamElementCoords).at(i)->m_stem->SetDrawingStemDir(STEMDIRECTION_up);
+        }
+        else if (this->m_beamPlace == BEAMPLACE_below) {
+            (*beamElementCoords).at(i)->m_stem->SetDrawingStemDir(STEMDIRECTION_down);
+        }
+        // mixed
+        else {
+            if (this->m_crossStaff) {
+                Staff *currentCrossStaff = (*beamElementCoords).at(i)->m_element->m_crossStaff;
+                if (currentCrossStaff) {
+                    //if (currentCrossStaff->GetN() < staff->GetN()
+                }
+            }
+        }
+        
+        
     }
 
     if (this->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
@@ -536,52 +586,53 @@ void Beam::InitCoords(ListOfObjects *childList)
         currentDur = (current->GetDurationInterface())->GetActualDur();
 
         if (current->Is(CHORD)) {
-            m_drawingParams.m_beamHasChord = true;
+            m_beamSegment.m_beamHasChord = true;
         }
 
         m_beamElementCoords.at(elementCount)->m_element = current;
-        current->m_beamElementCoord = m_beamElementCoords.at(elementCount);
         m_beamElementCoords.at(elementCount)->m_dur = currentDur;
 
         // Look at beam breaks
         m_beamElementCoords.at(elementCount)->m_breaksec = 0;
         AttBeamSecondary *beamsecondary = dynamic_cast<AttBeamSecondary *>(current);
         if (beamsecondary && beamsecondary->HasBreaksec()) {
-            if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
+            if (!m_beamSegment.m_changingDur) m_beamSegment.m_changingDur = true;
             m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
         }
 
         Staff *staff = current->GetCrossStaff(layer);
         if (staff != currentStaff) {
-            m_drawingParams.m_crossStaff = true;
+            m_beamSegment.m_crossStaff = true;
         }
         currentStaff = staff;
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
             // look at the stemDir to see if we have multiple stem Dir
-            if (!m_drawingParams.m_hasMultipleStemDir) {
+            if (!m_beamSegment.m_hasMultipleStemDir) {
                 StemmedDrawingInterface *interface = current->GetStemmedDrawingInterface();
                 assert(interface);
                 Stem *stem = interface->GetDrawingStem();
+                // This can be NULL but should not
+                m_beamElementCoords.at(elementCount)->m_stem = stem;
                 currentStemDir = STEMDIRECTION_NONE;
                 if (stem) {
                     assert(dynamic_cast<AttStems *>(stem));
                     currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
                 }
                 if (currentStemDir != STEMDIRECTION_NONE) {
-                    if ((m_drawingParams.m_stemDir != STEMDIRECTION_NONE)
-                        && (m_drawingParams.m_stemDir != currentStemDir)) {
-                        m_drawingParams.m_hasMultipleStemDir = true;
+                    if ((m_beamSegment.m_stemDir != STEMDIRECTION_NONE)
+                        && (m_beamSegment.m_stemDir != currentStemDir)) {
+                        m_beamSegment.m_hasMultipleStemDir = true;
                     }
-                    m_drawingParams.m_stemDir = currentStemDir;
+                    m_beamSegment.m_stemDir = currentStemDir;
                 }
             }
             // keep the shortest dur in the beam
-            m_drawingParams.m_shortestDur = std::max(currentDur, m_drawingParams.m_shortestDur);
+            m_beamSegment.m_shortestDur = std::max(currentDur, m_beamSegment.m_shortestDur);
         }
         // check if we have more than duration in the beam
-        if (!m_drawingParams.m_changingDur && currentDur != lastDur) m_drawingParams.m_changingDur = true;
+        if (!m_beamSegment.m_changingDur && currentDur != lastDur) m_beamSegment.m_changingDur = true;
         lastDur = currentDur;
 
         elementCount++;
@@ -607,11 +658,11 @@ void Beam::InitCoords(ListOfObjects *childList)
     int last = elementCount - 1;
 
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
-    m_drawingParams.m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
+    m_beamSegment.m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
 
     // Always set stem diretion to up for grace note beam unless stem direction is provided
-    if (this->m_drawingParams.m_cueSize && (this->m_drawingParams.m_stemDir == STEMDIRECTION_NONE)) {
-        this->m_drawingParams.m_stemDir = STEMDIRECTION_up;
+    if (this->m_beamSegment.m_cueSize && (this->m_beamSegment.m_stemDir == STEMDIRECTION_NONE)) {
+        this->m_beamSegment.m_stemDir = STEMDIRECTION_up;
     }
 }
 
@@ -630,7 +681,6 @@ void Beam::ClearCoords()
 
 BeamElementCoord::~BeamElementCoord()
 {
-    if (m_element) m_element->m_beamElementCoord = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -657,7 +707,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
     assert(staff);
 
-    this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
+    this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
 
     return FUNCTOR_CONTINUE;
 }
@@ -667,7 +717,7 @@ int Beam::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
     
-    this->m_drawingParams.Reset();
+    this->m_beamSegment.Reset();
     
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();

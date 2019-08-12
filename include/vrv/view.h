@@ -19,7 +19,7 @@ class Accid;
 class Arpeg;
 class BarLine;
 class Beam;
-class BeamDrawingParams;
+class BeamSegment;
 class BracketSpan;
 class Breath;
 class ControlElement;
