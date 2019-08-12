@@ -2872,6 +2872,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
 
     // Check interfaces
     if ((obj->GetPitchInterface() == NULL) || (obj->GetFacsimileInterface() == NULL)) {
+        LogError("Element is lacking an interface which is required for pitch adjusting");
         return false;
     }
     PitchInterface *pi = obj->GetPitchInterface();
@@ -2879,6 +2880,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
 
     // Check for facsimile
     if (!fi->HasFacs() || !staff->HasFacs()) {
+        LogError("Could not adjust pitch: the element or staff lacks facsimile data");
         return false;
     }
 
@@ -2893,6 +2895,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
         pi ->SetPname(PITCHNAME_g);
     }
     else {
+        LogError("Clef does not have valid shape");
         return false;
     }
     pi->SetOct(3);
