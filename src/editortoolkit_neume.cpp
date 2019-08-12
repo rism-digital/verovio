@@ -177,6 +177,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse change skew action");
     }
+    else if (action == "changeStaff") {
+        std::string elementId;
+        if(this->ParseChangeStaffAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->ChangeStaff(elementId);
+        }
+        LogWarning("Could not parse change staff action");
+    }
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
@@ -287,7 +294,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             element->FindAllChildByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
                 // dont change the text bbox position
-                if ((*it)->Is(SYL)) {
+                if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
                     continue;
                 }
                 (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
@@ -300,6 +307,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac,
             (syllable != NULL) ? syllable : element));
 
+        if (clefAfter == NULL) {
+            clefAfter = layer->GetCurrentClef();
+        }
+
         if (element->HasInterface(INTERFACE_PITCH)) {
             element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
             element->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
@@ -308,7 +319,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 ArrayOfObjects siblings;
                 syllable->FindAllChildByComparison(&siblings, &pitchIC);
                 for (auto it = siblings.begin(); it != siblings.end(); ++it) {
-                    if (*it == element) {
+                    if ((*it)->GetUuid() == element->GetUuid()) {
                         continue;
                     }
                     (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
@@ -433,12 +444,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
         Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
-        if (precedingClefBefore == NULL) {
-            precedingClefBefore = layer->GetCurrentClef();
-        }
-
         m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefBefore, &ic, clef,
-            (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+            (nextClefBefore != layer->GetCurrentClef()) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
         m_doc->GetDrawingPage()->FindAllChildBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
 
@@ -453,10 +460,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         Clef *precedingClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
         Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
-
-        if (precedingClefAfter == NULL) {
-            precedingClefAfter = layer->GetCurrentClef();
-        }
 
         // case 1
         if (precedingClefAfter == precedingClefBefore && nextClefAfter == nextClefBefore) {
@@ -477,7 +480,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                     std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
 
                 for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
-                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(precedingClefBefore, clef);
+                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                        (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef(), clef);
                 }
 
                 if (lineDiff != 0) {
@@ -494,7 +498,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                     std::inserter(noLongerWithThisClef, noLongerWithThisClef.begin()));
 
                 for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
-                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClefBefore);
+                    (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                        clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
                 }
 
                 if (lineDiff != 0) {
@@ -538,13 +543,15 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 std::inserter(newlyWithThisClef, newlyWithThisClef.begin()));
 
             for (auto iter = noLongerWithThisClef.begin(); iter != noLongerWithThisClef.end(); ++iter) {
-                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(clef, precedingClefBefore);
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                    clef, (precedingClefBefore != NULL) ? precedingClefBefore : layer->GetCurrentClef());
             }
 
             clef->SetLine(clefLine);
 
             for (auto iter = newlyWithThisClef.begin(); iter != newlyWithThisClef.end(); ++iter) {
-                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(precedingClefAfter, clef);
+                (*iter)->GetPitchInterface()->AdjustPitchForNewClef(
+                    (precedingClefAfter != NULL) ? precedingClefAfter : layer->GetCurrentClef(), clef);
             }
 
         }
@@ -943,9 +950,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
-            PitchInterface *pi = (*it)->GetPitchInterface();
-            assert(pi);
-            pi->AdjustPitchForNewClef(previousClef, clef);
+            if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                LogError("Failed to adjust pitch of %s", (*it)->GetUuid().c_str());
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to properly set pitch.");
+                return false;
+            }
         }
     }
     else if (elementType == "custos") {
@@ -1371,7 +1381,8 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(obj);
-    bool result, isNeumeOrNc, isNc, isClef;
+    bool result = false;
+    bool isNeumeOrNc, isNc, isClef;
     isNeumeOrNc = (obj->Is(NC) || obj->Is(NEUME));
     isNc = obj->Is(NC);
     isClef = obj->Is(CLEF);
@@ -1414,7 +1425,25 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef,
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
+        result = parent->DeleteChild(obj);
+
+        if (!result) {
+            LogError("Failed to delete the desired element (%s)", elementId.c_str());
+            m_infoObject.reset();
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to delete the desired element (" + elementId + ").");
+            return false;
+        }   
+
         for (auto it = elements.begin(); it != elements.end(); ++it) {
+            if (m_doc->GetType() == Facs) {
+                if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                    m_infoObject.import("status", "FAILURE");
+                    m_infoObject.import("message", "Failed to properly set pitch.");
+                    return false;
+                }
+                continue;
+            }
             PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
             // removing the current clef, and so the new clef for all of these elements is previousClef
@@ -1422,7 +1451,11 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         }
 
     }
-    result = parent->DeleteChild(obj);
+
+    if (!result) {
+        result = parent->DeleteChild(obj);
+    }
+
     if (!result) {
         LogError("Failed to delete the desired element (%s)", elementId.c_str());
         m_infoObject.reset();
@@ -1876,7 +1909,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // LogMessage("%d", sortedSyllables.size());
     if (sortedSyllables.size()) {
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
-            LogMessage((*it)->GetClassName().c_str());
             Syllable *syllable = dynamic_cast<Syllable *>(*it);
             if (clefsBefore[syllable] != newClef) {
                 syllable->FindAllChildByComparison(&pitchedChildren, &pitchComp);
@@ -2391,6 +2423,200 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     return true;
 }
 
+bool EditorToolkitNeume::ChangeStaff(std::string elementId)
+{
+    m_infoObject.reset();
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get the drawing page.");
+        return false;
+    }
+
+    if (m_doc->GetType() != Facs) {
+        LogWarning("Resizing is only available in facsimile mode.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Resizing is only available in facsimile mode.");
+        return false;
+    }
+
+    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    assert(element);
+    if (element == NULL) {
+        LogError("No element exists with ID '%s'.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No element exists with ID" + elementId + ".");
+        return false;
+    }
+
+    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF))) {
+        LogError("Element is of type %s, but only Syllables, Custos, and Clefs can change staves.", element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Element is of type " + element->GetClassName() +
+            ", but only Syllables, Custos, and Clefs can change staves.");
+        return false;
+    }
+
+    ArrayOfObjects staves;
+    ClassIdComparison ac(STAFF);
+    m_doc->FindAllChildByComparison(&staves, &ac);
+
+    ClosestBB comp;
+
+
+    if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
+        comp.x = element->GetFacsimileInterface()->GetZone()->GetUlx();
+        comp.y = element->GetFacsimileInterface()->GetZone()->GetUly();
+    }
+
+    else if (element->Is(SYLLABLE)) {
+        int ulx, uly, lrx, lry;
+        if (!element->GenerateBoundingBox(&ulx, &uly, &lrx, &lry)) {
+            LogError("Couldn't generate bounding box for syllable.");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Couldn't generate bounding box for syllable.");
+            return false;
+        }
+        comp.x = (lrx + ulx) / 2;
+        comp.y = (uly + lry) / 2;
+    }
+
+    else {
+        LogError("This element does not have a facsimile.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "This element does not have a facsimile.");
+        return false;
+    }
+
+    Staff *staff;
+
+    if (staves.size() > 0) {
+        std::sort(staves.begin(), staves.end(), comp);
+        staff = dynamic_cast<Staff *>(staves.at(0));
+    }
+    else {
+        LogError("Could not find any staves. This should not happen");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not find any staves. This should not happen");
+        return false;
+    }
+
+    Layer *parent = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+    Staff *sParent = dynamic_cast<Staff *>(parent->GetFirstParent(STAFF));
+    assert(parent);
+    if (parent == NULL || sParent == NULL) {
+        LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Couldn't find staff parent of element with id " + elementId);
+        return false;
+    }
+
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    assert(LAYER);
+    if (layer == NULL) {
+        LogError("Couldn't find layer child of staff. This should not happen");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Couldn't find layer child of staff. This should not happen");
+        return false;
+    }
+
+    if (layer == parent) {
+        m_infoObject.import("status", "WARNING");
+        m_infoObject.import("message", "Moving to the same staff as before.");
+        m_infoObject.import("elementId", elementId);
+        m_infoObject.import("newStaffId", staff->GetUuid());
+        return true;
+    }
+
+    // for pitch modification if the element is a clef
+    ClassIdComparison cic(CLEF);
+
+    Clef *previousClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, element));
+    if (previousClefBefore == NULL) {
+        previousClefBefore = layer->GetCurrentClef();
+    }
+    Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
+
+    element->MoveItselfTo(layer);
+    layer->ReorderByXPos();
+    parent->ClearRelinquishedChildren();
+    parent->ReorderByXPos();
+
+    // Adjust pitch/staff line.
+    if (element->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(element);
+        assert(custos);
+
+        if (!AdjustPitchFromPosition(custos)) {
+            LogError("Could not adjust pitch value of custos %s", custos->GetUuid().c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to properly set pitch.");
+            m_infoObject.import("elementId", custos->GetUuid());
+            m_infoObject.import("newStaffId", staff->GetUuid());
+            return false;
+        }
+    }
+    else if (element->Is(CLEF)) {
+        // Adjust clefline
+        if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
+            LogError("Could not adjust clef line of %s", element->GetUuid().c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to set clef line from facsimile.");
+            return false;
+        }
+
+        // apply pitch interface changes to any elements whose clef may have changed
+        ArrayOfObjects pitchChildren;
+        InterfaceComparison ic(INTERFACE_PITCH);
+        Clef *previousClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, element));
+        if (previousClefAfter == NULL) {
+            previousClefAfter = layer->GetCurrentClef();
+        }
+        Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
+
+        int indexDiff = staff->GetIdx() - sParent->GetIdx();
+
+        if (indexDiff < 0) {
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, 
+                (previousClefAfter != layer->GetCurrentClef()) ? previousClefAfter : NULL,
+                (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
+        }
+        else {
+            m_doc->GetDrawingPage()->FindAllChildBetween(&pitchChildren, &ic, 
+                (previousClefBefore != layer->GetCurrentClef()) ? previousClefBefore : NULL,
+                (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
+        }
+        for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
+            if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                LogError("Could not adjust pitch of element %s", (*it)->GetUuid().c_str());
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to properly set pitch.");
+                return false;
+            }
+        }
+    }
+    else if (element->Is(SYLLABLE)) {
+        // Apply pitch interface changes to children
+        ArrayOfObjects pitchChildren;
+        InterfaceComparison ic(INTERFACE_PITCH);
+        element->FindAllChildByComparison(&pitchChildren, &ic);
+
+        for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
+            if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to properly set pitch.");
+                return false;
+            }
+        }
+    }
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    m_infoObject.import("elementId", elementId);
+    m_infoObject.import("newStaffId", staff->GetUuid());
+    return true;
+}
+
 bool EditorToolkitNeume::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -2622,17 +2848,31 @@ bool EditorToolkitNeume::ParseChangeSkewAction(
     return true;
 }
 
-bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef = NULL) {
+bool EditorToolkitNeume::ParseChangeStaffAction(
+    jsonxx::Object param, std::string *elementId)
+{
+    if(!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+
+    return true;
+}
+
+bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) {
     Staff *staff = dynamic_cast<Staff *>(obj->GetFirstParent(STAFF));
     assert(staff);
     if (clef == NULL) {
-        Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-        clef = layer->GetClef(obj);
+        ClassIdComparison ac(CLEF);
+        clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+        if (clef == NULL) {
+            Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+            clef = layer->GetCurrentClef();
+        }
     }
     assert(clef);
 
     // Check interfaces
     if ((obj->GetPitchInterface() == NULL) || (obj->GetFacsimileInterface() == NULL)) {
+        LogError("Element is lacking an interface which is required for pitch adjusting");
         return false;
     }
     PitchInterface *pi = obj->GetPitchInterface();
@@ -2640,6 +2880,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef =
 
     // Check for facsimile
     if (!fi->HasFacs() || !staff->HasFacs()) {
+        LogError("Could not adjust pitch: the element or staff lacks facsimile data");
         return false;
     }
 
@@ -2654,6 +2895,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef =
         pi ->SetPname(PITCHNAME_g);
     }
     else {
+        LogError("Clef does not have valid shape");
         return false;
     }
     pi->SetOct(3);
@@ -2670,5 +2912,27 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef =
     pi->AdjustPitchByOffset(pitchDifference);
     return true;
 }
+bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
+{
+    assert(clef);
+
+    if (staff == NULL) {
+        staff = dynamic_cast<Staff *>(clef->GetFirstParent(STAFF));
+    }
+    assert(staff);
+
+    if (!clef->HasFacs() || !staff->HasFacs()) {
+        return false;
+    }
+
+    const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
+        + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
+        tan(staff->GetDrawingSkew() * M_PI / 180.0);
+    int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
+    clef->SetLine(clefLine);
+    return true;
+}
+
 
 }// namespace vrv

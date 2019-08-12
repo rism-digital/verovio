@@ -243,28 +243,28 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
     replacingChild->SetParent(this);
     this->Modify();
 }
-    
+
 void Object::InsertBefore(Object *child, Object *newChild)
 {
     assert(this->GetChildIndex(child) != -1);
     assert(this->GetChildIndex(newChild) == -1);
-    
+
     int idx = this->GetChildIndex(child);
     newChild->SetParent(this);
     this->InsertChild(newChild, idx);
 
     this->Modify();
 }
-    
+
 void Object::InsertAfter(Object *child, Object *newChild)
 {
     assert(this->GetChildIndex(child) != -1);
     assert(this->GetChildIndex(newChild) == -1);
-    
+
     int idx = this->GetChildIndex(child);
     newChild->SetParent(this);
     this->InsertChild(newChild, idx + 1);
-    
+
     this->Modify();
 }
 
@@ -714,13 +714,13 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
         return (m_parent->GetLastParentNot(classId, maxDepth - 1));
     }
 }
-    
+
 bool Object::HasEditorialContent()
 {
     ArrayOfObjects editorial;
     IsEditorialElementComparison editorialComparison;
     this->FindAllChildByComparison(&editorial, &editorialComparison);
-    return (!editorial.empty());    
+    return (!editorial.empty());
 }
 
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
@@ -1633,13 +1633,13 @@ bool Object::GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry)
     for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
         assert(fi);
-        if (fi->HasFacs()) {
+        if (!(*it)->Is(SYL) && fi->HasFacs()) {
             Zone *zone = fi->GetZone();
             assert(zone);
             *ulx = std::min(*ulx, zone->GetUlx());
             *uly = std::min(*uly, zone->GetUly());
             *lrx = std::max(*lrx, zone->GetLrx());
-            *lry = std::max(*lrx, zone->GetLry());
+            *lry = std::max(*lry, zone->GetLry());
             result |= true;
         }
     }
@@ -1715,7 +1715,7 @@ int Object::SetChildZones(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindNextChildByComparison(FunctorParams *functorparams) 
+int Object::FindNextChildByComparison(FunctorParams *functorparams)
 {
     FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
@@ -1745,7 +1745,7 @@ int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
     FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
     // this guy works by going from the start and replacing the return element with every nearer element
-    // until you get to the 'start' element 
+    // until you get to the 'start' element
     if (params->m_start == this) {
         // we've reached the end element, so stop
         return FUNCTOR_STOP;

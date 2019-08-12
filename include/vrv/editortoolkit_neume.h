@@ -53,6 +53,7 @@ public:
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds, std::string isLigature);
     bool ChangeSkew(std::string elementId, int dy, bool rightSide);
+    bool ChangeStaff(std::string elementId);
     ///@}
 protected:
 
@@ -76,13 +77,15 @@ protected:
     bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature);
     bool ParseChangeSkewAction(jsonxx::Object param, std::string *elementId, int *dy, bool *rightSide);
+    bool ParseChangeStaffAction(jsonxx::Object param, std::string *elementId);
     ///@}
 
     /**
      * Helper functions for editor actions.
      */
     ///@{
-    bool AdjustPitchFromPosition(LayerElement *obj, Clef *clef);
+    bool AdjustPitchFromPosition(LayerElement *obj, Clef *clef = NULL);
+    bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
     ///@}
 
 private:
@@ -99,8 +102,11 @@ struct ClosestBB {
     int x;
     int y;
 
-    int distanceToBB(int ulx, int uly, int lrx, int lry)
+    int distanceToBB(int ulx, int uly, int lrx, int lry, double skew = 0)
     {
+        int offset = (x - ulx) * tan(skew * M_PI / 180.0);
+        uly = uly - offset;
+        lry = lry - offset;
         int xDiff = std::max(
                 (ulx > x ? ulx - x : 0),
                 (x > lrx ? x - lrx : 0)
@@ -118,8 +124,8 @@ struct ClosestBB {
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
-        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry());
-        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry());
+        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(), zoneA->GetSkew());
+        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(), zoneB->GetSkew());
         return (distA < distB);
     }
 };
