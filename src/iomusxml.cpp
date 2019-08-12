@@ -935,6 +935,14 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         }
         m_slurStopStack.clear();
     }
+    if (!m_openDashesStack.empty()) { // open dashes without ending
+        std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
+        for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+            LogWarning(
+                "MusicXML import: Dashes/extender lines for '%s' could not be closed.", iter->first->GetUuid().c_str());
+        }
+        m_openDashesStack.clear();
+    }
 
     return false;
 }
@@ -1339,6 +1347,68 @@ void MusicXmlInput::ReadMusicXmlDirection(
         m_dynamStack.push_back(dynam);
     }
 
+    // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
+    pugi::xpath_node dashes = type.node().select_node("dashes");
+    if (dashes) {
+        int dashesNumber = dashes.node().attribute("number").as_int();
+        dashesNumber = (dashesNumber < 1) ? 1 : dashesNumber;
+        int staffNum = 1;
+        pugi::xpath_node staffNode = node.select_node("staff");
+        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+        if (HasAttributeWithValue(dashes.node(), "type", "stop")) {
+            std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
+            for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
+                int measureDifference = m_measureCounts.at(measure) - iter->second.m_measureCount;
+                if (iter->second.m_dirN == dashesNumber && iter->second.m_staffNum == staffNum) {
+                    if (iter->first->Is(DYNAM))
+                        dynamic_cast<Dynam *>(iter->first)
+                            ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    if (iter->first->Is(DIR))
+                        dynamic_cast<Dir *>(iter->first)
+                            ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    m_openDashesStack.erase(iter--);
+                }
+            }
+        }
+        else {
+            ControlElement *controlElement = nullptr;
+            // find last ControlElement of type dynam or dir and activate extender
+            std::vector<std::pair<std::string, ControlElement *> >::reverse_iterator riter;
+            for (riter = m_controlElements.rbegin(); riter != m_controlElements.rend(); ++riter) {
+                if (riter->second->Is(DYNAM)) {
+                    Dynam *dynam = dynamic_cast<Dynam *>(riter->second);
+                    std::vector<int> staffAttr = dynam->GetStaff();
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
+                        && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())
+                        && riter->first == measureNum) {
+                        dynam->SetExtender(BOOLEAN_true);
+                        controlElement = dynam;
+                        break;
+                    }
+                }
+                else if (riter->second->Is(DIR)) {
+                    Dir *dir = dynamic_cast<Dir *>(riter->second);
+                    std::vector<int> staffAttr = dir->GetStaff();
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
+                        && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())
+                        && riter->first == measureNum) {
+                        dir->SetExtender(BOOLEAN_true);
+                        controlElement = dir;
+                        break;
+                    }
+                }
+            }
+            if (controlElement != nullptr) {
+                musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
+                m_openDashesStack.push_back(std::make_pair(controlElement, openDashes));
+            }
+            else {
+                LogMessage("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
+                    measureNum.c_str());
+            }
+        }
+    }
+
     // Hairpins
     pugi::xpath_node wedge = type.node().select_node("wedge");
     if (wedge) {
@@ -1480,7 +1550,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !metronome && !xmlShift && !xmlPedal && !wedge) {
+    if (words.size() == 0 && !dynamics && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
