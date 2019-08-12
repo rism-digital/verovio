@@ -2548,6 +2548,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         assert(custos);
 
         if (!AdjustPitchFromPosition(custos)) {
+            LogError("Could not adjust pitch value of custos %s", custos->GetUuid().c_str());
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to properly set pitch.");
             m_infoObject.import("elementId", custos->GetUuid());
@@ -2558,6 +2559,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     else if (element->Is(CLEF)) {
         // Adjust clefline
         if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
+            LogError("Could not adjust clef line of %s", element->GetUuid().c_str());
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to set clef line from facsimile.");
             return false;
@@ -2586,6 +2588,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         }
         for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
             if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                LogError("Could not adjust pitch of element %s", (*it)->GetUuid().c_str());
                 m_infoObject.import("status", "FAILURE");
                 m_infoObject.import("message", "Failed to properly set pitch.");
                 return false;
