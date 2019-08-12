@@ -951,6 +951,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
             if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
+                LogError("Failed to adjust pitch of %s", (*it)->GetUuid().c_str());
                 m_infoObject.import("status", "FAILURE");
                 m_infoObject.import("message", "Failed to properly set pitch.");
                 return false;
