@@ -215,7 +215,7 @@ void BeamSegment::CalcBeam(
         
     }
 
-    if (this->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
+    if (this->m_beamPlace == BEAMPLACE_above) { // set stem direction for all the notes
         for (i = 0; i < elementCount; ++i) {
             (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_yTop;
         }
@@ -247,7 +247,7 @@ void BeamSegment::CalcBeam(
     }
 
     // swap x position and verticalShift direction with stem down
-    if (this->m_stemDir == STEMDIRECTION_up) {
+    if (this->m_beamPlace == BEAMPLACE_above) {
         // x-offset values for stem bases, dx[y] where y = element->m_cueSize
         stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
             - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -336,21 +336,21 @@ void BeamSegment::CalcBeam(
     double minDistToCenter = -VRV_UNSET;
 
     for (i = 0; i < elementCount; ++i) {
-        if ((this->m_stemDir == STEMDIRECTION_up)
+        if ((this->m_beamPlace == BEAMPLACE_above)
             && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
             minDistToCenter = (*beamElementCoords).at(i)->m_yBeam - verticalCenter;
         }
-        else if ((this->m_stemDir == STEMDIRECTION_down)
+        else if ((this->m_beamPlace == BEAMPLACE_below)
             && (verticalCenter - (*beamElementCoords).at(i)->m_yBeam < minDistToCenter)) {
             minDistToCenter = verticalCenter - (*beamElementCoords).at(i)->m_yBeam;
         }
     }
 
     if (minDistToCenter < 0) {
-        this->m_startingY += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
+        this->m_startingY += (this->m_beamPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
         for (i = 0; i < elementCount; ++i) {
             (*beamElementCoords).at(i)->m_yBeam
-                += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
+                += (this->m_beamPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
         }
     }
 
@@ -361,7 +361,7 @@ void BeamSegment::CalcBeam(
             StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
             assert(interface);
 
-            if (this->m_stemDir == STEMDIRECTION_up) {
+            if (this->m_beamPlace == BEAMPLACE_above) {
                 y1 = (*beamElementCoords).at(i)->m_yBeam - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 y2 = (*beamElementCoords).at(i)->m_yBottom
                     + interface->GetStemUpSE(doc, staff->m_drawingStaffSize, this->m_cueSize).y;
