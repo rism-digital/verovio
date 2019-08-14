@@ -2871,7 +2871,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
         pi ->SetPname(PITCHNAME_g);
     }
     else {
-        LogError("Clef does not have valid shape");
+        LogError("Clef %s does not have valid shape. Shape is %d", clef->GetUuid().c_str(), clef->GetShape());
         return false;
     }
     pi->SetOct(3);
