@@ -776,20 +776,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
         }
 
-        // Find closest valid clef
-        Clef *clef = NULL;
-        clef = layer->GetClef(nc);
-        if (clef == NULL) {
-            LogError("There is no valid clef available.");
-            delete syllable;
-            delete neume;
-            delete nc;
-
-            m_infoObject.import("status", "FAILURE");
-            m_infoObject.import("message", "There is no valid clef available.");
-            return false;
-        }
-
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
         ulx -= noteWidth / 2;
@@ -800,7 +786,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
 
-        if (!AdjustPitchFromPosition(nc, clef)) {
+        layer->ReorderByXPos();
+
+        if (!AdjustPitchFromPosition(nc)) {
             delete syllable;
             delete neume;
             delete nc;
@@ -966,31 +954,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         custos->SetZone(zone);
         custos->SetFacs(zone->GetUuid());
         layer->AddChild(custos);
-        // Find closest valid clef
-        Clef *clef = NULL;
-        clef = layer->GetClef(custos);
-        if (clef == NULL) {
-            LogError("There is no valid clef available.");
-            delete custos;
-
-            m_infoObject.import("status", "FAILURE");
-            m_infoObject.import("message", "There is no valid clef available.");
-            return false;
-        }
-
-        custos->SetOct(3);
-        if (clef->GetShape() == CLEFSHAPE_C)
-            custos->SetPname(PITCHNAME_c);
-        else if (clef->GetShape() == CLEFSHAPE_F)
-            custos->SetPname(PITCHNAME_f);
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly) +
-            - ((ulx - staff->GetZone()->GetUlx()) * tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
 
-        custos->AdjustPitchByOffset(pitchDifference);
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
 
@@ -998,6 +966,14 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
+        layer->ReorderByXPos();
+        if (!AdjustPitchFromPosition(custos)) {
+            LogError("Failed to set pitch.");
+
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Failed to set pitch.");
+            return false;
+        }
         m_infoObject.import("uuid", custos->GetUuid());
     }
     else {
@@ -2900,6 +2876,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) 
     }
     pi->SetOct(3);
 
+    // glyphs in verovio are actually not centered, but are in the top left corner of a giant box
     int centerY = fi->GetZone()->GetUly();
     int centerX = fi->GetZone()->GetUlx();
 
