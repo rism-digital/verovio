@@ -227,6 +227,7 @@ if ($? == 0) {
 	}
 } else {
 	print " Failed.\n";
+	exit 1;
 }
 
 exit 0;
