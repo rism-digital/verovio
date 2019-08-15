@@ -65,7 +65,7 @@ double FacsimileInterface::GetDrawingSkew() const
     // this method should only be called in staff->GetDrawingSkew()
     // since this method cannot validate the m_useSkew option
     // while the staff->GetDrawingSkew() method can
-    
+
     assert(m_zone);
     return m_zone->GetSkew();
 }
@@ -92,6 +92,11 @@ void FacsimileInterface::SetZone(Zone *zone)
         }
     }
     m_zone = zone;
-    this->SetFacs(m_zone->GetUuid());
+    if (m_zone == NULL) {
+        this->SetFacs("");
+    }
+    else {
+        this->SetFacs(m_zone->GetUuid());
+    }
 }
 }
