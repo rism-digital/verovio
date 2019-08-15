@@ -1668,9 +1668,14 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
+        Clef *tempClef;
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
-            clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it),
-                dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)))));
+            tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
+            if (tempClef == NULL) {
+                Layer *layer = dynamic_cast<Layer *>((*it)->GetFirstParent(LAYER));
+                tempClef = layer->GetCurrentClef();
+            }
+            clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it), tempClef));
         }
         newClef = clefsBefore[dynamic_cast<Syllable *>(sortedSyllables.front())];
     }
@@ -2029,6 +2034,9 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 assert(currentParent);
                 firstIsSyl = false;
                 oldClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, currentParent));
+                if (oldClef == NULL) {
+                    oldClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
+                }
             }
             else{
                 LogError("Invalid groupType for ungrouping");
@@ -2143,6 +2151,9 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         std::stable_sort(syllables.begin(), syllables.end(), Object::sortByUlx);
         for (auto it = syllables.begin(); it != syllables.end(); ++it) {
             currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
+            if (currentClef == NULL) {
+                    currentClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
+                }
             if (currentClef != oldClef) {
                 (*it)->FindAllChildByComparison(&pitchedChildren, &ic);
                 for (auto pChild = pitchedChildren.begin(); pChild != pitchedChildren.end(); ++pChild) {
