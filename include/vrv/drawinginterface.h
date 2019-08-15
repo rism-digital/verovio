@@ -89,6 +89,22 @@ public:
     ///@}
 
 protected:
+    //
+public:
+    // values to be set before calling CalcBeam
+    bool m_changingDur;
+    bool m_beamHasChord;
+    bool m_hasMultipleStemDir;
+    bool m_cueSize;
+    bool m_crossStaff;
+    int m_shortestDur;
+    data_STEMDIRECTION m_stemDir;
+    data_BEAMPLACE m_beamPlace;
+    
+    // values set by CalcBeam
+    int m_beamWidth;
+    int m_beamWidthBlack;
+    int m_beamWidthWhite;
 };
 
 //----------------------------------------------------------------------------

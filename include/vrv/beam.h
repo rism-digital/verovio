@@ -36,30 +36,40 @@ public:
      */
     ///@{
     BeamSegment();
-    virtual ~BeamSegment() {}
+    virtual ~BeamSegment();
 
     void Reset();
 
     void CalcBeam(
         Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, data_BEAMPLACE place = BEAMPLACE_NONE);
+    
+    
+    /**
+     *
+     */
+    const ArrayOfBeamElementCoords *GetElementCoords();
+    
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by Beam::FilterList
+     */
+    void InitCoords(ArrayOfObjects *childList);
+    
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoords();
 
-    // values to be set before calling CalcBeam
-    bool m_changingDur;
-    bool m_beamHasChord;
-    bool m_hasMultipleStemDir;
-    bool m_cueSize;
-    bool m_crossStaff;
-    int m_shortestDur;
-    data_STEMDIRECTION m_stemDir;
-    data_BEAMPLACE m_beamPlace;
-
+public:
     // values set by CalcBeam
-    int m_beamWidth;
-    int m_beamWidthBlack;
-    int m_beamWidthWhite;
     int m_startingX; // the initial X position of the beam
     int m_startingY; // the initial Y position of the beam
     double m_beamSlope; // the slope of the beam
+    
+    /**
+     * An array of coordinates for each element
+     **/
+    ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 //----------------------------------------------------------------------------
@@ -103,11 +113,6 @@ public:
     bool IsLastInBeam(LayerElement *element);
     ///@}
 
-    /**
-     *
-     */
-    const ArrayOfBeamElementCoords *GetElementCoords();
-
     //----------//
     // Functors //
     //----------//
@@ -128,11 +133,6 @@ protected:
      * This also initializes the m_beamElementCoords vector
      */
     virtual void FilterList(ArrayOfObjects *childList);
-    /**
-     * Initializes the m_beamElementCoords vector objects.
-     * This is called by Beam::FilterList
-     */
-    void InitCoords(ArrayOfObjects *childList);
 
     /**
      * Return the position of the element in the beam.
@@ -140,22 +140,12 @@ protected:
      */
     int GetPosition(LayerElement *element);
 
-    /**
-     * Clear the m_beamElementCoords vector and delete all the objects.
-     */
-    void ClearCoords();
-
 private:
     //
 public:
     /** */
     BeamSegment m_beamSegment;
 
-private:
-    /**
-     * An array of coordinates for each element
-     **/
-    mutable ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 //----------------------------------------------------------------------------

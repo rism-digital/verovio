@@ -31,31 +31,35 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BeamDrawingParams
+// BeamSegment
 //----------------------------------------------------------------------------
 
 BeamSegment::BeamSegment()
 {
     Reset();
 }
+    
+BeamSegment::~BeamSegment()
+{
+    this->ClearCoords();
+}
 
 void BeamSegment::Reset()
 {
-    m_changingDur = false;
-    m_beamHasChord = false;
-    m_hasMultipleStemDir = false;
-    m_cueSize = false;
-    m_crossStaff = false;
-    m_shortestDur = 0;
-    m_stemDir = STEMDIRECTION_NONE;
-    m_beamPlace = BEAMPLACE_NONE;
-
-    m_beamWidth = 0;
-    m_beamWidthBlack = 0;
-    m_beamWidthWhite = 0;
+    this->ClearCoords();
+    
     m_startingX = 0;
     m_startingY = 0;
     m_beamSlope = 0.0;
+}
+
+void BeamSegment::ClearCoords()
+{
+    ArrayOfBeamElementCoords::iterator iter;
+    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter) {
+        delete *iter;
+    }
+    m_beamElementCoords.clear();
 }
 
 void BeamSegment::CalcBeam(
@@ -664,15 +668,6 @@ void Beam::InitCoords(ArrayOfObjects *childList)
     if (this->m_beamSegment.m_cueSize && (this->m_beamSegment.m_stemDir == STEMDIRECTION_NONE)) {
         this->m_beamSegment.m_stemDir = STEMDIRECTION_up;
     }
-}
-
-void Beam::ClearCoords()
-{
-    ArrayOfBeamElementCoords::iterator iter;
-    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter) {
-        delete *iter;
-    }
-    m_beamElementCoords.clear();
 }
 
 //----------------------------------------------------------------------------

@@ -74,7 +74,18 @@ BeamDrawingInterface::~BeamDrawingInterface() {}
 
 void BeamDrawingInterface::Reset()
 {
+    m_changingDur = false;
+    m_beamHasChord = false;
+    m_hasMultipleStemDir = false;
+    m_cueSize = false;
+    m_crossStaff = false;
+    m_shortestDur = 0;
+    m_stemDir = STEMDIRECTION_NONE;
+    m_beamPlace = BEAMPLACE_NONE;
     
+    m_beamWidth = 0;
+    m_beamWidthBlack = 0;
+    m_beamWidthWhite = 0;
 }
 
 //----------------------------------------------------------------------------
