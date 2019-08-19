@@ -4045,11 +4045,11 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
     }
 
-    //if the current parent is a syllable then we need to make sure that a syl got added
-    //if not then add a blank one
+    // if the current parent is a syllable then we need to make sure that a syl got added
+    // if not then add a blank one
     if (strcmp(parentNode.name(), "syllable") == 0) {
         auto testSyl = parent->FindChildByType(SYL);
-        if(testSyl == NULL) {
+        if (testSyl == NULL) {
             Syl *syl = new Syl();
             parent->AddChild(syl);
         }
@@ -4546,14 +4546,14 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 
     parent->AddChild(vrvSyllable);
 
-    //read all of the syllables elements
-    //and add an empty <syl> if it doesn't have one
-    if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
+    // read all of the syllables elements
+    // and add an empty <syl> if it doesn't have one
+    if ((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
 
         Object *obj = vrvSyllable->FindChildByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
 
-        if(syl == NULL) {
+        if (syl == NULL) {
             syl = new Syl();
             vrvSyllable->AddChild(syl);
         }

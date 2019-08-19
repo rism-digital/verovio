@@ -91,7 +91,7 @@ public:
     ///@{
     virtual int AdjustArpeg(FunctorParams *functorParams);
     ///@}
-                  
+
     /**
      * See Object::ResetDrawing
      */

@@ -41,12 +41,13 @@ public:
     void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly();
     int GetLogicalLry();
+
 protected:
     //
 private:
     //
 };
 
-}   // namespace vrv
+} // namespace vrv
 
 #endif

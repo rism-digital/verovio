@@ -39,7 +39,7 @@ void Surface::Reset()
 
 void Surface::AddChild(Object *object)
 {
-    //TODO Add support for graphic tag
+    // TODO Add support for graphic tag
     if (object->Is(ZONE)) {
         object->SetParent(this);
         this->m_children.push_back(object);
@@ -61,7 +61,7 @@ int Surface::GetMaxX()
     ClassIdComparison ac(ZONE);
     ArrayOfObjects zones;
     FindAllChildByComparison(&zones, &ac);
-    for (auto iter = zones.begin(); iter!= zones.end(); iter++) {
+    for (auto iter = zones.begin(); iter != zones.end(); iter++) {
         Zone *zone = dynamic_cast<Zone *>(*iter);
         assert(zone);
         max = (zone->GetLrx() > max) ? zone->GetLrx() : max;
@@ -76,7 +76,7 @@ int Surface::GetMaxY()
     ClassIdComparison ac(ZONE);
     ArrayOfObjects zones;
     FindAllChildByComparison(&zones, &ac);
-    for (auto iter = zones.begin(); iter!= zones.end(); iter++) {
+    for (auto iter = zones.begin(); iter != zones.end(); iter++) {
         Zone *zone = dynamic_cast<Zone *>(*iter);
         assert(zone);
         max = (zone->GetLry() > max) ? zone->GetLry() : max;

@@ -578,7 +578,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = dynamic_cast<Clef *>(element);
     assert(clef);
-    int x,y;
+    int x, y;
     if (m_doc->GetType() == Facs && clef->HasFacs()) {
         y = ToLogicalY(staff->GetDrawingY());
         x = clef->GetDrawingX();
@@ -712,7 +712,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    int x,y;
+    int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());

@@ -533,7 +533,8 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
+    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs)
+        && (m_options->m_breaks.GetValue() != BREAKS_none)) {
         if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
@@ -557,14 +558,13 @@ bool Toolkit::LoadData(const std::string &data)
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
     }
-    switch(m_doc.m_notationType) {
+    switch (m_doc.m_notationType) {
         case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
         case NOTATIONTYPE_mensural:
         case NOTATIONTYPE_mensural_black:
         case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
         case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
-        default:
-             m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
+        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
     }
 #endif
 
@@ -585,8 +585,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
     MeiOutput meioutput(&m_doc, "");
     meioutput.SetScoreBasedMEI(scoreBased);
     std::string output = meioutput.GetOutput(pageNo);
-    if (initialPageNo >= 0)
-        m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
 
@@ -1076,8 +1075,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
-    if (initialPageNo >= 0)
-        m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }
 

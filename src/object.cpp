@@ -238,28 +238,28 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
     replacingChild->SetParent(this);
     this->Modify();
 }
-    
+
 void Object::InsertBefore(Object *child, Object *newChild)
 {
     assert(this->GetChildIndex(child) != -1);
     assert(this->GetChildIndex(newChild) == -1);
-    
+
     int idx = this->GetChildIndex(child);
     newChild->SetParent(this);
     this->InsertChild(newChild, idx);
 
     this->Modify();
 }
-    
+
 void Object::InsertAfter(Object *child, Object *newChild)
 {
     assert(this->GetChildIndex(child) != -1);
     assert(this->GetChildIndex(newChild) == -1);
-    
+
     int idx = this->GetChildIndex(child);
     newChild->SetParent(this);
     this->InsertChild(newChild, idx + 1);
-    
+
     this->Modify();
 }
 
@@ -709,13 +709,13 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
         return (m_parent->GetLastParentNot(classId, maxDepth - 1));
     }
 }
-    
+
 bool Object::HasEditorialContent()
 {
     ArrayOfObjects editorial;
     IsEditorialElementComparison editorialComparison;
     this->FindAllChildByComparison(&editorial, &editorialComparison);
-    return (!editorial.empty());    
+    return (!editorial.empty());
 }
 
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
@@ -828,8 +828,6 @@ void Object::ReorderByXPos()
     Functor reorder(&Object::ReorderByXPos);
     this->Process(&reorder, &params);
 }
-
-
 
 //----------------------------------------------------------------------------
 // ObjectListInterface

@@ -487,7 +487,7 @@ bool Beam::IsLastInBeam(LayerElement *element)
     if (position == (size - 1)) return true;
     return false;
 }
-    
+
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 {
     this->GetList(this);
@@ -666,12 +666,12 @@ int Beam::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     this->m_drawingParams.Reset();
-    
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
-    
+
     return FUNCTOR_CONTINUE;
 }
 

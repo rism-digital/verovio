@@ -108,25 +108,25 @@ int StaffGrp::GetMaxStaffSize()
 {
     this->ResetList(this);
     const ArrayOfObjects *childList = this->GetList(this);
-    
+
     if (childList->empty()) return 100;
-    
+
     int max = 0;
-    
+
     StaffDef *staffDef = NULL;
-    for (auto& child : *childList) {
+    for (auto &child : *childList) {
         staffDef = dynamic_cast<StaffDef *>(child);
         assert(staffDef);
         if (staffDef->GetScale() > max) {
             max = staffDef->GetScale();
         }
     }
-    
+
     if (max == 0) return 100;
-    
+
     return max;
 }
-    
+
 //----------------------------------------------------------------------------
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
