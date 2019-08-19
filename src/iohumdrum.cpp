@@ -14109,6 +14109,10 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     string currentsection;
     if (m_sectionlabels[startline]) {
         currentsection = *m_sectionlabels[startline];
+        if (currentsection.compare(0, 2, "*>") == 0) {
+            currentsection = currentsection.substr(2);
+        }
+        currentsection = "label-" + currentsection;
     }
     else {
         currentsection = "";
@@ -14148,9 +14152,14 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     if (ending && (m_endingnum != endnum)) {
         // create a new ending
         m_currentending = new Ending;
+        std::string endingid = *m_sectionlabels[startline];
+        if (endingid.compare(0, 2, "*>") == 0) {
+            endingid = endingid.substr(2);
+        }
+        endingid = "label-" + endingid;
         setN(m_currentending, endnum, m_sectionlabels[startline]);
         // sanitize id if not valid:
-        m_currentending->SetUuid(*m_sectionlabels[startline]);
+        m_currentending->SetUuid(endingid);
         if (m_sections.size() > 1) {
             // assuming the ending does not start at beginning
             // of music.
@@ -14430,8 +14439,7 @@ void HumdrumInput::setupMeiDocument()
     hum::HTp starting = infile.getTrackStart(1);
     if (starting) {
         section->SetUuid(getLocationId(section, starting, -1));
-        // Disable temporarily: https://github.com/rism-ch/verovio/issues/1125
-        // storeExpansionLists(section, starting);
+        storeExpansionLists(section, starting);
     }
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());
@@ -15735,7 +15743,7 @@ void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
     }
 
     for (int i = 0; i < (int)labels.size(); i++) {
-        string ref = "#" + labels[i];
+        string ref = "#label-" + labels[i];
         exp->AddRefAllowDuplicate(ref);
     }
 }
