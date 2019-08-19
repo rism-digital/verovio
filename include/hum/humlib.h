@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Aug  9 22:21:56 EDT 2019
+// Last Modified: Tue Aug 13 16:51:35 EDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4821,14 +4821,18 @@ class Tool_homophonic : public HumTool {
 		void        analyzeLine        (HumdrumFile& infile, int line);
 		void        initialize         (void);
 		void        markHomophonicNotes(void);
+		void        printFractionAnalysis(HumdrumFile& infile, std::vector<double>& score);
+		int         getExtantVoiceCount(HumdrumFile& infile);
+		int         getOriginalVoiceCount(HumdrumFile& infile);
 
 	private:
 		std::vector<std::string> m_homophonic;
 		std::vector<int> m_notecount;
 		std::vector<int> m_attacks;
 		std::vector<std::vector<HPNote>> m_notes;
-		int m_count = 4;
-
+		double m_threshold = 4.0;
+		double m_score = 1.0;
+		double m_intermediate_score = 0.5;
 };
 
 
