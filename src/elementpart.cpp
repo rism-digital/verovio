@@ -230,7 +230,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
         assert(tuplet && tuplet->GetDrawingLeft() && tuplet->GetDrawingRight());
         if (tuplet->GetNumAlignedBeam()) {
-            const ArrayOfBeamElementCoords *coords = tuplet->GetNumAlignedBeam()->GetElementCoords();
+            const ArrayOfBeamElementCoords *coords = tuplet->GetNumAlignedBeam()->m_beamSegment.GetElementCoordRefs();
             int xLeft = coords->front()->m_x;
             int xRight = coords->back()->m_x;
             return xLeft + ((xRight - xLeft) / 2);

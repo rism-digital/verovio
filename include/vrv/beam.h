@@ -41,24 +41,23 @@ public:
     void Reset();
 
     void CalcBeam(
-        Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, data_BEAMPLACE place = BEAMPLACE_NONE);
-    
-    
+        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *interface, data_BEAMPLACE place = BEAMPLACE_NONE);
+        
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords();
+    const ArrayOfBeamElementCoords *GetElementCoordRefs();
     
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
-    void InitCoords(ArrayOfObjects *childList);
+    void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
     
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
-    void ClearCoords();
+    void ClearCoordRefs();
 
 public:
     // values set by CalcBeam
@@ -69,7 +68,7 @@ public:
     /**
      * An array of coordinates for each element
      **/
-    ArrayOfBeamElementCoords m_beamElementCoords;
+    ArrayOfBeamElementCoords m_beamElementCoordRefs;
 };
 
 //----------------------------------------------------------------------------
@@ -78,7 +77,6 @@ public:
 
 class Beam : public LayerElement,
              public ObjectListInterface,
-             public DrawingListInterface,
              public BeamDrawingInterface,
              public AttColor,
              public AttBeamedWith,
@@ -112,6 +110,11 @@ public:
     bool IsFirstInBeam(LayerElement *element);
     bool IsLastInBeam(LayerElement *element);
     ///@}
+                                  
+     /**
+      *
+      */
+     const ArrayOfBeamElementCoords *GetElementCoords();
 
     //----------//
     // Functors //

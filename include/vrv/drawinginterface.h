@@ -87,6 +87,17 @@ public:
     virtual ~BeamDrawingInterface();
     virtual void Reset();
     ///@}
+    
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by Beam::FilterList
+     */
+    void InitCoords(ArrayOfObjects *childList);
+    
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoords();
 
 protected:
     //
@@ -105,6 +116,11 @@ public:
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
+    
+    /**
+     * An array of coordinates for each element
+     **/
+    ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 //----------------------------------------------------------------------------

@@ -325,23 +325,23 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     m_numAlignedBeam = m_bracketAlignedBeam;
 
     // Cancel alignment of the bracket with the beam if position and stemdirection are not concordant
-    if (m_bracketAlignedBeam && (m_bracketAlignedBeam->m_beamSegment.m_stemDir == STEMDIRECTION_up)
+    if (m_bracketAlignedBeam && (m_bracketAlignedBeam->m_stemDir == STEMDIRECTION_up)
         && (m_drawingBracketPos == STAFFREL_basic_below)) {
         m_bracketAlignedBeam = NULL;
     }
     else if (m_bracketAlignedBeam
-        && ((m_bracketAlignedBeam->m_beamSegment.m_stemDir == STEMDIRECTION_down)
+        && ((m_bracketAlignedBeam->m_stemDir == STEMDIRECTION_down)
                && (m_drawingBracketPos == STAFFREL_basic_above))) {
         m_bracketAlignedBeam = NULL;
     }
 
     // Cancel alignment of the num with the beam if position and stemdirection are not concordant
-    if (m_numAlignedBeam && (m_numAlignedBeam->m_beamSegment.m_stemDir == STEMDIRECTION_up)
+    if (m_numAlignedBeam && (m_numAlignedBeam->m_stemDir == STEMDIRECTION_up)
         && (m_drawingNumPos == STAFFREL_basic_below)) {
         m_numAlignedBeam = NULL;
     }
     else if (m_numAlignedBeam
-        && ((m_numAlignedBeam->m_beamSegment.m_stemDir == STEMDIRECTION_down)
+        && ((m_numAlignedBeam->m_stemDir == STEMDIRECTION_down)
                && (m_drawingNumPos == STAFFREL_basic_above))) {
         m_numAlignedBeam = NULL;
     }
