@@ -29,17 +29,17 @@ namespace vrv {
 
 class EditorToolkitNeume : public EditorToolkit {
 public:
-    EditorToolkitNeume(Doc * doc, View *view) : EditorToolkit(doc, view) {}
-    bool ParseEditorAction(const std::string &json_editorAction, bool isChain=false);
+    EditorToolkitNeume(Doc *doc, View *view) : EditorToolkit(doc, view) {}
+    bool ParseEditorAction(const std::string &json_editorAction, bool isChain = false);
 
     /**
      * Experimental editor functions.
      */
     ///@{
     bool Chain(jsonxx::Array actions);
-    bool Drag(std::string elementId, int x, int y, bool isChain=false);
-    bool Insert(std::string elementType, std::string staffId, int ulx, int uly,
-        int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes);
+    bool Drag(std::string elementId, int x, int y, bool isChain = false);
+    bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
+        std::vector<std::pair<std::string, std::string> > attributes);
     bool Merge(std::vector<std::string> elementIds);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool SetText(std::string elementId, std::string text);
@@ -53,7 +53,6 @@ public:
     bool ToggleLigature(std::vector<std::string> elementIds, std::string isLigature);
     ///@}
 protected:
-
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -61,7 +60,7 @@ protected:
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
-        int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes);
+        int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
@@ -88,19 +87,14 @@ struct ClosestBB {
 
     int distanceToBB(int ulx, int uly, int lrx, int lry)
     {
-        int xDiff = std::max(
-                (ulx > x ? ulx - x : 0),
-                (x > lrx ? x - lrx : 0)
-        );
-        int yDiff = std::max(
-                (uly > y ? uly - y : 0),
-                (y > lry ? y - lry : 0)
-        );
+        int xDiff = std::max((ulx > x ? ulx - x : 0), (x > lrx ? x - lrx : 0));
+        int yDiff = std::max((uly > y ? uly - y : 0), (y > lry ? y - lry : 0));
 
         return sqrt(xDiff * xDiff + yDiff * yDiff);
     }
 
-    bool operator() (Object *a, Object *b) {
+    bool operator()(Object *a, Object *b)
+    {
         if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
@@ -116,14 +110,15 @@ struct ClosestBB {
 struct StaffSort {
     // Sort staves left-to-right and top-to-bottom
     // Sort by y if there is no intersection, by x if there is
-    bool operator() (Object *a, Object *b) {
+    bool operator()(Object *a, Object *b)
+    {
         if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
         // Check for y intersection
-        if ((zoneA->GetUly() < zoneB->GetLry() && zoneA->GetLry() > zoneB->GetLry()) ||
-            (zoneA->GetUly() < zoneB->GetUly() && zoneA->GetLry() > zoneB->GetUly())) {
+        if ((zoneA->GetUly() < zoneB->GetLry() && zoneA->GetLry() > zoneB->GetLry())
+            || (zoneA->GetUly() < zoneB->GetUly() && zoneA->GetLry() > zoneB->GetUly())) {
             // y intersection, so sort by ulx
             return (zoneA->GetUlx() < zoneB->GetUlx());
         }

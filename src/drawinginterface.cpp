@@ -82,12 +82,12 @@ void BeamDrawingInterface::Reset()
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
     m_beamPlace = BEAMPLACE_NONE;
-    
+
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
 }
-    
+
 void BeamDrawingInterface::ClearCoords()
 {
     ArrayOfBeamElementCoords::iterator iter;
@@ -96,8 +96,7 @@ void BeamDrawingInterface::ClearCoords()
     }
     m_beamElementCoords.clear();
 }
-    
-    
+
 void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList)
 {
     ClearCoords();
@@ -175,8 +174,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList)
                     currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
                 }
                 if (currentStemDir != STEMDIRECTION_NONE) {
-                    if ((this->m_stemDir != STEMDIRECTION_NONE)
-                        && (this->m_stemDir != currentStemDir)) {
+                    if ((this->m_stemDir != STEMDIRECTION_NONE) && (this->m_stemDir != currentStemDir)) {
                         this->m_hasMultipleStemDir = true;
                     }
                     this->m_stemDir = currentStemDir;

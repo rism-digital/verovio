@@ -330,8 +330,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
         m_bracketAlignedBeam = NULL;
     }
     else if (m_bracketAlignedBeam
-        && ((m_bracketAlignedBeam->m_stemDir == STEMDIRECTION_down)
-               && (m_drawingBracketPos == STAFFREL_basic_above))) {
+        && ((m_bracketAlignedBeam->m_stemDir == STEMDIRECTION_down) && (m_drawingBracketPos == STAFFREL_basic_above))) {
         m_bracketAlignedBeam = NULL;
     }
 
@@ -341,8 +340,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
         m_numAlignedBeam = NULL;
     }
     else if (m_numAlignedBeam
-        && ((m_numAlignedBeam->m_stemDir == STEMDIRECTION_down)
-               && (m_drawingNumPos == STAFFREL_basic_above))) {
+        && ((m_numAlignedBeam->m_stemDir == STEMDIRECTION_down) && (m_drawingNumPos == STAFFREL_basic_above))) {
         m_numAlignedBeam = NULL;
     }
 
@@ -532,7 +530,7 @@ int Tuplet::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
 

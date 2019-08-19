@@ -713,7 +713,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int barLineThickWidth = m_doc->GetDrawingBeamWidth(staffSize, false);
     int x1 = x - m_doc->GetDrawingBeamWidth(staffSize, false) - barLineWidth;
     int x2 = x + m_doc->GetDrawingBeamWidth(staffSize, false) + barLineWidth;
-    
+
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(staffSize) * 16 / 13;
     int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
@@ -803,8 +803,10 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     assert(barLine);
 
     int x = barLine->GetDrawingX();
-    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
+        - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
+        + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
 
     int yBottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);

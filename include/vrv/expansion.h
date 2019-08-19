@@ -36,7 +36,7 @@ public:
     virtual std::string GetClassName() const { return "Expansion"; }
     virtual ClassId GetClassId() const { return EXPANSION; }
     ///@}
-    
+
     /**
      * @name Getter to interfaces
      */

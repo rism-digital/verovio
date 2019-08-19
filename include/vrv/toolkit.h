@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-    
+
 class EditorToolkit;
 
 enum FileFormat {

@@ -179,7 +179,7 @@ public:
      * The currentChild is not deleted by the methods.
      */
     void ReplaceChild(Object *currentChild, Object *replacingChild);
-    
+
     /**
      * @name Insert an object before or after a given child
      */
@@ -465,7 +465,7 @@ public:
     bool IsAttribute() const { return m_isAttribute; }
     void IsAttribute(bool isAttribute) { m_isAttribute = isAttribute; }
     ///@}
-    
+
     /**
      * Return true if the object contains any editorial content
      */

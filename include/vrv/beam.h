@@ -42,18 +42,18 @@ public:
 
     void CalcBeam(
         Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *interface, data_BEAMPLACE place = BEAMPLACE_NONE);
-        
+
     /**
      *
      */
     const ArrayOfBeamElementCoords *GetElementCoordRefs();
-    
+
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
     void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
-    
+
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
@@ -64,7 +64,7 @@ public:
     int m_startingX; // the initial X position of the beam
     int m_startingY; // the initial Y position of the beam
     double m_beamSlope; // the slope of the beam
-    
+
     /**
      * An array of coordinates for each element
      **/
@@ -110,11 +110,11 @@ public:
     bool IsFirstInBeam(LayerElement *element);
     bool IsLastInBeam(LayerElement *element);
     ///@}
-                                  
-     /**
-      *
-      */
-     const ArrayOfBeamElementCoords *GetElementCoords();
+
+    /**
+     *
+     */
+    const ArrayOfBeamElementCoords *GetElementCoords();
 
     //----------//
     // Functors //
@@ -148,7 +148,6 @@ private:
 public:
     /** */
     BeamSegment m_beamSegment;
-
 };
 
 //----------------------------------------------------------------------------
@@ -161,7 +160,11 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamElementCoord() { m_element = NULL; m_stem = NULL; }
+    BeamElementCoord()
+    {
+        m_element = NULL;
+        m_stem = NULL;
+    }
     virtual ~BeamElementCoord();
 
     int m_x;

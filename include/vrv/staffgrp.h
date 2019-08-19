@@ -58,7 +58,7 @@ public:
     VisibilityOptimization GetDrawingVisibility() const { return m_drawingVisibility; }
     void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
     ///@}
-    
+
     /**
      * Return the maximum staff size in the staffGrp (100 if empty)
      */

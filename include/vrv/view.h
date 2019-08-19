@@ -523,11 +523,12 @@ private:
     float CalcInitialSlur(FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN,
         curvature_CURVEDIR curveDir, Point points[4]);
     ///@}
-    
+
     /**
      * Internal method for drawing a BeamSegment
      */
-    void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff, Measure *measure);
+    void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
+        Staff *staff, Measure *measure);
 
     /**
      * Used for calculating clustered information/dot position

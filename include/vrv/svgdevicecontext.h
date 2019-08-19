@@ -167,17 +167,16 @@ public:
 
     void SetFacsimile(bool facsimile) { m_facsimile = facsimile; }
     bool GetFacsimile() { return m_facsimile; }
-    
+
     /**
      * Setting m_svgBoudingBoxes flag (false by default)
      */
     void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
-    
+
     /**
      * Setting m_svgViewBox flag (false by default)
      */
     void SetSvgViewBox(bool svgViewBox) { m_svgViewBox = svgViewBox; }
-
 
 private:
     /**
@@ -195,7 +194,6 @@ private:
      * Internal method for drawing debug SVG bounding box
      */
     void DrawSvgBoundingBoxRectangle(int x, int y, int width, int height);
-
 
     /**
      * Change the flag for indicating the use of the VerovioText font

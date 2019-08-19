@@ -56,39 +56,39 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             beamStaff = staff;
         }
     }
-    
+
     /******************************************************************/
     // initialization
-    
+
     const ArrayOfObjects *beamChildren = beam->GetList(beam);
-    
+
     // Should we assert this at the beginning?
     if (beamChildren->empty()) {
         return;
     }
-    
+
     beam->m_beamSegment.InitCoordRefs(beam->GetElementCoords());
-    
+
     /******************************************************************/
     // Calculate the beam slope and position
-    
+
     beam->m_beamSegment.CalcBeam(layer, beamStaff, m_doc, beam, beam->GetPlace());
-    
+
     /******************************************************************/
     // Start the Beam graphic and draw the children
-    
+
     dc->StartGraphic(element, "", element->GetUuid());
-    
+
     /******************************************************************/
     // Draw the children
-    
+
     DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
     // Draw the beamSegment
-    
+
     DrawBeamSegment(dc, &beam->m_beamSegment, beam, layer, staff, measure);
-    
+
     dc->EndGraphic(element, this);
 }
 
@@ -229,8 +229,9 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->EndGraphic(element, this);
 }
-    
-void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDrawingInterface *beamInterface, Layer *layer, Staff *staff, Measure *measure)
+
+void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDrawingInterface *beamInterface,
+    Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(beamSegment);
@@ -238,72 +239,72 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     // temporary coordinates
     int x1, x2, y1, y2;
-    
+
     // temporary variables
     int shiftY;
     int fullBars, polygonHeight;
     double dy1, dy2;
-    
+
     // loops
     int i, j;
-    
+
     const ArrayOfBeamElementCoords *beamElementCoords = beamSegment->GetElementCoordRefs();
-    
+
     int elementCount = (int)beamElementCoords->size();
     int last = elementCount - 1;
-    
+
     /******************************************************************/
     // Draw the beam full bars
-    
+
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw
     // only one bar and the others will be drawn separately.
     fullBars = !beamInterface->m_changingDur ? (beamInterface->m_shortestDur - DUR_4) : 1;
-    
+
     // Adjust the x position of the first and last element for taking into account the stem width
     beamElementCoords->at(0)->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     beamElementCoords->at(last)->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    
+
     // Shift direction
     shiftY = (beamInterface->m_stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
-    
+
     y1 = beamElementCoords->at(0)->m_yBeam;
     y2 = beamElementCoords->at(last)->m_yBeam;
-    
+
     x1 = beamElementCoords->at(0)->m_x;
     x2 = beamElementCoords->at(last)->m_x;
-    
+
     dy1 = shiftY;
     dy2 = shiftY;
-    
+
     // For acc and rit beam (see AttBeamingVis set
     // s_y = 0 and s_y2 = 0 respectively
-    
+
     for (j = 0; j < fullBars; ++j) {
         polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
         DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;
-        
+
         // dy1 must == 0 for accelerando beams
         if (!dy1)
             y1 += (beamInterface->m_beamWidthBlack * shiftY) * -1;
         else
             y1 += dy1 * beamInterface->m_beamWidthWhite;
-        
+
         // reverse for retardendo beam
         if (!dy2)
             y2 += (beamInterface->m_beamWidthBlack * shiftY) * -1;
         else
             y2 += dy2 * beamInterface->m_beamWidthWhite;
     }
-    
+
     /******************************************************************/
     // Draw the beam for partial bars (if any)
-    
+
     /* calcul des x en cas de beaming multiple */
     /* parcours horizontal ajoutant barres en fonction de m_dur la plus
      breve (shortestDur), controle par boucle while; la premiere boucle for
@@ -313,7 +314,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
      marqueurs partitionnant les sous-groupes; la troisieme boucle for est
      pilotee par l'indice de l'array; elle dessine horizontalement les barres
      de chaque sous-groupe en suivant les marqueurs */
-    
+
     // Map the indexes of the notes/chords since we need to ignore rests when drawing partials
     // However, exception for the first and last element of a beam
     std::vector<int> noteIndexes;
@@ -323,33 +324,33 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
         noteIndexes.push_back(i);
     }
     int noteCount = (int)noteIndexes.size();
-    
+
     if (beamInterface->m_changingDur && noteCount > 0) {
         int testDur = DUR_8 + fullBars;
         int barY = beamInterface->m_beamWidth;
-        
+
         if (beamInterface->m_stemDir == STEMDIRECTION_up) {
             barY = -barY;
         }
-        
+
         int fractBeamWidth
-        = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beamInterface->m_cueSize)
-        * 7 / 10;
-        
+            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beamInterface->m_cueSize) * 7
+            / 10;
+
         // loop
         while (testDur <= beamInterface->m_shortestDur) {
             // true at the beginning of a beam or after a breakSec
             bool start = true;
-            
+
             int idx = 0;
-            
+
             // all but the last one
             for (i = 0; i < noteCount - 1; ++i) {
                 idx = noteIndexes.at(i);
                 int nextIdx = noteIndexes.at(i + 1);
-                
+
                 bool breakSec = ((beamElementCoords->at(idx)->m_breaksec)
-                                 && (testDur - DUR_8 >= beamElementCoords->at(idx)->m_breaksec));
+                    && (testDur - DUR_8 >= beamElementCoords->at(idx)->m_breaksec));
                 beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_NONE;
                 // partial is needed
                 if (beamElementCoords->at(idx)->m_dur >= (char)testDur) {
@@ -371,7 +372,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                             }
                             // if the previous level underneath was a partial through, put it left
                             else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlags[testDur - 1 - DUR_8]
-                                     == PARTIAL_THROUGH) {
+                                == PARTIAL_THROUGH) {
                                 beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                             }
                             // if the level underneath was not left (right or through), put it right
@@ -404,7 +405,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                     beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                 }
             }
-            
+
             // draw them
             for (i = 0; i < noteCount; ++i) {
                 idx = noteIndexes.at(i);
@@ -416,31 +417,28 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                     y2 = beamElementCoords->at(noteIndexes.at(i + 1))->m_yBeam + barY;
                     polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1,
-                                       beamElementCoords->at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
+                        beamElementCoords->at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = beamElementCoords->at(idx)->m_yBeam + barY;
                     int x2 = beamElementCoords->at(idx)->m_x + fractBeamWidth;
-                    y2 = beamSegment->m_startingY + barY
-                    + beamSegment->m_beamSlope * (x2 - beamSegment->m_startingX);
+                    y2 = beamSegment->m_startingY + barY + beamSegment->m_beamSlope * (x2 - beamSegment->m_startingX);
                     polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
                     y2 = beamElementCoords->at(idx)->m_yBeam + barY;
                     int x1 = beamElementCoords->at(idx)->m_x - fractBeamWidth;
-                    y1 = beamSegment->m_startingY + barY
-                    + beamSegment->m_beamSlope * (x1 - beamSegment->m_startingX);
+                    y1 = beamSegment->m_startingY + barY + beamSegment->m_beamSlope * (x1 - beamSegment->m_startingX);
                     polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, x1, y1, beamElementCoords->at(idx)->m_x, y2, polygonHeight);
                 }
             }
-            
+
             testDur += 1;
             barY += shiftY * beamInterface->m_beamWidth;
         } // end of while
     } // end of drawing partial bars
-    
 }
 
 } // namespace vrv

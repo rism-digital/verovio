@@ -69,7 +69,8 @@ LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInter
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement(std::string classid)
+    : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
@@ -101,9 +102,7 @@ void LayerElement::Reset()
     m_crossLayer = NULL;
 }
 
-LayerElement::~LayerElement()
-{
-}
+LayerElement::~LayerElement() {}
 
 LayerElement &LayerElement::operator=(const LayerElement &element)
 {

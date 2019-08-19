@@ -87,13 +87,13 @@ public:
     virtual ~BeamDrawingInterface();
     virtual void Reset();
     ///@}
-    
+
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
     void InitCoords(ArrayOfObjects *childList);
-    
+
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
@@ -111,12 +111,12 @@ public:
     int m_shortestDur;
     data_STEMDIRECTION m_stemDir;
     data_BEAMPLACE m_beamPlace;
-    
+
     // values set by CalcBeam
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
-    
+
     /**
      * An array of coordinates for each element
      **/

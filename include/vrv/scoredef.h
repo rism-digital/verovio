@@ -185,12 +185,12 @@ public:
     PgHead *GetPgHead();
     PgHead2 *GetPgHead2();
     ///@}
-    
+
     /**
      * Return the maximum staff size in the scoreDef (100 if empty)
      */
     int GetMaxStaffSize();
-    
+
     //----------//
     // Functors //
     //----------//

@@ -38,7 +38,7 @@ BeamSegment::BeamSegment()
 {
     Reset();
 }
-    
+
 BeamSegment::~BeamSegment()
 {
     this->ClearCoordRefs();
@@ -47,16 +47,15 @@ BeamSegment::~BeamSegment()
 void BeamSegment::Reset()
 {
     this->ClearCoordRefs();
-    
+
     m_startingX = 0;
     m_startingY = 0;
     m_beamSlope = 0.0;
 }
-    
 
 const ArrayOfBeamElementCoords *BeamSegment::GetElementCoordRefs()
 {
-    //this->GetList(this);
+    // this->GetList(this);
     return &m_beamElementCoordRefs;
 }
 
@@ -64,21 +63,19 @@ void BeamSegment::ClearCoordRefs()
 {
     m_beamElementCoordRefs.clear();
 }
-    
+
 void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords)
 {
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void BeamSegment::CalcBeam(
-    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *interface, data_BEAMPLACE place)
+void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *interface, data_BEAMPLACE place)
 {
     assert(layer);
     assert(staff);
     assert(doc);
-    
-    int elementCount
-    = (int)m_beamElementCoordRefs.size();
+
+    int elementCount = (int)m_beamElementCoordRefs.size();
     assert(elementCount > 0);
 
     int y1, y2, avgY, high, low, verticalCenter, verticalShift;
@@ -168,7 +165,7 @@ void BeamSegment::CalcBeam(
     if (elementCount != nbRests) {
         avgY /= (elementCount - nbRests);
     }
-    
+
     // Beam@place has precedence in all cases
     if (place != BEAMPLACE_NONE) {
         if (interface->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
@@ -206,10 +203,10 @@ void BeamSegment::CalcBeam(
         }
     }
     assert(interface->m_beamPlace != BEAMPLACE_NONE);
-    
+
     for (i = 0; i < elementCount; ++i) {
         if (!m_beamElementCoordRefs.at(i)->m_stem) continue;
-        
+
         if (interface->m_beamPlace == BEAMPLACE_above) {
             m_beamElementCoordRefs.at(i)->m_stem->SetDrawingStemDir(STEMDIRECTION_up);
         }
@@ -221,7 +218,7 @@ void BeamSegment::CalcBeam(
             if (interface->m_crossStaff) {
                 Staff *currentCrossStaff = m_beamElementCoordRefs.at(i)->m_element->m_crossStaff;
                 if (currentCrossStaff) {
-                    //if (currentCrossStaff->GetN() < staff->GetN()
+                    // if (currentCrossStaff->GetN() < staff->GetN()
                 }
             }
         }
@@ -401,7 +398,8 @@ void BeamSegment::CalcBeam(
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
+Beam::Beam()
+    : LayerElement("beam-"), ObjectListInterface(), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
@@ -410,9 +408,7 @@ Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), BeamDrawingInterfac
     Reset();
 }
 
-Beam::~Beam()
-{
-}
+Beam::~Beam() {}
 
 void Beam::Reset()
 {
@@ -554,14 +550,11 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
     return &m_beamElementCoords;
 }
 
-
 //----------------------------------------------------------------------------
 // BeamElementCoord
 //----------------------------------------------------------------------------
 
-BeamElementCoord::~BeamElementCoord()
-{
-}
+BeamElementCoord::~BeamElementCoord() {}
 
 //----------------------------------------------------------------------------
 // Functors methods
@@ -595,12 +588,12 @@ int Beam::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     this->m_beamSegment.Reset();
-    
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
-    
+
     return FUNCTOR_CONTINUE;
 }
 

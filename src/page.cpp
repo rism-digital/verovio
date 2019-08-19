@@ -123,7 +123,7 @@ void Page::LayOut(bool force)
     this->LayOutHorizontally();
     this->JustifyHorizontally();
     this->LayOutVertically();
-    
+
     Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
     if (doc->GetOptions()->m_svgBoundingBoxes.GetValue()) {
@@ -134,7 +134,7 @@ void Page::LayOut(bool force)
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
     }
-        
+
     m_layoutDone = true;
 }
 

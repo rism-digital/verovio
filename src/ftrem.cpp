@@ -36,9 +36,7 @@ FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), BeamDrawingInter
     Reset();
 }
 
-FTrem::~FTrem()
-{
-}
+FTrem::~FTrem() {}
 
 void FTrem::Reset()
 {
@@ -75,9 +73,9 @@ void FTrem::AddChild(Object *child)
 const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
 {
     this->GetList(this);
-    
+
     this->m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
-    
+
     return &m_beamElementCoords;
 }
 
@@ -173,7 +171,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     if (fTremChildren->empty()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     assert(this->GetElementCoords()->size() == 2);
 
     this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
@@ -192,9 +190,9 @@ int FTrem::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     this->m_beamSegment.Reset();
-    
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
     return FUNCTOR_CONTINUE;

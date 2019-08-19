@@ -138,7 +138,6 @@ class Unclear;
 class Verse;
 class Zone;
 
-
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
@@ -180,8 +179,6 @@ public:
      * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
-
-
 
 private:
     bool WriteDoc(Doc *doc);
