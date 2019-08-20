@@ -550,6 +550,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeCrossStaffStemDirections();
     m_spine_color.resize(infile.getMaxTrack() + 1);
     initializeSpineColor(infile);
+    initializeIgnoreVector(infile);
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -670,6 +671,30 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::initializeIgnoreVector -- Mark areas of the input file that
+//     should not be converted into
+//
+
+void HumdrumInput::initializeIgnoreVector(hum::HumdrumFile &infile)
+{
+    m_ignore.resize(infile.getLineCount());
+    int state = false;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        m_ignore[i] = state;
+        if (!infile[i].isGlobalComment()) {
+            continue;
+        }
+        if ((std::string)infile[i] == "!!ignore") {
+            state = true;
+        }
+        else if ((std::string)infile[i] == "!!Xignore") {
+            state = false;
+        }
+    }
 }
 
 //////////////////////////////
@@ -3552,11 +3577,19 @@ bool HumdrumInput::convertSystemMeasure(int &line)
     hum::HumdrumFile &infile = m_infiles[0];
     int startline = line;
     int endline = getMeasureEndLine(startline);
+    if (endline > infile.getLineCount()) {
+        return false;
+    }
     if (endline < 0) {
         // empty measure, skip it.  This can happen at the start of
         // a score if there is an invisible measure before the start of the
         // data, or if there is an ending bar before the ending of the data.
         line = -endline;
+        return true;
+    }
+    else if (m_ignore[startline]) {
+        // don't convert this measure (!!ignore/!!Xignore toggles)
+        line = endline;
         return true;
     }
     else if (m_multirest[line] < 0) {

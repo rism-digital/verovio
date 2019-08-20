@@ -540,6 +540,7 @@ protected:
     void checkForLayoutBreak(int line);
     std::string removeCommas(const std::string &input);
     void extractNullInformation(vector<bool> &nulls, hum::HumdrumFile &infile);
+    void initializeIgnoreVector(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -797,6 +798,10 @@ private:
     // null data line.  Add this value when calculating the prespace
     // variable in fillContentsOfLayer().
     std::vector<hum::HumNum> m_duradj;
+
+    // m_ignore == limit conversion range of data (for speeding up editing of
+    // larger files).
+    std::vector<bool> m_ignore;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
