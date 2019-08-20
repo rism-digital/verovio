@@ -923,9 +923,18 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
-
-    if (!m_doc.GetDrawingPage()) return o.json();
-    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
+    
+    Object *element = NULL;
+    
+    // Try to get the element on the current drawing page - it is usually the case and fast
+    if (m_doc.GetDrawingPage()) {
+        element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
+    }
+    // If it wasn't there, try on the whole doc
+    if (!element) {
+        element = m_doc.FindChildByUuid(xmlId);
+    }
+    // If not found at all
     if (!element) {
         LogMessage("Element with id '%s' could not be found", xmlId.c_str());
         return o.json();
