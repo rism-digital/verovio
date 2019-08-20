@@ -27,8 +27,8 @@ public:
     GraceGrp();
     virtual ~GraceGrp();
     virtual void Reset();
-    virtual std::string GetClassName() { return "GraceGrp"; };
-    virtual ClassId GetClassId() { return GRACEGRP; };
+    virtual std::string GetClassName() const { return "GraceGrp"; };
+    virtual ClassId GetClassId() const { return GRACEGRP; };
     ///@}
 
     /**
