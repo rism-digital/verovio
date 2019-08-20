@@ -660,6 +660,16 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
 
+    pugi::xml_node respStmt = titleStmt.append_child("respStmt");
+
+    pugi::xpath_node_set creators = root.select_nodes("/score-partwise/identification/creator");
+    for (pugi::xpath_node_set::const_iterator it = creators.begin(); it != creators.end(); ++it) {
+        pugi::xpath_node creator = *it;
+        pugi::xml_node persName = respStmt.append_child("persName");
+        persName.text().set(creator.node().text().as_string());
+        persName.append_attribute("role").set_value(creator.node().attribute("type").as_string());
+    }
+
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
     GenerateUuid(encodingDesc);
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");

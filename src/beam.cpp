@@ -69,7 +69,7 @@ void BeamSegment::InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoord
     m_beamElementCoordRefs = *beamElementCoords;
 }
 
-void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *interface, data_BEAMPLACE place)
+void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
 {
     assert(layer);
     assert(staff);
@@ -168,54 +168,54 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
 
     // Beam@place has precedence in all cases
     if (place != BEAMPLACE_NONE) {
-        if (interface->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
+        if (beamInterface->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
             LogDebug("Stem directions (mixed) contradict beam placement (below or above)");
         }
-        else if ((interface->m_stemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
+        else if ((beamInterface->m_stemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
             LogDebug("Stem directions (up) contradict beam placement (below)");
         }
-        else if ((interface->m_stemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
+        else if ((beamInterface->m_stemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
             LogDebug("Stem directions (down) contradict beam placement (above)");
         }
-        interface->m_beamPlace = place;
+        beamInterface->m_beamPlace = place;
     }
     // Default with cross-staff
-    else if (interface->m_crossStaff) {
-        interface->m_beamPlace = BEAMPLACE_mixed;
+    else if (beamInterface->m_crossStaff) {
+        beamInterface->m_beamPlace = BEAMPLACE_mixed;
     }
-    else if (interface->m_hasMultipleStemDir) {
-        interface->m_beamPlace = BEAMPLACE_mixed;
+    else if (beamInterface->m_hasMultipleStemDir) {
+        beamInterface->m_beamPlace = BEAMPLACE_mixed;
     }
     else {
         // force layer direction if it exists and nothing in the notes
-        if (interface->m_stemDir == STEMDIRECTION_NONE) {
-            interface->m_stemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
+        if (beamInterface->m_stemDir == STEMDIRECTION_NONE) {
+            beamInterface->m_stemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
         }
         // Now look at the stem direction
-        if (interface->m_stemDir == STEMDIRECTION_up) {
-            interface->m_beamPlace = BEAMPLACE_above;
+        if (beamInterface->m_stemDir == STEMDIRECTION_up) {
+            beamInterface->m_beamPlace = BEAMPLACE_above;
         }
-        else if (interface->m_stemDir == STEMDIRECTION_down) {
-            interface->m_beamPlace = BEAMPLACE_below;
+        else if (beamInterface->m_stemDir == STEMDIRECTION_down) {
+            beamInterface->m_beamPlace = BEAMPLACE_below;
         }
         else {
-            interface->m_beamPlace = (avgY < verticalCenter) ? BEAMPLACE_below : BEAMPLACE_below;
+            beamInterface->m_beamPlace = (avgY < verticalCenter) ? BEAMPLACE_below : BEAMPLACE_below;
         }
     }
-    assert(interface->m_beamPlace != BEAMPLACE_NONE);
+    assert(beamInterface->m_beamPlace != BEAMPLACE_NONE);
 
     for (i = 0; i < elementCount; ++i) {
         if (!m_beamElementCoordRefs.at(i)->m_stem) continue;
 
-        if (interface->m_beamPlace == BEAMPLACE_above) {
+        if (beamInterface->m_beamPlace == BEAMPLACE_above) {
             m_beamElementCoordRefs.at(i)->m_stem->SetDrawingStemDir(STEMDIRECTION_up);
         }
-        else if (interface->m_beamPlace == BEAMPLACE_below) {
+        else if (beamInterface->m_beamPlace == BEAMPLACE_below) {
             m_beamElementCoordRefs.at(i)->m_stem->SetDrawingStemDir(STEMDIRECTION_down);
         }
         // mixed
         else {
-            if (interface->m_crossStaff) {
+            if (beamInterface->m_crossStaff) {
                 Staff *currentCrossStaff = m_beamElementCoordRefs.at(i)->m_element->m_crossStaff;
                 if (currentCrossStaff) {
                     // if (currentCrossStaff->GetN() < staff->GetN()
@@ -224,7 +224,7 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         }
     }
 
-    if (interface->m_beamPlace == BEAMPLACE_above) { // set stem direction for all the notes
+    if (beamInterface->m_beamPlace == BEAMPLACE_above) { // set stem direction for all the notes
         for (i = 0; i < elementCount; ++i) {
             m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yTop;
         }
@@ -235,28 +235,28 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         }
     }
 
-    interface->m_beamWidthBlack = doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, interface->m_cueSize);
-    interface->m_beamWidthWhite = doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, interface->m_cueSize);
-    interface->m_beamWidth = interface->m_beamWidthBlack + interface->m_beamWidthWhite;
+    beamInterface->m_beamWidthBlack = doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
+    beamInterface->m_beamWidthWhite = doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
+    beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
 
     /******************************************************************/
     // Calculate the slope doing a linear regression
 
     // The vertical shift depends on the shortestDur value we have in the beam
-    verticalShift = ((interface->m_shortestDur - DUR_8) * (interface->m_beamWidth));
+    verticalShift = ((beamInterface->m_shortestDur - DUR_8) * (beamInterface->m_beamWidth));
 
     // if the beam has smaller-size notes
     if (m_beamElementCoordRefs.at(last)->m_element->GetDrawingCueSize()) {
         verticalShift += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
     }
     else {
-        verticalShift += (interface->m_shortestDur > DUR_8)
+        verticalShift += (beamInterface->m_shortestDur > DUR_8)
             ? doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * verticalShiftFactor
             : doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (verticalShiftFactor + 0.5);
     }
 
     // swap x position and verticalShift direction with stem down
-    if (interface->m_beamPlace == BEAMPLACE_above) {
+    if (beamInterface->m_beamPlace == BEAMPLACE_above) {
         // x-offset values for stem bases, dx[y] where y = element->m_cueSize
         stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
             - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -272,14 +272,14 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     for (i = 0; i < elementCount; ++i) {
         // change the stem dir for all objects
         if (m_beamElementCoordRefs.at(i)->m_element->Is(NOTE)) {
-            ((Note *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(interface->m_stemDir);
+            ((Note *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
         }
         else if (m_beamElementCoordRefs.at(i)->m_element->Is(CHORD)) {
-            ((Chord *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(interface->m_stemDir);
+            ((Chord *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
         }
 
         m_beamElementCoordRefs.at(i)->m_yBeam = m_beamElementCoordRefs.at(i)->m_y + verticalShift;
-        m_beamElementCoordRefs.at(i)->m_x += stemX[interface->m_cueSize];
+        m_beamElementCoordRefs.at(i)->m_x += stemX[beamInterface->m_cueSize];
     }
 
     for (i = 0; i < elementCount; i++) {
@@ -328,8 +328,8 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
             + this->m_beamSlope * (m_beamElementCoordRefs.at(i)->m_x - this->m_startingX);
 
         // if the stem is not long enough, add extra stem length needed to all members of the beam
-        if ((interface->m_stemDir == STEMDIRECTION_up && (oldYPos > expectedY))
-            || (interface->m_stemDir == STEMDIRECTION_down && (oldYPos < expectedY))) {
+        if ((beamInterface->m_stemDir == STEMDIRECTION_up && (oldYPos > expectedY))
+            || (beamInterface->m_stemDir == STEMDIRECTION_down && (oldYPos < expectedY))) {
             verticalAdjustment += oldYPos - expectedY;
         }
     }
@@ -345,21 +345,21 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     double minDistToCenter = -VRV_UNSET;
 
     for (i = 0; i < elementCount; ++i) {
-        if ((interface->m_beamPlace == BEAMPLACE_above)
+        if ((beamInterface->m_beamPlace == BEAMPLACE_above)
             && (m_beamElementCoordRefs.at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
             minDistToCenter = m_beamElementCoordRefs.at(i)->m_yBeam - verticalCenter;
         }
-        else if ((interface->m_beamPlace == BEAMPLACE_below)
+        else if ((beamInterface->m_beamPlace == BEAMPLACE_below)
             && (verticalCenter - m_beamElementCoordRefs.at(i)->m_yBeam < minDistToCenter)) {
             minDistToCenter = verticalCenter - m_beamElementCoordRefs.at(i)->m_yBeam;
         }
     }
 
     if (minDistToCenter < 0) {
-        this->m_startingY += (interface->m_beamPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
+        this->m_startingY += (beamInterface->m_beamPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
         for (i = 0; i < elementCount; ++i) {
             m_beamElementCoordRefs.at(i)->m_yBeam
-                += (interface->m_beamPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
+                += (beamInterface->m_beamPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
         }
     }
 
@@ -368,24 +368,24 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         LayerElement *el = m_beamElementCoordRefs.at(i)->m_element;
         if ((el->Is(NOTE)) || (el->Is(CHORD))) {
             StemmedDrawingInterface *stemmedInterface = el->GetStemmedDrawingInterface();
-            assert(interface);
+            assert(beamInterface);
 
-            if (interface->m_beamPlace == BEAMPLACE_above) {
+            if (beamInterface->m_beamPlace == BEAMPLACE_above) {
                 y1 = m_beamElementCoordRefs.at(i)->m_yBeam - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 y2 = m_beamElementCoordRefs.at(i)->m_yBottom
-                    + stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, interface->m_cueSize).y;
+                    + stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
                 y1 = m_beamElementCoordRefs.at(i)->m_yBeam + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
                 y2 = m_beamElementCoordRefs.at(i)->m_yTop
-                    + stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, interface->m_cueSize).y;
+                    + stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
 
             Stem *stem = stemmedInterface->GetDrawingStem();
             // This is the case with fTrem on whole notes
             if (!stem) continue;
 
-            stem->SetDrawingStemDir(interface->m_stemDir);
+            stem->SetDrawingStemDir(beamInterface->m_stemDir);
             // Since the value were calculated relatively to the element position, adjust them
             stem->SetDrawingXRel(m_beamElementCoordRefs.at(i)->m_x - el->GetDrawingX());
             stem->SetDrawingYRel(y2 - el->GetDrawingY());

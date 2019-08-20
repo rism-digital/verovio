@@ -41,7 +41,7 @@ public:
     void Reset();
 
     void CalcBeam(
-        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *interface, data_BEAMPLACE place = BEAMPLACE_NONE);
+        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place = BEAMPLACE_NONE);
 
     /**
      *
