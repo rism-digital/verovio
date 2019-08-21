@@ -1290,9 +1290,11 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     // Resize current staff and insert new one filling remaining area.
     int newUlx = x;
     int newLrx = staff->GetZone()->GetLrx();
+    int newUly = staff->GetZone()->GetUly() - ((x - staff->GetZone()->GetUlx()) * tan(staff->GetZone()->GetSkew() * M_PI / 180.0));
+    int newLry = staff->GetZone()->GetLry(); // don't need to maintain height since we're setting skew manually
     std::vector<std::pair<std::string, std::string>> v;
 
-    if (!this->Insert("staff", "auto", newUlx, staff->GetZone()->GetUly(), newLrx, staff->GetZone()->GetLry(), v)) {
+    if (!this->Insert("staff", "auto", newUlx, newUly, newLrx, newLry, v)) {
         LogError("Failed to create a second staff.");
         m_infoObject.reset();
         m_infoObject.import("status", "FAILURE");
@@ -1309,7 +1311,13 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         return false;
     }
 
+    splitStaff->GetZone()->SetSkew(staff->GetZone()->GetSkew());
+
     staff->GetZone()->SetLrx(x);
+    if (staff->GetZone()->GetSkew() != 0) {
+        staff->GetZone()->SetLry(staff->GetZone()->GetLry() + (newLrx - x) * tan(staff->GetZone()->GetSkew() * M_PI / 180.0));
+    }
+    
     Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
     Layer *splitLayer = dynamic_cast<Layer *>(splitStaff->GetFirst(LAYER));
 
