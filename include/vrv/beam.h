@@ -14,10 +14,63 @@
 
 namespace vrv {
 
+class BeamElementCoord;
+    
 // the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
 
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
+    
+//----------------------------------------------------------------------------
+// BeamSegment
+//----------------------------------------------------------------------------
+
+/**
+ * Class for storing drawing parameters when calculating beams.
+ * See View::DrawBeam and View::CalcBeam
+ */
+
+class BeamSegment {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    BeamSegment();
+    virtual ~BeamSegment();
+
+    void Reset();
+
+    void CalcBeam(
+        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place = BEAMPLACE_NONE);
+
+    /**
+     *
+     */
+    const ArrayOfBeamElementCoords *GetElementCoordRefs();
+
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by Beam::FilterList
+     */
+    void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoordRefs();
+
+public:
+    // values set by CalcBeam
+    int m_startingX; // the initial X position of the beam
+    int m_startingY; // the initial Y position of the beam
+    double m_beamSlope; // the slope of the beam
+
+    /**
+     * An array of coordinates for each element
+     **/
+    ArrayOfBeamElementCoords m_beamElementCoordRefs;
+};
 
 //----------------------------------------------------------------------------
 // Beam
@@ -96,57 +149,6 @@ private:
 public:
     /** */
     BeamSegment m_beamSegment;
-};
-    
-//----------------------------------------------------------------------------
-// BeamSegment
-//----------------------------------------------------------------------------
-
-/**
- * Class for storing drawing parameters when calculating beams.
- * See View::DrawBeam and View::CalcBeam
- */
-
-class BeamSegment {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     */
-    ///@{
-    BeamSegment();
-    virtual ~BeamSegment();
-
-    void Reset();
-
-    void CalcBeam(
-        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place = BEAMPLACE_NONE);
-
-    /**
-     *
-     */
-    const ArrayOfBeamElementCoords *GetElementCoordRefs();
-
-    /**
-     * Initializes the m_beamElementCoords vector objects.
-     * This is called by Beam::FilterList
-     */
-    void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
-
-    /**
-     * Clear the m_beamElementCoords vector and delete all the objects.
-     */
-    void ClearCoordRefs();
-
-public:
-    // values set by CalcBeam
-    int m_startingX; // the initial X position of the beam
-    int m_startingY; // the initial Y position of the beam
-    double m_beamSlope; // the slope of the beam
-
-    /**
-     * An array of coordinates for each element
-     **/
-    ArrayOfBeamElementCoords m_beamElementCoordRefs;
 };
 
 //----------------------------------------------------------------------------
