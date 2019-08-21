@@ -31,6 +31,162 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Beam
+//----------------------------------------------------------------------------
+
+Beam::Beam()
+    : LayerElement("beam-"), ObjectListInterface(), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
+{
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_BEAMEDWITH);
+    RegisterAttClass(ATT_BEAMREND);
+
+    Reset();
+}
+
+Beam::~Beam() {}
+
+void Beam::Reset()
+{
+    LayerElement::Reset();
+    BeamDrawingInterface::Reset();
+    ResetColor();
+    ResetBeamedWith();
+    ResetBeamRend();
+}
+
+void Beam::AddChild(Object *child)
+{
+    if (child->Is(BEAM)) {
+        assert(dynamic_cast<Beam *>(child));
+    }
+    else if (child->Is(BTREM)) {
+        assert(dynamic_cast<BTrem *>(child));
+    }
+    else if (child->Is(CHORD)) {
+        assert(dynamic_cast<Chord *>(child));
+    }
+    else if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(NOTE)) {
+        assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->Is(REST)) {
+        assert(dynamic_cast<Rest *>(child));
+    }
+    else if (child->Is(SPACE)) {
+        assert(dynamic_cast<Space *>(child));
+    }
+    else if (child->Is(TUPLET)) {
+        assert(dynamic_cast<Tuplet *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
+void Beam::FilterList(ArrayOfObjects *childList)
+{
+    bool firstNoteGrace = false;
+    // We want to keep only notes and rests
+    // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
+    ArrayOfObjects::iterator iter = childList->begin();
+
+    while (iter != childList->end()) {
+        if (!(*iter)->IsLayerElement()) {
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+            iter = childList->erase(iter);
+            continue;
+        }
+        if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
+            // remove anything that has not a DurationInterface
+            iter = childList->erase(iter);
+            continue;
+        }
+        else {
+            LayerElement *element = dynamic_cast<LayerElement *>(*iter);
+            assert(element);
+            // if we are at the beginning of the beam
+            // and the note is cueSize
+            // assume all the beam is of grace notes
+            if (childList->begin() == iter) {
+                if (element->IsGraceNote()) firstNoteGrace = true;
+            }
+            // if the first note in beam was NOT a grace
+            // we have grace notes embedded in a beam
+            // drop them
+            if (!firstNoteGrace && element->IsGraceNote()) {
+                iter = childList->erase(iter);
+                continue;
+            }
+            // also remove notes within chords
+            if (element->Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(element);
+                assert(note);
+                if (note->IsChordTone()) {
+                    iter = childList->erase(iter);
+                    continue;
+                }
+            }
+            ++iter;
+        }
+    }
+
+    InitCoords(childList);
+}
+
+int Beam::GetPosition(LayerElement *element)
+{
+    this->GetList(this);
+    int position = this->GetListIndex(element);
+    // Check if this is a note in the chord
+    if ((position == -1) && (element->Is(NOTE))) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) position = this->GetListIndex(chord);
+    }
+    return position;
+}
+
+bool Beam::IsFirstInBeam(LayerElement *element)
+{
+    this->GetList(this);
+    int position = this->GetPosition(element);
+    // This method should be called only if the note is part of a beam
+    assert(position != -1);
+    // this is the first one
+    if (position == 0) return true;
+    return false;
+}
+
+bool Beam::IsLastInBeam(LayerElement *element)
+{
+    int size = (int)this->GetList(this)->size();
+    int position = this->GetPosition(element);
+    // This method should be called only if the note is part of a beam
+    assert(position != -1);
+    // this is the last one
+    if (position == (size - 1)) return true;
+    return false;
+}
+
+const ArrayOfBeamElementCoords *Beam::GetElementCoords()
+{
+    this->GetList(this);
+    return &m_beamElementCoords;
+}
+    
+//----------------------------------------------------------------------------
 // BeamSegment
 //----------------------------------------------------------------------------
 
@@ -392,162 +548,6 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
             stem->SetDrawingStemLen(y2 - y1);
         }
     }
-}
-
-//----------------------------------------------------------------------------
-// Beam
-//----------------------------------------------------------------------------
-
-Beam::Beam()
-    : LayerElement("beam-"), ObjectListInterface(), BeamDrawingInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
-{
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_BEAMEDWITH);
-    RegisterAttClass(ATT_BEAMREND);
-
-    Reset();
-}
-
-Beam::~Beam() {}
-
-void Beam::Reset()
-{
-    LayerElement::Reset();
-    BeamDrawingInterface::Reset();
-    ResetColor();
-    ResetBeamedWith();
-    ResetBeamRend();
-}
-
-void Beam::AddChild(Object *child)
-{
-    if (child->Is(BEAM)) {
-        assert(dynamic_cast<Beam *>(child));
-    }
-    else if (child->Is(BTREM)) {
-        assert(dynamic_cast<BTrem *>(child));
-    }
-    else if (child->Is(CHORD)) {
-        assert(dynamic_cast<Chord *>(child));
-    }
-    else if (child->Is(CLEF)) {
-        assert(dynamic_cast<Clef *>(child));
-    }
-    else if (child->Is(NOTE)) {
-        assert(dynamic_cast<Note *>(child));
-    }
-    else if (child->Is(REST)) {
-        assert(dynamic_cast<Rest *>(child));
-    }
-    else if (child->Is(SPACE)) {
-        assert(dynamic_cast<Space *>(child));
-    }
-    else if (child->Is(TUPLET)) {
-        assert(dynamic_cast<Tuplet *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void Beam::FilterList(ArrayOfObjects *childList)
-{
-    bool firstNoteGrace = false;
-    // We want to keep only notes and rests
-    // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ArrayOfObjects::iterator iter = childList->begin();
-
-    while (iter != childList->end()) {
-        if (!(*iter)->IsLayerElement()) {
-            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = childList->erase(iter);
-            continue;
-        }
-        if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
-            // remove anything that has not a DurationInterface
-            iter = childList->erase(iter);
-            continue;
-        }
-        else {
-            LayerElement *element = dynamic_cast<LayerElement *>(*iter);
-            assert(element);
-            // if we are at the beginning of the beam
-            // and the note is cueSize
-            // assume all the beam is of grace notes
-            if (childList->begin() == iter) {
-                if (element->IsGraceNote()) firstNoteGrace = true;
-            }
-            // if the first note in beam was NOT a grace
-            // we have grace notes embedded in a beam
-            // drop them
-            if (!firstNoteGrace && element->IsGraceNote()) {
-                iter = childList->erase(iter);
-                continue;
-            }
-            // also remove notes within chords
-            if (element->Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(element);
-                assert(note);
-                if (note->IsChordTone()) {
-                    iter = childList->erase(iter);
-                    continue;
-                }
-            }
-            ++iter;
-        }
-    }
-
-    InitCoords(childList);
-}
-
-int Beam::GetPosition(LayerElement *element)
-{
-    this->GetList(this);
-    int position = this->GetListIndex(element);
-    // Check if this is a note in the chord
-    if ((position == -1) && (element->Is(NOTE))) {
-        Note *note = dynamic_cast<Note *>(element);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) position = this->GetListIndex(chord);
-    }
-    return position;
-}
-
-bool Beam::IsFirstInBeam(LayerElement *element)
-{
-    this->GetList(this);
-    int position = this->GetPosition(element);
-    // This method should be called only if the note is part of a beam
-    assert(position != -1);
-    // this is the first one
-    if (position == 0) return true;
-    return false;
-}
-
-bool Beam::IsLastInBeam(LayerElement *element)
-{
-    int size = (int)this->GetList(this)->size();
-    int position = this->GetPosition(element);
-    // This method should be called only if the note is part of a beam
-    assert(position != -1);
-    // this is the last one
-    if (position == (size - 1)) return true;
-    return false;
-}
-
-const ArrayOfBeamElementCoords *Beam::GetElementCoords()
-{
-    this->GetList(this);
-    return &m_beamElementCoords;
 }
 
 //----------------------------------------------------------------------------
