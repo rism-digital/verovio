@@ -993,18 +993,17 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     ArrayOfObjects staves;
-    int ulx = INT_MAX, uly = 0, lrx = 0, lry = 0;
+    double skew;
+    int avgHeight = 0;
 
     // Get the staves by element ID and fail if a staff does not exist.
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        Staff *obj = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(*it));
         if (obj != NULL && obj->Is(STAFF)) {
             staves.push_back(obj);
-            Zone *zone = obj->GetFacsimileInterface()->GetZone();
-            ulx = ulx < zone->GetUlx() ? ulx : zone->GetUlx();
-            lrx = lrx > zone->GetLrx() ? lrx : zone->GetLrx();
-            uly += zone->GetUly();
-            lry += zone->GetLry();
+            int height = obj->GetZone()->GetLry() + (obj->GetZone()->GetLrx() - obj->GetZone()->GetUlx()) * 
+                tan(obj->GetZone()->GetSkew() * M_PI / 180.0) - obj->GetZone()->GetUly();
+            avgHeight += height;
         }
         else {
             LogError("Staff with ID '%s' does not exist!", it->c_str());
@@ -1019,11 +1018,16 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         m_infoObject.import("message", "At least two staves must be provided.");
         return false;
     }
-
-    uly /= staves.size();
-    lry /= staves.size();
     StaffSort staffSort;
     std::sort(staves.begin(), staves.end(), staffSort);
+
+    avgHeight /= staves.size();
+    int ulx = dynamic_cast<Staff *>(staves.front())->GetZone()->GetUlx();
+    int uly = dynamic_cast<Staff *>(staves.front())->GetZone()->GetUly();
+    int lrx = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLrx();
+    int lry = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLry();
+
+    skew = atan((lry + avgHeight - uly) / (lrx - ulx)) * 180.0 / M_PI;
 
     // Move children to the first staff (in order)
     auto stavesIt = staves.begin();
@@ -1045,6 +1049,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     staffZone->SetUly(uly);
     staffZone->SetLrx(lrx);
     staffZone->SetLry(lry);
+    staffZone->SetSkew(skew);
 
     fillLayer->ReorderByXPos();
 
