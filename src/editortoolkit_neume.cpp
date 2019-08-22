@@ -1026,7 +1026,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     int lrx = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLrx();
     int lry = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLry();
 
-    skew = atan((lry + avgHeight - uly) / (lrx - ulx)) * 180.0 / M_PI;
+    skew = atan( (double) (uly + avgHeight - lry) / (double) (lrx - ulx) ) * 180.0 / M_PI;
 
     // Move children to the first staff (in order)
     auto stavesIt = staves.begin();
