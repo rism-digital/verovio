@@ -2871,62 +2871,149 @@ bool EditorToolkitNeume::ParseChangeStaffAction(
     return true;
 }
 
-bool EditorToolkitNeume::AdjustPitchFromPosition(LayerElement *obj, Clef *clef) {
-    Staff *staff = dynamic_cast<Staff *>(obj->GetFirstParent(STAFF));
-    assert(staff);
-    if (clef == NULL) {
-        ClassIdComparison ac(CLEF);
-        clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
-        if (clef == NULL) {
-            Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-            clef = layer->GetCurrentClef();
+bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef) 
+{
+    // remember to reorderbyxpos! (not called in function so that it can be used in loops)
+    // clef re-association is done at the syllable level (not neume or nc)
+    // so this function should only be called on custos or syllables
+    // it should also only be called in cases where finding the old clef is not required
+    // since doing it based only on clefs is much more efficient than based on position
+    // also if you are calling this function in a loop you should always be passing a clef argument
+    // since repeatedly finding the previous clef is very inneficient
+
+    if (obj->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(obj);
+        Staff *staff = dynamic_cast<Staff *>(custos->GetFirstParent(STAFF));
+        assert(staff);
+
+        // Check interfaces
+        if ((custos->GetPitchInterface() == NULL) || (custos->GetFacsimileInterface() == NULL)) {
+            LogError("Element is lacking an interface which is required for pitch adjusting");
+            return false;
         }
-    }
-    assert(clef);
+        PitchInterface *pi = custos->GetPitchInterface();
+        FacsimileInterface *fi = custos->GetFacsimileInterface();
 
-    // Check interfaces
-    if ((obj->GetPitchInterface() == NULL) || (obj->GetFacsimileInterface() == NULL)) {
-        LogError("Element is lacking an interface which is required for pitch adjusting");
-        return false;
-    }
-    PitchInterface *pi = obj->GetPitchInterface();
-    FacsimileInterface *fi = obj->GetFacsimileInterface();
+        // Check for facsimile
+        if (!fi->HasFacs() || !staff->HasFacs()) {
+            LogError("Could not adjust pitch: the element or staff lacks facsimile data");
+            return false;
+        }
 
-    // Check for facsimile
-    if (!fi->HasFacs() || !staff->HasFacs()) {
-        LogError("Could not adjust pitch: the element or staff lacks facsimile data");
-        return false;
+        if (clef == NULL) {
+            ClassIdComparison ac(CLEF);
+            clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+            if (clef == NULL) {
+                LogMessage("Getting default clef");
+                Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+                assert(layer);
+                clef = layer->GetCurrentClef();
+            }
+        }
+    
+        assert(clef);
+
+        LogMessage(clef->GetUuid().c_str());
+
+        // Reset pitch to be "on clef"
+        if (clef->GetShape() == CLEFSHAPE_C) {
+            pi->SetPname(PITCHNAME_c);
+        }
+        else if (clef->GetShape() == CLEFSHAPE_F) {
+            pi->SetPname(PITCHNAME_f);
+        }
+        else if (clef->GetShape() == CLEFSHAPE_G) {
+            pi->SetPname(PITCHNAME_g);
+        }
+        else {
+            LogError("Clef %s does not have valid shape. Shape is %s", clef->GetUuid().c_str(), clef->GetShape());
+            return false;
+        }
+        pi->SetOct(3);
+
+        // glyphs in verovio are actually not centered, but are in the top left corner of a giant box
+        int centerY = fi->GetZone()->GetUly();
+        int centerX = fi->GetZone()->GetUlx();
+
+        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() +
+            (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
+            centerY - ((centerX - staff->GetZone()->GetUlx()) *
+            tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
+
+        pi->AdjustPitchByOffset(pitchDifference);
+        return true;
     }
 
-    // Reset pitch to be "on clef"
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pi->SetPname(PITCHNAME_c);
+    else if (obj->Is(SYLLABLE)) {
+        Syllable *syl = dynamic_cast<Syllable *>(obj);
+        Staff *staff = dynamic_cast<Staff *>(syl->GetFirstParent(STAFF));
+        assert(staff);
+
+        ArrayOfObjects pitchedChildren;
+        InterfaceComparison ic(INTERFACE_PITCH);
+        syl->FindAllChildByComparison(&pitchedChildren, &ic);
+
+        if (pitchedChildren.empty()) {
+            LogWarning("Syllable had no pitched children to reorder for syllable %s", obj->GetUuid().c_str());
+            return true;
+        }
+
+        if (clef == NULL) {
+            ClassIdComparison ac(CLEF);
+            clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
+            if (clef == NULL) {
+                Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+                assert(layer);
+                clef = layer->GetCurrentClef();
+            }
+        }
+    
+        assert(clef);
+
+        data_PITCHNAME pname;
+        switch(clef->GetShape()) {
+            case CLEFSHAPE_C : pname = PITCHNAME_c; break;
+            case CLEFSHAPE_F : pname = PITCHNAME_f; break;
+            case CLEFSHAPE_G : pname = PITCHNAME_g; break;
+            default : LogError("Clef %s does not have valid shape. Shape is %s", clef->GetUuid().c_str(), clef->GetShape());
+                return false;
+        }
+
+        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+        PitchInterface *pi;
+        FacsimileInterface *fi;
+
+        for (auto it = pitchedChildren.begin(); it != pitchedChildren.end(); ++it) {
+            fi = (*it)->GetFacsimileInterface();
+            if (fi == NULL || !fi->HasFacs()) {
+                LogError("Could not adjust pitch: child %s does not have facsimile data", (*it)->GetUuid().c_str());
+                return false;
+            }
+
+            pi = (*it)->GetPitchInterface();
+            assert(pi);
+            pi->SetPname(pname);
+
+            int pitchDifference = round((double) (staff->GetZone()->GetUly() +
+                (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
+                fi->GetZone()->GetUly() - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
+                tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
+
+            pi->AdjustPitchByOffset(pitchDifference);
+        }
+
+        return true;
     }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pi->SetPname(PITCHNAME_f);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_G) {
-        pi ->SetPname(PITCHNAME_g);
-    }
+
     else {
-        LogError("Clef %s does not have valid shape. Shape is %d", clef->GetUuid().c_str(), clef->GetShape());
+        LogError("AdjustPitchFromPosition should only be called on custos or syllables." 
+            "It has been called on %s, whose id is %s", obj->GetClassName().c_str(), obj->GetUuid().c_str());
         return false;
     }
-    pi->SetOct(3);
-
-    // glyphs in verovio are actually not centered, but are in the top left corner of a giant box
-    int centerY = fi->GetZone()->GetUly();
-    int centerX = fi->GetZone()->GetUlx();
-
-    const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int pitchDifference = round((double) (staff->GetZone()->GetUly() +
-        (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
-        centerY - ((centerX - staff->GetZone()->GetUlx()) *
-        tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
-
-    pi->AdjustPitchByOffset(pitchDifference);
-    return true;
 }
+
 bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
 {
     assert(clef);
