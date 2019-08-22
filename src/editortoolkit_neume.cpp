@@ -993,18 +993,17 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     ArrayOfObjects staves;
-    int ulx = INT_MAX, uly = 0, lrx = 0, lry = 0;
+    double skew;
+    int avgHeight = 0;
 
     // Get the staves by element ID and fail if a staff does not exist.
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        Staff *obj = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(*it));
         if (obj != NULL && obj->Is(STAFF)) {
             staves.push_back(obj);
-            Zone *zone = obj->GetFacsimileInterface()->GetZone();
-            ulx = ulx < zone->GetUlx() ? ulx : zone->GetUlx();
-            lrx = lrx > zone->GetLrx() ? lrx : zone->GetLrx();
-            uly += zone->GetUly();
-            lry += zone->GetLry();
+            int height = obj->GetZone()->GetLry() + (obj->GetZone()->GetLrx() - obj->GetZone()->GetUlx()) * 
+                tan(obj->GetZone()->GetSkew() * M_PI / 180.0) - obj->GetZone()->GetUly();
+            avgHeight += height;
         }
         else {
             LogError("Staff with ID '%s' does not exist!", it->c_str());
@@ -1019,11 +1018,23 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         m_infoObject.import("message", "At least two staves must be provided.");
         return false;
     }
-
-    uly /= staves.size();
-    lry /= staves.size();
+    
     StaffSort staffSort;
     std::sort(staves.begin(), staves.end(), staffSort);
+
+    avgHeight /= staves.size();
+    int ulx = dynamic_cast<Staff *>(staves.front())->GetZone()->GetUlx();
+    int uly = dynamic_cast<Staff *>(staves.front())->GetZone()->GetUly();
+    int lrx = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLrx();
+    int lry = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLry();
+
+    skew = atan( (double) (uly + avgHeight - lry) / (double) (lrx - ulx) ) * 180.0 / M_PI;
+    if (skew > 30 || skew < -30) {
+        LogError("Merging these staves would require too large a skew");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Merging these staves would require too large a skew");
+        return false;
+    }
 
     // Move children to the first staff (in order)
     auto stavesIt = staves.begin();
@@ -1045,6 +1056,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     staffZone->SetUly(uly);
     staffZone->SetLrx(lrx);
     staffZone->SetLry(lry);
+    staffZone->SetSkew(skew);
 
     fillLayer->ReorderByXPos();
 
@@ -1290,9 +1302,11 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     // Resize current staff and insert new one filling remaining area.
     int newUlx = x;
     int newLrx = staff->GetZone()->GetLrx();
+    int newUly = staff->GetZone()->GetUly() - ((x - staff->GetZone()->GetUlx()) * tan(staff->GetZone()->GetSkew() * M_PI / 180.0));
+    int newLry = staff->GetZone()->GetLry(); // don't need to maintain height since we're setting skew manually
     std::vector<std::pair<std::string, std::string>> v;
 
-    if (!this->Insert("staff", "auto", newUlx, staff->GetZone()->GetUly(), newLrx, staff->GetZone()->GetLry(), v)) {
+    if (!this->Insert("staff", "auto", newUlx, newUly, newLrx, newLry, v)) {
         LogError("Failed to create a second staff.");
         m_infoObject.reset();
         m_infoObject.import("status", "FAILURE");
@@ -1309,7 +1323,13 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         return false;
     }
 
+    splitStaff->GetZone()->SetSkew(staff->GetZone()->GetSkew());
+
     staff->GetZone()->SetLrx(x);
+    if (staff->GetZone()->GetSkew() != 0) {
+        staff->GetZone()->SetLry(staff->GetZone()->GetLry() + (newLrx - x) * tan(staff->GetZone()->GetSkew() * M_PI / 180.0));
+    }
+    
     Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
     Layer *splitLayer = dynamic_cast<Layer *>(splitStaff->GetFirst(LAYER));
 
@@ -2393,6 +2413,13 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     int adj = zone->GetLrx() - zone->GetUlx();
     double currentSkew = zone->GetSkew();
     double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + (rightSide ? -dy : dy)) / adj)) * 180.0 / M_PI;
+    LogMessage("%f", newSkew);
+    if (newSkew > 30 || newSkew < -30) {
+        LogError("Cannot set skew to be larger than 12 degrees");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Cannot set skew to be larger than 12 degrees");
+        return false;
+    }
     zone->SetSkew(newSkew);
 
     if (rightSide) {
