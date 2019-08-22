@@ -1018,6 +1018,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         m_infoObject.import("message", "At least two staves must be provided.");
         return false;
     }
+    
     StaffSort staffSort;
     std::sort(staves.begin(), staves.end(), staffSort);
 
@@ -1028,6 +1029,12 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     int lry = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLry();
 
     skew = atan( (double) (uly + avgHeight - lry) / (double) (lrx - ulx) ) * 180.0 / M_PI;
+    if (skew > 30 || skew < -30) {
+        LogError("Merging these staves would require too large a skew");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Merging these staves would require too large a skew");
+        return false;
+    }
 
     // Move children to the first staff (in order)
     auto stavesIt = staves.begin();
@@ -2406,6 +2413,13 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     int adj = zone->GetLrx() - zone->GetUlx();
     double currentSkew = zone->GetSkew();
     double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + (rightSide ? -dy : dy)) / adj)) * 180.0 / M_PI;
+    LogMessage("%f", newSkew);
+    if (newSkew > 30 || newSkew < -30) {
+        LogError("Cannot set skew to be larger than 12 degrees");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Cannot set skew to be larger than 12 degrees");
+        return false;
+    }
     zone->SetSkew(newSkew);
 
     if (rightSide) {
