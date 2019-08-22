@@ -699,7 +699,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         ClassIdComparison ac(STAFF);
         parent->FindAllChildByComparison(&staves, &ac);
         staves.push_back(newStaff);
-        std::stable_sort(staves.begin(), staves.end(), Object::sortByUlx);
+        StaffSort staffSort;
+        std::stable_sort(staves.begin(), staves.end(), staffSort);
         for (int i = 0; i < (int)staves.size(); i++) {
             if (staves.at(i) == newStaff) {
                 newStaff->SetParent(parent);
