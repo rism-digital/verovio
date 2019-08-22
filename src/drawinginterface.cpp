@@ -82,6 +82,7 @@ void BeamDrawingInterface::Reset()
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
     m_beamPlace = BEAMPLACE_NONE;
+    m_beamStaff = NULL;
 
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
@@ -97,13 +98,17 @@ void BeamDrawingInterface::ClearCoords()
     m_beamElementCoords.clear();
 }
 
-void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList)
+void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place)
 {
+    assert(staff);
+    
     ClearCoords();
 
     if (childList->empty()) {
         return;
     }
+    
+    m_beamStaff = staff;
 
     // duration variables
     int lastDur, currentDur;

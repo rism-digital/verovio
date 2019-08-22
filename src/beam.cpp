@@ -20,6 +20,7 @@
 #include "elementpart.h"
 #include "functorparams.h"
 #include "layer.h"
+#include "measure.h"
 #include "note.h"
 #include "rest.h"
 #include "smufl.h"
@@ -203,6 +204,9 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         }
     }
     assert(beamInterface->m_beamPlace != BEAMPLACE_NONE);
+    
+    // Temporary fix to set the stem dir
+    beamInterface->m_stemDir = (beamInterface->m_beamPlace == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
 
     for (i = 0; i < elementCount; ++i) {
         if (!m_beamElementCoordRefs.at(i)->m_stem) continue;
@@ -504,8 +508,30 @@ void Beam::FilterList(ArrayOfObjects *childList)
             ++iter;
         }
     }
+    
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    Staff *beamStaff = staff;
+    if (this->HasBeamWith()) {
+        Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+        assert(measure);
+        if (this->GetBeamWith() == OTHERSTAFF_below) {
+            beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
+            if (beamStaff == NULL) {
+                LogError("Cannot access staff below for beam '%s'", this->GetUuid().c_str());
+                beamStaff = staff;
+            }
+        }
+        else if (this->GetBeamWith() == OTHERSTAFF_above) {
+            beamStaff = dynamic_cast<Staff *>(measure->GetPrevious(staff, STAFF));
+            if (beamStaff == NULL) {
+                LogError("Cannot access staff above for beam '%s'", this->GetUuid().c_str());
+                beamStaff = staff;
+            }
+        }
+    }
 
-    InitCoords(childList);
+    InitCoords(childList, beamStaff, this->GetPlace());
 }
 
 int Beam::GetPosition(LayerElement *element)

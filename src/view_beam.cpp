@@ -41,22 +41,6 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
 
-    Staff *beamStaff = staff;
-    if (beam->GetBeamWith() == OTHERSTAFF_below) {
-        beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
-        if (beamStaff == NULL) {
-            LogError("Cannot access staff below for beam '%s'", beam->GetUuid().c_str());
-            beamStaff = staff;
-        }
-    }
-    else if (beam->GetBeamWith() == OTHERSTAFF_above) {
-        beamStaff = dynamic_cast<Staff *>(measure->GetPrevious(staff, STAFF));
-        if (beamStaff == NULL) {
-            LogError("Cannot access staff above for beam '%s'", beam->GetUuid().c_str());
-            beamStaff = staff;
-        }
-    }
-
     /******************************************************************/
     // initialization
 
@@ -72,7 +56,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Calculate the beam slope and position
 
-    beam->m_beamSegment.CalcBeam(layer, beamStaff, m_doc, beam, beam->GetPlace());
+    beam->m_beamSegment.CalcBeam(layer, beam->m_beamStaff, m_doc, beam, beam->GetPlace());
 
     /******************************************************************/
     // Start the Beam graphic and draw the children
@@ -132,7 +116,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Calculate the beam slope and position
 
-    fTrem->m_beamSegment.CalcBeam(layer, staff, m_doc, fTrem);
+    fTrem->m_beamSegment.CalcBeam(layer, fTrem->m_beamStaff, m_doc, fTrem);
 
     /******************************************************************/
     // Start the grahic

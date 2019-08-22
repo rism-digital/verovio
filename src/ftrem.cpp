@@ -101,7 +101,10 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    InitCoords(childList);
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    
+    InitCoords(childList, staff, BEAMPLACE_NONE);
 }
 
 /*

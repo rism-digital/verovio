@@ -92,7 +92,7 @@ public:
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
-    void InitCoords(ArrayOfObjects *childList);
+    void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
@@ -111,6 +111,7 @@ public:
     int m_shortestDur;
     data_STEMDIRECTION m_stemDir;
     data_BEAMPLACE m_beamPlace;
+    Staff *m_beamStaff;
 
     // values set by CalcBeam
     int m_beamWidth;
