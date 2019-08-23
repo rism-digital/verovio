@@ -259,13 +259,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         int pitchDifference = round ( ((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0))
             / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
-        Clef *clefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac,
-            ((syllable != NULL) ? syllable : element)));
-
-        if (clefBefore == NULL) {
-            clefBefore = layer->GetCurrentClef();
-        }
-
         FacsimileInterface *fi = element->GetFacsimileInterface();
         if (fi && fi->HasFacs()) {
             bool ignoreFacs = false;
@@ -285,8 +278,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 assert(fi);
                 Zone *zone = fi->GetZone();
                 assert(zone);
-                zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
-                    + x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
+                zone->ShiftByXY(x, -y);
             }
         }
         else {
@@ -297,56 +289,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
                     continue;
                 }
-                (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize
-                    + x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
+                (*it)->GetFacsimileInterface()->GetZone()->ShiftByXY(x, -y);
             }
         }
 
         layer->ReorderByXPos();
 
-        Clef *clefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac,
-            (syllable != NULL) ? syllable : element));
-
-        if (clefAfter == NULL) {
-            clefAfter = layer->GetCurrentClef();
-        }
-
-        if (element->HasInterface(INTERFACE_PITCH)) {
-            element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
-            element->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
-
-            if (syllable != NULL) {
-                ArrayOfObjects siblings;
-                syllable->FindAllChildByComparison(&siblings, &pitchIC);
-                for (auto it = siblings.begin(); it != siblings.end(); ++it) {
-                    if ((*it)->GetUuid() == element->GetUuid()) {
-                        continue;
-                    }
-                    (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
-                }
-            }
+        if (element->Is(CUSTOS)) {
+            AdjustPitchFromPosition(element);
         }
         else {
-            ArrayOfObjects pitchChildren;
-            element->FindAllChildByComparison(&pitchChildren, &pitchIC);
-
-            for (auto it = pitchChildren.begin(); it != pitchChildren.end(); ++it) {
-                (*it)->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
-                (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
-            }
-
-            if (!(element->Is(SYLLABLE)) && (syllable != NULL)) {
-                ArrayOfObjects siblingChildren;
-                syllable->FindAllChildByComparison(&siblingChildren, &pitchIC);
-
-                ArrayOfObjects notBeenAdjusted;
-                std::set_difference(siblingChildren.begin(), siblingChildren.end(),
-                    pitchChildren.begin(), pitchChildren.end(), std::inserter(notBeenAdjusted, notBeenAdjusted.begin()));
-
-                for (auto it = notBeenAdjusted.begin(); it != notBeenAdjusted.end(); ++it) {
-                    (*it)->GetPitchInterface()->AdjustPitchForNewClef(clefBefore, clefAfter);
-                }
-            }
+            AdjustPitchFromPosition(syllable);
         }
     }
     else if (element->Is(CLEF)) {
@@ -2904,7 +2857,6 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
             if (clef == NULL) {
-                LogMessage("Getting default clef");
                 Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
                 assert(layer);
                 clef = layer->GetCurrentClef();
@@ -2912,8 +2864,6 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         }
     
         assert(clef);
-
-        LogMessage(clef->GetUuid().c_str());
 
         // Reset pitch to be "on clef"
         if (clef->GetShape() == CLEFSHAPE_C) {
@@ -2995,6 +2945,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             pi = (*it)->GetPitchInterface();
             assert(pi);
             pi->SetPname(pname);
+            pi->SetOct(3);
 
             int pitchDifference = round((double) (staff->GetZone()->GetUly() +
                 (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
