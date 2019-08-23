@@ -2355,7 +2355,7 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     int adj = zone->GetLrx() - zone->GetUlx();
     double currentSkew = zone->GetSkew();
     double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + (rightSide ? -dy : dy)) / adj)) * 180.0 / M_PI;
-    LogMessage("%f", newSkew);
+
     if (newSkew > 30 || newSkew < -30) {
         LogError("Cannot set skew to be larger than 12 degrees");
         m_infoObject.import("status", "FAILURE");
