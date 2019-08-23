@@ -84,7 +84,7 @@ protected:
      * Helper functions for editor actions.
      */
     ///@{
-    bool AdjustPitchFromPosition(LayerElement *obj, Clef *clef = NULL);
+    bool AdjustPitchFromPosition(Object *obj, Clef *clef = NULL);
     bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
     ///@}
 
