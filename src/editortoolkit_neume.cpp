@@ -741,7 +741,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
         layer->ReorderByXPos();
 
-        if (!AdjustPitchFromPosition(nc)) {
+        if (!AdjustPitchFromPosition(syllable)) {
             delete syllable;
             delete neume;
             delete nc;
