@@ -891,12 +891,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
-            if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
-                LogError("Failed to adjust pitch of %s", (*it)->GetUuid().c_str());
-                m_infoObject.import("status", "FAILURE");
-                m_infoObject.import("message", "Failed to properly set pitch.");
-                return false;
-            }
+            PitchInterface *pi = (*it)->GetPitchInterface();
+            assert(pi);
+            pi->AdjustPitchForNewClef(previousClef, clef);
         }
     }
     else if (elementType == "custos") {
@@ -1385,14 +1382,6 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         }   
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
-            if (m_doc->GetType() == Facs) {
-                if (!AdjustPitchFromPosition(dynamic_cast<LayerElement *>(*it))) {
-                    m_infoObject.import("status", "FAILURE");
-                    m_infoObject.import("message", "Failed to properly set pitch.");
-                    return false;
-                }
-                continue;
-            }
             PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
             // removing the current clef, and so the new clef for all of these elements is previousClef
