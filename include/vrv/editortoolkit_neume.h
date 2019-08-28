@@ -140,10 +140,26 @@ struct StaffSort {
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
+        int aLowest, bLowest, aHighest, bHighest;
+
+        aLowest = zoneA->GetSkew() < 0 ? zoneA->GetLry() : 
+            zoneA->GetLry() + (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetSkew() * M_PI / 180.0);
+
+        aHighest = zoneA->GetSkew() < 0 ? zoneA->GetUly() :
+            zoneA->GetUly() - (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetSkew() * M_PI / 180.0);
+
+        bLowest = zoneB->GetSkew() < 0 ? zoneB->GetLry() : 
+            zoneB->GetLry() + (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetSkew() * M_PI / 180.0);
+
+        bHighest = zoneB->GetSkew() < 0 ? zoneB->GetUly() : 
+            zoneB->GetUly() - (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetSkew() * M_PI / 180.0);
+
         // Check for y intersection
-        if ((zoneA->GetUly() < zoneB->GetLry() && zoneA->GetLry() > zoneB->GetLry()) ||
-            (zoneA->GetUly() < zoneB->GetUly() && zoneA->GetLry() > zoneB->GetUly())) {
-            // y intersection, so sort by ulx
+        if ((aLowest <= bLowest && aLowest >= bHighest) ||
+            (aHighest <= bLowest && aHighest >= bHighest) ||
+            (bLowest <= aLowest && bLowest >= aHighest) ||
+            (bHighest <= aLowest && bHighest >= aHighest)) {
+            // sort by x center
             return (zoneA->GetUlx() < zoneB->GetUlx());
         }
         else { // no intersection

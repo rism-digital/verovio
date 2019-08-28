@@ -1481,6 +1481,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         zone->SetLrx(lrx);
         zone->SetLry(lry);
         zone->Modify();
+        staff->GetParent()->StableSort(StaffSort());
     }
     else if (obj->Is(SYL)) {
         Syl *syl = dynamic_cast<Syl *>(obj);
@@ -2372,6 +2373,8 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     }
 
     zone->Modify();
+
+    staff->GetParent()->StableSort(StaffSort());
 
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
