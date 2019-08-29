@@ -979,7 +979,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     int lry = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLry();
 
     skew = atan( (double) (uly + avgHeight - lry) / (double) (lrx - ulx) ) * 180.0 / M_PI;
-    if (skew > 30 || skew < -30) {
+    if (skew > 12 || skew < -12) {
         LogError("Merging these staves would require too large a skew");
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Merging these staves would require too large a skew");
@@ -2357,7 +2357,7 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
     double currentSkew = zone->GetSkew();
     double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + (rightSide ? -dy : dy)) / adj)) * 180.0 / M_PI;
 
-    if (newSkew > 30 || newSkew < -30) {
+    if (newSkew > 12 || newSkew < -12) {
         LogError("Cannot set skew to be larger than 12 degrees");
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Cannot set skew to be larger than 12 degrees");
