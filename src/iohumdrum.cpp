@@ -8805,13 +8805,11 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             startchordsorted.push_back(v);
         }
         std::sort(startchordsorted.begin(), startchordsorted.end());
-
         for (int j = 0; j < (int)slurindex[i].size(); j++) {
             hum::HTp slurstart = slurstarts[slurindex[i][j]];
 
             std::vector<pair<int, bool> > slurstartnoteinfo;
             extractSlurNoteAttachmentInformation(slurstartnoteinfo, slurstart, '(');
-
             if (!slurstart) {
                 // should never occur...
                 return;
