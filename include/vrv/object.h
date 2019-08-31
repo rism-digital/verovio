@@ -179,7 +179,7 @@ public:
      * The currentChild is not deleted by the methods.
      */
     void ReplaceChild(Object *currentChild, Object *replacingChild);
-    
+
     /**
      * @name Insert an object before or after a given child
      */
@@ -446,7 +446,7 @@ public:
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
-    void FillFlatList(ListOfObjects *list);
+    void FillFlatList(ArrayOfObjects *list);
 
     /**
      * Check if the content was modified or not
@@ -465,7 +465,7 @@ public:
     bool IsAttribute() const { return m_isAttribute; }
     void IsAttribute(bool isAttribute) { m_isAttribute = isAttribute; }
     ///@}
-    
+
     /**
      * Return true if the object contains any editorial content
      */
@@ -797,9 +797,12 @@ public:
     virtual int SetOverflowBBoxesEnd(FunctorParams *functorParams);
 
     /**
-     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
+     * @name Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
+    ///@{
     virtual int AlignSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     ///@}
 
@@ -1233,18 +1236,18 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    const ListOfObjects *GetList(Object *node);
+    const ArrayOfObjects *GetList(Object *node);
 
 private:
-    mutable ListOfObjects m_list;
-    ListOfObjects::iterator m_iteratorCurrent;
+    mutable ArrayOfObjects m_list;
+    ArrayOfObjects::iterator m_iteratorCurrent;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfObjects *childList){};
+    virtual void FilterList(ArrayOfObjects *childList){};
 
 public:
     /**
@@ -1285,7 +1288,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfObjects *childList);
+    virtual void FilterList(ArrayOfObjects *childList);
 
 private:
     //

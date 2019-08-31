@@ -185,12 +185,12 @@ public:
     PgHead *GetPgHead();
     PgHead2 *GetPgHead2();
     ///@}
-    
+
     /**
      * Return the maximum staff size in the scoreDef (100 if empty)
      */
     int GetMaxStaffSize();
-    
+
     //----------//
     // Functors //
     //----------//
@@ -215,7 +215,7 @@ protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    virtual void FilterList(ListOfObjects *childList);
+    virtual void FilterList(ArrayOfObjects *childList);
 
 private:
     //

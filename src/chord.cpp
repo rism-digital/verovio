@@ -126,10 +126,10 @@ void Chord::AddChild(Object *child)
     Modify();
 }
 
-void Chord::FilterList(ListOfObjects *childList)
+void Chord::FilterList(ArrayOfObjects *childList)
 {
     // Retain only note children of chords
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if ((*iter)->Is(NOTE))
@@ -198,7 +198,7 @@ int Chord::PositionInChord(Note *note)
 
 void Chord::GetYExtremes(int &yMax, int &yMin)
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -209,7 +209,7 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
 
 int Chord::GetYTop()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The last note is the top
@@ -218,7 +218,7 @@ int Chord::GetYTop()
 
 int Chord::GetYBottom()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -227,7 +227,7 @@ int Chord::GetYBottom()
 
 Note *Chord::GetTopNote()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     Note *topNote = dynamic_cast<Note *>(childList->back());
@@ -237,7 +237,7 @@ Note *Chord::GetTopNote()
 
 Note *Chord::GetBottomNote()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -248,11 +248,11 @@ Note *Chord::GetBottomNote()
 
 int Chord::GetXMin()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     int x = -VRV_UNSET;
-    ListOfObjects::const_iterator iter = childList->begin();
+    ArrayOfObjects::const_iterator iter = childList->begin();
     while (iter != childList->end()) {
         if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
         ++iter;
@@ -262,11 +262,11 @@ int Chord::GetXMin()
 
 int Chord::GetXMax()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     int x = VRV_UNSET;
-    ListOfObjects::const_iterator iter = childList->begin();
+    ArrayOfObjects::const_iterator iter = childList->begin();
     while (iter != childList->end()) {
         if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
         ++iter;
@@ -355,7 +355,7 @@ bool Chord::IsVisible()
     }
 
     // if the chord doens't have it, see if all the children are invisible
-    const ListOfObjects *notes = this->GetList(this);
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
     for (auto &iter : *notes) {
@@ -371,7 +371,7 @@ bool Chord::IsVisible()
 
 bool Chord::HasNoteWithDots()
 {
-    const ListOfObjects *notes = this->GetList(this);
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
     for (auto &iter : *notes) {
@@ -537,8 +537,8 @@ int Chord::CalcDots(FunctorParams *functorParams)
     params->m_chordDrawingX = this->GetDrawingX();
     params->m_chordStemDir = this->GetDrawingStemDir();
 
-    ListOfObjects::const_reverse_iterator rit;
-    const ListOfObjects *notes = this->GetList(this);
+    ArrayOfObjects::const_reverse_iterator rit;
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
     assert(this->GetTopNote());
@@ -642,8 +642,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     SetDrawingStem(currentStem);
 
     // Also set the drawing stem object (or NULL) to all child notes
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         assert((*it)->Is(NOTE));
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
@@ -698,7 +698,7 @@ int Chord::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
     return FUNCTOR_CONTINUE;

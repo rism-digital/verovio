@@ -272,8 +272,6 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
-typedef std::vector<Object *> ListOfObjects;
-
 typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
@@ -510,17 +508,12 @@ enum {
 //----------------------------------------------------------------------------
 
 enum Accessor { SELF = 0, CONTENT };
-    
+
 //----------------------------------------------------------------------------
 // Some keys
 //----------------------------------------------------------------------------
 
-enum {
-    KEY_LEFT = 37,
-    KEY_UP = 38,
-    KEY_RIGHT = 39,
-    KEY_DOWN = 40
-};
+enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

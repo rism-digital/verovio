@@ -88,13 +88,13 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the ListOfObjects
+ * member 0: the ArrayOfObjects
  **/
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
-    AddLayerElementToFlatListParams(ListOfObjects *flatList) { m_flatList = flatList; }
-    ListOfObjects *m_flatList;
+    AddLayerElementToFlatListParams(ArrayOfObjects *flatList) { m_flatList = flatList; }
+    ArrayOfObjects *m_flatList;
 };
 
 //----------------------------------------------------------------------------
@@ -554,17 +554,24 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the system margin
+ * member 2: the doc
  **/
 
 class AlignSystemsParams : public FunctorParams {
 public:
-    AlignSystemsParams()
+    AlignSystemsParams(Doc *doc)
     {
         m_shift = 0;
         m_systemMargin = 0;
+        m_justifiableSystems = 0;
+        m_justifiableStaves = 0;
+        m_doc = doc;
     }
     int m_shift;
     int m_systemMargin;
+    int m_justifiableSystems;
+    int m_justifiableStaves;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1236,6 +1243,33 @@ public:
     int m_leftBarLineX;
     int m_rightBarLineX;
     int m_systemFullWidth;
+    Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// JustifyYParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the justification ratio
+ * member 4: the functor to be redirected to the MeasureAligner
+ * member 5: the doc
+ **/
+
+class JustifyYParams : public FunctorParams {
+public:
+    JustifyYParams(Functor *functor, Doc *doc)
+    {
+        m_justifiableStep = 0;
+        m_stepCount = 0;
+        m_stepCountStaff = 0;
+        m_functor = functor;
+        m_doc = doc;
+    }
+    int m_justifiableStep;
+    int m_stepCount;
+    int m_stepCountStaff;
     Functor *m_functor;
     Doc *m_doc;
 };

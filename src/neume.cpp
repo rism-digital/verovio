@@ -32,11 +32,11 @@
 
 namespace vrv {
 
-std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PES }, { "d", CLIVIS },
-    { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS },
-    { "ddu", CLIMACUS_RESUPINUS },{ "udu", TORCULUS_RESUPINUS }, { "dud", PORRECTUS_FLEXUS },
-    { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS }, { "uudd", SCANDICUS_SUBPUNCTIS },
-    { "dudd", PORRECTUS_SUBPUNCTIS }, { "sd", PRESSUS } };
+std::map<std::string, NeumeGroup> Neume::s_neumes
+    = { { "", PUNCTUM }, { "u", PES }, { "d", CLIVIS }, { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS },
+          { "du", PORRECTUS }, { "ddd", CLIMACUS }, { "ddu", CLIMACUS_RESUPINUS }, { "udu", TORCULUS_RESUPINUS },
+          { "dud", PORRECTUS_FLEXUS }, { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS },
+          { "uudd", SCANDICUS_SUBPUNCTIS }, { "dudd", PORRECTUS_SUBPUNCTIS }, { "sd", PRESSUS } };
 
 //----------------------------------------------------------------------------
 // Neume
@@ -103,22 +103,18 @@ NeumeGroup Neume::GetNeumeGroup()
 
     std::string key = "";
 
-    for (; iter != children.end(); iter++)
-    {
+    for (; iter != children.end(); iter++) {
         Nc *current = dynamic_cast<Nc *>(*iter);
         assert(current);
 
         int pitchDifference = current->PitchDifferenceTo(previous);
-        if (pitchDifference > 0)
-        {
+        if (pitchDifference > 0) {
             key += "u";
         }
-        else if (pitchDifference < 0)
-        {
+        else if (pitchDifference < 0) {
             key += "d";
         }
-        else
-        {
+        else {
             key += "s";
         }
         previous = current;
@@ -139,7 +135,7 @@ std::vector<int> Neume::GetPitchDifferences()
     auto iter = ncChildren.begin();
     Nc *previous = dynamic_cast<Nc *>(*iter);
     if (previous == NULL) return pitchDifferences;
-    iter ++;
+    iter++;
 
     for (; iter != ncChildren.end(); iter++) {
         Nc *current = dynamic_cast<Nc *>(*iter);
@@ -199,7 +195,7 @@ PitchInterface *Neume::GetHighestPitch()
         PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
         assert(pi);
         if (pi->PitchDifferenceTo(max) > 0) {
-           max = pi;
+            max = pi;
         }
     }
     return max;
@@ -218,7 +214,7 @@ PitchInterface *Neume::GetLowestPitch()
         PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
         assert(pi);
         if (pi->PitchDifferenceTo(min) < 0) {
-           min = pi;
+            min = pi;
         }
     }
     return min;

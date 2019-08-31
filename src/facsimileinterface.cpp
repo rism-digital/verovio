@@ -44,7 +44,7 @@ int FacsimileInterface::GetDrawingX() const
 int FacsimileInterface::GetDrawingY() const
 {
     assert(m_zone);
-    int y = ( m_zone->GetLogicalUly());
+    int y = (m_zone->GetLogicalUly());
     return y;
 }
 
@@ -77,4 +77,4 @@ void FacsimileInterface::SetZone(Zone *zone)
     }
     m_zone = zone;
 }
-}
+} // namespace vrv

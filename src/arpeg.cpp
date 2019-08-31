@@ -230,16 +230,15 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Arpeg::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     ControlElement::ResetDrawing(functorParams);
-    
+
     PlistInterface *interface = this->GetPlistInterface();
     assert(interface);
     return interface->InterfaceResetDrawing(functorParams, this);
-    
 }
 
 } // namespace vrv

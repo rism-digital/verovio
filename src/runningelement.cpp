@@ -84,9 +84,9 @@ void RunningElement::AddChild(Object *child)
     Modify();
 }
 
-void RunningElement::FilterList(ListOfObjects *childList)
+void RunningElement::FilterList(ArrayOfObjects *childList)
 {
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         // remove nested rend elements

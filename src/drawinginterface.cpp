@@ -51,7 +51,7 @@ void DrawingListInterface::AddToDrawingList(Object *object)
      */
 }
 
-ListOfObjects *DrawingListInterface::GetDrawingList()
+ArrayOfObjects *DrawingListInterface::GetDrawingList()
 {
     return &m_drawingList;
 }
