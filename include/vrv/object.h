@@ -797,9 +797,12 @@ public:
     virtual int SetOverflowBBoxesEnd(FunctorParams *functorParams);
 
     /**
-     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
+     * @name Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
+    ///@{
     virtual int AlignSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     ///@}
 

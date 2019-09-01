@@ -563,6 +563,9 @@ int System::AlignSystems(FunctorParams *functorParams)
     assert(m_systemAligner.GetBottomAlignment());
 
     params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel() - params->m_systemMargin;
+    params->m_justifiableSystems++;
+    // -1 because of the bottom aligner
+    params->m_justifiableStaves += m_systemAligner.GetChildCount() - 1;
 
     return FUNCTOR_SIBLINGS;
 }
@@ -605,6 +608,30 @@ int System::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::JustifyY(FunctorParams *functorParams)
+{
+    JustifyYParams *params = dynamic_cast<JustifyYParams *>(functorParams);
+    assert(params);
+    
+    bool systemOnly = params->m_doc->GetOptions()->m_justifySystemsOnly.GetValue();
+    
+    if (!systemOnly) {
+        params->m_stepCount += params->m_stepCountStaff;
+    }
+
+    this->SetDrawingYRel(this->GetDrawingY() - params->m_justifiableStep * params->m_stepCount);
+    
+    if (systemOnly) {
+        params->m_stepCount++;
+    }
+    else {
+        params->m_stepCountStaff = 0;
+        m_systemAligner.Process(params->m_functor, params);
+    }
+ 
+    return FUNCTOR_CONTINUE;
+}
+    
 int System::AdjustStaffOverlap(FunctorParams *functorParams)
 {
     AdjustStaffOverlapParams *params = dynamic_cast<AdjustStaffOverlapParams *>(functorParams);

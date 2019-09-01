@@ -211,6 +211,11 @@ public:
      * See Object::JustifyX
      */
     virtual int JustifyX(FunctorParams *functorParams);
+    
+    /**
+     * See Object::JustifyY
+     */
+    virtual int JustifyY(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustStaffOverlap
