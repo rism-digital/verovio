@@ -56,7 +56,7 @@ void Page::Reset()
     m_pageMarginRight = 0;
     m_pageMarginTop = 0;
     m_PPUFactor = 1.0;
-    
+
     m_drawingJustifiableHeight = 0;
     m_drawingJustifiableSystems = 0;
     m_drawingJustifiableStaves = 0;
@@ -483,29 +483,29 @@ void Page::JustifyHorizontally()
         = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyX, &justifyXParams);
 }
-    
+
 void Page::JustifyVertically()
 {
     Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
-    
+
     // Nothing to justify
     if (this->m_drawingJustifiableHeight < 0) {
         return;
     }
-    
+
     // Vertical justificaiton is not enabled
     if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
         return;
     }
-    
+
     // Last page and justification of last page is not enabled
     Pages *pages = doc->GetPages();
     assert(pages);
     if ((pages->GetLast() == this) && (!doc->GetOptions()->m_justifyIncludeLastPage.GetValue())) {
         return;
     }
-    
+
     int step = 0;
     if (doc->GetOptions()->m_justifySystemsOnly.GetValue()) {
         step = this->m_drawingJustifiableSystems - 1;
@@ -513,7 +513,7 @@ void Page::JustifyVertically()
     else {
         step = this->m_drawingJustifiableStaves - 1;
     }
-    
+
     // Step should be greater than one...
     if (step == 0) {
         return;
@@ -527,7 +527,7 @@ void Page::JustifyVertically()
     Functor justifyY(&Object::JustifyY);
     JustifyYParams justifyYParams(&justifyY, doc);
     justifyYParams.m_justifiableStep = this->m_drawingJustifiableHeight / step;
-    //justifyYParams
+    // justifyYParams
     //    = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyY, &justifyYParams);
 }
@@ -695,7 +695,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
-    
+
     params->m_justifiableSystems = 0;
     params->m_justifiableStaves = 0;
 
@@ -707,26 +707,27 @@ int Page::AlignSystems(FunctorParams *functorParams)
     RunningElement *footer = this->GetFooter();
     if (footer) {
         // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight() + params->m_doc->m_drawingPageMarginTop + params->m_doc->m_drawingPageMarginBot);
+        footer->SetDrawingYRel(
+            footer->GetTotalHeight() + params->m_doc->m_drawingPageMarginTop + params->m_doc->m_drawingPageMarginBot);
     }
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Page::AlignSystemsEnd(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
-    
-    this->m_drawingJustifiableHeight = params->m_shift - params->m_doc->m_drawingPageMarginBot -  params->m_doc->m_drawingPageMarginTop;
+
+    this->m_drawingJustifiableHeight
+        = params->m_shift - params->m_doc->m_drawingPageMarginBot - params->m_doc->m_drawingPageMarginTop;
     this->m_drawingJustifiableSystems = params->m_justifiableSystems;
     this->m_drawingJustifiableStaves = params->m_justifiableStaves;
-    
+
     RunningElement *footer = this->GetFooter();
     if (footer) {
         this->m_drawingJustifiableHeight -= footer->GetTotalHeight();
     }
-
 
     return FUNCTOR_CONTINUE;
 }

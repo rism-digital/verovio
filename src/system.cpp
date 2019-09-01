@@ -612,15 +612,15 @@ int System::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = dynamic_cast<JustifyYParams *>(functorParams);
     assert(params);
-    
+
     bool systemOnly = params->m_doc->GetOptions()->m_justifySystemsOnly.GetValue();
-    
+
     if (!systemOnly) {
         params->m_stepCount += params->m_stepCountStaff;
     }
 
     this->SetDrawingYRel(this->GetDrawingY() - params->m_justifiableStep * params->m_stepCount);
-    
+
     if (systemOnly) {
         params->m_stepCount++;
     }
@@ -628,10 +628,10 @@ int System::JustifyY(FunctorParams *functorParams)
         params->m_stepCountStaff = 0;
         m_systemAligner.Process(params->m_functor, params);
     }
- 
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int System::AdjustStaffOverlap(FunctorParams *functorParams)
 {
     AdjustStaffOverlapParams *params = dynamic_cast<AdjustStaffOverlapParams *>(functorParams);

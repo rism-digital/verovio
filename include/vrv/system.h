@@ -211,7 +211,7 @@ public:
      * See Object::JustifyX
      */
     virtual int JustifyX(FunctorParams *functorParams);
-    
+
     /**
      * See Object::JustifyY
      */

@@ -225,7 +225,7 @@ public:
      * See Object::AdjustSlurs
      */
     virtual int AdjustSlurs(FunctorParams *functorParams);
-    
+
     /**
      * See Object::JustifyY
      */

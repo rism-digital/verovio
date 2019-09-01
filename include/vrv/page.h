@@ -201,7 +201,7 @@ public:
      * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI
      */
     double m_PPUFactor;
-    
+
     /**
      * The height that can be justified once the systems are aligned.
      * Takes into account header and footer.
@@ -213,13 +213,11 @@ public:
      */
     int m_drawingJustifiableStaves;
 
-    
     /**
      * The numberof staves to justify in the page
      */
     int m_drawingJustifiableSystems;
-    
-    
+
 private:
     /**
      * A flag for indicating whether the layout has been done or not.
