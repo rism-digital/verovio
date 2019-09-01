@@ -501,6 +501,18 @@ Options::Options()
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
 
+    m_justifyIncludeLastPage.SetInfo("Justify including the last page", "Justify including the last page");
+    m_justifyIncludeLastPage.Init(false);
+    this->Register(&m_justifyIncludeLastPage, "justifyIncludeLastPage", &m_general);
+
+    m_justifySystemsOnly.SetInfo("Justify systems only", "Justify systems only and not staves");
+    m_justifySystemsOnly.Init(false);
+    this->Register(&m_justifySystemsOnly, "justifySystemsOnly", &m_general);
+
+    m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
+    m_justifyVertically.Init(true);
+    this->Register(&m_justifyVertically, "justifyVertically", &m_general);
+
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);

@@ -213,6 +213,11 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
+     * See Object::JustifyY
+     */
+    virtual int JustifyY(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustStaffOverlap
      */
     virtual int AdjustStaffOverlap(FunctorParams *functorParams);

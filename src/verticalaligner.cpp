@@ -636,4 +636,20 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int StaffAlignment::JustifyY(FunctorParams *functorParams)
+{
+    JustifyYParams *params = dynamic_cast<JustifyYParams *>(functorParams);
+    assert(params);
+
+    // Skip bottom aligner
+    if (!this->m_staff) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    this->SetYRel(this->GetYRel() - params->m_justifiableStep * params->m_stepCountStaff);
+    params->m_stepCountStaff++;
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
