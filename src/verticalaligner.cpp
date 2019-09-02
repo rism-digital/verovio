@@ -646,7 +646,7 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetYRel(this->GetYRel() - params->m_justifiableStep * params->m_stepCountStaff);
+    this->SetYRel(this->GetYRel() - params->m_stepSize * params->m_stepCountStaff);
     params->m_stepCountStaff++;
 
     return FUNCTOR_CONTINUE;

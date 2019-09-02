@@ -133,6 +133,11 @@ public:
      *
      */
     int GetContentWidth() const;
+    
+    /**
+     * Calculate the justification step for a page according.
+     */
+    int CalcJustificationStepSize(bool systemsOnly) const;
 
     //----------//
     // Functors //

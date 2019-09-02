@@ -488,6 +488,10 @@ void Page::JustifyVertically()
 {
     Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
+    
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
 
     // Nothing to justify
     if (this->m_drawingJustifiableHeight < 0) {
@@ -498,37 +502,37 @@ void Page::JustifyVertically()
     if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
         return;
     }
+    
+    bool systemsOnly = doc->GetOptions()->m_justifySystemsOnly.GetValue();
+    int stepSize = this->CalcJustificationStepSize(systemsOnly);
 
     // Last page and justification of last page is not enabled
     Pages *pages = doc->GetPages();
     assert(pages);
-    if ((pages->GetLast() == this) && (!doc->GetOptions()->m_justifyIncludeLastPage.GetValue())) {
-        return;
+    if (pages->GetLast() == this) {
+        if (!doc->GetOptions()->m_justifyIncludeLastPage.GetValue()) {
+            return;
+        }
+        int idx = this->GetIdx();
+        if (idx > 0) {
+            Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
+            assert(penultimatePage);
+            if (!penultimatePage->m_layoutDone) {
+                doc->SetDrawingPage(idx - 1);
+                penultimatePage->LayOut();
+                doc->SetDrawingPage(idx);
+            }
+            int previousStepSize = penultimatePage->CalcJustificationStepSize(systemsOnly);
+            if (previousStepSize < stepSize) {
+                stepSize = previousStepSize;
+            }
+        }
     }
-
-    int step = 0;
-    if (doc->GetOptions()->m_justifySystemsOnly.GetValue()) {
-        step = this->m_drawingJustifiableSystems - 1;
-    }
-    else {
-        step = this->m_drawingJustifiableStaves - 1;
-    }
-
-    // Step should be greater than one...
-    if (step == 0) {
-        return;
-    }
-
-    // Doc::SetDrawingPage should have been called before
-    // Make sure we have the correct page
-    assert(this == doc->GetDrawingPage());
 
     // Justify Y position
     Functor justifyY(&Object::JustifyY);
     JustifyYParams justifyYParams(&justifyY, doc);
-    justifyYParams.m_justifiableStep = this->m_drawingJustifiableHeight / step;
-    // justifyYParams
-    //    = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
+    justifyYParams.m_stepSize = stepSize;
     this->Process(&justifyY, &justifyYParams);
 }
 
@@ -591,6 +595,28 @@ int Page::GetContentWidth() const
 
     // we include the left margin and the right margin
     return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
+}
+    
+int Page::CalcJustificationStepSize(bool systemsOnly) const
+{
+    if (this->m_drawingJustifiableHeight < 0) {
+        return 0;
+    }
+    
+    int stepCount = 0;
+    if (systemsOnly) {
+        stepCount = this->m_drawingJustifiableSystems - 1;
+    }
+    else {
+        stepCount = this->m_drawingJustifiableStaves - 1;
+    }
+    
+    // Step should be greater than one...
+    if (stepCount == 0) {
+        return 0;
+    }
+    
+    return this->m_drawingJustifiableHeight / stepCount;
 }
 
 void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
