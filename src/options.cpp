@@ -510,7 +510,7 @@ Options::Options()
     this->Register(&m_justifySystemsOnly, "justifySystemsOnly", &m_general);
 
     m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
-    m_justifyVertically.Init(true);
+    m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
 
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
