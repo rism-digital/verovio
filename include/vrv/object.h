@@ -579,6 +579,14 @@ public:
     ///@}
 
     /**
+     * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
+     * See Doc::ConvertScoreDefMarkupDoc
+     */
+    ///@{
+    virtual int ConvertScoreDefMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+    
+    /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */
     ///@{

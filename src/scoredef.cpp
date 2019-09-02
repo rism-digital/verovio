@@ -52,7 +52,7 @@ void ScoreDefElement::Reset()
     ResetTyped();
 }
 
-bool ScoreDefElement::HasClefInfo() const
+bool ScoreDefElement::HasClefInfo()
 {
     if (this->HasClefAttrInfo()) return true;
     return (this->HasClefElementInfo());
@@ -80,10 +80,6 @@ bool ScoreDefElement::HasClefAttrInfo() const
 {
     // We need at least a @clef.shape and a @clef.line ?
     return (this->HasClefShape() && this->HasClefLine());
-
-    // Eventually we can look for a child clef element
-    // We would probably need to take into account app and rdg?
-    return false;
 }
 
 bool ScoreDefElement::HasKeySigAttrInfo() const
@@ -103,11 +99,11 @@ bool ScoreDefElement::HasMeterSigAttrInfo() const
     return (this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
 }
 
-bool ScoreDefElement::HasClefElementInfo() const
+bool ScoreDefElement::HasClefElementInfo()
 {
     // Eventually we can look for a child clef element
     // We would probably need to take into account app and rdg?
-    return false;
+    return (this->FindChildByType(CLEF));
 }
 
 bool ScoreDefElement::HasKeySigElementInfo() const
@@ -125,13 +121,16 @@ bool ScoreDefElement::HasMeterSigElementInfo() const
     return false;
 }
 
-Clef *ScoreDefElement::GetClefCopy() const
+Clef *ScoreDefElement::GetClefCopy()
 {
     Clef *copy = NULL;
     if (this->HasClefAttrInfo()) {
         copy = new Clef(this);
     }
     else if (this->HasClefElementInfo()) {
+        Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
+        assert(clef);
+        copy = dynamic_cast<Clef *>(clef->Clone());
         // Eventually return a copy of the child element;
     }
     // Always check if HasClefInfo() is true before asking for a copy
@@ -414,10 +413,23 @@ int ScoreDef::GetMaxStaffSize()
     StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindChildByType(STAFFGRP));
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
+    
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
-// ScoreDef functor methods
-//----------------------------------------------------------------------------
+int ScoreDefElement::ConvertScoreDefMarkup(FunctorParams *functorParams)
+{
+    ConvertScoreDefMarkupParams *params = dynamic_cast<ConvertScoreDefMarkupParams *>(functorParams);
+    assert(params);
+    
+    if (this->HasClefShape() && this->HasClefLine()) {
+        Clef *clef = new Clef(this);
+        clef->IsAttribute(true);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 {

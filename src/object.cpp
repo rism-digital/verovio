@@ -1329,6 +1329,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         assert(element);
         Clef *clef = dynamic_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
+        if (clef->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);

@@ -892,6 +892,23 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertScoreDefMarkupParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating whereas the conversion is permanent of not
+ **/
+
+class ConvertScoreDefMarkupParams : public FunctorParams {
+public:
+    ConvertScoreDefMarkupParams(bool permanent)
+    {
+        m_permanent = permanent;
+    }
+    bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
 // ConvertToCastOffMensuralParams
 //----------------------------------------------------------------------------
 

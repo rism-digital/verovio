@@ -45,6 +45,14 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+                 
+    /**
+     * @name Setter and getter of the scoreDefElement flag
+     */
+    ///@{
+    bool IsScoreDefElement() const { return m_isScoreDefElement; }
+    void IsScoreDefElement(bool isScoreDefElement) { m_isScoreDefElement = isScoreDefElement; }
+    ///@}
 
     /**
      * Return the offset of the clef
@@ -57,7 +65,8 @@ public:
     static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place);
 
 private:
-    //
+    /** Flag for scoreDef or staffDef children */
+    bool m_isScoreDefElement;
 public:
     //
 private:

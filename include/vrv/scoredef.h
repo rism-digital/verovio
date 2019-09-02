@@ -63,7 +63,7 @@ public:
      * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)
      */
     ///@{
-    bool HasClefInfo() const;
+    bool HasClefInfo();
     bool HasKeySigInfo() const;
     bool HasMensurInfo() const;
     bool HasMeterSigInfo() const;
@@ -78,7 +78,7 @@ public:
      * constructor of each corresponding class (Clef, KeySig, etc.)
      */
     ///@{
-    Clef *GetClefCopy() const;
+    Clef *GetClefCopy();
     KeySig *GetKeySigCopy() const;
     Mensur *GetMensurCopy() const;
     MeterSig *GetMeterSigCopy() const;
@@ -100,11 +100,20 @@ private:
      * To be implemented.
      */
     ///@{
-    bool HasClefElementInfo() const;
+    bool HasClefElementInfo();
     bool HasKeySigElementInfo() const;
     bool HasMensurElementInfo() const;
     bool HasMeterSigElementInfo() const;
     ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertScoreDefMarkup(FunctorParams *functorParams);
 };
 
 //----------------------------------------------------------------------------

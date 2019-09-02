@@ -2593,6 +2593,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     success = ReadMdivChildren(m_doc, body, false);
+    
+    if (success) {
+        m_doc->ConvertScoreDefMarkupDoc();
+    }
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
@@ -3371,6 +3375,9 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
         // content
+        else if (std::string(current.name()) == "clef") {
+            success = ReadClef(parent, current);
+        }
         else if (std::string(current.name()) == "instrDef") {
             success = ReadInstrDef(parent, current);
         }
@@ -3381,7 +3388,7 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadLabelAbbr(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
+            LogWarning("Unsupported '<%s>' within <staffDef>", current.name());
         }
     }
     return success;

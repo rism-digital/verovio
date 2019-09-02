@@ -72,7 +72,12 @@ void StaffDef::Reset()
 
 void StaffDef::AddChild(Object *child)
 {
-    if (child->Is(INSTRDEF)) {
+    if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
+        Clef *clef = dynamic_cast<Clef *>(child);
+        clef->IsScoreDefElement(true);
+    }
+    else if (child->Is(INSTRDEF)) {
         assert(dynamic_cast<InstrDef *>(child));
     }
     else if (child->Is(LABEL)) {
