@@ -619,7 +619,7 @@ int System::JustifyY(FunctorParams *functorParams)
         params->m_stepCount += params->m_stepCountStaff;
     }
 
-    this->SetDrawingYRel(this->GetDrawingY() - params->m_justifiableStep * params->m_stepCount);
+    this->SetDrawingYRel(this->GetDrawingY() - params->m_stepSize * params->m_stepCount);
 
     if (systemOnly) {
         params->m_stepCount++;

@@ -1261,13 +1261,13 @@ class JustifyYParams : public FunctorParams {
 public:
     JustifyYParams(Functor *functor, Doc *doc)
     {
-        m_justifiableStep = 0;
+        m_stepSize = 0;
         m_stepCount = 0;
         m_stepCountStaff = 0;
         m_functor = functor;
         m_doc = doc;
     }
-    int m_justifiableStep;
+    int m_stepSize;
     int m_stepCount;
     int m_stepCountStaff;
     Functor *m_functor;
