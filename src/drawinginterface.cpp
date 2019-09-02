@@ -79,10 +79,6 @@ void StaffDefDrawingInterface::Reset()
     m_currentMensur.Reset();
     m_currentMeterSig.Reset();
 
-    if (m_currentClef.GetLine() > 4) {
-        Clef clef2;
-    }
-
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;
