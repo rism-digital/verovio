@@ -294,12 +294,16 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
         }
         if (newStaffDef->HasMensurInfo()) {
             staffDef->SetDrawMensur(true);
+            // Never draw a mensur AND a meterSig
+            staffDef->SetDrawMeterSig(false);
             Mensur *mensur = newStaffDef->GetMensurCopy();
             staffDef->SetCurrentMensur(mensur);
             delete mensur;
         }
         if (newStaffDef->HasMeterSigInfo()) {
             staffDef->SetDrawMeterSig(true);
+            // Never draw a meterSig AND a mensur
+            staffDef->SetDrawMensur(false);
             MeterSig *meterSig = newStaffDef->GetMeterSigCopy();
             staffDef->SetCurrentMeterSig(meterSig);
             delete meterSig;
