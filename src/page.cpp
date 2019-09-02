@@ -488,7 +488,7 @@ void Page::JustifyVertically()
 {
     Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
-    
+
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
@@ -502,7 +502,7 @@ void Page::JustifyVertically()
     if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
         return;
     }
-    
+
     bool systemsOnly = doc->GetOptions()->m_justifySystemsOnly.GetValue();
     int stepSize = this->CalcJustificationStepSize(systemsOnly);
 
@@ -596,13 +596,13 @@ int Page::GetContentWidth() const
     // we include the left margin and the right margin
     return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
 }
-    
+
 int Page::CalcJustificationStepSize(bool systemsOnly) const
 {
     if (this->m_drawingJustifiableHeight < 0) {
         return 0;
     }
-    
+
     int stepCount = 0;
     if (systemsOnly) {
         stepCount = this->m_drawingJustifiableSystems - 1;
@@ -610,12 +610,12 @@ int Page::CalcJustificationStepSize(bool systemsOnly) const
     else {
         stepCount = this->m_drawingJustifiableStaves - 1;
     }
-    
+
     // Step should be greater than one...
     if (stepCount == 0) {
         return 0;
     }
-    
+
     return this->m_drawingJustifiableHeight / stepCount;
 }
 
