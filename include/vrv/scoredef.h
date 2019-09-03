@@ -59,12 +59,11 @@ public:
     ///@}
 
     /**
-     * @name Methods for checking the presence of clef, key signature, etc. information.
-     * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)
+     * @name Methods for checking the presence of clef, key signature, etc. information and getting them.
      */
     ///@{
     bool HasClefInfo();
-    bool HasKeySigInfo() const;
+    bool HasKeySigInfo();
     bool HasMensurInfo() const;
     bool HasMeterSigInfo() const;
     ///@}
@@ -79,7 +78,7 @@ public:
      */
     ///@{
     Clef *GetClefCopy();
-    KeySig *GetKeySigCopy() const;
+    KeySig *GetKeySigCopy();
     Mensur *GetMensurCopy() const;
     MeterSig *GetMeterSigCopy() const;
     ///@}
@@ -89,8 +88,6 @@ private:
      * @name Methods for checking if clef info is available at the attribute level.
      */
     ///@{
-    bool HasClefAttrInfo() const;
-    bool HasKeySigAttrInfo() const;
     bool HasMensurAttrInfo() const;
     bool HasMeterSigAttrInfo() const;
     ///@}
@@ -100,8 +97,6 @@ private:
      * To be implemented.
      */
     ///@{
-    bool HasClefElementInfo();
-    bool HasKeySigElementInfo() const;
     bool HasMensurElementInfo() const;
     bool HasMeterSigElementInfo() const;
     ///@}

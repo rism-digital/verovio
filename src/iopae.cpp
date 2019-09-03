@@ -197,6 +197,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
     if (strlen(c_keysig)) {
         KeySig *k = new KeySig();
+        // Make it an attribute for now
+        k->IsAttribute(true);
         getKeyInfo(c_keysig, k);
         if (!scoreDefKeySig) {
             scoreDefKeySig = k;
@@ -397,16 +399,16 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
         // key signature change
         else if ((incipit[i] == '$') && (i + 1 < length)) {
-            KeySig *k = new KeySig;
+            KeySig *k = new KeySig();
+            // Make it an attribute for now
+            k->IsAttribute(true);
             i += getKeyInfo(incipit, k, i + 1);
             if (current_measure.notes.size() == 0) {
                 if (current_measure.key) delete current_measure.key;
-
                 current_measure.key = k;
             }
             else {
                 if (current_note.key) delete current_note.key;
-
                 current_note.key = k;
             }
         }
@@ -440,8 +442,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         if (obj.key || obj.meter) {
             ScoreDef *scoreDef = new ScoreDef();
             if (obj.key) {
-                scoreDef->SetKeySig(obj.key->ConvertToKeySigLog());
-                delete obj.key;
+                obj.key->IsAttribute(true);
+                scoreDef->AddChild(obj.key);
                 obj.key = NULL;
             }
             if (obj.meter) {
@@ -468,15 +470,14 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
     }
     if (staffDefClef) {
-        staffDef->SetClefShape(staffDefClef->GetShape());
-        staffDef->SetClefLine(staffDefClef->GetLine());
-        staffDef->SetClefDis(staffDefClef->GetDis());
-        staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
-        delete staffDefClef;
+        // Make it an attribute for now
+        staffDefClef->IsAttribute(true);
+        staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->m_scoreDef.SetKeySig(scoreDefKeySig->ConvertToKeySigLog());
-        delete scoreDefKeySig;
+        // Make it an attribute for now
+        scoreDefKeySig->IsAttribute(true);
+        m_doc->m_scoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
@@ -1106,11 +1107,12 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
     int length = (int)strlen(incipit);
     int i = index;
     bool end_of_keysig = false;
+    data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': key->SetAlterationType(ACCIDENTAL_WRITTEN_f); break;
-            case 'x': key->SetAlterationType(ACCIDENTAL_WRITTEN_s); break;
-            case 'n': key->SetAlterationType(ACCIDENTAL_WRITTEN_n); break;
+            case 'b': alterationType = ACCIDENTAL_WRITTEN_f; break;
+            case 'x': alterationType = ACCIDENTAL_WRITTEN_s; break;
+            case 'n': alterationType = ACCIDENTAL_WRITTEN_n; break;
             case '[': break;
             case 'F':
             case 'C':
@@ -1127,11 +1129,11 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
         }
     }
 
-    if (key->GetAlterationType() != ACCIDENTAL_WRITTEN_n) {
-        key->SetAlterationNumber(alt_nr);
+    if (alterationType != ACCIDENTAL_WRITTEN_n) {
+        key->SetSig(std::make_pair(alt_nr, alterationType));
     }
 
-    key->ConvertToMei();
+    //key->ConvertToMei();
 
     return i - index;
 }

@@ -80,6 +80,11 @@ void StaffDef::AddChild(Object *child)
     else if (child->Is(INSTRDEF)) {
         assert(dynamic_cast<InstrDef *>(child));
     }
+    else if (child->Is(KEYSIG)) {
+        assert(dynamic_cast<KeySig *>(child));
+        KeySig *keySig = dynamic_cast<KeySig *>(child);
+        keySig->IsScoreDefElement(true);
+    }
     else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }

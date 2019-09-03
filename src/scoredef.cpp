@@ -54,14 +54,12 @@ void ScoreDefElement::Reset()
 
 bool ScoreDefElement::HasClefInfo()
 {
-    if (this->HasClefAttrInfo()) return true;
-    return (this->HasClefElementInfo());
+    return (this->FindChildByType(CLEF));
 }
 
-bool ScoreDefElement::HasKeySigInfo() const
+bool ScoreDefElement::HasKeySigInfo()
 {
-    if (this->HasKeySigAttrInfo()) return true;
-    return (this->HasKeySigElementInfo());
+    return (this->FindChildByType(KEYSIG));
 }
 
 bool ScoreDefElement::HasMensurInfo() const
@@ -76,17 +74,6 @@ bool ScoreDefElement::HasMeterSigInfo() const
     return (this->HasMeterSigElementInfo());
 }
 
-bool ScoreDefElement::HasClefAttrInfo() const
-{
-    // We need at least a @clef.shape and a @clef.line ?
-    return (this->HasClefShape() && this->HasClefLine());
-}
-
-bool ScoreDefElement::HasKeySigAttrInfo() const
-{
-    return (this->HasKeySig());
-}
-
 bool ScoreDefElement::HasMensurAttrInfo() const
 {
     // What is the minimum we need? Checking only some for now. Need clarification
@@ -97,18 +84,6 @@ bool ScoreDefElement::HasMensurAttrInfo() const
 bool ScoreDefElement::HasMeterSigAttrInfo() const
 {
     return (this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
-}
-
-bool ScoreDefElement::HasClefElementInfo()
-{
-    // Eventually we can look for a child clef element
-    // We would probably need to take into account app and rdg?
-    return (this->FindChildByType(CLEF));
-}
-
-bool ScoreDefElement::HasKeySigElementInfo() const
-{
-    return false;
 }
 
 bool ScoreDefElement::HasMensurElementInfo() const
@@ -123,31 +98,20 @@ bool ScoreDefElement::HasMeterSigElementInfo() const
 
 Clef *ScoreDefElement::GetClefCopy()
 {
-    Clef *copy = NULL;
-    if (this->HasClefAttrInfo()) {
-        copy = new Clef(this);
-    }
-    else if (this->HasClefElementInfo()) {
-        Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
-        assert(clef);
-        copy = dynamic_cast<Clef *>(clef->Clone());
-        // Eventually return a copy of the child element;
-    }
     // Always check if HasClefInfo() is true before asking for a copy
+    Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
+    assert(clef);
+    Clef *copy = dynamic_cast<Clef *>(clef->Clone());
     assert(copy);
     return copy;
 }
 
-KeySig *ScoreDefElement::GetKeySigCopy() const
+KeySig *ScoreDefElement::GetKeySigCopy()
 {
-    KeySig *copy = NULL;
-    if (this->HasKeySigAttrInfo()) {
-        copy = new KeySig(this);
-    }
-    else {
-        // Eventually return a copy of the child element;
-    }
     // Always check if HasKeySigInfo() is true before asking for a copy
+    KeySig *keySig = dynamic_cast<KeySig *>(this->FindChildByType(KEYSIG));
+    assert(keySig);
+    KeySig *copy = dynamic_cast<KeySig *>(keySig->Clone());
     assert(copy);
     return copy;
 }
@@ -207,7 +171,17 @@ void ScoreDef::Reset()
 
 void ScoreDef::AddChild(Object *child)
 {
-    if (child->Is(STAFFGRP)) {
+    if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
+        Clef *clef = dynamic_cast<Clef *>(child);
+        clef->IsScoreDefElement(true);
+    }
+    else if (child->Is(KEYSIG)) {
+        assert(dynamic_cast<KeySig *>(child));
+        KeySig *keySig = dynamic_cast<KeySig *>(child);
+        keySig->IsScoreDefElement(true);
+    }
+    else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -423,10 +397,12 @@ int ScoreDefElement::ConvertScoreDefMarkup(FunctorParams *functorParams)
     ConvertScoreDefMarkupParams *params = dynamic_cast<ConvertScoreDefMarkupParams *>(functorParams);
     assert(params);
     
+    /*
     if (this->HasClefShape() && this->HasClefLine()) {
         Clef *clef = new Clef(this);
         clef->IsAttribute(true);
     }
+    */
 
     return FUNCTOR_CONTINUE;
 }

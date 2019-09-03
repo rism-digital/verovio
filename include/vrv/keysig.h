@@ -11,6 +11,7 @@
 
 #include "atts_analytical.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -33,7 +34,7 @@ class ScoreDefInterface;
  * are available for converting from and to the MEI representation to the
  * internal (and vice versa)
  */
-class KeySig : public LayerElement, public AttAccidental, public AttPitch, public AttKeySigAnl {
+class KeySig : public LayerElement, public AttAccidental, public AttPitch, public AttKeySigAnl, public AttKeySigLog, public AttKeySigVis, public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -41,9 +42,6 @@ public:
      */
     ///@{
     KeySig();
-    KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType);
-    KeySig(const ScoreDefInterface *keySigAttr);
-    void Init();
     virtual ~KeySig();
     virtual void Reset();
     virtual Object *Clone() const { return new KeySig(*this); }
@@ -52,21 +50,20 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+    
+    /**
+     * @name Setter and getter of the scoreDefElement flag
+     */
+    ///@{
+    bool IsScoreDefElement() const { return m_isScoreDefElement; }
+    void IsScoreDefElement(bool isScoreDefElement) { m_isScoreDefElement = isScoreDefElement; }
+    ///@}
 
-    /* Alteration number getter/setter */
-    int GetAlterationNumber() const { return m_alterationNumber; }
-    void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; }
+    /* Alteration number getter */
+    int GetAlterationNumber() const;
 
-    /* Alteration number getter/setter */
-    data_ACCIDENTAL_WRITTEN GetAlterationType() const { return m_alterationType; }
-    void SetAlterationType(data_ACCIDENTAL_WRITTEN alterationType) { m_alterationType = alterationType; }
-
-    /* Temporary methods for turning @accid and @pitch into num_alter and alter */
-    void ConvertToMei();
-    void ConvertToInternal();
-
-    /* Convert to KeySigLog */
-    data_KEYSIGNATURE ConvertToKeySigLog();
+    /* Alteration number getter */
+    data_ACCIDENTAL_WRITTEN GetAlterationType() const;
 
     /**
      * Static methods for calculating position;
@@ -92,13 +89,12 @@ public:
     bool m_drawingShowchange;
 
 private:
+    /** Flag for scoreDef or staffDef children */
+    bool m_isScoreDefElement;
+    
     static data_PITCHNAME flats[];
     static data_PITCHNAME sharps[];
     static int octave_map[2][9][7];
-
-    // This is temporary - it needs to be changed to libMEI atts
-    int m_alterationNumber;
-    data_ACCIDENTAL_WRITTEN m_alterationType;
 };
 
 } // namespace vrv

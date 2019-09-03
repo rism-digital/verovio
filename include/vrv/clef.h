@@ -34,8 +34,6 @@ public:
      */
     ///@{
     Clef();
-    Clef(const ScoreDefInterface *clefAttr);
-    void Init();
     virtual ~Clef();
     virtual void Reset();
     virtual Object *Clone() const { return new Clef(*this); }
@@ -67,6 +65,7 @@ public:
 private:
     /** Flag for scoreDef or staffDef children */
     bool m_isScoreDefElement;
+                 
 public:
     //
 private:

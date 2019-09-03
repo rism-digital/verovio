@@ -25,11 +25,6 @@ namespace vrv {
 
 ScoreDefInterface::ScoreDefInterface()
     : Interface()
-    , AttCleffingLog()
-    , AttCleffingVis()
-    , AttKeySigDefaultAnl()
-    , AttKeySigDefaultLog()
-    , AttKeySigDefaultVis()
     , AttLyricStyle()
     , AttMeasureNumbers()
     , AttMensuralLog()
@@ -40,11 +35,6 @@ ScoreDefInterface::ScoreDefInterface()
     , AttMidiTempo()
     , AttMultinumMeasures()
 {
-    RegisterInterfaceAttClass(ATT_CLEFFINGLOG);
-    RegisterInterfaceAttClass(ATT_CLEFFINGVIS);
-    RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTANL);
-    RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTLOG);
-    RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_LYRICSTYLE);
     RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
     RegisterInterfaceAttClass(ATT_MENSURALLOG);
@@ -62,11 +52,6 @@ ScoreDefInterface::~ScoreDefInterface() {}
 
 void ScoreDefInterface::Reset()
 {
-    ResetCleffingLog();
-    ResetCleffingVis();
-    ResetKeySigDefaultAnl();
-    ResetKeySigDefaultLog();
-    ResetKeySigDefaultVis();
     ResetLyricStyle();
     ResetMeasureNumbers();
     ResetMensuralLog();

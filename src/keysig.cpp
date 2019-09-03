@@ -61,63 +61,15 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
-KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch(), AttKeySigAnl()
-{
-    Init();
-}
-
-KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType)
-    : LayerElement("keysig-"), AttAccidental(), AttPitch()
-{
-    Init();
-
-    m_alterationNumber = alterationNumber;
-    m_alterationType = alterationType;
-}
-
-KeySig::KeySig(const ScoreDefInterface *keySigAttr)
-    : LayerElement("keysig-"), AttAccidental(), AttPitch(), AttKeySigAnl()
-{
-    Init();
-
-    char key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
-    /* see data_KEYSIGNATURE order; key will be:
-      0 for KEYSIGNATURE_0
-     -1 for KEYSIGNATURE_1f
-      1 for KEYSIGNATURE_1s
-     -2 for KEYSIGNATURE_2f
-      2 for KEYSIGNATURE_2s
-     etc.
-     */
-    if ((key > (KEYSIGNATURE_7s - KEYSIGNATURE_0)) || (key < (KEYSIGNATURE_7f - KEYSIGNATURE_0))) {
-        // other values are  KEYSIGNATURE_NONE or  KEYSIGNATURE_mixed (unsupported)
-        return;
-    }
-    if (key > 0) {
-        m_alterationType = ACCIDENTAL_WRITTEN_s;
-    }
-    else if (key < 0) {
-        m_alterationType = ACCIDENTAL_WRITTEN_f;
-    }
-    else {
-        m_alterationType = ACCIDENTAL_WRITTEN_n;
-    }
-    m_alterationNumber = abs(key);
-
-    if (keySigAttr->GetKeysigShow() == BOOLEAN_false) {
-        m_drawingShow = false;
-    }
-    if (keySigAttr->GetKeysigShowchange() == BOOLEAN_true) {
-        m_drawingShowchange = true;
-    }
-}
-
-void KeySig::Init()
+KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch(), AttKeySigAnl(), AttKeySigLog(), AttKeySigVis(), AttVisibility()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_PITCH);
     RegisterAttClass(ATT_KEYSIGANL);
-
+    RegisterAttClass(ATT_KEYSIGLOG);
+    RegisterAttClass(ATT_KEYSIGVIS);
+    RegisterAttClass(ATT_VISIBILITY);
+    
     Reset();
 }
 
@@ -129,9 +81,11 @@ void KeySig::Reset()
     ResetAccidental();
     ResetPitch();
     ResetKeySigAnl();
-
-    m_alterationNumber = 0;
-    m_alterationType = ACCIDENTAL_WRITTEN_NONE;
+    ResetKeySigLog();
+    ResetKeySigVis();
+    ResetVisibility();
+    
+    m_isScoreDefElement = false;
 
     // key change drawing values
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
@@ -139,53 +93,19 @@ void KeySig::Reset()
     m_drawingShow = true;
     m_drawingShowchange = false;
 }
-
-void KeySig::ConvertToInternal()
+    
+int KeySig::GetAlterationNumber() const
 {
-    int i;
-    if (this->GetAccid() == ACCIDENTAL_WRITTEN_s) {
-        m_alterationType = ACCIDENTAL_WRITTEN_s;
-        for (i = 0; i < 7; i++) {
-            if (KeySig::sharps[i] == this->GetPname()) {
-                m_alterationNumber = i + 1;
-                break;
-            }
-        }
-    }
-    else if (this->GetAccid() == ACCIDENTAL_WRITTEN_f) {
-        m_alterationType = ACCIDENTAL_WRITTEN_f;
-        for (i = 0; i < 7; i++) {
-            if (KeySig::flats[i] == this->GetPname()) {
-                m_alterationNumber = i + 1;
-                break;
-            }
-        }
-    }
-    else
-        return;
+    if (!this->HasSig()) return 0;
+    
+    return (this->GetSig().first);
 }
-
-void KeySig::ConvertToMei()
+    
+data_ACCIDENTAL_WRITTEN KeySig::GetAlterationType() const
 {
-    if ((m_alterationNumber < 1) || (m_alterationNumber > 7)) return;
-
-    if (m_alterationType == ACCIDENTAL_WRITTEN_s) {
-        this->SetAccid(ACCIDENTAL_WRITTEN_s);
-        this->SetPname(KeySig::sharps[m_alterationNumber - 1]);
-    }
-    else if (m_alterationType == ACCIDENTAL_WRITTEN_f) {
-        this->SetAccid(ACCIDENTAL_WRITTEN_f);
-        this->SetPname(KeySig::flats[m_alterationNumber - 1]);
-    }
-    else
-        return;
-}
-
-data_KEYSIGNATURE KeySig::ConvertToKeySigLog()
-{
-    char key = m_alterationNumber;
-    if (m_alterationType == ACCIDENTAL_WRITTEN_f) key = -key;
-    return (data_KEYSIGNATURE)(key + KEYSIGNATURE_0);
+    if (!this->HasSig()) return ACCIDENTAL_WRITTEN_NONE;
+    
+    return (this->GetSig().second);
 }
 
 //----------------------------------------------------------------------------
