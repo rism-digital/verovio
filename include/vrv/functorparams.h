@@ -1592,17 +1592,17 @@ public:
 
 class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
 public:
-    ReplaceDrawingValuesInStaffDefParams(Clef *clef, KeySig *keySig, Mensur *mensur, MeterSig *meterSig)
+    ReplaceDrawingValuesInStaffDefParams(Clef const *clef, KeySig const *keySig, Mensur const *mensur, MeterSig const *meterSig)
     {
         m_clef = clef;
         m_keySig = keySig;
         m_mensur = mensur;
         m_meterSig = meterSig;
     }
-    Clef *m_clef;
-    KeySig *m_keySig;
-    Mensur *m_mensur;
-    MeterSig *m_meterSig;
+    Clef const *m_clef;
+    KeySig const *m_keySig;
+    Mensur const *m_mensur;
+    MeterSig const *m_meterSig;
 };
 
 //----------------------------------------------------------------------------

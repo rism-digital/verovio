@@ -85,14 +85,14 @@ void StaffDefDrawingInterface::Reset()
     m_drawMeterSig = false;
 }
 
-void StaffDefDrawingInterface::SetCurrentClef(Clef *clef)
+void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
 {
     if (clef) {
         m_currentClef = *clef;
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentKeySig(KeySig *keySig)
+void StaffDefDrawingInterface::SetCurrentKeySig(KeySig const *keySig)
 {
     if (keySig) {
         char drawingCancelAccidCount = m_currentKeySig.GetAlterationNumber();
@@ -103,14 +103,14 @@ void StaffDefDrawingInterface::SetCurrentKeySig(KeySig *keySig)
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMensur(Mensur *mensur)
+void StaffDefDrawingInterface::SetCurrentMensur(Mensur const *mensur)
 {
     if (mensur) {
         m_currentMensur = *mensur;
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig *meterSig)
+void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
 {
     if (meterSig) {
         m_currentMeterSig = *meterSig;

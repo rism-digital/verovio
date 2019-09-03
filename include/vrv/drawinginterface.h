@@ -118,10 +118,10 @@ public:
      * @name Set the current clef, keySig, mensur and meterSig.
      */
     ///@{
-    void SetCurrentClef(Clef *clef);
-    void SetCurrentKeySig(KeySig *keySig);
-    void SetCurrentMensur(Mensur *mensur);
-    void SetCurrentMeterSig(MeterSig *meterSig);
+    void SetCurrentClef(Clef const *clef);
+    void SetCurrentKeySig(KeySig const *keySig);
+    void SetCurrentMensur(Mensur const *mensur);
+    void SetCurrentMeterSig(MeterSig const *meterSig);
     ///@}
 
     /**

@@ -96,22 +96,34 @@ bool ScoreDefElement::HasMeterSigElementInfo() const
     return false;
 }
 
-Clef *ScoreDefElement::GetClefCopy()
+Clef const *ScoreDefElement::GetClef()
 {
     // Always check if HasClefInfo() is true before asking for a copy
     Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
     assert(clef);
-    Clef *copy = dynamic_cast<Clef *>(clef->Clone());
+    return clef;
+}
+    
+Clef *ScoreDefElement::GetClefCopy()
+{
+    // Always check if HasClefInfo() is true before asking for a copy
+    Clef *copy = dynamic_cast<Clef *>(this->GetClef()->Clone());
     assert(copy);
     return copy;
 }
 
-KeySig *ScoreDefElement::GetKeySigCopy()
+KeySig const *ScoreDefElement::GetKeySig()
 {
     // Always check if HasKeySigInfo() is true before asking for a copy
     KeySig *keySig = dynamic_cast<KeySig *>(this->FindChildByType(KEYSIG));
     assert(keySig);
-    KeySig *copy = dynamic_cast<KeySig *>(keySig->Clone());
+    return keySig;
+}
+    
+KeySig *ScoreDefElement::GetKeySigCopy()
+{
+    // Always check if HasKeySigInfo() is true before asking for a copy
+    KeySig *copy = dynamic_cast<KeySig *>(this->GetKeySig()->Clone());
     assert(copy);
     return copy;
 }
@@ -210,18 +222,18 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     bool drawKeySig = false;
     bool drawMensur = false;
     bool drawMeterSig = false;
-    Clef *clef = NULL;
-    KeySig *keySig = NULL;
+    Clef const *clef = NULL;
+    KeySig const *keySig = NULL;
     Mensur *mensur = NULL;
     MeterSig *meterSig = NULL;
 
     if (newScoreDef->HasClefInfo()) {
         drawClef = true;
-        clef = newScoreDef->GetClefCopy();
+        clef = newScoreDef->GetClef();
     }
     if (newScoreDef->HasKeySigInfo()) {
         drawKeySig = true;
-        keySig = newScoreDef->GetKeySigCopy();
+        keySig = newScoreDef->GetKeySig();
     }
     if (newScoreDef->HasMensurInfo()) {
         drawMensur = true;
@@ -236,8 +248,6 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
     this->Process(&replaceDrawingValuesInScoreDef, &replaceDrawingValuesInStaffDefParams);
 
-    if (clef) delete clef;
-    if (keySig) delete keySig;
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;
 
@@ -255,15 +265,13 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     if (staffDef) {
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
-            Clef *clef = newStaffDef->GetClefCopy();
+            Clef const *clef = newStaffDef->GetClef();
             staffDef->SetCurrentClef(clef);
-            delete clef;
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
-            KeySig *keySig = newStaffDef->GetKeySigCopy();
+            KeySig const *keySig = newStaffDef->GetKeySig();
             staffDef->SetCurrentKeySig(keySig);
-            delete keySig;
         }
         if (newStaffDef->HasMensurInfo()) {
             staffDef->SetDrawMensur(true);
