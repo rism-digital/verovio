@@ -51,13 +51,8 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
     
-    /**
-     * @name Setter and getter of the scoreDefElement flag
-     */
-    ///@{
-    bool IsScoreDefElement() const { return m_isScoreDefElement; }
-    void IsScoreDefElement(bool isScoreDefElement) { m_isScoreDefElement = isScoreDefElement; }
-    ///@}
+    /** Override the method since check is required */
+    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
 
     /* Alteration number getter */
     int GetAlterationNumber() const;
@@ -80,18 +75,8 @@ public:
      */
     data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
-    /**
-     * Equivalent to @key.sig.show and @showchange, but set for drawing
-     * KeySig has no equivalent in MEI and will be true and false by default
-     * See KeySig::KeySig(KeySigAttr *keySigAttr) for initialisation
-     */
-    bool m_drawingShow;
-    bool m_drawingShowchange;
 
 private:
-    /** Flag for scoreDef or staffDef children */
-    bool m_isScoreDefElement;
-    
     static data_PITCHNAME flats[];
     static data_PITCHNAME sharps[];
     static int octave_map[2][9][7];

@@ -371,6 +371,9 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) con
         alterationNumber = atoi(value.substr(0, 1).c_str());
         alterationType = (value.at(1) == 's') ? ACCIDENTAL_WRITTEN_s : ACCIDENTAL_WRITTEN_f;
     }
+    else {
+        alterationType = ACCIDENTAL_WRITTEN_n;
+    }
     
     return std::make_pair(alterationNumber, alterationType);
 }

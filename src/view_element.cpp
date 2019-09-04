@@ -901,7 +901,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     // hidden key signature
-    if (!keySig->m_drawingShow) {
+    if (keySig->GetVisible() == BOOLEAN_false) {
         keySig->SetEmptyBB();
         return;
     }
@@ -946,7 +946,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->StartGraphic(element, "", element->GetUuid());
 
     // Show cancellation if show cancellation (showchange) is true (false by default)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
@@ -976,7 +976,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     // Show cancellation if show cancellation (showchange) is true (false by default)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
         // Same time of alteration, but smaller number - cancellation is displayed afterwards
         if ((keySig->GetAlterationType() == keySig->m_drawingCancelAccidType)
             && (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount)) {

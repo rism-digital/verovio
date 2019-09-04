@@ -41,8 +41,6 @@ void Clef::Reset()
     ResetColor();
     ResetLineLoc();
     ResetOctaveDisplacement();
-    
-    m_isScoreDefElement = false;
 }
 
 int Clef::GetClefLocOffset() const

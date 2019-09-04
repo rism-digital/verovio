@@ -84,14 +84,10 @@ void KeySig::Reset()
     ResetKeySigLog();
     ResetKeySigVis();
     ResetVisibility();
-    
-    m_isScoreDefElement = false;
 
     // key change drawing values
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
-    m_drawingShow = true;
-    m_drawingShowchange = false;
 }
     
 int KeySig::GetAlterationNumber() const
