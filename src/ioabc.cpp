@@ -300,8 +300,7 @@ int AbcInput::SetBarLine(const std::string &musicCode, int i)
 void AbcInput::CalcUnitNoteLength()
 {
     MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindChildByType(METERSIG));
-    if (!meterSig || !meterSig->HasUnit()
-        || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
+    if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
         // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
@@ -594,7 +593,7 @@ void AbcInput::parseKey(std::string keyString)
             ++i;
             break;
         case 'b':
-           m_key->SetAccid(ACCIDENTAL_WRITTEN_f);
+            m_key->SetAccid(ACCIDENTAL_WRITTEN_f);
             accidNum -= 7;
             ++i;
             break;

@@ -354,8 +354,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             // set MIDI time signature
             MeterSig *meterSig = dynamic_cast<MeterSig *>(this->m_scoreDef.FindChildByType(METERSIG));
             if (meterSig && meterSig->HasCount()) {
-                midiFile->addTimeSignature(
-                    midiTrack, 0, meterSig->GetCount(), meterSig->GetUnit());
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetCount(), meterSig->GetUnit());
             }
         }
 
@@ -1091,11 +1090,11 @@ void Doc::ConvertScoreDefMarkupDoc(bool permanent)
 {
     ConvertScoreDefMarkupParams convertScoreDefMarkupParams(permanent);
     Functor convertScoreDefMarkup(&Object::ConvertScoreDefMarkup);
-    
+
     m_scoreDef.Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
     this->Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
 }
-    
+
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
 {
     if (!m_hasAnalyticalMarkup) return;

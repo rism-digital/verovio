@@ -44,7 +44,7 @@ Mensur::Mensur()
     RegisterAttClass(ATT_MENSURVIS);
     RegisterAttClass(ATT_SLASHCOUNT);
     RegisterAttClass(ATT_STAFFLOC);
-    
+
     Reset();
 }
 

@@ -585,7 +585,7 @@ public:
     ///@{
     virtual int ConvertScoreDefMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-    
+
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */

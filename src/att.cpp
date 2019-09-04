@@ -339,7 +339,7 @@ data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarnin
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
 {
     std::string value;
-    
+
     if (data.first == VRV_UNSET) {
         value = "mixed";
     }
@@ -349,7 +349,7 @@ std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
     else if (data.first != -1) {
         value = StringFormat("%d%s", data.first, AccidentalWrittenToStr(data.second).c_str());
     }
-    
+
     return value;
 }
 
@@ -357,13 +357,13 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) con
 {
     int alterationNumber = 0;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
-    
+
     std::regex test("mixed|0|[1-7][s|f]");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.KEYSIGNATURE '%s'", value.c_str());
         return std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
     }
-    
+
     if (value == "mixed") {
         return std::make_pair(VRV_UNSET, ACCIDENTAL_WRITTEN_NONE);
     }
@@ -374,7 +374,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) con
     else {
         alterationType = ACCIDENTAL_WRITTEN_n;
     }
-    
+
     return std::make_pair(alterationNumber, alterationType);
 }
 

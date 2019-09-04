@@ -1119,8 +1119,6 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
         key->SetSig(std::make_pair(alt_nr, alterationType));
     }
 
-    //key->ConvertToMei();
-
     return i - index;
 }
 

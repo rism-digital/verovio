@@ -49,10 +49,10 @@ public:
     virtual ClassId GetClassId() const { return LAYER_ELEMENT; }
     ///@}
 
-     /**
-      * Overriding CopyReset() method to be called after copy / assignment calls.
-      */
-     virtual void CopyReset();
+    /**
+     * Overriding CopyReset() method to be called after copy / assignment calls.
+     */
+    virtual void CopyReset();
 
     /**
      * @name Getter to interfaces
@@ -67,7 +67,7 @@ public:
      * It typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
-                         
+
     /**
      * Return true if the element is part of a scoreDef or staffDef
      */

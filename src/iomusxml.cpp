@@ -743,8 +743,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             if (clefSign.node().text()) {
                 if (!clef) clef = new Clef();
-                clef->SetShape(
-                    clef->AttClefShape::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
+                clef->SetShape(clef->AttClefShape::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
             }
             // clef line
             pugi::xpath_node clefLine;
@@ -782,7 +781,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 clef->IsAttribute(true);
                 staffDef->AddChild(clef);
             }
-            
+
             // key sig
             KeySig *keySig = NULL;
             pugi::xpath_node key;
@@ -808,8 +807,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
                 }
                 if (key.node().select_node("mode")) {
-                    keySig->SetMode(keySig->AttKeySigLog::StrToMode(
-                        key.node().select_node("mode").node().text().as_string()));
+                    keySig->SetMode(
+                        keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
                 }
             }
             // add it if necessary
@@ -818,7 +817,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 keySig->IsAttribute(true);
                 staffDef->AddChild(keySig);
             }
-            
+
             // staff details
             pugi::xpath_node staffDetails;
             xpath = StringFormat("staff-details[@number='%d']", i + 1);
@@ -841,7 +840,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (staffTuning) {
                 staffDef->SetNotationtype(NOTATIONTYPE_tab);
             }
-            
+
             // time
             MeterSig *meterSig = NULL;
             pugi::xpath_node time;
@@ -888,7 +887,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 meterSig->IsAttribute(true);
                 staffDef->AddChild(meterSig);
             }
-            
+
             // transpose
             pugi::xpath_node transpose;
             xpath = StringFormat("transpose[@number='%d']", i + 1);
@@ -1182,8 +1181,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
         if (key.node().select_node("mode")) {
             if (!keySig) keySig = new KeySig();
-            keySig->SetMode(
-                keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
+            keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
         }
         // Add it if necessary
         if (keySig) {
@@ -1191,7 +1189,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             keySig->IsAttribute(true);
             scoreDef->AddChild(keySig);
         }
-        
+
         if (time) {
             MeterSig *meterSig = NULL;
             std::string symbol = time.node().attribute("symbol").as_string();
@@ -1233,9 +1231,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 scoreDef->AddChild(meterSig);
             }
         }
-        
-        
-        
+
         section->AddChild(scoreDef);
     }
 

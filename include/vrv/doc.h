@@ -271,7 +271,7 @@ public:
      * Reverse of ConvertToCastOffMensuralDoc()
      */
     void ConvertToUnCastOffMensuralDoc();
-    
+
     /**
      * Convert scoreDef / staffDef attributes (clef.*, key.*, meter.*, etc.) to corresponding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output

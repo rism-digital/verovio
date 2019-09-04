@@ -86,11 +86,11 @@ public:
     MeterSig const *GetMeterSig();
     MeterSig *GetMeterSigCopy();
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
 private:
     //
 public:

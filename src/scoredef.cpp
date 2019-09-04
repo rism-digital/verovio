@@ -79,7 +79,7 @@ Clef const *ScoreDefElement::GetClef()
     assert(clef);
     return clef;
 }
-    
+
 Clef *ScoreDefElement::GetClefCopy()
 {
     // Always check if HasClefInfo() is true before asking for a copy
@@ -95,7 +95,7 @@ KeySig const *ScoreDefElement::GetKeySig()
     assert(keySig);
     return keySig;
 }
-    
+
 KeySig *ScoreDefElement::GetKeySigCopy()
 {
     // Always check if HasKeySigInfo() is true before asking for a copy
@@ -111,7 +111,7 @@ Mensur const *ScoreDefElement::GetMensur()
     assert(mensur);
     return mensur;
 }
-    
+
 Mensur *ScoreDefElement::GetMensurCopy()
 {
     // Always check if HasMensurInfo() is true before asking for a copy
@@ -377,7 +377,7 @@ int ScoreDef::GetMaxStaffSize()
     StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindChildByType(STAFFGRP));
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
-    
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

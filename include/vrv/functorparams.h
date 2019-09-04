@@ -901,10 +901,7 @@ public:
 
 class ConvertScoreDefMarkupParams : public FunctorParams {
 public:
-    ConvertScoreDefMarkupParams(bool permanent)
-    {
-        m_permanent = permanent;
-    }
+    ConvertScoreDefMarkupParams(bool permanent) { m_permanent = permanent; }
     bool m_permanent;
 };
 
@@ -1592,7 +1589,8 @@ public:
 
 class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
 public:
-    ReplaceDrawingValuesInStaffDefParams(Clef const *clef, KeySig const *keySig, Mensur const *mensur, MeterSig const *meterSig)
+    ReplaceDrawingValuesInStaffDefParams(
+        Clef const *clef, KeySig const *keySig, Mensur const *mensur, MeterSig const *meterSig)
     {
         m_clef = clef;
         m_keySig = keySig;

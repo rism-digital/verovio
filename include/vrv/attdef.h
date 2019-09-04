@@ -139,7 +139,6 @@ typedef wchar_t data_HEXNUM;
  */
 typedef std::pair<int, data_ACCIDENTAL_WRITTEN> data_KEYSIGNATURE;
 
-
 /**
  * MEI data.MEASUREBEAT
  */

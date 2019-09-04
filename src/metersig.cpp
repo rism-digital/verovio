@@ -63,7 +63,7 @@ meterSigDefaultVis_METERFORM MeterSig::meterSigVisToMeterSigDefaultVis(meterSigV
         default: return meterSigDefaultVis_METERFORM_NONE;
     }
 }
-    
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

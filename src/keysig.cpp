@@ -61,7 +61,14 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
-KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch(), AttKeySigAnl(), AttKeySigLog(), AttKeySigVis(), AttVisibility()
+KeySig::KeySig()
+    : LayerElement("keysig-")
+    , AttAccidental()
+    , AttPitch()
+    , AttKeySigAnl()
+    , AttKeySigLog()
+    , AttKeySigVis()
+    , AttVisibility()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_PITCH);
@@ -69,7 +76,7 @@ KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch(), AttKeyS
     RegisterAttClass(ATT_KEYSIGLOG);
     RegisterAttClass(ATT_KEYSIGVIS);
     RegisterAttClass(ATT_VISIBILITY);
-    
+
     Reset();
 }
 
@@ -89,18 +96,18 @@ void KeySig::Reset()
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
 }
-    
+
 int KeySig::GetAlterationNumber() const
 {
     if (!this->HasSig()) return 0;
-    
+
     return (this->GetSig().first);
 }
-    
+
 data_ACCIDENTAL_WRITTEN KeySig::GetAlterationType() const
 {
     if (!this->HasSig()) return ACCIDENTAL_WRITTEN_NONE;
-    
+
     return (this->GetSig().second);
 }
 

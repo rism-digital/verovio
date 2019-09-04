@@ -28,7 +28,7 @@ Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), 
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LINELOC);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
-    
+
     Reset();
 }
 

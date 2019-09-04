@@ -34,7 +34,13 @@ class ScoreDefInterface;
  * are available for converting from and to the MEI representation to the
  * internal (and vice versa)
  */
-class KeySig : public LayerElement, public AttAccidental, public AttPitch, public AttKeySigAnl, public AttKeySigLog, public AttKeySigVis, public AttVisibility {
+class KeySig : public LayerElement,
+               public AttAccidental,
+               public AttPitch,
+               public AttKeySigAnl,
+               public AttKeySigLog,
+               public AttKeySigVis,
+               public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -50,7 +56,7 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
-    
+
     /** Override the method since check is required */
     virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
 
