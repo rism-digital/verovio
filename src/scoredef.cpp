@@ -67,20 +67,9 @@ bool ScoreDefElement::HasMensurInfo()
     return (this->FindChildByType(MENSUR));
 }
 
-bool ScoreDefElement::HasMeterSigInfo() const
+bool ScoreDefElement::HasMeterSigInfo()
 {
-    if (this->HasMeterSigAttrInfo()) return true;
-    return (this->HasMeterSigElementInfo());
-}
-
-bool ScoreDefElement::HasMeterSigAttrInfo() const
-{
-    return (this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
-}
-
-bool ScoreDefElement::HasMeterSigElementInfo() const
-{
-    return false;
+    return (this->FindChildByType(METERSIG));
 }
 
 Clef const *ScoreDefElement::GetClef()
@@ -131,16 +120,18 @@ Mensur *ScoreDefElement::GetMensurCopy()
     return copy;
 }
 
-MeterSig *ScoreDefElement::GetMeterSigCopy() const
+MeterSig const *ScoreDefElement::GetMeterSig()
 {
-    MeterSig *copy = NULL;
-    if (this->HasMeterSigAttrInfo()) {
-        copy = new MeterSig(this);
-    }
-    else {
-        // Eventually return a copy of the child element;
-    }
+    // Always check if HasMeterSigInfo() is true before asking for it
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindChildByType(METERSIG));
+    assert(meterSig);
+    return meterSig;
+}
+
+MeterSig *ScoreDefElement::GetMeterSigCopy()
+{
     // Always check if HasMeterSigInfo() is true before asking for a copy
+    MeterSig *copy = dynamic_cast<MeterSig *>(this->GetMeterSig()->Clone());
     assert(copy);
     return copy;
 }
@@ -183,6 +174,9 @@ void ScoreDef::AddChild(Object *child)
     }
     else if (child->Is(MENSUR)) {
         assert(dynamic_cast<Mensur *>(child));
+    }
+    else if (child->Is(METERSIG)) {
+        assert(dynamic_cast<MeterSig *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -387,21 +381,6 @@ int ScoreDef::GetMaxStaffSize()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-
-int ScoreDefElement::ConvertScoreDefMarkup(FunctorParams *functorParams)
-{
-    ConvertScoreDefMarkupParams *params = dynamic_cast<ConvertScoreDefMarkupParams *>(functorParams);
-    assert(params);
-    
-    /*
-    if (this->HasClefShape() && this->HasClefLine()) {
-        Clef *clef = new Clef(this);
-        clef->IsAttribute(true);
-    }
-    */
-
-    return FUNCTOR_CONTINUE;
-}
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 {

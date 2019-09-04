@@ -176,10 +176,7 @@ void AbcInput::parseABC(std::istream &infile)
                 m_key = NULL;
             }
             if (m_meter) {
-                m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
-                m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
-                m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
-                delete m_meter;
+                m_doc->m_scoreDef.AddChild(m_meter);
                 m_meter = NULL;
             }
         }
@@ -302,8 +299,9 @@ int AbcInput::SetBarLine(const std::string &musicCode, int i)
 
 void AbcInput::CalcUnitNoteLength()
 {
-    if (!m_doc->m_scoreDef.HasMeterUnit()
-        || double(m_doc->m_scoreDef.GetMeterCount()) / double(m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindChildByType(METERSIG));
+    if (!meterSig || !meterSig->HasUnit()
+        || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
         // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
@@ -1511,11 +1509,9 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
         if (m_meter) {
             // todo: apply meter changes to staves
             ScoreDef *scoreDef = new ScoreDef();
-            scoreDef->SetMeterCount(m_meter->GetCount());
-            scoreDef->SetMeterUnit(m_meter->GetUnit());
-            scoreDef->SetMeterSym(m_meter->GetSym());
+            m_meter->IsAttribute(true);
+            scoreDef->AddChild(m_meter);
             section->AddChild(scoreDef);
-            delete m_meter;
             m_meter = NULL;
         }
     }

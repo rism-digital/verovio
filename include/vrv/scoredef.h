@@ -65,7 +65,7 @@ public:
     bool HasClefInfo();
     bool HasKeySigInfo();
     bool HasMensurInfo();
-    bool HasMeterSigInfo() const;
+    bool HasMeterSigInfo();
     ///@}
 
     /**
@@ -83,33 +83,20 @@ public:
     KeySig *GetKeySigCopy();
     Mensur const *GetMensur();
     Mensur *GetMensurCopy();
-    MeterSig *GetMeterSigCopy() const;
-    ///@}
-
-private:
-    /**
-     * @name Methods for checking if clef info is available at the attribute level.
-     */
-    ///@{
-    bool HasMeterSigAttrInfo() const;
-    ///@}
-
-    /**
-     * @name Methods for checking if clef info is available at the element level.
-     * To be implemented.
-     */
-    ///@{
-    bool HasMeterSigElementInfo() const;
+    MeterSig const *GetMeterSig();
+    MeterSig *GetMeterSigCopy();
     ///@}
     
     //----------//
     // Functors //
     //----------//
     
-    /**
-     * See Object::ConvertAnalyticalMarkup
-     */
-    virtual int ConvertScoreDefMarkup(FunctorParams *functorParams);
+private:
+    //
+public:
+    //
+private:
+    //
 };
 
 //----------------------------------------------------------------------------

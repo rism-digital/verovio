@@ -27,8 +27,6 @@ ScoreDefInterface::ScoreDefInterface()
     : Interface()
     , AttLyricStyle()
     , AttMeasureNumbers()
-    , AttMeterSigDefaultLog()
-    , AttMeterSigDefaultVis()
     , AttMidiTempo()
     , AttMultinumMeasures()
 {
@@ -48,8 +46,6 @@ void ScoreDefInterface::Reset()
 {
     ResetLyricStyle();
     ResetMeasureNumbers();
-    ResetMeterSigDefaultLog();
-    ResetMeterSigDefaultVis();
     ResetMidiTempo();
     ResetMultinumMeasures();
 }

@@ -497,7 +497,7 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMensur(m_currentNode, dynamic_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
-        m_currentNode = m_currentNode.append_child("meterSig");
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("meterSig");
         WriteMeterSig(m_currentNode, dynamic_cast<MeterSig *>(object));
     }
     else if (object->Is(MREST)) {
@@ -1557,6 +1557,18 @@ void MeiOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 void MeiOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 {
     assert(meterSig);
+    
+    if (meterSig->IsAttribute()) {
+        AttMeterSigDefaultLog meterSigDefaultLog;
+        meterSigDefaultLog.SetMeterCount(meterSig->GetCount());
+        meterSigDefaultLog.SetMeterSym(meterSig->GetSym());
+        meterSigDefaultLog.SetMeterUnit(meterSig->GetUnit());
+        meterSigDefaultLog.WriteMeterSigDefaultLog(currentNode);
+        AttMeterSigDefaultVis meterSigDefaultVis;
+        meterSigDefaultVis.SetMeterForm(meterSig->meterSigVisToMeterSigDefaultVis(meterSig->GetForm()));
+        meterSigDefaultVis.WriteMeterSigDefaultVis(currentNode);
+        return;
+    }
 
     WriteLayerElement(currentNode, meterSig);
     meterSig->WriteMeterSigLog(currentNode);
@@ -1899,8 +1911,6 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     assert(interface);
 
     interface->WriteLyricStyle(element);
-    interface->WriteMeterSigDefaultLog(element);
-    interface->WriteMeterSigDefaultVis(element);
     interface->WriteMidiTempo(element);
     interface->WriteMultinumMeasures(element);
 }
@@ -3219,6 +3229,22 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvMensur->SetColor(mensuralVis.GetMensurColor());
         vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
         object->AddChild(vrvMensur);
+    }
+    
+    AttMeterSigDefaultLog meterSigDefaultLog;
+    meterSigDefaultLog.ReadMeterSigDefaultLog(element);
+    AttMeterSigDefaultVis meterSigDefaultVis;
+    meterSigDefaultVis.ReadMeterSigDefaultVis(element);
+    if (meterSigDefaultLog.HasMeterCount() || meterSigDefaultLog.HasMeterSym() || meterSigDefaultLog.HasMeterUnit())
+    {
+        MeterSig *vrvMeterSig = new MeterSig();
+        vrvMeterSig->IsAttribute(true);
+        vrvMeterSig->SetCount(meterSigDefaultLog.GetMeterCount());
+        vrvMeterSig->SetSym(meterSigDefaultLog.GetMeterSym());
+        vrvMeterSig->SetUnit(meterSigDefaultLog.GetMeterUnit());
+        //
+        vrvMeterSig->SetForm(vrvMeterSig->meterSigDefaultVisToMeterSigVis(meterSigDefaultVis.GetMeterForm()));
+        object->AddChild(vrvMeterSig);
     }
 
     return true;
@@ -4942,8 +4968,6 @@ bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *
 bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
 {
     interface->ReadLyricStyle(element);
-    interface->ReadMeterSigDefaultLog(element);
-    interface->ReadMeterSigDefaultVis(element);
     interface->ReadMidiTempo(element);
     interface->ReadMultinumMeasures(element);
     return true;
@@ -5678,6 +5702,7 @@ void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMorden
 void MeiInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement)
 {
     KeySig *keySig = dynamic_cast<KeySig *>(vrvScoreDefElement->FindChildByType(KEYSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(vrvScoreDefElement->FindChildByType(METERSIG));
     
     if (scoreDefElement.attribute("key.sig.show")) {
         if (keySig) {
@@ -5700,9 +5725,10 @@ void MeiInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, Sc
         }
     }
     if (scoreDefElement.attribute("meter.rend")) {
-        vrvScoreDefElement->SetMeterForm(vrvScoreDefElement->AttMeterSigDefaultVis::StrToMeterSigDefaultVisMeterform(
-            scoreDefElement.attribute("meter.rend").value()));
-        scoreDefElement.remove_attribute("meter.rend");
+        if (meterSig) {
+            meterSig->SetForm(meterSig->AttMeterSigVis::StrToMeterSigVisForm(scoreDefElement.attribute("meter.rend").value()));
+            scoreDefElement.remove_attribute("meter.rend");
+        }
     }
 }
 

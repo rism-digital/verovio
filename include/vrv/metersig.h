@@ -31,8 +31,6 @@ public:
      */
     ///@{
     MeterSig();
-    MeterSig(const ScoreDefInterface *meterSigAttr);
-    void Init();
     virtual ~MeterSig();
     virtual void Reset();
     virtual std::string GetClassName() const { return "MeterSig"; }
@@ -42,9 +40,14 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+    
+    /** Override the method since check is required */
+    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
 
-    /** Convert rendition to form */
+    /** Convert attribute types form */
     meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form);
+    meterSigDefaultVis_METERFORM meterSigVisToMeterSigDefaultVis(meterSigVis_FORM form);
+
 
     //----------//
     // Functors //

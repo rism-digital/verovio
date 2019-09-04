@@ -841,7 +841,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (staffTuning) {
                 staffDef->SetNotationtype(NOTATIONTYPE_tab);
             }
+            
             // time
+            MeterSig *meterSig = NULL;
             pugi::xpath_node time;
             xpath = StringFormat("time[@number='%d']", i + 1);
             time = it->select_node(xpath.c_str());
@@ -849,14 +851,15 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 time = it->select_node("time");
             }
             if (time) {
+                if (!meterSig) meterSig = new MeterSig();
                 std::string symbol = time.node().attribute("symbol").as_string();
                 if (!symbol.empty()) {
                     if (symbol == "cut" || symbol == "common")
-                        staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
+                        meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                     else if (symbol == "single-number")
-                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                        meterSig->SetForm(meterSigVis_FORM_num);
                     else
-                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
+                        meterSig->SetForm(meterSigVis_FORM_norm);
                 }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
@@ -871,14 +874,21 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
                         LogWarning("MusicXML import: Compound time is not supported");
                     }
-                    staffDef->SetMeterCount(m_meterCount);
+                    meterSig->SetCount(m_meterCount);
                 }
                 pugi::xpath_node beatType = time.node().select_node("beat-type");
                 if (beatType.node().text()) {
                     m_meterUnit = beatType.node().text().as_int();
-                    staffDef->SetMeterUnit(m_meterUnit);
+                    meterSig->SetUnit(m_meterUnit);
                 }
             }
+            // add it if necessary
+            if (meterSig) {
+                // Make it an attribute for now
+                meterSig->IsAttribute(true);
+                staffDef->AddChild(meterSig);
+            }
+            
             // transpose
             pugi::xpath_node transpose;
             xpath = StringFormat("transpose[@number='%d']", i + 1);
@@ -1183,20 +1193,23 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
         
         if (time) {
+            MeterSig *meterSig = NULL;
             std::string symbol = time.node().attribute("symbol").as_string();
             if (!symbol.empty()) {
+                if (!meterSig) meterSig = new MeterSig();
                 if (symbol == "cut" || symbol == "common")
-                    scoreDef->SetMeterSym(scoreDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
+                    meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
-                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                    meterSig->SetForm(meterSigVis_FORM_num);
                 else
-                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
+                    meterSig->SetForm(meterSigVis_FORM_norm);
             }
             if (time.node().select_nodes("beats").size() > 1) {
                 LogWarning("MusicXML import: Compound meter signatures are not supported");
             }
             pugi::xpath_node beats = time.node().select_node("beats");
             if (beats.node().text()) {
+                if (!meterSig) meterSig = new MeterSig();
                 m_meterCount = beats.node().text().as_int();
                 // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
                 // this is a little "hack", until libMEI is fixed
@@ -1205,14 +1218,24 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
                     LogWarning("MusicXML import: Compound time is not supported");
                 }
-                scoreDef->SetMeterCount(m_meterCount);
+                meterSig->SetCount(m_meterCount);
             }
             pugi::xpath_node beatType = time.node().select_node("beat-type");
             if (beatType.node().text()) {
+                if (!meterSig) meterSig = new MeterSig();
                 m_meterUnit = beatType.node().text().as_int();
-                scoreDef->SetMeterUnit(m_meterUnit);
+                meterSig->SetUnit(m_meterUnit);
+            }
+            // add it if necessary
+            if (meterSig) {
+                // Make it an attribute for now
+                meterSig->IsAttribute(true);
+                scoreDef->AddChild(meterSig);
             }
         }
+        
+        
+        
         section->AddChild(scoreDef);
     }
 

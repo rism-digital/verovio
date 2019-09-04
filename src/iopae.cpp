@@ -447,14 +447,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
                 obj.key = NULL;
             }
             if (obj.meter) {
-                scoreDef->SetMeterCount(obj.meter->GetCount());
-                scoreDef->SetMeterUnit(obj.meter->GetUnit());
-                scoreDef->SetMeterSym(obj.meter->GetSym());
-                // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
-                if (obj.meter->GetForm() == meterSigVis_FORM_num) {
-                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
-                }
-                delete obj.meter;
+                obj.meter->IsAttribute(true);
+                scoreDef->AddChild(obj.meter);
                 obj.meter = NULL;
             }
             section->AddChild(scoreDef);
@@ -480,14 +474,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
-        m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
-        m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
-        m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
-        // No common data type in MEI 4.0 - hopefully this will be changed in the next MEI version
-        if (scoreDefMeterSig->GetForm() == meterSigVis_FORM_num) {
-            m_doc->m_scoreDef.SetMeterForm(meterSigDefaultVis_METERFORM_num);
-        }
-        delete scoreDefMeterSig;
+        // Make it an attribute for now
+        scoreDefMeterSig->IsAttribute(true);
+        m_doc->m_scoreDef.AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now

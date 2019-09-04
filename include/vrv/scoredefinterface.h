@@ -29,8 +29,6 @@ namespace vrv {
 class ScoreDefInterface : public Interface,
                           public AttLyricStyle,
                           public AttMeasureNumbers,
-                          public AttMeterSigDefaultLog,
-                          public AttMeterSigDefaultVis,
                           public AttMidiTempo,
                           public AttMultinumMeasures {
 public:

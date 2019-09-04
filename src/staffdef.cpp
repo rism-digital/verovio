@@ -90,6 +90,9 @@ void StaffDef::AddChild(Object *child)
     else if (child->Is(MENSUR)) {
         assert(dynamic_cast<Mensur *>(child));
     }
+    else if (child->Is(METERSIG)) {
+        assert(dynamic_cast<MeterSig *>(child));
+    }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);
