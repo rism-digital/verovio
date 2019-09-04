@@ -87,6 +87,9 @@ void StaffDef::AddChild(Object *child)
     else if (child->Is(LABELABBR)) {
         assert(dynamic_cast<LabelAbbr *>(child));
     }
+    else if (child->Is(MENSUR)) {
+        assert(dynamic_cast<Mensur *>(child));
+    }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);

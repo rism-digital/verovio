@@ -490,12 +490,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         delete scoreDefMeterSig;
     }
     if (scoreDefMensur) {
-        m_doc->m_scoreDef.SetMensurDot(scoreDefMensur->GetDot());
-        m_doc->m_scoreDef.SetMensurSign(scoreDefMensur->GetSign());
-        m_doc->m_scoreDef.SetMensurSlash(scoreDefMensur->GetSlash());
-        m_doc->m_scoreDef.SetProportNum(scoreDefMensur->GetNum());
-        m_doc->m_scoreDef.SetProportNumbase(scoreDefMensur->GetNumbase());
-        delete scoreDefMensur;
+        // Make it an attribute for now
+        scoreDefMensur->IsAttribute(true);
+        m_doc->m_scoreDef.AddChild(scoreDefMensur);
     }
     if (m_tie != NULL) {
         delete m_tie;

@@ -64,7 +64,7 @@ public:
     ///@{
     bool HasClefInfo();
     bool HasKeySigInfo();
-    bool HasMensurInfo() const;
+    bool HasMensurInfo();
     bool HasMeterSigInfo() const;
     ///@}
 
@@ -81,7 +81,8 @@ public:
     Clef *GetClefCopy();
     KeySig const *GetKeySig();
     KeySig *GetKeySigCopy();
-    Mensur *GetMensurCopy() const;
+    Mensur const *GetMensur();
+    Mensur *GetMensurCopy();
     MeterSig *GetMeterSigCopy() const;
     ///@}
 
@@ -90,7 +91,6 @@ private:
      * @name Methods for checking if clef info is available at the attribute level.
      */
     ///@{
-    bool HasMensurAttrInfo() const;
     bool HasMeterSigAttrInfo() const;
     ///@}
 
@@ -99,7 +99,6 @@ private:
      * To be implemented.
      */
     ///@{
-    bool HasMensurElementInfo() const;
     bool HasMeterSigElementInfo() const;
     ///@}
     

@@ -62,10 +62,9 @@ bool ScoreDefElement::HasKeySigInfo()
     return (this->FindChildByType(KEYSIG));
 }
 
-bool ScoreDefElement::HasMensurInfo() const
+bool ScoreDefElement::HasMensurInfo()
 {
-    if (this->HasMensurAttrInfo()) return true;
-    return (this->HasMensurElementInfo());
+    return (this->FindChildByType(MENSUR));
 }
 
 bool ScoreDefElement::HasMeterSigInfo() const
@@ -74,21 +73,9 @@ bool ScoreDefElement::HasMeterSigInfo() const
     return (this->HasMeterSigElementInfo());
 }
 
-bool ScoreDefElement::HasMensurAttrInfo() const
-{
-    // What is the minimum we need? Checking only some for now. Need clarification
-    return (this->HasProlatio() || this->HasTempus() || this->HasProportNum() || this->HasProportNumbase()
-        || this->HasMensurSign());
-}
-
 bool ScoreDefElement::HasMeterSigAttrInfo() const
 {
     return (this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
-}
-
-bool ScoreDefElement::HasMensurElementInfo() const
-{
-    return false;
 }
 
 bool ScoreDefElement::HasMeterSigElementInfo() const
@@ -98,7 +85,7 @@ bool ScoreDefElement::HasMeterSigElementInfo() const
 
 Clef const *ScoreDefElement::GetClef()
 {
-    // Always check if HasClefInfo() is true before asking for a copy
+    // Always check if HasClefInfo() is true before asking for it
     Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
     assert(clef);
     return clef;
@@ -114,7 +101,7 @@ Clef *ScoreDefElement::GetClefCopy()
 
 KeySig const *ScoreDefElement::GetKeySig()
 {
-    // Always check if HasKeySigInfo() is true before asking for a copy
+    // Always check if HasKeySigInfo() is true before asking for it
     KeySig *keySig = dynamic_cast<KeySig *>(this->FindChildByType(KEYSIG));
     assert(keySig);
     return keySig;
@@ -128,16 +115,18 @@ KeySig *ScoreDefElement::GetKeySigCopy()
     return copy;
 }
 
-Mensur *ScoreDefElement::GetMensurCopy() const
+Mensur const *ScoreDefElement::GetMensur()
 {
-    Mensur *copy = NULL;
-    if (this->HasMensurAttrInfo()) {
-        copy = new Mensur(this);
-    }
-    else {
-        // Eventually return a copy of the child element;
-    }
+    // Always check if HasMensurInfo() is true before asking for it
+    Mensur *mensur = dynamic_cast<Mensur *>(this->FindChildByType(MENSUR));
+    assert(mensur);
+    return mensur;
+}
+    
+Mensur *ScoreDefElement::GetMensurCopy()
+{
     // Always check if HasMensurInfo() is true before asking for a copy
+    Mensur *copy = dynamic_cast<Mensur *>(this->GetMensur()->Clone());
     assert(copy);
     return copy;
 }
@@ -191,6 +180,9 @@ void ScoreDef::AddChild(Object *child)
     }
     else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
+    }
+    else if (child->Is(MENSUR)) {
+        assert(dynamic_cast<Mensur *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

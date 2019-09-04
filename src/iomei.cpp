@@ -493,7 +493,7 @@ bool MeiOutput::WriteObject(Object *object)
         WriteLigature(m_currentNode, dynamic_cast<Ligature *>(object));
     }
     else if (object->Is(MENSUR)) {
-        m_currentNode = m_currentNode.append_child("mensur");
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("mensur");
         WriteMensur(m_currentNode, dynamic_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
@@ -1521,6 +1521,27 @@ void MeiOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
 void MeiOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
+    
+    if (mensur->IsAttribute()) {
+        AttMensuralLog mensuralLog;
+        mensuralLog.SetMensurDot(mensur->GetDot());
+        mensuralLog.SetProportNum(mensur->GetNum());
+        mensuralLog.SetProportNumbase(mensur->GetNumbase());
+        mensuralLog.SetMensurSign(mensur->GetSign());
+        mensuralLog.SetMensurSlash(mensur->GetSlash());
+        mensuralLog.WriteMensuralLog(currentNode);
+        AttMensuralShared mensuralShared;
+        mensuralShared.SetModusmaior(mensur->GetModusmaior());
+        mensuralShared.SetModusminor(mensur->GetModusminor());
+        mensuralShared.SetProlatio(mensur->GetProlatio());
+        mensuralShared.SetTempus(mensur->GetTempus());
+        mensuralShared.WriteMensuralShared(currentNode);
+        AttMensuralVis mensuralVis;
+        mensuralVis.SetMensurColor(mensur->GetColor());
+        mensuralVis.SetMensurOrient(mensur->GetOrient());
+        mensuralVis.WriteMensuralVis(currentNode);
+        return;
+    }
 
     WriteLayerElement(currentNode, mensur);
     mensur->WriteColor(currentNode);
@@ -1878,9 +1899,6 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     assert(interface);
 
     interface->WriteLyricStyle(element);
-    interface->WriteMensuralLog(element);
-    interface->WriteMensuralShared(element);
-    interface->WriteMensuralVis(element);
     interface->WriteMeterSigDefaultLog(element);
     interface->WriteMeterSigDefaultVis(element);
     interface->WriteMidiTempo(element);
@@ -3174,6 +3192,33 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigShow());
         vrvKeySig->SetSigShowchange(keySigDefaultVis.GetKeysigShowchange());
         object->AddChild(vrvKeySig);
+    }
+    
+    AttMensuralLog mensuralLog;
+    mensuralLog.ReadMensuralLog(element);
+    AttMensuralShared mensuralShared;
+    mensuralShared.ReadMensuralShared(element);
+    AttMensuralVis mensuralVis;
+    mensuralVis.ReadMensuralVis(element);
+    if (mensuralShared.HasProlatio() || mensuralShared.HasTempus() || mensuralLog.HasProportNum() || mensuralLog.HasProportNumbase()
+        || mensuralLog.HasMensurSign()) {
+        Mensur *vrvMensur = new Mensur();
+        vrvMensur->IsAttribute(true);
+        //
+        vrvMensur->SetDot(mensuralLog.GetMensurDot());
+        vrvMensur->SetNum(mensuralLog.GetProportNum());
+        vrvMensur->SetNumbase(mensuralLog.GetProportNumbase());
+        vrvMensur->SetSign(mensuralLog.GetMensurSign());
+        vrvMensur->SetSlash(mensuralLog.GetMensurSlash());
+        //
+        vrvMensur->SetModusmaior(mensuralShared.GetModusmaior());
+        vrvMensur->SetModusminor(mensuralShared.GetModusminor());
+        vrvMensur->SetProlatio(mensuralShared.GetProlatio());
+        vrvMensur->SetTempus(mensuralShared.GetTempus());
+        //
+        vrvMensur->SetColor(mensuralVis.GetMensurColor());
+        vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
+        object->AddChild(vrvMensur);
     }
 
     return true;
@@ -4897,9 +4942,6 @@ bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *
 bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
 {
     interface->ReadLyricStyle(element);
-    interface->ReadMensuralLog(element);
-    interface->ReadMensuralVis(element);
-    interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
     interface->ReadMidiTempo(element);

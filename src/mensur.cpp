@@ -36,32 +36,6 @@ Mensur::Mensur()
     , AttSlashCount()
     , AttStaffLoc()
 {
-    Init();
-}
-
-Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
-{
-    Init();
-
-    this->SetColor(mensurAttr->GetMensurColor());
-    this->SetDot(mensurAttr->GetMensurDot());
-    this->SetOrient(mensurAttr->GetMensurOrient());
-    this->SetSign(mensurAttr->GetMensurSign());
-    this->SetSlash(mensurAttr->GetMensurSlash());
-    //
-    this->SetModusmaior(mensurAttr->GetModusmaior());
-    this->SetModusminor(mensurAttr->GetModusminor());
-    this->SetProlatio(mensurAttr->GetProlatio());
-    this->SetTempus(mensurAttr->GetTempus());
-    //
-    this->SetNum(mensurAttr->GetProportNum());
-    this->SetNumbase(mensurAttr->GetProportNumbase());
-    // It is unclear why we don't have mensur.num and mensur.numbase attributes
-    // in att.mensura.default.log - ask Perry...
-}
-
-void Mensur::Init()
-{
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_DURATIONRATIO);
@@ -70,7 +44,7 @@ void Mensur::Init()
     RegisterAttClass(ATT_MENSURVIS);
     RegisterAttClass(ATT_SLASHCOUNT);
     RegisterAttClass(ATT_STAFFLOC);
-
+    
     Reset();
 }
 
