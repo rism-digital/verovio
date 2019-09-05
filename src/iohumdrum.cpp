@@ -3121,33 +3121,38 @@ void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig,
         return;
     }
 
+    MeterSig *vrvmetersig = getMeterSig(element);
+    if (!vrvmetersig) {
+        return;
+    }
+
     if (metersig == "C") {
         // This is used more strictly for C mensuration.
-        element->SetMeterSym(METERSIGN_common);
+        vrvmetersig->SetSym(METERSIGN_common);
     }
     else if (metersig == "c") {
-        element->SetMeterSym(METERSIGN_common);
+        vrvmetersig->SetSym(METERSIGN_common);
     }
     else if (metersig == "c|") {
-        element->SetMeterSym(METERSIGN_cut);
+        vrvmetersig->SetSym(METERSIGN_cut);
     }
     else if (metersig == "C|") {
         // This is used more strictly for Cut-C mensuration.
-        element->SetMeterSym(METERSIGN_cut);
+        vrvmetersig->SetSym(METERSIGN_cut);
     }
     else if (metersig == "*omet(C)") {
         // This is used more strictly for C mensuration.
-        element->SetMeterSym(METERSIGN_common);
+        vrvmetersig->SetSym(METERSIGN_common);
     }
     else if (metersig == "*omet(c)") {
-        element->SetMeterSym(METERSIGN_common);
+        vrvmetersig->SetSym(METERSIGN_common);
     }
     else if (metersig == "*omet(c|)") {
-        element->SetMeterSym(METERSIGN_cut);
+        vrvmetersig->SetSym(METERSIGN_cut);
     }
     else if (metersig == "*omet(C|)") {
         // This is used more strictly for Cut-C mensuration.
-        element->SetMeterSym(METERSIGN_cut);
+        vrvmetersig->SetSym(METERSIGN_cut);
     }
 }
 
@@ -3158,11 +3163,17 @@ void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig,
 
 template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig)
 {
+
+    Mensur *vrvmensur = getMensur(element);
+    if (!vrvmensur) {
+        return;
+    }
+
     if (metersig.find('C') != std::string::npos) {
-        element->SetMensurSign(MENSURATIONSIGN_C);
+        vrvmensur->SetSign(MENSURATIONSIGN_C);
     }
     else if (metersig.find('O') != std::string::npos) {
-        element->SetMensurSign(MENSURATIONSIGN_O);
+        vrvmensur->SetSign(MENSURATIONSIGN_O);
     }
     else {
         std::cerr << "Warning: do not understand mensuration " << metersig << std::endl;
@@ -3170,25 +3181,25 @@ template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *elemen
     }
 
     if (metersig.find('|') != std::string::npos) {
-        element->SetMensurSlash(1);
+        vrvmensur->SetSlash(1);
     }
     if (metersig.find('.') != std::string::npos) {
-        element->SetMensurDot(BOOLEAN_true);
+        vrvmensur->SetDot(BOOLEAN_true);
     }
     if (metersig.find('r') != std::string::npos) {
-        element->SetMensurOrient(ORIENTATION_reversed);
+        vrvmensur->SetOrient(ORIENTATION_reversed);
     }
 
     hum::HumRegex hre;
     if (hre.search(metersig, "(\\d+)/(\\d+)")) {
-        element->SetProportNum(hre.getMatchInt(1));
-        element->SetProportNumbase(hre.getMatchInt(2));
+        vrvmensur->SetNum(hre.getMatchInt(1));
+        vrvmensur->SetNumbase(hre.getMatchInt(2));
     }
     else if (hre.search(metersig, "/(\\d+)")) {
-        element->SetProportNumbase(hre.getMatchInt(1));
+        vrvmensur->SetNumbase(hre.getMatchInt(1));
     }
     else if (hre.search(metersig, "(\\d+)")) {
-        element->SetProportNum(hre.getMatchInt(1));
+        vrvmensur->SetNum(hre.getMatchInt(1));
     }
 }
 
@@ -3202,6 +3213,12 @@ void HumdrumInput::setTimeSig(
 {
     if ((partstart != NULL) && partstart->isMens()) {
         // Don't display time signatures in mensural notation.
+        return;
+    }
+
+    // Search for a MeterSig child in StaffDef and add one if it does not exist.
+    MeterSig *vrvmeter = getMeterSig(part);
+    if (!vrvmeter) {
         return;
     }
 
@@ -3229,17 +3246,17 @@ void HumdrumInput::setTimeSig(
             if (!mensuration) {
                 // Can't add if there is a mensuration; otherwise,
                 // a time signature will be shown.
-                part->SetMeterCount(top * 2);
+                vrvmeter->SetCount(top * 2);
             }
-            part->SetMeterUnit(1);
+            vrvmeter->SetUnit(1);
         }
         else {
             if (!mensuration) {
                 // Can't add if there is a mensuration; otherwise,
                 // a time signature will be shown.
-                part->SetMeterCount(top);
+                vrvmeter->SetCount(top);
             }
-            part->SetMeterUnit(bot);
+            vrvmeter->SetUnit(bot);
         }
     }
     else {
@@ -3315,12 +3332,12 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
         keyvalue = -7;
     }
     else if (!bb && !eb && !ab && !db && !gb && !cb && !fb && !fs && !cs && !gs && !ds && !as && !es && !bs) {
-        element->SetKeySig(KEYSIGNATURE_0);
+        // element->SetKeySig(KEYSIGNATURE_0); // what to do with this line?
         keyvalue = 0;
     }
     else {
         // nonstandard keysignature, so give a NONE style.
-        element->SetKeySig(KEYSIGNATURE_NONE);
+        // element->SetKeySig(KEYSIGNATURE_NONE); // what to do with this line?
         return;
     }
 
@@ -3328,31 +3345,44 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
         keyvalue += hum::Convert::base40IntervalToLineOfFifths(m_transpose[partindex]);
     }
 
-    switch (keyvalue) {
-        case 0: element->SetKeySig(KEYSIGNATURE_0); break;
-        case +1: element->SetKeySig(KEYSIGNATURE_1s); break;
-        case -1: element->SetKeySig(KEYSIGNATURE_1f); break;
-        case +2: element->SetKeySig(KEYSIGNATURE_2s); break;
-        case -2: element->SetKeySig(KEYSIGNATURE_2f); break;
-        case +3: element->SetKeySig(KEYSIGNATURE_3s); break;
-        case -3: element->SetKeySig(KEYSIGNATURE_3f); break;
-        case +4: element->SetKeySig(KEYSIGNATURE_4s); break;
-        case -4: element->SetKeySig(KEYSIGNATURE_4f); break;
-        case +5: element->SetKeySig(KEYSIGNATURE_5s); break;
-        case -5: element->SetKeySig(KEYSIGNATURE_5f); break;
-        case +6: element->SetKeySig(KEYSIGNATURE_6s); break;
-        case -6: element->SetKeySig(KEYSIGNATURE_6f); break;
-        case +7: element->SetKeySig(KEYSIGNATURE_7s); break;
-        case -7: element->SetKeySig(KEYSIGNATURE_7f); break;
-        default: element->SetKeySig(KEYSIGNATURE_NONE);
+    // Search for a KeySig child in StaffDef and add one if it does not exist.
+    KeySig *vrvkeysig = getKeySig(element);
+    if (!vrvkeysig) {
+        return;
     }
+
+    if ((keyvalue >= -7) && (keyvalue <= 7)) {
+        std::string keystr = to_string(keyvalue);
+        vrvkeysig->SetSig(vrvkeysig->AttKeySigLog::StrToKeysignature(keystr));
+    }
+
+    /*
+        switch (keyvalue) {
+            case 0: element->SetKeySig(KEYSIGNATURE_0); break;
+            case +1: element->SetKeySig(KEYSIGNATURE_1s); break;
+            case -1: element->SetKeySig(KEYSIGNATURE_1f); break;
+            case +2: element->SetKeySig(KEYSIGNATURE_2s); break;
+            case -2: element->SetKeySig(KEYSIGNATURE_2f); break;
+            case +3: element->SetKeySig(KEYSIGNATURE_3s); break;
+            case -3: element->SetKeySig(KEYSIGNATURE_3f); break;
+            case +4: element->SetKeySig(KEYSIGNATURE_4s); break;
+            case -4: element->SetKeySig(KEYSIGNATURE_4f); break;
+            case +5: element->SetKeySig(KEYSIGNATURE_5s); break;
+            case -5: element->SetKeySig(KEYSIGNATURE_5f); break;
+            case +6: element->SetKeySig(KEYSIGNATURE_6s); break;
+            case -6: element->SetKeySig(KEYSIGNATURE_6f); break;
+            case +7: element->SetKeySig(KEYSIGNATURE_7s); break;
+            case -7: element->SetKeySig(KEYSIGNATURE_7f); break;
+            default: element->SetKeySig(KEYSIGNATURE_NONE);
+        }
+    */
 
     if (secondary && (keyvalue == 0)) {
         // force cancellation keysignature.
-        element->SetKeysigShowchange(BOOLEAN_true);
+        vrvkeysig->SetSigShowchange(BOOLEAN_true);
     }
     else if (m_show_cautionary_keysig) {
-        element->SetKeysigShowchange(BOOLEAN_true);
+        vrvkeysig->SetSigShowchange(BOOLEAN_true);
     }
 }
 
@@ -3400,55 +3430,61 @@ void HumdrumInput::setDynamicTransposition(int partindex, StaffDef *part, const 
 
 void HumdrumInput::setClef(StaffDef *part, const std::string &clef)
 {
+    // Search for a Clef child in StaffDef and add one if it does not exist.
+    Clef *vrvclef = getClef(part);
+    if (!vrvclef) {
+        return;
+    }
+
     if (clef.find("clefGG") != string::npos) {
-        part->SetClefShape(CLEFSHAPE_GG);
+        vrvclef->SetShape(CLEFSHAPE_GG);
     }
     else if (clef.find("clefG") != string::npos) {
-        part->SetClefShape(CLEFSHAPE_G);
+        vrvclef->SetShape(CLEFSHAPE_G);
     }
     else if (clef.find("clefF") != string::npos) {
-        part->SetClefShape(CLEFSHAPE_F);
+        vrvclef->SetShape(CLEFSHAPE_F);
     }
     else if (clef.find("clefC") != string::npos) {
-        part->SetClefShape(CLEFSHAPE_C);
+        vrvclef->SetShape(CLEFSHAPE_C);
     }
     if (clef.find("clefX") != string::npos) {
-        part->SetClefShape(CLEFSHAPE_perc);
+        vrvclef->SetShape(CLEFSHAPE_perc);
         // by default place on 3rd line (unless another numbe is given):
-        part->SetClefLine(3);
+        vrvclef->SetLine(3);
     }
 
     if (clef.find("2") != string::npos) {
-        part->SetClefLine(2);
+        vrvclef->SetLine(2);
     }
     else if (clef.find("4") != string::npos) {
-        part->SetClefLine(4);
+        vrvclef->SetLine(4);
     }
     else if (clef.find("3") != string::npos) {
-        part->SetClefLine(3);
+        vrvclef->SetLine(3);
     }
     else if (clef.find("5") != string::npos) {
-        part->SetClefLine(5);
+        vrvclef->SetLine(5);
     }
     else if (clef.find("1") != string::npos) {
-        part->SetClefLine(1);
+        vrvclef->SetLine(1);
     }
 
     if (clef.find("vv") != string::npos) {
-        part->SetClefDis(OCTAVE_DIS_15);
-        part->SetClefDisPlace(STAFFREL_basic_below);
+        vrvclef->SetDis(OCTAVE_DIS_15);
+        vrvclef->SetDisPlace(STAFFREL_basic_below);
     }
     else if (clef.find("v") != string::npos) {
-        part->SetClefDis(OCTAVE_DIS_8);
-        part->SetClefDisPlace(STAFFREL_basic_below);
+        vrvclef->SetDis(OCTAVE_DIS_8);
+        vrvclef->SetDisPlace(STAFFREL_basic_below);
     }
     else if (clef.find("^^") != string::npos) {
-        part->SetClefDis(OCTAVE_DIS_15);
-        part->SetClefDisPlace(STAFFREL_basic_above);
+        vrvclef->SetDis(OCTAVE_DIS_15);
+        vrvclef->SetDisPlace(STAFFREL_basic_above);
     }
     else if (clef.find("^") != string::npos) {
-        part->SetClefDis(OCTAVE_DIS_8);
-        part->SetClefDisPlace(STAFFREL_basic_above);
+        vrvclef->SetDis(OCTAVE_DIS_8);
+        vrvclef->SetDisPlace(STAFFREL_basic_above);
     }
 }
 
@@ -8889,6 +8925,74 @@ void HumdrumInput::insertMeterSigElement(
     // check for mensuration here.
 }
 
+//////////////////////////////
+//
+// HumdrumInput::getMeterSig -- Return the MeterSig element of
+//   the given object, or if there is none create it and
+//   return a pointer to it. ELEMENT can be ScoreDef or StaffDef.
+//
+
+template <class ELEMENT> MeterSig *HumdrumInput::getMeterSig(ELEMENT element)
+{
+    MeterSig *output = (MeterSig *)element->FindChildByType(ClassId::METERSIG);
+    if (!output) {
+        output = new MeterSig;
+        element->AddChild(output);
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getKeySig -- Return the KeySig element of
+//   the given object, or if there is none create it and
+//   return a pointer to it. ELEMENT can be ScoreDef or StaffDef.
+//
+
+template <class ELEMENT> KeySig *HumdrumInput::getKeySig(ELEMENT element)
+{
+    KeySig *output = (KeySig *)element->FindChildByType(ClassId::KEYSIG);
+    if (!output) {
+        output = new KeySig;
+        element->AddChild(output);
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getClef -- Return the Clef element of
+//   the given object, or if there is none create it and
+//   return a pointer to it. ELEMENT can be ScoreDef or StaffDef.
+//
+
+template <class ELEMENT> Clef *HumdrumInput::getClef(ELEMENT element)
+{
+    Clef *output = (Clef *)element->FindChildByType(ClassId::KEYSIG);
+    if (!output) {
+        output = new Clef;
+        element->AddChild(output);
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMensur -- Return the Mensur element of
+//   the given object, or if there is none create it and
+//   return a pointer to it. ELEMENT can be ScoreDef or StaffDef.
+//
+
+template <class ELEMENT> Mensur *HumdrumInput::getMensur(ELEMENT element)
+{
+    Mensur *output = (Mensur *)element->FindChildByType(ClassId::MENSUR);
+    if (!output) {
+        output = new Mensur;
+        element->AddChild(output);
+    }
+    return output;
+}
+
 /////////////////////////////
 //
 // HumdrumInput::addSystemKeyTimeChange -- Add key or time signature changes
@@ -8944,8 +9048,9 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             if (!metersig) {
                 count = stoi(matches[1]);
                 unit = stoi(matches[2]);
-                scoreDef->SetMeterCount(count);
-                scoreDef->SetMeterUnit(unit);
+                MeterSig *vrvmetersig = getMeterSig(scoreDef);
+                vrvmetersig->SetCount(count);
+                vrvmetersig->SetUnit(unit);
             }
             else if (metersig && (metersig->find('C') == std::string::npos)
                 && (metersig->find('O') == std::string::npos)) {
@@ -8953,15 +9058,17 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
                 // otherwise verovio will display both.
                 count = stoi(matches[1]);
                 unit = stoi(matches[2]);
-                scoreDef->SetMeterCount(count);
-                scoreDef->SetMeterUnit(unit);
+                MeterSig *vrvmetersig = getMeterSig(scoreDef);
+                vrvmetersig->SetCount(count);
+                vrvmetersig->SetUnit(unit);
             }
             else {
                 // But always need to provide @meter.unit since timestamps
                 // are in reference to it (can't add meter.count since
                 // this will also print a time signature.
                 unit = stoi(matches[2]);
-                scoreDef->SetMeterUnit(unit);
+                MeterSig *vrvmetersig = getMeterSig(scoreDef);
+                vrvmetersig->SetUnit(unit);
             }
             if (metersig) {
                 auto ploc = metersig->rfind(")");

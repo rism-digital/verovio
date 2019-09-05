@@ -21,6 +21,8 @@
 #include "dir.h"
 #include "ending.h"
 #include "io.h"
+#include "keysig.h"
+#include "metersig.h"
 #include "options.h"
 #include "pedal.h"
 #include "runningelement.h"
@@ -556,6 +558,10 @@ protected:
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
     template <class ELEMENT> void setN(ELEMENT element, int nvalue);
     template <class ELEMENT> void assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex);
+    template <class ELEMENT> KeySig *getKeySig(ELEMENT element);
+    template <class ELEMENT> MeterSig *getMeterSig(ELEMENT element);
+    template <class ELEMENT> Clef *getClef(ELEMENT element);
+    template <class ELEMENT> Mensur *getMensur(ELEMENT element);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
