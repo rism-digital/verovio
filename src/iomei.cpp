@@ -3304,6 +3304,13 @@ bool MeiInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "keySig") {
             success = ReadKeySig(parent, current);
         }
+        else if (std::string(current.name()) == "mensur") {
+            success = ReadMensur(parent, current);
+        }
+        else if (std::string(current.name()) == "meterSig") {
+            success = ReadMeterSig(parent, current);
+        }
+
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
             success = ReadPgFoot(parent, current);
@@ -3521,6 +3528,12 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "keySig") {
             success = ReadKeySig(parent, current);
+        }
+        else if (std::string(current.name()) == "mensur") {
+            success = ReadMensur(parent, current);
+        }
+        else if (std::string(current.name()) == "meterSig") {
+            success = ReadMeterSig(parent, current);
         }
         // content
         else if (std::string(current.name()) == "instrDef") {
