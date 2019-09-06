@@ -61,6 +61,8 @@ class FTrem;
 class Hairpin;
 class HalfmRpt;
 class Harm;
+class KeyAccid;
+class KeySig;
 class LinkingInterface;
 class InstrDef;
 class Label;
@@ -248,6 +250,7 @@ private:
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt);
+    void WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid);
     void WriteKeySig(pugi::xml_node currentNode, KeySig *keySig);
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
@@ -494,6 +497,7 @@ private:
     bool ReadDot(Object *parent, pugi::xml_node dot);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt);
+    bool ReadKeyAccid(Object *parent, pugi::xml_node keyAccid);
     bool ReadKeySig(Object *parent, pugi::xml_node keySig);
     bool ReadLigature(Object *parent, pugi::xml_node ligature);
     bool ReadMensur(Object *parent, pugi::xml_node mensur);

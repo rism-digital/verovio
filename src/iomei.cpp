@@ -52,6 +52,7 @@
 #include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
+#include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -483,6 +484,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(HALFMRPT)) {
         m_currentNode = m_currentNode.append_child("halfmRpt");
         WriteHalfmRpt(m_currentNode, dynamic_cast<HalfmRpt *>(object));
+    }
+    else if (object->Is(KEYACCID)) {
+        m_currentNode = m_currentNode.append_child("keyAccid");
+        WriteKeyAccid(m_currentNode, dynamic_cast<KeyAccid *>(object));
     }
     else if (object->Is(KEYSIG)) {
         if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("keySig");
@@ -1480,6 +1485,17 @@ void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
     WriteLayerElement(currentNode, halfmRpt);
 }
 
+void MeiOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
+{
+    assert(keyAccid);
+
+    WriteLayerElement(currentNode, keyAccid);
+    WritePositionInterface(currentNode, keyAccid);
+    keyAccid->WriteAccidental(currentNode);
+    keyAccid->WriteColor(currentNode);
+    keyAccid->WriteEnclosingChars(currentNode);
+}
+
 void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 {
     assert(keySig);
@@ -2407,6 +2423,15 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "note") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for keySig
+    else if (filterParent->Is(KEYSIG)) {
+        if (element == "keyAccid") {
             return true;
         }
         else {
@@ -4146,6 +4171,9 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "halfmRpt") {
             success = ReadHalfmRpt(parent, xmlElement);
         }
+        else if (elementName == "keyAccid") {
+            success = ReadKeyAccid(parent, xmlElement);
+        }
         else if (elementName == "keySig") {
             success = ReadKeySig(parent, xmlElement);
         }
@@ -4442,6 +4470,21 @@ bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
     return true;
 }
 
+bool MeiInput::ReadKeyAccid(Object *parent, pugi::xml_node keyAccid)
+{
+    KeyAccid *vrvKeyAccid = new KeyAccid();
+    ReadLayerElement(keyAccid, vrvKeyAccid);
+
+    ReadPositionInterface(keyAccid, vrvKeyAccid);
+    vrvKeyAccid->ReadAccidental(keyAccid);
+    vrvKeyAccid->ReadColor(keyAccid);
+    vrvKeyAccid->ReadEnclosingChars(keyAccid);
+
+    parent->AddChild(vrvKeyAccid);
+    ReadUnsupportedAttr(keyAccid, vrvKeyAccid);
+    return true;
+}
+
 bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 {
     KeySig *vrvKeySig = new KeySig();
@@ -4456,7 +4499,7 @@ bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 
     parent->AddChild(vrvKeySig);
     ReadUnsupportedAttr(keySig, vrvKeySig);
-    return true;
+    return ReadLayerChildren(vrvKeySig, keySig, vrvKeySig);
 }
 
 bool MeiInput::ReadLigature(Object *parent, pugi::xml_node ligature)

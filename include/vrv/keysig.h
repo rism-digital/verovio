@@ -60,6 +60,11 @@ public:
     /** Override the method since check is required */
     virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
 
+    /**
+     * Add an element (a keyAccid) to a keySig.
+     */
+    virtual void AddChild(Object *object);
+
     /* Alteration number getter */
     int GetAlterationNumber() const;
 
