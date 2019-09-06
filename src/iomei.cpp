@@ -3310,7 +3310,6 @@ bool MeiInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "meterSig") {
             success = ReadMeterSig(parent, current);
         }
-
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
             success = ReadPgFoot(parent, current);
