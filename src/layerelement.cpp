@@ -110,8 +110,7 @@ void LayerElement::CopyReset()
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
-    m_beamElementCoord = NULL;
-
+    
     m_crossStaff = NULL;
     m_crossLayer = NULL;
 }
