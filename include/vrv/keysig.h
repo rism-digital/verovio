@@ -11,6 +11,7 @@
 
 #include "atts_analytical.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -24,16 +25,15 @@ class ScoreDefInterface;
 
 /**
  * This class models the MEI <keySig> element.
- * Since it is unclear how to encode the logical key signature in keySig, an
- * internal representation is used (there is no equivalent of staffDef @key
- * within keySig. Currently the @accid and @pname are used for this. The
- * @pname stores the value of the latest accidental, which is doubtfully the
- * expected use of it.
- * Two temporary methods KeySig::ConvertToMei and KeySig::ConvertToInternal
- * are available for converting from and to the MEI representation to the
- * internal (and vice versa)
  */
-class KeySig : public LayerElement, public AttAccidental, public AttPitch, public AttKeySigAnl {
+class KeySig : public LayerElement,
+               public ObjectListInterface,
+               public AttAccidental,
+               public AttPitch,
+               public AttKeySigAnl,
+               public AttKeySigLog,
+               public AttKeySigVis,
+               public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -41,9 +41,6 @@ public:
      */
     ///@{
     KeySig();
-    KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType);
-    KeySig(const ScoreDefInterface *keySigAttr);
-    void Init();
     virtual ~KeySig();
     virtual void Reset();
     virtual Object *Clone() const { return new KeySig(*this); }
@@ -53,52 +50,54 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
-    /* Alteration number getter/setter */
-    int GetAlterationNumber() const { return m_alterationNumber; }
-    void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; }
+    /** Override the method since check is required */
+    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
 
-    /* Alteration number getter/setter */
-    data_ACCIDENTAL_WRITTEN GetAlterationType() const { return m_alterationType; }
-    void SetAlterationType(data_ACCIDENTAL_WRITTEN alterationType) { m_alterationType = alterationType; }
+    /**
+     * Add an element (a keyAccid) to a keySig.
+     */
+    virtual void AddChild(Object *object);
 
-    /* Temporary methods for turning @accid and @pitch into num_alter and alter */
-    void ConvertToMei();
-    void ConvertToInternal();
+    /* Accid number getter */
+    int GetAccidCount();
 
-    /* Convert to KeySigLog */
-    data_KEYSIGNATURE ConvertToKeySigLog();
+    /* Accid type getter */
+    data_ACCIDENTAL_WRITTEN GetAccidType();
+
+    /**
+     * Return the string of the alteration at the positon pos.
+     * Looks at keyAccid children if any.
+     * The accid at pos is return in accid and the pname in pname.
+     */
+    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname);
 
     /**
      * Static methods for calculating position;
      */
-    static data_PITCHNAME GetAlterationAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
+    static data_PITCHNAME GetAccidPnameAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
     static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef);
+
+protected:
+    /**
+     * Filter the flat list and keep only StaffDef elements.
+     */
+    virtual void FilterList(ArrayOfObjects *childList);
 
 private:
     //
 public:
+    bool m_mixedChildrenAccidType;
     /**
      * Variables for storing cancellation introduced by the key sig.
      * The values are StaffDefDrawingInterface::ReplaceKeySig
      */
     data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
-    /**
-     * Equivalent to @key.sig.show and @showchange, but set for drawing
-     * KeySig has no equivalent in MEI and will be true and false by default
-     * See KeySig::KeySig(KeySigAttr *keySigAttr) for initialisation
-     */
-    bool m_drawingShow;
-    bool m_drawingShowchange;
 
 private:
     static data_PITCHNAME flats[];
     static data_PITCHNAME sharps[];
     static int octave_map[2][9][7];
-
-    // This is temporary - it needs to be changed to libMEI atts
-    int m_alterationNumber;
-    data_ACCIDENTAL_WRITTEN m_alterationType;
 };
 
 } // namespace vrv

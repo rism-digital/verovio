@@ -292,6 +292,12 @@
 		4D796B5E1D78641900A15238 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
 		4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
+		4D81351B2322C2CC00F59C01 /* keyaccid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D81351A2322C2CC00F59C01 /* keyaccid.h */; };
+		4D81351C2322C2CC00F59C01 /* keyaccid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D81351A2322C2CC00F59C01 /* keyaccid.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D81351E2322C41800F59C01 /* keyaccid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D81351D2322C41800F59C01 /* keyaccid.cpp */; };
+		4D81351F2322C41800F59C01 /* keyaccid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D81351D2322C41800F59C01 /* keyaccid.cpp */; };
+		4D8135202322C41800F59C01 /* keyaccid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D81351D2322C41800F59C01 /* keyaccid.cpp */; };
+		4D8135212322C41800F59C01 /* keyaccid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D81351D2322C41800F59C01 /* keyaccid.cpp */; };
 		4D89F90C201771A700A4D336 /* num.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D89F90B201771A700A4D336 /* num.h */; };
 		4D89F90E201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
 		4D89F90F201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
@@ -1257,6 +1263,8 @@
 		4D796B5D1D78641900A15238 /* harm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = harm.cpp; path = src/harm.cpp; sourceTree = "<group>"; };
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
 		4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawinginterface.cpp; path = src/drawinginterface.cpp; sourceTree = "<group>"; };
+		4D81351A2322C2CC00F59C01 /* keyaccid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = keyaccid.h; path = include/vrv/keyaccid.h; sourceTree = "<group>"; };
+		4D81351D2322C41800F59C01 /* keyaccid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = keyaccid.cpp; path = src/keyaccid.cpp; sourceTree = "<group>"; };
 		4D89F90B201771A700A4D336 /* num.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = num.h; path = include/vrv/num.h; sourceTree = "<group>"; };
 		4D89F90D201771AE00A4D336 /* num.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = num.cpp; path = src/num.cpp; sourceTree = "<group>"; };
 		4D89F9112018A93200A4D336 /* svg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svg.cpp; path = src/svg.cpp; sourceTree = "<group>"; };
@@ -2075,6 +2083,8 @@
 				409B3DD71F2D1C0C0098A265 /* ftrem.h */,
 				4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */,
 				4D1BD1B821908D78000D35B2 /* halfmrpt.h */,
+				4D81351D2322C41800F59C01 /* keyaccid.cpp */,
+				4D81351A2322C2CC00F59C01 /* keyaccid.h */,
 				8F086EC5188539540037FD8E /* keysig.cpp */,
 				8F59291C18854BF800FE51AD /* keysig.h */,
 				8F086EC7188539540037FD8E /* layerelement.cpp */,
@@ -2177,6 +2187,7 @@
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
 				40C2E4212052A6EC0003625F /* pb.h in Headers */,
 				40BD9393206B95120037BF8E /* annot.h in Headers */,
+				4D81351B2322C2CC00F59C01 /* keyaccid.h in Headers */,
 				4DEC4DD621C8295700D1D273 /* del.h in Headers */,
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
@@ -2342,6 +2353,7 @@
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
 				BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */,
 				BB4C4BC222A9330D001F6AF0 /* pugiconfig.hpp in Headers */,
+				4D81351C2322C2CC00F59C01 /* keyaccid.h in Headers */,
 				BB4C4A8722A9321F001F6AF0 /* atts_visual.h in Headers */,
 				BBC19FC922B39AC400100F42 /* git_commit.h in Headers */,
 				BB4C4A8F22A9328F001F6AF0 /* attdef.h in Headers */,
@@ -2713,6 +2725,7 @@
 				4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */,
 				4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */,
 				4DEC4DAF21C81F0600D1D273 /* sic.cpp in Sources */,
+				4D81351F2322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
 				4D1694061E3A44F300569BF4 /* iomei.cpp in Sources */,
 				4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */,
@@ -3042,6 +3055,7 @@
 				4DC34BA819BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */,
 				4D7927D020ECCC6D0002A45D /* view_slur.cpp in Sources */,
+				4D81351E2322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
 				4DEC4DB221C826E000D1D273 /* supplied.cpp in Sources */,
 				4DA0EAC322BB779400A7EBEB /* surface.cpp in Sources */,
@@ -3088,6 +3102,7 @@
 				4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
 				4DB3D8F51F83D1D600B5FC2B /* view_control.cpp in Sources */,
+				4D8135202322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4D4FCD141F54570E0009C455 /* staffdef.cpp in Sources */,
 				4DEC4D7C21C8048700D1D273 /* abbr.cpp in Sources */,
 				403BEFF9206C00FF00D022D5 /* beatrpt.cpp in Sources */,
@@ -3276,6 +3291,7 @@
 				4DA0EAC622BB779400A7EBEB /* surface.cpp in Sources */,
 				BB4C4ADB22A932BC001F6AF0 /* abbr.cpp in Sources */,
 				BB4C4A9322A9328F001F6AF0 /* doc.cpp in Sources */,
+				4D8135212322C41800F59C01 /* keyaccid.cpp in Sources */,
 				BB4C4B9922A932E5001F6AF0 /* linkinginterface.cpp in Sources */,
 				BB4C4A6A22A9321F001F6AF0 /* atts_externalsymbols.cpp in Sources */,
 				BB4C4AAD22A932A6001F6AF0 /* io.cpp in Sources */,

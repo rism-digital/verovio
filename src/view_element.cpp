@@ -891,7 +891,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     KeySig *keySig = dynamic_cast<KeySig *>(element);
     assert(keySig);
 
-    int symb;
     int x, y, i;
 
     Clef *c = layer->GetClef(element);
@@ -901,42 +900,46 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     // hidden key signature
-    if (!keySig->m_drawingShow) {
+    if (keySig->GetVisible() == BOOLEAN_false) {
         keySig->SetEmptyBB();
         return;
     }
 
     // C major (0) key sig and no cancellation
-    else if ((keySig->GetAlterationNumber() == 0) && (keySig->m_drawingCancelAccidCount == 0)) {
+    else if ((keySig->GetAccidCount() == 0) && (keySig->m_drawingCancelAccidCount == 0)) {
         keySig->SetEmptyBB();
         return;
     }
 
     // C major (0) key sig and system scoreDef - cancellation (if any) is done at the end of the previous system
-    else if ((keySig->GetScoreDefRole() == SCOREDEF_SYSTEM) && (keySig->GetAlterationNumber() == 0)) {
+    else if ((keySig->GetScoreDefRole() == SCOREDEF_SYSTEM) && (keySig->GetAccidCount() == 0)) {
         keySig->SetEmptyBB();
         return;
     }
 
     x = element->GetDrawingX();
     // HARDCODED
-    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
+    int naturalGlyphWidth = m_doc->GetGlyphWidth(SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+    int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int naturalStep = step * TEMP_KEYSIG_NATURAL_STEP;
+    step *= TEMP_KEYSIG_STEP;
 
     int clefLocOffset = layer->GetClefLocOffset(element);
     int loc;
 
     // Show cancellation if C major (0)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAlterationNumber() == 0)) {
+    // This is not meant to make sense with mixed key signature
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAccidCount() == 0)) {
         dc->StartGraphic(element, "", element->GetUuid());
 
         for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-            data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
             loc = PitchInterface::CalcLoc(
                 pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
             y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
             DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-            x += step;
+            x += naturalGlyphWidth + naturalStep;
         }
 
         dc->EndGraphic(element, this);
@@ -946,48 +949,55 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->StartGraphic(element, "", element->GetUuid());
 
     // Show cancellation if show cancellation (showchange) is true (false by default)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+    // This is not meant to make sense with mixed key signature
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
-        if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
+        if (keySig->GetAccidType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
                 y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += step;
+                x += naturalGlyphWidth + naturalStep;
             }
         }
     }
 
-    for (i = 0; i < keySig->GetAlterationNumber(); ++i) {
-        data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->GetAlterationType(), i);
-        loc = PitchInterface::CalcLoc(pitch, KeySig::GetOctave(keySig->GetAlterationType(), pitch, c), clefLocOffset);
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+
+    for (i = 0; i < keySig->GetAccidCount(); ++i) {
+        // We get the pitch from the keySig (looks for keyAccid children if any)
+        data_ACCIDENTAL_WRITTEN accid;
+        data_PITCHNAME pname;
+        std::wstring accidStr = keySig->GetKeyAccidStrAt(i, accid, pname);
+
+        loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-        if (keySig->GetAlterationType() == ACCIDENTAL_WRITTEN_f)
-            symb = SMUFL_E260_accidentalFlat;
-        else
-            symb = SMUFL_E262_accidentalSharp;
-
-        DrawSmuflCode(dc, x, y, symb, staff->m_drawingStaffSize, false);
-        x += step;
+        DrawSmuflString(dc, x, y, accidStr, false, staff->m_drawingStaffSize, false);
+        TextExtend extend;
+        dc->GetSmuflTextExtent(accidStr, &extend);
+        x += extend.m_width + step;
     }
 
+    dc->ResetFont();
+
     // Show cancellation if show cancellation (showchange) is true (false by default)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+    // This is not meant to make sense with mixed key signature
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
         // Same time of alteration, but smaller number - cancellation is displayed afterwards
-        if ((keySig->GetAlterationType() == keySig->m_drawingCancelAccidType)
-            && (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount)) {
-            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+        if ((keySig->GetAccidType() == keySig->m_drawingCancelAccidType)
+            && (keySig->GetAccidCount() < keySig->m_drawingCancelAccidCount)) {
+            for (i = keySig->GetAccidCount(); i < keySig->m_drawingCancelAccidCount; ++i) {
+                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
                 y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += step;
+                x += naturalGlyphWidth + naturalStep;
             }
         }
     }

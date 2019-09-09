@@ -339,51 +339,43 @@ data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarnin
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
 {
     std::string value;
-    switch (data) {
-        case KEYSIGNATURE_7f: value = "7f"; break;
-        case KEYSIGNATURE_6f: value = "6f"; break;
-        case KEYSIGNATURE_5f: value = "5f"; break;
-        case KEYSIGNATURE_4f: value = "4f"; break;
-        case KEYSIGNATURE_3f: value = "3f"; break;
-        case KEYSIGNATURE_2f: value = "2f"; break;
-        case KEYSIGNATURE_1f: value = "1f"; break;
-        case KEYSIGNATURE_0: value = "0"; break;
-        case KEYSIGNATURE_1s: value = "1s"; break;
-        case KEYSIGNATURE_2s: value = "2s"; break;
-        case KEYSIGNATURE_3s: value = "3s"; break;
-        case KEYSIGNATURE_4s: value = "4s"; break;
-        case KEYSIGNATURE_5s: value = "5s"; break;
-        case KEYSIGNATURE_6s: value = "6s"; break;
-        case KEYSIGNATURE_7s: value = "7s"; break;
-        case KEYSIGNATURE_mixed: value = "mixed"; break;
-        default:
-            LogWarning("Unknown key signature '%d'", data);
-            value = "";
-            break;
+
+    if (data.first == VRV_UNSET) {
+        value = "mixed";
     }
+    else if (data.first == 0) {
+        value = "0";
+    }
+    else if (data.first != -1) {
+        value = StringFormat("%d%s", data.first, AccidentalWrittenToStr(data.second).c_str());
+    }
+
     return value;
 }
 
 data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) const
 {
-    if (value == "7f") return KEYSIGNATURE_7f;
-    if (value == "6f") return KEYSIGNATURE_6f;
-    if (value == "5f") return KEYSIGNATURE_5f;
-    if (value == "4f") return KEYSIGNATURE_4f;
-    if (value == "3f") return KEYSIGNATURE_3f;
-    if (value == "2f") return KEYSIGNATURE_2f;
-    if (value == "1f") return KEYSIGNATURE_1f;
-    if (value == "0") return KEYSIGNATURE_0;
-    if (value == "1s") return KEYSIGNATURE_1s;
-    if (value == "2s") return KEYSIGNATURE_2s;
-    if (value == "3s") return KEYSIGNATURE_3s;
-    if (value == "4s") return KEYSIGNATURE_4s;
-    if (value == "5s") return KEYSIGNATURE_5s;
-    if (value == "6s") return KEYSIGNATURE_6s;
-    if (value == "7s") return KEYSIGNATURE_7s;
-    if (value == "mixed") return KEYSIGNATURE_mixed;
-    if (logWarning && !value.empty()) LogWarning("Unsupported key signature '%s'", value.c_str());
-    return KEYSIGNATURE_NONE;
+    int alterationNumber = 0;
+    data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
+
+    std::regex test("mixed|0|[1-7][s|f]");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.KEYSIGNATURE '%s'", value.c_str());
+        return std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
+    }
+
+    if (value == "mixed") {
+        return std::make_pair(VRV_UNSET, ACCIDENTAL_WRITTEN_NONE);
+    }
+    else if (value != "0") {
+        alterationNumber = atoi(value.substr(0, 1).c_str());
+        alterationType = (value.at(1) == 's') ? ACCIDENTAL_WRITTEN_s : ACCIDENTAL_WRITTEN_f;
+    }
+    else {
+        alterationType = ACCIDENTAL_WRITTEN_n;
+    }
+
+    return std::make_pair(alterationNumber, alterationType);
 }
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const

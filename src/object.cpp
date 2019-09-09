@@ -1329,6 +1329,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         assert(element);
         Clef *clef = dynamic_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
+        if (clef->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
@@ -1339,12 +1342,15 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new keysig
     if (this->Is(KEYSIG)) {
-        KeySig *keysig = dynamic_cast<KeySig *>(this);
-        assert(keysig);
+        KeySig *keySig = dynamic_cast<KeySig *>(this);
+        assert(keySig);
+        if (keySig->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
-        upcomingStaffDef->SetCurrentKeySig(keysig);
+        upcomingStaffDef->SetCurrentKeySig(keySig);
         params->m_upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }

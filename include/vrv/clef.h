@@ -34,8 +34,6 @@ public:
      */
     ///@{
     Clef();
-    Clef(const ScoreDefInterface *clefAttr);
-    void Init();
     virtual ~Clef();
     virtual void Reset();
     virtual Object *Clone() const { return new Clef(*this); }
@@ -45,6 +43,9 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+
+    /** Override the method since check is required */
+    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
 
     /**
      * Return the offset of the clef
@@ -57,7 +58,6 @@ public:
     static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place);
 
 private:
-    //
 public:
     //
 private:

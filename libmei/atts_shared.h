@@ -1919,14 +1919,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSig(std::string sig_) { m_sig = sig_; }
-    std::string GetSig() const { return m_sig; }
+    void SetSig(data_KEYSIGNATURE sig_) { m_sig = sig_; }
+    data_KEYSIGNATURE GetSig() const { return m_sig; }
     bool HasSig() const;
     ///@}
 
 private:
     /** Written key signature. **/
-    std::string m_sig;
+    data_KEYSIGNATURE m_sig;
 
     /* include <attsig> */
 };
@@ -5294,8 +5294,8 @@ private:
      **/
     double m_transDiat;
     /**
-     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ =
-     * 1, necessary to calculate the sounded pitch from the written one.
+     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ = 1,
+     * necessary to calculate the sounded pitch from the written one.
      **/
     double m_transSemi;
 

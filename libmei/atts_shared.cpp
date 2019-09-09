@@ -2441,14 +2441,14 @@ AttKeySigLog::~AttKeySigLog()
 
 void AttKeySigLog::ResetKeySigLog()
 {
-    m_sig = "";
+    m_sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
 }
 
 bool AttKeySigLog::ReadKeySigLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("sig")) {
-        this->SetSig(StrToStr(element.attribute("sig").value()));
+        this->SetSig(StrToKeysignature(element.attribute("sig").value()));
         element.remove_attribute("sig");
         hasAttribute = true;
     }
@@ -2459,7 +2459,7 @@ bool AttKeySigLog::WriteKeySigLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasSig()) {
-        element.append_attribute("sig") = StrToStr(this->GetSig()).c_str();
+        element.append_attribute("sig") = KeysignatureToStr(this->GetSig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2467,7 +2467,7 @@ bool AttKeySigLog::WriteKeySigLog(pugi::xml_node element)
 
 bool AttKeySigLog::HasSig() const
 {
-    return (m_sig != "");
+    return (m_sig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
 /* include <attsig> */
@@ -2487,7 +2487,7 @@ AttKeySigDefaultLog::~AttKeySigDefaultLog()
 
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
 {
-    m_keySig = KEYSIGNATURE_NONE;
+    m_keySig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
 }
 
 bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element)
@@ -2513,7 +2513,7 @@ bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element)
 
 bool AttKeySigDefaultLog::HasKeySig() const
 {
-    return (m_keySig != KEYSIGNATURE_NONE);
+    return (m_keySig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
 /* include <attkey.sig> */
@@ -8386,7 +8386,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttKeySigLog *att = dynamic_cast<AttKeySigLog *>(element);
         assert(att);
         if (attrType == "sig") {
-            att->SetSig(att->StrToStr(attrValue));
+            att->SetSig(att->StrToKeysignature(attrValue));
             return true;
         }
     }
@@ -9853,7 +9853,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttKeySigLog *att = dynamic_cast<const AttKeySigLog *>(element);
         assert(att);
         if (att->HasSig()) {
-            attributes->push_back(std::make_pair("sig", att->StrToStr(att->GetSig())));
+            attributes->push_back(std::make_pair("sig", att->KeysignatureToStr(att->GetSig())));
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {

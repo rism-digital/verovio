@@ -107,10 +107,9 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
 
     // key signature of the scoreDef
     if (scoreDef->HasKeySigInfo()) {
-        KeySig *keySig = scoreDef->GetKeySigCopy();
+        KeySig *keySig = scoreDef->GetKeySig();
         assert(keySig);
-        numAlteration = (keySig->GetAlterationNumber() > numAlteration) ? keySig->GetAlterationNumber() : numAlteration;
-        delete keySig;
+        numAlteration = (keySig->GetAccidCount() > numAlteration) ? keySig->GetAccidCount() : numAlteration;
     }
 
     // longest key signature of the staffDefs
@@ -119,10 +118,9 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
-        KeySig *keySig = staffDef->GetKeySigCopy();
+        KeySig *keySig = staffDef->GetKeySig();
         assert(keySig);
-        numAlteration = (keySig->GetAlterationNumber() > numAlteration) ? keySig->GetAlterationNumber() : numAlteration;
-        delete keySig;
+        numAlteration = (keySig->GetAccidCount() > numAlteration) ? keySig->GetAccidCount() : numAlteration;
     }
 
     int width = 0;

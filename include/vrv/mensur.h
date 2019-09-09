@@ -40,8 +40,6 @@ public:
      */
     ///@{
     Mensur();
-    Mensur(const ScoreDefInterface *mensurAttr);
-    void Init();
     virtual ~Mensur();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Mensur"; }
@@ -51,6 +49,9 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+
+    /** Override the method since check is required */
+    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
 
     //----------//
     // Functors //

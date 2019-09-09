@@ -176,6 +176,7 @@ enum ClassId {
     FTREM,
     HALFMRPT,
     KEYSIG,
+    KEYACCID,
     LIGATURE,
     MENSUR,
     METERSIG,
