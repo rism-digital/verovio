@@ -15,7 +15,9 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "keyaccid.h"
 #include "scoredefinterface.h"
+#include "smufl.h"
 
 namespace vrv {
 
@@ -63,6 +65,7 @@ int KeySig::octave_map[2][9][7] = {
 
 KeySig::KeySig()
     : LayerElement("keysig-")
+    , ObjectListInterface()
     , AttAccidental()
     , AttPitch()
     , AttKeySigAnl()
@@ -92,78 +95,160 @@ void KeySig::Reset()
     ResetKeySigVis();
     ResetVisibility();
 
+    m_mixedChildrenAccidType = false;
+
     // key change drawing values
     m_drawingCancelAccidType = ACCIDENTAL_WRITTEN_n;
     m_drawingCancelAccidCount = 0;
 }
 
-int KeySig::GetAlterationNumber() const
+void KeySig::FilterList(ArrayOfObjects *childList)
 {
+    // nothing  to filter since we allow only KeyAccid for now.
+    ArrayOfObjects::iterator iter = childList->begin();
+
+    while (iter != childList->end()) {
+        if ((*iter)->Is(KEYACCID))
+            ++iter;
+        else
+            iter = childList->erase(iter);
+    }
+
+    data_ACCIDENTAL_WRITTEN type = ACCIDENTAL_WRITTEN_NONE;
+    m_mixedChildrenAccidType = false;
+
+    for (auto &child : *childList) {
+        KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(child);
+        assert(keyAccid);
+        if (type == ACCIDENTAL_WRITTEN_NONE) {
+            type = keyAccid->GetAccid();
+            continue;
+        }
+        if (type != keyAccid->GetAccid()) {
+            m_mixedChildrenAccidType = true;
+            break;
+        }
+    }
+}
+
+int KeySig::GetAccidCount()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    if (childList->size() > 0) {
+        return (int)childList->size();
+    }
+
     if (!this->HasSig()) return 0;
 
     return (this->GetSig().first);
 }
 
-data_ACCIDENTAL_WRITTEN KeySig::GetAlterationType() const
+data_ACCIDENTAL_WRITTEN KeySig::GetAccidType()
 {
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    if (childList->size() > 0) {
+        if (m_mixedChildrenAccidType) return ACCIDENTAL_WRITTEN_NONE;
+        KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(childList->at(0));
+        assert(keyAccid);
+        return keyAccid->GetAccid();
+    }
+
     if (!this->HasSig()) return ACCIDENTAL_WRITTEN_NONE;
 
     return (this->GetSig().second);
+}
+
+std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname)
+{
+    pname = PITCHNAME_c;
+    accid = ACCIDENTAL_WRITTEN_s;
+    std::wstring symbolStr = L"";
+
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    if (childList->size() > 0) {
+        if (childList->size() <= pos) return symbolStr;
+        KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(childList->at(pos));
+        assert(keyAccid);
+        accid = keyAccid->GetAccid();
+        pname = keyAccid->GetPname();
+        return keyAccid->GetSymbolStr();
+    }
+
+    data_PITCHNAME *accidSet;
+
+    if (pos > 6) return symbolStr;
+
+    int symb;
+    accid = this->GetAccidType();
+    if (accid == ACCIDENTAL_WRITTEN_f) {
+        symb = SMUFL_E260_accidentalFlat;
+        accidSet = flats;
+    }
+    else {
+        symb = SMUFL_E262_accidentalSharp;
+        accidSet = sharps;
+    }
+
+    pname = accidSet[pos];
+    symbolStr.push_back(symb);
+    return symbolStr;
 }
 
 //----------------------------------------------------------------------------
 // Static methods
 //----------------------------------------------------------------------------
 
-data_PITCHNAME KeySig::GetAlterationAt(data_ACCIDENTAL_WRITTEN alterationType, int pos)
+data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int pos)
 {
-    data_PITCHNAME *alteration_set;
+    data_PITCHNAME *accidSet;
 
     if (pos > 6) return PITCHNAME_c;
 
-    if (alterationType == ACCIDENTAL_WRITTEN_f)
-        alteration_set = flats;
-    else
-        alteration_set = sharps;
+    if (accidType == ACCIDENTAL_WRITTEN_f) {
+        accidSet = flats;
+    }
+    else {
+        accidSet = sharps;
+    }
 
-    return alteration_set[pos];
+    return accidSet[pos];
 }
 
-int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef)
+int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, Clef *clef)
 {
-    int alter_set = 0; // flats
-    int key_set = 0;
+    int accidSet = 0; // flats
+    int keySet = 0;
 
-    if (alterationType == ACCIDENTAL_WRITTEN_s) alter_set = 1;
+    if (accidType == ACCIDENTAL_WRITTEN_s) accidSet = 1;
 
     int shapeLine = 0;
     shapeLine = clef->GetShape() << 8 | clef->GetLine();
 
     switch (shapeLine) {
-        case (CLEFSHAPE_G << 8 | 1): key_set = 0; break;
-        case (CLEFSHAPE_G << 8 | 2): key_set = 1; break;
-        case (CLEFSHAPE_G << 8 | 3): key_set = 2; break;
-        case (CLEFSHAPE_G << 8 | 4): key_set = 3; break;
-        case (CLEFSHAPE_G << 8 | 5): key_set = 4; break;
+        case (CLEFSHAPE_G << 8 | 1): keySet = 0; break;
+        case (CLEFSHAPE_G << 8 | 2): keySet = 1; break;
+        case (CLEFSHAPE_G << 8 | 3): keySet = 2; break;
+        case (CLEFSHAPE_G << 8 | 4): keySet = 3; break;
+        case (CLEFSHAPE_G << 8 | 5): keySet = 4; break;
 
-        case (CLEFSHAPE_C << 8 | 1): key_set = 2; break;
-        case (CLEFSHAPE_C << 8 | 2): key_set = 3; break;
-        case (CLEFSHAPE_C << 8 | 3): key_set = 4; break;
-        case (CLEFSHAPE_C << 8 | 4): key_set = 5; break;
-        case (CLEFSHAPE_C << 8 | 5): key_set = 6; break;
+        case (CLEFSHAPE_C << 8 | 1): keySet = 2; break;
+        case (CLEFSHAPE_C << 8 | 2): keySet = 3; break;
+        case (CLEFSHAPE_C << 8 | 3): keySet = 4; break;
+        case (CLEFSHAPE_C << 8 | 4): keySet = 5; break;
+        case (CLEFSHAPE_C << 8 | 5): keySet = 6; break;
 
-        case (CLEFSHAPE_F << 8 | 3): key_set = 6; break;
-        case (CLEFSHAPE_F << 8 | 4): key_set = 7; break;
-        case (CLEFSHAPE_F << 8 | 5): key_set = 8; break;
+        case (CLEFSHAPE_F << 8 | 3): keySet = 6; break;
+        case (CLEFSHAPE_F << 8 | 4): keySet = 7; break;
+        case (CLEFSHAPE_F << 8 | 5): keySet = 8; break;
 
         // does not really exist but just to make it somehow aligned with the clef
-        case (CLEFSHAPE_F << 8 | 1): key_set = 8; break;
-        case (CLEFSHAPE_F << 8 | 2): key_set = 8; break;
+        case (CLEFSHAPE_F << 8 | 1): keySet = 8; break;
+        case (CLEFSHAPE_F << 8 | 2): keySet = 8; break;
 
-        default: key_set = 4; break;
+        default: keySet = 4; break;
     }
 
-    int octave = octave_map[alter_set][key_set][pitch - 1] + OCTAVE_OFFSET;
+    int octave = octave_map[accidSet][keySet][pitch - 1] + OCTAVE_OFFSET;
 
     int disPlace = 0;
     if (clef->GetDis() != OCTAVE_DIS_NONE) {

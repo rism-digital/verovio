@@ -1490,7 +1490,7 @@ void MeiOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
     assert(keyAccid);
 
     WriteLayerElement(currentNode, keyAccid);
-    WritePositionInterface(currentNode, keyAccid);
+    WritePitchInterface(currentNode, keyAccid);
     keyAccid->WriteAccidental(currentNode);
     keyAccid->WriteColor(currentNode);
     keyAccid->WriteEnclosingChars(currentNode);
@@ -4475,7 +4475,7 @@ bool MeiInput::ReadKeyAccid(Object *parent, pugi::xml_node keyAccid)
     KeyAccid *vrvKeyAccid = new KeyAccid();
     ReadLayerElement(keyAccid, vrvKeyAccid);
 
-    ReadPositionInterface(keyAccid, vrvKeyAccid);
+    ReadPitchInterface(keyAccid, vrvKeyAccid);
     vrvKeyAccid->ReadAccidental(keyAccid);
     vrvKeyAccid->ReadColor(keyAccid);
     vrvKeyAccid->ReadEnclosingChars(keyAccid);

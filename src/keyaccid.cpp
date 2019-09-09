@@ -28,10 +28,10 @@ namespace vrv {
 // KeyAccid
 //----------------------------------------------------------------------------
 
-KeyAccid::KeyAccid() : LayerElement("keyaccid-"), PositionInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
+KeyAccid::KeyAccid() : LayerElement("keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
 {
 
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -44,7 +44,7 @@ KeyAccid::~KeyAccid() {}
 void KeyAccid::Reset()
 {
     LayerElement::Reset();
-    PositionInterface::Reset();
+    PitchInterface::Reset();
     ResetAccidental();
     ResetColor();
     ResetEnclosingChars();

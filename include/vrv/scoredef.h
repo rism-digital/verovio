@@ -77,13 +77,13 @@ public:
      * constructor of each corresponding class (Clef, KeySig, etc.)
      */
     ///@{
-    Clef const *GetClef();
+    Clef *GetClef();
     Clef *GetClefCopy();
-    KeySig const *GetKeySig();
+    KeySig *GetKeySig();
     KeySig *GetKeySigCopy();
-    Mensur const *GetMensur();
+    Mensur *GetMensur();
     Mensur *GetMensurCopy();
-    MeterSig const *GetMeterSig();
+    MeterSig *GetMeterSig();
     MeterSig *GetMeterSigCopy();
     ///@}
 

@@ -72,7 +72,7 @@ bool ScoreDefElement::HasMeterSigInfo()
     return (this->FindChildByType(METERSIG));
 }
 
-Clef const *ScoreDefElement::GetClef()
+Clef *ScoreDefElement::GetClef()
 {
     // Always check if HasClefInfo() is true before asking for it
     Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
@@ -88,7 +88,7 @@ Clef *ScoreDefElement::GetClefCopy()
     return copy;
 }
 
-KeySig const *ScoreDefElement::GetKeySig()
+KeySig *ScoreDefElement::GetKeySig()
 {
     // Always check if HasKeySigInfo() is true before asking for it
     KeySig *keySig = dynamic_cast<KeySig *>(this->FindChildByType(KEYSIG));
@@ -104,7 +104,7 @@ KeySig *ScoreDefElement::GetKeySigCopy()
     return copy;
 }
 
-Mensur const *ScoreDefElement::GetMensur()
+Mensur *ScoreDefElement::GetMensur()
 {
     // Always check if HasMensurInfo() is true before asking for it
     Mensur *mensur = dynamic_cast<Mensur *>(this->FindChildByType(MENSUR));
@@ -120,7 +120,7 @@ Mensur *ScoreDefElement::GetMensurCopy()
     return copy;
 }
 
-MeterSig const *ScoreDefElement::GetMeterSig()
+MeterSig *ScoreDefElement::GetMeterSig()
 {
     // Always check if HasMeterSigInfo() is true before asking for it
     MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindChildByType(METERSIG));

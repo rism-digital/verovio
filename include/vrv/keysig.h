@@ -25,16 +25,9 @@ class ScoreDefInterface;
 
 /**
  * This class models the MEI <keySig> element.
- * Since it is unclear how to encode the logical key signature in keySig, an
- * internal representation is used (there is no equivalent of staffDef @key
- * within keySig. Currently the @accid and @pname are used for this. The
- * @pname stores the value of the latest accidental, which is doubtfully the
- * expected use of it.
- * Two temporary methods KeySig::ConvertToMei and KeySig::ConvertToInternal
- * are available for converting from and to the MEI representation to the
- * internal (and vice versa)
  */
 class KeySig : public LayerElement,
+               public ObjectListInterface,
                public AttAccidental,
                public AttPitch,
                public AttKeySigAnl,
@@ -65,21 +58,35 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    /* Alteration number getter */
-    int GetAlterationNumber() const;
+    /* Accid number getter */
+    int GetAccidCount();
 
-    /* Alteration number getter */
-    data_ACCIDENTAL_WRITTEN GetAlterationType() const;
+    /* Accid type getter */
+    data_ACCIDENTAL_WRITTEN GetAccidType();
+
+    /**
+     * Return the string of the alteration at the positon pos.
+     * Looks at keyAccid children if any.
+     * The accid at pos is return in accid and the pname in pname.
+     */
+    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname);
 
     /**
      * Static methods for calculating position;
      */
-    static data_PITCHNAME GetAlterationAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
+    static data_PITCHNAME GetAccidPnameAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
     static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef);
+
+protected:
+    /**
+     * Filter the flat list and keep only StaffDef elements.
+     */
+    virtual void FilterList(ArrayOfObjects *childList);
 
 private:
     //
 public:
+    bool m_mixedChildrenAccidType;
     /**
      * Variables for storing cancellation introduced by the key sig.
      * The values are StaffDefDrawingInterface::ReplaceKeySig

@@ -96,8 +96,8 @@ void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
 void StaffDefDrawingInterface::SetCurrentKeySig(KeySig const *keySig)
 {
     if (keySig) {
-        char drawingCancelAccidCount = m_currentKeySig.GetAlterationNumber();
-        data_ACCIDENTAL_WRITTEN drawingCancelAccidType = m_currentKeySig.GetAlterationType();
+        char drawingCancelAccidCount = m_currentKeySig.GetAccidCount();
+        data_ACCIDENTAL_WRITTEN drawingCancelAccidType = m_currentKeySig.GetAccidType();
         m_currentKeySig = *keySig;
         m_currentKeySig.CopyReset();
         m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;

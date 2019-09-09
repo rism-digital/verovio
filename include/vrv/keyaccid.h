@@ -10,7 +10,7 @@
 
 #include "atts_gestural.h"
 #include "layerelement.h"
-#include "positioninterface.h"
+#include "pitchinterface.h"
 
 namespace vrv {
 
@@ -22,7 +22,7 @@ namespace vrv {
  * This class models the MEI <keyAccid> element.
  */
 class KeyAccid : public LayerElement,
-                 public PositionInterface,
+                 public PitchInterface,
                  public AttAccidental,
                  public AttColor,
                  public AttEnclosingChars {
@@ -35,11 +35,12 @@ public:
     KeyAccid();
     virtual ~KeyAccid();
     virtual void Reset();
+    virtual Object *Clone() const { return new KeyAccid(*this); }
     virtual std::string GetClassName() const { return "KeyAccid"; }
     virtual ClassId GetClassId() const { return KEYACCID; }
     ///@}
 
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
 
     /**
      * Retrieve SMuFL string for the accidental.

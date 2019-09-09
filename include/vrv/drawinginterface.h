@@ -98,19 +98,13 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); }
+    bool DrawClef() { return (m_drawClef && m_currentClef.HasShape()); }
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
-    bool DrawKeySig() const
-    {
-        return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_WRITTEN_NONE));
-    }
+    bool DrawKeySig() { return (m_drawKeySig && (m_currentKeySig.GetAccidCount() > 0)); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() { return (m_drawMensur && m_currentMensur.HasSign()); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
-    bool DrawMeterSig() const
-    {
-        return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym()));
-    }
+    bool DrawMeterSig() { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
     ///@}
 
