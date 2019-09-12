@@ -25,7 +25,7 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-data_PITCHNAME KeySig::flats[]
+data_PITCHNAME KeySig::s_pnameForFlats[]
     = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
 data_PITCHNAME KeySig::sharps[]
     = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
@@ -203,7 +203,7 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     accid = this->GetAccidType();
     if (accid == ACCIDENTAL_WRITTEN_f) {
         symb = SMUFL_E260_accidentalFlat;
-        accidSet = flats;
+        accidSet = s_pnameForFlats;
     }
     else {
         symb = SMUFL_E262_accidentalSharp;
@@ -226,7 +226,7 @@ data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int po
     if (pos > 6) return PITCHNAME_c;
 
     if (accidType == ACCIDENTAL_WRITTEN_f) {
-        accidSet = flats;
+        accidSet = s_pnameForFlats;
     }
     else {
         accidSet = sharps;

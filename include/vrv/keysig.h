@@ -99,9 +99,10 @@ public:
     data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
 
-private:
-    static data_PITCHNAME flats[];
+    static data_PITCHNAME s_pnameForFlats[];
     static data_PITCHNAME sharps[];
+                   
+private:
     static int octave_map[2][9][7];
 };
 

@@ -1091,6 +1091,8 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 
 int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
+    key->Reset();
+    
     int alt_nr = 0;
     std::string m_keySigString = "";
 
@@ -1098,9 +1100,10 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
     int length = (int)strlen(incipit);
     int i = index;
     bool end_of_keysig = false;
-    bool enclose = false;
-    bool has_enclose = false;
-    std::vector<std::pair<data_ACCIDENTAL_WRITTEN, bool> > accids;
+    bool enclosed = false;
+    bool has_enclosed = false;
+    std::vector<bool> enclosedAccids;
+    enclosedAccids.reserve(7);
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
@@ -1108,10 +1111,10 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             case 'x': alterationType = ACCIDENTAL_WRITTEN_s; break;
             case 'n': alterationType = ACCIDENTAL_WRITTEN_n; break;
             case '[':
-                enclose = true;
-                has_enclose = true;
+                enclosed = true;
+                has_enclosed = true;
                 break;
-            case ']': enclose = false; break;
+            case ']': enclosed = false; break;
             case 'F':
             case 'C':
             case 'G':
@@ -1122,13 +1125,25 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             default: end_of_keysig = true; break;
         }
         if (!end_of_keysig) {
-            m_keySigString.push_back(incipit[i]);
+            if (alt_nr < 7) {
+                //enclosedAccids.at(alt_nr) = enclosed;
+            }
             i++;
         }
     }
 
+    if (has_enclosed == true) {
+        for (int i = 0; i < alt_nr; ++i) {
+            
+        }
+        
+    }
     if (alterationType != ACCIDENTAL_WRITTEN_n) {
         key->SetSig(std::make_pair(alt_nr, alterationType));
+    }
+    else {
+        key->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+        key->SetSigShowchange(BOOLEAN_true);
     }
 
     m_currentKeySig = key;
