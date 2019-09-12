@@ -58,11 +58,16 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    /* Accid number getter */
+    /** Accid number getter */
     int GetAccidCount();
 
-    /* Accid type getter */
+    /** Accid type getter */
     data_ACCIDENTAL_WRITTEN GetAccidType();
+
+    /**
+     * Fill the map of modified pitches
+     */
+    void FillMap(MapOfPitchAccid &mapOfPitchAccid);
 
     /**
      * Return the string of the alteration at the positon pos.
@@ -94,9 +99,10 @@ public:
     data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
 
+    static data_PITCHNAME s_pnameForFlats[];
+    static data_PITCHNAME s_pnameForSharps[];
+
 private:
-    static data_PITCHNAME flats[];
-    static data_PITCHNAME sharps[];
     static int octave_map[2][9][7];
 };
 

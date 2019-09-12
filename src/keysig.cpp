@@ -25,9 +25,9 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-data_PITCHNAME KeySig::flats[]
+data_PITCHNAME KeySig::s_pnameForFlats[]
     = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-data_PITCHNAME KeySig::sharps[]
+data_PITCHNAME KeySig::s_pnameForSharps[]
     = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
 
 int KeySig::octave_map[2][9][7] = {
@@ -158,6 +158,27 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType()
     return (this->GetSig().second);
 }
 
+void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
+{
+    mapOfPitchAccid.clear();
+
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    if (childList->size() > 0) {
+        for (auto &child : *childList) {
+            KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(child);
+            assert(keyAccid);
+            mapOfPitchAccid[keyAccid->GetPname()] = keyAccid->GetAccid();
+        }
+        return;
+    }
+
+    int i;
+    data_ACCIDENTAL_WRITTEN accidType = this->GetAccidType();
+    for (i = 0; i < this->GetAccidCount(); i++) {
+        mapOfPitchAccid[KeySig::GetAccidPnameAt(accidType, i)] = accidType;
+    }
+}
+
 std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname)
 {
     pname = PITCHNAME_c;
@@ -182,11 +203,11 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     accid = this->GetAccidType();
     if (accid == ACCIDENTAL_WRITTEN_f) {
         symb = SMUFL_E260_accidentalFlat;
-        accidSet = flats;
+        accidSet = s_pnameForFlats;
     }
     else {
         symb = SMUFL_E262_accidentalSharp;
-        accidSet = sharps;
+        accidSet = s_pnameForSharps;
     }
 
     pname = accidSet[pos];
@@ -205,10 +226,10 @@ data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int po
     if (pos > 6) return PITCHNAME_c;
 
     if (accidType == ACCIDENTAL_WRITTEN_f) {
-        accidSet = flats;
+        accidSet = s_pnameForFlats;
     }
     else {
-        accidSet = sharps;
+        accidSet = s_pnameForSharps;
     }
 
     return accidSet[pos];

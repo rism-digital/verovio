@@ -309,6 +309,8 @@ typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
 
+typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
+
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 /**

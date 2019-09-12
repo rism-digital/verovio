@@ -823,4 +823,65 @@ xsdPositiveInteger_List Att::StrToXsdPositiveIntegerList(std::string value) cons
     return list;
 }
 
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+
+data_ACCIDENTAL_WRITTEN Att::AccidentalGesturalToWritten(data_ACCIDENTAL_GESTURAL accidGes)
+{
+    data_ACCIDENTAL_WRITTEN accid;
+    switch (accidGes) {
+        case ACCIDENTAL_GESTURAL_s: accid = ACCIDENTAL_WRITTEN_s; break;
+        case ACCIDENTAL_GESTURAL_f: accid = ACCIDENTAL_WRITTEN_f; break;
+        case ACCIDENTAL_GESTURAL_ss: accid = ACCIDENTAL_WRITTEN_ss; break;
+        case ACCIDENTAL_GESTURAL_ff: accid = ACCIDENTAL_WRITTEN_ff; break;
+        case ACCIDENTAL_GESTURAL_n: accid = ACCIDENTAL_WRITTEN_n; break;
+        case ACCIDENTAL_GESTURAL_su: accid = ACCIDENTAL_WRITTEN_su; break;
+        case ACCIDENTAL_GESTURAL_sd: accid = ACCIDENTAL_WRITTEN_sd; break;
+        case ACCIDENTAL_GESTURAL_fu: accid = ACCIDENTAL_WRITTEN_fu; break;
+        case ACCIDENTAL_GESTURAL_fd: accid = ACCIDENTAL_WRITTEN_fd; break;
+        default: accid = ACCIDENTAL_WRITTEN_NONE; break;
+    }
+    return accid;
+}
+
+data_ACCIDENTAL_GESTURAL Att::AccidentalWrittenToGestural(data_ACCIDENTAL_WRITTEN accid)
+{
+    data_ACCIDENTAL_GESTURAL accidGes;
+    switch (accid) {
+        case ACCIDENTAL_WRITTEN_s: accidGes = ACCIDENTAL_GESTURAL_s; break;
+        case ACCIDENTAL_WRITTEN_f: accidGes = ACCIDENTAL_GESTURAL_f; break;
+        case ACCIDENTAL_WRITTEN_ss:
+        case ACCIDENTAL_WRITTEN_x: accidGes = ACCIDENTAL_GESTURAL_ss; break;
+        case ACCIDENTAL_WRITTEN_ff: accidGes = ACCIDENTAL_GESTURAL_ff; break;
+        /* To verified - triple sharp missing in gestural ? */
+        case ACCIDENTAL_WRITTEN_xs:
+        case ACCIDENTAL_WRITTEN_sx:
+        case ACCIDENTAL_WRITTEN_ts: accidGes = ACCIDENTAL_GESTURAL_ss; break;
+        /* To be verified - triple flat missing in gestural ? */
+        case ACCIDENTAL_WRITTEN_tf: accidGes = ACCIDENTAL_GESTURAL_ff; break;
+        case ACCIDENTAL_WRITTEN_n: accidGes = ACCIDENTAL_GESTURAL_n; break;
+        case ACCIDENTAL_WRITTEN_nf: accidGes = ACCIDENTAL_GESTURAL_f; break;
+        case ACCIDENTAL_WRITTEN_ns: accidGes = ACCIDENTAL_GESTURAL_s; break;
+        case ACCIDENTAL_WRITTEN_su: accidGes = ACCIDENTAL_GESTURAL_su; break;
+        case ACCIDENTAL_WRITTEN_sd: accidGes = ACCIDENTAL_GESTURAL_sd; break;
+        case ACCIDENTAL_WRITTEN_fu: accidGes = ACCIDENTAL_GESTURAL_fu; break;
+        case ACCIDENTAL_WRITTEN_fd: accidGes = ACCIDENTAL_GESTURAL_fd; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_nu: accidGes = ACCIDENTAL_GESTURAL_n; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_nd: accidGes = ACCIDENTAL_GESTURAL_n; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_1qf: accidGes = ACCIDENTAL_GESTURAL_fu; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_3qf: accidGes = ACCIDENTAL_GESTURAL_fd; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_1qs: accidGes = ACCIDENTAL_GESTURAL_su; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_3qs: accidGes = ACCIDENTAL_GESTURAL_sd; break;
+        default: accidGes = ACCIDENTAL_GESTURAL_NONE; break;
+    }
+    return accidGes;
+}
+
 } // namespace vrv

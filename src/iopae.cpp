@@ -26,6 +26,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
+#include "keyaccid.h"
 #include "keysig.h"
 #include "layer.h"
 #include "mdiv.h"
@@ -87,6 +88,10 @@ PaeInput::PaeInput(Doc *doc, std::string filename)
     m_tie = NULL;
     m_is_in_chord = false;
     m_is_mensural = false;
+
+    m_currentKeySig = NULL;
+    m_tieAccid.first = PITCHNAME_NONE;
+    m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
 }
 
 PaeInput::~PaeInput() {}
@@ -153,7 +158,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     staffDef->SetN(1);
     staffDef->SetLines(5);
     staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
 
     // read values
     while (!infile.eof()) {
@@ -342,6 +346,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
             current_measure.abbreviation_offset = 0; // just in case...
             staff.push_back(current_measure);
             current_measure.reset();
+            if (m_currentKeySig) m_currentKeySig->FillMap(m_currentAccids);
         }
 
         // clef change
@@ -442,7 +447,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         if (obj.key || obj.meter) {
             ScoreDef *scoreDef = new ScoreDef();
             if (obj.key) {
-                obj.key->IsAttribute(true);
                 scoreDef->AddChild(obj.key);
                 obj.key = NULL;
             }
@@ -469,8 +473,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        // Make it an attribute for now
-        scoreDefKeySig->IsAttribute(true);
         m_doc->m_scoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
@@ -483,6 +485,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         scoreDefMensur->IsAttribute(true);
         m_doc->m_scoreDef.AddChild(scoreDefMensur);
     }
+
+    m_doc->m_scoreDef.AddChild(staffGrp);
+
     if (m_tie != NULL) {
         delete m_tie;
         m_tie = NULL;
@@ -1086,20 +1091,40 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 
 int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
+    key->Reset();
+
     int alt_nr = 0;
-    m_keySigString = "";
+    std::string m_keySigString = "";
 
     // at the key information line, extract data
     int length = (int)strlen(incipit);
     int i = index;
     bool end_of_keysig = false;
+    bool enclosed = false;
+    bool has_enclosed = false;
+    std::vector<bool> enclosedAccids;
+    enclosedAccids.resize(7);
+    bool cancel = false;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': alterationType = ACCIDENTAL_WRITTEN_f; break;
-            case 'x': alterationType = ACCIDENTAL_WRITTEN_s; break;
-            case 'n': alterationType = ACCIDENTAL_WRITTEN_n; break;
-            case '[': break;
+            case 'b':
+                alt_nr = 0;
+                alterationType = ACCIDENTAL_WRITTEN_f;
+                break;
+            case 'x':
+                alt_nr = 0;
+                alterationType = ACCIDENTAL_WRITTEN_s;
+                break;
+            case 'n':
+                alt_nr = 0;
+                cancel = true;
+                break;
+            case '[':
+                enclosed = true;
+                has_enclosed = true;
+                break;
+            case ']': enclosed = false; break;
             case 'F':
             case 'C':
             case 'G':
@@ -1110,14 +1135,44 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             default: end_of_keysig = true; break;
         }
         if (!end_of_keysig) {
-            m_keySigString.push_back(incipit[i]);
+            if (alt_nr < 7) {
+                enclosedAccids.at(alt_nr) = enclosed;
+            }
             i++;
         }
     }
 
-    if (alterationType != ACCIDENTAL_WRITTEN_n) {
-        key->SetSig(std::make_pair(alt_nr, alterationType));
+    // Just in case
+    alt_nr = std::min(6, alt_nr);
+
+    if (alterationType != ACCIDENTAL_WRITTEN_NONE) {
+        if (has_enclosed == true) {
+            key->IsAttribute(false);
+            for (int i = 0; i < alt_nr; ++i) {
+                KeyAccid *keyAccid = new KeyAccid();
+                data_PITCHNAME pname = (alterationType == ACCIDENTAL_WRITTEN_f) ? KeySig::s_pnameForFlats[i]
+                                                                                : KeySig::s_pnameForSharps[i];
+                keyAccid->SetPname(pname);
+                keyAccid->SetAccid(alterationType);
+                key->AddChild(keyAccid);
+                if (enclosedAccids.at(i)) {
+                    keyAccid->SetEnclose(ENCLOSURE_brack);
+                }
+            }
+        }
+        else {
+            key->SetSig(std::make_pair(alt_nr, alterationType));
+        }
+        if (cancel) {
+            key->SetSigShowchange(BOOLEAN_true);
+        }
     }
+    else {
+        key->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
+    }
+
+    m_currentKeySig = key;
+    key->FillMap(m_currentAccids);
 
     return i - index;
 }
@@ -1152,11 +1207,35 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     }
     note->pitch = getPitch(incipit[i]);
 
-    if (m_keySigString.find(incipit[i]) != std::string::npos) {
-        if (m_keySigString[0] == 'x')
-            note->accidGes = ACCIDENTAL_GESTURAL_s;
-        else if (m_keySigString[0] == 'b')
-            note->accidGes = ACCIDENTAL_GESTURAL_f;
+    // If necessary pass the accid from the tied note (could be from the previous measure)
+    if (m_tieAccid.first != PITCHNAME_NONE) {
+        if (m_tieAccid.second == ACCIDENTAL_WRITTEN_n) {
+            if (m_currentAccids.count(m_tieAccid.first) != 0) {
+                m_currentAccids.erase(m_tieAccid.first);
+            }
+        }
+        else if (m_tieAccid.second != ACCIDENTAL_WRITTEN_NONE) {
+            m_currentAccids[m_tieAccid.first] = m_tieAccid.second;
+        }
+    }
+    m_tieAccid.first = PITCHNAME_NONE;
+    m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
+
+    // Natural in front of the note, remove it from the current list
+    if (note->accidental == ACCIDENTAL_WRITTEN_n) {
+        if (m_currentAccids.count(note->pitch) != 0) {
+            m_currentAccids.erase(note->pitch);
+        }
+    }
+    // Not a natural in front of the note, add it to the current list
+    else if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
+        m_currentAccids[note->pitch] = note->accidental;
+    }
+
+    // Nothing in front of the note, but something in the list - make it an accid.ges
+    if ((note->accidental == ACCIDENTAL_WRITTEN_NONE) && (m_currentAccids.count(note->pitch) != 0)) {
+        note->accidental = m_currentAccids.at(note->pitch);
+        note->accidGes = true;
     }
 
     // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
@@ -1173,6 +1252,14 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     // tie
     if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
         note->tie = true;
+        if (note->accidental) {
+            m_tieAccid.first = note->pitch;
+            m_tieAccid.second = note->accidental;
+        }
+    }
+    else {
+        m_tieAccid.first = PITCHNAME_NONE;
+        m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
     }
 
     // trills
@@ -1268,7 +1355,7 @@ void PaeInput::parseNote(pae::Note *note)
 
         if (note->fermata) {
             Fermata *fermata = new Fermata();
-            fermata->SetStartid(rest->GetUuid());
+            fermata->SetStartid("#" + rest->GetUuid());
             m_measure->AddChild(fermata);
         }
 
@@ -1281,14 +1368,13 @@ void PaeInput::parseNote(pae::Note *note)
         mnote->SetOct(note->octave);
         if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
             Accid *accid = new Accid();
-            accid->SetAccid(note->accidental);
+            if (note->accidGes) {
+                accid->SetAccidGes(Att::AccidentalWrittenToGestural(note->accidental));
+            }
+            else {
+                accid->SetAccid(note->accidental);
+            }
             mnote->AddChild(accid);
-        }
-        if (!mnote->FindChildByType(ACCID)) {
-            Accid *accid = new Accid();
-            mnote->AddChild(accid);
-            accid->IsAttribute(true);
-            accid->SetAccidGes(note->accidGes);
         }
 
         mnote->SetDur(note->duration);
@@ -1307,25 +1393,25 @@ void PaeInput::parseNote(pae::Note *note)
 
         if (note->fermata) {
             Fermata *fermata = new Fermata();
-            fermata->SetStartid(mnote->GetUuid());
+            fermata->SetStartid("#" + mnote->GetUuid());
             m_measure->AddChild(fermata);
         }
 
         if (note->trill) {
             Trill *trill = new Trill();
-            trill->SetStartid(mnote->GetUuid());
+            trill->SetStartid("#" + mnote->GetUuid());
             m_measure->AddChild(trill);
         }
 
         if (m_tie != NULL) {
-            m_tie->SetEndid(mnote->GetUuid());
-            m_measure->AddChild(m_tie);
+            m_tie->SetEndid("#" + mnote->GetUuid());
             m_tie = NULL;
         }
 
         if (note->tie) {
             m_tie = new Tie();
-            m_tie->SetStartid(mnote->GetUuid());
+            m_tie->SetStartid("#" + mnote->GetUuid());
+            m_measure->AddChild(m_tie);
         }
 
         element = mnote;
