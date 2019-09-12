@@ -100,7 +100,7 @@ public:
     ///@{
     bool DrawClef() { return (m_drawClef && m_currentClef.HasShape()); }
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
-    bool DrawKeySig() { return (m_drawKeySig && (m_currentKeySig.GetAccidCount() > 0)); }
+    bool DrawKeySig() { return (m_drawKeySig); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
     bool DrawMensur() { return (m_drawMensur && m_currentMensur.HasSign()); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }

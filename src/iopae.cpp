@@ -26,6 +26,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
+#include "keyaccid.h"
 #include "keysig.h"
 #include "layer.h"
 #include "mdiv.h"
@@ -157,7 +158,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     staffDef->SetN(1);
     staffDef->SetLines(5);
     staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
 
     // read values
     while (!infile.eof()) {
@@ -447,7 +447,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         if (obj.key || obj.meter) {
             ScoreDef *scoreDef = new ScoreDef();
             if (obj.key) {
-                obj.key->IsAttribute(true);
                 scoreDef->AddChild(obj.key);
                 obj.key = NULL;
             }
@@ -474,8 +473,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        // Make it an attribute for now
-        scoreDefKeySig->IsAttribute(true);
         m_doc->m_scoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
@@ -488,6 +485,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         scoreDefMensur->IsAttribute(true);
         m_doc->m_scoreDef.AddChild(scoreDefMensur);
     }
+
+    m_doc->m_scoreDef.AddChild(staffGrp);
+
     if (m_tie != NULL) {
         delete m_tie;
         m_tie = NULL;
@@ -1092,7 +1092,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
     key->Reset();
-    
+
     int alt_nr = 0;
     std::string m_keySigString = "";
 
@@ -1103,13 +1103,23 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
     bool enclosed = false;
     bool has_enclosed = false;
     std::vector<bool> enclosedAccids;
-    enclosedAccids.reserve(7);
+    enclosedAccids.resize(7);
+    bool cancel = false;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': alterationType = ACCIDENTAL_WRITTEN_f; break;
-            case 'x': alterationType = ACCIDENTAL_WRITTEN_s; break;
-            case 'n': alterationType = ACCIDENTAL_WRITTEN_n; break;
+            case 'b':
+                alt_nr = 0;
+                alterationType = ACCIDENTAL_WRITTEN_f;
+                break;
+            case 'x':
+                alt_nr = 0;
+                alterationType = ACCIDENTAL_WRITTEN_s;
+                break;
+            case 'n':
+                alt_nr = 0;
+                cancel = true;
+                break;
             case '[':
                 enclosed = true;
                 has_enclosed = true;
@@ -1126,24 +1136,39 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
         }
         if (!end_of_keysig) {
             if (alt_nr < 7) {
-                //enclosedAccids.at(alt_nr) = enclosed;
+                enclosedAccids.at(alt_nr) = enclosed;
             }
             i++;
         }
     }
 
-    if (has_enclosed == true) {
-        for (int i = 0; i < alt_nr; ++i) {
-            
+    // Just in case
+    alt_nr = std::min(6, alt_nr);
+
+    if (alterationType != ACCIDENTAL_WRITTEN_NONE) {
+        if (has_enclosed == true) {
+            key->IsAttribute(false);
+            for (int i = 0; i < alt_nr; ++i) {
+                KeyAccid *keyAccid = new KeyAccid();
+                data_PITCHNAME pname = (alterationType == ACCIDENTAL_WRITTEN_f) ? KeySig::s_pnameForFlats[i]
+                                                                                : KeySig::s_pnameForSharps[i];
+                keyAccid->SetPname(pname);
+                keyAccid->SetAccid(alterationType);
+                key->AddChild(keyAccid);
+                if (enclosedAccids.at(i)) {
+                    keyAccid->SetEnclose(ENCLOSURE_brack);
+                }
+            }
         }
-        
-    }
-    if (alterationType != ACCIDENTAL_WRITTEN_n) {
-        key->SetSig(std::make_pair(alt_nr, alterationType));
+        else {
+            key->SetSig(std::make_pair(alt_nr, alterationType));
+        }
+        if (cancel) {
+            key->SetSigShowchange(BOOLEAN_true);
+        }
     }
     else {
         key->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
-        key->SetSigShowchange(BOOLEAN_true);
     }
 
     m_currentKeySig = key;

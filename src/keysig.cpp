@@ -27,7 +27,7 @@ namespace vrv {
 
 data_PITCHNAME KeySig::s_pnameForFlats[]
     = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-data_PITCHNAME KeySig::sharps[]
+data_PITCHNAME KeySig::s_pnameForSharps[]
     = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
 
 int KeySig::octave_map[2][9][7] = {
@@ -207,7 +207,7 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
     }
     else {
         symb = SMUFL_E262_accidentalSharp;
-        accidSet = sharps;
+        accidSet = s_pnameForSharps;
     }
 
     pname = accidSet[pos];
@@ -229,7 +229,7 @@ data_PITCHNAME KeySig::GetAccidPnameAt(data_ACCIDENTAL_WRITTEN accidType, int po
         accidSet = s_pnameForFlats;
     }
     else {
-        accidSet = sharps;
+        accidSet = s_pnameForSharps;
     }
 
     return accidSet[pos];

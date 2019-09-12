@@ -100,8 +100,8 @@ public:
     char m_drawingCancelAccidCount;
 
     static data_PITCHNAME s_pnameForFlats[];
-    static data_PITCHNAME sharps[];
-                   
+    static data_PITCHNAME s_pnameForSharps[];
+
 private:
     static int octave_map[2][9][7];
 };
