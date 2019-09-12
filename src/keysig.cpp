@@ -158,6 +158,27 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType()
     return (this->GetSig().second);
 }
 
+void KeySig::FillMap(MapOfPitchAccid &mapOfPitchAccid)
+{
+    mapOfPitchAccid.clear();
+
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    if (childList->size() > 0) {
+        for (auto &child : *childList) {
+            KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(child);
+            assert(keyAccid);
+            mapOfPitchAccid[keyAccid->GetPname()] = keyAccid->GetAccid();
+        }
+        return;
+    }
+
+    int i;
+    data_ACCIDENTAL_WRITTEN accidType = this->GetAccidType();
+    for (i = 0; i < this->GetAccidCount(); i++) {
+        mapOfPitchAccid[KeySig::GetAccidPnameAt(accidType, i)] = accidType;
+    }
+}
+
 std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname)
 {
     pname = PITCHNAME_c;

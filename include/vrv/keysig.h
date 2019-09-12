@@ -58,11 +58,16 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    /* Accid number getter */
+    /** Accid number getter */
     int GetAccidCount();
 
-    /* Accid type getter */
+    /** Accid type getter */
     data_ACCIDENTAL_WRITTEN GetAccidType();
+
+    /**
+     * Fill the map of modified pitches
+     */
+    void FillMap(MapOfPitchAccid &mapOfPitchAccid);
 
     /**
      * Return the string of the alteration at the positon pos.
