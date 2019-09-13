@@ -15,6 +15,9 @@
 
 #include "comparison.h"
 #include "custos.h"
+#include "editortoolkit_cmn.h"
+#include "editortoolkit_mensural.h"
+#include "editortoolkit_neume.h"
 #include "functorparams.h"
 #include "ioabc.h"
 #include "iodarms.h"
@@ -40,12 +43,6 @@
 #include "checked.h"
 #include "jsonxx.h"
 #include "unchecked.h"
-
-#ifdef USE_EMSCRIPTEN
-#include "editortoolkit_cmn.h"
-#include "editortoolkit_mensural.h"
-#include "editortoolkit_neume.h"
-#endif
 
 namespace vrv {
 
@@ -75,10 +72,7 @@ Toolkit::Toolkit(bool initFont)
 
     m_options = m_doc.GetOptions();
 
-#ifdef USE_EMSCRIPTEN
-    // Initialize editortoolkit later based on input.
     m_editorToolkit = NULL;
-#endif
 }
 
 Toolkit::~Toolkit()
@@ -91,12 +85,10 @@ Toolkit::~Toolkit()
         free(m_cString);
         m_cString = NULL;
     }
-#ifdef USE_EMSCRIPTEN
     if (m_editorToolkit) {
         delete m_editorToolkit;
         m_editorToolkit = NULL;
     }
-#endif
 }
 
 bool Toolkit::SetResourcePath(const std::string &path)
@@ -541,7 +533,8 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
+    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs)
+        && (m_options->m_breaks.GetValue() != BREAKS_none)) {
         if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
@@ -560,20 +553,18 @@ bool Toolkit::LoadData(const std::string &data)
     delete input;
     m_view.SetDoc(&m_doc);
 
-#ifdef USE_EMSCRIPTEN
+#if defined NO_HUMDRUM_SUPPORT
     // Create editor toolkit based on notation type.
     if (m_editorToolkit != NULL) {
         delete m_editorToolkit;
     }
-    switch(m_doc.m_notationType) {
+    switch (m_doc.m_notationType) {
         case NOTATIONTYPE_neume: m_editorToolkit = new EditorToolkitNeume(&m_doc, &m_view); break;
         case NOTATIONTYPE_mensural:
         case NOTATIONTYPE_mensural_black:
         case NOTATIONTYPE_mensural_white: m_editorToolkit = new EditorToolkitMensural(&m_doc, &m_view); break;
         case NOTATIONTYPE_cmn: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view); break;
-        default:
-            LogWarning("Unsupported notation type for editing. Will not create an editor toolki.");
-            m_editorToolkit = NULL;
+        default: m_editorToolkit = new EditorToolkitCMN(&m_doc, &m_view);
     }
 #endif
 
@@ -594,8 +585,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
     MeiOutput meioutput(&m_doc, "");
     meioutput.SetScoreBasedMEI(scoreBased);
     std::string output = meioutput.GetOutput(pageNo);
-    if (initialPageNo >= 0)
-        m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
 
@@ -934,8 +924,17 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
 
-    if (!m_doc.GetDrawingPage()) return o.json();
-    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
+    Object *element = NULL;
+
+    // Try to get the element on the current drawing page - it is usually the case and fast
+    if (m_doc.GetDrawingPage()) {
+        element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
+    }
+    // If it wasn't there, try on the whole doc
+    if (!element) {
+        element = m_doc.FindChildByUuid(xmlId);
+    }
+    // If not found at all
     if (!element) {
         LogMessage("Element with id '%s' could not be found", xmlId.c_str());
         return o.json();
@@ -956,24 +955,12 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 
 bool Toolkit::Edit(const std::string &json_editorAction)
 {
-#ifdef USE_EMSCRIPTEN
     return m_editorToolkit->ParseEditorAction(json_editorAction);
-#else
-    // The non-js version of the app should not use this function.
-    LogError("This function should not be accessed through the non-js version of the app.");
-    return false;
-#endif
 }
 
 std::string Toolkit::EditInfo()
 {
-#ifdef USE_EMSCRIPTEN
     return m_editorToolkit->EditInfo();
-#else
-    // The non-js version of the app should not use this function.
-    LogError("This function should not be accessed through the non-js version of the app.");
-    return "";
-#endif
 }
 
 std::string Toolkit::GetLog()
@@ -1085,6 +1072,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     }
 
     // set the option to use viewbox on svg root
+    if (m_options->m_svgBoundingBoxes.GetValue()) {
+        svg.SetSvgBoundingBoxes(true);
+    }
+
     if (m_options->m_svgViewBox.GetValue()) {
         svg.SetSvgViewBox(true);
     }
@@ -1093,8 +1084,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
-    if (initialPageNo >= 0)
-        m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }
 

@@ -31,7 +31,11 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public Object, public FacsimileInterface, public LinkingInterface, public AttLabelled, public AttTyped {
+class LayerElement : public Object,
+                     public FacsimileInterface,
+                     public LinkingInterface,
+                     public AttLabelled,
+                     public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -46,9 +50,9 @@ public:
     ///@}
 
     /**
-     * Copy assignment for resetting pointers
+     * Overriding CopyReset() method to be called after copy / assignment calls.
      */
-    LayerElement &operator=(const LayerElement &element);
+    virtual void CopyReset();
 
     /**
      * @name Getter to interfaces
@@ -63,6 +67,11 @@ public:
      * It typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
+
+    /**
+     * Return true if the element is part of a scoreDef or staffDef
+     */
+    virtual bool IsScoreDefElement() const { return false; }
 
     /**
      * Return true if the element is relative to the staff and not to its parent.

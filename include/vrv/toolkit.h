@@ -17,12 +17,9 @@
 
 //----------------------------------------------------------------------------
 
-#ifdef USE_EMSCRIPTEN
-#include "editortoolkit.h"
-#include "jsonxx.h"
-#endif
-
 namespace vrv {
+
+class EditorToolkit;
 
 enum FileFormat {
     UNKNOWN = 0,
@@ -302,9 +299,7 @@ private:
      */
     char *m_cString;
 
-#ifdef USE_EMSCRIPTEN
     EditorToolkit *m_editorToolkit;
-#endif
 };
 
 } // namespace vrv

@@ -343,7 +343,7 @@ public:
     int GetDrawingStemLen() { return m_drawingStemLen; }
     void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
     ///@}
-    
+
     /**
      * @name Setter and getter of the virtual flag
      */

@@ -53,4 +53,4 @@ int Zone::GetLogicalLry()
     return (this->GetLry());
 }
 
-}   // namespace vrv
+} // namespace vrv

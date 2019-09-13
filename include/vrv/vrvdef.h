@@ -42,6 +42,13 @@ namespace vrv {
 enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0 };
 
 //----------------------------------------------------------------------------
+// Default midi values
+//----------------------------------------------------------------------------
+
+#define MIDI_VELOCITY 90
+#define MIDI_TEMPO 120
+
+//----------------------------------------------------------------------------
 // Object defines
 //----------------------------------------------------------------------------
 
@@ -170,6 +177,7 @@ enum ClassId {
     GRACEGRP,
     HALFMRPT,
     KEYSIG,
+    KEYACCID,
     LIGATURE,
     MENSUR,
     METERSIG,
@@ -266,8 +274,6 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
-typedef std::vector<Object *> ListOfObjects;
-
 typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
@@ -303,6 +309,8 @@ typedef std::vector<TextElement *> ArrayOfTextElements;
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
+
+typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
 
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
@@ -504,6 +512,12 @@ enum {
 //----------------------------------------------------------------------------
 
 enum Accessor { SELF = 0, CONTENT };
+
+//----------------------------------------------------------------------------
+// Some keys
+//----------------------------------------------------------------------------
+
+enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

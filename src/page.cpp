@@ -56,6 +56,10 @@ void Page::Reset()
     m_pageMarginRight = 0;
     m_pageMarginTop = 0;
     m_PPUFactor = 1.0;
+
+    m_drawingJustifiableHeight = 0;
+    m_drawingJustifiableSystems = 0;
+    m_drawingJustifiableStaves = 0;
 }
 
 void Page::AddChild(Object *child)
@@ -123,6 +127,18 @@ void Page::LayOut(bool force)
     this->LayOutHorizontally();
     this->JustifyHorizontally();
     this->LayOutVertically();
+    this->JustifyVertically();
+
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    assert(doc);
+    if (doc->GetOptions()->m_svgBoundingBoxes.GetValue()) {
+        View view;
+        view.SetDoc(doc);
+        BBoxDeviceContext bBoxDC(&view, 0, 0);
+        // Do not do the layout in this view - otherwise we will loop...
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
 
     m_layoutDone = true;
 }
@@ -439,11 +455,12 @@ void Page::LayOutVertically()
     }
 
     // Adjust system Y position
-    AlignSystemsParams alignSystemsParams;
+    AlignSystemsParams alignSystemsParams(doc);
     alignSystemsParams.m_shift = doc->m_drawingPageHeight;
     alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
-    this->Process(&alignSystems, &alignSystemsParams);
+    Functor alignSystemsEnd(&Object::AlignSystemsEnd);
+    this->Process(&alignSystems, &alignSystemsParams, &alignSystemsEnd);
 }
 
 void Page::JustifyHorizontally()
@@ -465,6 +482,58 @@ void Page::JustifyHorizontally()
     justifyXParams.m_systemFullWidth
         = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyX, &justifyXParams);
+}
+
+void Page::JustifyVertically()
+{
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    assert(doc);
+
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+
+    // Nothing to justify
+    if (this->m_drawingJustifiableHeight < 0) {
+        return;
+    }
+
+    // Vertical justificaiton is not enabled
+    if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
+        return;
+    }
+
+    bool systemsOnly = doc->GetOptions()->m_justifySystemsOnly.GetValue();
+    int stepSize = this->CalcJustificationStepSize(systemsOnly);
+
+    // Last page and justification of last page is not enabled
+    Pages *pages = doc->GetPages();
+    assert(pages);
+    if (pages->GetLast() == this) {
+        if (!doc->GetOptions()->m_justifyIncludeLastPage.GetValue()) {
+            return;
+        }
+        int idx = this->GetIdx();
+        if (idx > 0) {
+            Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
+            assert(penultimatePage);
+            if (!penultimatePage->m_layoutDone) {
+                doc->SetDrawingPage(idx - 1);
+                penultimatePage->LayOut();
+                doc->SetDrawingPage(idx);
+            }
+            int previousStepSize = penultimatePage->CalcJustificationStepSize(systemsOnly);
+            if (previousStepSize < stepSize) {
+                stepSize = previousStepSize;
+            }
+        }
+    }
+
+    // Justify Y position
+    Functor justifyY(&Object::JustifyY);
+    JustifyYParams justifyYParams(&justifyY, doc);
+    justifyYParams.m_stepSize = stepSize;
+    this->Process(&justifyY, &justifyYParams);
 }
 
 void Page::LayOutPitchPos()
@@ -526,6 +595,28 @@ int Page::GetContentWidth() const
 
     // we include the left margin and the right margin
     return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
+}
+
+int Page::CalcJustificationStepSize(bool systemsOnly) const
+{
+    if (this->m_drawingJustifiableHeight < 0) {
+        return 0;
+    }
+
+    int stepCount = 0;
+    if (systemsOnly) {
+        stepCount = this->m_drawingJustifiableSystems - 1;
+    }
+    else {
+        stepCount = this->m_drawingJustifiableStaves - 1;
+    }
+
+    // Step should be greater than one...
+    if (stepCount == 0) {
+        return 0;
+    }
+
+    return this->m_drawingJustifiableHeight / stepCount;
 }
 
 void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
@@ -631,6 +722,9 @@ int Page::AlignSystems(FunctorParams *functorParams)
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
+    params->m_justifiableSystems = 0;
+    params->m_justifiableStaves = 0;
+
     RunningElement *header = this->GetHeader();
     if (header) {
         header->SetDrawingYRel(params->m_shift);
@@ -638,10 +732,27 @@ int Page::AlignSystems(FunctorParams *functorParams)
     }
     RunningElement *footer = this->GetFooter();
     if (footer) {
-        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-        assert(doc);
         // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageMarginTop + doc->m_drawingPageMarginBot);
+        footer->SetDrawingYRel(
+            footer->GetTotalHeight() + params->m_doc->m_drawingPageMarginTop + params->m_doc->m_drawingPageMarginBot);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::AlignSystemsEnd(FunctorParams *functorParams)
+{
+    AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
+    assert(params);
+
+    this->m_drawingJustifiableHeight
+        = params->m_shift - params->m_doc->m_drawingPageMarginBot - params->m_doc->m_drawingPageMarginTop;
+    this->m_drawingJustifiableSystems = params->m_justifiableSystems;
+    this->m_drawingJustifiableStaves = params->m_justifiableStaves;
+
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        this->m_drawingJustifiableHeight -= footer->GetTotalHeight();
     }
 
     return FUNCTOR_CONTINUE;

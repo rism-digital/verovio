@@ -230,11 +230,12 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
 
 void Staff::SetFromFacsimile(Doc *doc)
 {
-    if(!this->HasFacs()) return;
+    if (!this->HasFacs()) return;
     assert(doc);
     Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
     assert(zone);
-    m_drawingStaffSize = 100 * (zone->GetLry() - zone->GetUly()) / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+    m_drawingStaffSize
+        = 100 * (zone->GetLry() - zone->GetUly()) / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
 }
 
 //----------------------------------------------------------------------------

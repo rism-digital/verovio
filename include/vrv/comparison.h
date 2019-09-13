@@ -109,6 +109,27 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// IsEditorialElementComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is an editorial element.
+ */
+class IsEditorialElementComparison : public Comparison {
+
+public:
+    IsEditorialElementComparison() : Comparison() {}
+
+    virtual bool operator()(Object *object)
+    {
+        if (object->IsEditorialElement()) return true;
+        return false;
+    }
+
+    bool MatchesType(Object *object) { return true; }
+};
+
+//----------------------------------------------------------------------------
 // IsEmptyComparison
 //----------------------------------------------------------------------------
 

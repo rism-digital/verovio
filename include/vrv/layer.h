@@ -89,7 +89,7 @@ public:
      * This goes back by facsimile position until a clef is found.
      * Returns NULL if a clef cannot be found via this method.
      */
-     Clef *GetClefFacs(LayerElement *test);
+    Clef *GetClefFacs(LayerElement *test);
 
     /**
      * Return the clef offset for the position x.

@@ -107,22 +107,20 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
 
     // key signature of the scoreDef
     if (scoreDef->HasKeySigInfo()) {
-        KeySig *keySig = scoreDef->GetKeySigCopy();
+        KeySig *keySig = scoreDef->GetKeySig();
         assert(keySig);
-        numAlteration = (keySig->GetAlterationNumber() > numAlteration) ? keySig->GetAlterationNumber() : numAlteration;
-        delete keySig;
+        numAlteration = (keySig->GetAccidCount() > numAlteration) ? keySig->GetAccidCount() : numAlteration;
     }
 
     // longest key signature of the staffDefs
-    const ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
+    const ArrayOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
-        KeySig *keySig = staffDef->GetKeySigCopy();
+        KeySig *keySig = staffDef->GetKeySig();
         assert(keySig);
-        numAlteration = (keySig->GetAlterationNumber() > numAlteration) ? keySig->GetAlterationNumber() : numAlteration;
-        delete keySig;
+        numAlteration = (keySig->GetAccidCount() > numAlteration) ? keySig->GetAccidCount() : numAlteration;
     }
 
     int width = 0;
@@ -191,8 +189,8 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     assert(dc);
     assert(system);
 
-    ListOfObjects *drawingList = system->GetDrawingList();
-    ListOfObjects::iterator iter;
+    ArrayOfObjects *drawingList = system->GetDrawingList();
+    ArrayOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if ((*iter)->Is(classId) && (classId == BRACKETSPAN)) {
@@ -275,13 +273,13 @@ void View::DrawStaffGrp(
 
     TextExtend extend;
 
-    const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+    const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
     if (staffDefs->empty()) {
         return;
     }
 
     StaffDef *firstDef = NULL;
-    ListOfObjects::const_iterator iter;
+    ArrayOfObjects::const_iterator iter;
     for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
@@ -292,7 +290,7 @@ void View::DrawStaffGrp(
     }
 
     StaffDef *lastDef = NULL;
-    ListOfObjects::const_reverse_iterator riter;
+    ArrayOfObjects::const_reverse_iterator riter;
     for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
         assert(staffDef);
@@ -372,8 +370,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
     assert(measure);
     assert(scoreDef);
 
-    const ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
-    ListOfObjects::const_iterator iter = scoreDefChildren->begin();
+    const ArrayOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
+    ArrayOfObjects::const_iterator iter = scoreDefChildren->begin();
     while (iter != scoreDefChildren->end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
 
@@ -622,13 +620,13 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
     }
     else {
-        const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+        const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
         if (staffDefs->empty()) {
             return;
         }
 
         StaffDef *firstDef = NULL;
-        ListOfObjects::const_iterator iter;
+        ArrayOfObjects::const_iterator iter;
         for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
             assert(staffDef);
@@ -639,7 +637,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         StaffDef *lastDef = NULL;
-        ListOfObjects::const_reverse_iterator riter;
+        ArrayOfObjects::const_reverse_iterator riter;
         for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
             assert(staffDef);
@@ -682,8 +680,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
             StaffDef *childStaffDef = NULL;
-            const ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); ++it) {
+            const ArrayOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ArrayOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); ++it) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
@@ -713,7 +711,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int barLineThickWidth = m_doc->GetDrawingBeamWidth(staffSize, false);
     int x1 = x - m_doc->GetDrawingBeamWidth(staffSize, false) - barLineWidth;
     int x2 = x + m_doc->GetDrawingBeamWidth(staffSize, false) + barLineWidth;
-    
+
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(staffSize) * 16 / 13;
     int dotLength = m_doc->GetDrawingUnit(staffSize) * 4 / 13;
@@ -803,8 +801,10 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     assert(barLine);
 
     int x = barLine->GetDrawingX();
-    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
+        - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
+        + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
 
     int yBottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -1211,8 +1211,8 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
     assert(staff);
     assert(measure);
 
-    ListOfObjects *drawingList = layer->GetDrawingList();
-    ListOfObjects::iterator iter;
+    ArrayOfObjects *drawingList = layer->GetDrawingList();
+    ArrayOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if ((*iter)->Is(classId) && (classId == TUPLET_BRACKET)) {

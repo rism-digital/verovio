@@ -80,7 +80,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    Neume *neume = dynamic_cast<Neume*>(nc->GetFirstParent(NEUME));
+    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
     assert(neume);
     int position = neume->GetChildIndex(element);
 
@@ -94,9 +94,9 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         // Check if this is the first or second part of a ligature
         Object *nextSibling = neume->GetChild(position + 1);
         if (nextSibling != NULL) {
-            Nc *nextNc = dynamic_cast<Nc*>(nextSibling);
+            Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
             assert(nextNc);
-            if (nextNc->GetLigated() == BOOLEAN_true) { //first part of the ligature
+            if (nextNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
                 isFirst = true;
                 pitchDifference = nextNc->PitchDifferenceTo(nc);
                 params.at(0).yOffset = pitchDifference;
@@ -173,8 +173,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     yValue = clefYPosition + pitchOffset + octaveOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
-        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
-               it->fontNo, staff->m_drawingStaffSize, false, true);
+        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
+            staff->m_drawingStaffSize, false, true);
     }
 
     // Draw the children

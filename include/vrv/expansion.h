@@ -37,6 +37,13 @@ public:
     virtual ClassId GetClassId() const { return EXPANSION; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
+    ////@}
+
     //----------//
     // Functors //
     //----------//

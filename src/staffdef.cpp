@@ -72,14 +72,26 @@ void StaffDef::Reset()
 
 void StaffDef::AddChild(Object *child)
 {
-    if (child->Is(INSTRDEF)) {
+    if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(INSTRDEF)) {
         assert(dynamic_cast<InstrDef *>(child));
+    }
+    else if (child->Is(KEYSIG)) {
+        assert(dynamic_cast<KeySig *>(child));
     }
     else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }
     else if (child->Is(LABELABBR)) {
         assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else if (child->Is(MENSUR)) {
+        assert(dynamic_cast<Mensur *>(child));
+    }
+    else if (child->Is(METERSIG)) {
+        assert(dynamic_cast<MeterSig *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());

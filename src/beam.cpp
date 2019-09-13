@@ -340,10 +340,11 @@ void BeamDrawingParams::CalcBeam(
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttBeamedWith()
+Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
+    RegisterAttClass(ATT_BEAMREND);
 
     Reset();
 }
@@ -358,6 +359,7 @@ void Beam::Reset()
     LayerElement::Reset();
     ResetColor();
     ResetBeamedWith();
+    ResetBeamRend();
 
     ClearCoords();
 }
@@ -405,12 +407,12 @@ void Beam::AddChild(Object *child)
     Modify();
 }
 
-void Beam::FilterList(ListOfObjects *childList)
+void Beam::FilterList(ArrayOfObjects *childList)
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->IsLayerElement()) {
@@ -491,7 +493,13 @@ bool Beam::IsLastInBeam(LayerElement *element)
     return false;
 }
 
-void Beam::InitCoords(ListOfObjects *childList)
+const ArrayOfBeamElementCoords *Beam::GetElementCoords()
+{
+    this->GetList(this);
+    return &m_beamElementCoords;
+}
+
+void Beam::InitCoords(ArrayOfObjects *childList)
 {
     ClearCoords();
 
@@ -526,7 +534,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
     int elementCount = 0;
 
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
@@ -639,7 +647,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ListOfObjects *beamChildren = this->GetList(this);
+    const ArrayOfObjects *beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (beamChildren->empty()) {
@@ -661,8 +669,14 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
 int Beam::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    this->m_drawingParams.Reset();
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
+
     return FUNCTOR_CONTINUE;
 }
 

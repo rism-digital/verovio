@@ -134,6 +134,11 @@ public:
      */
     int GetContentWidth() const;
 
+    /**
+     * Calculate the justification step for a page according.
+     */
+    int CalcJustificationStepSize(bool systemsOnly) const;
+
     //----------//
     // Functors //
     //----------//
@@ -158,7 +163,10 @@ public:
     /**
      * See Object::AlignSystems
      */
+    ///@{
     virtual int AlignSystems(FunctorParams *functorParams);
+    virtual int AlignSystemsEnd(FunctorParams *functorParams);
+    ///@}
 
 private:
     /**
@@ -198,6 +206,22 @@ public:
      * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI
      */
     double m_PPUFactor;
+
+    /**
+     * The height that can be justified once the systems are aligned.
+     * Takes into account header and footer.
+     */
+    int m_drawingJustifiableHeight;
+
+    /**
+     * The number of systems to justify in the page
+     */
+    int m_drawingJustifiableStaves;
+
+    /**
+     * The numberof staves to justify in the page
+     */
+    int m_drawingJustifiableSystems;
 
 private:
     /**
