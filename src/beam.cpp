@@ -366,7 +366,6 @@ void Beam::Reset()
 
 void Beam::AddChild(Object *child)
 {
-    LogWarning("%i", child->GetClassId());
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
     }
