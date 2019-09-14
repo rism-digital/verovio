@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Aug 29 16:30:30 PDT 2019
+// Last Modified: Fri Sep  6 22:56:51 PDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1616,6 +1616,7 @@ class HumdrumFileBase : public HumHash {
 		                                                { return getMaxTrack(); }
 		int           getSpineCount            (void) const
 		                                                { return getMaxTrack(); }
+		std::vector<int> getMeasureNumbers     (void);
 		int           getMeasureNumber         (int line);
 		std::ostream& printSpineInfo           (std::ostream& out = std::cout);
 		std::ostream& printDataTypeInfo        (std::ostream& out = std::cout);
@@ -1627,6 +1628,7 @@ class HumdrumFileBase : public HumHash {
 		void          usage                    (const std::string& command);
 		void          example                  (void);
 
+		bool          analyzeNonNullDataTokens (void);
 		HTp           getTrackStart            (int track) const;
 		void          getSpineStopList         (std::vector<HTp>& spinestops);
 		HTp           getSpineStart            (int spine) const
@@ -1743,7 +1745,6 @@ class HumdrumFileBase : public HumHash {
 		bool          stitchLinesTogether       (HumdrumLine& previous,
 		                                         HumdrumLine& next);
 		void          addToTrackStarts          (HTp token);
-		bool          analyzeNonNullDataTokens  (void);
 		void          addUniqueTokens           (std::vector<HTp>& target,
 		                                         std::vector<HTp>& source);
 		bool          processNonNullDataTokensForTrackForward(HTp starttoken,
@@ -1827,6 +1828,10 @@ class HumdrumFileBase : public HumHash {
 		// m_slurs_analyzed: Used to keep track of whether or not
 		// slur endpoints have been linked or not.
 		bool m_slurs_analyzed = false;
+
+		// m_nulls_analyzed: Used to keep track of wheter or not
+		// null tokens have been analyzed yet.
+		bool m_nulls_analyzed = false;
 
 	public:
 		// Dummy functions to allow the HumdrumFile class's inheritance
@@ -2081,7 +2086,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		bool    checkRestForVerticalPositioning(HTp rest, int baseline);
 		bool    analyzeKernStemLengths    (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
 		void    getBaselines              (std::vector<std::vector<int>>& centerlines);
-		void    createLinkedTies          (std::vector<std::pair<HTp, int>>& starts, 
+		void    createLinkedTies          (std::vector<std::pair<HTp, int>>& starts,
 		                                   std::vector<std::pair<HTp, int>>& ends);
 		void    checkCrossStaffStems      (HTp token, std::string& above, std::string& below);
 		void    checkDataForCrossStaffStems(HTp token, std::string& above, std::string& below);
@@ -2489,7 +2494,7 @@ class NoteCell {
 		int    getSliceIndex        (void) { return m_timeslice;         }
 		int    getVoiceIndex        (void) { return m_voice;             }
 
-		bool   isAttack             (void) { return m_b40>0? true:false; }
+		bool   isAttack             (void);
 		bool   isRest               (void);
 		bool   isSustained          (void);
 
@@ -4015,7 +4020,7 @@ class HumdrumFileSet {
    protected:
       vector<HumdrumFile*>  m_data;
 
-      void                  appendHumdrumFileContent(const std::string& filename, 
+      void                  appendHumdrumFileContent(const std::string& filename,
                                                std::stringstream& inbuffer);
 };
 
@@ -4039,12 +4044,14 @@ class Tool_autobeam : public HumTool {
 		void     addBeam         (HTp startnote, HTp endnote);
 		void     addBeams        (HumdrumFile& infile);
 		void     removeBeams     (HumdrumFile& infile);
+		void     removeEdgeRests (HTp& startnote, HTp& endnote);
 
 	private:
 		vector<vector<pair<int, HumNum> > > m_timesigs;
 		vector<HTp> m_kernspines;
 		bool        m_overwriteQ;
 		int         m_track;
+		bool        m_includerests = false;
 
 };
 
@@ -4831,12 +4838,12 @@ class Tool_homophonic : public HumTool {
 		void        analyzeLine        (HumdrumFile& infile, int line);
 		void        initialize         (void);
 		void        markHomophonicNotes(void);
-		void        printFractionAnalysis(HumdrumFile& infile, std::vector<double>& score);
 		int         getExtantVoiceCount(HumdrumFile& infile);
 		int         getOriginalVoiceCount(HumdrumFile& infile);
-		void        printRawAnalysis   (HumdrumFile& infile, vector<double>& raw);
-		void        printAccumulatedScores(HumdrumFile& infile, vector<double>& score);
-		void        printAttacks(HumdrumFile& infile, vector<int>& attacks);
+		void        addRawAnalysis     (HumdrumFile& infile, vector<double>& raw);
+		void        addAccumulatedScores(HumdrumFile& infile, vector<double>& score);
+		void        addAttacks         (HumdrumFile& infile, vector<int>& attacks);
+		void        addFractionAnalysis(HumdrumFile& infile, std::vector<double>& score);
 
 	private:
 		std::vector<std::string> m_homophonic;
@@ -4847,6 +4854,7 @@ class Tool_homophonic : public HumTool {
 		double m_score = 1.0;
 		double m_intermediate_score = 0.5;
 		int m_voice_count = 0;
+		bool m_letterQ = false;
 };
 
 
@@ -4896,7 +4904,7 @@ class Tool_hproof : public HumTool {
 
 
 // A TimePoint records the event times in a file.  These are positions of note attacks
-// in the file.  The "index" variable keeps track of the line in the original file 
+// in the file.  The "index" variable keeps track of the line in the original file
 // (for the first position in index), and other positions in index keep track of the
 // equivalent line position of the timepoint in other file(s) that are being compared.
 class TimePoint {
@@ -5049,7 +5057,32 @@ class Tool_imitation : public HumTool {
 		vector<int> m_intervals;
 		bool m_mark;
 		char m_marker = '@';
+		bool m_single = false;
 		static int Enumerator;
+		bool m_first = false;
+		bool m_nozero = false;
+		bool m_onlyzero = false;
+		bool m_measure = false;
+		bool m_beat    = false;
+		bool m_length  = false;
+
+		bool m_noInfo = false;
+
+		bool m_noN    = false;
+		bool m_noC    = false;
+		bool m_noD    = false;
+		bool m_noI    = false;
+
+		bool m_noNN   = false;
+		bool m_noCC   = false;
+		bool m_noDD   = false;
+		bool m_noII   = false;
+
+		bool m_addsearches  = false;
+		bool m_inversion  = false;
+		bool m_retrograde = false;
+
+		vector<int> m_barlines;
 };
 
 
@@ -5373,7 +5406,7 @@ class Tool_melisma : public HumTool {
 		                                HumdrumFile& infile, vector<vector<int>>& notecount);
 		string extractWord             (WordInfo& winfo, HTp token, vector<vector<int>>& counts);
 		HumNum getEndtime              (HTp text);
-		void   printWordlist           (HumdrumFile& infile, vector<WordInfo>& wordinfo, 
+		void   printWordlist           (HumdrumFile& infile, vector<WordInfo>& wordinfo,
 		                                map<string, int>);
 		void   initializePartInfo      (HumdrumFile& infile);
 		void   getMelismaNoteCounts    (vector<int>& ncounts, vector<int>& mcounts,
@@ -5658,7 +5691,7 @@ class Tool_musicxml2hum : public HumTool {
 		                       std::vector<MxmlPart>& partdata, HumNum nowtime);
 		void addKeySigLine    (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node>>& keysigs,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
-		void addKeyDesignationLine(GridMeasure* outdata, vector<vector<xml_node>>& keydesigs, 
+		void addKeyDesignationLine(GridMeasure* outdata, vector<vector<xml_node>>& keydesigs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartKeySigs (pugi::xml_node keysig, GridPart& part);
 		void insertPartKeyDesignations(xml_node keydeg, GridPart& part);
