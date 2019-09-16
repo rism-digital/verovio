@@ -1296,7 +1296,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
         // something went wrong
-        cerr << "m_humdrumBuffer is NULL (out of memory?)" << endl;
+        std::cerr << "m_humdrumBuffer is NULL (out of memory?)" << std::endl;
         return;
     }
     strcpy(m_humdrumBuffer, data);
