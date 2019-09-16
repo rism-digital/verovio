@@ -2738,14 +2738,20 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string primarymensuration;
     bool haslabel = false;
     std::string label;
+    hum::HTp labeltok = NULL;
     std::string abbreviation;
+    hum::HTp abbrtok = NULL;
     std::string clef;
+    hum::HTp cleftok = NULL;
     std::string keysig;
+    hum::HTp keytok = NULL;
     std::string key;
     std::string transpose;
     std::string itranspose;
     std::string timesig;
+    hum::HTp timetok = NULL;
     std::string metersig;
+    hum::HTp metertok = NULL;
     int top = 0;
     int bot = 0;
 
@@ -2755,6 +2761,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         if (part->compare(0, 5, "*clef") == 0) {
             if (hre.search(part, 5, "\\d")) {
                 clef = *part;
+                cleftok = part;
             }
         }
         else if (part->compare(0, 6, "*oclef") == 0) {
@@ -2767,6 +2774,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 3, "*k[") == 0) {
             keysig = *part;
+            keytok = part;
         }
         else if (part->compare(0, 4, "*Trd") == 0) {
             transpose = *part;
@@ -2776,21 +2784,27 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 3, "*I'") == 0) {
             if (partcount > 1) {
+                // Avoid encoding the part abbreviation when there is only one
+                // part in order to suppress the display of the abbreviation.
                 abbreviation = part->substr(3);
+                abbrtok = part;
             }
         }
         else if (part->compare(0, 3, "*I\"") == 0) {
             label = part->substr(3);
+            labeltok = part;
             haslabel = true;
         }
         else if (part->compare(0, 5, "*met(") == 0) {
             auto ploc = part->rfind(")");
             if (ploc != string::npos) {
                 metersig = part->substr(5, ploc - 5);
+                metertok = part;
             }
         }
         else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
             timesig = *part;
+            timetok = part;
             ss[partnumber - 1].meter_bottom = bot;
             ss[partnumber - 1].meter_top = top;
             if (bot == 0) {
@@ -2832,6 +2846,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     if (partstart->isMens()) {
         if ((!m_oclef.empty()) && (partnumber == m_oclef.back().first)) {
             clef = *m_oclef.back().second;
+            cleftok = m_oclef.back().second;
         }
     }
 
@@ -2839,6 +2854,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     if (partstart->isMens()) {
         if ((!m_omet.empty()) && (partnumber == m_omet.back().first)) {
             metersig = *m_omet.back().second;
+            metertok = m_omet.back().second;
         }
     }
 
@@ -2846,7 +2862,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     m_staffdef.back()->SetLines(5);
 
     if (clef.size() > 0) {
-        setClef(m_staffdef.back(), clef);
+        setClef(m_staffdef.back(), clef, cleftok);
         ss.at(partnumber - 1).last_clef = clef;
     }
     else {
@@ -2865,40 +2881,41 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (abbreviation.size() > 0) {
-        setInstrumentAbbreviation(m_staffdef.back(), abbreviation);
+        setInstrumentAbbreviation(m_staffdef.back(), abbreviation, abbrtok);
     }
 
     if (haslabel) {
-        setInstrumentName(m_staffdef.back(), label);
+        setInstrumentName(m_staffdef.back(), label, labeltok);
     }
     else if (partnumber == 1) {
-        // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;&#160;");
-        setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
+        setInstrumentName(m_staffdef.back(), "   ");
+        // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;");
+        // setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
     }
 
     if (keysig.size() > 0) {
-        setKeySig(partnumber - 1, m_staffdef.back(), keysig, false);
+        setKeySig(partnumber - 1, m_staffdef.back(), keysig, keytok, false);
     }
 
     if (primarymensuration.empty()) {
         if (timesig.size() > 0) {
-            setTimeSig(m_staffdef.back(), timesig, metersig, partstart);
+            setTimeSig(m_staffdef.back(), timesig, metersig, partstart, timetok);
         }
         if (metersig.size() > 0) {
-            setMeterSymbol(m_staffdef.back(), metersig, partstart);
+            setMeterSymbol(m_staffdef.back(), metersig, partstart, metertok);
         }
     }
     else {
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
             setTimeSig(m_staffdef.back(), "*M2/1", metersig, partstart);
-            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart, metertok);
         }
         else if ((primarymensuration == "C") || (primarymensuration == "c")) {
-            setTimeSig(m_staffdef.back(), "*M4/1", metersig, partstart);
+            setTimeSig(m_staffdef.back(), "*M4/1", metersig, partstart, metertok);
             setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
         else if ((primarymensuration == "O") || (primarymensuration == "o")) {
-            setTimeSig(m_staffdef.back(), "*M3/1", metersig, partstart);
+            setTimeSig(m_staffdef.back(), "*M3/1", metersig, partstart, metertok);
             setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
     }
@@ -2915,18 +2932,27 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 // HumdrumInput::setInstrumentName -- for staffDef or staffGrp.
 //
 
-template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, const string &name)
+template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, const string &name, hum::HTp labeltok)
 {
     if (name.empty()) {
         // no instrument name to display
         return;
     }
-    hum::HumRegex hre;
+    // hum::HumRegex hre;
     // "\xc2\xa0" is a non-breaking space
-    string newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
+    string newname;
     Label *label = new Label();
     Text *text = new Text;
-    text->SetText(UTF8to16(newname));
+    if (name == "   ") {
+        text->SetText(L"\u00a0\u00a0\u00a0");
+    }
+    else {
+        // newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
+        text->SetText(UTF8to16(name));
+    }
+    if (labeltok) {
+        setLocationId(label, labeltok);
+    }
     label->AddChild(text);
     element->InsertChild(label, 0);
 }
@@ -2936,10 +2962,14 @@ template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, 
 // HumdrumInput::setInstrumentAbbreviation -- for staffDef or staffGrp.
 //
 
-template <class ELEMENT> void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const string &name)
+template <class ELEMENT>
+void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const string &name, hum::HTp abbrtok)
 {
     LabelAbbr *label = new LabelAbbr();
     Text *text = new Text;
+    if (abbrtok) {
+        setLocationId(label, abbrtok);
+    }
     text->SetText(UTF8to16(name));
     label->AddChild(text);
     element->InsertChild(label, 0);
@@ -3104,20 +3134,20 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 //
 
 template <class ELEMENT>
-void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart)
+void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart, hum::HTp metertok)
 {
     if ((partstart != NULL) && partstart->isMens()) {
-        setMensurationSymbol(element, metersig);
+        setMensurationSymbol(element, metersig, metertok);
         return;
     }
 
     // handle mensuration displays:
     if (metersig.find("C") != std::string::npos) {
-        setMensurationSymbol(element, metersig);
+        setMensurationSymbol(element, metersig, metertok);
         return;
     }
     if (metersig.find("O") != std::string::npos) {
-        setMensurationSymbol(element, metersig);
+        setMensurationSymbol(element, metersig, metertok);
         return;
     }
 
@@ -3161,12 +3191,16 @@ void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig,
 // HumdrumInput::setMensurationSymbol --
 //
 
-template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig)
+template <class ELEMENT>
+void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok)
 {
 
     Mensur *vrvmensur = getMensur(element);
     if (!vrvmensur) {
         return;
+    }
+    if (mensurtok) {
+        setLocationId(vrvmensur, mensurtok);
     }
 
     if (metersig.find('C') != std::string::npos) {
@@ -3209,7 +3243,7 @@ template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *elemen
 //
 
 void HumdrumInput::setTimeSig(
-    StaffDef *part, const std::string &timesig, const std::string &metersig, hum::HTp partstart)
+    StaffDef *part, const std::string &timesig, const std::string &metersig, hum::HTp partstart, hum::HTp timetok)
 {
     if ((partstart != NULL) && partstart->isMens()) {
         // Don't display time signatures in mensural notation.
@@ -3220,6 +3254,9 @@ void HumdrumInput::setTimeSig(
     MeterSig *vrvmeter = getMeterSig(part);
     if (!vrvmeter) {
         return;
+    }
+    if (timetok) {
+        setLocationId(vrvmeter, timetok);
     }
 
     // Don't store time signature if there is a mensuration to show
@@ -3270,7 +3307,7 @@ void HumdrumInput::setTimeSig(
 //
 
 template <class ELEMENT>
-void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig, bool secondary)
+void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig, hum::HTp keytok, bool secondary)
 {
     bool fs = keysig.find("f#") != string::npos;
     bool cs = keysig.find("c#") != string::npos;
@@ -3332,12 +3369,16 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
         keyvalue = -7;
     }
     else if (!bb && !eb && !ab && !db && !gb && !cb && !fb && !fs && !cs && !gs && !ds && !as && !es && !bs) {
-        // element->SetKeySig(KEYSIGNATURE_0); // what to do with this line?
+        // Assuming C major / A minor key signature.
         keyvalue = 0;
     }
     else {
-        // nonstandard keysignature, so give a NONE style.
-        // element->SetKeySig(KEYSIGNATURE_NONE); // what to do with this line?
+        // Non-standard keysignature, so give a NONE style (deal with it later).
+        KeySig *vrvkeysig = getKeySig(element);
+        if (keytok) {
+            setLocationId(vrvkeysig, keytok);
+        }
+        vrvkeysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
         return;
     }
 
@@ -3350,32 +3391,25 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
     if (!vrvkeysig) {
         return;
     }
+    if (keytok) {
+        setLocationId(vrvkeysig, keytok);
+    }
 
     if ((keyvalue >= -7) && (keyvalue <= 7)) {
         std::string keystr = to_string(keyvalue);
-        vrvkeysig->SetSig(vrvkeysig->AttKeySigLog::StrToKeysignature(keystr));
-    }
-
-    /*
-        switch (keyvalue) {
-            case 0: element->SetKeySig(KEYSIGNATURE_0); break;
-            case +1: element->SetKeySig(KEYSIGNATURE_1s); break;
-            case -1: element->SetKeySig(KEYSIGNATURE_1f); break;
-            case +2: element->SetKeySig(KEYSIGNATURE_2s); break;
-            case -2: element->SetKeySig(KEYSIGNATURE_2f); break;
-            case +3: element->SetKeySig(KEYSIGNATURE_3s); break;
-            case -3: element->SetKeySig(KEYSIGNATURE_3f); break;
-            case +4: element->SetKeySig(KEYSIGNATURE_4s); break;
-            case -4: element->SetKeySig(KEYSIGNATURE_4f); break;
-            case +5: element->SetKeySig(KEYSIGNATURE_5s); break;
-            case -5: element->SetKeySig(KEYSIGNATURE_5f); break;
-            case +6: element->SetKeySig(KEYSIGNATURE_6s); break;
-            case -6: element->SetKeySig(KEYSIGNATURE_6f); break;
-            case +7: element->SetKeySig(KEYSIGNATURE_7s); break;
-            case -7: element->SetKeySig(KEYSIGNATURE_7f); break;
-            default: element->SetKeySig(KEYSIGNATURE_NONE);
+        if (keyvalue < 0) {
+            vrvkeysig->SetSig(std::make_pair(-keyvalue, ACCIDENTAL_WRITTEN_f));
         }
-    */
+        else if (keyvalue > 0) {
+            vrvkeysig->SetSig(std::make_pair(keyvalue, ACCIDENTAL_WRITTEN_s));
+        }
+        else if (keyvalue == 0) {
+            vrvkeysig->SetSig(std::make_pair(keyvalue, ACCIDENTAL_WRITTEN_NONE));
+        }
+        else {
+            vrvkeysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+        }
+    }
 
     if (secondary && (keyvalue == 0)) {
         // force cancellation keysignature.
@@ -3428,12 +3462,15 @@ void HumdrumInput::setDynamicTransposition(int partindex, StaffDef *part, const 
 // HumdrumInput::setClef -- Convert a Humdrum clef to an MEI clef.
 //
 
-void HumdrumInput::setClef(StaffDef *part, const std::string &clef)
+void HumdrumInput::setClef(StaffDef *part, const std::string &clef, hum::HTp cleftok)
 {
     // Search for a Clef child in StaffDef and add one if it does not exist.
     Clef *vrvclef = getClef(part);
     if (!vrvclef) {
         return;
+    }
+    if (cleftok) {
+        setLocationId(vrvclef, cleftok);
     }
 
     if (clef.find("clefGG") != string::npos) {
@@ -8899,6 +8936,9 @@ void HumdrumInput::insertMeterSigElement(
     std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int index)
 {
     hum::HTp tsig = layerdata[index];
+    if (!tsig) {
+        return;
+    }
     if (tsig->getDurationFromStart() <= 0) {
         return;
     }
@@ -8917,6 +8957,9 @@ void HumdrumInput::insertMeterSigElement(
         return;
     }
     MeterSig *msig = new MeterSig;
+    if (tsig) {
+        setLocationId(msig, tsig);
+    }
     appendElement(elements, pointers, msig);
     msig->SetCount(count);
     if (unit > 0) {
@@ -9087,7 +9130,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     }
     if (keysig) {
         // cerr << "KEYSIG = " << keysig << endl;
-        setKeySig(-1, scoreDef, *((string *)keysig), true);
+        setKeySig(-1, scoreDef, *((string *)keysig), keysig, true);
     }
 }
 
