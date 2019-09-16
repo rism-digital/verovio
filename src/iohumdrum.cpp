@@ -1751,7 +1751,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
         }
     }
     if (allsame) {
-        setInstrumentAbbreviation(group, nonempty);
+        setInstrumentAbbreviation(group, nonempty, NULL);
         for (int i = 0; i < (int)sds.size(); i++) {
             if (names.at(i).empty()) {
                 continue;
