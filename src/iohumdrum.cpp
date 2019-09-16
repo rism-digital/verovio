@@ -2738,7 +2738,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string primarymensuration;
     bool haslabel = false;
     std::string label;
+    hum::HTp labeltok = NULL;
     std::string abbreviation;
+    hum::HTp abbrtok = NULL;
     std::string clef;
     hum::HTp cleftok = NULL;
     std::string keysig;
@@ -2780,11 +2782,15 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 3, "*I'") == 0) {
             if (partcount > 1) {
+                // Avoid encoding the part abbreviation when there is only one
+                // part in order to suppress the display of the abbreviation.
                 abbreviation = part->substr(3);
+                abbrtok = part;
             }
         }
         else if (part->compare(0, 3, "*I\"") == 0) {
             label = part->substr(3);
+            labeltok = part;
             haslabel = true;
         }
         else if (part->compare(0, 5, "*met(") == 0) {
@@ -2870,15 +2876,16 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (abbreviation.size() > 0) {
-        setInstrumentAbbreviation(m_staffdef.back(), abbreviation);
+        setInstrumentAbbreviation(m_staffdef.back(), abbreviation, abbrtok);
     }
 
     if (haslabel) {
-        setInstrumentName(m_staffdef.back(), label);
+        setInstrumentName(m_staffdef.back(), label, labeltok);
     }
     else if (partnumber == 1) {
-        // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;&#160;");
-        setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
+        setInstrumentName(m_staffdef.back(), "   ");
+        // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;");
+        // setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
     }
 
     if (keysig.size() > 0) {
@@ -2920,18 +2927,27 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 // HumdrumInput::setInstrumentName -- for staffDef or staffGrp.
 //
 
-template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, const string &name)
+template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, const string &name, hum::HTp labeltok)
 {
     if (name.empty()) {
         // no instrument name to display
         return;
     }
-    hum::HumRegex hre;
+    // hum::HumRegex hre;
     // "\xc2\xa0" is a non-breaking space
-    string newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
+    string newname;
     Label *label = new Label();
     Text *text = new Text;
-    text->SetText(UTF8to16(newname));
+    if (name == "   ") {
+        text->SetText(L"\u00a0\u00a0\u00a0");
+    }
+    else {
+        // newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
+        text->SetText(UTF8to16(name));
+    }
+    if (labeltok) {
+        setLocationId(label, labeltok);
+    }
     label->AddChild(text);
     element->InsertChild(label, 0);
 }
@@ -2941,10 +2957,14 @@ template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, 
 // HumdrumInput::setInstrumentAbbreviation -- for staffDef or staffGrp.
 //
 
-template <class ELEMENT> void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const string &name)
+template <class ELEMENT>
+void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const string &name, hum::HTp abbrtok)
 {
     LabelAbbr *label = new LabelAbbr();
     Text *text = new Text;
+    if (abbrtok) {
+        setLocationId(label, abbrtok);
+    }
     text->SetText(UTF8to16(name));
     label->AddChild(text);
     element->InsertChild(label, 0);

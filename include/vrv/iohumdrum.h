@@ -576,8 +576,10 @@ protected:
     template <class ELEMENT>
     void setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL);
     template <class ELEMENT> void setMensurationSymbol(ELEMENT *element, const std::string &metersig);
-    template <class ELEMENT> void setInstrumentName(ELEMENT *staffdef, const std::string &name);
-    template <class ELEMENT> void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name);
+    template <class ELEMENT>
+    void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
+    template <class ELEMENT>
+    void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
