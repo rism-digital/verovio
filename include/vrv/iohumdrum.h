@@ -462,6 +462,7 @@ protected:
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
+    bool analyzeBreaks(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
     void prepareSections();
     int getDirection(const std::string &token, const std::string &target);
@@ -535,6 +536,13 @@ protected:
     std::string getStringParameter(hum::HTp token, const string &category, const string &key);
     bool shouldHideBeamBracket(
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int layerindex);
+    void checkBeamWith(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
+        std::vector<hum::HTp> &layerdata, int startindex);
+    std::string getTrackText(hum::HTp token);
+    void checkForLayoutBreak(int line);
+    std::string removeCommas(const std::string &input);
+    void extractNullInformation(vector<bool> &nulls, hum::HumdrumFile &infile);
+    void initializeIgnoreVector(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -557,7 +565,7 @@ protected:
     template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
-    template <class ELEMENT> void setN(ELEMENT element, int nvalue);
+    template <class ELEMENT> void setN(ELEMENT element, int nvalue, hum::HTp tok = NULL);
     template <class ELEMENT> void assignAutomaticStem(ELEMENT element, hum::HTp tok, int staffindex);
     template <class ELEMENT> KeySig *getKeySig(ELEMENT element);
     template <class ELEMENT> MeterSig *getMeterSig(ELEMENT element);
@@ -670,8 +678,8 @@ private:
     // m_rkern == reverse mapping of Humdrum track to staff number..
     std::vector<int> m_rkern;
 
-    // m_infile == Humdrum file used for conversion.
-    hum::HumdrumFile m_infile;
+    // m_infiles == Humdrum file used for conversion.
+    hum::HumdrumFileSet m_infiles;
 
     // m_timesigdurs == Prevailing time signature duration of measure
     std::vector<hum::HumNum> m_timesigdurs;
@@ -737,7 +745,7 @@ private:
     std::vector<int> m_multirest;
 
     // m_sections == keep track of thru sections and 1st/second endings.
-    std::vector<std::string> m_sectionlabels;
+    std::vector<hum::HTp> m_sectionlabels;
 
     // m_endingnum == keep track of current ending.
     int m_endingnum = 0;
@@ -790,6 +798,21 @@ private:
     // 0 = *Xslash marker encountered in spine.
     // Up to 1000 spines can be processed (see constructor).
     std::vector<int> m_slash;
+
+    // m_breaks == true if the music contains encoded page/system breaks
+    bool m_breaks = false;
+
+    // m_nulls == true if the line only contains null data.
+    std::vector<bool> m_nulls;
+
+    // m_duradj == duration adjustments due to the presence of a full
+    // null data line.  Add this value when calculating the prespace
+    // variable in fillContentsOfLayer().
+    std::vector<hum::HumNum> m_duradj;
+
+    // m_ignore == limit conversion range of data (for speeding up editing of
+    // larger files).
+    std::vector<bool> m_ignore;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
