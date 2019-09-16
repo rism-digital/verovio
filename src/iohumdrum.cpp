@@ -2740,6 +2740,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string label;
     std::string abbreviation;
     std::string clef;
+    hum::HTp cleftok = NULL;
     std::string keysig;
     hum::HTp keytok = NULL;
     std::string key;
@@ -2756,6 +2757,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         if (part->compare(0, 5, "*clef") == 0) {
             if (hre.search(part, 5, "\\d")) {
                 clef = *part;
+                cleftok = part;
             }
         }
         else if (part->compare(0, 6, "*oclef") == 0) {
@@ -2834,6 +2836,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     if (partstart->isMens()) {
         if ((!m_oclef.empty()) && (partnumber == m_oclef.back().first)) {
             clef = *m_oclef.back().second;
+            cleftok = m_oclef.back().second;
         }
     }
 
@@ -2848,7 +2851,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     m_staffdef.back()->SetLines(5);
 
     if (clef.size() > 0) {
-        setClef(m_staffdef.back(), clef);
+        setClef(m_staffdef.back(), clef, cleftok);
         ss.at(partnumber - 1).last_clef = clef;
     }
     else {
@@ -3427,12 +3430,15 @@ void HumdrumInput::setDynamicTransposition(int partindex, StaffDef *part, const 
 // HumdrumInput::setClef -- Convert a Humdrum clef to an MEI clef.
 //
 
-void HumdrumInput::setClef(StaffDef *part, const std::string &clef)
+void HumdrumInput::setClef(StaffDef *part, const std::string &clef, hum::HTp cleftok)
 {
     // Search for a Clef child in StaffDef and add one if it does not exist.
     Clef *vrvclef = getClef(part);
     if (!vrvclef) {
         return;
+    }
+    if (cleftok) {
+        setLocationId(vrvclef, cleftok);
     }
 
     if (clef.find("clefGG") != string::npos) {
