@@ -2741,6 +2741,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string abbreviation;
     std::string clef;
     std::string keysig;
+    hum::HTp keytok = NULL;
     std::string key;
     std::string transpose;
     std::string itranspose;
@@ -2767,6 +2768,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 3, "*k[") == 0) {
             keysig = *part;
+            keytok = part;
         }
         else if (part->compare(0, 4, "*Trd") == 0) {
             transpose = *part;
@@ -2877,7 +2879,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (keysig.size() > 0) {
-        setKeySig(partnumber - 1, m_staffdef.back(), keysig, false);
+        setKeySig(partnumber - 1, m_staffdef.back(), keysig, keytok, false);
     }
 
     if (primarymensuration.empty()) {
@@ -3270,7 +3272,7 @@ void HumdrumInput::setTimeSig(
 //
 
 template <class ELEMENT>
-void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig, bool secondary)
+void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig, hum::HTp keytok, bool secondary)
 {
     bool fs = keysig.find("f#") != string::npos;
     bool cs = keysig.find("c#") != string::npos;
@@ -3338,6 +3340,9 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
     else {
         // Non-standard keysignature, so give a NONE style (deal with it later).
         KeySig *vrvkeysig = getKeySig(element);
+        if (keytok) {
+            setLocationId(vrvkeysig, keytok);
+        }
         vrvkeysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
         return;
     }
@@ -3350,6 +3355,9 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
     KeySig *vrvkeysig = getKeySig(element);
     if (!vrvkeysig) {
         return;
+    }
+    if (keytok) {
+        setLocationId(vrvkeysig, keytok);
     }
 
     if ((keyvalue >= -7) && (keyvalue <= 7)) {
@@ -9078,7 +9086,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     }
     if (keysig) {
         // cerr << "KEYSIG = " << keysig << endl;
-        setKeySig(-1, scoreDef, *((string *)keysig), true);
+        setKeySig(-1, scoreDef, *((string *)keysig), keysig, true);
     }
 }
 
