@@ -347,8 +347,8 @@ protected:
     void setClef(StaffDef *part, const std::string &clef, hum::HTp cleftok = NULL);
     void setTransposition(StaffDef *part, const std::string &transpose);
     void setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose);
-    void setTimeSig(
-        StaffDef *part, const std::string &timesig, const std::string &metersig = "", hum::HTp partstart = NULL);
+    void setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig = "",
+        hum::HTp partstart = NULL, hum::HTp timetok = NULL);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();

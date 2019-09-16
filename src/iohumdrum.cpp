@@ -2749,6 +2749,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string transpose;
     std::string itranspose;
     std::string timesig;
+    hum::HTp timetok = NULL;
     std::string metersig;
     int top = 0;
     int bot = 0;
@@ -2801,6 +2802,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
             timesig = *part;
+            timetok = part;
             ss[partnumber - 1].meter_bottom = bot;
             ss[partnumber - 1].meter_top = top;
             if (bot == 0) {
@@ -2894,7 +2896,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
     if (primarymensuration.empty()) {
         if (timesig.size() > 0) {
-            setTimeSig(m_staffdef.back(), timesig, metersig, partstart);
+            setTimeSig(m_staffdef.back(), timesig, metersig, partstart, timetok);
         }
         if (metersig.size() > 0) {
             setMeterSymbol(m_staffdef.back(), metersig, partstart);
@@ -3234,7 +3236,7 @@ template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *elemen
 //
 
 void HumdrumInput::setTimeSig(
-    StaffDef *part, const std::string &timesig, const std::string &metersig, hum::HTp partstart)
+    StaffDef *part, const std::string &timesig, const std::string &metersig, hum::HTp partstart, hum::HTp timetok)
 {
     if ((partstart != NULL) && partstart->isMens()) {
         // Don't display time signatures in mensural notation.
@@ -3245,6 +3247,9 @@ void HumdrumInput::setTimeSig(
     MeterSig *vrvmeter = getMeterSig(part);
     if (!vrvmeter) {
         return;
+    }
+    if (timetok) {
+        setLocationId(vrvmeter, timetok);
     }
 
     // Don't store time signature if there is a mensuration to show
@@ -8924,6 +8929,9 @@ void HumdrumInput::insertMeterSigElement(
     std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int index)
 {
     hum::HTp tsig = layerdata[index];
+    if (!tsig) {
+        return;
+    }
     if (tsig->getDurationFromStart() <= 0) {
         return;
     }
@@ -8942,6 +8950,9 @@ void HumdrumInput::insertMeterSigElement(
         return;
     }
     MeterSig *msig = new MeterSig;
+    if (tsig) {
+        setLocationId(msig, tsig);
+    }
     appendElement(elements, pointers, msig);
     msig->SetCount(count);
     if (unit > 0) {
