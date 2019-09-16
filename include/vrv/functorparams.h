@@ -229,10 +229,10 @@ public:
     AdjustFloatingPositionerGrpsParams(Doc *doc)
     {
         m_doc = doc;
-        m_place = STAFFREL_basic_above;
+        m_place = STAFFREL_above;
     }
     std::vector<ClassId> m_classIds;
-    data_STAFFREL_basic m_place;
+    data_STAFFREL m_place;
     Doc *m_doc;
 };
 

@@ -531,7 +531,7 @@ private:
     /**
      * Find the nearest unit position in the direction indicated by place.
      */
-    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL_basic place);
+    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
 
 public:
     /** Document */

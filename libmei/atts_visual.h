@@ -387,8 +387,6 @@ public:
     void SetPlace(data_EVENTREL place_) { m_place = place_; }
     data_EVENTREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:
@@ -628,14 +626,10 @@ public:
     void SetPlace(data_EVENTREL place_) { m_place = place_; }
     data_EVENTREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
     //
     void SetTilt(data_COMPASSDIRECTION tilt_) { m_tilt = tilt_; }
     data_COMPASSDIRECTION GetTilt() const { return m_tilt; }
     bool HasTilt() const;
-    /** Getter for reference (for alternate type only) */
-    data_COMPASSDIRECTION *GetTiltAlternate() { return &m_tilt; }
     ///@}
 
 private:
@@ -1313,8 +1307,6 @@ public:
     void SetPlace(data_EVENTREL place_) { m_place = place_; }
     data_EVENTREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:

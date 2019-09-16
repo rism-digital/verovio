@@ -221,54 +221,6 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
     return 0;
 }
 
-std::string Att::CompassdirectionToStr(data_COMPASSDIRECTION data) const
-{
-    std::string value;
-    if (data.GetType() == COMPASSDIRECTION_basic)
-        value = CompassdirectionBasicToStr(data.GetBasic());
-    else if (data.GetType() == COMPASSDIRECTION_extended)
-        value = CompassdirectionExtendedToStr(data.GetExtended());
-
-    return value;
-}
-
-data_COMPASSDIRECTION Att::StrToCompassdirection(std::string value, bool logWarning) const
-{
-    data_COMPASSDIRECTION data;
-    data.SetBasic(StrToCompassdirectionBasic(value, false));
-    if (data.HasValue()) return data;
-    data.SetExtended(StrToCompassdirectionExtended(value, false));
-    if (data.HasValue()) return data;
-
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.COMPASSDIRECTION '%s'", value.c_str());
-
-    return data;
-}
-
-std::string Att::EventrelToStr(data_EVENTREL data) const
-{
-    std::string value;
-    if (data.GetType() == EVENTREL_basic)
-        value = EventrelBasicToStr(data.GetBasic());
-    else if (data.GetType() == EVENTREL_extended)
-        value = EventrelExtendedToStr(data.GetExtended());
-
-    return value;
-}
-
-data_EVENTREL Att::StrToEventrel(std::string value, bool logWarning) const
-{
-    data_EVENTREL data;
-    data.SetBasic(StrToEventrelBasic(value, false));
-    if (data.HasValue()) return data;
-    data.SetExtended(StrToEventrelExtended(value, false));
-    if (data.HasValue()) return data;
-
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.EVENTREL '%s'", value.c_str());
-
-    return data;
-}
-
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
     std::string value;
@@ -626,7 +578,7 @@ std::string Att::PlacementToStr(data_PLACEMENT data) const
 {
     std::string value;
     if (data.GetType() == PLACEMENT_staffRel)
-        value = StaffrelToStr(*data.GetStaffRelAtlernate());
+        value = StaffrelToStr(data.GetStaffRel());
     else if (data.GetType() == PLACEMENT_nonStaffPlace)
         value = NonstaffplaceToStr(data.GetNonStaffPlace());
     else if (data.GetType() == PLACEMENT_nmtoken)
@@ -671,68 +623,6 @@ data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
     if (value == "3") return PROLATIO_3;
     if (logWarning && !value.empty()) LogWarning("Unsupported prolatio '%s'", value.c_str());
     return PROLATIO_NONE;
-}
-
-std::string Att::StaffitemToStr(data_STAFFITEM data) const
-{
-    std::string value;
-    LogWarning("Writing data.STAFFITEM is not implemented");
-
-    return value;
-}
-
-data_STAFFITEM Att::StrToStaffitem(std::string value, bool logWarning) const
-{
-    data_STAFFITEM data;
-    LogWarning("Reading data.STAFFITEM is not implemented");
-
-    return data;
-}
-
-std::string Att::StaffrelToStr(data_STAFFREL data) const
-{
-    std::string value;
-    if (data.GetType() == STAFFREL_basic)
-        value = StaffrelBasicToStr(data.GetBasic());
-    else if (data.GetType() == STAFFREL_extended)
-        value = StaffrelExtendedToStr(data.GetExtended());
-
-    return value;
-}
-
-data_STAFFREL Att::StrToStaffrel(std::string value, bool logWarning) const
-{
-    data_STAFFREL data;
-    data.SetBasic(StrToStaffrelBasic(value, false));
-    if (data.HasValue()) return data;
-    data.SetExtended(StrToStaffrelExtended(value, false));
-    if (data.HasValue()) return data;
-
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.STAFFREL '%s'", value.c_str());
-
-    return data;
-}
-
-std::string Att::StemdirectionToStr(data_STEMDIRECTION data) const
-{
-    std::string value;
-    switch (data) {
-        case STEMDIRECTION_up: value = "up"; break;
-        case STEMDIRECTION_down: value = "down"; break;
-        default:
-            LogWarning("Unknown stem direction '%d'", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_STEMDIRECTION Att::StrToStemdirection(std::string value, bool logWarning) const
-{
-    if (value == "up") return STEMDIRECTION_up;
-    if (value == "down") return STEMDIRECTION_down;
-    if (logWarning && !value.empty()) LogWarning("Unsupported stem direction '%s'", value.c_str());
-    return STEMDIRECTION_NONE;
 }
 
 std::string Att::TempusToStr(data_TEMPUS data) const
@@ -882,6 +772,28 @@ data_ACCIDENTAL_GESTURAL Att::AccidentalWrittenToGestural(data_ACCIDENTAL_WRITTE
         default: accidGes = ACCIDENTAL_GESTURAL_NONE; break;
     }
     return accidGes;
+}
+
+data_STAFFREL Att::StaffrelBasicToStaffrel(data_STAFFREL_basic staffrelBasic)
+{
+    data_STAFFREL staffrel;
+    switch (staffrelBasic) {
+        case STAFFREL_basic_above: staffrel = STAFFREL_above; break;
+        case STAFFREL_basic_below: staffrel = STAFFREL_below; break;
+        default: staffrel = STAFFREL_NONE; break;
+    }
+    return staffrel;
+}
+
+data_STAFFREL_basic Att::StaffrelToStaffrelBasic(data_STAFFREL staffrel)
+{
+    data_STAFFREL_basic staffrelBasic;
+    switch (staffrel) {
+        case STAFFREL_above: staffrelBasic = STAFFREL_basic_above; break;
+        case STAFFREL_below: staffrelBasic = STAFFREL_basic_below; break;
+        default: staffrelBasic = STAFFREL_basic_NONE; break;
+    }
+    return staffrelBasic;
 }
 
 } // namespace vrv
