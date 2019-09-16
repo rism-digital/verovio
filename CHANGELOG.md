@@ -2,13 +2,16 @@
 
 ## [unreleased]
 * Support for `<graceGrp>` (@rettinghaus)
-* Support for `<keyAccid>`
+* Support for `<keyAccid>` for custom key signatures
 * Support for `@vel` on `<note>` in MIDI playback (@rettinghaus)
 * Support for `<turn>` in MusicXML import (@wergo)
 * Support for `<arpgeg>` in MusicXML import (@wergo)
 * Support iOS Framework build (@Noroxs)
 * Improved support for pedal marks in MusicXML import (@wergo)
+* Improved import of key signatures from PAE (show cancellation accidentals)
 * Improved import of tuplets from PAE
+* Improved element attribute access also when not rendered in a page
+* Options for vertical justication (--justify-include-last-page, --justify-system-only, --justify-vertically)
 * Option to set minimum width for justification (--min-last-justification) (@earboxer).
 
 ### Changed
