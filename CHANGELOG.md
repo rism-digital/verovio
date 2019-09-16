@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Support for `<graceGrp>` (@rettinghaus)
+* Support for `<keyAccid>`
 * Support for `@vel` on `<note>` in MIDI playback (@rettinghaus)
 * Support for `<turn>` in MusicXML import (@wergo)
 * Support for `<arpgeg>` in MusicXML import (@wergo)

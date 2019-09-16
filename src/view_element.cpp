@@ -126,6 +126,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(FLAG)) {
         DrawFlag(dc, element, layer, staff, measure);
     }
+    else if (element->Is(GRACEGRP)) {
+        DrawGraceGrp(dc, element, layer, staff, measure);
+    }
     else if (element->Is(HALFMRPT)) {
         DrawHalfmRpt(dc, element, layer, staff, measure);
     }
@@ -853,6 +856,22 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     wchar_t code = flag->GetSmuflCode(stem->GetDrawingStemDir());
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawGraceGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    // basically nothing to do here
+    DrawLayerChildren(dc, element, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
