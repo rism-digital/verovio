@@ -454,7 +454,7 @@ bool OptionStaffrel::SetValue(std::string value)
 {
     Att converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
-    if (!staffrel.HasValue()) {
+    if (staffrel == STAFFREL_NONE) {
         LogError("Parameter '%s' not valid", value.c_str());
         return false;
     }

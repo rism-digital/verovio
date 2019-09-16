@@ -396,10 +396,10 @@ void AbcInput::AddFermata(LayerElement *element)
 
     Fermata *fermata = new Fermata();
     fermata->SetStartid("#" + element->GetUuid());
-    fermata->GetPlaceAlternate()->SetBasic(m_fermata);
+    fermata->SetPlace(m_fermata);
     m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), fermata));
 
-    m_fermata = STAFFREL_basic_NONE;
+    m_fermata = STAFFREL_NONE;
 }
 
 void AbcInput::AddOrnaments(LayerElement *element)
@@ -510,9 +510,9 @@ void AbcInput::parseDecoration(std::string decorationString)
     else if (!strcmp(decorationString.c_str(), "emphasis"))
         m_artic.push_back(ARTICULATION_acc);
     else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H"))
-        m_fermata = STAFFREL_basic_above;
+        m_fermata = STAFFREL_above;
     else if (!strcmp(decorationString.c_str(), "invertedfermata"))
-        m_fermata = STAFFREL_basic_below;
+        m_fermata = STAFFREL_below;
     else if (!strcmp(decorationString.c_str(), "tenuto"))
         m_artic.push_back(ARTICULATION_ten);
     else if (!strcmp(decorationString.c_str(), "+"))
@@ -1120,7 +1120,7 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             // add fermata
-            if (m_fermata != STAFFREL_basic_NONE) {
+            if (m_fermata != STAFFREL_NONE) {
                 AddFermata(chord);
             }
         }
@@ -1266,7 +1266,7 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             // add fermata
-            if (m_fermata != STAFFREL_basic_NONE) {
+            if (m_fermata != STAFFREL_NONE) {
                 AddFermata(note);
             }
 
@@ -1373,7 +1373,7 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
             m_ID = rest->GetUuid();
 
             // add Fermata
-            if (m_fermata != STAFFREL_basic_NONE) {
+            if (m_fermata != STAFFREL_NONE) {
                 AddFermata(rest);
             }
 

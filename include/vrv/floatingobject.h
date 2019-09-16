@@ -187,7 +187,7 @@ public:
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
-    data_STAFFREL_basic GetDrawingPlace() const { return m_place; }
+    data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     /**
      * @name Get and set the X and Y drawing relative position.
@@ -227,7 +227,7 @@ protected:
      */
     StaffAlignment *m_alignment;
 
-    data_STAFFREL_basic m_place;
+    data_STAFFREL m_place;
 
 public:
     /**

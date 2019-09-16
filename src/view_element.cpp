@@ -301,7 +301,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
     int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int direction = (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? 1 : -1;
+    int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
 
     int y = articPart->GetDrawingY();
 
@@ -328,15 +328,14 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         if (articPart->GetType() == ARTIC_PART_INSIDE) {
             // If we are above the top of the  staff, just pile them up
-            if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) && (y > staff->GetDrawingY()))
-                y += yShift;
+            if ((articPart->GetPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) y += yShift;
             // If we are below the bottom, just pile the down
-            else if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_below)
+            else if ((articPart->GetPlace() == STAFFREL_below)
                 && (y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
                 y -= yShift;
             // Otherwise make it fit the staff space
             else {
-                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlaceAlternate()->GetBasic());
+                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlace());
                 if (IsOnStaffLine(y, staff)) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * direction;
             }
         }
@@ -351,8 +350,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         // Center the glyh if necessary
         if (Artic::IsCentered(*articIter)) {
-            y += (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? -(glyphHeight / 2)
-                                                                                      : (glyphHeight / 2);
+            y += (articPart->GetPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
         }
 
         // Adjust the baseline for glyph above the baseline in SMuFL
@@ -1651,11 +1649,11 @@ bool View::IsOnStaffLine(int y, Staff *staff)
     return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
 }
 
-int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL_basic place)
+int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place)
 {
     int yPos = y - staff->GetDrawingY();
     int distance = yPos % m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (place == STAFFREL_basic_above) {
+    if (place == STAFFREL_above) {
         if (distance > 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - distance;
         return y - distance + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }

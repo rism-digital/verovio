@@ -25,8 +25,6 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 
 #define VRV_UNSET -0x7FFFFFFF
 
-class data_STAFFREL;
-
 /**
  * MEI virtual unit;
  */
@@ -255,21 +253,6 @@ enum data_PITCHNAME_GES {
  * NONE is -3 for perfect value (abs) by default
  */
 enum data_PROLATIO { PROLATIO_NONE = -3, PROLATIO_2 = 2, PROLATIO_3 };
-
-/**
- * MEI data.STEMDIRECTION
- */
-enum data_STEMDIRECTION {
-    STEMDIRECTION_NONE = 0,
-    STEMDIRECTION_up,
-    STEMDIRECTION_down,
-    STEMDIRECTION_left,
-    STEMDIRECTION_right,
-    STEMDIRECTION_ne,
-    STEMDIRECTION_se,
-    STEMDIRECTION_nw,
-    STEMDIRECTION_sw,
-};
 
 /**
  * MEI data.TIE

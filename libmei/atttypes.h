@@ -372,6 +372,22 @@ enum data_COLORNAMES {
 };
 
 /**
+ * MEI data.COMPASSDIRECTION
+ */
+enum data_COMPASSDIRECTION {
+    COMPASSDIRECTION_NONE = 0,
+    COMPASSDIRECTION_n,
+    COMPASSDIRECTION_e,
+    COMPASSDIRECTION_s,
+    COMPASSDIRECTION_w,
+    COMPASSDIRECTION_ne,
+    COMPASSDIRECTION_nw,
+    COMPASSDIRECTION_se,
+    COMPASSDIRECTION_sw,
+    COMPASSDIRECTION_MAX
+};
+
+/**
  * MEI data.COMPASSDIRECTION.basic
  */
 enum data_COMPASSDIRECTION_basic {
@@ -403,6 +419,22 @@ enum data_ENCLOSURE {
     ENCLOSURE_paren,
     ENCLOSURE_brack,
     ENCLOSURE_MAX
+};
+
+/**
+ * MEI data.EVENTREL
+ */
+enum data_EVENTREL {
+    EVENTREL_NONE = 0,
+    EVENTREL_above,
+    EVENTREL_below,
+    EVENTREL_left,
+    EVENTREL_right,
+    EVENTREL_above_left,
+    EVENTREL_above_right,
+    EVENTREL_below_left,
+    EVENTREL_below_right,
+    EVENTREL_MAX
 };
 
 /**
@@ -545,6 +577,30 @@ enum data_GRACE {
     GRACE_unacc,
     GRACE_unknown,
     GRACE_MAX
+};
+
+/**
+ * MEI data.HEADSHAPE
+ */
+enum data_HEADSHAPE {
+    HEADSHAPE_NONE = 0,
+    HEADSHAPE_quarter,
+    HEADSHAPE_half,
+    HEADSHAPE_whole,
+    HEADSHAPE_backslash,
+    HEADSHAPE_circle,
+    HEADSHAPE_plus,
+    HEADSHAPE_diamond,
+    HEADSHAPE_isotriangle,
+    HEADSHAPE_oval,
+    HEADSHAPE_piewedge,
+    HEADSHAPE_rectangle,
+    HEADSHAPE_rtriangle,
+    HEADSHAPE_semicircle,
+    HEADSHAPE_slash,
+    HEADSHAPE_square,
+    HEADSHAPE_x,
+    HEADSHAPE_MAX
 };
 
 /**
@@ -965,6 +1021,24 @@ enum data_NOTATIONTYPE {
 };
 
 /**
+ * MEI data.NOTEHEADMODIFIER
+ */
+enum data_NOTEHEADMODIFIER {
+    NOTEHEADMODIFIER_NONE = 0,
+    NOTEHEADMODIFIER_slash,
+    NOTEHEADMODIFIER_backslash,
+    NOTEHEADMODIFIER_vline,
+    NOTEHEADMODIFIER_hline,
+    NOTEHEADMODIFIER_centerdot,
+    NOTEHEADMODIFIER_paren,
+    NOTEHEADMODIFIER_brack,
+    NOTEHEADMODIFIER_box,
+    NOTEHEADMODIFIER_circle,
+    NOTEHEADMODIFIER_dblwhole,
+    NOTEHEADMODIFIER_MAX
+};
+
+/**
  * MEI data.NOTEHEADMODIFIER.list
  */
 enum data_NOTEHEADMODIFIER_list {
@@ -993,6 +1067,74 @@ enum data_OTHERSTAFF {
 };
 
 /**
+ * MEI data.RELATIONSHIP
+ */
+enum data_RELATIONSHIP {
+    RELATIONSHIP_NONE = 0,
+    RELATIONSHIP_hasAbridgement,
+    RELATIONSHIP_isAbridgementOf,
+    RELATIONSHIP_hasAdaptation,
+    RELATIONSHIP_isAdaptationOf,
+    RELATIONSHIP_hasAlternate,
+    RELATIONSHIP_isAlternateOf,
+    RELATIONSHIP_hasArrangement,
+    RELATIONSHIP_isArrangementOf,
+    RELATIONSHIP_hasComplement,
+    RELATIONSHIP_isComplementOf,
+    RELATIONSHIP_hasEmbodiment,
+    RELATIONSHIP_isEmbodimentOf,
+    RELATIONSHIP_hasExemplar,
+    RELATIONSHIP_isExemplarOf,
+    RELATIONSHIP_hasImitation,
+    RELATIONSHIP_isImitationOf,
+    RELATIONSHIP_hasPart,
+    RELATIONSHIP_isPartOf,
+    RELATIONSHIP_hasRealization,
+    RELATIONSHIP_isRealizationOf,
+    RELATIONSHIP_hasReconfiguration,
+    RELATIONSHIP_isReconfigurationOf,
+    RELATIONSHIP_hasReproduction,
+    RELATIONSHIP_isReproductionOf,
+    RELATIONSHIP_hasRevision,
+    RELATIONSHIP_isRevisionOf,
+    RELATIONSHIP_hasSuccessor,
+    RELATIONSHIP_isSuccessorOf,
+    RELATIONSHIP_hasSummarization,
+    RELATIONSHIP_isSummarizationOf,
+    RELATIONSHIP_hasSupplement,
+    RELATIONSHIP_isSupplementOf,
+    RELATIONSHIP_hasTransformation,
+    RELATIONSHIP_isTransformationOf,
+    RELATIONSHIP_hasTranslation,
+    RELATIONSHIP_isTranslationOf,
+    RELATIONSHIP_preceding,
+    RELATIONSHIP_succeeding,
+    RELATIONSHIP_original,
+    RELATIONSHIP_host,
+    RELATIONSHIP_constituent,
+    RELATIONSHIP_otherVersion,
+    RELATIONSHIP_otherFormat,
+    RELATIONSHIP_isReferencedBy,
+    RELATIONSHIP_references,
+    RELATIONSHIP_MAX
+};
+
+/**
+ * MEI data.ROTATION
+ */
+enum data_ROTATION {
+    ROTATION_NONE = 0,
+    ROTATION_none,
+    ROTATION_down,
+    ROTATION_left,
+    ROTATION_ne,
+    ROTATION_nw,
+    ROTATION_se,
+    ROTATION_sw,
+    ROTATION_MAX
+};
+
+/**
  * MEI data.ROTATIONDIRECTION
  */
 enum data_ROTATIONDIRECTION {
@@ -1005,6 +1147,43 @@ enum data_ROTATIONDIRECTION {
     ROTATIONDIRECTION_se,
     ROTATIONDIRECTION_sw,
     ROTATIONDIRECTION_MAX
+};
+
+/**
+ * MEI data.STAFFITEM
+ */
+enum data_STAFFITEM {
+    STAFFITEM_NONE = 0,
+    STAFFITEM_accid,
+    STAFFITEM_annot,
+    STAFFITEM_artic,
+    STAFFITEM_dir,
+    STAFFITEM_dynam,
+    STAFFITEM_harm,
+    STAFFITEM_ornam,
+    STAFFITEM_sp,
+    STAFFITEM_stageDir,
+    STAFFITEM_tempo,
+    STAFFITEM_beam,
+    STAFFITEM_bend,
+    STAFFITEM_bracketSpan,
+    STAFFITEM_breath,
+    STAFFITEM_cpMark,
+    STAFFITEM_fermata,
+    STAFFITEM_fing,
+    STAFFITEM_hairpin,
+    STAFFITEM_harpPedal,
+    STAFFITEM_lv,
+    STAFFITEM_mordent,
+    STAFFITEM_octave,
+    STAFFITEM_pedal,
+    STAFFITEM_reh,
+    STAFFITEM_tie,
+    STAFFITEM_trill,
+    STAFFITEM_tuplet,
+    STAFFITEM_turn,
+    STAFFITEM_ligature,
+    STAFFITEM_MAX
 };
 
 /**
@@ -1061,6 +1240,18 @@ enum data_STAFFITEM_mensural {
 };
 
 /**
+ * MEI data.STAFFREL
+ */
+enum data_STAFFREL {
+    STAFFREL_NONE = 0,
+    STAFFREL_above,
+    STAFFREL_below,
+    STAFFREL_between,
+    STAFFREL_within,
+    STAFFREL_MAX
+};
+
+/**
  * MEI data.STAFFREL.basic
  */
 enum data_STAFFREL_basic {
@@ -1078,6 +1269,46 @@ enum data_STAFFREL_extended {
     STAFFREL_extended_between,
     STAFFREL_extended_within,
     STAFFREL_extended_MAX
+};
+
+/**
+ * MEI data.STEMDIRECTION
+ */
+enum data_STEMDIRECTION {
+    STEMDIRECTION_NONE = 0,
+    STEMDIRECTION_up,
+    STEMDIRECTION_down,
+    STEMDIRECTION_left,
+    STEMDIRECTION_right,
+    STEMDIRECTION_ne,
+    STEMDIRECTION_se,
+    STEMDIRECTION_nw,
+    STEMDIRECTION_sw,
+    STEMDIRECTION_MAX
+};
+
+/**
+ * MEI data.STEMDIRECTION.basic
+ */
+enum data_STEMDIRECTION_basic {
+    STEMDIRECTION_basic_NONE = 0,
+    STEMDIRECTION_basic_up,
+    STEMDIRECTION_basic_down,
+    STEMDIRECTION_basic_MAX
+};
+
+/**
+ * MEI data.STEMDIRECTION.extended
+ */
+enum data_STEMDIRECTION_extended {
+    STEMDIRECTION_extended_NONE = 0,
+    STEMDIRECTION_extended_left,
+    STEMDIRECTION_extended_right,
+    STEMDIRECTION_extended_ne,
+    STEMDIRECTION_extended_se,
+    STEMDIRECTION_extended_nw,
+    STEMDIRECTION_extended_sw,
+    STEMDIRECTION_extended_MAX
 };
 
 /**
@@ -1118,6 +1349,42 @@ enum data_TEMPERAMENT {
     TEMPERAMENT_mean,
     TEMPERAMENT_pythagorean,
     TEMPERAMENT_MAX
+};
+
+/**
+ * MEI data.TEXTRENDITION
+ */
+enum data_TEXTRENDITION {
+    TEXTRENDITION_NONE = 0,
+    TEXTRENDITION_quote,
+    TEXTRENDITION_quotedbl,
+    TEXTRENDITION_italic,
+    TEXTRENDITION_oblique,
+    TEXTRENDITION_smcaps,
+    TEXTRENDITION_bold,
+    TEXTRENDITION_bolder,
+    TEXTRENDITION_lighter,
+    TEXTRENDITION_box,
+    TEXTRENDITION_circle,
+    TEXTRENDITION_dbox,
+    TEXTRENDITION_tbox,
+    TEXTRENDITION_bslash,
+    TEXTRENDITION_fslash,
+    TEXTRENDITION_line_through,
+    TEXTRENDITION_none,
+    TEXTRENDITION_overline,
+    TEXTRENDITION_overstrike,
+    TEXTRENDITION_strike,
+    TEXTRENDITION_sub,
+    TEXTRENDITION_sup,
+    TEXTRENDITION_superimpose,
+    TEXTRENDITION_underline,
+    TEXTRENDITION_x_through,
+    TEXTRENDITION_ltr,
+    TEXTRENDITION_rtl,
+    TEXTRENDITION_lro,
+    TEXTRENDITION_rlo,
+    TEXTRENDITION_MAX
 };
 
 /**

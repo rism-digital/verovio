@@ -431,12 +431,10 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
-                    && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(curve, true);
                 }
-                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(curve, true);
                 }
             }
@@ -451,12 +449,10 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
-                    && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(curve, false);
                 }
-                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(curve, false);
                 }
             }

@@ -1335,11 +1335,11 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         // form and place
         if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
             fermata->SetForm(fermataVis_FORM_inv);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_below);
+            fermata->SetPlace(STAFFREL_below);
         }
         else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
             fermata->SetForm(fermataVis_FORM_norm);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_above);
+            fermata->SetPlace(STAFFREL_above);
         }
     }
 }
@@ -2136,11 +2136,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // form and place
         if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
             fermata->SetForm(fermataVis_FORM_inv);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_below);
+            fermata->SetPlace(STAFFREL_below);
         }
         else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
             fermata->SetForm(fermataVis_FORM_norm);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_above);
+            fermata->SetPlace(STAFFREL_above);
         }
     }
 
