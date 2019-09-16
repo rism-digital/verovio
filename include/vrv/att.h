@@ -93,6 +93,9 @@ public:
     static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
     ///@}
 
+    static data_ACCIDENTAL_WRITTEN AccidentalGesturalToWritten(data_ACCIDENTAL_GESTURAL accid);
+    static data_ACCIDENTAL_GESTURAL AccidentalWrittenToGestural(data_ACCIDENTAL_WRITTEN accid);
+
 public:
     /** Dummy string converter */
     std::string StrToStr(std::string str) const;

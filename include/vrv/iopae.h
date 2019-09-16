@@ -81,7 +81,7 @@ namespace pae {
             pitch = PITCHNAME_NONE;
             duration = DURATION_NONE;
             accidental = ACCIDENTAL_WRITTEN_NONE;
-            accidGes = ACCIDENTAL_GESTURAL_NONE;
+            accidGes = false;
             dots = 0;
             rest = false;
 
@@ -147,7 +147,7 @@ namespace pae {
         data_PITCHNAME pitch;
         data_DURATION duration;
         data_ACCIDENTAL_WRITTEN accidental;
-        data_ACCIDENTAL_GESTURAL accidGes;
+        bool accidGes;
         unsigned int dots;
         bool rest;
 
@@ -292,7 +292,10 @@ private:
     Tie *m_tie;
     bool m_is_in_chord;
     bool m_is_mensural;
-    std::string m_keySigString;
+
+    MapOfPitchAccid m_currentAccids;
+    KeySig *m_currentKeySig;
+    std::pair<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> m_tieAccid;
 
     std::vector<LayerElement *> m_nested_objects;
 };

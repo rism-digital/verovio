@@ -50,9 +50,9 @@ public:
     ///@}
 
     /**
-     * Copy assignment for resetting pointers
+     * Overriding CopyReset() method to be called after copy / assignment calls.
      */
-    LayerElement &operator=(const LayerElement &element);
+    virtual void CopyReset();
 
     /**
      * @name Getter to interfaces
@@ -67,6 +67,11 @@ public:
      * It typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
+
+    /**
+     * Return true if the element is part of a scoreDef or staffDef
+     */
+    virtual bool IsScoreDefElement() const { return false; }
 
     /**
      * Return true if the element is relative to the staff and not to its parent.

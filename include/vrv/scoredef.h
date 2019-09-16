@@ -59,14 +59,13 @@ public:
     ///@}
 
     /**
-     * @name Methods for checking the presence of clef, key signature, etc. information.
-     * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)
+     * @name Methods for checking the presence of clef, key signature, etc. information and getting them.
      */
     ///@{
-    bool HasClefInfo() const;
-    bool HasKeySigInfo() const;
-    bool HasMensurInfo() const;
-    bool HasMeterSigInfo() const;
+    bool HasClefInfo();
+    bool HasKeySigInfo();
+    bool HasMensurInfo();
+    bool HasMeterSigInfo();
     ///@}
 
     /**
@@ -78,33 +77,26 @@ public:
      * constructor of each corresponding class (Clef, KeySig, etc.)
      */
     ///@{
-    Clef *GetClefCopy() const;
-    KeySig *GetKeySigCopy() const;
-    Mensur *GetMensurCopy() const;
-    MeterSig *GetMeterSigCopy() const;
+    Clef *GetClef();
+    Clef *GetClefCopy();
+    KeySig *GetKeySig();
+    KeySig *GetKeySigCopy();
+    Mensur *GetMensur();
+    Mensur *GetMensurCopy();
+    MeterSig *GetMeterSig();
+    MeterSig *GetMeterSigCopy();
     ///@}
+
+    //----------//
+    // Functors //
+    //----------//
 
 private:
-    /**
-     * @name Methods for checking if clef info is available at the attribute level.
-     */
-    ///@{
-    bool HasClefAttrInfo() const;
-    bool HasKeySigAttrInfo() const;
-    bool HasMensurAttrInfo() const;
-    bool HasMeterSigAttrInfo() const;
-    ///@}
-
-    /**
-     * @name Methods for checking if clef info is available at the element level.
-     * To be implemented.
-     */
-    ///@{
-    bool HasClefElementInfo() const;
-    bool HasKeySigElementInfo() const;
-    bool HasMensurElementInfo() const;
-    bool HasMeterSigElementInfo() const;
-    ///@}
+    //
+public:
+    //
+private:
+    //
 };
 
 //----------------------------------------------------------------------------

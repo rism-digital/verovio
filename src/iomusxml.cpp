@@ -733,6 +733,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
 
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
+            Clef *clef = NULL;
             pugi::xpath_node clefSign;
             xpath = StringFormat("clef[@number='%d']/sign", i + 1);
             clefSign = it->select_node(xpath.c_str());
@@ -741,8 +742,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 clefSign = it->select_node("clef/sign");
             }
             if (clefSign.node().text()) {
-                staffDef->SetClefShape(
-                    staffDef->AttCleffingLog::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
+                if (!clef) clef = new Clef();
+                clef->SetShape(clef->AttClefShape::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
             }
             // clef line
             pugi::xpath_node clefLine;
@@ -752,7 +753,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 clefLine = it->select_node("clef/line");
             }
             if (clefLine.node().text()) {
-                staffDef->SetClefLine(staffDef->AttCleffingLog::StrToInt(clefLine.node().text().as_string()));
+                if (!clef) clef = new Clef();
+                clef->SetLine(clef->AttLineLoc::StrToInt(clefLine.node().text().as_string()));
             }
             // clef octave change
             pugi::xpath_node clefOctaveChange;
@@ -763,16 +765,25 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             if (clefOctaveChange.node().text()) {
                 int change = clefOctaveChange.node().text().as_int();
+                if (!clef) clef = new Clef();
                 if (abs(change) == 1)
-                    staffDef->SetClefDis(OCTAVE_DIS_8);
+                    clef->SetDis(OCTAVE_DIS_8);
                 else if (abs(change) == 2)
-                    staffDef->SetClefDis(OCTAVE_DIS_15);
+                    clef->SetDis(OCTAVE_DIS_15);
                 if (change < 0)
-                    staffDef->SetClefDisPlace(STAFFREL_basic_below);
+                    clef->SetDisPlace(STAFFREL_basic_below);
                 else if (change > 0)
-                    staffDef->SetClefDisPlace(STAFFREL_basic_above);
+                    clef->SetDisPlace(STAFFREL_basic_above);
             }
+            // add it if necessary
+            if (clef) {
+                // Make it an attribute for now
+                clef->IsAttribute(true);
+                staffDef->AddChild(clef);
+            }
+
             // key sig
+            KeySig *keySig = NULL;
             pugi::xpath_node key;
             xpath = StringFormat("key[@number='%d']", i + 1);
             key = it->select_node(xpath.c_str());
@@ -780,25 +791,33 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 key = it->select_node("key");
             }
             if (key) {
+                if (!keySig) keySig = new KeySig();
                 if (key.node().select_node("fifths")) {
                     int fifths = atoi(key.node().select_node("fifths").node().text().as_string());
-                    std::string keySig;
+                    std::string keySigStr;
                     if (fifths < 0)
-                        keySig = StringFormat("%df", abs(fifths));
+                        keySigStr = StringFormat("%df", abs(fifths));
                     else if (fifths > 0)
-                        keySig = StringFormat("%ds", fifths);
+                        keySigStr = StringFormat("%ds", fifths);
                     else
-                        keySig = "0";
-                    staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeysignature(keySig));
+                        keySigStr = "0";
+                    keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
                 }
                 else if (key.node().select_node("key-step")) {
-                    staffDef->SetKeySig(KEYSIGNATURE_mixed);
+                    keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
                 }
                 if (key.node().select_node("mode")) {
-                    staffDef->SetKeyMode(staffDef->AttKeySigDefaultLog::StrToMode(
-                        key.node().select_node("mode").node().text().as_string()));
+                    keySig->SetMode(
+                        keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
                 }
             }
+            // add it if necessary
+            if (keySig) {
+                // Make it an attribute for now
+                keySig->IsAttribute(true);
+                staffDef->AddChild(keySig);
+            }
+
             // staff details
             pugi::xpath_node staffDetails;
             xpath = StringFormat("staff-details[@number='%d']", i + 1);
@@ -821,7 +840,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (staffTuning) {
                 staffDef->SetNotationtype(NOTATIONTYPE_tab);
             }
+
             // time
+            MeterSig *meterSig = NULL;
             pugi::xpath_node time;
             xpath = StringFormat("time[@number='%d']", i + 1);
             time = it->select_node(xpath.c_str());
@@ -829,14 +850,15 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 time = it->select_node("time");
             }
             if (time) {
+                if (!meterSig) meterSig = new MeterSig();
                 std::string symbol = time.node().attribute("symbol").as_string();
                 if (!symbol.empty()) {
                     if (symbol == "cut" || symbol == "common")
-                        staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
+                        meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                     else if (symbol == "single-number")
-                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                        meterSig->SetForm(meterSigVis_FORM_num);
                     else
-                        staffDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
+                        meterSig->SetForm(meterSigVis_FORM_norm);
                 }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
@@ -851,14 +873,21 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
                         LogWarning("MusicXML import: Compound time is not supported");
                     }
-                    staffDef->SetMeterCount(m_meterCount);
+                    meterSig->SetCount(m_meterCount);
                 }
                 pugi::xpath_node beatType = time.node().select_node("beat-type");
                 if (beatType.node().text()) {
                     m_meterUnit = beatType.node().text().as_int();
-                    staffDef->SetMeterUnit(m_meterUnit);
+                    meterSig->SetUnit(m_meterUnit);
                 }
             }
+            // add it if necessary
+            if (meterSig) {
+                // Make it an attribute for now
+                meterSig->IsAttribute(true);
+                staffDef->AddChild(meterSig);
+            }
+
             // transpose
             pugi::xpath_node transpose;
             xpath = StringFormat("transpose[@number='%d']", i + 1);
@@ -1133,39 +1162,52 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     // for now only read first part and make it change in scoreDef
     if ((key || time) && node.select_node("ancestor::part[not(preceding-sibling::part)]")) {
         ScoreDef *scoreDef = new ScoreDef();
+        KeySig *keySig = NULL;
         if (key.node().select_node("fifths")) {
+            if (!keySig) keySig = new KeySig();
             int fifths = atoi(key.node().select_node("fifths").node().text().as_string());
-            std::string keySig;
+            std::string keySigStr;
             if (fifths < 0)
-                keySig = StringFormat("%df", abs(fifths));
+                keySigStr = StringFormat("%df", abs(fifths));
             else if (fifths > 0)
-                keySig = StringFormat("%ds", fifths);
+                keySigStr = StringFormat("%ds", fifths);
             else
-                keySig = "0";
-            scoreDef->SetKeySig(scoreDef->AttKeySigDefaultLog::StrToKeysignature(keySig));
+                keySigStr = "0";
+            keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
         else if (key.node().select_node("key-step")) {
-            scoreDef->SetKeySig(KEYSIGNATURE_mixed);
+            if (!keySig) keySig = new KeySig();
+            keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
         }
         if (key.node().select_node("mode")) {
-            scoreDef->SetKeyMode(
-                scoreDef->AttKeySigDefaultLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
+            if (!keySig) keySig = new KeySig();
+            keySig->SetMode(keySig->AttKeySigLog::StrToMode(key.node().select_node("mode").node().text().as_string()));
         }
+        // Add it if necessary
+        if (keySig) {
+            // Make it an attribute for now
+            keySig->IsAttribute(true);
+            scoreDef->AddChild(keySig);
+        }
+
         if (time) {
+            MeterSig *meterSig = NULL;
             std::string symbol = time.node().attribute("symbol").as_string();
             if (!symbol.empty()) {
+                if (!meterSig) meterSig = new MeterSig();
                 if (symbol == "cut" || symbol == "common")
-                    scoreDef->SetMeterSym(scoreDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
+                    meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
-                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_num);
+                    meterSig->SetForm(meterSigVis_FORM_num);
                 else
-                    scoreDef->SetMeterForm(meterSigDefaultVis_METERFORM_norm);
+                    meterSig->SetForm(meterSigVis_FORM_norm);
             }
             if (time.node().select_nodes("beats").size() > 1) {
                 LogWarning("MusicXML import: Compound meter signatures are not supported");
             }
             pugi::xpath_node beats = time.node().select_node("beats");
             if (beats.node().text()) {
+                if (!meterSig) meterSig = new MeterSig();
                 m_meterCount = beats.node().text().as_int();
                 // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
                 // this is a little "hack", until libMEI is fixed
@@ -1174,14 +1216,22 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                     m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
                     LogWarning("MusicXML import: Compound time is not supported");
                 }
-                scoreDef->SetMeterCount(m_meterCount);
+                meterSig->SetCount(m_meterCount);
             }
             pugi::xpath_node beatType = time.node().select_node("beat-type");
             if (beatType.node().text()) {
+                if (!meterSig) meterSig = new MeterSig();
                 m_meterUnit = beatType.node().text().as_int();
-                scoreDef->SetMeterUnit(m_meterUnit);
+                meterSig->SetUnit(m_meterUnit);
+            }
+            // add it if necessary
+            if (meterSig) {
+                // Make it an attribute for now
+                meterSig->IsAttribute(true);
+                scoreDef->AddChild(meterSig);
             }
         }
+
         section->AddChild(scoreDef);
     }
 

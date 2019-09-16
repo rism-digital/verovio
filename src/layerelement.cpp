@@ -111,17 +111,16 @@ LayerElement::~LayerElement()
     }
 }
 
-LayerElement &LayerElement::operator=(const LayerElement &element)
+void LayerElement::CopyReset()
 {
-    // not self assignement
-    if (this != &element) {
-        // pointers have to be NULL
-        ResetParent();
-        m_alignment = NULL;
-        m_graceAlignment = NULL;
-        m_beamElementCoord = NULL;
-    }
-    return *this;
+    // pointers have to be NULL
+    m_alignment = NULL;
+    m_graceAlignment = NULL;
+    m_alignmentLayerN = VRV_UNSET;
+    m_beamElementCoord = NULL;
+
+    m_crossStaff = NULL;
+    m_crossLayer = NULL;
 }
 
 LayerElement *LayerElement::ThisOrSameasAsLink()
@@ -632,6 +631,8 @@ int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
     ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
@@ -644,6 +645,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 
     // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     this->SetScoreDefRole(params->m_scoreDefRole);
 
@@ -824,6 +827,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 {
     SetAlignmentPitchPosParams *params = dynamic_cast<SetAlignmentPitchPosParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     LayerElement *layerElementY = this;
     Staff *staffY = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
@@ -1074,6 +1079,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     // Check if we are starting a new layer content - if yes copy the current elements to previous
     if (!params->m_current.empty() && (this->GetAlignmentLayerN() != params->m_currentLayerN)) {
         params->m_previous.reserve(params->m_previous.size() + params->m_current.size());
@@ -1164,6 +1171,8 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
     // LogDebug("********* Aligning %s", this->GetClassName().c_str());
@@ -1200,6 +1209,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // we should have processed aligned before
     assert(this->GetAlignment());
@@ -1259,6 +1270,8 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
     if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (!this->HasSelfBB()) return FUNCTOR_CONTINUE;
 
     this->SetDrawingXRel(-this->GetSelfX1());
@@ -1268,6 +1281,8 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 
 int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 {
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (this->IsGraceNote()) {
         m_drawingCueSize = true;
     }
@@ -1319,6 +1334,8 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
@@ -1387,6 +1404,8 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     DurationInterface *durElement = this->GetDurationInterface();
     if (!durElement) return FUNCTOR_CONTINUE;
 
@@ -1406,6 +1425,8 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (params->m_lastDot) {
         params->m_lastDot->m_drawingNextElement = this;
         params->m_lastDot = NULL;
@@ -1422,6 +1443,8 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 {
     PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
@@ -1445,6 +1468,8 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
@@ -1466,6 +1491,8 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
     LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // For mRest we do not look at the time span
     if (this->Is(MREST)) {
@@ -1506,6 +1533,8 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
     FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (!this->Is(params->m_classIds)) {
         return FUNCTOR_CONTINUE;
     }
@@ -1537,6 +1566,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 {
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     LayerElement *element = this->ThisOrSameasAsLink();
 
@@ -1623,6 +1654,8 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (this->HasSameasLink()) {
         assert(this->GetSameasLink());
         this->GetSameasLink()->Process(params->m_functor, functorParams);
@@ -1635,6 +1668,8 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 {
     GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     if (this->HasSameasLink()) {
         assert(this->GetSameasLink());
