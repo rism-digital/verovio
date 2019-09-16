@@ -574,8 +574,10 @@ protected:
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
     template <class ELEMENT>
-    void setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL);
-    template <class ELEMENT> void setMensurationSymbol(ELEMENT *element, const std::string &metersig);
+    void setMeterSymbol(
+        ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL, hum::HTp metertok = NULL);
+    template <class ELEMENT>
+    void setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok = NULL);
     template <class ELEMENT>
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>

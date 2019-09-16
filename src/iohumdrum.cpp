@@ -2751,6 +2751,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string timesig;
     hum::HTp timetok = NULL;
     std::string metersig;
+    hum::HTp metertok = NULL;
     int top = 0;
     int bot = 0;
 
@@ -2798,6 +2799,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             auto ploc = part->rfind(")");
             if (ploc != string::npos) {
                 metersig = part->substr(5, ploc - 5);
+                metertok = part;
             }
         }
         else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
@@ -2852,6 +2854,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     if (partstart->isMens()) {
         if ((!m_omet.empty()) && (partnumber == m_omet.back().first)) {
             metersig = *m_omet.back().second;
+            metertok = m_omet.back().second;
         }
     }
 
@@ -2899,20 +2902,20 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             setTimeSig(m_staffdef.back(), timesig, metersig, partstart, timetok);
         }
         if (metersig.size() > 0) {
-            setMeterSymbol(m_staffdef.back(), metersig, partstart);
+            setMeterSymbol(m_staffdef.back(), metersig, partstart, metertok);
         }
     }
     else {
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
             setTimeSig(m_staffdef.back(), "*M2/1", metersig, partstart);
-            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart, metertok);
         }
         else if ((primarymensuration == "C") || (primarymensuration == "c")) {
-            setTimeSig(m_staffdef.back(), "*M4/1", metersig, partstart);
+            setTimeSig(m_staffdef.back(), "*M4/1", metersig, partstart, metertok);
             setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
         else if ((primarymensuration == "O") || (primarymensuration == "o")) {
-            setTimeSig(m_staffdef.back(), "*M3/1", metersig, partstart);
+            setTimeSig(m_staffdef.back(), "*M3/1", metersig, partstart, metertok);
             setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
     }
@@ -3131,20 +3134,20 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 //
 
 template <class ELEMENT>
-void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart)
+void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart, hum::HTp metertok)
 {
     if ((partstart != NULL) && partstart->isMens()) {
-        setMensurationSymbol(element, metersig);
+        setMensurationSymbol(element, metersig, metertok);
         return;
     }
 
     // handle mensuration displays:
     if (metersig.find("C") != std::string::npos) {
-        setMensurationSymbol(element, metersig);
+        setMensurationSymbol(element, metersig, metertok);
         return;
     }
     if (metersig.find("O") != std::string::npos) {
-        setMensurationSymbol(element, metersig);
+        setMensurationSymbol(element, metersig, metertok);
         return;
     }
 
@@ -3188,12 +3191,16 @@ void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig,
 // HumdrumInput::setMensurationSymbol --
 //
 
-template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig)
+template <class ELEMENT>
+void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig, hum::HTp mensurtok)
 {
 
     Mensur *vrvmensur = getMensur(element);
     if (!vrvmensur) {
         return;
+    }
+    if (mensurtok) {
+        setLocationId(vrvmensur, mensurtok);
     }
 
     if (metersig.find('C') != std::string::npos) {
