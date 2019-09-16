@@ -16,6 +16,7 @@
 #include "barline.h"
 #include "beam.h"
 #include "beatrpt.h"
+#include "btrem.h"
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
