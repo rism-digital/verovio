@@ -3332,12 +3332,13 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
         keyvalue = -7;
     }
     else if (!bb && !eb && !ab && !db && !gb && !cb && !fb && !fs && !cs && !gs && !ds && !as && !es && !bs) {
-        // element->SetKeySig(KEYSIGNATURE_0); // what to do with this line?
+        // Assuming C major / A minor key signature.
         keyvalue = 0;
     }
     else {
-        // nonstandard keysignature, so give a NONE style.
-        // element->SetKeySig(KEYSIGNATURE_NONE); // what to do with this line?
+        // Non-standard keysignature, so give a NONE style (deal with it later).
+        KeySig *vrvkeysig = getKeySig(element);
+        vrvkeysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
         return;
     }
 
@@ -3353,29 +3354,19 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
 
     if ((keyvalue >= -7) && (keyvalue <= 7)) {
         std::string keystr = to_string(keyvalue);
-        vrvkeysig->SetSig(vrvkeysig->AttKeySigLog::StrToKeysignature(keystr));
-    }
-
-    /*
-        switch (keyvalue) {
-            case 0: element->SetKeySig(KEYSIGNATURE_0); break;
-            case +1: element->SetKeySig(KEYSIGNATURE_1s); break;
-            case -1: element->SetKeySig(KEYSIGNATURE_1f); break;
-            case +2: element->SetKeySig(KEYSIGNATURE_2s); break;
-            case -2: element->SetKeySig(KEYSIGNATURE_2f); break;
-            case +3: element->SetKeySig(KEYSIGNATURE_3s); break;
-            case -3: element->SetKeySig(KEYSIGNATURE_3f); break;
-            case +4: element->SetKeySig(KEYSIGNATURE_4s); break;
-            case -4: element->SetKeySig(KEYSIGNATURE_4f); break;
-            case +5: element->SetKeySig(KEYSIGNATURE_5s); break;
-            case -5: element->SetKeySig(KEYSIGNATURE_5f); break;
-            case +6: element->SetKeySig(KEYSIGNATURE_6s); break;
-            case -6: element->SetKeySig(KEYSIGNATURE_6f); break;
-            case +7: element->SetKeySig(KEYSIGNATURE_7s); break;
-            case -7: element->SetKeySig(KEYSIGNATURE_7f); break;
-            default: element->SetKeySig(KEYSIGNATURE_NONE);
+        if (keyvalue < 0) {
+            vrvkeysig->SetSig(std::make_pair(-keyvalue, ACCIDENTAL_WRITTEN_f));
         }
-    */
+        else if (keyvalue > 0) {
+            vrvkeysig->SetSig(std::make_pair(keyvalue, ACCIDENTAL_WRITTEN_s));
+        }
+        else if (keyvalue == 0) {
+            vrvkeysig->SetSig(std::make_pair(keyvalue, ACCIDENTAL_WRITTEN_NONE));
+        }
+        else {
+            vrvkeysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+        }
+    }
 
     if (secondary && (keyvalue == 0)) {
         // force cancellation keysignature.
