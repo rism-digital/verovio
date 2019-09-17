@@ -3565,10 +3565,10 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
 
 //////////////////////////////
 //
-// prepareNonStandardKeySignature(KeySig *vrvkeysig, std::string ks, hum::HTp keytok) {
+// prepareNonStandardKeySignature --
 //
 
-void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, std::string ks, hum::HTp keytok)
+void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::string &ks, hum::HTp keytok)
 {
     if (!vrvkeysig) {
         return;
