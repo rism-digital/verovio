@@ -2000,16 +2000,20 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                     if (textNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
                     }
-                    if (GetContentOfChild(lyric, "syllabic") == "begin") {
-                        syl->SetCon(sylLog_CON_d);
+                    if (GetContentOfChild(lyric, "syllabic") == "single") {
+                        syl->SetCon(sylLog_CON_s);
+                    }
+                    else if (GetContentOfChild(lyric, "syllabic") == "begin") {
                         syl->SetWordpos(sylLog_WORDPOS_i);
+                        syl->SetCon(sylLog_CON_d);
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "middle") {
-                        syl->SetCon(sylLog_CON_d);
                         syl->SetWordpos(sylLog_WORDPOS_m);
+                        syl->SetCon(sylLog_CON_d);
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
+                        syl->SetCon(sylLog_CON_s);
                     }
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
                     if (!textWeight.empty())
