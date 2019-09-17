@@ -2999,12 +2999,22 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (haslabel) {
-        setInstrumentName(m_staffdef.back(), label, labeltok);
+        if (hasIndent(labeltok)) {
+            setInstrumentName(m_staffdef.back(), "   ");
+        }
+        else {
+            setInstrumentName(m_staffdef.back(), label, labeltok);
+        }
     }
     else if (partnumber == 1) {
-        setInstrumentName(m_staffdef.back(), "   ");
+        if (hasIndent(partstart)) {
+            setInstrumentName(m_staffdef.back(), "   ");
+        }
         // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;");
         // setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
+    }
+    else if (hasIndent(partstart)) {
+        setInstrumentName(m_staffdef.back(), "   ");
     }
 
     if (keysig.size() > 0) {
@@ -3039,6 +3049,32 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     if (partstart->isMens()) {
         m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_white);
     }
+}
+
+//////////////////////////////
+//
+// hasIndent -- true if *indent tandem interpretation before first data token.
+//
+
+bool HumdrumInput::hasIndent(hum::HTp tok)
+{
+    hum::HTp current = tok;
+    while (current) {
+        if (!current->isInterpretation()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (*current == "*indent") {
+            return true;
+        }
+        if (*current == "*I\"") {
+            // alternate version (empty part name)
+            return true;
+        }
+        current = current->getNextToken();
+        continue;
+    }
+    return false;
 }
 
 //////////////////////////////

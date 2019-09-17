@@ -543,6 +543,7 @@ protected:
     std::string removeCommas(const std::string &input);
     void extractNullInformation(vector<bool> &nulls, hum::HumdrumFile &infile);
     void initializeIgnoreVector(hum::HumdrumFile &infile);
+    bool hasIndent(hum::HTp tok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

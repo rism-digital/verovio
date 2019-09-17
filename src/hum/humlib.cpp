@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Sep 16 13:32:10 PDT 2019
+// Last Modified: Mon Sep 16 13:54:18 PDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -37288,6 +37288,8 @@ bool Tool_composite::run(HumdrumFile& infile) {
 	initialize();
 	processFile(infile);
 	infile.createLinesFromTokens();
+	// need to convert to text for now:
+	m_humdrum_text << infile;
 	return true;
 }
 
@@ -37468,8 +37470,6 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 		autobeam.run(infile);
 	}
 
-	// need to convert to text for now:
-	m_humdrum_text << infile;
 
 }
 
