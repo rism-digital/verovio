@@ -64,6 +64,8 @@
 #include "harm.h"
 #include "instrdef.h"
 #include "iomei.h"
+#include "keyaccid.h"
+#include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
@@ -3459,81 +3461,62 @@ void HumdrumInput::setTimeSig(
 template <class ELEMENT>
 void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig, hum::HTp keytok, bool secondary)
 {
-    bool fs = keysig.find("f#") != string::npos;
-    bool cs = keysig.find("c#") != string::npos;
-    bool gs = keysig.find("g#") != string::npos;
-    bool ds = keysig.find("d#") != string::npos;
-    bool as = keysig.find("a#") != string::npos;
-    bool es = keysig.find("e#") != string::npos;
-    bool bs = keysig.find("b#") != string::npos;
 
-    bool bb = keysig.find("b-") != string::npos;
-    bool eb = keysig.find("e-") != string::npos;
-    bool ab = keysig.find("a-") != string::npos;
-    bool db = keysig.find("d-") != string::npos;
-    bool gb = keysig.find("g-") != string::npos;
-    bool cb = keysig.find("c-") != string::npos;
-    bool fb = keysig.find("f-") != string::npos;
-
-    int keyvalue = 0;
-    if (fs && !cs && !gs && !ds && !as && !es && !bs) {
-        keyvalue = 1;
-    }
-    else if (fs && cs && !gs && !ds && !as && !es && !bs) {
-        keyvalue = 2;
-    }
-    else if (fs && cs && gs && !ds && !as && !es && !bs) {
-        keyvalue = 3;
-    }
-    else if (fs && cs && gs && ds && !as && !es && !bs) {
-        keyvalue = 4;
-    }
-    else if (fs && cs && gs && ds && as && !es && !bs) {
-        keyvalue = 5;
-    }
-    else if (fs && cs && gs && ds && as && es && !bs) {
-        keyvalue = 6;
-    }
-    else if (fs && cs && gs && ds && as && es && bs) {
-        keyvalue = 7;
-    }
-    else if (bb && !eb && !ab && !db && !gb && !cb && !fb) {
-        keyvalue = -1;
-    }
-    else if (bb && eb && !ab && !db && !gb && !cb && !fb) {
-        keyvalue = -2;
-    }
-    else if (bb && eb && ab && !db && !gb && !cb && !fb) {
-        keyvalue = -3;
-    }
-    else if (bb && eb && ab && db && !gb && !cb && !fb) {
-        keyvalue = -4;
-    }
-    else if (bb && eb && ab && db && gb && !cb && !fb) {
-        keyvalue = -5;
-    }
-    else if (bb && eb && ab && db && gb && cb && !fb) {
-        keyvalue = -6;
-    }
-    else if (bb && eb && ab && db && gb && cb && fb) {
-        keyvalue = -7;
-    }
-    else if (!bb && !eb && !ab && !db && !gb && !cb && !fb && !fs && !cs && !gs && !ds && !as && !es && !bs) {
-        // Assuming C major / A minor key signature.
-        keyvalue = 0;
-    }
-    else {
-        // Non-standard keysignature, so give a NONE style (deal with it later).
-        KeySig *vrvkeysig = getKeySig(element);
-        if (keytok) {
-            setLocationId(vrvkeysig, keytok);
+    std::string ks = keysig;
+    auto pos = ks.find("]");
+    if (pos != std::string::npos) {
+        ks = ks.substr(0, pos);
+        pos = ks.find("[");
+        if (pos != std::string::npos) {
+            ks = ks.substr(pos + 1);
         }
-        vrvkeysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
-        return;
     }
 
-    if ((partindex >= 0) && (m_transpose[partindex] != 0)) {
-        keyvalue += hum::Convert::base40IntervalToLineOfFifths(m_transpose[partindex]);
+    int keynum = -1000;
+    if (ks == "") {
+        keynum = 0;
+    }
+    else if (ks == "b-") {
+        keynum = -1;
+    }
+    else if (ks == "f#") {
+        keynum = +1;
+    }
+    else if (ks == "b-e-") {
+        keynum = -2;
+    }
+    else if (ks == "f#c#") {
+        keynum = +2;
+    }
+    else if (ks == "b-e-a-") {
+        keynum = -3;
+    }
+    else if (ks == "f#c#g#") {
+        keynum = +3;
+    }
+    else if (ks == "b-e-a-d-") {
+        keynum = -4;
+    }
+    else if (ks == "f#c#g#d#") {
+        keynum = +4;
+    }
+    else if (ks == "b-e-a-d-g-") {
+        keynum = -5;
+    }
+    else if (ks == "f#c#g#d#a#") {
+        keynum = +5;
+    }
+    else if (ks == "b-e-a-d-g-c-") {
+        keynum = -6;
+    }
+    else if (ks == "f#c#g#d#a#e#") {
+        keynum = +6;
+    }
+    else if (ks == "b-e-a-d-g-c-f-") {
+        keynum = -7;
+    }
+    else if (ks == "f#c#g#d#a#e#b#") {
+        keynum = +7;
     }
 
     // Search for a KeySig child in StaffDef and add one if it does not exist.
@@ -3545,8 +3528,12 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
         setLocationId(vrvkeysig, keytok);
     }
 
-    if ((keyvalue >= -7) && (keyvalue <= 7)) {
-        std::string keystr = to_string(keyvalue);
+    int keyvalue = keynum;
+    if ((partindex >= 0) && (m_transpose[partindex] != 0)) {
+        keyvalue += hum::Convert::base40IntervalToLineOfFifths(m_transpose[partindex]);
+    }
+    if ((keyvalue >= -7) && (keyvalue <= +7)) {
+        // standard key signature
         if (keyvalue < 0) {
             vrvkeysig->SetSig(std::make_pair(-keyvalue, ACCIDENTAL_WRITTEN_f));
         }
@@ -3560,13 +3547,93 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
             vrvkeysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
         }
     }
+    else {
+        // Non-standard keysignature, so give a NONE style (deal with it later).
+        prepareNonStandardKeySignature(vrvkeysig, ks, keytok);
+        return;
+    }
 
     if (secondary && (keyvalue == 0)) {
-        // force cancellation keysignature.
+        // Force cancellation keysignature when there are no
+        // sharps/flats in key signature change.
         vrvkeysig->SetSigShowchange(BOOLEAN_true);
     }
     else if (m_show_cautionary_keysig) {
         vrvkeysig->SetSigShowchange(BOOLEAN_true);
+    }
+}
+
+//////////////////////////////
+//
+// prepareNonStandardKeySignature(KeySig *vrvkeysig, std::string ks, hum::HTp keytok) {
+//
+
+void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, std::string ks, hum::HTp keytok)
+{
+    if (!vrvkeysig) {
+        return;
+    }
+    std::vector<std::string> pieces;
+
+    for (int i = 0; i < (int)ks.size(); i++) {
+        if ((ks[i] >= 'a') && (ks[i] <= 'g')) {
+            pieces.resize(pieces.size() + 1);
+        }
+        if (pieces.size() == 0) {
+            continue;
+        }
+        pieces.back() += ks[i];
+    }
+
+    for (int i = 0; i < (int)pieces.size(); i++) {
+        if (pieces[i].empty()) {
+            // strange error, ignore
+            continue;
+        }
+        KeyAccid *kacc = new KeyAccid;
+        vrvkeysig->AddChild(kacc);
+
+        int pclass = pieces[i][0] - 'a';
+        switch (pclass) {
+            case 0: kacc->SetPname(PITCHNAME_a); break;
+            case 1: kacc->SetPname(PITCHNAME_b); break;
+            case 2: kacc->SetPname(PITCHNAME_c); break;
+            case 3: kacc->SetPname(PITCHNAME_d); break;
+            case 4: kacc->SetPname(PITCHNAME_e); break;
+            case 5: kacc->SetPname(PITCHNAME_f); break;
+            case 6: kacc->SetPname(PITCHNAME_g); break;
+        }
+
+        for (int j = 0; j < (int)pieces[i].size(); j++) {
+            if (std::isdigit(pieces[i][j])) {
+                int octave = pieces[i][j] - '0';
+                kacc->SetOct(octave);
+                break;
+            }
+        }
+
+        if (pieces[i].find("##") != std::string::npos) {
+            kacc->SetAccid(ACCIDENTAL_WRITTEN_x);
+        }
+        else if (pieces[i].find("--") != std::string::npos) {
+            kacc->SetAccid(ACCIDENTAL_WRITTEN_ff);
+        }
+        else if (pieces[i].find("#") != std::string::npos) {
+            kacc->SetAccid(ACCIDENTAL_WRITTEN_s);
+        }
+        else if (pieces[i].find("-") != std::string::npos) {
+            kacc->SetAccid(ACCIDENTAL_WRITTEN_f);
+        }
+        else if (pieces[i].find("n") != std::string::npos) {
+            kacc->SetAccid(ACCIDENTAL_WRITTEN_n);
+        }
+        else {
+            kacc->SetAccid(ACCIDENTAL_WRITTEN_n);
+        }
+
+        if (pieces[i].find("X") != std::string::npos) {
+            kacc->SetEnclose(ENCLOSURE_brack);
+        }
     }
 }
 
