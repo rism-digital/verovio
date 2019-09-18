@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for non-standard keys from MusicXML (@rettinghaus)
 * Support for `<graceGrp>` (@rettinghaus)
 * Support for `<keyAccid>` for custom key signatures
 * Support for `@vel` on `<note>` in MIDI playback (@rettinghaus)
