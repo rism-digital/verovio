@@ -33,6 +33,7 @@
 #include "hairpin.h"
 #include "harm.h"
 #include "instrdef.h"
+#include "keyaccid.h"
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
@@ -784,9 +785,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
 
             // key sig
             KeySig *keySig = NULL;
-            pugi::xpath_node key;
             xpath = StringFormat("key[@number='%d']", i + 1);
-            key = it->select_node(xpath.c_str());
+            pugi::xpath_node key = it->select_node(xpath.c_str());
             if (!key) {
                 key = it->select_node("key");
             }
@@ -803,8 +803,23 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         keySigStr = "0";
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
                 }
-                else if (key.node().select_node("key-step")) {
+                else if (key.node().child("key-step")) {
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
+                    for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
+                         keyStep = keyStep.next_sibling("key-step")) {
+                        KeyAccid *keyAccid = new KeyAccid();
+                        keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
+                        if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
+                            data_ACCIDENTAL_GESTURAL accidValue
+                            = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                            keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
+                            if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
+                                keyAccid->SetAccid(
+                                    ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                            }
+                        }
+                        keySig->AddChild(keyAccid);
+                    }
                 }
                 if (key.node().select_node("mode")) {
                     keySig->SetMode(
@@ -813,8 +828,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // add it if necessary
             if (keySig) {
-                // Make it an attribute for now
-                keySig->IsAttribute(true);
                 staffDef->AddChild(keySig);
             }
 
@@ -1165,7 +1178,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         KeySig *keySig = NULL;
         if (key.node().select_node("fifths")) {
             if (!keySig) keySig = new KeySig();
-            int fifths = atoi(key.node().select_node("fifths").node().text().as_string());
+            int fifths = key.node().select_node("fifths").node().text().as_int();
             std::string keySigStr;
             if (fifths < 0)
                 keySigStr = StringFormat("%df", abs(fifths));
@@ -1175,9 +1188,23 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 keySigStr = "0";
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
-        else if (key.node().select_node("key-step")) {
-            if (!keySig) keySig = new KeySig();
+        else if (key.node().child("key-step")) {
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
+            for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
+                 keyStep = keyStep.next_sibling("key-step")) {
+                KeyAccid *keyAccid = new KeyAccid();
+                keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
+                if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
+                    data_ACCIDENTAL_GESTURAL accidValue
+                    = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                    keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
+                    if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
+                        keyAccid->SetAccid(
+                                           ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                    }
+                }
+                keySig->AddChild(keyAccid);
+            }
         }
         if (key.node().select_node("mode")) {
             if (!keySig) keySig = new KeySig();
@@ -2423,17 +2450,25 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {
     if (value == "sharp") return ACCIDENTAL_WRITTEN_s;
-    if (value == "natural") return ACCIDENTAL_WRITTEN_n;
-    if (value == "flat") return ACCIDENTAL_WRITTEN_f;
-    if (value == "double-sharp") return ACCIDENTAL_WRITTEN_x;
-    if (value == "sharp-sharp") return ACCIDENTAL_WRITTEN_ss;
-    if (value == "flat-flat") return ACCIDENTAL_WRITTEN_ff;
-    if (value == "natural-sharp") return ACCIDENTAL_WRITTEN_ns;
-    if (value == "natural-flat") return ACCIDENTAL_WRITTEN_nf;
-    if (value == "quarter-flat") return ACCIDENTAL_WRITTEN_1qf;
-    if (value == "quarter-sharp") return ACCIDENTAL_WRITTEN_1qs;
-    if (value == "three-quarters-flat") return ACCIDENTAL_WRITTEN_3qf;
-    if (value == "three-quarters-sharp") return ACCIDENTAL_WRITTEN_3qs;
+    else if (value == "natural") return ACCIDENTAL_WRITTEN_n;
+    else if (value == "flat") return ACCIDENTAL_WRITTEN_f;
+    else if (value == "double-sharp") return ACCIDENTAL_WRITTEN_x;
+    else if (value == "sharp-sharp") return ACCIDENTAL_WRITTEN_ss;
+    else if (value == "flat-flat") return ACCIDENTAL_WRITTEN_ff;
+    else if (value == "natural-sharp") return ACCIDENTAL_WRITTEN_ns;
+    else if (value == "natural-flat") return ACCIDENTAL_WRITTEN_nf;
+    else if (value == "quarter-flat") return ACCIDENTAL_WRITTEN_1qf;
+    else if (value == "quarter-sharp") return ACCIDENTAL_WRITTEN_1qs;
+    else if (value == "three-quarters-flat") return ACCIDENTAL_WRITTEN_3qf;
+    else if (value == "three-quarters-sharp") return ACCIDENTAL_WRITTEN_3qs;
+    else if (value == "sharp-down") return ACCIDENTAL_WRITTEN_sd;
+    else if (value == "sharp-up") return ACCIDENTAL_WRITTEN_su;
+    else if (value == "natural-down") return ACCIDENTAL_WRITTEN_nd;
+    else if (value == "natural-up") return ACCIDENTAL_WRITTEN_nu;
+    else if (value == "flat-down") return ACCIDENTAL_WRITTEN_fd;
+    else if (value == "flat-up") return ACCIDENTAL_WRITTEN_fu;
+    else if (value == "triple-sharp") return ACCIDENTAL_WRITTEN_ts;
+    else if (value == "triple-flat") return ACCIDENTAL_WRITTEN_tf;
     LogWarning("MusicXML import: Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
 }
@@ -2449,7 +2484,7 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(float value)
     if (value == 1) return ACCIDENTAL_GESTURAL_s;
     if (value == 1.5) return ACCIDENTAL_GESTURAL_su;
     if (value == 2) return ACCIDENTAL_GESTURAL_ss;
-    LogWarning("MusicXML import: Unsupported alter value '%d'", value);
+    LogWarning("MusicXML import: Unsupported alter value '%.1f'", value);
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
