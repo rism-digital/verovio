@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Sep 16 13:54:18 PDT 2019
+// Last Modified: Fri Sep 20 06:46:55 PDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -32569,7 +32569,6 @@ void Tool_autobeam::addBeam(HTp startnote, HTp endnote) {
 
 void Tool_autobeam::removeEdgeRests(HTp& startnote, HTp& endnote) {
 	HTp current = startnote;
-	HTp previous = startnote;;
 
 	int startindex = startnote->getLineIndex();
 	int endindex = endnote->getLineIndex();
@@ -32582,7 +32581,6 @@ void Tool_autobeam::removeEdgeRests(HTp& startnote, HTp& endnote) {
 				startnote = current;
 				return;
 			}
-			previous = current;
 			current = current->getNextNNDT();
 		}
 
@@ -32596,7 +32594,6 @@ void Tool_autobeam::removeEdgeRests(HTp& startnote, HTp& endnote) {
 
 	if (endnote->isRest()) {
 		HTp newcurrent = endnote;
-		previous = endnote;
 
 		newcurrent = newcurrent->getPreviousNNDT();
 		while (newcurrent && newcurrent->isRest()) {
@@ -32604,7 +32601,6 @@ void Tool_autobeam::removeEdgeRests(HTp& startnote, HTp& endnote) {
 				endnote = newcurrent;
 				return;
 			}
-			previous = newcurrent;
 			newcurrent = newcurrent->getPreviousNNDT();
 		}
 
@@ -37333,7 +37329,7 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 		if (durations[i] == 0) {
 			continue;
 		}
-		bool allnull = true;
+		// bool allnull = true;
 		bool allrest = true;
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp tok = infile.token(i, j);
@@ -37341,12 +37337,12 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 				continue;
 			}
 			if (tok->isNote()) {
-				allnull = false;
+				// allnull = false;
 				allrest = false;
 				break;
 			}
 			if (tok->isRest()) {
-				allnull = false;
+				// allnull = false;
 			}
 		}
 		if (allrest) {
@@ -40360,7 +40356,7 @@ void Tool_esac2hum::convertSong(vector<string>& song, ostream& out) {
 	string key;
 	double mindur = 1.0;
 	string meter;
-	int tonic;
+	int tonic = 0;
 	getKeyInfo(song, key, mindur, tonic, meter, out);
 
 	vector<NoteData> songdata;
@@ -44195,7 +44191,7 @@ void Tool_homophonic::processFile(HumdrumFile& infile) {
 	vector<double> score(infile.getLineCount(), 0);
 	vector<double> raw(infile.getLineCount(), 0);
 
-	double sum;
+	double sum = 0.0;
 	for (int i=0; i<(int)data.size(); i++) {
 		if (m_homophonic[data[i]].find("Y") != string::npos) {
 			if (m_homophonic[data[i]].find("N") != string::npos) {
@@ -55192,7 +55188,7 @@ void Tool_musicxml2hum::insertPartOttavas(xml_node ottava, GridPart& part, int p
 		return;
 	}
 
-	HTp token;
+	HTp token = NULL;
 	int staffnum = 0;
 	while (ottava) {
 		ottava = convertOttavaToHumdrum(ottava, token, staffnum, partindex, partstaffindex, staffcount);
@@ -55391,7 +55387,7 @@ void Tool_musicxml2hum::insertPartMensurations(xml_node timesig,
 		return;
 	}
 
-	HTp token;
+	HTp token = NULL;
 	int staffnum = 0;
 
 	while (timesig) {
