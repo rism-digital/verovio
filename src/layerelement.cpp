@@ -1283,7 +1283,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 {
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->IsGraceNote()) {
+    if (this->IsGraceNote() || this->GetFirstParent(GRACEGRP)) {
         m_drawingCueSize = true;
     }
     // This cover the case when the @size is given on the element
