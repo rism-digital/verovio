@@ -925,8 +925,8 @@ void MeiOutput::WriteExpansion(pugi::xml_node currentNode, Expansion *expansion)
 {
     assert(expansion);
 
-    WritePlistInterface(currentNode, expansion);
     WriteSystemElement(currentNode, expansion);
+    WritePlistInterface(currentNode, expansion);
 }
 
 void MeiOutput::WritePb(pugi::xml_node currentNode, Pb *pb)
@@ -2595,8 +2595,14 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     success = ReadMdivChildren(m_doc, body, false);
     
     // WG
+    LogMessage("iomei: renderExpansion: %s.", m_doc->GetOptions()->m_renderExpansion.Option::GetStrValue().c_str());
     const vrv::ArrayOfObjects * mdivs = m_doc->GetChildren();
+    //Score *score = m_doc->GetScore();
+    //Section *sect = dynamic_cast<Section *>(score->GetChild(1));
+    //Section *newsect = sect;
+    //score->AddChild(newsect);
     m_doc->process(mdivs, 0, "");
+    // WG
     
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
@@ -2884,7 +2890,8 @@ bool MeiInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 {
     Expansion *vrvExpansion = new Expansion();
     ReadSystemElement(expansion, vrvExpansion);
-
+    ReadPlistInterface(expansion, vrvExpansion);
+    
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);
     if (m_readingScoreBased)

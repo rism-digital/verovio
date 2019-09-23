@@ -18,6 +18,7 @@
 #include "beatrpt.h"
 #include "chord.h"
 #include "comparison.h"
+#include "expansion.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
@@ -43,6 +44,7 @@
 #include "pghead2.h"
 #include "runningelement.h"
 #include "score.h"
+#include "section.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -1591,9 +1593,24 @@ void Doc::process(const vrv::ArrayOfObjects * arr, int index, std::string indent
     if (arr->at(index)->Is(MEASURE))
     {
         Measure *m = dynamic_cast<Measure*>(arr->at(index));
-        LogMessage("%sMEASURE found: %s (n=%s)", indent.c_str(), m->GetUuid().c_str(), m->GetN().c_str());
-        //return;
+        Measure *m1 = m;
+        m->GetParent()->AddChild(m1);
+        //LogMessage("%sMEASURE found: %s (n=%s)", indent.c_str(), m->GetUuid().c_str(), m->GetN().c_str());
+        return;
     }
+    else if (arr->at(index)->Is(EXPANSION)) {
+        Expansion *e = dynamic_cast<Expansion *>(arr->at(index));
+        xsdAnyURI_List expansionList = e->GetPlist();
+        LogMessage("XXXXX Expansion: %s type: %s", arr->at(index)->GetUuid().c_str(), e->GetType().c_str());
+        for (std::string s : expansionList)
+            printf("%s, ", s.c_str());
+        printf("\n");
+    }
+    //else if (arr->at(index)->Is(SECTION)) {
+    //    Section *s = dynamic_cast<Section *>(arr->at(index));
+    //    Section *s1 = s;
+    //    s->GetParent()->AddChild(s1);
+    //}
     else if (arr->at(index)->GetChildren() != NULL)
     {
         //LogMessage("Going to deeper layer.");

@@ -1007,9 +1007,10 @@ void Toolkit::RedoPagePitchPosLayout()
     
 bool Toolkit::RenderExpansion()
 {
-    const vrv::ArrayOfObjects * mdivs = m_doc.GetChildren();
-    LogMessage("DocType %d: \n", m_doc.GetType());
-    m_doc.process(mdivs, 0, "");
+    //WG
+    //const vrv::ArrayOfObjects * mdivs = m_doc.GetChildren();
+    //LogMessage("DocType %d: \n", m_doc.GetType());
+    //m_doc.process(mdivs, 0, "");
     return true;
 }
     
