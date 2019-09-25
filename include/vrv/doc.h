@@ -120,10 +120,17 @@ public:
      */
     bool GetMidiExportDone() const;
 
+    const vrv::ArrayOfObjects *extracted(const vrv::ArrayOfObjects *arr, int index);
+
     /**
      * WG: process recursion
      */
-    void process(const vrv::ArrayOfObjects * array, int index, std::string indent);
+    void process(const vrv::ArrayOfObjects *array, int index, std::string indent);
+
+    /**
+     * WG: render expansion recursion
+     */
+    xsdAnyURI_List renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
 
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes

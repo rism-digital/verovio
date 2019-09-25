@@ -2593,17 +2593,28 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     success = ReadMdivChildren(m_doc, body, false);
-    
+
     // WG
-    LogMessage("iomei: renderExpansion: %s.", m_doc->GetOptions()->m_renderExpansion.Option::GetStrValue().c_str());
-    const vrv::ArrayOfObjects * mdivs = m_doc->GetChildren();
-    //Score *score = m_doc->GetScore();
-    //Section *sect = dynamic_cast<Section *>(score->GetChild(1));
-    //Section *newsect = sect;
-    //score->AddChild(newsect);
-    m_doc->process(mdivs, 0, "");
+    std::string expansionId = m_doc->GetOptions()->m_renderExpansion.GetValue();
+    if (!expansionId.empty()) {
+        Expansion *start = dynamic_cast<Expansion *>(m_doc->FindChildByUuid(expansionId));
+        if (start == NULL) {
+            LogMessage("iomei: expansion ID \"%s\" not found.", expansionId.c_str());
+        }
+        else {
+            xsdAnyURI_List expansionList = start->GetPlist();
+            LogMessage("XXXXX START Expansion: %s plist={", expansionId.c_str());
+            for (std::string s : expansionList) printf("%s, ", s.c_str());
+            printf("}\n");
+            xsdAnyURI_List existingList;
+            existingList = m_doc->renderExpansion(expansionList, existingList, start);
+            LogMessage("XXXXX END ExistingList={", expansionId.c_str());
+            for (std::string s : existingList) printf("%s, ", s.c_str());
+            printf("}\n");
+        }
+    }
     // WG
-    
+
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
         m_doc->ConvertAnalyticalMarkupDoc();
@@ -2891,7 +2902,7 @@ bool MeiInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
     Expansion *vrvExpansion = new Expansion();
     ReadSystemElement(expansion, vrvExpansion);
     ReadPlistInterface(expansion, vrvExpansion);
-    
+
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);
     if (m_readingScoreBased)
@@ -4056,11 +4067,11 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
     }
 
-    //if the current parent is a syllable then we need to make sure that a syl got added
-    //if not then add a blank one
+    // if the current parent is a syllable then we need to make sure that a syl got added
+    // if not then add a blank one
     if (strcmp(parentNode.name(), "syllable") == 0) {
         auto testSyl = parent->FindChildByType(SYL);
-        if(testSyl == NULL) {
+        if (testSyl == NULL) {
             Syl *syl = new Syl();
             parent->AddChild(syl);
         }
@@ -4557,14 +4568,14 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 
     parent->AddChild(vrvSyllable);
 
-    //read all of the syllables elements
-    //and add an empty <syl> if it doesn't have one
-    if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
+    // read all of the syllables elements
+    // and add an empty <syl> if it doesn't have one
+    if ((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
 
         Object *obj = vrvSyllable->FindChildByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
 
-        if(syl == NULL) {
+        if (syl == NULL) {
             syl = new Syl();
             vrvSyllable->AddChild(syl);
         }

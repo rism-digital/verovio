@@ -1520,7 +1520,8 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+        return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
 
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
@@ -1530,7 +1531,8 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+        return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
@@ -1586,44 +1588,66 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
-void Doc::process(const vrv::ArrayOfObjects * arr, int index, std::string indent) {
+
+void Doc::process(const vrv::ArrayOfObjects *arr, int index, std::string indent)
+{
     if (arr->size() == 0) return;
     LogMessage("%s%s (%d)", indent.c_str(), arr->at(index)->GetUuid().c_str(), arr->at(index)->GetIdx());
-    if (arr->at(index)->Is(MEASURE))
-    {
-        Measure *m = dynamic_cast<Measure*>(arr->at(index));
-        Measure *m1 = m;
-        m->GetParent()->AddChild(m1);
-        //LogMessage("%sMEASURE found: %s (n=%s)", indent.c_str(), m->GetUuid().c_str(), m->GetN().c_str());
+    if (arr->at(index)->Is(MEASURE)) {
+        Measure *m = dynamic_cast<Measure *>(arr->at(index));
+        // Measure *m1 = m;
+        // m->GetParent()->AddChild(m1);
+        LogMessage("%sMEASURE found: %s (n=%s)", indent.c_str(), m->GetUuid().c_str(), m->GetN().c_str());
         return;
     }
     else if (arr->at(index)->Is(EXPANSION)) {
         Expansion *e = dynamic_cast<Expansion *>(arr->at(index));
         xsdAnyURI_List expansionList = e->GetPlist();
         LogMessage("XXXXX Expansion: %s type: %s", arr->at(index)->GetUuid().c_str(), e->GetType().c_str());
-        for (std::string s : expansionList)
-            printf("%s, ", s.c_str());
+        for (std::string s : expansionList) printf("%s, ", s.c_str());
         printf("\n");
     }
-    //else if (arr->at(index)->Is(SECTION)) {
+    // else if (arr->at(index)->Is(SECTION)) {
     //    Section *s = dynamic_cast<Section *>(arr->at(index));
     //    Section *s1 = s;
     //    s->GetParent()->AddChild(s1);
     //}
-    else if (arr->at(index)->GetChildren() != NULL)
-    {
-        //LogMessage("Going to deeper layer.");
+    else if (arr->at(index)->GetChildren() != NULL) {
+        // LogMessage("Going to deeper layer.");
         process(arr->at(index)->GetChildren(), 0, indent.append("..")); // start to crawl at a deeper layer
     }
     if (index < arr->size() - 1) {
-        //LogMessage("Incrementing.");
-        process(arr, index + 1, indent.substr(0,indent.size()));
+        // LogMessage("Incrementing.");
+        process(arr, index + 1, indent.substr(0, indent.size()));
     }
     else {
-        //indent = indent.substr(0, indent.size()-3);
+        // indent = indent.substr(0, indent.size()-3);
         return;
     }
+}
+
+xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection)
+{
+    for (std::string s : expansionList) {
+        if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1);
+        Object *currSection = this->FindChildByUuid(s);
+        if (currSection->Is(EXPANSION)) {
+            existingList
+                = Doc::renderExpansion(dynamic_cast<Expansion *>(currSection)->GetPlist(), existingList, prevSection);
+        }
+        else {
+            if (std::find(existingList.begin(), existingList.end(), s) != existingList.end()) { // el exists in list
+                // dont add to eisting List, but add after element
+                LogMessage("Element <%s> to be added again after <%s>.", s.c_str(), prevSection->GetUuid().c_str());
+            }
+            else { // add to existingList, remember previous element, but do nothing else
+                LogMessage("Element <%s> already there.", s.c_str());
+                prevSection = currSection;
+                existingList.push_back(s);
+            }
+        }
+    }
+    return existingList;
 }
 
 } // namespace vrv
