@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <regex>
 
 //----------------------------------------------------------------------------
 
@@ -1600,12 +1601,23 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
         }
         else {
             if (std::find(existingList.begin(), existingList.end(), s) != existingList.end()) { // el exists in list
-                // dont add to eisting List, but add after element
+                // dont add to existing List, but add after element
                 LogMessage("%s <%s> to be added again after <%s>.", currSect->GetClassName().c_str(), s.c_str(),
                     prevSect->GetUuid().c_str());
                 MeiOutput meioutput(this, "");
                 std::string mei = meioutput.GetOutput(currSect);
-                LogMessage("MEI Code: %s.", mei.c_str());
+                //
+                std::string tmp = mei;
+                std::smatch match;
+                std::regex e("<(\\d+?\\w)xml:id=\"[a-zA-Z0-9_:.-]+?\""); // match xml:id, but avoid "#"
+                while (std::regex_search(tmp, match, e)) {
+                    for (std::string x : match) {
+                        LogMessage("Match: %s", x.c_str());
+                        LogMessage("Match: %s", x.substr(8, x.size() - 9).c_str());
+                    }
+                    tmp = match.suffix().str();
+                }
+                // LogMessage("MEI Code: %s.", mei.c_str());
             }
             else { // add to existingList, remember previous element, but do nothing else
                 LogMessage("%s <%s> already there.", currSect->GetClassName().c_str(), s.c_str());
