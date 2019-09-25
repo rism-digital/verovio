@@ -22,6 +22,7 @@
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
+#include "iomei.h"
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
@@ -1589,23 +1590,26 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection)
+xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSect)
 {
     for (std::string s : expansionList) {
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1);
-        Object *currSection = this->FindChildByUuid(s);
-        if (currSection->Is(EXPANSION)) {
-            existingList
-                = Doc::renderExpansion(dynamic_cast<Expansion *>(currSection)->GetPlist(), existingList, prevSection);
+        Object *currSect = this->FindChildByUuid(s);
+        if (currSect->Is(EXPANSION)) {
+            existingList = renderExpansion(dynamic_cast<Expansion *>(currSect)->GetPlist(), existingList, prevSect);
         }
         else {
             if (std::find(existingList.begin(), existingList.end(), s) != existingList.end()) { // el exists in list
                 // dont add to eisting List, but add after element
-                LogMessage("Element <%s> to be added again after <%s>.", s.c_str(), prevSection->GetUuid().c_str());
+                LogMessage("%s <%s> to be added again after <%s>.", currSect->GetClassName().c_str(), s.c_str(),
+                    prevSect->GetUuid().c_str());
+                MeiOutput meioutput(this, "");
+                std::string mei = meioutput.GetOutput(currSect);
+                LogMessage("MEI Code: %s.", mei.c_str());
             }
             else { // add to existingList, remember previous element, but do nothing else
-                LogMessage("Element <%s> already there.", s.c_str());
-                prevSection = currSection;
+                LogMessage("%s <%s> already there.", currSect->GetClassName().c_str(), s.c_str());
+                prevSect = currSect;
                 existingList.push_back(s);
             }
         }

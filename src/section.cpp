@@ -70,6 +70,17 @@ void Section::AddChild(Object *child)
     Modify();
 }
 
+// WG
+Object *Section::Clone()
+{
+    Section *section = new Section();
+    for (Object *o : *this->GetChildren()) {
+        section->AddChild(o->Clone());
+    }
+    return section;
+}
+// WG
+
 //----------------------------------------------------------------------------
 // Section functor methods
 //----------------------------------------------------------------------------

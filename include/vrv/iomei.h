@@ -138,7 +138,6 @@ class Unclear;
 class Verse;
 class Zone;
 
-
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
@@ -177,11 +176,14 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
+     * Return the output of element as a string by writing it to the stringstream member.
+     */
+    std::string GetOutput(Object *object);
+
+    /**
      * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
-
-
 
 private:
     bool WriteDoc(Doc *doc);

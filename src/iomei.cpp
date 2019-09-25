@@ -228,6 +228,20 @@ std::string MeiOutput::GetOutput(int page)
     return m_streamStringOutput.str();
 }
 
+// WG
+std::string MeiOutput::GetOutput(Object *object)
+{
+    m_writeToStreamString = true;
+    SetScoreBasedMEI(true);
+    pugi::xml_document doc;
+    m_currentNode = doc.append_child(object->GetClassName().c_str());
+    object->Save(this);
+    m_writeToStreamString = false;
+    doc.save(m_streamStringOutput, "   ");
+    return m_streamStringOutput.str();
+}
+// WG
+
 bool MeiOutput::WriteObject(Object *object)
 {
     if (object->HasComment()) {
@@ -925,8 +939,8 @@ void MeiOutput::WriteExpansion(pugi::xml_node currentNode, Expansion *expansion)
 {
     assert(expansion);
 
-    WriteSystemElement(currentNode, expansion);
     WritePlistInterface(currentNode, expansion);
+    WriteSystemElement(currentNode, expansion);
 }
 
 void MeiOutput::WritePb(pugi::xml_node currentNode, Pb *pb)
