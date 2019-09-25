@@ -1609,7 +1609,7 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                 //
                 std::string tmp = mei;
                 std::smatch match;
-                std::regex e("<(\\d+?\\w)xml:id=\"[a-zA-Z0-9_:.-]+?\""); // match xml:id, but avoid "#"
+                std::regex e("xml:id=\"[a-zA-Z0-9_:.-]+?\""); // match xml:id, but avoid "#"
                 while (std::regex_search(tmp, match, e)) {
                     for (std::string x : match) {
                         LogMessage("Match: %s", x.c_str());
