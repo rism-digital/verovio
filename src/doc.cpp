@@ -1589,43 +1589,6 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-void Doc::process(const vrv::ArrayOfObjects *arr, int index, std::string indent)
-{
-    if (arr->size() == 0) return;
-    LogMessage("%s%s (%d)", indent.c_str(), arr->at(index)->GetUuid().c_str(), arr->at(index)->GetIdx());
-    if (arr->at(index)->Is(MEASURE)) {
-        Measure *m = dynamic_cast<Measure *>(arr->at(index));
-        // Measure *m1 = m;
-        // m->GetParent()->AddChild(m1);
-        LogMessage("%sMEASURE found: %s (n=%s)", indent.c_str(), m->GetUuid().c_str(), m->GetN().c_str());
-        return;
-    }
-    else if (arr->at(index)->Is(EXPANSION)) {
-        Expansion *e = dynamic_cast<Expansion *>(arr->at(index));
-        xsdAnyURI_List expansionList = e->GetPlist();
-        LogMessage("XXXXX Expansion: %s type: %s", arr->at(index)->GetUuid().c_str(), e->GetType().c_str());
-        for (std::string s : expansionList) printf("%s, ", s.c_str());
-        printf("\n");
-    }
-    // else if (arr->at(index)->Is(SECTION)) {
-    //    Section *s = dynamic_cast<Section *>(arr->at(index));
-    //    Section *s1 = s;
-    //    s->GetParent()->AddChild(s1);
-    //}
-    else if (arr->at(index)->GetChildren() != NULL) {
-        // LogMessage("Going to deeper layer.");
-        process(arr->at(index)->GetChildren(), 0, indent.append("..")); // start to crawl at a deeper layer
-    }
-    if (index < arr->size() - 1) {
-        // LogMessage("Incrementing.");
-        process(arr, index + 1, indent.substr(0, indent.size()));
-    }
-    else {
-        // indent = indent.substr(0, indent.size()-3);
-        return;
-    }
-}
-
 xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection)
 {
     for (std::string s : expansionList) {

@@ -2594,7 +2594,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     success = ReadMdivChildren(m_doc, body, false);
 
-    // WG
+    // WG: render expansion ID, given by command line argument
     std::string expansionId = m_doc->GetOptions()->m_renderExpansion.GetValue();
     if (!expansionId.empty()) {
         Expansion *start = dynamic_cast<Expansion *>(m_doc->FindChildByUuid(expansionId));
