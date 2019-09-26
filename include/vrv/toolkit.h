@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-    
+
 class EditorToolkit;
 
 enum FileFormat {
@@ -122,13 +122,8 @@ public:
      * This is used only for Emscripten-based compilation.
      */
     void ResetLogBuffer();
-    
+
     /**
-     * Render the expansion element plist information
-     */
-    bool RenderExpansion();
-    
-     /**
      * Render the page to the deviceContext.
      * Page number is 1-based.
      */
@@ -185,6 +180,16 @@ public:
      * Return element attributes as a JSON string
      */
     std::string GetElementAttr(const std::string &xmlId);
+
+    /**
+     * Returns the ID string of the notated (the original) element
+     */
+    std::string getNotatedIdForElement(const std::string &xmlId);
+
+    /**
+     * Returns a vector of ID strings of all elements (the notated and the expanded) for a given element
+     */
+    std::vector<std::string> getExpansionIdsForElement(const std::string &xmlId);
 
     /**
      * Redo the layout of the loaded data.

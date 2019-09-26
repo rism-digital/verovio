@@ -127,6 +127,8 @@ public:
      */
     xsdAnyURI_List renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
 
+    void ReplaceStringInPlace(std::string &subject, const std::string &search, const std::string &replace);
+
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
@@ -409,6 +411,14 @@ public:
     /** Record notation type for document */
     data_NOTATIONTYPE m_notationType;
 
+    /** A flag to indicate whether the expansionMap has been created */
+    bool m_hasExpansionMap = false;
+
+    /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
+    std::vector<std::vector<std::string> > m_expansionMap;
+
+    std::vector<std::string> getExpansionIdsForElement(const std::string &xmlId);
+
 private:
     /**
      * The type of document indicates how to deal with the layout information.
@@ -500,6 +510,9 @@ private:
 
     /** Facsimile information */
     Facsimile *m_facsimile = NULL;
+
+    /** Ads an id string to an original/notated id */
+    bool addExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId);
 };
 
 } // namespace vrv

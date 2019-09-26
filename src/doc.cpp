@@ -1604,20 +1604,41 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                 // dont add to existing List, but add after element
                 LogMessage("%s <%s> to be added again after <%s>.", currSect->GetClassName().c_str(), s.c_str(),
                     prevSect->GetUuid().c_str());
-                MeiOutput meioutput(this, "");
-                std::string mei = meioutput.GetOutput(currSect);
+                MeiOutput meiOutput(this, "");
+                std::string mei = meiOutput.GetOutput(currSect);
+                // LogMessage("\n\nold MEI Code: %s.\n", mei.c_str());
                 //
+                std::string elementName, oldId, newId;
                 std::string tmp = mei;
-                std::smatch match;
-                std::regex e("xml:id=\"[a-zA-Z0-9_:.-]+?\""); // match xml:id, but avoid "#"
-                while (std::regex_search(tmp, match, e)) {
-                    for (std::string x : match) {
-                        LogMessage("Match: %s", x.c_str());
-                        LogMessage("Match: %s", x.substr(8, x.size() - 9).c_str());
+                std::smatch lineMatch, elementMatch, idMatch;
+                std::regex lineE("<[a-zA-Z0-9_-.]+? xml:id=\"[a-zA-Z0-9_:.-]+?\""); // match element plus xml:id
+                while (std::regex_search(tmp, lineMatch, lineE)) {
+                    for (std::string x : lineMatch) { // go through all found xml:id without "#"
+                        std::regex elementE("<[a-zA-Z0-9_-.]+? ");
+                        std::regex_search(x, elementMatch, elementE);
+                        elementName = elementMatch.str();
+                        elementName = elementName.substr(1, elementName.size() - 2);
+                        std::regex idE(" xml:id=\"[a-zA-Z0-9_:.-]+?\"");
+                        std::regex_search(x, idMatch, idE);
+                        oldId = idMatch.str();
+                        oldId = oldId.substr(9, oldId.size() - 10);
+                        // oldId = x.substr(8, x.size() - 9);
+                        char str[17];
+                        snprintf(str, 17, "%016d", std::rand());
+                        newId = std::string(elementName + "-" + str);
+                        this->addExpandedIdToExpansionMap(oldId, newId);
+                        std::smatch replaceMatch;
+                        // std::regex // TODO: make a regex replace with [ #\"\']oldId[ \"\'] to reduce edge cases
+                        this->ReplaceStringInPlace(mei, oldId, newId);
+                        // LogMessage("Match: %s", x.c_str());
+                        // LogMessage("Match: %s", oldId.c_str());
                     }
-                    tmp = match.suffix().str();
+                    tmp = lineMatch.suffix().str();
                 }
-                // LogMessage("MEI Code: %s.", mei.c_str());
+                // LogMessage("\n\nnew MEI Code: %s.\n", mei.c_str());
+                MeiInput meiInput(this, "");
+                Object *clonedSect = meiInput.ImportStringToExpansionObject(mei);
+                prevSect->GetParent()->InsertAfter(prevSect, clonedSect);
             }
             else { // add to existingList, remember previous element, but do nothing else
                 LogMessage("%s <%s> already there.", currSect->GetClassName().c_str(), s.c_str());
@@ -1627,6 +1648,50 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
         }
     }
     return existingList;
+}
+
+void Doc::ReplaceStringInPlace(std::string &subject, const std::string &search, const std::string &replace)
+{
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != std::string::npos) {
+        subject.replace(pos, search.length(), replace);
+        pos += replace.length();
+    }
+}
+
+bool Doc::addExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId)
+{
+    bool found = false;
+    std::vector<std::vector<std::string> >::iterator iter;
+    for (iter = m_expansionMap.begin(); iter != m_expansionMap.end(); ++iter) {
+        auto it = std::find(iter->begin(), iter->end(), origXmlId);
+        if (it != iter->end()) {
+            iter->push_back(newXmlId);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        std::vector<std::string> ids;
+        ids.push_back(origXmlId.c_str());
+        ids.push_back(newXmlId.c_str());
+        m_expansionMap.push_back(ids);
+    }
+    return true;
+}
+
+std::vector<std::string> Doc::getExpansionIdsForElement(const std::string &xmlId)
+{
+    std::vector<std::vector<std::string> >::iterator iter;
+    for (iter = m_expansionMap.begin(); iter != m_expansionMap.end(); ++iter) {
+        auto it = std::find(iter->begin(), iter->end(), xmlId);
+        if (it != iter->end()) {
+            return (*iter);
+        }
+    }
+    std::vector<std::string> ids;
+    ids.push_back(xmlId.c_str());
+    return ids;
 }
 
 } // namespace vrv

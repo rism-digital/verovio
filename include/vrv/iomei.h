@@ -420,6 +420,7 @@ public:
 
     virtual bool ImportFile();
     virtual bool ImportString(const std::string &mei);
+    Object *ImportStringToExpansionObject(const std::string &mei); // WG
 
 private:
     bool ReadDoc(pugi::xml_node root);

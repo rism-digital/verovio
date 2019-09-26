@@ -234,7 +234,7 @@ std::string MeiOutput::GetOutput(Object *object)
     m_writeToStreamString = true;
     SetScoreBasedMEI(true);
     pugi::xml_document doc;
-    m_currentNode = doc.append_child(object->GetClassName().c_str());
+    m_currentNode = doc.root();
     object->Save(this);
     m_writeToStreamString = false;
     doc.save(m_streamStringOutput, "   ");
@@ -2175,6 +2175,46 @@ bool MeiInput::ImportString(const std::string &mei)
     }
 }
 
+Object *MeiInput::ImportStringToExpansionObject(const std::string &mei)
+{
+    Object *object = NULL;
+    try {
+        pugi::xml_document doc;
+        doc.load_string(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
+        pugi::xml_node node = doc.first_child();
+        m_readingScoreBased = true;
+        if (std::string(node.name()) == "section") {
+            object = new Section();
+            SetMeiUuid(node, object);
+            ReadUnsupportedAttr(node, object);
+            ReadSectionChildren(object, node);
+        }
+        else if (std::string(node.name()) == "ending") {
+            object = new Ending();
+            SetMeiUuid(node, object);
+            ReadUnsupportedAttr(node, object);
+            ReadSectionChildren(object, node);
+        }
+        else if (std::string(node.name()) == "rdg") {
+            object = new Rdg();
+            SetMeiUuid(node, object);
+            ReadUnsupportedAttr(node, object);
+            ReadRdg(object, node, EDITORIAL_TOPLEVEL);
+        }
+        else if (std::string(node.name()) == "lem") {
+            object = new Lem();
+            SetMeiUuid(node, object);
+            ReadUnsupportedAttr(node, object);
+            ReadLem(object, node, EDITORIAL_TOPLEVEL);
+        }
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return object;
+    }
+    return object;
+}
+
 bool MeiInput::IsAllowed(std::string element, Object *filterParent)
 {
     if (!filterParent) {
@@ -2626,6 +2666,9 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
             for (std::string s : existingList) printf("%s, ", s.c_str());
             printf("}\n");
         }
+    }
+    for (auto const &stringVector : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
+        for (auto const &string : stringVector) std::cout << string << ((string != stringVector.back()) ? ", " : ".\n");
     }
     // WG
 

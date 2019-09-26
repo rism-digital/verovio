@@ -441,10 +441,6 @@ int main(int argc, char **argv)
         }
     }
     
-    // WG Expansion argument to be added here
-    toolkit.RenderExpansion();
-    // WG
-
     if (toolkit.GetOutputFormat() != vrv::HUMDRUM) {
         // Check the page range
         if (page > toolkit.GetPageCount()) {
