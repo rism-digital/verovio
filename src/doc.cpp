@@ -1610,7 +1610,7 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                 //
                 std::string elementName, oldId, newId;
                 std::string tmp = mei;
-                std::smatch lineMatch, elementMatch, idMatch;
+                std::smatch lineMatch, elementMatch, idMatch, replaceMatch;
                 std::regex lineE("<[a-zA-Z0-9_-.]+? xml:id=\"[a-zA-Z0-9_:.-]+?\""); // match element plus xml:id
                 while (std::regex_search(tmp, lineMatch, lineE)) {
                     for (std::string x : lineMatch) { // go through all found xml:id without "#"
@@ -1627,9 +1627,15 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                         snprintf(str, 17, "%016d", std::rand());
                         newId = std::string(elementName + "-" + str);
                         this->addExpandedIdToExpansionMap(oldId, newId);
-                        std::smatch replaceMatch;
-                        // std::regex // TODO: make a regex replace with [ #\"\']oldId[ \"\'] to reduce edge cases
-                        this->ReplaceStringInPlace(mei, oldId, newId);
+                        //                        std::regex replaceQuotes("[\"\']" + oldId + "[\"\']");
+                        //                        mei = std::regex_replace(mei, replaceQuotes, "\"" + newId + "\"$2");
+                        //                        std::regex replaceReferences("[#]" + oldId + "[\"\']");
+                        //                        mei = std::regex_replace(mei, replaceReferences, "#" + newId +
+                        //                        "\"$2"); std::regex replacePLists("#" + oldId + "[ ]"); mei =
+                        //                        std::regex_replace(mei, replacePLists, "#" + newId + " $2");
+                        this->ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
+                        this->ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
+                        this->ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
                         // LogMessage("Match: %s", x.c_str());
                         // LogMessage("Match: %s", oldId.c_str());
                     }
