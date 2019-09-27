@@ -1619,40 +1619,46 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                 std::string mei = meiOutput.GetOutput(currSect);
                 // LogMessage("\n\nold MEI Code: %s.\n", mei.c_str());
                 //
-                std::string elementName, oldId, newId;
-                std::string tmp = mei;
-                std::smatch lineMatch, elementMatch, idMatch, replaceMatch;
-                std::regex lineE("<[a-zA-Z0-9_-.]+? xml:id=\"[a-zA-Z0-9_:.-]+?\""); // match element plus xml:id
-                while (std::regex_search(tmp, lineMatch, lineE)) {
-                    for (std::string x : lineMatch) { // go through all found xml:id without "#"
-                        std::regex elementE("<[a-zA-Z0-9_-.]+? ");
-                        std::regex_search(x, elementMatch, elementE);
-                        elementName = elementMatch.str();
-                        elementName = elementName.substr(1, elementName.size() - 2);
-                        std::regex idE(" xml:id=\"[a-zA-Z0-9_:.-]+?\"");
-                        std::regex_search(x, idMatch, idE);
-                        oldId = idMatch.str();
-                        oldId = oldId.substr(9, oldId.size() - 10);
+                try {
+                    std::string elementName, oldId, newId;
+                    std::string tmp = mei;
+                    std::smatch lineMatch, elementMatch, idMatch, replaceMatch;
+                    std::regex lineE("<[a-zA-Z0-9_-.]+? xml:id=\"[a-zA-Z0-9_:.-]+?\"",
+                        std::regex_constants::basic); // match element plus xml:id
+                    while (std::regex_search(tmp, lineMatch, lineE)) {
+                        for (std::string x : lineMatch) { // go through all found xml:id without "#"
+                            std::regex elementE("<[a-zA-Z0-9_-.]+? ", std::regex_constants::basic);
+                            std::regex_search(x, elementMatch, elementE);
+                            elementName = elementMatch.str();
+                            elementName = elementName.substr(1, elementName.size() - 2);
+                            std::regex idE(" xml:id=\"[a-zA-Z0-9_:.-]+?\"", std::regex_constants::basic);
+                            std::regex_search(x, idMatch, idE);
+                            oldId = idMatch.str();
+                            oldId = oldId.substr(9, oldId.size() - 10);
 
-                        // format exisitng sections|endings|rdgs|lemmas by extending them with rendition number
-                        if (elementName == "section" || elementName == "ending" || elementName == "rdg"
-                            || elementName == "lem") {
-                            newId = oldId + "-rend" + std::to_string(getExpansionIdsForElement(oldId).size() + 1);
-                        }
-                        else {
-                            char str[17];
-                            snprintf(str, 17, "%016d", std::rand());
-                            newId = std::string(elementName + "-" + str);
-                        }
-                        addExpandedIdToExpansionMap(oldId, newId);
-                        m_hasExpansionMap = true;
+                            // format exisitng sections|endings|rdgs|lemmas by extending them with rendition number
+                            if (elementName == "section" || elementName == "ending" || elementName == "rdg"
+                                || elementName == "lem") {
+                                newId = oldId + "-rend" + std::to_string(getExpansionIdsForElement(oldId).size() + 1);
+                            }
+                            else {
+                                char str[17];
+                                snprintf(str, 17, "%016d", std::rand());
+                                newId = std::string(elementName + "-" + str);
+                            }
+                            addExpandedIdToExpansionMap(oldId, newId);
+                            m_hasExpansionMap = true;
 
-                        // do these triple checks to reduce edge conditions in wrong replacements
-                        ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
-                        ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
-                        ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
+                            // do these triple checks to reduce edge conditions in wrong replacements
+                            ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
+                            ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
+                            ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
+                        }
+                        tmp = lineMatch.suffix().str();
                     }
-                    tmp = lineMatch.suffix().str();
+                }
+                catch (const std::regex_error &e) {
+                    LogError("Regex error: %s\n", e.what());
                 }
 
                 // read MEI back in and add to structure
