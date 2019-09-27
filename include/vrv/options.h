@@ -43,7 +43,9 @@ class OptionGrp;
 #define TEMP_LYRIC_LINE_SPACE 5.0
 
 // the key signature spacing factor
-#define TEMP_KEYSIG_STEP 1.3
+#define TEMP_KEYSIG_STEP 0.4
+// the key signature spacing factor for natural (usually slighly larger)
+#define TEMP_KEYSIG_NATURAL_STEP 0.6
 
 /* Options parameters for mensural notation */
 // Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
@@ -454,6 +456,9 @@ public:
     OptionIntMap m_breaks;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
+    OptionBool m_justifyIncludeLastPage;
+    OptionBool m_justifySystemsOnly;
+    OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;

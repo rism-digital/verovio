@@ -48,5 +48,5 @@ public:
     int GetMaxX();
 };
 
-}
+} // namespace vrv
 #endif

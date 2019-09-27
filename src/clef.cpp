@@ -24,22 +24,6 @@ namespace vrv {
 
 Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement()
 {
-    Init();
-}
-
-Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-")
-{
-    Init();
-
-    this->SetShape(clefAttr->GetClefShape());
-    this->SetLine(clefAttr->GetClefLine());
-    this->SetDis(clefAttr->GetClefDis());
-    this->SetDisPlace(clefAttr->GetClefDisPlace());
-    this->SetColor(clefAttr->GetClefColor());
-}
-
-void Clef::Init()
-{
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LINELOC);

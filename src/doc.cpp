@@ -356,9 +356,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
             // set MIDI time signature
-            if (this->m_scoreDef.HasMeterCount()) {
-                midiFile->addTimeSignature(
-                    midiTrack, 0, this->m_scoreDef.GetMeterCount(), this->m_scoreDef.GetMeterUnit());
+            MeterSig *meterSig = dynamic_cast<MeterSig *>(this->m_scoreDef.FindChildByType(METERSIG));
+            if (meterSig && meterSig->HasCount()) {
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetCount(), meterSig->GetUnit());
             }
         }
 
@@ -1088,6 +1088,15 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->SetCurrentScoreDefDoc(true);
+}
+
+void Doc::ConvertScoreDefMarkupDoc(bool permanent)
+{
+    ConvertScoreDefMarkupParams convertScoreDefMarkupParams(permanent);
+    Functor convertScoreDefMarkup(&Object::ConvertScoreDefMarkup);
+
+    m_scoreDef.Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
+    this->Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
 }
 
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)

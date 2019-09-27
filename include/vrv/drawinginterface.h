@@ -52,7 +52,7 @@ public:
      * Return the drawing list.
      * This is used when actually drawing the list (see View::DrawLayerList)
      */
-    ListOfObjects *GetDrawingList();
+    ArrayOfObjects *GetDrawingList();
 
     /**
      * Reset the drawing list.
@@ -66,7 +66,7 @@ public:
     //
 private:
     /** The list of object for which drawing is postponed */
-    ListOfObjects m_drawingList;
+    ArrayOfObjects m_drawingList;
 };
 
 //----------------------------------------------------------------------------
@@ -98,19 +98,13 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); }
+    bool DrawClef() { return (m_drawClef && m_currentClef.HasShape()); }
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
-    bool DrawKeySig() const
-    {
-        return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_WRITTEN_NONE));
-    }
+    bool DrawKeySig() { return (m_drawKeySig); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() { return (m_drawMensur && m_currentMensur.HasSign()); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
-    bool DrawMeterSig() const
-    {
-        return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym()));
-    }
+    bool DrawMeterSig() { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
     ///@}
 
@@ -118,10 +112,10 @@ public:
      * @name Set the current clef, keySig, mensur and meterSig.
      */
     ///@{
-    void SetCurrentClef(Clef *clef);
-    void SetCurrentKeySig(KeySig *keySig);
-    void SetCurrentMensur(Mensur *mensur);
-    void SetCurrentMeterSig(MeterSig *meterSig);
+    void SetCurrentClef(Clef const *clef);
+    void SetCurrentKeySig(KeySig const *keySig);
+    void SetCurrentMensur(Mensur const *mensur);
+    void SetCurrentMeterSig(MeterSig const *meterSig);
     ///@}
 
     /**

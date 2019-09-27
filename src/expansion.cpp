@@ -22,7 +22,7 @@ namespace vrv {
 Expansion::Expansion() : SystemElement("expansion-"), PlistInterface()
 {
     RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
-    
+
     Reset();
 }
 

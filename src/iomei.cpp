@@ -48,10 +48,12 @@
 #include "fig.h"
 #include "ftrem.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
+#include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -479,7 +481,7 @@ bool MeiOutput::WriteObject(Object *object)
         WriteChord(m_currentNode, dynamic_cast<Chord *>(object));
     }
     else if (object->Is(CLEF)) {
-        m_currentNode = m_currentNode.append_child("clef");
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("clef");
         WriteClef(m_currentNode, dynamic_cast<Clef *>(object));
     }
     else if (object->Is(CUSTOS)) {
@@ -494,12 +496,20 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("fTrem");
         WriteFTrem(m_currentNode, dynamic_cast<FTrem *>(object));
     }
+    else if (object->Is(GRACEGRP)) {
+        m_currentNode = m_currentNode.append_child("graceGrp");
+        WriteGraceGrp(m_currentNode, dynamic_cast<GraceGrp *>(object));
+    }
     else if (object->Is(HALFMRPT)) {
         m_currentNode = m_currentNode.append_child("halfmRpt");
         WriteHalfmRpt(m_currentNode, dynamic_cast<HalfmRpt *>(object));
     }
+    else if (object->Is(KEYACCID)) {
+        m_currentNode = m_currentNode.append_child("keyAccid");
+        WriteKeyAccid(m_currentNode, dynamic_cast<KeyAccid *>(object));
+    }
     else if (object->Is(KEYSIG)) {
-        m_currentNode = m_currentNode.append_child("keySig");
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("keySig");
         WriteKeySig(m_currentNode, dynamic_cast<KeySig *>(object));
     }
     else if (object->Is(LIGATURE)) {
@@ -507,11 +517,11 @@ bool MeiOutput::WriteObject(Object *object)
         WriteLigature(m_currentNode, dynamic_cast<Ligature *>(object));
     }
     else if (object->Is(MENSUR)) {
-        m_currentNode = m_currentNode.append_child("mensur");
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("mensur");
         WriteMensur(m_currentNode, dynamic_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
-        m_currentNode = m_currentNode.append_child("meterSig");
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("meterSig");
         WriteMeterSig(m_currentNode, dynamic_cast<MeterSig *>(object));
     }
     else if (object->Is(MREST)) {
@@ -1436,6 +1446,19 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
 {
     assert(clef);
 
+    if (clef->IsAttribute()) {
+        AttCleffingLog cleffingLog;
+        cleffingLog.SetClefShape(clef->GetShape());
+        cleffingLog.SetClefLine(clef->GetLine());
+        cleffingLog.SetClefDis(clef->GetDis());
+        cleffingLog.SetClefDisPlace(clef->GetDisPlace());
+        cleffingLog.WriteCleffingLog(currentNode);
+        AttCleffingVis cleffingVis;
+        cleffingVis.SetClefColor(clef->GetColor());
+        cleffingVis.WriteCleffingVis(currentNode);
+        return;
+    }
+
     WriteLayerElement(currentNode, clef);
     WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
@@ -1474,6 +1497,16 @@ void MeiOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     fTrem->WriteTremMeasured(currentNode);
 }
 
+void MeiOutput::WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp)
+{
+    assert(graceGrp);
+
+    WriteLayerElement(currentNode, graceGrp);
+    graceGrp->WriteColor(currentNode);
+    graceGrp->WriteGraced(currentNode);
+    graceGrp->WriteGraceGrpLog(currentNode);
+}
+
 void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
 {
     assert(halfmRpt);
@@ -1481,14 +1514,45 @@ void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
     WriteLayerElement(currentNode, halfmRpt);
 }
 
+void MeiOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
+{
+    assert(keyAccid);
+
+    WriteLayerElement(currentNode, keyAccid);
+    WritePitchInterface(currentNode, keyAccid);
+    keyAccid->WriteAccidental(currentNode);
+    keyAccid->WriteColor(currentNode);
+    keyAccid->WriteEnclosingChars(currentNode);
+}
+
 void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 {
     assert(keySig);
+
+    if (keySig->IsAttribute()) {
+        AttKeySigDefaultAnl attKeySigDefaultAnl;
+        // Broken in MEI 4.0.2 - waiting for a fix
+        // attKeySigDefaultAnl.SetKeyAccid(keySig->GetAccid());
+        attKeySigDefaultAnl.SetKeyMode(keySig->GetMode());
+        attKeySigDefaultAnl.SetKeyPname(keySig->GetPname());
+        attKeySigDefaultAnl.WriteKeySigDefaultAnl(currentNode);
+        AttKeySigDefaultLog attKeySigDefaultLog;
+        attKeySigDefaultLog.SetKeySig(keySig->GetSig());
+        attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
+        AttKeySigDefaultVis attKeySigDefaultVis;
+        attKeySigDefaultVis.SetKeysigShow(keySig->GetVisible());
+        attKeySigDefaultVis.SetKeysigShowchange(keySig->GetSigShowchange());
+        attKeySigDefaultVis.WriteKeySigDefaultVis(currentNode);
+        return;
+    }
 
     WriteLayerElement(currentNode, keySig);
     keySig->WriteAccidental(currentNode);
     keySig->WritePitch(currentNode);
     keySig->WriteKeySigAnl(currentNode);
+    keySig->WriteKeySigLog(currentNode);
+    keySig->WriteKeySigVis(currentNode);
+    keySig->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
@@ -1502,6 +1566,27 @@ void MeiOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
 void MeiOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
+
+    if (mensur->IsAttribute()) {
+        AttMensuralLog mensuralLog;
+        mensuralLog.SetMensurDot(mensur->GetDot());
+        mensuralLog.SetProportNum(mensur->GetNum());
+        mensuralLog.SetProportNumbase(mensur->GetNumbase());
+        mensuralLog.SetMensurSign(mensur->GetSign());
+        mensuralLog.SetMensurSlash(mensur->GetSlash());
+        mensuralLog.WriteMensuralLog(currentNode);
+        AttMensuralShared mensuralShared;
+        mensuralShared.SetModusmaior(mensur->GetModusmaior());
+        mensuralShared.SetModusminor(mensur->GetModusminor());
+        mensuralShared.SetProlatio(mensur->GetProlatio());
+        mensuralShared.SetTempus(mensur->GetTempus());
+        mensuralShared.WriteMensuralShared(currentNode);
+        AttMensuralVis mensuralVis;
+        mensuralVis.SetMensurColor(mensur->GetColor());
+        mensuralVis.SetMensurOrient(mensur->GetOrient());
+        mensuralVis.WriteMensuralVis(currentNode);
+        return;
+    }
 
     WriteLayerElement(currentNode, mensur);
     mensur->WriteColor(currentNode);
@@ -1517,6 +1602,18 @@ void MeiOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 void MeiOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 {
     assert(meterSig);
+
+    if (meterSig->IsAttribute()) {
+        AttMeterSigDefaultLog meterSigDefaultLog;
+        meterSigDefaultLog.SetMeterCount(meterSig->GetCount());
+        meterSigDefaultLog.SetMeterSym(meterSig->GetSym());
+        meterSigDefaultLog.SetMeterUnit(meterSig->GetUnit());
+        meterSigDefaultLog.WriteMeterSigDefaultLog(currentNode);
+        AttMeterSigDefaultVis meterSigDefaultVis;
+        meterSigDefaultVis.SetMeterForm(meterSig->meterSigVisToMeterSigDefaultVis(meterSig->GetForm()));
+        meterSigDefaultVis.WriteMeterSigDefaultVis(currentNode);
+        return;
+    }
 
     WriteLayerElement(currentNode, meterSig);
     meterSig->WriteMeterSigLog(currentNode);
@@ -1858,17 +1955,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
 {
     assert(interface);
 
-    interface->WriteCleffingLog(element);
-    interface->WriteCleffingVis(element);
-    interface->WriteKeySigDefaultAnl(element);
-    interface->WriteKeySigDefaultLog(element);
-    interface->WriteKeySigDefaultVis(element);
     interface->WriteLyricStyle(element);
-    interface->WriteMensuralLog(element);
-    interface->WriteMensuralShared(element);
-    interface->WriteMensuralVis(element);
-    interface->WriteMeterSigDefaultLog(element);
-    interface->WriteMeterSigDefaultVis(element);
     interface->WriteMidiTempo(element);
     interface->WriteMultinumMeasures(element);
 }
@@ -2353,6 +2440,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "clef") {
             return true;
         }
+        else if (element == "graceGrp") {
+            return true;
+        }
         else if (element == "note") {
             return true;
         }
@@ -2405,6 +2495,36 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "note") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for graceGrp
+    else if (filterParent->Is(GRACEGRP)) {
+        if (element == "beam") {
+            return true;
+        }
+        else if (element == "chord") {
+            return true;
+        }
+        else if (element == "note") {
+            return true;
+        }
+        else if (element == "rest") {
+            return true;
+        }
+        else if (element == "space") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for keySig
+    else if (filterParent->Is(KEYSIG)) {
+        if (element == "keyAccid") {
             return true;
         }
         else {
@@ -3193,6 +3313,83 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     object->ReadMeasureNumbers(element);
     object->ReadTyped(element);
 
+    AttCleffingLog cleffingLog;
+    cleffingLog.ReadCleffingLog(element);
+    AttCleffingVis cleffingVis;
+    cleffingVis.ReadCleffingVis(element);
+    if (cleffingLog.HasClefLine() && cleffingLog.HasClefShape()) {
+        Clef *vrvClef = new Clef();
+        vrvClef->IsAttribute(true);
+        vrvClef->SetShape(cleffingLog.GetClefShape());
+        vrvClef->SetLine(cleffingLog.GetClefLine());
+        vrvClef->SetDis(cleffingLog.GetClefDis());
+        vrvClef->SetDisPlace(cleffingLog.GetClefDisPlace());
+        vrvClef->SetColor(cleffingVis.GetClefColor());
+        object->AddChild(vrvClef);
+    }
+
+    AttKeySigDefaultAnl keySigDefaultAnl;
+    keySigDefaultAnl.ReadKeySigDefaultAnl(element);
+    AttKeySigDefaultLog keySigDefaultLog;
+    keySigDefaultLog.ReadKeySigDefaultLog(element);
+    AttKeySigDefaultVis keySigDefaultVis;
+    keySigDefaultVis.ReadKeySigDefaultVis(element);
+    if (keySigDefaultAnl.HasKeyAccid() || keySigDefaultAnl.HasKeyMode() || keySigDefaultAnl.HasKeyPname()
+        || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigShow() || keySigDefaultVis.HasKeysigShowchange()) {
+        KeySig *vrvKeySig = new KeySig();
+        vrvKeySig->IsAttribute(true);
+        // Broken in MEI 4.0.2 - waiting for a fix
+        // vrvKeySig->SetAccid(keySigDefaultAnl.GetKeyAccid());
+        vrvKeySig->SetMode(keySigDefaultAnl.GetKeyMode());
+        vrvKeySig->SetPname(keySigDefaultAnl.GetKeyPname());
+        vrvKeySig->SetSig(keySigDefaultLog.GetKeySig());
+        vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigShow());
+        vrvKeySig->SetSigShowchange(keySigDefaultVis.GetKeysigShowchange());
+        object->AddChild(vrvKeySig);
+    }
+
+    AttMensuralLog mensuralLog;
+    mensuralLog.ReadMensuralLog(element);
+    AttMensuralShared mensuralShared;
+    mensuralShared.ReadMensuralShared(element);
+    AttMensuralVis mensuralVis;
+    mensuralVis.ReadMensuralVis(element);
+    if (mensuralShared.HasProlatio() || mensuralShared.HasTempus() || mensuralLog.HasProportNum()
+        || mensuralLog.HasProportNumbase() || mensuralLog.HasMensurSign()) {
+        Mensur *vrvMensur = new Mensur();
+        vrvMensur->IsAttribute(true);
+        //
+        vrvMensur->SetDot(mensuralLog.GetMensurDot());
+        vrvMensur->SetNum(mensuralLog.GetProportNum());
+        vrvMensur->SetNumbase(mensuralLog.GetProportNumbase());
+        vrvMensur->SetSign(mensuralLog.GetMensurSign());
+        vrvMensur->SetSlash(mensuralLog.GetMensurSlash());
+        //
+        vrvMensur->SetModusmaior(mensuralShared.GetModusmaior());
+        vrvMensur->SetModusminor(mensuralShared.GetModusminor());
+        vrvMensur->SetProlatio(mensuralShared.GetProlatio());
+        vrvMensur->SetTempus(mensuralShared.GetTempus());
+        //
+        vrvMensur->SetColor(mensuralVis.GetMensurColor());
+        vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
+        object->AddChild(vrvMensur);
+    }
+
+    AttMeterSigDefaultLog meterSigDefaultLog;
+    meterSigDefaultLog.ReadMeterSigDefaultLog(element);
+    AttMeterSigDefaultVis meterSigDefaultVis;
+    meterSigDefaultVis.ReadMeterSigDefaultVis(element);
+    if (meterSigDefaultLog.HasMeterCount() || meterSigDefaultLog.HasMeterSym() || meterSigDefaultLog.HasMeterUnit()) {
+        MeterSig *vrvMeterSig = new MeterSig();
+        vrvMeterSig->IsAttribute(true);
+        vrvMeterSig->SetCount(meterSigDefaultLog.GetMeterCount());
+        vrvMeterSig->SetSym(meterSigDefaultLog.GetMeterSym());
+        vrvMeterSig->SetUnit(meterSigDefaultLog.GetMeterUnit());
+        //
+        vrvMeterSig->SetForm(vrvMeterSig->meterSigDefaultVisToMeterSigVis(meterSigDefaultVis.GetMeterForm()));
+        object->AddChild(vrvMeterSig);
+    }
+
     return true;
 }
 
@@ -3214,7 +3411,7 @@ bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     ReadScoreDefElement(scoreDef, vrvScoreDef);
 
     if (m_version < MEI_4_0_0) {
-        UpgradeScoreDefTo_4_0_0(scoreDef, vrvScoreDef);
+        UpgradeScoreDefElementTo_4_0_0(scoreDef, vrvScoreDef);
     }
 
     ReadScoreDefInterface(scoreDef, vrvScoreDef);
@@ -3242,6 +3439,19 @@ bool MeiInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         // editorial
         else if (IsEditorialElementName(current.name())) {
             success = ReadEditorialElement(parent, current, EDITORIAL_SCOREDEF);
+        }
+        // clef, keySig, etc.
+        else if (std::string(current.name()) == "clef") {
+            success = ReadClef(parent, current);
+        }
+        else if (std::string(current.name()) == "keySig") {
+            success = ReadKeySig(parent, current);
+        }
+        else if (std::string(current.name()) == "mensur") {
+            success = ReadMensur(parent, current);
+        }
+        else if (std::string(current.name()) == "meterSig") {
+            success = ReadMeterSig(parent, current);
         }
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
@@ -3419,6 +3629,7 @@ bool MeiInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     ReadScoreDefElement(staffDef, vrvStaffDef);
 
     if (m_version < MEI_4_0_0) {
+        UpgradeScoreDefElementTo_4_0_0(staffDef, vrvStaffDef);
         UpgradeStaffDefTo_4_0_0(staffDef, vrvStaffDef);
     }
 
@@ -3453,6 +3664,19 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
+        // clef, keySig, etc.
+        else if (std::string(current.name()) == "clef") {
+            success = ReadClef(parent, current);
+        }
+        else if (std::string(current.name()) == "keySig") {
+            success = ReadKeySig(parent, current);
+        }
+        else if (std::string(current.name()) == "mensur") {
+            success = ReadMensur(parent, current);
+        }
+        else if (std::string(current.name()) == "meterSig") {
+            success = ReadMeterSig(parent, current);
+        }
         // content
         else if (std::string(current.name()) == "instrDef") {
             success = ReadInstrDef(parent, current);
@@ -3464,7 +3688,7 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadLabelAbbr(parent, current);
         }
         else {
-            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
+            LogWarning("Unsupported '<%s>' within <staffDef>", current.name());
         }
     }
     return success;
@@ -4062,8 +4286,14 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "fTrem") {
             success = ReadFTrem(parent, xmlElement);
         }
+        else if (elementName == "graceGrp") {
+            success = ReadGraceGrp(parent, xmlElement);
+        }
         else if (elementName == "halfmRpt") {
             success = ReadHalfmRpt(parent, xmlElement);
+        }
+        else if (elementName == "keyAccid") {
+            success = ReadKeyAccid(parent, xmlElement);
         }
         else if (elementName == "keySig") {
             success = ReadKeySig(parent, xmlElement);
@@ -4351,6 +4581,20 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     return ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
 
+bool MeiInput::ReadGraceGrp(Object *parent, pugi::xml_node graceGrp)
+{
+    GraceGrp *vrvGraceGrp = new GraceGrp();
+    ReadLayerElement(graceGrp, vrvGraceGrp);
+
+    vrvGraceGrp->ReadColor(graceGrp);
+    vrvGraceGrp->ReadGraced(graceGrp);
+    vrvGraceGrp->ReadGraceGrpLog(graceGrp);
+
+    parent->AddChild(vrvGraceGrp);
+    ReadUnsupportedAttr(graceGrp, vrvGraceGrp);
+    return ReadLayerChildren(vrvGraceGrp, graceGrp, vrvGraceGrp);
+}
+
 bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
 {
     HalfmRpt *vrvHalfmRpt = new HalfmRpt();
@@ -4358,6 +4602,21 @@ bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
 
     parent->AddChild(vrvHalfmRpt);
     ReadUnsupportedAttr(halfmRpt, vrvHalfmRpt);
+    return true;
+}
+
+bool MeiInput::ReadKeyAccid(Object *parent, pugi::xml_node keyAccid)
+{
+    KeyAccid *vrvKeyAccid = new KeyAccid();
+    ReadLayerElement(keyAccid, vrvKeyAccid);
+
+    ReadPitchInterface(keyAccid, vrvKeyAccid);
+    vrvKeyAccid->ReadAccidental(keyAccid);
+    vrvKeyAccid->ReadColor(keyAccid);
+    vrvKeyAccid->ReadEnclosingChars(keyAccid);
+
+    parent->AddChild(vrvKeyAccid);
+    ReadUnsupportedAttr(keyAccid, vrvKeyAccid);
     return true;
 }
 
@@ -4369,13 +4628,13 @@ bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
     vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadPitch(keySig);
     vrvKeySig->ReadKeySigAnl(keySig);
-
-    // special processing required
-    vrvKeySig->ConvertToInternal();
+    vrvKeySig->ReadKeySigLog(keySig);
+    vrvKeySig->ReadKeySigVis(keySig);
+    vrvKeySig->ReadVisibility(keySig);
 
     parent->AddChild(vrvKeySig);
     ReadUnsupportedAttr(keySig, vrvKeySig);
-    return true;
+    return ReadLayerChildren(vrvKeySig, keySig, vrvKeySig);
 }
 
 bool MeiInput::ReadLigature(Object *parent, pugi::xml_node ligature)
@@ -4898,17 +5157,7 @@ bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *
 
 bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
 {
-    interface->ReadCleffingLog(element);
-    interface->ReadCleffingVis(element);
-    interface->ReadKeySigDefaultAnl(element);
-    interface->ReadKeySigDefaultLog(element);
-    interface->ReadKeySigDefaultVis(element);
     interface->ReadLyricStyle(element);
-    interface->ReadMensuralLog(element);
-    interface->ReadMensuralVis(element);
-    interface->ReadMensuralShared(element);
-    interface->ReadMeterSigDefaultLog(element);
-    interface->ReadMeterSigDefaultVis(element);
     interface->ReadMidiTempo(element);
     interface->ReadMultinumMeasures(element);
     return true;
@@ -5640,37 +5889,41 @@ void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMorden
     }
 }
 
-void MeiInput::UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef)
+void MeiInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement)
 {
-    if (scoreDef.attribute("key.sig.show")) {
-        vrvScoreDef->SetKeysigShow(
-            vrvScoreDef->AttKeySigDefaultVis::StrToBoolean(scoreDef.attribute("key.sig.show").value()));
-        scoreDef.remove_attribute("key.sig.show");
+    KeySig *keySig = dynamic_cast<KeySig *>(vrvScoreDefElement->FindChildByType(KEYSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(vrvScoreDefElement->FindChildByType(METERSIG));
+
+    if (scoreDefElement.attribute("key.sig.show")) {
+        if (keySig) {
+            keySig->SetVisible(keySig->AttVisibility::StrToBoolean(scoreDefElement.attribute("key.sig.show").value()));
+            scoreDefElement.remove_attribute("key.sig.show");
+        }
+        else {
+            LogWarning("No keySig found when trying to upgrade '@key.sig.show'");
+        }
     }
-    if (scoreDef.attribute("key.sig.showchange")) {
-        vrvScoreDef->SetKeysigShowchange(
-            vrvScoreDef->AttKeySigDefaultVis::StrToBoolean(scoreDef.attribute("key.sig.showchange").value()));
-        scoreDef.remove_attribute("key.sig.showchange");
+    if (scoreDefElement.attribute("key.sig.showchange")) {
+        if (keySig) {
+            keySig->SetSigShowchange(
+                keySig->AttKeySigVis::StrToBoolean(scoreDefElement.attribute("key.sig.showchange").value()));
+            scoreDefElement.remove_attribute("key.sig.showchange");
+        }
+        else {
+            LogWarning("No keySig found when trying to upgrade '@key.sig.showchange'");
+        }
     }
-    if (scoreDef.attribute("meter.rend")) {
-        vrvScoreDef->SetMeterForm(vrvScoreDef->AttMeterSigDefaultVis::StrToMeterSigDefaultVisMeterform(
-            scoreDef.attribute("meter.rend").value()));
-        scoreDef.remove_attribute("meter.rend");
+    if (scoreDefElement.attribute("meter.rend")) {
+        if (meterSig) {
+            meterSig->SetForm(
+                meterSig->AttMeterSigVis::StrToMeterSigVisForm(scoreDefElement.attribute("meter.rend").value()));
+            scoreDefElement.remove_attribute("meter.rend");
+        }
     }
 }
 
 void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef)
 {
-    if (staffDef.attribute("key.sig.show")) {
-        vrvStaffDef->SetKeysigShow(
-            vrvStaffDef->AttKeySigDefaultVis::StrToBoolean(staffDef.attribute("key.sig.show").value()));
-        staffDef.remove_attribute("key.sig.show");
-    }
-    if (staffDef.attribute("key.sig.showchange")) {
-        vrvStaffDef->SetKeysigShowchange(
-            vrvStaffDef->AttKeySigDefaultVis::StrToBoolean(staffDef.attribute("key.sig.showchange").value()));
-        staffDef.remove_attribute("key.sig.showchange");
-    }
     if (staffDef.attribute("label")) {
         Text *text = new Text();
         text->SetText(UTF8to16(staffDef.attribute("label").value()));
@@ -5686,11 +5939,6 @@ void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
         labelAbbr->AddChild(text);
         vrvStaffDef->AddChild(labelAbbr);
         staffDef.remove_attribute("label.abbr");
-    }
-    if (staffDef.attribute("meter.rend")) {
-        vrvStaffDef->SetMeterForm(vrvStaffDef->AttMeterSigDefaultVis::StrToMeterSigDefaultVisMeterform(
-            staffDef.attribute("meter.rend").value()));
-        staffDef.remove_attribute("meter.rend");
     }
 }
 

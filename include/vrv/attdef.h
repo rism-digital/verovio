@@ -25,8 +25,6 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 
 #define VRV_UNSET -0x7FFFFFFF
 
-class data_STAFFREL;
-
 /**
  * MEI virtual unit;
  */
@@ -134,29 +132,10 @@ typedef wchar_t data_HEXNUM;
 
 /**
  * MEI data.KEYSIGNATURE
- * The maximum is 255 (unsigned char)
- * Order from 7f to 7s should not be changed. This is a special case since we use abs()
- * to get the number of flats or sharps
+ * default (unset) is -1; ACCIDENTAL_WRITTEN_NONE
+ * "mixed" is VRV_UNSET; ACCITENTDAL_WRITTEN_NONE
  */
-enum data_KEYSIGNATURE {
-    KEYSIGNATURE_NONE = 0,
-    KEYSIGNATURE_7f,
-    KEYSIGNATURE_6f,
-    KEYSIGNATURE_5f,
-    KEYSIGNATURE_4f,
-    KEYSIGNATURE_3f,
-    KEYSIGNATURE_2f,
-    KEYSIGNATURE_1f,
-    KEYSIGNATURE_0,
-    KEYSIGNATURE_1s,
-    KEYSIGNATURE_2s,
-    KEYSIGNATURE_3s,
-    KEYSIGNATURE_4s,
-    KEYSIGNATURE_5s,
-    KEYSIGNATURE_6s,
-    KEYSIGNATURE_7s,
-    KEYSIGNATURE_mixed
-};
+typedef std::pair<int, data_ACCIDENTAL_WRITTEN> data_KEYSIGNATURE;
 
 /**
  * MEI data.MEASUREBEAT
@@ -274,21 +253,6 @@ enum data_PITCHNAME_GES {
  * NONE is -3 for perfect value (abs) by default
  */
 enum data_PROLATIO { PROLATIO_NONE = -3, PROLATIO_2 = 2, PROLATIO_3 };
-
-/**
- * MEI data.STEMDIRECTION
- */
-enum data_STEMDIRECTION {
-    STEMDIRECTION_NONE = 0,
-    STEMDIRECTION_up,
-    STEMDIRECTION_down,
-    STEMDIRECTION_left,
-    STEMDIRECTION_right,
-    STEMDIRECTION_ne,
-    STEMDIRECTION_se,
-    STEMDIRECTION_nw,
-    STEMDIRECTION_sw,
-};
 
 /**
  * MEI data.TIE

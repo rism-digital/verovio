@@ -166,26 +166,17 @@ void AbcInput::parseABC(std::istream &infile)
             staffDef->SetLines(m_stafflines);
             staffDef->SetTransSemi(m_transpose);
             if (m_clef) {
-                staffDef->SetClefShape(m_clef->GetShape());
-                staffDef->SetClefLine(m_clef->GetLine());
-                delete m_clef;
+                staffDef->AddChild(m_clef);
                 m_clef = NULL;
             }
             staffGrp->AddChild(staffDef);
             m_doc->m_scoreDef.AddChild(staffGrp);
             if (m_key) {
-                // waiting for fix
-                // m_doc->m_scoreDef.SetKeyMode(m_key->GetMode());
-                // m_doc->m_scoreDef.SetKeyPname(m_key->GetPname());
-                // m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(m_key->GetSig()));
-                delete m_key;
+                m_doc->m_scoreDef.AddChild(m_key);
                 m_key = NULL;
             }
             if (m_meter) {
-                m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
-                m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
-                m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
-                delete m_meter;
+                m_doc->m_scoreDef.AddChild(m_meter);
                 m_meter = NULL;
             }
         }
@@ -308,8 +299,8 @@ int AbcInput::SetBarLine(const std::string &musicCode, int i)
 
 void AbcInput::CalcUnitNoteLength()
 {
-    if (!m_doc->m_scoreDef.HasMeterUnit()
-        || double(m_doc->m_scoreDef.GetMeterCount()) / double(m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindChildByType(METERSIG));
+    if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
         // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
@@ -405,10 +396,10 @@ void AbcInput::AddFermata(LayerElement *element)
 
     Fermata *fermata = new Fermata();
     fermata->SetStartid("#" + element->GetUuid());
-    fermata->GetPlaceAlternate()->SetBasic(m_fermata);
+    fermata->SetPlace(m_fermata);
     m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), fermata));
 
-    m_fermata = STAFFREL_basic_NONE;
+    m_fermata = STAFFREL_NONE;
 }
 
 void AbcInput::AddOrnaments(LayerElement *element)
@@ -519,9 +510,9 @@ void AbcInput::parseDecoration(std::string decorationString)
     else if (!strcmp(decorationString.c_str(), "emphasis"))
         m_artic.push_back(ARTICULATION_acc);
     else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H"))
-        m_fermata = STAFFREL_basic_above;
+        m_fermata = STAFFREL_above;
     else if (!strcmp(decorationString.c_str(), "invertedfermata"))
-        m_fermata = STAFFREL_basic_below;
+        m_fermata = STAFFREL_below;
     else if (!strcmp(decorationString.c_str(), "tenuto"))
         m_artic.push_back(ARTICULATION_ten);
     else if (!strcmp(decorationString.c_str(), "+"))
@@ -579,15 +570,17 @@ void AbcInput::parseKey(std::string keyString)
     m_ID = "";
     short int accidNum = 0;
     data_MODE mode = MODE_NONE;
-    // m_key = new KeySig();
+    m_key = new KeySig();
+    m_key->IsAttribute(true);
     m_clef = new Clef();
+    m_clef->IsAttribute(true);
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
     if (pitch.find(keyString[i]) != std::string::npos) {
         accidNum = int(pitch.find(keyString[i])) - 1;
         keyString[i] = tolower(keyString[i]);
-        m_doc->m_scoreDef.SetKeyPname((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToPitchname(keyString.substr(i, 1)));
+        m_key->SetPname(m_key->AttPitch::StrToPitchname(keyString.substr(i, 1)));
         ++i;
     }
     while (isspace(keyString[i])) ++i;
@@ -595,12 +588,12 @@ void AbcInput::parseKey(std::string keyString)
     // set key.accid
     switch (keyString[i]) {
         case '#':
-            m_doc->m_scoreDef.SetKeyAccid(ACCIDENTAL_GESTURAL_s);
+            m_key->SetAccid(ACCIDENTAL_WRITTEN_s);
             accidNum += 7;
             ++i;
             break;
         case 'b':
-            m_doc->m_scoreDef.SetKeyAccid(ACCIDENTAL_GESTURAL_f);
+            m_key->SetAccid(ACCIDENTAL_WRITTEN_f);
             accidNum -= 7;
             ++i;
             break;
@@ -608,7 +601,7 @@ void AbcInput::parseKey(std::string keyString)
     }
 
     // set key.mode
-    if (m_doc->m_scoreDef.HasKeyPname()) {
+    if (m_key->HasPname()) {
         // when no mode is indicated, major is assumed
         mode = MODE_major;
         while (isspace(keyString[i])) ++i;
@@ -655,7 +648,7 @@ void AbcInput::parseKey(std::string keyString)
             }
         }
     }
-    m_doc->m_scoreDef.SetKeyMode(mode);
+    m_key->SetMode(mode);
 
     // we need set @key.sig for correct rendering
     if (accidNum != 0) {
@@ -675,7 +668,7 @@ void AbcInput::parseKey(std::string keyString)
         }
 
         // m_doc->m_scoreDef.SetSig(keySig);
-        m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
+        m_key->SetSig(m_key->AttKeySigLog::StrToKeysignature(keySig));
         keyPitchAlter = pitch.substr(posStart, posEnd);
     }
 
@@ -1127,7 +1120,7 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             // add fermata
-            if (m_fermata != STAFFREL_basic_NONE) {
+            if (m_fermata != STAFFREL_NONE) {
                 AddFermata(chord);
             }
         }
@@ -1273,7 +1266,7 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             // add fermata
-            if (m_fermata != STAFFREL_basic_NONE) {
+            if (m_fermata != STAFFREL_NONE) {
                 AddFermata(note);
             }
 
@@ -1380,7 +1373,7 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
             m_ID = rest->GetUuid();
 
             // add Fermata
-            if (m_fermata != STAFFREL_basic_NONE) {
+            if (m_fermata != STAFFREL_NONE) {
                 AddFermata(rest);
             }
 
@@ -1515,11 +1508,9 @@ void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
         if (m_meter) {
             // todo: apply meter changes to staves
             ScoreDef *scoreDef = new ScoreDef();
-            scoreDef->SetMeterCount(m_meter->GetCount());
-            scoreDef->SetMeterUnit(m_meter->GetUnit());
-            scoreDef->SetMeterSym(m_meter->GetSym());
+            m_meter->IsAttribute(true);
+            scoreDef->AddChild(m_meter);
             section->AddChild(scoreDef);
-            delete m_meter;
             m_meter = NULL;
         }
     }

@@ -126,6 +126,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(FLAG)) {
         DrawFlag(dc, element, layer, staff, measure);
     }
+    else if (element->Is(GRACEGRP)) {
+        DrawGraceGrp(dc, element, layer, staff, measure);
+    }
     else if (element->Is(HALFMRPT)) {
         DrawHalfmRpt(dc, element, layer, staff, measure);
     }
@@ -301,7 +304,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
     int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int direction = (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? 1 : -1;
+    int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
 
     int y = articPart->GetDrawingY();
 
@@ -328,15 +331,14 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         if (articPart->GetType() == ARTIC_PART_INSIDE) {
             // If we are above the top of the  staff, just pile them up
-            if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) && (y > staff->GetDrawingY()))
-                y += yShift;
+            if ((articPart->GetPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) y += yShift;
             // If we are below the bottom, just pile the down
-            else if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_below)
+            else if ((articPart->GetPlace() == STAFFREL_below)
                 && (y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
                 y -= yShift;
             // Otherwise make it fit the staff space
             else {
-                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlaceAlternate()->GetBasic());
+                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlace());
                 if (IsOnStaffLine(y, staff)) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * direction;
             }
         }
@@ -351,8 +353,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         // Center the glyh if necessary
         if (Artic::IsCentered(*articIter)) {
-            y += (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? -(glyphHeight / 2)
-                                                                                      : (glyphHeight / 2);
+            y += (articPart->GetPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
         }
 
         // Adjust the baseline for glyph above the baseline in SMuFL
@@ -578,7 +579,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = dynamic_cast<Clef *>(element);
     assert(clef);
-    int x,y;
+    int x, y;
     if (m_doc->GetType() == Facs && clef->HasFacs()) {
         y = ToLogicalY(staff->GetDrawingY());
         x = clef->GetDrawingX();
@@ -712,7 +713,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    int x,y;
+    int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());
@@ -859,6 +860,22 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->EndGraphic(element, this);
 }
 
+void View::DrawGraceGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    // basically nothing to do here
+    DrawLayerChildren(dc, element, layer, staff, measure);
+
+    dc->EndGraphic(element, this);
+}
+
 void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -891,7 +908,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     KeySig *keySig = dynamic_cast<KeySig *>(element);
     assert(keySig);
 
-    int symb;
     int x, y, i;
 
     Clef *c = layer->GetClef(element);
@@ -901,42 +917,46 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     // hidden key signature
-    if (!keySig->m_drawingShow) {
+    if (keySig->GetVisible() == BOOLEAN_false) {
         keySig->SetEmptyBB();
         return;
     }
 
     // C major (0) key sig and no cancellation
-    else if ((keySig->GetAlterationNumber() == 0) && (keySig->m_drawingCancelAccidCount == 0)) {
+    else if ((keySig->GetAccidCount() == 0) && (keySig->m_drawingCancelAccidCount == 0)) {
         keySig->SetEmptyBB();
         return;
     }
 
     // C major (0) key sig and system scoreDef - cancellation (if any) is done at the end of the previous system
-    else if ((keySig->GetScoreDefRole() == SCOREDEF_SYSTEM) && (keySig->GetAlterationNumber() == 0)) {
+    else if ((keySig->GetScoreDefRole() == SCOREDEF_SYSTEM) && (keySig->GetAccidCount() == 0)) {
         keySig->SetEmptyBB();
         return;
     }
 
     x = element->GetDrawingX();
     // HARDCODED
-    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
+    int naturalGlyphWidth = m_doc->GetGlyphWidth(SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+    int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int naturalStep = step * TEMP_KEYSIG_NATURAL_STEP;
+    step *= TEMP_KEYSIG_STEP;
 
     int clefLocOffset = layer->GetClefLocOffset(element);
     int loc;
 
     // Show cancellation if C major (0)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAlterationNumber() == 0)) {
+    // This is not meant to make sense with mixed key signature
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAccidCount() == 0)) {
         dc->StartGraphic(element, "", element->GetUuid());
 
         for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-            data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+            data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
             loc = PitchInterface::CalcLoc(
                 pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
             y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
             DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-            x += step;
+            x += naturalGlyphWidth + naturalStep;
         }
 
         dc->EndGraphic(element, this);
@@ -946,48 +966,55 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->StartGraphic(element, "", element->GetUuid());
 
     // Show cancellation if show cancellation (showchange) is true (false by default)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+    // This is not meant to make sense with mixed key signature
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
-        if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
+        if (keySig->GetAccidType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
                 y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += step;
+                x += naturalGlyphWidth + naturalStep;
             }
         }
     }
 
-    for (i = 0; i < keySig->GetAlterationNumber(); ++i) {
-        data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->GetAlterationType(), i);
-        loc = PitchInterface::CalcLoc(pitch, KeySig::GetOctave(keySig->GetAlterationType(), pitch, c), clefLocOffset);
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+
+    for (i = 0; i < keySig->GetAccidCount(); ++i) {
+        // We get the pitch from the keySig (looks for keyAccid children if any)
+        data_ACCIDENTAL_WRITTEN accid;
+        data_PITCHNAME pname;
+        std::wstring accidStr = keySig->GetKeyAccidStrAt(i, accid, pname);
+
+        loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-        if (keySig->GetAlterationType() == ACCIDENTAL_WRITTEN_f)
-            symb = SMUFL_E260_accidentalFlat;
-        else
-            symb = SMUFL_E262_accidentalSharp;
-
-        DrawSmuflCode(dc, x, y, symb, staff->m_drawingStaffSize, false);
-        x += step;
+        DrawSmuflString(dc, x, y, accidStr, false, staff->m_drawingStaffSize, false);
+        TextExtend extend;
+        dc->GetSmuflTextExtent(accidStr, &extend);
+        x += extend.m_width + step;
     }
 
+    dc->ResetFont();
+
     // Show cancellation if show cancellation (showchange) is true (false by default)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+    // This is not meant to make sense with mixed key signature
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetSigShowchange() == BOOLEAN_true)) {
         // Same time of alteration, but smaller number - cancellation is displayed afterwards
-        if ((keySig->GetAlterationType() == keySig->m_drawingCancelAccidType)
-            && (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount)) {
-            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+        if ((keySig->GetAccidType() == keySig->m_drawingCancelAccidType)
+            && (keySig->GetAccidCount() < keySig->m_drawingCancelAccidCount)) {
+            for (i = keySig->GetAccidCount(); i < keySig->m_drawingCancelAccidCount; ++i) {
+                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
                 y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += step;
+                x += naturalGlyphWidth + naturalStep;
             }
         }
     }
@@ -1641,11 +1668,11 @@ bool View::IsOnStaffLine(int y, Staff *staff)
     return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
 }
 
-int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL_basic place)
+int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place)
 {
     int yPos = y - staff->GetDrawingY();
     int distance = yPos % m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (place == STAFFREL_basic_above) {
+    if (place == STAFFREL_above) {
         if (distance > 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - distance;
         return y - distance + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }

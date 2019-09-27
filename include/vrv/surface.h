@@ -42,12 +42,13 @@ public:
 
     int GetMaxX();
     int GetMaxY();
+
 protected:
-//
+    //
 private:
-//
+    //
 };
 
-} //namespace vrv
+} // namespace vrv
 
 #endif

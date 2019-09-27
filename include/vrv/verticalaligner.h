@@ -226,6 +226,11 @@ public:
      */
     virtual int AdjustSlurs(FunctorParams *functorParams);
 
+    /**
+     * See Object::JustifyY
+     */
+    virtual int JustifyY(FunctorParams *functorParams);
+
 private:
     //
 public:
