@@ -1624,14 +1624,14 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                     std::string tmp = mei;
                     std::smatch lineMatch, elementMatch, idMatch, replaceMatch;
                     std::regex lineE("<[a-zA-Z0-9_-.]+? xml:id=\"[a-zA-Z0-9_:.-]+?\"",
-                        std::regex_constants::basic); // match element plus xml:id
+                        std::regex_constants::ECMAScript); // match element plus xml:id
                     while (std::regex_search(tmp, lineMatch, lineE)) {
                         for (std::string x : lineMatch) { // go through all found xml:id without "#"
-                            std::regex elementE("<[a-zA-Z0-9_-.]+? ", std::regex_constants::basic);
+                            std::regex elementE("<[a-zA-Z0-9_-.]+? ", std::regex_constants::ECMAScript);
                             std::regex_search(x, elementMatch, elementE);
                             elementName = elementMatch.str();
                             elementName = elementName.substr(1, elementName.size() - 2);
-                            std::regex idE(" xml:id=\"[a-zA-Z0-9_:.-]+?\"", std::regex_constants::basic);
+                            std::regex idE(" xml:id=\"[a-zA-Z0-9_:.-]+?\"", std::regex_constants::ECMAScript);
                             std::regex_search(x, idMatch, idE);
                             oldId = idMatch.str();
                             oldId = oldId.substr(9, oldId.size() - 10);
