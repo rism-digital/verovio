@@ -1594,16 +1594,18 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
 xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSect)
 {
     for (std::string s : expansionList) {
-        if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1);
-        Object *currSect = this->FindChildByUuid(s);
-        if (currSect->Is(EXPANSION)) {
+        if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
+        Object *currSect = this->FindChildByUuid(s); // find section pointer of reference string
+        if (currSect->Is(EXPANSION)) { // if reference is expansion, resolve it recursively
             existingList = renderExpansion(dynamic_cast<Expansion *>(currSect)->GetPlist(), existingList, prevSect);
         }
         else {
-            if (std::find(existingList.begin(), existingList.end(), s) != existingList.end()) { // el exists in list
-                // dont add to existing List, but add after element
+            if (std::find(existingList.begin(), existingList.end(), s)
+                != existingList.end()) { // section exists in list
                 LogMessage("%s <%s> to be added again after <%s>.", currSect->GetClassName().c_str(), s.c_str(),
                     prevSect->GetUuid().c_str());
+
+                // convert element
                 MeiOutput meiOutput(this, "");
                 std::string mei = meiOutput.GetOutput(currSect);
                 // LogMessage("\n\nold MEI Code: %s.\n", mei.c_str());
@@ -1622,29 +1624,32 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                         std::regex_search(x, idMatch, idE);
                         oldId = idMatch.str();
                         oldId = oldId.substr(9, oldId.size() - 10);
-                        // oldId = x.substr(8, x.size() - 9);
-                        char str[17];
-                        snprintf(str, 17, "%016d", std::rand());
-                        newId = std::string(elementName + "-" + str);
+
+                        // format exisitng sections|endings|rdgs|lemmas by extending them with rendition number
+                        if (elementName == "section" || elementName == "ending" || elementName == "rdg"
+                            || elementName == "lem") {
+                            newId = oldId + "-rend" + std::to_string(getExpansionIdsForElement(oldId).size() + 1);
+                        }
+                        else {
+                            char str[17];
+                            snprintf(str, 17, "%016d", std::rand());
+                            newId = std::string(elementName + "-" + str);
+                        }
                         this->addExpandedIdToExpansionMap(oldId, newId);
-                        //                        std::regex replaceQuotes("[\"\']" + oldId + "[\"\']");
-                        //                        mei = std::regex_replace(mei, replaceQuotes, "\"" + newId + "\"$2");
-                        //                        std::regex replaceReferences("[#]" + oldId + "[\"\']");
-                        //                        mei = std::regex_replace(mei, replaceReferences, "#" + newId +
-                        //                        "\"$2"); std::regex replacePLists("#" + oldId + "[ ]"); mei =
-                        //                        std::regex_replace(mei, replacePLists, "#" + newId + " $2");
+
+                        // do these triple checks to reduce edge conditions in wrong replacements
                         this->ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
                         this->ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
                         this->ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
-                        // LogMessage("Match: %s", x.c_str());
-                        // LogMessage("Match: %s", oldId.c_str());
                     }
                     tmp = lineMatch.suffix().str();
                 }
-                // LogMessage("\n\nnew MEI Code: %s.\n", mei.c_str());
+
+                // read MEI back in and add to structure
                 MeiInput meiInput(this, "");
                 Object *clonedSect = meiInput.ImportStringToExpansionObject(mei);
                 prevSect->GetParent()->InsertAfter(prevSect, clonedSect);
+                prevSect = clonedSect;
             }
             else { // add to existingList, remember previous element, but do nothing else
                 LogMessage("%s <%s> already there.", currSect->GetClassName().c_str(), s.c_str());
