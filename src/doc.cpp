@@ -1635,12 +1635,13 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                             snprintf(str, 17, "%016d", std::rand());
                             newId = std::string(elementName + "-" + str);
                         }
-                        this->addExpandedIdToExpansionMap(oldId, newId);
+                        addExpandedIdToExpansionMap(oldId, newId);
+                        m_hasExpansionMap = true;
 
                         // do these triple checks to reduce edge conditions in wrong replacements
-                        this->ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
-                        this->ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
-                        this->ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
+                        ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
+                        ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
+                        ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
                     }
                     tmp = lineMatch.suffix().str();
                 }

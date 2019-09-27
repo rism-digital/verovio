@@ -120,8 +120,6 @@ public:
      */
     bool GetMidiExportDone() const;
 
-    const vrv::ArrayOfObjects *extracted(const vrv::ArrayOfObjects *arr, int index);
-
     /**
      * WG: render expansion recursion
      */
