@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Sep 20 06:46:55 PDT 2019
+// Last Modified: Sun Sep 29 08:05:25 PDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -336,6 +336,7 @@ class HumNum {
 		std::ostream& printMixedFraction (std::ostream& out = std::cout,
 		                             std::string separator = "_") const;
 		std::ostream& printList          (std::ostream& out) const;
+		std::ostream& printTwoPart  (std::ostream& out, const std::string& spacer = "+") const;
 
 	protected:
 		void     reduce             (void);
@@ -2462,6 +2463,604 @@ class HumdrumFile : public HUMDRUMFILE_PARENT {
 
 
 
+// Reference:     Beyond Midi, page 410.
+#define E_muserec_note_regular       'N'
+	//                                'A' --> use type E_muserec_note_regular
+	//                                'B' --> use type E_muserec_note_regular
+	//                                'C' --> use type E_muserec_note_regular
+	//                                'D' --> use type E_muserec_note_regular
+	//                                'E' --> use type E_muserec_note_regular
+	//                                'F' --> use type E_muserec_note_regular
+	//                                'G' --> use type E_muserec_note_regular
+#define E_muserec_note_chord         'C'
+#define E_muserec_note_cue           'c'
+#define E_muserec_note_grace         'g'
+#define E_muserec_note_grace_chord   'G'
+#define E_muserec_print_suggestion   'P'
+#define E_muserec_sound_directives   'S'
+#define E_muserec_end                '/'
+#define E_muserec_endtext            'T'
+#define E_muserec_append             'a'
+#define E_muserec_backspace          'b'
+#define E_muserec_back               'b'
+#define E_muserec_backward           'b'
+#define E_muserec_figured_harmony    'f'
+#define E_muserec_rest_invisible     'i'
+#define E_muserec_forward            'i'
+#define E_muserec_measure            'm'
+#define E_muserec_rest               'r'
+#define E_muserec_musical_attributes '$'
+#define E_muserec_comment_toggle     '&'
+#define E_muserec_comment_line       '@'
+#define E_muserec_musical_directions '*'
+#define E_muserec_header_1           '1'  // reserved for copyright notice
+#define E_muserec_header_2           '2'  // reserved for identification
+#define E_muserec_header_3           '3'  // reserved
+#define E_muserec_header_4           '4'  // <date> <name of encoder>
+#define E_muserec_header_5           '5'  // WK#:<work number> MV#:<mvmt num>
+#define E_muserec_header_6           '6'  // <source>
+#define E_muserec_header_7           '7'  // <work title>
+#define E_muserec_header_8           '8'  // <movement title>
+#define E_muserec_header_9           '9'  // <name of part>
+#define E_muserec_header_part_name   '9'  // <name of part>
+#define E_muserec_header_10          '0'  // misc designations
+#define E_muserec_header_11          'A'  // group memberships
+#define E_muserec_group_memberships  'A'  // group memberships
+// multiple musered_head_12 lines can occur:
+#define E_muserec_header_12          'B'  // <name1>: part <x> of <num in group>
+#define E_muserec_unknown            'U'  // unknown record type
+#define E_muserec_empty              'E'  // nothing on line and not header
+	                                       // or multi-line comment
+#define E_muserec_deleted            'D'  // deleted line
+// non-standard record types for MuseDataSet
+#define E_muserec_filemarker         '+'
+#define E_muserec_filename           'F'
+#define E_musrec_header               1000
+#define E_musrec_footer               2000
+
+
+class MuseRecordBasic {
+	public:
+		                  MuseRecordBasic    (void);
+		                  MuseRecordBasic    (const std::string& aLine, int index = -1);
+		                  MuseRecordBasic    (MuseRecordBasic& aRecord);
+		                 ~MuseRecordBasic    ();
+
+		void              clear              (void);
+		int               isEmpty            (void);
+		void              cleanLineEnding    (void);
+		std::string       extract            (int start, int stop);
+		char&             getColumn          (int index);
+		std::string       getColumns         (int startcol, int endcol);
+		void              setColumns         (std::string& data, int startcol,
+		                                      int endcol);
+		int               getLength          (void) const;
+		std::string       getLine            (void);
+		int               getLineIndex       (void) { return m_lineindex; }
+		void              setLineIndex       (int index);
+		int               getLineNumber      (void) { return m_lineindex+1; }
+		int               getType            (void) const;
+		void              setTypeGraceNote   (void);
+		void              setTypeGraceChordNote(void);
+
+		MuseRecordBasic&  operator=          (MuseRecordBasic& aRecord);
+		MuseRecordBasic&  operator=          (MuseRecordBasic* aRecord);
+		MuseRecordBasic&  operator=          (const std::string& aRecord);
+		char&             operator[]         (int index);
+		void              setLine            (const std::string& aString);
+		void              setType            (int aType);
+		void              shrink             (void);
+		void              insertString       (int column, const std::string& strang);
+		void              insertStringRight  (int column, const std::string& strang);
+		void              setString          (std::string& strang);
+		void              appendString       (const std::string& strang);
+		void              appendInteger      (int value);
+		void              appendRational     (HumNum& value);
+		void              append             (const char* format, ...);
+
+		// mark-up accessor functions:
+
+		void              setAbsBeat         (HumNum value);
+		void              setAbsBeat         (int topval, int botval = 1);
+		HumNum            getAbsBeat         (void);
+
+		void              setLineDuration    (HumNum value);
+		void              setLineDuration    (int topval, int botval = 1);
+		HumNum            getLineDuration    (void);
+
+		void              setNoteDuration    (HumNum value);
+		void              setNoteDuration    (int topval, int botval = 1);
+		HumNum            getNoteDuration    (void);
+		void              setRoundedBreve    (void);
+
+		void              setMarkupPitch     (int aPitch);
+		int               getMarkupPitch     (void);
+
+
+		// tied note functions:
+		int               isTied                  (void);
+		int               getLastTiedNoteLineIndex(void);
+		int               getNextTiedNoteLineIndex(void);
+		void              setLastTiedNoteLineIndex(int index);
+		void              setNextTiedNoteLineIndex(int index);
+
+		// boolean type fuctions:
+		bool              isAttributes       (void);
+		bool              isBarline          (void);
+		bool              isChordGraceNote   (void);
+		bool              isChordNote        (void);
+		bool              isCueNote          (void);
+		bool              isFiguredHarmony   (void);
+		bool              isGraceNote        (void);
+		bool              isNote             (void);
+		bool              isPartName         (void);
+		bool              isRest             (void);
+
+	protected:
+		std::string       m_recordString;    // actual characters on line
+
+		// mark-up data for the line:
+		int               m_lineindex;       // index into original file
+		int               m_type;            // category of MuseRecordBasic record
+		HumNum            m_absbeat;         // dur in quarter notes from start
+		HumNum            m_lineduration;    // duration of line
+		HumNum            m_noteduration;    // duration of note
+
+		int               m_b40pitch;        // base 40 pitch
+		int               m_nexttiednote;    // line number of next note tied to
+		                                     // this one (-1 if no tied note)
+		int               m_lasttiednote;    // line number of previous note tied
+		                                     // to this one (-1 if no tied note)
+		int               m_roundBreve;
+};
+
+
+std::ostream& operator<<(std::ostream& out, MuseRecordBasic& aRecord);
+
+
+
+
+
+class MuseRecord : public MuseRecordBasic {
+	public:
+		                  MuseRecord                  (void);
+		                  MuseRecord                  (const std::string& aLine);
+		                  MuseRecord                  (MuseRecord& aRecord);
+		                 ~MuseRecord                  ();
+
+
+	//////////////////////////////
+	// functions which work with regular note, cue note, and grace note records
+	// (A..G, c, g)
+
+		// columns 1 -- 5: pitch field information
+		std::string      getNoteField                 (void);
+		int              getOctave                    (void);
+		std::string      getOctaveString              (void);
+		int              getPitch                     (void);
+		std::string      getPitchString               (void);
+		int              getPitchClass                (void);
+		std::string      getPitchClassString          (void);
+		int              getAccidental                (void);
+		std::string      getAccidentalString          (void);
+		int              getBase40                    (void);
+		void             setPitch                     (int base40, int chordnote = 0,
+		                                               int gracenote = 0);
+		void             setPitch                     (const std::string& pitchname);
+		void             setPitchAtIndex              (int index,
+		                                               const std::string& pitchname);
+		void             setChordPitch                (const std::string& pitchname);
+		void             setGracePitch                (const std::string& pitchname);
+		void             setGraceChordPitch           (const std::string& pitchname);
+		void             setCuePitch                  (const std::string& pitchname);
+		void             setStemDown                  (void);
+		void             setStemUp                    (void);
+
+		// columns 6 -- 9: duration field information
+		std::string      getTickDurationField         (void);
+		std::string      getTickDurationString        (void);
+		int              getTickDuration              (void);
+		int              getLineTickDuration          (void);
+		int              getNoteTickDuration          (void);
+		std::string      getTieString                 (void);
+		int              getTie                       (void);
+		int              setTie                       (int hidden = 0);
+		int              tieQ                         (void);
+		int              getTicks                     (void);
+		void             setTicks                     (int value);
+		void             setBack                      (int value);
+		void             setDots                      (int value);
+		void             setNoteheadShape             (HumNum duration);
+		void             setNoteheadShapeMensural     (HumNum duration);
+		void             setNoteheadMaxima            (void);
+		void             setNoteheadLong              (void);
+		void             setNoteheadBreve             (void);
+		void             setNoteheadBreveSquare       (void);
+		void             setNoteheadBreveRound        (void);
+
+		void             setNoteheadWhole             (void);
+		void             setNoteheadHalf              (void);
+		void             setNoteheadQuarter           (void);
+		void             setNotehead8th               (void);
+		void             setNotehead16th              (void);
+		void             setNotehead32nd              (void);
+		void             setNotehead64th              (void);
+		void             setNotehead128th             (void);
+		void             setNotehead256th             (void);
+
+		void             setNoteheadBreveMensural     (void);
+		void             setNoteheadWholeMensural     (void);
+		void             setNoteheadHalfMensural      (void);
+		void             setNoteheadQuarterMensural   (void);
+		void             setNotehead8thMensural       (void);
+		void             setNotehead16thMensural      (void);
+		void             setNotehead32ndMensural      (void);
+		void             setNotehead64thMensural      (void);
+		void             setNotehead128thMensural     (void);
+		void             setNotehead256thMensural     (void);
+
+		// columns 10 -- 12 ---> blank
+
+		// columns 13 -- 80: graphical and interpretive information
+
+		// column 13: footnote flag
+		std::string      getFootnoteFlagField         (void);
+		std::string      getFootnoteFlagString        (void);
+		int              getFootnoteFlag              (void);
+		int              footnoteFlagQ                (void);
+
+		// column 14: level number
+		std::string      getLevelField                (void);
+		std::string      getLevelString               (void);
+		int              getLevel                     (void);
+		int              levelQ                       (void);
+
+		// column 15: track number
+		std::string      getTrackField                (void);
+		std::string      getTrackString               (void);
+		int              getTrack                     (void);
+		int              trackQ                       (void);
+
+		// column 16 ---> blank
+
+		// column 17: graphic note type
+		std::string      getGraphicNoteTypeField      (void);
+		std::string      getGraphicNoteTypeString     (void);
+		int              getGraphicNoteType           (void);
+		int              getGraphicNoteTypeSize       (void);
+		int              graphicNoteTypeQ             (void);
+
+		// column 18: dots of prolongation
+		std::string      getProlongationField         (void);
+		std::string      getProlongationString        (void);
+		int              getProlongation              (void);
+		std::string      getStringProlongation        (void);
+		int              prolongationQ                (void);
+
+		// column 19: actual notated accidentals
+		std::string      getNotatedAccidentalField    (void);
+		std::string      getNotatedAccidentalString   (void);
+		int              getNotatedAccidental         (void);
+		int              notatedAccidentalQ           (void);
+
+		// columns 20 -- 22: time modification
+		std::string      getTimeModificationField     (void);
+		std::string      getTimeModification          (void);
+		std::string      getTimeModificationLeftField (void);
+		std::string      getTimeModificationLeftString(void);
+		int              getTimeModificationLeft      (void);
+		std::string      getTimeModificationRightField(void);
+		std::string      getTimeModificationRightString(void);
+		int              getTimeModificationRight     (void);
+		int              timeModificationQ            (void);
+		int              timeModificationLeftQ        (void);
+		int              timeModificationRightQ       (void);
+
+		// column 23
+		std::string      getStemDirectionField        (void);
+		std::string      getStemDirectionString       (void);
+		int              getStemDirection             (void);
+		int              stemDirectionQ               (void);
+
+		// column 24
+		std::string      getStaffField                (void);
+		std::string      getStaffString               (void);
+		int              getStaff                     (void);
+		int              staffQ                       (void);
+		
+		// column 25 ---> blank
+
+		// columns 26 - 31: beam codes
+		std::string      getBeamField                 (void);
+		int              beamQ                        (void);
+		char             getBeam8                     (void);
+		char             getBeam16                    (void);
+		char             getBeam32                    (void);
+		char             getBeam64                    (void);
+		char             getBeam128                   (void);
+		char             getBeam256                   (void);
+		int              beam8Q                       (void);
+		int              beam16Q                      (void);
+		int              beam32Q                      (void);
+		int              beam64Q                      (void);
+		int              beam128Q                     (void);
+		int              beam256Q                     (void);
+		std::string      getKernBeamStyle             (void);
+		void             setBeamInfo                  (std::string& strang);
+
+		// columns 32 -- 43: additional notation
+		std::string      getAdditionalNotationsField  (void);
+		int              additionalNotationsQ         (void);
+		int              getAddCount                  (void);
+		std::string      getAddItem                   (int elementIndex);
+		int              addAdditionalNotation        (char symbol);
+		int              addAdditionalNotation        (const std::string& symbol);
+		int              getAddItemLevel              (int elementIndex);
+		std::string      getEditorialLevels           (void);
+		int              addEditorialLevelQ           (void);
+		//  protected:   getAddElementIndex
+		int              findField                    (const std::string& key);
+		int              findField                    (char key, int mincol,
+		                                               int maxcol);
+		// int           getNotationLevel
+		int              getSlurStartColumn           (void);
+		std::string      getSlurParameterRegion       (void);
+		void             getSlurInfo                  (string& slurstarts, string& slurends);
+
+		// columns 44 -- 80: text underlay
+		std::string      getTextUnderlayField         (void);
+		int              textUnderlayQ                (void);
+		int              getVerseCount                (void);
+		std::string      getVerse                     (int index);
+
+		// general functions for note records:
+		std::string      getKernNoteStyle             (int beams = 0, int stems = 0);
+		std::string      getKernNoteAccents           (void);
+
+
+	//////////////////////////////
+	// functions which work with basso continuo figuration records ('f'):
+
+		// column 2: number of figure fields
+		std::string      getFigureCountField          (void);
+		std::string      getFigureCountString         (void);
+		int              getFigureCount               (void);
+
+		// columns 3 -- 5 ---> blank
+		
+		// columns 6 -- 8: figure division pointer advancement (duration)
+		std::string      getFigurePointerField        (void);
+		int              figurePointerQ               (void);
+		// same as note records: getDuration
+
+		// columns 9 -- 12 ---> blank
+
+		// columns 13 -- 15: footnote and level information
+		// column 13 --> footnote: uses same functions as note records in col 13.
+		// column 14 --> level: uses same functions as note records on column 14.
+		// column 15 ---> blank
+
+		// columns 17 -- 80: figure fields
+		std::string      getFigureFields              (void);
+		std::string      getFigureString              (void);
+		int              figureFieldsQ                (void);
+		std::string      getFigure                    (int index = 0);
+
+
+	//////////////////////////////
+	// functions which work with combined records ('b', 'i'):
+
+
+	//////////////////////////////
+	// functions which work with measure records ('m'):
+
+		// columns 1 -- 7: measure style information
+		std::string      getMeasureTypeField          (void);
+
+		// columns 9 -- 12: measure number (left justified)
+		std::string      getMeasureNumberField        (void);
+		std::string      getMeasureNumberString       (void);
+		int              getMeasureNumber             (void);
+		int              measureNumberQ               (void);
+
+		// columns 17 -- 80: measure flags
+		int              measureFermataQ              (void);
+		int              measureFlagQ                 (const std::string& key);
+		void             addMeasureFlag               (const std::string& strang);
+
+		// general functions for measure records:
+		std::string      getKernMeasureStyle          (void);
+
+
+	//////////////////////////////
+	// functions which work with musical attributes records ('$'):
+
+		std::string      getAttributes                (void);
+		void             getAttributeMap              (std::map<std::string, std::string>& amap);
+		int              attributeQ                   (const std::string& attribute);
+		int              getAttributeInt              (char attribute);
+		int              getAttributeField            (std::string& output, const std::string& attribute);
+
+
+	//
+	//////////////////////////////
+
+		std::string      getKernRestStyle             (int quarter = 16);
+
+	protected:
+		void             allowNotesOnly               (const std::string& functioName);
+		void             allowMeasuresOnly            (const std::string& functioName);
+		void             allowFigurationOnly          (const std::string& functioName);
+		void             allowFigurationAndNotesOnly  (const std::string& functioName);
+		int              getAddElementIndex           (int& index, std::string& output,
+		                                               const std::string& input);
+		void             zerase                       (std::string& inout, int num);
+};
+
+
+
+
+// A MuseEventSet is a timestamp and then a list of pointers to all
+// lines in the original file that occur at that time.
+// The MuseData class contains a variable called "sequence" which is
+// a list of MuseEventSet object pointers which are sorted by time.
+
+class MuseEventSet {
+	public:
+		                   MuseEventSet       (void);
+		                   MuseEventSet       (HumNum atime);
+		                  ~MuseEventSet       ()     { clear(); }
+
+		void               clear              (void);
+		void               setTime            (HumNum abstime);
+		HumNum             getTime            (void);
+		void               appendRecord       (MuseRecord* arecord);
+		MuseRecord&        operator[]         (int index);
+		MuseEventSet       operator=          (MuseEventSet& anevent);
+		int                getEventCount      (void);
+
+	protected:
+		HumNum     absbeat;              // starting time of events
+		std::vector<MuseRecord*> events; // list of events on absbeat
+};
+
+
+
+class MuseData {
+	public:
+		                  MuseData            (void);
+		                  MuseData            (MuseData& input);
+		                 ~MuseData            ();
+
+		void              setFilename         (const std::string& filename);
+		std::string       getFilename         (void);
+		std::string       getPartName         (void);
+		int               isMember            (const std::string& mstring);
+		int               getMembershipPartNumber(const std::string& mstring);
+		void              selectMembership    (const std::string& selectstring);
+		MuseData&         operator=           (MuseData& input);
+		int               getLineCount        (void);
+		int               getNumLines         (void) { return getLineCount(); }
+		MuseRecord&       last                (void);
+		int               isEmpty             (void);
+		int               append              (MuseRecord& arecord);
+		int               append              (MuseData& musedata);
+		int               append              (std::string& charstring);
+		void              insert              (int index, MuseRecord& arecord);
+		void              clear               (void);
+		int               getInitialTpq       (void);
+
+		int               read                (std::istream& input);
+		int               readString          (const std::string& filename);
+		int               readFile            (const std::string& filename);
+
+		// aliases for access to MuseRecord objects based on line indexes:
+		std::string       getLine             (int index);
+		bool              isPartName          (int index);
+
+		// additional mark-up analysis functions for post-processing:
+		void              doAnalyses          (void);
+		void              analyzeType         (void);
+		void              analyzeRhythm       (void);
+		void              analyzeTies         (void);
+		void              analyzePitch        (void);
+
+		// line-based (file-order indexing) accessor functions:
+		MuseRecord&       operator[]          (int lindex);
+		MuseRecord&       getRecord           (int lindex);
+		HumNum            getTiedDuration     (int lindex);
+
+		HumNum            getAbsBeat         (int lindex);
+		HumNum            getFileDuration    (void);
+
+		int               getLineTickDuration (int lindex);
+
+		// event-based (time-order indexing) accessor functions:
+		MuseEventSet&     getEvent            (int eindex);
+		int               getEventCount       (void);
+		HumNum            getEventTime        (int eindex);
+		MuseRecord&       getRecord           (int eindex, int erecord);
+		int               getLineIndex        (int eindex, int erecord);
+		HumNum            getLineDuration     (int eindex, int erecord);
+		HumNum            getNoteDuration     (int eindex, int erecord);
+		int               getLastTiedNoteLineIndex(int eindex, int erecord);
+		int               getNextTiedNoteLineIndex(int eindex, int erecord);
+		HumNum            getTiedDuration     (int eindex, int erecord);
+		int               getType             (int eindex, int erecord);
+		void              cleanLineEndings    (void);
+		std::string       getError            (void);
+		bool              hasError            (void);
+
+	private:
+		std::vector<MuseRecord*>    m_data;
+		std::vector<MuseEventSet*>  m_sequence;
+		std::string                 m_name;
+		std::string                 m_error;
+
+	protected:
+		void              clearError          (void);
+		void              setError            (const std::string& error);
+		void              processTie          (int eventindex, int recordindex,
+		                                       int lastindex);
+		int               searchForPitch      (int eventindex, int b40,
+		                                       int track);
+		int               getNextEventIndex   (int startindex,
+		                                       HumNum target);
+		void              constructTimeSequence(void);
+		void              insertEventBackwards (HumNum atime,
+		                                        MuseRecord* arecord);
+		int               getPartNameIndex    (void);
+		std::string       getPartName         (int index);
+};
+
+
+std::ostream& operator<<(std::ostream& out, MuseData& musedata);
+
+
+
+
+class MuseDataSet {
+	public:
+		                  MuseDataSet         (void);
+		                  MuseDataSet         (MuseDataSet& input);
+		                 ~MuseDataSet         () { clear(); }
+
+		void              clear               (void);
+		int               readPartFile        (const std::string& filename);
+		int               readPartString      (const std::string& data);
+		int               readPart            (std::istream& input);
+		int               readFile            (const std::string& filename);
+		int               readString          (const std::string& data);
+		int               read                (std::istream& input);
+		MuseData&         operator[]          (int index);
+		int               getPartCount        (void);
+		void              deletePart          (int index);
+		void              cleanLineEndings    (void);
+
+		std::string       getError            (void);
+		bool              hasError            (void);
+		void              clearError          (void);
+
+	private:
+		std::vector<MuseData*>  m_part;
+		std::string             m_error;
+
+	protected:
+		int               appendPart          (MuseData* musedata);
+		void              analyzeSetType      (std::vector<int>& types,
+		                                       std::vector<std::string>& lines);
+		void              analyzePartSegments (std::vector<int>& startindex,
+		                                       std::vector<int>& stopindex,
+		                                       std::vector<std::string>& lines);
+		void              setError            (const std::string& error);
+
+};
+
+
+std::ostream& operator<<(std::ostream& out, MuseDataSet& musedata);
+
+
+
 #define GRIDREST NAN
 
 class NoteGrid;
@@ -2725,6 +3324,15 @@ class Convert {
 		static HumNum  mensToDurationNoDots(const std::string& mensdata,
 		                                     HumNum scale = 4,
 		                                     const std::string& separator = " ");
+
+		// MuseData conversions in Convert-musedata.cpp
+      static int       museToBase40        (const std::string& pitchString);
+      static std::string musePitchToKernPitch(const std::string& museInput);
+		static std::string museClefToKernClef(const std::string& mclef);
+		static std::string museKeySigToKernKeySig(const std::string& mkeysig);
+		static std::string museTimeSigToKernTimeSig(const std::string& mtimesig);
+		static std::string museMeterSigToKernMeterSig(const std::string& mtimesig);
+		static std::string museFiguredBassToKernFiguredBass(const std::string& mfb);
 
 		// Harmony processing, defined in Convert-harmony.cpp
 		static std::vector<int> minorHScaleBase40(void);
@@ -2994,6 +3602,11 @@ class GridPart : public std::vector<GridStaff*>, public GridSide {
 	public:
 		GridPart(void);
 		~GridPart();
+
+	private:
+		std::string m_partName;
+
+
 };
 
 std::ostream& operator<<(std::ostream& output, GridPart* part);
@@ -3064,6 +3677,8 @@ class GridMeasure : public std::list<GridSlice*> {
 		void         addLayoutParameter(GridSlice* slice, int partindex, const std::string& locomment);
 		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
 		void         addFiguredBassLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
+		GridSlice*   addFiguredBass(HTp token, HumNum timestamp, int part, int maxstaff);
+		GridSlice*   addFiguredBass(const std::string& tok, HumNum timestamp, int part, int maxstaff);
 		bool         isInvisible(void);
 		bool         isSingleChordMeasure(void);
 		bool         isMonophonicMeasure(void);
@@ -3166,6 +3781,7 @@ class GridSlice : public std::vector<GridPart*> {
 
 
 std::ostream& operator<<(std::ostream& output, GridSlice* slice);
+std::ostream& operator<<(std::ostream& output, GridSlice& slice);
 
 
 
@@ -3235,6 +3851,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		int  getPartCount               (void);
 		int  getStaffCount              (int partindex);
 		void deleteMeasure              (int index);
+		void setPartName                (int index, const string& name);
+		std::string getPartName         (int index);
 
 	protected:
 		void calculateGridDurations        (void);
@@ -3244,6 +3862,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 		                                    GridSlice& slice);
 		void insertPartIndications         (HumdrumFile& outfile);
 		void insertStaffIndications        (HumdrumFile& outfile);
+		void insertPartNames               (HumdrumFile& outfile);
 		void addNullTokens                 (void);
 		void addNullTokensForGraceNotes    (void);
 		void addNullTokensForClefChanges   (void);
@@ -3283,6 +3902,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		                                    int staff);
 		void insertSideStaffInfo           (HumdrumLine* line, int part,
 		                                    int staff, int staffnum);
+		void insertSideNullInterpretations (HumdrumLine* line,
+		                                    int part, int staff);
 		void getMetricBarNumbers           (std::vector<int>& barnums);
 		string  createBarToken             (int m, int barnum,
 		                                    GridMeasure* measure);
@@ -3307,6 +3928,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		std::vector<bool>             m_dynamics;
 		std::vector<bool>             m_figured_bass;
 		std::vector<bool>             m_harmony;
+
+		std::vector<std::string>      m_partnames;
 
 		// options:
 		bool m_recip;               // include **recip spine in output
@@ -3765,6 +4388,7 @@ class HumTool : public Options {
 		bool          hasError        (void);
 		std::string   getError        (void);
 		ostream&      getError        (ostream& out);
+		void          setError        (const string& message);
 
 	protected:
 		std::stringstream m_humdrum_text;  // output text in Humdrum syntax.
@@ -4046,6 +4670,16 @@ class Tool_autobeam : public HumTool {
 		void     addBeams        (HumdrumFile& infile);
 		void     removeBeams     (HumdrumFile& infile);
 		void     removeEdgeRests (HTp& startnote, HTp& endnote);
+		void     breakBeamsByLyrics(HumdrumFile& infile);
+		void     processStrandForLyrics(HTp stok, HTp etok);
+		bool     hasSyllable     (HTp token);
+		void     splitBeam       (HTp tok, HTp stok, HTp etok);
+		void     splitBeam2      (vector<HTp>& group, HTp tok);
+		void     getBeamedNotes(vector<HTp>& toks, HTp tok, HTp stok, HTp etok);
+		bool     isLazy          (vector<HTp>& group);
+		void     splitBeamLazy   (vector<HTp>& group, HTp tok);
+		void     splitBeamNotLazy(vector<HTp>& group, HTp tok);
+		void     removeBeamCharacters(HTp token);
 
 	private:
 		std::vector<std::vector<pair<int, HumNum> > > m_timesigs;
@@ -4053,6 +4687,7 @@ class Tool_autobeam : public HumTool {
 		bool        m_overwriteQ;
 		int         m_track;
 		bool        m_includerests = false;
+		int         m_splitcount = 0;
 
 };
 
@@ -5583,6 +6218,53 @@ class Tool_msearch : public HumTool {
 		string      m_text;
 		string      m_marker;
 };
+
+
+class Tool_musedata2hum : public HumTool {
+	public:
+		        Tool_musedata2hum    (void);
+		       ~Tool_musedata2hum    () {}
+
+		bool    convertFile          (ostream& out, const string& filename);
+		bool    convertString        (ostream& out, const string& input);
+		bool    convert              (ostream& out, MuseDataSet& mds);
+		bool    convert              (ostream& out, istream& input);
+
+		void    setOptions           (int argc, char** argv);
+		void    setOptions           (const std::vector<std::string>& argvlist);
+		Options getOptionDefinitions (void);
+		void    setInitialOmd        (const string& omd);
+
+	protected:
+		void    initialize           (void);
+		void    convertLine          (GridMeasure* gm, MuseRecord& mr);
+		bool    convertPart          (HumGrid& outdata, MuseDataSet& mds, int index);
+		int     convertMeasure       (HumGrid& outdata, MuseData& part, int startindex);
+		GridMeasure* getMeasure      (HumGrid& outdata, HumNum starttime);
+		void    setTimeSigDurInfo    (const std::string& mtimesig);
+		void    setMeasureStyle      (GridMeasure* gm, MuseRecord& mr);
+		void    storePartName        (HumGrid& outdata, MuseData& part, int index);
+		void    addNoteDynamics      (GridSlice* slice, int part, 
+		                              MuseRecord& mr);
+		void    addFiguredHarmony    (MuseRecord& mr, GridMeasure* gm,
+		                              HumNum timestamp, int part, int maxstaff);
+
+	private:
+		// options:
+		Options m_options;
+		bool    m_stemsQ = false;    // used with -s option
+		bool    m_recipQ = false;    // used with -r option
+		std::string m_omd = "";      // initial tempo designation (store for later output)
+
+		// state variables:
+		int m_tpq      = 1;          // Ticks per quarter note
+		int m_part     = 0;          // staff index currently being processed
+		int m_maxstaff = 0;          // total number of staves (parts)
+		HumNum m_timesigdur = 4;     // duration of current time signature in quarter notes
+		HTp m_lastfigure = NULL;     // last figured bass token
+
+};
+
 
 
 class MusicXmlHarmonyInfo {
