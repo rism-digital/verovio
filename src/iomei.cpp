@@ -2794,6 +2794,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     for (auto const &stringVector : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
         for (auto const &string : stringVector) std::cout << string << ((string != stringVector.back()) ? ", " : ".\n");
     }
+    std::cout << "DEBUG: ";
+    for (std::string s : m_doc->getExpansionIdsForElement("measure-0000000262908720")) {
+        std::cout << s << "; ";
+    }
     // WG
 
     if (success && m_readingScoreBased) {
