@@ -961,15 +961,18 @@ std::string Toolkit::getNotatedIdForElement(const std::string &xmlId)
         return xmlId;
 }
 
-std::vector<std::string> Toolkit::getExpansionIdsForElement(const std::string &xmlId)
+std::string Toolkit::getExpansionIdsForElement(const std::string &xmlId)
 {
-    if (m_doc.m_hasExpansionMap)
-        return m_doc.getExpansionIdsForElement(xmlId);
-    else {
-        std::vector<std::string> ids;
-        ids.push_back("");
-        return ids;
+    jsonxx::Array a;
+    if (m_doc.m_hasExpansionMap) {
+        for (std::string id : m_doc.getExpansionIdsForElement(xmlId)) {
+            a << id;
+        }
     }
+    else {
+        a << "";
+    }
+    return a.json();
 }
 
 bool Toolkit::Edit(const std::string &json_editorAction)

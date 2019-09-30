@@ -189,7 +189,7 @@ public:
     /**
      * Returns a vector of ID strings of all elements (the notated and the expanded) for a given element
      */
-    std::vector<std::string> getExpansionIdsForElement(const std::string &xmlId);
+    std::string getExpansionIdsForElement(const std::string &xmlId);
 
     /**
      * Redo the layout of the loaded data.
