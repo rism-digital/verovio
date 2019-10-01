@@ -1600,24 +1600,23 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSect)
+xsdAnyURI_List Doc::useExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSect)
 {
     for (std::string s : expansionList) {
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
         Object *currSect = this->FindChildByUuid(s); // find section pointer of reference string
         if (currSect->Is(EXPANSION)) { // if reference is expansion, resolve it recursively
-            existingList = renderExpansion(dynamic_cast<Expansion *>(currSect)->GetPlist(), existingList, prevSect);
+            existingList = useExpansion(dynamic_cast<Expansion *>(currSect)->GetPlist(), existingList, prevSect);
         }
         else {
             if (std::find(existingList.begin(), existingList.end(), s)
                 != existingList.end()) { // section exists in list
-                LogMessage("%s <%s> to be added again after <%s>.", currSect->GetClassName().c_str(), s.c_str(),
-                    prevSect->GetUuid().c_str());
+                // LogMessage("%s <%s> to be added again after <%s>.", currSect->GetClassName().c_str(), s.c_str(),
+                //    prevSect->GetUuid().c_str());
 
                 // convert element
                 MeiOutput meiOutput(this, "");
                 std::string mei = meiOutput.GetOutput(currSect);
-                // LogMessage("\n\nold MEI Code: %s.\n", mei.c_str());
                 //
                 try {
                     std::string elementName, oldId, newId;
@@ -1646,8 +1645,7 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                                 snprintf(str, 17, "%016d", std::rand());
                                 newId = std::string(elementName + "-" + str);
                             }
-                            addExpandedIdToExpansionMap(oldId, newId);
-                            m_hasExpansionMap = true;
+                            this->addExpandedIdToExpansionMap(oldId, newId);
 
                             // do these triple checks to reduce edge conditions in wrong replacements
                             ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
@@ -1668,7 +1666,7 @@ xsdAnyURI_List Doc::renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List
                 prevSect = clonedSect;
             }
             else { // add to existingList, remember previous element, but do nothing else
-                LogMessage("%s <%s> already there.", currSect->GetClassName().c_str(), s.c_str());
+                // LogMessage("%s <%s> already there.", currSect->GetClassName().c_str(), s.c_str());
                 prevSect = currSect;
                 existingList.push_back(s);
             }
@@ -1719,6 +1717,11 @@ std::vector<std::string> Doc::getExpansionIdsForElement(const std::string &xmlId
     std::vector<std::string> ids;
     ids.push_back(xmlId.c_str());
     return ids;
+}
+
+bool Doc::HasExpansionMap()
+{
+    return (m_expansionMap.empty()) ? false : true;
 }
 
 } // namespace vrv

@@ -574,9 +574,9 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
-    m_renderExpansion.SetInfo("Render expansion", "Render (expand) all referenced elements of an expansion <xml:id>");
-    m_renderExpansion.Init("");
-    this->Register(&m_renderExpansion, "renderExpansion", &m_general);
+    m_useExpansion.SetInfo("Use expansion", "Use (expand) all referenced elements of an expansion <xml:id>");
+    m_useExpansion.Init("");
+    this->Register(&m_useExpansion, "useExpansion", &m_general);
 
     m_svgBoundingBoxes.SetInfo("Svg bounding boxes viewbox on svg root", "Include bounding boxes in SVG output");
     m_svgBoundingBoxes.Init(false);

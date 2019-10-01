@@ -98,6 +98,11 @@ public:
     bool HasPage(int pageIdx);
 
     /**
+     * Check if m_expansionMap has been filled
+     */
+    bool HasExpansionMap();
+
+    /**
      * Get the Score in the visible Mdiv.
      * Will find it only when having read a score-based MEI file
      */
@@ -123,7 +128,7 @@ public:
     /**
      * WG: render expansion recursion
      */
-    xsdAnyURI_List renderExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
+    xsdAnyURI_List useExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
 
     void ReplaceStringInPlace(std::string &subject, const std::string &search, const std::string &replace);
 
@@ -415,9 +420,6 @@ public:
 
     /** Record notation type for document */
     data_NOTATIONTYPE m_notationType;
-
-    /** A flag to indicate whether the expansionMap has been created */
-    bool m_hasExpansionMap = false;
 
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
     std::vector<std::vector<std::string> > m_expansionMap;

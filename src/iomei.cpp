@@ -2768,37 +2768,32 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     success = ReadMdivChildren(m_doc, body, false);
 
-    // WG: render expansion ID, given by command line argument
-    std::string expansionId = m_doc->GetOptions()->m_renderExpansion.GetValue();
+    // Upon MEI import: use expansion ID, given by command line argument
+    std::string expansionId = m_doc->GetOptions()->m_useExpansion.GetValue();
     if (!expansionId.empty()) {
         Expansion *start = dynamic_cast<Expansion *>(m_doc->FindChildByUuid(expansionId));
         if (start == NULL) {
-            LogMessage("iomei: expansion ID \"%s\" not found.", expansionId.c_str());
+            LogMessage("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
         }
         else {
             xsdAnyURI_List expansionList = start->GetPlist();
-            std::cout << "[renderExpansion] xml:id=\"" << expansionId.c_str() << "\" plist={";
-            for (std::string s : expansionList) std::cout << s.c_str() << ((s != expansionList.back()) ? " " : "}.\n");
+            //std::cout << "[useExpansion] xml:id=\"" << expansionId.c_str() << "\" plist={";
+            //for (std::string s : expansionList) std::cout << s.c_str() << ((s != expansionList.back()) ? " " : "}.\n");
             xsdAnyURI_List existingList;
-            existingList = m_doc->renderExpansion(expansionList, existingList, start);
-            // save original/notated expansion as element in MEI
+            existingList = m_doc->useExpansion(expansionList, existingList, start);
+            // save original/notated expansion as element in expanded MEI
             Expansion *originalExpansion = new Expansion();
             originalExpansion->SetUuid("expansion-notated");
             for (std::string ref : existingList) originalExpansion->GetPlistInterface()->AddRef("#" + ref);
             start->GetParent()->InsertAfter(start, originalExpansion);
-            std::cout << "[renderExpansion] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
-                      << "\" plist={";
-            for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
+            //std::cout << "[useExpansion] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
+            //          << "\" plist={";
+            //for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
         }
     }
-    for (auto const &stringVector : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
-        for (auto const &string : stringVector) std::cout << string << ((string != stringVector.back()) ? ", " : ".\n");
-    }
-    std::cout << "DEBUG: ";
-    for (std::string s : m_doc->getExpansionIdsForElement("measure-0000000262908720")) {
-        std::cout << s << "; ";
-    }
-    // WG
+    //for (auto const &strVect : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
+    //    for (auto const &string : strVect) std::cout << string << ((string != strVect.back()) ? ", " : ".\n");
+    //}
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
