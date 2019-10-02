@@ -82,10 +82,11 @@ Clef *ScoreDefElement::GetClef()
 
 Clef *ScoreDefElement::GetClefCopy()
 {
-    // Always check if HasClefInfo() is true before asking for a copy
-    Clef *copy = dynamic_cast<Clef *>(this->GetClef()->Clone());
-    assert(copy);
-    return copy;
+    // Always check if HasClefInfo() is true before asking for a clone
+    Clef *clone = dynamic_cast<Clef *>(this->GetClef()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
 KeySig *ScoreDefElement::GetKeySig()
@@ -98,10 +99,11 @@ KeySig *ScoreDefElement::GetKeySig()
 
 KeySig *ScoreDefElement::GetKeySigCopy()
 {
-    // Always check if HasKeySigInfo() is true before asking for a copy
-    KeySig *copy = dynamic_cast<KeySig *>(this->GetKeySig()->Clone());
-    assert(copy);
-    return copy;
+    // Always check if HasKeySigInfo() is true before asking for a clone
+    KeySig *clone = dynamic_cast<KeySig *>(this->GetKeySig()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
 Mensur *ScoreDefElement::GetMensur()
@@ -114,10 +116,11 @@ Mensur *ScoreDefElement::GetMensur()
 
 Mensur *ScoreDefElement::GetMensurCopy()
 {
-    // Always check if HasMensurInfo() is true before asking for a copy
-    Mensur *copy = dynamic_cast<Mensur *>(this->GetMensur()->Clone());
-    assert(copy);
-    return copy;
+    // Always check if HasMensurInfo() is true before asking for a clone
+    Mensur *clone = dynamic_cast<Mensur *>(this->GetMensur()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
 MeterSig *ScoreDefElement::GetMeterSig()
@@ -130,10 +133,11 @@ MeterSig *ScoreDefElement::GetMeterSig()
 
 MeterSig *ScoreDefElement::GetMeterSigCopy()
 {
-    // Always check if HasMeterSigInfo() is true before asking for a copy
-    MeterSig *copy = dynamic_cast<MeterSig *>(this->GetMeterSig()->Clone());
-    assert(copy);
-    return copy;
+    // Always check if HasMeterSigInfo() is true before asking for a clone
+    MeterSig *clone = dynamic_cast<MeterSig *>(this->GetMeterSig()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
 //----------------------------------------------------------------------------

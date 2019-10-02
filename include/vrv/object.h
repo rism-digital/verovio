@@ -219,7 +219,7 @@ public:
      * This methods has to be called expicitly when overriden because it is not called from the constructors.
      * Do not forget to call base-class equivalent whenever applicable (e.g, with more than one hierarchy level).
      */
-    virtual void CopyReset(){};
+    virtual void CloneReset();
 
     std::string GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);

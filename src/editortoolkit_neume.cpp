@@ -1461,6 +1461,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 continue;
             }
             Object *newParent = currentParent->Clone();
+            newParent->CloneReset();
             assert(newParent);
             newParent->ClearChildren();
 

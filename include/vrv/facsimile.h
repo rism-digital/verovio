@@ -37,6 +37,7 @@ public:
     ///@{
     Facsimile();
     virtual ~Facsimile();
+    virtual Object *Clone() const { return new Facsimile(*this); }
     virtual void Reset();
     virtual ClassId GetClassId() const { return FACSIMILE; }
     virtual std::string GetClassName() const { return "facsimile"; }

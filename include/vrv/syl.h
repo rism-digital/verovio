@@ -43,6 +43,7 @@ public:
     ///@{
     Syl();
     virtual ~Syl();
+    virtual Object *Clone() const { return new Syl(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Syl"; }
     virtual ClassId GetClassId() const { return SYL; }
