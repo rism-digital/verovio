@@ -50,7 +50,8 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
-
+class Verse;
+    
 //----------------------------------------------------------------------------
 // FunctorParams
 //----------------------------------------------------------------------------
@@ -370,14 +371,14 @@ class AdjustSylSpacingParams : public FunctorParams {
 public:
     AdjustSylSpacingParams(Doc *doc)
     {
-        m_previousSyl = NULL;
+        m_previousVerse = NULL;
         m_previousMeasure = NULL;
         m_freeSpace = 0;
         m_staffSize = 100;
         m_doc = doc;
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
-    Syl *m_previousSyl;
+    Verse *m_previousVerse;
     Measure *m_previousMeasure;
     int m_freeSpace;
     int m_staffSize;

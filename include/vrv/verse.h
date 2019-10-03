@@ -39,6 +39,13 @@ public:
      * Only Syl elements will be actually added to the verse.
      */
     virtual void AddChild(Object *object);
+    
+    /**
+     * Calculate the adjustment according to the overlap and the free space available before.
+     * Will move the syllable accordingly.
+     * Called from Syl::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     */
+    int AdjustPreviousVerse(int overlap, int freeSpace, Doc *doc);
 
     //----------//
     // Functors //
@@ -48,6 +55,11 @@ public:
      * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);
+    
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareProcessingLists

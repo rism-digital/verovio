@@ -71,7 +71,7 @@ public:
      * Will move the syllable accordingly.
      * Called from Syl::AdjustSylSpacing and System::AdjustSylSpacingEnd
      */
-    int CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params);
+    int CalcConnectorSpacing(Doc *doc, int staffSize);
 
     //----------//
     // Functors //

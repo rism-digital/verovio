@@ -74,50 +74,30 @@ void Syl::AddChild(Object *child)
     Modify();
 }
 
-int Syl::CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params)
+int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
 {
+    assert(doc);
+    
     sylLog_WORDPOS pos = this->GetWordpos();
-    int nextFreeSpace = 0;
+
+    int spacing = 0;
 
     // We have a word connector - the space have to be wide enough
     if ((pos == sylLog_WORDPOS_i) || (pos == sylLog_WORDPOS_m)) {
-        int hyphen = params->m_doc->GetDrawingUnit(params->m_staffSize)
-            * params->m_doc->GetOptions()->m_lyricHyphenLength.GetValue();
+        int hyphen = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricHyphenLength.GetValue();
         // Adjust it proportionally to the lyric size
-        hyphen *= params->m_doc->GetOptions()->m_lyricSize.GetValue()
-            / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
-        overlap += (2 * hyphen);
+        hyphen *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
+        spacing = (2 * hyphen);
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
-        int wordSpace = params->m_doc->GetDrawingUnit(params->m_staffSize)
-            * params->m_doc->GetOptions()->m_lyricWordSpace.GetValue();
+        int wordSpace = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricWordSpace.GetValue();
         // Adjust it proportionally to the lyric size
-        wordSpace *= params->m_doc->GetOptions()->m_lyricSize.GetValue()
-            / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
-        overlap += wordSpace;
+        wordSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
+        spacing = wordSpace;
     }
 
-    if (overlap > 0) {
-        // We have enough space to absorb the overla completely
-        if (params->m_freeSpace > overlap) {
-            params->m_previousSyl->SetDrawingXRel(params->m_previousSyl->GetDrawingXRel() - overlap);
-            // The space is set to 0. This means that consecutive overlaps will not be recursively absorbed.
-            // Only the first preceeding syl will be moved.
-            nextFreeSpace = 0;
-            overlap = 0;
-        }
-        else if (params->m_freeSpace > 0) {
-            params->m_previousSyl->SetDrawingXRel(params->m_previousSyl->GetDrawingXRel() - params->m_freeSpace);
-            overlap -= params->m_freeSpace;
-            nextFreeSpace = 0;
-        }
-    }
-    else {
-        nextFreeSpace = std::min(-overlap, 3 * params->m_doc->GetDrawingUnit(100));
-    }
-
-    return nextFreeSpace;
+    return spacing;
 }
 
 //----------------------------------------------------------------------------
@@ -178,6 +158,7 @@ int Syl::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 
 int Syl::AdjustSylSpacing(FunctorParams *functorParams)
 {
+    /*
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
@@ -192,6 +173,8 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
         *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
 
     this->SetDrawingXRel(-1 * shift);
+    
+    Object *parentVerse = this->GetFirstParent(VERSE);
 
     // Not much to do when we hit the first syllable of the system
     if (params->m_previousSyl == NULL) {
@@ -200,6 +183,10 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
         params->m_freeSpace = 0;
         params->m_previousMeasure = NULL;
         return FUNCTOR_CONTINUE;
+    }
+    else if (parentVerse && (parentVerse == params->m_previousSyl->GetFirstParent(VERSE))) {
+        int sylShift = params->m_previousSyl->GetContentX2() + params->m_previousSyl->GetDrawingXRel();
+        this->SetDrawingXRel(sylShift);
     }
 
     int xShift = 0;
@@ -232,8 +219,10 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
     params->m_previousSyl = this;
     params->m_freeSpace = nextFreeSpace;
     params->m_previousMeasure = NULL;
-
+    */
+     
     return FUNCTOR_CONTINUE;
+     
 }
 
 int Syl::ResetDrawing(FunctorParams *functorParams)
