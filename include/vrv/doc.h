@@ -133,6 +133,8 @@ public:
     void ReplaceStringInPlace(std::string &subject, const std::string &search, const std::string &replace);
     
     std::vector<std::string> * getUuids(Object *object, std::vector<std::string> *idList);
+    
+    bool updateIds(Object *object);
 
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes

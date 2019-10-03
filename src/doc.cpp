@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <math.h>
 #include <iostream>
+#include <math.h>
 #include <regex>
 
 //----------------------------------------------------------------------------
@@ -1615,70 +1615,75 @@ xsdAnyURI_List Doc::useExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List ex
                 // LogMessage("%s <%s> to be added again after <%s>.", currSect->GetClassName().c_str(), s.c_str(),
                 //    prevSect->GetUuid().c_str());
 
-//                // convert element
-//                MeiOutput meiOutput(this, "");
-//                std::string mei = meiOutput.GetOutput(currSect);
-//                //
-//                try {
-//                    std::string elementName, oldId, newId;
-//                    std::string tmp = mei;
-//                    std::smatch lineMatch, elementMatch, idMatch, replaceMatch;
-//                    std::regex lineE("<[a-zA-Z0-9_.-]+? xml:id=\"[a-zA-Z0-9_:.-]+?\"",
-//                        std::regex_constants::ECMAScript); // match element plus xml:id
-//                    while (std::regex_search(tmp, lineMatch, lineE)) {
-//                        for (std::string x : lineMatch) { // go through all found xml:id without "#"
-//                            std::regex elementE("<[a-zA-Z0-9_.-]+? ", std::regex_constants::ECMAScript);
-//                            std::regex_search(x, elementMatch, elementE);
-//                            elementName = elementMatch.str();
-//                            elementName = elementName.substr(1, elementName.size() - 2);
-//                            std::regex idE(" xml:id=\"[a-zA-Z0-9_:.-]+?\"", std::regex_constants::ECMAScript);
-//                            std::regex_search(x, idMatch, idE);
-//                            oldId = idMatch.str();
-//                            oldId = oldId.substr(9, oldId.size() - 10);
-//
-//                            // format exisitng sections|endings|rdgs|lemmas by extending them with rendition number
-//                            if (elementName == "section" || elementName == "ending" || elementName == "rdg"
-//                                || elementName == "lem") {
-//                                newId = oldId + "-rend" + std::to_string(getExpansionIdsForElement(oldId).size() + 1);
-//                            }
-//                            else {
-//                                char str[17];
-//                                snprintf(str, 17, "%016d", std::rand());
-//                                newId = std::string(elementName + "-" + str);
-//                            }
-//                            this->addExpandedIdToExpansionMap(oldId, newId);
-//
-//                            // do these triple checks to reduce edge conditions in wrong replacements
-//                            ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
-//                            ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
-//                            ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
-//                        }
-//                        tmp = lineMatch.suffix().str();
-//                    }
-//                }
-//                catch (const std::regex_error &e) {
-//                    LogError("Regex error: %s\n", e.what());
-//                }
-//
-//                // read MEI back in and add to structure
-//                MeiInput meiInput(this, "");
-//                Object *clonedSect = meiInput.ImportStringToExpansionObject(mei);
-//                prevSect->GetParent()->InsertAfter(prevSect, clonedSect);
-//                prevSect = clonedSect;
-                
+                //                // convert element
+                //                MeiOutput meiOutput(this, "");
+                //                std::string mei = meiOutput.GetOutput(currSect);
+                //                //
+                //                try {
+                //                    std::string elementName, oldId, newId;
+                //                    std::string tmp = mei;
+                //                    std::smatch lineMatch, elementMatch, idMatch, replaceMatch;
+                //                    std::regex lineE("<[a-zA-Z0-9_.-]+? xml:id=\"[a-zA-Z0-9_:.-]+?\"",
+                //                        std::regex_constants::ECMAScript); // match element plus xml:id
+                //                    while (std::regex_search(tmp, lineMatch, lineE)) {
+                //                        for (std::string x : lineMatch) { // go through all found xml:id without "#"
+                //                            std::regex elementE("<[a-zA-Z0-9_.-]+? ",
+                //                            std::regex_constants::ECMAScript); std::regex_search(x, elementMatch,
+                //                            elementE); elementName = elementMatch.str(); elementName =
+                //                            elementName.substr(1, elementName.size() - 2); std::regex idE("
+                //                            xml:id=\"[a-zA-Z0-9_:.-]+?\"", std::regex_constants::ECMAScript);
+                //                            std::regex_search(x, idMatch, idE);
+                //                            oldId = idMatch.str();
+                //                            oldId = oldId.substr(9, oldId.size() - 10);
+                //
+                //                            // format exisitng sections|endings|rdgs|lemmas by extending them with
+                //                            rendition number if (elementName == "section" || elementName == "ending"
+                //                            || elementName == "rdg"
+                //                                || elementName == "lem") {
+                //                                newId = oldId + "-rend" +
+                //                                std::to_string(getExpansionIdsForElement(oldId).size() + 1);
+                //                            }
+                //                            else {
+                //                                char str[17];
+                //                                snprintf(str, 17, "%016d", std::rand());
+                //                                newId = std::string(elementName + "-" + str);
+                //                            }
+                //                            this->addExpandedIdToExpansionMap(oldId, newId);
+                //
+                //                            // do these triple checks to reduce edge conditions in wrong replacements
+                //                            ReplaceStringInPlace(mei, "\"" + oldId + "\"", "\"" + newId + "\"");
+                //                            ReplaceStringInPlace(mei, "#" + oldId + "\"", "#" + newId + "\"");
+                //                            ReplaceStringInPlace(mei, "#" + oldId + " ", "#" + newId + " ");
+                //                        }
+                //                        tmp = lineMatch.suffix().str();
+                //                    }
+                //                }
+                //                catch (const std::regex_error &e) {
+                //                    LogError("Regex error: %s\n", e.what());
+                //                }
+                //
+                //                // read MEI back in and add to structure
+                //                MeiInput meiInput(this, "");
+                //                Object *clonedSect = meiInput.ImportStringToExpansionObject(mei);
+                //                prevSect->GetParent()->InsertAfter(prevSect, clonedSect);
+                //                prevSect = clonedSect;
+
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
-                
-                std::vector<std::string> idList;
-                this->getUuids(currSect, &idList);
-                std::cout << "######### Current Section ######### \n";
-                for (std::string s : idList)
-                    std::cout << s << "\n";
-                idList.clear();
-                this->getUuids(clonedObject, &idList);
-                std::cout << "######### CLONED Section ######### \n";
-                for (std::string s : idList)
-                    std::cout << s << "\n";
+                clonedObject->SetUuid(currSect->GetUuid() + "-rend"
+                    + std::to_string(getExpansionIdsForElement(currSect->GetChild(0)->GetUuid()).size() + 1));
+
+                // get IDs of old and new sections and add them to expansionMap
+                std::vector<std::string> oldIds;
+                this->getUuids(currSect, &oldIds);
+                std::vector<std::string> clonedIds;
+                this->getUuids(clonedObject, &clonedIds);
+                for (int i = 0; i < oldIds.size(); i++) {
+                    this->addExpandedIdToExpansionMap(oldIds[i], clonedIds[i]);
+                }
+
+                // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface,
+                updateIds(clonedObject);
 
                 prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
                 prevSect = clonedObject;
@@ -1702,12 +1707,47 @@ void Doc::ReplaceStringInPlace(std::string &subject, const std::string &search, 
     }
 }
 
-std::vector<std::string> * Doc::getUuids(Object *object, std::vector<std::string> *idList) {
+std::vector<std::string> *Doc::getUuids(Object *object, std::vector<std::string> *idList)
+{
     for (Object *o : *object->GetChildren()) {
         idList->push_back(o->GetUuid());
         idList = getUuids(o, idList);
     }
     return idList;
+}
+
+bool Doc::updateIds(Object *object)
+{
+    for (Object *o : *object->GetChildren()) {
+        if (o->HasInterface(INTERFACE_TIME_POINT)) {
+            TimePointInterface *tpi = o->GetTimePointInterface();
+            Object *ref = tpi->GetStart();
+            if (ref == NULL) return false;
+            std::string newStartId
+                = getExpansionIdsForElement(ref->GetUuid()).back(); // assuming the new ID is the last in vector
+            tpi->SetStart(dynamic_cast<LayerElement *>(FindChildByUuid(newStartId)));
+        }
+        else if (o->HasInterface(INTERFACE_TIME_SPANNING)) {
+            TimeSpanningInterface *tsi = o->GetTimeSpanningInterface();
+            std::string refString = tsi->GetStartid();
+            if (refString.rfind("#", 0) == 0) refString = refString.substr(1, refString.size() - 1);
+            if (refString.empty()) return false;
+            std::vector<std::string> v = getExpansionIdsForElement(refString);
+            std::string newStartId = v.back();
+            tsi->SetStartid("#" + newStartId);
+            // tsi->SetStart(dynamic_cast<LayerElement *>(FindChildByUuid(newStartId)));
+            refString = tsi->GetEndid();
+            if (refString.rfind("#", 0) == 0) refString = refString.substr(1, refString.size() - 1);
+            if (refString.empty()) return false;
+            v = getExpansionIdsForElement(refString);
+            std::string newEndId = v.back();
+            tsi->SetEndid("#" + newEndId);
+            std::string q = "";
+            // tsi->SetStart(dynamic_cast<LayerElement *>(FindChildByUuid(newEndId)));
+        } // TODO: PListInterface, LinkingInterface
+        updateIds(o);
+    }
+    return true;
 }
 
 bool Doc::addExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId)
@@ -1737,6 +1777,7 @@ std::vector<std::string> Doc::getExpansionIdsForElement(const std::string &xmlId
     for (iter = m_expansionMap.begin(); iter != m_expansionMap.end(); ++iter) {
         auto it = std::find(iter->begin(), iter->end(), xmlId);
         if (it != iter->end()) {
+            std::cout << "Doc::getExpansionIdsForElement: " << (*it) << " found.\n";
             return (*iter);
         }
     }

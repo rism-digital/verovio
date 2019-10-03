@@ -2791,9 +2791,9 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
             //for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
         }
     }
-    //for (auto const &strVect : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
-    //    for (auto const &string : strVect) std::cout << string << ((string != strVect.back()) ? ", " : ".\n");
-    //}
+    for (auto const &strVect : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
+        for (auto const &string : strVect) std::cout << string << ((string != strVect.back()) ? ", " : ".\n");
+    }
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
