@@ -2777,8 +2777,9 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         }
         else {
             xsdAnyURI_List expansionList = start->GetPlist();
-            //std::cout << "[useExpansion] xml:id=\"" << expansionId.c_str() << "\" plist={";
-            //for (std::string s : expansionList) std::cout << s.c_str() << ((s != expansionList.back()) ? " " : "}.\n");
+            // std::cout << "[useExpansion] xml:id=\"" << expansionId.c_str() << "\" plist={";
+            // for (std::string s : expansionList) std::cout << s.c_str() << ((s != expansionList.back()) ? " " :
+            // "}.\n");
             xsdAnyURI_List existingList;
             existingList = m_doc->useExpansion(expansionList, existingList, start);
             // save original/notated expansion as element in expanded MEI
@@ -2786,14 +2787,14 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
             originalExpansion->SetUuid("expansion-notated");
             for (std::string ref : existingList) originalExpansion->GetPlistInterface()->AddRef("#" + ref);
             start->GetParent()->InsertAfter(start, originalExpansion);
-            //std::cout << "[useExpansion] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
+            // std::cout << "[useExpansion] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
             //          << "\" plist={";
-            //for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
+            // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
         }
     }
-    for (auto const &strVect : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
-        for (auto const &string : strVect) std::cout << string << ((string != strVect.back()) ? ", " : ".\n");
-    }
+    // for (auto const &strVect : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
+    //    for (auto const &string : strVect) std::cout << string << ((string != strVect.back()) ? ", " : ".\n");
+    //}
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
