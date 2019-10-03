@@ -35,6 +35,7 @@ public:
     ///@{
     Surface();
     virtual ~Surface();
+    virtual Object *Clone() const { return new Surface(*this); }
     virtual void Reset();
     ClassId GetClassId() const { return SURFACE; }
     ///@}

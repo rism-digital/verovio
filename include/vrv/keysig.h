@@ -42,8 +42,8 @@ public:
     ///@{
     KeySig();
     virtual ~KeySig();
-    virtual void Reset();
     virtual Object *Clone() const { return new KeySig(*this); }
+    virtual void Reset();
     virtual std::string GetClassName() const { return "KeySig"; }
     virtual ClassId GetClassId() const { return KEYSIG; }
 

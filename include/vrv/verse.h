@@ -28,6 +28,7 @@ public:
     ///@{
     Verse();
     virtual ~Verse();
+    virtual Object *Clone() const { return new Verse(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Verse"; }
     virtual ClassId GetClassId() const { return VERSE; }

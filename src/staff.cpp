@@ -79,8 +79,10 @@ void Staff::Reset()
     ClearLedgerLines();
 }
 
-void Staff::CopyReset()
+void Staff::CloneReset()
 {
+    Object::CloneReset();
+    
     m_ledgerLinesAbove = NULL;
     m_ledgerLinesBelow = NULL;
     m_ledgerLinesAboveCue = NULL;
@@ -292,7 +294,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     assert(params);
 
     params->m_targetStaff = new Staff(*this);
-    params->m_targetStaff->CopyReset();
+    params->m_targetStaff->CloneReset();
     // Keep the xml:id of the staff in the first staff segment
     params->m_targetStaff->SwapUuid(this);
     assert(params->m_targetMeasure);

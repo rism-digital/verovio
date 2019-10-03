@@ -34,8 +34,8 @@ public:
     ///@{
     KeyAccid();
     virtual ~KeyAccid();
-    virtual void Reset();
     virtual Object *Clone() const { return new KeyAccid(*this); }
+    virtual void Reset();
     virtual std::string GetClassName() const { return "KeyAccid"; }
     virtual ClassId GetClassId() const { return KEYACCID; }
     ///@}

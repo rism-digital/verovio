@@ -29,10 +29,10 @@ public:
     ///@{
     Proport();
     virtual ~Proport();
+    virtual Object *Clone() const { return new Proport(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Proport"; }
     virtual ClassId GetClassId() const { return PROPORT; }
-    virtual Object *Clone() const { return new Proport(*this); }
     ///@}
 
     /** Override the method since alignment is required */

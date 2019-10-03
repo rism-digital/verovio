@@ -34,6 +34,7 @@ public:
     ///@{
     Ligature();
     virtual ~Ligature();
+    virtual Object *Clone() const { return new Ligature(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Ligature"; }
     virtual ClassId GetClassId() const { return LIGATURE; }

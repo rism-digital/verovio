@@ -116,6 +116,7 @@ public:
     ///@{
     ScoreDef();
     virtual ~ScoreDef();
+    virtual Object *Clone() const { return new ScoreDef(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "ScoreDef"; }
     virtual ClassId GetClassId() const { return SCOREDEF; }
