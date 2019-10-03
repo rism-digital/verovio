@@ -68,7 +68,7 @@ void Verse::AddChild(Object *child)
     Modify();
 }
     
-int Verse::AdjustPreviousVerse(int overlap, int freeSpace, Doc *doc)
+int Verse::AdjustPosition(int &overlap, int freeSpace, Doc *doc)
 {
     assert(doc);
     
@@ -80,13 +80,11 @@ int Verse::AdjustPreviousVerse(int overlap, int freeSpace, Doc *doc)
             this->SetDrawingXRel(this->GetDrawingXRel() - overlap);
             // The space is set to 0. This means that consecutive overlaps will not be recursively absorbed.
             // Only the first preceeding syl will be moved.
-            nextFreeSpace = 0;
             overlap = 0;
         }
         else if (freeSpace > 0) {
             this->SetDrawingXRel(this->GetDrawingXRel() - freeSpace);
             overlap -= freeSpace;
-            nextFreeSpace = 0;
         }
     }
     else {
@@ -129,15 +127,18 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     // Adjust it proportionally to the lyric size
     shift
     *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
+    
     int previousSylShift = 0;
+    
+    this->SetDrawingXRel(-1 * shift);
     
     ArrayOfObjects::iterator iter = syls.begin();
     while (iter != syls.end()) {
         if ((*iter)->HasContentHorizontalBB()) {
             Syl *syl = dynamic_cast<Syl *>(*iter);
             assert(syl);
-            syl->SetDrawingXRel(-1 * shift + previousSylShift);
-            previousSylShift += syl->GetContentX2();
+            syl->SetDrawingXRel(previousSylShift);
+            previousSylShift += syl->GetContentX2() + syl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
             ++iter;
         }
         else {
@@ -146,10 +147,17 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     }
     
     if (syls.empty()) return FUNCTOR_CONTINUE;
+    
+    Syl *firstSyl = dynamic_cast<Syl *>(syls.front());
+    assert(firstSyl);
+    // We keep a pointer to the last syl because we move it (when more than one) and the verse content bounding box is not updated
+    Syl *lastSyl = dynamic_cast<Syl *>(syls.back());
+    assert(lastSyl);
 
     // Not much to do when we hit the first syllable of the system
     if (params->m_previousVerse == NULL) {
         params->m_previousVerse = this;
+        params->m_lastSyl = lastSyl;
         // No free space because we never move the first one back
         params->m_freeSpace = 0;
         params->m_previousMeasure = NULL;
@@ -163,14 +171,12 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     if (params->m_previousMeasure) {
         xShift = params->m_previousMeasure->GetWidth();
     }
-
-    int overlap = params->m_previousVerse->GetContentRight() - (this->GetContentLeft() + xShift);
     
-    Syl *lastSyl = dynamic_cast<Syl *>(syls.back());
-    assert(lastSyl);
+    // Use the syl because the content bounding box of the verse might be invalid at this stage
+    int overlap = params->m_lastSyl->GetContentRight() - (firstSyl->GetContentLeft() + xShift);
     overlap += lastSyl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
     
-    int nextFreeSpace = params->m_previousVerse->AdjustPreviousVerse(overlap, params->m_freeSpace, params->m_doc);
+    int nextFreeSpace = params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
     if (overlap > 0) {
         // We are adjusting syl in two different measures - move only the to right barline of the first measure
@@ -189,6 +195,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     }
 
     params->m_previousVerse = this;
+    params->m_lastSyl = lastSyl;
     params->m_freeSpace = nextFreeSpace;
     params->m_previousMeasure = NULL;
 

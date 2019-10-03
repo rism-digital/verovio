@@ -79,6 +79,7 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     assert(doc);
     
     sylLog_WORDPOS pos = this->GetWordpos();
+    sylLog_CON con = this->GetCon();
 
     int spacing = 0;
 
@@ -88,6 +89,15 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
         // Adjust it proportionally to the lyric size
         hyphen *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
         spacing = (2 * hyphen);
+    }
+    // Elision
+    else if (con == sylLog_CON_b) {
+        FontInfo *fFont = doc->GetDrawingLyricFont(staffSize);
+        // Empirical equivalent of the elision sign
+        int elisionSpace = doc->GetTextGlyphWidth(L'c', fFont, false);
+        // Adjust it proportionally to the lyric size
+        elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
+        spacing = elisionSpace;
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
@@ -154,75 +164,6 @@ int Syl::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
-}
-
-int Syl::AdjustSylSpacing(FunctorParams *functorParams)
-{
-    /*
-    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasContentHorizontalBB()) {
-        LogDebug("Syl %s is skipped in alignment - it is probably empty", this->GetUuid().c_str());
-        return FUNCTOR_CONTINUE;
-    }
-
-    int shift = params->m_doc->GetDrawingUnit(params->m_staffSize);
-    // Adjust it proportionally to the lyric size
-    shift
-        *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
-
-    this->SetDrawingXRel(-1 * shift);
-    
-    Object *parentVerse = this->GetFirstParent(VERSE);
-
-    // Not much to do when we hit the first syllable of the system
-    if (params->m_previousSyl == NULL) {
-        params->m_previousSyl = this;
-        // No free space because we never move the first one back
-        params->m_freeSpace = 0;
-        params->m_previousMeasure = NULL;
-        return FUNCTOR_CONTINUE;
-    }
-    else if (parentVerse && (parentVerse == params->m_previousSyl->GetFirstParent(VERSE))) {
-        int sylShift = params->m_previousSyl->GetContentX2() + params->m_previousSyl->GetDrawingXRel();
-        this->SetDrawingXRel(sylShift);
-    }
-
-    int xShift = 0;
-
-    // We have a previous syllable from the previous measure - we need to add the measure with because the measures are
-    // not aligned yet
-    if (params->m_previousMeasure) {
-        xShift = params->m_previousMeasure->GetWidth();
-    }
-
-    int overlap = params->m_previousSyl->GetContentRight() - (this->GetContentLeft() + xShift);
-    int nextFreeSpace = params->m_previousSyl->CalcHorizontalAdjustment(overlap, params);
-
-    if (overlap > 0) {
-        // We are adjusting syl in two different measures - move only the to right barline of the first measure
-        if (params->m_previousMeasure) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(),
-                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
-            // Do it now
-            params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
-            params->m_overlapingSyl.clear();
-        }
-        else {
-            // Normal case, both in the same measure
-            params->m_overlapingSyl.push_back(
-                std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));
-        }
-    }
-
-    params->m_previousSyl = this;
-    params->m_freeSpace = nextFreeSpace;
-    params->m_previousMeasure = NULL;
-    */
-     
-    return FUNCTOR_CONTINUE;
-     
 }
 
 int Syl::ResetDrawing(FunctorParams *functorParams)

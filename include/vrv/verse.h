@@ -42,10 +42,10 @@ public:
     
     /**
      * Calculate the adjustment according to the overlap and the free space available before.
-     * Will move the syllable accordingly.
-     * Called from Syl::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     * Will move the verse accordingly.
+     * Called from Verse::AdjustSylSpacing and System::AdjustSylSpacingEnd
      */
-    int AdjustPreviousVerse(int overlap, int freeSpace, Doc *doc);
+    int AdjustPosition(int &overlap, int freeSpace, Doc *doc);
 
     //----------//
     // Functors //

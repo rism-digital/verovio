@@ -372,6 +372,7 @@ public:
     AdjustSylSpacingParams(Doc *doc)
     {
         m_previousVerse = NULL;
+        m_lastSyl = NULL;
         m_previousMeasure = NULL;
         m_freeSpace = 0;
         m_staffSize = 100;
@@ -379,6 +380,7 @@ public:
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
     Verse *m_previousVerse;
+    Syl *m_lastSyl;
     Measure *m_previousMeasure;
     int m_freeSpace;
     int m_staffSize;

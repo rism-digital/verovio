@@ -498,7 +498,7 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
     if (params->m_previousVerse) {
         int overlap = params->m_previousVerse->GetContentRight()
             - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
-        params->m_previousVerse->AdjustPreviousVerse(overlap, params->m_freeSpace, params->m_doc);
+        params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
         if (overlap > 0) {
             params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),

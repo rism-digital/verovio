@@ -1405,6 +1405,22 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
     DrawTextChildren(dc, syl, params);
+    
+    if (syl->GetCon() == sylLog_CON_b) {
+        dc->ReactivateGraphic();
+        dc->DeactivateGraphic();
+        FontInfo vrvTxt;
+        vrvTxt.SetFaceName("VerovioText");
+        dc->SetFont(&vrvTxt);
+        std::wstring str;
+        str.push_back(VRV_TEXT_E551);
+        dc->DrawText(UTF16to8(str), str);
+        dc->ResetFont();
+        dc->ReactivateGraphic();
+        dc->DeactivateGraphicY();
+        
+    }
+    
     dc->EndText();
 
     dc->ResetFont();

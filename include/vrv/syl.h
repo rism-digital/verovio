@@ -67,9 +67,7 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * Calculate the adjustment according to the overlap and the free space available before.
-     * Will move the syllable accordingly.
-     * Called from Syl::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     * Calculate the spacing needed depending on the @worpos and @con
      */
     int CalcConnectorSpacing(Doc *doc, int staffSize);
 
@@ -86,11 +84,6 @@ public:
      * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
