@@ -230,20 +230,6 @@ std::string MeiOutput::GetOutput(int page)
     return m_streamStringOutput.str();
 }
 
-// WG
-std::string MeiOutput::GetOutput(Object *object)
-{
-    m_writeToStreamString = true;
-    SetScoreBasedMEI(true);
-    pugi::xml_document doc;
-    m_currentNode = doc.root();
-    object->Save(this);
-    m_writeToStreamString = false;
-    doc.save(m_streamStringOutput, "   ");
-    return m_streamStringOutput.str();
-}
-// WG
-
 bool MeiOutput::WriteObject(Object *object)
 {
     if (object->HasComment()) {
@@ -2262,46 +2248,6 @@ bool MeiInput::ImportString(const std::string &mei)
     }
 }
 
-Object *MeiInput::ImportStringToExpansionObject(const std::string &mei)
-{
-    Object *object = NULL;
-    try {
-        pugi::xml_document doc;
-        doc.load_string(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
-        pugi::xml_node node = doc.first_child();
-        m_readingScoreBased = true;
-        if (std::string(node.name()) == "section") {
-            object = new Section();
-            SetMeiUuid(node, object);
-            ReadUnsupportedAttr(node, object);
-            ReadSectionChildren(object, node);
-        }
-        else if (std::string(node.name()) == "ending") {
-            object = new Ending();
-            SetMeiUuid(node, object);
-            ReadUnsupportedAttr(node, object);
-            ReadSectionChildren(object, node);
-        }
-        else if (std::string(node.name()) == "rdg") {
-            object = new Rdg();
-            SetMeiUuid(node, object);
-            ReadUnsupportedAttr(node, object);
-            ReadRdg(object, node, EDITORIAL_TOPLEVEL);
-        }
-        else if (std::string(node.name()) == "lem") {
-            object = new Lem();
-            SetMeiUuid(node, object);
-            ReadUnsupportedAttr(node, object);
-            ReadLem(object, node, EDITORIAL_TOPLEVEL);
-        }
-    }
-    catch (char *str) {
-        LogError("%s", str);
-        return object;
-    }
-    return object;
-}
-
 bool MeiInput::IsAllowed(std::string element, Object *filterParent)
 {
     if (!filterParent) {
@@ -2767,6 +2713,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     success = ReadMdivChildren(m_doc, body, false);
+
+    if (success) {
+        m_doc->ConvertScoreDefMarkupDoc();
+    }
 
     // Upon MEI import: use expansion ID, given by command line argument
     std::string expansionId = m_doc->GetOptions()->m_useExpansion.GetValue();

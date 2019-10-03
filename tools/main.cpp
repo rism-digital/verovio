@@ -440,7 +440,7 @@ int main(int argc, char **argv)
             exit(1);
         }
     }
-    
+
     if (toolkit.GetOutputFormat() != vrv::HUMDRUM) {
         // Check the page range
         if (page > toolkit.GetPageCount()) {
