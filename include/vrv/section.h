@@ -62,11 +62,6 @@ public:
     virtual int ConvertToUnCastOffMensural(FunctorParams *params);
     
     /**
-     * See Object::Clone
-     */
-    virtual Object * Clone();
-
-    /**
      * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);

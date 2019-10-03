@@ -131,6 +131,8 @@ public:
     xsdAnyURI_List useExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
 
     void ReplaceStringInPlace(std::string &subject, const std::string &search, const std::string &replace);
+    
+    std::vector<std::string> * getUuids(Object *object, std::vector<std::string> *idList);
 
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
