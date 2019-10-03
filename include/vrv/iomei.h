@@ -179,11 +179,6 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Return the output of element as a string by writing it to the stringstream member.
-     */
-    std::string GetOutput(Object *object);
-
-    /**
      * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
@@ -425,7 +420,6 @@ public:
 
     virtual bool ImportFile();
     virtual bool ImportString(const std::string &mei);
-    Object *ImportStringToExpansionObject(const std::string &mei); // WG
 
 private:
     bool ReadDoc(pugi::xml_node root);
