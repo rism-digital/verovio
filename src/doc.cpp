@@ -45,7 +45,6 @@
 #include "pghead2.h"
 #include "runningelement.h"
 #include "score.h"
-#include "section.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"

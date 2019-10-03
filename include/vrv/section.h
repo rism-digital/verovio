@@ -60,7 +60,7 @@ public:
      * See Object::ConvertToUnCastOffMensural
      */
     virtual int ConvertToUnCastOffMensural(FunctorParams *params);
-    
+
     /**
      * See Object::PrepareBoundaries
      */
