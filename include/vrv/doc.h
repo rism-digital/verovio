@@ -126,13 +126,15 @@ public:
     bool GetMidiExportDone() const;
 
     /**
-     * WG: render expansion recursion
+     * Expand expansion recursively
      */
-    xsdAnyURI_List useExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
+    xsdAnyURI_List UseExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
 
-    std::vector<std::string> *getUuidList(Object *object, std::vector<std::string> *idList);
+    std::vector<std::string> *GetUuidList(Object *object, std::vector<std::string> *idList);
 
-    bool updateIds(Object *object);
+    bool UpdateIds(Object *object);
+
+    std::vector<std::string> GetExpansionIdsForElement(const std::string &xmlId);
 
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
@@ -381,6 +383,8 @@ private:
      */
     int CalcMusicFontSize();
 
+    /** Ads an id string to an original/notated id */
+    bool AddExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId);
 public:
     /**
      * A copy of the header tree stored as pugi::xml_document
@@ -424,9 +428,7 @@ public:
     data_NOTATIONTYPE m_notationType;
 
     /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
-    std::vector<std::vector<std::string> > m_expansionMap;
-
-    std::vector<std::string> getExpansionIdsForElement(const std::string &xmlId);
+    std::map<std::string, std::vector<std::string> > m_expansionMap;
 
 private:
     /**
@@ -520,8 +522,6 @@ private:
     /** Facsimile information */
     Facsimile *m_facsimile = NULL;
 
-    /** Ads an id string to an original/notated id */
-    bool addExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId);
 };
 
 } // namespace vrv

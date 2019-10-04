@@ -956,7 +956,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 std::string Toolkit::getNotatedIdForElement(const std::string &xmlId)
 {
     if (m_doc.HasExpansionMap())
-        return m_doc.getExpansionIdsForElement(xmlId).front();
+        return m_doc.GetExpansionIdsForElement(xmlId).front();
     else
         return xmlId;
 }
@@ -965,7 +965,7 @@ std::string Toolkit::getExpansionIdsForElement(const std::string &xmlId)
 {
     jsonxx::Array a;
     if (m_doc.HasExpansionMap()) {
-        for (std::string id : m_doc.getExpansionIdsForElement(xmlId)) {
+        for (std::string id : m_doc.GetExpansionIdsForElement(xmlId)) {
             a << id;
         }
     }
