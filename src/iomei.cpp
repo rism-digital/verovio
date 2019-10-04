@@ -42,6 +42,7 @@
 #include "ending.h"
 #include "expan.h"
 #include "expansion.h"
+#include "expansionmap.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -2719,7 +2720,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     // Upon MEI import: use expansion ID, given by command line argument
-    std::string expansionId = m_doc->GetOptions()->m_useExpansion.GetValue();
+    std::string expansionId = m_doc->GetOptions()->m_expand.GetValue();
     if (!expansionId.empty()) {
         Expansion *start = dynamic_cast<Expansion *>(m_doc->FindChildByUuid(expansionId));
         if (start == NULL) {
@@ -2731,7 +2732,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
             // for (std::string s : expansionList) std::cout << s.c_str() << ((s != expansionList.back()) ? " " :
             // "}.\n");
             xsdAnyURI_List existingList;
-            existingList = m_doc->UseExpansion(expansionList, existingList, start);
+            existingList = m_doc->m_expansionMap.Expand(expansionList, existingList, start);
             // save original/notated expansion as element in expanded MEI
             Expansion *originalExpansion = new Expansion();
             originalExpansion->SetUuid("expansion-notated");
@@ -2742,10 +2743,11 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
             // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
         }
     }
-     for (auto const &strVect : m_doc->m_expansionMap) { // DEBUG: display expansionMap on console
-        std::cout << strVect.first << ": <";
-        for (auto const &string : strVect.second) std::cout << string << ((string != strVect.second.back()) ? ", " : ">.\n");
-    }
+    // for (auto const &strVect : m_doc->m_expansionMap.m_map) { // DEBUG: display expansionMap on console
+    //     std::cout << strVect.first << ": <";
+    //     for (auto const &string : strVect.second)
+    //        std::cout << string << ((string != strVect.second.back()) ? ", " : ">.\n");
+    // }
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();

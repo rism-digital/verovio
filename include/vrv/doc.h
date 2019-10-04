@@ -9,6 +9,7 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
+#include "expansionmap.h"
 #include "facsimile.h"
 #include "options.h"
 #include "scoredef.h"
@@ -98,11 +99,6 @@ public:
     bool HasPage(int pageIdx);
 
     /**
-     * Check if m_expansionMap has been filled
-     */
-    bool HasExpansionMap();
-
-    /**
      * Get the Score in the visible Mdiv.
      * Will find it only when having read a score-based MEI file
      */
@@ -124,17 +120,6 @@ public:
      * Return true if the MIDI generation is already done
      */
     bool GetMidiExportDone() const;
-
-    /**
-     * Expand expansion recursively
-     */
-    xsdAnyURI_List UseExpansion(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
-
-    std::vector<std::string> *GetUuidList(Object *object, std::vector<std::string> *idList);
-
-    bool UpdateIds(Object *object);
-
-    std::vector<std::string> GetExpansionIdsForElement(const std::string &xmlId);
 
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
@@ -383,8 +368,6 @@ private:
      */
     int CalcMusicFontSize();
 
-    /** Ads an id string to an original/notated id */
-    bool AddExpandedIdToExpansionMap(const std::string &origXmlId, std::string newXmlId);
 public:
     /**
      * A copy of the header tree stored as pugi::xml_document
@@ -427,8 +410,8 @@ public:
     /** Record notation type for document */
     data_NOTATIONTYPE m_notationType;
 
-    /** The expansion map indicates which xmlId has been repeated (expanded) elsewhere */
-    std::map<std::string, std::vector<std::string> > m_expansionMap;
+    /** An expansion map that contains  */
+    ExpansionMap m_expansionMap;
 
 private:
     /**
@@ -521,7 +504,6 @@ private:
 
     /** Facsimile information */
     Facsimile *m_facsimile = NULL;
-
 };
 
 } // namespace vrv

@@ -953,19 +953,19 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     return o.json();
 }
 
-std::string Toolkit::getNotatedIdForElement(const std::string &xmlId)
+std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
 {
-    if (m_doc.HasExpansionMap())
-        return m_doc.GetExpansionIdsForElement(xmlId).front();
+    if (m_doc.m_expansionMap.HasExpansionMap())
+        return m_doc.m_expansionMap.GetExpansionIdsForElement(xmlId).front();
     else
         return xmlId;
 }
 
-std::string Toolkit::getExpansionIdsForElement(const std::string &xmlId)
+std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
 {
     jsonxx::Array a;
-    if (m_doc.HasExpansionMap()) {
-        for (std::string id : m_doc.GetExpansionIdsForElement(xmlId)) {
+    if (m_doc.m_expansionMap.HasExpansionMap()) {
+        for (std::string id : m_doc.m_expansionMap.GetExpansionIdsForElement(xmlId)) {
             a << id;
         }
     }
