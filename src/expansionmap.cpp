@@ -77,6 +77,7 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
 bool ExpansionMap::UpdateIds(Object *object)
 {
     for (Object *o : *object->GetChildren()) {
+        o->IsExpansion(true);
         if (o->HasInterface(INTERFACE_TIME_POINT)) {
             TimePointInterface *interface = o->GetTimePointInterface();
             // @startid

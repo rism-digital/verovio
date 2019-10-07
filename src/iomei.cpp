@@ -2728,17 +2728,19 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         }
         else {
             xsdAnyURI_List expansionList = start->GetPlist();
-            // std::cout << "[useExpansion] xml:id=\"" << expansionId.c_str() << "\" plist={";
+            // std::cout << "[expand] xml:id=\"" << expansionId.c_str() << "\" plist={";
             // for (std::string s : expansionList) std::cout << s.c_str() << ((s != expansionList.back()) ? " " :
             // "}.\n");
             xsdAnyURI_List existingList;
             existingList = m_doc->m_expansionMap.Expand(expansionList, existingList, start);
             // save original/notated expansion as element in expanded MEI
             Expansion *originalExpansion = new Expansion();
-            originalExpansion->SetUuid("expansion-notated");
+            char rnd[35];
+            snprintf(rnd, 35, "expansion-notated-%016d", std::rand());
+            originalExpansion->SetUuid(rnd);
             for (std::string ref : existingList) originalExpansion->GetPlistInterface()->AddRef("#" + ref);
             start->GetParent()->InsertAfter(start, originalExpansion);
-            // std::cout << "[useExpansion] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
+            // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
             //          << "\" plist={";
             // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
         }
