@@ -568,22 +568,36 @@ bool HumdrumInput::convertHumdrum()
     stafftypes.push_back("**mens");
     infile.getSpineStartList(staffstarts, stafftypes);
 
+    m_fbstates.resize(staffstarts.size());
+    std::fill(m_fbstates.begin(), m_fbstates.end(), 0);
+
+    m_fbstaff.resize(staffstarts.size());
+    std::fill(m_fbstaff.begin(), m_fbstaff.end(), false);
+
     std::vector<hum::HTp> spinestarts;
     infile.getSpineStartList(spinestarts);
+    int spineindex = -1;
     for (auto it : spinestarts) {
-        if (it->isDataType("**mxhm")) {
+        if (it->isDataType("**kern")) {
+            spineindex++;
+        }
+        else if (it->isDataType("**mxhm")) {
             m_harm = true;
         }
-        if (it->isDataType("**fing")) {
+        else if (it->isDataType("**mxhm")) {
+            m_harm = true;
+        }
+        else if (it->isDataType("**fing")) {
             m_fing = true;
         }
-        if (it->isDataType("**string")) {
+        else if (it->isDataType("**string")) {
             m_string = true;
         }
-        if (it->isDataType("**mens")) {
+        else if (it->isDataType("**mens")) {
+            spineindex++;
             m_mens = true;
         }
-        if (it->isDataType("**harm")) {
+        else if (it->isDataType("**harm")) {
             m_harm = true;
         }
         else if (it->isDataType("**rhrm")) { // **recip + **harm
@@ -592,15 +606,27 @@ bool HumdrumInput::convertHumdrum()
         else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
             m_harm = true;
         }
-        if (it->isDataType("**fb")) {
+        else if (it->isDataType("**fb")) {
             m_fb = true;
+            if (spineindex >= 0) {
+                m_fbstates[spineindex] = -1;
+                m_fbstaff[spineindex] = true;
+            }
         }
-        if (it->isDataType("**fba")) {
+        else if (it->isDataType("**fba")) {
             m_fb = true;
+            if (spineindex >= 0) {
+                m_fbstates[spineindex] = +1;
+                m_fbstaff[spineindex] = true;
+            }
         }
-        if (it->isDataType("**Bnum")) {
+        else if (it->isDataType("**Bnum")) {
             // older name
             m_fb = true;
+            if (spineindex >= 0) {
+                m_fbstates[spineindex] = -1;
+                m_fbstaff[spineindex] = true;
+            }
         }
     }
 
@@ -4159,6 +4185,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
         return;
     }
     hum::HumdrumFile &infile = m_infiles[0];
+
     for (int i = startline; i < endline; ++i) {
         if (infile[i].isInterpretation()) {
             for (int j = 0; j < infile[i].getFieldCount(); ++j) {
@@ -4290,6 +4317,9 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
 
             m_measure->AddChild(harm);
             int staffindex = m_rkern[kerntrack];
+            if (m_placement.at(spinetrack)) {
+                m_fbstates.at(staffindex) = m_placement.at(spinetrack);
+            }
             hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
             harm->SetTstamp(tstamp.getFloat());
             setStaff(harm, staffindex + 1);
@@ -5395,6 +5425,22 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 
 //////////////////////////////
 //
+// HumdrumInput::fixLargeTuplets -- fix triple-breve/triplet-wholenote cases.
+//
+
+void HumdrumInput::fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
+{
+    for (int i = 1; i < (int)tg.size(); i++) {
+        if ((tg[i].tupletstart == 2) && (tg[i].tupletend == 1) && (tg[i - 1].tupletstart == 1)
+            && (tg[i - 1].tupletend == 1)) {
+            tg[i].tupletstart = 0;
+            tg[i - 1].tupletend = 0;
+        }
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::printGroupInfo --
 //
 
@@ -5896,6 +5942,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     if (m_debug) {
         printGroupInfo(tgs, layerdata);
     }
+
+    fixLargeTuplets(tgs);
 
     m_tupletscaling = 1;
 
@@ -9822,8 +9870,12 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     elements.push_back("tuplet");
     pointers.push_back((void *)tuplet);
 
-    int staff = m_rkern[token->getTrack()];
+    int staffindex = m_rkern[token->getTrack()];
     int placement = 0;
+    if (m_fbstaff[staffindex]) {
+        placement = -m_fbstates.at(staffindex);
+    }
+
     if (hasAboveParameter(layerdata[layerindex], "TUP")) {
         placement = +1;
     }
@@ -9837,7 +9889,7 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
             case +1: tuplet->SetBracketPlace(STAFFREL_basic_above); break;
         }
     }
-    if (ss[staff].verse) {
+    if (ss[staffindex].verse) {
         // If the music contains lyrics, force the tuplet above the staff.
         tuplet->SetBracketPlace(STAFFREL_basic_above);
     }
@@ -10371,6 +10423,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if ((tuptop[i - 1] == -1) && (tupbot[i - 1] == -1)) {
             continue;
         }
+
         if ((tuptop[i] != tuptop[i - 1]) || (tupbot[i] != tupbot[i - 1])) {
             if (tupletgroups[i] == tupletgroups[i - 1]) {
                 correction++;
@@ -14750,6 +14803,7 @@ void HumdrumInput::clear()
     m_breaks = false;
     m_duradj.clear();
     m_nulls.clear();
+    m_fbstates.clear();
 }
 
 //////////////////////////////
