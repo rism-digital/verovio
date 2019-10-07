@@ -81,7 +81,7 @@ void Layer::Reset()
 void Layer::CloneReset()
 {
     Object::CloneReset();
-    
+
     m_drawKeySigCancellation = false;
     m_staffDefClef = NULL;
     m_staffDefKeySig = NULL;

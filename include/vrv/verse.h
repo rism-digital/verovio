@@ -39,7 +39,7 @@ public:
      * Only Syl elements will be actually added to the verse.
      */
     virtual void AddChild(Object *object);
-    
+
     /**
      * Calculate the adjustment according to the overlap and the free space available before.
      * Will move the verse accordingly.
@@ -55,7 +55,7 @@ public:
      * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustSylSpacing
      */

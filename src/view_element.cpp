@@ -1405,7 +1405,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
     DrawTextChildren(dc, syl, params);
-    
+
     if (syl->GetCon() == sylLog_CON_b) {
         dc->ReactivateGraphic();
         dc->DeactivateGraphic();
@@ -1418,9 +1418,8 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->ResetFont();
         dc->ReactivateGraphic();
         dc->DeactivateGraphicY();
-        
     }
-    
+
     dc->EndText();
 
     dc->ResetFont();

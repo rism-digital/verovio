@@ -77,11 +77,11 @@ Measure::~Measure()
     // We need to delete own objects
     Reset();
 }
-    
+
 void Measure::CloneReset()
 {
     Object::CloneReset();
-    
+
     m_measureAligner.Reset();
     m_measureAligner.SetParent(this);
     // Idem for timestamps
@@ -89,7 +89,7 @@ void Measure::CloneReset()
     // Idem for barlines
     m_leftBarLine.SetParent(this);
     m_rightBarLine.SetParent(this);
-    
+
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
 }

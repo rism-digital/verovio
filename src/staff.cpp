@@ -82,7 +82,7 @@ void Staff::Reset()
 void Staff::CloneReset()
 {
     Object::CloneReset();
-    
+
     m_ledgerLinesAbove = NULL;
     m_ledgerLinesBelow = NULL;
     m_ledgerLinesAboveCue = NULL;

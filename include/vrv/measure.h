@@ -52,7 +52,7 @@ public:
     virtual std::string GetClassName() const { return "Measure"; }
     virtual ClassId GetClassId() const { return MEASURE; }
     ///@}
-                    
+
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */

@@ -33,7 +33,7 @@ public:
     SystemAligner();
     virtual ~SystemAligner();
     virtual ClassId GetClassId() const { return SYSTEM_ALIGNER; }
-    
+
     /**
      * Do not copy children for HorizontalAligner
      */

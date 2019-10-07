@@ -114,7 +114,7 @@ LayerElement::~LayerElement()
 void LayerElement::CloneReset()
 {
     Object::CloneReset();
-    
+
     // pointers have to be NULL
     m_alignment = NULL;
     m_graceAlignment = NULL;

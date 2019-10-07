@@ -811,7 +811,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
                         if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
                             data_ACCIDENTAL_GESTURAL accidValue
-                            = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                                = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
                             keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
                             if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                                 keyAccid->SetAccid(
@@ -1196,11 +1196,11 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
                 if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
                     data_ACCIDENTAL_GESTURAL accidValue
-                    = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                        = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
                     keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
                     if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                         keyAccid->SetAccid(
-                                           ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                            ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
                     }
                 }
                 keySig->AddChild(keyAccid);
@@ -2449,26 +2449,46 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {
-    if (value == "sharp") return ACCIDENTAL_WRITTEN_s;
-    else if (value == "natural") return ACCIDENTAL_WRITTEN_n;
-    else if (value == "flat") return ACCIDENTAL_WRITTEN_f;
-    else if (value == "double-sharp") return ACCIDENTAL_WRITTEN_x;
-    else if (value == "sharp-sharp") return ACCIDENTAL_WRITTEN_ss;
-    else if (value == "flat-flat") return ACCIDENTAL_WRITTEN_ff;
-    else if (value == "natural-sharp") return ACCIDENTAL_WRITTEN_ns;
-    else if (value == "natural-flat") return ACCIDENTAL_WRITTEN_nf;
-    else if (value == "quarter-flat") return ACCIDENTAL_WRITTEN_1qf;
-    else if (value == "quarter-sharp") return ACCIDENTAL_WRITTEN_1qs;
-    else if (value == "three-quarters-flat") return ACCIDENTAL_WRITTEN_3qf;
-    else if (value == "three-quarters-sharp") return ACCIDENTAL_WRITTEN_3qs;
-    else if (value == "sharp-down") return ACCIDENTAL_WRITTEN_sd;
-    else if (value == "sharp-up") return ACCIDENTAL_WRITTEN_su;
-    else if (value == "natural-down") return ACCIDENTAL_WRITTEN_nd;
-    else if (value == "natural-up") return ACCIDENTAL_WRITTEN_nu;
-    else if (value == "flat-down") return ACCIDENTAL_WRITTEN_fd;
-    else if (value == "flat-up") return ACCIDENTAL_WRITTEN_fu;
-    else if (value == "triple-sharp") return ACCIDENTAL_WRITTEN_ts;
-    else if (value == "triple-flat") return ACCIDENTAL_WRITTEN_tf;
+    if (value == "sharp")
+        return ACCIDENTAL_WRITTEN_s;
+    else if (value == "natural")
+        return ACCIDENTAL_WRITTEN_n;
+    else if (value == "flat")
+        return ACCIDENTAL_WRITTEN_f;
+    else if (value == "double-sharp")
+        return ACCIDENTAL_WRITTEN_x;
+    else if (value == "sharp-sharp")
+        return ACCIDENTAL_WRITTEN_ss;
+    else if (value == "flat-flat")
+        return ACCIDENTAL_WRITTEN_ff;
+    else if (value == "natural-sharp")
+        return ACCIDENTAL_WRITTEN_ns;
+    else if (value == "natural-flat")
+        return ACCIDENTAL_WRITTEN_nf;
+    else if (value == "quarter-flat")
+        return ACCIDENTAL_WRITTEN_1qf;
+    else if (value == "quarter-sharp")
+        return ACCIDENTAL_WRITTEN_1qs;
+    else if (value == "three-quarters-flat")
+        return ACCIDENTAL_WRITTEN_3qf;
+    else if (value == "three-quarters-sharp")
+        return ACCIDENTAL_WRITTEN_3qs;
+    else if (value == "sharp-down")
+        return ACCIDENTAL_WRITTEN_sd;
+    else if (value == "sharp-up")
+        return ACCIDENTAL_WRITTEN_su;
+    else if (value == "natural-down")
+        return ACCIDENTAL_WRITTEN_nd;
+    else if (value == "natural-up")
+        return ACCIDENTAL_WRITTEN_nu;
+    else if (value == "flat-down")
+        return ACCIDENTAL_WRITTEN_fd;
+    else if (value == "flat-up")
+        return ACCIDENTAL_WRITTEN_fu;
+    else if (value == "triple-sharp")
+        return ACCIDENTAL_WRITTEN_ts;
+    else if (value == "triple-flat")
+        return ACCIDENTAL_WRITTEN_tf;
     LogWarning("MusicXML import: Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
 }

@@ -495,8 +495,8 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
     }
 
     // Here we also need to handle the last syl of the measure - we check the alignment with the right barline
-    if (params->m_previousVerse) {
-        int overlap = params->m_previousVerse->GetContentRight()
+    if (params->m_previousVerse && params->m_lastSyl) {
+        int overlap = params->m_lastSyl->GetContentRight()
             - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
         params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 

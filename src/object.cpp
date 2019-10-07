@@ -112,7 +112,7 @@ Object::Object(const Object &object) : BoundingBox(object)
         }
     }
 }
-    
+
 void Object::CloneReset()
 {
     this->Modify();

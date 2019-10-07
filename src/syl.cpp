@@ -77,7 +77,7 @@ void Syl::AddChild(Object *child)
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
 {
     assert(doc);
-    
+
     sylLog_WORDPOS pos = this->GetWordpos();
     sylLog_CON con = this->GetCon();
 
