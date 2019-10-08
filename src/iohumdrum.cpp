@@ -5430,11 +5430,37 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 
 void HumdrumInput::fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
+    // triplet-whole + triplet-breve cases
     for (int i = 1; i < (int)tg.size(); i++) {
         if ((tg[i].tupletstart == 2) && (tg[i].tupletend == 1) && (tg[i - 1].tupletstart == 1)
             && (tg[i - 1].tupletend == 1)) {
             tg[i].tupletstart = 0;
             tg[i - 1].tupletend = 0;
+        }
+    }
+
+    // two triplet-halfs + triplet-breve case
+    for (int i = 2; i < (int)tg.size(); i++) {
+        if ((tg[i].tupletstart == 2) && (tg[i].tupletend == 1) && (tg[i - 1].tupletstart == 0)
+            && (tg[i - 1].tupletend == 1) && (tg[i - 2].tupletstart == 1) && (tg[i - 2].tupletend == 0)) {
+            tg[i - 1].numscale = 1;
+            tg[i - 2].numscale = 1;
+            tg[i].tupletstart = 0;
+            tg[i - 1].tupletend = 0;
+            tg[i].numbase = 2;
+        }
+    }
+
+    // two triplet-halfs + triplet-breve case + two triplet-halfs
+    for (int i = 2; i < (int)tg.size(); i++) {
+        if ((tg[i].tupletstart == 0) && (tg[i].tupletend == 2) && (tg[i - 1].tupletstart == 2)
+            && (tg[i - 1].tupletend == 0) && (tg[i - 2].tupletstart == 1) && (tg[i - 2].tupletend == 1)) {
+            tg[i].tupletend = 1;
+            tg[i - 1].tupletstart = 0;
+            tg[i - 2].tupletend = 0;
+            tg[i - 2].numbase = 2;
+            tg[i].numscale = 1;
+            tg[i - 1].numscale = 1;
         }
     }
 }
@@ -5466,8 +5492,8 @@ void HumdrumInput::printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg,
         cerr << tg[i].beamend << "\t";
         cerr << tg[i].gbeamstart << "\t";
         cerr << tg[i].gbeamend << "\t";
-        cerr << tg[i].tupletstart << "\t";
-        cerr << tg[i].tupletend << "\t";
+        cerr << "TS:" << tg[i].tupletstart << "\t";
+        cerr << "TE:" << tg[i].tupletend << "\t";
         cerr << tg[i].priority;
         cerr << endl;
     }
@@ -5938,12 +5964,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     std::vector<humaux::HumdrumBeamAndTuplet> tgs;
     prepareBeamAndTupletGroups(layerdata, tgs);
+    fixLargeTuplets(tgs);
 
     if (m_debug) {
         printGroupInfo(tgs, layerdata);
     }
-
-    fixLargeTuplets(tgs);
 
     m_tupletscaling = 1;
 
