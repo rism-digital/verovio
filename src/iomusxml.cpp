@@ -39,6 +39,7 @@
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
+#include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
 #include "mrpt.h"
@@ -239,7 +240,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     if (!staffNumStr.empty()) {
         staffNum = atoi(staffNumStr.c_str());
     }
-    if ((staffNum < 1) || (staffNum > measure->GetChildCount())) {
+    if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
     }
@@ -1008,6 +1009,14 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     std::string measureNum = node.attribute("number").as_string();
     if (measure != NULL) measure->SetN(measureNum);
 
+    std::string implicit = node.attribute("implicit").as_string();
+    if (implicit == "yes") {
+        // We would use an empty mNum, but some parts of the code
+        // rely on all of the children of a measure being staffs.
+        //MNum *mNum = new MNum();
+        //measure->AddChild(mNum);
+    }
+
     int i = 0;
     for (i = 0; i < nbStaves; i++) {
         // the staff @n must take into account the staffOffset
@@ -1299,7 +1308,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(0));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetFirst(STAFF));
     assert(staff);
 
     data_BARRENDITION barRendition = BARRENDITION_NONE;
