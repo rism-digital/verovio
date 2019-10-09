@@ -71,9 +71,14 @@ void View::DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams
     }
 }
 
-void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
+void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend)
 {
     assert(dc);
+
+    if (rend && rend->HasFontfam()) {
+        DrawTextString(dc, str, params);
+        return;
+    }
 
     ArrayOfStringDynamTypePairs tokens;
     if (Dynam::GetSymbolsInStr(str, tokens)) {
@@ -339,7 +344,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     if (text->GetFirstParent(DYNAM)) {
-        DrawDynamString(dc, text->GetText(), params);
+        DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstParent(REND)));
     }
     else if (text->GetFirstParent(HARM)) {
         DrawHarmString(dc, text->GetText(), params);
@@ -349,7 +354,6 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     else if (text->GetFirstParent(SYL)) {
         DrawLyricString(dc, text->GetText());
     }
-
     else {
         DrawTextString(dc, text->GetText(), params);
     }
