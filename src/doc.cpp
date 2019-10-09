@@ -1262,6 +1262,18 @@ int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
     return w;
 }
 
+int Doc::GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    int advX = glyph->GetHorizAdvX();
+    advX = advX * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) advX = advX * this->m_options->m_graceFactor.GetValue();
+    return advX;
+}
+
 int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const
 {
     assert(font);

@@ -154,6 +154,7 @@ public:
     ///@{
     int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
+    int GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextLineHeight(FontInfo *font, bool graceSize) const;
     ///@}
