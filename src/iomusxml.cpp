@@ -183,6 +183,9 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         for (auto current : *measure->GetChildren()) {
+            if (! current->Is(STAFF) ) {
+                continue;
+            }
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
@@ -224,6 +227,9 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     }
     // Check if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
     for (auto item : *measure->GetChildren()) {
+        if (! item->Is(STAFF) ) {
+            continue;
+        }
         Staff *staff = dynamic_cast<Staff *>(item);
         assert(staff);
         for (auto layer : *staff->GetChildren()) {
@@ -1107,6 +1113,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     for (auto staff : *measure->GetChildren()) {
+        if (! staff->Is(STAFF) ) {
+            continue;
+        }
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
             staff->AddChild(new Layer());
