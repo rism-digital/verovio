@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct  8 12:41:24 PDT 2019
+// Last Modified: Wed Oct  9 14:56:17 PDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5154,6 +5154,7 @@ class Tool_composite : public HumTool {
 	protected:
 		void        processFile        (HumdrumFile& infile);
 		void        initialize         (void);
+		HumNum      getLineDuration    (HumdrumFile& infile, int index, vector<bool>& isNull);
 
 	private:
 		string      m_pitch = "e";

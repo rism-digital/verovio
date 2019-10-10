@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct  8 12:41:24 PDT 2019
+// Last Modified: Wed Oct  9 14:56:17 PDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -46285,28 +46285,35 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 	}
 
 	vector<bool> isRest(infile.getLineCount(), false);
+	vector<bool> isNull(infile.getLineCount(), false);
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (durations[i] == 0) {
 			continue;
 		}
-		// bool allnull = true;
+		bool allnull = true;
 		bool allrest = true;
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			HTp tok = infile.token(i, j);
+			if (tok->isNull()) {
+				continue;
+			}
+			allnull = false;
 			if (!tok->isKern()) {
 				continue;
 			}
 			if (tok->isNote()) {
-				// allnull = false;
 				allrest = false;
 				break;
 			}
 			if (tok->isRest()) {
-				// allnull = false;
+				allnull = false;
 			}
 		}
 		if (allrest) {
 			isRest[i] = true;
+		}
+		if (allnull) {
+			isNull[i] = true;
 		}
 	}
 
@@ -46390,7 +46397,13 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 			}
 			continue;
 		}
-		string recip = Convert::durationToRecip(infile[i].getDuration());
+		HumNum duration = getLineDuration(infile, i, isNull);
+		string recip;
+		if (isNull[i]) {
+			recip = ".";
+		} else {
+			recip = Convert::durationToRecip(duration);
+		}
 
 		if (appendQ) {
 			token = infile.token(i, infile[i].getFieldCount() - 1);
@@ -46398,7 +46411,9 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 			token = infile.token(i, 0);
 		}
 		if (isRest[i]) {
-			recip += "r";
+			if (!isNull[i]) {
+				recip += "r";
+			}
 		} else {
 			recip += pstring;
 		}
@@ -46429,6 +46444,33 @@ void Tool_composite::processFile(HumdrumFile& infile) {
 
 }
 
+
+//////////////////////////////
+//
+// Tool_composite::getLineDuration -- Return the duration of the line, but return
+//    0 if the line only contains nulls.  Also add the duration of any subsequent 
+//    lines that are null lines before any data content lines.
+
+HumNum Tool_composite::getLineDuration(HumdrumFile& infile, int index, vector<bool>& isNull) {
+	if (isNull[index]) {
+		return 0;
+	}
+	if (!infile[index].isData()) {
+		return 0;
+	}
+	HumNum output = infile[index].getDuration();
+	for (int i=index+1; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		if (isNull[i]) {
+			output += infile[i].getDuration();
+		} else {
+			break;
+		}
+	}
+	return output;
+}
 
 
 
