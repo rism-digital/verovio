@@ -39,8 +39,8 @@ $FLAGS .= " -DNDEBUG";
 $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++11";
 $FLAGS .= " -s ASM_JS=1";
-$FLAGS .= " -s TOTAL_MEMORY=256*1024*1024";
-$FLAGS .= " -s TOTAL_STACK=128*1024*1024";
+$FLAGS .= " -s TOTAL_MEMORY=256MB";
+$FLAGS .= " -s TOTAL_STACK=128MB";
 $FLAGS .= " -s WASM=0";
 
 my ($FLAGS_NAME, $VERSION, $CHATTY);
@@ -98,8 +98,8 @@ if ($wasmQ) {
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
 	# this is for now necessary to avoid integer overflow runtime error
 	$FLAGS .= " -s \"BINARYEN_TRAP_MODE='clamp'\"";
-	$FLAGS .= " -s TOTAL_MEMORY=512*1024*1024";
-	$FLAGS .= " -s TOTAL_STACK=256*1024*1024";
+	$FLAGS .= " -s TOTAL_MEMORY=512MB";
+	$FLAGS .= " -s TOTAL_STACK=256MB";
 	$FLAGS .= " -s ALLOW_MEMORY_GROWTH=1";
 	$FLAGS_NAME = "-wasm";
 }

@@ -26,6 +26,7 @@ public:
     ///@{
     GraceGrp();
     virtual ~GraceGrp();
+    virtual Object *Clone() const { return new GraceGrp(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "GraceGrp"; };
     virtual ClassId GetClassId() const { return GRACEGRP; };

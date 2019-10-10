@@ -38,6 +38,7 @@ public:
     ///@{
     Accid();
     virtual ~Accid();
+    virtual Object *Clone() const { return new Accid(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Accid"; }
     virtual ClassId GetClassId() const { return ACCID; }

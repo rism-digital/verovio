@@ -35,8 +35,8 @@ public:
     ///@{
     Clef();
     virtual ~Clef();
-    virtual void Reset();
     virtual Object *Clone() const { return new Clef(*this); }
+    virtual void Reset();
     virtual std::string GetClassName() const { return "Clef"; }
     virtual ClassId GetClassId() const { return CLEF; }
     ///@}

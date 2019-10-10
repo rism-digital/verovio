@@ -38,6 +38,7 @@ public:
     ///@{
     Dir();
     virtual ~Dir();
+    virtual Object *Clone() const { return new Dir(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dir"; }
     virtual ClassId GetClassId() const { return DIR; }

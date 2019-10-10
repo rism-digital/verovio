@@ -89,7 +89,7 @@ void StaffDefDrawingInterface::SetCurrentClef(Clef const *clef)
 {
     if (clef) {
         m_currentClef = *clef;
-        m_currentClef.CopyReset();
+        m_currentClef.CloneReset();
     }
 }
 
@@ -99,7 +99,7 @@ void StaffDefDrawingInterface::SetCurrentKeySig(KeySig const *keySig)
         char drawingCancelAccidCount = m_currentKeySig.GetAccidCount();
         data_ACCIDENTAL_WRITTEN drawingCancelAccidType = m_currentKeySig.GetAccidType();
         m_currentKeySig = *keySig;
-        m_currentKeySig.CopyReset();
+        m_currentKeySig.CloneReset();
         m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;
         m_currentKeySig.m_drawingCancelAccidType = drawingCancelAccidType;
     }
@@ -109,7 +109,7 @@ void StaffDefDrawingInterface::SetCurrentMensur(Mensur const *mensur)
 {
     if (mensur) {
         m_currentMensur = *mensur;
-        m_currentMensur.CopyReset();
+        m_currentMensur.CloneReset();
     }
 }
 
@@ -117,7 +117,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig const *meterSig)
 {
     if (meterSig) {
         m_currentMeterSig = *meterSig;
-        m_currentMeterSig.CopyReset();
+        m_currentMeterSig.CloneReset();
     }
 }
 

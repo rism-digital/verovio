@@ -362,6 +362,11 @@ public:
     virtual void Reset();
     ///@}
 
+    /**
+     * Do not copy children for HorizontalAligner
+     */
+    virtual bool CopyChildren() const { return false; }
+
     int GetAlignmentCount() const { return (int)m_children.size(); }
 
     //----------//

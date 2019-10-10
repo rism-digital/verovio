@@ -35,6 +35,11 @@ public:
     virtual ClassId GetClassId() const { return SYSTEM_ALIGNER; }
 
     /**
+     * Do not copy children for HorizontalAligner
+     */
+    virtual bool CopyChildren() const { return false; }
+
+    /**
      * Reset the aligner (clear the content) and creates the end (bottom) alignement
      */
     virtual void Reset();

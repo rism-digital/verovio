@@ -78,8 +78,10 @@ void Layer::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
-void Layer::CopyReset()
+void Layer::CloneReset()
 {
+    Object::CloneReset();
+
     m_drawKeySigCancellation = false;
     m_staffDefClef = NULL;
     m_staffDefKeySig = NULL;
@@ -422,7 +424,7 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
     params->m_contentLayer = this;
 
     params->m_targetLayer = new Layer(*this);
-    params->m_targetLayer->CopyReset();
+    params->m_targetLayer->CloneReset();
     // Keep the xml:id of the layer in the first segment
     params->m_targetLayer->SwapUuid(this);
     assert(params->m_targetStaff);

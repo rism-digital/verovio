@@ -104,13 +104,20 @@ Object::Object(const Object &object) : BoundingBox(object)
     int i;
     for (i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
-        Object *copy = current->Clone();
-        if (copy) {
-            copy->Modify();
-            copy->SetParent(this);
-            m_children.push_back(copy);
+        Object *clone = current->Clone();
+        if (clone) {
+            clone->SetParent(this);
+            clone->CloneReset();
+            m_children.push_back(clone);
         }
     }
+}
+
+void Object::CloneReset()
+{
+    this->Modify();
+    FunctorParams voidParams;
+    this->ResetDrawing(&voidParams);
 }
 
 Object &Object::operator=(const Object &object)
@@ -139,10 +146,10 @@ Object &Object::operator=(const Object &object)
             int i;
             for (i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
-                Object *copy = current->Clone();
-                copy->Modify();
-                copy->SetParent(this);
-                m_children.push_back(copy);
+                Object *clone = current->Clone();
+                clone->SetParent(this);
+                clone->CloneReset();
+                m_children.push_back(clone);
             }
         }
     }

@@ -2276,6 +2276,21 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for dynam
+    else if (filterParent->Is(DYNAM)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for dir
     else if (filterParent->Is(DIR)) {
         if (element == "") {

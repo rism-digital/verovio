@@ -35,6 +35,7 @@ public:
     ///@{
     Tuplet();
     virtual ~Tuplet();
+    virtual Object *Clone() const { return new Tuplet(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tuplet"; }
     virtual ClassId GetClassId() const { return TUPLET; }

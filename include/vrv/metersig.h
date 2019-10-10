@@ -32,10 +32,10 @@ public:
     ///@{
     MeterSig();
     virtual ~MeterSig();
+    virtual Object *Clone() const { return new MeterSig(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MeterSig"; }
     virtual ClassId GetClassId() const { return METERSIG; }
-    virtual Object *Clone() const { return new MeterSig(*this); }
     ///@}
 
     /** Override the method since alignment is required */

@@ -50,9 +50,9 @@ public:
     ///@}
 
     /**
-     * Overriding CopyReset() method to be called after copy / assignment calls.
+     * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CopyReset();
+    virtual void CloneReset();
 
     /**
      * @name Getter to interfaces

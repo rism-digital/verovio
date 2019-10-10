@@ -29,6 +29,7 @@ public:
     ///@{
     Tie();
     virtual ~Tie();
+    virtual Object *Clone() const { return new Tie(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tie"; }
     virtual ClassId GetClassId() const { return TIE; }

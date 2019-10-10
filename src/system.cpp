@@ -29,6 +29,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "trill.h"
+#include "verse.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -476,7 +477,7 @@ int System::AdjustSylSpacing(FunctorParams *functorParams)
 
     // reset it
     params->m_overlapingSyl.clear();
-    params->m_previousSyl = NULL;
+    params->m_previousVerse = NULL;
     params->m_previousMeasure = NULL;
     params->m_freeSpace = 0;
     params->m_staffSize = 100;
@@ -494,13 +495,13 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
     }
 
     // Here we also need to handle the last syl of the measure - we check the alignment with the right barline
-    if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetContentRight()
+    if (params->m_previousVerse && params->m_lastSyl) {
+        int overlap = params->m_lastSyl->GetContentRight()
             - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
-        params->m_previousSyl->CalcHorizontalAdjustment(overlap, params);
+        params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
         if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(),
+            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
                 params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
         }
     }
