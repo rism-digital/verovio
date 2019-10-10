@@ -1017,10 +1017,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 
     std::string implicit = node.attribute("implicit").as_string();
     if (implicit == "yes") {
-        // We would use an empty mNum, but some parts of the code
-        // rely on all of the children of a measure being staffs.
-        //MNum *mNum = new MNum();
-        //measure->AddChild(mNum);
+        MNum *mNum = new MNum();
+        // An empty mNum means that we like to render this measure number as blank.
+        measure->AddChild(mNum);
     }
 
     int i = 0;
