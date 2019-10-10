@@ -251,7 +251,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
         staffNum = 1;
     }
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     return SelectLayer(layerNum, staff);
 }
@@ -259,7 +259,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
 {
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);

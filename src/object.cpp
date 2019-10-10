@@ -544,6 +544,15 @@ Object *Object::GetChild(int idx) const
     return m_children.at(idx);
 }
 
+Object *Object::GetChild(int idx, const ClassId classId)
+{
+    Object* obj = GetFirst(classId);
+    for(int i = idx; i > 0; i--) {
+        obj = GetNext();
+    }
+    return obj;
+}
+
 bool Object::DeleteChild(Object *child)
 {
     auto it = std::find(m_children.begin(), m_children.end(), child);

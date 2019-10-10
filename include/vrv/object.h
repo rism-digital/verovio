@@ -246,6 +246,7 @@ public:
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
+    Object *GetChild(int idx, const ClassId classId);
 
     /**
      * Return a cont pointer to the children
