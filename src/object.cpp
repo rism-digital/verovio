@@ -547,7 +547,7 @@ Object *Object::GetChild(int idx) const
 Object *Object::GetChild(int idx, const ClassId classId)
 {
     Object* obj = GetFirst(classId);
-    for(int i = idx; i > 0; i--) {
+    for(int i = idx; i > 0 && obj; i--) {
         obj = GetNext();
     }
     return obj;
