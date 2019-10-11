@@ -2640,12 +2640,16 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
 
 std::string MusicXmlInput::ConvertAlterToSymbol(std::string value)
 {
-    if (value == "-1")
+    if (value == "-2")
+        return "𝄫";
+    else if (value == "-1")
         return "♭";
     else if (value == "0")
         return "♮";
     else if (value == "1")
         return "♯";
+    else if (value == "2")
+        return "𝄪";
     else
         return "";
 }
