@@ -302,6 +302,7 @@ private:
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
     std::string ConvertAlterToSymbol(std::string value);
     std::string ConvertKindToSymbol(std::string value);
+    std::string ConvertKindToText(std::string value);
     ///@}
 
 private:
