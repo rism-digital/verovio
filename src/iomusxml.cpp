@@ -1708,9 +1708,13 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xpath_node kind = node.select_node("kind");
     if (kind) {
-        harmText = harmText + kind.node().attribute("text").as_string();
-        if (HasAttributeWithValue(kind.node(), "use-symbols", "yes"))
+        if (HasAttributeWithValue(kind.node(), "use-symbols", "yes")) {
             harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
+        } else if (kind.node().attribute("text")){
+            harmText = harmText + kind.node().attribute("text").as_string();
+        } else {
+            harmText = harmText + ConvertKindToText(GetContent(kind.node()));
+        }
     }
     pugi::xpath_node degree = node.select_node("degree");
     if (degree) {
@@ -2636,30 +2640,84 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
 
 std::string MusicXmlInput::ConvertAlterToSymbol(std::string value)
 {
-    if (value == "-1")
+    if (value == "-2")
+        return "𝄫";
+    else if (value == "-1")
         return "♭";
     else if (value == "0")
         return "♮";
     else if (value == "1")
         return "♯";
+    else if (value == "2")
+        return "𝄪";
     else
         return "";
 }
 
 std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
 {
-    if (value.find("major") != std::string::npos)
-        return "△";
-    else if (value.find("minor") != std::string::npos)
-        return "-";
-    else if (value.find("augmented") != std::string::npos)
-        return "+";
-    else if (value.find("diminished") != std::string::npos)
-        return "°";
-    else if (value.find("half-diminished") != std::string::npos)
-        return "ø";
-    else
-        return "";
+    if (value == "major") return ""; // Use no symbol to avoid ambiguity of "C△".
+    else if (value == "minor") return "-";
+    else if (value == "augmented") return "+";
+    else if (value == "diminished") return "°";
+    else if (value == "dominant") return "7";
+    else if (value == "major-seventh") return "△7";
+    else if (value == "minor-seventh") return "-7";
+    else if (value == "diminished-seventh") return "°7";
+    else if (value == "augmented-seventh") return "+7";
+    else if (value == "half-diminished") return "ø";
+    else if (value == "major-minor") return "-△7";
+    else if (value == "major-sixth") return "6";
+    else if (value == "minor-sixth") return "-6";
+    else if (value == "dominant-ninth") return "9";
+    else if (value == "major-ninth") return "△9";
+    else if (value == "minor-ninth") return "-9";
+    else if (value == "dominant-11th") return "11";
+    else if (value == "major-11th") return "△11";
+    else if (value == "minor-11th") return "-11";
+    else if (value == "dominant-13th") return "13";
+    else if (value == "major-13th") return "△13";
+    else if (value == "minor-13th") return "-13";
+    else if (value == "suspended-second") return "sus2";
+    else if (value == "suspended-fourth") return "sus4";
+    // Skipping "functional sixths": Neapolitan, Italian, French, German.
+    // Skipping pedal (pedal-point bass)
+    else if (value == "power") return "5";
+    // Skipping Tristan
+    else return "";
+}
+
+std::string MusicXmlInput::ConvertKindToText(std::string value)
+{
+    if (value == "major") return "";
+    else if (value == "minor") return "m";
+    else if (value == "augmented") return "aug";
+    else if (value == "diminished") return "dim";
+    else if (value == "dominant") return "7";
+    else if (value == "major-seventh") return "Maj7";
+    else if (value == "minor-seventh") return "m7";
+    else if (value == "diminished-seventh") return "dim7";
+    else if (value == "augmented-seventh") return "aug7";
+    else if (value == "half-diminished") return "m7♭5";
+    else if (value == "major-minor") return "mMaj7";
+    else if (value == "major-sixth") return "6";
+    else if (value == "minor-sixth") return "m6";
+    else if (value == "dominant-ninth") return "9";
+    else if (value == "major-ninth") return "Maj9";
+    else if (value == "minor-ninth") return "m9";
+    else if (value == "dominant-11th") return "11";
+    else if (value == "major-11th") return "Maj11";
+    else if (value == "minor-11th") return "m11";
+    else if (value == "dominant-13th") return "13";
+    else if (value == "major-13th") return "Maj13";
+    else if (value == "minor-13th") return "m13";
+    else if (value == "suspended-second") return "sus2";
+    else if (value == "suspended-fourth") return "sus4";
+    // Skipping "functional sixths": Neapolitan, Italian, French, German.
+    // Skipping pedal (pedal-point bass)
+    else if (value == "power") return "5";
+    // Skipping Tristan
+    else return "";
 }
 
 bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
