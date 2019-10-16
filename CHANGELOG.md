@@ -1,6 +1,9 @@
 # Changelog
 
 ## [unreleased]
+* Support for superscript and subscript in `<rend>`
+* Support for chord-symbol parsing in MusicXML (@earboxer)
+* Support for dynamics with mixed text and music fonts
 * Support for non-standard keys from MusicXML (@rettinghaus)
 * Support for `<graceGrp>` (@rettinghaus)
 * Support for `<keyAccid>` for custom key signatures

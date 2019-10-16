@@ -530,6 +530,10 @@ enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7
 
+#define SUPER_SCRIPT_FACTOR 0.58
+#define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline
+#define SUB_SCRIPT_POSITION -0.17 // lowered down from the baseline
+
 } // namespace vrv
 
 #endif // __VRV_DEF_H__

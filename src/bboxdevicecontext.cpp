@@ -260,6 +260,12 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
     }
 }
 
+void BBoxDeviceContext::MoveTextVerticallyTo(int y)
+{
+    assert(m_drawingText);
+    m_textY = y;
+}
+
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
 {
     assert(m_fontStack.top());

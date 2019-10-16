@@ -26,7 +26,14 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend() : TextElement("rend-"), AreaPosInterface(), AttColor(), AttLang(), AttTextRendition(), AttTypography(), AttWhitespace()
+Rend::Rend()
+    : TextElement("rend-")
+    , AreaPosInterface()
+    , AttColor()
+    , AttLang()
+    , AttTextRendition()
+    , AttTypography()
+    , AttWhitespace()
 {
     RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
