@@ -9897,8 +9897,10 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
 
     int staffindex = m_rkern[token->getTrack()];
     int placement = 0;
-    if (m_fbstaff[staffindex]) {
-        placement = -m_fbstates.at(staffindex);
+
+    int rstaffindex = (int)m_fbstaff.size() - staffindex - 1;
+    if (m_fbstaff[rstaffindex]) {
+        placement = -m_fbstates.at(rstaffindex);
     }
 
     if (hasAboveParameter(layerdata[layerindex], "TUP")) {
