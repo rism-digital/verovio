@@ -546,11 +546,13 @@ Object *Object::GetChild(int idx) const
 
 Object *Object::GetChild(int idx, const ClassId classId)
 {
-    Object* obj = GetFirst(classId);
-    for(int i = idx; i > 0 && obj; i--) {
-        obj = GetNext();
+    ArrayOfObjects objects;
+    ClassIdComparison matchClassId(classId);
+    this->FindAllChildByComparison(&objects, &matchClassId);
+    if ((idx < 0) || (idx >= (int)objects.size())) {
+        return NULL;
     }
-    return obj;
+    return objects.at(idx);
 }
 
 bool Object::DeleteChild(Object *child)
