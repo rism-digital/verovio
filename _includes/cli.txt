@@ -1,4 +1,4 @@
-Verovio 2.2.0-dev-8eecb06-dirty
+Verovio 2.2.0-dev-151d39f
 
 Example usage:
 
@@ -22,6 +22,9 @@ Input and page layout options
  --breaks <s>                      Define page and system breaks layout (default: "auto"; other values: "none", "encoded")
  --even-note-spacing               Specify the linear spacing factor
  --hum-type                        Include type attributes when importing from Humdrum
+ --justify-include-last-page       Justify including the last page
+ --justify-systems-only            Justify systems only and not staves
+ --justify-vertically              Justify spacing vertically to fill the page
  --landscape                       The landscape paper orientation flag
  --mensural-to-measure             Convert mensural sections to measure-based MEI
  --min-last-justification <f>      The last system is only justified if the unjustified width is greater than this percent (default: 0.80; min: 0.00; max: 1.00)
