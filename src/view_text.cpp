@@ -62,15 +62,6 @@ void View::DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams
 {
     assert(dc);
 
-    if (params.m_newLine) {
-        dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
-        params.m_newLine = false;
-    }
-    else if (params.m_verticalShift) {
-        dc->MoveTextVerticallyTo(ToDeviceContextY(params.m_y));
-        params.m_verticalShift = false;
-    }
-
     dc->DrawText(UTF16to8(str), str);
 }
 
@@ -364,6 +355,15 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     assert(text);
 
     dc->StartTextGraphic(text, "", text->GetUuid());
+    
+    if (params.m_newLine) {
+        dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
+        params.m_newLine = false;
+    }
+    else if (params.m_verticalShift) {
+        dc->MoveTextVerticallyTo(ToDeviceContextY(params.m_y));
+        params.m_verticalShift = false;
+    }
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     if (text->GetFirstParent(DYNAM)) {
