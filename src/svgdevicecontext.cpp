@@ -871,7 +871,7 @@ std::string SvgDeviceContext::GetColour(int colour)
             int red = (colour >> 16) & 255;
             ss << red << green << blue;
             // std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
-            return ss.str();
+            return StringFormat("#%s", ss.str());
     }
 }
 
