@@ -17,6 +17,7 @@
 
 namespace vrv {
 
+#define AxNONE -1
 #define AxWHITE 255 << 16 | 255 << 8 | 255
 #define AxBLACK 0
 #define AxRED 255 << 16
