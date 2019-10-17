@@ -62,13 +62,7 @@ void View::DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams
 {
     assert(dc);
 
-    if (params.m_laidOut && params.m_newLine) {
-        dc->DrawText(UTF16to8(str), str, ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
-        params.m_newLine = false;
-    }
-    else {
-        dc->DrawText(UTF16to8(str), str);
-    }
+    dc->DrawText(UTF16to8(str), str);
 }
 
 void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend)
@@ -234,7 +228,6 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 
     params.m_y -= m_doc->GetTextLineHeight(currentFont, false);
     params.m_newLine = true;
-    params.m_laidOut = true;
 
     dc->EndTextGraphic(lb, this);
 }
@@ -281,6 +274,15 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     dc->StartTextGraphic(rend, "", rend->GetUuid());
 
+    if (params.m_laidOut) {
+        if (params.m_alignment == HORIZONTALALIGNMENT_NONE) {
+            params.m_alignment = rend->HasHalign() ? rend->GetHalign() : HORIZONTALALIGNMENT_left;
+            params.m_x = rend->GetDrawingX();
+            params.m_y = rend->GetDrawingY();
+            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), params.m_alignment);
+        }
+    }
+
     FontInfo rendFont;
     bool customFont = false;
     if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
@@ -313,22 +315,34 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }
+
     if (customFont) dc->SetFont(&rendFont);
 
-    if (params.m_laidOut) {
-        if (params.m_alignment == HORIZONTALALIGNMENT_NONE) {
-            params.m_alignment = rend->HasHalign() ? rend->GetHalign() : HORIZONTALALIGNMENT_left;
-            params.m_x = rend->GetDrawingX();
-            params.m_y = rend->GetDrawingY();
-            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), params.m_alignment);
+    int yShift = 0;
+    if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
+        assert(dc->GetFont());
+        int MHeight = m_doc->GetTextGlyphHeight('M', dc->GetFont(), false);
+        if (rend->GetRend() == TEXTRENDITION_sup) {
+            yShift = m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
+            yShift += (MHeight * SUPER_SCRIPT_POSITION);
         }
-        else if (params.m_newLine) {
-            params.m_newLine = false;
-            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
+        else {
+            yShift = MHeight * SUB_SCRIPT_POSITION;
         }
+        params.m_y += yShift;
+        params.m_verticalShift = true;
+        dc->GetFont()->SetSupSubScript(true);
+        dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() * SUPER_SCRIPT_FACTOR);
     }
 
     DrawTextChildren(dc, rend, params);
+
+    if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
+        params.m_y -= yShift;
+        params.m_verticalShift = true;
+        dc->GetFont()->SetSupSubScript(false);
+        dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
+    }
 
     if (customFont) dc->ResetFont();
 
@@ -341,6 +355,15 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     assert(text);
 
     dc->StartTextGraphic(text, "", text->GetUuid());
+    
+    if (params.m_newLine) {
+        dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
+        params.m_newLine = false;
+    }
+    else if (params.m_verticalShift) {
+        dc->MoveTextVerticallyTo(ToDeviceContextY(params.m_y));
+        params.m_verticalShift = false;
+    }
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     if (text->GetFirstParent(DYNAM)) {

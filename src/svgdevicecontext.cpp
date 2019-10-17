@@ -726,6 +726,11 @@ void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignme
     }
 }
 
+void SvgDeviceContext::MoveTextVerticallyTo(int y)
+{
+    m_currentNode.append_attribute("y") = y;
+}
+
 void SvgDeviceContext::EndText()
 {
     m_svgNodeStack.pop_back();

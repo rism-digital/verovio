@@ -1292,7 +1292,10 @@ int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
     int descender = -this->GetTextGlyphDescender(L'q', font, graceSize);
     int height = this->GetTextGlyphHeight(L'I', font, graceSize);
 
-    return ((descender + height) * 1.1);
+    int lineHeight = ((descender + height) * 1.1);
+    if (font->GetSupSubScript()) lineHeight /= SUPER_SCRIPT_FACTOR;
+
+    return lineHeight;
 }
 
 int Doc::GetDrawingUnit(int staffSize) const
