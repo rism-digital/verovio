@@ -548,7 +548,7 @@ Object *Object::GetChild(int idx, const ClassId classId)
 {
     ArrayOfObjects objects;
     ClassIdComparison matchClassId(classId);
-    this->FindAllChildByComparison(&objects, &matchClassId);
+    this->FindAllChildByComparison(&objects, &matchClassId, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
