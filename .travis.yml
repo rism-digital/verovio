@@ -2,9 +2,19 @@ branches:
   only:
   - develop
 
-sudo: false
+notifications:
+  email: true
+
+sudo: required
 dist: trusty
 language: cpp
+
+services:
+  - docker
+
+language: node_js
+node_js:
+  - node
 
 matrix:
   include:
@@ -21,10 +31,11 @@ matrix:
 
     # Clang on OSX
     - os: osx
-      osx_image: xcode9.2
+      osx_image: xcode10.1
 
 before_install:
   - eval "${MATRIX_EVAL}"
+  - docker run -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
 
 before_install:
   - eval "${MATRIX_EVAL}"
@@ -35,3 +46,5 @@ before_script:
 
 script: 
   - make
+  - docker exec -it emscripten make helloworld.js
+  - make test
