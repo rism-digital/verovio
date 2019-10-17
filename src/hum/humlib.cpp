@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct  9 14:56:17 PDT 2019
+// Last Modified: Wed Oct 16 13:40:45 PDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -1522,14 +1522,16 @@ string Convert::museFiguredBassToKernFiguredBass(const string& mfb) {
 	for (int i=0; i<(int)mfb.size(); i++) {
 		if (mfb[i] == 'b') { // blank spot in figure stack
 			output += 'X';
+		} else if (mfb[i] == 'f') { // flat
+			output += '-';
 		} else if ((mfb[i] == '&') && (i < (int)mfb.size()-1) && (mfb[i+1] == '0')) {
 			output += ":";
 			i++;
-		} else if ((mfb[i] == '/')) {  // assuming means flat
+		} else if ((mfb[i] == '/')) {  // assuming slash means flat
 			output += "-/";
-		} else if ((mfb[i] == '\\')) { // assuming means sharp
+		} else if ((mfb[i] == '\\')) { // assuming slash means sharp
 			output += "#/";
-		} else if ((mfb[i] == '+')) {  // assuming means sharp
+		} else if ((mfb[i] == '+')) {  // assuming slash means sharp
 			output += "#|";
 		} else if (isdigit(mfb[i]) && (i < (int)mfb.size() - 1) && (mfb[i+1] == '#')) {
 			output += mfb[i];
@@ -1538,7 +1540,7 @@ string Convert::museFiguredBassToKernFiguredBass(const string& mfb) {
 			i++;
 		} else if (isdigit(mfb[i]) && (i < (int)mfb.size() - 1) && (mfb[i+1] == 'f')) {
 			output += mfb[i];
-			output += mfb[i+1];
+			output += '-';
 			output += 'r';
 			i++;
 		} else if (isdigit(mfb[i]) && (i < (int)mfb.size() - 1) && (mfb[i+1] == 'n')) {
@@ -4201,6 +4203,21 @@ GridSlice* GridMeasure::addFiguredBass(HTp token, HumNum timestamp, int part, in
 		}
 	}
 
+
+	if ((!processed) && (!this->empty()) && (this->back()->getTimestamp() == timestamp)) {
+		// This case is related to putting figures on the first note in a measure
+		// but the note is not yet there, but the key signature/meter/clef etc. have already
+		// been added.
+		gs = new GridSlice(this, timestamp, SliceType::Notes, maxstaff);
+		int staff = 0;
+		int voice = 0;
+		string null = ".";
+		gs->addToken(null, part, staff, voice);
+		gs->at(part)->setFiguredBass(token);
+		this->push_back(gs);
+		processed = true;
+	}
+
 	if (!processed) {
 		cerr << "Error: could not insert figured bass: " << token << endl;
 	} else {
@@ -4213,6 +4230,8 @@ GridSlice* GridMeasure::addFiguredBass(HTp token, HumNum timestamp, int part, in
 	return gs;
 }
 
+
+
 //////////////////////////////
 //
 // GridMeasure::addFiguredBass --
@@ -4222,6 +4241,7 @@ GridSlice* GridMeasure::addFiguredBass(const string& tok, HumNum timestamp, int 
 	bool processed = false;
 
 	if (this->empty() || (this->back()->getTimestamp() < timestamp)) {
+
 		// add a new GridSlice to an empty list or at end of list if timestamp
 		// is after last entry in list.
 		gs = new GridSlice(this, timestamp, SliceType::Notes, maxstaff);
@@ -4257,6 +4277,20 @@ GridSlice* GridMeasure::addFiguredBass(const string& tok, HumNum timestamp, int 
 			}
 			iterator++;
 		}
+	}
+
+	if ((!processed) && (!this->empty()) && (this->back()->getTimestamp() == timestamp)) {
+		// This case is related to putting figures on the first note in a measure
+		// but the note is not yet there, but the key signature/meter/clef etc. have already
+		// been added.
+		gs = new GridSlice(this, timestamp, SliceType::Notes, maxstaff);
+		int staff = 0;
+		int voice = 0;
+		string null = ".";
+		gs->addToken(null, part, staff, voice);
+		gs->at(part)->setFiguredBass(tok);
+		this->push_back(gs);
+		processed = true;
 	}
 
 	if (!processed) {
@@ -6139,6 +6173,21 @@ void GridSlice::invalidate(void) {
 
 //////////////////////////////
 //
+// GridSlice::reportVerseCount --
+//
+
+void GridSlice::reportVerseCount(int partindex, int staffindex, int count) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->reportVerseCount(partindex, staffindex, count);
+}
+
+
+
+
+//////////////////////////////
+//
 // GridStaff::GridStaff -- Constructor.
 //
 
@@ -7188,6 +7237,34 @@ void HumGrid::setHarmonyCount(int partindex, int count) {
 		return;
 	}
 	m_harmonyCount[partindex] = count;
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::reportVerseCount --
+//
+
+void HumGrid::reportVerseCount(int partindex, int staffindex, int count) {
+	if (count <= 0) {
+		return;
+	}
+	int staffnumber = staffindex + 1;
+	int partsize = (int)m_verseCount.size();
+	if (partindex >= partsize) {
+		m_verseCount.resize(partindex+1);
+	}
+	int staffcount = (int)m_verseCount.at(partindex).size();
+	if (staffnumber >= staffcount) {
+		m_verseCount.at(partindex).resize(staffnumber+1);
+		for (int i=staffcount; i<=staffnumber; i++) {
+			m_verseCount.at(partindex).at(i) = 0;
+		}
+	}
+	if (count > m_verseCount.at(partindex).at(staffnumber)) {
+		m_verseCount.at(partindex).at(staffnumber) = count;
+	}
 }
 
 
@@ -32139,6 +32216,18 @@ string MuseRecord::getVerse(int index) {
 
 //////////////////////////////
 //
+// MuseRecord::getVerseUtf8 --
+//
+
+string MuseRecord::getVerseUtf8(int index) {
+	string tverse = getVerse(index);
+	return MuseRecord::musedataToUtf8(tverse);
+}
+
+
+
+//////////////////////////////
+//
 // MuseRecord::getKernNoteStyle --
 //	    default values: beams = 0, stems = 0
 //
@@ -33365,6 +33454,7 @@ void MuseRecord::zerase(string& inout, int num) {
 	}
 	inout.resize(inout.size() - num);
 }
+
 
 
 
@@ -34657,6 +34747,113 @@ GridVoice* MuseRecordBasic::getVoice(void) {
 std::string MuseRecordBasic::getLayoutVis(void) {
 	return m_graphicrecip;
 }
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::musedataToUtf8 --
+//
+
+string MuseRecordBasic::musedataToUtf8(string& input) {
+	string output;
+	int isize = (int)input.size();
+	for (int i=0; i<isize; i++) {
+		if (input[i] != '\\') {
+			output += input[i];
+			continue;
+		}
+		if (i+2 >= isize) {
+			output += input[i];
+			continue;
+		}
+		string st = input.substr(i+1, 2);
+
+		// graves
+		if (st == "A8") { output += (char)0xc3; output += (char)0x80; i+=2; continue; }
+		if (st == "E8") { output += (char)0xc3; output += (char)0x88; i+=2; continue; }
+		if (st == "I8") { output += (char)0xc3; output += (char)0x8c; i+=2; continue; }
+		if (st == "O8") { output += (char)0xc3; output += (char)0x92; i+=2; continue; }
+		if (st == "U8") { output += (char)0xc3; output += (char)0x99; i+=2; continue; }
+		if (st == "a8") { output += (char)0xc3; output += (char)0xa0; i+=2; continue; }
+		if (st == "e8") { output += (char)0xc3; output += (char)0xa8; i+=2; continue; }
+		if (st == "i8") { output += (char)0xc3; output += (char)0xac; i+=2; continue; }
+		if (st == "o8") { output += (char)0xc3; output += (char)0xb2; i+=2; continue; }
+		if (st == "u8") { output += (char)0xc3; output += (char)0xb9; i+=2; continue; }
+
+		// acutes
+		if (st == "A7") { output += (char)0xc3; output += (char)0x81; i+=2; continue; }
+		if (st == "E7") { output += (char)0xc3; output += (char)0x89; i+=2; continue; }
+		if (st == "I7") { output += (char)0xc3; output += (char)0x8d; i+=2; continue; }
+		if (st == "O7") { output += (char)0xc3; output += (char)0x93; i+=2; continue; }
+		if (st == "U7") { output += (char)0xc3; output += (char)0x9a; i+=2; continue; }
+		if (st == "a7") { output += (char)0xc3; output += (char)0xa1; i+=2; continue; }
+		if (st == "e7") { output += (char)0xc3; output += (char)0xa9; i+=2; continue; }
+		if (st == "i7") { output += (char)0xc3; output += (char)0xad; i+=2; continue; }
+		if (st == "o7") { output += (char)0xc3; output += (char)0xb3; i+=2; continue; }
+		if (st == "u7") { output += (char)0xc3; output += (char)0xba; i+=2; continue; }
+
+		// umlauts
+		if (st == "A3") { output += (char)0xc3; output += (char)0x84; i+=2; continue; }
+		if (st == "E3") { output += (char)0xc3; output += (char)0x8b; i+=2; continue; }
+		if (st == "I3") { output += (char)0xc3; output += (char)0x8f; i+=2; continue; }
+		if (st == "O3") { output += (char)0xc3; output += (char)0x96; i+=2; continue; }
+		if (st == "U3") { output += (char)0xc3; output += (char)0x9c; i+=2; continue; }
+		if (st == "a3") { output += (char)0xc3; output += (char)0xa4; i+=2; continue; }
+		if (st == "e3") { output += (char)0xc3; output += (char)0xab; i+=2; continue; }
+		if (st == "i3") { output += (char)0xc3; output += (char)0xaf; i+=2; continue; }
+		if (st == "o3") { output += (char)0xc3; output += (char)0xb6; i+=2; continue; }
+		if (st == "u3") { output += (char)0xc3; output += (char)0xbc; i+=2; continue; }
+
+		// other
+		if (st == "s2") { output += (char)0xc3; output += (char)0x9f; i+=2; continue; }  // eszett
+
+		// Older Musedata files reverse the number and letters:
+
+		// graves
+		if (st == "8A") { output += (char)0xc3; output += (char)0x80; i+=2; continue; }
+		if (st == "8E") { output += (char)0xc3; output += (char)0x88; i+=2; continue; }
+		if (st == "8I") { output += (char)0xc3; output += (char)0x8c; i+=2; continue; }
+		if (st == "8O") { output += (char)0xc3; output += (char)0x92; i+=2; continue; }
+		if (st == "8U") { output += (char)0xc3; output += (char)0x99; i+=2; continue; }
+		if (st == "8a") { output += (char)0xc3; output += (char)0xa0; i+=2; continue; }
+		if (st == "8e") { output += (char)0xc3; output += (char)0xa8; i+=2; continue; }
+		if (st == "8i") { output += (char)0xc3; output += (char)0xac; i+=2; continue; }
+		if (st == "8o") { output += (char)0xc3; output += (char)0xb2; i+=2; continue; }
+		if (st == "8u") { output += (char)0xc3; output += (char)0xb9; i+=2; continue; }
+
+		// acutes
+		if (st == "7A") { output += (char)0xc3; output += (char)0x81; i+=2; continue; }
+		if (st == "7E") { output += (char)0xc3; output += (char)0x89; i+=2; continue; }
+		if (st == "7I") { output += (char)0xc3; output += (char)0x8d; i+=2; continue; }
+		if (st == "7O") { output += (char)0xc3; output += (char)0x93; i+=2; continue; }
+		if (st == "7U") { output += (char)0xc3; output += (char)0x9a; i+=2; continue; }
+		if (st == "7a") { output += (char)0xc3; output += (char)0xa1; i+=2; continue; }
+		if (st == "7e") { output += (char)0xc3; output += (char)0xa9; i+=2; continue; }
+		if (st == "7i") { output += (char)0xc3; output += (char)0xad; i+=2; continue; }
+		if (st == "7o") { output += (char)0xc3; output += (char)0xb3; i+=2; continue; }
+		if (st == "7u") { output += (char)0xc3; output += (char)0xba; i+=2; continue; }
+
+		// umlauts
+		if (st == "3A") { output += (char)0xc3; output += (char)0x84; i+=2; continue; }
+		if (st == "3E") { output += (char)0xc3; output += (char)0x8b; i+=2; continue; }
+		if (st == "3I") { output += (char)0xc3; output += (char)0x8f; i+=2; continue; }
+		if (st == "3O") { output += (char)0xc3; output += (char)0x96; i+=2; continue; }
+		if (st == "3U") { output += (char)0xc3; output += (char)0x9c; i+=2; continue; }
+		if (st == "3a") { output += (char)0xc3; output += (char)0xa4; i+=2; continue; }
+		if (st == "3e") { output += (char)0xc3; output += (char)0xab; i+=2; continue; }
+		if (st == "3i") { output += (char)0xc3; output += (char)0xaf; i+=2; continue; }
+		if (st == "3o") { output += (char)0xc3; output += (char)0xb6; i+=2; continue; }
+		if (st == "3u") { output += (char)0xc3; output += (char)0xbc; i+=2; continue; }
+
+		// other
+		if (st == "2s") { output += (char)0xc3; output += (char)0x9f; i+=2; continue; }  // eszett
+
+	}
+
+	return output;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -52937,6 +53134,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(homophonic2, infile, commands[i].second, status);
 		} else if (commands[i].first == "hproof") {
 			RUNTOOL(hproof, infile, commands[i].second, status);
+		} else if (commands[i].first == "humsar") {
+			RUNTOOL(humsar, infile, commands[i].second, status);
 		} else if (commands[i].first == "imitation") {
 			RUNTOOL(imitation, infile, commands[i].second, status);
 		} else if (commands[i].first == "extract") {
@@ -54480,6 +54679,341 @@ ostream& operator<<(ostream& out, NotePoint& np) {
 		out << "\t\tindex " << i << " is:\t" << np.matched[i] << endl;
 	}
 	return out;
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_humsar::Tool_humsar -- Set the recognized options for the tool.
+//
+
+Tool_humsar::Tool_humsar(void) {
+	define("q|query=s", "query string");
+	define("r|replace=s", "replace string");
+	define("k|kern=b", "process kern spines only");
+	define("x|exinterps|exinerp|exclusive-interpretation|exclusive-interpretations=s", "process only specified spines");
+	define("s|spine|spines=s", "list of spines to process");
+	define("I|interpretation=b", "process interpretation tokens only");
+	define("i|ignore-case=b", "Ignore case of letters");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_humsar::run -- Do the main work of the tool.
+//
+
+bool Tool_humsar::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_humsar::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humsar::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humsar::run(HumdrumFile& infile) {
+	initialize();
+	initializeSegment(infile);
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_humsar::initialize(void) {
+	m_search = getString("query");
+	HumRegex hre;
+	hre.replaceDestructive(m_search, "\\\\", "\\", "g");
+	if (getBoolean("kern")) {
+		m_exinterps.push_back("**kern");
+	} else if (getBoolean("exclusive-interpretations")) {
+		fillInExInterpList();
+	}
+	if (getBoolean("ignore-case")) {
+		m_grepoptions += "i";
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_humsar::initializeSegment -- Recalculate variables for each Humdrum input segment.
+//
+
+void Tool_humsar::initializeSegment(HumdrumFile& infile) {
+	m_spines.clear();
+	if (getBoolean("spines")) {
+		int maxtrack = infile.getMaxTrack();
+		Convert::makeBooleanTrackList(m_spines, getString("spines"), maxtrack);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::fillInExInterpList --
+//
+
+void Tool_humsar::fillInExInterpList(void) {
+	m_exinterps.clear();
+	m_exinterps.resize(1);
+	string elist = getString("exclusive-interpretations");
+	for (int i=0; i<(int)elist.size(); i++) {
+		if (isspace(elist[i]) || (elist[i] == ',')) {
+			if (!m_exinterps.back().empty()) {
+				m_exinterps.push_back("");
+			}
+		} else {
+			m_exinterps.back() += elist[i];
+		}
+	}
+	if (m_exinterps.back().empty()) {
+		m_exinterps.resize((int)m_exinterps.size() - 1);
+	}
+	for (int i=0; i<(int)m_exinterps.size(); i++) {
+		if (m_exinterps[i].compare(0, 2, "**") == 0) {
+			continue;
+		}
+		if (m_exinterps[i].compare(0, 1, "*") == 0) {
+			m_exinterps[i] = "*" + m_exinterps[i];
+			continue;
+		}
+		m_exinterps[i] = "**" + m_exinterps[i];
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::processFile --
+//
+
+void Tool_humsar::processFile(HumdrumFile& infile) {
+	if (m_search == "") {
+		// nothing to do
+		return;
+	}
+	m_modified = false;
+	m_replace = getString("replace");
+
+	m_interpretation = getBoolean("interpretation");
+
+	if (m_interpretation) {
+		searchAndReplaceInterpretation(infile);
+	//if (m_barline) {
+	//	searchAndReplaceBarline(infile);
+	} else {
+		searchAndReplaceData(infile);
+	}
+
+	if (m_modified) {
+		infile.createLinesFromTokens();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::searchAndReplaceBarline --
+//
+
+void Tool_humsar::searchAndReplaceBarline(HumdrumFile& infile) {
+	string isearch;
+	if (m_search[0] == '^') {
+		isearch = "^=" + m_search.substr(1);
+	} else {
+		isearch = "^=.*" + m_search;
+	}
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {	
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, isearch, m_grepoptions)) {
+				string text = token->getText();
+				hre.replaceDestructive(text, m_replace, isearch, m_grepoptions);
+				hre.replaceDestructive(text, "", "^=+");
+				text = "=" + text;
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_humsar::searchAndReplaceInterpretation --
+//
+
+void Tool_humsar::searchAndReplaceInterpretation(HumdrumFile& infile) {
+	string isearch;
+	if (m_search[0] == '^') {
+		isearch = "^\\*" + m_search.substr(1);
+	} else {
+		isearch = "^\\*.*" + m_search;
+	}
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		} else if (infile[i].isExclusiveInterpretation()) {
+			continue;
+		} else if (infile[i].isManipulator()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {	
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, isearch, m_grepoptions)) {
+				string text = token->getText();
+				hre.replaceDestructive(text, m_replace, isearch, m_grepoptions);
+				hre.replaceDestructive(text, "", "^\\*+");
+				text = "*" + text;
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::searchAndReplaceData --
+//
+
+void Tool_humsar::searchAndReplaceData(HumdrumFile& infile) {
+	string dsearch = m_search;
+
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, dsearch, m_grepoptions)) {
+				string text = token->getText();
+				hre.replaceDestructive(text, m_replace, dsearch, m_grepoptions);
+				if (text == "") {
+					text = ".";
+				}
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::isValidDataType -- usar with -x and -k options.
+//
+
+bool Tool_humsar::isValidDataType(HTp token) {
+	if (m_exinterps.empty()) {
+		return true;
+	}
+	string datatype = token->getDataType();
+	for (int i=0; i<(int)m_exinterps.size(); i++) {
+		if (datatype == m_exinterps[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::isValidSpine -- usar with -s option.
+//
+
+bool Tool_humsar::isValidSpine(HTp token) {
+	if (m_spines.empty()) {
+		return true;
+	}
+	int track = token->getTrack();
+	return m_spines.at(track);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsar::isValid --
+//
+
+bool Tool_humsar::isValid(HTp token) {
+	if (isValidDataType(token) && isValidSpine(token)) {
+		return true;
+	}
+	return false;
 }
 
 
@@ -60785,10 +61319,18 @@ void Tool_msearch::fillWords(HumdrumFile& infile, vector<TextInfo*>& words) {
 
 void Tool_msearch::fillWordsForTrack(vector<TextInfo*>& words,
 		HTp starttoken) {
-	HTp tok = starttoken->getNextNNDT();
+	HTp tok = starttoken->getNextToken();
 	while (tok != NULL) {
 		if (tok->empty()) {
-			tok = tok->getNextNNDT();
+			tok = tok->getNextToken();
+			continue;
+		}
+		if (tok->isNull()) {
+			tok = tok->getNextToken();
+			continue;
+		}
+		if (!tok->isData()) {
+			tok = tok->getNextToken();
 			continue;
 		}
 		if (tok->at(0) == '-') {
@@ -60799,7 +61341,7 @@ void Tool_msearch::fillWordsForTrack(vector<TextInfo*>& words,
 					words.back()->fullword.pop_back();
 				}
 			}
-			tok = tok->getNextNNDT();
+			tok = tok->getNextToken();
 			continue;
 		} else {
 			// start a new word
@@ -60816,7 +61358,7 @@ void Tool_msearch::fillWordsForTrack(vector<TextInfo*>& words,
 			}
 			temp->starttoken = tok;
 			words.push_back(temp);
-			tok = tok->getNextNNDT();
+			tok = tok->getNextToken();
 			continue;
 		}
 	}
@@ -60840,7 +61382,7 @@ void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
 	HumRegex hre;
 	for (int i=0; i<(int)query.size(); i++) {
 		for (int j=0; j<(int)words.size(); j++) {
-			if (hre.search(words[j]->fullword, query[i].word, "i")) {
+			if (hre.search(words.at(j)->fullword, query.at(i).word, "i")) {
 				tcount++;
 				markTextMatch(infile, *words[j]);
 			}
@@ -60946,13 +61488,23 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 	string text;
 	while (tok && (tok != mend)) {
 		if (!tok->isData()) {
-			return;
+			tok = tok->getNextToken();
+			continue;
+		}
+		if (tok->isNull()) {
+			tok = tok->getNextToken();
+			continue;
+		}
+		if (tok->empty()) {
+			// skip marking null tokens
+			tok = tok->getNextToken();
+			continue;
 		}
 		text = tok->getText() + m_marker;
 		tok->setText(text);
-		tok = tok->getNextNNDT();
+		tok = tok->getNextToken();
 		if (tok && !tok->isKern()) {
-			cerr << "STRANGE LINKING WITH TEXT SPINE IN getNextNNDT()" << endl;
+			cerr << "STRANGE LINKING WITH TEXT SPINE" << endl;
 			break;
 		}
 	}
@@ -60962,11 +61514,10 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 
 //////////////////////////////
 //
-// Tool_msearch::markTextMatch -- assumes monophonic music.
+// Tool_msearch::markTextMatch -- assumes monophonic voices.
 //
 
 void Tool_msearch::markTextMatch(HumdrumFile& infile, TextInfo& word) {
-// ggg
 	HTp mstart = word.starttoken;
 	HTp mnext = word.nexttoken;
 	// while (mstart && !mstart->isKern()) {
@@ -60997,7 +61548,12 @@ void Tool_msearch::markTextMatch(HumdrumFile& infile, TextInfo& word) {
 	string text;
 	while (tok && (tok != mnext)) {
 		if (!tok->isData()) {
-			return;
+			tok = tok->getNextToken();
+			continue;
+		}
+		if (tok->isNull()) {
+			tok = tok->getNextToken();
+			continue;
 		}
 		text = tok->getText();
 		if ((!text.empty()) && (text.back() == '-')) {
@@ -61008,7 +61564,7 @@ void Tool_msearch::markTextMatch(HumdrumFile& infile, TextInfo& word) {
 			text += m_marker;
 		}
 		tok->setText(text);
-		tok = tok->getNextNNDT();
+		tok = tok->getNextToken();
 	}
 }
 
@@ -61668,7 +62224,7 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 	
 	HumNum timestamp = mr.getAbsBeat();
 	string tok;
-	GridSlice* slice;
+	GridSlice* slice = NULL;
 
 	if (mr.isBarline()) {
 		tok = mr.getKernMeasureStyle();
@@ -61722,6 +62278,7 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 		}
 		m_lastnote = slice->at(part)->at(staff)->at(layer)->getToken();
 		addNoteDynamics(slice, part, mr);
+		addLyrics(slice, part, staff, mr);
 	} else if (mr.isFiguredHarmony()) {
 		addFiguredHarmony(mr, gm, timestamp, part, maxstaff);
 	} else if (mr.isChordNote()) {
@@ -61764,18 +62321,17 @@ void Tool_musedata2hum::addFiguredHarmony(MuseRecord& mr, GridMeasure* gm,
 		HumNum timestamp, int part, int maxstaff) {
 	string fh = mr.getFigureString();
 	fh = Convert::museFiguredBassToKernFiguredBass(fh);
-	GridSlice* slice;
 	if (fh.find(":") == string::npos) {
 		HTp fhtok = new HumdrumToken(fh);
 		m_lastfigure = fhtok;
-		slice = gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
+		gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
 		return;
 	}
 
 	if (!m_lastfigure) {
 		HTp fhtok = new HumdrumToken(fh);
 		m_lastfigure = fhtok;
-		slice = gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
+		gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
 		return;
 	}
 
@@ -61822,7 +62378,7 @@ void Tool_musedata2hum::addFiguredHarmony(MuseRecord& mr, GridMeasure* gm,
 	if (pieces.empty() || (position >= (int)pieces.size())) {
 		HTp fhtok = new HumdrumToken(fh);
 		m_lastfigure = fhtok;
-		slice = gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
+		gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
 		return;
 	}
 
@@ -61840,7 +62396,26 @@ void Tool_musedata2hum::addFiguredHarmony(MuseRecord& mr, GridMeasure* gm,
 	fh.erase(colpos, 1);
 	HTp newtok = new HumdrumToken(fh);
 	m_lastfigure = newtok;
-	slice = gm->addFiguredBass(newtok, timestamp, part, maxstaff);
+	gm->addFiguredBass(newtok, timestamp, part, maxstaff);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musedata2hum::addLyrics --
+//
+
+void Tool_musedata2hum::addLyrics(GridSlice* slice, int part, int staff, MuseRecord& mr) {
+	int versecount = mr.getVerseCount();
+	if (versecount == 0) {
+		return;
+	}
+	for (int i=0; i<versecount; i++) {
+		string verse = mr.getVerseUtf8(i);
+		slice->at(part)->at(staff)->setVerse(i, verse);
+	}
+	slice->reportVerseCount(part, staff, versecount);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct  9 14:56:17 PDT 2019
+// Last Modified: Wed Oct 16 13:40:45 PDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2639,6 +2639,7 @@ class MuseRecordBasic {
 		bool              hasTpq             (void);
 		int               getTpq             (void);
 		void              setTpq             (int value);
+		static std::string musedataToUtf8    (std::string& input);
 
 	protected:
 		std::string       m_recordString;    // actual characters on line
@@ -2868,6 +2869,7 @@ class MuseRecord : public MuseRecordBasic {
 		int              textUnderlayQ                (void);
 		int              getVerseCount                (void);
 		std::string      getVerse                     (int index);
+		std::string      getVerseUtf8                 (int index);
 
 		// general functions for note records:
 		std::string      getKernNoteStyle             (int beams = 0, int stems = 0);
@@ -3842,6 +3844,7 @@ class GridSlice : public std::vector<GridPart*> {
 		void initializePartStaves  (std::vector<MxmlPart>& partdata);
 		void initializeBySlice     (GridSlice* slice);
 		void initializeByStaffCount(int staffcount);
+		void reportVerseCount      (int partindex, int staffindex, int count);
 
 		HumNum       getDuration        (void);
 		void         setDuration        (HumNum duration);
@@ -3943,6 +3946,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void setFiguredBassPresent      (int partindex);
 		void setHarmonyPresent          (int partindex);
 		void setVerseCount              (int partindex, int staffindex, int count);
+		void reportVerseCount           (int partindex, int staffindex, int count);
 		void setHarmonyCount            (int partindex, int count);
 		void removeRedundantClefChanges (void);
 		void removeSibeliusIncipit      (void);
@@ -5748,6 +5752,40 @@ ostream& operator<<(ostream& out, NotePoint& np);
 
 
 
+class Tool_humsar : public HumTool {
+	public:
+		         Tool_humsar       (void);
+		        ~Tool_humsar       () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void    processFile        (HumdrumFile& infile);
+		void    searchAndReplaceInterpretation(HumdrumFile& infile);
+		void    searchAndReplaceData(HumdrumFile& infile);
+		void    searchAndReplaceBarline(HumdrumFile& infile);
+		void    initialize         (void);
+		void    initializeSegment  (HumdrumFile& infile);
+		bool    isValid            (HTp token);
+		bool    isValidDataType    (HTp token);
+		bool    isValidSpine       (HTp token);
+		void    fillInExInterpList (void);
+
+	private:
+		std::string m_search;      // search string
+		std::string m_replace;     // replace string
+		bool        m_interpretation = false; // process only interpretation records
+		bool        m_modified = false;
+		std::vector<std::string> m_exinterps; // list of exclusive interpretations to process
+		std::vector<bool> m_spines; // usar with -s option
+		std::string m_grepoptions;
+
+};
+
+
 class Tool_humsort : public HumTool {
 	public:
 		         Tool_humsort      (void);
@@ -6357,6 +6395,7 @@ class Tool_musedata2hum : public HumTool {
 		void    storePartName        (HumGrid& outdata, MuseData& part, int index);
 		void    addNoteDynamics      (GridSlice* slice, int part, 
 		                              MuseRecord& mr);
+		void    addLyrics            (GridSlice* slice, int part, int staff, MuseRecord& mr);
 		void    addFiguredHarmony    (MuseRecord& mr, GridMeasure* gm,
 		                              HumNum timestamp, int part, int maxstaff);
 		std::string trimSpaces       (std::string input);
