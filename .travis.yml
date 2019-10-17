@@ -37,9 +37,6 @@ before_install:
   - eval "${MATRIX_EVAL}"
   - docker run -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
 
-before_install:
-  - eval "${MATRIX_EVAL}"
-
 before_script:
   - cd tools
   - cmake .
