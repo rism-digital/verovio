@@ -18,9 +18,9 @@ The project page is http://www.verovio.org. Verovio is available under the LGPL 
 NPM
 ---
 
-The development version is available via [NPM](https://www.npmjs.com/package/verovio-dev)
+The latest stable version is available via [NPM](https://www.npmjs.com/package/verovio)
 
-    $ npm install verovio-dev
+    $ npm install verovio
 
 LibMEI
 ------
