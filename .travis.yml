@@ -1,47 +1,18 @@
-branches:
-  only:
-  - develop
-
 notifications:
-  email: true
-
-sudo: required
-dist: trusty
-language: cpp
-
-services:
-  - docker
+  email: false
 
 language: node_js
 node_js:
   - node
 
-matrix:
-  include:
-    # GCC5 on Linux
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-      env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+sudo: required
 
-    # Clang on OSX
-    - os: osx
-      osx_image: xcode10.1
+services:
+  - docker
 
 before_install:
-  - eval "${MATRIX_EVAL}"
   - docker run -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
 
-before_script:
-  - cd tools
-  - cmake .
-
-script: 
-  - make
+script:
   - docker exec -it emscripten make helloworld.js
   - make test
