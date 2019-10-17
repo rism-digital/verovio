@@ -1,18 +1,37 @@
-notifications:
-  email: false
+branches:
+  only:
+  - develop
 
-language: node_js
-node_js:
-  - node
+sudo: false
+dist: trusty
+language: cpp
 
-sudo: required
+matrix:
+  include:
+    # GCC5 on Linux
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
 
-services:
-  - docker
+    # Clang on OSX
+    - os: osx
+      osx_image: xcode9.2
 
 before_install:
-  - docker run -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
+  - eval "${MATRIX_EVAL}"
 
-script:
-  - docker exec -it emscripten ./emscripten/buildToolkit.sh -H
-  
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+before_script:
+  - cd tools
+  - cmake .
+
+script: 
+  - make
