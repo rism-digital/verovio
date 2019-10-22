@@ -29,7 +29,11 @@
 
 // Windows has no Bourne shell (sh), therefore no "git_commit.h" is created.
 #ifndef _WIN32
+#ifdef COCOAPODS
+#define GIT_COMMIT "[cocoapods]"
+#else
 #include "git_commit.h"
+#endif
 #else
 #define GIT_COMMIT "[undefined]"
 #endif
