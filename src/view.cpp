@@ -30,7 +30,7 @@ View::View()
     m_options = NULL;
     m_pageIdx = 0;
 
-    m_currentColour = AxNONE;
+    m_currentColour = AxBLACK;
     m_currentElement = NULL;
     m_currentLayer = NULL;
     m_currentMeasure = NULL;
