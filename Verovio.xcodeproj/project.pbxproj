@@ -2637,9 +2637,10 @@
 			};
 			buildConfigurationList = 8F086EA3188534680037FD8E /* Build configuration list for PBXProject "Verovio" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = en;
+			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 8F086E9E188534680037FD8E;

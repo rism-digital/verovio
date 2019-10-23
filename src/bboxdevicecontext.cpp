@@ -35,8 +35,8 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_drawingText = false;
     m_textAlignment = HORIZONTALALIGNMENT_left;
 
-    SetBrush(AxNONE, AxSOLID);
-    SetPen(AxNONE, 1, AxSOLID);
+    SetBrush(AxBLACK, AxSOLID);
+    SetPen(AxBLACK, 1, AxSOLID);
 
     m_update = update;
 
