@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
 											    'include/{hum,json,midi,pugi,utf8,vrv}/*.{h,hpp}',
 													'libmei/{attc*,atts_a*,atts_c*,atts_ex*,atts_fa*,atts_g*,atts_m*,atts_n*,atts_pa*,atts_s*,atts_v*,attt*}.{h}'
 	s.platform       = :ios, '12.0'
-  s.resources = 'data/**'
+  s.resources = 'data'
 	s.xcconfig = {
 	    "CLANG_CXX_LANGUAGE_STANDARD" => "gnu++14",
 			"CLANG_CXX_LIBRARY" => "libc++",
@@ -29,4 +29,7 @@ Pod::Spec.new do |s|
 			"SUPPORTS_UIKITFORMAC" => "NO",
 			"MTL_ENABLE_DEBUG_INFO" => "NO"
 	  }
+  s.info_plist = {
+    'CFBundleIdentifier' => 'com.rism.VerovioFramework'
+  }
 end
