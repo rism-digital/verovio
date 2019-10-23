@@ -34,10 +34,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 3
-#define VERSION_REVISION 0
+#define VERSION_MINOR 2
+#define VERSION_REVISION 1
 // Adds "-dev" in the version number - should be set to false for releases
-#define VERSION_DEV true
+#define VERSION_DEV false
 
 enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0 };
 

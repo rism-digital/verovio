@@ -2,6 +2,9 @@
 
 ## [unreleased]
 
+## [2.2.1] - 2019-10-23
+* Fix bug with mensural notation layout
+
 ## [2.2.0] - 2019-10-17
 * Support for superscript and subscript in `<rend>`
 * Support for chord-symbol parsing in MusicXML (@earboxer)
