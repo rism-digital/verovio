@@ -33,6 +33,7 @@ public:
     ///@{
     Section();
     virtual ~Section();
+    virtual Object *Clone() const { return new Section(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Section"; }
     virtual ClassId GetClassId() const { return SECTION; }

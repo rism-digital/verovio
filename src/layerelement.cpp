@@ -59,8 +59,9 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -68,8 +69,10 @@ LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(),
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterface(), AttLabelled(), AttTyped()
+LayerElement::LayerElement(std::string classid)
+    : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -80,6 +83,7 @@ LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterf
 void LayerElement::Reset()
 {
     Object::Reset();
+    FacsimileInterface::Reset();
     LinkingInterface::Reset();
     ResetLabelled();
     ResetTyped();
@@ -107,17 +111,18 @@ LayerElement::~LayerElement()
     }
 }
 
-LayerElement &LayerElement::operator=(const LayerElement &element)
+void LayerElement::CloneReset()
 {
-    // not self assignement
-    if (this != &element) {
-        // pointers have to be NULL
-        ResetParent();
-        m_alignment = NULL;
-        m_graceAlignment = NULL;
-        m_beamElementCoord = NULL;
-    }
-    return *this;
+    Object::CloneReset();
+
+    // pointers have to be NULL
+    m_alignment = NULL;
+    m_graceAlignment = NULL;
+    m_alignmentLayerN = VRV_UNSET;
+    m_beamElementCoord = NULL;
+
+    m_crossStaff = NULL;
+    m_crossLayer = NULL;
 }
 
 LayerElement *LayerElement::ThisOrSameasAsLink()
@@ -240,6 +245,15 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
+    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingX
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingX();
+        }
+    }
+
     // Since m_xAbs is the left position, we adjust the XRel accordingly in AdjustXRelForTranscription
     if (m_xAbs != VRV_UNSET) return m_xAbs + this->GetDrawingXRel();
 
@@ -278,6 +292,15 @@ int LayerElement::GetDrawingX() const
 
 int LayerElement::GetDrawingY() const
 {
+    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingY
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingY();
+        }
+    }
+
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     // Look if we have a crossStaff situation
@@ -296,7 +319,7 @@ int LayerElement::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, ArticPartType type)
+int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
 {
     // It would not crash otherwise but there is not reason to call it
     assert(this->Is({ NOTE, CHORD }));
@@ -314,20 +337,20 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, A
         if (firstArtic) firstArticPart = firstArtic->GetOutsidePart();
         if (lastArtic) lastArticPart = lastArtic->GetOutsidePart();
         // Ignore them if on the opposite side of what we are looking for
-        if (firstArticPart && (firstArticPart->GetPlaceAlternate()->GetBasic() != place)) firstArticPart = NULL;
-        if (lastArticPart && (lastArticPart->GetPlaceAlternate()->GetBasic() != place)) lastArticPart = NULL;
+        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
+        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
     }
     // Looking at the inside if nothing is given outside
     if (firstArtic && !firstArticPart) {
         firstArticPart = firstArtic->GetInsidePart();
-        if (firstArticPart && (firstArticPart->GetPlaceAlternate()->GetBasic() != place)) firstArticPart = NULL;
+        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
     }
     if (lastArtic && !lastArticPart) {
         lastArticPart = lastArtic->GetInsidePart();
-        if (lastArticPart && (lastArticPart->GetPlaceAlternate()->GetBasic() != place)) lastArticPart = NULL;
+        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
     }
 
-    if (place == STAFFREL_basic_above) {
+    if (place == STAFFREL_above) {
         int firstY = !firstArticPart ? VRV_UNSET : firstArticPart->GetSelfTop();
         int lastY = !lastArticPart ? VRV_UNSET : lastArticPart->GetSelfTop();
         return std::max(firstY, lastY);
@@ -367,7 +390,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_basic_above, type);
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
             if (articY != VRV_UNSET) return articY;
         }
         DurationInterface *durationInterface = this->GetDurationInterface();
@@ -400,7 +423,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_basic_below, type);
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
             if (articY != -VRV_UNSET) return articY;
         }
         DurationInterface *durationInterface = this->GetDurationInterface();
@@ -610,6 +633,8 @@ int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
     ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
@@ -622,6 +647,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 
     // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     this->SetScoreDefRole(params->m_scoreDefRole);
 
@@ -803,6 +830,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     SetAlignmentPitchPosParams *params = dynamic_cast<SetAlignmentPitchPosParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     LayerElement *layerElementY = this;
     Staff *staffY = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staffY);
@@ -922,13 +951,13 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             if (beam) {
                 beam->ResetList(beam);
 
-                const ListOfObjects *beamList = beam->GetList(beam);
+                const ArrayOfObjects *beamList = beam->GetList(beam);
                 int restIndex = beam->GetChildIndex(rest);
 
                 int leftLoc = loc;
-                ListOfObjects::const_iterator it = beamList->begin();
+                ArrayOfObjects::const_iterator it = beamList->begin();
                 std::advance(it, restIndex);
-                ListOfObjects::const_reverse_iterator rit(it);
+                ArrayOfObjects::const_reverse_iterator rit(it);
                 // iterate through the elements from the rest to the beginning of the beam
                 // until we hit a note or chord, which we will use to determine where the rest should be placed
                 for (; rit != beamList->rend(); ++rit) {
@@ -957,7 +986,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
                         rightLoc = PitchInterface::CalcLoc(layerElement, layerY, layerElementY);
-                        break;
                         break;
                     }
                     else if (layerElement->Is(CHORD)) {
@@ -1053,6 +1081,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     // Check if we are starting a new layer content - if yes copy the current elements to previous
     if (!params->m_current.empty() && (this->GetAlignmentLayerN() != params->m_currentLayerN)) {
         params->m_previous.reserve(params->m_previous.size() + params->m_current.size());
@@ -1143,6 +1173,8 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
     // LogDebug("********* Aligning %s", this->GetClassName().c_str());
@@ -1179,6 +1211,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // we should have processed aligned before
     assert(this->GetAlignment());
@@ -1238,6 +1272,8 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
     if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (!this->HasSelfBB()) return FUNCTOR_CONTINUE;
 
     this->SetDrawingXRel(-this->GetSelfX1());
@@ -1247,7 +1283,9 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 
 int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 {
-    if (this->IsGraceNote()) {
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    if (this->IsGraceNote() || this->GetFirstParent(GRACEGRP)) {
         m_drawingCueSize = true;
     }
     // This cover the case when the @size is given on the element
@@ -1298,6 +1336,8 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
@@ -1366,6 +1406,8 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     DurationInterface *durElement = this->GetDurationInterface();
     if (!durElement) return FUNCTOR_CONTINUE;
 
@@ -1385,6 +1427,8 @@ int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (params->m_lastDot) {
         params->m_lastDot->m_drawingNextElement = this;
         params->m_lastDot = NULL;
@@ -1401,6 +1445,8 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 {
     PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
@@ -1424,6 +1470,8 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
@@ -1445,6 +1493,8 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
     LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // For mRest we do not look at the time span
     if (this->Is(MREST)) {
@@ -1485,6 +1535,8 @@ int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)
     FindSpannedLayerElementsParams *params = dynamic_cast<FindSpannedLayerElementsParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (!this->Is(params->m_classIds)) {
         return FUNCTOR_CONTINUE;
     }
@@ -1516,6 +1568,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 {
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     LayerElement *element = this->ThisOrSameasAsLink();
 
@@ -1602,6 +1656,8 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
     if (this->HasSameasLink()) {
         assert(this->GetSameasLink());
         this->GetSameasLink()->Process(params->m_functor, functorParams);
@@ -1614,6 +1670,8 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 {
     GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
+
+    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     if (this->HasSameasLink()) {
         assert(this->GetSameasLink());

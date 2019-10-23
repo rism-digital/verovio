@@ -35,6 +35,7 @@ public:
     ///@{
     BracketSpan();
     virtual ~BracketSpan();
+    virtual Object *Clone() const { return new BracketSpan(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "BracketSpan"; }
     virtual ClassId GetClassId() const { return BRACKETSPAN; }

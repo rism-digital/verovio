@@ -78,8 +78,10 @@ void Layer::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
-void Layer::CopyReset()
+void Layer::CloneReset()
 {
+    Object::CloneReset();
+
     m_drawKeySigCancellation = false;
     m_staffDefClef = NULL;
     m_staffDefKeySig = NULL;
@@ -199,8 +201,26 @@ Clef *Layer::GetClef(LayerElement *test)
         assert(clef);
         return clef;
     }
-
+    Clef *facsClef = this->GetClefFacs(test);
+    if (facsClef != NULL) {
+        return facsClef;
+    }
     return GetCurrentClef();
+}
+
+Clef *Layer::GetClefFacs(LayerElement *test)
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    if (doc->GetType() == Facs) {
+        ArrayOfObjects clefs;
+        ClassIdComparison ac(CLEF);
+        doc->FindAllChildBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
+        if (clefs.size() > 0) {
+            return dynamic_cast<Clef *>(*clefs.rbegin());
+        }
+    }
+    return NULL;
 }
 
 int Layer::GetClefLocOffset(LayerElement *test)
@@ -404,7 +424,8 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
     params->m_contentLayer = this;
 
     params->m_targetLayer = new Layer(*this);
-    params->m_targetLayer->CopyReset();
+    params->m_targetLayer->ClearChildren();
+    params->m_targetLayer->CloneReset();
     // Keep the xml:id of the layer in the first segment
     params->m_targetLayer->SwapUuid(this);
     assert(params->m_targetStaff);

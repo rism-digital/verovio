@@ -52,133 +52,92 @@ void ScoreDefElement::Reset()
     ResetTyped();
 }
 
-bool ScoreDefElement::HasClefInfo() const
+bool ScoreDefElement::HasClefInfo()
 {
-    if (this->HasClefAttrInfo()) return true;
-    return (this->HasClefElementInfo());
+    return (this->FindChildByType(CLEF));
 }
 
-bool ScoreDefElement::HasKeySigInfo() const
+bool ScoreDefElement::HasKeySigInfo()
 {
-    if (this->HasKeySigAttrInfo()) return true;
-    return (this->HasKeySigElementInfo());
+    return (this->FindChildByType(KEYSIG));
 }
 
-bool ScoreDefElement::HasMensurInfo() const
+bool ScoreDefElement::HasMensurInfo()
 {
-    if (this->HasMensurAttrInfo()) return true;
-    return (this->HasMensurElementInfo());
+    return (this->FindChildByType(MENSUR));
 }
 
-bool ScoreDefElement::HasMeterSigInfo() const
+bool ScoreDefElement::HasMeterSigInfo()
 {
-    if (this->HasMeterSigAttrInfo()) return true;
-    return (this->HasMeterSigElementInfo());
+    return (this->FindChildByType(METERSIG));
 }
 
-bool ScoreDefElement::HasClefAttrInfo() const
+Clef *ScoreDefElement::GetClef()
 {
-    // We need at least a @clef.shape and a @clef.line ?
-    return (this->HasClefShape() && this->HasClefLine());
-
-    // Eventually we can look for a child clef element
-    // We would probably need to take into account app and rdg?
-    return false;
+    // Always check if HasClefInfo() is true before asking for it
+    Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
+    assert(clef);
+    return clef;
 }
 
-bool ScoreDefElement::HasKeySigAttrInfo() const
+Clef *ScoreDefElement::GetClefCopy()
 {
-    return (this->HasKeySig());
+    // Always check if HasClefInfo() is true before asking for a clone
+    Clef *clone = dynamic_cast<Clef *>(this->GetClef()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
-bool ScoreDefElement::HasMensurAttrInfo() const
+KeySig *ScoreDefElement::GetKeySig()
 {
-    // What is the minimum we need? Checking only some for now. Need clarification
-    return (this->HasProlatio() || this->HasTempus() || this->HasProportNum() || this->HasProportNumbase()
-        || this->HasMensurSign());
+    // Always check if HasKeySigInfo() is true before asking for it
+    KeySig *keySig = dynamic_cast<KeySig *>(this->FindChildByType(KEYSIG));
+    assert(keySig);
+    return keySig;
 }
 
-bool ScoreDefElement::HasMeterSigAttrInfo() const
+KeySig *ScoreDefElement::GetKeySigCopy()
 {
-    return (this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
+    // Always check if HasKeySigInfo() is true before asking for a clone
+    KeySig *clone = dynamic_cast<KeySig *>(this->GetKeySig()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
-bool ScoreDefElement::HasClefElementInfo() const
+Mensur *ScoreDefElement::GetMensur()
 {
-    // Eventually we can look for a child clef element
-    // We would probably need to take into account app and rdg?
-    return false;
+    // Always check if HasMensurInfo() is true before asking for it
+    Mensur *mensur = dynamic_cast<Mensur *>(this->FindChildByType(MENSUR));
+    assert(mensur);
+    return mensur;
 }
 
-bool ScoreDefElement::HasKeySigElementInfo() const
+Mensur *ScoreDefElement::GetMensurCopy()
 {
-    return false;
+    // Always check if HasMensurInfo() is true before asking for a clone
+    Mensur *clone = dynamic_cast<Mensur *>(this->GetMensur()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
-bool ScoreDefElement::HasMensurElementInfo() const
+MeterSig *ScoreDefElement::GetMeterSig()
 {
-    return false;
+    // Always check if HasMeterSigInfo() is true before asking for it
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindChildByType(METERSIG));
+    assert(meterSig);
+    return meterSig;
 }
 
-bool ScoreDefElement::HasMeterSigElementInfo() const
+MeterSig *ScoreDefElement::GetMeterSigCopy()
 {
-    return false;
-}
-
-Clef *ScoreDefElement::GetClefCopy() const
-{
-    Clef *copy = NULL;
-    if (this->HasClefAttrInfo()) {
-        copy = new Clef(this);
-    }
-    else if (this->HasClefElementInfo()) {
-        // Eventually return a copy of the child element;
-    }
-    // Always check if HasClefInfo() is true before asking for a copy
-    assert(copy);
-    return copy;
-}
-
-KeySig *ScoreDefElement::GetKeySigCopy() const
-{
-    KeySig *copy = NULL;
-    if (this->HasKeySigAttrInfo()) {
-        copy = new KeySig(this);
-    }
-    else {
-        // Eventually return a copy of the child element;
-    }
-    // Always check if HasKeySigInfo() is true before asking for a copy
-    assert(copy);
-    return copy;
-}
-
-Mensur *ScoreDefElement::GetMensurCopy() const
-{
-    Mensur *copy = NULL;
-    if (this->HasMensurAttrInfo()) {
-        copy = new Mensur(this);
-    }
-    else {
-        // Eventually return a copy of the child element;
-    }
-    // Always check if HasMensurInfo() is true before asking for a copy
-    assert(copy);
-    return copy;
-}
-
-MeterSig *ScoreDefElement::GetMeterSigCopy() const
-{
-    MeterSig *copy = NULL;
-    if (this->HasMeterSigAttrInfo()) {
-        copy = new MeterSig(this);
-    }
-    else {
-        // Eventually return a copy of the child element;
-    }
-    // Always check if HasMeterSigInfo() is true before asking for a copy
-    assert(copy);
-    return copy;
+    // Always check if HasMeterSigInfo() is true before asking for a clone
+    MeterSig *clone = dynamic_cast<MeterSig *>(this->GetMeterSig()->Clone());
+    clone->CloneReset();
+    assert(clone);
+    return clone;
 }
 
 //----------------------------------------------------------------------------
@@ -208,8 +167,20 @@ void ScoreDef::Reset()
 
 void ScoreDef::AddChild(Object *child)
 {
-    if (child->Is(STAFFGRP)) {
+    if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(KEYSIG)) {
+        assert(dynamic_cast<KeySig *>(child));
+    }
+    else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
+    }
+    else if (child->Is(MENSUR)) {
+        assert(dynamic_cast<Mensur *>(child));
+    }
+    else if (child->Is(METERSIG)) {
+        assert(dynamic_cast<MeterSig *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -237,18 +208,18 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     bool drawKeySig = false;
     bool drawMensur = false;
     bool drawMeterSig = false;
-    Clef *clef = NULL;
-    KeySig *keySig = NULL;
+    Clef const *clef = NULL;
+    KeySig const *keySig = NULL;
     Mensur *mensur = NULL;
     MeterSig *meterSig = NULL;
 
     if (newScoreDef->HasClefInfo()) {
         drawClef = true;
-        clef = newScoreDef->GetClefCopy();
+        clef = newScoreDef->GetClef();
     }
     if (newScoreDef->HasKeySigInfo()) {
         drawKeySig = true;
-        keySig = newScoreDef->GetKeySigCopy();
+        keySig = newScoreDef->GetKeySig();
     }
     if (newScoreDef->HasMensurInfo()) {
         drawMensur = true;
@@ -263,8 +234,6 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
     this->Process(&replaceDrawingValuesInScoreDef, &replaceDrawingValuesInStaffDefParams);
 
-    if (clef) delete clef;
-    if (keySig) delete keySig;
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;
 
@@ -282,24 +251,26 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     if (staffDef) {
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
-            Clef *clef = newStaffDef->GetClefCopy();
+            Clef const *clef = newStaffDef->GetClef();
             staffDef->SetCurrentClef(clef);
-            delete clef;
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
-            KeySig *keySig = newStaffDef->GetKeySigCopy();
+            KeySig const *keySig = newStaffDef->GetKeySig();
             staffDef->SetCurrentKeySig(keySig);
-            delete keySig;
         }
         if (newStaffDef->HasMensurInfo()) {
             staffDef->SetDrawMensur(true);
+            // Never draw a mensur AND a meterSig
+            staffDef->SetDrawMeterSig(false);
             Mensur *mensur = newStaffDef->GetMensurCopy();
             staffDef->SetCurrentMensur(mensur);
             delete mensur;
         }
         if (newStaffDef->HasMeterSigInfo()) {
             staffDef->SetDrawMeterSig(true);
+            // Never draw a meterSig AND a mensur
+            staffDef->SetDrawMensur(false);
             MeterSig *meterSig = newStaffDef->GetMeterSigCopy();
             staffDef->SetCurrentMeterSig(meterSig);
             delete meterSig;
@@ -314,10 +285,10 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     }
 }
 
-void ScoreDef::FilterList(ListOfObjects *childList)
+void ScoreDef::FilterList(ArrayOfObjects *childList)
 {
     // We want to keep only staffDef
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->Is(STAFFDEF)) {
@@ -332,8 +303,8 @@ void ScoreDef::FilterList(ListOfObjects *childList)
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
     this->ResetList(this);
-    const ListOfObjects *childList = this->GetList(this);
-    ListOfObjects::const_iterator iter;
+    const ArrayOfObjects *childList = this->GetList(this);
+    ArrayOfObjects::const_iterator iter;
 
     StaffDef *staffDef = NULL;
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
@@ -351,8 +322,8 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 std::vector<int> ScoreDef::GetStaffNs()
 {
     this->ResetList(this);
-    const ListOfObjects *childList = this->GetList(this);
-    ListOfObjects::const_iterator iter;
+    const ArrayOfObjects *childList = this->GetList(this);
+    ArrayOfObjects::const_iterator iter;
 
     std::vector<int> ns;
     StaffDef *staffDef = NULL;
@@ -405,8 +376,14 @@ PgHead2 *ScoreDef::GetPgHead2()
     return dynamic_cast<PgHead2 *>(this->FindChildByType(PGHEAD2));
 }
 
+int ScoreDef::GetMaxStaffSize()
+{
+    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindChildByType(STAFFGRP));
+    return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
+}
+
 //----------------------------------------------------------------------------
-// ScoreDef functor methods
+// Functors methods
 //----------------------------------------------------------------------------
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)

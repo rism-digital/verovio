@@ -25,6 +25,7 @@ class Rend : public TextElement,
              public AreaPosInterface,
              public AttColor,
              public AttLang,
+             public AttTextRendition,
              public AttTypography,
              public AttWhitespace {
 public:

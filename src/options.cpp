@@ -454,7 +454,7 @@ bool OptionStaffrel::SetValue(std::string value)
 {
     Att converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
-    if (!staffrel.HasValue()) {
+    if (staffrel == STAFFREL_NONE) {
         LogError("Parameter '%s' not valid", value.c_str());
         return false;
     }
@@ -501,6 +501,18 @@ Options::Options()
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
 
+    m_justifyIncludeLastPage.SetInfo("Justify including the last page", "Justify including the last page");
+    m_justifyIncludeLastPage.Init(false);
+    this->Register(&m_justifyIncludeLastPage, "justifyIncludeLastPage", &m_general);
+
+    m_justifySystemsOnly.SetInfo("Justify systems only", "Justify systems only and not staves");
+    m_justifySystemsOnly.Init(false);
+    this->Register(&m_justifySystemsOnly, "justifySystemsOnly", &m_general);
+
+    m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
+    m_justifyVertically.Init(false);
+    this->Register(&m_justifyVertically, "justifyVertically", &m_general);
+
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
@@ -512,6 +524,11 @@ Options::Options()
     m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_generalLayout);
+
+    m_minLastJustification.SetInfo("Minimum last-system-justification width",
+        "The last system is only justified if the unjustified width is greater than this percent");
+    m_minLastJustification.Init(0.8, 0.0, 1.0);
+    this->Register(&m_minLastJustification, "minLastJustification", &m_general);
 
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
@@ -557,6 +574,10 @@ Options::Options()
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
+    m_svgBoundingBoxes.SetInfo("Svg bounding boxes viewbox on svg root", "Include bounding boxes in SVG output");
+    m_svgBoundingBoxes.Init(false);
+    this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
+
     m_svgViewBox.SetInfo("Use viewbox on svg root", "Use viewBox on svg root element for easy scaling of document");
     m_svgViewBox.Init(false);
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
@@ -564,6 +585,11 @@ Options::Options()
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
+
+    m_useFacsimile.SetInfo(
+        "Use facsimile for layout", "Use information in the <facsimile> element to control the layout");
+    m_useFacsimile.Init(false);
+    this->Register(&m_useFacsimile, "useFacsimile", &m_general);
 
     m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
     m_usePgFooterForAll.Init(false);

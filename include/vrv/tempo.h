@@ -38,6 +38,7 @@ public:
     ///@{
     Tempo();
     virtual ~Tempo();
+    virtual Object *Clone() const { return new Tempo(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tempo"; }
     virtual ClassId GetClassId() const { return TEMPO; }

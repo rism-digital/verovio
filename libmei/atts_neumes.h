@@ -122,8 +122,6 @@ public:
     void SetTilt(data_COMPASSDIRECTION tilt_) { m_tilt = tilt_; }
     data_COMPASSDIRECTION GetTilt() const { return m_tilt; }
     bool HasTilt() const;
-    /** Getter for reference (for alternate type only) */
-    data_COMPASSDIRECTION *GetTiltAlternate() { return &m_tilt; }
     ///@}
 
 private:

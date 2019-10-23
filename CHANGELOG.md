@@ -1,5 +1,28 @@
 # Changelog
 
+## [unreleased]
+
+## [2.2.0] - 2019-10-17
+* Support for superscript and subscript in `<rend>`
+* Support for chord-symbol parsing in MusicXML (@earboxer)
+* Support for dynamics with mixed text and music fonts
+* Support for non-standard keys from MusicXML (@rettinghaus)
+* Support for `<graceGrp>` (@rettinghaus)
+* Support for `<keyAccid>` for custom key signatures
+* Support for `@vel` on `<note>` in MIDI playback (@rettinghaus)
+* Support for `<turn>` in MusicXML import (@wergo)
+* Support for `<arpgeg>` in MusicXML import (@wergo)
+* Support iOS Framework build (@Noroxs)
+* Improved support for pedal marks in MusicXML import (@wergo)
+* Improved import of key signatures from PAE (show cancellation accidentals)
+* Improved import of tuplets from PAE
+* Improved element attribute access also when not rendered in a page
+* Options for vertical justication (--justify-include-last-page, --justify-system-only, --justify-vertically)
+* Option to set minimum width for justification (--min-last-justification) (@earboxer).
+
+### Changed
+* Method getMIDIValuesForElement (JS) return a JSON object
+
 ## [2.1.0] - 2019-05-25
 * Update pugixml
 * Support for SMUFL figured bass figures

@@ -31,20 +31,22 @@ public:
      */
     ///@{
     MeterSig();
-    MeterSig(const ScoreDefInterface *meterSigAttr);
-    void Init();
     virtual ~MeterSig();
+    virtual Object *Clone() const { return new MeterSig(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MeterSig"; }
     virtual ClassId GetClassId() const { return METERSIG; }
-    virtual Object *Clone() const { return new MeterSig(*this); }
     ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
-    /** Convert rendition to form */
+    /** Override the method since check is required */
+    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstParent(SCOREDEF)); }
+
+    /** Convert attribute types form */
     meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form);
+    meterSigDefaultVis_METERFORM meterSigVisToMeterSigDefaultVis(meterSigVis_FORM form);
 
     //----------//
     // Functors //

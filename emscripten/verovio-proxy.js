@@ -12,6 +12,9 @@ verovio.vrvToolkit.destructor = Module.cwrap('vrvToolkit_destructor', null, ['nu
 // bool edit(Toolkit *ic, const char *editorAction) 
 verovio.vrvToolkit.edit = Module.cwrap('vrvToolkit_edit', 'number', ['number', 'string']);
 
+// char *editInfo(Toolkit *ic)
+verovio.vrvToolkit.editInfo = Module.cwrap('vrvToolkit_editInfo', 'string', ['number']);
+
 // char *getAvailableOptions(Toolkit *ic)
 verovio.vrvToolkit.getAvailableOptions = Module.cwrap('vrvToolkit_getAvailableOptions', 'string', ['number']);
 
@@ -93,6 +96,10 @@ verovio.toolkit.prototype.edit = function (editorAction) {
 	return verovio.vrvToolkit.edit(this.ptr, JSON.stringify(editorAction));
 };
 
+verovio.toolkit.prototype.editInfo = function () {
+    return JSON.parse(verovio.vrvToolkit.editInfo(this.ptr));
+};
+
 verovio.toolkit.prototype.getAvailableOptions = function () {
 	return JSON.parse(verovio.vrvToolkit.getAvailableOptions(this.ptr));
 };
@@ -118,7 +125,7 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 };
 
 verovio.toolkit.prototype.getMIDIValuesForElement = function (xmlId) {
-	return verovio.vrvToolkit.getMIDIValuesForElement(this.ptr, xmlId);
+	return JSON.parse(verovio.vrvToolkit.getMIDIValuesForElement(this.ptr, xmlId));
 };
 
 verovio.toolkit.prototype.getOptions = function (defaultValues) {

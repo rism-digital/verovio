@@ -9,6 +9,7 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
+#include "facsimile.h"
 #include "options.h"
 #include "scoredef.h"
 
@@ -25,7 +26,7 @@ class Pages;
 class Page;
 class Score;
 
-enum DocType { Raw = 0, Rendering, Transcription };
+enum DocType { Raw = 0, Rendering, Transcription, Facs };
 
 //----------------------------------------------------------------------------
 // Doc
@@ -153,6 +154,7 @@ public:
     ///@{
     int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
+    int GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextLineHeight(FontInfo *font, bool graceSize) const;
     ///@}
@@ -272,6 +274,13 @@ public:
     void ConvertToUnCastOffMensuralDoc();
 
     /**
+     * Convert scoreDef / staffDef attributes (clef.*, key.*, meter.*, etc.) to corresponding elements
+     * By default, the element are used only for the rendering and not preserved in the MEI output
+     * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
+     */
+    void ConvertScoreDefMarkupDoc(bool permanent = false);
+
+    /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
@@ -328,6 +337,15 @@ public:
     ///@{
     void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
     bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
+    ///@}
+
+    /**
+     * @name Setter and getter for facsimile
+     */
+    ///@{
+    void SetFacsimile(Facsimile *facsimile) { m_facsimile = facsimile; }
+    Facsimile *GetFacsimile() { return m_facsimile; }
+    bool HasFacsimile() const { return m_facsimile != NULL; }
     ///@}
 
     //----------//
@@ -388,6 +406,9 @@ public:
     float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
+
+    /** Record notation type for document */
+    data_NOTATIONTYPE m_notationType;
 
 private:
     /**
@@ -477,6 +498,9 @@ private:
     int m_pageMarginRight;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
     int m_pageMarginTop;
+
+    /** Facsimile information */
+    Facsimile *m_facsimile = NULL;
 };
 
 } // namespace vrv

@@ -89,10 +89,10 @@ void StaffGrp::AddChild(Object *child)
     Modify();
 }
 
-void StaffGrp::FilterList(ListOfObjects *childList)
+void StaffGrp::FilterList(ArrayOfObjects *childList)
 {
     // We want to keep only staffDef
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->Is(STAFFDEF)) {
@@ -102,6 +102,29 @@ void StaffGrp::FilterList(ListOfObjects *childList)
             ++iter;
         }
     }
+}
+
+int StaffGrp::GetMaxStaffSize()
+{
+    this->ResetList(this);
+    const ArrayOfObjects *childList = this->GetList(this);
+
+    if (childList->empty()) return 100;
+
+    int max = 0;
+
+    StaffDef *staffDef = NULL;
+    for (auto &child : *childList) {
+        staffDef = dynamic_cast<StaffDef *>(child);
+        assert(staffDef);
+        if (staffDef->GetScale() > max) {
+            max = staffDef->GetScale();
+        }
+    }
+
+    if (max == 0) return 100;
+
+    return max;
 }
 
 //----------------------------------------------------------------------------

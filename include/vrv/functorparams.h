@@ -50,6 +50,7 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
+class Verse;
 
 //----------------------------------------------------------------------------
 // FunctorParams
@@ -88,13 +89,13 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the ListOfObjects
+ * member 0: the ArrayOfObjects
  **/
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
-    AddLayerElementToFlatListParams(ListOfObjects *flatList) { m_flatList = flatList; }
-    ListOfObjects *m_flatList;
+    AddLayerElementToFlatListParams(ArrayOfObjects *flatList) { m_flatList = flatList; }
+    ArrayOfObjects *m_flatList;
 };
 
 //----------------------------------------------------------------------------
@@ -229,10 +230,10 @@ public:
     AdjustFloatingPositionerGrpsParams(Doc *doc)
     {
         m_doc = doc;
-        m_place = STAFFREL_basic_above;
+        m_place = STAFFREL_above;
     }
     std::vector<ClassId> m_classIds;
-    data_STAFFREL_basic m_place;
+    data_STAFFREL m_place;
     Doc *m_doc;
 };
 
@@ -370,14 +371,16 @@ class AdjustSylSpacingParams : public FunctorParams {
 public:
     AdjustSylSpacingParams(Doc *doc)
     {
-        m_previousSyl = NULL;
+        m_previousVerse = NULL;
+        m_lastSyl = NULL;
         m_previousMeasure = NULL;
         m_freeSpace = 0;
         m_staffSize = 100;
         m_doc = doc;
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
-    Syl *m_previousSyl;
+    Verse *m_previousVerse;
+    Syl *m_lastSyl;
     Measure *m_previousMeasure;
     int m_freeSpace;
     int m_staffSize;
@@ -554,17 +557,24 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the system margin
+ * member 2: the doc
  **/
 
 class AlignSystemsParams : public FunctorParams {
 public:
-    AlignSystemsParams()
+    AlignSystemsParams(Doc *doc)
     {
         m_shift = 0;
         m_systemMargin = 0;
+        m_justifiableSystems = 0;
+        m_justifiableStaves = 0;
+        m_doc = doc;
     }
     int m_shift;
     int m_systemMargin;
+    int m_justifiableSystems;
+    int m_justifiableStaves;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -881,6 +891,20 @@ public:
     std::vector<Note *> m_currentNotes;
     Chord *m_currentChord;
     ArrayOfObjects m_controlEvents;
+    bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
+// ConvertScoreDefMarkupParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a flag indicating whereas the conversion is permanent of not
+ **/
+
+class ConvertScoreDefMarkupParams : public FunctorParams {
+public:
+    ConvertScoreDefMarkupParams(bool permanent) { m_permanent = permanent; }
     bool m_permanent;
 };
 
@@ -1216,11 +1240,12 @@ public:
  * member 2: the non justifiable margin
  * member 3: the system full width (without system margins)
  * member 4: the functor to be redirected to the MeasureAligner
+ * member 5: the doc
  **/
 
 class JustifyXParams : public FunctorParams {
 public:
-    JustifyXParams(Functor *functor)
+    JustifyXParams(Functor *functor, Doc *doc)
     {
         m_measureXRel = 0;
         m_justifiableRatio = 1.0;
@@ -1228,6 +1253,7 @@ public:
         m_rightBarLineX = 0;
         m_systemFullWidth = 0;
         m_functor = functor;
+        m_doc = doc;
     }
     int m_measureXRel;
     double m_justifiableRatio;
@@ -1235,6 +1261,34 @@ public:
     int m_rightBarLineX;
     int m_systemFullWidth;
     Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// JustifyYParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the justification ratio
+ * member 4: the functor to be redirected to the MeasureAligner
+ * member 5: the doc
+ **/
+
+class JustifyYParams : public FunctorParams {
+public:
+    JustifyYParams(Functor *functor, Doc *doc)
+    {
+        m_stepSize = 0;
+        m_stepCount = 0;
+        m_stepCountStaff = 0;
+        m_functor = functor;
+        m_doc = doc;
+    }
+    int m_stepSize;
+    int m_stepCount;
+    int m_stepCountStaff;
+    Functor *m_functor;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1538,17 +1592,18 @@ public:
 
 class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
 public:
-    ReplaceDrawingValuesInStaffDefParams(Clef *clef, KeySig *keySig, Mensur *mensur, MeterSig *meterSig)
+    ReplaceDrawingValuesInStaffDefParams(
+        Clef const *clef, KeySig const *keySig, Mensur const *mensur, MeterSig const *meterSig)
     {
         m_clef = clef;
         m_keySig = keySig;
         m_mensur = mensur;
         m_meterSig = meterSig;
     }
-    Clef *m_clef;
-    KeySig *m_keySig;
-    Mensur *m_mensur;
-    MeterSig *m_meterSig;
+    Clef const *m_clef;
+    KeySig const *m_keySig;
+    Mensur const *m_mensur;
+    MeterSig const *m_meterSig;
 };
 
 //----------------------------------------------------------------------------
@@ -1727,6 +1782,18 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ReorderByXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current object whose children we (may) reorder
+ **/
+class ReorderByXPosParams : public FunctorParams {
+public:
+    int modifications = 0;
+};
+
+//----------------------------------------------------------------------------
 // UnsetCurrentScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -1738,6 +1805,19 @@ class UnsetCurrentScoreDefParams : public FunctorParams {
 public:
     UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// SetChildZonesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the Doc for the children operated on
+ */
+class SetChildZonesParams : public FunctorParams {
+public:
+    SetChildZonesParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
 };
 
 } // namespace vrv

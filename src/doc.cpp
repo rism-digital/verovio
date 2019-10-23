@@ -82,6 +82,7 @@ void Doc::Reset()
     Object::Reset();
 
     m_type = Raw;
+    m_notationType = NOTATIONTYPE_NONE;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageMarginBottom = 0;
@@ -246,7 +247,7 @@ void Doc::CalculateMidiTimemap()
         page->LayOutHorizontally();
     }
 
-    int tempo = 120;
+    int tempo = MIDI_TEMPO;
 
     // Set tempo
     if (m_scoreDef.HasMidiBpm()) {
@@ -284,7 +285,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
     }
 
-    int tempo = 120;
+    int tempo = MIDI_TEMPO;
 
     // set MIDI tempo
     if (m_scoreDef.HasMidiBpm()) {
@@ -351,9 +352,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
             // set MIDI time signature
-            if (this->m_scoreDef.HasMeterCount()) {
-                midiFile->addTimeSignature(
-                    midiTrack, 0, this->m_scoreDef.GetMeterCount(), this->m_scoreDef.GetMeterUnit());
+            MeterSig *meterSig = dynamic_cast<MeterSig *>(this->m_scoreDef.FindChildByType(METERSIG));
+            if (meterSig && meterSig->HasCount()) {
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetCount(), meterSig->GetUnit());
             }
         }
 
@@ -970,6 +971,9 @@ void Doc::ConvertToCastOffMensuralDoc()
     // Do not convert transcription files
     if (this->GetType() == Transcription) return;
 
+    // Do not convert facs files
+    if (this->GetType() == Facs) return;
+
     // We are converting to measure music in a definitiv way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
         m_isMensuralMusicOnly = false;
@@ -1026,7 +1030,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     if (!m_isMensuralMusicOnly) return;
 
     // Do not convert transcription files
-    if (this->GetType() == Transcription) return;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) return;
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1080,6 +1084,15 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->SetCurrentScoreDefDoc(true);
+}
+
+void Doc::ConvertScoreDefMarkupDoc(bool permanent)
+{
+    ConvertScoreDefMarkupParams convertScoreDefMarkupParams(permanent);
+    Functor convertScoreDefMarkup(&Object::ConvertScoreDefMarkup);
+
+    m_scoreDef.Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
+    this->Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
 }
 
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
@@ -1249,6 +1262,18 @@ int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
     return w;
 }
 
+int Doc::GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    int advX = glyph->GetHorizAdvX();
+    advX = advX * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) advX = advX * this->m_options->m_graceFactor.GetValue();
+    return advX;
+}
+
 int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const
 {
     assert(font);
@@ -1267,7 +1292,10 @@ int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
     int descender = -this->GetTextGlyphDescender(L'q', font, graceSize);
     int height = this->GetTextGlyphHeight(L'I', font, graceSize);
 
-    return ((descender + height) * 1.1);
+    int lineHeight = ((descender + height) * 1.1);
+    if (font->GetSupSubScript()) lineHeight /= SUPER_SCRIPT_FACTOR;
+
+    return lineHeight;
 }
 
 int Doc::GetDrawingUnit(int staffSize) const
@@ -1514,7 +1542,8 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+        return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
 
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
@@ -1524,7 +1553,8 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+        return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;

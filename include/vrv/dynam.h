@@ -34,6 +34,7 @@ public:
     ///@{
     Dynam();
     virtual ~Dynam();
+    virtual Object *Clone() const { return new Dynam(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dynam"; }
     virtual ClassId GetClassId() const { return DYNAM; }
@@ -59,7 +60,21 @@ public:
      */
     bool IsSymbolOnly();
 
+    /**
+     * Return the SMuFL str for the dynamic symbol.
+     * Call IsSymbolOnly first to check.
+     */
     std::wstring GetSymbolStr() const;
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    static bool GetSymbolsInStr(std::wstring &str, ArrayOfStringDynamTypePairs &tokens);
+
+    static bool IsSymbolOnly(const std::wstring &str);
+
+    static std::wstring GetSymbolStr(const std::wstring &str);
 
     //----------//
     // Functors //

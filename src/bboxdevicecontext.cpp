@@ -35,8 +35,8 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_drawingText = false;
     m_textAlignment = HORIZONTALALIGNMENT_left;
 
-    SetBrush(AxBLACK, AxSOLID);
-    SetPen(AxBLACK, 1, AxSOLID);
+    SetBrush(AxNONE, AxSOLID);
+    SetPen(AxNONE, 1, AxSOLID);
 
     m_update = update;
 
@@ -45,7 +45,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
 
 BBoxDeviceContext::~BBoxDeviceContext() {}
 
-void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
+void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend)
 {
     // add the object object
     object->BoundingBox::ResetBoundingBox();
@@ -258,6 +258,12 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
     if (alignment != HORIZONTALALIGNMENT_NONE) {
         m_textAlignment = alignment;
     }
+}
+
+void BBoxDeviceContext::MoveTextVerticallyTo(int y)
+{
+    assert(m_drawingText);
+    m_textY = y;
 }
 
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)

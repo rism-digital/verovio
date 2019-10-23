@@ -59,6 +59,11 @@ public:
     void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
     ///@}
 
+    /**
+     * Return the maximum staff size in the staffGrp (100 if empty)
+     */
+    int GetMaxStaffSize();
+
     //----------//
     // Functors //
     //----------//
@@ -72,7 +77,7 @@ protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    virtual void FilterList(ListOfObjects *childList);
+    virtual void FilterList(ArrayOfObjects *childList);
 
 private:
     //

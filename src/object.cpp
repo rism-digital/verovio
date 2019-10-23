@@ -43,6 +43,7 @@
 #include "text.h"
 #include "textelement.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -82,6 +83,7 @@ Object::Object(const Object &object) : BoundingBox(object)
 
     m_classid = object.m_classid;
     m_parent = NULL;
+
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
@@ -102,13 +104,20 @@ Object::Object(const Object &object) : BoundingBox(object)
     int i;
     for (i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
-        Object *copy = current->Clone();
-        if (copy) {
-            copy->Modify();
-            copy->SetParent(this);
-            m_children.push_back(copy);
+        Object *clone = current->Clone();
+        if (clone) {
+            clone->SetParent(this);
+            clone->CloneReset();
+            m_children.push_back(clone);
         }
     }
+}
+
+void Object::CloneReset()
+{
+    this->Modify();
+    FunctorParams voidParams;
+    this->ResetDrawing(&voidParams);
 }
 
 Object &Object::operator=(const Object &object)
@@ -137,10 +146,10 @@ Object &Object::operator=(const Object &object)
             int i;
             for (i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
-                Object *copy = current->Clone();
-                copy->Modify();
-                copy->SetParent(this);
-                m_children.push_back(copy);
+                Object *clone = current->Clone();
+                clone->SetParent(this);
+                clone->CloneReset();
+                m_children.push_back(clone);
             }
         }
     }
@@ -237,6 +246,36 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
     this->Modify();
 }
 
+void Object::InsertBefore(Object *child, Object *newChild)
+{
+    assert(this->GetChildIndex(child) != -1);
+    assert(this->GetChildIndex(newChild) == -1);
+
+    int idx = this->GetChildIndex(child);
+    newChild->SetParent(this);
+    this->InsertChild(newChild, idx);
+
+    this->Modify();
+}
+
+void Object::InsertAfter(Object *child, Object *newChild)
+{
+    assert(this->GetChildIndex(child) != -1);
+    assert(this->GetChildIndex(newChild) == -1);
+
+    int idx = this->GetChildIndex(child);
+    newChild->SetParent(this);
+    this->InsertChild(newChild, idx + 1);
+
+    this->Modify();
+}
+
+void Object::SortChildren(Object::binaryComp comp)
+{
+    std::stable_sort(m_children.begin(), m_children.end(), comp);
+    this->Modify();
+}
+
 void Object::MoveItselfTo(Object *targetParent)
 {
     assert(targetParent);
@@ -306,6 +345,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
+    Att::GetNeumes(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);
@@ -361,7 +401,7 @@ Object *Object::GetPrevious(Object *child, const ClassId classId)
     riteratorEnd = m_children.rend();
     riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
     if (riteratorCurrent != riteratorEnd) {
-        riteratorCurrent++;
+        ++riteratorCurrent;
         riteratorCurrent = std::find_if(riteratorCurrent, riteratorEnd, ObjectComparison(classId));
     }
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
@@ -628,7 +668,7 @@ void Object::Modify(bool modified)
     m_isModified = modified;
 }
 
-void Object::FillFlatList(ListOfObjects *flatList)
+void Object::FillFlatList(ArrayOfObjects *flatList)
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
@@ -675,6 +715,14 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
     else {
         return (m_parent->GetLastParentNot(classId, maxDepth - 1));
     }
+}
+
+bool Object::HasEditorialContent()
+{
+    ArrayOfObjects editorial;
+    IsEditorialElementComparison editorialComparison;
+    this->FindAllChildByComparison(&editorial, &editorialComparison);
+    return (!editorial.empty());
 }
 
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
@@ -781,6 +829,13 @@ int Object::Save(FileOutputStream *output)
     return true;
 }
 
+void Object::ReorderByXPos()
+{
+    ReorderByXPosParams params;
+    Functor reorder(&Object::ReorderByXPos);
+    this->Process(&reorder, &params);
+}
+
 //----------------------------------------------------------------------------
 // ObjectListInterface
 //----------------------------------------------------------------------------
@@ -813,7 +868,7 @@ void ObjectListInterface::ResetList(Object *node)
     this->FilterList(&m_list);
 }
 
-const ListOfObjects *ObjectListInterface::GetList(Object *node)
+const ArrayOfObjects *ObjectListInterface::GetList(Object *node)
 {
     ResetList(node);
     return &m_list;
@@ -821,7 +876,7 @@ const ListOfObjects *ObjectListInterface::GetList(Object *node)
 
 int ObjectListInterface::GetListIndex(const Object *listElement)
 {
-    ListOfObjects::iterator iter;
+    ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -833,7 +888,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
-    ListOfObjects::iterator it = m_list.begin();
+    ArrayOfObjects::iterator it = m_list.begin();
     int idx = GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
@@ -843,18 +898,18 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
-    ListOfObjects::iterator it = m_list.begin();
+    ArrayOfObjects::iterator it = m_list.begin();
     int idx = GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
-    ListOfObjects::reverse_iterator rit(it);
+    ArrayOfObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
 }
 
 Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
-    ListOfObjects::iterator iter;
+    ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -871,7 +926,7 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
 
 Object *ObjectListInterface::GetListNext(Object *listElement)
 {
-    ListOfObjects::reverse_iterator iter;
+    ArrayOfObjects::reverse_iterator iter;
     int i;
     for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -894,8 +949,8 @@ std::wstring TextListInterface::GetText(Object *node)
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         if ((*it)->Is(LB)) {
             continue;
         }
@@ -910,8 +965,8 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         if ((*it)->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
@@ -926,9 +981,9 @@ void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &li
     }
 }
 
-void TextListInterface::FilterList(ListOfObjects *childList)
+void TextListInterface::FilterList(ArrayOfObjects *childList)
 {
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
     while (iter != childList->end()) {
         if (!(*iter)->Is({ LB, TEXT })) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
@@ -1281,6 +1336,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         assert(element);
         Clef *clef = dynamic_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
+        if (clef->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
@@ -1291,12 +1349,15 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new keysig
     if (this->Is(KEYSIG)) {
-        KeySig *keysig = dynamic_cast<KeySig *>(this);
-        assert(keysig);
+        KeySig *keySig = dynamic_cast<KeySig *>(this);
+        assert(keySig);
+        if (keySig->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
-        upcomingStaffDef->SetCurrentKeySig(keysig);
+        upcomingStaffDef->SetCurrentKeySig(keySig);
         params->m_upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
@@ -1471,6 +1532,79 @@ int Object::SaveEnd(FunctorParams *functorParams)
 
     if (!params->m_output->WriteObjectEnd(this)) {
         return FUNCTOR_STOP;
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+bool Object::sortByUlx(Object *a, Object *b)
+{
+    FacsimileInterface *fa = NULL, *fb = NULL;
+    InterfaceComparison comp(INTERFACE_FACSIMILE);
+    if (a->GetFacsimileInterface())
+        fa = a->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        a->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+                fa = temp;
+            }
+        }
+    }
+    if (b->GetFacsimileInterface())
+        fb = b->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        b->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+                fb = temp;
+            }
+        }
+    }
+
+    if (fa == NULL || fb == NULL) {
+        LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
+        return false;
+    }
+
+    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+}
+
+int Object::ReorderByXPos(FunctorParams *functorParams)
+{
+    if (this->GetFacsimileInterface() != NULL) {
+        if (this->GetFacsimileInterface()->HasFacs()) {
+            return FUNCTOR_SIBLINGS; // This would have already been reordered.
+        }
+    }
+
+    std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::SetChildZones(FunctorParams *functorParams)
+{
+    SetChildZonesParams *params = dynamic_cast<SetChildZonesParams *>(functorParams);
+    assert(params);
+
+    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(this->GetFacsimileInterface());
+    if (fi != NULL) {
+        if (fi->HasFacs()) {
+            assert(params->m_doc);
+            assert(params->m_doc->GetFacsimile());
+            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(fi->GetFacs());
+            if (zone == NULL) {
+                LogError("Could not find a zone of UUID %s", fi->GetFacs().c_str());
+                return FUNCTOR_STOP;
+            }
+            fi->SetZone(zone);
+        }
     }
     return FUNCTOR_CONTINUE;
 }
