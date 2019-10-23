@@ -294,6 +294,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     assert(params);
 
     params->m_targetStaff = new Staff(*this);
+    params->m_targetStaff->ClearChildren();
     params->m_targetStaff->CloneReset();
     // Keep the xml:id of the staff in the first staff segment
     params->m_targetStaff->SwapUuid(this);

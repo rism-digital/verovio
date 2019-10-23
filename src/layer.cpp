@@ -424,6 +424,7 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
     params->m_contentLayer = this;
 
     params->m_targetLayer = new Layer(*this);
+    params->m_targetLayer->ClearChildren();
     params->m_targetLayer->CloneReset();
     // Keep the xml:id of the layer in the first segment
     params->m_targetLayer->SwapUuid(this);
