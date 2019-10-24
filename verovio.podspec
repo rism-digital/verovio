@@ -2,8 +2,8 @@ Pod::Spec.new do |s|
   s.name           = 'Verovio'
   s.version        = '2.1.0'
   s.license        = { :type => 'LGPL' }
-  s.homepage       = 'https://github.com/vitalii-unicsoft/verovio'
-  s.authors        = { 'Vitalii Yevtushenko' => 'https://github.com/rism-ch/verovio/graphs/contributors' }
+  s.homepage       = 'https://www.verovio.org/index.xhtml'
+  s.authors        = { 'Contributors List' => 'https://github.com/rism-ch/verovio/graphs/contributors' }
   s.summary        = 'Verovio'
   s.source         = { :git => 'https://github.com/rism-ch/verovio.git', :tag => 'version-' + s.version.to_s }
   s.swift_versions = ['5.1']
