@@ -81,7 +81,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         m_currentColour = AxRED;
     }
     else {
-        m_currentColour = AxBLACK;
+        m_currentColour = AxNONE;
     }
 
     if (element->Is(ACCID)) {
@@ -1466,8 +1466,8 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     assert(stem);
     assert(staff);
 
-    dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
-    dc->SetBrush(AxBLACK, AxSOLID);
+    dc->SetPen(AxNONE, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    dc->SetBrush(AxNONE, AxSOLID);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift * 3 / 2;
