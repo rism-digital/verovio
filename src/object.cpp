@@ -544,6 +544,17 @@ Object *Object::GetChild(int idx) const
     return m_children.at(idx);
 }
 
+Object *Object::GetChild(int idx, const ClassId classId)
+{
+    ArrayOfObjects objects;
+    ClassIdComparison matchClassId(classId);
+    this->FindAllChildByComparison(&objects, &matchClassId, 1);
+    if ((idx < 0) || (idx >= (int)objects.size())) {
+        return NULL;
+    }
+    return objects.at(idx);
+}
+
 bool Object::DeleteChild(Object *child)
 {
     auto it = std::find(m_children.begin(), m_children.end(), child);

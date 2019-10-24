@@ -39,6 +39,7 @@
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
+#include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
 #include "mrpt.h"
@@ -182,6 +183,9 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         for (auto current : *measure->GetChildren()) {
+            if (! current->Is(STAFF) ) {
+                continue;
+            }
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
@@ -223,6 +227,9 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     }
     // Check if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
     for (auto item : *measure->GetChildren()) {
+        if (! item->Is(STAFF) ) {
+            continue;
+        }
         Staff *staff = dynamic_cast<Staff *>(item);
         assert(staff);
         for (auto layer : *staff->GetChildren()) {
@@ -239,12 +246,12 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     if (!staffNumStr.empty()) {
         staffNum = atoi(staffNumStr.c_str());
     }
-    if ((staffNum < 1) || (staffNum > measure->GetChildCount())) {
+    if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
     }
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     return SelectLayer(layerNum, staff);
 }
@@ -252,7 +259,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
 {
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);
@@ -1008,6 +1015,13 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     std::string measureNum = node.attribute("number").as_string();
     if (measure != NULL) measure->SetN(measureNum);
 
+    std::string implicit = node.attribute("implicit").as_string();
+    if (implicit == "yes") {
+        MNum *mNum = new MNum();
+        // An empty mNum means that we like to render this measure number as blank.
+        measure->AddChild(mNum);
+    }
+
     int i = 0;
     for (i = 0; i < nbStaves; i++) {
         // the staff @n must take into account the staffOffset
@@ -1098,6 +1112,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     for (auto staff : *measure->GetChildren()) {
+        if (! staff->Is(STAFF) ) {
+            continue;
+        }
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
             staff->AddChild(new Layer());
@@ -1299,7 +1316,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(0));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetFirst(STAFF));
     assert(staff);
 
     data_BARRENDITION barRendition = BARRENDITION_NONE;
