@@ -24,7 +24,7 @@ git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DI
 
 OUTPUT_DIRECTORY="$~/{GH_PAGES_DIRECTORY}"
 
-cd ../tools
+cd ./tools
 cmake .
 make
 ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
