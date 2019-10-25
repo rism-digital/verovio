@@ -246,7 +246,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
-        Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+        Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             // Check if the note is on the top line or above (add a unit for the note head half size)
             if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -449,14 +449,14 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     bool drawingCueSize = false;
     int x, y;
 
-    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
+    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindDescendantByType(CHORD));
     // Get from the chord or note child
     if (childChord) {
         drawingDur = childChord->GetDur();
         childElement = childChord;
     }
     else {
-        childNote = dynamic_cast<Note *>(bTrem->FindChildByType(NOTE));
+        childNote = dynamic_cast<Note *>(bTrem->FindDescendantByType(NOTE));
         if (childNote) {
             drawingDur = childNote->GetDur();
             childElement = childNote;
@@ -846,7 +846,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Flag *flag = dynamic_cast<Flag *>(element);
     assert(flag);
 
-    Stem *stem = dynamic_cast<Stem *>(flag->GetFirstParent(STEM));
+    Stem *stem = dynamic_cast<Stem *>(flag->GetFirstAncestor(STEM));
     assert(stem);
 
     int x = flag->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
@@ -1426,7 +1426,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->ResetBrush();
 
     if (syl->GetStart() && syl->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        System *currentSystem = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
         if (currentSystem) {
@@ -1643,9 +1643,9 @@ int View::GetFYRel(F *f, Staff *staff)
 
     y = positioner->GetDrawingY();
 
-    Object *fb = f->GetFirstParent(FB);
+    Object *fb = f->GetFirstAncestor(FB);
     assert(fb);
-    int line = fb->GetChildIndex(f, FIGURE, UNLIMITED_DEPTH);
+    int line = fb->GetDescendantIndex(f, FIGURE, UNLIMITED_DEPTH);
 
     if (line > 0) {
         FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);

@@ -180,10 +180,10 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     // otherwise copy the content to the corresponding existing measure
     else {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
-        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
+        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         for (auto current : *measure->GetChildren()) {
-            if (! current->Is(STAFF) ) {
+            if (!current->Is(STAFF)) {
                 continue;
             }
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
@@ -227,7 +227,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     }
     // Check if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
     for (auto item : *measure->GetChildren()) {
-        if (! item->Is(STAFF) ) {
+        if (!item->Is(STAFF)) {
             continue;
         }
         Staff *staff = dynamic_cast<Staff *>(item);
@@ -278,7 +278,7 @@ Layer *MusicXmlInput::SelectLayer(int layerNum, Staff *staff)
     }
     else {
         AttNIntegerComparison comparisonLayer(LAYER, layerNum);
-        layer = dynamic_cast<Layer *>(staff->FindChildByComparison(&comparisonLayer, 1));
+        layer = dynamic_cast<Layer *>(staff->FindDescendantByComparison(&comparisonLayer, 1));
     }
     if (layer) return layer;
     // else add it
@@ -562,7 +562,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
             else {
-                StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindChildByType(STAFFDEF));
+                StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindDescendantByType(STAFFDEF));
                 if (staffDef) {
                     if (label) staffDef->AddChild(label);
                     if (labelAbbr) staffDef->AddChild(labelAbbr);
@@ -593,7 +593,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
+            measure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning("MusicXML import: Element '%s' could not be added to measure '%s'",
@@ -731,7 +731,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         for (i = 0; i < nbStaves; i++) {
             // Find or create the staffDef
             AttNIntegerComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
-            StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindChildByComparison(&comparisonStaffDef, 1));
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
@@ -1112,7 +1112,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     for (auto staff : *measure->GetChildren()) {
-        if (! staff->Is(STAFF) ) {
+        if (!staff->Is(STAFF)) {
             continue;
         }
         assert(staff);
@@ -1559,7 +1559,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
                     int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
                     hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
-                    Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
+                    Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByType(STAFF));
                     assert(staff);
                     hairpin->SetStaff(
                         staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(std::get<0>(*iter))));
@@ -1767,7 +1767,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     Layer *layer = SelectLayer(node, measure);
     assert(layer);
 
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     pugi::xpath_node isChord = node.select_node("chord");

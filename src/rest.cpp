@@ -130,7 +130,7 @@ int Rest::ConvertAnalyticalMarkup(FunctorParams *functorParams)
 
 int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
         if (!currentDots) {
@@ -169,7 +169,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -178,7 +178,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     int staffSize = staff->m_drawingStaffSize;
 
     // For single rests we need here to set the dot loc
-    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
     std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);

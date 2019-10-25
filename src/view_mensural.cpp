@@ -438,7 +438,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
     Note *firstNote = ligature->GetFirstNote();

@@ -327,7 +327,7 @@ int Object::GetChildCount(const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
     ClassIdComparison matchClassId(classId);
-    this->FindAllChildByComparison(&objects, &matchClassId);
+    this->FindAllDescendantByComparison(&objects, &matchClassId);
     return (int)objects.size();
 }
 
@@ -445,7 +445,7 @@ Object *Object::DetachChild(int idx)
     return child;
 }
 
-bool Object::HasChild(Object *child, int deepness) const
+bool Object::HasDescendant(Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
@@ -454,7 +454,7 @@ bool Object::HasChild(Object *child, int deepness) const
             return true;
         else if (deepness == 0)
             return false;
-        else if ((*iter)->HasChild(child, deepness - 1))
+        else if ((*iter)->HasDescendant(child, deepness - 1))
             return true;
     }
 
@@ -483,7 +483,7 @@ void Object::ClearRelinquishedChildren()
     }
 }
 
-Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
+Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direction)
 {
     Functor findByUuid(&Object::FindByUuid);
     FindByUuidParams findbyUuidParams;
@@ -492,13 +492,13 @@ Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
     return findbyUuidParams.m_element;
 }
 
-Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
+Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
 {
     ClassIdComparison comparison(classId);
-    return FindChildByComparison(&comparison, deepness, direction);
+    return FindDescendantByComparison(&comparison, deepness, direction);
 }
 
-Object *Object::FindChildByComparison(Comparison *comparison, int deepness, bool direction)
+Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction)
 {
     Functor findByComparison(&Object::FindByComparison);
     FindByComparisonParams findByComparisonParams(comparison);
@@ -506,7 +506,7 @@ Object *Object::FindChildByComparison(Comparison *comparison, int deepness, bool
     return findByComparisonParams.m_element;
 }
 
-Object *Object::FindChildExtremeByComparison(Comparison *comparison, int deepness, bool direction)
+Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction)
 {
     Functor findExtremeByComparison(&Object::FindExtremeByComparison);
     FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
@@ -514,7 +514,7 @@ Object *Object::FindChildExtremeByComparison(Comparison *comparison, int deepnes
     return findExtremeByComparisonParams.m_element;
 }
 
-void Object::FindAllChildByComparison(
+void Object::FindAllDescendantByComparison(
     ArrayOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
@@ -525,7 +525,7 @@ void Object::FindAllChildByComparison(
     this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction);
 }
 
-void Object::FindAllChildBetween(
+void Object::FindAllDescendantBetween(
     ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
 {
     assert(objects);
@@ -548,7 +548,7 @@ Object *Object::GetChild(int idx, const ClassId classId)
 {
     ArrayOfObjects objects;
     ClassIdComparison matchClassId(classId);
-    this->FindAllChildByComparison(&objects, &matchClassId, 1);
+    this->FindAllDescendantByComparison(&objects, &matchClassId, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
@@ -655,11 +655,11 @@ int Object::GetChildIndex(const Object *child)
     return -1;
 }
 
-int Object::GetChildIndex(const Object *child, const ClassId classId, int deepth)
+int Object::GetDescendantIndex(const Object *child, const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
     ClassIdComparison matchClassId(classId);
-    this->FindAllChildByComparison(&objects, &matchClassId);
+    this->FindAllDescendantByComparison(&objects, &matchClassId);
     ArrayOfObjects::iterator iter;
     int i;
     for (iter = objects.begin(), i = 0; iter != objects.end(); ++iter, ++i) {
@@ -686,7 +686,7 @@ void Object::FillFlatList(ArrayOfObjects *flatList)
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
+Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -696,11 +696,11 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
         return m_parent;
     }
     else {
-        return (m_parent->GetFirstParent(classId, maxDepth - 1));
+        return (m_parent->GetFirstAncestor(classId, maxDepth - 1));
     }
 }
 
-Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
+Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -710,11 +710,11 @@ Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId cl
         return m_parent;
     }
     else {
-        return (m_parent->GetFirstParentInRange(classIdMin, classIdMax, maxDepth - 1));
+        return (m_parent->GetFirstAncestorInRange(classIdMin, classIdMax, maxDepth - 1));
     }
 }
 
-Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
+Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -724,7 +724,7 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
         return this;
     }
     else {
-        return (m_parent->GetLastParentNot(classId, maxDepth - 1));
+        return (m_parent->GetLastAncestorNot(classId, maxDepth - 1));
     }
 }
 
@@ -732,7 +732,7 @@ bool Object::HasEditorialContent()
 {
     ArrayOfObjects editorial;
     IsEditorialElementComparison editorialComparison;
-    this->FindAllChildByComparison(&editorial, &editorialComparison);
+    this->FindAllDescendantByComparison(&editorial, &editorialComparison);
     return (!editorial.empty());
 }
 
@@ -1468,7 +1468,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     bool skipAbove = false;
     bool skipBelow = false;
-    Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chord && params->m_staffAlignment) {
         chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
@@ -1555,7 +1555,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         fa = a->GetFacsimileInterface();
     else {
         ArrayOfObjects children;
-        a->FindAllChildByComparison(&children, &comp);
+        a->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
@@ -1568,7 +1568,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         fb = b->GetFacsimileInterface();
     else {
         ArrayOfObjects children;
-        b->FindAllChildByComparison(&children, &comp);
+        b->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);

@@ -121,7 +121,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     ArrayOfObjects syls;
     ClassIdComparison matchTypeSyl(SYL);
-    this->FindAllChildByComparison(&syls, &matchTypeSyl);
+    this->FindAllDescendantByComparison(&syls, &matchTypeSyl);
 
     int shift = params->m_doc->GetDrawingUnit(params->m_staffSize);
     // Adjust it proportionally to the lyric size
@@ -209,8 +209,8 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
     assert(params);
     // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(staff && layer);
 
     params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];

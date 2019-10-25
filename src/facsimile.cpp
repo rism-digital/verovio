@@ -43,14 +43,14 @@ void Facsimile::AddChild(Object *object)
 
 Zone *Facsimile::FindZoneByUuid(std::string zoneId)
 {
-    return dynamic_cast<Zone *>(this->FindChildByUuid(zoneId));
+    return dynamic_cast<Zone *>(this->FindDescendantByUuid(zoneId));
 }
 
 int Facsimile::GetMaxX()
 {
     ClassIdComparison ac(SURFACE);
     ArrayOfObjects surfaces;
-    this->FindAllChildByComparison(&surfaces, &ac);
+    this->FindAllDescendantByComparison(&surfaces, &ac);
 
     int max = 0;
     for (auto iter = surfaces.begin(); iter != surfaces.end(); iter++) {
@@ -65,7 +65,7 @@ int Facsimile::GetMaxY()
 {
     ClassIdComparison ac(SURFACE);
     ArrayOfObjects surfaces;
-    this->FindAllChildByComparison(&surfaces, &ac);
+    this->FindAllDescendantByComparison(&surfaces, &ac);
 
     int max = 0;
     for (auto iter = surfaces.begin(); iter != surfaces.end(); iter++) {

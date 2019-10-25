@@ -516,8 +516,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     if (currentPen.GetOpacity() != 1.0) ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        ellipseChild.append_attribute("stroke")
-            = GetColour(m_penStack.top().GetColour()).c_str();
+        ellipseChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
     }
 }
 
@@ -588,8 +587,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        pathChild.append_attribute("stroke")
-            = GetColour(m_penStack.top().GetColour()).c_str();
+        pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
     }
 }
 
@@ -616,16 +614,13 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
     // if (fillStyle == wxODDEVEN_RULE)
     //    polygonChild.append_attribute("fill-rule") = "evenodd;";
     // else
-    if (currentPen.GetWidth() > 0)
-        polygonChild.append_attribute("stroke")
-            = GetColour(currentPen.GetColour()).c_str();
+    if (currentPen.GetWidth() > 0) polygonChild.append_attribute("stroke") = GetColour(currentPen.GetColour()).c_str();
     if (currentPen.GetWidth() > 1)
         polygonChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
     if (currentPen.GetOpacity() != 1.0)
         polygonChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetOpacity()).c_str();
     if (currentBrush.GetColour() != AxNONE)
-        polygonChild.append_attribute("fill")
-            = GetColour(currentBrush.GetColour()).c_str();
+        polygonChild.append_attribute("fill") = GetColour(currentBrush.GetColour()).c_str();
     if (currentBrush.GetOpacity() != 1.0)
         polygonChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
 

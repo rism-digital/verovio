@@ -200,7 +200,7 @@ void Measure::AddChildBack(Object *child)
 int Measure::GetDrawingX() const
 {
     if (!this->IsMeasuredMusic()) {
-        System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+        System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
         if (system->m_yAbs != VRV_UNSET) {
             return (system->m_systemLeftMar);
@@ -211,7 +211,7 @@ int Measure::GetDrawingX() const
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
-    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     m_cachedDrawingX = system->GetDrawingX() + this->GetDrawingXRel();
     return m_cachedDrawingX;
@@ -279,9 +279,9 @@ int Measure::GetRightBarLineRight() const
 int Measure::GetWidth() const
 {
     if (!this->IsMeasuredMusic()) {
-        System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+        System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
-        Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
+        Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
         assert(page);
         if (system->m_yAbs != VRV_UNSET) {
             // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
@@ -310,7 +310,7 @@ int Measure::GetDrawingOverflow()
     Functor adjustXOverlfow(&Object::AdjustXOverflow);
     Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
     AdjustXOverflowParams adjustXOverflowParams(0);
-    adjustXOverflowParams.m_currentSystem = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    adjustXOverflowParams.m_currentSystem = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(adjustXOverflowParams.m_currentSystem);
     adjustXOverflowParams.m_lastMeasure = this;
     this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
@@ -341,7 +341,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     ClassIdComparison matchType(STAFFGRP);
     ArrayOfObjects staffGrps;
     ArrayOfObjects::iterator staffGrpIter;
-    scoreDef->FindAllChildByComparison(&staffGrps, &matchType);
+    scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
     for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); ++staffGrpIter) {
@@ -352,7 +352,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     // Get the corresponding staves in the measure
     for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison matchN(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(this->FindChildByComparison(&matchN, 1));
+        Staff *staff = dynamic_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
             continue;
@@ -571,8 +571,8 @@ int Measure::OptimizeScoreDef(FunctorParams *functorParams)
     OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
 
-    params->m_hasFermata = (this->FindChildByType(FERMATA));
-    params->m_hasTempo = (this->FindChildByType(TEMPO));
+    params->m_hasFermata = (this->FindDescendantByType(FERMATA));
+    params->m_hasTempo = (this->FindDescendantByType(TEMPO));
 
     return FUNCTOR_CONTINUE;
 }
@@ -770,14 +770,14 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     // First try to see if we have a double measure length element
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2
-        = dynamic_cast<Alignment *>(m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
+        = dynamic_cast<Alignment *>(m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
 
     // With a double measure with element (mRpt2, multiRpt)
     if (fullMeasure2 != NULL) {
         minMeasureWidth *= 2;
     }
     // Nothing if the measure has at least one note or @metcon="false"
-    else if ((this->FindChildByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
+    else if ((this->FindDescendantByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
         minMeasureWidth = 0;
     }
 
@@ -947,7 +947,7 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
             TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
             assert(interface);
             if (interface->GetEnd()) {
-                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
+                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
             }
         }
         if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
@@ -957,7 +957,7 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
                 // We should have one because we allow only control Event (dir and dynam) to be linked as target
                 TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
                 assert(nextInterface);
-                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstParent(MEASURE));
+                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
             }
         }
         assert(endParent);
@@ -1027,7 +1027,7 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
     std::vector<Hairpin *>::iterator iter = params->m_hairpins.begin();
     while (iter != params->m_hairpins.end()) {
         assert((*iter)->GetEnd());
-        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstParent(MEASURE));
+        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
         if (measureEnd == this) {
             iter = params->m_hairpins.erase(iter);
         }
@@ -1180,7 +1180,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     params->m_maxCurrentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
 
     // search for tempo marks in the measure
-    Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
+    Tempo *tempo = dynamic_cast<Tempo *>(this->FindDescendantByType(TEMPO));
     if (tempo && tempo->HasMidiBpm()) {
         params->m_currentTempo = tempo->GetMidiBpm();
     }

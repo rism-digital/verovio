@@ -140,17 +140,17 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     LayerElement *layerElement = NULL;
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
     if (!start->Is(TIMESTAMP_ATTR)) {
-        layer = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+        layer = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
         layerElement = start;
     }
     else {
-        layer = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+        layer = dynamic_cast<Layer *>(end->GetFirstAncestor(LAYER));
         layerElement = end;
     }
     assert(layer);
 
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
-        System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
+        System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
         assert(system);
         // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
         // situations
@@ -424,7 +424,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        start->FindAllChildByComparison(&artics, &matchType);
+        start->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
@@ -442,7 +442,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     }
     // normal case or end
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        end->FindAllChildByComparison(&artics, &matchType);
+        end->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
@@ -489,7 +489,7 @@ float View::CalcInitialSlur(
 
     /************** content **************/
 
-    System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
+    System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
     assert(system);
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
     findSpannedLayerElementsParams.m_minPos = p1.x;

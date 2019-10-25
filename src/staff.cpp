@@ -143,7 +143,7 @@ void Staff::AddChild(Object *child)
 int Staff::GetDrawingX() const
 {
     if (this->HasFacs()) {
-        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingX();
@@ -155,7 +155,7 @@ int Staff::GetDrawingX() const
 int Staff::GetDrawingY() const
 {
     if (this->HasFacs()) {
-        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(DOC);
         if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingY();
@@ -168,7 +168,7 @@ int Staff::GetDrawingY() const
 
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
-    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
 
     m_cachedDrawingY = system->GetDrawingY() + m_staffAlignment->GetYRel();
@@ -177,7 +177,7 @@ int Staff::GetDrawingY() const
 
 bool Staff::DrawingIsVisible()
 {
-    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     assert(system->GetDrawingScoreDef());
 
@@ -340,11 +340,11 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
     // Ignore layers that are empty (or with @sameas)
     ArrayOfObjects layers;
     IsEmptyComparison matchTypeLayer(LAYER, true);
-    this->FindAllChildByComparison(&layers, &matchTypeLayer);
+    this->FindAllDescendantByComparison(&layers, &matchTypeLayer);
 
     ArrayOfObjects mRests;
     ClassIdComparison matchTypeMRest(MREST);
-    this->FindAllChildByComparison(&mRests, &matchTypeMRest);
+    this->FindAllDescendantByComparison(&mRests, &matchTypeMRest);
 
     // Show the staff only if no layer with content or only mRests
     if (layers.empty() || (mRests.size() != layers.size())) {
@@ -432,7 +432,7 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     while (iter != params->m_timeSpanningElements.end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
-        Measure *currentMeasure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+        Measure *currentMeasure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
         assert(currentMeasure);
         // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
         // notation
@@ -495,7 +495,7 @@ int Staff::CalcStem(FunctorParams *)
 {
     ClassIdComparison isLayer(LAYER);
     ArrayOfObjects layers;
-    this->FindAllChildByComparison(&layers, &isLayer);
+    this->FindAllDescendantByComparison(&layers, &isLayer);
 
     // Not more than one layer - drawing stem dir remains unset
     if (layers.size() < 2) {
@@ -505,7 +505,7 @@ int Staff::CalcStem(FunctorParams *)
     // Detecting empty layers (empty layers can also have @sameas) which have to be ignored for stem direction
     IsEmptyComparison isEmptyElement(LAYER);
     ArrayOfObjects emptyLayers;
-    this->FindAllChildByComparison(&emptyLayers, &isEmptyElement);
+    this->FindAllDescendantByComparison(&emptyLayers, &isEmptyElement);
 
     // We have only one layer (or less) with content - drawing stem dir remains unset
     if ((layers.size() < 3) && (emptyLayers.size() > 0)) {
