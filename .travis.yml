@@ -8,29 +8,6 @@ language: cpp
 
 jobs:
   include:
-  - stage: build-c++
-    name: osx-xcode
-    os: osx
-    osx_image: xcode11.1
-    script:
-      - cd tools
-      - cmake .
-      - make
-  - name: linux-g++-5       
-    os: linux
-    dist: trusty
-    env: "CC=gcc-5 && CXX=g++-5"
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-5
-    script:
-      - cd tools
-      - cmake .
-      - make
-
   - stage: deploy
     name: emscripten
     os: linux
@@ -42,5 +19,4 @@ jobs:
       - ./emsdk activate latest
       - source ./emsdk_env.sh
       - cd ..
-      - cd tools
-      - emcc --version
+      - ./deploy-develop.sh
