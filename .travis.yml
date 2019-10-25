@@ -12,6 +12,13 @@ jobs:
     name: emscripten
     os: linux
     dist: trusty
+    env: "CC=gcc-5 && CXX=g++-5"
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-5
     script:
       - git clone https://github.com/emscripten-core/emsdk.git
       - cd emsdk
