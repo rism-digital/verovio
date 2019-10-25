@@ -29,11 +29,12 @@ OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 ls $OUTPUT_DIRECTORY
 
 cd ./tools
-cmake .
-make
-./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
+#cmake .
+#make
+#./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
+cd ..
 
-cd ../emscripten
+cd ./emscripten
 
 ./buildToolkit -c -H
 cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/

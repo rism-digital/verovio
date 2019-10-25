@@ -22,8 +22,8 @@ jobs:
     script:
       - git clone https://github.com/emscripten-core/emsdk.git
       - cd emsdk
-      - ./emsdk install latest
-      - ./emsdk activate latest
+      - ./emsdk install latest-upstream
+      - ./emsdk activate latest-upstream
       - source ./emsdk_env.sh
       - cd ..
       - ./deploy-develop.sh
