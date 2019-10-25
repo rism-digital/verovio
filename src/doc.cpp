@@ -1262,6 +1262,18 @@ int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
     return w;
 }
 
+int Doc::GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    int advX = glyph->GetHorizAdvX();
+    advX = advX * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) advX = advX * this->m_options->m_graceFactor.GetValue();
+    return advX;
+}
+
 int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const
 {
     assert(font);
@@ -1280,7 +1292,10 @@ int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
     int descender = -this->GetTextGlyphDescender(L'q', font, graceSize);
     int height = this->GetTextGlyphHeight(L'I', font, graceSize);
 
-    return ((descender + height) * 1.1);
+    int lineHeight = ((descender + height) * 1.1);
+    if (font->GetSupSubScript()) lineHeight /= SUPER_SCRIPT_FACTOR;
+
+    return lineHeight;
 }
 
 int Doc::GetDrawingUnit(int staffSize) const

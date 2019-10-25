@@ -255,27 +255,6 @@ void View::DrawSmuflString(
     dc->ResetBrush();
 }
 
-void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize)
-{
-    assert(dc);
-
-    std::wistringstream iss(s);
-    std::wstring token;
-    while (std::getline(iss, token, L'_')) {
-        dc->DrawText(UTF16to8(token), token);
-        // no _
-        if (iss.eof()) break;
-
-        FontInfo vrvTxt;
-        vrvTxt.SetFaceName("VerovioText");
-        dc->SetFont(&vrvTxt);
-        std::wstring str;
-        str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str), str);
-        dc->ResetFont();
-    }
-}
-
 void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle)
 {
     assert(dc);

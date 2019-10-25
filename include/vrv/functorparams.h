@@ -50,6 +50,7 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
+class Verse;
 
 //----------------------------------------------------------------------------
 // FunctorParams
@@ -229,10 +230,10 @@ public:
     AdjustFloatingPositionerGrpsParams(Doc *doc)
     {
         m_doc = doc;
-        m_place = STAFFREL_basic_above;
+        m_place = STAFFREL_above;
     }
     std::vector<ClassId> m_classIds;
-    data_STAFFREL_basic m_place;
+    data_STAFFREL m_place;
     Doc *m_doc;
 };
 
@@ -370,14 +371,16 @@ class AdjustSylSpacingParams : public FunctorParams {
 public:
     AdjustSylSpacingParams(Doc *doc)
     {
-        m_previousSyl = NULL;
+        m_previousVerse = NULL;
+        m_lastSyl = NULL;
         m_previousMeasure = NULL;
         m_freeSpace = 0;
         m_staffSize = 100;
         m_doc = doc;
     }
     ArrayOfAdjustmentTuples m_overlapingSyl;
-    Syl *m_previousSyl;
+    Verse *m_previousVerse;
+    Syl *m_lastSyl;
     Measure *m_previousMeasure;
     int m_freeSpace;
     int m_staffSize;

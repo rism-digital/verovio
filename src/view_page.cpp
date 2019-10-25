@@ -841,11 +841,9 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
         if (mnum) {
             // this should be an option
             Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
-            if (measure == systemStart || !mnum->IsGenerated()) {
-                // Draw measure numbers > 1
-                if ((measure->GetN() != "0") && (measure->GetN()) != "1") {
-                    DrawMNum(dc, mnum, measure);
-                }
+            // Draw non-generated measure numbers, and system starting measure numbers > 1.
+            if ((measure == systemStart && measure->GetN() != "0" && measure->GetN() != "1") || !mnum->IsGenerated()) {
+                DrawMNum(dc, mnum, measure);
             }
         }
     }

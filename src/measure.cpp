@@ -78,6 +78,22 @@ Measure::~Measure()
     Reset();
 }
 
+void Measure::CloneReset()
+{
+    Object::CloneReset();
+
+    m_measureAligner.Reset();
+    m_measureAligner.SetParent(this);
+    // Idem for timestamps
+    m_timestampAligner.SetParent(this);
+    // Idem for barlines
+    m_leftBarLine.SetParent(this);
+    m_rightBarLine.SetParent(this);
+
+    // owned pointers need to be set to NULL;
+    m_drawingScoreDef = NULL;
+}
+
 void Measure::Reset()
 {
     Object::Reset();

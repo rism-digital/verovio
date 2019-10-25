@@ -12,11 +12,13 @@
 #include <assert.h>
 #include <iostream>
 #include <math.h>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "dynam.h"
 #include "f.h"
 #include "fb.h"
 #include "fig.h"
@@ -56,7 +58,51 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     dc->EndTextGraphic(f, this);
 }
 
-void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wstring s)
+void View::DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
+{
+    assert(dc);
+
+    dc->DrawText(UTF16to8(str), str);
+}
+
+void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend)
+{
+    assert(dc);
+
+    if (rend && rend->HasFontfam()) {
+        DrawTextString(dc, str, params);
+        return;
+    }
+
+    ArrayOfStringDynamTypePairs tokens;
+    if (Dynam::GetSymbolsInStr(str, tokens)) {
+        int first = true;
+        for (auto &token : tokens) {
+            if (!first) {
+                // DrawTextString(dc, L" ", params);
+            }
+            first = false;
+
+            if (token.second) {
+                std::wstring smuflStr = Dynam::GetSymbolStr(token.first);
+                FontInfo vrvTxt;
+                vrvTxt.SetFaceName("VerovioText");
+                vrvTxt.SetStyle(FONTSTYLE_normal);
+                dc->SetFont(&vrvTxt);
+                DrawTextString(dc, smuflStr, params);
+                dc->ResetFont();
+            }
+            else {
+                DrawTextString(dc, token.first, params);
+            }
+        }
+    }
+    else {
+        DrawTextString(dc, str, params);
+    }
+}
+
+void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams &params)
 {
     assert(dc);
 
@@ -64,10 +110,10 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
     int toDcY = ToDeviceContextY(params.m_y);
 
     std::size_t prevPos = 0, pos;
-    while ((pos = s.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
+    while ((pos = str.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
-            std::wstring substr = s.substr(prevPos, pos - prevPos);
+            std::wstring substr = str.substr(prevPos, pos - prevPos);
             dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
             // Once we have rendered the some text to not pass x / y anymore
             toDcX = VRV_UNSET;
@@ -75,9 +121,9 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
         }
 
         // if it is the same or we still have space, it is the accidental
-        if (pos == prevPos || pos < s.length()) {
+        if (pos == prevPos || pos < str.length()) {
             // Then the accidental
-            std::wstring accid = s.substr(pos, 1);
+            std::wstring accid = str.substr(pos, 1);
             std::wstring smuflAccid;
             if (accid == L"\u266D") { // MUSIC FLAT SIGN
                 smuflAccid.push_back(SMUFL_E260_accidentalFlat);
@@ -105,8 +151,8 @@ void View::DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wst
         prevPos = pos + 1;
     }
     // Print the remainder of the string, or the full string if no accid
-    if (prevPos < s.length()) {
-        std::wstring substr = s.substr(prevPos, std::wstring::npos);
+    if (prevPos < str.length()) {
+        std::wstring substr = str.substr(prevPos, std::wstring::npos);
         dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
     }
 
@@ -150,6 +196,27 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
     }
 }
 
+void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize)
+{
+    assert(dc);
+
+    std::wistringstream iss(str);
+    std::wstring token;
+    while (std::getline(iss, token, L'_')) {
+        dc->DrawText(UTF16to8(token), token);
+        // no _
+        if (iss.eof()) break;
+
+        FontInfo vrvTxt;
+        vrvTxt.SetFaceName("VerovioText");
+        dc->SetFont(&vrvTxt);
+        std::wstring str;
+        str.push_back(VRV_TEXT_E551);
+        dc->DrawText(UTF16to8(str), str);
+        dc->ResetFont();
+    }
+}
+
 void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 {
     assert(dc);
@@ -161,7 +228,6 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 
     params.m_y -= m_doc->GetTextLineHeight(currentFont, false);
     params.m_newLine = true;
-    params.m_laidOut = true;
 
     dc->EndTextGraphic(lb, this);
 }
@@ -208,6 +274,15 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     dc->StartTextGraphic(rend, "", rend->GetUuid());
 
+    if (params.m_laidOut) {
+        if (params.m_alignment == HORIZONTALALIGNMENT_NONE) {
+            params.m_alignment = rend->HasHalign() ? rend->GetHalign() : HORIZONTALALIGNMENT_left;
+            params.m_x = rend->GetDrawingX();
+            params.m_y = rend->GetDrawingY();
+            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), params.m_alignment);
+        }
+    }
+
     FontInfo rendFont;
     bool customFont = false;
     if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
@@ -240,22 +315,34 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }
+
     if (customFont) dc->SetFont(&rendFont);
 
-    if (params.m_laidOut) {
-        if (params.m_alignment == HORIZONTALALIGNMENT_NONE) {
-            params.m_alignment = rend->HasHalign() ? rend->GetHalign() : HORIZONTALALIGNMENT_left;
-            params.m_x = rend->GetDrawingX();
-            params.m_y = rend->GetDrawingY();
-            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), params.m_alignment);
+    int yShift = 0;
+    if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
+        assert(dc->GetFont());
+        int MHeight = m_doc->GetTextGlyphHeight('M', dc->GetFont(), false);
+        if (rend->GetRend() == TEXTRENDITION_sup) {
+            yShift = m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
+            yShift += (MHeight * SUPER_SCRIPT_POSITION);
         }
-        else if (params.m_newLine) {
-            params.m_newLine = false;
-            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
+        else {
+            yShift = MHeight * SUB_SCRIPT_POSITION;
         }
+        params.m_y += yShift;
+        params.m_verticalShift = true;
+        dc->GetFont()->SetSupSubScript(true);
+        dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() * SUPER_SCRIPT_FACTOR);
     }
 
     DrawTextChildren(dc, rend, params);
+
+    if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
+        params.m_y -= yShift;
+        params.m_verticalShift = true;
+        dc->GetFont()->SetSupSubScript(false);
+        dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
+    }
 
     if (customFont) dc->ResetFont();
 
@@ -268,26 +355,30 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     assert(text);
 
     dc->StartTextGraphic(text, "", text->GetUuid());
+    
+    if (params.m_newLine) {
+        dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
+        params.m_newLine = false;
+    }
+    else if (params.m_verticalShift) {
+        dc->MoveTextVerticallyTo(ToDeviceContextY(params.m_y));
+        params.m_verticalShift = false;
+    }
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
-    if (text->GetFirstParent(HARM)) {
-        DrawHarmString(dc, params, text->GetText());
+    if (text->GetFirstParent(DYNAM)) {
+        DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstParent(REND)));
+    }
+    else if (text->GetFirstParent(HARM)) {
+        DrawHarmString(dc, text->GetText(), params);
     }
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
     else if (text->GetFirstParent(SYL)) {
-        DrawLyricString(dc, params.m_x, params.m_y, text->GetText());
+        DrawLyricString(dc, text->GetText());
     }
-
     else {
-        if (params.m_laidOut && params.m_newLine) {
-            dc->DrawText(
-                UTF16to8(text->GetText()), text->GetText(), ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
-            params.m_newLine = false;
-        }
-        else {
-            dc->DrawText(UTF16to8(text->GetText()), text->GetText());
-        }
+        DrawTextString(dc, text->GetText(), params);
     }
 
     dc->EndTextGraphic(text, this);

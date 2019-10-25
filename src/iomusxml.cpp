@@ -33,11 +33,13 @@
 #include "hairpin.h"
 #include "harm.h"
 #include "instrdef.h"
+#include "keyaccid.h"
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
+#include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
 #include "mrpt.h"
@@ -181,6 +183,9 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         for (auto current : *measure->GetChildren()) {
+            if (! current->Is(STAFF) ) {
+                continue;
+            }
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
@@ -222,6 +227,9 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     }
     // Check if voice number corresponds to an existing layer number in any staff (as with cross-staff notes).
     for (auto item : *measure->GetChildren()) {
+        if (! item->Is(STAFF) ) {
+            continue;
+        }
         Staff *staff = dynamic_cast<Staff *>(item);
         assert(staff);
         for (auto layer : *staff->GetChildren()) {
@@ -238,12 +246,12 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
     if (!staffNumStr.empty()) {
         staffNum = atoi(staffNumStr.c_str());
     }
-    if ((staffNum < 1) || (staffNum > measure->GetChildCount())) {
+    if ((staffNum < 1) || (staffNum > measure->GetChildCount(STAFF))) {
         LogWarning("MusicXML import: Staff %d cannot be found", staffNum);
         staffNum = 1;
     }
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     return SelectLayer(layerNum, staff);
 }
@@ -251,7 +259,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
 {
     staffNum--;
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum, STAFF));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);
@@ -784,9 +792,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
 
             // key sig
             KeySig *keySig = NULL;
-            pugi::xpath_node key;
             xpath = StringFormat("key[@number='%d']", i + 1);
-            key = it->select_node(xpath.c_str());
+            pugi::xpath_node key = it->select_node(xpath.c_str());
             if (!key) {
                 key = it->select_node("key");
             }
@@ -803,8 +810,23 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         keySigStr = "0";
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
                 }
-                else if (key.node().select_node("key-step")) {
+                else if (key.node().child("key-step")) {
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
+                    for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
+                         keyStep = keyStep.next_sibling("key-step")) {
+                        KeyAccid *keyAccid = new KeyAccid();
+                        keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
+                        if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
+                            data_ACCIDENTAL_GESTURAL accidValue
+                                = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                            keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
+                            if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
+                                keyAccid->SetAccid(
+                                    ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                            }
+                        }
+                        keySig->AddChild(keyAccid);
+                    }
                 }
                 if (key.node().select_node("mode")) {
                     keySig->SetMode(
@@ -813,8 +835,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // add it if necessary
             if (keySig) {
-                // Make it an attribute for now
-                keySig->IsAttribute(true);
                 staffDef->AddChild(keySig);
             }
 
@@ -995,6 +1015,13 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     std::string measureNum = node.attribute("number").as_string();
     if (measure != NULL) measure->SetN(measureNum);
 
+    std::string implicit = node.attribute("implicit").as_string();
+    if (implicit == "yes") {
+        MNum *mNum = new MNum();
+        // An empty mNum means that we like to render this measure number as blank.
+        measure->AddChild(mNum);
+    }
+
     int i = 0;
     for (i = 0; i < nbStaves; i++) {
         // the staff @n must take into account the staffOffset
@@ -1085,6 +1112,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     for (auto staff : *measure->GetChildren()) {
+        if (! staff->Is(STAFF) ) {
+            continue;
+        }
         assert(staff);
         if (staff->GetChildCount() == 0) { // add a default layer, if staff completely empty at the end of a measure.
             staff->AddChild(new Layer());
@@ -1165,7 +1195,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         KeySig *keySig = NULL;
         if (key.node().select_node("fifths")) {
             if (!keySig) keySig = new KeySig();
-            int fifths = atoi(key.node().select_node("fifths").node().text().as_string());
+            int fifths = key.node().select_node("fifths").node().text().as_int();
             std::string keySigStr;
             if (fifths < 0)
                 keySigStr = StringFormat("%df", abs(fifths));
@@ -1175,9 +1205,23 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 keySigStr = "0";
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
-        else if (key.node().select_node("key-step")) {
-            if (!keySig) keySig = new KeySig();
+        else if (key.node().child("key-step")) {
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
+            for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
+                 keyStep = keyStep.next_sibling("key-step")) {
+                KeyAccid *keyAccid = new KeyAccid();
+                keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
+                if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
+                    data_ACCIDENTAL_GESTURAL accidValue
+                        = ConvertAlterToAccid(std::atof(keyStep.next_sibling().text().as_string()));
+                    keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
+                    if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
+                        keyAccid->SetAccid(
+                            ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                    }
+                }
+                keySig->AddChild(keyAccid);
+            }
         }
         if (key.node().select_node("mode")) {
             if (!keySig) keySig = new KeySig();
@@ -1272,7 +1316,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(0));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetFirst(STAFF));
     assert(staff);
 
     data_BARRENDITION barRendition = BARRENDITION_NONE;
@@ -1335,11 +1379,11 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         // form and place
         if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
             fermata->SetForm(fermataVis_FORM_inv);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_below);
+            fermata->SetPlace(STAFFREL_below);
         }
         else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
             fermata->SetForm(fermataVis_FORM_norm);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_above);
+            fermata->SetPlace(STAFFREL_above);
         }
     }
 }
@@ -1681,9 +1725,15 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xpath_node kind = node.select_node("kind");
     if (kind) {
-        harmText = harmText + kind.node().attribute("text").as_string();
-        if (HasAttributeWithValue(kind.node(), "use-symbols", "yes"))
+        if (HasAttributeWithValue(kind.node(), "use-symbols", "yes")) {
             harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
+        }
+        else if (kind.node().attribute("text")) {
+            harmText = harmText + kind.node().attribute("text").as_string();
+        }
+        else {
+            harmText = harmText + ConvertKindToText(GetContent(kind.node()));
+        }
     }
     pugi::xpath_node degree = node.select_node("degree");
     if (degree) {
@@ -2000,16 +2050,20 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                     if (textNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
                     }
-                    if (GetContentOfChild(lyric, "syllabic") == "begin") {
-                        syl->SetCon(sylLog_CON_d);
+                    if (GetContentOfChild(lyric, "syllabic") == "single") {
+                        syl->SetCon(sylLog_CON_s);
+                    }
+                    else if (GetContentOfChild(lyric, "syllabic") == "begin") {
                         syl->SetWordpos(sylLog_WORDPOS_i);
+                        syl->SetCon(sylLog_CON_d);
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "middle") {
-                        syl->SetCon(sylLog_CON_d);
                         syl->SetWordpos(sylLog_WORDPOS_m);
+                        syl->SetCon(sylLog_CON_d);
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
+                        syl->SetCon(sylLog_CON_s);
                     }
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
                     if (!textWeight.empty())
@@ -2136,11 +2190,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // form and place
         if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
             fermata->SetForm(fermataVis_FORM_inv);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_below);
+            fermata->SetPlace(STAFFREL_below);
         }
         else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
             fermata->SetForm(fermataVis_FORM_norm);
-            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_above);
+            fermata->SetPlace(STAFFREL_above);
         }
     }
 
@@ -2418,18 +2472,46 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {
-    if (value == "sharp") return ACCIDENTAL_WRITTEN_s;
-    if (value == "natural") return ACCIDENTAL_WRITTEN_n;
-    if (value == "flat") return ACCIDENTAL_WRITTEN_f;
-    if (value == "double-sharp") return ACCIDENTAL_WRITTEN_x;
-    if (value == "sharp-sharp") return ACCIDENTAL_WRITTEN_ss;
-    if (value == "flat-flat") return ACCIDENTAL_WRITTEN_ff;
-    if (value == "natural-sharp") return ACCIDENTAL_WRITTEN_ns;
-    if (value == "natural-flat") return ACCIDENTAL_WRITTEN_nf;
-    if (value == "quarter-flat") return ACCIDENTAL_WRITTEN_1qf;
-    if (value == "quarter-sharp") return ACCIDENTAL_WRITTEN_1qs;
-    if (value == "three-quarters-flat") return ACCIDENTAL_WRITTEN_3qf;
-    if (value == "three-quarters-sharp") return ACCIDENTAL_WRITTEN_3qs;
+    if (value == "sharp")
+        return ACCIDENTAL_WRITTEN_s;
+    else if (value == "natural")
+        return ACCIDENTAL_WRITTEN_n;
+    else if (value == "flat")
+        return ACCIDENTAL_WRITTEN_f;
+    else if (value == "double-sharp")
+        return ACCIDENTAL_WRITTEN_x;
+    else if (value == "sharp-sharp")
+        return ACCIDENTAL_WRITTEN_ss;
+    else if (value == "flat-flat")
+        return ACCIDENTAL_WRITTEN_ff;
+    else if (value == "natural-sharp")
+        return ACCIDENTAL_WRITTEN_ns;
+    else if (value == "natural-flat")
+        return ACCIDENTAL_WRITTEN_nf;
+    else if (value == "quarter-flat")
+        return ACCIDENTAL_WRITTEN_1qf;
+    else if (value == "quarter-sharp")
+        return ACCIDENTAL_WRITTEN_1qs;
+    else if (value == "three-quarters-flat")
+        return ACCIDENTAL_WRITTEN_3qf;
+    else if (value == "three-quarters-sharp")
+        return ACCIDENTAL_WRITTEN_3qs;
+    else if (value == "sharp-down")
+        return ACCIDENTAL_WRITTEN_sd;
+    else if (value == "sharp-up")
+        return ACCIDENTAL_WRITTEN_su;
+    else if (value == "natural-down")
+        return ACCIDENTAL_WRITTEN_nd;
+    else if (value == "natural-up")
+        return ACCIDENTAL_WRITTEN_nu;
+    else if (value == "flat-down")
+        return ACCIDENTAL_WRITTEN_fd;
+    else if (value == "flat-up")
+        return ACCIDENTAL_WRITTEN_fu;
+    else if (value == "triple-sharp")
+        return ACCIDENTAL_WRITTEN_ts;
+    else if (value == "triple-flat")
+        return ACCIDENTAL_WRITTEN_tf;
     LogWarning("MusicXML import: Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
 }
@@ -2445,7 +2527,7 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(float value)
     if (value == 1) return ACCIDENTAL_GESTURAL_s;
     if (value == 1.5) return ACCIDENTAL_GESTURAL_su;
     if (value == 2) return ACCIDENTAL_GESTURAL_ss;
-    LogWarning("MusicXML import: Unsupported alter value '%d'", value);
+    LogWarning("MusicXML import: Unsupported alter value '%.1f'", value);
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
@@ -2577,28 +2659,134 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
 
 std::string MusicXmlInput::ConvertAlterToSymbol(std::string value)
 {
-    if (value == "-1")
+    if (value == "-2")
+        return "𝄫";
+    else if (value == "-1")
         return "♭";
     else if (value == "0")
         return "♮";
     else if (value == "1")
         return "♯";
+    else if (value == "2")
+        return "𝄪";
     else
         return "";
 }
 
 std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
 {
-    if (value.find("major") != std::string::npos)
-        return "△";
-    else if (value.find("minor") != std::string::npos)
+    if (value == "major")
+        return ""; // Use no symbol to avoid ambiguity of "C△".
+    else if (value == "minor")
         return "-";
-    else if (value.find("augmented") != std::string::npos)
+    else if (value == "augmented")
         return "+";
-    else if (value.find("diminished") != std::string::npos)
+    else if (value == "diminished")
         return "°";
-    else if (value.find("half-diminished") != std::string::npos)
+    else if (value == "dominant")
+        return "7";
+    else if (value == "major-seventh")
+        return "△7";
+    else if (value == "minor-seventh")
+        return "-7";
+    else if (value == "diminished-seventh")
+        return "°7";
+    else if (value == "augmented-seventh")
+        return "+7";
+    else if (value == "half-diminished")
         return "ø";
+    else if (value == "major-minor")
+        return "-△7";
+    else if (value == "major-sixth")
+        return "6";
+    else if (value == "minor-sixth")
+        return "-6";
+    else if (value == "dominant-ninth")
+        return "9";
+    else if (value == "major-ninth")
+        return "△9";
+    else if (value == "minor-ninth")
+        return "-9";
+    else if (value == "dominant-11th")
+        return "11";
+    else if (value == "major-11th")
+        return "△11";
+    else if (value == "minor-11th")
+        return "-11";
+    else if (value == "dominant-13th")
+        return "13";
+    else if (value == "major-13th")
+        return "△13";
+    else if (value == "minor-13th")
+        return "-13";
+    else if (value == "suspended-second")
+        return "sus2";
+    else if (value == "suspended-fourth")
+        return "sus4";
+    // Skipping "functional sixths": Neapolitan, Italian, French, German.
+    // Skipping pedal (pedal-point bass)
+    else if (value == "power")
+        return "5";
+    // Skipping Tristan
+    else
+        return "";
+}
+
+std::string MusicXmlInput::ConvertKindToText(std::string value)
+{
+    if (value == "major")
+        return "";
+    else if (value == "minor")
+        return "m";
+    else if (value == "augmented")
+        return "aug";
+    else if (value == "diminished")
+        return "dim";
+    else if (value == "dominant")
+        return "7";
+    else if (value == "major-seventh")
+        return "Maj7";
+    else if (value == "minor-seventh")
+        return "m7";
+    else if (value == "diminished-seventh")
+        return "dim7";
+    else if (value == "augmented-seventh")
+        return "aug7";
+    else if (value == "half-diminished")
+        return "m7♭5";
+    else if (value == "major-minor")
+        return "mMaj7";
+    else if (value == "major-sixth")
+        return "6";
+    else if (value == "minor-sixth")
+        return "m6";
+    else if (value == "dominant-ninth")
+        return "9";
+    else if (value == "major-ninth")
+        return "Maj9";
+    else if (value == "minor-ninth")
+        return "m9";
+    else if (value == "dominant-11th")
+        return "11";
+    else if (value == "major-11th")
+        return "Maj11";
+    else if (value == "minor-11th")
+        return "m11";
+    else if (value == "dominant-13th")
+        return "13";
+    else if (value == "major-13th")
+        return "Maj13";
+    else if (value == "minor-13th")
+        return "m13";
+    else if (value == "suspended-second")
+        return "sus2";
+    else if (value == "suspended-fourth")
+        return "sus4";
+    // Skipping "functional sixths": Neapolitan, Italian, French, German.
+    // Skipping pedal (pedal-point bass)
+    else if (value == "power")
+        return "5";
+    // Skipping Tristan
     else
         return "";
 }

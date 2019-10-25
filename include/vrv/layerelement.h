@@ -50,9 +50,9 @@ public:
     ///@}
 
     /**
-     * Overriding CopyReset() method to be called after copy / assignment calls.
+     * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CopyReset();
+    virtual void CloneReset();
 
     /**
      * @name Getter to interfaces
@@ -318,7 +318,7 @@ public:
     virtual int ResetDrawing(FunctorParams *);
 
 private:
-    int GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, ArticPartType type);
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

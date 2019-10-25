@@ -104,8 +104,10 @@ void LayerElement::Reset()
 
 LayerElement::~LayerElement() {}
 
-void LayerElement::CopyReset()
+void LayerElement::CloneReset()
 {
+    Object::CloneReset();
+
     // pointers have to be NULL
     m_alignment = NULL;
     m_graceAlignment = NULL;
@@ -309,7 +311,7 @@ int LayerElement::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, ArticPartType type)
+int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
 {
     // It would not crash otherwise but there is not reason to call it
     assert(this->Is({ NOTE, CHORD }));
@@ -327,20 +329,20 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, A
         if (firstArtic) firstArticPart = firstArtic->GetOutsidePart();
         if (lastArtic) lastArticPart = lastArtic->GetOutsidePart();
         // Ignore them if on the opposite side of what we are looking for
-        if (firstArticPart && (firstArticPart->GetPlaceAlternate()->GetBasic() != place)) firstArticPart = NULL;
-        if (lastArticPart && (lastArticPart->GetPlaceAlternate()->GetBasic() != place)) lastArticPart = NULL;
+        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
+        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
     }
     // Looking at the inside if nothing is given outside
     if (firstArtic && !firstArticPart) {
         firstArticPart = firstArtic->GetInsidePart();
-        if (firstArticPart && (firstArticPart->GetPlaceAlternate()->GetBasic() != place)) firstArticPart = NULL;
+        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
     }
     if (lastArtic && !lastArticPart) {
         lastArticPart = lastArtic->GetInsidePart();
-        if (lastArticPart && (lastArticPart->GetPlaceAlternate()->GetBasic() != place)) lastArticPart = NULL;
+        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
     }
 
-    if (place == STAFFREL_basic_above) {
+    if (place == STAFFREL_above) {
         int firstY = !firstArticPart ? VRV_UNSET : firstArticPart->GetSelfTop();
         int lastY = !lastArticPart ? VRV_UNSET : lastArticPart->GetSelfTop();
         return std::max(firstY, lastY);
@@ -380,7 +382,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_basic_above, type);
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
             if (articY != VRV_UNSET) return articY;
         }
         DurationInterface *durationInterface = this->GetDurationInterface();
@@ -413,7 +415,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_basic_below, type);
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
             if (articY != -VRV_UNSET) return articY;
         }
         DurationInterface *durationInterface = this->GetDurationInterface();
@@ -1275,7 +1277,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 {
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (this->IsGraceNote()) {
+    if (this->IsGraceNote() || this->GetFirstParent(GRACEGRP)) {
         m_drawingCueSize = true;
     }
     // This cover the case when the @size is given on the element

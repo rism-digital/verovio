@@ -48,6 +48,7 @@
 #include "fig.h"
 #include "ftrem.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
 #include "harm.h"
@@ -480,6 +481,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(FTREM)) {
         m_currentNode = m_currentNode.append_child("fTrem");
         WriteFTrem(m_currentNode, dynamic_cast<FTrem *>(object));
+    }
+    else if (object->Is(GRACEGRP)) {
+        m_currentNode = m_currentNode.append_child("graceGrp");
+        WriteGraceGrp(m_currentNode, dynamic_cast<GraceGrp *>(object));
     }
     else if (object->Is(HALFMRPT)) {
         m_currentNode = m_currentNode.append_child("halfmRpt");
@@ -1478,6 +1483,16 @@ void MeiOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     fTrem->WriteTremMeasured(currentNode);
 }
 
+void MeiOutput::WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp)
+{
+    assert(graceGrp);
+
+    WriteLayerElement(currentNode, graceGrp);
+    graceGrp->WriteColor(currentNode);
+    graceGrp->WriteGraced(currentNode);
+    graceGrp->WriteGraceGrpLog(currentNode);
+}
+
 void MeiOutput::WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt)
 {
     assert(halfmRpt);
@@ -1834,6 +1849,7 @@ void MeiOutput::WriteRend(pugi::xml_node currentNode, Rend *rend)
     WriteAreaPosInterface(currentNode, rend);
     rend->WriteColor(currentNode);
     rend->WriteLang(currentNode);
+    rend->WriteTextRendition(currentNode);
     rend->WriteTypography(currentNode);
     rend->WriteWhitespace(currentNode);
 }
@@ -2261,6 +2277,21 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for dynam
+    else if (filterParent->Is(DYNAM)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for dir
     else if (filterParent->Is(DIR)) {
         if (element == "") {
@@ -2371,6 +2402,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "clef") {
             return true;
         }
+        else if (element == "graceGrp") {
+            return true;
+        }
         else if (element == "note") {
             return true;
         }
@@ -2423,6 +2457,27 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "note") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for graceGrp
+    else if (filterParent->Is(GRACEGRP)) {
+        if (element == "beam") {
+            return true;
+        }
+        else if (element == "chord") {
+            return true;
+        }
+        else if (element == "note") {
+            return true;
+        }
+        else if (element == "rest") {
+            return true;
+        }
+        else if (element == "space") {
             return true;
         }
         else {
@@ -4168,6 +4223,9 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "fTrem") {
             success = ReadFTrem(parent, xmlElement);
         }
+        else if (elementName == "graceGrp") {
+            success = ReadGraceGrp(parent, xmlElement);
+        }
         else if (elementName == "halfmRpt") {
             success = ReadHalfmRpt(parent, xmlElement);
         }
@@ -4458,6 +4516,20 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     parent->AddChild(vrvFTrem);
     ReadUnsupportedAttr(fTrem, vrvFTrem);
     return ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
+}
+
+bool MeiInput::ReadGraceGrp(Object *parent, pugi::xml_node graceGrp)
+{
+    GraceGrp *vrvGraceGrp = new GraceGrp();
+    ReadLayerElement(graceGrp, vrvGraceGrp);
+
+    vrvGraceGrp->ReadColor(graceGrp);
+    vrvGraceGrp->ReadGraced(graceGrp);
+    vrvGraceGrp->ReadGraceGrpLog(graceGrp);
+
+    parent->AddChild(vrvGraceGrp);
+    ReadUnsupportedAttr(graceGrp, vrvGraceGrp);
+    return ReadLayerChildren(vrvGraceGrp, graceGrp, vrvGraceGrp);
 }
 
 bool MeiInput::ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt)
@@ -4916,6 +4988,7 @@ bool MeiInput::ReadRend(Object *parent, pugi::xml_node rend)
 
     vrvRend->ReadColor(rend);
     vrvRend->ReadLang(rend);
+    vrvRend->ReadTextRendition(rend);
     vrvRend->ReadTypography(rend);
     vrvRend->ReadWhitespace(rend);
 

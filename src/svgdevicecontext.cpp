@@ -38,8 +38,8 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_originX = 0;
     m_originY = 0;
 
-    SetBrush(AxBLACK, AxSOLID);
-    SetPen(AxBLACK, 1, AxSOLID);
+    SetBrush(AxNONE, AxSOLID);
+    SetPen(AxNONE, 1, AxSOLID);
 
     m_smuflGlyphs.clear();
 
@@ -389,7 +389,7 @@ void SvgDeviceContext::StartPage()
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.append_child(pugi::node_pcdata)
-            .set_value("g.page-margin{font-family:Times;} "
+            .set_value("g.page-margin{color:black;font-family:Times;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
                        "g.tempo{font-weight:bold;} g.dir, g.dynam, "
@@ -482,9 +482,9 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
             bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
             )
               .c_str();
-    // pathChild.append_attribute("fill") = "#000000";
+    // pathChild.append_attribute("fill") = "currentColor";
     // pathChild.append_attribute("fill-opacity") = "1";
-    pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+    pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     // pathChild.append_attribute("stroke-opacity") = "1";
@@ -517,7 +517,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
         ellipseChild.append_attribute("stroke")
-            = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+            = GetColour(m_penStack.top().GetColour()).c_str();
     }
 }
 
@@ -583,13 +583,13 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     pathChild.append_attribute("d") = StringFormat(
         "M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye))
                                           .c_str();
-    // pathChild.append_attribute("fill") = "#000000";
+    // pathChild.append_attribute("fill") = "currentColor";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
         pathChild.append_attribute("stroke")
-            = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+            = GetColour(m_penStack.top().GetColour()).c_str();
     }
 }
 
@@ -597,7 +597,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+    pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
     if (m_penStack.top().GetDashLength() > 0)
         pathChild.append_attribute("stroke-dasharray")
             = StringFormat("%d, %d", m_penStack.top().GetDashLength(), m_penStack.top().GetDashLength()).c_str();
@@ -618,14 +618,14 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
     // else
     if (currentPen.GetWidth() > 0)
         polygonChild.append_attribute("stroke")
-            = StringFormat("#%s", GetColour(currentPen.GetColour()).c_str()).c_str();
+            = GetColour(currentPen.GetColour()).c_str();
     if (currentPen.GetWidth() > 1)
         polygonChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
     if (currentPen.GetOpacity() != 1.0)
         polygonChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetOpacity()).c_str();
-    if (currentBrush.GetColour() != AxBLACK)
+    if (currentBrush.GetColour() != AxNONE)
         polygonChild.append_attribute("fill")
-            = StringFormat("#%s", GetColour(currentBrush.GetColour()).c_str()).c_str();
+            = GetColour(currentBrush.GetColour()).c_str();
     if (currentBrush.GetOpacity() != 1.0)
         polygonChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
 
@@ -726,6 +726,11 @@ void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignme
     }
 }
 
+void SvgDeviceContext::MoveTextVerticallyTo(int y)
+{
+    m_currentNode.append_attribute("y") = y;
+}
+
 void SvgDeviceContext::EndText()
 {
     m_svgNodeStack.pop_back();
@@ -761,6 +766,17 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+    }
+    if (m_fontStack.top()->GetStyle() != FONTSIZE_NONE) {
+        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
+            textChild.append_attribute("font-style") = "italic";
+        }
+        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+            textChild.append_attribute("font-style") = "normal";
+        }
+        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
+            textChild.append_attribute("font-style") = "oblique";
+        }
     }
     textChild.append_attribute("class") = "text";
     textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
@@ -801,6 +817,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
         useChild.append_attribute("xlink:href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
+        useChild.append_attribute("href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
@@ -839,16 +856,18 @@ void SvgDeviceContext::AddDescription(const std::string &text)
 std::string SvgDeviceContext::GetColour(int colour)
 {
     std::ostringstream ss;
+    ss << "#";
     ss << std::hex;
 
     switch (colour) {
-        case (AxBLACK): return "000000";
-        case (AxWHITE): return "FFFFFF";
-        case (AxRED): return "FF0000";
-        case (AxGREEN): return "00FF00";
-        case (AxBLUE): return "0000FF";
-        case (AxCYAN): return "00FFFF";
-        case (AxLIGHT_GREY): return "777777";
+        case (AxNONE): return "currentColor";
+        case (AxBLACK): return "#000000";
+        case (AxWHITE): return "#FFFFFF";
+        case (AxRED): return "#FF0000";
+        case (AxGREEN): return "#00FF00";
+        case (AxBLUE): return "#0000FF";
+        case (AxCYAN): return "#00FFFF";
+        case (AxLIGHT_GREY): return "#777777";
         default:
             int blue = (colour & 255);
             int green = (colour >> 8) & 255;
@@ -948,8 +967,8 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                         SetPen(AxGREEN, 10, AxSOLID);
                         SetBrush(AxGREEN, AxSOLID);
                         this->DrawCircle(view->ToDeviceContextX(p.x), view->ToDeviceContextY(p.y), 5);
-                        SetPen(AxBLACK, 1, AxSOLID);
-                        SetBrush(AxBLACK, AxSOLID);
+                        SetPen(AxNONE, 1, AxSOLID);
+                        SetBrush(AxNONE, AxSOLID);
                     }
                 }
             }

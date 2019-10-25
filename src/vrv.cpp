@@ -29,7 +29,11 @@
 
 // Windows has no Bourne shell (sh), therefore no "git_commit.h" is created.
 #ifndef _WIN32
+#ifdef COCOAPODS
+#define GIT_COMMIT "[cocoapods]"
+#else
 #include "git_commit.h"
+#endif
 #else
 #define GIT_COMMIT "[undefined]"
 #endif
@@ -77,7 +81,7 @@ bool Resources::InitFonts()
         return false;
     }
 
-    if (!InitTextFont()) {
+    if (!InitTextFont("Times") || !InitTextFont("VerovioText-1.0")) {
         LogError("Text font could not be initialized.");
         return false;
     }
@@ -190,13 +194,13 @@ bool Resources::LoadFont(std::string fontName)
     return true;
 }
 
-bool Resources::InitTextFont()
+bool Resources::InitTextFont(std::string fontName)
 {
     // For the text font, we load the bounding boxes only
     pugi::xml_document doc;
     // For now, we have only Times bounding boxes for ASCII chars
     // For any other char, we currently use 'o' bounding box
-    std::string filename = Resources::GetPath() + "/text/Times.xml";
+    std::string filename = Resources::GetPath() + "/text/" + fontName + ".xml";
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result) {
         // File not found, default bounding boxes will be used
@@ -224,6 +228,9 @@ bool Resources::InitTextFont()
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph.SetBoundingBox(x, y, width, height);
             if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
+            if (m_textFont.count(code) > 0) {
+                LogDebug("Redefining %d with %s", code, fontName.c_str());
+            }
             m_textFont[code] = glyph;
         }
     }

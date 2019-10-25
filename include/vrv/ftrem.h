@@ -35,6 +35,7 @@ public:
     ///@{
     FTrem();
     virtual ~FTrem();
+    virtual Object *Clone() const { return new FTrem(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "FTrem"; }
     virtual ClassId GetClassId() const { return FTREM; }

@@ -1292,57 +1292,14 @@ void Toolkit::SetHumdrumBuffer(const char *data)
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
     }
-
-#ifndef NO_HUMDRUM_SUPPORT
-    hum::HumdrumFile file;
-    file.readString(data);
-    // apply Humdrum tools if there are any filters in the file.
-    if (file.hasFilters()) {
-        std::string output;
-        hum::Tool_filter filter;
-        filter.run(file);
-        if (filter.hasHumdrumText()) {
-            output = filter.getHumdrumText();
-        }
-        else {
-            // humdrum structure not always correct in output from tools
-            // yet, so reload.
-            stringstream tempdata;
-            tempdata << file;
-            output = tempdata.str();
-        }
-        m_humdrumBuffer = (char *)malloc(output.size() + 1);
-        if (!m_humdrumBuffer) {
-            // something went wrong
-            return;
-        }
-        strcpy(m_humdrumBuffer, output.c_str());
-    }
-    else {
-        int size = (int)strlen(data) + 1;
-        m_humdrumBuffer = (char *)malloc(size);
-        if (!m_humdrumBuffer) {
-            // something went wrong
-            return;
-        }
-        strcpy(m_humdrumBuffer, data);
-    }
-    if (file.getExinterpCount("mens")) {
-        m_options->m_evenNoteSpacing.SetValue(true);
-    }
-    else {
-        m_options->m_evenNoteSpacing.SetValue(false);
-    }
-
-#else
-    size_t size = (int)strlen(data) + 1;
+    size_t size = strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
         // something went wrong
+        std::cerr << "m_humdrumBuffer is NULL (out of memory?)" << std::endl;
         return;
     }
     strcpy(m_humdrumBuffer, data);
-#endif
 }
 const char *Toolkit::GetHumdrumBuffer()
 {

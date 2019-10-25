@@ -81,7 +81,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         m_currentColour = AxRED;
     }
     else {
-        m_currentColour = AxBLACK;
+        m_currentColour = AxNONE;
     }
 
     if (element->Is(ACCID)) {
@@ -125,6 +125,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(FLAG)) {
         DrawFlag(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(GRACEGRP)) {
+        DrawGraceGrp(dc, element, layer, staff, measure);
     }
     else if (element->Is(HALFMRPT)) {
         DrawHalfmRpt(dc, element, layer, staff, measure);
@@ -301,7 +304,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
     int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int direction = (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? 1 : -1;
+    int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
 
     int y = articPart->GetDrawingY();
 
@@ -328,15 +331,14 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         if (articPart->GetType() == ARTIC_PART_INSIDE) {
             // If we are above the top of the  staff, just pile them up
-            if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) && (y > staff->GetDrawingY()))
-                y += yShift;
+            if ((articPart->GetPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) y += yShift;
             // If we are below the bottom, just pile the down
-            else if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_below)
+            else if ((articPart->GetPlace() == STAFFREL_below)
                 && (y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
                 y -= yShift;
             // Otherwise make it fit the staff space
             else {
-                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlaceAlternate()->GetBasic());
+                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlace());
                 if (IsOnStaffLine(y, staff)) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * direction;
             }
         }
@@ -351,8 +353,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         // Center the glyh if necessary
         if (Artic::IsCentered(*articIter)) {
-            y += (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? -(glyphHeight / 2)
-                                                                                      : (glyphHeight / 2);
+            y += (articPart->GetPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
         }
 
         // Adjust the baseline for glyph above the baseline in SMuFL
@@ -855,6 +856,22 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     wchar_t code = flag->GetSmuflCode(stem->GetDrawingStemDir());
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawGraceGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    // basically nothing to do here
+    DrawLayerChildren(dc, element, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -1388,6 +1405,21 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
     DrawTextChildren(dc, syl, params);
+
+    if (syl->GetCon() == sylLog_CON_b) {
+        dc->ReactivateGraphic();
+        dc->DeactivateGraphic();
+        FontInfo vrvTxt;
+        vrvTxt.SetFaceName("VerovioText");
+        dc->SetFont(&vrvTxt);
+        std::wstring str;
+        str.push_back(VRV_TEXT_E551);
+        dc->DrawText(UTF16to8(str), str);
+        dc->ResetFont();
+        dc->ReactivateGraphic();
+        dc->DeactivateGraphicY();
+    }
+
     dc->EndText();
 
     dc->ResetFont();
@@ -1434,8 +1466,8 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     assert(stem);
     assert(staff);
 
-    dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
-    dc->SetBrush(AxBLACK, AxSOLID);
+    dc->SetPen(AxNONE, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    dc->SetBrush(AxNONE, AxSOLID);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift * 3 / 2;
@@ -1651,11 +1683,11 @@ bool View::IsOnStaffLine(int y, Staff *staff)
     return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
 }
 
-int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL_basic place)
+int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place)
 {
     int yPos = y - staff->GetDrawingY();
     int distance = yPos % m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (place == STAFFREL_basic_above) {
+    if (place == STAFFREL_above) {
         if (distance > 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - distance;
         return y - distance + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }

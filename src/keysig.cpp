@@ -187,7 +187,7 @@ std::wstring KeySig::GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, d
 
     const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     if (childList->size() > 0) {
-        if (childList->size() <= pos) return symbolStr;
+        if ((int)childList->size() <= pos) return symbolStr;
         KeyAccid *keyAccid = dynamic_cast<KeyAccid *>(childList->at(pos));
         assert(keyAccid);
         accid = keyAccid->GetAccid();

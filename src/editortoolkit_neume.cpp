@@ -544,14 +544,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "tilt") {
                 if (it->second == "n") {
-                    data_COMPASSDIRECTION direction;
-                    direction.SetBasic(COMPASSDIRECTION_basic_n);
-                    nc->SetTilt(direction);
+                    nc->SetTilt(COMPASSDIRECTION_n);
                 }
                 else if (it->second == "se") {
-                    data_COMPASSDIRECTION direction;
-                    direction.SetExtended(COMPASSDIRECTION_extended_se);
-                    nc->SetTilt(direction);
+                    nc->SetTilt(COMPASSDIRECTION_se);
                 }
             }
             else if (it->first == "contour") {
@@ -1465,6 +1461,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 continue;
             }
             Object *newParent = currentParent->Clone();
+            newParent->CloneReset();
             assert(newParent);
             newParent->ClearChildren();
 

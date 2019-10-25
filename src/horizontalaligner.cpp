@@ -253,6 +253,10 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
 
         rightAlignment = dynamic_cast<Alignment *>(*riter);
         assert(rightAlignment);
+        
+        if (rightAlignment->IsOfType({ALIGNMENT_FULLMEASURE, ALIGNMENT_FULLMEASURE2})) {
+            continue;
+        }
 
         // Do not go beyond the left bar line
         if (rightAlignment->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {

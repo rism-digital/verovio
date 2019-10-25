@@ -32,6 +32,7 @@ public:
     ///@{
     Expansion();
     virtual ~Expansion();
+    virtual Object *Clone() const { return new Expansion(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Expansion"; }
     virtual ClassId GetClassId() const { return EXPANSION; }
