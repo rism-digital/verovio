@@ -8,15 +8,15 @@ language: cpp
 
 jobs:
   include:
-  - stage: Build-C++
-    name: OSX-XCode
+  - stage: build-c++
+    name: osx-xcode
     os: osx
     osx_image: xcode11.1
     script:
       - cd tools
       - cmake .
       - make
-  - name: Linux-g++-5       
+  - name: linux-g++-5       
     os: linux
     dist: trusty
     env: "CC=gcc-5 && CXX=g++-5"
@@ -31,7 +31,8 @@ jobs:
       - cmake .
       - make
 
-  - stage: Build-JavaScript       
+  - stage: deploy
+    name: emscripten
     os: linux
     dist: trusty
     script:
