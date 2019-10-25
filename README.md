@@ -20,6 +20,30 @@ NPM
 The latest stable version is available via [NPM](https://www.npmjs.com/package/verovio)
 
     $ npm install verovio
+    
+CocoaPods
+---
+You can use [CocoaPods](http://cocoapods.org/) to install `Verovio` by adding it to your to your `Podfile`:
+
+```ruby
+platform :ios, '12.0'
+use_frameworks!
+
+target 'MyApp' do
+	pod 'Verovio', :git => 'https://github.com/rism-ch/verovio.git', :branch => 'develop'
+end
+```
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
+
+To use Verovio in your iOS project import
+```bash
+#import <Verovio/Verovio-umbrella.h>
+```
 
 LibMEI
 ------
