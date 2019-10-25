@@ -88,10 +88,10 @@ void Slur::GetCrossStaffOverflows(
 
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
-        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstParent(STAFF));
+        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
     }
     if (!endStaff) {
-        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstParent(STAFF));
+        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
     }
 
     // This happens with slurs starting or ending with a timestamp

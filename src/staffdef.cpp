@@ -105,11 +105,11 @@ void StaffDef::AddChild(Object *child)
 
 bool StaffDef::IsInBraceAndBracket()
 {
-    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp *>(this->GetFirstParent(STAFFGRP));
+    StaffGrp *staffGrp1 = dynamic_cast<StaffGrp *>(this->GetFirstAncestor(STAFFGRP));
     if (!staffGrp1 || !staffGrp1->HasSymbol()) {
         return false;
     }
-    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp *>(staffGrp1->GetFirstParent(STAFFGRP));
+    StaffGrp *staffGrp2 = dynamic_cast<StaffGrp *>(staffGrp1->GetFirstAncestor(STAFFGRP));
     if (!staffGrp2 || !staffGrp2->HasSymbol()) {
         return false;
     }

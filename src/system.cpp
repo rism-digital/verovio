@@ -186,19 +186,19 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     ClassIdsComparison matchType({ CHORD, NOTE });
     ArrayOfObjects children;
     ArrayOfObjects::iterator childrenIter;
-    this->FindAllChildBetween(&children, &matchType, start, end);
+    this->FindAllDescendantBetween(&children, &matchType, start, end);
 
-    Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+    Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
-    Staff *staffStart = dynamic_cast<Staff *>(layerStart->GetFirstParent(STAFF));
+    Staff *staffStart = dynamic_cast<Staff *>(layerStart->GetFirstAncestor(STAFF));
     assert(staffStart);
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
-        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstParent(LAYER));
+        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstAncestor(LAYER));
         assert(layer);
-        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstAncestor(STAFF));
         assert(staff);
 
         // If the slur is spanning over several measure, the the children list will include note and chords
@@ -400,7 +400,7 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     Alignment *left = objectX->GetAlignment();
-    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstParent(MEASURE));
+    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstAncestor(MEASURE));
     if (objectXMeasure != params->m_lastMeasure) {
         left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
     }

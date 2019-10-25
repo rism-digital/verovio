@@ -3230,7 +3230,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
     Object *start = NULL;
     if (boundaryEnd.attribute("startid")) {
         std::string startUuid = boundaryEnd.attribute("startid").value();
-        start = m_doc->FindChildByUuid(startUuid);
+        start = m_doc->FindDescendantByUuid(startUuid);
     }
     if (!start) {
         LogError("Could not find start element '%s' for boundaryEnd", startUuid.c_str());
@@ -4298,7 +4298,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     // if the current parent is a syllable then we need to make sure that a syl got added
     // if not then add a blank one
     if (strcmp(parentNode.name(), "syllable") == 0) {
-        auto testSyl = parent->FindChildByType(SYL);
+        auto testSyl = parent->FindDescendantByType(SYL);
         if (testSyl == NULL) {
             Syl *syl = new Syl();
             parent->AddChild(syl);
@@ -4829,7 +4829,7 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     // and add an empty <syl> if it doesn't have one
     if ((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
 
-        Object *obj = vrvSyllable->FindChildByType(SYL);
+        Object *obj = vrvSyllable->FindDescendantByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
 
         if (syl == NULL) {
@@ -4992,7 +4992,7 @@ bool MeiInput::ReadRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadTypography(rend);
     vrvRend->ReadWhitespace(rend);
 
-    if (vrvRend->GetFirstParent(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
+    if (vrvRend->GetFirstAncestor(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
         LogWarning("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetUuid().c_str());
         // Eventually to be added to unsupported attributes?
         vrvRend->SetHalign(HORIZONTALALIGNMENT_NONE);
@@ -5716,14 +5716,14 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     // position (pitch)
     if (tupletSpan.attribute("startid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("startid").value());
-        start = dynamic_cast<LayerElement *>(measure->FindChildByUuid(refId));
+        start = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
         if (!start) {
             LogWarning("Element with @startid '%s' not found when trying to read the <tupletSpan>", refId.c_str());
         }
     }
     if (tupletSpan.attribute("endid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("endid").value());
-        end = dynamic_cast<LayerElement *>(measure->FindChildByUuid(refId));
+        end = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
         if (!end) {
             LogWarning("Element with @endid '%s' not found when trying to read the <tupletSpan>", refId.c_str());
         }
@@ -5733,8 +5733,8 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
         return false;
     }
 
-    LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastParentNot(LAYER));
-    LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastParentNot(LAYER));
+    LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastAncestorNot(LAYER));
+    LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastAncestorNot(LAYER));
 
     if (!startChild || !endChild || (startChild->GetParent() != endChild->GetParent())) {
         LogWarning("Start and end elements for <tupletSpan> '%s' not in the same layer", tuplet->GetUuid().c_str());
@@ -5829,8 +5829,8 @@ void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMorden
 
 void MeiInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement)
 {
-    KeySig *keySig = dynamic_cast<KeySig *>(vrvScoreDefElement->FindChildByType(KEYSIG));
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(vrvScoreDefElement->FindChildByType(METERSIG));
+    KeySig *keySig = dynamic_cast<KeySig *>(vrvScoreDefElement->FindDescendantByType(KEYSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(vrvScoreDefElement->FindDescendantByType(METERSIG));
 
     if (scoreDefElement.attribute("key.sig.show")) {
         if (keySig) {
@@ -5931,7 +5931,7 @@ void MeiInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
     if (system->m_systemRightMar == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
 
-    Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
+    Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
     assert(page);
     measure->m_xAbs = system->m_systemLeftMar;
     measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
