@@ -1,37 +1,45 @@
 branches:
   only:
   - develop
-
+  
 sudo: false
 dist: trusty
 language: cpp
 
-matrix:
+jobs:
   include:
-    # GCC5 on Linux
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-      env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+  - stage: build-osx
+    os: osx
+    osx_image: xcode11.1
+    script:
+      - cd tools
+      - cmake .
+      - make
+  
+  - stage: build-linux-g++-5       
+    os: linux
+    dist: trusty
+    env: "CC=gcc-5 && CXX=g++-5"
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-5
+    script:
+      - cd tools
+      - cmake .
+      - make
 
-    # Clang on OSX
-    - os: osx
-      osx_image: xcode9.2
-
-before_install:
-  - eval "${MATRIX_EVAL}"
-
-before_install:
-  - eval "${MATRIX_EVAL}"
-
-before_script:
-  - cd tools
-  - cmake .
-
-script: 
-  - make
+  - stage: build-javascript       
+    os: linux
+    dist: trusty
+    script:
+      - git clone https://github.com/emscripten-core/emsdk.git
+      - cd emsdk
+      - ./emsdk install latest
+      - ./emsdk activate latest
+      - source ./emsdk_env.sh
+      - cd ..
+      - cd tools
+      - emcc --version
