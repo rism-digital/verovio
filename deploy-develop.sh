@@ -24,6 +24,10 @@ git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DI
 
 OUTPUT_DIRECTORY="~/${GH_PAGES_DIRECTORY}"
 
+ls $OUTPUT_DIRECTORY
+
+exit 0
+
 cd ./tools
 cmake .
 make
