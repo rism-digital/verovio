@@ -20,9 +20,12 @@ GH_PAGES_DIRECTORY="gh-pages"
 
 # Clone the docs repo.
 echo "Cloning ${GH_PAGES_REPOSITORY}"
-git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
+#git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
 
-OUTPUT_DIRECTORY="~/${GH_PAGES_DIRECTORY}"
+pwd
+CURRENT_PATH=`pwd`
+echo $CURRENT_PATH
+OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
 ls $OUTPUT_DIRECTORY
 
