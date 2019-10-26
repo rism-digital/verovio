@@ -1796,7 +1796,7 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
 
 void HumdrumInput::removeInstrumentName(StaffDef *sd)
 {
-    Object *obj = sd->FindChildByType(ClassId::LABEL);
+    Object *obj = sd->FindDescendantByType(ClassId::LABEL);
     if (!obj) {
         return;
     }
@@ -1810,7 +1810,7 @@ void HumdrumInput::removeInstrumentName(StaffDef *sd)
 
 void HumdrumInput::removeInstrumentAbbreviation(StaffDef *sd)
 {
-    Object *obj = sd->FindChildByType(ClassId::LABELABBR);
+    Object *obj = sd->FindDescendantByType(ClassId::LABELABBR);
     if (!obj) {
         return;
     }
@@ -1824,11 +1824,11 @@ void HumdrumInput::removeInstrumentAbbreviation(StaffDef *sd)
 
 std::string HumdrumInput::getInstrumentName(StaffDef *sd)
 {
-    Object *label = sd->FindChildByType(ClassId::LABEL);
+    Object *label = sd->FindDescendantByType(ClassId::LABEL);
     if (!label) {
         return "";
     }
-    Object *obj = label->FindChildByType(ClassId::TEXT);
+    Object *obj = label->FindDescendantByType(ClassId::TEXT);
     if (!obj) {
         return "";
     }
@@ -1847,11 +1847,11 @@ std::string HumdrumInput::getInstrumentName(StaffDef *sd)
 
 std::string HumdrumInput::getInstrumentAbbreviation(StaffDef *sd)
 {
-    Object *label = sd->FindChildByType(ClassId::LABELABBR);
+    Object *label = sd->FindDescendantByType(ClassId::LABELABBR);
     if (!label) {
         return "";
     }
-    Object *obj = label->FindChildByType(ClassId::TEXT);
+    Object *obj = label->FindDescendantByType(ClassId::TEXT);
     if (!obj) {
         return "";
     }
@@ -2404,7 +2404,7 @@ bool HumdrumInput::prepareFooter(
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pgfoot = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT);
+    Object *pgfoot = tempdoc.m_scoreDef.FindDescendantByType(ClassId::PGFOOT);
     if (pgfoot == NULL) {
         return false;
     }
@@ -2424,7 +2424,7 @@ bool HumdrumInput::prepareFooter(
 
     m_doc->m_scoreDef.AddChild(pgfoot);
 
-    Object *pgfoot2 = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT2);
+    Object *pgfoot2 = tempdoc.m_scoreDef.FindDescendantByType(ClassId::PGFOOT2);
     if (pgfoot2 == NULL) {
         return true;
     }
@@ -2578,7 +2578,7 @@ bool HumdrumInput::prepareHeader(
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pghead = tempdoc.m_scoreDef.FindChildByType(ClassId::PGHEAD);
+    Object *pghead = tempdoc.m_scoreDef.FindDescendantByType(ClassId::PGHEAD);
     if (pghead == NULL) {
         return false;
     }
@@ -9378,7 +9378,7 @@ void HumdrumInput::insertMeterSigElement(
 
 template <class ELEMENT> MeterSig *HumdrumInput::getMeterSig(ELEMENT element)
 {
-    MeterSig *output = (MeterSig *)element->FindChildByType(ClassId::METERSIG);
+    MeterSig *output = (MeterSig *)element->FindDescendantByType(ClassId::METERSIG);
     if (!output) {
         output = new MeterSig;
         element->AddChild(output);
@@ -9395,7 +9395,7 @@ template <class ELEMENT> MeterSig *HumdrumInput::getMeterSig(ELEMENT element)
 
 template <class ELEMENT> KeySig *HumdrumInput::getKeySig(ELEMENT element)
 {
-    KeySig *output = (KeySig *)element->FindChildByType(ClassId::KEYSIG);
+    KeySig *output = (KeySig *)element->FindDescendantByType(ClassId::KEYSIG);
     if (!output) {
         output = new KeySig;
         element->AddChild(output);
@@ -9412,7 +9412,7 @@ template <class ELEMENT> KeySig *HumdrumInput::getKeySig(ELEMENT element)
 
 template <class ELEMENT> Clef *HumdrumInput::getClef(ELEMENT element)
 {
-    Clef *output = (Clef *)element->FindChildByType(ClassId::KEYSIG);
+    Clef *output = (Clef *)element->FindDescendantByType(ClassId::KEYSIG);
     if (!output) {
         output = new Clef;
         element->AddChild(output);
@@ -9429,7 +9429,7 @@ template <class ELEMENT> Clef *HumdrumInput::getClef(ELEMENT element)
 
 template <class ELEMENT> Mensur *HumdrumInput::getMensur(ELEMENT element)
 {
-    Mensur *output = (Mensur *)element->FindChildByType(ClassId::MENSUR);
+    Mensur *output = (Mensur *)element->FindDescendantByType(ClassId::MENSUR);
     if (!output) {
         output = new Mensur;
         element->AddChild(output);

@@ -124,10 +124,12 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
         params->m_targetSubSystem->AddChild(params->m_targetMeasure);
         // Add a staff with same attribute as in the previous segment
         params->m_targetStaff = new Staff(*params->m_targetStaff);
+        params->m_targetStaff->ClearChildren();
         params->m_targetStaff->CloneReset();
         params->m_targetMeasure->AddChild(params->m_targetStaff);
         // Add a layer also with the same attribute as in the previous segment
         params->m_targetLayer = new Layer(*params->m_targetLayer);
+        params->m_targetLayer->ClearChildren();
         params->m_targetLayer->CloneReset();
         params->m_targetStaff->AddChild(params->m_targetLayer);
     }
@@ -139,9 +141,10 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 
         // Look if we already have the staff (e.g., with more than one layer)
         AttNIntegerComparison comparisonStaffN(STAFF, params->m_targetStaff->GetN());
-        Staff *staff = dynamic_cast<Staff *>(params->m_targetMeasure->FindChildByComparison(&comparisonStaffN));
+        Staff *staff = dynamic_cast<Staff *>(params->m_targetMeasure->FindDescendantByComparison(&comparisonStaffN));
         if (!staff) {
             staff = new Staff(*params->m_targetStaff);
+            staff->ClearChildren();
             staff->CloneReset();
             params->m_targetMeasure->AddChild(staff);
         }
@@ -149,6 +152,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 
         // Add a new layer as the new target
         params->m_targetLayer = new Layer(*params->m_targetLayer);
+        params->m_targetLayer->ClearChildren();
         params->m_targetLayer->CloneReset();
         params->m_targetStaff->AddChild(params->m_targetLayer);
     }

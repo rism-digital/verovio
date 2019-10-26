@@ -1,3 +1,7 @@
+** Please use the [verovio](https://www.npmjs.com/package/verovio) package instead **
+
+***
+
 This is an NPM of the development version of the Verovio JavaScript toolkit.
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) music scores into SVG.

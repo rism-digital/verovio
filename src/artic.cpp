@@ -90,13 +90,13 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
 ArticPart *Artic::GetInsidePart()
 {
     ArticPartTypeComparison articPartComparison(ARTIC_PART_INSIDE);
-    return dynamic_cast<ArticPart *>(FindChildByComparison(&articPartComparison, 1));
+    return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
 }
 
 ArticPart *Artic::GetOutsidePart()
 {
     ArticPartTypeComparison articPartComparison(ARTIC_PART_OUTSIDE);
-    return dynamic_cast<ArticPart *>(FindChildByComparison(&articPartComparison, 1));
+    return dynamic_cast<ArticPart *>(FindDescendantByComparison(&articPartComparison, 1));
 }
 
 wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
@@ -259,12 +259,12 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     LayerElement *parent = NULL;
     Note *parentNote = NULL;
-    Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, 2));
+    Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, 2));
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STAFFREL place = STAFFREL_NONE;
 
     if (!parentChord) {
-        parentNote = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        parentNote = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE));
         parent = parentNote;
     }
     else {
@@ -276,9 +276,9 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();

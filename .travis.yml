@@ -1,37 +1,58 @@
 branches:
   only:
   - develop
-
+  
 sudo: false
-dist: trusty
+dist: bionic
 language: cpp
 
-matrix:
+git:
+  depth:
+    3
+
+jobs:
   include:
-    # GCC5 on Linux
-    - os: linux
+    # test build on osx and an linux with g++
+    - stage: build-c++
+      name: osx-xcode
+      os: osx
+      osx_image: xcode11.1
+      script:
+        - cd tools
+        - cmake .
+        - make
+    - name: linux-g++-5       
+      os: linux
+      dist: bionic
+      script:
+        - cd tools
+        - cmake .
+        - make
+    # deploy emscripten build and doxygen
+    - stage: deploy
+      name: emscripten
+      os: linux
+      dist: bionic
+      env:
+        global:
+          - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+      script:
+        - git clone https://github.com/emscripten-core/emsdk.git
+        - cd emsdk
+        - ./emsdk install latest
+        - ./emsdk activate latest
+        - source ./emsdk_env.sh
+        - cd ..
+        - ./deploy-develop.sh
+    - name: doxygen
+      os: linux
+      dist: bionic
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
-            - g++-5
+            - doxygen
       env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-
-    # Clang on OSX
-    - os: osx
-      osx_image: xcode9.2
-
-before_install:
-  - eval "${MATRIX_EVAL}"
-
-before_install:
-  - eval "${MATRIX_EVAL}"
-
-before_script:
-  - cd tools
-  - cmake .
-
-script: 
-  - make
+        global:
+          - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+      script:
+        - ./deploy-doxygen.sh

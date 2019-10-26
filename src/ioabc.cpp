@@ -225,7 +225,7 @@ void AbcInput::parseABC(std::istream &infile)
         Measure *measure = NULL;
         for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
             if (!measure || (layer && layer->GetUuid() != iter->first)) {
-                layer = dynamic_cast<Layer *>(section->FindChildByUuid(iter->first));
+                layer = dynamic_cast<Layer *>(section->FindDescendantByUuid(iter->first));
             }
             if (!layer) {
                 LogWarning("ABC input: Element '%s' could not be assigned to layer '%s'",
@@ -233,7 +233,7 @@ void AbcInput::parseABC(std::istream &infile)
                 delete iter->second;
                 continue;
             }
-            measure = dynamic_cast<Measure *>(layer->GetFirstParent(MEASURE));
+            measure = dynamic_cast<Measure *>(layer->GetFirstAncestor(MEASURE));
             assert(measure);
             measure->AddChild(iter->second);
         }
@@ -241,7 +241,7 @@ void AbcInput::parseABC(std::istream &infile)
         score->AddChild(section);
 
         // only append first tune in file
-        if (!score->GetFirstParent(MDIV)) delete score;
+        if (!score->GetFirstAncestor(MDIV)) delete score;
     }
 
     m_controlElements.clear();
@@ -299,7 +299,7 @@ int AbcInput::SetBarLine(const std::string &musicCode, int i)
 
 void AbcInput::CalcUnitNoteLength()
 {
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindChildByType(METERSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
@@ -325,7 +325,7 @@ void AbcInput::AddBeam()
         for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
             beam->AddChild(*iter);
         }
-        if (beam->FindChildByType(NOTE)) {
+        if (beam->FindDescendantByType(NOTE)) {
             m_layer->AddChild(beam);
         }
         else {

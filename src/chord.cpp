@@ -462,9 +462,9 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -530,7 +530,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
         }
     }
 
-    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
     params->m_chordDots = dots;
@@ -610,9 +610,9 @@ int Chord::CalcDots(FunctorParams *functorParams)
 
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
 
     if (!currentStem) {
         currentStem = new Stem();
@@ -652,7 +652,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
         if (!currentDots) {
