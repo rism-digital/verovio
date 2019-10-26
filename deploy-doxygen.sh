@@ -31,10 +31,10 @@ cd ./doc
 cd ..
 
 # 
-cd ${DOXYGEN_REPOSITORY}
+cd ${DOXYGEN_DIRECTORY}
 
 echo "Configuring git push"
-git config user.name "Documentation Builder"
+git config user.name "Documentation deployment"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
 git status

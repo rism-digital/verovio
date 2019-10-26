@@ -59,7 +59,7 @@ cd ..
 cd ${GH_PAGES_DIRECTORY}
 
 echo "Configuring git push"
-git config user.name "Documentation Builder"
+git config user.name "JavaScript toolkit builder"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
 git status
