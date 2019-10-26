@@ -280,7 +280,7 @@ void View::DrawStaffGrp(
 
     StaffDef *firstDef = NULL;
     ArrayOfObjects::const_iterator iter;
-    for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+    for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -291,7 +291,7 @@ void View::DrawStaffGrp(
 
     StaffDef *lastDef = NULL;
     ArrayOfObjects::const_reverse_iterator riter;
-    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
