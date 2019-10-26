@@ -22,7 +22,7 @@ echo "Cloning ${GH_PAGES_REPOSITORY}"
 git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
 
 
-CURRENT_PATH=`pwd`
+CURRENT_PATH=$(pwd)
 OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
 cd ./tools
