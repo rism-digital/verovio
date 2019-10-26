@@ -23,7 +23,7 @@ jobs:
       #- source ./emsdk_env.sh
       #- cd ..
       #- ./deploy-develop.sh
-    name: doxygen
+  - name: doxygen
     os: linux
     dist: bionic
     addons:
