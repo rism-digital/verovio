@@ -24,31 +24,31 @@ jobs:
         - cd tools
         - cmake .
         - make
-  # deploy emscripten build and doxygen
-  - stage: deploy
-    name: emscripten
-    os: linux
-    dist: bionic
-    env:
-      global:
-        - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
-    script:
-      - git clone https://github.com/emscripten-core/emsdk.git
-      - cd emsdk
-      - ./emsdk install latest
-      - ./emsdk activate latest
-      - source ./emsdk_env.sh
-      - cd ..
-      - ./deploy-develop.sh
-  - name: doxygen
-    os: linux
-    dist: bionic
-    addons:
-      apt:
-        packages:
-          - doxygen
-    env:
-      global:
-        - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
-    script:
-      - ./deploy-doxygen.sh
+    # deploy emscripten build and doxygen
+    - stage: deploy
+      name: emscripten
+      os: linux
+      dist: bionic
+      env:
+        global:
+          - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+      script:
+        - git clone https://github.com/emscripten-core/emsdk.git
+        - cd emsdk
+        - ./emsdk install latest
+        - ./emsdk activate latest
+        - source ./emsdk_env.sh
+        - cd ..
+        - ./deploy-develop.sh
+    - name: doxygen
+      os: linux
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - doxygen
+      env:
+        global:
+          - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+      script:
+        - ./deploy-doxygen.sh
