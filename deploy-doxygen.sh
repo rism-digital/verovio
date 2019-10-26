@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# This script builds the JavaScript toolkit and automatically commits
-# It uses an encrypted GH_TOKEN setting in Travis to check out the Guidelines, build them, commit
-# the changes, and then push.
+# This script builds the doxygen documentation and automatically commits
+# It uses an encrypted GH_TOKEN setting in Travis to check out the latest version, 
+# build the doc, commit the changes, and then push.
 
 set -e # Exit with nonzero exit code if anything fails
 
 if [ "${TRAVIS_BRANCH}" != "develop" ]; then
-    echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
+    echo "Will not build doxygen documentation for branch ${TRAVIS_BRANCH}"
     exit 0
 fi
 
@@ -16,7 +16,7 @@ SHA=`git rev-parse --verify HEAD`
 DOXYGEN_REPOSITORY="https://${GH_USERNAME}:${GH_TOKEN}@github.com/rism-ch/verovio-doxygen"
 DOXYGEN_DIRECTORY="doxygen"
 
-# Clone the docs repo.
+# Clone the doxygen repo.
 echo "Cloning ${DOXYGEN_REPOSITORY}"
 git clone ${DOXYGEN_REPOSITORY} ${DOXYGEN_DIRECTORY}
 
@@ -47,4 +47,4 @@ git pull
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-git push ${DOXYGEN_REPOSITORY} master
+# git push ${DOXYGEN_REPOSITORY} master
