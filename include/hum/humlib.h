@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 16 13:40:45 PDT 2019
+// Last Modified: Sat Oct 19 18:43:18 PDT 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2615,6 +2615,7 @@ class MuseRecordBasic {
 		bool              isBodyRecord       (void);
 		bool              isChordGraceNote   (void);
 		bool              isChordNote        (void);
+		bool              isDirection        (void);
 		bool              isAnyComment       (void);
 		bool              isLineComment      (void);
 		bool              isBlockComment     (void);
@@ -2940,18 +2941,40 @@ class MuseRecord : public MuseRecordBasic {
 		int              getAttributeInt              (char attribute);
 		int              getAttributeField            (std::string& output, const std::string& attribute);
 
+	//////////////////////////////
+	// functions which work with musical direction records ('$'):
+
+		// columns 17-18: type of direction
+		std::string      getDirectionTypeField        (void);
+		std::string      getDirectionTypeString       (void);
+		bool             isTextDirection              (void);
+		bool             isHairpin                    (void);
+		bool             isHairpinStart               (void);
+		bool             isHairpinStop                (void);
+		bool             isDashStart                  (void);
+		bool             isDashStop                   (void);
+		bool             isPedalStart                 (void);
+		bool             isPedalEnd                   (void);
+		bool             isRehearsal                  (void);
+		bool             isOctaveUpStart              (void);
+		bool             isOctaveDownStart            (void);
+		bool             isOctaveStop                 (void);
+
+		std::string      getDirectionText             (void);
+		std::string      getTextDirection             (void) { return getDirectionText(); }
 
 	//
 	//////////////////////////////
 
-		std::string      getKernRestStyle             (int quarter = 16);
+		std::string      getKernRestStyle             (void);
 
 	protected:
-		void             allowNotesOnly               (const std::string& functioName);
+		void             allowNotesOnly               (const std::string& functionName);
 		void             allowNotesAndRestsOnly       (const std::string& functionName);
 		void             allowMeasuresOnly            (const std::string& functioName);
 		void             allowFigurationOnly          (const std::string& functioName);
 		void             allowFigurationAndNotesOnly  (const std::string& functioName);
+		void             allowDirectionsOnly          (const std::string& functioName);
 		int              getAddElementIndex           (int& index, std::string& output,
 		                                               const std::string& input);
 		void             zerase                       (std::string& inout, int num);
@@ -3776,6 +3799,7 @@ class GridMeasure : public std::list<GridSlice*> {
 		bool         isRepeatBoth(void)
 		                  { return m_style == MeasureStyle::RepeatBoth; }
 		void         addLayoutParameter(GridSlice* slice, int partindex, const std::string& locomment);
+		void         addLayoutParameter(HumNum timestamp, int partindex, int staffindex, const std::string& locomment);
 		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
 		void         addFiguredBassLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
 		GridSlice*   addFiguredBass(HTp token, HumNum timestamp, int part, int maxstaff);
@@ -6399,6 +6423,8 @@ class Tool_musedata2hum : public HumTool {
 		void    addFiguredHarmony    (MuseRecord& mr, GridMeasure* gm,
 		                              HumNum timestamp, int part, int maxstaff);
 		std::string trimSpaces       (std::string input);
+		void    addTextDirection     (GridMeasure* gm, int part, int staff,
+		                              MuseRecord& mr, HumNum timestamp);
 
 	private:
 		// options:
@@ -6408,7 +6434,6 @@ class Tool_musedata2hum : public HumTool {
 		std::string m_omd = "";      // initial tempo designation (store for later output)
 
 		// state variables:
-		int m_tpq      = 1;          // Ticks per quarter note
 		int m_part     = 0;          // staff index currently being processed
 		int m_maxstaff = 0;          // total number of staves (parts)
 		HumNum m_timesigdur = 4;     // duration of current time signature in quarter notes
@@ -6812,6 +6837,7 @@ class Tool_pccount : public HumTool {
 		                                 HumdrumFile& infile);
 		std::string getFinal            (HumdrumFile& infile);
 		double  getPercent              (const string& pitchclass);
+		int     getCount                (const string& pitchclass);
 		void    setFactorMaximum        (void);
 		void    setFactorNormalize      (void);
 
@@ -6835,6 +6861,7 @@ class Tool_pccount : public HumTool {
 		double m_ratio      = 0.67;
 		bool m_key          = true;
 		double m_factor     = 1.0;
+		int m_maxpc         = 0;
 		std::string m_title = "";
 		std::string m_id    = "id";
 		std::map<std::string, std::string> m_vcolor;

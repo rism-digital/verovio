@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 16 13:40:45 PDT 2019
+// Last Modified: Sat Oct 19 18:43:18 PDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4556,6 +4556,173 @@ void GridMeasure::setTimeSigDur(HumNum duration) {
 	m_timesigdur = duration;
 }
 
+
+
+//////////////////////////////
+//
+// GridMeasure::addLayoutParameter -- Add a layout line at a particular timestamp
+//
+
+void GridMeasure::addLayoutParameter(HumNum timestamp, int partindex,
+		int staffindex, const string& locomment) {
+	auto iter = this->rbegin();
+	if (iter == this->rend()) {
+		// no items in measure yet, so add
+		cerr << "DEAL WITH THIS LAYOUT COMMAND" << endl;
+		return;
+	}
+	GridPart* part;
+	GridStaff* staff;
+	GridVoice* voice;
+
+	auto previous = iter;
+	previous++;
+	while (previous != this->rend()) {
+		if ((*previous)->isLayoutSlice()) {
+			part = (*previous)->at(partindex);
+			staff = part->at(0);
+			if (staff->size() == 0) {
+				GridVoice* v = new GridVoice;
+				staff->push_back(v);
+			}
+			voice = staff->at(0);
+			if (voice) {
+				if (voice->getToken() == NULL) {
+					// create a token with text
+					HTp newtoken = new HumdrumToken(locomment);
+					voice->setToken(newtoken);
+					return;
+				} else if (*voice->getToken() == "!") {
+					// replace token with text
+					HTp newtoken = new HumdrumToken(locomment);
+					voice->setToken(newtoken);
+					return;
+				}
+			} else {
+				previous++;
+				continue;
+			}
+		} else {
+			break;
+		}
+		previous++;
+	}
+
+	auto insertpoint = previous.base();
+	GridSlice* newslice = new GridSlice(this, (*iter)->getTimestamp(), SliceType::Layouts);
+	newslice->initializeBySlice(*iter);
+	this->insert(insertpoint, newslice);
+	HTp newtoken = new HumdrumToken(locomment);
+	if (newslice->at(partindex)->at(0)->size() == 0) {
+		GridVoice* v = new GridVoice;
+		newslice->at(partindex)->at(0)->push_back(v);
+	}
+	newslice->at(partindex)->at(0)->at(0)->setToken(newtoken);
+}
+
+/*
+GridSlice* GridMeasure::addLayoutParameter(const string& tok, HumNum timestamp,
+	int part, int staff, int voice, int maxstaff, int gracenumber) {
+	if (gracenumber < 1) {
+		cerr << "ERROR: gracenumber " << gracenumber << " has to be larger than 0" << endl;
+		return NULL;
+	}
+
+	GridSlice* gs = NULL;
+	// GridSlice* datatarget = NULL;
+	auto iterator = this->begin();
+	if (this->empty()) {
+		// add a new GridSlice to an empty list or at end of list if timestamp
+		// is after last entry in list.
+		gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+		gs->addToken(tok, part, staff, voice);
+		this->push_back(gs);
+	} else if (timestamp > this->back()->getTimestamp()) {
+
+		// Grace note needs to be added at the end of a measure:
+		auto it2 = this->end();
+		it2--;
+		int counter = 0;
+		while (it2 != this->end()) {
+			if ((*it2)->isGraceSlice()) {
+				counter++;
+				if (counter == gracenumber) {
+					// insert grace note into this slice
+					(*it2)->addToken(tok, part, staff, voice);
+					return *it2;
+				}
+			} else if ((*it2)->isLayoutSlice()) {
+				// skip over any layout paramter lines.
+				it2--;
+				continue;
+			} else if ((*it2)->isDataSlice()) {
+				// insert grace note after this note
+				gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				it2++;
+				this->insert(it2, gs);
+				return gs;
+			}
+			it2--;
+		}
+		return NULL;
+
+	} else {
+		// search for existing line with same timestamp on a data slice:
+
+		while (iterator != this->end()) {
+			if (timestamp < (*iterator)->getTimestamp()) {
+				cerr << "STRANGE CASE 2 IN GRIDMEASURE::ADDGRACETOKEN" << endl;
+				cerr << "\tGRACE TIMESTAMP: " << timestamp << endl;
+				cerr << "\tTEST  TIMESTAMP: " << (*iterator)->getTimestamp() << endl;
+				return NULL;
+			}
+			if ((*iterator)->isDataSlice()) {
+				if ((*iterator)->getTimestamp() == timestamp) {
+					// found dataslice just before graceslice(s)
+					// datatarget = *iterator;
+					break;
+				}
+			}
+			iterator++;
+		}
+
+		auto it2 = iterator;
+		it2--;
+		int counter = 0;
+		while (it2 != this->end()) {
+			if ((*it2)->isGraceSlice()) {
+				counter++;
+				if (counter == gracenumber) {
+					// insert grace note into this slice
+					(*it2)->addToken(tok, part, staff, voice);
+					return *it2;
+				}
+			} else if ((*it2)->isLayoutSlice()) {
+				// skip over any layout paramter lines.
+				it2--;
+				continue;
+			} else if ((*it2)->isDataSlice()) {
+				// insert grace note after this note
+				gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				it2++;
+				this->insert(it2, gs);
+				return gs;
+			}
+			it2--;
+		}
+
+		// grace note should be added at start of measure
+		gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+		gs->addToken(tok, part, staff, voice);
+		this->insert(this->begin(), gs);
+
+	}
+
+	return NULL;
+}
+*/
 
 
 //////////////////////////////
@@ -15781,6 +15948,9 @@ void HumdrumFileBase::getTrackSequence(vector<vector<HTp> >& sequence,
 	bool foundTrack;
 
 	for (i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isEmpty()) {
+			continue;
+		}
 		tempout.resize(0);
 		if (!noglobalQ && (infile[i].isGlobal())) {
 			tempout.push_back(infile[i].token(0));
@@ -27694,6 +27864,7 @@ void MuseData::analyzeTpq(void) {
 		MuseRecord* mr = &getRecord(i);
 		if (!mr->isAttributes()) {
 			mr->setTpq(ticks);
+
 			continue;
 		}
 		string line = getLine(i);
@@ -32235,6 +32406,11 @@ string MuseRecord::getVerseUtf8(int index) {
 string MuseRecord::getKernNoteStyle(int beams, int stems) {
 	string output;
 
+	if (!isAnyNote()) {
+		// not a note, so return nothing
+		return "";
+	}
+
 	// place the rhythm
 	stringstream tempdur;
 	int notetype = getGraphicNoteType();
@@ -32352,10 +32528,10 @@ string MuseRecord::getKernNoteStyle(int beams, int stems) {
 		int nexttie = getNextTiedNoteLineIndex();
 		int state = 0;
 		if (lasttie >= 0) {
-			state = 2;
+			state |= 2;
 		}
 		if (nexttie >= 0) {
-			state = 1;
+			state |= 1;
 		}
 		switch (state) {
 			case 1:
@@ -32464,13 +32640,25 @@ string MuseRecord::getKernNoteAccents(void) {
 // MuseRecord::getKernRestStyle --
 //
 
-string MuseRecord::getKernRestStyle(int quarter) {
+string MuseRecord::getKernRestStyle(void) {
+
 	string output;
 	string rhythmstring;
 
 	// place the rhythm
 	stringstream tempdur;
 
+	if (!isAnyRest()) {
+		// not a rest, so return nothing
+		return "";
+	}
+
+	// logical duration of the note
+	HumNum logicalduration = getTicks();
+	logicalduration /= getTpq();
+	string durrecip = Convert::durationToRecip(logicalduration);
+
+	/*
 	int notetype;
 	if (graphicNoteTypeQ()) {
 		notetype = getGraphicNoteType();
@@ -32491,6 +32679,9 @@ string MuseRecord::getKernRestStyle(int quarter) {
 		rhythmstring = Convert::durationToRecip(dnotetype);
 		output += rhythmstring;
 	}
+	*/
+
+	output = durrecip;
 
 	// add the pitch to the output string
 	output += "r";
@@ -33218,6 +33409,23 @@ void MuseRecord::allowMeasuresOnly(const string& functionName) {
 }
 
 
+//////////////////////////////
+//
+// MuseRecord::allDirectionsOnly --
+//
+
+void MuseRecord::allowDirectionsOnly(const std::string& functionName) {
+	switch (getType()) {
+		case E_muserec_musical_directions:
+			break;
+		default:
+			cerr << "Error: can only access " << functionName
+				  << " on a musical direction record.  Line is: " << getLine() << endl;
+			return;
+	}
+}
+
+
 
 //////////////////////////////
 //
@@ -33453,6 +33661,260 @@ void MuseRecord::zerase(string& inout, int num) {
 		}
 	}
 	inout.resize(inout.size() - num);
+}
+
+
+
+/////////////////////////////////////////
+//
+// MuseRecord::getDirectionTypeString -- columns 17 and 18.
+//    A = segno sign
+//    B = right-justified text
+//    C = center-justified text
+//    D = left-justified text
+//    E = dynamics hairpin start
+//    F = dynamics hairpin end
+//    G = letter dynamics (text given starting in column 25)
+//    H = begin dashes (after words)
+//    J = end dashes
+//    P = pedal start
+//    Q = pedal stop
+//    R = rehearsal number or letter
+//    U = octave up start
+//    V = octave down start
+//    W = octave stop
+//
+
+std::string MuseRecord::getDirectionTypeField(void) {
+	allowDirectionsOnly("getDirectionType");
+	return extract(17, 18);
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getDirectionTypeString -- Same as the field version, but
+//    trailing spaces are removed (not leading ones, at least for now).
+//
+
+std::string MuseRecord::getDirectionTypeString(void) {
+	string output = getDirectionTypeField();
+	if (output.back() == ' ') {
+		output.resize(output.size() - 1);
+	}
+	if (output.back() == ' ') {
+		output.resize(output.size() - 1);
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isTextDirection -- Text is stored starting at column 25.
+//    B = right justified
+//    C = center justified
+//    D = left justified
+//
+
+bool MuseRecord::isTextDirection(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('B') != string::npos) {
+		return true;
+	}
+	if (typefield.find('C') != string::npos) {
+		return true;
+	}
+	if (typefield.find('D') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isHairpin --
+//
+
+bool MuseRecord::isHairpin(void) {
+	string typefield = getDirectionTypeField();
+	if (isHairpinStart()) {
+		return true;
+	}
+	if (isHairpinStop()) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isHairpinStart --
+//
+
+bool MuseRecord::isHairpinStart(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('E') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isHairpinStop --
+//
+
+bool MuseRecord::isHairpinStop(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('F') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isDashStart --
+//
+
+bool MuseRecord::isDashStart(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('H') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isDashStop --
+//
+
+bool MuseRecord::isDashStop(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('J') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isPedalStart --
+//
+
+bool MuseRecord::isPedalStart(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('P') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isPedalEnd --
+//
+
+bool MuseRecord::isPedalEnd(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('Q') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isRehearsal --
+//
+
+bool MuseRecord::isRehearsal(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('R') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isOctiveUpStart --
+//
+
+bool MuseRecord::isOctaveUpStart(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('U') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isOctaveDownStart --
+//
+
+bool MuseRecord::isOctaveDownStart(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('V') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isOctaveStop --
+//
+
+bool MuseRecord::isOctaveStop(void) {
+	string typefield = getDirectionTypeField();
+	if (typefield.find('W') != string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getDirectionText -- Return the text starting in column 25.
+//
+
+std::string MuseRecord::getDirectionText(void) {
+	int length = (int)m_recordString.size();
+	if (length < 25) {
+		// no text
+		return "";
+	}
+	return trimSpaces(m_recordString.substr(24));
 }
 
 
@@ -34332,6 +34794,18 @@ bool MuseRecordBasic::isBlockComment(void) {
 
 bool MuseRecordBasic::isChordNote(void) {
 	return m_type == E_muserec_note_chord;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isDirection -- Is a musical direction (text)
+//     instruction.
+//
+
+bool MuseRecordBasic::isDirection(void) {
+	return m_type == E_muserec_musical_directions;
 }
 
 
@@ -62054,7 +62528,6 @@ bool Tool_musedata2hum::convertPart(HumGrid& outdata, MuseDataSet& mds, int inde
 	m_lastfigure = NULL;
 	m_lastnote = NULL;
 	m_lastbarnum = -1;
-	m_tpq = part.getInitialTpq();
 	m_part = index;
 	m_maxstaff = (int)mds.getPartCount();
 	
@@ -62212,7 +62685,6 @@ void Tool_musedata2hum::setMeasureStyle(GridMeasure* gm, MuseRecord& mr) {
 //
 
 void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
-	int tpq          = m_tpq;
 	int part         = m_part;
 	int staff        = 0;
 	int maxstaff     = m_maxstaff;
@@ -62223,6 +62695,7 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 	}
 	
 	HumNum timestamp = mr.getAbsBeat();
+cerr << "CONVERTING LINE " << timestamp << "\t" << mr << endl;
 	string tok;
 	GridSlice* slice = NULL;
 
@@ -62298,7 +62771,7 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 	} else if (mr.isChordGraceNote()) {
 		cerr << "PROCESS GRACE CHORD NOTE HERE: " << mr << endl;
 	} else if (mr.isAnyRest()) {
-		tok  = mr.getKernRestStyle(tpq);
+		tok  = mr.getKernRestStyle();
 		slice = gm->addDataToken(tok, timestamp, part, staff, layer, maxstaff);
 		if (slice) {
 			mr.setVoice(slice->at(part)->at(staff)->at(layer));
@@ -62307,9 +62780,46 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 				cerr << "GRAPHIC VERSION OF NOTEB " << gr << endl;
 			}
 		}
+	} else if (mr.isDirection()) {
+
+		cerr << "PROCESS DIRECTION HERE: " << mr << endl;
+		if (mr.isTextDirection()) {
+			addTextDirection(gm, part, staff, mr, timestamp);
+		}
 	}
 }
 
+
+
+//////////////////////////////
+//
+// Tool_musedata2hum::addTextDirection --
+//
+
+void Tool_musedata2hum::addTextDirection(GridMeasure* gm, int part, int staff,
+		MuseRecord& mr, HumNum timestamp) {
+
+	if (!mr.isTextDirection()) {
+		return;
+	}
+	string text = mr.getTextDirection();
+	if (text == "") {
+		// no text direction to process
+		return;
+	}
+	HumRegex hre;
+	hre.replaceDestructive(text, "&colon;", ":", "g");
+	string output = "!LO:TX";
+	output += ":b";   // text below (figure out above cases)
+	output += ":t=";
+	output += text;
+	cerr << "LAYOUT FOR TEXT IS " << output << endl;
+
+	// add staff index later
+	gm->addLayoutParameter(NULL, part, output);
+
+
+}
 
 
 //////////////////////////////
@@ -69071,6 +69581,7 @@ void Tool_pccount::initialize(HumdrumFile& infile) {
 	m_vcolor["[Canto 1]"]		=	"#e49689";
 	m_vcolor["[Canto]"]		=	"#e49689";
 	m_vcolor["[Soprano o Tenore]"]	=	"#e49689";
+	m_vcolor["Soprano"]		=	"#e49689";
 
 	m_vcolor["Canto 2."]		=	"#d67365";
 	m_vcolor["Canto II"]		=	"#d67365";
@@ -69105,6 +69616,7 @@ void Tool_pccount::initialize(HumdrumFile& infile) {
 	m_vcolor["Nona parte [Nono]"]	=	"#a39ce5";
 
 	m_vcolor["Basso"]		=	"#d2aef7";
+	m_vcolor["Bass"]		=	"#d2aef7";
 
 	m_vcolor["Basso II"]		=	"#c69af5";
 	m_vcolor["Basso II [Decimo]"]	=	"#c69af5";
@@ -69149,9 +69661,20 @@ string Tool_pccount::getFinal(HumdrumFile& infile) {
 void Tool_pccount::processFile(HumdrumFile& infile) {
 	countPitches(infile);
 
-	string datavar = "data_" + m_id;
-	string target = "id_" + m_id;
-	string jsonvar = "vega_" + m_id;
+	string datavar;
+	string target;
+	string jsonvar;
+
+	if (m_attack) {
+		datavar = "data_" + m_id + "_count";
+		target = "id_" + m_id + "_count";
+		jsonvar = "vega_" + m_id + "_count";
+	} else {
+		datavar = "data_" + m_id + "_dur";
+		target = "id_" + m_id + "_dur";
+		jsonvar = "vega_" + m_id + "_dur";
+	}
+
 	if (m_template) {
 		printVegaLiteJsonTemplate(datavar, infile);
 	} else if (m_data) {
@@ -69213,7 +69736,7 @@ void Tool_pccount::printVegaLiteHtml(const string& jsonvar,
 		const string& target, const string& datavar, HumdrumFile& infile) {
 	stringstream& out = m_free_text;
 
-	out << "<div id=\"" << target << "\"></div>\n";
+	out << "<div class=\"vega-svg\" id=\"" << target << "\"></div>\n";
 	out << "\n";
 	out << "<script>\n";
 	printVegaLiteScript(jsonvar, target, datavar, infile);
@@ -69251,10 +69774,10 @@ void Tool_pccount::printVegaLiteScript(const string& jsonvar,
 void Tool_pccount::printVegaLiteJsonData(void) {
 	stringstream& out = m_free_text;
 
-	double maxpc = 0.0;
+	m_maxpc = 0;
 	for (int i=0; i<(int)m_counts[0].size(); i++) {
-		if (m_counts[0][i] > maxpc) {
-			maxpc = m_counts[0][i];
+		if (m_counts[0][i] > m_maxpc) {
+			m_maxpc = m_counts[0][i];
 		}
 	}
 	out << "[\n";
@@ -69271,7 +69794,11 @@ void Tool_pccount::printVegaLiteJsonData(void) {
 				out << "\t";
 			}
 			commacounter++;
-			out << "{\"percent\":" << m_counts[i][j]/maxpc*percent << ", ";
+			if (m_attack) {
+				out << "{\"count\":" << m_counts[i][j] << ", ";
+			} else {
+				out << "{\"percent\":" << m_counts[i][j]/m_maxpc*percent << ", ";
+			}
 			out << "\"pitch class\":\"" << getPitchClassString(j) << "\", ";
 			out << "\"voice\":\"" << m_names[i] << "\"";
 			out << "}";
@@ -69340,20 +69867,27 @@ void Tool_pccount::printHumdrumTable(void) {
 	// part names
 	m_free_text << "*";
 	for (int i=0; i<(int)m_counts.size(); i++) {
-		if (!m_names[i].empty()) {
-			m_free_text << "\t*I\"" << m_names[i];
+		if (i < (int)m_names.size()) {
+			m_free_text << "\t*I\"" << m_names.at(i);
+		} else {
+			m_free_text << "\t*";
 		}
 	}
 	m_free_text << endl;
 
-	// part abbreviation
-	m_free_text << "*";
-	for (int i=0; i<(int)m_counts.size(); i++) {
-		if (!m_names[i].empty()) {
-			m_free_text << "\t*I\'" << m_abbreviations[i];
+	if (!m_abbreviations.empty()) {
+
+		// part abbreviation
+		m_free_text << "*";
+		for (int i=0; i<(int)m_counts.size(); i++) {
+			if (i < (int)m_abbreviations.size()) {
+				m_free_text << "\t*I\'" << m_abbreviations.at(i);
+			} else {
+				m_free_text << "\t*";
+			}
 		}
+		m_free_text << endl;
 	}
-	m_free_text << endl;
 
 	for (int i=0; i<(int)m_counts[0].size(); i++) {
 		if (m_counts[0][i] == 0) {
@@ -69489,23 +70023,39 @@ void Tool_pccount::initializePartInfo(HumdrumFile& infile) {
 
 	vector<HTp> starts = infile.getKernSpineStartList();
 
+	int foundpart = false;
+	int foundabbr = false;
+
 	int track = 0;
 	for (int i=0; i<(int)starts.size(); i++) {
 		track = starts[i]->getTrack();
 		m_rkern[track] = i+1;
 		m_parttracks.push_back(track);
 		HTp current = starts[i];
+		foundpart = false;
+		foundabbr = false;
+		if (!current->isKern()) {
+			continue;
+		}
 		while (current) {
 			if (current->isData()) {
 				break;
 			}
-			if (current->compare(0, 3, "*I\"") == 0) {
+			if ((!foundpart) && (current->compare(0, 3, "*I\"") == 0)) {
 				m_names.emplace_back(current->substr(3));
-			} else if (current->compare(0, 3, "*I\'") == 0) {
+				foundpart = true;
+			} else if ((!foundabbr) && (current->compare(0, 3, "*I\'") == 0)) {
 				m_abbreviations.emplace_back(current->substr(3));
+				foundabbr = true;
 			}
 			current = current->getNextToken();
 		}
+		//if (!foundpart) {
+		//		m_names.emplace_back("");
+		//}
+		//if (!foundabbr) {
+		//		m_names.emplace_back("");
+		//}
 	}
 
 }
@@ -69519,6 +70069,12 @@ void Tool_pccount::initializePartInfo(HumdrumFile& infile) {
 void Tool_pccount::printVegaLiteJsonTemplate(const string& datavariable, HumdrumFile& infile) {
 	stringstream& out = m_free_text;
 
+	string idinfo;
+	if (m_id.empty() || m_id == "id") {
+		// do nothing
+	} else {
+		idinfo = "for " + m_id;
+	}
 	out << "{\n";
 	out << "	\"$schema\": \"https://vega.github.io/schema/vega-lite/v4.0.0-beta.1.json\",\n";
 	out << "	\"data\": {\"values\": " << datavariable << "},\n";
@@ -69526,19 +70082,28 @@ void Tool_pccount::printVegaLiteJsonTemplate(const string& datavariable, Humdrum
 		out << "	\"title\": \"" << m_title << "\",\n";
 	} else {
 		if (m_attack) {
-			out << "	\"title\": \"Attack-weighted pitch-class distribution for " << m_id <<" \",\n";
+			out << "	\"title\": \"Note-count pitch-class distribution " << idinfo <<" \",\n";
 		} else {
-			out << "	\"title\": \"Duration-weighted pitch-class distribution for " << m_id <<" \",\n";
+			out << "	\"title\": \"Duration-weighted pitch-class distribution " << idinfo <<" \",\n";
 		}
 	}
 	out << "	\"width\": " << m_width << ",\n";
 	out << "	\"height\": " << int(m_width * m_ratio) << ",\n";
 	out << "	\"encoding\": {\n";
 	out << "		\"y\": {\n";
-	out << "			\"field\": \"percent\",\n";
-	out << "			\"title\": \"Percent of maximum pitch class\",\n";
+	if (m_attack) {
+		out << "			\"field\": \"count\",\n";
+		out << "			\"title\": \"Number of note attacks\",\n";
+	} else {
+		out << "			\"field\": \"percent\",\n";
+		out << "			\"title\": \"Percent of maximum pitch class\",\n";
+	}
 	out << "			\"type\": \"quantitative\",\n";
-	out << "			\"scale\": {\"domain\": [0, 100]},\n";
+	if (m_attack) {
+		out << "			\"scale\": {\"domain\": [0, " << m_maxpc << "]},\n";
+	} else {
+		out << "			\"scale\": {\"domain\": [0, 100]},\n";
+	}
 	out << "			\"aggregate\": \"sum\"\n";
 	out << "		},\n";
 	out << "		\"x\": {\n";
@@ -69577,12 +70142,17 @@ void Tool_pccount::printVegaLiteJsonTemplate(const string& datavariable, Humdrum
 	out << "		{\"mark\": \"bar\"}";
 
 	string final = getFinal(infile);
-	double percent = getPercent(final);
 	if (m_key && !final.empty()) {
 		out << ",\n";
 		out << "		{\n";
 		out << "			\"mark\": {\"type\":\"text\", \"align\":\"center\", \"fill\":\"black\", \"baseline\":\"bottom\"},\n";
-		out << "			\"data\": {\"values\": [ {\"pitch class\":\"" << final << "\", \"percent\":" << percent << "}]},\n";
+		if (m_attack) {
+			int count = getCount(final);
+			out << "			\"data\": {\"values\": [ {\"pitch class\":\"" << final << "\", \"count\":" << count << "}]},\n";
+		} else {
+			double percent = getPercent(final);
+			out << "			\"data\": {\"values\": [ {\"pitch class\":\"" << final << "\", \"percent\":" << percent << "}]},\n";
+		}
 		out << "			\"encoding\": {\"text\": {\"value\":\"final\"}}\n";
 		out << "		}\n";
 	}
@@ -69590,6 +70160,20 @@ void Tool_pccount::printVegaLiteJsonTemplate(const string& datavariable, Humdrum
 	out << "	]\n";
 	out << "}\n";
 
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pccount::getCount --
+//
+
+int Tool_pccount::getCount(const string& pitchclass) {
+	int b40 = Convert::kernToBase40(pitchclass);
+	int index = b40 % 40;
+	int output = (int)m_counts[0][index];
+	return output;
 }
 
 
