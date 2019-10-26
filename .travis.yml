@@ -12,7 +12,10 @@ jobs:
     name: emscripten
     os: linux
     dist: bionic
-    env: "CC=gcc-5 && CXX=g++-5"
+    #env: "CC=gcc-5 && CXX=g++-5"
+    env:
+      global:
+        - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
     script:
       - git clone https://github.com/emscripten-core/emsdk.git
       - cd emsdk

@@ -29,18 +29,18 @@ OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 ls $OUTPUT_DIRECTORY
 
 cd ./tools
-#cmake .
-#make
-#./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
+cmake .
+make
+./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
 cd ..
 
 cd ./emscripten
 
-./buildToolkit -c -H
-cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
+#./buildToolkit -c -H
+#cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
 
-#./buildToolkit -c -H -l
-#cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
+./buildToolkit -c -H -l
+cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 #./buildToolkit -c -H -w
 #cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
@@ -68,4 +68,4 @@ git pull
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-# git push ${DOCS_REPOSITORY} ${DOCS_BRANCH}
+git push ${DOCS_REPOSITORY} ${DOCS_BRANCH}
