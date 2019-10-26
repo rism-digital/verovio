@@ -24,7 +24,7 @@ git clone ${DOXYGEN_REPOSITORY} ${DOXYGEN_DIRECTORY}
 CURRENT_PATH=`pwd`
 OUTPUT_DIRECTORY="${CURRENT_PATH}/${DOXYGEN_REPOSITORY}"
 
-cd ../doc
+cd ./doc
 (cat verovio.conf ; echo "OUTPUT_DIRECTORY = ${OUTPUT_DIRECTORY}") | doxygen -
 
 # Return to the root
