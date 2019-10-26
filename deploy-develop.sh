@@ -14,7 +14,7 @@ fi
 # Get the music-encoding revision
 SHA=`git rev-parse --verify HEAD`
 
-GH_PAGES_REPOSITORY="https://${GH_USERNAME}:${GH_TOKEN}@github.com/rism-ch/verovio"
+GH_PAGES_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio"
 GH_PAGES_DIRECTORY="gh-pages"
 
 # Clone the docs repo.
@@ -25,31 +25,29 @@ git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DI
 CURRENT_PATH=`pwd`
 OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
-ls $OUTPUT_DIRECTORY
-
 cd ./tools
 cmake .
 make
-# update the documentation of the option list
+echo "Update the documentation of the option list"
 ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
 cd ..
 
 cd ./emscripten
 
-# without humdrum
-./buildToolkit -H
+echo "Building toolkit without humdrum"
+./buildToolkit -c -H
 cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
 
-# without humdrum and light
-./buildToolkit -H -l
+echo "Building toolkit without humdrum as light version"
+./buildToolkit -c -H -l
 cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
 
-# without humdrum and wasm
-./buildToolkit -H -w
+echo "Building toolkit without humdrum as wasm"
+./buildToolkit -c -H -w
 cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
 
-# default (with humdrum)
-./buildToolkit
+echo "Building default toolkit (with humdrum)"
+./buildToolkit -c
 cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 # Return to the root

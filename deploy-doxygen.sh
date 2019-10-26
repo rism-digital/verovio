@@ -13,7 +13,7 @@ fi
 
 SHA=`git rev-parse --verify HEAD`
 
-DOXYGEN_REPOSITORY="https://${GH_USERNAME}:${GH_TOKEN}@github.com/rism-ch/verovio-doxygen"
+DOXYGEN_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio-doxygen"
 DOXYGEN_DIRECTORY="doxygen"
 
 # Clone the doxygen repo.

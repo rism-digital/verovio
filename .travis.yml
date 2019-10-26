@@ -6,6 +6,10 @@ sudo: false
 dist: bionic
 language: cpp
 
+git:
+  depth:
+    3
+
 jobs:
   include:
     # test build on osx and an linux with g++
