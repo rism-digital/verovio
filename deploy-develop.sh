@@ -68,4 +68,4 @@ git pull
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-git push ${DOCS_REPOSITORY} ${DOCS_BRANCH}
+git push ${GH_PAGES_REPOSITORY} develop
