@@ -176,7 +176,6 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
     FileFormat musicxmlDefault = MUSICXML;
 #endif
 
-    size_t searchLimit = 600;
     if (data.size() == 0) {
         return UNKNOWN;
     }
@@ -198,6 +197,7 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
         return UNKNOWN;
     }
     if (data[0] == '<') {
+        size_t searchLimit = 600;
         // <mei> == root node for standard organization of MEI data
         // <pages> == root node for pages organization of MEI data
         // <score-partwise> == root node for part-wise organization of MusicXML data
