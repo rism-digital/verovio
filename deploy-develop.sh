@@ -6,7 +6,7 @@
 
 set -e # Exit with nonzero exit code if anything fails
 
-if [ "${TRAVIS_BRANCH}" != "develop" ]; then
+if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
     echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
     exit 0
 fi
@@ -36,19 +36,19 @@ cd ./emscripten
 
 echo "Building toolkit without humdrum"
 ./buildToolkit -c -H
-cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
+cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/travis-test/
 
-echo "Building toolkit without humdrum as light version"
-./buildToolkit -c -H -l
-cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
+#echo "Building toolkit without humdrum as light version"
+#./buildToolkit -c -H -l
+#cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/travis-test/
 
-echo "Building toolkit without humdrum as wasm"
-./buildToolkit -c -H -w
-cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
+#echo "Building toolkit without humdrum as wasm"
+#./buildToolkit -c -H -w
+#cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/travis-test/
 
-echo "Building default toolkit (with humdrum)"
-./buildToolkit -c
-cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
+#echo "Building default toolkit (with humdrum)"
+#./buildToolkit -c
+#cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/travis-test/
 
 # Return to the root
 cd ..
@@ -70,4 +70,4 @@ git pull
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-# git push ${GH_PAGES_REPOSITORY} develop
+# git push ${GH_PAGES_REPOSITORY} travis-test

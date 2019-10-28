@@ -10,6 +10,10 @@ git:
   depth:
     4
 
+env:
+  global:
+    - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+
 jobs:
   include:
     # test build on osx and an linux with g++
@@ -33,9 +37,6 @@ jobs:
       name: emscripten
       os: linux
       dist: bionic
-      env:
-        global:
-          - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
       script:
         - git clone https://github.com/emscripten-core/emsdk.git
         - cd emsdk
@@ -51,8 +52,5 @@ jobs:
         apt:
           packages:
             - doxygen
-      env:
-        global:
-          - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
       script:
         - ./deploy-doxygen.sh
