@@ -34,21 +34,21 @@ cd ..
 
 cd ./emscripten
 
-echo "Building toolkit without humdrum"
-./buildToolkit -c -H
-cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
+#echo "Building toolkit without humdrum"
+#./buildToolkit -c -H
+#cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
 
-#echo "Building toolkit without humdrum as light version"
-#./buildToolkit -c -H -l
-#cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/travis-test/
+echo "Building toolkit without humdrum as light version"
+./buildToolkit -c -H -l
+cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 #echo "Building toolkit without humdrum as wasm"
 #./buildToolkit -c -H -w
-#cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/travis-test/
+#cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
 
 #echo "Building default toolkit (with humdrum)"
 #./buildToolkit -c
-#cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/travis-test/
+#cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 # Return to the root
 cd ..
