@@ -8,7 +8,7 @@ language: cpp
 
 git:
   depth:
-    4
+    3
 
 env:
   global:
@@ -32,8 +32,7 @@ jobs:
         - cd tools
         - cmake .
         - make
-    # deploy emscripten build and doxygen
-    - stage: deploy
+    - stage: build-js
       name: emscripten
       os: linux
       dist: bionic
@@ -44,6 +43,12 @@ jobs:
         - ./emsdk activate latest
         - source ./emsdk_env.sh
         - cd ..
+    # deploy emscripten build and doxygen
+    - stage: deploy
+      name: emscripten
+      os: linux
+      dist: bionic
+      script:
         - ./deploy-develop.sh
     - name: doxygen
       os: linux

@@ -11,13 +11,13 @@ if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
     exit 0
 fi
 
-# Get the music-encoding revision
+# Get the rism-ch revision
 SHA=`git rev-parse --verify HEAD`
 
 GH_PAGES_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio"
 GH_PAGES_DIRECTORY="gh-pages"
 
-# Clone the docs repo.
+# Clone the gh-pages repo.
 echo "Cloning ${GH_PAGES_REPOSITORY}"
 git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
 
