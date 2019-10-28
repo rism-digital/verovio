@@ -1,6 +1,6 @@
 branches:
   only:
-  - develop
+  - travis-test
   
 sudo: false
 dist: bionic
