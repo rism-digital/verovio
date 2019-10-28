@@ -36,7 +36,7 @@ cd ./emscripten
 
 echo "Building toolkit without humdrum"
 ./buildToolkit -c -H
-cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/travis-test/
+cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 #echo "Building toolkit without humdrum as light version"
 #./buildToolkit -c -H -l
