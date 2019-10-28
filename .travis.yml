@@ -36,21 +36,20 @@ jobs:
       name: emscripten
       os: linux
       dist: bionic
-      script:
+      before_install:
         - git clone https://github.com/emscripten-core/emsdk.git
+      install:
         - cd emsdk
         - ./emsdk install latest
         - ./emsdk activate latest
         - source ./emsdk_env.sh
         - cd ..
-    # deploy emscripten build and doxygen
-    - stage: deploy
-      name: emscripten
-      os: linux
-      dist: bionic
       script:
         - ./deploy-develop.sh
-    - name: doxygen
+
+    # deploy emscripten build and doxygen
+    - stage: deploy
+      name: doxygen
       os: linux
       dist: bionic
       addons:
