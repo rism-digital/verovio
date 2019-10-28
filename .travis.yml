@@ -13,6 +13,9 @@ git:
 env:
   global:
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+    # EM_USE_GLOBAL_CACHE=1 tells emscripten to use precompiled libraries from
+    # the emscripten-libs-asmjs package. This speeds up the build significantly.
+    - EM_USE_GLOBAL_CACHE=1
 
 jobs:
   include:
