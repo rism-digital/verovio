@@ -38,8 +38,6 @@ jobs:
 
     - stage: build-js
       name: toolkit-without-humdrum
-      os: linux
-      dist: bionic
       before_install:
         - git clone https://github.com/emscripten-core/emsdk.git
       install:
@@ -50,11 +48,8 @@ jobs:
         - cd ..
       script:
         - ./deploy-toolkit-without-humdrum.sh
-
     - stage: build-js
         name: toolkit-without-humdrum-light
-        os: linux
-        dist: bionic
         before_install:
           - git clone https://github.com/emscripten-core/emsdk.git
         install:
@@ -69,8 +64,6 @@ jobs:
     # deploy emscripten build and doxygen
     - stage: deploy
       name: doxygen
-      os: linux
-      dist: bionic
       addons:
         apt:
           packages:
