@@ -37,7 +37,6 @@ jobs:
         - make
 
     - stage: build-js
-      name: toolkit-without-humdrum
       before_install:
         - git clone https://github.com/emscripten-core/emsdk.git
       install:
@@ -49,17 +48,16 @@ jobs:
       script:
         - ./deploy-toolkit-without-humdrum.sh
     - stage: build-js
-        name: toolkit-without-humdrum-light
-        before_install:
-          - git clone https://github.com/emscripten-core/emsdk.git
-        install:
-          - cd emsdk
-          - ./emsdk install latest
-          - ./emsdk activate latest
-          - source ./emsdk_env.sh
-          - cd ..
-        script:
-          - ./deploy-toolkit-without-humdrum-light.sh
+      before_install:
+        - git clone https://github.com/emscripten-core/emsdk.git
+      install:
+        - cd emsdk
+        - ./emsdk install latest
+        - ./emsdk activate latest
+        - source ./emsdk_env.sh
+        - cd ..
+      script:
+        - ./deploy-toolkit-without-humdrum-light.sh
 
     # deploy emscripten build and doxygen
     - stage: deploy
