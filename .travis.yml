@@ -33,6 +33,12 @@ jobs:
         - cmake .
         - make
     - stage: build-js
+      name: emscripten
+      env:
+        - TOOLKIT=woh
+        - TOOLKIT=wohl
+        - TOOLKIT=wohw
+        - TOOLKIT=default
       before_install:
         - git clone https://github.com/emscripten-core/emsdk.git
       install:
@@ -42,10 +48,7 @@ jobs:
         - source ./emsdk_env.sh
         - cd ..
       script:
-        - ./deploy-toolkit-without-humdrum.sh
-        - ./deploy-toolkit-without-humdrum-light.sh
-        - ./deploy-toolkit-without-humdrum-wasmk.sh
-        - ./deploy-toolkit-with-humdrum.sh
+        - ./deploy-develop.sh $TOOLKIT
 
     # deploy emscripten build and doxygen
     - stage: deploy

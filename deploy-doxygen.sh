@@ -6,7 +6,7 @@
 
 set -e # Exit with nonzero exit code if anything fails
 
-if [ "${TRAVIS_BRANCH}" != "develop" ]; then
+if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
     echo "Will not build doxygen documentation for branch ${TRAVIS_BRANCH}"
     exit 0
 fi
