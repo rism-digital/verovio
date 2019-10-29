@@ -32,7 +32,6 @@ jobs:
         - cd tools
         - cmake .
         - make
-
     - stage: build-js
       before_install:
         - git clone https://github.com/emscripten-core/emsdk.git
@@ -44,17 +43,9 @@ jobs:
         - cd ..
       script:
         - ./deploy-toolkit-without-humdrum.sh
-    - stage: build-js
-      before_install:
-        - git clone https://github.com/emscripten-core/emsdk.git
-      install:
-        - cd emsdk
-        - ./emsdk install latest
-        - ./emsdk activate latest
-        - source ./emsdk_env.sh
-        - cd ..
-      script:
         - ./deploy-toolkit-without-humdrum-light.sh
+        - ./deploy-toolkit-without-humdrum-wasmk.sh
+        - ./deploy-toolkit-with-humdrum.sh
 
     # deploy emscripten build and doxygen
     - stage: deploy
