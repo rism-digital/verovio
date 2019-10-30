@@ -12,6 +12,7 @@ git:
 
 env:
   global:
+    - BUILD_BRANCH: travis-test   # TODO: switch back to "develop"
     # switch author email to: $(git log -1 --pretty=format:"%aE")
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
     # repos
@@ -71,10 +72,14 @@ jobs:
         - echo "Cloning emscripten"
         - rm -rf $EMSCRIPTEN_DIRECTORY
         - git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
+        - echo "am here $(pwd)"
+        - ls- alh
       install:
         - cd $EMSCRIPTEN_DIRECTORY
         - ./emsdk install latest
         - cd ..
+        - echo "am here $(pwd)"
+        - ls -alh
       script:
         - ./ci_precache.sh
 
