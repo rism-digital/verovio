@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.34",
+    "fontVersion": "5.2.35",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -600,6 +600,46 @@
             "bBoxSW": [
                 0.0,
                 -3.04
+            ]
+        },
+        "uniE24C": {
+            "bBoxNE": [
+                1.1072,
+                3.8
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
+            ]
+        },
+        "uniE24D": {
+            "bBoxNE": [
+                1.1072,
+                3.116
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.8
+            ]
+        },
+        "uniE24E": {
+            "bBoxNE": [
+                1.1203,
+                4.56
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
+            ]
+        },
+        "uniE24F": {
+            "bBoxNE": [
+                1.1203,
+                3.116
+            ],
+            "bBoxSW": [
+                0.0,
+                -4.56
             ]
         },
         "uniE260": {
@@ -2924,6 +2964,18 @@
         },
         "uniE24B": {
             "codepoint": "0XE24B"
+        },
+        "uniE24C": {
+            "codepoint": "0XE24C"
+        },
+        "uniE24D": {
+            "codepoint": "0XE24D"
+        },
+        "uniE24E": {
+            "codepoint": "0XE24E"
+        },
+        "uniE24F": {
+            "codepoint": "0XE24F"
         },
         "uniE260": {
             "codepoint": "0XE260"

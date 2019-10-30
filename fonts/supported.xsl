@@ -589,10 +589,10 @@
             <glyph glyph-code="E249" smufl-name="flag128thDown"/>
             <glyph glyph-code="E24A" smufl-name="flag256thUp"/>
             <glyph glyph-code="E24B" smufl-name="flag256thDown"/>
-            <!--<glyph glyph-code="E24C" smufl-name="flag512thUp"/>-->
-            <!--<glyph glyph-code="E24D" smufl-name="flag512thDown"/>-->
-            <!--<glyph glyph-code="E24E" smufl-name="flag1024thUp"/>-->
-            <!--<glyph glyph-code="E24F" smufl-name="flag1024thDown"/>-->
+            <glyph glyph-code="E24C" smufl-name="flag512thUp"/>
+            <glyph glyph-code="E24D" smufl-name="flag512thDown"/>
+            <glyph glyph-code="E24E" smufl-name="flag1024thUp"/>
+            <glyph glyph-code="E24F" smufl-name="flag1024thDown"/>
             <!--<glyph glyph-code="E250" smufl-name="flagInternalUp"/>-->
             <!--<glyph glyph-code="E251" smufl-name="flagInternalDown"/>-->
             <range_end>U+E25F</range_end>
