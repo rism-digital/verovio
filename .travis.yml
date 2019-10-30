@@ -92,22 +92,22 @@ jobs:
       name: "no humdrum"
       os: linux
       script:
-        - ./ci_build_toolkit.sh nohumdrum
+        - ./ci_build-toolkit.sh nohumdrum
     - stage: build-toolkit
       name: "no humdrum light"
       os: linux
       script:
-        - ./ci_build_toolkit.sh light
+        - ./ci_build-toolkit.sh light
     - stage: build-toolkit
       name: "no humdrum wasm"
       os: linux
       script:
-        - ./ci_build_toolkit.sh wasm
+        - ./ci_build-toolkit.sh wasm
     - stage: build-toolkit
       name: "default (with humdrum)"
       os: linux
       script:
-        - ./ci_build_toolkit.sh default
+        - ./ci_build-toolkit.sh default
 
     ##############
     # DEPLOY stage
