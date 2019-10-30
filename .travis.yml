@@ -25,10 +25,10 @@ env:
     - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
 # cache emscripten installation, tools build and output directory to be used throughout different stages
-#cache:
-#  directories:
+cache:
+  directories:
     #- $EMSCRIPTEN_DIRECTORY
-#    - $GH_PAGES_DIRECTORY
+    - $GH_PAGES_DIRECTORY
     #- tools
 
 # define order of stages
