@@ -17,8 +17,8 @@ git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
 cd $EMSCRIPTEN_DIRECTORY
 ./emsdk install latest
 # activate and source emscripten tools
-./emsdk/emsdk activate latest
-source ./emsdk/emsdk_env.sh
+./emsdk activate latest
+source ./emsdk_env.sh
 cd ..
 
 # copy gh-pages of verovio repository
