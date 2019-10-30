@@ -108,7 +108,7 @@ jobs:
       name: "default (with humdrum)"
       os: linux
       script:
-        - travis_wait ./ci_build-toolkit.sh default
+        - travis_wait 30 ./ci_build-toolkit.sh default
 
     ##############
     # DEPLOY stage

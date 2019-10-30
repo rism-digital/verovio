@@ -30,7 +30,7 @@ git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
 git status
 
-git add -A
+# git add -A
 git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
 
 git diff --cached  ## TODO: remove

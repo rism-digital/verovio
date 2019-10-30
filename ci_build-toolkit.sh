@@ -53,3 +53,8 @@ fi
 
 # Return to the root
 cd ..
+
+# add new files to git stage
+cd ${GH_PAGES_DIRECTORY}
+
+git add -A
