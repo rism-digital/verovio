@@ -20,6 +20,7 @@ cd ..
 
 # copy gh-pages of verovio repository
 echo "Cloning ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
+rm -rf $GH_PAGES_DIRECTORY
 git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
 
 # make build
