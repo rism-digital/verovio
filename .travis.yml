@@ -27,7 +27,7 @@ stages:
 
 jobs:
   include:
-    # test build on osx and an linux with g++
+    # test build on osx and on linux with g++
     - stage: build-c++
       name: osx-xcode
       os: osx
@@ -45,7 +45,9 @@ jobs:
     #    - make
     # precache the emscripten installation, has to be before "build-emscripten"
     - stage: precache-emscripten
-      name: "Precaching the emscripten installation"
+      name: "Precache the emscripten installation"
+      os: linux
+      dist: bionic
       script: true
       before_install:
         - git clone https://github.com/emscripten-core/emsdk.git
@@ -55,31 +57,43 @@ jobs:
         - ./emsdk activate latest
         - source ./emsdk_env.sh
         - cd ..
-    # 4 stages with the same id "build-emscripten" run the 4 different builds in parallel
+        - pwd
+        - ls -alh
+    # 4 different builds are run in parallel in 4 stages with the same id "build-emscripten"
     - stage: build-emscripten
       name: "no humdrum"
+      os: linux
+      dist: bionic
       env: BUILDTARGET=nohumdrum
       script:
-        - ./deploy-test.sh $BUILDTARGET
+        - ./deploy-develop.sh $BUILDTARGET
     - stage: build-emscripten
       name: "no humdrum light"
       env: BUILDTARGET=light
+      os: linux
+      dist: bionic
       script:
-        - ./deploy-test.sh $BUILDTARGET
+        - ./deploy-develop.sh $BUILDTARGET
     - stage: build-emscripten
       name: "no humdrum wasm"
       env: BUILDTARGET=wasm
+      os: linux
+      dist: bionic
       script:
-        - ./deploy-test.sh $BUILDTARGET
+        - ./deploy-develop.sh $BUILDTARGET
     - stage: build-emscripten
       name: "default (with humdrum)"
       env: BUILDTARGET=default
+      os: linux
+      dist: bionic
       script:
-        - ./deploy-test.sh $BUILDTARGET
+        - ./deploy-develop.sh $BUILDTARGET
 
     # deploy doxygen build
     - stage: deploy
       name: doxygen
+      os: linux
+      dist: bionic
       addons:
         apt:
           packages:

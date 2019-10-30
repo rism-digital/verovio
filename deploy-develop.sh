@@ -8,17 +8,16 @@ set -e # Exit with nonzero exit code if anything fails
 
 if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
     echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
-    exit 0
+    exit 1
 fi
 
-BUILDFLAG="$1"
-echo "$BUILDFLAG"
-
-if ["$BUILDFLAG" == "woh"]; then
-    echo "Building toolkit without humdrum"
-else
-    echo "Other BUILDFLAG: ${BUILDFLAG}"
+if [ -z "$1" ]; then
+    echo "No argument for BUILDTARGET supplied"
+    exit 1
 fi
+
+BUILDTARGET="$1"
+echo "$BUILDTARGET"
 
 # Get the rism-ch revision
 SHA=`git rev-parse --verify HEAD`
@@ -43,32 +42,36 @@ cd ..
 
 cd ./emscripten
 
-if ["$BUILDFLAG" == "woh"]; then
+if [[ "$BUILDTARGET" == nohumdrum ]]; then
     echo "Building toolkit without humdrum"
     ./buildToolkit -c -H
     cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
 
-elif ["$BUILDFLAG" == "wohl"]; then
+elif [[ "$BUILDTARGET" == light ]]; then
     echo "Building toolkit without humdrum as light version"
     ./buildToolkit -c -H -l
     cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
 
-elif  ["$BUILDFLAG" == "wohw"]; then
+elif [[ "$BUILDTARGET" == wasm ]]; then
     echo "Building toolkit without humdrum as wasm"
     ./buildToolkit -c -H -w
     cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
 
-elif ["$BUILDFLAG" == "default"]; then
+elif [[ "$BUILDTARGET" == default ]]; then
     echo "Building default toolkit (with humdrum)"
     ./buildToolkit -c
     cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
+
 else
-  echo "No buildflag matched: $BUILDFLAG"
+  echo "No BUILDTARGET matched: $BUILDTARGET"
 fi
 
 
 # Return to the root
 cd ..
+
+echo "Folder structure"
+ls -alh
 
 # 
 cd ${GH_PAGES_DIRECTORY}
