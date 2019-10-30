@@ -14,33 +14,18 @@ fi
 if [ -z "$1" ]; then
     echo "No argument for BUILDTARGET supplied"
     exit 1
+else
+  BUILDTARGET="$1"
+  echo "$BUILDTARGET" # TODO: remove
 fi
 
-BUILDTARGET="$1"
-echo "$BUILDTARGET"
-
-# Get the rism-ch revision
-SHA=$(git rev-parse --verify HEAD)
-
-#GH_PAGES_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio"
-#GH_PAGES_DIRECTORY="gh-pages"
-
-# Clone the gh-pages repo.
-#echo "Cloning ${GH_PAGES_REPOSITORY}"
-#git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
-#CURRENT_PATH=$(pwd)
-#OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
-
-#cd ./tools
-#cmake .
-#make
-
-#echo "Update the documentation of the option list"
-#./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
-#cd ..
+# activate and source emscripten tools
+./emsdk/emsdk activate latest
+source ./emsdk/emsdk_env.sh
 
 cd ./emscripten
 
+# build toolkit depending on build target
 if [[ "$BUILDTARGET" == nohumdrum ]]; then
     echo "Building toolkit without humdrum"
     ./buildToolkit -c -H
@@ -66,28 +51,5 @@ else
   exit 1
 fi
 
-
 # Return to the root
 cd ..
-
-echo "Folder structure"
-ls -alh
-
-# 
-cd ${GH_PAGES_DIRECTORY}
-
-echo "Configuring git push"
-git config user.name "JavaScript toolkit builder"
-git config user.email "${COMMIT_AUTHOR_EMAIL}"
-
-git status
-
-git add -A
-git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
-
-echo "Syncing from origin..."
-git pull
-
-echo "Pushing commits"
-# Now that we're all set up, we can push.
-# git push ${GH_PAGES_REPOSITORY} develop

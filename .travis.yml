@@ -27,7 +27,7 @@ cache:
 
 stages:
   #- build-c++
-  - precache-emscripten
+  - precache
   - build-toolkit
   - deploy
 
@@ -47,10 +47,11 @@ jobs:
     #  script:
     #    - cd tools
     #    - cmake .
-    #    - makec
-    # precache the emscripten installation, has to come before "build-toolkit" stage
-    - stage: precache-emscripten
-      name: "Precache the emscripten installation"
+    #    - make
+    # precache the emscripten installation
+    # has to come before "build-toolkit" stage
+    - stage: precache
+      name: "Precache emscripten installation and make build"
       os: linux
       dist: bionic
       before_install:
@@ -62,49 +63,40 @@ jobs:
         - cd emsdk
         - ./emsdk install latest
         - cd ..
-      before_script:
-        # verovio repo
-        - echo "Cloning ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
-        - git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
       script:
-        - cd ./tools
-        - cmake .
-        - make
-        - echo "Update the documentation of the option list"
-        - echo "$OUTPUT_DIRECTORY"  # TODO: remove
-        - ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
-        - cd ..
+        - ./ci_precache.sh
     # 4 different builds are run in parallel in 4 stages with the same id "build-toolkit"
     - stage: build-toolkit
       name: "no humdrum"
       os: linux
       script:
-        - ./emsdk/emsdk activate latest
-        - source ./emsdk/emsdk_env.sh
-        - ./deploy-develop.sh nohumdrum
+        - ./ci_build_toolkit.sh nohumdrum
     - stage: build-toolkit
       name: "no humdrum light"
       os: linux
       script:
-        - ./deploy-develop.sh light
+        - ./ci_build_toolkit.sh light
     - stage: build-toolkit
       name: "no humdrum wasm"
       os: linux
       script:
-        - ./deploy-develop.sh wasm
+        - ./ci_build_toolkit.sh wasm
     - stage: build-toolkit
       name: "default (with humdrum)"
       os: linux
       script:
-        - ./deploy-develop.sh default
-
-    # deploy doxygen build
+        - ./ci_build_toolkit.sh default
     - stage: deploy
-      name: doxygen
+      name: toolkit
+      os: linux
+      script:
+        - ./ci_deploy-toolkit.sh
+    # deploy doxygen build
+    - name: doxygen
       os: linux
       addons:
         apt:
           packages:
             - doxygen
       script:
-        - ./deploy-doxygen.sh
+        - ./ci_deploy-doxygen.sh
