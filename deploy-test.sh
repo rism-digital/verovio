@@ -21,16 +21,16 @@ echo "1: $1"
 echo "BUILDFLAG: $BUILDFLAG"
 echo "{BUILDFLAG}: ${BUILDFLAG}"
 
-if ["$BUILDFLAG" == woh]; then
+if [[ "$BUILDFLAG" == woh ]]; then
     echo "Building toolkit without humdrum"
 
-elif ["$BUILDFLAG" == wohl]; then
+elif [[ "$BUILDFLAG" == wohl ]]; then
     echo "Building toolkit without humdrum as light version"
 
-elif  ["$BUILDFLAG" == wohw]; then
+elif  [[ "$BUILDFLAG" == wohw ]]; then
     echo "Building toolkit without humdrum as wasm"
 
-elif ["$BUILDFLAG" == default]; then
+elif [[ "$BUILDFLAG" == default ]]; then
     echo "Building default toolkit (with humdrum)"
 
 else
