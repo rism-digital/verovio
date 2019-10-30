@@ -49,8 +49,12 @@ jobs:
       dist: bionic
       script: true
       before_install:
-        - ls- alh
-        - git clone https://github.com/emscripten-core/emsdk.git
+        - ls -alh
+        # clone into temporary folder as emsdk folder was created by travis cache before
+        # cf. https://stackoverflow.com/a/13852329
+        - git clone https://github.com/emscripten-core/emsdk.git temp
+        - mv temp/.git emsdk/.git
+        - rm -rf temp
       install:
         - cd emsdk
         - ./emsdk install latest
