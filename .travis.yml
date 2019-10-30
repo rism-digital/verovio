@@ -64,29 +64,25 @@ jobs:
     - stage: build-toolkit
       name: "no humdrum"
       os: linux
-      env: BUILDTARGET=nohumdrum
       script:
         - ./emsdk/emsdk activate latest
         - source ./emsdk/emsdk_env.sh
-        - ./deploy-develop.sh $BUILDTARGET
+        - ./deploy-develop.sh nohumdrum
     - stage: build-toolkit
       name: "no humdrum light"
-      env: BUILDTARGET=light
       os: linux
       script:
-        - ./deploy-develop.sh $BUILDTARGET
+        - ./deploy-develop.sh light
     - stage: build-toolkit
       name: "no humdrum wasm"
-      env: BUILDTARGET=wasm
       os: linux
       script:
-        - ./deploy-develop.sh $BUILDTARGET
+        - ./deploy-develop.sh wasm
     - stage: build-toolkit
       name: "default (with humdrum)"
-      env: BUILDTARGET=default
       os: linux
       script:
-        - ./deploy-develop.sh $BUILDTARGET
+        - ./deploy-develop.sh default
 
     # deploy doxygen build
     - stage: deploy
