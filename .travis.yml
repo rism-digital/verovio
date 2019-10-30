@@ -49,26 +49,25 @@ jobs:
       dist: bionic
       script: true
       before_install:
-        - ls -alh
+        - ls -alh  #TODO: remove
         # clone into temporary folder as emsdk folder was created by travis cache before
         # cf. https://stackoverflow.com/a/13852329
         - git clone https://github.com/emscripten-core/emsdk.git temp
         - mv temp/.git emsdk/.git
         - rm -rf temp
+        - ls ./emsdk -alh  # TODO: remove
       install:
         - cd emsdk
         - ./emsdk install latest
-        - ./emsdk activate latest
-        - source ./emsdk_env.sh
         - cd ..
-        - pwd
-        - ls -alh
     # 4 different builds are run in parallel in 4 stages with the same id "build-toolkit"
     - stage: build-toolkit
       name: "no humdrum"
       os: linux
       env: BUILDTARGET=nohumdrum
       script:
+        - emsdk/emsdk activate latest
+        - source emsdk/emsdk_env.sh
         - ./deploy-develop.sh $BUILDTARGET
     - stage: build-toolkit
       name: "no humdrum light"
