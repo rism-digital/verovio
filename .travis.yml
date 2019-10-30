@@ -17,21 +17,21 @@ env:
 jobs:
   include:
     # test build on osx and an linux with g++
-    - stage: build-c++
-      name: osx-xcode
-      os: osx
-      osx_image: xcode11.1
-      script:
-        - cd tools
-        - cmake .
-        - make
-    - name: linux-g++-5       
-      os: linux
-      dist: bionic
-      script:
-        - cd tools
-        - cmake .
-        - make
+    #- stage: build-c++
+    #  name: osx-xcode
+    #  os: osx
+    #  osx_image: xcode11.1
+    #  script:
+    #    - cd tools
+    #    - cmake .
+    #    - make
+    #- name: linux-g++-5
+    #  os: linux
+    #  dist: bionic
+    #  script:
+    #    - cd tools
+    #    - cmake .
+    #    - make
     - stage: build-js
       name: emscripten
       env:
@@ -51,11 +51,11 @@ jobs:
         - ./deploy-develop.sh $TOOLKIT
 
     # deploy emscripten build and doxygen
-    - stage: deploy
-      name: doxygen
-      addons:
-        apt:
-          packages:
-            - doxygen
-      script:
-        - ./deploy-doxygen.sh
+    #- stage: deploy
+    #  name: doxygen
+    #  addons:
+    #    apt:
+    #      packages:
+    #        - doxygen
+    #  script:
+    #    - ./deploy-doxygen.sh

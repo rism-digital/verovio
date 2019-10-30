@@ -11,6 +11,13 @@ if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
     exit 0
 fi
 
+BUILDFLAG = "$1"
+echo BUILDFLAG
+
+if [BUILDFLAG =  "woh"]; then
+    echo "Building toolkit without humdrum"
+fi
+
 # Get the rism-ch revision
 SHA=`git rev-parse --verify HEAD`
 
@@ -34,25 +41,25 @@ cd ..
 
 cd ./emscripten
 
-if ["$1" =  "woh"]; then
+if [BUILDFLAG =  "woh"]; then
     echo "Building toolkit without humdrum"
     ./buildToolkit -c -H
     cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
 fi
 
-if ["$1" =  "wohl"]; then
+if [BUILDFLAG =  "wohl"]; then
     echo "Building toolkit without humdrum as light version"
     ./buildToolkit -c -H -l
     cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
 fi
 
-if ["$1" =  "wohw"]; then
+if [BUILDFLAG =  "wohw"]; then
     echo "Building toolkit without humdrum as wasm"
     ./buildToolkit -c -H -w
     cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
 fi
 
-if ["$1" =  "default"]; then
+if [BUILDFLAG =  "default"]; then
     echo "Building default toolkit (with humdrum)"
     ./buildToolkit -c
     cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
