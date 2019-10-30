@@ -28,9 +28,15 @@ echo "Configuring git push"
 git config user.name "JavaScript toolkit builder"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
+echo "Running git status"
 git status
 
-# git add -A
+git add -A
+
+echo "Running git status"
+git status
+
+echo "Running git commit"
 git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
 
 git diff --cached  ## TODO: remove

@@ -19,10 +19,6 @@ else
   echo "$BUILDTARGET" # TODO: remove
 fi
 
-# activate and source emscripten tools
-./emsdk/emsdk activate latest
-source ./emsdk/emsdk_env.sh
-
 cd ./emscripten
 
 # build toolkit depending on build target
@@ -54,7 +50,15 @@ fi
 # Return to the root
 cd ..
 
-# add new files to git stage
+# add new files to git stage of gh-pages directory
 cd ${GH_PAGES_DIRECTORY}
 
-git add -A
+# Record intention to add files later to commit. An entry for the path is placed in the index with no content.
+echo "git add --intent-to-add"
+git add --intent-to-add
+
+echo "git status"
+git status
+
+# Return to the root
+cd ..

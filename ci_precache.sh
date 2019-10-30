@@ -11,12 +11,21 @@ if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     exit 1
 fi
 
+# install emscripten
+echo "Cloning emscripten"
+git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
+cd $EMSCRIPTEN_DIRECTORY
+./emsdk install latest
+# activate and source emscripten tools
+./emsdk/emsdk activate latest
+source ./emsdk/emsdk_env.sh
+cd ..
 
-# remove empty GH_PAGES_DIRECTORY folder created by travis cache before
-rm -rf $GH_PAGES_DIRECTORY
+# copy gh-pages of verovio repository
 echo "Cloning ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
 git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
 
+# make build
 cd ./tools
 cmake .
 make
