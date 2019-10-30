@@ -12,18 +12,23 @@ git:
 
 env:
   global:
+    # switch author email to: $(git log -1 --pretty=format:"%aE")
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+    # repos
+    - EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
     - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
-    - GH_PAGES_DIRECTORY: "gh-pages"
+    # directories
     - CURRENT_PATH: "$(pwd)"
+    - EMSCRIPTEN_DIRECTORY: "emsdk"
+    - GH_PAGES_DIRECTORY: "gh-pages"
     - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
-# cache emscripten installation, tools build and output directory to use throughout different stages
+# cache emscripten installation, tools build and output directory to be used throughout different stages
 cache:
   directories:
-    - emsdk
-    - tools
+    - $EMSCRIPTEN_DIRECTORY
     - $OUTPUT_DIRECTORY
+    - tools
 
 # define order of stages
 stages:
@@ -64,10 +69,10 @@ jobs:
       before_install:
         # remove empty emsdk folder created by travis cache before
         - echo "Cloning emscripten"
-        - rm -rf emsdk
-        - git clone https://github.com/emscripten-core/emsdk.git
+        - rm -rf $EMSCRIPTEN_DIRECTORY
+        - git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
       install:
-        - cd emsdk
+        - cd $EMSCRIPTEN_DIRECTORY
         - ./emsdk install latest
         - cd ..
       script:
