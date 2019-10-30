@@ -20,7 +20,7 @@ BUILDTARGET="$1"
 echo "$BUILDTARGET"
 
 # Get the rism-ch revision
-SHA=`git rev-parse --verify HEAD`
+SHA=$(git rev-parse --verify HEAD)
 
 #GH_PAGES_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio"
 #GH_PAGES_DIRECTORY="gh-pages"
@@ -28,9 +28,7 @@ SHA=`git rev-parse --verify HEAD`
 # Clone the gh-pages repo.
 #echo "Cloning ${GH_PAGES_REPOSITORY}"
 #git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
-
-
-#CURRENT_PATH=`pwd`
+#CURRENT_PATH=$(pwd)
 #OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
 #cd ./tools

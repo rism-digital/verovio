@@ -11,7 +11,7 @@ if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
     exit 0
 fi
 
-SHA=`git rev-parse --verify HEAD`
+SHA=$(git rev-parse --verify HEAD)
 
 DOXYGEN_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio-doxygen"
 DOXYGEN_DIRECTORY="doxygen"
@@ -21,7 +21,7 @@ echo "Cloning ${DOXYGEN_REPOSITORY}"
 git clone ${DOXYGEN_REPOSITORY} ${DOXYGEN_DIRECTORY}
 
 
-CURRENT_PATH=`pwd`
+CURRENT_PATH=$(pwd)
 OUTPUT_DIRECTORY="${CURRENT_PATH}/${DOXYGEN_DIRECTORY}"
 
 cd ./doc

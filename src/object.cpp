@@ -389,7 +389,7 @@ Object *Object::GetNext(Object *child, const ClassId classId)
     iteratorEnd = m_children.end();
     iteratorCurrent = std::find(m_children.begin(), iteratorEnd, child);
     if (iteratorCurrent != iteratorEnd) {
-        iteratorCurrent++;
+        ++iteratorCurrent;
         iteratorCurrent = std::find_if(iteratorCurrent, iteratorEnd, ObjectComparison(classId));
     }
     return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;

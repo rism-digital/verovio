@@ -18,11 +18,12 @@ env:
     - CURRENT_PATH: "$(pwd)"
     - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
-# cache the emscripten installation and tools build"
+# cache the emscripten installation and tools build
 cache:
   directories:
     - emsdk
     - tools
+    - $OUTPUT_DIRECTORY
 
 stages:
   #- build-c++
@@ -57,18 +58,20 @@ jobs:
         - echo "Cloning emscripten"
         - rm -rf emsdk
         - git clone https://github.com/emscripten-core/emsdk.git
-        # verovio repo
-        - echo "Cloning ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
-        - git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
       install:
         - cd emsdk
         - ./emsdk install latest
         - cd ..
+      before_script:
+        # verovio repo
+        - echo "Cloning ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
+        - git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
       script:
         - cd ./tools
         - cmake .
         - make
         - echo "Update the documentation of the option list"
+        - echo "$OUTPUT_DIRECTORY"  # TODO: remove
         - ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
         - cd ..
     # 4 different builds are run in parallel in 4 stages with the same id "build-toolkit"
