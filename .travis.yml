@@ -13,11 +13,16 @@ git:
 env:
   global:
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+    - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
+    - GH_PAGES_DIRECTORY: "gh-pages"
+    - CURRENT_PATH: `pwd`
+    - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
 # cache the emscripten installation in directory "emsdk"
 cache:
   directories:
     - emsdk
+    - tools
 
 stages:
   #- build-c++
@@ -47,18 +52,24 @@ jobs:
       name: "Precache the emscripten installation"
       os: linux
       dist: bionic
-      script: true
       before_install:
-        - ls -alh  #TODO: remove
-        # clone into temporary folder as emsdk folder was created by travis cache before
-        # cf. https://stackoverflow.com/a/13852329
+        # remove empty emsdk folder created by travis cache before
+        - echo "Cloning emscripten"
         - rm -rf emsdk
         - git clone https://github.com/emscripten-core/emsdk.git
-        - ls ./emsdk -alh  # TODO: remove
-        - ls ./emsdk/.git -alh  # TODO: remove
+        # verovio repo
+        - echo "Cloning ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
+        - git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
       install:
         - cd emsdk
         - ./emsdk install latest
+        - cd ..
+      script:
+        - cd ./tools
+        - cmake .
+        - make
+        - echo "Update the documentation of the option list"
+        - ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
         - cd ..
     # 4 different builds are run in parallel in 4 stages with the same id "build-toolkit"
     - stage: build-toolkit

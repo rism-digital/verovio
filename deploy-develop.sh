@@ -22,24 +22,24 @@ echo "$BUILDTARGET"
 # Get the rism-ch revision
 SHA=`git rev-parse --verify HEAD`
 
-GH_PAGES_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio"
-GH_PAGES_DIRECTORY="gh-pages"
+#GH_PAGES_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio"
+#GH_PAGES_DIRECTORY="gh-pages"
 
 # Clone the gh-pages repo.
-echo "Cloning ${GH_PAGES_REPOSITORY}"
-git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
+#echo "Cloning ${GH_PAGES_REPOSITORY}"
+#git clone --single-branch --branch gh-pages ${GH_PAGES_REPOSITORY} ${GH_PAGES_DIRECTORY}
 
 
-CURRENT_PATH=`pwd`
-OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
+#CURRENT_PATH=`pwd`
+#OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
-cd ./tools
-cmake .
-make
+#cd ./tools
+#cmake .
+#make
 
-echo "Update the documentation of the option list"
-./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
-cd ..
+#echo "Update the documentation of the option list"
+#./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
+#cd ..
 
 cd ./emscripten
 
