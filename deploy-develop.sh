@@ -12,10 +12,12 @@ if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
 fi
 
 BUILDFLAG="$1"
-echo BUILDFLAG
+echo "$BUILDFLAG"
 
-if [BUILDFLAG == "woh"]; then
+if ["$BUILDFLAG" == "woh"]; then
     echo "Building toolkit without humdrum"
+else
+    echo "Other BUILDFLAG: ${BUILDFLAG}"
 fi
 
 # Get the rism-ch revision
