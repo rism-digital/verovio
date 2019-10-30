@@ -20,36 +20,36 @@ cache:
     - emsdk
 
 stages:
-  - build-c++
+  #- build-c++
   - precache-emscripten
-  - build-emscripten
+  - build-toolkit
   - deploy
 
 jobs:
   include:
     # test build on osx and on linux with g++
-    - stage: build-c++
-      name: osx-xcode
-      os: osx
-      osx_image: xcode11.1
-      script:
-        - cd tools
+    #- stage: build-c++
+    #  name: osx-xcode
+    #  os: osx
+    #  osx_image: xcode11.1
+    #  script:
+    #    - cd tools
     #    - cmake .
     #    - make
-    - name: linux-g++-5
-      os: linux
-      dist: bionic
-      script:
-        - cd tools
+    #- name: linux-g++-5
+    #  os: linux
+    #  script:
+    #    - cd tools
     #    - cmake .
-    #    - make
-    # precache the emscripten installation, has to be before "build-emscripten"
+    #    - makec
+    # precache the emscripten installation, has to come before "build-toolkit" stage
     - stage: precache-emscripten
       name: "Precache the emscripten installation"
       os: linux
       dist: bionic
       script: true
       before_install:
+        - ls- alh
         - git clone https://github.com/emscripten-core/emsdk.git
       install:
         - cd emsdk
@@ -59,33 +59,29 @@ jobs:
         - cd ..
         - pwd
         - ls -alh
-    # 4 different builds are run in parallel in 4 stages with the same id "build-emscripten"
-    - stage: build-emscripten
+    # 4 different builds are run in parallel in 4 stages with the same id "build-toolkit"
+    - stage: build-toolkit
       name: "no humdrum"
       os: linux
-      dist: bionic
       env: BUILDTARGET=nohumdrum
       script:
         - ./deploy-develop.sh $BUILDTARGET
-    - stage: build-emscripten
+    - stage: build-toolkit
       name: "no humdrum light"
       env: BUILDTARGET=light
       os: linux
-      dist: bionic
       script:
         - ./deploy-develop.sh $BUILDTARGET
-    - stage: build-emscripten
+    - stage: build-toolkit
       name: "no humdrum wasm"
       env: BUILDTARGET=wasm
       os: linux
-      dist: bionic
       script:
         - ./deploy-develop.sh $BUILDTARGET
-    - stage: build-emscripten
+    - stage: build-toolkit
       name: "default (with humdrum)"
       env: BUILDTARGET=default
       os: linux
-      dist: bionic
       script:
         - ./deploy-develop.sh $BUILDTARGET
 
@@ -93,7 +89,6 @@ jobs:
     - stage: deploy
       name: doxygen
       os: linux
-      dist: bionic
       addons:
         apt:
           packages:

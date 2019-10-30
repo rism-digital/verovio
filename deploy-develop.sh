@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This script builds the JavaScript toolkit and automatically commits
-# It uses an encrypted GH_TOKEN setting in Travis to check out the latest versoin,
+# It uses an encrypted GH_TOKEN setting in Travis to check out the latest version,
 # build the toolkit, commit the changes, and then push.
 
 set -e # Exit with nonzero exit code if anything fails
@@ -64,6 +64,7 @@ elif [[ "$BUILDTARGET" == default ]]; then
 
 else
   echo "No BUILDTARGET matched: $BUILDTARGET"
+  exit 1
 fi
 
 
