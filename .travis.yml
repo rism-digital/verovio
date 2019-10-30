@@ -18,13 +18,14 @@ env:
     - CURRENT_PATH: "$(pwd)"
     - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
-# cache the emscripten installation and tools build
+# cache emscripten installation, tools build and output directory to use throughout different stages
 cache:
   directories:
     - emsdk
     - tools
     - $OUTPUT_DIRECTORY
 
+# define order of stages
 stages:
   #- build-c++
   - precache
@@ -33,7 +34,10 @@ stages:
 
 jobs:
   include:
-    # test build on osx and on linux with g++
+    #################
+    # BUILD-C++ STAGE
+    #################
+    # tests builds on osx and on linux with g++
     #- stage: build-c++
     #  name: osx-xcode
     #  os: osx
@@ -48,12 +52,15 @@ jobs:
     #    - cd tools
     #    - cmake .
     #    - make
-    # precache the emscripten installation
+
+    ################
+    # PRECACHE STAGE
+    ################
+    # precaches the emscripten installation
     # has to come before "build-toolkit" stage
     - stage: precache
       name: "Precache emscripten installation and make build"
       os: linux
-      dist: bionic
       before_install:
         # remove empty emsdk folder created by travis cache before
         - echo "Cloning emscripten"
@@ -65,7 +72,12 @@ jobs:
         - cd ..
       script:
         - ./ci_precache.sh
-    # 4 different builds are run in parallel in 4 stages with the same id "build-toolkit"
+
+    #####################
+    # BUILD-TOOLKIT STAGE
+    #####################
+    # builds toolkit with different options in parallel
+    # all "substages" have to use the same id "build-toolkit"
     - stage: build-toolkit
       name: "no humdrum"
       os: linux
@@ -86,12 +98,16 @@ jobs:
       os: linux
       script:
         - ./ci_build_toolkit.sh default
+
+    ##############
+    # DEPLOY stage
+    ##############
+    # deploys toolkit and doxygen builds
     - stage: deploy
       name: toolkit
       os: linux
       script:
         - ./ci_deploy-toolkit.sh
-    # deploy doxygen build
     - name: doxygen
       os: linux
       addons:
