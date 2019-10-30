@@ -32,6 +32,7 @@ cache:
     - tools
 
 # define order of stages
+# conditions for any stage can be included here
 stages:
   #- build-c++
   - precache
@@ -107,7 +108,7 @@ jobs:
       name: "default (with humdrum)"
       os: linux
       script:
-        - ./ci_build-toolkit.sh default
+        - travis_wait ./ci_build-toolkit.sh default
 
     ##############
     # DEPLOY stage
