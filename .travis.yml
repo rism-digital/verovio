@@ -15,10 +15,10 @@ env:
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
     - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
     - GH_PAGES_DIRECTORY: "gh-pages"
-    - CURRENT_PATH: `pwd`
+    - CURRENT_PATH: "$(pwd)"
     - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 
-# cache the emscripten installation in directory "emsdk"
+# cache the emscripten installation and tools build"
 cache:
   directories:
     - emsdk
