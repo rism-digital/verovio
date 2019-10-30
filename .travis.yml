@@ -13,6 +13,24 @@ git:
 env:
   global:
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+  matrix:
+    - BUILDTARGET=nohumdrum
+    - BUILDTARGET=light
+    - BUILDTARGET=wasm
+    - BUILDTARGET=default
+
+script:
+  - ./deploy-test.sh $BUILDTARGET
+
+stages:
+  #- name: build-c++
+    # if: type != cron AND branch != integration
+  - name: build-emscripten
+    # if: type = cron OR branch = integration OR commit_message =~ run_tests
+  - name: deploy
+    # if: type != cron AND branch != integration
+
+
 
 jobs:
   include:
@@ -34,28 +52,23 @@ jobs:
     #    - make
     - stage: build-js
       name: emscripten
-      env:
-        - TOOLKIT=woh
-        - TOOLKIT=wohl
-        - TOOLKIT=wohw
-        - TOOLKIT=default
-      before_install:
-        - git clone https://github.com/emscripten-core/emsdk.git
-      install:
-        - cd emsdk
-        - ./emsdk install latest
-        - ./emsdk activate latest
-        - source ./emsdk_env.sh
-        - cd ..
-      script:
-        - ./deploy-test.sh $TOOLKIT
+      #before_install:
+      #  - git clone https://github.com/emscripten-core/emsdk.git
+      #install:
+      # - cd emsdk
+      # - ./emsdk install latest
+      #  - ./emsdk activate latest
+      #  - source ./emsdk_env.sh
+      #  - cd ..
+      #script:
+      #  - ./deploy-test.sh $BUILDTARGET
 
     # deploy emscripten build and doxygen
-    #- stage: deploy
-    #  name: doxygen
-    #  addons:
-    #    apt:
-    #      packages:
-    #        - doxygen
-    #  script:
-    #    - ./deploy-doxygen.sh
+    - stage: deploy
+      name: doxygen
+      addons:
+        apt:
+          packages:
+            - doxygen
+      script:
+        - ./deploy-doxygen.sh

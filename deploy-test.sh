@@ -12,27 +12,27 @@ if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
 fi
 
 if [ -z "$1" ]; then
-    echo "No argument for BUILDFLAG supplied"
+    echo "No argument for BUILDTARGET supplied"
     exit 1
 fi
 
-BUILDFLAG="$1"
+BUILDTARGET="$1"
 echo "1: $1"
-echo "BUILDFLAG: $BUILDFLAG"
-echo "{BUILDFLAG}: ${BUILDFLAG}"
+echo "BUILDTARGET: $BUILDTARGET"
+echo "{BUILDTARGET}: ${BUILDTARGET}"
 
-if [[ "$BUILDFLAG" == woh ]]; then
+if [[ "$BUILDTARGET" == nohumdrum ]]; then
     echo "Building toolkit without humdrum"
 
-elif [[ "$BUILDFLAG" == wohl ]]; then
+elif [[ "$BUILDTARGET" == light ]]; then
     echo "Building toolkit without humdrum as light version"
 
-elif  [[ "$BUILDFLAG" == wohw ]]; then
+elif  [[ "$BUILDTARGET" == wasm ]]; then
     echo "Building toolkit without humdrum as wasm"
 
-elif [[ "$BUILDFLAG" == default ]]; then
+elif [[ "$BUILDTARGET" == default ]]; then
     echo "Building default toolkit (with humdrum)"
 
 else
-  echo "No buildflag matched: $BUILDFLAG"
+  echo "No BUILDTARGET matched: $BUILDTARGET"
 fi
