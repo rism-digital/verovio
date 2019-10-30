@@ -16,9 +16,6 @@ echo "Cloning emscripten"
 git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
 cd $EMSCRIPTEN_DIRECTORY
 ./emsdk install latest
-# activate and source emscripten tools
-./emsdk activate latest
-source ./emsdk_env.sh
 cd ..
 
 # copy gh-pages of verovio repository

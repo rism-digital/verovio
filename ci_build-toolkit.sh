@@ -19,6 +19,12 @@ else
   echo "$BUILDTARGET" # TODO: remove
 fi
 
+# activate and source emscripten tools
+cd ${EMSCRIPTEN_DIRECTORY}
+./emsdk activate latest
+source ./emsdk_env.sh
+cd ..
+
 cd ./emscripten
 
 # build toolkit depending on build target
