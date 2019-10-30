@@ -52,6 +52,7 @@ jobs:
         - ls -alh  #TODO: remove
         # clone into temporary folder as emsdk folder was created by travis cache before
         # cf. https://stackoverflow.com/a/13852329
+        - rm -rf emsdk/.git
         - git clone https://github.com/emscripten-core/emsdk.git temp
         - mv temp/.git emsdk/.git
         - rm -rf temp

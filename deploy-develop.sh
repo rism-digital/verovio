@@ -36,6 +36,7 @@ OUTPUT_DIRECTORY="${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
 cd ./tools
 cmake .
 make
+
 echo "Update the documentation of the option list"
 ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
 cd ..
@@ -91,4 +92,4 @@ git pull
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-# git push ${GH_PAGES_REPOSITORY} travis-test
+# git push ${GH_PAGES_REPOSITORY} develop
