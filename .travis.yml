@@ -73,7 +73,7 @@ jobs:
         - rm -rf $EMSCRIPTEN_DIRECTORY
         - git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
         - echo "am here $(pwd)"
-        - ls- alh
+        - ls -alh
       install:
         - cd $EMSCRIPTEN_DIRECTORY
         - ./emsdk install latest
