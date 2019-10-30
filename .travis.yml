@@ -19,51 +19,46 @@ env:
     - BUILDTARGET=wasm
     - BUILDTARGET=default
 
+#before_install:
+#  - git clone https://github.com/emscripten-core/emsdk.git
+#install:
+# - cd emsdk
+# - ./emsdk install latest
+#  - ./emsdk activate latest
+#  - source ./emsdk_env.sh
+#  - cd ..
+
 script:
   - ./deploy-test.sh $BUILDTARGET
 
 stages:
-  #- name: build-c++
-    # if: type != cron AND branch != integration
+  - name: build-c++
   - name: build-emscripten
-    # if: type = cron OR branch = integration OR commit_message =~ run_tests
   - name: deploy
-    # if: type != cron AND branch != integration
-
-
 
 jobs:
   include:
     # test build on osx and an linux with g++
-    #- stage: build-c++
-    #  name: osx-xcode
+    - stage: build-c++
+      env: # OVERWRITE WITH EMPTY
+      name: osx-xcode
     #  os: osx
     #  osx_image: xcode11.1
     #  script:
     #    - cd tools
     #    - cmake .
     #    - make
-    #- name: linux-g++-5
+    - name: linux-g++-5
     #  os: linux
     #  dist: bionic
     #  script:
     #    - cd tools
     #    - cmake .
     #    - make
-    #- stage: build-emscripten
-      #before_install:
-      #  - git clone https://github.com/emscripten-core/emsdk.git
-      #install:
-      # - cd emsdk
-      # - ./emsdk install latest
-      #  - ./emsdk activate latest
-      #  - source ./emsdk_env.sh
-      #  - cd ..
-      #script:
-      #  - ./deploy-test.sh $BUILDTARGET
 
-    # deploy emscripten build and doxygen
+    # deploy doxygen build
     - stage: deploy
+      env: # OVERWRITE WITH EMPTY
       name: doxygen
       addons:
         apt:
