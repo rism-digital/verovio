@@ -14,8 +14,14 @@ env:
   global:
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
 
+# cache the emscripten installation in directory "emsdk"
+cache:
+  directories:
+    - emsdk
+
 stages:
   - build-c++
+  - precache-emscripten
   - build-emscripten
   - deploy
 
@@ -23,52 +29,56 @@ jobs:
   include:
     # test build on osx and an linux with g++
     - stage: build-c++
-      env: # OVERWRITE WITH EMPTY
       name: osx-xcode
-    #  os: osx
-    #  osx_image: xcode11.1
+      os: osx
+      osx_image: xcode11.1
       script:
         - cd tools
     #    - cmake .
     #    - make
     - name: linux-g++-5
-    #  os: linux
-    #  dist: bionic
+      os: linux
+      dist: bionic
       script:
         - cd tools
     #    - cmake .
     #    - make
+    # precache the emscripten installation, has to be before "build-emscripten"
+    - stage: precache-emscripten
+      name: "Precaching the emscripten installation"
+      script: true
+      before_install:
+        - git clone https://github.com/emscripten-core/emsdk.git
+      install:
+        - cd emsdk
+        - ./emsdk install latest
+        - ./emsdk activate latest
+        - source ./emsdk_env.sh
+        - cd ..
+    # 4 stages with the same id "build-emscripten" run the 4 different builds in parallel
     - stage: build-emscripten
       name: "no humdrum"
       env: BUILDTARGET=nohumdrum
-      #before_install:
-      #  - git clone https://github.com/emscripten-core/emsdk.git
-      #install:
-      #  - cd emsdk
-      #  - ./emsdk install latest
-      #  - ./emsdk activate latest
-      #  - source ./emsdk_env.sh
-      #  - cd ..
       script:
         - ./deploy-test.sh $BUILDTARGET
     - stage: build-emscripten
       name: "no humdrum light"
       env: BUILDTARGET=light
-      before_install:
-        - git clone https://github.com/emscripten-core/emsdk.git
-      install:
-      #  - cd emsdk
-       # - ./emsdk install latest
-       # - ./emsdk activate latest
-       # - source ./emsdk_env.sh
-       # - cd ..
+      script:
+        - ./deploy-test.sh $BUILDTARGET
+    - stage: build-emscripten
+      name: "no humdrum wasm"
+      env: BUILDTARGET=wasm
+      script:
+        - ./deploy-test.sh $BUILDTARGET
+    - stage: build-emscripten
+      name: "default (with humdrum)"
+      env: BUILDTARGET=default
       script:
         - ./deploy-test.sh $BUILDTARGET
 
-
     # deploy doxygen build
     - stage: deploy
-      env: # OVERWRITE WITH EMPTY
       name: doxygen
       addons:
         apt:
