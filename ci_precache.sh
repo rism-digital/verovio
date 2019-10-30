@@ -26,7 +26,7 @@ git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIR
 # make build
 cd ./tools
 cmake .
-make
+time nice make -j3
 echo "Update the documentation of the option list"
 ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
 cd ..
