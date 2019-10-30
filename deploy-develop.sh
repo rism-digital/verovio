@@ -43,28 +43,27 @@ cd ..
 
 cd ./emscripten
 
-if [BUILDFLAG == "woh"]; then
+if ["$BUILDFLAG" == "woh"]; then
     echo "Building toolkit without humdrum"
     ./buildToolkit -c -H
     cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
-fi
 
-if [BUILDFLAG == "wohl"]; then
+elif ["$BUILDFLAG" == "wohl"]; then
     echo "Building toolkit without humdrum as light version"
     ./buildToolkit -c -H -l
     cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
-fi
 
-if [BUILDFLAG == "wohw"]; then
+elif  ["$BUILDFLAG" == "wohw"]; then
     echo "Building toolkit without humdrum as wasm"
     ./buildToolkit -c -H -w
     cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
-fi
 
-if [BUILDFLAG == "default"]; then
+elif ["$BUILDFLAG" == "default"]; then
     echo "Building default toolkit (with humdrum)"
     ./buildToolkit -c
     cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
+else
+  echo "No buildflag matched: $BUILDFLAG"
 fi
 
 

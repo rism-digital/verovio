@@ -48,7 +48,7 @@ jobs:
         - source ./emsdk_env.sh
         - cd ..
       script:
-        - ./deploy-develop.sh $TOOLKIT
+        - ./deploy-test.sh $TOOLKIT
 
     # deploy emscripten build and doxygen
     #- stage: deploy
