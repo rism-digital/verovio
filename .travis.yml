@@ -50,8 +50,7 @@ jobs:
     #    - cd tools
     #    - cmake .
     #    - make
-    - stage: build-js
-      name: emscripten
+    - stage: build-emscripten
       #before_install:
       #  - git clone https://github.com/emscripten-core/emsdk.git
       #install:
