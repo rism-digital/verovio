@@ -8,7 +8,12 @@ set -e # Exit with nonzero exit code if anything fails
 
 if [ "${TRAVIS_BRANCH}" != "travis-test" ]; then
     echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
-    exit 0
+    exit 1
+fi
+
+if [ -z "$1" ]; then
+    echo "No argument for BUILDFLAG supplied"
+    exit 1
 fi
 
 BUILDFLAG="$1"
@@ -16,16 +21,16 @@ echo "1: $1"
 echo "BUILDFLAG: $BUILDFLAG"
 echo "{BUILDFLAG}: ${BUILDFLAG}"
 
-if ["$BUILDFLAG" == "woh"]; then
+if ["$BUILDFLAG" == woh]; then
     echo "Building toolkit without humdrum"
 
-elif ["$BUILDFLAG" == "wohl"]; then
+elif ["$BUILDFLAG" == wohl]; then
     echo "Building toolkit without humdrum as light version"
 
-elif  ["$BUILDFLAG" == "wohw"]; then
+elif  ["$BUILDFLAG" == wohw]; then
     echo "Building toolkit without humdrum as wasm"
 
-elif ["$BUILDFLAG" == "default"]; then
+elif ["$BUILDFLAG" == default]; then
     echo "Building default toolkit (with humdrum)"
 
 else
