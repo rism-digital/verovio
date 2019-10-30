@@ -10,26 +10,9 @@ git:
   depth:
     3
 
-#before_install:
-#  - git clone https://github.com/emscripten-core/emsdk.git
-#install:
-# - cd emsdk
-# - ./emsdk install latest
-#  - ./emsdk activate latest
-#  - source ./emsdk_env.sh
-#  - cd ..
-
-script:
-  - ./deploy-test.sh $BUILDTARGET
-
 env:
   global:
     - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
-  matrix:
-    - BUILDTARGET=nohumdrum
-    - BUILDTARGET=light
-    - BUILDTARGET=wasm
-    - BUILDTARGET=default
 
 stages:
   - build-c++
@@ -55,6 +38,33 @@ jobs:
         - cd tools
     #    - cmake .
     #    - make
+    - stage: build-emscripten
+      name: "no humdrum"
+      env: BUILDTARGET=nohumdrum
+      #before_install:
+      #  - git clone https://github.com/emscripten-core/emsdk.git
+      #install:
+      #  - cd emsdk
+      #  - ./emsdk install latest
+      #  - ./emsdk activate latest
+      #  - source ./emsdk_env.sh
+      #  - cd ..
+      script:
+        - ./deploy-test.sh $BUILDTARGET
+    - stage: build-emscripten
+      name: "no humdrum light"
+      env: BUILDTARGET=light
+      before_install:
+        - git clone https://github.com/emscripten-core/emsdk.git
+      install:
+      #  - cd emsdk
+       # - ./emsdk install latest
+       # - ./emsdk activate latest
+       # - source ./emsdk_env.sh
+       # - cd ..
+      script:
+        - ./deploy-test.sh $BUILDTARGET
+
 
     # deploy doxygen build
     - stage: deploy
