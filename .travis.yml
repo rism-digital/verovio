@@ -10,15 +10,6 @@ git:
   depth:
     3
 
-env:
-  global:
-    - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
-  matrix:
-    - BUILDTARGET=nohumdrum
-    - BUILDTARGET=light
-    - BUILDTARGET=wasm
-    - BUILDTARGET=default
-
 #before_install:
 #  - git clone https://github.com/emscripten-core/emsdk.git
 #install:
@@ -31,10 +22,19 @@ env:
 script:
   - ./deploy-test.sh $BUILDTARGET
 
+env:
+  global:
+    - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+  matrix:
+    - BUILDTARGET=nohumdrum
+    - BUILDTARGET=light
+    - BUILDTARGET=wasm
+    - BUILDTARGET=default
+
 stages:
-  - name: build-c++
-  - name: build-emscripten
-  - name: deploy
+  - build-c++
+  - build-emscripten
+  - deploy
 
 jobs:
   include:
@@ -44,15 +44,15 @@ jobs:
       name: osx-xcode
     #  os: osx
     #  osx_image: xcode11.1
-    #  script:
-    #    - cd tools
+      script:
+        - cd tools
     #    - cmake .
     #    - make
     - name: linux-g++-5
     #  os: linux
     #  dist: bionic
-    #  script:
-    #    - cd tools
+      script:
+        - cd tools
     #    - cmake .
     #    - make
 
