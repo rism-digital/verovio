@@ -1,3 +1,7 @@
+branches:
+  only:
+    - travis-test
+
 sudo: false
 dist: bionic
 language: cpp
@@ -18,10 +22,6 @@ env:
     - EMSCRIPTEN_DIRECTORY: "emsdk"
     - GH_PAGES_DIRECTORY: "gh-pages"
     - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
-
-branches:
-  only:
-    - $BUILD_BRANCH
 
 # cache emscripten installation, tools build and output directory to be used throughout different stages
 cache:
