@@ -4,7 +4,7 @@
 # It uses an encrypted GH_TOKEN setting in Travis to check out the latest versoin,
 # build the toolkit, commit the changes, and then push.
 
-set -e # Exit with nonzero exit code if anything fails
+set -ev # Exit with nonzero exit code if anything fails
 
 if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
@@ -28,7 +28,7 @@ git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIR
 # make build
 cd ./tools
 cmake .
-time nice make -j3
+make -j3
 echo "Update the documentation of the option list"
 ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
 cd ..

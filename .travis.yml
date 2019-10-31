@@ -79,21 +79,25 @@ jobs:
     - stage: build-toolkit
       name: "no humdrum"
       os: linux
+      skip_cleanup: true
       script:
         - ./ci_build-toolkit.sh nohumdrum
     - stage: build-toolkit
       name: "no humdrum light"
       os: linux
+      skip_cleanup: true
       script:
         - ./ci_build-toolkit.sh light
     - stage: build-toolkit
       name: "no humdrum wasm"
       os: linux
+      skip_cleanup: true
       script:
         - ./ci_build-toolkit.sh wasm
     - stage: build-toolkit
       name: "default (with humdrum)"
       os: linux
+      skip_cleanup: true
       script:
         - travis_wait 30 ./ci_build-toolkit.sh default
 
@@ -104,6 +108,7 @@ jobs:
     - stage: deploy
       name: toolkit
       os: linux
+      skip_cleanup: true
       script:
         - ./ci_deploy-toolkit.sh
     - name: doxygen

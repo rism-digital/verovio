@@ -4,16 +4,12 @@
 # It uses an encrypted GH_TOKEN setting in Travis to check out the latest versoin,
 # build the toolkit, commit the changes, and then push.
 
-set -e # Exit with nonzero exit code if anything fails
+set -ev # Exit with nonzero exit code if anything fails
 
 if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
-    exit 0
+    exit 1
 fi
-
-# Get the rism-ch revision
-SHA=`git rev-parse --verify HEAD`
-
 
 # TODO: remove
 echo "Folder structure"

@@ -4,7 +4,7 @@
 # It uses an encrypted GH_TOKEN setting in Travis to check out the latest version,
 # build the toolkit, commit the changes, and then push.
 
-set -e # Exit with nonzero exit code if anything fails
+set -ev # Exit with nonzero exit code if anything fails
 
 if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
