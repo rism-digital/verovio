@@ -1,6 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support for 512th and 1024th duration
+* Support for iOS cocoapods build (@eltiren)
+* Support for SVG currentColor (@rettinghaus)
+* Bug fix with grace notes and mRests
 
 ## [2.2.1] - 2019-10-23
 * Fix bug with mensural notation layout
