@@ -76,25 +76,24 @@ jobs:
     #####################
     # builds toolkit with different options in parallel
     # all "substages" have to use the same id "build-toolkit"
-    - stage: build-toolkit
+    - stage: build-toolkit-nohumdrum
       name: "no humdrum"
       os: linux
-      skip_cleanup: true
       script:
         - ./ci_build-toolkit.sh nohumdrum
-    - name: "no humdrum light"
+    - stage: build-toolkit-light
+      name: "no humdrum light"
       os: linux
-      skip_cleanup: true
       script:
         - ./ci_build-toolkit.sh light
-    - name: "no humdrum wasm"
+    - stage: build-toolkit-wasm
+      name: "no humdrum wasm"
       os: linux
-      skip_cleanup: true
       script:
         - ./ci_build-toolkit.sh wasm
-    - name: "default (with humdrum)"
+    - stage: build-toolkit-default
+      name: "default (with humdrum)"
       os: linux
-      skip_cleanup: true
       script:
         - travis_wait 30 ./ci_build-toolkit.sh default
 
