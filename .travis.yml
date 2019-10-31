@@ -36,7 +36,10 @@ cache:
 stages:
   #- build-c++
   - precache
-  - build-toolkit
+  - build-toolkit-humdrum
+  - build-toolkit-light
+  - build-toolkit-wasm
+  - build-toolkit-default
   - deploy
 
 jobs:
