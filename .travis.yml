@@ -1,7 +1,3 @@
-branches:
-  only:
-  - travis-test
-  
 sudo: false
 dist: bionic
 language: cpp
@@ -13,8 +9,7 @@ git:
 env:
   global:
     - BUILD_BRANCH: travis-test   # TODO: switch back to "develop"
-    # switch author email to: $(git log -1 --pretty=format:"%aE")
-    - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"
+    - COMMIT_AUTHOR_EMAIL: "lxpugin@gmail.com"  # TODO: switch author email to: $(git log -1 --pretty=format:"%aE") if necessary
     # repos
     - EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
     - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
@@ -23,6 +18,10 @@ env:
     - EMSCRIPTEN_DIRECTORY: "emsdk"
     - GH_PAGES_DIRECTORY: "gh-pages"
     - OUTPUT_DIRECTORY: "${CURRENT_PATH}/${GH_PAGES_DIRECTORY}"
+
+branches:
+  only:
+    - $BUILD_BRANCH
 
 # cache emscripten installation, tools build and output directory to be used throughout different stages
 cache:
@@ -34,7 +33,7 @@ cache:
 # define order of stages
 # conditions for any stage can be included here
 stages:
-  #- build-c++
+  - build-c++
   - precache
   - build-toolkit-nohumdrum
   - build-toolkit-light
@@ -48,20 +47,20 @@ jobs:
     # BUILD-C++ STAGE
     #################
     # tests builds on osx and on linux with g++
-    #- stage: build-c++
-    #  name: osx-xcode
-    #  os: osx
-    #  osx_image: xcode11.1
-    #  script:
-    #    - cd tools
-    #    - cmake .
-    #    - make
-    #- name: linux-g++-5
-    #  os: linux
-    #  script:
-    #    - cd tools
-    #    - cmake .
-    #    - make
+    - stage: build-c++
+      name: osx-xcode
+      os: osx
+      osx_image: xcode11.1
+      script:
+        - cd tools
+        - cmake .
+        - make
+    - name: linux-g++-5
+      os: linux
+      script:
+        - cd tools
+        - cmake .
+        - make
 
     ################
     # PRECACHE STAGE
@@ -77,8 +76,8 @@ jobs:
     #####################
     # BUILD-TOOLKIT STAGE
     #####################
-    # builds toolkit with different options in parallel
-    # all "substages" have to use the same id "build-toolkit"
+    # builds toolkit with different options in sequence
+    # all "substages" have to use a different stage id "build-toolkit-xx"
     - stage: build-toolkit-nohumdrum
       name: "no humdrum"
       os: linux
@@ -103,7 +102,7 @@ jobs:
     ##############
     # DEPLOY stage
     ##############
-    # deploys toolkit and doxygen builds
+    # deploys toolkit and doxygen builds in parallel
     - stage: deploy
       name: toolkit
       os: linux

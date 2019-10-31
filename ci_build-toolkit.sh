@@ -4,7 +4,8 @@
 # It uses an encrypted GH_TOKEN setting in Travis to check out the latest version,
 # build the toolkit, commit the changes, and then push.
 
-set -ev # Exit with nonzero exit code if anything fails
+set -ev # -e: Exit with nonzero exit code if anything fails
+        # -v: verbose mode; print every command in travis output
 
 if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     echo "Will not build JavaScript toolkit for branch ${TRAVIS_BRANCH}"
@@ -16,7 +17,6 @@ if [ -z "$1" ]; then
     exit 1
 else
   BUILDTARGET="$1"
-  echo "$BUILDTARGET" # TODO: remove
 fi
 
 # activate and source emscripten tools
@@ -52,19 +52,6 @@ else
   echo "No BUILDTARGET matched: $BUILDTARGET"
   exit 1
 fi
-
-# Return to the root
-cd ..
-
-# add new files to git stage of gh-pages directory
-cd ${GH_PAGES_DIRECTORY}
-
-# Record intention to add files later to commit. An entry for the path is placed in the index with no content.
-echo "git add"
-git add -A
-
-echo "git status"
-git status
 
 # Return to the root
 cd ..
