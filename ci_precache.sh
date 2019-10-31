@@ -11,6 +11,8 @@ if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     exit 1
 fi
 
+# remove empty emsdk folder created by travis cache before
+rm -rf $EMSCRIPTEN_DIRECTORY
 # install emscripten
 echo "Cloning emscripten"
 git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY

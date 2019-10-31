@@ -27,15 +27,15 @@ env:
 # cache emscripten installation, tools build and output directory to be used throughout different stages
 cache:
   directories:
-    #- $EMSCRIPTEN_DIRECTORY
+    - $EMSCRIPTEN_DIRECTORY
     - $GH_PAGES_DIRECTORY
-    #- tools
+    - tools
 
 # define order of stages
 # conditions for any stage can be included here
 stages:
   #- build-c++
-  #- precache
+  - precache
   - build-toolkit
   - deploy
 
@@ -63,26 +63,13 @@ jobs:
     ################
     # PRECACHE STAGE
     ################
-    # precaches the emscripten installation
+    # precaches the emscripten installation, gh-pages, and make-build
     # has to come before "build-toolkit" stage
-    #- stage: precache
-    #  name: "Precache emscripten installation and make build"
-    #  os: linux
-    #  before_install:
-        # remove empty emsdk folder created by travis cache before
-     #   - echo "Cloning emscripten"
-     #   - rm -rf $EMSCRIPTEN_DIRECTORY
-     #   - git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
-     #   - echo "am here $(pwd)"
-     #   - ls -alh
-     # install:
-     #   - cd $EMSCRIPTEN_DIRECTORY
-     #   - ./emsdk install latest
-     #   - cd ..
-     #   - echo "am here $(pwd)"
-     #   - ls -alh
-     # script:
-     #   - ./ci_precache.sh
+    - stage: precache
+      name: "Precache emscripten installation, make build and gh-pages"
+      os: linux
+      script:
+        - ./ci_precache.sh
 
     #####################
     # BUILD-TOOLKIT STAGE
@@ -93,25 +80,21 @@ jobs:
       name: "no humdrum"
       os: linux
       script:
-        - ./ci_precache.sh
         - ./ci_build-toolkit.sh nohumdrum
     - stage: build-toolkit
       name: "no humdrum light"
       os: linux
       script:
-        - ./ci_precache.sh
         - ./ci_build-toolkit.sh light
     - stage: build-toolkit
       name: "no humdrum wasm"
       os: linux
       script:
-        - ./ci_precache.sh
         - ./ci_build-toolkit.sh wasm
     - stage: build-toolkit
       name: "default (with humdrum)"
       os: linux
       script:
-        - ./ci_precache.sh
         - travis_wait 30 ./ci_build-toolkit.sh default
 
     ##############
