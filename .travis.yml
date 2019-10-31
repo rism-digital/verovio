@@ -36,7 +36,7 @@ cache:
 stages:
   #- build-c++
   - precache
-  - build-toolkit-humdrum
+  - build-toolkit-nohumdrum
   - build-toolkit-light
   - build-toolkit-wasm
   - build-toolkit-default
