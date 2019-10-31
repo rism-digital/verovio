@@ -14,12 +14,19 @@ Verovio follows the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) s
 
 The project page is http://www.verovio.org. Verovio is available under the LGPL license (see LICENSE.txt).
 
-NPM
----
+Building and using instructions
+-------------------------------
 
-The latest stable version is available via [NPM](https://www.npmjs.com/package/verovio)
+See the [wiki](https://github.com/rism-ch/verovio/wiki/Building-instructions), with instructions for:
+* [Command-line tool](https://github.com/rism-ch/verovio/wiki/Building-instructions#command-line-tool)
+* [XCode](https://github.com/rism-ch/verovio/wiki/Building-instructions#xcode)
+* [Visual Studio](https://github.com/rism-ch/verovio/wiki/Building-instructions#visual-studio)
+* [JavaScript](https://github.com/rism-ch/verovio/wiki/Building-instructions#javascript-toolkit)
+* [NPM](https://github.com/rism-ch/verovio/wiki/Building-instructions#npm)
+* [Python](https://github.com/rism-ch/verovio/wiki/Building-instructions#building-the-python-toolkit)
+* [Java](https://github.com/rism-ch/verovio/wiki/Building-instructions#building-the-java-toolkit)
+* [CocoaPods](https://github.com/rism-ch/verovio/wiki/Building-instructions#cocoapods)
 
-    $ npm install verovio
 
 LibMEI
 ------
