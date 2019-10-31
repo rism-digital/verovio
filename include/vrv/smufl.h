@@ -155,6 +155,8 @@ enum {
     SMUFL_E4E9_rest64th = 0xE4E9,
     SMUFL_E4EA_rest128th = 0xE4EA,
     SMUFL_E4EB_rest256th = 0xE4EB,
+    SMUFL_E4EC_rest512th = 0xE4EC,
+    SMUFL_E4ED_rest1024th = 0xE4ED,
     SMUFL_E500_repeat1Bar = 0xE500,
     SMUFL_E501_repeat2Bars = 0xE501,
     SMUFL_E502_repeat4Bars = 0xE502,
@@ -312,7 +314,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 287
+#define SMUFL_COUNT 289
 
 } // vrv namespace
 
