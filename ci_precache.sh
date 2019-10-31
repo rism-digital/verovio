@@ -32,3 +32,16 @@ make -j3
 echo "Update the documentation of the option list"
 ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
 cd ..
+
+# add new files to git stage of gh-pages directory
+cd ${GH_PAGES_DIRECTORY}
+
+# Record intention to add files later to commit. An entry for the path is placed in the index with no content.
+echo "git add"
+git add -A
+
+echo "git status"
+git status
+
+# Return to the root
+cd ..

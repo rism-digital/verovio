@@ -60,8 +60,8 @@ cd ..
 cd ${GH_PAGES_DIRECTORY}
 
 # Record intention to add files later to commit. An entry for the path is placed in the index with no content.
-echo "git add --intent-to-add"
-git add --intent-to-add
+echo "git add"
+git add -A
 
 echo "git status"
 git status
