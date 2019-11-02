@@ -306,11 +306,6 @@ int main(int argc, char **argv)
                 options->m_pageMarginTop.SetValue(optarg);
                 break;
 
-            case 'y':
-                vrv::LogWarning("Option --no-footer is deprecated; use --footer none");
-                options->m_footer.SetValue(vrv::FOOTER_none);
-                break;
-
             case 'f':
                 if (!toolkit.SetFormat(std::string(optarg))) {
                     exit(1);
@@ -320,11 +315,6 @@ int main(int argc, char **argv)
             case 'h':
                 vrv::LogWarning("Option -h is deprecated; use --page-height instead");
                 options->m_pageHeight.SetValue(optarg);
-                break;
-
-            case 'z':
-                vrv::LogWarning("Option --no-header is deprecated; use --header none");
-                options->m_header.SetValue(vrv::HEADER_none);
                 break;
 
             case 'i':
@@ -362,6 +352,16 @@ int main(int argc, char **argv)
                 break;
 
             case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
+
+            case 'y':
+                vrv::LogWarning("Option --no-footer is deprecated; use --footer none");
+                options->m_footer.SetValue(vrv::FOOTER_none);
+                break;
+
+            case 'z':
+                vrv::LogWarning("Option --no-header is deprecated; use --header none");
+                options->m_header.SetValue(vrv::HEADER_none);
+                break;
 
             case '?':
                 display_usage();
