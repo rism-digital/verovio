@@ -515,8 +515,11 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // generate the page header and footer if necessary
-    if (true) { // change this to an option
-        m_doc.GenerateHeaderAndFooter();
+    if (m_options->m_footer.GetValue() == FOOTER_auto) {
+        m_doc.GenerateFooter();
+    }
+    if (m_options->m_header.GetValue() == HEADER_auto) {
+        m_doc.GenerateHeader();
     }
 
     // generate missing measure numbers
