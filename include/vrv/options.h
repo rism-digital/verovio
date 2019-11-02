@@ -470,9 +470,7 @@ public:
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
-    OptionBool m_noFooter;
     OptionIntMap m_footer;
-    OptionBool m_noHeader;
     OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
