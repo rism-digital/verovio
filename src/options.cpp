@@ -540,17 +540,9 @@ Options::Options()
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
 
-    m_noFooter.SetInfo("No footer", "Option NoFooter is deprecated; use footer instead");
-    m_noFooter.Init(false);
-    this->Register(&m_noFooter, "noFooter", &m_general);
-
     m_footer.SetInfo("Footer", "Control footer layout");
     m_footer.Init(FOOTER_auto, &Option::s_footer);
     this->Register(&m_footer, "footer", &m_general);
-
-    m_noHeader.SetInfo("No header", "Option NoHeader is deprecated; use header instead");
-    m_noHeader.Init(false);
-    this->Register(&m_noHeader, "noHeader", &m_general);
 
     m_header.SetInfo("Header", "Control header layout");
     m_header.Init(HEADER_auto, &Option::s_header);

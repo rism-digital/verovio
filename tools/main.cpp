@@ -224,6 +224,8 @@ int main(int argc, char **argv)
         // deprecated - some use undocumented short options to catch them as such
         { "border", required_argument, 0, 'b' },
         { "ignore-layout", no_argument, 0, 'i' },
+        { "no-footer", no_argument, 0, 'y' },
+        { "no-header", no_argument, 0, 'z' },
         { "no-layout", no_argument, 0, 'n' },
         { "page-height-deprecated", required_argument, 0, 'h' },
         { "page-width-deprecated", required_argument, 0, 'w' },
@@ -304,6 +306,11 @@ int main(int argc, char **argv)
                 options->m_pageMarginTop.SetValue(optarg);
                 break;
 
+            case 'y':
+                vrv::LogWarning("Option --no-footer is deprecated; use --footer none");
+                options->m_footer.SetValue(vrv::FOOTER_none);
+                break;
+
             case 'f':
                 if (!toolkit.SetFormat(std::string(optarg))) {
                     exit(1);
@@ -313,6 +320,11 @@ int main(int argc, char **argv)
             case 'h':
                 vrv::LogWarning("Option -h is deprecated; use --page-height instead");
                 options->m_pageHeight.SetValue(optarg);
+                break;
+
+            case 'z':
+                vrv::LogWarning("Option --no-header is deprecated; use --header none");
+                options->m_header.SetValue(vrv::HEADER_none);
                 break;
 
             case 'i':
