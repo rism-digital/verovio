@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Oct 19 18:43:18 PDT 2019
+// Last Modified: Wed Oct 30 12:26:49 PDT 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -53493,6 +53493,20 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	}                                               \
 	delete tool;
 
+#define RUNTOOL2(NAME, INFILE1, INFILE2, COMMAND, STATUS) \
+	Tool_##NAME *tool = new Tool_##NAME;            \
+	tool->process(COMMAND);                         \
+	tool->run(INFILE1, INFILE2);                    \
+	if (tool->hasError()) {                         \
+		status = false;                              \
+		tool->getError(cerr);                        \
+		delete tool;                                 \
+		break;                                       \
+	} else if (tool->hasHumdrumText()) {            \
+		INFILE1.readString(tool->getHumdrumText());  \
+	}                                               \
+	delete tool;
+
 #define RUNTOOLSET(NAME, INFILES, COMMAND, STATUS) \
 	Tool_##NAME *tool = new Tool_##NAME;            \
 	tool->process(COMMAND);                         \
@@ -53507,18 +53521,18 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	}                                               \
 	delete tool;
 
-#define RUNTOOL2(NAME, INFILE1, INFILE2, COMMAND, STATUS) \
-	Tool_##NAME *tool = new Tool_##NAME;            \
-	tool->process(COMMAND);                         \
-	tool->run(INFILE1, INFILE2);                    \
-	if (tool->hasError()) {                         \
-		status = false;                              \
-		tool->getError(cerr);                        \
-		delete tool;                                 \
-		break;                                       \
-	} else if (tool->hasHumdrumText()) {            \
-		INFILE1.readString(tool->getHumdrumText());  \
-	}                                               \
+#define RUNTOOLSTREAM(NAME, INFILES, COMMAND, STATUS) \
+	Tool_##NAME *tool = new Tool_##NAME;               \
+	tool->process(COMMAND);                            \
+	tool->run(INFILES);                                \
+	if (tool->hasError()) {                            \
+		status = false;                                 \
+		tool->getError(cerr);                           \
+		delete tool;                                    \
+		break;                                          \
+	} else if (tool->hasHumdrumText()) {               \
+		INFILES.readString(tool->getHumdrumText());     \
+	}                                                  \
 	delete tool;
 
 
@@ -53564,6 +53578,8 @@ bool Tool_filter::runUniversal(HumdrumFileSet& infiles) {
 			RUNTOOLSET(humdiff, infiles, commands[i].second, status);
 		} else if (commands[i].first == "chooser") {
 			RUNTOOLSET(chooser, infiles, commands[i].second, status);
+		} else if (commands[i].first == "myank") {
+			RUNTOOL(myank, infiles, commands[i].second, status);
 		}
 	}
 
@@ -53608,8 +53624,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(homophonic2, infile, commands[i].second, status);
 		} else if (commands[i].first == "hproof") {
 			RUNTOOL(hproof, infile, commands[i].second, status);
-		} else if (commands[i].first == "humsar") {
-			RUNTOOL(humsar, infile, commands[i].second, status);
+		} else if (commands[i].first == "shed") {
+			RUNTOOL(shed, infile, commands[i].second, status);
 		} else if (commands[i].first == "imitation") {
 			RUNTOOL(imitation, infile, commands[i].second, status);
 		} else if (commands[i].first == "extract") {
@@ -54639,11 +54655,11 @@ void Tool_hproof::markHarmonicTones(HTp tok, vector<int>& cts) {
 //
 
 Tool_humdiff::Tool_humdiff(void) {
-	define("r|reference=i:0",     "sequence number of reference score");
+	define("r|reference=i:1",     "sequence number of reference score");
 	define("report=b",            "display report of differences");
 	define("time-points|times=b", "display timepoint lists for each file");
 	define("note-points|notes=b", "display notepoint lists for each file");
-	define("c|color=s:red",       "color for markers");
+	define("c|color=s:red",       "color for difference markers");
 }
 
 
@@ -54654,60 +54670,52 @@ Tool_humdiff::Tool_humdiff(void) {
 //
 
 bool Tool_humdiff::run(HumdrumFileSet& infiles) {
-	bool status = true;
-	if (infiles.getCount() >= 2) {
-		status = run(infiles[0], infiles[1]);
-	} else {
-		status = false;
+	int reference = getInteger("reference") - 1;
+	if (reference < 0) {
+		cerr << "Error: reference has to be 1 or higher" << endl;
+		return false;
 	}
-	return status;
-}
-
-
-bool Tool_humdiff::run(const string& indata1, const string& indata2, ostream& out) {
-	HumdrumFile infile1(indata1);
-	HumdrumFile infile2;
-	bool status;
-	if (indata2.empty()) {
-		infile2.read(indata2);
-		status = run(infile1, infile2);
-	} else {
-		status = run(infile1, infile1);
+	if (reference > infiles.getCount()) {
+		cerr << "Error: reference number is too large: " << reference << endl;
+		cerr << "Maximum is " << infiles.getCount() << endl;
+		return false;
 	}
-	if (hasAnyText()) {
-		getAllText(out);
-	} else {
-		out << infile1;
-		out << infile2;
-	}
-	return status;
-}
 
-bool Tool_humdiff::run(HumdrumFile& infile1, HumdrumFile& infile2, ostream& out) {
-	bool status;
-	if (infile2.getLineCount() == 0) {
-		status = run(infile1, infile1);
+	if (infiles.getSize() == 0) {
+		cerr << "Usage: " << getCommand() << " files" << endl;
+		return false;
+	} else if (infiles.getSize() < 2) {
+		cerr << "Error: requires two or more files" << endl;
+		cerr << "Usage: " << getCommand() << " files" << endl;
+		return false;
 	} else {
-		status = run(infile1, infile2);
-	}
-	if (hasAnyText()) {
-		getAllText(out);
-	} else {
-		out << infile1;
-		out << infile2;
-	}
-	return status;
-}
+		HumNum targetdur = infiles[0].getScoreDuration();
+		for (int i=1; i<infiles.getSize(); i++) {
+			HumNum dur = infiles[i].getScoreDuration();
+			if (dur != targetdur) {
+				cerr << "Error: all files must have the same duration" << endl;
+				return false;
+			}
+		}
 
-//
-// In-place processing of file:
-//
+		for (int i=0; i<infiles.getCount(); i++) {
+			if (i == reference) {
+				continue;
+			}
+			compareFiles(infiles[reference], infiles[i]);
+		}
 
-bool Tool_humdiff::run(HumdrumFile& infile1, HumdrumFile& infile2) {
-	if (infile2.getLineCount() == 0) {
-		processFile(infile1, infile1);
-	} else {
-		processFile(infile1, infile2);
+		if (!getBoolean("report")) {
+			infiles[reference].createLinesFromTokens();
+			m_humdrum_text << infiles[reference];
+			if (m_marked) {
+				m_humdrum_text << "!!!RDF**kern: @ = marked note";
+				if (getBoolean("color")) {
+					m_humdrum_text << "color=\"" << getString("color") << "\"";
+				}
+				m_humdrum_text << endl;
+			}
+		}
 	}
 
 	return true;
@@ -54717,76 +54725,20 @@ bool Tool_humdiff::run(HumdrumFile& infile1, HumdrumFile& infile2) {
 
 //////////////////////////////
 //
-// Tool_humdiff::processFile
-//
-
-void Tool_humdiff::processFile(HumdrumFile& infile1, HumdrumFile& infile2) {
-	HumdrumFileSet humset;
-	humset.readAppendHumdrum(infile1);
-	humset.readAppendHumdrum(infile2);
-	int reference = getInteger("reference");
-	if (reference > 1) {
-		if (reference > humset.getCount()) {
-			cerr << "Error: work number is too large: " << reference << endl;
-			cerr << "Maximum is " << humset.getCount() << endl;
-			return;
-		}
-		reference--;
-		humset.swap(0, reference);
-	}
-
-	if (humset.getSize() == 0) {
-		cerr << "Usage: " << getCommand() << " files" << endl;
-		return;
-	} else if (humset.getSize() < 2) {
-		cerr << "Error: requires two or more files" << endl;
-		cerr << "Usage: " << getCommand() << " files" << endl;
-		return;
-	} else {
-		HumNum targetdur = humset[0].getScoreDuration();
-		for (int i=1; i<humset.getSize(); i++) {
-			HumNum dur = humset[i].getScoreDuration();
-			if (dur != targetdur) {
-				cerr << "Error: all files must have the same duration" << endl;
-				return;
-			}
-		}
-		compareFiles(humset);
-	}
-
-	if (!getBoolean("report")) {
-		humset[0].createLinesFromTokens();
-		m_humdrum_text << humset[0];
-		if (m_marked) {
-			m_humdrum_text << "!!!RDF**kern: @ = marked note";
-			if (getBoolean("color")) {
-				m_humdrum_text << "color=\"" << getString("color") << "\"";
-			}
-			m_humdrum_text << endl;
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
 // Tool_humdiff::compareFiles --
 //
 
-void Tool_humdiff::compareFiles(HumdrumFileSet& humset) {
-	vector<vector<TimePoint>> timepoints(humset.getSize());;
-	for (int i=0; i<humset.getSize(); i++) {
-		extractTimePoints(timepoints.at(i), humset[i]);
-	}
+void Tool_humdiff::compareFiles(HumdrumFile& reference, HumdrumFile& alternate) {
+	vector<vector<TimePoint>> timepoints(2);
+	extractTimePoints(timepoints.at(0), reference);
+	extractTimePoints(timepoints.at(1), alternate);
 
 	if (getBoolean("time-points")) {
-		for (int i=0; i<(int)timepoints.size(); i++) {
-	 		printTimePoints(cout, timepoints[i]);
-		}
+		printTimePoints(timepoints[0]);
+		printTimePoints(timepoints[1]);
 	}
 
-	compareTimePoints(cout, timepoints, humset);
+	compareTimePoints(timepoints, reference, alternate);
 }
 
 
@@ -54796,12 +54748,11 @@ void Tool_humdiff::compareFiles(HumdrumFileSet& humset) {
 // Tool_humdiff::printTimePoints --
 //
 
-ostream& Tool_humdiff::printTimePoints(ostream& out, vector<TimePoint>& timepoints) {
+void Tool_humdiff::printTimePoints(vector<TimePoint>& timepoints) {
 	for (int i=0; i<(int)timepoints.size(); i++) {
-		out << "TIMEPOINT " << i << ":" << endl;
-		out << timepoints[i] << endl;
+		m_free_text << "TIMEPOINT " << i << ":" << endl;
+		m_free_text << timepoints[i] << endl;
 	}
-	return out;
 }
 
 
@@ -54811,11 +54762,16 @@ ostream& Tool_humdiff::printTimePoints(ostream& out, vector<TimePoint>& timepoin
 // Tool_humdiff::compareTimePoints --
 //
 
-ostream& Tool_humdiff::compareTimePoints(ostream& out, vector<vector<TimePoint>>& timepoints, HumdrumFileSet& humset) {
+void Tool_humdiff::compareTimePoints(vector<vector<TimePoint>>& timepoints,
+		HumdrumFile& reference, HumdrumFile& alternate) {
 	vector<int> indexes(timepoints.size(), 0);
 	HumNum minval;
 	HumNum value;
 	int found;
+
+	vector<HumdrumFile*> infiles(2, NULL);
+	infiles[0] = &reference;
+	infiles[1] = &alternate;
 
 	vector<int> increment(timepoints.size(), 0);
 
@@ -54860,13 +54816,12 @@ ostream& Tool_humdiff::compareTimePoints(ostream& out, vector<vector<TimePoint>>
 		if (!found) {
 			break;
 		} else {
-			compareLines(minval, indexes, timepoints, humset);
+			compareLines(minval, indexes, timepoints, infiles);
 		}
 		for (int i=0; i<(int)increment.size(); i++) {
 			indexes.at(i) += increment.at(i);
 		}
 	}
-	return out;
 }
 
 
@@ -54877,13 +54832,13 @@ ostream& Tool_humdiff::compareTimePoints(ostream& out, vector<vector<TimePoint>>
 //
 
 void Tool_humdiff::printNotePoints(vector<NotePoint>& notelist) {
-	cout << "vvvvvvvvvvvvvvvvvvvvvvvvv" << endl;
+	m_free_text << "vvvvvvvvvvvvvvvvvvvvvvvvv" << endl;
 	for (int i=0; i<(int)notelist.size(); i++) {
-		cout << "NOTE " << i << endl;
-		cout << notelist.at(i) << endl;
+		m_free_text << "NOTE " << i << endl;
+		m_free_text << notelist.at(i) << endl;
 	}
-	cout << "^^^^^^^^^^^^^^^^^^^^^^^^^" << endl;
-	cout << endl;
+	m_free_text << "^^^^^^^^^^^^^^^^^^^^^^^^^" << endl;
+	m_free_text << endl;
 }
 
 
@@ -54923,12 +54878,15 @@ void Tool_humdiff::markNote(NotePoint& np) {
 //
 
 void Tool_humdiff::compareLines(HumNum minval, vector<int>& indexes,
-		vector<vector<TimePoint>>& timepoints, HumdrumFileSet& humset) {
+		vector<vector<TimePoint>>& timepoints, vector<HumdrumFile*> infiles) {
 
 	bool reportQ = getBoolean("report");
 
 	// cerr << "COMPARING LINES ====================================" << endl;
 	vector<vector<NotePoint>> notelist(indexes.size());
+
+	// Note: timepoints size must be 2
+	// and infiles size must be 2
 	for (int i=0; i<(int)timepoints.size(); i++) {
 		if (indexes.at(i) >= (int)timepoints.at(i).size()) {
 			continue;
@@ -54938,7 +54896,7 @@ void Tool_humdiff::compareLines(HumNum minval, vector<int>& indexes,
 			continue;
 		}
 
-		getNoteList(notelist.at(i), humset[i],
+		getNoteList(notelist.at(i), *infiles[i],
 			timepoints.at(i).at(indexes.at(i)).index[0],
 			timepoints.at(i).at(indexes.at(i)).measure, i, indexes.at(i));
 
@@ -54978,7 +54936,7 @@ void Tool_humdiff::compareLines(HumNum minval, vector<int>& indexes,
 				int humindex = notelist.at(0).at(i).token->getLineIndex();
 				cout << "\tREFERENCE MEASURE\t: " << notelist.at(0).at(i).measure << endl;
 				cout << "\tREFERENCE LINE NO.\t: " << humindex+1 << endl;
-				cout << "\tREFERENCE LINE TEXT\t: " << humset[0][humindex] << endl;
+				cout << "\tREFERENCE LINE TEXT\t: " << (*infiles[0])[humindex] << endl;
 
 				cout << "\tTARGET  " << j << " LINE NO. ";
 				if (j < 10) {
@@ -54996,7 +54954,6 @@ void Tool_humdiff::compareLines(HumNum minval, vector<int>& indexes,
 			}
 		}
 	}
-
 }
 
 
@@ -55153,341 +55110,6 @@ ostream& operator<<(ostream& out, NotePoint& np) {
 		out << "\t\tindex " << i << " is:\t" << np.matched[i] << endl;
 	}
 	return out;
-}
-
-
-
-
-
-/////////////////////////////////
-//
-// Tool_humsar::Tool_humsar -- Set the recognized options for the tool.
-//
-
-Tool_humsar::Tool_humsar(void) {
-	define("q|query=s", "query string");
-	define("r|replace=s", "replace string");
-	define("k|kern=b", "process kern spines only");
-	define("x|exinterps|exinerp|exclusive-interpretation|exclusive-interpretations=s", "process only specified spines");
-	define("s|spine|spines=s", "list of spines to process");
-	define("I|interpretation=b", "process interpretation tokens only");
-	define("i|ignore-case=b", "Ignore case of letters");
-}
-
-
-
-/////////////////////////////////
-//
-// Tool_humsar::run -- Do the main work of the tool.
-//
-
-bool Tool_humsar::run(HumdrumFileSet& infiles) {
-	bool status = true;
-	for (int i=0; i<infiles.getCount(); i++) {
-		status &= run(infiles[i]);
-	}
-	return status;
-}
-
-
-bool Tool_humsar::run(const string& indata, ostream& out) {
-	HumdrumFile infile(indata);
-	bool status = run(infile);
-	if (hasAnyText()) {
-		getAllText(out);
-	} else {
-		out << infile;
-	}
-	return status;
-}
-
-
-bool Tool_humsar::run(HumdrumFile& infile, ostream& out) {
-	bool status = run(infile);
-	if (hasAnyText()) {
-		getAllText(out);
-	} else {
-		out << infile;
-	}
-	return status;
-}
-
-
-bool Tool_humsar::run(HumdrumFile& infile) {
-	initialize();
-	initializeSegment(infile);
-	processFile(infile);
-	return true;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::initialize --  Initializations that only have to be done once
-//    for all HumdrumFile segments.
-//
-
-void Tool_humsar::initialize(void) {
-	m_search = getString("query");
-	HumRegex hre;
-	hre.replaceDestructive(m_search, "\\\\", "\\", "g");
-	if (getBoolean("kern")) {
-		m_exinterps.push_back("**kern");
-	} else if (getBoolean("exclusive-interpretations")) {
-		fillInExInterpList();
-	}
-	if (getBoolean("ignore-case")) {
-		m_grepoptions += "i";
-	}
-}
-
-
-//////////////////////////////
-//
-// Tool_humsar::initializeSegment -- Recalculate variables for each Humdrum input segment.
-//
-
-void Tool_humsar::initializeSegment(HumdrumFile& infile) {
-	m_spines.clear();
-	if (getBoolean("spines")) {
-		int maxtrack = infile.getMaxTrack();
-		Convert::makeBooleanTrackList(m_spines, getString("spines"), maxtrack);
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::fillInExInterpList --
-//
-
-void Tool_humsar::fillInExInterpList(void) {
-	m_exinterps.clear();
-	m_exinterps.resize(1);
-	string elist = getString("exclusive-interpretations");
-	for (int i=0; i<(int)elist.size(); i++) {
-		if (isspace(elist[i]) || (elist[i] == ',')) {
-			if (!m_exinterps.back().empty()) {
-				m_exinterps.push_back("");
-			}
-		} else {
-			m_exinterps.back() += elist[i];
-		}
-	}
-	if (m_exinterps.back().empty()) {
-		m_exinterps.resize((int)m_exinterps.size() - 1);
-	}
-	for (int i=0; i<(int)m_exinterps.size(); i++) {
-		if (m_exinterps[i].compare(0, 2, "**") == 0) {
-			continue;
-		}
-		if (m_exinterps[i].compare(0, 1, "*") == 0) {
-			m_exinterps[i] = "*" + m_exinterps[i];
-			continue;
-		}
-		m_exinterps[i] = "**" + m_exinterps[i];
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::processFile --
-//
-
-void Tool_humsar::processFile(HumdrumFile& infile) {
-	if (m_search == "") {
-		// nothing to do
-		return;
-	}
-	m_modified = false;
-	m_replace = getString("replace");
-
-	m_interpretation = getBoolean("interpretation");
-
-	if (m_interpretation) {
-		searchAndReplaceInterpretation(infile);
-	//if (m_barline) {
-	//	searchAndReplaceBarline(infile);
-	} else {
-		searchAndReplaceData(infile);
-	}
-
-	if (m_modified) {
-		infile.createLinesFromTokens();
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::searchAndReplaceBarline --
-//
-
-void Tool_humsar::searchAndReplaceBarline(HumdrumFile& infile) {
-	string isearch;
-	if (m_search[0] == '^') {
-		isearch = "^=" + m_search.substr(1);
-	} else {
-		isearch = "^=.*" + m_search;
-	}
-	HumRegex hre;
-	for (int i=0; i<infile.getLineCount(); i++) {
-		if (!infile[i].isBarline()) {
-			continue;
-		}
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			HTp token = infile.token(i, j);
-			if (token->isNull()) {	
-				// Don't mess with null interpretations
-				continue;
-			}
-			if (!isValid(token)) {
-				continue;
-			}
-			if (hre.search(token, isearch, m_grepoptions)) {
-				string text = token->getText();
-				hre.replaceDestructive(text, m_replace, isearch, m_grepoptions);
-				hre.replaceDestructive(text, "", "^=+");
-				text = "=" + text;
-				token->setText(text);
-				m_modified = true;
-			}
-		}
-	}
-}
-
-
-//////////////////////////////
-//
-// Tool_humsar::searchAndReplaceInterpretation --
-//
-
-void Tool_humsar::searchAndReplaceInterpretation(HumdrumFile& infile) {
-	string isearch;
-	if (m_search[0] == '^') {
-		isearch = "^\\*" + m_search.substr(1);
-	} else {
-		isearch = "^\\*.*" + m_search;
-	}
-	HumRegex hre;
-	for (int i=0; i<infile.getLineCount(); i++) {
-		if (!infile[i].isInterpretation()) {
-			continue;
-		} else if (infile[i].isExclusiveInterpretation()) {
-			continue;
-		} else if (infile[i].isManipulator()) {
-			continue;
-		}
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			HTp token = infile.token(i, j);
-			if (token->isNull()) {	
-				// Don't mess with null interpretations
-				continue;
-			}
-			if (!isValid(token)) {
-				continue;
-			}
-			if (hre.search(token, isearch, m_grepoptions)) {
-				string text = token->getText();
-				hre.replaceDestructive(text, m_replace, isearch, m_grepoptions);
-				hre.replaceDestructive(text, "", "^\\*+");
-				text = "*" + text;
-				token->setText(text);
-				m_modified = true;
-			}
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::searchAndReplaceData --
-//
-
-void Tool_humsar::searchAndReplaceData(HumdrumFile& infile) {
-	string dsearch = m_search;
-
-	HumRegex hre;
-	for (int i=0; i<infile.getLineCount(); i++) {
-		if (!infile[i].isData()) {
-			continue;
-		}
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			HTp token = infile.token(i, j);
-			if (token->isNull()) {
-				// Don't mess with null interpretations
-				continue;
-			}
-			if (!isValid(token)) {
-				continue;
-			}
-			if (hre.search(token, dsearch, m_grepoptions)) {
-				string text = token->getText();
-				hre.replaceDestructive(text, m_replace, dsearch, m_grepoptions);
-				if (text == "") {
-					text = ".";
-				}
-				token->setText(text);
-				m_modified = true;
-			}
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::isValidDataType -- usar with -x and -k options.
-//
-
-bool Tool_humsar::isValidDataType(HTp token) {
-	if (m_exinterps.empty()) {
-		return true;
-	}
-	string datatype = token->getDataType();
-	for (int i=0; i<(int)m_exinterps.size(); i++) {
-		if (datatype == m_exinterps[i]) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::isValidSpine -- usar with -s option.
-//
-
-bool Tool_humsar::isValidSpine(HTp token) {
-	if (m_spines.empty()) {
-		return true;
-	}
-	int track = token->getTrack();
-	return m_spines.at(track);
-}
-
-
-
-//////////////////////////////
-//
-// Tool_humsar::isValid --
-//
-
-bool Tool_humsar::isValid(HTp token) {
-	if (isValidDataType(token) && isValidSpine(token)) {
-		return true;
-	}
-	return false;
 }
 
 
@@ -72426,6 +72048,630 @@ void Tool_satb2gs::example(void) {
 
 void Tool_satb2gs::usage(const string& command) {
 
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_shed::Tool_shed -- Set the recognized options for the tool.
+//
+
+Tool_shed::Tool_shed(void) {
+	define("s|spine|spines=s", "list of spines to process");
+	define("e|expression=s", "regular expression");
+	define("i|exclusive-interpretations=s", "apply only to spine types in list");
+	define("k|kern=b", "apply only to **kern data");
+	define("x=s", "defineable exclusive interpretation x");
+	define("y=s", "defineable exclusive interpretation y");
+	define("z=s", "defineable exclusive interpretation z");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_shed::run -- Do the main work of the tool.
+//
+
+bool Tool_shed::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_shed::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_shed::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_shed::run(HumdrumFile& infile) {
+	initialize();
+	initializeSegment(infile);
+	for (int i=0; i<m_options.size(); i++) {
+		prepareSearch(i);
+		processFile(infile);
+	}
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::prepareSearch --
+//
+
+void Tool_shed::prepareSearch(int index) {
+	// deal with command-line options (seprately for each search):
+	m_exinterps.clear();
+
+	if (getBoolean("kern")) {
+		m_exinterps.push_back("**kern");
+	} else if (getBoolean("exclusive-interpretations")) {
+		vector<string> extra = addToExInterpList();
+		for (int i=0; i<(int)extra.size(); i++) {
+			m_exinterps.push_back(extra[i]);
+		}
+	}
+
+	m_search  = m_searches.at(index);
+	m_replace = m_replaces.at(index);
+	m_option  = m_options.at(index);
+
+	m_grepoptions = "";
+	if (m_option.find("i") != std::string::npos) {
+		m_grepoptions += "i";
+	}
+	if (m_option.find("g") != std::string::npos) {
+		m_grepoptions += "g";
+	}
+
+	if (m_option.find("x") != std::string::npos) {
+		if (m_xInterp != "") {
+			m_exinterps.push_back(m_xInterp);
+		}
+	}
+	if (m_option.find("y") != std::string::npos) {
+		if (m_yInterp != "") {
+			m_exinterps.push_back(m_yInterp);
+		}
+	}
+	if (m_option.find("z") != std::string::npos) {
+		if (m_zInterp != "") {
+			m_exinterps.push_back(m_zInterp);
+		}
+	}
+
+	m_data = true;             // process data
+	m_barline = false;         // process barline
+	m_exinterp = false;        // process exclusive interpretations
+	m_interpretation = false;  // process interpretations (other than exinterp
+	                           //     and spine manipulators).
+
+	if (m_option.find("I") != std::string::npos) {
+		m_interpretation = true;
+		m_data = false;
+	}
+	if (m_option.find("X") != std::string::npos) {
+		m_exinterp = true;
+		m_data = false;
+	}
+	if (m_option.find("B") != std::string::npos) {
+		m_barline = true;
+		m_data = false;
+	}
+	if (m_option.find("L") != std::string::npos) {
+		m_localcomment = true;
+		m_data = false;
+	}
+	if (m_option.find("D") != std::string::npos) {
+		m_data = true;
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_shed::initialize(void) {
+	if (getBoolean("expression")) {
+		string value = getString("expression");
+		parseExpression(value);
+	}
+
+	if (getBoolean("x")) {
+		m_xInterp = getExInterp(getString("x"));
+	}
+	if (getBoolean("y")) {
+		m_yInterp = getExInterp(getString("y"));
+	}
+	if (getBoolean("z")) {
+		m_zInterp = getExInterp(getString("z"));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::getExInterp --
+//
+
+string Tool_shed::getExInterp(const string& value) {
+	if (value == "") {
+		return "**";
+	}
+	if (value == "*") {
+		return "**";
+	}
+	if (value.compare(0, 2, "**") == 0) {
+		return value;
+	}
+	if (value.compare(0, 1, "*") == 0) {
+		return "*" + value;
+	}
+	return "**" + value;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::parseExpression --
+//     Form of string:
+//        s/search/replace/options; s/search2/replace2/options2
+// 
+//
+
+void Tool_shed::parseExpression(const string& expression) {
+	int state = 0;
+	
+	m_searches.clear();
+	m_replaces.clear();
+	m_options.clear();
+
+	char divchar = '/';
+
+	for (int i=0; i<(int)expression.size(); i++) {
+		if (state == 0) {  // start of expression
+			if (isspace(expression[i])) {
+				continue;
+			} else if (expression[i] == 's') {
+				if (i >= (int)expression.size() - 1) {
+					cerr << "Error: spurious s at end of expression: "
+					     << expression << endl;
+					return;
+				} else {
+					divchar = expression[i+1];
+					i++;
+					state++;
+					m_searches.push_back("");
+				}
+			} else {
+				cerr << "Error at position " << i 
+				     << " in expression: " << expression << endl;
+				return;
+			}
+		} else if (state == 1) { // search string
+			if (expression[i] == divchar) {
+				state++;
+				m_replaces.push_back("");
+				continue;
+			} if (expression[i] == '\\') {
+				if (i >= (int)expression.size() - 1) {
+					cerr << "Error: expression ends too soon: "
+					     << expression << endl;
+					return;
+				} else {
+					m_searches.back() += '\\';
+					m_searches.back() += expression[i+1];
+					i++;
+				}
+			} else {
+				m_searches.back() += expression[i];
+			}
+		} else if (state == 2) { // replace string
+			if (expression[i] == divchar) {
+				state++;
+				m_options.push_back("");
+				continue;
+			} if (expression[i] == '\\') {
+				if (i >= (int)expression.size() - 1) {
+					cerr << "Error: expression ends too soon: "
+					     << expression << endl;
+					return;
+				} else {
+					m_replaces.back() += '\\';
+					m_replaces.back() += expression[i+1];
+					i++;
+				}
+			} else {
+				m_replaces.back() += expression[i];
+			}
+		} else if (state == 3) { // regular expression options
+			if (expression[i] == ';') {
+				state++;
+			} else if (isspace(expression[i])) {
+				state++;
+			} else {
+				m_options.back() += expression[i];
+			}
+		}
+		if (state == 4) {
+			state = 0;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::initializeSegment -- Recalculate variables for each Humdrum 
+//      input segment.
+//
+
+void Tool_shed::initializeSegment(HumdrumFile& infile) {
+	m_spines.clear();
+	if (getBoolean("spines")) {
+		int maxtrack = infile.getMaxTrack();
+		Convert::makeBooleanTrackList(m_spines, getString("spines"), maxtrack);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::addToExInterpList --
+//
+
+vector<string> Tool_shed::addToExInterpList(void) {
+	vector<string> output(1);
+	string elist = getString("exclusive-interpretations");
+	for (int i=0; i<(int)elist.size(); i++) {
+		if (isspace(elist[i]) || (elist[i] == ',')) {
+			if (!output.back().empty()) {
+				output.push_back("");
+			}
+		} else {
+			output.back() += elist[i];
+		}
+	}
+	if (output.back().empty()) {
+		output.resize((int)output.size() - 1);
+	}
+	for (int i=0; i<(int)output.size(); i++) {
+		if (output[i].compare(0, 2, "**") == 0) {
+			continue;
+		}
+		if (output[i].compare(0, 1, "*") == 0) {
+			output[i] = "*" + output[i];
+			continue;
+		}
+		output[i] = "**" + output[i];
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::processFile --
+//
+
+void Tool_shed::processFile(HumdrumFile& infile) {
+	if (m_search == "") {
+		// nothing to do
+		return;
+	}
+	m_modified = false;
+
+	if (m_interpretation) {
+		searchAndReplaceInterpretation(infile);
+	}
+
+	if (m_localcomment) {
+		searchAndReplaceLocalComment(infile);
+	}
+
+	if (m_exinterp) {
+		searchAndReplaceExinterp(infile);
+	}
+
+	//if (m_barline) {
+	//	searchAndReplaceBarline(infile);
+
+	if (m_data) {
+		searchAndReplaceData(infile);
+	}
+
+	if (m_modified) {
+		infile.createLinesFromTokens();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceBarline --
+//
+
+void Tool_shed::searchAndReplaceBarline(HumdrumFile& infile) {
+	string isearch;
+	if (m_search[0] == '^') {
+		isearch = "^=" + m_search.substr(1);
+	} else {
+		isearch = "^=.*" + m_search;
+	}
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {	
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, isearch, m_grepoptions)) {
+				string text = token->getText().substr(1);
+				hre.replaceDestructive(text, m_replace, m_search, m_grepoptions);
+				hre.replaceDestructive(text, "", "^=+");
+				text = "=" + text;
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceInterpretation --
+//
+
+void Tool_shed::searchAndReplaceInterpretation(HumdrumFile& infile) {
+	string isearch;
+	if (m_search[0] == '^') {
+		isearch = "^\\*" + m_search.substr(1);
+	} else {
+		isearch = "^\\*.*" + m_search;
+	}
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		} else if (infile[i].isExclusiveInterpretation()) {
+			continue;
+		} else if (infile[i].isManipulator()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {	
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, isearch, m_grepoptions)) {
+				string text = token->getText().substr(1);
+				hre.replaceDestructive(text, m_replace, m_search, m_grepoptions);
+				hre.replaceDestructive(text, "", "^\\*+");
+				text = "*" + text;
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceLocalComment --
+//
+
+void Tool_shed::searchAndReplaceLocalComment(HumdrumFile& infile) {
+	string isearch;
+	if (m_search[0] == '^') {
+		isearch = "^!" + m_search.substr(1);
+	} else {
+		isearch = "^!.*" + m_search;
+	}
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isLocalComment()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {	
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, isearch, m_grepoptions)) {
+				string text = token->getText().substr(1);
+				hre.replaceDestructive(text, m_replace, m_search, m_grepoptions);
+				hre.replaceDestructive(text, "", "^!+");
+				text = "!" + text;
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceExinterp --
+//
+
+void Tool_shed::searchAndReplaceExinterp(HumdrumFile& infile) {
+	string isearch;
+	if (m_search[0] == '^') {
+		isearch = "^\\*\\*" + m_search.substr(1);
+	} else {
+		isearch = "^\\*\\*.*" + m_search;
+	}
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		} else if (!infile[i].isExclusiveInterpretation()) {
+			// assuming a single line for all exclusive interpretations
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {	
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, isearch, m_grepoptions)) {
+				string text = token->getText().substr(2);
+				hre.replaceDestructive(text, m_replace, m_search, m_grepoptions);
+				hre.replaceDestructive(text, "", "^\\*+");
+				text = "**" + text;
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceData --
+//
+
+void Tool_shed::searchAndReplaceData(HumdrumFile& infile) {
+	string dsearch = m_search;
+
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isNull()) {
+				// Don't mess with null interpretations
+				continue;
+			}
+			if (!isValid(token)) {
+				continue;
+			}
+			if (hre.search(token, dsearch, m_grepoptions)) {
+				string text = token->getText();
+				hre.replaceDestructive(text, m_replace, dsearch, m_grepoptions);
+				if (text == "") {
+					text = ".";
+				}
+				token->setText(text);
+				m_modified = true;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::isValidDataType -- usar with -x and -k options.
+//
+
+bool Tool_shed::isValidDataType(HTp token) {
+	if (m_exinterps.empty()) {
+		return true;
+	}
+	string datatype = token->getDataType();
+	for (int i=0; i<(int)m_exinterps.size(); i++) {
+		if (datatype == m_exinterps[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::isValidSpine -- usar with -s option.
+//
+
+bool Tool_shed::isValidSpine(HTp token) {
+	if (m_spines.empty()) {
+		return true;
+	}
+	int track = token->getTrack();
+	return m_spines.at(track);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::isValid --
+//
+
+bool Tool_shed::isValid(HTp token) {
+	if (isValidDataType(token) && isValidSpine(token)) {
+		return true;
+	}
+	return false;
 }
 
 
