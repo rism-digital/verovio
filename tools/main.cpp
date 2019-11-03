@@ -111,8 +111,7 @@ void display_usage()
     std::cout << " -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)" << std::endl;
     std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
     std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
-    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")"
-              << std::endl;
+    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
     std::cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << std::endl;
     std::cout << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << std::endl;
     std::cout << " -v, --version         Display the version number" << std::endl;
@@ -212,16 +211,26 @@ int main(int argc, char **argv)
     }
 
     static struct option base_options[]
-        = { { "all-pages", no_argument, 0, 'a' }, { "format", required_argument, 0, 'f' },
-              { "help", no_argument, 0, '?' }, { "outfile", required_argument, 0, 'o' },
-              { "page", required_argument, 0, 'p' }, { "resources", required_argument, 0, 'r' },
-              { "scale", required_argument, 0, 's' }, { "type", required_argument, 0, 't' },
-              { "version", no_argument, 0, 'v' }, { "xml-id-seed", required_argument, 0, 'x' },
-              // deprecated - some use undocumented short options to catch them as such
-              { "border", required_argument, 0, 'b' }, { "ignore-layout", no_argument, 0, 'd' },
-              { "no-footer", no_argument, 0, 'd' }, { "no-header", no_argument, 0, 'd' },
-              { "no-layout", no_argument, 0, 'd' }, { "page-height-deprecated", required_argument, 0, 'h' },
-              { "page-width-deprecated", required_argument, 0, 'w' }, { 0, 0, 0, 0 } };
+        = { { "all-pages", no_argument, 0, 'a' },
+            { "format", required_argument, 0, 'f' },
+            { "help", no_argument, 0, '?' },
+            { "outfile", required_argument, 0, 'o' },
+            { "page", required_argument, 0, 'p' },
+            { "resources", required_argument, 0, 'r' },
+            { "scale", required_argument, 0, 's' },
+            { "type", required_argument, 0, 't' },
+            { "version", no_argument, 0, 'v' },
+            { "xml-id-seed", required_argument, 0, 'x' },
+            // deprecated - some use undocumented short options to catch them as such
+            { "border", required_argument, 0, 'b' },
+            { "ignore-layout", no_argument, 0, 'd' },
+            { "no-footer", no_argument, 0, 'd' },
+            { "no-header", no_argument, 0, 'd' },
+            { "no-layout", no_argument, 0, 'd' },
+            { "page-height-deprecated", required_argument, 0, 'h' },
+            { "page-width-deprecated", required_argument, 0, 'w' },
+            { 0, 0, 0, 0 }
+        };
 
     int baseSize = sizeof(base_options) / sizeof(option);
 
