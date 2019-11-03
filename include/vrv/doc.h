@@ -76,9 +76,14 @@ public:
     bool GenerateDocumentScoreDef();
 
     /**
+     * Generate a document pgFoot if none is provided
+     */
+    bool GenerateFooter();
+
+    /**
      * Generate a document pgHead from the MEI header if none is provided
      */
-    bool GenerateHeaderAndFooter();
+    bool GenerateHeader();
 
     /**
      * Generate measure numbers from measure attributes

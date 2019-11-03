@@ -111,7 +111,8 @@ void display_usage()
     std::cout << " -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)" << std::endl;
     std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
     std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
-    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
+    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")"
+              << std::endl;
     std::cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << std::endl;
     std::cout << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << std::endl;
     std::cout << " -v, --version         Display the version number" << std::endl;
@@ -179,7 +180,7 @@ void display_usage()
             }
             if (optIntMap) {
                 std::cout << " (default: \"" << optIntMap->GetDefaultStrValue()
-                     << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
+                          << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
             }
             std::cout << std::endl;
         }
@@ -210,25 +211,17 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    static struct option base_options[] = {
-        { "all-pages", no_argument, 0, 'a' },
-        { "format", required_argument, 0, 'f' },
-        { "help", no_argument, 0, '?' },
-        { "outfile", required_argument, 0, 'o' },
-        { "page", required_argument, 0, 'p' },
-        { "resources", required_argument, 0, 'r' },
-        { "scale", required_argument, 0, 's' },
-        { "type", required_argument, 0, 't' },
-        { "version", no_argument, 0, 'v' },
-        { "xml-id-seed", required_argument, 0, 'x' },
-        // deprecated - some use undocumented short options to catch them as such
-        { "border", required_argument, 0, 'b' },
-        { "ignore-layout", no_argument, 0, 'i' },
-        { "no-layout", no_argument, 0, 'n' },
-        { "page-height-deprecated", required_argument, 0, 'h' },
-        { "page-width-deprecated", required_argument, 0, 'w' },
-        { 0, 0, 0, 0 }
-    };
+    static struct option base_options[]
+        = { { "all-pages", no_argument, 0, 'a' }, { "format", required_argument, 0, 'f' },
+              { "help", no_argument, 0, '?' }, { "outfile", required_argument, 0, 'o' },
+              { "page", required_argument, 0, 'p' }, { "resources", required_argument, 0, 'r' },
+              { "scale", required_argument, 0, 's' }, { "type", required_argument, 0, 't' },
+              { "version", no_argument, 0, 'v' }, { "xml-id-seed", required_argument, 0, 'x' },
+              // deprecated - some use undocumented short options to catch them as such
+              { "border", required_argument, 0, 'b' }, { "ignore-layout", no_argument, 0, 'd' },
+              { "no-footer", no_argument, 0, 'd' }, { "no-header", no_argument, 0, 'd' },
+              { "no-layout", no_argument, 0, 'd' }, { "page-height-deprecated", required_argument, 0, 'h' },
+              { "page-width-deprecated", required_argument, 0, 'w' }, { 0, 0, 0, 0 } };
 
     int baseSize = sizeof(base_options) / sizeof(option);
 
@@ -296,12 +289,32 @@ int main(int argc, char **argv)
             case 'a': all_pages = 1; break;
 
             case 'b':
-                vrv::LogWarning("Option -b and --border is deprecated; use --page-margin-bottom, --page-margin-left, --page-margin-right and "
-                           "--page-margin-top instead");
+                vrv::LogWarning("Option -b and --border is deprecated; use --page-margin-bottom, --page-margin-left, "
+                                "--page-margin-right and "
+                                "--page-margin-top instead");
                 options->m_pageMarginBottom.SetValue(optarg);
                 options->m_pageMarginLeft.SetValue(optarg);
                 options->m_pageMarginRight.SetValue(optarg);
                 options->m_pageMarginTop.SetValue(optarg);
+                break;
+
+            case 'd':
+                if (!strcmp(long_options[option_index].name, "ignore-layout")) {
+                    vrv::LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
+                    options->m_breaks.SetValue(vrv::BREAKS_auto);
+                }
+                else if (!strcmp(long_options[option_index].name, "no-footer")) {
+                    vrv::LogWarning("Option --no-footer is deprecated; use --footer none");
+                    options->m_footer.SetValue(vrv::FOOTER_none);
+                }
+                else if (!strcmp(long_options[option_index].name, "no-header")) {
+                    vrv::LogWarning("Option --no-header is deprecated; use --header none");
+                    options->m_header.SetValue(vrv::HEADER_none);
+                }
+                else if (!strcmp(long_options[option_index].name, "no-layout")) {
+                    vrv::LogWarning("Option --no-layout is deprecated; use --breaks none");
+                    options->m_breaks.SetValue(vrv::BREAKS_none);
+                }
                 break;
 
             case 'f':
@@ -313,16 +326,6 @@ int main(int argc, char **argv)
             case 'h':
                 vrv::LogWarning("Option -h is deprecated; use --page-height instead");
                 options->m_pageHeight.SetValue(optarg);
-                break;
-
-            case 'i':
-                vrv::LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
-                options->m_breaks.SetValue(vrv::BREAKS_auto);
-                break;
-
-            case 'n':
-                vrv::LogWarning("Option --no-layout is deprecated; use --breaks none");
-                options->m_breaks.SetValue(vrv::BREAKS_none);
                 break;
 
             case 'o': outfile = std::string(optarg); break;
@@ -383,13 +386,14 @@ int main(int argc, char **argv)
     // Save many headaches for empty SVGs
     if (!dir_exists(vrv::Resources::GetPath())) {
         std::cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option."
-             << std::endl;
+                  << std::endl;
         exit(1);
     }
 
     // Load the music font from the resource directory
     if (!vrv::Resources::InitFonts()) {
-        std::cerr << "The music font could not be loaded; please check the contents of the resource directory." << std::endl;
+        std::cerr << "The music font could not be loaded; please check the contents of the resource directory."
+                  << std::endl;
         exit(1);
     }
 
@@ -444,8 +448,8 @@ int main(int argc, char **argv)
     if (toolkit.GetOutputFormat() != vrv::HUMDRUM) {
         // Check the page range
         if (page > toolkit.GetPageCount()) {
-            std::cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount()
-                 << ")." << std::endl;
+            std::cerr << "The page requested (" << page << ") is not in the page range (max is "
+                      << toolkit.GetPageCount() << ")." << std::endl;
             exit(1);
         }
         if (page < 1) {
