@@ -185,7 +185,6 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
     FileFormat musicxmlDefault = MUSICXML;
 #endif
 
-    size_t searchLimit = 600;
     if (data.size() == 0) {
         return UNKNOWN;
     }
@@ -214,6 +213,7 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
         return UNKNOWN;
     }
     if (data[0] == '<') {
+        size_t searchLimit = 600;
         // <mei> == root node for standard organization of MEI data
         // <pages> == root node for pages organization of MEI data
         // <score-partwise> == root node for part-wise organization of MusicXML data
@@ -559,8 +559,11 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // generate the page header and footer if necessary
-    if (true) { // change this to an option
-        m_doc.GenerateHeaderAndFooter();
+    if (m_options->m_footer.GetValue() == FOOTER_auto) {
+        m_doc.GenerateFooter();
+    }
+    if (m_options->m_header.GetValue() == HEADER_auto) {
+        m_doc.GenerateHeader();
     }
 
     // generate missing measure numbers
@@ -881,6 +884,20 @@ bool Toolkit::SetOptions(const std::string &json_options)
                     SetFormat(json.get<jsonxx::String>("inputFormat"));
                 }
             }
+            else if (iter->first == "noFooter") {
+                LogWarning("Option noFooter is deprecated; use footer: \"auto\"|\"encoded\"|\"none\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("footer");
+                assert(opt);
+                if (json.has<jsonxx::Number>("noFooter")) {
+                    if ((int)json.get<jsonxx::Number>("noFooter") == 1) {
+                        opt->SetValue("none");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
             else if (iter->first == "noLayout") {
                 LogWarning("Option noLayout is deprecated; use breaks: \"auto\"|\"none\" instead");
                 Option *opt = NULL;
@@ -888,6 +905,20 @@ bool Toolkit::SetOptions(const std::string &json_options)
                 assert(opt);
                 if (json.has<jsonxx::Number>("noLayout")) {
                     if ((int)json.get<jsonxx::Number>("noLayout") == 1) {
+                        opt->SetValue("none");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
+            else if (iter->first == "noHeader") {
+                LogWarning("Option noHeader is deprecated; use header: \"auto\"|\"encoded\"|\"none\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("header");
+                assert(opt);
+                if (json.has<jsonxx::Number>("noHeader")) {
+                    if ((int)json.get<jsonxx::Number>("noHeader") == 1) {
                         opt->SetValue("none");
                     }
                     else {

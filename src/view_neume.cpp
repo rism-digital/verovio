@@ -89,7 +89,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
     }
     else if (nc->GetLigated() == BOOLEAN_true) {
-        int pitchDifference;
+        int pitchDifference = 0;
         bool isFirst;
         // Check if this is the first or second part of a ligature
         Object *nextSibling = neume->GetChild(position + 1);

@@ -65,6 +65,10 @@ class OptionGrp;
 
 enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_encoded };
 
+enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded };
+
+enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
+
 enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
 
 //----------------------------------------------------------------------------
@@ -100,6 +104,8 @@ public:
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */
     static std::map<int, std::string> s_breaks;
+    static std::map<int, std::string> s_footer;
+    static std::map<int, std::string> s_header;
     static std::map<int, std::string> s_measureNumber;
 
 protected:
@@ -464,8 +470,8 @@ public:
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
-    OptionBool m_noFooter;
-    OptionBool m_noHeader;
+    OptionIntMap m_footer;
+    OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionInt m_pageHeight;

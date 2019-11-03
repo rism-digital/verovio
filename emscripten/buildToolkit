@@ -97,6 +97,7 @@ if ($wasmQ) {
 	# should be fixed in the next version of emscripten (https://github.com/kripken/emscripten/issues/5718)
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
 	# this is for now necessary to avoid integer overflow runtime error
+    # used to be fixed with " -s \"BINARYEN_TRAP_MODE='clamp'\""
 	$FLAGS .= " -mnontrapping-fptoint";
 	$FLAGS .= " -s TOTAL_MEMORY=512MB";
 	$FLAGS .= " -s TOTAL_STACK=256MB";
