@@ -1,5 +1,7 @@
 # Changelog
 
+## [unreleased]
+
 ## [2.3.0] - 2019-11-04
 * Support for 512th and 1024th duration
 * Support for iOS cocoapods build (@eltiren)
