@@ -29,10 +29,12 @@ git status
 echo "Running git commit"
 git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
 
+git remote show origin
+
 echo "Syncing from origin..."
 git pull
 
 echo "Pushing commits"
-# Now that we're all set up, we can push.
+# Now that we're all set up, we can push
 # git push ${VEROVIO_REPOSITORY} develop
 git push https://${GH_TOKEN}@github.com/musicEnfanthen/verovio travis-output
