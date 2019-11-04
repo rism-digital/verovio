@@ -54,28 +54,28 @@ void ScoreDefElement::Reset()
 
 bool ScoreDefElement::HasClefInfo()
 {
-    return (this->FindChildByType(CLEF));
+    return (this->FindDescendantByType(CLEF));
 }
 
 bool ScoreDefElement::HasKeySigInfo()
 {
-    return (this->FindChildByType(KEYSIG));
+    return (this->FindDescendantByType(KEYSIG));
 }
 
 bool ScoreDefElement::HasMensurInfo()
 {
-    return (this->FindChildByType(MENSUR));
+    return (this->FindDescendantByType(MENSUR));
 }
 
 bool ScoreDefElement::HasMeterSigInfo()
 {
-    return (this->FindChildByType(METERSIG));
+    return (this->FindDescendantByType(METERSIG));
 }
 
 Clef *ScoreDefElement::GetClef()
 {
     // Always check if HasClefInfo() is true before asking for it
-    Clef *clef = dynamic_cast<Clef *>(this->FindChildByType(CLEF));
+    Clef *clef = dynamic_cast<Clef *>(this->FindDescendantByType(CLEF));
     assert(clef);
     return clef;
 }
@@ -92,7 +92,7 @@ Clef *ScoreDefElement::GetClefCopy()
 KeySig *ScoreDefElement::GetKeySig()
 {
     // Always check if HasKeySigInfo() is true before asking for it
-    KeySig *keySig = dynamic_cast<KeySig *>(this->FindChildByType(KEYSIG));
+    KeySig *keySig = dynamic_cast<KeySig *>(this->FindDescendantByType(KEYSIG));
     assert(keySig);
     return keySig;
 }
@@ -109,7 +109,7 @@ KeySig *ScoreDefElement::GetKeySigCopy()
 Mensur *ScoreDefElement::GetMensur()
 {
     // Always check if HasMensurInfo() is true before asking for it
-    Mensur *mensur = dynamic_cast<Mensur *>(this->FindChildByType(MENSUR));
+    Mensur *mensur = dynamic_cast<Mensur *>(this->FindDescendantByType(MENSUR));
     assert(mensur);
     return mensur;
 }
@@ -126,7 +126,7 @@ Mensur *ScoreDefElement::GetMensurCopy()
 MeterSig *ScoreDefElement::GetMeterSig()
 {
     // Always check if HasMeterSigInfo() is true before asking for it
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindChildByType(METERSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindDescendantByType(METERSIG));
     assert(meterSig);
     return meterSig;
 }
@@ -358,27 +358,27 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 
 PgFoot *ScoreDef::GetPgFoot()
 {
-    return dynamic_cast<PgFoot *>(this->FindChildByType(PGFOOT));
+    return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 PgFoot2 *ScoreDef::GetPgFoot2()
 {
-    return dynamic_cast<PgFoot2 *>(this->FindChildByType(PGFOOT2));
+    return dynamic_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 PgHead *ScoreDef::GetPgHead()
 {
-    return dynamic_cast<PgHead *>(this->FindChildByType(PGHEAD));
+    return dynamic_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 PgHead2 *ScoreDef::GetPgHead2()
 {
-    return dynamic_cast<PgHead2 *>(this->FindChildByType(PGHEAD2));
+    return dynamic_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 int ScoreDef::GetMaxStaffSize()
 {
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindChildByType(STAFFGRP));
+    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     return (staffGrp) ? staffGrp->GetMaxStaffSize() : 100;
 }
 

@@ -246,6 +246,7 @@ public:
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
+    Object *GetChild(int idx, const ClassId classId);
 
     /**
      * Return a cont pointer to the children
@@ -342,7 +343,7 @@ public:
     /**
      * Look for all Objects of a class and return its position (-1 if not found)
      */
-    int GetChildIndex(const Object *child, const ClassId classId, int deepth);
+    int GetDescendantIndex(const Object *child, const ClassId classId, int deepth);
 
     /**
      * Insert an element at the idx position.
@@ -356,48 +357,49 @@ public:
     Object *DetachChild(int idx);
 
     /**
-     * Return true if the object has the child Object as child (reference of direct).
+     * Return true if the object has the child Object as descendant (reference of direct).
      * Processes in depth-first.
      */
-    bool HasChild(Object *child, int deepness = UNLIMITED_DEPTH) const;
+    bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
-     * Look for a child with the specified uuid (returns NULL if not found)
+     * Look for a descendant with the specified uuid (returns NULL if not found)
      * This method is a wrapper for the Object::FindByUuid functor.
      */
-    Object *FindChildByUuid(std::string uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindDescendantByUuid(std::string uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Look for a child with the specified type (returns NULL if not found)
+     * Look for a descendant with the specified type (returns NULL if not found)
      * This method is a wrapper for the Object::FindByType functor.
      */
-    Object *FindChildByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindDescendantByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return the first element matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByComparison(Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindDescendantByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return the element matching the extreme value with an Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildExtremeByComparison(
+    Object *FindDescendantExtremeByComparison(
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllChildByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllChildBetween(
+    void FindAllDescendantBetween(
         ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
@@ -429,18 +431,18 @@ public:
     bool DeleteChild(Object *child);
 
     /**
-     * Return the first parent of the specified type.
+     * Return the first ancestor of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
+    Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1) const;
 
-    Object *GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
+    Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
 
     /**
-     * Return the last parent that is NOT of the specified type.
+     * Return the last ancestor that is NOT of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetLastParentNot(const ClassId classId, int maxSteps = -1);
+    Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1);
 
     /**
      * Fill the list of all the children LayerElement.

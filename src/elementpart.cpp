@@ -80,6 +80,8 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 4: return SMUFL_E246_flag64thUp;
             case 5: return SMUFL_E248_flag128thUp;
             case 6: return SMUFL_E24A_flag256thUp;
+            case 7: return SMUFL_E24C_flag512thUp;
+            case 8: return SMUFL_E24E_flag1024thUp;
             default: return 0; break;
         }
     }
@@ -91,6 +93,8 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 4: return SMUFL_E247_flag64thDown;
             case 5: return SMUFL_E249_flag128thDown;
             case 6: return SMUFL_E24B_flag256thDown;
+            case 7: return SMUFL_E24D_flag512thDown;
+            case 8: return SMUFL_E24F_flag1024thDown;
             default: return 0; break;
         }
     }
@@ -136,7 +140,7 @@ void TupletBracket::Reset()
 
 int TupletBracket::GetDrawingXLeft()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
     return tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
@@ -144,7 +148,7 @@ int TupletBracket::GetDrawingXLeft()
 
 int TupletBracket::GetDrawingXRight()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
     return tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
@@ -152,7 +156,7 @@ int TupletBracket::GetDrawingXRight()
 
 int TupletBracket::GetDrawingYLeft()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingLeft());
 
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -169,7 +173,7 @@ int TupletBracket::GetDrawingYLeft()
 
 int TupletBracket::GetDrawingYRight()
 {
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
     assert(tuplet && tuplet->GetDrawingRight());
 
     Beam *beam = tuplet->GetBracketAlignedBeam();
@@ -227,7 +231,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         return xLeft + ((xRight - xLeft) / 2);
     }
     else {
-        Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstParent(TUPLET));
+        Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
         assert(tuplet && tuplet->GetDrawingLeft() && tuplet->GetDrawingRight());
         if (tuplet->GetNumAlignedBeam()) {
             const ArrayOfBeamElementCoords *coords = tuplet->GetNumAlignedBeam()->GetElementCoords();
@@ -426,7 +430,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     // SMUFL flags cover some additional stem length from the 32th only
     if (params->m_dur > DUR_4) {
-        flag = dynamic_cast<Flag *>(this->FindChildByType(FLAG));
+        flag = dynamic_cast<Flag *>(this->FindDescendantByType(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
         flag->SetDrawingYRel(-this->GetDrawingStemLen());

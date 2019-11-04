@@ -114,7 +114,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
 
 bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
@@ -128,7 +128,7 @@ bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
 
 bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }

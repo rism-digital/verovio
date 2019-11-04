@@ -48,7 +48,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     DrawTextChildren(dc, f, params);
 
     if (f->GetStart() && f->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(f->GetFirstParent(SYSTEM));
+        System *currentSystem = dynamic_cast<System *>(f->GetFirstAncestor(SYSTEM));
         // Postpone the drawing of the end of the system; this will call DrawFConnector
         if (currentSystem) {
             currentSystem->AddToDrawingList(f);
@@ -257,7 +257,7 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
 
     dc->StartGraphic(fig, "", fig->GetUuid());
 
-    Svg *svg = dynamic_cast<Svg *>(fig->FindChildByType(SVG));
+    Svg *svg = dynamic_cast<Svg *>(fig->FindDescendantByType(SVG));
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
@@ -355,7 +355,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     assert(text);
 
     dc->StartTextGraphic(text, "", text->GetUuid());
-    
+
     if (params.m_newLine) {
         dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
         params.m_newLine = false;
@@ -366,15 +366,15 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
-    if (text->GetFirstParent(DYNAM)) {
-        DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstParent(REND)));
+    if (text->GetFirstAncestor(DYNAM)) {
+        DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstAncestor(REND)));
     }
-    else if (text->GetFirstParent(HARM)) {
+    else if (text->GetFirstAncestor(HARM)) {
         DrawHarmString(dc, text->GetText(), params);
     }
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
-    else if (text->GetFirstParent(SYL)) {
+    else if (text->GetFirstAncestor(SYL)) {
         DrawLyricString(dc, text->GetText());
     }
     else {

@@ -176,7 +176,6 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
     FileFormat musicxmlDefault = MUSICXML;
 #endif
 
-    size_t searchLimit = 600;
     if (data.size() == 0) {
         return UNKNOWN;
     }
@@ -198,6 +197,7 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
         return UNKNOWN;
     }
     if (data[0] == '<') {
+        size_t searchLimit = 600;
         // <mei> == root node for standard organization of MEI data
         // <pages> == root node for pages organization of MEI data
         // <score-partwise> == root node for part-wise organization of MusicXML data
@@ -515,8 +515,11 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // generate the page header and footer if necessary
-    if (true) { // change this to an option
-        m_doc.GenerateHeaderAndFooter();
+    if (m_options->m_footer.GetValue() == FOOTER_auto) {
+        m_doc.GenerateFooter();
+    }
+    if (m_options->m_header.GetValue() == HEADER_auto) {
+        m_doc.GenerateHeader();
     }
 
     // generate missing measure numbers
@@ -837,6 +840,20 @@ bool Toolkit::SetOptions(const std::string &json_options)
                     SetFormat(json.get<jsonxx::String>("inputFormat"));
                 }
             }
+            else if (iter->first == "noFooter") {
+                LogWarning("Option noFooter is deprecated; use footer: \"auto\"|\"encoded\"|\"none\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("footer");
+                assert(opt);
+                if (json.has<jsonxx::Number>("noFooter")) {
+                    if ((int)json.get<jsonxx::Number>("noFooter") == 1) {
+                        opt->SetValue("none");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
             else if (iter->first == "noLayout") {
                 LogWarning("Option noLayout is deprecated; use breaks: \"auto\"|\"none\" instead");
                 Option *opt = NULL;
@@ -844,6 +861,20 @@ bool Toolkit::SetOptions(const std::string &json_options)
                 assert(opt);
                 if (json.has<jsonxx::Number>("noLayout")) {
                     if ((int)json.get<jsonxx::Number>("noLayout") == 1) {
+                        opt->SetValue("none");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
+            else if (iter->first == "noHeader") {
+                LogWarning("Option noHeader is deprecated; use header: \"auto\"|\"encoded\"|\"none\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("header");
+                assert(opt);
+                if (json.has<jsonxx::Number>("noHeader")) {
+                    if ((int)json.get<jsonxx::Number>("noHeader") == 1) {
                         opt->SetValue("none");
                     }
                     else {
@@ -928,11 +959,11 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 
     // Try to get the element on the current drawing page - it is usually the case and fast
     if (m_doc.GetDrawingPage()) {
-        element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
+        element = m_doc.GetDrawingPage()->FindDescendantByUuid(xmlId);
     }
     // If it wasn't there, try on the whole doc
     if (!element) {
-        element = m_doc.FindChildByUuid(xmlId);
+        element = m_doc.FindDescendantByUuid(xmlId);
     }
     // If not found at all
     if (!element) {
@@ -1163,7 +1194,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
-    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByComparison(&matchMeasureTime));
+    Measure *measure = dynamic_cast<Measure *>(m_doc.FindDescendantByComparison(&matchMeasureTime));
 
     if (!measure) {
         return o.json();
@@ -1174,13 +1205,13 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
-    Page *page = dynamic_cast<Page *>(measure->GetFirstParent(PAGE));
+    Page *page = dynamic_cast<Page *>(measure->GetFirstAncestor(PAGE));
     if (page) pageNo = page->GetIdx() + 1;
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
 
-    measure->FindAllChildByComparison(&notes, &matchNoteTime);
+    measure->FindAllDescendantByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
     ArrayOfObjects::iterator iter;
@@ -1225,11 +1256,11 @@ int Toolkit::GetPageCount()
 
 int Toolkit::GetPageWithElement(const std::string &xmlId)
 {
-    Object *element = m_doc.FindChildByUuid(xmlId);
+    Object *element = m_doc.FindDescendantByUuid(xmlId);
     if (!element) {
         return 0;
     }
-    Page *page = dynamic_cast<Page *>(element->GetFirstParent(PAGE));
+    Page *page = dynamic_cast<Page *>(element->GetFirstAncestor(PAGE));
     if (!page) {
         return 0;
     }
@@ -1238,7 +1269,7 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
 
 int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
-    Object *element = m_doc.FindChildByUuid(xmlId);
+    Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());
@@ -1256,7 +1287,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
         }
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
-        Measure *measure = dynamic_cast<Measure *>(note->GetFirstParent(MEASURE));
+        Measure *measure = dynamic_cast<Measure *>(note->GetFirstAncestor(MEASURE));
         assert(measure);
         // For now ignore repeats and access always the first
         timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
@@ -1267,7 +1298,7 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
 
 std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 {
-    Object *element = m_doc.FindChildByUuid(xmlId);
+    Object *element = m_doc.FindDescendantByUuid(xmlId);
 
     if (!element) {
         LogWarning("Element '%s' not found", xmlId.c_str());

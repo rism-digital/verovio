@@ -49,7 +49,9 @@ typedef double data_VU;
 #define DUR_32 7
 #define DUR_64 8
 #define DUR_128 9
-#define DUR_256 10 // this is it for now
+#define DUR_256 10
+#define DUR_512 11
+#define DUR_1024 12 // this is it for now
 // used for alignement
 #define DUR_MAX 1024
 // mensural duration
