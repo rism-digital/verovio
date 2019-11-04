@@ -35,3 +35,4 @@ git pull
 echo "Pushing commits"
 # Now that we're all set up, we can push.
 # git push ${VEROVIO_REPOSITORY} develop
+git push https://${GH_TOKEN}@github.com/musicEnfanthen/verovio travis-output

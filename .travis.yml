@@ -35,10 +35,7 @@ cache:
 stages:
   - build-c++
   - precache
-  - build-toolkit-nohumdrum
-  - build-toolkit-light
-  - build-toolkit-wasm
-  - build-toolkit-default
+  - build-toolkit
   - deploy
 
 jobs:
@@ -78,38 +75,39 @@ jobs:
     #####################
     # builds toolkit with different options in sequence
     # all "substages" have to use a different stage id "build-toolkit-xx"
-    - stage: build-toolkit-nohumdrum
+    - stage: build-toolkit
       name: "no humdrum"
       os: linux
       script:
         - ./ci_build-toolkit.sh nohumdrum
-    - stage: build-toolkit-light
-      name: "no humdrum light"
+        - ./ci_deploy-toolkit.sh
+    - name: "no humdrum light"
       os: linux
       script:
         - ./ci_build-toolkit.sh light
-    - stage: build-toolkit-wasm
-      name: "no humdrum wasm"
+        - ./ci_deploy-toolkit.sh
+    - name: "no humdrum wasm"
       os: linux
       script:
         - ./ci_build-toolkit.sh wasm
-    - stage: build-toolkit-default
-      name: "default (with humdrum)"
+        - ./ci_deploy-toolkit.sh
+    - name: "default (with humdrum)"
       os: linux
       script:
         - travis_wait 30 ./ci_build-toolkit.sh default
+        - ./ci_deploy-toolkit.sh
 
     ##############
     # DEPLOY stage
     ##############
     # deploys toolkit and doxygen builds in parallel
     - stage: deploy
-      name: toolkit
-      os: linux
-      skip_cleanup: true
-      script:
-        - ./ci_deploy-toolkit.sh
-    - name: doxygen
+    #  name: toolkit
+    #+  os: linux
+    # skip_cleanup: true
+    #  script:
+    #    - ./ci_deploy-toolkit.sh
+      name: doxygen
       os: linux
       addons:
         apt:
