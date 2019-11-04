@@ -1,4 +1,4 @@
-Verovio 2.3.0-dev-3df101b
+Verovio 2.4.0-dev-39a11b3
 
 Example usage:
 
@@ -29,8 +29,8 @@ Input and page layout options
  --mensural-to-measure             Convert mensural sections to measure-based MEI
  --min-last-justification <f>      The last system is only justified if the unjustified width is greater than this percent (default: 0.80; min: 0.00; max: 1.00)
  --mm-output                       Specify that the output in the SVG is given in mm (default is px)
- --no-footer                       Do not add any footer
- --no-header                       Do not add any header
+ --footer <s>                      Control footer layout (default: "auto"; other values: "none", "encoded")
+ --header <s>                      Control header layout (default: "auto"; other values: "none", "encoded")
  --no-justification                Do not justify the system
  --open-control-events             Render open control events
  --page-height <i>                 The page height (default: 2970; min: 100; max: 60000)
