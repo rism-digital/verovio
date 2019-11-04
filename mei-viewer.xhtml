@@ -55,7 +55,7 @@ downloads:
     var savedOptions = undefined;
     var customOptions = undefined;
     var target = "";
-    var disabledOptions = ["adjustPageHeight", "breaks", "landscape", "pageHeight", "pageWidth", "mmOutput", "noFooter"];
+    var disabledOptions = ["adjustPageHeight", "breaks", "landscape", "pageHeight", "pageWidth", "mmOutput", "footer"];
 
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
@@ -82,7 +82,7 @@ downloads:
                     breaks: "auto",
                     inputFormat: format,
                     mmOutput: "false",
-                    noFooter: "true",
+                    footer: "none",
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     scale: zoom
@@ -428,7 +428,7 @@ downloads:
                     adjustPageHeight: false,
                     breaks: "auto",
                     mmOutput: true,
-                    noFooter: false,
+                    footer: "auto",
                     pageHeight: pdfHeight,
                     pageWidth: pdfWidth,
                     scale: 100
