@@ -33,7 +33,7 @@ cache:
 # define order of stages
 # conditions for any stage can be included here
 stages:
-  - build-c++
+  #- build-c++
   - precache
   - build-toolkit
   - deploy
@@ -44,20 +44,20 @@ jobs:
     # BUILD-C++ STAGE
     #################
     # tests builds on osx and on linux with g++
-    - stage: build-c++
-      name: osx-xcode
-      os: osx
-      osx_image: xcode11.1
-      script:
-        - cd tools
-        - cmake .
-        - make
-    - name: linux-g++-5
-      os: linux
-      script:
-        - cd tools
-        - cmake .
-        - make
+   # - stage: build-c++
+   #  name: osx-xcode
+   #   os: osx
+   #   osx_image: xcode11.1
+   #   script:
+   #     - cd tools
+   #     - cmake .
+   #     - make
+   # - name: linux-g++-5
+   #   os: linux
+   #   script:
+   #     - cd tools
+   #     - cmake .
+   #     - make
 
     ################
     # PRECACHE STAGE
