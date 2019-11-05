@@ -30,11 +30,13 @@ echo "Running git commit"
 git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
 
 git remote show origin
+git remote show https://${GH_TOKEN}@github.com/musicEnfanthen/verovio   # TODO: remove this in production
 
 echo "Syncing from origin..."
-git pull
+# git pull --verbose  # TODO: use this in production
+git pull https://${GH_TOKEN}@github.com/musicEnfanthen/verovio --verbose
 
 echo "Pushing commits"
 # Now that we're all set up, we can push
-# git push ${VEROVIO_REPOSITORY} develop
+# git push ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}  # TODO: use this in production
 git push https://${GH_TOKEN}@github.com/musicEnfanthen/verovio ${GH_PAGES_DIRECTORY}
