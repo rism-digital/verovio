@@ -37,6 +37,6 @@ echo "Syncing from origin..."
 git pull https://${GH_TOKEN}@github.com/musicEnfanthen/verovio --verbose
 
 echo "Pushing commits"
-# Now that we're all set up, we can push
+# Now that we're all set up, we can push.
 # git push ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}  # TODO: use this in production
 git push https://${GH_TOKEN}@github.com/musicEnfanthen/verovio ${GH_PAGES_DIRECTORY}
