@@ -69,7 +69,7 @@ jobs:
       os: linux
       script:
         - ./ci_precache.sh
-        - ./ci_deploy-toolkit.sh  # check for changed files: cli options
+        - ./ci_deploy-toolkit.sh
 
     #####################
     # BUILD-TOOLKIT STAGE
