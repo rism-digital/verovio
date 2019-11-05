@@ -30,7 +30,7 @@ echo "Running git commit"
 git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
 
 git remote show origin
-git remote show https://${GH_TOKEN}@github.com/musicEnfanthen/verovio   # TODO: remove this in production
+# git remote show https://${GH_TOKEN}@github.com/musicEnfanthen/verovio   # TODO: remove this in production
 
 echo "Syncing from origin..."
 # git pull --verbose  # TODO: use this in production
