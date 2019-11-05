@@ -3,6 +3,7 @@ branches:
     - travis-test
 
 sudo: false
+os: linux
 dist: bionic
 language: cpp
 
