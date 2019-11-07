@@ -19,6 +19,11 @@ else
   BUILDTARGET="$1"
 fi
 
+
+###############
+# Build toolkit
+###############
+
 # activate and source emscripten tools
 cd ${EMSCRIPTEN_DIRECTORY}
 ./emsdk activate latest
@@ -55,3 +60,32 @@ fi
 
 # Return to the root
 cd ..
+
+
+##################################
+# Push changes to temporary output
+##################################
+
+cd ${OUTPUT_DIRECTORY}
+git checkout ${TEMPORARY_OUTPUT_BRANCH}
+
+echo "Configuring git push"
+git config user.name "JavaScript toolkit builder"
+git config user.email "${COMMIT_AUTHOR_EMAIL}"
+
+echo "Running git add"
+git add -A
+
+echo "Running git commit"
+git commit -m "Auto-commit of ${BUILDTARGET} toolkit build for rism-ch/verovio@${SHA}"
+
+echo "Syncing from origin..."
+# clean-up
+git fetch origin --prune
+# make sure that we are on the correct branch (temporary output)
+git checkout ${TEMPORARY_OUTPUT_BRANCH}
+git pull origin ${TEMPORARY_OUTPUT_BRANCH} --verbose
+
+echo "Pushing commits"
+# Now that we're all set up, we can push latest changes to temporary output
+git push origin ${TEMPORARY_OUTPUT_BRANCH}

@@ -22,25 +22,26 @@ git config user.email "${COMMIT_AUTHOR_EMAIL}"
 echo "Syncing from origin..."
 # clean-up
 git fetch origin --prune
-# make sure that we are on the correct branch
+# make sure that we are on the correct branch (gh-pages=
 git checkout ${GH_PAGES_BRANCH}
 git pull origin ${GH_PAGES_BRANCH} --verbose
 
-# Now that we're all set up, we can squash merge
-echo "Squash merge commits from ${UPDATE_TOOLKIT_BRANCH} into ${GH_PAGES_BRANCH}"
-git merge --squash ${UPDATE_TOOLKIT_BRANCH}
+# Now that we're all set up, we can squash merge temporary output into gh-pages
+# "squash merge" reduces all temporary commits to a single one
+echo "Squash merge commits from ${TEMPORARY_OUTPUT_BRANCH} into ${GH_PAGES_BRANCH}"
+git merge --squash ${TEMPORARY_OUTPUT_BRANCH}
 
 echo "Running git commit"
-git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
+git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}" # TODO: include build-branch in commit message?
 
-echo "Running git status"   # TODO: remove
+echo "Running git status"
 git status
 
 # Push all changes in one commit to the gh-pages branch
 echo "Pushing final commit"
 git push origin ${GH_PAGES_BRANCH}
 
-# After all, it is safe to delete the update branch locally and on remote
-echo "Delete ${UPDATE_TOOLKIT_BRANCH}"
-git branch -D ${UPDATE_TOOLKIT_BRANCH}
-git push origin :${UPDATE_TOOLKIT_BRANCH}
+# After all, it is safe to delete the temporary output branch locally and on remote
+echo "Delete ${TEMPORARY_OUTPUT_BRANCH}"
+git branch -D ${TEMPORARY_OUTPUT_BRANCH}
+git push origin :${TEMPORARY_OUTPUT_BRANCH}

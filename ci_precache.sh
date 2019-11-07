@@ -40,11 +40,11 @@ git clone --single-branch --branch ${GH_PAGES_BRANCH} ${VEROVIO_REPOSITORY} ${OU
 # checkout new branch for toolkit updates
 cd ${OUTPUT_DIRECTORY}
 
-echo "Checkout ${UPDATE_TOOLKIT_BRANCH} branch"
-git checkout -b ${UPDATE_TOOLKIT_BRANCH}
+echo "Checkout ${TEMPORARY_OUTPUT_BRANCH} branch"
+git checkout -b ${TEMPORARY_OUTPUT_BRANCH}
 
 echo "Push new branch to remote and track it"
-git push -u origin ${UPDATE_TOOLKIT_BRANCH}
+git push -u origin ${TEMPORARY_OUTPUT_BRANCH}
 
 # Return to the root
 cd ..

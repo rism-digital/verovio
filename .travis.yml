@@ -1,6 +1,6 @@
 branches:
   only:
-    - travis-test
+    - travis-test # TODO: switch back to "develop"
 
 sudo: false
 os: linux
@@ -21,7 +21,7 @@ env:
     # branches
     - BUILD_BRANCH: travis-test   # TODO: switch back to "develop"
     - GH_PAGES_BRANCH: gh-pages
-    - UPDATE_TOOLKIT_BRANCH: gh-pages-update-toolkit
+    - TEMPORARY_OUTPUT_BRANCH: gh-pages-update-toolkit-${SHA}
     # directories
     - CURRENT_PATH: "$(pwd)"
     - EMSCRIPTEN_DIRECTORY: "emsdk"
@@ -38,7 +38,7 @@ cache:
 # define order of stages
 # conditions for any stage can be included here
 stages:
-  #- build-c++
+  - build-c++
   - precache
   - build-toolkit
   - deploy
@@ -49,20 +49,20 @@ jobs:
     # BUILD-C++ STAGE
     #################
     # tests builds on osx and on linux with g++
-   # - stage: build-c++
-   #  name: osx-xcode
-   #   os: osx
-   #   osx_image: xcode11.1
-   #   script:
-   #     - cd tools
-   #     - cmake .
-   #     - make
-   # - name: linux-g++-5
-   #   os: linux
-   #   script:
-   #     - cd tools
-   #     - cmake .
-   #     - make
+    - stage: build-c++
+      name: osx-xcode
+      os: osx
+      osx_image: xcode11.1
+      script:
+        - cd tools
+        - cmake .
+        - make
+    - name: linux-g++-5
+      os: linux
+      script:
+        - cd tools
+        - cmake .
+        - make
 
     ################
     # PRECACHE STAGE
@@ -79,8 +79,8 @@ jobs:
     #####################
     # BUILD-TOOLKIT STAGE
     #####################
-    # builds toolkit with different options in sequence
-    # all "substages" have to use a different stage id "build-toolkit-xx"
+    # builds toolkit with different options in parallel
+    # all "substages" have to use the same stage id ("build-toolkit")
     - stage: build-toolkit
       name: "no humdrum"
       os: linux
