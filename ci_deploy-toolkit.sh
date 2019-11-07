@@ -49,14 +49,9 @@ git commit -m "Auto-commit of ${BUILDTARGET} toolkit build for rism-ch/verovio@$
 echo "Syncing from origin..."
 # clean-up
 git fetch origin --prune
-
-# make sure wethat  are on the correct branch
+# make sure that we are on the correct branch
 git checkout ${UPDATE_TOOLKIT_BRANCH}
-
-# rebase local branch
-git rebase --preserve-merges origin/${UPDATE_TOOLKIT_BRANCH}
-
-# git pull origin ${UPDATE_TOOLKIT_BRANCH} --verbose # TODO: remove or replace the steps above with this line; cf. https://adamcod.es/2014/12/10/git-pull-correct-workflow.html
+git pull origin ${UPDATE_TOOLKIT_BRANCH} --verbose
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
