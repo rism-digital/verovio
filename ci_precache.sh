@@ -22,9 +22,16 @@ cd $EMSCRIPTEN_DIRECTORY
 cd ..
 
 # copy gh-pages of verovio repository
-echo "Cloning ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
+echo "Cloning branch ${GH_PAGES_DIRECTORY} of ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
 rm -rf $GH_PAGES_DIRECTORY
 git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
+
+ls -alh
+
+cd $GH_PAGES_DIRECTORY
+pwd
+
+cd ..
 
 # make build
 cd ./tools

@@ -12,6 +12,13 @@ if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     exit 1
 fi
 
+if [ -z "$1" ]; then
+    echo "No argument for BUILDTARGET supplied"
+    exit 1
+else
+  BUILDTARGET="$1"
+fi
+
 cd ${GH_PAGES_DIRECTORY}
 
 echo "Configuring git push"
@@ -31,7 +38,7 @@ echo "Get the rism-ch revision"
 SHA=$(git rev-parse --verify HEAD)
 
 echo "Running git commit"
-git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
+git commit -m "Auto-commit of ${BUILDTARGET} toolkit build for rism-ch/verovio@${SHA}"
 
 echo "Syncing from origin..."
 git pull --verbose
