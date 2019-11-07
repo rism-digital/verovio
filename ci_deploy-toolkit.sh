@@ -36,8 +36,8 @@ git fetch origin --prune
 git checkout ${GH_PAGES_BRANCH}
 git pull origin ${GH_PAGES_BRANCH} --verbose
 
+# Now that we're all set up, we can merge
 echo "Squash merge commits from ${UPDATE_TOOLKIT_BRANCH} into ${GH_PAGES_BRANCH}"
-# Now that we're all set up, we can merge.
 git merge --squash ${UPDATE_TOOLKIT_BRANCH}
 
 echo "Running git commit"
@@ -46,7 +46,11 @@ git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
 echo "Running git status"   # TODO: remove
 git status
 
-# Push the changes in one commit to the gh-pages branch
+# Push all changes in one commit to the gh-pages branch
 echo "Pushing final commit"
-git push ${VEROVIO_REPOSITORY} ${GH_PAGES_BRANCH}
+git push origin ${GH_PAGES_BRANCH}
 
+# After all, it is safe to delete the update branch locally and on remote
+echo "Delete ${UPDATE_TOOLKIT_BRANCH}"
+git branch -d ${UPDATE_TOOLKIT_BRANCH}
+git push origin :${UPDATE_TOOLKIT_BRANCH}

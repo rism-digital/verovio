@@ -55,4 +55,4 @@ git pull origin ${UPDATE_TOOLKIT_BRANCH} --verbose
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-git push ${VEROVIO_REPOSITORY} ${UPDATE_TOOLKIT_BRANCH}
+git push origin ${UPDATE_TOOLKIT_BRANCH}
