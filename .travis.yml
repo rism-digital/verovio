@@ -73,7 +73,7 @@ jobs:
       os: linux
       script:
         - ./ci_precache.sh
-        - ./ci_deploy-toolkit.sh precache
+        - ./ci_push-changes.sh precache
 
     #####################
     # BUILD-TOOLKIT STAGE
@@ -85,34 +85,34 @@ jobs:
       os: linux
       script:
         - ./ci_build-toolkit.sh nohumdrum
-        - ./ci_deploy-toolkit.sh nohumdrum
+        - ./ci_push-changes.sh nohumdrum
     - name: "no humdrum light"
       os: linux
       script:
         - ./ci_build-toolkit.sh light
-        - ./ci_deploy-toolkit.sh light
+        - ./ci_push-changes.sh light
     - name: "no humdrum wasm"
       os: linux
       script:
         - ./ci_build-toolkit.sh wasm
-        - ./ci_deploy-toolkit.sh wasm
+        - ./ci_push-changes.sh wasm
     - name: "default (with humdrum)"
       os: linux
       script:
         - travis_wait 30 ./ci_build-toolkit.sh default
-        - ./ci_deploy-toolkit.sh default
+        - ./ci_push-changes.sh default
 
     ##############
     # DEPLOY stage
     ##############
     # deploys toolkit and doxygen builds in parallel
     - stage: deploy
-    #  name: toolkit
-    #+  os: linux
-    # skip_cleanup: true
-    #  script:
-    #    - ./ci_deploy-toolkit.sh
-      name: doxygen
+      name: toolkit
+      os: linux
+      skip_cleanup: true
+      script:
+        - ./ci_deploy-toolkit.sh
+    - name: doxygen
       os: linux
       addons:
         apt:

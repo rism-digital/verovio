@@ -12,41 +12,47 @@ if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     exit 1
 fi
 
+if [ -z "$1" ]; then
+    echo "No argument for BUILDTARGET supplied"
+    exit 1
+else
+  BUILDTARGET="$1"
+fi
+
 cd ${OUTPUT_DIRECTORY}
 
-git checkout ${GH_PAGES_BRANCH}
+ls -alh
+
+git status
+
+git checkout ${UPDATE_TOOLKIT_BRANCH}
 
 echo "Configuring git push"
 git config user.name "JavaScript toolkit builder"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
-echo "Running git remote show origin"   # TODO: remove
+echo "Running git remote show origin"
 git remote show origin
 
-echo "Running git status"    # TODO: remove
+echo "Running git add"
+git add -A
+
+echo "Running git status"
 git status
 
 echo "Get the rism-ch revision"
 SHA=$(git rev-parse --verify HEAD)
 
+echo "Running git commit"
+git commit -m "Auto-commit of ${BUILDTARGET} toolkit build for rism-ch/verovio@${SHA}"
+
 echo "Syncing from origin..."
 # clean-up
 git fetch origin --prune
 # make sure that we are on the correct branch
-git checkout ${GH_PAGES_BRANCH}
-git pull origin ${GH_PAGES_BRANCH} --verbose
+git checkout ${UPDATE_TOOLKIT_BRANCH}
+git pull origin ${UPDATE_TOOLKIT_BRANCH} --verbose
 
-echo "Squash merge commits from ${UPDATE_TOOLKIT_BRANCH} into ${GH_PAGES_BRANCH}"
-# Now that we're all set up, we can merge.
-git merge --squash ${UPDATE_TOOLKIT_BRANCH}
-
-echo "Running git commit"
-git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}"
-
-echo "Running git status"   # TODO: remove
-git status
-
-# Push the changes in one commit to the gh-pages branch
-echo "Pushing final commit"
-git push ${VEROVIO_REPOSITORY} ${GH_PAGES_BRANCH}
-
+echo "Pushing commits"
+# Now that we're all set up, we can push.
+git push ${VEROVIO_REPOSITORY} ${UPDATE_TOOLKIT_BRANCH}
