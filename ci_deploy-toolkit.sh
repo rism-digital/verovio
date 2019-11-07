@@ -19,7 +19,11 @@ else
   BUILDTARGET="$1"
 fi
 
-cd ${GH_PAGES_DIRECTORY}
+cd ${OUTPUT_DIRECTORY}
+
+ls -alh
+
+git status
 
 echo "Configuring git push"
 git config user.name "JavaScript toolkit builder"
@@ -45,4 +49,4 @@ git pull --verbose
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-git push ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
+git push ${VEROVIO_REPOSITORY} ${UPDATE_TOOLKIT_BRANCH}
