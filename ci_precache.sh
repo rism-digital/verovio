@@ -21,10 +21,13 @@ cd $EMSCRIPTEN_DIRECTORY
 ./emsdk install latest
 cd ..
 
-# copy gh-pages of verovio repository
-echo "Cloning branch ${GH_PAGES_DIRECTORY} of ${VEROVIO_REPOSITORY} into ${GH_PAGES_DIRECTORY}"
+# copy gh-pages branch of verovio repository
+echo "Cloning branch ${GH_PAGES_BRANCH} of ${VEROVIO_REPOSITORY} into ${OUTPUT_DIRECTORY}"
 rm -rf $GH_PAGES_DIRECTORY
-git clone --single-branch --branch gh-pages ${VEROVIO_REPOSITORY} ${GH_PAGES_DIRECTORY}
+git clone --single-branch --branch ${GH_PAGES_BRANCH} ${VEROVIO_REPOSITORY} ${OUTPUT_DIRECTORY}
+
+echo "Checkout ${UPDATE_TOOLKIT_BRANCH} branch"
+git checkout -b ${UPDATE_TOOLKIT_BRANCH}
 
 ls -alh
 
