@@ -25,6 +25,8 @@ ls -alh
 
 git status
 
+git checkout ${UPDATE_TOOLKIT_BRANCH}
+
 echo "Configuring git push"
 git config user.name "JavaScript toolkit builder"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
@@ -45,7 +47,19 @@ echo "Running git commit"
 git commit -m "Auto-commit of ${BUILDTARGET} toolkit build for rism-ch/verovio@${SHA}"
 
 echo "Syncing from origin..."
-git pull --verbose
+# clean-up
+git fetch origin --prune
+
+# make sure wethat  are on the correct branch
+git checkout ${UPDATE_TOOLKIT_BRANCH}
+
+# try to do a fast forward merge (will fail with local changes)
+git merge --ff-only origin/${UPDATE_TOOLKIT_BRANCH}
+
+# rebase local branch
+git rebase --preserve-merges origin/${UPDATE_TOOLKIT_BRANCH}
+
+# git pull origin ${UPDATE_TOOLKIT_BRANCH} --verbose # TODO: remove or replace the steps above with this line; cf. https://adamcod.es/2014/12/10/git-pull-correct-workflow.html
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
