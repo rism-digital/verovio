@@ -29,9 +29,14 @@ git clone --single-branch --branch ${GH_PAGES_BRANCH} ${VEROVIO_REPOSITORY} ${OU
 echo "Checkout ${UPDATE_TOOLKIT_BRANCH} branch"
 git checkout -b ${UPDATE_TOOLKIT_BRANCH}
 
+git status
+
 ls -alh
 
 cd $GH_PAGES_DIRECTORY
+pwd
+
+cd $OUTPUT_DIRECTORY
 pwd
 
 cd ..
