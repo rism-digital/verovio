@@ -14,6 +14,7 @@ git:
 env:
   global:
     - COMMIT_AUTHOR_EMAIL: "$(git log -1 --pretty=format:'%aE')"  # TODO: switch author email back to: "lxpugin@gmail.com" if necessary
+    - SHA: "$(git rev-parse --verify HEAD)"
     # repos
     - EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
     - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/musicEnfanthen/verovio"  # TODO: switch back to "https://${GH_TOKEN}@github.com/rism-ch/verovio"

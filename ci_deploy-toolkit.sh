@@ -13,21 +13,11 @@ if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
 fi
 
 cd ${OUTPUT_DIRECTORY}
-
 git checkout ${GH_PAGES_BRANCH}
 
 echo "Configuring git push"
 git config user.name "JavaScript toolkit builder"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
-
-echo "Running git remote show origin"   # TODO: remove
-git remote show origin
-
-echo "Running git status"    # TODO: remove
-git status
-
-echo "Get the rism-ch revision"
-SHA=$(git rev-parse --verify HEAD)
 
 echo "Syncing from origin..."
 # clean-up
@@ -36,7 +26,7 @@ git fetch origin --prune
 git checkout ${GH_PAGES_BRANCH}
 git pull origin ${GH_PAGES_BRANCH} --verbose
 
-# Now that we're all set up, we can merge
+# Now that we're all set up, we can squash merge
 echo "Squash merge commits from ${UPDATE_TOOLKIT_BRANCH} into ${GH_PAGES_BRANCH}"
 git merge --squash ${UPDATE_TOOLKIT_BRANCH}
 
@@ -52,5 +42,5 @@ git push origin ${GH_PAGES_BRANCH}
 
 # After all, it is safe to delete the update branch locally and on remote
 echo "Delete ${UPDATE_TOOLKIT_BRANCH}"
-git branch -d ${UPDATE_TOOLKIT_BRANCH}
+git branch -D ${UPDATE_TOOLKIT_BRANCH}
 git push origin :${UPDATE_TOOLKIT_BRANCH}

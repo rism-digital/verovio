@@ -20,28 +20,14 @@ else
 fi
 
 cd ${OUTPUT_DIRECTORY}
-
-ls -alh
-
-git status
-
 git checkout ${UPDATE_TOOLKIT_BRANCH}
 
 echo "Configuring git push"
 git config user.name "JavaScript toolkit builder"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
-echo "Running git remote show origin"
-git remote show origin
-
 echo "Running git add"
 git add -A
-
-echo "Running git status"
-git status
-
-echo "Get the rism-ch revision"
-SHA=$(git rev-parse --verify HEAD)
 
 echo "Running git commit"
 git commit -m "Auto-commit of ${BUILDTARGET} toolkit build for rism-ch/verovio@${SHA}"
@@ -54,5 +40,5 @@ git checkout ${UPDATE_TOOLKIT_BRANCH}
 git pull origin ${UPDATE_TOOLKIT_BRANCH} --verbose
 
 echo "Pushing commits"
-# Now that we're all set up, we can push.
+# Now that we're all set up, we can push latest changes.
 git push origin ${UPDATE_TOOLKIT_BRANCH}

@@ -43,12 +43,8 @@ cd ${OUTPUT_DIRECTORY}
 echo "Checkout ${UPDATE_TOOLKIT_BRANCH} branch"
 git checkout -b ${UPDATE_TOOLKIT_BRANCH}
 
-echo "Track new branch"
+echo "Push new branch to remote and track it"
 git push -u origin ${UPDATE_TOOLKIT_BRANCH}
-
-git status
-
-ls -alh
 
 # Return to the root
 cd ..
