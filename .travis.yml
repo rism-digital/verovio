@@ -74,7 +74,6 @@ jobs:
       os: linux
       script:
         - ./ci_precache.sh
-        - ./ci_push-changes.sh precache
 
     #####################
     # BUILD-TOOLKIT STAGE
@@ -86,22 +85,18 @@ jobs:
       os: linux
       script:
         - ./ci_build-toolkit.sh nohumdrum
-        - ./ci_push-changes.sh nohumdrum
     - name: "no humdrum light"
       os: linux
       script:
         - ./ci_build-toolkit.sh light
-        - ./ci_push-changes.sh light
     - name: "no humdrum wasm"
       os: linux
       script:
         - ./ci_build-toolkit.sh wasm
-        - ./ci_push-changes.sh wasm
     - name: "default (with humdrum)"
       os: linux
       script:
         - travis_wait 30 ./ci_build-toolkit.sh default
-        - ./ci_push-changes.sh default
 
     ##############
     # DEPLOY stage
