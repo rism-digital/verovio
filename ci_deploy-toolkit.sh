@@ -53,9 +53,6 @@ git fetch origin --prune
 # make sure wethat  are on the correct branch
 git checkout ${UPDATE_TOOLKIT_BRANCH}
 
-# try to do a fast forward merge (will fail with local changes)
-git merge --ff-only origin/${UPDATE_TOOLKIT_BRANCH}
-
 # rebase local branch
 git rebase --preserve-merges origin/${UPDATE_TOOLKIT_BRANCH}
 
