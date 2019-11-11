@@ -86,6 +86,8 @@ wchar_t Rest::GetRestGlyph() const
         case DUR_64: symc = SMUFL_E4E9_rest64th; break;
         case DUR_128: symc = SMUFL_E4EA_rest128th; break;
         case DUR_256: symc = SMUFL_E4EB_rest256th; break;
+        case DUR_512: symc = SMUFL_E4EC_rest512th; break;
+        case DUR_1024: symc = SMUFL_E4ED_rest1024th; break;
     }
     return symc;
 }

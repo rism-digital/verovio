@@ -80,7 +80,7 @@ void Page::AddChild(Object *child)
 RunningElement *Page::GetHeader() const
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
-    if (!doc || doc->GetOptions()->m_noHeader.GetValue()) {
+    if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
 
@@ -99,7 +99,7 @@ RunningElement *Page::GetHeader() const
 RunningElement *Page::GetFooter() const
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
-    if (!doc || doc->GetOptions()->m_noFooter.GetValue()) {
+    if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
 
