@@ -2,6 +2,19 @@
 
 ## [unreleased]
 
+## [2.3.1] - 2019-11-16
+* Fix  bug with scoreDef / staffDef redefinition
+
+## [2.3.0] - 2019-11-04
+* Support for 512th and 1024th duration
+* Support for iOS cocoapods build (@eltiren)
+* Support for SVG currentColor (@rettinghaus)
+* Options for controlling header and footer (--header / --footer "auto|none|encoded") (@rettinghaus)
+* Bug fix with grace notes and mRests
+
+### Changes
+* Options --no-header and --no-footer deprecated
+
 ## [2.2.1] - 2019-10-23
 * Fix bug with mensural notation layout
 

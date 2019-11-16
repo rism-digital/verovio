@@ -1319,11 +1319,10 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     Staff *staff = dynamic_cast<Staff *>(measure->GetFirst(STAFF));
     assert(staff);
 
-    data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");
     pugi::xpath_node repeat = node.select_node("repeat");
     if (!barStyle.empty()) {
-        barRendition = ConvertStyleToRend(barStyle, repeat);
+        data_BARRENDITION barRendition = ConvertStyleToRend(barStyle, repeat);
         if (HasAttributeWithValue(node, "location", "left")) {
             measure->SetLeft(barRendition);
         }

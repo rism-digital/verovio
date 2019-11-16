@@ -280,7 +280,7 @@ void View::DrawStaffGrp(
 
     StaffDef *firstDef = NULL;
     ArrayOfObjects::const_iterator iter;
-    for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+    for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -291,7 +291,7 @@ void View::DrawStaffGrp(
 
     StaffDef *lastDef = NULL;
     ArrayOfObjects::const_reverse_iterator riter;
-    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -612,6 +612,11 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 // for the bottom position we need to take into account the number of lines and the staff size
                 int yBottom = staff->GetDrawingY()
                     - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                // Make sure barlines are visible with a single line
+                if (childStaffDef->GetLines() == 1) {
+                    yTop += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                    yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                }
                 DrawBarLine(dc, yTop, yBottom, barLine);
                 if (barLine->HasRepetitionDots()) {
                     DrawBarLineDots(dc, childStaffDef, staff, barLine);
