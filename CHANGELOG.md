@@ -1,5 +1,7 @@
 # Changelog
 
+## [unreleased]
+
 ## [2.3.1] - 2019-11-16
 * Fix  bug with scoreDef / staffDef redefinition
 
