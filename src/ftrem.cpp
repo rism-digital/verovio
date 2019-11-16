@@ -101,7 +101,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     
     InitCoords(childList, staff, BEAMPLACE_NONE);

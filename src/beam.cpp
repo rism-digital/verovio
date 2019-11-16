@@ -513,11 +513,11 @@ void Beam::FilterList(ArrayOfObjects *childList)
         }
     }
     
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     Staff *beamStaff = staff;
     if (this->HasBeamWith()) {
-        Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+        Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
         assert(measure);
         if (this->GetBeamWith() == OTHERSTAFF_below) {
             beamStaff = dynamic_cast<Staff *>(measure->GetNext(staff, STAFF));
