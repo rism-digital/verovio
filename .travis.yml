@@ -73,7 +73,7 @@ jobs:
       name: "Precache emscripten installation, make build and gh-pages"
       os: linux
       script:
-        - ./ci_precache.sh
+        - ./travis/ci_precache.sh
 
     #####################
     # BUILD-TOOLKIT STAGE
@@ -84,19 +84,19 @@ jobs:
       name: "no humdrum"
       os: linux
       script:
-        - ./ci_build-toolkit.sh nohumdrum
+        - ./travis/ci_build-toolkit.sh nohumdrum
     - name: "no humdrum light"
       os: linux
       script:
-        - ./ci_build-toolkit.sh light
+        - ./travis/ci_build-toolkit.sh light
     - name: "no humdrum wasm"
       os: linux
       script:
-        - ./ci_build-toolkit.sh wasm
+        - ./travis/ci_build-toolkit.sh wasm
     - name: "default (with humdrum)"
       os: linux
       script:
-        - travis_wait 30 ./ci_build-toolkit.sh default
+        - travis_wait 30 ./travis/ci_build-toolkit.sh default
 
     ##############
     # DEPLOY stage
@@ -107,7 +107,7 @@ jobs:
       os: linux
       skip_cleanup: true
       script:
-        - ./ci_deploy-toolkit.sh
+        - ./travis/ci_deploy-toolkit.sh
     - name: doxygen
       os: linux
       addons:
@@ -115,4 +115,4 @@ jobs:
           packages:
             - doxygen
       script:
-        - ./ci_deploy-doxygen.sh
+        - ./travis/ci_deploy-doxygen.sh
