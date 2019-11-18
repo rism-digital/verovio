@@ -53,7 +53,7 @@ cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
 # Return to the root
 cd ..
 
-# 
+#
 cd ${GH_PAGES_DIRECTORY}
 
 echo "Configuring git push"

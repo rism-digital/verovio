@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
 # This script builds the doxygen documentation and automatically commits
-# It uses an encrypted GH_TOKEN setting in Travis to check out the latest version,
+# It uses an encrypted GH_TOKEN setting in Travis to check out the latest version, 
 # build the doc, commit the changes, and then push.
 
-set -e # Exit with nonzero exit code if anything fails
+set -ev # -e: Exit with nonzero exit code if anything fails
+        # -v: verbose mode; print every command in travis output
 
-if [ "${TRAVIS_BRANCH}" != "develop" ]; then
+if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     echo "Will not build doxygen documentation for branch ${TRAVIS_BRANCH}"
-    exit 0
+    exit 1
 fi
 
 SHA=$(git rev-parse --verify HEAD)
@@ -30,16 +31,20 @@ cd ./doc
 # Return to the root
 cd ..
 
-#
+# 
 cd ${DOXYGEN_DIRECTORY}
 
 echo "Configuring git push"
 git config user.name "Documentation deployment"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
-git status
 
 git add -A
+
+echo "Running git status"
+git status
+
+echo "Running git commit"
 git commit -m "Auto-commit of documentation build for rism-ch/verovio-doxygen@${SHA}"
 
 echo "Syncing from origin..."
