@@ -1,6 +1,6 @@
 branches:
   only:
-    - travis-test # TODO: switch back to "develop"
+    - develop-travis # TODO: switch back to "develop"
 
 sudo: false
 os: linux
@@ -17,9 +17,9 @@ env:
     - SHA: "$(git rev-parse --verify HEAD)"
     # repos
     - EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
-    - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/musicEnfanthen/verovio"  # TODO: switch back to "https://${GH_TOKEN}@github.com/rism-ch/verovio"
+    - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
     # branches
-    - BUILD_BRANCH: travis-test   # TODO: switch back to "develop"
+    - BUILD_BRANCH: develop-travis   # TODO: switch back to "develop"
     - GH_PAGES_BRANCH: gh-pages
     - TEMPORARY_OUTPUT_BRANCH: gh-pages-update-toolkit-${SHA}
     # directories
