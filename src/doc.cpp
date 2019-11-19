@@ -173,7 +173,7 @@ bool Doc::GenerateFooter()
     if (m_scoreDef.FindDescendantByType(PGFOOT) || m_options->m_adjustPageHeight.GetValue()) {
         return false;
     }
-    
+
     PgFoot *pgFoot = new PgFoot();
     // We mark it as generated for not having it written in the output
     pgFoot->IsGenerated(true);
