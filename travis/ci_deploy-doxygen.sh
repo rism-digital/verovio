@@ -52,4 +52,4 @@ git pull
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-# git push ${DOXYGEN_REPOSITORY} master
+git push ${DOXYGEN_REPOSITORY} master

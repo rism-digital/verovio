@@ -1,6 +1,6 @@
 branches:
   only:
-    - develop-travis # TODO: switch back to "develop"
+    - develop
 
 sudo: false
 os: linux
@@ -19,7 +19,7 @@ env:
     - EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
     - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
     # branches
-    - BUILD_BRANCH: develop-travis   # TODO: switch back to "develop"
+    - BUILD_BRANCH: develop
     - GH_PAGES_BRANCH: gh-pages
     - TEMPORARY_OUTPUT_BRANCH: gh-pages-update-toolkit-${SHA}
     # directories
