@@ -32,6 +32,12 @@
 		403BEFF9206C00FF00D022D5 /* beatrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFE7206C00B400D022D5 /* beatrpt.cpp */; };
 		403BEFFA206C010100D022D5 /* beatrpt.h in Headers */ = {isa = PBXBuildFile; fileRef = 403BEFE9206C00B400D022D5 /* beatrpt.h */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
+		406916DC23833770009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
+		406916DE23833794009E6B04 /* mspace.h in Headers */ = {isa = PBXBuildFile; fileRef = 406916DD2383378F009E6B04 /* mspace.h */; };
+		406916DF23833795009E6B04 /* mspace.h in Headers */ = {isa = PBXBuildFile; fileRef = 406916DD2383378F009E6B04 /* mspace.h */; };
+		406916E02383379A009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
+		406916E12383379B009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
+		406916E22383379C009E6B04 /* mspace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 406916DB2383376F009E6B04 /* mspace.cpp */; };
 		40910FEC1E42734C00DB1FA5 /* mordent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40910FEA1E42734C00DB1FA5 /* mordent.cpp */; };
 		409B3DD91F2D1C2A0098A265 /* ftrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DD81F2D1C2A0098A265 /* ftrem.cpp */; };
 		409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DDA1F2D1C550098A265 /* btrem.cpp */; };
@@ -1162,6 +1168,8 @@
 		403BEFEC206C00B400D022D5 /* multirpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = multirpt.cpp; path = src/multirpt.cpp; sourceTree = "<group>"; };
 		4067E4C71DDDAF0000C6E059 /* fermata.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fermata.cpp; path = src/fermata.cpp; sourceTree = "<group>"; };
 		4067E4C91DDDAF6400C6E059 /* fermata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fermata.h; path = include/vrv/fermata.h; sourceTree = "<group>"; };
+		406916DB2383376F009E6B04 /* mspace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mspace.cpp; path = src/mspace.cpp; sourceTree = "<group>"; };
+		406916DD2383378F009E6B04 /* mspace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mspace.h; path = include/vrv/mspace.h; sourceTree = "<group>"; };
 		40910FEA1E42734C00DB1FA5 /* mordent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mordent.cpp; path = src/mordent.cpp; sourceTree = "<group>"; };
 		40910FEB1E42734C00DB1FA5 /* mordent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mordent.h; path = include/vrv/mordent.h; sourceTree = "<group>"; };
 		409B3DD61F2D1C0C0098A265 /* btrem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btrem.h; path = include/vrv/btrem.h; sourceTree = "<group>"; };
@@ -2111,6 +2119,8 @@
 				403BEFE5206C00B300D022D5 /* mrpt.h */,
 				403BEFEB206C00B400D022D5 /* mrpt2.cpp */,
 				403BEFE8206C00B400D022D5 /* mrpt2.h */,
+				406916DB2383376F009E6B04 /* mspace.cpp */,
+				406916DD2383378F009E6B04 /* mspace.h */,
 				8F086ECB188539540037FD8E /* multirest.cpp */,
 				8F59292218854BF800FE51AD /* multirest.h */,
 				403BEFEC206C00B400D022D5 /* multirpt.cpp */,
@@ -2163,6 +2173,7 @@
 				4DEC4DD421C8295700D1D273 /* expan.h in Headers */,
 				4DB3D8A51F828E9100B5FC2B /* areaposinterface.h in Headers */,
 				4DEC4DD321C8295700D1D273 /* restore.h in Headers */,
+				406916DE23833794009E6B04 /* mspace.h in Headers */,
 				4D9C53111B52E4AE0003C6EC /* checked.h in Headers */,
 				4DB3D8E51F83D16600B5FC2B /* elementpart.h in Headers */,
 				4DB3D8D21F83D12000B5FC2B /* octave.h in Headers */,
@@ -2483,6 +2494,7 @@
 				BB4C4B7822A932D7001F6AF0 /* syllable.h in Headers */,
 				BB4C4B6A22A932D7001F6AF0 /* nc.h in Headers */,
 				BB4C4ADC22A932BC001F6AF0 /* abbr.h in Headers */,
+				406916DF23833795009E6B04 /* mspace.h in Headers */,
 				BB4C4AB622A932A6001F6AF0 /* iomei.h in Headers */,
 				BB4C4AB222A932A6001F6AF0 /* iodarms.h in Headers */,
 				BB4C4A5B22A9318E001F6AF0 /* humlib.h in Headers */,
@@ -2809,6 +2821,7 @@
 				4DB3D8A81F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
 				4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */,
 				4D4335CA1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
+				406916E12383379B009E6B04 /* mspace.cpp in Sources */,
 				4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */,
 				4D6413792035F58200BB630E /* pages.cpp in Sources */,
 				4D16942E1E3A44F300569BF4 /* textelement.cpp in Sources */,
@@ -2945,6 +2958,7 @@
 				4D6331F51F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4DF4407D1D511D0200152B7E /* boundary.cpp in Sources */,
 				8F086EF5188539540037FD8E /* measure.cpp in Sources */,
+				406916DC23833770009E6B04 /* mspace.cpp in Sources */,
 				4D4335D21ED4567F003BE1A9 /* atts_externalsymbols.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
@@ -3188,6 +3202,7 @@
 				8F3DD33618854B250051330C /* staff.cpp in Sources */,
 				4DB3D8C61F83D0FA00B5FC2B /* breath.cpp in Sources */,
 				4DB3D8CF1F83D11600B5FC2B /* mordent.cpp in Sources */,
+				406916E02383379A009E6B04 /* mspace.cpp in Sources */,
 				4DB3D8D71F83D13600B5FC2B /* trill.cpp in Sources */,
 				4D6413802035F68600BB630E /* mdiv.cpp in Sources */,
 				4D766F0320ACAD6E006875D8 /* neume.cpp in Sources */,
@@ -3378,6 +3393,7 @@
 				BB4C4B7722A932D7001F6AF0 /* syllable.cpp in Sources */,
 				BB4C4BB122A932EB001F6AF0 /* view_page.cpp in Sources */,
 				BB4C4A9F22A9328F001F6AF0 /* toolkit.cpp in Sources */,
+				406916E22383379C009E6B04 /* mspace.cpp in Sources */,
 				BB4C4AE922A932BC001F6AF0 /* del.cpp in Sources */,
 				BB4C4B7122A932D7001F6AF0 /* rest.cpp in Sources */,
 				BB4C4BB222A932EB001F6AF0 /* view_running.cpp in Sources */,
