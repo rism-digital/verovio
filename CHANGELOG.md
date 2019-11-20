@@ -2,6 +2,9 @@
 
 ## [unreleased]
 
+## [2.3.2] - 2019-11-20
+* Fix bug with mordent when loading MEI 3.0 files
+
 ## [2.3.1] - 2019-11-16
 * Fix  bug with scoreDef / staffDef redefinition
 
