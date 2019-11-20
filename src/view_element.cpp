@@ -720,7 +720,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     else {
         x = element->GetDrawingX();
-        y = staff->GetDrawingY();
+        y = element->GetDrawingY();
     }
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
