@@ -71,7 +71,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction,
     }
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
-        int ulx, uly, lrx, lry;
+        int ulx = 0, uly = 0, lrx = 0, lry = 0;
         std::vector<std::pair<std::string, std::string> > attributes;
         if (this->ParseInsertAction(
                 json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &lrx, &lry, &attributes)) {
