@@ -1255,6 +1255,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         parent->ReorderByXPos();
+        if (doubleParent == NULL) {
+            LogError("No second level parent!");
+            return false;
+        }
         doubleParent->AddChild(parent);
 
         Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
@@ -1311,6 +1315,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     (*it)->MoveItselfTo(fullSyllable);
                 }
             }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->AddChild(fullSyllable);
             Layer *layer = dynamic_cast<Layer *>(fullSyllable->GetFirstAncestor(LAYER));
             assert(layer);
@@ -1323,12 +1331,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *obj = (*it).first;
         obj->ClearRelinquishedChildren();
         if (obj->GetChildCount() == 0) {
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->DeleteChild(obj);
         }
         else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
             Object *syl;
             while ((syl = obj->FindDescendantByType(SYL)) != NULL) {
                 obj->DeleteChild(syl);
+            }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
             }
             doubleParent->DeleteChild(obj);
         }
