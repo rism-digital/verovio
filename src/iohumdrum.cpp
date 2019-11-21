@@ -4034,9 +4034,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
         }
     }
 
-	if (m_debug) {
-    	printMeasureTokens();
-	}
+    if (m_debug) {
+        printMeasureTokens();
+    }
 }
 
 //////////////////////////////
@@ -10603,12 +10603,12 @@ bool HumdrumInput::checkForTupletForcedBreak(const std::vector<hum::HTp> &durite
 
 void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
-	vector<humaux::HumdrumBeamAndTuplet*> newtg;
-	for (int i=0; i<(int)tg.size(); i++) {
-		if (tg[i].group >= 0) {
-			newtg.push_back(&tg[i]);
-		}
-	}
+    vector<humaux::HumdrumBeamAndTuplet *> newtg;
+    for (int i = 0; i < (int)tg.size(); i++) {
+        if (tg[i].group >= 0) {
+            newtg.push_back(&tg[i]);
+        }
+    }
 
     std::vector<int> inbeam(newtg.size(), 0);
     for (int i = 0; i < (int)inbeam.size(); i++) {
@@ -10661,9 +10661,9 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
         scaleadj[i] = 2;
         scaleadj[i + 1] = 2;
         for (int j = i + 1; j < (int)newtg.size(); j++) {
-			if (newtg[j]->group < 0) {
-				continue;
-			}
+            if (newtg[j]->group < 0) {
+                continue;
+            }
             if (!newtg[j]->tupletend) {
                 scaleadj[j] = 2;
                 continue;
@@ -10696,9 +10696,9 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
     }
 
     for (int i = 0; i < (int)tg.size(); i++) {
-		if (tg[i].group < 0) {
-			continue;
-		}
+        if (tg[i].group < 0) {
+            continue;
+        }
         tg[i].numscale *= scaleadj[i];
     }
 }
