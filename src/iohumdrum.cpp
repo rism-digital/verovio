@@ -4034,7 +4034,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
         }
     }
 
-    // printMeasureTokens();
+	if (m_debug) {
+    	printMeasureTokens();
+	}
 }
 
 //////////////////////////////
@@ -10034,7 +10036,7 @@ void HumdrumInput::removeGBeam(std::vector<string> &elements, std::vector<void *
 void HumdrumInput::removeTuplet(std::vector<string> &elements, std::vector<void *> &pointers)
 {
     if (elements.back() != "tuplet") {
-        cerr << "ERROR REMOVING Tuplet" << endl;
+        cerr << "ERROR REMOVING TUPLET" << endl;
         cerr << "ELEMENT BACK IS " << elements.back() << endl;
         cerr << "ELEMENT STACK:" << endl;
         for (int i = (int)elements.size() - 1; i >= 0; i--) {
@@ -10601,12 +10603,19 @@ bool HumdrumInput::checkForTupletForcedBreak(const std::vector<hum::HTp> &durite
 
 void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
-    std::vector<int> inbeam(tg.size(), 0);
+	vector<humaux::HumdrumBeamAndTuplet*> newtg;
+	for (int i=0; i<(int)tg.size(); i++) {
+		if (tg[i].group >= 0) {
+			newtg.push_back(&tg[i]);
+		}
+	}
+
+    std::vector<int> inbeam(newtg.size(), 0);
     for (int i = 0; i < (int)inbeam.size(); i++) {
-        if (tg[i].beamstart) {
-            inbeam[i] = tg[i].beamstart;
+        if (newtg[i]->beamstart) {
+            inbeam[i] = newtg[i]->beamstart;
         }
-        else if (tg[i].beamend) {
+        else if (newtg[i]->beamend) {
             inbeam[i] = 0;
         }
         else if (i > 0) {
@@ -10617,60 +10626,63 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
         }
     }
 
-    std::vector<int> scaleadj(tg.size(), 1);
-    for (int i = 0; i < (int)tg.size(); i++) {
-        if (!(inbeam[i] && tg[i].tupletend)) {
+    std::vector<int> scaleadj(newtg.size(), 1);
+    for (int i = 0; i < (int)newtg.size(); i++) {
+        if (!(inbeam[i] && newtg[i]->tupletend)) {
             continue;
         }
-        if (i >= (int)tg.size() - 1) {
+        if (i >= (int)newtg.size() - 1) {
             continue;
         }
-        if (!tg[i + 1].tupletstart) {
+        if (!newtg[i + 1]->tupletstart) {
             continue;
         }
-        if (tg[i].num != tg[i + 1].num) {
+        if (newtg[i]->num != newtg[i + 1]->num) {
             continue;
         }
-        if (tg[i].numbase != tg[i + 1].numbase) {
+        if (newtg[i]->numbase != newtg[i + 1]->numbase) {
             continue;
         }
         // Need to merge adjacent tuplets (only can merge one pair at a time
         // properly with scaleadj at the moment).
-        int target = tg[i].tupletend;
+        int target = newtg[i]->tupletend;
         for (int j = i; j >= 0; j--) {
-            if (!tg[j].tupletstart) {
+            if (!newtg[j]->tupletstart) {
                 scaleadj[j] = 2;
                 continue;
             }
-            if (target == tg[j].tupletstart) {
+            if (target == newtg[j]->tupletstart) {
                 scaleadj[j] = 2;
                 break;
             }
             cerr << "SOMETHING STANGE HAPPENED HERE" << endl;
         }
-        target = tg[i + 1].tupletstart;
+        target = newtg[i + 1]->tupletstart;
         scaleadj[i] = 2;
         scaleadj[i + 1] = 2;
-        for (int j = i + 1; j < (int)tg.size(); j++) {
-            if (!tg[j].tupletend) {
+        for (int j = i + 1; j < (int)newtg.size(); j++) {
+			if (newtg[j]->group < 0) {
+				continue;
+			}
+            if (!newtg[j]->tupletend) {
                 scaleadj[j] = 2;
                 continue;
             }
-            if (target == tg[j].tupletend) {
+            if (target == newtg[j]->tupletend) {
                 scaleadj[j] = 2;
                 break;
             }
             cerr << "SOMETHING STANGE HAPPENED HERE2" << endl;
         }
 
-        tg[i].tupletend = 0;
-        tg[i + 1].tupletstart = 0;
-        for (int j = i + 2; j < (int)tg.size(); j++) {
-            if (tg[j].tupletstart) {
-                tg[j].tupletstart--;
+        newtg[i]->tupletend = 0;
+        newtg[i + 1]->tupletstart = 0;
+        for (int j = i + 2; j < (int)newtg.size(); j++) {
+            if (newtg[j]->tupletstart) {
+                newtg[j]->tupletstart--;
             }
-            if (tg[j].tupletend) {
-                tg[j].tupletend--;
+            if (newtg[j]->tupletend) {
+                newtg[j]->tupletend--;
             }
         }
     }
@@ -10684,6 +10696,9 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
     }
 
     for (int i = 0; i < (int)tg.size(); i++) {
+		if (tg[i].group < 0) {
+			continue;
+		}
         tg[i].numscale *= scaleadj[i];
     }
 }
