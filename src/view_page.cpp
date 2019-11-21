@@ -147,16 +147,18 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     dc->StartGraphic(system, "", system->GetUuid());
 
-    // Draw system divider (from the second one) if scoreDef is optimized
+    // draw system divider (from the second one) if scoreDef is optimized
     if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
         int x1 = system->GetDrawingX() - m_doc->GetDrawingUnit(100) * 3;
         int y1 = system->GetDrawingY() - m_doc->GetDrawingUnit(100) * 1;
         int x2 = system->GetDrawingX() + m_doc->GetDrawingUnit(100) * 3;
         int y2 = system->GetDrawingY() + m_doc->GetDrawingUnit(100) * 3;
+        dc->StartCustomGraphic("systemDivider");
         DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
         y1 += m_doc->GetDrawingUnit(100) * 2;
         y2 += m_doc->GetDrawingUnit(100) * 2;
         DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+        dc->EndCustomGraphic();
     }
 
     // first we need to clear the drawing list of postponed elements
