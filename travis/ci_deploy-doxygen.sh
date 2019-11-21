@@ -12,6 +12,11 @@ if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     exit 1
 fi
 
+if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
+    echo "Will not build doxygen documentation for pull requests. Skipping it."
+    exit 0
+fi
+
 SHA=$(git rev-parse --verify HEAD)
 
 DOXYGEN_REPOSITORY="https://${GH_TOKEN}@github.com/rism-ch/verovio-doxygen"

@@ -12,6 +12,11 @@ if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     exit 1
 fi
 
+if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
+    echo "Will not build JavaScript toolkit for pull requests. Skipping it."
+    exit 0
+fi
+
 cd ${OUTPUT_DIRECTORY}
 git checkout ${GH_PAGES_BRANCH}
 
