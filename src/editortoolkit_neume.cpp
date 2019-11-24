@@ -1524,6 +1524,10 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
             el->DeleteChild(*it);
         }
     }
+    if (!firstChild) {
+        LogMessage("Unable to find first child.");
+        return false;
+    }
     // Get the coordinates of the remaining child.
     int initialUlx = firstChild->GetZone()->GetUlx();
     int initialUly = firstChild->GetZone()->GetUly();
