@@ -325,7 +325,6 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
 
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
-    int shift, leftShift, rightShift;
 
     int dist = abs(p2.x - p1.x);
     float posXRatio = 1.0;
@@ -365,6 +364,7 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
 
         // Keep the maximum shift on the left and right
+        int shift;
         if (curveDir == curvature_CURVEDIR_above) {
             shift = intersection;
         }
@@ -373,8 +373,8 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
         }
         // shift += doc->GetDrawingUnit(100);
         if (shift > 0) {
-            leftShift = (forceBothSides || leftPoint) ? shift : shift * posXRatio;
-            rightShift = (forceBothSides || !leftPoint) ? shift : shift * posXRatio;
+            int leftShift = (forceBothSides || leftPoint) ? shift : shift * posXRatio;
+            int rightShift = (forceBothSides || !leftPoint) ? shift : shift * posXRatio;
             maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
             maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
         }
