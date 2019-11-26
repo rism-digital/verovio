@@ -364,13 +364,12 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
         }
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
 
-        shift = 0;
         // Keep the maximum shift on the left and right
         if (curveDir == curvature_CURVEDIR_above) {
             shift = intersection;
         }
         else {
-            shift = intersection;
+            shift = -intersection;
         }
         // shift += doc->GetDrawingUnit(100);
         if (shift > 0) {
