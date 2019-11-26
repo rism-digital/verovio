@@ -2,6 +2,9 @@
 
 ## [unreleased]
 
+## [2.3.3] - 2019-11-26
+* Fix bug with NPM build (remove init function for adjusting memory)
+
 ## [2.3.2] - 2019-11-20
 * Fix bug with mordent when loading MEI 3.0 files
 
