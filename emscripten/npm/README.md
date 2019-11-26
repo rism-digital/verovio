@@ -19,13 +19,3 @@ svg = vrvToolkit.renderPage(1, {});
 
 fs.writeFileSync("hello.svg", svg);
 ```
-
-### Memory allocation
-
-The memory available for Verovio can be increased during import by passing a MB value to the `init` function.
-
-```javascript
-var verovio = require('verovio').init(512);
-```
-
-The value has to be less than 1024MB.
