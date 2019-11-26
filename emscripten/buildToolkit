@@ -207,8 +207,8 @@ if ($? == 0) {
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
 	`cat $BUILD_DIR/verovio.js verovio-js-start.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
 
-	# wrap the npm package (but not with wasm build for now)
-	if (!$wasmQ) {
+	# wrap the npm package (but not with wasm build and without humdrum for now)
+	if (!$wasmQ && !$lightQ && $nohumdrum) {
 		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
