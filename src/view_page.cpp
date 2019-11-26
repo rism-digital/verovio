@@ -1409,11 +1409,13 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
-
+    if (element->Is(APP)) {
+        App *app = dynamic_cast<App *>(element);
+        assert(app && app->GetLevel() == EDITORIAL_TOPLEVEL);
+    } else if (element->Is(CHOICE)) {
+        Choice *choice = dynamic_cast<Choice *>(element);
+        assert(choice && choice->GetLevel() == EDITORIAL_TOPLEVEL);
+    }
     std::string boundaryStart;
     if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
 
@@ -1432,10 +1434,13 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_MEASURE);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_MEASURE);
+    if (element->Is(APP)) {
+        App *app = dynamic_cast<App *>(element);
+        assert(app && app->GetLevel() == EDITORIAL_MEASURE);
+    } else if (element->Is(CHOICE)) {
+        Choice *choice = dynamic_cast<Choice *>(element);
+        assert(choice && choice->GetLevel() == EDITORIAL_MEASURE);
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1451,10 +1456,13 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_STAFF);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_STAFF);
+    if (element->Is(APP)) {
+        App *app = dynamic_cast<App *>(element);
+        assert(app && app->GetLevel() == EDITORIAL_STAFF);
+    } else if (element->Is(CHOICE)) {
+        Choice *choice = dynamic_cast<Choice *>(element);
+        assert(choice && choice->GetLevel() == EDITORIAL_STAFF);
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1471,10 +1479,13 @@ void View::DrawLayerEditorialElement(
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_LAYER);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_LAYER);
+    if (element->Is(APP)) {
+        App *app = dynamic_cast<App *>(element);
+        assert(app && app->GetLevel() == EDITORIAL_LAYER);
+    } else if (element->Is(CHOICE)) {
+        Choice *choice = dynamic_cast<Choice *>(element);
+        assert(choice && choice->GetLevel() == EDITORIAL_LAYER);
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1490,10 +1501,13 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
         DrawAnnot(dc, element, true);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TEXT);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TEXT);
+    if (element->Is(APP)) {
+        App *app = dynamic_cast<App *>(element);
+        assert(app && app->GetLevel() == EDITORIAL_TEXT);
+    } else if (element->Is(CHOICE)) {
+        Choice *choice = dynamic_cast<Choice *>(element);
+        assert(choice && choice->GetLevel() == EDITORIAL_TEXT);
+    }
 
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1509,10 +1523,13 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
         DrawAnnot(dc, element, true);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_FB);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_FB);
+    if (element->Is(APP)) {
+        App *app = dynamic_cast<App *>(element);
+        assert(app && app->GetLevel() == EDITORIAL_FB);
+    } else if (element->Is(CHOICE)) {
+        Choice *choice = dynamic_cast<Choice *>(element);
+        assert(choice && choice->GetLevel() == EDITORIAL_FB);
+    }
 
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1528,10 +1545,13 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
         DrawAnnot(dc, element, true);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_RUNNING);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_RUNNING);
+    if (element->Is(APP)) {
+        App *app = dynamic_cast<App *>(element);
+        assert(app && app->GetLevel() == EDITORIAL_RUNNING);
+    } else if (element->Is(CHOICE)) {
+        Choice *choice = dynamic_cast<Choice *>(element);
+        assert(choice && choice->GetLevel() == EDITORIAL_RUNNING);
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
