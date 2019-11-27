@@ -4,10 +4,16 @@
 # It uses an encrypted GH_TOKEN setting in Travis to check out the latest version, 
 # build the doc, commit the changes, and then push.
 
-set -e # Exit with nonzero exit code if anything fails
+set -ev # -e: Exit with nonzero exit code if anything fails
+        # -v: verbose mode; print every command in travis output
 
-if [ "${TRAVIS_BRANCH}" != "develop" ]; then
+if [ "${TRAVIS_BRANCH}" != "${BUILD_BRANCH}" ]; then
     echo "Will not build doxygen documentation for branch ${TRAVIS_BRANCH}"
+    exit 1
+fi
+
+if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
+    echo "Will not build doxygen documentation for pull requests. Skipping it."
     exit 0
 fi
 
@@ -37,9 +43,13 @@ echo "Configuring git push"
 git config user.name "Documentation deployment"
 git config user.email "${COMMIT_AUTHOR_EMAIL}"
 
-git status
 
 git add -A
+
+echo "Running git status"
+git status
+
+echo "Running git commit"
 git commit -m "Auto-commit of documentation build for rism-ch/verovio-doxygen@${SHA}"
 
 echo "Syncing from origin..."
@@ -47,4 +57,4 @@ git pull
 
 echo "Pushing commits"
 # Now that we're all set up, we can push.
-# git push ${DOXYGEN_REPOSITORY} master
+git push ${DOXYGEN_REPOSITORY} master

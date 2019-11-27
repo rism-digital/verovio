@@ -542,8 +542,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             for (auto &artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }
-            delete chord;
             this->m_chainedId = chord->GetUuid();
+            delete chord;
             return true;
         }
         else if (count > 2) {
