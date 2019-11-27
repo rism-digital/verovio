@@ -465,7 +465,7 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     // keep the widest width for the system - careful: this can be the label OR labelAbbr
     system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
     // also store in the system the maximum width with abbreviations for justification
-    if (!abbreviations && (labelAbbrStr.length() > 0)) {
+    if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
         std::vector<std::wstring> lines;
         labelAbbr->GetTextLines(labelAbbr, lines);
