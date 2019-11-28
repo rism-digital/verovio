@@ -1206,6 +1206,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
         else if (key.node().child("key-step")) {
+            if (!keySig) keySig = new KeySig();
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
             for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
                  keyStep = keyStep.next_sibling("key-step")) {
