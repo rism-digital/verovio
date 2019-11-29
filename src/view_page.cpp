@@ -1410,11 +1410,9 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         return;
     }
     if (element->Is(APP)) {
-        App *app = dynamic_cast<App *>(element);
-        assert(app && app->GetLevel() == EDITORIAL_TOPLEVEL);
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     } else if (element->Is(CHOICE)) {
-        Choice *choice = dynamic_cast<Choice *>(element);
-        assert(choice && choice->GetLevel() == EDITORIAL_TOPLEVEL);
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
     std::string boundaryStart;
     if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
@@ -1435,11 +1433,9 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
         return;
     }
     if (element->Is(APP)) {
-        App *app = dynamic_cast<App *>(element);
-        assert(app && app->GetLevel() == EDITORIAL_MEASURE);
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_MEASURE));
     } else if (element->Is(CHOICE)) {
-        Choice *choice = dynamic_cast<Choice *>(element);
-        assert(choice && choice->GetLevel() == EDITORIAL_MEASURE);
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_MEASURE));
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1457,11 +1453,9 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
         return;
     }
     if (element->Is(APP)) {
-        App *app = dynamic_cast<App *>(element);
-        assert(app && app->GetLevel() == EDITORIAL_STAFF);
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_STAFF));
     } else if (element->Is(CHOICE)) {
-        Choice *choice = dynamic_cast<Choice *>(element);
-        assert(choice && choice->GetLevel() == EDITORIAL_STAFF);
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_STAFF));
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1480,11 +1474,9 @@ void View::DrawLayerEditorialElement(
         return;
     }
     if (element->Is(APP)) {
-        App *app = dynamic_cast<App *>(element);
-        assert(app && app->GetLevel() == EDITORIAL_LAYER);
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_LAYER));
     } else if (element->Is(CHOICE)) {
-        Choice *choice = dynamic_cast<Choice *>(element);
-        assert(choice && choice->GetLevel() == EDITORIAL_LAYER);
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_LAYER));
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1502,11 +1494,9 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
         return;
     }
     if (element->Is(APP)) {
-        App *app = dynamic_cast<App *>(element);
-        assert(app && app->GetLevel() == EDITORIAL_TEXT);
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TEXT));
     } else if (element->Is(CHOICE)) {
-        Choice *choice = dynamic_cast<Choice *>(element);
-        assert(choice && choice->GetLevel() == EDITORIAL_TEXT);
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TEXT));
     }
 
     dc->StartTextGraphic(element, "", element->GetUuid());
@@ -1524,11 +1514,9 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
         return;
     }
     if (element->Is(APP)) {
-        App *app = dynamic_cast<App *>(element);
-        assert(app && app->GetLevel() == EDITORIAL_FB);
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_FB));
     } else if (element->Is(CHOICE)) {
-        Choice *choice = dynamic_cast<Choice *>(element);
-        assert(choice && choice->GetLevel() == EDITORIAL_FB);
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_FB));
     }
 
     dc->StartTextGraphic(element, "", element->GetUuid());
@@ -1546,11 +1534,9 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
         return;
     }
     if (element->Is(APP)) {
-        App *app = dynamic_cast<App *>(element);
-        assert(app && app->GetLevel() == EDITORIAL_RUNNING);
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_RUNNING));
     } else if (element->Is(CHOICE)) {
-        Choice *choice = dynamic_cast<Choice *>(element);
-        assert(choice && choice->GetLevel() == EDITORIAL_RUNNING);
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_RUNNING));
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
