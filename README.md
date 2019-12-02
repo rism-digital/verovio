@@ -43,4 +43,4 @@ Example output
 
 This page was generated with version 0.9.13-dev-b953d3b
 
-![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-0.9.13-dev.png)
+![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-2.4.0-dev.png)
