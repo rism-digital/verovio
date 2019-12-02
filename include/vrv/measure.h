@@ -186,6 +186,12 @@ public:
      * Return the first staff of each staffGrp according to the scoreDef
      */
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
+                    
+    /**
+     * Return the top (first) visible staff in the measure (if any).
+     * Takes into account system optimization
+     */
+    Staff *GetTopVisibleStaff();
 
     /**
      * Check if the measure encloses the given time (in millisecond)
