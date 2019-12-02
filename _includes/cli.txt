@@ -1,4 +1,4 @@
-Verovio 2.4.0-dev-2748fed
+Verovio 2.4.0-dev-1efe5a5
 
 Example usage:
 
@@ -79,6 +79,7 @@ General layout options
  --spacing-system <i>              The system minimal spacing in MEI units (default: 3; min: 0; max: 12)
  --staff-line-width <f>            The staff line width in unit (default: 0.15; min: 0.10; max: 0.30)
  --stem-width <f>                  The stem width (default: 0.20; min: 0.10; max: 0.50)
+ --system-divider <s>              The display of system dividers (default: "left"; other values: "none", "left-right")
  --tie-thickness <f>               The tie thickness in MEI units (default: 0.50; min: 0.20; max: 1.00)
 
 Element selectors
