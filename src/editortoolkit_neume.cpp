@@ -1464,7 +1464,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 return false;
             }
         }
-        else {
+        else if (currentParent) {
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
