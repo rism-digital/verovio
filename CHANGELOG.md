@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Options for controlling system divider display (--systemDivider "none|left|left-right")
 
 ## [2.3.3] - 2019-11-26
 * Fix bug with NPM build (remove init function for adjusting memory)
