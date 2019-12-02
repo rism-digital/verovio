@@ -596,6 +596,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 else {
                     LogMessage("Unsupported character in contour.");
+                    delete newNc;
+                    delete newZone;
                     return false;
                 }
                 newZone->SetUlx(newUlx);
@@ -1569,6 +1571,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         }
         else {
             LogMessage("Unsupported character in contour.");
+            delete newNc;
+            delete zone;
             return false;
         }
         zone->SetUlx(newUlx);
@@ -1667,6 +1671,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     }
     else {
         LogWarning("isLigature is invalid!");
+        delete zone;
         return false;
     }
     if (success1 && success2 && m_doc->GetType() != Facs) {
