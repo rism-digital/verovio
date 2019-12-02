@@ -41,6 +41,6 @@ If you are willing to contribute to Verovio, please follow the [contribution](do
 Example output
 --------------
 
-This page was generated with version 0.9.13-dev-b953d3b
+This page was generated with version 2.4.0-dev-2748fed
 
 ![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-2.4.0-dev.png)
