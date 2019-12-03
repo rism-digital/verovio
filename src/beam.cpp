@@ -213,7 +213,7 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     assert(beamInterface->m_beamPlace != BEAMPLACE_NONE);
     
     // Temporary fix to set the stem dir
-    beamInterface->m_stemDir = (beamInterface->m_beamPlace == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    //beamInterface->m_stemDir = (beamInterface->m_beamPlace == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
 
     for (i = 0; i < elementCount; ++i) {
         if (!m_beamElementCoordRefs.at(i)->m_stem) continue;
@@ -280,18 +280,20 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         verticalShift = -verticalShift;
     }
 
+    
     for (i = 0; i < elementCount; ++i) {
         // change the stem dir for all objects
         if (m_beamElementCoordRefs.at(i)->m_element->Is(NOTE)) {
-            ((Note *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
+           // ((Note *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
         }
         else if (m_beamElementCoordRefs.at(i)->m_element->Is(CHORD)) {
-            ((Chord *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
+           // ((Chord *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
         }
 
         m_beamElementCoordRefs.at(i)->m_yBeam = m_beamElementCoordRefs.at(i)->m_y + verticalShift;
         m_beamElementCoordRefs.at(i)->m_x += stemX[beamInterface->m_cueSize];
     }
+    
 
     for (i = 0; i < elementCount; i++) {
         s_y += m_beamElementCoordRefs.at(i)->m_yBeam - yRel;
@@ -339,8 +341,8 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
             + this->m_beamSlope * (m_beamElementCoordRefs.at(i)->m_x - this->m_startingX);
 
         // if the stem is not long enough, add extra stem length needed to all members of the beam
-        if ((beamInterface->m_stemDir == STEMDIRECTION_up && (oldYPos > expectedY))
-            || (beamInterface->m_stemDir == STEMDIRECTION_down && (oldYPos < expectedY))) {
+        if ((beamInterface->m_beamPlace == BEAMPLACE_above && (oldYPos > expectedY))
+            || (beamInterface->m_beamPlace == BEAMPLACE_below && (oldYPos < expectedY))) {
             verticalAdjustment += oldYPos - expectedY;
         }
     }
@@ -396,7 +398,7 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
             // This is the case with fTrem on whole notes
             if (!stem) continue;
 
-            stem->SetDrawingStemDir(beamInterface->m_stemDir);
+            //stem->SetDrawingStemDir(beamInterface->m_stemDir);
             // Since the value were calculated relatively to the element position, adjust them
             stem->SetDrawingXRel(m_beamElementCoordRefs.at(i)->m_x - el->GetDrawingX());
             stem->SetDrawingYRel(y2 - el->GetDrawingY());
