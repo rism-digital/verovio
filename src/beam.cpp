@@ -189,19 +189,25 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         beamInterface->m_beamPlace = BEAMPLACE_mixed;
     }
     else {
-        // force layer direction if it exists and nothing in the notes
-        if (beamInterface->m_stemDir == STEMDIRECTION_NONE) {
-            beamInterface->m_stemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
-        }
-        // Now look at the stem direction
+        // Now look at the stem direction of the notes within the beam
         if (beamInterface->m_stemDir == STEMDIRECTION_up) {
             beamInterface->m_beamPlace = BEAMPLACE_above;
         }
         else if (beamInterface->m_stemDir == STEMDIRECTION_down) {
             beamInterface->m_beamPlace = BEAMPLACE_below;
         }
-        else {
-            beamInterface->m_beamPlace = (avgY < verticalCenter) ? BEAMPLACE_below : BEAMPLACE_below;
+        // Look at the layer direction or, finally, at the note position
+        else
+        {
+            data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
+            // Layer direction ?
+            if (layerStemDir == STEMDIRECTION_NONE) {
+                beamInterface->m_beamPlace = (avgY < verticalCenter) ? BEAMPLACE_above : BEAMPLACE_below;
+            }
+            // Look at the note position
+            else {
+                beamInterface->m_beamPlace = (layerStemDir == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
+            }
         }
     }
     assert(beamInterface->m_beamPlace != BEAMPLACE_NONE);

@@ -181,8 +181,11 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
                 if (currentStemDir != STEMDIRECTION_NONE) {
                     if ((this->m_stemDir != STEMDIRECTION_NONE) && (this->m_stemDir != currentStemDir)) {
                         this->m_hasMultipleStemDir = true;
+                        this->m_stemDir = STEMDIRECTION_NONE;
                     }
-                    this->m_stemDir = currentStemDir;
+                    else {
+                        this->m_stemDir = currentStemDir;
+                    }
                 }
             }
             // keep the shortest dur in the beam
