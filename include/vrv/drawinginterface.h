@@ -109,7 +109,7 @@ public:
     bool m_cueSize;
     bool m_crossStaff;
     int m_shortestDur;
-    data_STEMDIRECTION m_stemDir;
+    data_STEMDIRECTION m_noteStemDir;
     data_BEAMPLACE m_beamPlace;
     Staff *m_beamStaff;
 

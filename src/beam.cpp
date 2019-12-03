@@ -173,10 +173,10 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         if (beamInterface->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
             LogDebug("Stem directions (mixed) contradict beam placement (below or above)");
         }
-        else if ((beamInterface->m_stemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
+        else if ((beamInterface->m_noteStemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
             LogDebug("Stem directions (up) contradict beam placement (below)");
         }
-        else if ((beamInterface->m_stemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
+        else if ((beamInterface->m_noteStemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
             LogDebug("Stem directions (down) contradict beam placement (above)");
         }
         beamInterface->m_beamPlace = place;
@@ -190,10 +190,10 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     }
     else {
         // Now look at the stem direction of the notes within the beam
-        if (beamInterface->m_stemDir == STEMDIRECTION_up) {
+        if (beamInterface->m_noteStemDir == STEMDIRECTION_up) {
             beamInterface->m_beamPlace = BEAMPLACE_above;
         }
-        else if (beamInterface->m_stemDir == STEMDIRECTION_down) {
+        else if (beamInterface->m_noteStemDir == STEMDIRECTION_down) {
             beamInterface->m_beamPlace = BEAMPLACE_below;
         }
         // Look at the layer direction or, finally, at the note position

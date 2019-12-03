@@ -80,7 +80,7 @@ void BeamDrawingInterface::Reset()
     m_cueSize = false;
     m_crossStaff = false;
     m_shortestDur = 0;
-    m_stemDir = STEMDIRECTION_NONE;
+    m_noteStemDir = STEMDIRECTION_NONE;
     m_beamPlace = BEAMPLACE_NONE;
     m_beamStaff = NULL;
 
@@ -179,12 +179,12 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
                     currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
                 }
                 if (currentStemDir != STEMDIRECTION_NONE) {
-                    if ((this->m_stemDir != STEMDIRECTION_NONE) && (this->m_stemDir != currentStemDir)) {
+                    if ((this->m_noteStemDir != STEMDIRECTION_NONE) && (this->m_noteStemDir != currentStemDir)) {
                         this->m_hasMultipleStemDir = true;
-                        this->m_stemDir = STEMDIRECTION_NONE;
+                        this->m_noteStemDir = STEMDIRECTION_NONE;
                     }
                     else {
-                        this->m_stemDir = currentStemDir;
+                        this->m_noteStemDir = currentStemDir;
                     }
                 }
             }
@@ -221,8 +221,8 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     this->m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
 
     // Always set stem diretion to up for grace note beam unless stem direction is provided
-    if (this->m_cueSize && (this->m_stemDir == STEMDIRECTION_NONE)) {
-        this->m_stemDir = STEMDIRECTION_up;
+    if (this->m_cueSize && (this->m_noteStemDir == STEMDIRECTION_NONE)) {
+        this->m_noteStemDir = STEMDIRECTION_up;
     }
 }
 
