@@ -1,0 +1,10 @@
+<chord dur="8" color="blue">
+  <note pname="d" oct="4" accid="f"/>
+  <note pname="f" oct="4" color="green"/>
+  <note pname="g" oct="4" color="red">
+    <accid accid="s" color="yellow"/>
+  </note>
+  <note pname="c" oct="5" color="fuchsia">
+    <accid accid="s"/>
+  </note>
+</chord>

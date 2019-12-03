@@ -8,5 +8,5 @@
       </beam>
     </layer>
   </staff>
-  <turn accidlower="s" delayed="true" place="above" staff="1" tstamp="2.75"/>
+  <turn accidlower="s" delayed="true" place="above" staff="1" tstamp="2.66" label="delayed turn"/>
 </measure>
