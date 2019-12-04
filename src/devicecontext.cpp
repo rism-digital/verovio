@@ -37,6 +37,9 @@ void DeviceContext::SetPen(int colour, int width, int opacity, int dashLength)
 
     switch (opacity) {
         case AxSOLID: opacityValue = 1.0; break;
+        case AxDOT: dashLength = dashLength ?: width * 1; opacityValue = 1.0; break;
+        case AxLONG_DASH: dashLength = dashLength ?: width * 4; opacityValue = 1.0; break;
+        case AxSHORT_DASH: dashLength = dashLength ?: width * 2; opacityValue = 1.0; break;
         case AxTRANSPARENT: opacityValue = 0.0; break;
         default: opacityValue = 1.0; // solid brush by default
     }

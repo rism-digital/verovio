@@ -255,6 +255,25 @@ void View::DrawSmuflString(
     dc->ResetBrush();
 }
 
+void View::DrawDashedBezierCurve(DeviceContext *dc, Point bezier[4], int penStyle, int thickness, int staffSize, float angle)
+{
+    assert(dc);
+
+    Point bez1[4], bez2[4]; // filled array with control points and end point
+
+    BoundingBox::CalcThickBezier(bezier, 0, angle, bez1, bez2);
+
+    bez1[0] = ToDeviceContext(bez1[0]);
+    bez1[1] = ToDeviceContext(bez1[1]);
+    bez1[2] = ToDeviceContext(bez1[2]);
+    bez1[3] = ToDeviceContext(bez1[3]);
+
+    // Actually draw it
+    dc->SetPen(m_currentColour, thickness, penStyle);
+    dc->DrawSimpleBezierPath(bez1);
+    dc->ResetPen();
+}
+
 void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle)
 {
     assert(dc);
