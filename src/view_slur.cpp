@@ -62,10 +62,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     switch (slur->GetLform()) {
         case LINEFORM_dashed:
-            DrawThickBezierCurve(dc, points, curve->GetThickness() / 2, staff->m_drawingStaffSize, curve->GetAngle(), AxLONG_DASH);
+            DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle(), AxSHORT_DASH);
             break;
         case LINEFORM_dotted:
-            DrawThickBezierCurve(dc, points, curve->GetThickness() / 2, staff->m_drawingStaffSize, curve->GetAngle(), AxDOT);
+            DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle(), AxDOT);
             break;
         case LINEFORM_wavy:
             // TODO: Implement wavy slur.
