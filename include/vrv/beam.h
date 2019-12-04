@@ -59,6 +59,9 @@ public:
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoordRefs();
+    
+private:
+    void CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
 public:
     // values set by CalcBeam

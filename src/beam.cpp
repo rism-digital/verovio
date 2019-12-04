@@ -407,6 +407,11 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     }
 }
     
+void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+{
+    
+}
+    
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
