@@ -17,7 +17,11 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature, public AttCurveRend {
+class Slur : public ControlElement,
+             public TimeSpanningInterface,
+             public AttColor,
+             public AttCurvature,
+             public AttCurveRend {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
