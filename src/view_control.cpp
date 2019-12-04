@@ -888,14 +888,9 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     int penStyle = AxSOLID;
     switch (tie->GetLform()) {
-        case LINEFORM_dashed:
-            penStyle = AxSHORT_DASH;
-            break;
-        case LINEFORM_dotted:
-            penStyle = AxDOT;
-            break;
-        default:
-            break;
+        case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
+        case LINEFORM_dotted: penStyle = AxDOT; break;
+        default: break;
     }
 
     if (graphic)
