@@ -886,11 +886,18 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     assert(curve);
     curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
 
+    int penStyle = AxSOLID;
+    switch (tie->GetLform()) {
+        case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
+        case LINEFORM_dotted: penStyle = AxDOT; break;
+        default: break;
+    }
+
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "spanning-tie", "");
-    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize);
+    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize, 0, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
