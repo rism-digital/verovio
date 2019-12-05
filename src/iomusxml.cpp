@@ -2100,6 +2100,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }
+            tie->SetLform(tie->AttCurveRend::StrToLineform(startTie.node().attribute("line-type").as_string()));
+
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(note, tie);
@@ -2354,7 +2356,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             meiSlur->SetColor(slur.attribute("color").as_string());
             // lineform
-            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(slur.attribute("line-type ").as_string()));
+            meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
             meiSlur->SetCurvedir(
