@@ -9080,6 +9080,15 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             Measure *startmeasure = m_measures[mindex];
             Slur *slur = new Slur;
 
+            string dotted = slurstart->getLayoutParameter("S", "dot");
+            string dashed = slurstart->getLayoutParameter("S", "dash");
+            if (!dotted.empty()) {
+                slur->SetLform(LINEFORM_dotted);
+            }
+            else if (!dashed.empty()) {
+                slur->SetLform(LINEFORM_dashed);
+            }
+
             // start ID can sometimes not be set yet due to cross layer slurs.
             std::string startid = slurstart->getValue("MEI", "xml:id");
             std::string endid = slurend->getValue("MEI", "xml:id");
