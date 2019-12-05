@@ -152,14 +152,14 @@ bool MeiOutput::ExportFile()
             // schema processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
             // schematron processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = "https://music-encoding.org/schema/4.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
 
@@ -5814,10 +5814,10 @@ void MeiInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMorden
 {
     if (mordent.attribute("form")) {
         std::string form = std::string(mordent.attribute("form").value());
-        if (form == "inv") {
+        if (form == "norm") {
             vrvMordent->SetForm(mordentLog_FORM_lower);
         }
-        else if (form == "norm") {
+        else if (form == "inv") {
             vrvMordent->SetForm(mordentLog_FORM_upper);
         }
         else {

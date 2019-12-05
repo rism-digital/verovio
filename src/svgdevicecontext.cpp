@@ -389,7 +389,7 @@ void SvgDeviceContext::StartPage()
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.append_child(pugi::node_pcdata)
-            .set_value("g.page-margin{color:black;font-family:Times;} "
+            .set_value("g.page-margin{font-family:Times;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
                        "g.tempo{font-weight:bold;} g.dir, g.dynam, "
@@ -401,6 +401,7 @@ void SvgDeviceContext::StartPage()
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "definition-scale";
+    m_currentNode.append_attribute("color") = "black";
     if (this->GetFacsimile()) {
         m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d", GetWidth(), GetHeight()).c_str();
     }

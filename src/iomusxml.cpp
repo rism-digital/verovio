@@ -1206,6 +1206,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
         else if (key.node().child("key-step")) {
+            if (!keySig) keySig = new KeySig();
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
             for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
                  keyStep = keyStep.next_sibling("key-step")) {
@@ -1305,8 +1306,11 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     pugi::xpath_node nextNote = node.next_sibling("note");
     if (nextNote && m_durTotal > 0) {
         // We need a <space> if a note follows that starts not at the beginning of the measure
-        Layer *layer = new Layer();
-        if (!node.select_node("voice")) layer = SelectLayer(nextNote.node(), measure);
+        Layer *layer;
+        if (node.select_node("voice"))
+            layer = new Layer();
+        else
+            layer = SelectLayer(nextNote.node(), measure);
         FillSpace(layer, m_durTotal);
     }
 }

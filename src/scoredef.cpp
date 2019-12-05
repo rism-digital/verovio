@@ -54,28 +54,28 @@ void ScoreDefElement::Reset()
 
 bool ScoreDefElement::HasClefInfo()
 {
-    return (this->FindDescendantByType(CLEF));
+    return (this->FindDescendantByType(CLEF, 1));
 }
 
 bool ScoreDefElement::HasKeySigInfo()
 {
-    return (this->FindDescendantByType(KEYSIG));
+    return (this->FindDescendantByType(KEYSIG, 1));
 }
 
 bool ScoreDefElement::HasMensurInfo()
 {
-    return (this->FindDescendantByType(MENSUR));
+    return (this->FindDescendantByType(MENSUR, 1));
 }
 
 bool ScoreDefElement::HasMeterSigInfo()
 {
-    return (this->FindDescendantByType(METERSIG));
+    return (this->FindDescendantByType(METERSIG, 1));
 }
 
 Clef *ScoreDefElement::GetClef()
 {
     // Always check if HasClefInfo() is true before asking for it
-    Clef *clef = dynamic_cast<Clef *>(this->FindDescendantByType(CLEF));
+    Clef *clef = dynamic_cast<Clef *>(this->FindDescendantByType(CLEF, 1));
     assert(clef);
     return clef;
 }
@@ -92,7 +92,7 @@ Clef *ScoreDefElement::GetClefCopy()
 KeySig *ScoreDefElement::GetKeySig()
 {
     // Always check if HasKeySigInfo() is true before asking for it
-    KeySig *keySig = dynamic_cast<KeySig *>(this->FindDescendantByType(KEYSIG));
+    KeySig *keySig = dynamic_cast<KeySig *>(this->FindDescendantByType(KEYSIG, 1));
     assert(keySig);
     return keySig;
 }
@@ -109,7 +109,7 @@ KeySig *ScoreDefElement::GetKeySigCopy()
 Mensur *ScoreDefElement::GetMensur()
 {
     // Always check if HasMensurInfo() is true before asking for it
-    Mensur *mensur = dynamic_cast<Mensur *>(this->FindDescendantByType(MENSUR));
+    Mensur *mensur = dynamic_cast<Mensur *>(this->FindDescendantByType(MENSUR, 1));
     assert(mensur);
     return mensur;
 }
@@ -126,7 +126,7 @@ Mensur *ScoreDefElement::GetMensurCopy()
 MeterSig *ScoreDefElement::GetMeterSig()
 {
     // Always check if HasMeterSigInfo() is true before asking for it
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindDescendantByType(METERSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(this->FindDescendantByType(METERSIG, 1));
     assert(meterSig);
     return meterSig;
 }

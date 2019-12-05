@@ -1,6 +1,18 @@
 # Changelog
 
 ## [unreleased]
+* Options for controlling system divider display (--systemDivider "none|left|left-right")
+
+## [2.3.3] - 2019-11-26
+* Fix bug with NPM build (remove init function for adjusting memory)
+
+## [2.3.2] - 2019-11-20
+* Fix bug with mordent when loading MEI 3.0 files
+
+## [2.3.1] - 2019-11-16
+* Fix  bug with scoreDef / staffDef redefinition
+
+## [2.3.0] - 2019-11-04
 * Support for 512th and 1024th duration
 * Support for iOS cocoapods build (@eltiren)
 * Support for SVG currentColor (@rettinghaus)

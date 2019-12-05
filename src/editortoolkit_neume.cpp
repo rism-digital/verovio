@@ -71,7 +71,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction,
     }
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
-        int ulx, uly, lrx, lry;
+        int ulx = 0, uly = 0, lrx = 0, lry = 0;
         std::vector<std::pair<std::string, std::string> > attributes;
         if (this->ParseInsertAction(
                 json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &lrx, &lry, &attributes)) {
@@ -1255,6 +1255,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         parent->ReorderByXPos();
+        if (doubleParent == NULL) {
+            LogError("No second level parent!");
+            return false;
+        }
         doubleParent->AddChild(parent);
 
         Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
@@ -1311,6 +1315,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     (*it)->MoveItselfTo(fullSyllable);
                 }
             }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->AddChild(fullSyllable);
             Layer *layer = dynamic_cast<Layer *>(fullSyllable->GetFirstAncestor(LAYER));
             assert(layer);
@@ -1323,12 +1331,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *obj = (*it).first;
         obj->ClearRelinquishedChildren();
         if (obj->GetChildCount() == 0) {
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->DeleteChild(obj);
         }
         else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
             Object *syl;
             while ((syl = obj->FindDescendantByType(SYL)) != NULL) {
                 obj->DeleteChild(syl);
+            }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
             }
             doubleParent->DeleteChild(obj);
         }
@@ -1448,7 +1464,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 return false;
             }
         }
-        else {
+        else if (currentParent) {
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
@@ -1507,6 +1523,10 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         else {
             el->DeleteChild(*it);
         }
+    }
+    if (!firstChild) {
+        LogMessage("Unable to find first child.");
+        return false;
     }
     // Get the coordinates of the remaining child.
     int initialUlx = firstChild->GetZone()->GetUlx();
