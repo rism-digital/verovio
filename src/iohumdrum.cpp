@@ -4782,7 +4782,7 @@ std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
 
     int slash = 0;
     // slash = 1 :: forward slash /
-    // slash = 2 :: back slash \
+    // slash = 2 :: back slash \ .
     // slash = 3 :: vertical slash |
     if (input.find("/") != std::string::npos) {
         slash = 1;
