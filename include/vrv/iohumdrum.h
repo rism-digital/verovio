@@ -593,6 +593,8 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
+    template <class ELEMENT>
+    void addLineFormStyle(ELEMENT element, hum::HTp token, const string &layout, int index = 0);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
