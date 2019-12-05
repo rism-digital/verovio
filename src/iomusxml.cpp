@@ -17,6 +17,7 @@
 #include "arpeg.h"
 #include "beam.h"
 #include "beatrpt.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
 #include "chord.h"
@@ -1637,6 +1638,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
+    }
+
+    // Principal voice
+    pugi::xpath_node lead = type.node().select_node("principal-voice");
+    if (lead) {
+        BracketSpan *bracketSpan = new BracketSpan();
+        bracketSpan->SetColor(lead.node().attribute("color").as_string());
+        // if (!placeStr.empty()) bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
     }
 
     // Tempo
