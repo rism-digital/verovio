@@ -33,6 +33,7 @@ class TimestampAttr;
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
 class Measure : public Object,
+                public AttBarring,
                 public AttMeasureLog,
                 public AttMeterConformanceBar,
                 public AttNNumberLike,

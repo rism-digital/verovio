@@ -1070,6 +1070,7 @@ void MeiOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     assert(measure);
 
     WriteXmlId(currentNode, measure);
+    measure->WriteBarring(currentNode);
     measure->WriteMeasureLog(currentNode);
     measure->WriteMeterConformanceBar(currentNode);
     measure->WriteNNumberLike(currentNode);
@@ -3676,6 +3677,7 @@ bool MeiInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     }
     SetMeiUuid(measure, vrvMeasure);
 
+    vrvMeasure->ReadBarring(measure);
     vrvMeasure->ReadMeasureLog(measure);
     vrvMeasure->ReadMeterConformanceBar(measure);
     vrvMeasure->ReadNNumberLike(measure);
