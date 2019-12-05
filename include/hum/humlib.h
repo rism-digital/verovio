@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 30 12:26:49 PDT 2019
+// Last Modified: Wed 04 Dec 2019 04:17:23 PM PST
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1044,6 +1044,8 @@ class HumdrumLine : public std::string, public HumHash {
 		HumdrumFile*  getOwner             (void);
 		void          setText              (const std::string& text);
 		std::string   getText              (void);
+		int           getBarNumber         (void);
+		int           getMeasureNumber     (void) { return getBarNumber(); }
 
 		HumNum      getDuration            (void);
 		HumNum      getDurationFromStart   (void);

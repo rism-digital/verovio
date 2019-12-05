@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 30 12:26:49 PDT 2019
+// Last Modified: Wed 04 Dec 2019 04:17:23 PM PST
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3237,9 +3237,9 @@ string Convert::getHumNumAttributes(const HumNum& num) {
 string Convert::trimWhiteSpace(const string& input) {
 	string s = input;
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-			std::not1(std::ptr_fun<int, int>(isspace))));
+			[](int c) {return !std::isspace(c);}));
 	s.erase(std::find_if(s.rbegin(), s.rend(),
-			std::not1(std::ptr_fun<int, int>(isspace))).base(), s.end());
+			[](int c) {return !std::isspace(c);}).base(), s.end());
 	return s;
 }
 
@@ -5653,7 +5653,7 @@ HTp GridSlice::createRecipTokenFromDuration(HumNum duration) {
 	HumNum dotdur;
 	if (duration.getNumerator() == 0) {
 		// if the GridSlice is at the end of a measure, the
-      // time between the starttime/endtime of the GridSlice should
+		// time between the starttime/endtime of the GridSlice should
 		// be subtracted from the endtime of the current GridMeasure.
 		token = new HumdrumToken("g");
 		return token;
@@ -5721,7 +5721,7 @@ bool GridSlice::isDataSlice(void) {
 //
 
 void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
-	HTp token;
+	HTp token = NULL;
 	HumdrumLine* line = new HumdrumLine;
 	GridVoice* voice;
 	string empty = ".";
@@ -5766,8 +5766,13 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 			token = new HumdrumToken("55");
 			empty = "!z";
 		}
-		if (hasSpines()) {
-			line->appendToken(token);
+		if (token != NULL) {
+			if (hasSpines()) {
+				line->appendToken(token);
+			} else {
+				delete token;
+				token = NULL;
+			}
 		}
 	}
 
@@ -24343,6 +24348,35 @@ void HumdrumLine::storeGlobalLinkedParameters(void) {
 
 //////////////////////////////
 //
+// HumdrumLine::getBarNumber -- return the bar number on the line.
+//    If the line is not a bar line, then return -1.  If there is
+//    no number at any token position on the line then return -1.
+//
+
+int HumdrumLine::getBarNumber(void) {
+	if (!isBarline()) {
+		return -1;
+	}
+	int output = -1;
+	for (int i=0; i<getFieldCount(); i++) {
+		HTp tok = token(i);
+		if (tok->size() < 2) {
+			return -1;
+		}
+		if (isdigit(tok->at(1))) {
+			sscanf(tok->c_str(), "=%d", &output);
+			if (output >= 0) {
+				return output;
+			}
+		}
+	}
+	return -1;
+}
+
+
+
+//////////////////////////////
+//
 // operator<< -- Print a HumdrumLine. Needed to avoid interaction with
 //     HumHash parent class.
 //
@@ -24650,7 +24684,7 @@ HumdrumToken* HumdrumToken::getNextNonNullDataToken(int index) {
 //    Expand later to handle slur ends and elided slurs.  The function
 //    HumdrumFileContent::analyzeSlurs() should be called before accessing
 //    this function.  If the slur duruation was already calculated, return
-//    thave value; otherwise, calculate from the location of a matching
+//    that value; otherwise, calculate from the location of a matching
 //    slur end.
 //
 
@@ -64645,10 +64679,19 @@ string Tool_musicxml2hum::convertFiguredBassNumber(const xml_node& figure) {
 	// with a post-processing tool.
 	if (suffix == "cross" || prefix == "cross") {
 		slash = "|";
+		if (accidental.empty()) {
+			accidental = "#";
+		}
 	} else if ((suffix == "backslash") || (prefix == "backslash")) {
 		slash = "\\";
+		if (accidental.empty()) {
+			accidental = "#";
+		}
 	} else if ((suffix == "slash") || (prefix == "slash")) {
 		slash = "/";
+		if (accidental.empty()) {
+			accidental = "-";
+		}
 	}
 
 	string editorial;
@@ -72062,11 +72105,11 @@ void Tool_satb2gs::usage(const string& command) {
 Tool_shed::Tool_shed(void) {
 	define("s|spine|spines=s", "list of spines to process");
 	define("e|expression=s", "regular expression");
-	define("i|exclusive-interpretations=s", "apply only to spine types in list");
+	define("x|exclusive-interpretations=s", "apply only to spine types in list");
 	define("k|kern=b", "apply only to **kern data");
-	define("x=s", "defineable exclusive interpretation x");
-	define("y=s", "defineable exclusive interpretation y");
-	define("z=s", "defineable exclusive interpretation z");
+	define("X=s", "defineable exclusive interpretation x");
+	define("Y=s", "defineable exclusive interpretation y");
+	define("Z=s", "defineable exclusive interpretation z");
 }
 
 
@@ -72111,7 +72154,7 @@ bool Tool_shed::run(HumdrumFile& infile, ostream& out) {
 bool Tool_shed::run(HumdrumFile& infile) {
 	initialize();
 	initializeSegment(infile);
-	for (int i=0; i<m_options.size(); i++) {
+	for (int i=0; i<(int)m_options.size(); i++) {
 		prepareSearch(i);
 		processFile(infile);
 	}
@@ -72150,17 +72193,17 @@ void Tool_shed::prepareSearch(int index) {
 		m_grepoptions += "g";
 	}
 
-	if (m_option.find("x") != std::string::npos) {
+	if (m_option.find("X") != std::string::npos) {
 		if (m_xInterp != "") {
 			m_exinterps.push_back(m_xInterp);
 		}
 	}
-	if (m_option.find("y") != std::string::npos) {
+	if (m_option.find("Y") != std::string::npos) {
 		if (m_yInterp != "") {
 			m_exinterps.push_back(m_yInterp);
 		}
 	}
-	if (m_option.find("z") != std::string::npos) {
+	if (m_option.find("Z") != std::string::npos) {
 		if (m_zInterp != "") {
 			m_exinterps.push_back(m_zInterp);
 		}
@@ -72208,14 +72251,14 @@ void Tool_shed::initialize(void) {
 		parseExpression(value);
 	}
 
-	if (getBoolean("x")) {
-		m_xInterp = getExInterp(getString("x"));
+	if (getBoolean("X")) {
+		m_xInterp = getExInterp(getString("X"));
 	}
-	if (getBoolean("y")) {
-		m_yInterp = getExInterp(getString("y"));
+	if (getBoolean("Y")) {
+		m_yInterp = getExInterp(getString("Y"));
 	}
-	if (getBoolean("z")) {
-		m_zInterp = getExInterp(getString("z"));
+	if (getBoolean("Z")) {
+		m_zInterp = getExInterp(getString("Z"));
 	}
 }
 
