@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed 04 Dec 2019 04:17:23 PM PST
+// Last Modified: Thu 05 Dec 2019 10:35:04 AM PST
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4442,6 +4442,7 @@ bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip,
 //
 
 void GridMeasure::appendInitialBarline(HumdrumFile& infile, int startbarline) {
+	(void)startbarline; // suppress compiler warnings about variable not being used
 	if (infile.getLineCount() == 0) {
 		// strange case which should never happen.
 		return;
@@ -27486,27 +27487,30 @@ MuseEventSet::MuseEventSet(HumNum atime) {
 	events.reserve(20);
 }
 
+MuseEventSet::MuseEventSet(const MuseEventSet& aSet) {
+	absbeat = aSet.absbeat;
+	events.resize(aSet.events.size());
+	for (int i=0; i<(int)aSet.events.size(); i++) {
+		events[i] = aSet.events[i];
+	}
+}
+
 
 
 //////////////////////////////
 //
-// MuseData::operator= --
+// MuseEventSet::operator= --
 //
 
-MuseData& MuseData::operator=(MuseData& input) {
-	if (this == &input) {
+MuseEventSet MuseEventSet::operator=(MuseEventSet& anevent) {
+	if (&anevent == this) {
 		return *this;
 	}
-	m_data.resize(input.m_data.size());
-	MuseRecord* temprec;
-	int i;
-	for (i=0; i<(int)m_data.size(); i++) {
-		temprec = new MuseRecord;
-		*temprec = *(input.m_data[i]);
-		m_data[i] = temprec;
+	absbeat = anevent.absbeat;
+	events.resize(anevent.events.size());
+	for (int i=0; i<(int)events.size(); i++) {
+		events[i] = anevent.events[i];
 	}
-	// do something with m_sequence...
-	m_name = input.m_name;
 	return *this;
 }
 
@@ -27572,27 +27576,6 @@ MuseRecord& MuseEventSet::operator[](int eindex) {
 
 //////////////////////////////
 //
-// MuseEventSet::operator= --
-//
-
-MuseEventSet MuseEventSet::operator=(MuseEventSet& anevent) {
-	if (&anevent == this) {
-		return *this;
-	}
-
-	this->absbeat = anevent.absbeat;
-	this->events.resize(anevent.events.size());
-	int i;
-	for (i=0; i<(int)this->events.size(); i++) {
-		this->events[i] = anevent.events[i];
-	}
-	return *this;
-}
-
-
-
-//////////////////////////////
-//
 // MuseEventSet::getEventCount --
 //
 
@@ -27644,6 +27627,30 @@ MuseData::MuseData(MuseData& input) {
 
 MuseData::~MuseData() {
 	clear();
+}
+
+
+
+//////////////////////////////
+//
+// MuseData::operator= --
+//
+
+MuseData& MuseData::operator=(MuseData& input) {
+	if (this == &input) {
+		return *this;
+	}
+	m_data.resize(input.m_data.size());
+	MuseRecord* temprec;
+	int i;
+	for (i=0; i<(int)m_data.size(); i++) {
+		temprec = new MuseRecord;
+		*temprec = *(input.m_data[i]);
+		m_data[i] = temprec;
+	}
+	// do something with m_sequence...
+	m_name = input.m_name;
+	return *this;
 }
 
 
@@ -29892,6 +29899,34 @@ MuseRecord::MuseRecord(MuseRecord& aRecord) : MuseRecordBasic(aRecord) { }
 
 MuseRecord::~MuseRecord() {
 	// do nothing
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::operator= -- 
+//
+
+MuseRecord& MuseRecord::operator=(MuseRecord& aRecord) {
+	// don't copy onto self
+	if (&aRecord == this) {
+		return *this;
+	}
+
+	setLine(aRecord.getLine());
+	setType(aRecord.getType());
+	m_lineindex = aRecord.m_lineindex;
+
+	m_absbeat = aRecord.m_absbeat;
+	m_lineduration = aRecord.m_lineduration;
+	m_noteduration = aRecord.m_noteduration;
+
+	m_b40pitch     = aRecord.m_b40pitch;
+	m_nexttiednote = aRecord.m_nexttiednote;
+	m_lasttiednote = aRecord.m_lasttiednote;
+
+	return *this;
 }
 
 
@@ -41249,7 +41284,7 @@ int Options::storeOption(int index, int& position, int& running) {
 			}
 			tempname[position-2] = '\0';
 			optionType = getType(tempname);
-			if (optionType == -1) {         // suppressed --options option
+			if ((unsigned char)optionType == 0xff) {         // suppressed --options option
 				m_optionsArgQ = 1;
 				break;
 			}
@@ -41264,7 +41299,7 @@ int Options::storeOption(int index, int& position, int& running) {
 			break;
 	}
 
-	if (optionType == -1) {              // suppressed --options option
+	if ((unsigned char)optionType == 0xff) {              // suppressed --options option
 		m_optionsArgQ = 1;
 		index++;
 		position = 0;
