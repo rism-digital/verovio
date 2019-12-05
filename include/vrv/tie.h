@@ -20,7 +20,11 @@ namespace vrv {
 /**
  * This class models the MEI <tie> element.
  */
-class Tie : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature {
+class Tie : public ControlElement,
+            public TimeSpanningInterface,
+            public AttColor,
+            public AttCurvature,
+            public AttCurveRend {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

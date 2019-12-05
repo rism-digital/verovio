@@ -1206,6 +1206,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
         else if (key.node().child("key-step")) {
+            if (!keySig) keySig = new KeySig();
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
             for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
                  keyStep = keyStep.next_sibling("key-step")) {
@@ -1305,8 +1306,11 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     pugi::xpath_node nextNote = node.next_sibling("note");
     if (nextNote && m_durTotal > 0) {
         // We need a <space> if a note follows that starts not at the beginning of the measure
-        Layer *layer = new Layer();
-        if (!node.select_node("voice")) layer = SelectLayer(nextNote.node(), measure);
+        Layer *layer;
+        if (node.select_node("voice"))
+            layer = new Layer();
+        else
+            layer = SelectLayer(nextNote.node(), measure);
         FillSpace(layer, m_durTotal);
     }
 }
@@ -2096,6 +2100,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }
+            tie->SetLform(tie->AttCurveRend::StrToLineform(startTie.node().attribute("line-type").as_string()));
+
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(note, tie);
@@ -2350,7 +2356,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             meiSlur->SetColor(slur.attribute("color").as_string());
             // lineform
-            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(slur.attribute("line-type ").as_string()));
+            meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
             meiSlur->SetCurvedir(

@@ -29,11 +29,12 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature()
+Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
 
     Reset();
 }
@@ -46,6 +47,7 @@ void Slur::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetCurvature();
+    ResetCurveRend();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }
