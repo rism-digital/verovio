@@ -2,7 +2,6 @@
 // Name:        iohumdrum.cpp
 // Author:      Craig Stuart Sapp
 // Created:     06/06/2016
-// vim:         ts=4
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1194,10 +1193,10 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::ve
 //    Each entry in respPeople:
 //   [0] = Person's name
 //   [1] = role:
-//			COM = composer
-//			COA = attributed composer
-//			COS = suspected composer
-//			LYR = lyricist composer
+//          COM = composer
+//          COA = attributed composer
+//          COS = suspected composer
+//          LYR = lyricist composer
 //          see definition of getRespPeople() for more roles.
 //   [2] = @analog
 //   [3] = Line number for xml:id creation
@@ -4456,7 +4455,7 @@ void HumdrumInput::linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex
     // matches to the left, and then search for the last non-null
     // kern token to link to the fingering (figure out later how to link
     // to notes in secondary layers which will probably be done by
-    // placing fingerings in subspines of the	**fing spine.
+    // placing fingerings in subspines of the **fing spine.
 
     hum::HTp linkednote = NULL;
     int linktrack = -1;
@@ -4782,9 +4781,9 @@ std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
     }
 
     int slash = 0;
-    // slash = 1 :: forward slash
-    // slash = 2 :: back slash
-    // slash = 3 :: vertical slash
+    // slash = 1 :: forward slash /
+    // slash = 2 :: back slash \
+    // slash = 3 :: vertical slash |
     if (input.find("/") != std::string::npos) {
         slash = 1;
     }
@@ -4867,6 +4866,7 @@ std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
     else {
         // slash should be drawn on number (but some numbers
         // do not has slashes available).
+        // See: https://www.smufl.org/version/latest/range/figuredBass
         switch (digit) {
             case 0: output += L"\uEA50"; break; // draw without slash
             case 1: output += L"\uEA51"; break; // draw without slash
@@ -4883,8 +4883,8 @@ std::wstring HumdrumInput::convertFBNumber(const string &input, hum::HTp token)
                 break;
             case 6:
                 switch (slash) {
-                    case 2: output += L"\uEA6f"; break; // 6\ .
-                    case 1: // 6/
+                    case 1: output += L"\uEA5C"; break; // 6/
+                    case 2: output += L"\uEA5C"; break; // 6\ .
                     case 3: output += L"\uEA5C"; break; // 6|
                     default: output += L"\uEA5B"; break; // 6
                 }
@@ -5981,7 +5981,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     hum::HumNum remainingSplitDur;
 
     hum::HumRegex hre;
-    // ggg	processGlobalDirections(token, staffindex);
+    // ggg processGlobalDirections(token, staffindex);
 
     for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (prespace[i] > 0) {
@@ -7496,8 +7496,8 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
         else {
             Space *space = new Space;
             // if (m_doc->GetOptions()->m_humType.GetValue()) {
-            //	embedQstampInClass(space, layerdata[i], *layerdata[i]);
-            //}
+            //    embedQstampInClass(space, layerdata[i], *layerdata[i]);
+            // }
             appendElement(elements, pointers, space);
             duration -= setDuration(space, duration);
         }
@@ -8828,8 +8828,8 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
     }
     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
     // if (ss[staffindex].meter_bottom == 0) {
-    // 	mfactor = 1;
-    // 	mfactor /= 8;
+    //  mfactor = 1;
+    //  mfactor /= 8;
     // }
     hum::HumNum mbeat = qbeat * mfactor + 1;
     return mbeat;
@@ -8864,8 +8864,8 @@ hum::HumNum HumdrumInput::getMeasureTstampPlusDur(hum::HTp token, int staffindex
     }
     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
     // if (ss[staffindex].meter_bottom == 0) {
-    // 	mfactor = 1;
-    // 	mfactor /= 8;
+    //  mfactor = 1;
+    //  mfactor /= 8;
     // }
     hum::HumNum mbeat = qbeat * mfactor + 1;
     return mbeat;
@@ -13627,7 +13627,7 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     if (delayedQ) {
         hum::HumNum duration = token->getDuration();
         // if (ss[staffindex].meter_bottom == 0) {
-        // 	duration /= 2;
+        //    duration /= 2;
         // } else {
         duration *= ss[staffindex].meter_bottom;
         // }
