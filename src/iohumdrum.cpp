@@ -9080,7 +9080,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             Measure *startmeasure = m_measures[mindex];
             Slur *slur = new Slur;
 
-            addLineFormStyle(slur, slurstart, "S");
+            addLineStyle(slur, slurstart, "S");
 
             // start ID can sometimes not be set yet due to cross layer slurs.
             std::string startid = slurstart->getValue("MEI", "xml:id");
@@ -9205,13 +9205,13 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
 //////////////////////////////
 //
-// HumdrumInput::addLineFormStyle -- Add dotted or dashed line information to an element from
-//    layout parameters.
+// HumdrumInput::addLineStyle -- Add dotted or dashed line information to an
+//    element from layout parameters.
 //        Default parameter: index = 0.
 //
 
 template <class ELEMENT>
-void HumdrumInput::addLineFormStyle(ELEMENT element, hum::HTp token, const string &layout, int index)
+void HumdrumInput::addLineStyle(ELEMENT element, hum::HTp token, const string &layout, int index)
 {
     string dashed = token->getLayoutParameter(layout, "dash");
     string dotted = token->getLayoutParameter(layout, "dot");
@@ -9220,6 +9220,11 @@ void HumdrumInput::addLineFormStyle(ELEMENT element, hum::HTp token, const strin
     }
     else if (!dashed.empty()) {
         element->SetLform(LINEFORM_dashed);
+    }
+
+    string color = token->getLayoutParameter(layout, "color");
+    if (!color.empty()) {
+        element->SetColor(color);
     }
 }
 
@@ -14160,7 +14165,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
         vrv::Tie *tie = new Tie;
 
-        addLineFormStyle(tie, token, "T");
+        addLineStyle(tie, token, "T");
 
         m_measure->AddChild(tie);
         int endsubindex = endnumber - 1;
@@ -14324,7 +14329,7 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
 
     hum::HTp starttoken = found->getStartTokenPointer();
     if (starttoken) {
-        addLineFormStyle(tie, starttoken, "T");
+        addLineStyle(tie, starttoken, "T");
     }
 
     setTieLocationId(tie, found->getStartTokenPointer(), found->getStartSubindex(), token, subindex);
