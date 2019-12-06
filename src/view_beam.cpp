@@ -156,7 +156,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     secondElement->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
 
     // Shift direction
-    shiftY = (fTrem->m_beamPlace == BEAMPLACE_below) ? 1.0 : -1.0;
+    shiftY = (fTrem->m_drawingPlace == BEAMPLACE_below) ? 1.0 : -1.0;
     polygonHeight = fTrem->m_beamWidthBlack * shiftY;
 
     y1 = firstElement->m_yBeam;
@@ -253,7 +253,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     beamElementCoords->at(last)->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
 
     // Shift direction
-    shiftY = (beamInterface->m_beamPlace == BEAMPLACE_below) ? 1.0 : -1.0;
+    shiftY = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? 1.0 : -1.0;
 
     y1 = beamElementCoords->at(0)->m_yBeam;
     y2 = beamElementCoords->at(last)->m_yBeam;
@@ -313,7 +313,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
         int testDur = DUR_8 + fullBars;
         int barY = beamInterface->m_beamWidth;
 
-        if (beamInterface->m_beamPlace == BEAMPLACE_above) {
+        if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             barY = -barY;
         }
 

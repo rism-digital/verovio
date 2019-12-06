@@ -81,7 +81,7 @@ void BeamDrawingInterface::Reset()
     m_crossStaff = false;
     m_shortestDur = 0;
     m_noteStemDir = STEMDIRECTION_NONE;
-    m_beamPlace = BEAMPLACE_NONE;
+    m_drawingPlace = BEAMPLACE_NONE;
     m_beamStaff = NULL;
 
     m_beamWidth = 0;

@@ -110,7 +110,7 @@ public:
     bool m_crossStaff;
     int m_shortestDur;
     data_STEMDIRECTION m_noteStemDir;
-    data_BEAMPLACE m_beamPlace;
+    data_BEAMPLACE m_drawingPlace;
     Staff *m_beamStaff;
 
     // values set by CalcBeam

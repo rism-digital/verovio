@@ -240,7 +240,7 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         }
         if (tuplet->GetNumAlignedBeam()) {
             Beam *beam = tuplet->GetNumAlignedBeam();
-            switch (beam->m_beamPlace) {
+            switch (beam->m_drawingPlace) {
                 case BEAMPLACE_above: xLeft += (tuplet->GetDrawingLeft()->GetDrawingRadius(doc)); break;
                 case BEAMPLACE_below: xRight -= (tuplet->GetDrawingRight()->GetDrawingRadius(doc)); break;
                 default: break;
