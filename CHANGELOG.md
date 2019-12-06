@@ -2,10 +2,10 @@
 
 ## [unreleased]
 * Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
-* Support for dashed and dotted slurs and ties ((@earboxer and @napulen)
+* Support for dashed and dotted slurs and ties (@earboxer and @napulen)
 * Options for controlling system divider display (--systemDivider "none|left|left-right")
-* Fig coloring of ties and slurs (@rettinghaus)
-* Fig bug with tuplet number placement (@rettinghaus)
+* Fix coloring of ties and slurs (@rettinghaus)
+* Fix bug with tuplet number placement (@rettinghaus)
 
 ## [2.3.3] - 2019-11-26
 * Fix bug with NPM build (remove init function for adjusting memory)
