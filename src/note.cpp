@@ -419,6 +419,39 @@ char Note::GetMIDIPitch()
     return m_MIDIPitch;
 }
 
+int Note::GetChromaticAlteration()
+{
+    Accid *accid = this->GetDrawingAccid();
+
+    if (accid && accid->HasAccidGes()) {
+        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
+        switch (accImp) {
+            case ACCIDENTAL_GESTURAL_s: return 1;
+            case ACCIDENTAL_GESTURAL_f: return -1;
+            case ACCIDENTAL_GESTURAL_ss: return 2;
+            case ACCIDENTAL_GESTURAL_ff: return -2;
+            default: break;
+        }
+    }
+    else if (accid) {
+        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
+        switch (accExp) {
+            case ACCIDENTAL_WRITTEN_s: return 1;
+            case ACCIDENTAL_WRITTEN_f: return -1;
+            case ACCIDENTAL_WRITTEN_ss: return 2;
+            case ACCIDENTAL_WRITTEN_x: return 2;
+            case ACCIDENTAL_WRITTEN_ff: return -2;
+            case ACCIDENTAL_WRITTEN_xs: return 3;
+            case ACCIDENTAL_WRITTEN_ts: return 3;
+            case ACCIDENTAL_WRITTEN_tf: return -3;
+            case ACCIDENTAL_WRITTEN_nf: return -1;
+            case ACCIDENTAL_WRITTEN_ns: return 1;
+            default: break;
+        }
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -879,8 +912,6 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Accid *accid = note->GetDrawingAccid();
-
     // Create midi this
     int midiBase = 0;
     data_PITCHNAME pname = note->GetPname();
@@ -895,32 +926,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         case PITCHNAME_NONE: break;
     }
     // Check for accidentals
-    if (accid && accid->HasAccidGes()) {
-        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
-        switch (accImp) {
-            case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
-            case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
-            case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
-            case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
-            default: break;
-        }
-    }
-    else if (accid) {
-        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
-        switch (accExp) {
-            case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
-            case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
-            case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
-            case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
-            case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
-            case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
-            case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
-            case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
-            case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
-            case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
-            default: break;
-        }
-    }
+    midiBase += note->GetChromaticAlteration();
 
     // Adjustment for transposition intruments
     midiBase += params->m_transSemi;

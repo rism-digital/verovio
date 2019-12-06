@@ -182,6 +182,11 @@ public:
     char GetMIDIPitch();
     ///@}
 
+    /**
+     * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
+     */
+    int GetChromaticAlteration();
+
     //----------//
     // Functors //
     //----------//
