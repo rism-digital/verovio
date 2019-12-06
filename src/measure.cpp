@@ -44,8 +44,15 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-"), AttMeasureLog(), AttMeterConformanceBar(), AttNNumberLike(), AttPointing(), AttTyped()
+    : Object("measure-")
+    , AttBarring()
+    , AttMeasureLog()
+    , AttMeterConformanceBar()
+    , AttNNumberLike()
+    , AttPointing()
+    , AttTyped()
 {
+    RegisterAttClass(ATT_BARRING);
     RegisterAttClass(ATT_MEASURELOG);
     RegisterAttClass(ATT_METERCONFORMANCEBAR);
     RegisterAttClass(ATT_NNUMBERLIKE);

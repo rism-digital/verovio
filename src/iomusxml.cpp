@@ -1335,6 +1335,13 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         }
         else {
             measure->SetRight(barRendition);
+            if (barStyle == "short" || barStyle == "tick") {
+                measure->SetBarLen(4);
+                if (barStyle == "short")
+                    measure->SetBarPlace(2);
+                else
+                    measure->SetBarPlace(-2);
+            }
         }
     }
     // parse endings (prima volta, seconda volta...)
@@ -2548,8 +2555,8 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     // if (value == "") return BARRENDITION_rptboth;
     if ((value == "light-heavy") && repeat) return BARRENDITION_rptend;
     if (value == "regular") return BARRENDITION_single;
-    // if (value == "short") return; // TODO: Support 'short' barlines.
-    // if (value == "tick") return; // TODO: Support 'tick' barlines.
+    if (value == "short") return BARRENDITION_single;
+    if (value == "tick") return BARRENDITION_single;
     LogWarning("MusicXML import: Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;
 }
