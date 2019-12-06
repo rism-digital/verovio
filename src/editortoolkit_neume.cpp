@@ -1285,13 +1285,15 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // unless we're just grouping NC's in which case no need to worry about syl's of course
     else {
         if (elementClass == NC) {
-            parent = new Neume();
-            for (auto it = elements.begin(); it != elements.end(); ++it) {
-                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
-                    (*it)->MoveItselfTo(parent);
+            if (doubleParent) {
+                parent = new Neume();
+                for (auto it = elements.begin(); it != elements.end(); ++it) {
+                    if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                        (*it)->MoveItselfTo(parent);
+                    }
                 }
+                doubleParent->AddChild(parent);
             }
-            doubleParent->AddChild(parent);
         }
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
@@ -1352,7 +1354,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
     }
 
-    m_editInfo = parent->GetUuid();
+    if (parent) {
+        m_editInfo = parent->GetUuid();
+    }
+    
     return true;
 }
 
