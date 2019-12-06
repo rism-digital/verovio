@@ -149,6 +149,15 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if ((informat == "musicxml") || (informat == "xml")) {
         m_format = MUSICXML;
     }
+    else if (informat == "md") {
+        m_format = MUSEDATAHUM;
+    }
+    else if (informat == "musedata") {
+        m_format = MUSEDATAHUM;
+    }
+    else if (informat == "musedata-hum") {
+        m_format = MUSEDATAHUM;
+    }
     else if (informat == "musicxml-hum") {
         m_format = MUSICXMLHUM;
     }
@@ -181,6 +190,13 @@ FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
     }
     if (data[0] == 0) {
         return UNKNOWN;
+    }
+    std::string excerpt = data.substr(0, 2000);
+    std::string::size_type found = excerpt.find("Group memberships:");
+    if (found != std::string::npos) {
+        // MuseData may contain '@' as first character, so needs
+        // to be checked before PAE identification.
+        return MUSEDATAHUM;
     }
     if (data[0] == '@') {
         return PAE;
@@ -468,6 +484,34 @@ bool Toolkit::LoadData(const std::string &data)
         input = new MeiInput(&m_doc, "");
     }
 
+    else if (inputFormat == MUSEDATAHUM) {
+        // This is the indirect converter from MuseData to MEI using iohumdrum:
+        hum::Tool_musedata2hum converter;
+        stringstream conversion;
+        bool status = converter.convertString(conversion, data);
+        if (!status) {
+            LogError("Error converting MuseData data");
+            return false;
+        }
+        std::string buffer = conversion.str();
+        SetHumdrumBuffer(buffer.c_str());
+
+        // Now convert Humdrum into MEI:
+        Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        if (!tempinput->ImportString(conversion.str())) {
+            LogError("Error importing Humdrum data (4)");
+            delete tempinput;
+            return false;
+        }
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+        input = new MeiInput(&m_doc, "");
+    }
+
     else if (inputFormat == ESAC) {
         // This is the indirect converter from EsAC to MEI using iohumdrum:
         hum::Tool_esac2hum converter;
@@ -485,7 +529,7 @@ bool Toolkit::LoadData(const std::string &data)
         tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
-            LogError("Error importing Humdrum data (4)");
+            LogError("Error importing Humdrum data (5)");
             delete tempinput;
             return false;
         }

@@ -233,20 +233,20 @@ int TupletNum::GetDrawingXMid(Doc *doc)
     else {
         Tuplet *tuplet = dynamic_cast<Tuplet *>(this->GetFirstAncestor(TUPLET));
         assert(tuplet && tuplet->GetDrawingLeft() && tuplet->GetDrawingRight());
+        int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
+        int xRight = tuplet->GetDrawingRight()->GetDrawingX();
+        if (doc) {
+            xRight += (tuplet->GetDrawingRight()->GetDrawingRadius(doc) * 2);
+        }
         if (tuplet->GetNumAlignedBeam()) {
-            const ArrayOfBeamElementCoords *coords = tuplet->GetNumAlignedBeam()->m_beamSegment.GetElementCoordRefs();
-            int xLeft = coords->front()->m_x;
-            int xRight = coords->back()->m_x;
-            return xLeft + ((xRight - xLeft) / 2);
-        }
-        else {
-            int xLeft = tuplet->GetDrawingLeft()->GetDrawingX();
-            int xRight = tuplet->GetDrawingRight()->GetDrawingX();
-            if (doc) {
-                xRight += (tuplet->GetDrawingRight()->GetDrawingRadius(doc) * 2);
+            Beam *beam = tuplet->GetNumAlignedBeam();
+            switch (beam->m_beamPlace) {
+                case BEAMPLACE_above: xLeft += (tuplet->GetDrawingLeft()->GetDrawingRadius(doc)); break;
+                case BEAMPLACE_below: xRight -= (tuplet->GetDrawingRight()->GetDrawingRadius(doc)); break;
+                default: break;
             }
-            return xLeft + ((xRight - xLeft) / 2);
         }
+        return xLeft + ((xRight - xLeft) / 2);
     }
 }
 

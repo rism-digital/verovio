@@ -1335,6 +1335,13 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         }
         else {
             measure->SetRight(barRendition);
+            if (barStyle == "short" || barStyle == "tick") {
+                measure->SetBarLen(4);
+                if (barStyle == "short")
+                    measure->SetBarPlace(2);
+                else
+                    measure->SetBarPlace(-2);
+            }
         }
     }
     // parse endings (prima volta, seconda volta...)
@@ -2100,6 +2107,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }
+            tie->SetLform(tie->AttCurveRend::StrToLineform(startTie.node().attribute("line-type").as_string()));
+
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(note, tie);
@@ -2354,7 +2363,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             meiSlur->SetColor(slur.attribute("color").as_string());
             // lineform
-            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(slur.attribute("line-type ").as_string()));
+            meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
             meiSlur->SetCurvedir(
@@ -2546,8 +2555,8 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     // if (value == "") return BARRENDITION_rptboth;
     if ((value == "light-heavy") && repeat) return BARRENDITION_rptend;
     if (value == "regular") return BARRENDITION_single;
-    // if (value == "short") return; // TODO: Support 'short' barlines.
-    // if (value == "tick") return; // TODO: Support 'tick' barlines.
+    if (value == "short") return BARRENDITION_single;
+    if (value == "tick") return BARRENDITION_single;
     LogWarning("MusicXML import: Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;
 }

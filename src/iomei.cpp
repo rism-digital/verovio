@@ -1070,6 +1070,7 @@ void MeiOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     assert(measure);
 
     WriteXmlId(currentNode, measure);
+    measure->WriteBarring(currentNode);
     measure->WriteMeasureLog(currentNode);
     measure->WriteMeterConformanceBar(currentNode);
     measure->WriteNNumberLike(currentNode);
@@ -1254,6 +1255,7 @@ void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
     WriteTimeSpanningInterface(currentNode, slur);
     slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
+    slur->WriteCurveRend(currentNode);
 }
 
 void MeiOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
@@ -1292,6 +1294,7 @@ void MeiOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
     WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteColor(currentNode);
     tie->WriteCurvature(currentNode);
+    tie->WriteCurveRend(currentNode);
 }
 
 void MeiOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
@@ -3674,6 +3677,7 @@ bool MeiInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     }
     SetMeiUuid(measure, vrvMeasure);
 
+    vrvMeasure->ReadBarring(measure);
     vrvMeasure->ReadMeasureLog(measure);
     vrvMeasure->ReadMeterConformanceBar(measure);
     vrvMeasure->ReadNNumberLike(measure);
@@ -3995,6 +3999,7 @@ bool MeiInput::ReadSlur(Object *parent, pugi::xml_node slur)
     ReadTimeSpanningInterface(slur, vrvSlur);
     vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
+    vrvSlur->ReadCurveRend(slur);
 
     parent->AddChild(vrvSlur);
     ReadUnsupportedAttr(slur, vrvSlur);
@@ -4025,6 +4030,7 @@ bool MeiInput::ReadTie(Object *parent, pugi::xml_node tie)
     ReadTimeSpanningInterface(tie, vrvTie);
     vrvTie->ReadColor(tie);
     vrvTie->ReadCurvature(tie);
+    vrvTie->ReadCurveRend(tie);
 
     parent->AddChild(vrvTie);
     ReadUnsupportedAttr(tie, vrvTie);

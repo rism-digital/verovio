@@ -119,6 +119,16 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 }
 
 // calculated better
+void BBoxDeviceContext::DrawSimpleBezierPath(Point bezier[4])
+{
+    Point pos;
+    int width, height;
+    int minYPos, maxYPos;
+
+    BoundingBox::ApproximateBezierBoundingBox(bezier, pos, width, height, minYPos, maxYPos);
+    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+}
 void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     Point pos;
