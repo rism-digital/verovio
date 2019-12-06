@@ -9057,6 +9057,10 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
         }
         std::sort(startchordsorted.begin(), startchordsorted.end());
         for (int j = 0; j < (int)slurindex[i].size(); j++) {
+            int ndex = -1;
+            if (slurindex.size() > 1) {
+                ndex = j;
+            }
             hum::HTp slurstart = slurstarts[slurindex[i][j]];
 
             std::vector<pair<int, bool> > slurstartnoteinfo;
@@ -9080,7 +9084,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             Measure *startmeasure = m_measures[mindex];
             Slur *slur = new Slur;
 
-            addLineStyle(slur, slurstart, "S");
+            addLineStyle(slur, slurstart, "S", ndex);
 
             // start ID can sometimes not be set yet due to cross layer slurs.
             std::string startid = slurstart->getValue("MEI", "xml:id");
@@ -9210,11 +9214,11 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 //        Default parameter: index = 0.
 //
 
-template <class ELEMENT>
-void HumdrumInput::addLineStyle(ELEMENT element, hum::HTp token, const string &layout, int index)
+template <class ELEMENT> void HumdrumInput::addLineStyle(ELEMENT element, hum::HTp token, const string &layout, int index)
 {
-    string dashed = token->getLayoutParameter(layout, "dash");
-    string dotted = token->getLayoutParameter(layout, "dot");
+
+    string dashed = token->getLayoutParameter(layout, "dash", index);
+    string dotted = token->getLayoutParameter(layout, "dot", index);
     if (!dotted.empty()) {
         element->SetLform(LINEFORM_dotted);
     }
@@ -9222,7 +9226,7 @@ void HumdrumInput::addLineStyle(ELEMENT element, hum::HTp token, const string &l
         element->SetLform(LINEFORM_dashed);
     }
 
-    string color = token->getLayoutParameter(layout, "color");
+    string color = token->getLayoutParameter(layout, "color", index);
     if (!color.empty()) {
         element->SetColor(color);
     }
