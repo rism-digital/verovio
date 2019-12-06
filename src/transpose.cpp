@@ -42,6 +42,8 @@
 #define dpc_A 5
 #define dpc_B 6
 
+#include "transpose.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -55,22 +57,7 @@
 // note/accid in MEI data, and other complications that need to be resolved into
 // storing the correct pitch information in TPitch.
 //
-
-class TPitch {
-public:
-    int pname; // diatonic pitch class name: C = 0, D = 1, ... B = 6.
-    int accid; // chromatic alteration: 0 = natural, 1 = sharp, -2 = flat, +2 = double sharp
-    int oct; // octave number: 4 = middle-C octave
-
-    TPitch(){};
-    TPitch(int aPname, int anAccid, int anOct);
-    TPitch(const TPitch &pitch);
-    TPitch &operator=(const TPitch &pitch);
-    void setPitch(int aPname, int anAccid, int anOct);
-    bool isValid(int maxAccid);
-};
-
-std::ostream &operator<<(std::ostream &out, const TPitch &pitch);
+namespace vrv {
 
 //////////////////////////////
 //
@@ -1030,3 +1017,5 @@ int main(void)
       Interval between C4 and F##4 is AA4
       Interval between C4 and Gbb3 is -AA4
  */
+
+} // namespace vrv

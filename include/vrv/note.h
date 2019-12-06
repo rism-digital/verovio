@@ -21,6 +21,7 @@
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
+#include "transpose.h"
 
 namespace vrv {
 
@@ -28,6 +29,7 @@ class Accid;
 class Chord;
 class Slur;
 class Tie;
+class TPitch;
 class Verse;
 class Note;
 typedef std::vector<Note *> ChordCluster;
@@ -186,6 +188,8 @@ public:
      * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
      */
     int GetChromaticAlteration();
+
+    TPitch GetTPitch();
 
     //----------//
     // Functors //

@@ -29,6 +29,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "tie.h"
+#include "transpose.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -450,6 +451,12 @@ int Note::GetChromaticAlteration()
         }
     }
     return 0;
+}
+
+TPitch Note::GetTPitch()
+{
+    int pname = this->GetPname() - PITCHNAME_c;
+    return TPitch(pname, this->GetChromaticAlteration(), this->GetOct());
 }
 
 //----------------------------------------------------------------------------
