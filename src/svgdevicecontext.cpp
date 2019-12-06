@@ -208,6 +208,9 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
         if (att->HasColor()) {
+            if (object->IsControlElement()) {
+              m_currentNode.append_attribute("color") = att->GetColor().c_str();
+            }
             m_currentNode.append_attribute("fill") = att->GetColor().c_str();
         }
     }
