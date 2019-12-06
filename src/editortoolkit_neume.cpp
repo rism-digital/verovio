@@ -596,6 +596,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 else {
                     LogMessage("Unsupported character in contour.");
+                    delete newNc;
+                    delete newZone;
                     return false;
                 }
                 newZone->SetUlx(newUlx);
@@ -1283,13 +1285,15 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // unless we're just grouping NC's in which case no need to worry about syl's of course
     else {
         if (elementClass == NC) {
-            parent = new Neume();
-            for (auto it = elements.begin(); it != elements.end(); ++it) {
-                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
-                    (*it)->MoveItselfTo(parent);
+            if (doubleParent) {
+                parent = new Neume();
+                for (auto it = elements.begin(); it != elements.end(); ++it) {
+                    if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                        (*it)->MoveItselfTo(parent);
+                    }
                 }
+                doubleParent->AddChild(parent);
             }
-            doubleParent->AddChild(parent);
         }
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
@@ -1350,7 +1354,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
     }
 
-    m_editInfo = parent->GetUuid();
+    if (parent) {
+        m_editInfo = parent->GetUuid();
+    }
+    
     return true;
 }
 
@@ -1569,6 +1576,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         }
         else {
             LogMessage("Unsupported character in contour.");
+            delete newNc;
+            delete zone;
             return false;
         }
         zone->SetUlx(newUlx);
@@ -1667,6 +1676,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     }
     else {
         LogWarning("isLigature is invalid!");
+        delete zone;
         return false;
     }
     if (success1 && success2 && m_doc->GetType() != Facs) {
