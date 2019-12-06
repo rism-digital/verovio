@@ -44,6 +44,7 @@
 
 #include "transpose.h"
 
+#include <cctype>
 #include <iostream>
 #include <string>
 #include <vector>
