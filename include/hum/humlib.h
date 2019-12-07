@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu 05 Dec 2019 10:35:04 AM PST
+// Last Modified: Fri Dec  6 20:33:39 PST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1324,9 +1324,13 @@ class HumdrumToken : public std::string, public HumHash {
 		void     setParameters             (const std::string& pdata, HTp ptok = NULL);
 		int      getStrandIndex            (void) const;
 		int      getSlurStartElisionLevel  (int index = 0) const;
+		int      getPhraseStartElisionLevel(int index) const;
 		int      getSlurEndElisionLevel    (int index = 0) const;
+		int      getPhraseEndElisionLevel  (int index = 0) const;
 		HTp      getSlurStartToken         (int number = 0);
 		HTp      getSlurEndToken           (int number = 0);
+		HTp      getPhraseStartToken       (int number = 0);
+		HTp      getPhraseEndToken         (int number = 0);
 		void     storeLinkedParameters     (void);
 		bool     linkedParameterIsGlobal   (int index);
 		std::ostream& printCsv             (std::ostream& out = std::cout);
@@ -1343,6 +1347,7 @@ class HumdrumToken : public std::string, public HumHash {
 		HumParamSet* getLinkedParameter    (int index);
 		HumParamSet* getLinkedParameter    (void);
 		std::string getSlurLayoutParameter (const std::string& keyname, int subtokenindex = -1);
+		std::string getPhraseLayoutParameter(const std::string& keyname, int subtokenindex = -1);
 		std::string getLayoutParameter     (const std::string& category, const std::string& keyname,
 		                                    int subtokenindex = -1);
 		std::string getLayoutParameterChord(const std::string& category,
@@ -1835,6 +1840,10 @@ class HumdrumFileBase : public HumHash {
 		// slur endpoints have been linked or not.
 		bool m_slurs_analyzed = false;
 
+		// m_phrases_analyzed: Used to keep track of whether or not
+		// phrase endpoints have been linked or not.
+		bool m_phrases_analyzed = false;
+
 		// m_nulls_analyzed: Used to keep track of wheter or not
 		// null tokens have been analyzed yet.
 		bool m_nulls_analyzed = false;
@@ -2008,9 +2017,11 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		      ~HumdrumFileContent         ();
 
 		bool   analyzeSlurs               (void);
+		bool   analyzePhrasings           (void);
 	private:
 		bool   analyzeMensSlurs           (void);
 		bool   analyzeKernSlurs           (void);
+		bool   analyzeKernPhrasings       (void);
 	public:
 		bool   analyzeKernTies            (void);
 		bool   analyzeKernAccidentals     (void);
@@ -2068,11 +2079,18 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		int    hasPickup                  (void);
 
 	protected:
+
 		bool   analyzeKernSlurs           (HTp spinestart, std::vector<HTp>& slurstarts,
 		                                   std::vector<HTp>& slurends,
 		                                   std::vector<std::pair<HTp, HTp>>& labels,
 		                                   std::vector<int>& endings,
 		                                   const std::string& linksig = "");
+		bool   analyzeKernPhrasings       (HTp spinestart,
+		                                   std::vector<HTp>& linkstarts,
+		                                   std::vector<HTp>& linkends,
+		                                   std::vector<std::pair<HTp, HTp>>& labels,
+		                                   std::vector<int>& endings,
+		                                   const std::string& linksig);
 		bool   analyzeKernTies            (std::vector<std::pair<HTp, int>>& linkedtiestarts,
 		                                   std::vector<std::pair<HTp, int>>& linkedtieends,
 		                                   std::string& linkSignifier);
@@ -2081,11 +2099,15 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		void   resetDiatonicStatesWithKeySignature(std::vector<int>& states,
 				                             std::vector<int>& signature);
 		void    linkSlurEndpoints         (HTp slurstart, HTp slurend);
+		void    linkPhraseEndpoints       (HTp phrasestart, HTp phraseend);
 		void    linkTieEndpoints          (HTp tiestart, int startindex,
 		                                   HTp tieend, int endindex);
 		bool    isLinkedSlurBegin         (HTp token, int index, const std::string& pattern);
+		bool    isLinkedPhraseBegin       (HTp token, int index, const std::string& pattern);
 		bool    isLinkedSlurEnd           (HTp token, int index, const std::string& pattern);
+		bool    isLinkedPhraseEnd         (HTp token, int index, const std::string& pattern);
 		void    createLinkedSlurs         (std::vector<HTp>& linkstarts, std::vector<HTp>& linkends);
+		void    createLinkedPhrasings     (std::vector<HTp>& linkstarts, std::vector<HTp>& linkends);
 		void    assignVerticalRestPosition(HTp first, HTp second, int baseline);
 		int     getRestPositionAboveNotes (HTp rest, std::vector<int>& vpos);
 		int     getRestPositionBelowNotes (HTp rest, std::vector<int>& vpos);
@@ -3478,8 +3500,12 @@ class Convert {
 		static bool isKernNoteAttack        (const std::string& kerndata);
 		static bool hasKernSlurStart        (const std::string& kerndata);
 		static bool hasKernSlurEnd          (const std::string& kerndata);
+		static bool hasKernPhraseStart      (const std::string& kerndata);
+		static bool hasKernPhraseEnd        (const std::string& kerndata);
 		static int  getKernSlurStartElisionLevel(const std::string& kerndata, int index);
 		static int  getKernSlurEndElisionLevel  (const std::string& kerndata, int index);
+		static int  getKernPhraseStartElisionLevel(const std::string& kerndata, int index);
+		static int  getKernPhraseEndElisionLevel(const std::string& kerndata, int index);
 		static char hasKernStemDirection    (const std::string& kerndata);
 
 		static bool isKernSecondaryTiedNote (const std::string& kerndata);

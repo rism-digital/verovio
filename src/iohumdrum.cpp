@@ -541,6 +541,7 @@ bool HumdrumInput::convertHumdrum()
     m_breaks = analyzeBreaks(infile);
 
     infile.analyzeSlurs();
+    infile.analyzePhrasings();
     infile.analyzeKernTies();
     infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
@@ -6047,6 +6048,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         // convertRhythm(irest, spaceSplitToken);
                         setRhythmFromDuration(irest, remainingSplitDur);
                         // processSlurs(spaceSplitToken);
+                        // processPhrases(spaceSplitToken);
                         // processDynamics(spaceSplitToken, staffindex);
                         // processDirections(spaceSplitToken, staffindex);
                         // Store rest here to complete the split after the clef change.
@@ -6198,6 +6200,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 popElementStack(elements, pointers);
                 // maybe an extra pop here for tremolos?
                 processSlurs(layerdata[i]);
+                processPhrases(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 assignAutomaticStem(chord, layerdata[i], staffindex);
                 addArticulations(chord, layerdata[i]);
@@ -6228,6 +6231,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         // convertRhythm(irest, layerdata[i]);
                         setRhythmFromDuration(irest, splitdur);
                         processSlurs(layerdata[i]);
+                        processPhrases(layerdata[i]);
                         processDynamics(layerdata[i], staffindex);
                         processDirections(layerdata[i], staffindex);
                         // Store rest here to complete the split after the clef change.
@@ -6244,6 +6248,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         appendElement(elements, pointers, irest);
                         convertRhythm(irest, layerdata[i]);
                         processSlurs(layerdata[i]);
+                        processPhrases(layerdata[i]);
                         processDynamics(layerdata[i], staffindex);
                         processDirections(layerdata[i], staffindex);
                     }
@@ -6257,6 +6262,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     appendElement(elements, pointers, irest);
                     convertRhythm(irest, layerdata[i]);
                     processSlurs(layerdata[i]);
+                    processPhrases(layerdata[i]);
                     processDynamics(layerdata[i], staffindex);
                     processDirections(layerdata[i], staffindex);
                 }
@@ -6267,6 +6273,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 appendElement(elements, pointers, rest);
                 convertRest(rest, layerdata[i]);
                 processSlurs(layerdata[i]);
+                processPhrases(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 processDirections(layerdata[i], staffindex);
                 int line = layerdata[i]->getLineIndex();
@@ -6287,6 +6294,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 appendElement(elements, pointers, rest);
                 convertRest(rest, layerdata[i]);
                 processSlurs(layerdata[i]);
+                processPhrases(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 processDirections(layerdata[i], staffindex);
                 int line = layerdata[i]->getLineIndex();
@@ -6302,6 +6310,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
                 processSlurs(layerdata[i]);
+                processPhrases(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 processDirections(layerdata[i], staffindex);
             }
@@ -6370,6 +6379,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
             convertNote(note, layerdata[i], 0, staffindex);
             processSlurs(layerdata[i]);
+            processPhrases(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             assignAutomaticStem(note, layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
@@ -6757,6 +6767,7 @@ void HumdrumInput::convertMensuralToken(
         appendElement(elements, pointers, note);
         convertNote(note, token, 0, staffindex);
         processSlurs(token);
+        processPhrases(token);
         processDirections(token, staffindex);
         bool hasstem = false;
         string text = *token;
@@ -7484,6 +7495,7 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
             // setLocationId(rest, layerdata[i]);
             // convertRest(rest, layerdata[i]);
             // processSlurs(layerdata[i]);
+            // processPhrases(layerdata[i]);
             // processDynamics(layerdata[i], staffindex);
             // processDirections(layerdata[i], staffindex);
             // int line = layerdata[i]->getLineIndex();
@@ -9207,6 +9219,255 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
     }
 }
 
+/////////////////////////////
+//
+// HumdrumInput::processPhrases --
+//
+
+void HumdrumInput::processPhrases(hum::HTp phraseend)
+{
+    int startcount = phraseend->getValueInt("auto", "phraseStartCount");
+    if (startcount <= 0) {
+        return;
+    }
+
+    // phrasestarts contains a list of the correctly paired phrases
+    // attached to the note/chord.  Deal with unopened phrases
+    // here later (such as an excerpt of music where the opening
+    // of the phrase is not present in the data).
+    std::vector<hum::HTp> phrasestarts;
+    for (int i = 0; i < startcount; i++) {
+        hum::HTp tok;
+        tok = phraseend->getPhraseStartToken(i + 1);
+        if (tok) {
+            phrasestarts.push_back(tok);
+        }
+    }
+
+    // phraseindex contains a list of the indexes into phrasestarts,
+    // with all identical phrase starts placed on the first
+    // position that the note/chord is found in the phrasestarts list.
+    std::vector<std::vector<int> > phraseindex;
+    phraseindex.resize(phrasestarts.size());
+    for (int i = 0; i < (int)phrasestarts.size(); i++) {
+        for (int j = 0; j <= i; j++) {
+            if (phrasestarts[i] == phrasestarts[j]) {
+                phraseindex[j].push_back(i);
+                break;
+            }
+        }
+    }
+
+    std::vector<bool> indexused(32, false);
+
+    std::vector<pair<int, bool> > phraseendnoteinfo;
+    extractPhraseNoteAttachmentInformation(phraseendnoteinfo, phraseend, '}');
+
+    int endsubtokcount = phraseend->getSubtokenCount();
+    std::vector<int> endpitches;
+    for (int i = 0; i < endsubtokcount; i++) {
+        std::string subtok = phraseend->getSubtoken(i);
+        if (subtok.find("r") != std::string::npos) {
+            endpitches.push_back(0);
+        }
+        else {
+            endpitches.push_back(hum::Convert::kernToBase7(subtok));
+        }
+    }
+    std::vector<pair<int, int> > endchordsorted;
+    endchordsorted.reserve(endsubtokcount);
+    pair<int, int> v;
+    for (int i = 0; i < endsubtokcount; i++) {
+        v.first = endpitches[i];
+        v.second = i;
+        endchordsorted.push_back(v);
+    }
+    std::sort(endchordsorted.begin(), endchordsorted.end());
+
+    int startsubtokcount;
+    std::vector<int> startpitches;
+
+    for (int i = 0; i < (int)phraseindex.size(); i++) {
+        std::vector<pair<int, bool> > phrasestartnoteinfo;
+        extractPhraseNoteAttachmentInformation(phrasestartnoteinfo, phrasestarts.at(i), '{');
+
+        startsubtokcount = phrasestarts[i]->getSubtokenCount();
+        startpitches.clear();
+        for (int j = 0; j < startsubtokcount; j++) {
+            std::string subtok = phrasestarts[i]->getSubtoken(j);
+            if (subtok.find("r") != std::string::npos) {
+                startpitches.push_back(0);
+            }
+            else {
+                startpitches.push_back(hum::Convert::kernToBase7(subtok));
+            }
+        }
+        std::vector<std::pair<int, int> > startchordsorted;
+        startchordsorted.reserve(startsubtokcount);
+
+        pair<int, int> v;
+        for (int i = 0; i < startsubtokcount; i++) {
+            v.first = startpitches[i];
+            v.second = i;
+            startchordsorted.push_back(v);
+        }
+        std::sort(startchordsorted.begin(), startchordsorted.end());
+        for (int j = 0; j < (int)phraseindex[i].size(); j++) {
+            int ndex = -1;
+            if (phraseindex.size() > 1) {
+                ndex = j;
+            }
+            hum::HTp phrasestart = phrasestarts[phraseindex[i][j]];
+
+            std::vector<pair<int, bool> > phrasestartnoteinfo;
+            extractPhraseNoteAttachmentInformation(phrasestartnoteinfo, phrasestart, '{');
+            if (!phrasestart) {
+                // should never occur...
+                return;
+            }
+
+            int mindex;
+            std::string mindexstring = phrasestart->getValue("MEI", "measureIndex");
+            if (mindexstring == "") {
+                // cross-layer phraseing into later layer.  The beginning of the phrase
+                // is in the same measure since it has not yet been processed.
+                mindex = phraseend->getValueInt("MEI", "measureIndex");
+            }
+            else {
+                mindex = phrasestart->getValueInt("MEI", "measureIndex");
+            }
+
+            Measure *startmeasure = m_measures[mindex];
+            //  ggg
+            // Slur *slur = new Slur;
+            BracketSpan *phrase = new BracketSpan;
+            phrase->SetFunc("coloration"); // borrowing coloration style for now
+
+            // addSlurLineStyle(phrase, phrasestart, ndex);
+
+            // start ID can sometimes not be set yet due to cross layer phrases.
+            std::string startid = phrasestart->getValue("MEI", "xml:id");
+            std::string endid = phraseend->getValue("MEI", "xml:id");
+
+            if (startid == "") {
+                if (phrasestart->isChord()) {
+                    startid = "chord-L";
+                }
+                else {
+                    startid = "note-L";
+                }
+                startid += to_string(phrasestart->getLineNumber());
+                startid += "F";
+                startid += to_string(phrasestart->getFieldNumber());
+                phrasestart->setValue("MEI", "xml:id", startid);
+                startid = phrasestart->getValue("MEI", "xml:id");
+            }
+
+            if (phraseindex[i].size() > 1) {
+                if (endpitches.size() > 1) {
+                    calculateNoteIdForSlur(endid, endchordsorted, j);
+                }
+                if (startpitches.size() > 1) {
+                    calculateNoteIdForSlur(startid, startchordsorted, j);
+                }
+            }
+
+            if (phraseendnoteinfo.at(i).second) {
+                if (endid.find("chord") != std::string::npos) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(endid, "note", "chord");
+                    endid += "S";
+                    endid += to_string(phraseendnoteinfo[i].first + 1);
+                }
+            }
+
+            if (phrasestartnoteinfo.at(j).second) {
+                if (startid.find("chord") != std::string::npos) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(startid, "note", "chord");
+                    startid += "S";
+                    startid += to_string(phrasestartnoteinfo[i].first + 1);
+                }
+            }
+
+            phrase->SetEndid("#" + endid);
+            phrase->SetStartid("#" + startid);
+            setSlurLocationId(phrase, phrasestart, phraseend, j);
+
+            startmeasure->AddChild(phrase);
+            if (phrasestart->getTrack() == phraseend->getTrack()) {
+                // If the phrase starts and ends on different staves,
+                // do not specify the staff attribute, but later
+                // add a list of the two staves involved.
+                setStaff(phrase, m_currentstaff);
+            }
+
+            // if (hasAboveParameter(phrasestart, "S")) {
+            //     slur->SetCurvedir(curvature_CURVEDIR_above);
+            // }
+            // else if (hasBelowParameter(phrasestart, "S")) {
+            //     slur->SetCurvedir(curvature_CURVEDIR_below);
+            // }
+
+            std::string eid = phraseend->getValue("auto", "id");
+            int phraseidx = getSlurEndIndex(phrasestart, eid, indexused);
+            if (phraseidx < 0) {
+                continue;
+            }
+            indexused.at(phraseidx) = true;
+
+            // Calculate if the phrase should be forced above or below
+            // this is the case for doubly phrased chords.  Only the first
+            // two phrases between a pair of notes/chords will be oriented
+            // (other phrases will need to be manually adjusted and probably
+            // linked to individual notes to avoid overstriking the first
+            // two phrases.
+            // if (phraseindex[i].size() >= 2) {
+            //     if (phrasestarts[phraseindex[i][0]] == phrasestarts[phraseindex[i][1]]) {
+            //         if (j == 0) {
+            //             phrase->SetCurvedir(curvature_CURVEDIR_above);
+            //         }
+            //         else {
+            //             phrase->SetCurvedir(curvature_CURVEDIR_below);
+            //         }
+            //     }
+            // }
+
+            /*
+                        if (m_signifiers.above) {
+                            int count = -1;
+                            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
+                                if (phrasestart->at(k) == '(') {
+                                    count++;
+                                }
+                                if (count == phraseidx) {
+                                    if (phrasestart->at(k + 1) == m_signifiers.above) {
+                                        slur->SetCurvedir(curvature_CURVEDIR_above);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (m_signifiers.below) {
+                            int count = -1;
+                            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
+                                if (phrasestart->at(k) == '(') {
+                                    count++;
+                                }
+                                if (count == phraseidx) {
+                                    if (phrasestart->at(k + 1) == m_signifiers.below) {
+                                        slur->SetCurvedir(curvature_CURVEDIR_below);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+            */
+        }
+    }
+}
+
 //////////////////////////////
 //
 // HumdrumInput::addSlurLineStyle -- Add dotted or dashed line information to a
@@ -9281,14 +9542,14 @@ void HumdrumInput::extractSlurNoteAttachmentInformation(
         else if (token->at(i) == ')') {
             slurnumber++;
             if (slurtype == ')') {
-                notestate = getNoteState(token, slurnumber);
+                notestate = getNoteStateSlur(token, slurnumber);
                 data.emplace_back(std::make_pair(subtokindex, notestate));
             }
         }
         else if (token->at(i) == '(') {
             slurnumber++;
             if (slurtype == '(') {
-                notestate = getNoteState(token, slurnumber);
+                notestate = getNoteStateSlur(token, slurnumber);
                 data.emplace_back(std::make_pair(subtokindex, notestate));
             }
         }
@@ -9297,12 +9558,66 @@ void HumdrumInput::extractSlurNoteAttachmentInformation(
 
 //////////////////////////////
 //
-// HumdrumInput::getNoteState -- Return any slur attachment to a note parameter in a layout command for slurs.
+// HumdrumInput::extractPhraseNoteAttachmentInformation --
+//   Vector indexed by phrase (open or close depending on phrasetype) with data being the subtoken number and
+//   boolean for attached to note instead of chord.
 //
 
-bool HumdrumInput::getNoteState(hum::HTp token, int slurnumber)
+void HumdrumInput::extractPhraseNoteAttachmentInformation(
+    std::vector<std::pair<int, bool> > &data, hum::HTp token, char phrasetype)
+{
+    // phrasetype == '{' for phrase start
+    // phrasetype == '}' for phrase end
+    data.clear();
+    int subtokindex = 0;
+    int phrasenumber = 0;
+    int toksize = (int)token->size();
+    bool notestate;
+    for (int i = 0; i < toksize; i++) {
+        if (token->at(i) == ' ') {
+            subtokindex++;
+        }
+        else if (token->at(i) == '}') {
+            phrasenumber++;
+            if (phrasetype == '}') {
+                notestate = getNoteStatePhrase(token, phrasenumber);
+                data.emplace_back(std::make_pair(subtokindex, notestate));
+            }
+        }
+        else if (token->at(i) == '{') {
+            phrasenumber++;
+            if (phrasetype == '{') {
+                notestate = getNoteStatePhrase(token, phrasenumber);
+                data.emplace_back(std::make_pair(subtokindex, notestate));
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getNoteStateSlur -- Return any slur attachment to a note parameter in a layout command for slurs.
+//
+
+bool HumdrumInput::getNoteStateSlur(hum::HTp token, int slurnumber)
 {
     std::string data = token->getSlurLayoutParameter("note", slurnumber - 1);
+    if (data == "true") {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getNoteStatePhrase -- Return any phrase attachment to a note parameter in a layout command for phrases.
+//
+
+bool HumdrumInput::getNoteStatePhrase(hum::HTp token, int phrasenumber)
+{
+    std::string data = token->getPhraseLayoutParameter("note", phrasenumber - 1);
     if (data == "true") {
         return true;
     }

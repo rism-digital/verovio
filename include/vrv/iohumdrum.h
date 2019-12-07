@@ -108,7 +108,7 @@ namespace humaux {
         Measure *m_startmeasure;
         Measure *m_endmeasure;
         hum::HTp m_starttokenpointer = NULL;
-        int m_subindex; // the subtoken index for the start of the slur
+        int m_subindex; // the subtoken index for the start of the tie
     };
 
     class HumdrumBeamAndTuplet {
@@ -415,6 +415,7 @@ protected:
     void insertMeterSigElement(std::vector<std::string> &elements, std::vector<void *> &pointers,
         std::vector<hum::HTp> &layeritems, int index);
     void processSlurs(hum::HTp token);
+    void processPhrases(hum::HTp token);
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
     void addFingeringsForMeasure(int startline, int endline);
@@ -529,7 +530,10 @@ protected:
     void linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex);
     bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
     void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype);
-    bool getNoteState(hum::HTp token, int slurnumber);
+    void extractPhraseNoteAttachmentInformation(
+        std::vector<std::pair<int, bool> > &data, hum::HTp token, char phrasetype);
+    bool getNoteStateSlur(hum::HTp token, int slurnumber);
+    bool getNoteStatePhrase(hum::HTp token, int phrasenumber);
     void assignVerticalGroup(Pedal *ped, hum::HTp token);
     void storeAcclev(const std::string value, int staffindex);
     void storeStemInterpretation(const std::string &value, int staffindex, int layernumber);
