@@ -12634,7 +12634,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         showInAccidGes = true;
     }
     // alternate method of giving accidental
-    string loaccid2 = token->getLayoutParameter("A", "acc", subtoken);
+    string loaccid2 = token->getLayoutParameter("A", "vis", subtoken);
     if (!loaccid2.empty()) {
         // show the performance accidental in @accid.ges, and the
         // loaccid2 will be shown in @accid (the following false
@@ -12643,7 +12643,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         showInAccidGes = true;
     }
     // loaccid2 has priority over loaccid when both present
-    if (loaccid2.empty()) {
+    if (!loaccid2.empty()) {
         loaccid = loaccid2;
     }
 
@@ -12778,24 +12778,31 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             else if (edittype == "none") {
                 // display as a regular accidental
             }
-            switch (accidCount) {
-                case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
-                case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
-                case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
-                case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
-                case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+            if (loaccid.empty()) {
+                switch (accidCount) {
+                    case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+                    case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                    case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+                    case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                    case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+                }
+            }
+            else {
+                setAccid(accid, loaccid);
             }
         }
 
         if (showInAccidGes) {
-            switch (accidCount) {
-                // case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
-                // case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
-                case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
-                case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
-                case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
-                case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
-                case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
+            if (loaccid.empty()) {
+                switch (accidCount) {
+                    // case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
+                    // case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
+                    case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
+                    case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
+                    case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
+                    case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
+                    case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
+                }
             }
         }
 
@@ -12939,6 +12946,55 @@ void HumdrumInput::addCautionaryAccidental(Accid *accid, hum::HTp token, int aco
         case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
         case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
         case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setAccid -- set the written accidental according
+//    to the given style.
+//
+
+void HumdrumInput::setAccid(Accid *accid, const string &loaccid)
+{
+    if (loaccid.empty()) {
+        return;
+    }
+    if (loaccid == "#") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+    }
+    else if (loaccid == "-") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+    }
+    else if (loaccid == "##") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_ss);
+    }
+    else if (loaccid == "x") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_x);
+    }
+    else if (loaccid == "--") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
+    }
+    else if (loaccid == "xs") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_xs);
+    }
+    else if (loaccid == "sx") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_sx);
+    }
+    else if (loaccid == "###") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_ts);
+    }
+    else if (loaccid == "---") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_ts);
+    }
+    else if (loaccid == "n") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+    }
+    else if (loaccid == "n-") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_nf);
+    }
+    else if (loaccid == "n#") {
+        accid->SetAccid(ACCIDENTAL_WRITTEN_ns);
     }
 }
 

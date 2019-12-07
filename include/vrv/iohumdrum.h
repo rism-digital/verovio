@@ -553,6 +553,7 @@ protected:
     void fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void addSlurLineStyle(Slur *element, hum::HTp token, int slurindex);
     void addTieLineStyle(Tie *element, hum::HTp token, int noteindex);
+    void setAccid(Accid *accid, const string &loaccid);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
