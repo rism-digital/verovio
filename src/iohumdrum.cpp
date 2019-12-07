@@ -12570,6 +12570,21 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
     }
+    string edittype2 = token->getLayoutParameter("A", "edit", subtoken);
+    if (edittype.empty() && !edittype2.empty()) {
+        editorialQ = true;
+        if (edittype2 == "true") {
+            // default editorial accidental type
+            edittype = "";
+            // use the first editorial accidental RDF style in file if present
+            if (!m_signifiers.editacc.empty()) {
+                edittype = m_signifiers.edittype[0];
+            }
+        }
+        else {
+            edittype = edittype2;
+        }
+    }
 
     bool mensit = false;
     bool gesturalQ = false;
@@ -12617,6 +12632,19 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         // will be used to set disable normal visual accid display system)
         showInAccid = false;
         showInAccidGes = true;
+    }
+    // alternate method of giving accidental
+    string loaccid2 = token->getLayoutParameter("A", "acc", subtoken);
+    if (!loaccid2.empty()) {
+        // show the performance accidental in @accid.ges, and the
+        // loaccid2 will be shown in @accid (the following false
+        // will be used to set disable normal visual accid display system)
+        showInAccid = false;
+        showInAccidGes = true;
+    }
+    // loaccid2 has priority over loaccid when both present
+    if (loaccid2.empty()) {
+        loaccid = loaccid2;
     }
 
     if (mensit && hasAccidental) {
@@ -12729,13 +12757,26 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             if (edittype == "") {
                 accid->SetFunc(accidLog_FUNC_edit);
             }
+            else if (edittype == "above") {
+                accid->SetFunc(accidLog_FUNC_edit);
+            }
+            else if (edittype == "a") {
+                accid->SetFunc(accidLog_FUNC_edit);
+            }
             else if (edittype == "brack") {
                 // enclose="brack" cannot be present with func="edit" at the moment...
+                accid->SetEnclose(ENCLOSURE_brack);
+            }
+            else if (edittype == "brac") {
+                // enclose="brac" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_brack);
             }
             else if (edittype == "paren") {
                 // enclose="paren" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_paren);
+            }
+            else if (edittype == "none") {
+                // display as a regular accidental
             }
             switch (accidCount) {
                 case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
@@ -16074,6 +16115,9 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
             else if (value.find("paren") != string::npos) {
                 m_signifiers.edittype.push_back("paren");
+            }
+            else if (value.find("none") != string::npos) {
+                m_signifiers.edittype.push_back("none");
             }
             else {
                 m_signifiers.edittype.push_back("");
