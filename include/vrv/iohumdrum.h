@@ -3,7 +3,6 @@
 // Author:      Craig Stuart Sapp
 // Created:     06/06/2015
 // Copyright (c) Authors and others. All rights reserved.
-// vim:         ts=4
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef __VRV_IOHUMDRUM_H__
@@ -27,6 +26,8 @@
 #include "pedal.h"
 #include "runningelement.h"
 #include "section.h"
+#include "slur.h"
+#include "tie.h"
 #include "verse.h"
 #include "vrvdef.h"
 
@@ -546,6 +547,8 @@ protected:
     bool hasIndent(hum::HTp tok);
     void prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::string &ks, hum::HTp keytok);
     void fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
+    void addSlurLineStyle(Slur *element, hum::HTp token, int slurindex);
+    void addTieLineStyle(Tie *element, hum::HTp token, int noteindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -593,7 +596,6 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
-    template <class ELEMENT> void addLineStyle(ELEMENT element, hum::HTp token, const string &layout, int index = 0);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);

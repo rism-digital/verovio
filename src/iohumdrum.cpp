@@ -9084,7 +9084,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             Measure *startmeasure = m_measures[mindex];
             Slur *slur = new Slur;
 
-            addLineStyle(slur, slurstart, "S", ndex);
+            addSlurLineStyle(slur, slurstart, ndex);
 
             // start ID can sometimes not be set yet due to cross layer slurs.
             std::string startid = slurstart->getValue("MEI", "xml:id");
@@ -9209,16 +9209,16 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
 //////////////////////////////
 //
-// HumdrumInput::addLineStyle -- Add dotted or dashed line information to an
-//    element from layout parameters.
+// HumdrumInput::addSlurLineStyle -- Add dotted or dashed line information to a
+//    slur from layout parameters.
 //        Default parameter: index = 0.
 //
 
-template <class ELEMENT> void HumdrumInput::addLineStyle(ELEMENT element, hum::HTp token, const string &layout, int index)
+void HumdrumInput::addSlurLineStyle(Slur *element, hum::HTp token, int slurindex)
 {
 
-    string dashed = token->getLayoutParameter(layout, "dash", index);
-    string dotted = token->getLayoutParameter(layout, "dot", index);
+    string dashed = token->getLayoutParameter("S", "dash", slurindex);
+    string dotted = token->getLayoutParameter("S", "dot", slurindex);
     if (!dotted.empty()) {
         element->SetLform(LINEFORM_dotted);
     }
@@ -9226,7 +9226,32 @@ template <class ELEMENT> void HumdrumInput::addLineStyle(ELEMENT element, hum::H
         element->SetLform(LINEFORM_dashed);
     }
 
-    string color = token->getLayoutParameter(layout, "color", index);
+    string color = token->getLayoutParameter("S", "color", slurindex);
+    if (!color.empty()) {
+        element->SetColor(color);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addTieLineStyle -- Add dotted or dashed line information to a
+//    tie from layout parameters.
+//        Default parameter: index = 0.
+//
+
+void HumdrumInput::addTieLineStyle(Tie *element, hum::HTp token, int noteindex)
+{
+
+    string dashed = token->getLayoutParameter("T", "dash", noteindex);
+    string dotted = token->getLayoutParameter("T", "dot", noteindex);
+    if (!dotted.empty()) {
+        element->SetLform(LINEFORM_dotted);
+    }
+    else if (!dashed.empty()) {
+        element->SetLform(LINEFORM_dashed);
+    }
+
+    string color = token->getLayoutParameter("T", "color", noteindex);
     if (!color.empty()) {
         element->SetColor(color);
     }
@@ -14169,7 +14194,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
         vrv::Tie *tie = new Tie;
 
-        addLineStyle(tie, token, "T");
+        addTieLineStyle(tie, token, subindex);
 
         m_measure->AddChild(tie);
         int endsubindex = endnumber - 1;
@@ -14332,11 +14357,12 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
     Tie *tie = found->setEndAndInsert(noteuuid, m_measure, tstring);
 
     hum::HTp starttoken = found->getStartTokenPointer();
+    int startindex = found->getStartSubindex();
     if (starttoken) {
-        addLineStyle(tie, starttoken, "T");
+        addTieLineStyle(tie, starttoken, startindex);
     }
 
-    setTieLocationId(tie, found->getStartTokenPointer(), found->getStartSubindex(), token, subindex);
+    setTieLocationId(tie, starttoken, startindex, token, subindex);
 
     if (found->isInserted()) {
         // Only deleting the finished tie if it was successful.  Undeleted
