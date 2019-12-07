@@ -9339,8 +9339,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
 
             Measure *startmeasure = m_measures[mindex];
 
-            string none = phrasestart->getLayoutParameter("P", "none", ndex);
-            if (!none.empty()) {
+            if (phraseIsInvisible(phrasestart, ndex)) {
                 continue;
             }
 
@@ -9365,6 +9364,41 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
             }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::phraseIsInvisible -- Returns true if the phrase mark
+//    should not be rendered.
+//
+
+bool HumdrumInput::phraseIsInvisible(hum::HTp token, int pindex)
+{
+    string none = token->getLayoutParameter("P", "none", pindex);
+    if (!none.empty()) {
+        return true;
+    }
+    if (pindex < 0) {
+        pindex = 0;
+    }
+
+    int counter = -1;
+    for (int i = 0; i < (int)token->size() - 1; i++) {
+        char ch = token->at(i);
+        if (ch != '{') {
+            continue;
+        }
+        counter++;
+        if (counter != pindex) {
+            continue;
+        }
+        if (token->at(i + 1) == 'y') {
+            return true;
+        }
+        break;
+    }
+
+    return false;
 }
 
 //////////////////////////////

@@ -554,6 +554,7 @@ protected:
     void addSlurLineStyle(Slur *element, hum::HTp token, int slurindex);
     void addTieLineStyle(Tie *element, hum::HTp token, int noteindex);
     void setAccid(Accid *accid, const string &loaccid);
+    bool phraseIsInvisible(hum::HTp token, int pindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
