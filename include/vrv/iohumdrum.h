@@ -582,6 +582,12 @@ protected:
     template <class ELEMENT> MeterSig *getMeterSig(ELEMENT element);
     template <class ELEMENT> Clef *getClef(ELEMENT element);
     template <class ELEMENT> Mensur *getMensur(ELEMENT element);
+    template <class ELEMENT>
+    void insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp phraseend, Measure *startmeasure,
+        std::vector<pair<int, int> > &endchordsorted, std::vector<std::pair<int, int> > &startchordsorted,
+        std::vector<pair<int, bool> > &phrasestartnoteinfo, std::vector<pair<int, bool> > &phraseendnoteinfo, int ndex,
+        std::vector<std::vector<int> > &phraseindex, int i, int j, std::vector<int> &startpitches,
+        std::vector<int> &endpitches, std::vector<bool> &indexused);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);

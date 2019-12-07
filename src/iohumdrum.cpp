@@ -9338,134 +9338,219 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
             }
 
             Measure *startmeasure = m_measures[mindex];
-            //  ggg
-            // Slur *slur = new Slur;
-            BracketSpan *phrase = new BracketSpan;
-            phrase->SetFunc("coloration"); // borrowing coloration style for now
 
-            // addSlurLineStyle(phrase, phrasestart, ndex);
-
-            // start ID can sometimes not be set yet due to cross layer phrases.
-            std::string startid = phrasestart->getValue("MEI", "xml:id");
-            std::string endid = phraseend->getValue("MEI", "xml:id");
-
-            if (startid == "") {
-                if (phrasestart->isChord()) {
-                    startid = "chord-L";
-                }
-                else {
-                    startid = "note-L";
-                }
-                startid += to_string(phrasestart->getLineNumber());
-                startid += "F";
-                startid += to_string(phrasestart->getFieldNumber());
-                phrasestart->setValue("MEI", "xml:id", startid);
-                startid = phrasestart->getValue("MEI", "xml:id");
-            }
-
-            if (phraseindex[i].size() > 1) {
-                if (endpitches.size() > 1) {
-                    calculateNoteIdForSlur(endid, endchordsorted, j);
-                }
-                if (startpitches.size() > 1) {
-                    calculateNoteIdForSlur(startid, startchordsorted, j);
-                }
-            }
-
-            if (phraseendnoteinfo.at(i).second) {
-                if (endid.find("chord") != std::string::npos) {
-                    hum::HumRegex hre;
-                    hre.replaceDestructive(endid, "note", "chord");
-                    endid += "S";
-                    endid += to_string(phraseendnoteinfo[i].first + 1);
-                }
-            }
-
-            if (phrasestartnoteinfo.at(j).second) {
-                if (startid.find("chord") != std::string::npos) {
-                    hum::HumRegex hre;
-                    hre.replaceDestructive(startid, "note", "chord");
-                    startid += "S";
-                    startid += to_string(phrasestartnoteinfo[i].first + 1);
-                }
-            }
-
-            phrase->SetEndid("#" + endid);
-            phrase->SetStartid("#" + startid);
-            setSlurLocationId(phrase, phrasestart, phraseend, j);
-
-            startmeasure->AddChild(phrase);
-            if (phrasestart->getTrack() == phraseend->getTrack()) {
-                // If the phrase starts and ends on different staves,
-                // do not specify the staff attribute, but later
-                // add a list of the two staves involved.
-                setStaff(phrase, m_currentstaff);
-            }
-
-            // if (hasAboveParameter(phrasestart, "S")) {
-            //     slur->SetCurvedir(curvature_CURVEDIR_above);
-            // }
-            // else if (hasBelowParameter(phrasestart, "S")) {
-            //     slur->SetCurvedir(curvature_CURVEDIR_below);
-            // }
-
-            std::string eid = phraseend->getValue("auto", "id");
-            int phraseidx = getSlurEndIndex(phrasestart, eid, indexused);
-            if (phraseidx < 0) {
+            string none = phrasestart->getLayoutParameter("P", "none", ndex);
+            if (!none.empty()) {
                 continue;
             }
-            indexused.at(phraseidx) = true;
 
-            // Calculate if the phrase should be forced above or below
-            // this is the case for doubly phrased chords.  Only the first
-            // two phrases between a pair of notes/chords will be oriented
-            // (other phrases will need to be manually adjusted and probably
-            // linked to individual notes to avoid overstriking the first
-            // two phrases.
-            // if (phraseindex[i].size() >= 2) {
-            //     if (phrasestarts[phraseindex[i][0]] == phrasestarts[phraseindex[i][1]]) {
-            //         if (j == 0) {
-            //             phrase->SetCurvedir(curvature_CURVEDIR_above);
-            //         }
-            //         else {
-            //             phrase->SetCurvedir(curvature_CURVEDIR_below);
-            //         }
-            //     }
-            // }
-
-            /*
-                        if (m_signifiers.above) {
-                            int count = -1;
-                            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
-                                if (phrasestart->at(k) == '(') {
-                                    count++;
-                                }
-                                if (count == phraseidx) {
-                                    if (phrasestart->at(k + 1) == m_signifiers.above) {
-                                        slur->SetCurvedir(curvature_CURVEDIR_above);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (m_signifiers.below) {
-                            int count = -1;
-                            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
-                                if (phrasestart->at(k) == '(') {
-                                    count++;
-                                }
-                                if (count == phraseidx) {
-                                    if (phrasestart->at(k + 1) == m_signifiers.below) {
-                                        slur->SetCurvedir(curvature_CURVEDIR_below);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-            */
+            string isslur = phrasestart->getLayoutParameter("P", "slur", ndex);
+            if (!isslur.empty()) {
+                // insert phrase as slur
+                Slur *slur = new Slur;
+                insertPhrase(slur, phrasestart, phraseend, startmeasure, startchordsorted, endchordsorted,
+                    phrasestartnoteinfo, phraseendnoteinfo, ndex, phraseindex, i, j, startpitches, endpitches,
+                    indexused);
+                // Force phrase slur above the staff:
+                slur->SetCurvedir(curvature_CURVEDIR_above);
+            }
+            else {
+                // insert phrase as bracket
+                BracketSpan *bracket = new BracketSpan;
+                insertPhrase(bracket, phrasestart, phraseend, startmeasure, startchordsorted, endchordsorted,
+                    phrasestartnoteinfo, phraseendnoteinfo, ndex, phraseindex, i, j, startpitches, endpitches,
+                    indexused);
+                // bracket will not be drawn without the following line:
+                bracket->SetFunc("coloration");
+            }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertPhrase -- insert a phrase (which can be either
+//    rendered as a slur or as a bracketSpan (or not inserted if the
+//    style is "none").
+//
+
+template <class ELEMENT>
+void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp phraseend, Measure *startmeasure,
+    std::vector<pair<int, int> > &endchordsorted, std::vector<std::pair<int, int> > &startchordsorted,
+    std::vector<pair<int, bool> > &phrasestartnoteinfo, std::vector<pair<int, bool> > &phraseendnoteinfo, int ndex,
+    std::vector<std::vector<int> > &phraseindex, int i, int j, std::vector<int> &startpitches,
+    std::vector<int> &endpitches, std::vector<bool> &indexused)
+{
+
+    phrase->SetType("phrase");
+
+    string style = phrasestart->getLayoutParameter("P", "brack", ndex);
+    if (!style.empty()) {
+        style = "brack";
+    }
+    else {
+        style = phrasestart->getLayoutParameter("P", "dot", ndex);
+        if (!style.empty()) {
+            style = "dotted";
+        }
+        else {
+            style = phrasestart->getLayoutParameter("P", "dash", ndex);
+            if (!style.empty()) {
+                style = "dashed";
+            }
+            else {
+                style = phrasestart->getLayoutParameter("P", "open", ndex);
+                if (!style.empty()) {
+                    style = "open";
+                }
+                else {
+                    style = phrasestart->getLayoutParameter("P", "wavy", ndex);
+                    if (!style.empty()) {
+                        style = "wavy";
+                    }
+                }
+            }
+        }
+    }
+
+    if (style == "brack") {
+        phrase->SetLform(LINEFORM_solid);
+    }
+    else if (style == "dotted") {
+        phrase->SetLform(LINEFORM_dotted);
+    }
+    else if (style == "dashed") {
+        phrase->SetLform(LINEFORM_dashed);
+    }
+    else if (style == "wavy") {
+        // not yet implemented in verovio (will display as open bracket)
+        phrase->SetLform(LINEFORM_wavy);
+    }
+
+    string color = phrasestart->getLayoutParameter("P", "color", ndex);
+    if (!color.empty()) {
+        phrase->SetColor(color);
+    }
+
+    // start ID can sometimes not be set yet due to cross layer phrases.
+    std::string startid = phrasestart->getValue("MEI", "xml:id");
+    std::string endid = phraseend->getValue("MEI", "xml:id");
+
+    if (startid == "") {
+        if (phrasestart->isChord()) {
+            startid = "chord-L";
+        }
+        else {
+            startid = "note-L";
+        }
+        startid += to_string(phrasestart->getLineNumber());
+        startid += "F";
+        startid += to_string(phrasestart->getFieldNumber());
+        phrasestart->setValue("MEI", "xml:id", startid);
+        startid = phrasestart->getValue("MEI", "xml:id");
+    }
+
+    if (phraseindex[i].size() > 1) {
+        if (endpitches.size() > 1) {
+            calculateNoteIdForSlur(endid, endchordsorted, j);
+        }
+        if (startpitches.size() > 1) {
+            calculateNoteIdForSlur(startid, startchordsorted, j);
+        }
+    }
+
+    if (phraseendnoteinfo.at(i).second) {
+        if (endid.find("chord") != std::string::npos) {
+            hum::HumRegex hre;
+            hre.replaceDestructive(endid, "note", "chord");
+            endid += "S";
+            endid += to_string(phraseendnoteinfo[i].first + 1);
+        }
+    }
+
+    if (phrasestartnoteinfo.at(j).second) {
+        if (startid.find("chord") != std::string::npos) {
+            hum::HumRegex hre;
+            hre.replaceDestructive(startid, "note", "chord");
+            startid += "S";
+            startid += to_string(phrasestartnoteinfo[i].first + 1);
+        }
+    }
+
+    phrase->SetEndid("#" + endid);
+    phrase->SetStartid("#" + startid);
+    setSlurLocationId(phrase, phrasestart, phraseend, j);
+
+    startmeasure->AddChild(phrase);
+    if (phrasestart->getTrack() == phraseend->getTrack()) {
+        // If the phrase starts and ends on different staves,
+        // do not specify the staff attribute, but later
+        // add a list of the two staves involved.
+        setStaff(phrase, m_currentstaff);
+    }
+
+    // if (hasAboveParameter(phrasestart, "S")) {
+    //     slur->SetCurvedir(curvature_CURVEDIR_above);
+    // }
+    // else if (hasBelowParameter(phrasestart, "S")) {
+    //     slur->SetCurvedir(curvature_CURVEDIR_below);
+    // }
+
+    std::string eid = phraseend->getValue("auto", "id");
+    int phraseidx = getSlurEndIndex(phrasestart, eid, indexused);
+    if (phraseidx < 0) {
+        return;
+    }
+    indexused.at(phraseidx) = true;
+
+    // Calculate if the phrase should be forced above or below
+    // this is the case for doubly phrased chords.  Only the first
+    // two phrases between a pair of notes/chords will be oriented
+    // (other phrases will need to be manually adjusted and probably
+    // linked to individual notes to avoid overstriking the first
+    // two phrases.
+    // if (phraseindex[i].size() >= 2) {
+    //     if (phrasestarts[phraseindex[i][0]] == phrasestarts[phraseindex[i][1]]) {
+    //         if (j == 0) {
+    //             phrase->SetCurvedir(curvature_CURVEDIR_above);
+    //         }
+    //         else {
+    //             phrase->SetCurvedir(curvature_CURVEDIR_below);
+    //         }
+    //     }
+    // }
+
+    /*
+        if (m_signifiers.above) {
+            int count = -1;
+            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
+                if (phrasestart->at(k) == '(') {
+                    count++;
+                }
+                if (count == phraseidx) {
+                    if (phrasestart->at(k + 1) == m_signifiers.above) {
+                        slur->SetCurvedir(curvature_CURVEDIR_above);
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (m_signifiers.below) {
+            int count = -1;
+            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
+                if (phrasestart->at(k) == '(') {
+                    count++;
+                }
+                if (count == phraseidx) {
+                    if (phrasestart->at(k + 1) == m_signifiers.below) {
+                        slur->SetCurvedir(curvature_CURVEDIR_below);
+                    }
+                    break;
+                }
+            }
+        }
+    */
 }
 
 //////////////////////////////
