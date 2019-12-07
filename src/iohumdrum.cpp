@@ -9516,6 +9516,17 @@ void HumdrumInput::addTieLineStyle(Tie *element, hum::HTp token, int noteindex)
     if (!color.empty()) {
         element->SetColor(color);
     }
+
+    string above = token->getLayoutParameter("T", "a", noteindex);
+    if (!above.empty()) {
+        element->SetCurvedir(curvature_CURVEDIR_above);
+    }
+    else {
+        string below = token->getLayoutParameter("T", "b", noteindex);
+        if (!below.empty()) {
+            element->SetCurvedir(curvature_CURVEDIR_below);
+        }
+    }
 }
 
 //////////////////////////////
