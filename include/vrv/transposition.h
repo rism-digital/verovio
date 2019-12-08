@@ -15,12 +15,12 @@
 namespace vrv {
 
 class TransPitch;
-class Transposition;
+class Transposer;
 
 ////////////////////////////////////////////////////////////////////////////
 //
 // The TransPitch class is an interface for storing information about notes that will
-// be used in the Transposition class.  The diatonic pitch class, chromatic alteration
+// be used in the Transposer class.  The diatonic pitch class, chromatic alteration
 // of the diatonic pitch and the octave are store in the class.  Names given to the
 // parameters are analogous to MEI note attributes.  Note that note@accid can be also
 // note/accid in MEI data, and other complications that need to be resolved into
@@ -45,14 +45,14 @@ std::ostream &operator<<(std::ostream &out, const TransPitch &pitch);
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// The Transposition class is an interface for transposing notes represented in the
+// The Transposer class is an interface for transposing notes represented in the
 // TransPitch class format.
 //
 
-class Transposition {
+class Transposer {
 public:
-    Transposition();
-    ~Transposition();
+    Transposer();
+    ~Transposer();
 
     int GetBase();
     int GetMaxAccid();

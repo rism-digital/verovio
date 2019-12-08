@@ -17,13 +17,13 @@
 //                            pname: diatonic pitch class integer from C=0 to B=6.
 //                            accid: chromatic alterations in semitones (0=natural, -1=flat).
 //                            oct: octave number (4 = middle-C octave).
-//                   Transposition: transposition system which uses TransPitch as a user interface.
+//                   Transposer: transposition system which uses TransPitch as a user interface.
 //                   (Add MEI to TransPitch conversions in TransPitch class, or use external
 //                    code to interface to verovio attributes for <note>).
 //                   The default maximum accidental handling is +/- two sharps/flats (base-40).
-//                   Use the Transposition::SetMaxAccid() to set the maximum allowed accidental
-//                   count.  Transposition::SetBase40() is equivalent to Transposition::SetMaxAccid(2),
-//                   and Transposition::SetBase600() is equivalent to Transposition::SetMaxAccid(42).
+//                   Use the Transposer::SetMaxAccid() to set the maximum allowed accidental
+//                   count.  Transposer::SetBase40() is equivalent to Transposer::SetMaxAccid(2),
+//                   and Transposer::SetBase600() is equivalent to Transposer::SetMaxAccid(42).
 //
 // Todo: Probably useful to add an autowrap feature to force unrepresentable pitches to be
 //     moved to enharmonic equivalent pitches (better than leaving a pitch undefined).
@@ -55,7 +55,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //
 // The TransPitch class is an interface for storing information about notes which
-// will be used in the Transposition class.  The diatonic pitch class, chromatic alteration
+// will be used in the Transposer class.  The diatonic pitch class, chromatic alteration
 // of the diatonic pitch and the octave are store in the class.  Names given to the
 // parameters are analogous to MEI note attributes.  Note that note@accid can be also
 // note/accid in MEI data, and other complications that need to be resolved into
@@ -152,10 +152,10 @@ std::ostream &operator<<(std::ostream &out, const TransPitch &pitch)
 
 //////////////////////////////
 //
-// Transposition::Transposition -- Transposition constructor.
+// Transposer::Transposer -- Transposer constructor.
 //
 
-Transposition::Transposition()
+Transposer::Transposer()
 {
     // Initialize with base-40 system by default:
     SetMaxAccid(2);
@@ -163,23 +163,23 @@ Transposition::Transposition()
 
 //////////////////////////////
 //
-// Transposition::~Transposition -- Transposition deconstructor.
+// Transposer::~Transposer -- Transposer deconstructor.
 //
 
-Transposition::~Transposition()
+Transposer::~Transposer()
 {
     // do nothing;
 }
 
 //////////////////////////////
 //
-// Transposition::SetTransposition -- Set the transposition value which is an
-//   interval class in the current base system.  When Transposition::SetMaxAccid()
-//   or Transposition::SetBase*() are called, the transposition value will be set
+// Transposer::SetTransposition -- Set the transposition value which is an
+//   interval class in the current base system.  When Transposer::SetMaxAccid()
+//   or Transposer::SetBase*() are called, the transposition value will be set
 //   to 0 (a perfect unison).
 //
 
-void Transposition::SetTransposition(int transVal)
+void Transposer::SetTransposition(int transVal)
 {
     m_transpose = transVal;
 }
@@ -187,18 +187,18 @@ void Transposition::SetTransposition(int transVal)
 // Use a string to set the interval class in the current base system.  For example,
 //  "+M2" means up a major second, which is the integer 6 in base-40.
 
-void Transposition::SetTransposition(const std::string &transString)
+void Transposer::SetTransposition(const std::string &transString)
 {
     m_transpose = GetIntervalClass(transString);
 }
 
 //////////////////////////////
 //
-// Transposition::Transpose -- Do a transposition at the stored transposition interval, or
+// Transposer::Transpose -- Do a transposition at the stored transposition interval, or
 //   with a temporary provided integer interval class, or a temporary interval name.
 //
 
-void Transposition::Transpose(TransPitch &pitch)
+void Transposer::Transpose(TransPitch &pitch)
 {
     int ipitch = PitchToInteger(pitch);
     ipitch += m_transpose;
@@ -206,18 +206,18 @@ void Transposition::Transpose(TransPitch &pitch)
 }
 
 // Use a temporary transposition value in the following
-// two functions. To save for later use of Transposition::Transpose
+// two functions. To save for later use of Transposer::Transpose
 // without specifying the transposition interval, store
-// transposition value with Transposition::SetTransposition() first.
+// transposition value with Transposer::SetTransposition() first.
 
-void Transposition::Transpose(TransPitch &pitch, int transVal)
+void Transposer::Transpose(TransPitch &pitch, int transVal)
 {
     int ipitch = PitchToInteger(pitch);
     ipitch += transVal;
     pitch = IntegerToPitch(ipitch);
 }
 
-void Transposition::Transpose(TransPitch &pitch, const std::string &transString)
+void Transposer::Transpose(TransPitch &pitch, const std::string &transString)
 {
     int transVal = GetIntervalClass(transString);
     int ipitch = PitchToInteger(pitch);
@@ -227,31 +227,31 @@ void Transposition::Transpose(TransPitch &pitch, const std::string &transString)
 
 //////////////////////////////
 //
-// Transposition::GetBase -- Return the integer interval class representing an octave.
+// Transposer::GetBase -- Return the integer interval class representing an octave.
 //
 
-int Transposition::GetBase()
+int Transposer::GetBase()
 {
     return m_base;
 }
 
 //////////////////////////////
 //
-// Transposition::GetMaxAccid -- Return the maximum possible absolute accidental value
+// Transposer::GetMaxAccid -- Return the maximum possible absolute accidental value
 //     that can be represented by the current transposition base.
 //
 
-int Transposition::GetMaxAccid()
+int Transposer::GetMaxAccid()
 {
     return m_maxAccid;
 }
 
 //////////////////////////////
 //
-// Transposition::SetMaxAccid -- Calculate variables related to a specific base system.
+// Transposer::SetMaxAccid -- Calculate variables related to a specific base system.
 //
 
-void Transposition::SetMaxAccid(int maxAccid)
+void Transposer::SetMaxAccid(int maxAccid)
 {
     m_maxAccid = abs(maxAccid);
     m_base = 7 * (2 * m_maxAccid + 1) + 5;
@@ -261,12 +261,12 @@ void Transposition::SetMaxAccid(int maxAccid)
 
 //////////////////////////////
 //
-// Transposition::CalculateDiatonicMaping -- Calculate the integer values for the
+// Transposer::CalculateDiatonicMaping -- Calculate the integer values for the
 //    natural diatonic pitch classes: C, D, E, F, G, A, and B in the current
 //    base system.
 //
 
-void Transposition::CalculateDiatonicMapping()
+void Transposer::CalculateDiatonicMapping()
 {
     int M2 = MajorSecondClass();
     int m2 = M2 - 1;
@@ -282,7 +282,7 @@ void Transposition::CalculateDiatonicMapping()
 
 //////////////////////////////
 //
-// Transposition::GetIntervalClass -- Convert a diatonic interval with chromatic
+// Transposer::GetIntervalClass -- Convert a diatonic interval with chromatic
 //     quality and direction into an integer interval class.   Input string
 //     is in the format: direction + quality + diatonic interval.
 //     Such as +M2 for up a major second, -P5 is down a perfect fifth.
@@ -290,7 +290,7 @@ void Transposition::CalculateDiatonicMapping()
 //            (-|\+?)([Pp]|M|m|[aA]+|[dD]+)(\d+)
 //
 
-int Transposition::GetIntervalClass(const std::string &intervalName)
+int Transposer::GetIntervalClass(const std::string &intervalName)
 {
     std::string direction;
     std::string quality;
@@ -502,155 +502,155 @@ int Transposition::GetIntervalClass(const std::string &intervalName)
 
 //////////////////////////////
 //
-// Transposition::PerfectUnisonClass -- Return the integer interval class
+// Transposer::PerfectUnisonClass -- Return the integer interval class
 //     representing a perfect unison.
 //
 
-int Transposition::PerfectUnisonClass()
+int Transposer::PerfectUnisonClass()
 {
     return 0;
 }
 
 //////////////////////////////
 //
-// Transposition::MinorSecondClass -- Return the integer interval class
+// Transposer::MinorSecondClass -- Return the integer interval class
 //     representing a minor second.
 //
 
-int Transposition::MinorSecondClass()
+int Transposer::MinorSecondClass()
 {
     return m_maxAccid * 2 + 1;
 }
 
 //////////////////////////////
 //
-// Transposition::MajorSecondClass -- Return the integer interval class
+// Transposer::MajorSecondClass -- Return the integer interval class
 //    representing a major second.
 //
 
-int Transposition::MajorSecondClass()
+int Transposer::MajorSecondClass()
 {
     return MinorSecondClass() + 1;
 }
 
 //////////////////////////////
 //
-// Transposition::MinorThirdClass -- Return the integer interval class
+// Transposer::MinorThirdClass -- Return the integer interval class
 //    representing a minor third.
 //
 
-int Transposition::MinorThirdClass()
+int Transposer::MinorThirdClass()
 {
     return MajorThirdClass() - 1;
 }
 
 //////////////////////////////
 //
-// Transposition::MajorThirdClass -- Return the integer interval class
+// Transposer::MajorThirdClass -- Return the integer interval class
 //    representing a major third.
 //
 
-int Transposition::MajorThirdClass()
+int Transposer::MajorThirdClass()
 {
     return 2 * MajorSecondClass();
 }
 
 //////////////////////////////
 //
-// Transposition::PerfectFourthClass -- Return the integer interval class
+// Transposer::PerfectFourthClass -- Return the integer interval class
 //    representing a perfect fourth.
 //
 
-int Transposition::PerfectFourthClass()
+int Transposer::PerfectFourthClass()
 {
     return PerfectOctaveClass() - PerfectFifthClass();
 }
 
 //////////////////////////////
 //
-// Transposition::PerfectFifthClass -- Return the integer interval class
+// Transposer::PerfectFifthClass -- Return the integer interval class
 //    representing a perfect fifth.
 //
 
-int Transposition::PerfectFifthClass()
+int Transposer::PerfectFifthClass()
 {
     return 3 * MajorSecondClass() + MinorSecondClass();
 }
 
 //////////////////////////////
 //
-// Transposition::MinorSixthClass -- Return the integer interval class
+// Transposer::MinorSixthClass -- Return the integer interval class
 //    representing a minor sixth.
 //
 
-int Transposition::MinorSixthClass()
+int Transposer::MinorSixthClass()
 {
     return PerfectOctaveClass() - MajorThirdClass();
 }
 
 //////////////////////////////
 //
-// Transposition::MajorSixthClass -- Return the integer interval class
+// Transposer::MajorSixthClass -- Return the integer interval class
 //    representing a major sixth.
 //
 
-int Transposition::MajorSixthClass()
+int Transposer::MajorSixthClass()
 {
     return PerfectOctaveClass() - MinorThirdClass();
 }
 
 //////////////////////////////
 //
-// Transposition::MinorSeventhClass -- Return the integer interval class
+// Transposer::MinorSeventhClass -- Return the integer interval class
 //    representing a minor sixth.
 //
 
-int Transposition::MinorSeventhClass()
+int Transposer::MinorSeventhClass()
 {
     return PerfectOctaveClass() - MajorSecondClass();
 }
 
 //////////////////////////////
 //
-// Transposition::MajorSeventhClass -- Return the integer interval class
+// Transposer::MajorSeventhClass -- Return the integer interval class
 //    representing a major sixth.
 //
 
-int Transposition::MajorSeventhClass()
+int Transposer::MajorSeventhClass()
 {
     return PerfectOctaveClass() - MinorSecondClass();
 }
 
 //////////////////////////////
 //
-// Transposition::octaveClass -- Return the integer interval class
+// Transposer::octaveClass -- Return the integer interval class
 //    representing a major second.
 //
 
-int Transposition::PerfectOctaveClass()
+int Transposer::PerfectOctaveClass()
 {
     return m_base;
 }
 
 //////////////////////////////
 //
-// Transposition::PitchToInteger -- Convert a pitch (octave/diatonic pitch class/chromatic
+// Transposer::PitchToInteger -- Convert a pitch (octave/diatonic pitch class/chromatic
 //     alteration) into an integer value according to the current base.
 //
 
-int Transposition::PitchToInteger(const TransPitch &pitch)
+int Transposer::PitchToInteger(const TransPitch &pitch)
 {
     return pitch.oct * m_base + m_diatonicMapping[pitch.pname] + pitch.accid;
 }
 
 //////////////////////////////
 //
-// Transposition::IntegerToPitch -- Convert an integer within the current base
+// Transposer::IntegerToPitch -- Convert an integer within the current base
 //    into a pitch (octave/diatonic pitch class/chromatic alteration).  Pitches
 //    with negative octaves will have to be tested.
 //
 
-TransPitch Transposition::IntegerToPitch(int ipitch)
+TransPitch Transposer::IntegerToPitch(int ipitch)
 {
     TransPitch pitch;
     pitch.oct = ipitch / m_base;
@@ -697,32 +697,32 @@ TransPitch Transposition::IntegerToPitch(int ipitch)
 
 //////////////////////////////
 //
-// Transposition::SetBase40 -- Allow up to double sharp/flats.
+// Transposer::SetBase40 -- Allow up to double sharp/flats.
 //
 
-void Transposition::SetBase40()
+void Transposer::SetBase40()
 {
     SetMaxAccid(2);
 }
 
 //////////////////////////////
 //
-// Transposition::SetBase600 -- Allow up to 42 sharp/flats.
+// Transposer::SetBase600 -- Allow up to 42 sharp/flats.
 //
 
-void Transposition::SetBase600()
+void Transposer::SetBase600()
 {
     SetMaxAccid(42);
 }
 
 //////////////////////////////
 //
-// Transposition::GetIntervalClass -- Return the interval between two pitches.
+// Transposer::GetIntervalClass -- Return the interval between two pitches.
 //    If the second pitch is higher than the first, then the interval will be
 //    positive; otherwise, the interval will be negative.
 //
 
-int Transposition::GetIntervalClass(const TransPitch &p1, const TransPitch &p2)
+int Transposer::GetIntervalClass(const TransPitch &p1, const TransPitch &p2)
 {
     return PitchToInteger(p2) - PitchToInteger(p1);
 }
@@ -730,13 +730,13 @@ int Transposition::GetIntervalClass(const TransPitch &p1, const TransPitch &p2)
 // similar function, but the integer interval class is converted into a string
 // that is not dependent on a base.
 
-std::string Transposition::GetIntervalName(const TransPitch &p1, const TransPitch &p2)
+std::string Transposer::GetIntervalName(const TransPitch &p1, const TransPitch &p2)
 {
     int iclass = GetIntervalClass(p1, p2);
     return GetIntervalName(iclass);
 }
 
-std::string Transposition::GetIntervalName(int intervalClass)
+std::string Transposer::GetIntervalName(int intervalClass)
 {
     std::string direction;
     if (intervalClass < 0) {
@@ -891,7 +891,7 @@ std::string Transposition::GetIntervalName(int intervalClass)
 
 //////////////////////////////
 //
-// Transposition::IntervalToCircleOfFifths -- Returns the circle-of-fiths count
+// Transposer::IntervalToCircleOfFifths -- Returns the circle-of-fiths count
 //    that is represented by the given interval class or interval string.
 //    Examples:  "P5"  => +1      "-P5" => -1
 //               "P4"  => -1      "-P4" => +1
@@ -908,13 +908,13 @@ std::string Transposition::GetIntervalName(int intervalClass)
 // should be adjusted accordingly).
 //
 
-int Transposition::IntervalToCircleOfFifths(const std::string &transstring)
+int Transposer::IntervalToCircleOfFifths(const std::string &transstring)
 {
     int intervalClass = GetIntervalClass(transstring);
     return IntervalToCircleOfFifths(intervalClass);
 }
 
-int Transposition::IntervalToCircleOfFifths(int transval)
+int Transposer::IntervalToCircleOfFifths(int transval)
 {
     if (transval < 0) {
         transval = (m_base * 100 - transval) % m_base;
@@ -937,11 +937,11 @@ int Transposition::IntervalToCircleOfFifths(int transval)
 
 //////////////////////////////
 //
-// Transposition::CircleOfFifthsToIntervalClass -- Inputs a circle-of-fifths value and
+// Transposer::CircleOfFifthsToIntervalClass -- Inputs a circle-of-fifths value and
 //   returns the interval class as an integer in the current base.
 //
 
-int Transposition::CircleOfFifthsToIntervalClass(int fifths)
+int Transposer::CircleOfFifthsToIntervalClass(int fifths)
 {
     if (fifths == 0) {
         return 0;
@@ -956,11 +956,11 @@ int Transposition::CircleOfFifthsToIntervalClass(int fifths)
 
 //////////////////////////////
 //
-// Transposition::CircleOfFifthsToIntervalName -- Convert a circle-of-fifths position
+// Transposer::CircleOfFifthsToIntervalName -- Convert a circle-of-fifths position
 //    into an interval string.
 //
 
-std::string Transposition::CircleOfFifthsToIntervalName(int fifths)
+std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 {
     int intervalClass = CircleOfFifthsToIntervalClass(fifths);
     return GetIntervalName(intervalClass);
@@ -968,7 +968,7 @@ std::string Transposition::CircleOfFifthsToIntervalName(int fifths)
 
 //////////////////////////////
 //
-// Transposition::DiatonicChromaticToIntervalClass -- Convert a diatonic/chromatic interval
+// Transposer::DiatonicChromaticToIntervalClass -- Convert a diatonic/chromatic interval
 //    into a base-n interval class integer.
 //      +1D +1C = m2
 //      +1D +2C = M2
@@ -983,7 +983,7 @@ std::string Transposition::CircleOfFifthsToIntervalName(int fifths)
 //
 //
 
-std::string Transposition::DiatonicChromaticToIntervalName(int diatonic, int chromatic)
+std::string Transposer::DiatonicChromaticToIntervalName(int diatonic, int chromatic)
 {
     if (diatonic == 0) {
         std::string output;
@@ -1134,10 +1134,10 @@ std::string Transposition::DiatonicChromaticToIntervalName(int diatonic, int chr
 
 //////////////////////////////
 //
-// Transposition::DiatonicChromaticToIntervalClass --
+// Transposer::DiatonicChromaticToIntervalClass --
 //
 
-int Transposition::DiatonicChromaticToIntervalClass(int diatonic, int chromatic)
+int Transposer::DiatonicChromaticToIntervalClass(int diatonic, int chromatic)
 {
     std::string intervalName = DiatonicChromaticToIntervalName(diatonic, chromatic);
     return GetIntervalClass(intervalName);
@@ -1145,16 +1145,16 @@ int Transposition::DiatonicChromaticToIntervalClass(int diatonic, int chromatic)
 
 //////////////////////////////
 //
-// Transposition::IntervalToDiatonicChromatic --
+// Transposer::IntervalToDiatonicChromatic --
 //
 
-void Transposition::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass)
+void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass)
 {
     std::string intervalName = GetIntervalName(intervalClass);
     IntervalToDiatonicChromatic(diatonic, chromatic, intervalName);
 }
 
-void Transposition::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, const std::string &intervalName)
+void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, const std::string &intervalName)
 {
     int direction = 1;
     std::string quality;
@@ -1380,14 +1380,14 @@ void Transposition::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, c
 
 /////////////////////////////////////////////////////
 //
-// Test program for Transposition class:
+// Test program for Transposer class:
 //
 
 int main(void)
 {
     TransPitch pitch(dpc_C, 0, 4); // middle C
 
-    Transposition transpose;
+    Transposer transpose;
 
     // transpose.SetBase40() is the default system.
     transpose.SetTransposition(transpose.PerfectFifthClass());
