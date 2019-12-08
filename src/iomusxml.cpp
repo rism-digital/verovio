@@ -1643,23 +1643,28 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Principal voice
     pugi::xpath_node lead = type.node().select_node("principal-voice");
     if (lead) {
+        int voiceNumber = wedge.node().attribute("number").as_int();
+        voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(lead.node(), "type", "stop")) {
-            std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
-            for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-                if (iter->second->Is(BRACKETSPAN)) {
-                    BracketSpan *bracketSpan = dynamic_cast<BracketSpan *>(iter->second);
-                    bracketSpan->SetEndid(m_ID);
+            std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+            for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+                    int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
+                    iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    m_bracketStack.erase(iter);
+                    return;
             }
-        }
         }
         else {
             std::string symbol = lead.node().attribute("symbol").as_string();
             BracketSpan *bracketSpan = new BracketSpan();
+            musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
             bracketSpan->SetColor(lead.node().attribute("color").as_string());
             // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
             bracketSpan->SetFunc("analytical");
             bracketSpan->SetTstamp(timeStamp);
+            bracketSpan->SetType("principal-voice");
             m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
+            m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
         }
     }
 
@@ -2455,6 +2460,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_pedalStack.clear();
+    }
+    if (!m_bracketStack.empty()) {
+        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+            if (!(iter->first)->HasStaff()) {
+                        iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+                }
+        }
     }
     if (!m_tempoStack.empty()) {
         std::vector<Tempo *>::iterator iter;
