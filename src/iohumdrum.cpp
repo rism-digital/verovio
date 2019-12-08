@@ -9439,6 +9439,8 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     std::vector<int> &endpitches, std::vector<bool> &indexused)
 {
 
+    phrase->SetType("phrase");
+
     string style = m_signifiers.phrase_style;
 
     string teststyle = phrasestart->getLayoutParameter("P", "brack", ndex);
