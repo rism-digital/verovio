@@ -9343,7 +9343,10 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
                 continue;
             }
 
-            string isslur = phrasestart->getLayoutParameter("P", "slur", ndex);
+            string isslur = m_signifiers.phrase_slur;
+            if (isslur.empty()) {
+                isslur = phrasestart->getLayoutParameter("P", "slur", ndex);
+            }
             if (!isslur.empty()) {
                 // insert phrase as slur
                 Slur *slur = new Slur;
@@ -9360,7 +9363,7 @@ void HumdrumInput::processPhrases(hum::HTp phraseend)
                     phrasestartnoteinfo, phraseendnoteinfo, ndex, phraseindex, i, j, startpitches, endpitches,
                     indexused);
                 // bracket will not be drawn without the following line:
-                bracket->SetFunc("coloration");
+                bracket->SetFunc("phrase");
             }
         }
     }
@@ -9377,6 +9380,26 @@ bool HumdrumInput::phraseIsInvisible(hum::HTp token, int pindex)
     string none = token->getLayoutParameter("P", "none", pindex);
     if (!none.empty()) {
         return true;
+    }
+
+    string style = token->getLayoutParameter("P", "brack", pindex);
+    if (style.empty()) {
+        style = token->getLayoutParameter("P", "paren", pindex);
+    }
+    if (style.empty()) {
+        style = token->getLayoutParameter("P", "dot", pindex);
+    }
+    if (style.empty()) {
+        style = token->getLayoutParameter("P", "dash", pindex);
+    }
+    if (style.empty()) {
+        style = token->getLayoutParameter("P", "slur", pindex);
+    }
+
+    if (style.empty()) {
+        if (m_signifiers.phrase_style == "none") {
+            return true;
+        }
     }
     if (pindex < 0) {
         pindex = 0;
@@ -9418,28 +9441,30 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
 
     phrase->SetType("phrase");
 
-    string style = phrasestart->getLayoutParameter("P", "brack", ndex);
-    if (!style.empty()) {
+    string style = m_signifiers.phrase_style;
+
+    string teststyle = phrasestart->getLayoutParameter("P", "brack", ndex);
+    if (!teststyle.empty()) {
         style = "brack";
     }
     else {
-        style = phrasestart->getLayoutParameter("P", "dot", ndex);
-        if (!style.empty()) {
+        teststyle = phrasestart->getLayoutParameter("P", "dot", ndex);
+        if (!teststyle.empty()) {
             style = "dotted";
         }
         else {
-            style = phrasestart->getLayoutParameter("P", "dash", ndex);
-            if (!style.empty()) {
+            teststyle = phrasestart->getLayoutParameter("P", "dash", ndex);
+            if (!teststyle.empty()) {
                 style = "dashed";
             }
             else {
-                style = phrasestart->getLayoutParameter("P", "open", ndex);
-                if (!style.empty()) {
+                teststyle = phrasestart->getLayoutParameter("P", "open", ndex);
+                if (!teststyle.empty()) {
                     style = "open";
                 }
                 else {
-                    style = phrasestart->getLayoutParameter("P", "wavy", ndex);
-                    if (!style.empty()) {
+                    teststyle = phrasestart->getLayoutParameter("P", "wavy", ndex);
+                    if (!teststyle.empty()) {
                         style = "wavy";
                     }
                 }
@@ -9461,7 +9486,10 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
         phrase->SetLform(LINEFORM_wavy);
     }
 
-    string color = phrasestart->getLayoutParameter("P", "color", ndex);
+    string color = m_signifiers.phrase_color;
+    if (color.empty()) {
+        color = phrasestart->getLayoutParameter("P", "color", ndex);
+    }
     if (!color.empty()) {
         phrase->SetColor(color);
     }
@@ -16310,10 +16338,32 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
         }
 
+        else if (hre.search(value, "phrase")) {
+            // default phrase styling
+            if (value.find("none") != string::npos) {
+                m_signifiers.phrase_style = "none";
+            }
+            else if (value.find("brack") != string::npos) {
+                m_signifiers.phrase_style = "brack";
+            }
+            else if (value.find("dot") != string::npos) {
+                m_signifiers.phrase_style = "dot";
+            }
+            else if (value.find("dash") != string::npos) {
+                m_signifiers.phrase_style = "dash";
+            }
+            if (value.find("slur") != string::npos) {
+                m_signifiers.phrase_slur = "slur";
+            }
+            if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+                m_signifiers.phrase_color = hre.getMatch(1);
+            }
+        }
+
         // colored notes
         // !!!RDF**kern: i = marked note, color="#ff0000"
         // !!!RDF**kern: i = matched note, color=blue
-        if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+        else if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
             m_signifiers.mark.push_back(signifier);
             m_signifiers.mcolor.push_back(hre.getMatch(1));
 

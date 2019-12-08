@@ -287,6 +287,10 @@ public:
     char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
 
+    string phrase_color; // for global stying of phrase markers
+    string phrase_style; // for global stying of phrase markers
+    string phrase_slur; // for global stying of phrase markers
+
     std::string space_color; // !!!RDF**kern: show spaces color=hotpink
     std::string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
     std::string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
