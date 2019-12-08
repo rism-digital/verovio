@@ -21,7 +21,7 @@
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
-#include "transpose.h"
+#include "transposition.h"
 
 namespace vrv {
 
@@ -29,7 +29,7 @@ class Accid;
 class Chord;
 class Slur;
 class Tie;
-class TPitch;
+class TransPitch;
 class Verse;
 class Note;
 typedef std::vector<Note *> ChordCluster;
@@ -189,7 +189,7 @@ public:
      */
     int GetChromaticAlteration();
 
-    TPitch GetTPitch();
+    TransPitch GetTransPitch();
 
     //----------//
     // Functors //

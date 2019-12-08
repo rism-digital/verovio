@@ -13,12 +13,12 @@
 // Description:   Draft implementation of a transposition system for verovio.
 //                There is a main() function at the bottom of the file for demo/testing.
 //                There are two classes in this file:
-//                   TPitch: pitch representation as three integers:
+//                   TransPitch: pitch representation as three integers:
 //                            pname: diatonic pitch class integer from C=0 to B=6.
 //                            accid: chromatic alterations in semitones (0=natural, -1=flat).
 //                            oct: octave number (4 = middle-C octave).
-//                   Transpose: transposition system which uses TPitch as a user interface.
-//                   (Add MEI to TPitch conversions in TPitch class, or use external
+//                   Transpose: transposition system which uses TransPitch as a user interface.
+//                   (Add MEI to TransPitch conversions in TransPitch class, or use external
 //                    code to interface to verovio attributes for <note>).
 //                   The default maximum accidental handling is +/- two sharps/flats (base-40).
 //                   Use the Transpose::setMaxAccid() to set the maximum allowed accidental
@@ -45,7 +45,7 @@
 #define dpc_A 5
 #define dpc_B 6
 
-#include "transpose.h"
+#include "transposition.h"
 
 #include <cctype>
 #include <iostream>
@@ -54,26 +54,26 @@
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// The TPitch class is an interface for storing information about notes which
+// The TransPitch class is an interface for storing information about notes which
 // will be used in the Transpose class.  The diatonic pitch class, chromatic alteration
 // of the diatonic pitch and the octave are store in the class.  Names given to the
 // parameters are analogous to MEI note attributes.  Note that note@accid can be also
 // note/accid in MEI data, and other complications that need to be resolved into
-// storing the correct pitch information in TPitch.
+// storing the correct pitch information in TransPitch.
 //
 namespace vrv {
 
 //////////////////////////////
 //
-// TPitch::Tpitch -- TPitch constructor.
+// TransPitch::Tpitch -- TransPitch constructor.
 //
 
-TPitch::TPitch(int aPname, int anAccid, int anOct)
+TransPitch::TransPitch(int aPname, int anAccid, int anOct)
 {
     setPitch(aPname, anAccid, anOct);
 }
 
-TPitch::TPitch(const TPitch &pitch)
+TransPitch::TransPitch(const TransPitch &pitch)
 {
     pname = pitch.pname;
     accid = pitch.accid;
@@ -82,10 +82,10 @@ TPitch::TPitch(const TPitch &pitch)
 
 //////////////////////////////
 //
-// operator= TPitch -- copy operator for pitches.
+// operator= TransPitch -- copy operator for pitches.
 //
 
-TPitch &TPitch::operator=(const TPitch &pitch)
+TransPitch &TransPitch::operator=(const TransPitch &pitch)
 {
     if (this != &pitch) {
         pname = pitch.pname;
@@ -97,20 +97,20 @@ TPitch &TPitch::operator=(const TPitch &pitch)
 
 //////////////////////////////
 //
-// TPitch::isValid -- returns true if the absolute value of the accidental
+// TransPitch::isValid -- returns true if the absolute value of the accidental
 //     is less than or equal to the max value.
 
-bool TPitch::isValid(int maxAccid)
+bool TransPitch::isValid(int maxAccid)
 {
     return abs(accid) <= abs(maxAccid);
 }
 
 //////////////////////////////
 //
-// TPitch::setPitch -- Set the attributes for a pitch all at once.
+// TransPitch::setPitch -- Set the attributes for a pitch all at once.
 //
 
-void TPitch::setPitch(int aPname, int anAccid, int anOct)
+void TransPitch::setPitch(int aPname, int anAccid, int anOct)
 {
     pname = aPname;
     accid = anAccid;
@@ -119,10 +119,10 @@ void TPitch::setPitch(int aPname, int anAccid, int anOct)
 
 //////////////////////////////
 //
-// operator<< TPitch -- Print pitch data as string for debugging.
+// operator<< TransPitch -- Print pitch data as string for debugging.
 //
 
-std::ostream &operator<<(std::ostream &out, const TPitch &pitch)
+std::ostream &operator<<(std::ostream &out, const TransPitch &pitch)
 {
     switch (pitch.pname) {
         case dpc_C: out << "C"; break;
@@ -198,7 +198,7 @@ void Transpose::setTransposition(const std::string &transString)
 //   with a temporary provided integer interval class, or a temporary interval name.
 //
 
-void Transpose::transpose(TPitch &pitch)
+void Transpose::transpose(TransPitch &pitch)
 {
     int ipitch = pitchToInteger(pitch);
     ipitch += m_transpose;
@@ -210,14 +210,14 @@ void Transpose::transpose(TPitch &pitch)
 // without specifying the transposition interval, store
 // transposition value with Transpose::setTransposition() first.
 
-void Transpose::transpose(TPitch &pitch, int transVal)
+void Transpose::transpose(TransPitch &pitch, int transVal)
 {
     int ipitch = pitchToInteger(pitch);
     ipitch += transVal;
     pitch = integerToPitch(ipitch);
 }
 
-void Transpose::transpose(TPitch &pitch, const std::string &transString)
+void Transpose::transpose(TransPitch &pitch, const std::string &transString)
 {
     int transVal = getIntervalClass(transString);
     int ipitch = pitchToInteger(pitch);
@@ -638,7 +638,7 @@ int Transpose::perfectOctaveClass()
 //     alteration) into an integer value according to the current base.
 //
 
-int Transpose::pitchToInteger(const TPitch &pitch)
+int Transpose::pitchToInteger(const TransPitch &pitch)
 {
     return pitch.oct * m_base + m_diatonicMapping[pitch.pname] + pitch.accid;
 }
@@ -650,9 +650,9 @@ int Transpose::pitchToInteger(const TPitch &pitch)
 //    with negative octaves will have to be tested.
 //
 
-TPitch Transpose::integerToPitch(int ipitch)
+TransPitch Transpose::integerToPitch(int ipitch)
 {
-    TPitch pitch;
+    TransPitch pitch;
     pitch.oct = ipitch / m_base;
     int chroma = ipitch - pitch.oct * m_base;
     int mindiff = -1000;
@@ -722,7 +722,7 @@ void Transpose::setBase600()
 //    positive; otherwise, the interval will be negative.
 //
 
-int Transpose::getIntervalClass(const TPitch &p1, const TPitch &p2)
+int Transpose::getIntervalClass(const TransPitch &p1, const TransPitch &p2)
 {
     return pitchToInteger(p2) - pitchToInteger(p1);
 }
@@ -730,7 +730,7 @@ int Transpose::getIntervalClass(const TPitch &p1, const TPitch &p2)
 // similar function, but the integer interval class is converted into a string
 // that is not dependent on a base.
 
-std::string Transpose::getIntervalName(const TPitch &p1, const TPitch &p2)
+std::string Transpose::getIntervalName(const TransPitch &p1, const TransPitch &p2)
 {
     int iclass = getIntervalClass(p1, p2);
     return getIntervalName(iclass);
@@ -1385,7 +1385,7 @@ void Transpose::intervalToDiatonicChromatic(int &diatonic, int &chromatic, const
 
 int main(void)
 {
-    TPitch pitch(dpc_C, 0, 4); // middle C
+    TransPitch pitch(dpc_C, 0, 4); // middle C
 
     Transpose transpose;
 
@@ -1423,11 +1423,11 @@ int main(void)
     std::cout << std::endl;
     std::cout << "TESTING INTERVAL NAMES IN BASE-40:" << std::endl;
     transpose.setBase40();
-    TPitch p1(dpc_C, 0, 4);
-    TPitch p2(dpc_F, 2, 4);
+    TransPitch p1(dpc_C, 0, 4);
+    TransPitch p2(dpc_F, 2, 4);
     std::cout << "\tInterval between " << p1 << " and " << p2;
     std::cout << " is " << transpose.getIntervalName(p1, p2) << std::endl;
-    TPitch p3(dpc_G, -2, 3);
+    TransPitch p3(dpc_G, -2, 3);
     std::cout << "\tInterval between " << p1 << " and " << p3;
     std::cout << " is " << transpose.getIntervalName(p1, p3) << std::endl;
 

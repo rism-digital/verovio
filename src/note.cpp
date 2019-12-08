@@ -29,7 +29,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "tie.h"
-#include "transpose.h"
+#include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -453,10 +453,10 @@ int Note::GetChromaticAlteration()
     return 0;
 }
 
-TPitch Note::GetTPitch()
+TransPitch Note::GetTransPitch()
 {
     int pname = this->GetPname() - PITCHNAME_c;
-    return TPitch(pname, this->GetChromaticAlteration(), this->GetOct());
+    return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
 }
 
 //----------------------------------------------------------------------------

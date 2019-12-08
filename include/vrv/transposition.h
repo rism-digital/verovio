@@ -14,39 +14,39 @@
 
 namespace vrv {
 
-class TPitch;
+class TransPitch;
 class Transpose;
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// The TPitch class is an interface for storing information about notes that will
+// The TransPitch class is an interface for storing information about notes that will
 // be used in the Transpose class.  The diatonic pitch class, chromatic alteration
 // of the diatonic pitch and the octave are store in the class.  Names given to the
 // parameters are analogous to MEI note attributes.  Note that note@accid can be also
 // note/accid in MEI data, and other complications that need to be resolved into
-// storing the correct pitch information in TPitch.
+// storing the correct pitch information in TransPitch.
 //
 
-class TPitch {
+class TransPitch {
 public:
     int pname; // diatonic pitch class name: C = 0, D = 1, ... B = 6.
     int accid; // chromatic alteration: 0 = natural, 1 = sharp, -2 = flat, +2 = double sharp
     int oct; // octave number: 4 = middle-C octave
 
-    TPitch(){};
-    TPitch(int aPname, int anAccid, int anOct);
-    TPitch(const TPitch &pitch);
-    TPitch &operator=(const TPitch &pitch);
+    TransPitch(){};
+    TransPitch(int aPname, int anAccid, int anOct);
+    TransPitch(const TransPitch &pitch);
+    TransPitch &operator=(const TransPitch &pitch);
     bool isValid(int maxAccid);
     void setPitch(int aPname, int anAccid, int anOct);
 };
 
-std::ostream &operator<<(std::ostream &out, const TPitch &pitch);
+std::ostream &operator<<(std::ostream &out, const TransPitch &pitch);
 
 ////////////////////////////////////////////////////////////////////////////
 //
 // The Transpose class is an interface for transposing notes represented in the
-// TPitch class format.
+// TransPitch class format.
 //
 
 class Transpose {
@@ -60,15 +60,15 @@ public:
     void setBase40();
     void setBase600();
     int getIntervalClass(const std::string &intervalName);
-    int pitchToInteger(const TPitch &pitch);
-    TPitch integerToPitch(int ipitch);
+    int pitchToInteger(const TransPitch &pitch);
+    TransPitch integerToPitch(int ipitch);
     void setTransposition(int transVal);
     void setTransposition(const std::string &transString);
-    void transpose(TPitch &pitch);
-    void transpose(TPitch &pitch, int transVal);
-    void transpose(TPitch &pitch, const std::string &transString);
-    int getIntervalClass(const TPitch &p1, const TPitch &p2);
-    std::string getIntervalName(const TPitch &p1, const TPitch &p2);
+    void transpose(TransPitch &pitch);
+    void transpose(TransPitch &pitch, int transVal);
+    void transpose(TransPitch &pitch, const std::string &transString);
+    int getIntervalClass(const TransPitch &p1, const TransPitch &p2);
+    std::string getIntervalName(const TransPitch &p1, const TransPitch &p2);
     std::string getIntervalName(int intervalClass);
     int intervalToCircleOfFifths(const std::string &transString);
     int intervalToCircleOfFifths(int transval);
