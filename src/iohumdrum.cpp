@@ -9439,8 +9439,6 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     std::vector<int> &endpitches, std::vector<bool> &indexused)
 {
 
-    phrase->SetType("phrase");
-
     string style = m_signifiers.phrase_style;
 
     string teststyle = phrasestart->getLayoutParameter("P", "brack", ndex);
@@ -9541,7 +9539,8 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
 
     phrase->SetEndid("#" + endid);
     phrase->SetStartid("#" + startid);
-    setSlurLocationId(phrase, phrasestart, phraseend, j);
+
+    setSlurLocationId(phrase, phrasestart, phraseend, j, "phrase");
 
     startmeasure->AddChild(phrase);
     if (phrasestart->getTrack() == phraseend->getTrack()) {
@@ -16082,11 +16081,18 @@ void HumdrumInput::setTieLocationId(Object *object, hum::HTp tiestart, int sinde
 // such as &( and &).
 //
 
-void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex)
+void HumdrumInput::setSlurLocationId(
+    Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex, const string &prefix)
 {
     int startline = slurstart->getLineNumber();
     int startfield = slurstart->getFieldNumber();
-    std::string id = object->GetClassName();
+    std::string id;
+    if (prefix.empty()) {
+        id = object->GetClassName();
+    }
+    else {
+        id = prefix;
+    }
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);

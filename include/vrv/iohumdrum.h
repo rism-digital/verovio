@@ -450,7 +450,8 @@ protected:
     std::string getLocationId(const std::string &prefix, hum::HTp token, int subtoken = -1);
     std::string getLocationId(const std::string &prefix, int lineindex, int fieldindex, int subtokenindex);
     void setLocationIdNSuffix(vrv::Object *object, hum::HTp token, int number);
-    void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
+    void setSlurLocationId(
+        vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex, const std::string &prefix = "");
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
     void setBeamLocationId(vrv::Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int startindex);
