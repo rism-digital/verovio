@@ -14,9 +14,9 @@
 //                There is a main() function at the bottom of the file for demo/testing.
 //                There are two classes in this file:
 //                   TransPitch: pitch representation as three integers:
-//                            pname: diatonic pitch class integer from C=0 to B=6.
-//                            accid: chromatic alterations in semitones (0=natural, -1=flat).
-//                            oct: octave number (4 = middle-C octave).
+//                            m_pname: diatonic pitch class integer from C=0 to B=6.
+//                            m_accid: chromatic alterations in semitones (0=natural, -1=flat).
+//                            m_oct: octave number (4 = middle-C octave).
 //                   Transposer: transposition system which uses TransPitch as a user interface.
 //                   (Add MEI to TransPitch conversions in TransPitch class, or use external
 //                    code to interface to verovio attributes for <note>).
@@ -75,9 +75,9 @@ TransPitch::TransPitch(int aPname, int anAccid, int anOct)
 
 TransPitch::TransPitch(const TransPitch &pitch)
 {
-    pname = pitch.pname;
-    accid = pitch.accid;
-    oct = pitch.oct;
+    m_pname = pitch.m_pname;
+    m_accid = pitch.m_accid;
+    m_oct = pitch.m_oct;
 }
 
 //////////////////////////////
@@ -88,9 +88,9 @@ TransPitch::TransPitch(const TransPitch &pitch)
 TransPitch &TransPitch::operator=(const TransPitch &pitch)
 {
     if (this != &pitch) {
-        pname = pitch.pname;
-        accid = pitch.accid;
-        oct = pitch.oct;
+        m_pname = pitch.m_pname;
+        m_accid = pitch.m_accid;
+        m_oct = pitch.m_oct;
     }
     return *this;
 }
@@ -102,7 +102,7 @@ TransPitch &TransPitch::operator=(const TransPitch &pitch)
 
 bool TransPitch::IsValid(int maxAccid)
 {
-    return abs(accid) <= abs(maxAccid);
+    return abs(m_accid) <= abs(maxAccid);
 }
 
 //////////////////////////////
@@ -112,9 +112,9 @@ bool TransPitch::IsValid(int maxAccid)
 
 void TransPitch::SetPitch(int aPname, int anAccid, int anOct)
 {
-    pname = aPname;
-    accid = anAccid;
-    oct = anOct;
+    m_pname = aPname;
+    m_accid = anAccid;
+    m_oct = anOct;
 }
 
 //////////////////////////////
@@ -124,7 +124,7 @@ void TransPitch::SetPitch(int aPname, int anAccid, int anOct)
 
 std::ostream &operator<<(std::ostream &out, const TransPitch &pitch)
 {
-    switch (pitch.pname) {
+    switch (pitch.m_pname) {
         case dpc_C: out << "C"; break;
         case dpc_D: out << "D"; break;
         case dpc_E: out << "E"; break;
@@ -134,17 +134,17 @@ std::ostream &operator<<(std::ostream &out, const TransPitch &pitch)
         case dpc_B: out << "B"; break;
         default: out << "X";
     }
-    if (pitch.accid > 0) {
-        for (int i = 0; i < pitch.accid; i++) {
+    if (pitch.m_accid > 0) {
+        for (int i = 0; i < pitch.m_accid; i++) {
             out << "#";
         }
     }
-    else if (pitch.accid < 0) {
-        for (int i = 0; i < abs(pitch.accid); i++) {
+    else if (pitch.m_accid < 0) {
+        for (int i = 0; i < abs(pitch.m_accid); i++) {
             out << "b";
         }
     }
-    out << pitch.oct;
+    out << pitch.m_oct;
     return out;
 }
 
@@ -640,7 +640,7 @@ int Transposer::PerfectOctaveClass()
 
 int Transposer::PitchToInteger(const TransPitch &pitch)
 {
-    return pitch.oct * m_base + m_diatonicMapping[pitch.pname] + pitch.accid;
+    return pitch.m_oct * m_base + m_diatonicMapping[pitch.m_pname] + pitch.m_accid;
 }
 
 //////////////////////////////
@@ -653,8 +653,8 @@ int Transposer::PitchToInteger(const TransPitch &pitch)
 TransPitch Transposer::IntegerToPitch(int ipitch)
 {
     TransPitch pitch;
-    pitch.oct = ipitch / m_base;
-    int chroma = ipitch - pitch.oct * m_base;
+    pitch.m_oct = ipitch / m_base;
+    int chroma = ipitch - pitch.m_oct * m_base;
     int mindiff = -1000;
     int mini = -1;
 
@@ -690,8 +690,8 @@ TransPitch Transposer::IntegerToPitch(int ipitch)
             }
         }
     }
-    pitch.pname = mini;
-    pitch.accid = mindiff;
+    pitch.m_pname = mini;
+    pitch.m_accid = mindiff;
     return pitch;
 }
 
