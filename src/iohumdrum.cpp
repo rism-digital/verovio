@@ -9487,8 +9487,9 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     }
 
     string color = m_signifiers.phrase_color;
-    if (color.empty()) {
-        color = phrasestart->getLayoutParameter("P", "color", ndex);
+    string testcolor = phrasestart->getLayoutParameter("P", "color", ndex);
+    if (!testcolor.empty()) {
+        color = testcolor;
     }
     if (!color.empty()) {
         phrase->SetColor(color);
