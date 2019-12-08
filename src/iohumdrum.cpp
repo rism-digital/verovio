@@ -9450,12 +9450,12 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     else {
         teststyle = phrasestart->getLayoutParameter("P", "dot", ndex);
         if (!teststyle.empty()) {
-            style = "dotted";
+            style = "dot";
         }
         else {
             teststyle = phrasestart->getLayoutParameter("P", "dash", ndex);
             if (!teststyle.empty()) {
-                style = "dashed";
+                style = "dash";
             }
             else {
                 teststyle = phrasestart->getLayoutParameter("P", "open", ndex);
@@ -9475,10 +9475,10 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     if (style == "brack") {
         phrase->SetLform(LINEFORM_solid);
     }
-    else if (style == "dotted") {
+    else if (style == "dot") {
         phrase->SetLform(LINEFORM_dotted);
     }
-    else if (style == "dashed") {
+    else if (style == "dash") {
         phrase->SetLform(LINEFORM_dashed);
     }
     else if (style == "wavy") {
