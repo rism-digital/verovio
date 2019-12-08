@@ -17,6 +17,7 @@
 #include "arpeg.h"
 #include "beam.h"
 #include "beatrpt.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
 #include "chord.h"
@@ -1094,7 +1095,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -1530,7 +1531,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
-            std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+            std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> >::iterator iter;
             for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
                 if (iter->second.m_dirN == hairpinNumber) {
                     int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
@@ -1540,12 +1541,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 }
             }
             // ...or push on hairpin stop stack, if not matched.
-            m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenHairpin>(
-                0, timeStamp, musicxml::OpenHairpin(hairpinNumber, m_measureCounts.at(measure))));
+            m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenSpanner>(
+                0, timeStamp, musicxml::OpenSpanner(hairpinNumber, m_measureCounts.at(measure))));
         }
         else {
             Hairpin *hairpin = new Hairpin();
-            musicxml::OpenHairpin openHairpin(hairpinNumber, m_measureCounts.at(measure));
+            musicxml::OpenSpanner openHairpin(hairpinNumber, m_measureCounts.at(measure));
             if (HasAttributeWithValue(wedge.node(), "type", "crescendo")) {
                 hairpin->SetForm(hairpinLog_FORM_cres);
             }
@@ -1564,7 +1565,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             hairpin->SetVgrp(defaultY);
             // match new hairpin to existing hairpin stop
-            std::vector<std::tuple<int, double, musicxml::OpenHairpin> >::iterator iter;
+            std::vector<std::tuple<int, double, musicxml::OpenSpanner> >::iterator iter;
             for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
                     int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
@@ -1646,6 +1647,34 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
     }
 
+    // Principal voice
+    pugi::xpath_node lead = type.node().select_node("principal-voice");
+    if (lead) {
+        int voiceNumber = wedge.node().attribute("number").as_int();
+        voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
+        if (HasAttributeWithValue(lead.node(), "type", "stop")) {
+            std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+            for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+                    int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
+                    iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    m_bracketStack.erase(iter);
+                    return;
+            }
+        }
+        else {
+            std::string symbol = lead.node().attribute("symbol").as_string();
+            BracketSpan *bracketSpan = new BracketSpan();
+            musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
+            bracketSpan->SetColor(lead.node().attribute("color").as_string());
+            // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            bracketSpan->SetFunc("analytical");
+            bracketSpan->SetTstamp(timeStamp);
+            bracketSpan->SetType("principal-voice");
+            m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
+            m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
+        }
+    }
+
     // Tempo
     pugi::xpath_node metronome = type.node().select_node("metronome");
     if (node.select_node("sound[@tempo]") || metronome) {
@@ -1664,7 +1693,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes) {
+    if (words.size() == 0 && !dynamics && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
@@ -2439,6 +2468,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
         m_pedalStack.clear();
     }
+    if (!m_bracketStack.empty()) {
+        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+            if (!(iter->first)->HasStaff()) {
+                        iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+                }
+        }
+    }
     if (!m_tempoStack.empty()) {
         std::vector<Tempo *>::iterator iter;
         for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
@@ -2449,14 +2486,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
     // add staff to hairpins
     if (!m_hairpinStack.empty()) {
-        std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+        std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
             if (!iter->first->HasStaff())
                 iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
     }
     if (!m_hairpinStopStack.empty()) {
-        std::vector<std::tuple<int, double, musicxml::OpenHairpin> >::iterator iter;
+        std::vector<std::tuple<int, double, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
             if (std::get<0>(*iter) == 0) std::get<0>(*iter) = staff->GetN();
         }
