@@ -180,6 +180,7 @@ public:
     int m_dur; // drawing duration
     int m_breaksec;
     char m_partialFlags[MAX_DURATION_PARTIALS];
+    data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;
     Stem *m_stem; // a pointer to the stem in order to avoid to have to re-cast it
 };

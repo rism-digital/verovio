@@ -246,7 +246,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw
     // only one bar and the others will be drawn separately.
-    fullBars = !beamInterface->m_changingDur ? (beamInterface->m_shortestDur - DUR_4) : 1;
+    fullBars = 1; //!beamInterface->m_changingDur ? (beamInterface->m_shortestDur - DUR_4) : 1;
 
     // Adjust the x position of the first and last element for taking into account the stem width
     beamElementCoords->at(0)->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -309,7 +309,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     }
     int noteCount = (int)noteIndexes.size();
 
-    if (beamInterface->m_changingDur && noteCount > 0) {
+    if (noteCount > 0) {
         int testDur = DUR_8 + fullBars;
         int barY = beamInterface->m_beamWidth;
 
