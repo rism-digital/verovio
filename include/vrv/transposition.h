@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        transpose.h
+// Name:        transposition.h
 // Author:      Craig Stuart Sapp
 // Created:     03/12/2019
 // Copyright (c) Authors and others. All rights reserved.
@@ -15,12 +15,12 @@
 namespace vrv {
 
 class TransPitch;
-class Transpose;
+class Transposition;
 
 ////////////////////////////////////////////////////////////////////////////
 //
 // The TransPitch class is an interface for storing information about notes that will
-// be used in the Transpose class.  The diatonic pitch class, chromatic alteration
+// be used in the Transposition class.  The diatonic pitch class, chromatic alteration
 // of the diatonic pitch and the octave are store in the class.  Names given to the
 // parameters are analogous to MEI note attributes.  Note that note@accid can be also
 // note/accid in MEI data, and other complications that need to be resolved into
@@ -37,64 +37,64 @@ public:
     TransPitch(int aPname, int anAccid, int anOct);
     TransPitch(const TransPitch &pitch);
     TransPitch &operator=(const TransPitch &pitch);
-    bool isValid(int maxAccid);
-    void setPitch(int aPname, int anAccid, int anOct);
+    bool IsValid(int maxAccid);
+    void SetPitch(int aPname, int anAccid, int anOct);
 };
 
 std::ostream &operator<<(std::ostream &out, const TransPitch &pitch);
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// The Transpose class is an interface for transposing notes represented in the
+// The Transposition class is an interface for transposing notes represented in the
 // TransPitch class format.
 //
 
-class Transpose {
+class Transposition {
 public:
-    Transpose();
-    ~Transpose();
+    Transposition();
+    ~Transposition();
 
-    int getBase();
-    int getMaxAccid();
-    void setMaxAccid(int maxAccid);
-    void setBase40();
-    void setBase600();
-    int getIntervalClass(const std::string &intervalName);
-    int pitchToInteger(const TransPitch &pitch);
-    TransPitch integerToPitch(int ipitch);
-    void setTransposition(int transVal);
-    void setTransposition(const std::string &transString);
-    void transpose(TransPitch &pitch);
-    void transpose(TransPitch &pitch, int transVal);
-    void transpose(TransPitch &pitch, const std::string &transString);
-    int getIntervalClass(const TransPitch &p1, const TransPitch &p2);
-    std::string getIntervalName(const TransPitch &p1, const TransPitch &p2);
-    std::string getIntervalName(int intervalClass);
-    int intervalToCircleOfFifths(const std::string &transString);
-    int intervalToCircleOfFifths(int transval);
-    std::string circleOfFifthsToIntervalName(int fifths);
-    int circleOfFifthsToIntervalClass(int fifths);
-    std::string diatonicChromaticToIntervalName(int diatonic, int chromatic);
-    int diatonicChromaticToIntervalClass(int diatonic, int chromatic);
-    void intervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass);
-    void intervalToDiatonicChromatic(int &diatonic, int &chromatic, const std::string &intervalName);
+    int GetBase();
+    int GetMaxAccid();
+    void SetMaxAccid(int maxAccid);
+    void SetBase40();
+    void SetBase600();
+    int GetIntervalClass(const std::string &intervalName);
+    int PitchToInteger(const TransPitch &pitch);
+    TransPitch IntegerToPitch(int ipitch);
+    void SetTransposition(int transVal);
+    void SetTransposition(const std::string &transString);
+    void Transpose(TransPitch &pitch);
+    void Transpose(TransPitch &pitch, int transVal);
+    void Transpose(TransPitch &pitch, const std::string &transString);
+    int GetIntervalClass(const TransPitch &p1, const TransPitch &p2);
+    std::string GetIntervalName(const TransPitch &p1, const TransPitch &p2);
+    std::string GetIntervalName(int intervalClass);
+    int IntervalToCircleOfFifths(const std::string &transString);
+    int IntervalToCircleOfFifths(int transval);
+    std::string CircleOfFifthsToIntervalName(int fifths);
+    int CircleOfFifthsToIntervalClass(int fifths);
+    std::string DiatonicChromaticToIntervalName(int diatonic, int chromatic);
+    int DiatonicChromaticToIntervalClass(int diatonic, int chromatic);
+    void IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass);
+    void IntervalToDiatonicChromatic(int &diatonic, int &chromatic, const std::string &intervalName);
 
     // Convenience functions for calculating common interval classes.
     // augmented classes can be calculated by adding 1 to
     // perfect/major classes, and diminished classes can be
     // calcualted by subtracting 1 from perfect/minor classes.
-    int perfectUnisonClass();
-    int minorSecondClass();
-    int majorSecondClass();
-    int minorThirdClass();
-    int majorThirdClass();
-    int perfectFourthClass();
-    int perfectFifthClass();
-    int minorSixthClass();
-    int majorSixthClass();
-    int minorSeventhClass();
-    int majorSeventhClass();
-    int perfectOctaveClass();
+    int PerfectUnisonClass();
+    int MinorSecondClass();
+    int MajorSecondClass();
+    int MinorThirdClass();
+    int MajorThirdClass();
+    int PerfectFourthClass();
+    int PerfectFifthClass();
+    int MinorSixthClass();
+    int MajorSixthClass();
+    int MinorSeventhClass();
+    int MajorSeventhClass();
+    int PerfectOctaveClass();
 
 protected:
     int m_base; // integer representation for perfect octave
@@ -103,7 +103,7 @@ protected:
     std::vector<int> m_diatonicMapping; // pitch integers for each natural diatonic pitch class
 
 private:
-    void calculateDiatonicMapping();
+    void CalculateDiatonicMapping();
 };
 
 } // namespace vrv
