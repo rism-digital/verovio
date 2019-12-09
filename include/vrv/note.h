@@ -190,6 +190,7 @@ public:
     int GetChromaticAlteration();
 
     TransPitch GetTransPitch();
+    void UpdateFromTransPitch(TransPitch tp);
 
     //----------//
     // Functors //

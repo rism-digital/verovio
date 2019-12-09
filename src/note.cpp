@@ -459,6 +459,43 @@ TransPitch Note::GetTransPitch()
     return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
 }
 
+void Note::UpdateFromTransPitch(TransPitch tp)
+{
+    data_PITCHNAME pname = static_cast<data_PITCHNAME>(tp.m_pname + PITCHNAME_c);
+    this->SetPname(pname);
+
+    Accid *accid = this->GetDrawingAccid();
+    if (accid->HasAccidGes()) {
+        data_ACCIDENTAL_GESTURAL gestural = ACCIDENTAL_GESTURAL_NONE;
+        switch (tp.m_accid) {
+            case -2: gestural = ACCIDENTAL_GESTURAL_ff; break;
+            case -1: gestural = ACCIDENTAL_GESTURAL_f; break;
+            case 0: gestural = ACCIDENTAL_GESTURAL_NONE; break;
+            case 1: gestural = ACCIDENTAL_GESTURAL_s; break;
+            case 2: gestural = ACCIDENTAL_GESTURAL_ss; break;
+            default: break; // TODO: Return an error here.
+        }
+        accid->SetAccidGes(gestural);
+    }
+    else {
+        data_ACCIDENTAL_WRITTEN written = ACCIDENTAL_WRITTEN_NONE;
+        switch (tp.m_accid) {
+            case -3: written = ACCIDENTAL_WRITTEN_tf; break;
+            case -2: written = ACCIDENTAL_WRITTEN_ff; break;
+            case -1: written = ACCIDENTAL_WRITTEN_f; break;
+            case 0: written = ACCIDENTAL_WRITTEN_NONE; break;
+            case 1: written = ACCIDENTAL_WRITTEN_s; break;
+            case 2: written = ACCIDENTAL_WRITTEN_x; break;
+            case 3: written = ACCIDENTAL_WRITTEN_xs; break;
+            default: break; // TODO: Return an error here.
+        }
+        accid->SetAccid(written);
+    }
+
+    // Since we didn't read the oct.ges when getting TransPitch, we don't need to account for that.
+    this->SetOct(tp.m_oct);
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
