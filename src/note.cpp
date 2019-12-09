@@ -492,8 +492,12 @@ void Note::UpdateFromTransPitch(TransPitch tp)
         accid->SetAccid(written);
     }
 
-    // Since we didn't read the oct.ges when getting TransPitch, we don't need to account for that.
-    this->SetOct(tp.m_oct);
+    if (this->GetOct() != tp.m_oct) {
+        if(this->HasOctGes()) {
+            this->SetOctGes(this->GetOctGes() + tp.m_oct - this->GetOct());
+        }
+        this->SetOct(tp.m_oct);
+    }
 }
 
 //----------------------------------------------------------------------------
