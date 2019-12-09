@@ -15,9 +15,11 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "functorparams.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -283,6 +285,20 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
     octave -= disPlace;
 
     return octave;
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int KeySig::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    LogDebug("Transposing keySig");
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

@@ -30,9 +30,9 @@ std::map<int, std::string> Option::s_header
 
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
-    
+
 std::map<int, std::string> Option::s_systemDivider
-    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right"} };
+    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 //----------------------------------------------------------------------------
 // Option
@@ -737,7 +737,7 @@ Options::Options()
     m_stemWidth.SetInfo("Stem width", "The stem width");
     m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
-    
+
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
     m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
@@ -748,7 +748,7 @@ Options::Options()
 
     /********* selectors *********/
 
-    m_selectors.SetLabel("Element selectors", "3-selectors");
+    m_selectors.SetLabel("Element selectors and processing", "3-selectors");
     m_grps.push_back(&m_selectors);
 
     m_appXPathQuery.SetInfo("App xPath query",
@@ -774,6 +774,15 @@ Options::Options()
         "example: \"./del\"; by default the first child is selected");
     m_substXPathQuery.Init();
     this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
+
+    m_transpose.SetInfo("Transpose the content", "SUMMARY");
+    m_transpose.Init("");
+    this->Register(&m_transpose, "transpose", &m_selectors);
+
+    m_transposeSelectedOnly.SetInfo(
+        "Transpose selected only", "Transpose only the selected content and ignore unselected editorial content");
+    m_transposeSelectedOnly.Init(false);
+    this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
     /********* The layout left margin by element *********/
 

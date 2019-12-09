@@ -992,4 +992,14 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Note::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    LogDebug("Transposing note");
+
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv

@@ -255,6 +255,11 @@ public:
      */
     virtual int GenerateTimemap(FunctorParams *functorParams);
 
+    /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *);
+
 private:
     //
 public:
