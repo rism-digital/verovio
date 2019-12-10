@@ -465,25 +465,38 @@ void Note::UpdateFromTransPitch(TransPitch tp)
     this->SetPname(pname);
 
     Accid *accid = this->GetDrawingAccid();
+    bool transposeGesturalAccid = false;
+    bool transposeWrittenAccid = false;
     if (accid->HasAccidGes()) {
+        transposeGesturalAccid = true;
+    }
+    if (accid->HasAccid()) {
+        transposeWrittenAccid = true;
+    }
+    // TODO: Check the case of both existing but having unequal values.
+    if (!accid->HasAccidGes() && !accid->HasAccid()) {
+        transposeGesturalAccid = true;
+    }
+
+    if (transposeGesturalAccid) {
         data_ACCIDENTAL_GESTURAL gestural = ACCIDENTAL_GESTURAL_NONE;
         switch (tp.m_accid) {
             case -2: gestural = ACCIDENTAL_GESTURAL_ff; break;
             case -1: gestural = ACCIDENTAL_GESTURAL_f; break;
-            case 0: gestural = ACCIDENTAL_GESTURAL_NONE; break;
+            case 0: gestural = ACCIDENTAL_GESTURAL_n; break;
             case 1: gestural = ACCIDENTAL_GESTURAL_s; break;
             case 2: gestural = ACCIDENTAL_GESTURAL_ss; break;
             default: break; // TODO: Return an error here.
         }
         accid->SetAccidGes(gestural);
     }
-    else {
+    if (transposeWrittenAccid) {
         data_ACCIDENTAL_WRITTEN written = ACCIDENTAL_WRITTEN_NONE;
         switch (tp.m_accid) {
             case -3: written = ACCIDENTAL_WRITTEN_tf; break;
             case -2: written = ACCIDENTAL_WRITTEN_ff; break;
             case -1: written = ACCIDENTAL_WRITTEN_f; break;
-            case 0: written = ACCIDENTAL_WRITTEN_NONE; break;
+            case 0: written = ACCIDENTAL_WRITTEN_n; break;
             case 1: written = ACCIDENTAL_WRITTEN_s; break;
             case 2: written = ACCIDENTAL_WRITTEN_x; break;
             case 3: written = ACCIDENTAL_WRITTEN_xs; break;
@@ -493,7 +506,7 @@ void Note::UpdateFromTransPitch(TransPitch tp)
     }
 
     if (this->GetOct() != tp.m_oct) {
-        if(this->HasOctGes()) {
+        if (this->HasOctGes()) {
             this->SetOctGes(this->GetOctGes() + tp.m_oct - this->GetOct());
         }
         this->SetOct(tp.m_oct);
