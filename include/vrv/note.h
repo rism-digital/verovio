@@ -184,16 +184,6 @@ public:
     char GetMIDIPitch();
     ///@}
 
-    /**
-     * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
-     */
-    int GetChromaticAlteration();
-
-    TransPitch GetTransPitch();
-
-private:
-    void UpdateFromTransPitch(TransPitch tp);
-
 public:
     //----------//
     // Functors //
@@ -264,8 +254,16 @@ public:
      */
     virtual int Transpose(FunctorParams *);
 
-private:
-    //
+private:                 
+    /**
+     * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
+     */
+    int GetChromaticAlteration();
+
+    TransPitch GetTransPitch();
+
+    void UpdateFromTransPitch(TransPitch tp);
+                 
 public:
     //
 private:
