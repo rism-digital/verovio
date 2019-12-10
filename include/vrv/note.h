@@ -191,6 +191,10 @@ public:
 
     TransPitch GetTransPitch();
 
+private:
+    void UpdateFromTransPitch(TransPitch tp);
+
+public:
     //----------//
     // Functors //
     //----------//
