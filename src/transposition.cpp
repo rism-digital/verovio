@@ -205,6 +205,11 @@ void Transposer::Transpose(TransPitch &pitch)
     pitch = IntegerToPitch(ipitch);
 }
 
+int Transposer::Transpose(int ipitch)
+{
+    return ipitch + m_transpose;
+}
+
 // Use a temporary transposition value in the following
 // two functions. To save for later use of Transposer::Transpose
 // without specifying the transposition interval, store
