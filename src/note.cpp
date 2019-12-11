@@ -467,6 +467,10 @@ void Note::UpdateFromTransPitch(TransPitch tp)
     Accid *accid = this->GetDrawingAccid();
     bool transposeGesturalAccid = false;
     bool transposeWrittenAccid = false;
+    if (!accid) {
+        accid = new Accid();
+        this->AddChild(accid);
+    }
     if (accid->HasAccidGes()) {
         transposeGesturalAccid = true;
     }
