@@ -298,10 +298,14 @@ int KeySig::Transpose(FunctorParams *functorParams)
     assert(params);
 
     LogDebug("Transposing keySig");
-    int sig = this->GetSig().first;
+    int sig = 0;
     if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
-        sig *= -1;
+        sig = -1 * this->GetSig().first;
     }
+    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
+        sig = this->GetSig().first;
+    }
+
     int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
     intervalClass = params->m_transposer->Transpose(intervalClass);
     int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
