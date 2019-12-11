@@ -2885,8 +2885,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HTp abbrtok = NULL;
     std::string clef;
     hum::HTp cleftok = NULL;
-    std::string keysig;
     hum::HTp keytok = NULL;
+    std::string keysig;
+    hum::HTp keysigtok = NULL;
     std::string key;
     std::string transpose;
     std::string itranspose;
@@ -2915,7 +2916,10 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             m_omet.emplace_back(partnumber, part);
         }
         else if (part->compare(0, 3, "*k[") == 0) {
-            keysig = *part;
+            keysigtok = part;
+            keysig = *keysigtok;
+        }
+        else if (hre.search(part, "^\\*[a-gA-G][#-]*:([a-z]{3})?$")) {
             keytok = part;
         }
         else if (part->compare(0, 4, "*Trd") == 0) {
@@ -3046,7 +3050,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (keysig.size() > 0) {
-        setKeySig(partnumber - 1, m_staffdef.back(), keysig, keytok, false);
+        setKeySig(partnumber - 1, m_staffdef.back(), keysig, keysigtok, keytok, false);
     }
 
     if (primarymensuration.empty()) {
@@ -3485,7 +3489,8 @@ void HumdrumInput::setTimeSig(
 //
 
 template <class ELEMENT>
-void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig, hum::HTp keytok, bool secondary)
+void HumdrumInput::setKeySig(
+    int partindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary)
 {
 
     std::string ks = keysig;
@@ -3550,8 +3555,8 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
     if (!vrvkeysig) {
         return;
     }
-    if (keytok) {
-        setLocationId(vrvkeysig, keytok);
+    if (keysigtok) {
+        setLocationId(vrvkeysig, keysigtok);
     }
 
     int keyvalue = keynum;
@@ -3575,7 +3580,7 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
     }
     else {
         // Non-standard keysignature, so give a NONE style (deal with it later).
-        prepareNonStandardKeySignature(vrvkeysig, ks, keytok);
+        prepareNonStandardKeySignature(vrvkeysig, ks, keysigtok);
         return;
     }
 
@@ -3587,6 +3592,66 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
     else if (m_show_cautionary_keysig) {
         vrvkeysig->SetSigShowchange(BOOLEAN_true);
     }
+
+    if (!keytok) {
+        return;
+    }
+
+    // key designation: ^\*([a-gA-G])([#-]*):([a-z]{3})?$
+    // pname+mode / accid / mode
+    hum::HumRegex hre;
+    if (hre.search(*keytok, "^\\*([a-gA-G])([#-]*):([a-z]{3})?$")) {
+        std::string letter = hre.getMatch(1);
+        std::string accidental = hre.getMatch(2);
+        std::string modeabbr = hre.getMatch(3);
+
+        string mode;
+        if (std::isupper(letter[0])) {
+            mode = "major";
+        }
+        else {
+            mode = "minor";
+        }
+        if (!modeabbr.empty()) {
+            if (modeabbr == "dor") {
+                mode = "dorian";
+            }
+            else if (modeabbr == "phr") {
+                mode = "phrygian";
+            }
+            else if (modeabbr == "lyd") {
+                mode = "lydian";
+            }
+            else if (modeabbr == "mix") {
+                mode = "mixolydian";
+            }
+            else if (modeabbr == "aeo") {
+                mode = "aeolian";
+            }
+            else if (modeabbr == "loc") {
+                mode = "locrian";
+            }
+            else if (modeabbr == "ion") {
+                mode = "ionian";
+            }
+        }
+        vrvkeysig->SetMode(vrvkeysig->AttKeySigLog::StrToMode(mode));
+        switch (std::tolower(letter[0])) {
+            case 'c': vrvkeysig->SetPname(PITCHNAME_c); break;
+            case 'd': vrvkeysig->SetPname(PITCHNAME_d); break;
+            case 'e': vrvkeysig->SetPname(PITCHNAME_e); break;
+            case 'f': vrvkeysig->SetPname(PITCHNAME_f); break;
+            case 'g': vrvkeysig->SetPname(PITCHNAME_g); break;
+            case 'a': vrvkeysig->SetPname(PITCHNAME_a); break;
+            case 'b': vrvkeysig->SetPname(PITCHNAME_b); break;
+        }
+        if (accidental == "-") {
+            vrvkeysig->SetAccid(ACCIDENTAL_WRITTEN_f);
+        }
+        else if (accidental == "#") {
+            vrvkeysig->SetAccid(ACCIDENTAL_WRITTEN_s);
+        }
+    }
 }
 
 //////////////////////////////
@@ -3594,7 +3659,7 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
 // prepareNonStandardKeySignature --
 //
 
-void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::string &ks, hum::HTp keytok)
+void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::string &ks, hum::HTp keysigtok)
 {
     if (!vrvkeysig) {
         return;
@@ -9981,10 +10046,12 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumdrumFile &infile = m_infiles[0];
+    hum::HumRegex hre;
 
-    hum::HTp keysig = NULL;
-    hum::HTp timesig = NULL;
-    hum::HTp metersig = NULL;
+    hum::HTp keytok = NULL;
+    hum::HTp keysigtok = NULL;
+    hum::HTp timesigtok = NULL;
+    hum::HTp metersigtok = NULL;
 
     for (int i = startline; i <= endline; ++i) {
         if (infile[i].isData()) {
@@ -9994,19 +10061,29 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             continue;
         }
         for (int j = 0; j < infile[i].getFieldCount(); ++j) {
-            if ((!timesig) && regex_search(*infile.token(i, j), regex("^\\*M\\d+/\\d+"))) {
-                timesig = infile.token(i, j);
+            hum::HTp token = infile.token(i, j);
+
+            if (hre.search(token, "^\\*M\\d+/\\d+")) {
+                timesigtok = token;
             }
-            if ((!keysig) && regex_search(*infile.token(i, j), regex("^\\*k\\[.*\\]"))) {
-                keysig = infile.token(i, j);
+            else if (hre.search(token, "^\\*M\\d+/\\d+")) {
+                timesigtok = token;
             }
-            if (timesig && regex_search(*infile.token(i, j), regex("^\\*met\\(.*\\)"))) {
-                metersig = infile.token(i, j);
+            else if (hre.search(token, "^\\*k\\[.*\\]")) {
+                keysigtok = token;
+            }
+            else if (hre.search(token, "^\\*[a-gA-G][#-]*:([a-z]{3})?$")) {
+                keytok = token;
+            }
+
+            // meter signature will only be used if immediately following a time signature
+            if (timesigtok && hre.search(token, "^\\*met\\(.*\\)")) {
+                metersigtok = infile.token(i, j);
             }
         }
     }
 
-    if ((keysig == NULL) && (timesig == NULL)) {
+    if ((keysigtok == NULL) && (timesigtok == NULL)) {
         // no key or time signature changes.
         return;
     }
@@ -10016,21 +10093,21 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 
     //    <scoreDef meter.count="6" meter.unit="8" key.sig="1f"/>
 
-    if (timesig) {
-        // cerr << "TIMESIG = " << timesig << endl;
+    if (timesigtok) {
+        // cerr << "TIMESIG = " << timesigtok << endl;
         int count = -1;
         int unit = -1;
         std::smatch matches;
-        if (regex_search(*timesig, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
-            if (!metersig) {
+        if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
+            if (!metersigtok) {
                 count = stoi(matches[1]);
                 unit = stoi(matches[2]);
                 MeterSig *vrvmetersig = getMeterSig(scoreDef);
                 vrvmetersig->SetCount(count);
                 vrvmetersig->SetUnit(unit);
             }
-            else if (metersig && (metersig->find('C') == std::string::npos)
-                && (metersig->find('O') == std::string::npos)) {
+            else if (metersigtok && (metersigtok->find('C') == std::string::npos)
+                && (metersigtok->find('O') == std::string::npos)) {
                 // Only storing the time signature if there is no mensuration
                 // otherwise verovio will display both.
                 count = stoi(matches[1]);
@@ -10047,10 +10124,10 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
                 MeterSig *vrvmetersig = getMeterSig(scoreDef);
                 vrvmetersig->SetUnit(unit);
             }
-            if (metersig) {
-                auto ploc = metersig->rfind(")");
+            if (metersigtok) {
+                auto ploc = metersigtok->rfind(")");
                 if (ploc != string::npos) {
-                    string mstring = metersig->substr(5, ploc - 5);
+                    string mstring = metersigtok->substr(5, ploc - 5);
                     setMeterSymbol(scoreDef, mstring);
                 }
             }
@@ -10062,9 +10139,9 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             }
         }
     }
-    if (keysig) {
-        // cerr << "KEYSIG = " << keysig << endl;
-        setKeySig(-1, scoreDef, *((string *)keysig), keysig, true);
+    if (keysigtok) {
+        // eventually allow decoupling of keysig and key.
+        setKeySig(-1, scoreDef, *((string *)keysigtok), keysigtok, keytok, true);
     }
 }
 

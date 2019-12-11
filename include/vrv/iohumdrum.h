@@ -574,7 +574,8 @@ protected:
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
     template <class ELEMENT>
-    void setKeySig(int partindex, ELEMENT element, const std::string &keysig, hum::HTp keytok, bool secondary);
+    void setKeySig(
+        int partindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
