@@ -1053,6 +1053,10 @@ int Note::Transpose(FunctorParams *functorParams)
 
     LogDebug("Transposing note");
 
+    TransPitch pitch = this->GetTransPitch();
+    params->m_transposer->Transpose(pitch);
+    this->UpdateFromTransPitch(pitch);
+
     return FUNCTOR_SIBLINGS;
 }
 

@@ -1158,7 +1158,7 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
 void Doc::TransposeDoc()
 {
     Transposer transposer;
-    // here pass the value of this->m_options.m_transpose.GetValue() to the transposer
+    transposer.SetTransposition(this->m_options->m_transpose.GetValue());
 
     Functor transpose(&Object::Transpose);
     TransposeParams transposeParams(this, &transposer);
