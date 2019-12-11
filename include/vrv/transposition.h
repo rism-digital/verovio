@@ -65,6 +65,7 @@ public:
     void SetTransposition(int transVal);
     void SetTransposition(const std::string &transString);
     void Transpose(TransPitch &pitch);
+    int Transpose(int iPitch);
     void Transpose(TransPitch &pitch, int transVal);
     void Transpose(TransPitch &pitch, const std::string &transString);
     int GetIntervalClass(const TransPitch &p1, const TransPitch &p2);

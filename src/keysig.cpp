@@ -19,6 +19,7 @@
 #include "keyaccid.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
+#include "transposition.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -297,6 +298,25 @@ int KeySig::Transpose(FunctorParams *functorParams)
     assert(params);
 
     LogDebug("Transposing keySig");
+    int sig = this->GetSig().first;
+    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
+        sig *= -1;
+    }
+    int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
+    intervalClass = params->m_transposer->Transpose(intervalClass);
+    int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
+
+    if (fifths < 0) {
+        this->SetSig(std::make_pair(-fifths, ACCIDENTAL_WRITTEN_f));
+    }
+    else if (fifths > 0) {
+        this->SetSig(std::make_pair(fifths, ACCIDENTAL_WRITTEN_s));
+    }
+    else {
+        this->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+    }
+
+    // TODO: Also convert pname and accid attributes
 
     return FUNCTOR_SIBLINGS;
 }
