@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#define INVALID_INTERVAL_CLASS -123456789
+
 namespace vrv {
 
 class TransPitch;
@@ -64,6 +66,8 @@ public:
     TransPitch IntegerToPitch(int ipitch);
     void SetTransposition(int transVal);
     void SetTransposition(const std::string &transString);
+    int GetTranspositionIntervalClass();
+    std::string GetTranspositionIntervalName();
     void Transpose(TransPitch &pitch);
     int Transpose(int iPitch);
     void Transpose(TransPitch &pitch, int transVal);

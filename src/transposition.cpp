@@ -32,8 +32,6 @@
 //     to G## is up a diminished second ("d2").
 //
 
-#define INVALID_INTERVAL_CLASS -123456789
-
 // Diatonic pitch class integers:
 // These could be converted into an enum provided
 // that the same value are assigned to each class.
@@ -190,6 +188,27 @@ void Transposer::SetTransposition(int transVal)
 void Transposer::SetTransposition(const std::string &transString)
 {
     m_transpose = GetIntervalClass(transString);
+}
+
+//////////////////////////////
+//
+// Transposer::GetTranspositionIntervalClass -- return the interval class integer
+//   that was set for use with Transposer::Transpose.
+//
+
+int Transposer::GetTranspositionIntervalClass()
+{
+    return m_transpose;
+}
+
+//////////////////////////////
+//
+// Transposer::GetTranspositionIntervalClass -- return the interval integer
+//   as a string name that was set for use with Transposer::Transpose.
+//
+std::string Transposer::GetTranspositionIntervalName()
+{
+    return GetIntervalName(m_transpose);
 }
 
 //////////////////////////////
@@ -924,9 +943,13 @@ int Transposer::IntervalToCircleOfFifths(int transval)
     if (transval < 0) {
         transval = (m_base * 100 + transval) % m_base;
     }
-    if (transval == 0) {
+    else if (transval == 0) {
         return 0;
     }
+    else {
+        transval %= m_base;
+    }
+
     int p5 = PerfectFifthClass();
     int p4 = PerfectFourthClass();
     for (int i = 1; i < m_base; i++) {

@@ -310,7 +310,10 @@ int KeySig::Transpose(FunctorParams *functorParams)
     intervalClass = params->m_transposer->Transpose(intervalClass);
     int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
 
-    if (fifths < 0) {
+    if (fifths == INVALID_INTERVAL_CLASS) {
+        this->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+    }
+    else if (fifths < 0) {
         this->SetSig(std::make_pair(-fifths, ACCIDENTAL_WRITTEN_f));
     }
     else if (fifths > 0) {
