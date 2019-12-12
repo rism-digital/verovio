@@ -921,18 +921,20 @@ int Transposer::IntervalToCircleOfFifths(const std::string &transstring)
 
 int Transposer::IntervalToCircleOfFifths(int transval)
 {
-    int sign = 1.0;
     if (transval < 0) {
-        sign = -1.0;
-        transval = (m_base * 100 - transval) % m_base;
+        transval = (m_base * 100 + transval) % m_base;
     }
     if (transval == 0) {
         return 0;
     }
     int p5 = PerfectFifthClass();
+    int p4 = PerfectFourthClass();
     for (int i = 1; i < m_base; i++) {
         if ((p5 * i) % m_base == transval) {
-            return sign * i;
+            return i;
+        }
+        if ((p4 * i) % m_base == transval) {
+            return -i;
         }
     }
     return INVALID_INTERVAL_CLASS;
