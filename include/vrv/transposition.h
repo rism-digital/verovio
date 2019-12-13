@@ -12,6 +12,9 @@
 #include <string>
 #include <vector>
 
+#include "attdef.h"
+#include "atttypes.h"
+
 #define INVALID_INTERVAL_CLASS -123456789
 
 namespace vrv {

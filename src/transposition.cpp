@@ -44,14 +44,15 @@
 #define dpc_B 6
 
 #include "transposition.h"
-#include "attdef.h"
-#include "atttypes.h"
-#include "vrv.h"
 
 #include <cctype>
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include "attdef.h"
+#include "atttypes.h"
+#include "vrv.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
