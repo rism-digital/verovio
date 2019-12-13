@@ -323,7 +323,13 @@ int KeySig::Transpose(FunctorParams *functorParams)
         this->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
     }
 
-    // TODO: Also convert pname and accid attributes
+    // Also convert pname and accid attributes
+    if (this->HasPname()) {
+        TransPitch pitch = TransPitch(this->GetPname(), ACCIDENTAL_GESTURAL_NONE, this->GetAccid(), 4);
+        params->m_transposer->Transpose(pitch);
+        this->SetPname(pitch.GetPitchName());
+        this->SetAccid(pitch.GetAccidW());
+    }
 
     return FUNCTOR_SIBLINGS;
 }

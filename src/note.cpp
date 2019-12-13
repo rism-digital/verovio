@@ -424,31 +424,8 @@ int Note::GetChromaticAlteration()
 {
     Accid *accid = this->GetDrawingAccid();
 
-    if (accid && accid->HasAccidGes()) {
-        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
-        switch (accImp) {
-            case ACCIDENTAL_GESTURAL_s: return 1;
-            case ACCIDENTAL_GESTURAL_f: return -1;
-            case ACCIDENTAL_GESTURAL_ss: return 2;
-            case ACCIDENTAL_GESTURAL_ff: return -2;
-            default: break;
-        }
-    }
-    else if (accid) {
-        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
-        switch (accExp) {
-            case ACCIDENTAL_WRITTEN_s: return 1;
-            case ACCIDENTAL_WRITTEN_f: return -1;
-            case ACCIDENTAL_WRITTEN_ss: return 2;
-            case ACCIDENTAL_WRITTEN_x: return 2;
-            case ACCIDENTAL_WRITTEN_ff: return -2;
-            case ACCIDENTAL_WRITTEN_xs: return 3;
-            case ACCIDENTAL_WRITTEN_ts: return 3;
-            case ACCIDENTAL_WRITTEN_tf: return -3;
-            case ACCIDENTAL_WRITTEN_nf: return -1;
-            case ACCIDENTAL_WRITTEN_ns: return 1;
-            default: break;
-        }
+    if (accid) {
+        return TransPitch::GetChromaticAlteration(accid->GetAccidGes(), accid->GetAccid());
     }
     return 0;
 }
@@ -461,8 +438,7 @@ TransPitch Note::GetTransPitch()
 
 void Note::UpdateFromTransPitch(TransPitch tp)
 {
-    data_PITCHNAME pname = static_cast<data_PITCHNAME>(tp.m_pname + PITCHNAME_c);
-    this->SetPname(pname);
+    this->SetPname(tp.GetPitchName());
 
     Accid *accid = this->GetDrawingAccid();
     bool transposeGesturalAccid = false;
@@ -483,30 +459,10 @@ void Note::UpdateFromTransPitch(TransPitch tp)
     }
 
     if (transposeGesturalAccid) {
-        data_ACCIDENTAL_GESTURAL gestural = ACCIDENTAL_GESTURAL_NONE;
-        switch (tp.m_accid) {
-            case -2: gestural = ACCIDENTAL_GESTURAL_ff; break;
-            case -1: gestural = ACCIDENTAL_GESTURAL_f; break;
-            case 0: gestural = ACCIDENTAL_GESTURAL_n; break;
-            case 1: gestural = ACCIDENTAL_GESTURAL_s; break;
-            case 2: gestural = ACCIDENTAL_GESTURAL_ss; break;
-            default: break; // TODO: Return an error here.
-        }
-        accid->SetAccidGes(gestural);
+        accid->SetAccidGes(tp.GetAccidG());
     }
     if (transposeWrittenAccid) {
-        data_ACCIDENTAL_WRITTEN written = ACCIDENTAL_WRITTEN_NONE;
-        switch (tp.m_accid) {
-            case -3: written = ACCIDENTAL_WRITTEN_tf; break;
-            case -2: written = ACCIDENTAL_WRITTEN_ff; break;
-            case -1: written = ACCIDENTAL_WRITTEN_f; break;
-            case 0: written = ACCIDENTAL_WRITTEN_n; break;
-            case 1: written = ACCIDENTAL_WRITTEN_s; break;
-            case 2: written = ACCIDENTAL_WRITTEN_x; break;
-            case 3: written = ACCIDENTAL_WRITTEN_xs; break;
-            default: break; // TODO: Return an error here.
-        }
-        accid->SetAccid(written);
+        accid->SetAccid(tp.GetAccidW());
     }
 
     if (this->GetOct() != tp.m_oct) {
