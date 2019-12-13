@@ -21,6 +21,7 @@
 #include "measure.h"
 #include "system.h"
 #include "text.h"
+#include "transposition.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -205,6 +206,50 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
     params->m_previousHarmStart = this->GetStart();
     params->m_previousHarmPositioner = harmPositioner;
     params->m_previousMeasure = NULL;
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Harm::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    LogDebug("Transposing harm");
+
+    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
+    std::wstring text = textObject->GetText();
+
+    // Transpose chord names: "C".
+    if (text[0] >= 'A' && text[0] <= 'G') {
+        int accid = 0;
+        int i;
+        for (i = 1;; i++) {
+            // We can't use a switch-case here because text is a wstring
+            if (text[i] == L'𝄫')
+                accid -= 2;
+            else if (text[i] == 'b' || text[i] == L'♭')
+                accid--;
+            else if (text[i] == '#' || text[i] == L'♯')
+                accid++;
+            else if (text[i] == L'𝄪')
+                accid += 2;
+            else
+                break;
+        }
+        TransPitch pitch = TransPitch((text[0] - 'C' + 7) % 7, accid, 4);
+        params->m_transposer->Transpose(pitch);
+        char pitchLetter = (pitch.m_pname + ('C' - 'A')) % 7 + 'A';
+        switch (pitch.m_accid) {
+            case -2: text = std::wstring({ pitchLetter, L'𝄫' }) + &text[i]; break;
+            case -1: text = std::wstring({ pitchLetter, L'♭' }) + &text[i]; break;
+            case 0: text = std::wstring({ pitchLetter }) + &text[i]; break;
+            case 1: text = std::wstring({ pitchLetter, L'♯' }) + &text[i]; break;
+            case 2: text = std::wstring({ pitchLetter, L'𝄪' }) + &text[i]; break;
+        }
+        // TODO: Transpose base notes (the "/F#" in "G#m7/F#")
+    }
+    textObject->SetText(text);
 
     return FUNCTOR_SIBLINGS;
 }

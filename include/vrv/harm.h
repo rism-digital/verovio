@@ -72,6 +72,11 @@ public:
      */
     virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
 
+    /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *functorParams);
+
 protected:
     //
 private:
