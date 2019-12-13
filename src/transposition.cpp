@@ -90,23 +90,40 @@ TransPitch::TransPitch(const TransPitch &pitch)
 int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW)
 {
     switch (accidG) {
-        case ACCIDENTAL_GESTURAL_s: return 1;
-        case ACCIDENTAL_GESTURAL_f: return -1;
-        case ACCIDENTAL_GESTURAL_ss: return 2;
         case ACCIDENTAL_GESTURAL_ff: return -2;
+        // case ACCIDENTAL_GESTURAL_fd: return -1.5;
+        case ACCIDENTAL_GESTURAL_f: return -1;
+        // case ACCIDENTAL_GESTURAL_fu: return 0.5;
+        case ACCIDENTAL_GESTURAL_n: return 0;
+        // case ACCIDENTAL_GESTURAL_sd: return 0.5;
+        case ACCIDENTAL_GESTURAL_s: return 1;
+        // case ACCIDENTAL_GESTURAL_su: return 1.5;
+        case ACCIDENTAL_GESTURAL_ss: return 2;
         default: break;
     }
     switch (accidW) {
-        case ACCIDENTAL_WRITTEN_s: return 1;
+        case ACCIDENTAL_WRITTEN_tf: return -3;
+        case ACCIDENTAL_WRITTEN_ff: return -2;
+        // case ACCIDENTAL_WRITTEN_3qf: return -1.5;
+        // case ACCIDENTAL_WRITTEN_fd: return -1.5;
         case ACCIDENTAL_WRITTEN_f: return -1;
+        case ACCIDENTAL_WRITTEN_nf: return -1;
+        // case ACCIDENTAL_WRITTEN_fu: return -0.5;
+        // case ACCIDENTAL_WRITTEN_1qf: return -0.5;
+        // case ACCIDENTAL_WRITTEN_nd: return -0.5;
+        case ACCIDENTAL_WRITTEN_n: return 0;
+        // case ACCIDENTAL_WRITTEN_nu: return 0.5;
+        // case ACCIDENTAL_WRITTEN_1qs: return 0.5;
+        // case ACCIDENTAL_WRITTEN_sd: return 0.5;
+        case ACCIDENTAL_WRITTEN_ns: return 1;
+        case ACCIDENTAL_WRITTEN_s: return 1;
+        // case ACCIDENTAL_WRITTEN_su: return 1.5;
+        // case ACCIDENTAL_WRITTEN_3qs: return 1.5;
         case ACCIDENTAL_WRITTEN_ss: return 2;
         case ACCIDENTAL_WRITTEN_x: return 2;
-        case ACCIDENTAL_WRITTEN_ff: return -2;
         case ACCIDENTAL_WRITTEN_xs: return 3;
+        case ACCIDENTAL_WRITTEN_sx: return 3;
         case ACCIDENTAL_WRITTEN_ts: return 3;
-        case ACCIDENTAL_WRITTEN_tf: return -3;
-        case ACCIDENTAL_WRITTEN_nf: return -1;
-        case ACCIDENTAL_WRITTEN_ns: return 1;
         default: break;
     }
     return 0;
