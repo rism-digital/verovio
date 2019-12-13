@@ -225,18 +225,17 @@ int Harm::Transpose(FunctorParams *functorParams)
         int accid = 0;
         int i;
         for (i = 1;; i++) {
-            // We can't use a switch-case here because text is a wstring
-            if (text[i] == L'𝄫')
-                accid -= 2;
-            else if (text[i] == 'b' || text[i] == L'♭')
-                accid--;
-            else if (text[i] == '#' || text[i] == L'♯')
-                accid++;
-            else if (text[i] == L'𝄪')
-                accid += 2;
-            else
-                break;
+            switch (text[i]) {
+                case L'𝄫': accid -= 2; break;
+                case 'b':
+                case L'♭': accid--; break;
+                case '#':
+                case L'♯': accid++; break;
+                case L'𝄪': accid += 2; break;
+                default: goto break2;
+            }
         }
+    break2:
         TransPitch pitch = TransPitch((text[0] - 'C' + 7) % 7, accid, 4);
         params->m_transposer->Transpose(pitch);
         char pitchLetter = (pitch.m_pname + ('C' - 'A')) % 7 + 'A';
