@@ -1003,6 +1003,14 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         }
         m_openDashesStack.clear();
     }
+    if (!m_bracketStack.empty()) { // open brackets without ending
+        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+            LogWarning(
+                "MusicXML import: BracketSpan for '%s' could not be closed.", iter->first->GetUuid().c_str());
+        }
+        m_bracketStack.clear();
+    }
 
     return false;
 }
@@ -1646,13 +1654,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
         int voiceNumber = wedge.node().attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(lead.node(), "type", "stop")) {
-            std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
-            for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-                    int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
-                    iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
-                    m_bracketStack.erase(iter);
-                    return;
-            }
+            int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
+                m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    m_bracketStack.erase(m_bracketStack.begin());
         }
         else {
             std::string symbol = lead.node().attribute("symbol").as_string();
