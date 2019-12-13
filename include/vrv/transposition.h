@@ -12,6 +12,9 @@
 #include <string>
 #include <vector>
 
+#include "attdef.h"
+#include "atttypes.h"
+
 #define INVALID_INTERVAL_CLASS -123456789
 
 namespace vrv {
@@ -37,8 +40,13 @@ public:
 
     TransPitch(){};
     TransPitch(int aPname, int anAccid, int anOct);
+    TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW, int oct);
     TransPitch(const TransPitch &pitch);
     TransPitch &operator=(const TransPitch &pitch);
+    static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
+    data_ACCIDENTAL_GESTURAL GetAccidG();
+    data_ACCIDENTAL_WRITTEN GetAccidW();
+    data_PITCHNAME GetPitchName();
     bool IsValid(int maxAccid);
     void SetPitch(int aPname, int anAccid, int anOct);
 };

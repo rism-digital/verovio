@@ -50,6 +50,10 @@
 #include <string>
 #include <vector>
 
+#include "attdef.h"
+#include "atttypes.h"
+#include "vrv.h"
+
 ////////////////////////////////////////////////////////////////////////////
 //
 // The TransPitch class is an interface for storing information about notes which
@@ -71,6 +75,11 @@ TransPitch::TransPitch(int aPname, int anAccid, int anOct)
     SetPitch(aPname, anAccid, anOct);
 }
 
+TransPitch::TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW, int oct)
+{
+    SetPitch(pname - PITCHNAME_c, GetChromaticAlteration(accidG, accidW), oct);
+}
+
 TransPitch::TransPitch(const TransPitch &pitch)
 {
     m_pname = pitch.m_pname;
@@ -78,6 +87,80 @@ TransPitch::TransPitch(const TransPitch &pitch)
     m_oct = pitch.m_oct;
 }
 
+int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW)
+{
+    switch (accidG) {
+        case ACCIDENTAL_GESTURAL_ff: return -2;
+        // case ACCIDENTAL_GESTURAL_fd: return -1.5;
+        case ACCIDENTAL_GESTURAL_f: return -1;
+        // case ACCIDENTAL_GESTURAL_fu: return 0.5;
+        case ACCIDENTAL_GESTURAL_n: return 0;
+        // case ACCIDENTAL_GESTURAL_sd: return 0.5;
+        case ACCIDENTAL_GESTURAL_s: return 1;
+        // case ACCIDENTAL_GESTURAL_su: return 1.5;
+        case ACCIDENTAL_GESTURAL_ss: return 2;
+        default: break;
+    }
+    switch (accidW) {
+        case ACCIDENTAL_WRITTEN_tf: return -3;
+        case ACCIDENTAL_WRITTEN_ff: return -2;
+        // case ACCIDENTAL_WRITTEN_3qf: return -1.5;
+        // case ACCIDENTAL_WRITTEN_fd: return -1.5;
+        case ACCIDENTAL_WRITTEN_f: return -1;
+        case ACCIDENTAL_WRITTEN_nf: return -1;
+        // case ACCIDENTAL_WRITTEN_fu: return -0.5;
+        // case ACCIDENTAL_WRITTEN_1qf: return -0.5;
+        // case ACCIDENTAL_WRITTEN_nd: return -0.5;
+        case ACCIDENTAL_WRITTEN_n: return 0;
+        // case ACCIDENTAL_WRITTEN_nu: return 0.5;
+        // case ACCIDENTAL_WRITTEN_1qs: return 0.5;
+        // case ACCIDENTAL_WRITTEN_sd: return 0.5;
+        case ACCIDENTAL_WRITTEN_ns: return 1;
+        case ACCIDENTAL_WRITTEN_s: return 1;
+        // case ACCIDENTAL_WRITTEN_su: return 1.5;
+        // case ACCIDENTAL_WRITTEN_3qs: return 1.5;
+        case ACCIDENTAL_WRITTEN_ss: return 2;
+        case ACCIDENTAL_WRITTEN_x: return 2;
+        case ACCIDENTAL_WRITTEN_xs: return 3;
+        case ACCIDENTAL_WRITTEN_sx: return 3;
+        case ACCIDENTAL_WRITTEN_ts: return 3;
+        default: break;
+    }
+    return 0;
+}
+
+data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG()
+{
+    switch (m_accid) {
+        case -2: return ACCIDENTAL_GESTURAL_ff;
+        case -1: return ACCIDENTAL_GESTURAL_f;
+        case 0: return ACCIDENTAL_GESTURAL_n;
+        case 1: return ACCIDENTAL_GESTURAL_s;
+        case 2: return ACCIDENTAL_GESTURAL_ss;
+        default: break;
+    }
+    LogWarning("Transposition: Could not get Gestural Accidental for %i", m_accid);
+    return ACCIDENTAL_GESTURAL_NONE;
+}
+data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW()
+{
+    switch (m_accid) {
+        case -3: return ACCIDENTAL_WRITTEN_tf;
+        case -2: return ACCIDENTAL_WRITTEN_ff;
+        case -1: return ACCIDENTAL_WRITTEN_f;
+        case 0: return ACCIDENTAL_WRITTEN_n;
+        case 1: return ACCIDENTAL_WRITTEN_s;
+        case 2: return ACCIDENTAL_WRITTEN_x;
+        case 3: return ACCIDENTAL_WRITTEN_xs;
+        default: break;
+    }
+    LogWarning("Transposition: Could not get Written Accidental for %i", m_accid);
+    return ACCIDENTAL_WRITTEN_NONE;
+}
+data_PITCHNAME TransPitch::GetPitchName()
+{
+    return static_cast<data_PITCHNAME>(m_pname + PITCHNAME_c);
+}
 //////////////////////////////
 //
 // operator= TransPitch -- copy operator for pitches.
