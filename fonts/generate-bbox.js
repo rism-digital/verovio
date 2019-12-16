@@ -109,4 +109,4 @@ function extract() {
     };
 }
 
-page.open(address, extract());
+page.open("file://" + fs.absolute(address), extract());
