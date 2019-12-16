@@ -19,8 +19,8 @@ Pod::Spec.new do |s|
                           'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_gestural,atts_mei}.{h}', 
                           'libmei/{atts_mensural,atts_midi,atts_neumes,atts_pagebased,atts_shared}.{h}',
                           'libmei/{atts_visual,atttypes}.{h}'
-  s.platform       = :ios, '12.0'
-  s.resources      = 'data'
+  s.ios.deployment_target = '12.0'
+  s.osx.deployment_target = '10.13'
   s.xcconfig = {
       "CLANG_CXX_LANGUAGE_STANDARD" => "gnu++14",
       "CLANG_CXX_LIBRARY" => "libc++",
