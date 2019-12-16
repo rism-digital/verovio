@@ -47,6 +47,7 @@ public:
     data_ACCIDENTAL_GESTURAL GetAccidG();
     data_ACCIDENTAL_WRITTEN GetAccidW();
     data_PITCHNAME GetPitchName();
+    std::wstring GetPitchString();
     bool IsValid(int maxAccid);
     void SetPitch(int aPname, int anAccid, int anOct);
 };
