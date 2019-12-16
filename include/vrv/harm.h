@@ -11,6 +11,7 @@
 #include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
+#include "transposition.h"
 
 namespace vrv {
 
@@ -57,6 +58,12 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
+
+    /**
+     * Transposition related. The int tracks where we have iterated through the string.
+     */
+    TransPitch GetRootPitch(int &pos);
+    void SetRootPitch(TransPitch pitch, int endPos);
 
     //----------//
     // Functors //

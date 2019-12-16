@@ -79,6 +79,52 @@ void Harm::AddChild(Object *child)
     Modify();
 }
 
+TransPitch Harm::GetRootPitch(int &pos)
+{
+    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
+    assert(textObject);
+    std::wstring text = textObject->GetText();
+
+    if (text.at(pos) >= 'A' && text.at(pos) <= 'G') {
+        int pname = (text.at(pos) - 'C' + 7) % 7;
+        int accid = 0;
+        for (pos++; pos < text.length(); pos++) {
+            if (text.at(pos) == L'𝄫')
+                accid -= 2;
+            else if (text.at(pos) == 'b' || text.at(pos) == L'♭')
+                accid--;
+            else if (text.at(pos) == '#' || text.at(pos) == L'♯')
+                accid++;
+            else if (text.at(pos) == L'𝄪')
+                accid += 2;
+            else
+                break;
+        }
+        return TransPitch(pname, accid, 4);
+    }
+    LogWarning("Couldn't Get Root Pitch for harm '%s'", text.c_str());
+    // If we return octave -1, it knows it is an error.
+    return TransPitch(0, 0, -1);
+}
+
+void Harm::SetRootPitch(TransPitch pitch, int endPos)
+{
+    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
+    assert(textObject);
+    std::wstring text = textObject->GetText();
+
+    char pitchLetter = (pitch.m_pname + ('C' - 'A')) % 7 + 'A';
+    switch (pitch.m_accid) {
+        case -2: text = std::wstring({ pitchLetter, L'𝄫' }) + &text[endPos]; break;
+        case -1: text = std::wstring({ pitchLetter, L'♭' }) + &text[endPos]; break;
+        default: LogError("Harm Transposition: Could not get Accidental for %i", pitch.m_accid);
+        case 0: text = std::wstring({ pitchLetter }) + &text[endPos]; break;
+        case 1: text = std::wstring({ pitchLetter, L'♯' }) + &text[endPos]; break;
+        case 2: text = std::wstring({ pitchLetter, L'𝄪' }) + &text[endPos]; break;
+    }
+    textObject->SetText(text);
+}
+
 //----------------------------------------------------------------------------
 // Harm functor methods
 //----------------------------------------------------------------------------
@@ -217,38 +263,14 @@ int Harm::Transpose(FunctorParams *functorParams)
 
     LogDebug("Transposing harm");
 
-    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
-    std::wstring text = textObject->GetText();
-
-    // Transpose chord names: "C".
-    if (text[0] >= 'A' && text[0] <= 'G') {
-        int accid = 0;
-        int i;
-        for (i = 1;; i++) {
-            switch (text[i]) {
-                case L'𝄫': accid -= 2; break;
-                case 'b':
-                case L'♭': accid--; break;
-                case '#':
-                case L'♯': accid++; break;
-                case L'𝄪': accid += 2; break;
-                default: goto break2;
-            }
-        }
-    break2:
-        TransPitch pitch = TransPitch((text[0] - 'C' + 7) % 7, accid, 4);
+    int position = 0;
+    TransPitch pitch = this->GetRootPitch(position);
+    if (pitch.m_oct != -1) {
         params->m_transposer->Transpose(pitch);
-        char pitchLetter = (pitch.m_pname + ('C' - 'A')) % 7 + 'A';
-        switch (pitch.m_accid) {
-            case -2: text = std::wstring({ pitchLetter, L'𝄫' }) + &text[i]; break;
-            case -1: text = std::wstring({ pitchLetter, L'♭' }) + &text[i]; break;
-            case 0: text = std::wstring({ pitchLetter }) + &text[i]; break;
-            case 1: text = std::wstring({ pitchLetter, L'♯' }) + &text[i]; break;
-            case 2: text = std::wstring({ pitchLetter, L'𝄪' }) + &text[i]; break;
-        }
-        // TODO: Transpose base notes (the "/F#" in "G#m7/F#")
+        this->SetRootPitch(pitch, position);
     }
-    textObject->SetText(text);
+
+    // TODO: Transpose base notes (the "/F#" in "G#m7/F#")
 
     return FUNCTOR_SIBLINGS;
 }
