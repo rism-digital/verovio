@@ -546,6 +546,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
     infile.analyzeKernAccidentals();
+    infile.analyzeTextRepetition();
     parseSignifiers(infile);
     checkForColorSpine(infile);
     infile.analyzeRScale();
@@ -13282,6 +13283,8 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
 
     hum::HumRegex hre;
     vector<string> vtexts;
+    vector<hum::HTp> vtoks;
+    hum::HTp vtoken = NULL;
     string vcolor;
     std::string content;
     hum::HumdrumLine &line = *token->getLine();
@@ -13334,9 +13337,11 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         }
 
         vtexts.clear();
+        vtoks.clear();
         vcolor.clear();
         int track = line.token(i)->getTrack();
         if (line.token(i)->isDataType("**silbe")) {
+            vtoks.push_back(line.token(i));
             string value = line.token(i)->getText();
             hre.replaceDestructive(value, "", "\\|", "g");
             hre.replaceDestructive(value, "&uuml;", "u2", "g");
@@ -13346,6 +13351,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             vcolor = m_spine_color[track];
         }
         else {
+            vtoks.push_back(line.token(i));
             vtexts.push_back(*line.token(i));
             vcolor = m_spine_color[track];
         }
@@ -13355,6 +13361,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
 
         for (int j = 0; j < (int)vtexts.size(); ++j) {
             content = vtexts[j];
+            vtoken = vtoks[j];
             versenum++;
             if (content == "") {
                 continue;
@@ -13467,7 +13474,18 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             if ((!content.empty()) && content.back() == '-') {
                 content.resize(content.size() - 1);
             }
-            addTextElement(syl, content);
+
+            std::string inij = vtoken->getValue("auto", "ij");
+            bool ij = !inij.empty();
+            if (ij) {
+                Rend *rend = new Rend;
+                rend->SetFontstyle(FONTSTYLE_italic);
+                addTextElement(rend, content);
+                syl->AddChild(rend);
+            }
+            else {
+                addTextElement(syl, content);
+            }
         }
     }
 }
