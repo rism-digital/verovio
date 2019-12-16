@@ -8984,24 +8984,43 @@ void HumdrumInput::addTextElement(ELEMENT *element, const std::string &content, 
         data = replaceMusicShapes(data);
     }
     data = unescapeHtmlEntities(data);
-    text->SetText(UTF8to16(data));
 
-    if (fontstyle.empty()) {
-        element->AddChild(text);
-    }
-    else {
-        Rend *rend = new Rend;
-        element->AddChild(rend);
-        rend->AddChild(text);
-        if (fontstyle == "normal") {
-            rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+    hum::HumRegex hre;
+    std::vector<std::string> pieces;
+    hre.split(pieces, data, "\\\\n");
+
+    for (int i = 0; i < (int)pieces.size(); i++) {
+        data = pieces[i];
+        text->SetText(UTF8to16(data));
+
+        if (fontstyle.empty()) {
+            if (text != NULL) {
+                element->AddChild(text);
+            }
         }
-        else if (fontstyle == "bold") {
-            rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
-            rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+        else {
+            Rend *rend = new Rend;
+            element->AddChild(rend);
+            if (text != NULL) {
+                rend->AddChild(text);
+            }
+            if (fontstyle == "normal") {
+                rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+            }
+            else if (fontstyle == "bold") {
+                rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+                rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+            }
+            else if (fontstyle == "bold-italic") {
+                rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+            }
         }
-        else if (fontstyle == "bold-italic") {
-            rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+
+        if (i < (int)pieces.size() - 1) {
+            // Need to add another text element, but add lb before it.
+            Lb *lb = new Lb;
+            element->AddChild(lb);
+            text = new Text;
         }
     }
 }
