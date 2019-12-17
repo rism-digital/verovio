@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Dec 16 14:01:40 PST 2019
+// Last Modified: Mon Dec 16 18:46:19 PST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -19807,12 +19807,14 @@ bool HumdrumFileContent::analyzeTextRepetition(void) {
 	infile.getSpineStartList(sstarts);
 
 	bool output = false;
-
-	bool ijstate = false;
-	bool startij = false;  // true if at the first note in IJ
-	HTp lastword = NULL;   // non-null if last syllable before *Xij 
+	bool ijstate;
+	bool startij;  // true if at the first note in IJ
+	HTp lastword;   // non-null if last syllable before *Xij 
 
 	for (int i=0; i<(int)sstarts.size(); i++) {
+		ijstate = false;
+		startij = false;
+		lastword = NULL;
 		HTp start = sstarts[i];
 		if (!(start->isDataType("**text") || start->isDataType("**sylb"))) {
 			continue;
