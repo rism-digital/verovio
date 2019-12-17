@@ -13482,6 +13482,22 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
                 rend->SetFontstyle(FONTSTYLE_italic);
                 addTextElement(rend, content);
                 syl->AddChild(rend);
+                std::string ijbegin = vtoken->getValue("auto", "ij-begin");
+                bool ijbeginQ = !ijbegin.empty();
+                std::string ijend = vtoken->getValue("auto", "ij-end");
+                bool ijendQ = !ijend.empty();
+                if (ijbeginQ && ijendQ) {
+                    syl->SetType("repetition repetition-begin repetition-end");
+                }
+                else if (ijbeginQ) {
+                    syl->SetType("repetition repetition-begin");
+                }
+                else if (ijendQ) {
+                    syl->SetType("repetition repetition-end");
+                }
+                else {
+                    syl->SetType("repetition");
+                }
             }
             else {
                 addTextElement(syl, content);
