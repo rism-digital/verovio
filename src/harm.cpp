@@ -81,11 +81,11 @@ void Harm::AddChild(Object *child)
 
 bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)
 {
-    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
-    assert(textObject);
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return false;
     std::wstring text = textObject->GetText();
 
-    if (text.at(pos) >= 'A' && text.at(pos) <= 'G') {
+    if (text.length() > pos && text.at(pos) >= 'A' && text.at(pos) <= 'G') {
         int pname = (text.at(pos) - 'C' + 7) % 7;
         int accid = 0;
         for (pos++; pos < text.length(); pos++) {
@@ -109,18 +109,25 @@ bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)
 
 void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
 {
-    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
-    assert(textObject);
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return;
     std::wstring text = textObject->GetText();
 
-    textObject->SetText(pitch.GetPitchString() + &text[endPos]);
+    if (text.length() > endPos) {
+        textObject->SetText(pitch.GetPitchString() + &text.at(endPos));
+    }
+    else {
+        textObject->SetText(pitch.GetPitchString());
+    }
 }
 
 bool Harm::GetBassPitch(TransPitch &pitch)
 {
-    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
-    assert(textObject);
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return false;
     std::wstring text = textObject->GetText();
+    if (!text.length()) return false;
+
     for (unsigned int pos = 0; pos < text.length(); pos++) {
         if (text.at(pos) == L'/') {
             pos++;
@@ -132,8 +139,8 @@ bool Harm::GetBassPitch(TransPitch &pitch)
 
 void Harm::SetBassPitch(const TransPitch &pitch)
 {
-    Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
-    assert(textObject);
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return;
     std::wstring text = textObject->GetText();
     unsigned int pos;
     for (pos = 0; pos < text.length(); pos++) {
