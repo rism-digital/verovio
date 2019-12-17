@@ -655,6 +655,8 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     assert(root);
     pugi::xpath_node workTitle = root.select_node("/score-partwise/work/work-title");
     pugi::xpath_node movementTitle = root.select_node("/score-partwise/movement-title");
+    pugi::xpath_node workNumber = root.select_node("/score-partwise/work/work-number");
+    pugi::xpath_node movementNumber = root.select_node("/score-partwise/movement-number");
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
     // <fileDesc> /////////////
@@ -665,6 +667,17 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
         meiTitle.text().set(movementTitle.node().text().as_string());
     else if (workTitle)
         meiTitle.text().set(workTitle.node().text().as_string());
+
+    if (movementNumber) {
+        pugi::xml_node meiSubtitle = titleStmt.append_child("title");
+        meiSubtitle.text().set(movementNumber.node().text().as_string());
+        meiSubtitle.append_attribute("type").set_value("subordinate");
+    }
+    else if (workNumber) {
+        pugi::xml_node meiSubtitle = titleStmt.append_child("title");
+        meiSubtitle.text().set(workNumber.node().text().as_string());
+        meiSubtitle.append_attribute("type").set_value("subordinate");
+    }
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
