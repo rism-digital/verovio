@@ -877,9 +877,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     if (symbol == "cut" || symbol == "common")
                         meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                     else if (symbol == "single-number")
-                        meterSig->SetForm(meterSigVis_FORM_num);
+                        meterSig->SetForm(METERFORM_num);
                     else
-                        meterSig->SetForm(meterSigVis_FORM_norm);
+                        meterSig->SetForm(METERFORM_norm);
                 }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
@@ -1006,8 +1006,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     if (!m_bracketStack.empty()) { // open brackets without ending
         std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            LogWarning(
-                "MusicXML import: BracketSpan for '%s' could not be closed.", iter->first->GetUuid().c_str());
+            LogWarning("MusicXML import: BracketSpan for '%s' could not be closed.", iter->first->GetUuid().c_str());
         }
         m_bracketStack.clear();
     }
@@ -1252,9 +1251,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 if (symbol == "cut" || symbol == "common")
                     meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
-                    meterSig->SetForm(meterSigVis_FORM_num);
+                    meterSig->SetForm(METERFORM_num);
                 else
-                    meterSig->SetForm(meterSigVis_FORM_norm);
+                    meterSig->SetForm(METERFORM_norm);
             }
             if (time.node().select_nodes("beats").size() > 1) {
                 LogWarning("MusicXML import: Compound meter signatures are not supported");
@@ -1662,8 +1661,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(lead.node(), "type", "stop")) {
             int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
-                m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
-                    m_bracketStack.erase(m_bracketStack.begin());
+            m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+            m_bracketStack.erase(m_bracketStack.begin());
         }
         else {
             std::string symbol = lead.node().attribute("symbol").as_string();
@@ -2476,8 +2475,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
             if (!(iter->first)->HasStaff()) {
-                        iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-                }
+                iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
         }
     }
     if (!m_tempoStack.empty()) {

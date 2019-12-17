@@ -332,7 +332,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     }
     else if (m_bracketAlignedBeam
         && ((m_bracketAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
-               && (m_drawingBracketPos == STAFFREL_basic_above))) {
+            && (m_drawingBracketPos == STAFFREL_basic_above))) {
         m_bracketAlignedBeam = NULL;
     }
 
@@ -343,7 +343,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     }
     else if (m_numAlignedBeam
         && ((m_numAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
-               && (m_drawingNumPos == STAFFREL_basic_above))) {
+            && (m_drawingNumPos == STAFFREL_basic_above))) {
         m_numAlignedBeam = NULL;
     }
 

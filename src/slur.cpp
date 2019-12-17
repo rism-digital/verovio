@@ -207,8 +207,8 @@ int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedEl
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist
         / (maxHeightFactor
-              * (doc->GetOptions()->m_slurCurveFactor.GetValue()
-                    + 5)); // 5 is the minimum - can be increased for limiting curvature
+            * (doc->GetOptions()->m_slurCurveFactor.GetValue()
+                + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
     maxHeight = std::min(maxHeight, doc->GetDrawingOctaveSize(staffSize));
