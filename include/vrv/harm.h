@@ -62,10 +62,10 @@ public:
     /**
      * Transposition related. The int tracks where we have iterated through the string.
      */
-    TransPitch GetRootPitch(unsigned int &pos);
-    void SetRootPitch(TransPitch pitch, unsigned int endPos);
-    TransPitch GetBassPitch();
-    void SetBassPitch(TransPitch pitch);
+    bool GetRootPitch(TransPitch &pitch, unsigned int &pos);
+    void SetRootPitch(const TransPitch &pitch, unsigned int endPos);
+    bool GetBassPitch(TransPitch &pitch);
+    void SetBassPitch(const TransPitch &pitch);
 
     //----------//
     // Functors //

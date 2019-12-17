@@ -79,7 +79,7 @@ void Harm::AddChild(Object *child)
     Modify();
 }
 
-TransPitch Harm::GetRootPitch(unsigned int &pos)
+bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)
 {
     Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
     assert(textObject);
@@ -100,14 +100,14 @@ TransPitch Harm::GetRootPitch(unsigned int &pos)
             else
                 break;
         }
-        return TransPitch(pname, accid, 4);
+        pitch = TransPitch(pname, accid, 4);
+        return true;
     }
     LogWarning("Failed to extract a pitch.");
-    // If we return octave -1, it knows it is an error.
-    return TransPitch(0, 0, -1);
+    return false;
 }
 
-void Harm::SetRootPitch(TransPitch pitch, unsigned int endPos)
+void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
 {
     Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
     assert(textObject);
@@ -116,7 +116,7 @@ void Harm::SetRootPitch(TransPitch pitch, unsigned int endPos)
     textObject->SetText(pitch.GetPitchString() + &text[endPos]);
 }
 
-TransPitch Harm::GetBassPitch()
+bool Harm::GetBassPitch(TransPitch &pitch)
 {
     Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
     assert(textObject);
@@ -124,13 +124,13 @@ TransPitch Harm::GetBassPitch()
     for (unsigned int pos = 0; pos < text.length(); pos++) {
         if (text.at(pos) == L'/') {
             pos++;
-            return GetRootPitch(pos);
+            return GetRootPitch(pitch, pos);
         }
     }
-    return TransPitch(0, 0, -1);
+    return false;
 }
 
-void Harm::SetBassPitch(TransPitch pitch)
+void Harm::SetBassPitch(const TransPitch &pitch)
 {
     Text *textObject = dynamic_cast<Text *>(this->GetChild(0, TEXT));
     assert(textObject);
@@ -285,15 +285,14 @@ int Harm::Transpose(FunctorParams *functorParams)
     LogDebug("Transposing harm");
 
     unsigned int position = 0;
-    TransPitch pitch = this->GetRootPitch(position);
-    if (pitch.m_oct != -1) {
+    TransPitch pitch;
+    if (this->GetRootPitch(pitch, position)) {
         params->m_transposer->Transpose(pitch);
         this->SetRootPitch(pitch, position);
     }
 
     // Transpose bass notes (the "/F#" in "G#m7/F#")
-    pitch = this->GetBassPitch();
-    if (pitch.m_oct != -1) {
+    if (this->GetBassPitch(pitch)) {
         params->m_transposer->Transpose(pitch);
         this->SetBassPitch(pitch);
     }
