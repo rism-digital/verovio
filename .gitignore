@@ -1,4 +1,5 @@
 # xcode
+Verovio.xcodeproj
 Verovio.xccheckout
 Verovio.xcodeproj/project.xcworkspace/xcshareddata
 Verovio.xcodeproj/project.xcworkspace/xcuserdata
@@ -65,3 +66,4 @@ emscripten/npm-dev/node_modules
 # VS Code files
 .vscode/settings.json
 main
+DerivedData

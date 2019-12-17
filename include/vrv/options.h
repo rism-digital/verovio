@@ -43,7 +43,9 @@ class OptionGrp;
 #define TEMP_LYRIC_LINE_SPACE 5.0
 
 // the key signature spacing factor
-#define TEMP_KEYSIG_STEP 1.3
+#define TEMP_KEYSIG_STEP 0.4
+// the key signature spacing factor for natural (usually slighly larger)
+#define TEMP_KEYSIG_NATURAL_STEP 0.6
 
 /* Options parameters for mensural notation */
 // Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
@@ -63,7 +65,13 @@ class OptionGrp;
 
 enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_encoded };
 
+enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded };
+
+enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
+
 enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
+    
+enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
 // Option
@@ -98,7 +106,10 @@ public:
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */
     static std::map<int, std::string> s_breaks;
+    static std::map<int, std::string> s_footer;
+    static std::map<int, std::string> s_header;
     static std::map<int, std::string> s_measureNumber;
+    static std::map<int, std::string> s_systemDivider;
 
 protected:
     std::string m_title;
@@ -454,13 +465,16 @@ public:
     OptionIntMap m_breaks;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
+    OptionBool m_justifyIncludeLastPage;
+    OptionBool m_justifySystemsOnly;
+    OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
-    OptionBool m_noFooter;
-    OptionBool m_noHeader;
+    OptionIntMap m_footer;
+    OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionInt m_pageHeight;
@@ -469,6 +483,7 @@ public:
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionInt m_unit;
     OptionBool m_useFacsimile;
@@ -511,6 +526,7 @@ public:
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
+    OptionIntMap m_systemDivider;
     OptionDbl m_tieThickness;
 
     /**

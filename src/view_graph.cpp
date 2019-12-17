@@ -255,28 +255,8 @@ void View::DrawSmuflString(
     dc->ResetBrush();
 }
 
-void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize)
-{
-    assert(dc);
-
-    std::wistringstream iss(s);
-    std::wstring token;
-    while (std::getline(iss, token, L'_')) {
-        dc->DrawText(UTF16to8(token), token);
-        // no _
-        if (iss.eof()) break;
-
-        FontInfo vrvTxt;
-        vrvTxt.SetFaceName("VerovioText");
-        dc->SetFont(&vrvTxt);
-        std::wstring str;
-        str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str), str);
-        dc->ResetFont();
-    }
-}
-
-void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle)
+void View::DrawThickBezierCurve(
+    DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle, int penStyle)
 {
     assert(dc);
 
@@ -295,8 +275,16 @@ void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thicknes
     bez2[3] = ToDeviceContext(bez2[3]);
 
     // Actually draw it
-    dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), AxSOLID);
-    dc->DrawComplexBezierPath(bez1, bez2);
+    if (penStyle == AxSOLID) {
+        // Solid Thick Bezier Curves are made of two beziers, filled in.
+        dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), penStyle);
+        dc->DrawComplexBezierPath(bez1, bez2);
+    }
+    else {
+        // Dashed or Dotted Thick Bezier Curves have a uniform line width.
+        dc->SetPen(m_currentColour, thickness, penStyle);
+        dc->DrawSimpleBezierPath(bez1);
+    }
     dc->ResetPen();
 }
 

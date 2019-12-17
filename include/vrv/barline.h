@@ -29,8 +29,8 @@ public:
     ///@{
     BarLine();
     virtual ~BarLine();
-    virtual void Reset();
     virtual Object *Clone() const { return new BarLine(*this); }
+    virtual void Reset();
     virtual std::string GetClassName() const { return "BarLine"; }
     virtual ClassId GetClassId() const { return BARLINE; }
     ///@}

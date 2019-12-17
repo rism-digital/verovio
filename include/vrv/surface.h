@@ -35,6 +35,7 @@ public:
     ///@{
     Surface();
     virtual ~Surface();
+    virtual Object *Clone() const { return new Surface(*this); }
     virtual void Reset();
     ClassId GetClassId() const { return SURFACE; }
     ///@}
@@ -42,12 +43,13 @@ public:
 
     int GetMaxX();
     int GetMaxY();
+
 protected:
-//
+    //
 private:
-//
+    //
 };
 
-} //namespace vrv
+} // namespace vrv
 
 #endif

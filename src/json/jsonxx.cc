@@ -13,6 +13,7 @@
 #include <sstream>
 #include <vector>
 #include <limits>
+#include <mutex>
 
 // Snippet that creates an assertion function that works both in DEBUG & RELEASE mode.
 // JSONXX_ASSERT(...) macro will redirect to this. assert() macro is kept untouched.
@@ -377,6 +378,7 @@ bool Value::parse(std::istream& input, Value& value) {
             return true;
         }
         delete value.array_value_;
+        value.array_value_ = 0;
     }
     value.object_value_ = new Object();
     if (parse_object(input, *value.object_value_)) {
@@ -384,6 +386,7 @@ bool Value::parse(std::istream& input, Value& value) {
         return true;
     }
     delete value.object_value_;
+    value.object_value_ = 0;
     return false;
 }
 
@@ -527,28 +530,36 @@ typedef unsigned char byte;
 //template<bool quote>
 std::string escape_string( const std::string &input, const bool quote = false ) {
     static std::string map[256], *once = 0;
+    static std::mutex mutex;
     if( !once ) {
-        // base
-        for( int i = 0; i < 256; ++i ) {
-            map[ i ] = std::string() + char(i);
-        }
-        // non-printable
-        for( int i = 0; i < 32; ++i ) {
-            std::stringstream str;
-            str << "\\u" << std::hex << std::setw(4) << std::setfill('0') << i;
-            map[ i ] = str.str();
-        }
-        // exceptions
-        map[ byte('"') ] = "\\\"";
-        map[ byte('\\') ] = "\\\\";
-        map[ byte('/') ] = "\\/";
-        map[ byte('\b') ] = "\\b";
-        map[ byte('\f') ] = "\\f";
-        map[ byte('\n') ] = "\\n";
-        map[ byte('\r') ] = "\\r";
-        map[ byte('\t') ] = "\\t";
+        // The problem here is that, once is initializing at the end of job, but if multithreaded application is starting this for the first time
+        // it will jump into this part with several threads and cause double free or corruptions.
+        // To prevent it, it is required to have mutex, to lock other threads while only one of them is constructing the static map.
+        mutex.lock();
+        if (!once) {
+            // base
+            for( int i = 0; i < 256; ++i ) {
+                map[ i ] = std::string() + char(i);
+            }
+            // non-printable
+            for( int i = 0; i < 32; ++i ) {
+                std::stringstream str;
+                str << "\\u" << std::hex << std::setw(4) << std::setfill('0') << i;
+                map[ i ] = str.str();
+            }
+            // exceptions
+            map[ byte('"') ] = "\\\"";
+            map[ byte('\\') ] = "\\\\";
+            map[ byte('/') ] = "\\/";
+            map[ byte('\b') ] = "\\b";
+            map[ byte('\f') ] = "\\f";
+            map[ byte('\n') ] = "\\n";
+            map[ byte('\r') ] = "\\r";
+            map[ byte('\t') ] = "\\t";
 
-        once = map;
+            once = map;
+        }
+        mutex.unlock();
     }
     std::string output;
     output.reserve( input.size() * 2 + 2 ); // worst scenario

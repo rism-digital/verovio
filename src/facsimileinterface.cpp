@@ -44,7 +44,7 @@ int FacsimileInterface::GetDrawingX() const
 int FacsimileInterface::GetDrawingY() const
 {
     assert(m_zone);
-    int y = ( m_zone->GetLogicalUly());
+    int y = (m_zone->GetLogicalUly());
     return y;
 }
 
@@ -57,7 +57,7 @@ int FacsimileInterface::GetWidth() const
 int FacsimileInterface::GetSurfaceY() const
 {
     assert(m_zone);
-    Surface *surface = dynamic_cast<Surface *>(m_zone->GetFirstParent(SURFACE));
+    Surface *surface = dynamic_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
     assert(surface);
     if (surface->HasLry()) {
         return surface->GetLry();
@@ -77,4 +77,4 @@ void FacsimileInterface::SetZone(Zone *zone)
     }
     m_zone = zone;
 }
-}
+} // namespace vrv

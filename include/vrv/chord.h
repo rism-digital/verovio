@@ -48,6 +48,7 @@ public:
     ///@{
     Chord();
     virtual ~Chord();
+    virtual Object *Clone() const { return new Chord(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Chord"; }
     virtual ClassId GetClassId() const { return CHORD; }
@@ -194,7 +195,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ListOfObjects *childlist);
+    virtual void FilterList(ArrayOfObjects *childlist);
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

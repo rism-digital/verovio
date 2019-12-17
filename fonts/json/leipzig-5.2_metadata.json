@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.35",
+    "fontVersion": "5.2.37",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -600,6 +600,46 @@
             "bBoxSW": [
                 0.0,
                 -3.04
+            ]
+        },
+        "uniE24C": {
+            "bBoxNE": [
+                1.1072,
+                3.8
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
+            ]
+        },
+        "uniE24D": {
+            "bBoxNE": [
+                1.1072,
+                3.116
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.8
+            ]
+        },
+        "uniE24E": {
+            "bBoxNE": [
+                1.1203,
+                4.56
+            ],
+            "bBoxSW": [
+                0.0,
+                -3.116
+            ]
+        },
+        "uniE24F": {
+            "bBoxNE": [
+                1.1203,
+                3.116
+            ],
+            "bBoxSW": [
+                0.0,
+                -4.56
             ]
         },
         "uniE260": {
@@ -1324,22 +1364,22 @@
         },
         "uniE4EC": {
             "bBoxNE": [
-                0.0,
-                0.0
+                2.88,
+                3.652
             ],
             "bBoxSW": [
-                0.0,
-                0.0
+                -0.004,
+                -3.82
             ]
         },
         "uniE4ED": {
             "bBoxNE": [
-                0.0,
-                0.0
+                3.176,
+                4.576
             ],
             "bBoxSW": [
-                0.0,
-                0.0
+                -0.004,
+                -3.82
             ]
         },
         "uniE500": {
@@ -2452,156 +2492,6 @@
                 -3.04
             ]
         },
-        "uniE990": {
-            "bBoxNE": [
-                0.64,
-                0.408
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.404
-            ]
-        },
-        "uniE991": {
-            "bBoxNE": [
-                0.6,
-                0.452
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.452
-            ]
-        },
-        "uniE996": {
-            "bBoxNE": [
-                0.64,
-                0.408
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.604
-            ]
-        },
-        "uniE99B": {
-            "bBoxNE": [
-                0.616,
-                0.46
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.46
-            ]
-        },
-        "uniE99E": {
-            "bBoxNE": [
-                0.612,
-                0.456
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.984
-            ]
-        },
-        "uniE99F": {
-            "bBoxNE": [
-                0.496,
-                0.372
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.368
-            ]
-        },
-        "uniE9B4": {
-            "bBoxNE": [
-                0.056,
-                0.6
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.6
-            ]
-        },
-        "uniE9B5": {
-            "bBoxNE": [
-                0.056,
-                1.2
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.6
-            ]
-        },
-        "uniE9B6": {
-            "bBoxNE": [
-                0.056,
-                1.8
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.6
-            ]
-        },
-        "uniE9B7": {
-            "bBoxNE": [
-                0.056,
-                2.4
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.6
-            ]
-        },
-        "uniE9B8": {
-            "bBoxNE": [
-                0.056,
-                3.0
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.6
-            ]
-        },
-        "uniE9B9": {
-            "bBoxNE": [
-                1.86,
-                0.416
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.912
-            ]
-        },
-        "uniE9BA": {
-            "bBoxNE": [
-                2.316,
-                0.416
-            ],
-            "bBoxSW": [
-                0.0,
-                -1.6
-            ]
-        },
-        "uniE9BB": {
-            "bBoxNE": [
-                2.316,
-                0.416
-            ],
-            "bBoxSW": [
-                0.0,
-                -2.212
-            ]
-        },
-        "uniE9BC": {
-            "bBoxNE": [
-                2.316,
-                0.416
-            ],
-            "bBoxSW": [
-                0.0,
-                -2.812
-            ]
-        },
         "uniE9F0": {
             "bBoxNE": [
                 0.52,
@@ -2700,26 +2590,6 @@
             "bBoxSW": [
                 0.0,
                 0.0
-            ]
-        },
-        "uniEA02": {
-            "bBoxNE": [
-                2.46,
-                1.48
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.008
-            ]
-        },
-        "uniEA06": {
-            "bBoxNE": [
-                0.24,
-                1.26
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.404
             ]
         },
         "uniEAA9": {
@@ -3224,6 +3094,18 @@
         },
         "uniE24B": {
             "codepoint": "0XE24B"
+        },
+        "uniE24C": {
+            "codepoint": "0XE24C"
+        },
+        "uniE24D": {
+            "codepoint": "0XE24D"
+        },
+        "uniE24E": {
+            "codepoint": "0XE24E"
+        },
+        "uniE24F": {
+            "codepoint": "0XE24F"
         },
         "uniE260": {
             "codepoint": "0XE260"
@@ -3780,51 +3662,6 @@
         "uniE94C": {
             "codepoint": "0XE94C"
         },
-        "uniE990": {
-            "codepoint": "0XE990"
-        },
-        "uniE991": {
-            "codepoint": "0XE991"
-        },
-        "uniE996": {
-            "codepoint": "0XE996"
-        },
-        "uniE99B": {
-            "codepoint": "0XE99B"
-        },
-        "uniE99E": {
-            "codepoint": "0XE99E"
-        },
-        "uniE99F": {
-            "codepoint": "0XE99F"
-        },
-        "uniE9B4": {
-            "codepoint": "0XE9B4"
-        },
-        "uniE9B5": {
-            "codepoint": "0XE9B5"
-        },
-        "uniE9B6": {
-            "codepoint": "0XE9B6"
-        },
-        "uniE9B7": {
-            "codepoint": "0XE9B7"
-        },
-        "uniE9B8": {
-            "codepoint": "0XE9B8"
-        },
-        "uniE9B9": {
-            "codepoint": "0XE9B9"
-        },
-        "uniE9BA": {
-            "codepoint": "0XE9BA"
-        },
-        "uniE9BB": {
-            "codepoint": "0XE9BB"
-        },
-        "uniE9BC": {
-            "codepoint": "0XE9BC"
-        },
         "uniE9F0": {
             "codepoint": "0XE9F0"
         },
@@ -3854,12 +3691,6 @@
         },
         "uniE9F9": {
             "codepoint": "0XE9F9"
-        },
-        "uniEA02": {
-            "codepoint": "0XEA02"
-        },
-        "uniEA06": {
-            "codepoint": "0XEA06"
         },
         "uniEAA9": {
             "codepoint": "0XEAA9"

@@ -35,18 +35,20 @@ public:
     ///@{
     Zone();
     virtual ~Zone();
+    virtual Object *Clone() const { return new Zone(*this); }
     virtual void Reset();
     ClassId GetClassId() const { return ZONE; }
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly();
     int GetLogicalLry();
+
 protected:
     //
 private:
     //
 };
 
-}   // namespace vrv
+} // namespace vrv
 
 #endif

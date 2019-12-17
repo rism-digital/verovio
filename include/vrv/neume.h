@@ -65,15 +65,10 @@ public:
      */
     ///@{
     Neume();
-
     virtual ~Neume();
-
     virtual void Reset();
-
     virtual Object *Clone() const { return new Neume(*this); }
-
     virtual std::string GetClassName() const { return "Neume"; }
-
     virtual ClassId GetClassId() const { return NEUME; }
     ///@}
 

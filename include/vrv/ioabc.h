@@ -140,7 +140,7 @@ private:
     std::vector<data_ARTICULATION> m_artic;
     std::vector<std::string> m_dynam;
     std::string m_ornam;
-    data_STAFFREL_basic m_fermata = STAFFREL_basic_NONE;
+    data_STAFFREL m_fermata = STAFFREL_NONE;
     /*
      * The stack of control elements to be added at the end of each measure
      */

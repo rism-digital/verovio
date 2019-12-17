@@ -569,7 +569,7 @@ bool AttEpisemaVis::HasForm() const
 
 bool AttEpisemaVis::HasPlace() const
 {
-    return (m_place.HasValue());
+    return (m_place != data_EVENTREL());
 }
 
 /* include <attplace> */
@@ -900,12 +900,12 @@ bool AttHispanTickVis::WriteHispanTickVis(pugi::xml_node element)
 
 bool AttHispanTickVis::HasPlace() const
 {
-    return (m_place.HasValue());
+    return (m_place != data_EVENTREL());
 }
 
 bool AttHispanTickVis::HasTilt() const
 {
-    return (m_tilt.HasValue());
+    return (m_tilt != data_COMPASSDIRECTION());
 }
 
 /* include <atttilt> */
@@ -1836,7 +1836,7 @@ bool AttSignifLetVis::WriteSignifLetVis(pugi::xml_node element)
 
 bool AttSignifLetVis::HasPlace() const
 {
-    return (m_place.HasValue());
+    return (m_place != data_EVENTREL());
 }
 
 /* include <attplace> */

@@ -27,20 +27,22 @@ namespace vrv {
 
 class EditorToolkit {
 public:
-    EditorToolkit(Doc *doc, View *view) { m_doc = doc; m_view = view; m_editInfo = ""; }
+    EditorToolkit(Doc *doc, View *view)
+    {
+        m_doc = doc;
+        m_view = view;
+        m_editInfo = "";
+    }
     virtual ~EditorToolkit() {}
 
-#ifdef USE_EMSCRIPTEN
     /**
      * In child classes, this parses the provided editor action and then performs the correct action.
      */
-    virtual bool ParseEditorAction(const std::string &json_editorAction, bool isChain=false) = 0;
+    virtual bool ParseEditorAction(const std::string &json_editorAction, bool isChain = false) = 0;
     /**
      * Get information on the last editor function used
      */
-    std::string EditInfo() { return m_editInfo; }
-
-#endif
+    virtual std::string EditInfo() { return m_editInfo; }
 
 protected:
     Doc *m_doc;

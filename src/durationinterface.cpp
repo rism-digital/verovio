@@ -114,12 +114,12 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
 
 bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
-    const ListOfObjects *notesOrRests = beam->GetList(beam);
-    ListOfObjects::const_iterator iter = notesOrRests->begin();
+    const ArrayOfObjects *notesOrRests = beam->GetList(beam);
+    ArrayOfObjects::const_iterator iter = notesOrRests->begin();
     if (*iter == noteOrRest) {
         return true;
     }
@@ -128,12 +128,12 @@ bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
 
 bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
-    const ListOfObjects *notesOrRests = beam->GetList(beam);
-    ListOfObjects::const_reverse_iterator iter = notesOrRests->rbegin();
+    const ArrayOfObjects *notesOrRests = beam->GetList(beam);
+    ArrayOfObjects::const_reverse_iterator iter = notesOrRests->rbegin();
     if (*iter == noteOrRest) {
         return true;
     }

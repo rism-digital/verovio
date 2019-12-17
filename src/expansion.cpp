@@ -19,8 +19,10 @@ namespace vrv {
 // Expansion
 //----------------------------------------------------------------------------
 
-Expansion::Expansion() : SystemElement("expansion-")
+Expansion::Expansion() : SystemElement("expansion-"), PlistInterface()
 {
+    RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
+
     Reset();
 }
 
@@ -29,6 +31,7 @@ Expansion::~Expansion() {}
 void Expansion::Reset()
 {
     SystemElement::Reset();
+    PlistInterface::Reset();
 }
 
 //----------------------------------------------------------------------------

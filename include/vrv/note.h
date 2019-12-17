@@ -15,6 +15,7 @@
 #include "accid.h"
 #include "atts_frettab.h"
 #include "atts_mensural.h"
+#include "atts_midi.h"
 #include "atts_shared.h"
 #include "beam.h"
 #include "chord.h"
@@ -48,6 +49,7 @@ class Note : public LayerElement,
              public AttColoration,
              public AttCue,
              public AttGraced,
+             public AttMidiVelocity,
              public AttNoteAnlMensural,
              public AttNoteGesTab,
              public AttStems,
@@ -62,6 +64,7 @@ public:
     ///@{
     Note();
     virtual ~Note();
+    virtual Object *Clone() const { return new Note(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Note"; }
     virtual ClassId GetClassId() const { return NOTE; }

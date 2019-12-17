@@ -36,6 +36,7 @@ public:
     ///@{
     Rest();
     virtual ~Rest();
+    virtual Object *Clone() const { return new Rest(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Rest"; }
     virtual ClassId GetClassId() const { return REST; }

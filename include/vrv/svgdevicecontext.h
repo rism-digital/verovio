@@ -72,6 +72,7 @@ public:
      * @name Drawing methods
      */
     ///@{
+    virtual void DrawSimpleBezierPath(Point bezier[4]);
     virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]);
     virtual void DrawCircle(int x, int y, int radius);
     virtual void DrawEllipse(int x, int y, int width, int height);
@@ -97,15 +98,18 @@ public:
     virtual void EndText();
 
     /**
-     * Move a text to the specified position
+     * @name Move a text to the specified position, for example when starting a new line.
      */
+    ///@{
     virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
+    virtual void MoveTextVerticallyTo(int y);
+    ///@}
 
     /**
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(Object *object, std::string gClass, std::string gId);
+    virtual void StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend = false);
     virtual void EndGraphic(Object *object, View *view);
     ///@}
 
@@ -167,11 +171,16 @@ public:
 
     void SetFacsimile(bool facsimile) { m_facsimile = facsimile; }
     bool GetFacsimile() { return m_facsimile; }
+
+    /**
+     * Setting m_svgBoudingBoxes flag (false by default)
+     */
+    void SetSvgBoundingBoxes(bool svgBoundingBoxes) { m_svgBoundingBoxes = svgBoundingBoxes; }
+
     /**
      * Setting m_svgViewBox flag (false by default)
      */
     void SetSvgViewBox(bool svgViewBox) { m_svgViewBox = svgViewBox; }
-
 
 private:
     /**
@@ -184,6 +193,11 @@ private:
      * Internal method for drawing debug SVG bounding box
      */
     void DrawSvgBoundingBox(Object *object, View *view);
+
+    /**
+     * Internal method for drawing debug SVG bounding box
+     */
+    void DrawSvgBoundingBoxRectangle(int x, int y, int width, int height);
 
     /**
      * Change the flag for indicating the use of the VerovioText font
@@ -235,6 +249,8 @@ private:
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
     bool m_facsimile;
+    // add bouding boxes in svg output
+    bool m_svgBoundingBoxes;
     // use viewbox on svg root element
     bool m_svgViewBox;
 };

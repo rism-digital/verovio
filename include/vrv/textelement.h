@@ -91,6 +91,7 @@ public:
         m_width = 0;
         m_laidOut = false;
         m_newLine = false;
+        m_verticalShift = false;
         m_alignment = HORIZONTALALIGNMENT_left;
         m_pointSize = 0;
     }
@@ -101,6 +102,7 @@ public:
     int m_width;
     bool m_laidOut;
     bool m_newLine;
+    bool m_verticalShift;
     data_HORIZONTALALIGNMENT m_alignment;
     int m_pointSize;
 };
