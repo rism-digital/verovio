@@ -52,6 +52,7 @@
 #include "system.h"
 #include "text.h"
 #include "timestamp.h"
+#include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -1152,6 +1153,22 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
             }
         }
     }
+}
+
+void Doc::TransposeDoc()
+{
+    Transposer transposer;
+    transposer.SetTransposition(this->m_options->m_transpose.GetValue());
+
+    Functor transpose(&Object::Transpose);
+    TransposeParams transposeParams(this, &transposer);
+
+    if (this->m_options->m_transposeSelectedOnly.GetValue() == false) {
+        transpose.m_visibleOnly = false;
+    }
+
+    m_scoreDef.Process(&transpose, &transposeParams);
+    this->Process(&transpose, &transposeParams);
 }
 
 bool Doc::HasPage(int pageIdx)

@@ -1106,6 +1106,11 @@ public:
      */
     virtual int SetChildZones(FunctorParams *);
 
+    /**
+     * Transpose the content.
+     */
+    virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     static bool sortByUlx(Object *a, Object *b);
 
 protected:

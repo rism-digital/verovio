@@ -15,9 +15,12 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "functorparams.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
+#include "transposition.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -283,6 +286,52 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
     octave -= disPlace;
 
     return octave;
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int KeySig::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    LogDebug("Transposing keySig");
+    int sig = 0;
+    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
+        sig = -1 * this->GetSig().first;
+    }
+    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
+        sig = this->GetSig().first;
+    }
+
+    int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
+    intervalClass = params->m_transposer->Transpose(intervalClass);
+    int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
+
+    if (fifths == INVALID_INTERVAL_CLASS) {
+        this->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+    }
+    else if (fifths < 0) {
+        this->SetSig(std::make_pair(-fifths, ACCIDENTAL_WRITTEN_f));
+    }
+    else if (fifths > 0) {
+        this->SetSig(std::make_pair(fifths, ACCIDENTAL_WRITTEN_s));
+    }
+    else {
+        this->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+    }
+
+    // Also convert pname and accid attributes
+    if (this->HasPname()) {
+        TransPitch pitch = TransPitch(this->GetPname(), ACCIDENTAL_GESTURAL_NONE, this->GetAccid(), 4);
+        params->m_transposer->Transpose(pitch);
+        this->SetPname(pitch.GetPitchName());
+        this->SetAccid(pitch.GetAccidW());
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
