@@ -262,8 +262,8 @@ private:
 
     TransPitch GetTransPitch();
 
-    void UpdateFromTransPitch(TransPitch tp);
-                 
+    void UpdateFromTransPitch(const TransPitch &tp);
+
 public:
     //
 private:

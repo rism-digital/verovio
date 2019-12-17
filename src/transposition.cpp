@@ -129,7 +129,7 @@ int TransPitch::GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACC
     return 0;
 }
 
-data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG()
+data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG() const
 {
     switch (m_accid) {
         case -2: return ACCIDENTAL_GESTURAL_ff;
@@ -142,7 +142,7 @@ data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG()
     LogWarning("Transposition: Could not get Gestural Accidental for %i", m_accid);
     return ACCIDENTAL_GESTURAL_NONE;
 }
-data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW()
+data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW() const
 {
     switch (m_accid) {
         case -3: return ACCIDENTAL_WRITTEN_tf;
@@ -157,9 +157,22 @@ data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW()
     LogWarning("Transposition: Could not get Written Accidental for %i", m_accid);
     return ACCIDENTAL_WRITTEN_NONE;
 }
-data_PITCHNAME TransPitch::GetPitchName()
+data_PITCHNAME TransPitch::GetPitchName() const
 {
     return static_cast<data_PITCHNAME>(m_pname + PITCHNAME_c);
+}
+
+std::wstring TransPitch::GetPitchString() const
+{
+    char pitchLetter = (m_pname + ('C' - 'A')) % 7 + 'A';
+    switch (m_accid) {
+        case -2: return std::wstring({ pitchLetter, L'𝄫' });
+        case -1: return std::wstring({ pitchLetter, L'♭' });
+        default: LogError("Transposition: Could not get Accidental for %i", m_accid);
+        case 0: return std::wstring({ pitchLetter });
+        case 1: return std::wstring({ pitchLetter, L'♯' });
+        case 2: return std::wstring({ pitchLetter, L'♯', L'♯' });
+    }
 }
 //////////////////////////////
 //

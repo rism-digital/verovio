@@ -436,7 +436,7 @@ TransPitch Note::GetTransPitch()
     return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
 }
 
-void Note::UpdateFromTransPitch(TransPitch tp)
+void Note::UpdateFromTransPitch(const TransPitch &tp)
 {
     this->SetPname(tp.GetPitchName());
 

@@ -44,9 +44,10 @@ public:
     TransPitch(const TransPitch &pitch);
     TransPitch &operator=(const TransPitch &pitch);
     static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
-    data_ACCIDENTAL_GESTURAL GetAccidG();
-    data_ACCIDENTAL_WRITTEN GetAccidW();
-    data_PITCHNAME GetPitchName();
+    data_ACCIDENTAL_GESTURAL GetAccidG() const;
+    data_ACCIDENTAL_WRITTEN GetAccidW() const;
+    data_PITCHNAME GetPitchName() const;
+    std::wstring GetPitchString() const;
     bool IsValid(int maxAccid);
     void SetPitch(int aPname, int anAccid, int anOct);
 };
