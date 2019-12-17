@@ -209,7 +209,7 @@ bool Note::IsClusterExtreme() const
 
 TabGrp *Note::IsTabGrpNote() const
 {
-    return dynamic_cast<TabGrp *>(this->GetFirstParent(TABGRP, MAX_TABGRP_DEPTH));
+    return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 wchar_t Note::GetTabSmuflCode(data_NOTATIONTYPE notationType)

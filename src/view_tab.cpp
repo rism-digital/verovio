@@ -93,7 +93,7 @@ void View::DrawTabRhythm(DeviceContext *dc, LayerElement *element, Layer *layer,
     TabRhythm *tabRhythm = dynamic_cast<TabRhythm *>(element);
     assert(tabRhythm);
     
-    TabGrp *tabGrp = dynamic_cast<TabGrp *>(tabRhythm->GetFirstParent(TABGRP));
+    TabGrp *tabGrp = dynamic_cast<TabGrp *>(tabRhythm->GetFirstAncestor(TABGRP));
     assert(tabGrp);
     
     dc->StartGraphic(tabRhythm, "", tabRhythm->GetUuid());
