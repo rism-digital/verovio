@@ -137,6 +137,9 @@ public:
     std::string MensurationsignToStr(data_MENSURATIONSIGN data) const;
     data_MENSURATIONSIGN StrToMensurationsign(std::string value, bool logWarning = true) const;
 
+    std::string MeterformToStr(data_METERFORM data) const;
+    data_METERFORM StrToMeterform(std::string value, bool logWarning = true) const;
+
     std::string MetersignToStr(data_METERSIGN data) const;
     data_METERSIGN StrToMetersign(std::string value, bool logWarning = true) const;
 
@@ -337,12 +340,6 @@ public:
 
     std::string MeterConformanceMetconToStr(meterConformance_METCON data) const;
     meterConformance_METCON StrToMeterConformanceMetcon(std::string value, bool logWarning = true) const;
-
-    std::string MeterSigVisFormToStr(meterSigVis_FORM data) const;
-    meterSigVis_FORM StrToMeterSigVisForm(std::string value, bool logWarning = true) const;
-
-    std::string MeterSigDefaultVisMeterformToStr(meterSigDefaultVis_METERFORM data) const;
-    meterSigDefaultVis_METERFORM StrToMeterSigDefaultVisMeterform(std::string value, bool logWarning = true) const;
 
     std::string MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const;
     meterSigGrpLog_FUNC StrToMeterSigGrpLogFunc(std::string value, bool logWarning = true) const;
