@@ -303,7 +303,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
             if (params->m_place == STAFFREL_above) {
                 int iterY = yRel - (*iter)->GetContentY2()
                     - (params->m_doc->GetTopMargin((*iter)->GetObject()->GetClassId())
-                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                        * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel > iterY) {
                     nextYRel = iterY;
                 }
@@ -311,7 +311,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
             else {
                 int iterY = yRel + (*iter)->GetContentY2()
                     + (params->m_doc->GetBottomMargin((*iter)->GetObject()->GetClassId())
-                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                        * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel < iterY) {
                     nextYRel = iterY;
                 }

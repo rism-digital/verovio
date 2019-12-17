@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.authors        = { 'Contributors List' => 'https://github.com/rism-ch/verovio/graphs/contributors' }
   s.summary        = 'Verovio'
   s.source         = { :git => 'https://github.com/rism-ch/verovio.git', :tag => 'version-' + s.version.to_s }
-  s.swift_versions = ['5.1']
+  s.swift_versions = ['3.0', '4.0', '4.1', '4.2', '5.0','5.1']
   s.source_files        = 'src/**/*.{h,cpp,cc}',
                           'include/{hum,json,midi,pugi,utf8,vrv}/*.{h,hpp}',
                           'libmei/{attclasses,attconverter,atts_analytical,atts_cmn,atts_cmnornaments}.{h,cpp}',
@@ -19,8 +19,9 @@ Pod::Spec.new do |s|
                           'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_gestural,atts_mei}.{h}', 
                           'libmei/{atts_mensural,atts_midi,atts_neumes,atts_pagebased,atts_shared}.{h}',
                           'libmei/{atts_visual,atttypes}.{h}'
-  s.platform       = :ios, '12.0'
   s.resources      = 'data'
+  s.ios.deployment_target = '12.0'
+  s.osx.deployment_target = '10.13'
   s.xcconfig = {
       "CLANG_CXX_LANGUAGE_STANDARD" => "gnu++14",
       "CLANG_CXX_LIBRARY" => "libc++",
