@@ -1357,7 +1357,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     if (parent) {
         m_editInfo = parent->GetUuid();
     }
-    
+
     return true;
 }
 

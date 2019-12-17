@@ -146,7 +146,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     assert(system);
 
     dc->StartGraphic(system, "", system->GetUuid());
-    
+
     Measure *firstMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1));
 
     // Draw system divider (from the second one) if scoreDef is optimized
@@ -167,11 +167,12 @@ void View::DrawSystem(DeviceContext *dc, System *system)
             int y4 = y2 + m_doc->GetDrawingUnit(100) * 2;
             // left and left-right
             dc->StartCustomGraphic("systemDivider");
-            
+
             DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
             DrawObliquePolygon(dc, x1, y3, x2, y4, m_doc->GetDrawingUnit(100) * 1.5);
             if (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_left_right) {
-                // Right divider is not taken into account in the layout calculation and can collision with the music content
+                // Right divider is not taken into account in the layout calculation and can collision with the music
+                // content
                 Measure *lastMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
                 assert(lastMeasure);
                 int x4 = lastMeasure->GetDrawingX() + lastMeasure->GetRightBarLineRight();
@@ -179,7 +180,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
                 DrawObliquePolygon(dc, x3, y1, x4, y2, m_doc->GetDrawingUnit(100) * 1.5);
                 DrawObliquePolygon(dc, x3, y3, x4, y4, m_doc->GetDrawingUnit(100) * 1.5);
             }
-            
+
             dc->EndCustomGraphic();
         }
     }
@@ -1447,7 +1448,8 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
     }
     if (element->Is(APP)) {
         assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
-    } else if (element->Is(CHOICE)) {
+    }
+    else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
     }
     std::string boundaryStart;
@@ -1470,7 +1472,8 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
     }
     if (element->Is(APP)) {
         assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_MEASURE));
-    } else if (element->Is(CHOICE)) {
+    }
+    else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_MEASURE));
     }
 
@@ -1490,7 +1493,8 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
     }
     if (element->Is(APP)) {
         assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_STAFF));
-    } else if (element->Is(CHOICE)) {
+    }
+    else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_STAFF));
     }
 
@@ -1511,7 +1515,8 @@ void View::DrawLayerEditorialElement(
     }
     if (element->Is(APP)) {
         assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_LAYER));
-    } else if (element->Is(CHOICE)) {
+    }
+    else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_LAYER));
     }
 
@@ -1531,7 +1536,8 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
     }
     if (element->Is(APP)) {
         assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TEXT));
-    } else if (element->Is(CHOICE)) {
+    }
+    else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TEXT));
     }
 
@@ -1551,7 +1557,8 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
     }
     if (element->Is(APP)) {
         assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_FB));
-    } else if (element->Is(CHOICE)) {
+    }
+    else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_FB));
     }
 
@@ -1571,7 +1578,8 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
     }
     if (element->Is(APP)) {
         assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_RUNNING));
-    } else if (element->Is(CHOICE)) {
+    }
+    else if (element->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_RUNNING));
     }
 

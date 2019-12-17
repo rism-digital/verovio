@@ -340,6 +340,7 @@ enum data_COLORNAMES {
     COLORNAMES_plum,
     COLORNAMES_powderblue,
     COLORNAMES_purple,
+    COLORNAMES_rebeccapurple,
     COLORNAMES_red,
     COLORNAMES_rosybrown,
     COLORNAMES_royalblue,
@@ -2142,6 +2143,7 @@ enum sylLog_WORDPOS {
     sylLog_WORDPOS_NONE = 0,
     sylLog_WORDPOS_i,
     sylLog_WORDPOS_m,
+    sylLog_WORDPOS_s,
     sylLog_WORDPOS_t,
     sylLog_WORDPOS_MAX
 };

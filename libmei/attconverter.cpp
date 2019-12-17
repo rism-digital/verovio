@@ -578,6 +578,7 @@ std::string AttConverter::ColornamesToStr(data_COLORNAMES data) const
         case COLORNAMES_plum: value = "plum"; break;
         case COLORNAMES_powderblue: value = "powderblue"; break;
         case COLORNAMES_purple: value = "purple"; break;
+        case COLORNAMES_rebeccapurple: value = "rebeccapurple"; break;
         case COLORNAMES_red: value = "red"; break;
         case COLORNAMES_rosybrown: value = "rosybrown"; break;
         case COLORNAMES_royalblue: value = "royalblue"; break;
@@ -735,6 +736,7 @@ data_COLORNAMES AttConverter::StrToColornames(std::string value, bool logWarning
     if (value == "plum") return COLORNAMES_plum;
     if (value == "powderblue") return COLORNAMES_powderblue;
     if (value == "purple") return COLORNAMES_purple;
+    if (value == "rebeccapurple") return COLORNAMES_rebeccapurple;
     if (value == "red") return COLORNAMES_red;
     if (value == "rosybrown") return COLORNAMES_rosybrown;
     if (value == "royalblue") return COLORNAMES_royalblue;
@@ -4647,6 +4649,7 @@ std::string AttConverter::SylLogWordposToStr(sylLog_WORDPOS data) const
     switch (data) {
         case sylLog_WORDPOS_i: value = "i"; break;
         case sylLog_WORDPOS_m: value = "m"; break;
+        case sylLog_WORDPOS_s: value = "s"; break;
         case sylLog_WORDPOS_t: value = "t"; break;
         default:
             LogWarning("Unknown value '%d' for att.syl.log@wordpos", data);
@@ -4660,6 +4663,7 @@ sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value, bool logWarni
 {
     if (value == "i") return sylLog_WORDPOS_i;
     if (value == "m") return sylLog_WORDPOS_m;
+    if (value == "s") return sylLog_WORDPOS_s;
     if (value == "t") return sylLog_WORDPOS_t;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str());

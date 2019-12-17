@@ -1635,7 +1635,7 @@ void MeiOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
         meterSigDefaultLog.SetMeterUnit(meterSig->GetUnit());
         meterSigDefaultLog.WriteMeterSigDefaultLog(currentNode);
         AttMeterSigDefaultVis meterSigDefaultVis;
-        meterSigDefaultVis.SetMeterForm(meterSig->meterSigVisToMeterSigDefaultVis(meterSig->GetForm()));
+        meterSigDefaultVis.SetMeterForm(meterSig->GetForm());
         meterSigDefaultVis.WriteMeterSigDefaultVis(currentNode);
         return;
     }
@@ -2708,7 +2708,9 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         m_doc->m_header.append_copy(current);
         if (root.attribute("meiversion")) {
             std::string version = std::string(root.attribute("meiversion").value());
-            if (version == "4.0.0")
+            if (version == "4.0.1")
+                m_version = MEI_4_0_1;
+            else if (version == "4.0.0")
                 m_version = MEI_4_0_0;
             else if (version == "3.0.0")
                 m_version = MEI_3_0_0;
@@ -3399,8 +3401,7 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvMeterSig->SetCount(meterSigDefaultLog.GetMeterCount());
         vrvMeterSig->SetSym(meterSigDefaultLog.GetMeterSym());
         vrvMeterSig->SetUnit(meterSigDefaultLog.GetMeterUnit());
-        //
-        vrvMeterSig->SetForm(vrvMeterSig->meterSigDefaultVisToMeterSigVis(meterSigDefaultVis.GetMeterForm()));
+        vrvMeterSig->SetForm(meterSigDefaultVis.GetMeterForm());
         object->AddChild(vrvMeterSig);
     }
 
@@ -6016,7 +6017,7 @@ void MeiInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, Sc
     if (scoreDefElement.attribute("meter.rend")) {
         if (meterSig) {
             meterSig->SetForm(
-                meterSig->AttMeterSigVis::StrToMeterSigVisForm(scoreDefElement.attribute("meter.rend").value()));
+                meterSig->AttMeterSigVis::StrToMeterform(scoreDefElement.attribute("meter.rend").value()));
             scoreDefElement.remove_attribute("meter.rend");
         }
     }
