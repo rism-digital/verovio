@@ -1158,7 +1158,13 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
 void Doc::TransposeDoc()
 {
     Transposer transposer;
-    transposer.SetTransposition(this->m_options->m_transpose.GetValue());
+    bool setTransp = transposer.SetTransposition(this->m_options->m_transpose.GetValue());
+    if (!setTransp) {
+        // Set transposition by key tonic.
+        // TODO: Detect the current key from the keysignature.
+        TransPitch currentKey = TransPitch(0, 0, 0);
+        transposer.SetTransposition(currentKey, this->m_options->m_transpose.GetValue());
+    }
 
     Functor transpose(&Object::Transpose);
     TransposeParams transposeParams(this, &transposer);
