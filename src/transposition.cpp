@@ -1171,6 +1171,17 @@ std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 
 //////////////////////////////
 //
+// Transposer::CircleOfFifthsToPitch -- Assuming the mode is major, guess the pitch
+// from the circle of fifths position.
+//
+TransPitch Transposer::CircleOfFifthsToPitch(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerToPitch(GetMaxAccid() + 1 + intervalClass);
+}
+
+//////////////////////////////
+//
 // Transposer::DiatonicChromaticToIntervalClass -- Convert a diatonic/chromatic interval
 //    into a base-n interval class integer.
 //      +1D +1C = m2

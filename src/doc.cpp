@@ -1161,8 +1161,18 @@ void Doc::TransposeDoc()
     bool setTransp = transposer.SetTransposition(this->m_options->m_transpose.GetValue());
     if (!setTransp) {
         // Set transposition by key tonic.
-        // TODO: Detect the current key from the keysignature.
+        // Detect the current key from the keysignature.
+        KeySig *keysig = dynamic_cast<KeySig *>(this->FindDescendantByType(KEYSIG, 9));
+        // If there is no keysignature, assume it is C.
         TransPitch currentKey = TransPitch(0, 0, 0);
+        if (keysig && keysig->HasPname()) {
+            currentKey = TransPitch(keysig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keysig->GetAccid(), 0);
+        }
+        else if (keysig) {
+            int fifthsInt = keysig->GetFifthsInt();
+            currentKey = transposer.CircleOfFifthsToPitch(fifthsInt);
+        }
+
         transposer.SetTransposition(currentKey, this->m_options->m_transpose.GetValue());
     }
 

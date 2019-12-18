@@ -91,6 +91,7 @@ public:
     int IntervalToCircleOfFifths(int transval);
     std::string CircleOfFifthsToIntervalName(int fifths);
     int CircleOfFifthsToIntervalClass(int fifths);
+    TransPitch CircleOfFifthsToPitch(int fifths);
     std::string DiatonicChromaticToIntervalName(int diatonic, int chromatic);
     int DiatonicChromaticToIntervalClass(int diatonic, int chromatic);
     void IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass);
