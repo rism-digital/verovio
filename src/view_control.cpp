@@ -39,6 +39,7 @@
 #include "octave.h"
 #include "options.h"
 #include "pedal.h"
+#include "pitchinflection.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -68,7 +69,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, PITCHINFLECTION, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -144,7 +145,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ SLUR, BRACKETSPAN, HAIRPIN, OCTAVE, TIE })) return;
+            if (element->Is({ BRACKETSPAN, HAIRPIN, OCTAVE, PITCHINFLECTION, SLUR, TIE })) return;
         }
     }
 
@@ -292,6 +293,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         else if (element->Is(OCTAVE)) {
             // cast to Slur check in DrawOctave
             DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(PITCHINFLECTION)) {
+            // cast to PitchInflection check in DrawPitchInflection
+            DrawPitchInflection(
+                dc, dynamic_cast<PitchInflection *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(SLUR)) {
             // For slurs we limit support to one value in @staff
@@ -681,6 +687,30 @@ void View::DrawOctave(
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(octave, this);
+}
+
+void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflection, int x1, int x2, Staff *staff,
+    char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(pitchInflection);
+    assert(staff);
+
+    int y1 = pitchInflection->GetDrawingY();
+
+    /************** draw it **************/
+
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(pitchInflection, "spanning-pinflection", "");
+
+    //
+
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(pitchInflection, this);
 }
 
 void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
