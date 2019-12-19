@@ -679,6 +679,12 @@
 		4DF9D29A1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */; };
 		4DF9D29B1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */; };
 		4DF9D29C1C1B3F0A0069E8C8 /* attconverter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2971C1B3F0A0069E8C8 /* attconverter.h */; };
+		4DFB3E8523ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
+		4DFB3E8623ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
+		4DFB3E8723ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
+		4DFB3E8823ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
+		4DFB3E8A23ABDFDA00D688C7 /* pitchinflection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */; };
+		4DFB3E8B23ABDFDA00D688C7 /* pitchinflection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -1495,6 +1501,8 @@
 		4DF9D2951C1B3F0A0069E8C8 /* attclasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attclasses.h; path = libmei/attclasses.h; sourceTree = "<group>"; };
 		4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = attconverter.cpp; path = libmei/attconverter.cpp; sourceTree = "<group>"; };
 		4DF9D2971C1B3F0A0069E8C8 /* attconverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attconverter.h; path = libmei/attconverter.h; sourceTree = "<group>"; };
+		4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pitchinflection.cpp; path = src/pitchinflection.cpp; sourceTree = "<group>"; };
+		4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pitchinflection.h; path = include/vrv/pitchinflection.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* verticalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = verticalaligner.cpp; path = src/verticalaligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
@@ -1926,6 +1934,8 @@
 				4D5572411CF3F33C008D06A0 /* octave.h */,
 				4D5572431CF57B5C008D06A0 /* pedal.cpp */,
 				4D5572421CF57B4C008D06A0 /* pedal.h */,
+				4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */,
+				4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */,
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
 				4DB351121C8040B1002DD057 /* tempo.cpp */,
@@ -2339,6 +2349,7 @@
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
 				4DA0EAFA22BB78EA00A7EBEB /* atts_facsimile.h in Headers */,
+				4DFB3E8A23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
 				4DB3D8AB1F83D03500B5FC2B /* atts_critapp.h in Headers */,
 				4DB3D8B01F83D05500B5FC2B /* atts_pagebased.h in Headers */,
 				4DEC4DD821C8295700D1D273 /* unclear.h in Headers */,
@@ -2501,6 +2512,7 @@
 				BB4C4AC022A932B6001F6AF0 /* labelabbr.h in Headers */,
 				BB4C4ABE22A932B6001F6AF0 /* label.h in Headers */,
 				BB4C4B0A22A932C3001F6AF0 /* pghead.h in Headers */,
+				4DFB3E8B23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
 				BB4C4B8A22A932DF001F6AF0 /* mnum.h in Headers */,
 				BB4C4AD422A932B6001F6AF0 /* staffdef.h in Headers */,
 				BB4C4B1E22A932CF001F6AF0 /* bracketspan.h in Headers */,
@@ -2924,6 +2936,7 @@
 				4D1694471E3A44F300569BF4 /* ligature.cpp in Sources */,
 				4D6122BF1F77E1E000FC90A0 /* rend.cpp in Sources */,
 				4D1694481E3A44F300569BF4 /* controlelement.cpp in Sources */,
+				4DFB3E8623ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				4DEC4DA321C81EB300D1D273 /* rdg.cpp in Sources */,
 				4D1694491E3A44F300569BF4 /* main.cpp in Sources */,
 				4D16944A1E3A44F300569BF4 /* atts_shared.cpp in Sources */,
@@ -3008,6 +3021,7 @@
 				4DEC4D9E21C81E9400D1D273 /* orig.cpp in Sources */,
 				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
+				4DFB3E8523ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
 				4D2073F822A3BCE000E0765F /* tabrhythm.cpp in Sources */,
 				4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */,
@@ -3315,6 +3329,7 @@
 				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */,
 				4D1BE7701C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
+				4DFB3E8723ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				4D422105199805F800963292 /* att.cpp in Sources */,
 				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */,
@@ -3511,6 +3526,7 @@
 				BB4C4B2722A932CF001F6AF0 /* hairpin.cpp in Sources */,
 				BB4C4B3F22A932D7001F6AF0 /* barline.cpp in Sources */,
 				BB4C4AAF22A932A6001F6AF0 /* ioabc.cpp in Sources */,
+				4DFB3E8823ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				BB4C4B4D22A932D7001F6AF0 /* dot.cpp in Sources */,
 				BB4C4B1722A932CF001F6AF0 /* controlelement.cpp in Sources */,
 				BB4C4ACF22A932B6001F6AF0 /* score.cpp in Sources */,
