@@ -288,6 +288,16 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, C
     return octave;
 }
 
+int KeySig::GetFifthsInt()
+{
+    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
+        return -1 * this->GetSig().first;
+    }
+    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
+        return this->GetSig().first;
+    }
+    return 0;
+}
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -298,13 +308,7 @@ int KeySig::Transpose(FunctorParams *functorParams)
     assert(params);
 
     LogDebug("Transposing keySig");
-    int sig = 0;
-    if (this->GetSig().second == ACCIDENTAL_WRITTEN_f) {
-        sig = -1 * this->GetSig().first;
-    }
-    else if (this->GetSig().second == ACCIDENTAL_WRITTEN_s) {
-        sig = this->GetSig().first;
-    }
+    int sig = this->GetFifthsInt();
 
     int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
     intervalClass = params->m_transposer->Transpose(intervalClass);

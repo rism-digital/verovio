@@ -71,16 +71,19 @@ public:
     void SetBase40();
     void SetBase600();
     int GetIntervalClass(const std::string &intervalName);
+    int Subtract(const TransPitch &minuend, const TransPitch &subtrahend);
     int PitchToInteger(const TransPitch &pitch);
     TransPitch IntegerToPitch(int ipitch);
     void SetTransposition(int transVal);
-    void SetTransposition(const std::string &transString);
+    bool SetTransposition(const std::string &transString);
+    bool SetTransposition(const TransPitch &fromPitch, const std::string &toString);
     int GetTranspositionIntervalClass();
     std::string GetTranspositionIntervalName();
     void Transpose(TransPitch &pitch);
     int Transpose(int iPitch);
     void Transpose(TransPitch &pitch, int transVal);
     void Transpose(TransPitch &pitch, const std::string &transString);
+    bool GetKeyTonic(const std::string &keyTonic, TransPitch &tonic);
     int GetIntervalClass(const TransPitch &p1, const TransPitch &p2);
     std::string GetIntervalName(const TransPitch &p1, const TransPitch &p2);
     std::string GetIntervalName(int intervalClass);
@@ -88,6 +91,7 @@ public:
     int IntervalToCircleOfFifths(int transval);
     std::string CircleOfFifthsToIntervalName(int fifths);
     int CircleOfFifthsToIntervalClass(int fifths);
+    TransPitch CircleOfFifthsToPitch(int fifths);
     std::string DiatonicChromaticToIntervalName(int diatonic, int chromatic);
     int DiatonicChromaticToIntervalClass(int diatonic, int chromatic);
     void IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass);
