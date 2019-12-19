@@ -87,6 +87,7 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "pitchinflection.h"
 #include "proport.h"
 #include "rdg.h"
 #include "ref.h"
@@ -423,6 +424,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(PEDAL)) {
         m_currentNode = m_currentNode.append_child("pedal");
         WritePedal(m_currentNode, dynamic_cast<Pedal *>(object));
+    }
+    else if (object->Is(PITCHINFLECTION)) {
+        m_currentNode = m_currentNode.append_child("pitchInfection");
+        WritePitchInflection(m_currentNode, dynamic_cast<PitchInflection *>(object));
     }
     else if (object->Is(SLUR)) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -1281,6 +1286,14 @@ void MeiOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
     pedal->WriteVerticalGroup(currentNode);
+}
+
+void MeiOutput::WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection)
+{
+    assert(pitchInflection);
+
+    WriteControlElement(currentNode, pitchInflection);
+    WriteTimeSpanningInterface(currentNode, pitchInflection);
 }
 
 void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -3874,6 +3887,9 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "pedal") {
             success = ReadPedal(parent, current);
         }
+        else if (std::string(current.name()) == "pitchInflection") {
+            success = ReadPitchInflection(parent, current);
+        }
         else if (std::string(current.name()) == "slur") {
             success = ReadSlur(parent, current);
         }
@@ -4114,6 +4130,18 @@ bool MeiInput::ReadPedal(Object *parent, pugi::xml_node pedal)
 
     parent->AddChild(vrvPedal);
     ReadUnsupportedAttr(pedal, vrvPedal);
+    return true;
+}
+
+bool MeiInput::ReadPitchInflection(Object *parent, pugi::xml_node pitchInflection)
+{
+    PitchInflection *vrvPitchInflection = new PitchInflection();
+    ReadControlElement(pitchInflection, vrvPitchInflection);
+
+    ReadTimeSpanningInterface(pitchInflection, vrvPitchInflection);
+
+    parent->AddChild(vrvPitchInflection);
+    ReadUnsupportedAttr(pitchInflection, vrvPitchInflection);
     return true;
 }
 

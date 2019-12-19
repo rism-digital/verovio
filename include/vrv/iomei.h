@@ -99,6 +99,7 @@ class PgFoot;
 class PgFoot2;
 class PgHead;
 class PgHead2;
+class PitchInflection;
 class PitchInterface;
 class PlistInterface;
 class PositionInterface;
@@ -297,6 +298,7 @@ private:
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
+    void WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteTie(pugi::xml_node currentNode, Tie *tie);
@@ -552,6 +554,7 @@ private:
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
+    bool ReadPitchInflection(Object *parent, pugi::xml_node pitchInflection);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
     bool ReadTempo(Object *parent, pugi::xml_node tempo);
     bool ReadTie(Object *parent, pugi::xml_node tie);
