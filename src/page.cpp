@@ -315,7 +315,7 @@ void Page::LayOutHorizontally()
     AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
     adjustXPosParams.m_excludes.push_back(TABRHYTHM);
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
-    
+
     // Adjust tabRhyhtm separately
     adjustXPosParams.m_excludes.clear();
     adjustXPosParams.m_includes.push_back(TABRHYTHM);

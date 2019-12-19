@@ -30,9 +30,7 @@ TabGrp::TabGrp() : LayerElement("tabgrp-"), DurationInterface()
     Reset();
 }
 
-TabGrp::~TabGrp()
-{
-}
+TabGrp::~TabGrp() {}
 
 void TabGrp::Reset()
 {
@@ -55,7 +53,7 @@ void TabGrp::AddChild(Object *child)
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);
     }
-    
+
     child->SetParent(this);
     m_children.push_back(child);
     Modify();

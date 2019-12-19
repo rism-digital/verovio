@@ -28,9 +28,7 @@ TabRhythm::TabRhythm() : LayerElement("tabrhythm-"), AttNNumberLike()
     Reset();
 }
 
-TabRhythm::~TabRhythm()
-{
-}
+TabRhythm::~TabRhythm() {}
 
 void TabRhythm::Reset()
 {
@@ -42,7 +40,7 @@ void TabRhythm::AddChild(Object *child)
 {
     // Nothing of now
     assert(false);
-    
+
     child->SetParent(this);
     m_children.push_back(child);
     Modify();

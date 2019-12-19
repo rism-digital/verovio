@@ -33,7 +33,7 @@ public:
     virtual std::string GetClassName() const { return "TabGrp"; };
     virtual ClassId GetClassId() const { return TABGRP; };
     ///@}
-    
+
     /**
      * @name Getter to interfaces
      */

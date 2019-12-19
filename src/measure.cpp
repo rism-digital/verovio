@@ -757,7 +757,7 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
     params->m_staffNs = staffNs;
 
     return FUNCTOR_SIBLINGS;
-}    
+}
 
 int Measure::AdjustXPos(FunctorParams *functorParams)
 {

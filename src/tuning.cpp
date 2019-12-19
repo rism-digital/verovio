@@ -29,9 +29,7 @@ Tuning::Tuning() : Object("tuning-"), AttCourseLog()
     Reset();
 }
 
-Tuning::~Tuning()
-{
-}
+Tuning::~Tuning() {}
 
 void Tuning::Reset()
 {
@@ -51,12 +49,12 @@ void Tuning::AddChild(Object *child)
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);
     }
-    
+
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
 }
-    
+
 int Tuning::CalcPitchPos(int course)
 {
     return (course - 1) * 2;

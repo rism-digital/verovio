@@ -33,7 +33,7 @@ public:
     virtual std::string GetClassName() const { return "TabRhythm"; };
     virtual ClassId GetClassId() const { return TABRHYTHM; };
     ///@}
-    
+
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
@@ -41,7 +41,7 @@ public:
      * Add an element to a element.
      */
     virtual void AddChild(Object *object);
-    
+
     //----------//
     // Functors //
     //----------//

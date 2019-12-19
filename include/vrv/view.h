@@ -462,7 +462,7 @@ protected:
     void CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     ///@}
-    
+
     /**
      * @name Methods for drawing tab LayerElement child classes.
      * They are base drawing methods that are called directly from DrawLayerElement.

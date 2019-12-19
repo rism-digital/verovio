@@ -79,7 +79,7 @@ public:
      * Looks for the parent system and its current drawing scoreDef
      */
     bool DrawingIsVisible();
-    
+
     /**
      * @name Get notation type
      */
@@ -235,7 +235,7 @@ public:
     int m_yAbs;
 
     StaffDef *m_drawingStaffDef;
-    
+
     Tuning *m_drawingTuning;
 
 private:

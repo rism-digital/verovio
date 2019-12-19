@@ -188,12 +188,12 @@ bool Staff::DrawingIsVisible()
     assert(staffDef);
     return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
-    
+
 bool Staff::IsMensural()
 {
     bool isMensural = (this->m_drawingNotationType == NOTATIONTYPE_mensural
-                       || this->m_drawingNotationType == NOTATIONTYPE_mensural_white
-                       || this->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+        || this->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || this->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     return isMensural;
 }
 
@@ -205,11 +205,11 @@ bool Staff::IsNeume()
 
 bool Staff::IsTablature()
 {
-    bool isTablature = (this->m_drawingNotationType == NOTATIONTYPE_tab
-                        || this->m_drawingNotationType == NOTATIONTYPE_tab_guitar
-                        || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
-                        || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_french
-                        || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_german);
+    bool isTablature
+        = (this->m_drawingNotationType == NOTATIONTYPE_tab || this->m_drawingNotationType == NOTATIONTYPE_tab_guitar
+            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_italian
+            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_french
+            || this->m_drawingNotationType == NOTATIONTYPE_tab_lute_german);
     return isTablature;
 }
 

@@ -1084,19 +1084,19 @@ void MeiOutput::WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr)
 
     WriteXmlId(currentNode, labelAbbr);
 }
-    
+
 void MeiOutput::WriteTuning(pugi::xml_node currentNode, Tuning *tuning)
 {
     assert(tuning);
-    
+
     WriteXmlId(currentNode, tuning);
     tuning->WriteCourseLog(currentNode);
 }
-    
+
 void MeiOutput::WriteCourse(pugi::xml_node currentNode, Course *course)
 {
     assert(course);
-    
+
     WriteXmlId(currentNode, course);
     course->WriteNNumberLike(currentNode);
 }
@@ -1773,7 +1773,7 @@ void MeiOutput::WriteTabRhythm(pugi::xml_node currentNode, TabRhythm *tabRhythm)
     WriteLayerElement(currentNode, tabRhythm);
     tabRhythm->WriteNNumberLike(currentNode);
 }
-    
+
 void MeiOutput::WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
 {
     assert(tuplet);
@@ -3711,17 +3711,17 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
     }
     return success;
 }
-    
+
 bool MeiInput::ReadTuning(Object *parent, pugi::xml_node tuning)
 {
     assert(dynamic_cast<StaffDef *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     Tuning *vrvTuning = new Tuning();
     SetMeiUuid(tuning, vrvTuning);
-    
+
     parent->AddChild(vrvTuning);
     vrvTuning->ReadCourseLog(tuning);
-    
+
     ReadUnsupportedAttr(tuning, vrvTuning);
     return ReadTuningChildren(vrvTuning, tuning);
 }
@@ -3744,19 +3744,19 @@ bool MeiInput::ReadTuningChildren(Object *parent, pugi::xml_node parentNode)
     }
     return success;
 }
-    
+
 bool MeiInput::ReadCourse(Object *parent, pugi::xml_node course)
 {
     assert(dynamic_cast<Tuning *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     Course *vrvCourse = new Course();
     SetMeiUuid(course, vrvCourse);
-    
+
     parent->AddChild(vrvCourse);
     vrvCourse->ReadNNumberLike(course);
-    
+
     ReadUnsupportedAttr(course, vrvCourse);
-    
+
     return true;
 }
 
@@ -4978,7 +4978,7 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     }
     return success;
 }
-    
+
 bool MeiInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
 {
     TabGrp *vrvTabGrp = new TabGrp();
@@ -4990,12 +4990,12 @@ bool MeiInput::ReadTabGrp(Object *parent, pugi::xml_node tabGrp)
     ReadUnsupportedAttr(tabGrp, vrvTabGrp);
     return ReadLayerChildren(vrvTabGrp, tabGrp, vrvTabGrp);
 }
-    
+
 bool MeiInput::ReadTabRhythm(Object *parent, pugi::xml_node tabRhyhtm)
 {
     TabRhythm *vrvTabRhythm = new TabRhythm();
     ReadLayerElement(tabRhyhtm, vrvTabRhythm);
-    
+
     vrvTabRhythm->ReadNNumberLike(tabRhyhtm);
 
     parent->AddChild(vrvTabRhythm);
