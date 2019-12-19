@@ -291,8 +291,23 @@ bool Transposer::SetTransposition(const TransPitch &fromPitch, const std::string
 {
     TransPitch toPitch;
     if (GetKeyTonic(toString, toPitch)) {
-        // TODO: Determine proper octave offset.
+        // Determine proper octave offset.
+        int numSigns = toPitch.m_oct;
         m_transpose = Subtract(toPitch, fromPitch);
+        // A transposition with n plus or minus signs should never be more than n octaves away.
+        if (numSigns > 0 && m_transpose > PerfectOctaveClass() * numSigns) {
+            m_transpose -= PerfectOctaveClass();
+        }
+        else if (numSigns < 0 && m_transpose < PerfectOctaveClass() * numSigns) {
+            m_transpose += PerfectOctaveClass();
+        }
+        // A transposition with 0 plus or minus signs should never be more than 1/2 an octave away.
+        else if (numSigns == 0 && m_transpose > PerfectOctaveClass() / 2) {
+            m_transpose -= PerfectOctaveClass();
+        }
+        else if (numSigns == 0 && m_transpose < -1 * PerfectOctaveClass() / 2) {
+            m_transpose += PerfectOctaveClass();
+        }
         return true;
     }
     return false;
