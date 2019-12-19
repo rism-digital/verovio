@@ -125,9 +125,12 @@ public:
     TabGrp *IsTabGrpNote() const;
 
     /**
-     * Return the smufl code to use for a note give the notation type
+     * @name Return the smufl code or string to use for a note give the notation type
      */
-    wchar_t GetTabSmuflCode(data_NOTATIONTYPE notationType);
+    ///@{
+    wchar_t GetTabFretSmuflCode(data_NOTATIONTYPE notationType);
+    std::wstring GetTabFretString(data_NOTATIONTYPE notationType);
+    ///@}
 
     /**
      * Return true if the note is a unisson.
@@ -141,7 +144,7 @@ public:
     ///@{
     void SetCluster(ChordCluster *cluster, int position);
     ChordCluster *GetCluster() const { return m_cluster; }
-    ///}
+    ///@}
 
     /**
      * @name Setter and getter for the flipped note head flag
@@ -149,7 +152,7 @@ public:
     ///@{
     void SetFlippedNotehead(bool flippedNotehead) { m_flippedNotehead = flippedNotehead; }
     bool GetFlippedNotehead() const { return m_flippedNotehead; }
-    ///}
+    ///@}
 
     /**
      * Returns a single integer representing pitch and octave.

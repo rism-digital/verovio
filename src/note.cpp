@@ -212,7 +212,7 @@ TabGrp *Note::IsTabGrpNote() const
     return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-wchar_t Note::GetTabSmuflCode(data_NOTATIONTYPE notationType)
+wchar_t Note::GetTabFretSmuflCode(data_NOTATIONTYPE notationType)
 {
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         switch (this->GetTabFret()) {
@@ -230,6 +230,12 @@ wchar_t Note::GetTabSmuflCode(data_NOTATIONTYPE notationType)
         }
     }
     return SMUFL_EBE0_luteItalianFret0;
+}
+
+std::wstring Note::GetTabFretString(data_NOTATIONTYPE notationType)
+{
+    std::string str = StringFormat("%d", this->GetTabFret());
+    return UTF8to16(str);
 }
 
 bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
