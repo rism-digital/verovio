@@ -403,7 +403,7 @@ void Transposer::CalculateDiatonicMapping()
     int M2 = MajorSecondClass();
     int m2 = M2 - 1;
     m_diatonicMapping.resize(7);
-    m_diatonicMapping[dpc_C] = m_maxAccid + 1;
+    m_diatonicMapping[dpc_C] = m_maxAccid;
     m_diatonicMapping[dpc_D] = m_diatonicMapping[dpc_C] + M2;
     m_diatonicMapping[dpc_E] = m_diatonicMapping[dpc_D] + M2;
     m_diatonicMapping[dpc_F] = m_diatonicMapping[dpc_E] + m2;
