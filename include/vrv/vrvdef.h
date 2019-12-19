@@ -152,6 +152,7 @@ enum ClassId {
     MNUM,
     OCTAVE,
     PEDAL,
+    PITCHINFLECTION,
     SLUR,
     TEMPO,
     TIE,
