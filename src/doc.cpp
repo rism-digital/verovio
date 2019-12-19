@@ -1169,8 +1169,10 @@ void Doc::TransposeDoc()
             currentKey = TransPitch(keysig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keysig->GetAccid(), 0);
         }
         else if (keysig) {
+            // No tonic pitch in key signature, so infer from key signature.
             int fifthsInt = keysig->GetFifthsInt();
-            currentKey = transposer.CircleOfFifthsToPitch(fifthsInt);
+            // Check the keySig@mode is present (currently assuming major):
+            currentKey = transposer.CircleOfFifthsToMajorTonic(fifthsInt);
         }
 
         transposer.SetTransposition(currentKey, this->m_options->m_transpose.GetValue());

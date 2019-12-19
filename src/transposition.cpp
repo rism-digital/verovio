@@ -344,7 +344,7 @@ void Transposer::Transpose(TransPitch &pitch)
 {
     int ipitch = PitchToInteger(pitch);
     ipitch += m_transpose;
-    pitch = IntegerToPitch(ipitch);
+    pitch = IntegerPitchToTransPitch(ipitch);
 }
 
 int Transposer::Transpose(int ipitch)
@@ -361,7 +361,7 @@ void Transposer::Transpose(TransPitch &pitch, int transVal)
 {
     int ipitch = PitchToInteger(pitch);
     ipitch += transVal;
-    pitch = IntegerToPitch(ipitch);
+    pitch = IntegerPitchToTransPitch(ipitch);
 }
 
 void Transposer::Transpose(TransPitch &pitch, const std::string &transString)
@@ -369,7 +369,7 @@ void Transposer::Transpose(TransPitch &pitch, const std::string &transString)
     int transVal = GetIntervalClass(transString);
     int ipitch = PitchToInteger(pitch);
     ipitch += transVal;
-    pitch = IntegerToPitch(ipitch);
+    pitch = IntegerPitchToTransPitch(ipitch);
 }
 
 //////////////////////////////
@@ -859,12 +859,12 @@ int Transposer::PitchToInteger(const TransPitch &pitch)
 
 //////////////////////////////
 //
-// Transposer::IntegerToPitch -- Convert an integer within the current base
+// Transposer::IntegerPitchToTransPitch -- Convert an integer within the current base
 //    into a pitch (octave/diatonic pitch class/chromatic alteration).  Pitches
 //    with negative octaves will have to be tested.
 //
 
-TransPitch Transposer::IntegerToPitch(int ipitch)
+TransPitch Transposer::IntegerPitchToTransPitch(int ipitch)
 {
     TransPitch pitch;
     pitch.m_oct = ipitch / m_base;
@@ -1186,13 +1186,93 @@ std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 
 //////////////////////////////
 //
-// Transposer::CircleOfFifthsToPitch -- Assuming the mode is major, guess the pitch
-// from the circle of fifths position.
+// Transposer::CircleOfFifthsToMajorTonic -- Return the tonic
+//    of the major key that has the given key signature.  Return
+//    value is in the 0th octave.
 //
-TransPitch Transposer::CircleOfFifthsToPitch(int fifths)
+
+TransPitch Transposer::CircleOfFifthsToMajorTonic(int fifths)
 {
     int intervalClass = CircleOfFifthsToIntervalClass(fifths);
-    return IntegerToPitch(GetMaxAccid() + intervalClass);
+    return IntegerPitchToTransPitch((GetCPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToMinorTonic -- Return the tonic
+//    of the minor key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToMinorTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetAPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToDorianTonic -- Return the tonic
+//    of the dorian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToDorianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetDPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToPhrygianTonic -- Return the tonic
+//    of the phrygian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToPhrygianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetEPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToLydianTonic -- Return the tonic
+//    of the lydian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToLydianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetFPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToMixolydianTonic -- Return the tonic
+//    of the mixolydian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToMixolydianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetGPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToLocrianTonic -- Return the tonic
+//    of the locrian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToLocrianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetBPitchClass() + intervalClass) % GetBase());
 }
 
 //////////////////////////////
