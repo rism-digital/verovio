@@ -1177,7 +1177,7 @@ std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 TransPitch Transposer::CircleOfFifthsToPitch(int fifths)
 {
     int intervalClass = CircleOfFifthsToIntervalClass(fifths);
-    return IntegerToPitch(GetMaxAccid() + 1 + intervalClass);
+    return IntegerToPitch(GetMaxAccid() + intervalClass);
 }
 
 //////////////////////////////
