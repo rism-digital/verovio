@@ -888,7 +888,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         TabGrp *tabGrp = note->IsTabGrpNote();
         if (tabGrp) {
             assert(staffY->m_drawingTuning);
-            loc = staffY->m_drawingTuning->CalcPitchPos(note->GetTabCourse());
+            loc = staffY->m_drawingTuning->CalcPitchPos(
+                note->GetTabCourse(), staffY->m_drawingNotationType, staffY->m_drawingLines);
         }
         else if (note->HasPname()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);

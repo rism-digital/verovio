@@ -41,9 +41,9 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * Return the line for a the tuning and a given course.
+     * Return the line for a the tuning and a given course and a notation type
      */
-    int CalcPitchPos(int course);
+    int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines);
 
 protected:
     //

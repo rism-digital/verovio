@@ -55,9 +55,14 @@ void Tuning::AddChild(Object *child)
     Modify();
 }
 
-int Tuning::CalcPitchPos(int course)
+int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines)
 {
-    return (course - 1) * 2;
+    if (notationType == NOTATIONTYPE_tab_guitar) {
+        return abs(course - lines) * 2;
+    }
+    else {
+        return (course - 1) * 2;
+    }
 }
 
 } // namespace vrv
