@@ -47,6 +47,7 @@
 
 #include <cctype>
 #include <iostream>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -287,6 +288,9 @@ bool Transposer::SetTransposition(const std::string &transString)
     return m_transpose != INVALID_INTERVAL_CLASS;
 }
 
+// Set transposition interval based on two pitches that represent the source data
+// key tonic and the target key tonic.
+
 bool Transposer::SetTransposition(const TransPitch &fromPitch, const std::string &toString)
 {
     TransPitch toPitch;
@@ -344,7 +348,7 @@ void Transposer::Transpose(TransPitch &pitch)
 {
     int ipitch = PitchToInteger(pitch);
     ipitch += m_transpose;
-    pitch = IntegerToPitch(ipitch);
+    pitch = IntegerPitchToTransPitch(ipitch);
 }
 
 int Transposer::Transpose(int ipitch)
@@ -361,7 +365,7 @@ void Transposer::Transpose(TransPitch &pitch, int transVal)
 {
     int ipitch = PitchToInteger(pitch);
     ipitch += transVal;
-    pitch = IntegerToPitch(ipitch);
+    pitch = IntegerPitchToTransPitch(ipitch);
 }
 
 void Transposer::Transpose(TransPitch &pitch, const std::string &transString)
@@ -369,7 +373,7 @@ void Transposer::Transpose(TransPitch &pitch, const std::string &transString)
     int transVal = GetIntervalClass(transString);
     int ipitch = PitchToInteger(pitch);
     ipitch += transVal;
-    pitch = IntegerToPitch(ipitch);
+    pitch = IntegerPitchToTransPitch(ipitch);
 }
 
 //////////////////////////////
@@ -433,6 +437,7 @@ void Transposer::CalculateDiatonicMapping()
 //      where the octave is the direction it should go.
 //      Should conform to the following regular expression:
 //          ([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)
+
 bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
 {
     int octave = 0;
@@ -558,18 +563,18 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
     }
 
     if (quality.empty()) {
-        std::cerr << "Interval requires a chromatic quality: " << intervalName << std::endl;
+        LogError("Interval name requires a chromatic quality: %s", intervalName.c_str());
         return INVALID_INTERVAL_CLASS;
     }
 
     if (number.empty()) {
-        std::cerr << "Interval requires a diatonic interval number: " << intervalName << std::endl;
+        LogError("Interval name requires a diatonic interval number: %s", intervalName.c_str());
         return INVALID_INTERVAL_CLASS;
     }
 
     int dnum = stoi(number);
     if (dnum == 0) {
-        std::cerr << "Integer interval number cannot be zero: " << intervalName << std::endl;
+        LogError("Integer interval number cannot be zero: %s", intervalName.c_str());
         return INVALID_INTERVAL_CLASS;
     }
     dnum--;
@@ -589,7 +594,7 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else if (quality != "P") {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in interval quality: %s", intervalName.c_str());
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -609,7 +614,7 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in interval quality: %s", intervalName.c_str());
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -629,7 +634,7 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in interval quality: %s", intervalName.c_str());
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -642,7 +647,7 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else if (quality != "P") {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in interval quality: %s", intervalName.c_str());
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -655,7 +660,7 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else if (quality != "P") {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in interval quality: %s", intervalName.c_str());
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -675,7 +680,7 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in interval quality: %s", intervalName.c_str());
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -695,7 +700,7 @@ int Transposer::GetIntervalClass(const std::string &intervalName)
                 adjust = -(int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in interval quality: %s", intervalName.c_str());
                 return INVALID_INTERVAL_CLASS;
             }
             break;
@@ -859,12 +864,12 @@ int Transposer::PitchToInteger(const TransPitch &pitch)
 
 //////////////////////////////
 //
-// Transposer::IntegerToPitch -- Convert an integer within the current base
+// Transposer::IntegerPitchToTransPitch -- Convert an integer within the current base
 //    into a pitch (octave/diatonic pitch class/chromatic alteration).  Pitches
 //    with negative octaves will have to be tested.
 //
 
-TransPitch Transposer::IntegerToPitch(int ipitch)
+TransPitch Transposer::IntegerPitchToTransPitch(int ipitch)
 {
     TransPitch pitch;
     pitch.m_oct = ipitch / m_base;
@@ -911,7 +916,7 @@ TransPitch Transposer::IntegerToPitch(int ipitch)
 
 //////////////////////////////
 //
-// Transposer::SetBase40 -- Allow up to double sharp/flats.
+// Transposer::SetBase40 -- Standard chromatic alteration mode, allowing up to double sharp/flats.
 //
 
 void Transposer::SetBase40()
@@ -921,7 +926,7 @@ void Transposer::SetBase40()
 
 //////////////////////////////
 //
-// Transposer::SetBase600 -- Allow up to 42 sharp/flats.
+// Transposer::SetBase600 -- Extended chromatic alteration mode, allowing up to 42 sharp/flats.
 //
 
 void Transposer::SetBase600()
@@ -1186,13 +1191,93 @@ std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 
 //////////////////////////////
 //
-// Transposer::CircleOfFifthsToPitch -- Assuming the mode is major, guess the pitch
-// from the circle of fifths position.
+// Transposer::CircleOfFifthsToMajorTonic -- Return the tonic
+//    of the major key that has the given key signature.  Return
+//    value is in the 0th octave.
 //
-TransPitch Transposer::CircleOfFifthsToPitch(int fifths)
+
+TransPitch Transposer::CircleOfFifthsToMajorTonic(int fifths)
 {
     int intervalClass = CircleOfFifthsToIntervalClass(fifths);
-    return IntegerToPitch(GetMaxAccid() + intervalClass);
+    return IntegerPitchToTransPitch((GetCPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToMinorTonic -- Return the tonic
+//    of the minor key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToMinorTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetAPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToDorianTonic -- Return the tonic
+//    of the dorian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToDorianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetDPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToPhrygianTonic -- Return the tonic
+//    of the phrygian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToPhrygianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetEPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToLydianTonic -- Return the tonic
+//    of the lydian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToLydianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetFPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToMixolydianTonic -- Return the tonic
+//    of the mixolydian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToMixolydianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetGPitchClass() + intervalClass) % GetBase());
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToLocrianTonic -- Return the tonic
+//    of the locrian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+TransPitch Transposer::CircleOfFifthsToLocrianTonic(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerPitchToTransPitch((GetBPitchClass() + intervalClass) % GetBase());
 }
 
 //////////////////////////////
@@ -1442,14 +1527,14 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
     }
 
     if (quality.empty()) {
-        std::cerr << "Interval requires a chromatic quality: " << intervalName << std::endl;
+        LogError("Interval requires a chromatic quality: %s", intervalName.c_str());
         chromatic = INVALID_INTERVAL_CLASS;
         diatonic = INVALID_INTERVAL_CLASS;
         return;
     }
 
     if (number.empty()) {
-        std::cerr << "Interval requires a diatonic interval number: " << intervalName << std::endl;
+        LogError("Interval requires a diatonic interval number: %s", intervalName.c_str());
         chromatic = INVALID_INTERVAL_CLASS;
         diatonic = INVALID_INTERVAL_CLASS;
         return;
@@ -1457,7 +1542,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
 
     int dnum = stoi(number);
     if (dnum == 0) {
-        std::cerr << "Integer interval number cannot be zero: " << intervalName << std::endl;
+        LogError("Integer interval number cannot be zero: %s", intervalName.c_str());
         chromatic = INVALID_INTERVAL_CLASS;
         diatonic = INVALID_INTERVAL_CLASS;
         return;
@@ -1481,7 +1566,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 0;
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in Interval quality: %s", intervalName.c_str());
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1501,7 +1586,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 1 - (int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in Interval quality: %s", intervalName.c_str());
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1521,7 +1606,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 3 - (int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in Interval quality: %s", intervalName.c_str());
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1538,7 +1623,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 5;
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in Interval quality: %s", intervalName.c_str());
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1555,7 +1640,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 7;
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in Interval quality: %s", intervalName.c_str());
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1575,7 +1660,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 8 - (int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in Interval quality: %s", intervalName.c_str());
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1595,7 +1680,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
                 chromatic = 10 - (int)quality.size();
             }
             else {
-                std::cerr << "Error in interval quality: " << intervalName << std::endl;
+                LogError("Error in Interval quality: %s", intervalName.c_str());
                 chromatic = INVALID_INTERVAL_CLASS;
                 diatonic = INVALID_INTERVAL_CLASS;
                 return;
@@ -1603,6 +1688,90 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
             break;
     }
     chromatic *= direction;
+}
+
+//////////////////////////////
+//
+// Transposer::IsValidIntervalName -- Returns true if the input string
+//    is a valid chromatic interval string.  A valid interval name will match
+//    this regular expression:
+//          (-|\+?)([Pp]|M|m|[aA]+|[dD]+)([1-9][0-9]*)
+//
+//    Components of the regular expression:
+//
+//    1:  (-|\+?) == an optional direction for the interval.  When there
+//                   is no sign, a + sign is implied.  A sign on a unison (P1)
+//                   will be ignored.
+//    2:  ([Pp]|M|m|[aA]+|[dD]+) == The chromatic quality of the following
+//                   diatonic interval number.  Meanings of the letters:
+//                      P or p = perfect
+//                      M      = major
+//                      m      = minor
+//                      A or a = augmented
+//                      d or D = diminished
+//                   unisons (1), fourths, fifths and octaves (8) and octave multiples
+//                   of these intervals can be prefixed by P but not by M or m.  Seconds,
+//                   thirds, sixths, sevenths and octave transpositions of those intervals
+//                   can be prefixed by M and m but not by P.  All intervals can be prefixed
+//                   with A or d (or AA/dd for doubly augmented/diminished, etc.).  M and m
+//                   are case sensitive, but P, A, and d are case insensitive.  This function
+//                   does not check the correct pairing of M/m and P for the diatonic intervals
+//                   (such as the invalid interval construct P3 for a perfect third).
+//                   Transposer::GetIntervalClass(const std::string &intervalName) will do a
+//                   more thorough check for invalid pairings.  This function is used mainly to
+//                   determine whether an interval or a key tonic is being used in the --transpose
+//                   option for verovio.
+//     3: ([1-9][0-9]*) == a positive integer representing the diatonic interval.  1 = unison,
+//                   2 = second, 3 = third, and so on.  Compound intervals are allowed, such as
+//                   9 for a nineth (2nd plus a perfect octave), 15 for two perfect octaves.
+//
+//
+
+bool Transposer::IsValidIntervalName(const std::string &name)
+{
+    std::string pattern = "(-|\\+?)([Pp]|M|m|[aA]+|[dD]+)([1-9][0-9]*)";
+    if (std::regex_search(name, std::regex(pattern))) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
+// Transposer::IsValidKeyTonicName -- Returns true if the input string
+//    is a valid key tonic which can be used to calculate a transposition
+//    interval based on the current key.  A valid key tonic will match
+//    this regular expression:
+//          ([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)
+//
+//    Components of the regular expression:
+//
+//    1: ([+]*|[-]*) == An optional sign for the direction of the
+//                      transposition.  If there is no sign, then
+//                      the closest tonic pitch class to the tonic
+//                      of the data will be selected.  When The
+//                      sign is double/tripled/etc., additional
+//                      octaves will be added to the transposition.
+//    2: ([A-Ga-g]) ==  The pname letter of the tonic key.  The letter
+//                      is case insensitive, so "g" and "G" have the
+//                      same meaning.
+//    3: ([Ss#]*|[Ffb]*) == An optional accidental alteration of the
+//                      pname letter, such as eF, ef, eb, EF, Ef, or Eb,
+//                      all meaning e-flat, and aS, as, a#, AS, As, or
+//                      A# all meaning a-sharp.
+//
+
+bool Transposer::IsValidKeyTonic(const std::string &name)
+{
+    std::string pattern = "([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)";
+    if (std::regex_search(name, std::regex(pattern))) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 /*

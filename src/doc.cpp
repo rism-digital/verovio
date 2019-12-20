@@ -1158,8 +1158,13 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
 void Doc::TransposeDoc()
 {
     Transposer transposer;
-    bool setTransp = transposer.SetTransposition(this->m_options->m_transpose.GetValue());
-    if (!setTransp) {
+    transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
+    std::string transpositionOption = this->m_options->m_transpose.GetValue();
+    if (transposer.IsValidIntervalName(transpositionOption)) {
+        transposer.SetTransposition(transpositionOption);
+    }
+    else if (transposer.IsValidKeyTonic(transpositionOption)) {
+        // Find the starting key tonic of the data to use in calculating the tranposition interval:
         // Set transposition by key tonic.
         // Detect the current key from the keysignature.
         KeySig *keysig = dynamic_cast<KeySig *>(this->m_scoreDef.FindDescendantByType(KEYSIG, 3));
@@ -1169,11 +1174,20 @@ void Doc::TransposeDoc()
             currentKey = TransPitch(keysig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keysig->GetAccid(), 0);
         }
         else if (keysig) {
+            // No tonic pitch in key signature, so infer from key signature.
             int fifthsInt = keysig->GetFifthsInt();
-            currentKey = transposer.CircleOfFifthsToPitch(fifthsInt);
+            // Check the keySig@mode is present (currently assuming major):
+            currentKey = transposer.CircleOfFifthsToMajorTonic(fifthsInt);
         }
-
-        transposer.SetTransposition(currentKey, this->m_options->m_transpose.GetValue());
+        transposer.SetTransposition(currentKey, transpositionOption);
+    }
+    else {
+        LogWarning("Transposition option argument is invalid: %s", transpositionOption.c_str());
+        // there is no transposition that can be done so do not try
+        // to transpose any further (if continuing in this function,
+        // there will not be an error, just that the transposition 
+        // will be at the unison, so no notes should change.
+        return;
     }
 
     Functor transpose(&Object::Transpose);
