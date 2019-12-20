@@ -73,7 +73,7 @@ public:
     int GetIntervalClass(const std::string &intervalName);
     int Subtract(const TransPitch &minuend, const TransPitch &subtrahend);
     int PitchToInteger(const TransPitch &pitch);
-    TransPitch IntegerToPitch(int ipitch);
+    TransPitch IntegerPitchToTransPitch(int ipitch);
     void SetTransposition(int transVal);
     bool SetTransposition(const std::string &transString);
     bool SetTransposition(const TransPitch &fromPitch, const std::string &toString);
@@ -91,7 +91,13 @@ public:
     int IntervalToCircleOfFifths(int transval);
     std::string CircleOfFifthsToIntervalName(int fifths);
     int CircleOfFifthsToIntervalClass(int fifths);
-    TransPitch CircleOfFifthsToPitch(int fifths);
+    TransPitch CircleOfFifthsToMajorTonic(int fifths);
+    TransPitch CircleOfFifthsToMinorTonic(int fifths);
+    TransPitch CircleOfFifthsToDorianTonic(int fifths);
+    TransPitch CircleOfFifthsToPhrygianTonic(int fifths);
+    TransPitch CircleOfFifthsToLydianTonic(int fifths);
+    TransPitch CircleOfFifthsToMixolydianTonic(int fifths);
+    TransPitch CircleOfFifthsToLocrianTonic(int fifths);
     std::string DiatonicChromaticToIntervalName(int diatonic, int chromatic);
     int DiatonicChromaticToIntervalClass(int diatonic, int chromatic);
     void IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass);
@@ -113,6 +119,18 @@ public:
     int MinorSeventhClass();
     int MajorSeventhClass();
     int PerfectOctaveClass();
+
+    // Convenience functions for acessing m_diatonicMapping:
+    int GetCPitchClass() { return m_diatonicMapping[0]; }
+    int GetDPitchClass() { return m_diatonicMapping[1]; }
+    int GetEPitchClass() { return m_diatonicMapping[2]; }
+    int GetFPitchClass() { return m_diatonicMapping[3]; }
+    int GetGPitchClass() { return m_diatonicMapping[4]; }
+    int GetAPitchClass() { return m_diatonicMapping[5]; }
+    int GetBPitchClass() { return m_diatonicMapping[6]; }
+
+    static bool IsValidIntervalName(const std::string& name);
+    static bool IsValidKeyTonic(const std::string& name);
 
 protected:
     int m_base; // integer representation for perfect octave
