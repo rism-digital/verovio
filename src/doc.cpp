@@ -1183,6 +1183,11 @@ void Doc::TransposeDoc()
     }
     else {
         LogWarning("Transposition option argument is invalid: %s", transpositionOption.c_str());
+        // there is no transposition that can be done so do not try
+        // to transpose any further (if continuing in this function,
+        // there will not be an error, just that the transposition 
+        // will be at the unison, so no notes should change.
+        return;
     }
 
     Functor transpose(&Object::Transpose);
