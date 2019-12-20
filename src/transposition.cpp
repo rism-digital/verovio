@@ -281,9 +281,36 @@ void Transposer::SetTransposition(int transVal)
 // Use a string to set the interval class in the current base system.  For example,
 //  "+M2" means up a major second, which is the integer 6 in base-40.
 
-void Transposer::SetTransposition(const std::string &transString)
+bool Transposer::SetTransposition(const std::string &transString)
 {
     m_transpose = GetIntervalClass(transString);
+    return m_transpose != INVALID_INTERVAL_CLASS;
+}
+
+bool Transposer::SetTransposition(const TransPitch &fromPitch, const std::string &toString)
+{
+    TransPitch toPitch;
+    if (GetKeyTonic(toString, toPitch)) {
+        // Determine proper octave offset.
+        int numSigns = toPitch.m_oct;
+        m_transpose = Subtract(toPitch, fromPitch);
+        // A transposition with n plus or minus signs should never be more than n octaves away.
+        if (numSigns > 0 && m_transpose > PerfectOctaveClass() * numSigns) {
+            m_transpose -= PerfectOctaveClass();
+        }
+        else if (numSigns < 0 && m_transpose < PerfectOctaveClass() * numSigns) {
+            m_transpose += PerfectOctaveClass();
+        }
+        // A transposition with 0 plus or minus signs should never be more than 1/2 an octave away.
+        else if (numSigns == 0 && m_transpose > PerfectOctaveClass() / 2) {
+            m_transpose -= PerfectOctaveClass();
+        }
+        else if (numSigns == 0 && m_transpose < -1 * PerfectOctaveClass() / 2) {
+            m_transpose += PerfectOctaveClass();
+        }
+        return true;
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -391,13 +418,75 @@ void Transposer::CalculateDiatonicMapping()
     int M2 = MajorSecondClass();
     int m2 = M2 - 1;
     m_diatonicMapping.resize(7);
-    m_diatonicMapping[dpc_C] = m_maxAccid + 1;
+    m_diatonicMapping[dpc_C] = m_maxAccid;
     m_diatonicMapping[dpc_D] = m_diatonicMapping[dpc_C] + M2;
     m_diatonicMapping[dpc_E] = m_diatonicMapping[dpc_D] + M2;
     m_diatonicMapping[dpc_F] = m_diatonicMapping[dpc_E] + m2;
     m_diatonicMapping[dpc_G] = m_diatonicMapping[dpc_F] + M2;
     m_diatonicMapping[dpc_A] = m_diatonicMapping[dpc_G] + M2;
     m_diatonicMapping[dpc_B] = m_diatonicMapping[dpc_A] + M2;
+}
+
+//////////////////////////////
+//
+// Transposer::GetKeyTonic -- Convert a key tonic string into a TransPitch
+//      where the octave is the direction it should go.
+//      Should conform to the following regular expression:
+//          ([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)
+bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
+{
+    int octave = 0;
+    int pitch = 0;
+    int accid = 0;
+    int state = 0;
+    for (unsigned int i = 0; i < (unsigned int)keyTonic.size(); i++) {
+        switch (state) {
+            case 0:
+                switch (keyTonic[i]) {
+                    case '-': octave--; break;
+                    case '+': octave++; break;
+                    default:
+                        state++;
+                        i--;
+                        break;
+                }
+                break;
+            case 1:
+                state++;
+                switch (keyTonic[i]) {
+                    case 'C':
+                    case 'c': pitch = 0; break;
+                    case 'D':
+                    case 'd': pitch = 1; break;
+                    case 'E':
+                    case 'e': pitch = 2; break;
+                    case 'F':
+                    case 'f': pitch = 3; break;
+                    case 'G':
+                    case 'g': pitch = 4; break;
+                    case 'A':
+                    case 'a': pitch = 5; break;
+                    case 'B':
+                    case 'b': pitch = 6; break;
+                    default: LogWarning("Invalid keytonic pitch character: %c", keyTonic[i]); return false;
+                }
+                break;
+            case 2:
+                switch (keyTonic[i]) {
+                    case 'F':
+                    case 'f':
+                    case 'b': accid--; break;
+                    case 'S':
+                    case 's':
+                    case '#': accid++; break;
+                    default: LogWarning("Invalid keytonic accid character: %c", keyTonic[i]); return false;
+                }
+                break;
+        }
+    }
+
+    tonic = TransPitch(pitch, accid, octave);
+    return true;
 }
 
 //////////////////////////////
@@ -752,6 +841,11 @@ int Transposer::PerfectOctaveClass()
     return m_base;
 }
 
+int Transposer::Subtract(const TransPitch &minuend, const TransPitch &subtrahend)
+{
+    return PitchToInteger(minuend) - PitchToInteger(subtrahend);
+}
+
 //////////////////////////////
 //
 // Transposer::PitchToInteger -- Convert a pitch (octave/diatonic pitch class/chromatic
@@ -880,7 +974,7 @@ std::string Transposer::GetIntervalName(int intervalClass)
         }
     }
 
-    int number = -123456789;
+    int number = INVALID_INTERVAL_CLASS;
     int diminished = 0;
     int augmented = 0;
     std::string quality;
@@ -1088,6 +1182,17 @@ std::string Transposer::CircleOfFifthsToIntervalName(int fifths)
 {
     int intervalClass = CircleOfFifthsToIntervalClass(fifths);
     return GetIntervalName(intervalClass);
+}
+
+//////////////////////////////
+//
+// Transposer::CircleOfFifthsToPitch -- Assuming the mode is major, guess the pitch
+// from the circle of fifths position.
+//
+TransPitch Transposer::CircleOfFifthsToPitch(int fifths)
+{
+    int intervalClass = CircleOfFifthsToIntervalClass(fifths);
+    return IntegerToPitch(GetMaxAccid() + intervalClass);
 }
 
 //////////////////////////////

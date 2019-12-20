@@ -1158,7 +1158,23 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
 void Doc::TransposeDoc()
 {
     Transposer transposer;
-    transposer.SetTransposition(this->m_options->m_transpose.GetValue());
+    bool setTransp = transposer.SetTransposition(this->m_options->m_transpose.GetValue());
+    if (!setTransp) {
+        // Set transposition by key tonic.
+        // Detect the current key from the keysignature.
+        KeySig *keysig = dynamic_cast<KeySig *>(this->m_scoreDef.FindDescendantByType(KEYSIG, 3));
+        // If there is no keysignature, assume it is C.
+        TransPitch currentKey = TransPitch(0, 0, 0);
+        if (keysig && keysig->HasPname()) {
+            currentKey = TransPitch(keysig->GetPname(), ACCIDENTAL_GESTURAL_NONE, keysig->GetAccid(), 0);
+        }
+        else if (keysig) {
+            int fifthsInt = keysig->GetFifthsInt();
+            currentKey = transposer.CircleOfFifthsToPitch(fifthsInt);
+        }
+
+        transposer.SetTransposition(currentKey, this->m_options->m_transpose.GetValue());
+    }
 
     Functor transpose(&Object::Transpose);
     TransposeParams transposeParams(this, &transposer);
