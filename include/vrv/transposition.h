@@ -74,9 +74,11 @@ public:
     int Subtract(const TransPitch &minuend, const TransPitch &subtrahend);
     int PitchToInteger(const TransPitch &pitch);
     TransPitch IntegerPitchToTransPitch(int ipitch);
-    void SetTransposition(int transVal);
+    bool SetTransposition(int transVal);
     bool SetTransposition(const std::string &transString);
     bool SetTransposition(const TransPitch &fromPitch, const std::string &toString);
+    bool SetTransposition(int keyFifths, int semitones);
+    bool SetTransposition(int keyFifths, const std::string &semitones);
     int GetTranspositionIntervalClass();
     std::string GetTranspositionIntervalName();
     void Transpose(TransPitch &pitch);
@@ -129,8 +131,9 @@ public:
     int GetAPitchClass() { return m_diatonicMapping[5]; }
     int GetBPitchClass() { return m_diatonicMapping[6]; }
 
-    static bool IsValidIntervalName(const std::string& name);
-    static bool IsValidKeyTonic(const std::string& name);
+    static bool IsValidIntervalName(const std::string &name);
+    static bool IsValidKeyTonic(const std::string &name);
+    static bool IsValidSemitones(const std::string &name);
 
 protected:
     int m_base; // integer representation for perfect octave

@@ -271,12 +271,17 @@ Transposer::~Transposer()
 // Transposer::SetTransposition -- Set the transposition value which is an
 //   interval class in the current base system.  When Transposer::SetMaxAccid()
 //   or Transposer::SetBase*() are called, the transposition value will be set
-//   to 0 (a perfect unison).
+//   to 0 (a perfect unison).  The integer is a base-40 class of number.  If you
+//   want to transpose by semitone, do not use this option but rather the
+//   SetTranspose(int keyFifths, string semitones) function or the
+//   SetTranspose(int keyFifths, int semitones) function that are defined
+//   further below.
 //
 
-void Transposer::SetTransposition(int transVal)
+bool Transposer::SetTransposition(int transVal)
 {
     m_transpose = transVal;
+    return true;
 }
 
 // Use a string to set the interval class in the current base system.  For example,
@@ -315,6 +320,106 @@ bool Transposer::SetTransposition(const TransPitch &fromPitch, const std::string
         return true;
     }
     return false;
+}
+
+// Set the transposition based on the key signature (or inferred key signature coming from
+// the keySig@pname/keySig@accid/keySig@mode information) and a string containing the
+// semitone transposition.
+
+bool Transposer::SetTransposition(int keyFifths, const std::string &semitones)
+{
+    if (!IsValidSemitones(semitones)) {
+        return false;
+    }
+    int semis = stoi(semitones);
+    return SetTransposition(keyFifths, semis);
+}
+
+// Note the order of the variables (key signature information is first in all
+// cases where there are two input parametrs to SetTransposition().
+
+bool Transposer::SetTransposition(int keyFifths, int semitones)
+{
+    int sign = semitones < 0 ? -1 : +1;
+    semitones = semitones < 0 ? -semitones : semitones;
+    int octave = semitones / 12;
+    semitones = semitones - octave * 12;
+    int sum1, sum2;
+    std::string interval = "P1";
+    switch (semitones) {
+        case 0: interval = "P1"; break;
+
+        case 1:
+            sum1 = keyFifths - 5 * sign;
+            sum2 = keyFifths + 7 * sign;
+            interval = abs(sum1) < abs(sum2) ? "m2" : "A1";
+            break;
+
+        case 2:
+            sum1 = keyFifths + 2 * sign;
+            sum2 = keyFifths - 10 * sign;
+            interval = abs(sum1) < abs(sum2) ? "M2" : "d3";
+            break;
+
+        case 3:
+            sum1 = keyFifths - 3 * sign;
+            sum2 = keyFifths + 9 * sign;
+            interval = abs(sum1) < abs(sum2) ? "m3" : "A2";
+            break;
+
+        case 4:
+            sum1 = keyFifths + 4 * sign;
+            sum2 = keyFifths - 8 * sign;
+            interval = abs(sum1) < abs(sum2) ? "M3" : "d4";
+            break;
+
+        case 5:
+            sum1 = keyFifths - 1 * sign;
+            sum2 = keyFifths + 11 * sign;
+            interval = abs(sum1) < abs(sum2) ? "P4" : "A3";
+            break;
+
+        case 6:
+            sum1 = keyFifths + 6 * sign;
+            sum2 = keyFifths - 6 * sign;
+            interval = abs(sum1) < abs(sum2) ? "A4" : "d5";
+            break;
+
+        case 7:
+            sum1 = keyFifths + 1 * sign;
+            sum2 = keyFifths - 11 * sign;
+            interval = abs(sum1) < abs(sum2) ? "P5" : "d6";
+            break;
+
+        case 8:
+            sum1 = keyFifths - 4 * sign;
+            sum2 = keyFifths + 8 * sign;
+            interval = abs(sum1) < abs(sum2) ? "m6" : "A5";
+            break;
+
+        case 9:
+            sum1 = keyFifths + 3 * sign;
+            sum2 = keyFifths - 9 * sign;
+            interval = abs(sum1) < abs(sum2) ? "M6" : "d7";
+            break;
+
+        case 10:
+            sum1 = keyFifths - 2 * sign;
+            sum2 = keyFifths + 10 * sign;
+            interval = abs(sum1) < abs(sum2) ? "m7" : "A6";
+            break;
+
+        case 11:
+            sum1 = keyFifths + 5 * sign;
+            sum2 = keyFifths - 7 * sign;
+            interval = abs(sum1) < abs(sum2) ? "M7" : "d8";
+            break;
+    }
+
+    interval = sign < 0 ? "-" + interval : "+" + interval;
+    int intint = GetIntervalClass(interval);
+    intint += sign * octave * m_base;
+    return SetTransposition(intint);
 }
 
 //////////////////////////////
@@ -1730,6 +1835,35 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
 bool Transposer::IsValidIntervalName(const std::string &name)
 {
     std::string pattern = "(-|\\+?)([Pp]|M|m|[aA]+|[dD]+)([1-9][0-9]*)";
+    if (std::regex_search(name, std::regex(pattern))) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
+// Transposer::IsValidSemitones -- Returns true if the input string
+//    is a valid semitone interval string.  A valid interval name will match
+//    this regular expression:
+//          ^(-|\+?)(\d+)$
+//
+//    Components of the regular expression:
+//
+//    1:  (-|\+?) == an optional direction for the interval.  When there
+//                   is no sign, a + sign is implied.  A sign on 0
+//                   will be ignored.
+//    2:  (\d+)   == The number of semitones.  0 means transpose at the
+//                   unison (i.e., transpose to same pitch as input).
+//                   12 means an octave, 14 means a second plus an octave,
+//                   24 means two octaves.
+//
+
+bool Transposer::IsValidSemitones(const std::string &name)
+{
+    std::string pattern = "^(-|\\+?)(\\d+)$";
     if (std::regex_search(name, std::regex(pattern))) {
         return true;
     }

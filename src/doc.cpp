@@ -1164,6 +1164,7 @@ void Doc::TransposeDoc()
         transposer.SetTransposition(transpositionOption);
     }
     else if (transposer.IsValidKeyTonic(transpositionOption)) {
+
         // Find the starting key tonic of the data to use in calculating the tranposition interval:
         // Set transposition by key tonic.
         // Detect the current key from the keysignature.
@@ -1178,14 +1179,28 @@ void Doc::TransposeDoc()
             int fifthsInt = keysig->GetFifthsInt();
             // Check the keySig@mode is present (currently assuming major):
             currentKey = transposer.CircleOfFifthsToMajorTonic(fifthsInt);
+            // need to add a dummy "0" key signature in score (staffDefs of staffDef).
         }
         transposer.SetTransposition(currentKey, transpositionOption);
+    }
+
+    else if (transposer.IsValidSemitones(transpositionOption)) {
+        KeySig *keysig = dynamic_cast<KeySig *>(this->m_scoreDef.FindDescendantByType(KEYSIG, 3));
+        int fifths = 0;
+        if (keysig) {
+            fifths = keysig->GetFifthsInt();
+        }
+        else {
+            LogWarning("No key signature in data, assuming no key signature with no sharps/flats.");
+            // need to add a dummy "0" key signature in score (staffDefs of staffDef).
+        }
+        transposer.SetTransposition(fifths, transpositionOption);
     }
     else {
         LogWarning("Transposition option argument is invalid: %s", transpositionOption.c_str());
         // there is no transposition that can be done so do not try
         // to transpose any further (if continuing in this function,
-        // there will not be an error, just that the transposition 
+        // there will not be an error, just that the transposition
         // will be at the unison, so no notes should change.
         return;
     }
