@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Dec 16 18:46:19 PST 2019
+// Last Modified: Sun Dec 22 15:43:51 PST 2019
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -54352,10 +54352,10 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(composite, infile, commands[i].second, status);
 		} else if (commands[i].first == "dissonant") {
 			RUNTOOL(dissonant, infile, commands[i].second, status);
-		} else if (commands[i].first == "homophonic") {
-			RUNTOOL(homophonic, infile, commands[i].second, status);
-		} else if (commands[i].first == "homophonic2") {
-			RUNTOOL(homophonic2, infile, commands[i].second, status);
+		} else if (commands[i].first == "homorhythm") {
+			RUNTOOL(homorhythm, infile, commands[i].second, status);
+		} else if (commands[i].first == "homorhythm2") {
+			RUNTOOL(homorhythm2, infile, commands[i].second, status);
 		} else if (commands[i].first == "hproof") {
 			RUNTOOL(hproof, infile, commands[i].second, status);
 		} else if (commands[i].first == "shed") {
@@ -54549,20 +54549,20 @@ void Tool_filter::initialize(HumdrumFile& infile) {
 
 /////////////////////////////////
 //
-// Tool_homophonic::Tool_homophonic -- Set the recognized options for the tool.
+// Tool_homorhythm::Tool_homorhythm -- Set the recognized options for the tool.
 //
 
-Tool_homophonic::Tool_homophonic(void) {
+Tool_homorhythm::Tool_homorhythm(void) {
 	define("a|append=b", "Append analysis to end of input data");
 	define("attacks=b", "Append attack counts for each sonority");
 	define("p|prepend=b", "Prepend analysis to end of input data");
 	define("r|raw-sonority=b", "Display individual sonority scores only");
 	define("raw-score=b", "Display accumulated scores");
-	define("M|no-marks=b", "Do not mark homophonic section notes");
-	define("f|fraction=b", "calculate fraction of music that is homophonic");
+	define("M|no-marks=b", "Do not mark homorhythm section notes");
+	define("f|fraction=b", "calculate fraction of music that is homorhythm");
 	define("v|voice=b", "display voice information or fraction results");
 	define("F|filename=b", "show filename for f option");
-	define("n|t|threshold=d:4.0", "Threshold score sum required for homophonic texture detection");
+	define("n|t|threshold=d:4.0", "Threshold score sum required for homorhythm texture detection");
 	define("s|score=d:1.0", "Score assigned to a sonority with three or more attacks");
 	define("m|intermediate-score=d:0.5", "Score to give sonority between two adjacent attack sonoroties");
 	define("l|letter=b", "Display letter scoress before calculations");
@@ -54572,10 +54572,10 @@ Tool_homophonic::Tool_homophonic(void) {
 
 /////////////////////////////////
 //
-// Tool_homophonic::run -- Do the main work of the tool.
+// Tool_homorhythm::run -- Do the main work of the tool.
 //
 
-bool Tool_homophonic::run(HumdrumFileSet& infiles) {
+bool Tool_homorhythm::run(HumdrumFileSet& infiles) {
 	bool status = true;
 	for (int i=0; i<infiles.getCount(); i++) {
 		status &= run(infiles[i]);
@@ -54584,7 +54584,7 @@ bool Tool_homophonic::run(HumdrumFileSet& infiles) {
 }
 
 
-bool Tool_homophonic::run(const string& indata, ostream& out) {
+bool Tool_homorhythm::run(const string& indata, ostream& out) {
 	HumdrumFile infile;
 	infile.readStringNoRhythm(indata);
 	bool status = run(infile);
@@ -54597,7 +54597,7 @@ bool Tool_homophonic::run(const string& indata, ostream& out) {
 }
 
 
-bool Tool_homophonic::run(HumdrumFile& infile, ostream& out) {
+bool Tool_homorhythm::run(HumdrumFile& infile, ostream& out) {
 	bool status = run(infile);
 	if (hasAnyText()) {
 		getAllText(out);
@@ -54608,7 +54608,7 @@ bool Tool_homophonic::run(HumdrumFile& infile, ostream& out) {
 }
 
 
-bool Tool_homophonic::run(HumdrumFile& infile) {
+bool Tool_homorhythm::run(HumdrumFile& infile) {
 	initialize();
 	infile.analyzeStructure();
 	m_voice_count = getExtantVoiceCount(infile);
@@ -54622,10 +54622,10 @@ bool Tool_homophonic::run(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_homophonic::markHomophonicNotes --
+// Tool_homorhythm::markHomophonicNotes --
 //
 
-void Tool_homophonic::markHomophonicNotes(void) {
+void Tool_homorhythm::markHomophonicNotes(void) {
 	// currently done with a **color spine
 }
 
@@ -54633,10 +54633,10 @@ void Tool_homophonic::markHomophonicNotes(void) {
 
 //////////////////////////////
 //
-// Tool_homophonic::initialize --
+// Tool_homorhythm::initialize --
 //
 
-void Tool_homophonic::initialize(void) {
+void Tool_homorhythm::initialize(void) {
 	m_threshold = getInteger("threshold");
 	if (m_threshold < 1.0) {
 		m_threshold = 1.0;
@@ -54662,15 +54662,15 @@ void Tool_homophonic::initialize(void) {
 
 //////////////////////////////
 //
-// Tool_homophonic::processFile --
+// Tool_homorhythm::processFile --
 //
 
-void Tool_homophonic::processFile(HumdrumFile& infile) {
+void Tool_homorhythm::processFile(HumdrumFile& infile) {
 	vector<int> data;
 	data.reserve(infile.getLineCount());
 
-	m_homophonic.clear();
-	m_homophonic.resize(infile.getLineCount());
+	m_homorhythm.clear();
+	m_homorhythm.resize(infile.getLineCount());
 
 	m_notecount.clear();
 	m_notecount.resize(infile.getLineCount());
@@ -54693,16 +54693,16 @@ void Tool_homophonic::processFile(HumdrumFile& infile) {
 
 	// change Y N Y patterns to Y Y Y
 	for (int i=1; i<(int)data.size() - 1; i++) {
-		if (m_homophonic[data[i]] == "Y") {
+		if (m_homorhythm[data[i]] == "Y") {
 			continue;
 		}
-		if (m_homophonic[data[i+1]] == "N") {
+		if (m_homorhythm[data[i+1]] == "N") {
 			continue;
 		}
-		if (m_homophonic[data[i-1]] == "N") {
+		if (m_homorhythm[data[i-1]] == "N") {
 			continue;
 		}
-	  	m_homophonic[data[i]] = "NY";  // not homphonic by will get intermediate score.
+	  	m_homorhythm[data[i]] = "NY";  // not homphonic by will get intermediate score.
 	}
 
 	vector<double> score(infile.getLineCount(), 0);
@@ -54710,9 +54710,9 @@ void Tool_homophonic::processFile(HumdrumFile& infile) {
 
 	double sum = 0.0;
 	for (int i=0; i<(int)data.size(); i++) {
-		if (m_homophonic[data[i]].find("Y") != string::npos) {
-			if (m_homophonic[data[i]].find("N") != string::npos) {
-				// sonority between two homophonic-like sonorities.
+		if (m_homorhythm[data[i]].find("Y") != string::npos) {
+			if (m_homorhythm[data[i]].find("N") != string::npos) {
+				// sonority between two homorhythm-like sonorities.
 				// maybe also differentiate based on metric position.
 				sum += m_intermediate_score;
 				raw[data[i]] = m_intermediate_score;
@@ -54755,25 +54755,25 @@ void Tool_homophonic::processFile(HumdrumFile& infile) {
 	}
 
 	if (1) {
-		// Color the notes within homophonic textures.
-		// mark homophonic regions in red,
-		// non-homophonic sonorities within these regions in green
-		// and non-homophonic regions in black.
+		// Color the notes within homorhythm textures.
+		// mark homorhythm regions in red,
+		// non-homorhythm sonorities within these regions in green
+		// and non-homorhythm regions in black.
 		if (m_letterQ) {
-			infile.appendDataSpine(m_homophonic, "", "**hp");
+			infile.appendDataSpine(m_homorhythm, "", "**hp");
 		}
 		for (int i=0; i<(int)data.size(); i++) {
 			if (score[data[i]] >= m_threshold) {
 				if (m_attacks[data[i]] < (int)m_notes[data[i]].size() - 1) {
-					m_homophonic[data[i]] = "chartreuse";
+					m_homorhythm[data[i]] = "chartreuse";
 				} else {
-					m_homophonic[data[i]] = "red";
+					m_homorhythm[data[i]] = "red";
 				}
 			} else {
-				m_homophonic[data[i]] = "black";
+				m_homorhythm[data[i]] = "black";
 			}
 		}
-		infile.appendDataSpine(m_homophonic, "", "**color");
+		infile.appendDataSpine(m_homorhythm, "", "**color");
 
 		// problem with **color spine in javascript, so output via humdrum text
 		m_humdrum_text << infile;
@@ -54785,10 +54785,10 @@ void Tool_homophonic::processFile(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_homophonic::addAccumulatedScores --
+// Tool_homorhythm::addAccumulatedScores --
 //
 
-void Tool_homophonic::addAccumulatedScores(HumdrumFile& infile, vector<double>& score) {
+void Tool_homorhythm::addAccumulatedScores(HumdrumFile& infile, vector<double>& score) {
 	infile.appendDataSpine(score, "", "**score", false);
 }
 
@@ -54796,10 +54796,10 @@ void Tool_homophonic::addAccumulatedScores(HumdrumFile& infile, vector<double>& 
 
 //////////////////////////////
 //
-// Tool_homophonic::addRawAnalysis --
+// Tool_homorhythm::addRawAnalysis --
 //
 
-void Tool_homophonic::addRawAnalysis(HumdrumFile& infile, vector<double>& raw) {
+void Tool_homorhythm::addRawAnalysis(HumdrumFile& infile, vector<double>& raw) {
 	infile.appendDataSpine(raw, "", "**raw", false);
 }
 
@@ -54807,10 +54807,10 @@ void Tool_homophonic::addRawAnalysis(HumdrumFile& infile, vector<double>& raw) {
 
 //////////////////////////////
 //
-// Tool_homophonic::addAttacks --
+// Tool_homorhythm::addAttacks --
 //
 
-void Tool_homophonic::addAttacks(HumdrumFile& infile, vector<int>& attacks) {
+void Tool_homorhythm::addAttacks(HumdrumFile& infile, vector<int>& attacks) {
 	infile.appendDataSpine(attacks, "", "**atks");
 }
 
@@ -54818,10 +54818,10 @@ void Tool_homophonic::addAttacks(HumdrumFile& infile, vector<int>& attacks) {
 
 //////////////////////////////
 //
-// Tool_homophonic::addFractionAnalysis --
+// Tool_homorhythm::addFractionAnalysis --
 //
 
-void Tool_homophonic::addFractionAnalysis(HumdrumFile& infile, vector<double>& score) {
+void Tool_homorhythm::addFractionAnalysis(HumdrumFile& infile, vector<double>& score) {
 	double sum = 0.0;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isData()) {
@@ -54861,10 +54861,10 @@ void Tool_homophonic::addFractionAnalysis(HumdrumFile& infile, vector<double>& s
 
 //////////////////////////////
 //
-// Tool_homophonic::getOriginalVoiceCount --
+// Tool_homorhythm::getOriginalVoiceCount --
 //
 
-int Tool_homophonic::getOriginalVoiceCount(HumdrumFile& infile) {
+int Tool_homorhythm::getOriginalVoiceCount(HumdrumFile& infile) {
 	HumRegex hre;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isReference()) {
@@ -54887,10 +54887,10 @@ int Tool_homophonic::getOriginalVoiceCount(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_homophonic::getExtantVoiceCount --
+// Tool_homorhythm::getExtantVoiceCount --
 //
 
-int Tool_homophonic::getExtantVoiceCount(HumdrumFile& infile) {
+int Tool_homorhythm::getExtantVoiceCount(HumdrumFile& infile) {
 	vector<HTp> spines = infile.getKernSpineStartList();
 	return (int)spines.size();
 }
@@ -54899,10 +54899,10 @@ int Tool_homophonic::getExtantVoiceCount(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_homophonic::analyzeLine --
+// Tool_homorhythm::analyzeLine --
 //
 
-void Tool_homophonic::analyzeLine(HumdrumFile& infile, int line) {
+void Tool_homorhythm::analyzeLine(HumdrumFile& infile, int line) {
 	m_notes[line].reserve(10);
 	HPNote note;
 	if (!infile[line].isData()) {
@@ -54955,7 +54955,7 @@ void Tool_homophonic::analyzeLine(HumdrumFile& infile, int line) {
 		}
 	}
 
-	// There must be at least three attacks to be considered homophonic
+	// There must be at least three attacks to be considered homorhythm
 	// maybe adjust to N-1 or three voices, or a similar rule.
 	vector<HumNum> adurs;
 	for (int i=0; i<(int)m_notes[line].size(); i++) {
@@ -54968,21 +54968,21 @@ void Tool_homophonic::analyzeLine(HumdrumFile& infile, int line) {
 	if ((int)m_attacks[line] >= 3) {
 		string value = "Y";
 		// value += to_string(m_attacks[line]);
-		m_homophonic[line] = value;
+		m_homorhythm[line] = value;
 	} else if ((m_voice_count == 3) && (m_attacks[line] == 2)) {
 		if ((adurs.size() >= 2) && (adurs[0] == adurs[1])) {
-			m_homophonic[line] = "Y";
+			m_homorhythm[line] = "Y";
 		} else {
-			m_homophonic[line] = "N";
+			m_homorhythm[line] = "N";
 		}
 	} else {
 		string value = "N";
 		// value += to_string(m_attacks[line]);
-		m_homophonic[line] = value;
+		m_homorhythm[line] = value;
 	}
 	// redundant or three-or-more case:
 	if (m_notes[line].size() <= 2) {
-		m_homophonic[line] = "N";
+		m_homorhythm[line] = "N";
 	}
 }
 
@@ -54991,25 +54991,25 @@ void Tool_homophonic::analyzeLine(HumdrumFile& infile, int line) {
 
 /////////////////////////////////
 //
-// Tool_homophonic2::Tool_homophonic -- Set the recognized options for the tool.
+// Tool_homorhythm2::Tool_homorhythm -- Set the recognized options for the tool.
 //
 
-Tool_homophonic2::Tool_homophonic2(void) {
-	define("t|threshold=d:1.6", "Threshold score sum required for homophonic texture detection");
-	define("u|threshold2=d:1.3", "Threshold score sum required for semi-homophonic texture detection");
+Tool_homorhythm2::Tool_homorhythm2(void) {
+	define("t|threshold=d:1.6", "Threshold score sum required for homorhythm texture detection");
+	define("u|threshold2=d:1.3", "Threshold score sum required for semi-homorhythm texture detection");
 	define("s|score=b", "Show numeric scores");
 	define("n|length=i:4", "Sonority length to calculate");
-	define("f|fraction=b", "Report fraction of music that is homophonic");
+	define("f|fraction=b", "Report fraction of music that is homorhythm");
 }
 
 
 
 /////////////////////////////////
 //
-// Tool_homophonic2::run -- Do the main work of the tool.
+// Tool_homorhythm2::run -- Do the main work of the tool.
 //
 
-bool Tool_homophonic2::run(HumdrumFileSet& infiles) {
+bool Tool_homorhythm2::run(HumdrumFileSet& infiles) {
 	bool status = true;
 	for (int i=0; i<infiles.getCount(); i++) {
 		status &= run(infiles[i]);
@@ -55018,7 +55018,7 @@ bool Tool_homophonic2::run(HumdrumFileSet& infiles) {
 }
 
 
-bool Tool_homophonic2::run(const string& indata, ostream& out) {
+bool Tool_homorhythm2::run(const string& indata, ostream& out) {
 	HumdrumFile infile;
 	infile.read(indata);
 	bool status = run(infile);
@@ -55031,7 +55031,7 @@ bool Tool_homophonic2::run(const string& indata, ostream& out) {
 }
 
 
-bool Tool_homophonic2::run(HumdrumFile& infile, ostream& out) {
+bool Tool_homorhythm2::run(HumdrumFile& infile, ostream& out) {
 	bool status = run(infile);
 	if (hasAnyText()) {
 		getAllText(out);
@@ -55042,7 +55042,7 @@ bool Tool_homophonic2::run(HumdrumFile& infile, ostream& out) {
 }
 
 
-bool Tool_homophonic2::run(HumdrumFile& infile) {
+bool Tool_homorhythm2::run(HumdrumFile& infile) {
 	initialize();
 	processFile(infile);
 	return true;
@@ -55052,10 +55052,10 @@ bool Tool_homophonic2::run(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_homophonic2::initialize --
+// Tool_homorhythm2::initialize --
 //
 
-void Tool_homophonic2::initialize(void) {
+void Tool_homorhythm2::initialize(void) {
 	m_threshold = getDouble("threshold");
 	if (m_threshold < 0.0) {
 		m_threshold = 0.0;
@@ -55076,10 +55076,10 @@ void Tool_homophonic2::initialize(void) {
 
 //////////////////////////////
 //
-// Tool_homophonic2::processFile --
+// Tool_homorhythm2::processFile --
 //
 
-void Tool_homophonic2::processFile(HumdrumFile& infile) {
+void Tool_homorhythm2::processFile(HumdrumFile& infile) {
 	infile.analyzeStructure();
 	NoteGrid grid(infile);
 	m_score.resize(infile.getLineCount());
@@ -75204,6 +75204,18 @@ void Tool_tassoize::processFile(HumdrumFile& infile) {
 	if (terminalsQ)      { addTerminalLongs(infile); }
 	if (breaksQ)         { deleteBreaks(infile); }
 	if (transpositionsQ) { deleteDummyTranspositions(infile); }
+
+	// Input lyrics may contain "=" signs which are to be converted into
+	// spaces in **text data, and into elisions when displaying with verovio.
+	Tool_shed shed;
+	vector<string> argv;
+	argv.push_back("shed");
+	argv.push_back("-x");     // only apply to **text spines
+	argv.push_back("text");
+	argv.push_back("-e");
+	argv.push_back("s/=/ /g");
+	shed.process(argv);
+	shed.run(infile);
 }
 
 
