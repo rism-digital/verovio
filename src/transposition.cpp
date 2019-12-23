@@ -340,6 +340,18 @@ bool Transposer::SetTransposition(int keyFifths, const std::string &semitones)
 
 bool Transposer::SetTransposition(int keyFifths, int semitones)
 {
+    int intervalClass = SemitonesToIntervalClass(keyFifths, semitones);
+    return SetTransposition(intervalClass);
+}
+
+//////////////////////////////
+//
+// Transposer::SemitonesToIntervalClass -- convert semitones plus key
+//     signature information into an integer interval class.
+//
+
+int Transposer::SemitonesToIntervalClass(int keyFifths, int semitones)
+{
     int sign = semitones < 0 ? -1 : +1;
     semitones = semitones < 0 ? -semitones : semitones;
     int octave = semitones / 12;
@@ -419,7 +431,54 @@ bool Transposer::SetTransposition(int keyFifths, int semitones)
     interval = sign < 0 ? "-" + interval : "+" + interval;
     int intint = GetIntervalClass(interval);
     intint += sign * octave * m_base;
-    return SetTransposition(intint);
+    return intint;
+}
+
+//////////////////////////////
+//
+// Transposer::SemitonesToIntervalName -- convert semitones plus key
+//     signature information into an interval name string.
+//
+
+std::string Transposer::SemitonesToIntervalName(int keyFifths, int semitones)
+{
+    int intervalClass = SemitonesToIntervalClass(keyFifths, semitones);
+    return GetIntervalName(intervalClass);
+}
+
+//////////////////////////////
+//
+// Transposer::IntervalToSemitones --  Convert a base interval class into
+//   semitones.  Multiple enharmonic equivalent interval classes will collapse into
+//   a single semitone value, so the process is not completely reversable
+//   by calling Transposer::SemitonesToIntervalClass(), but for simple
+//   intervals it will be reversable.
+//
+
+int Transposer::IntervalToSemitones(int interval)
+{
+    int sign = interval < 0 ? -1 : +1;
+    interval = interval < 0 ? -interval : interval;
+    int octave = interval / m_base;
+    int intervalClass = interval - octave * m_base;
+    int diatonic = 0;
+    int chromatic = 0;
+    IntervalToDiatonicChromatic(diatonic, chromatic, intervalClass);
+    std::vector<int> diatonic2semitone{ 0, 2, 4, 5, 7, 9, 11 };
+    if ((diatonic != INVALID_INTERVAL_CLASS) && (chromatic != INVALID_INTERVAL_CLASS)) {
+        return (diatonic2semitone.at(diatonic) + chromatic) * sign;
+    }
+    else {
+        return INVALID_INTERVAL_CLASS;
+    }
+}
+
+//  Conversion from an interval name string into semitones:
+
+int Transposer::IntervalToSemitones(const std::string &intervalName)
+{
+    int interval = GetIntervalClass(intervalName);
+    return IntervalToSemitones(interval);
 }
 
 //////////////////////////////

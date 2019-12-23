@@ -70,7 +70,6 @@ public:
     void SetMaxAccid(int maxAccid);
     void SetBase40();
     void SetBase600();
-    int GetIntervalClass(const std::string &intervalName);
     int Subtract(const TransPitch &minuend, const TransPitch &subtrahend);
     int PitchToInteger(const TransPitch &pitch);
     TransPitch IntegerPitchToTransPitch(int ipitch);
@@ -79,6 +78,10 @@ public:
     bool SetTransposition(const TransPitch &fromPitch, const std::string &toString);
     bool SetTransposition(int keyFifths, int semitones);
     bool SetTransposition(int keyFifths, const std::string &semitones);
+    std::string SemitonesToIntervalName(int keyFifths, int semitones);
+    int SemitonesToIntervalClass(int keyFifths, int semitones);
+    int IntervalToSemitones(int intervalClass);
+    int IntervalToSemitones(const std::string &intervalName);
     int GetTranspositionIntervalClass();
     std::string GetTranspositionIntervalName();
     void Transpose(TransPitch &pitch);
@@ -86,6 +89,7 @@ public:
     void Transpose(TransPitch &pitch, int transVal);
     void Transpose(TransPitch &pitch, const std::string &transString);
     bool GetKeyTonic(const std::string &keyTonic, TransPitch &tonic);
+    int GetIntervalClass(const std::string &intervalName);
     int GetIntervalClass(const TransPitch &p1, const TransPitch &p2);
     std::string GetIntervalName(const TransPitch &p1, const TransPitch &p2);
     std::string GetIntervalName(int intervalClass);
