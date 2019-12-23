@@ -50,6 +50,7 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
+class Transposer;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -1765,6 +1766,26 @@ public:
     bool m_mensur;
     bool m_meterSig;
     bool m_applyToAll;
+};
+
+//----------------------------------------------------------------------------
+// TransposeParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the transposer
+ * member 1: a pointer to document
+ **/
+
+class TransposeParams : public FunctorParams {
+public:
+    TransposeParams(Doc *doc, Transposer *transposer)
+    {
+        m_transposer = transposer;
+        m_doc = doc;
+    }
+    Transposer *m_transposer;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

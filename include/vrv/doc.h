@@ -293,6 +293,11 @@ public:
     void ConvertAnalyticalMarkupDoc(bool permanent = false);
 
     /**
+     * Transpose the content of the doc.
+     */
+    void TransposeDoc();
+
+    /**
      * To be implemented.
      */
     void RefreshViews(){};
