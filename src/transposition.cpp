@@ -466,7 +466,7 @@ int Transposer::IntervalToSemitones(int interval)
     IntervalToDiatonicChromatic(diatonic, chromatic, intervalClass);
     std::vector<int> diatonic2semitone{ 0, 2, 4, 5, 7, 9, 11 };
     if ((diatonic != INVALID_INTERVAL_CLASS) && (chromatic != INVALID_INTERVAL_CLASS)) {
-        return (diatonic2semitone.at(diatonic) + chromatic) * sign;
+        return (diatonic2semitone.at(diatonic) + chromatic) * sign + 12 * octave;
     }
     else {
         return INVALID_INTERVAL_CLASS;
