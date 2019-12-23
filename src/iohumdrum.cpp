@@ -2710,10 +2710,51 @@ std::string HumdrumInput::automaticHeaderCenter(
     std::string output;
     std::string title;
 
+    int counter = 0;
     auto it = refmap.find("OTL");
     if (it != refmap.end()) {
         title = it->second;
     }
+
+    std::string PTL; // publication title
+    std::string PPR; // publisher
+    std::string PPP; // publisher place
+    std::string PDT; // publication date
+
+    it = refmap.find("PTL");
+    if (it != refmap.end()) {
+        PTL = it->second;
+        counter++;
+    }
+    it = refmap.find("PPR");
+    if (it != refmap.end()) {
+        PPR = it->second;
+        counter++;
+    }
+    it = refmap.find("PPP");
+    if (it != refmap.end()) {
+        PPP = it->second;
+        counter++;
+    }
+    it = refmap.find("PDT");
+    if (it != refmap.end()) {
+        PDT = it->second;
+        counter++;
+    }
+    std::string subtitle;
+    if (counter == 4) {
+        subtitle += "<rend fontstyle=\"italic\">";
+        subtitle += PTL;
+        subtitle += "</rend>";
+        subtitle += ", (";
+        subtitle += PPP;
+        subtitle += ": ";
+        subtitle += PPR;
+        subtitle += ", ";
+        subtitle += PDT;
+        subtitle += ")";
+    }
+
     if (title.empty()) {
         for (int i = 0; i < (int)biblist.size(); ++i) {
             if (biblist[i].first.substr(0, 3) == "OTL") {
@@ -2740,6 +2781,12 @@ std::string HumdrumInput::automaticHeaderCenter(
             output += ")";
         }
         output += "</rend>\n";
+        if (!subtitle.empty()) {
+            output += "<lb/>";
+            output += "<rend fontsize=\"small\">";
+            output += subtitle;
+            output += "</rend>";
+        }
         output += "<lb/>&#160;\n<lb/>&#160;\n";
         output += "</rend>\n";
     }
