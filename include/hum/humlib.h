@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Dec 16 18:46:19 PST 2019
+// Last Modified: Sun Dec 22 15:43:51 PST 2019
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5629,10 +5629,10 @@ class HPNote {
 		bool nullQ = false;
 };
 
-class Tool_homophonic : public HumTool {
+class Tool_homorhythm : public HumTool {
 	public:
-		            Tool_homophonic    (void);
-		           ~Tool_homophonic    () {};
+		            Tool_homorhythm    (void);
+		           ~Tool_homorhythm    () {};
 
 		bool        run                (HumdrumFileSet& infiles);
 		bool        run                (HumdrumFile& infile);
@@ -5652,7 +5652,7 @@ class Tool_homophonic : public HumTool {
 		void        addFractionAnalysis(HumdrumFile& infile, std::vector<double>& score);
 
 	private:
-		std::vector<std::string> m_homophonic;
+		std::vector<std::string> m_homorhythm;
 		std::vector<int> m_notecount;
 		std::vector<int> m_attacks;
 		std::vector<std::vector<HPNote>> m_notes;
@@ -5664,10 +5664,10 @@ class Tool_homophonic : public HumTool {
 };
 
 
-class Tool_homophonic2 : public HumTool {
+class Tool_homorhythm2 : public HumTool {
 	public:
-		            Tool_homophonic2    (void);
-		           ~Tool_homophonic2    () {};
+		            Tool_homorhythm2    (void);
+		           ~Tool_homorhythm2    () {};
 
 		bool        run                (HumdrumFileSet& infiles);
 		bool        run                (HumdrumFile& infile);
