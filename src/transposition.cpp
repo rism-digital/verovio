@@ -143,6 +143,7 @@ data_ACCIDENTAL_GESTURAL TransPitch::GetAccidG() const
     LogWarning("Transposition: Could not get Gestural Accidental for %i", m_accid);
     return ACCIDENTAL_GESTURAL_NONE;
 }
+
 data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW() const
 {
     switch (m_accid) {
@@ -158,6 +159,7 @@ data_ACCIDENTAL_WRITTEN TransPitch::GetAccidW() const
     LogWarning("Transposition: Could not get Written Accidental for %i", m_accid);
     return ACCIDENTAL_WRITTEN_NONE;
 }
+
 data_PITCHNAME TransPitch::GetPitchName() const
 {
     return static_cast<data_PITCHNAME>(m_pname + PITCHNAME_c);
@@ -289,7 +291,7 @@ bool Transposer::SetTransposition(int transVal)
 
 bool Transposer::SetTransposition(const std::string &transString)
 {
-    m_transpose = GetIntervalClass(transString);
+    m_transpose = GetInterval(transString);
     return m_transpose != INVALID_INTERVAL_CLASS;
 }
 
@@ -302,7 +304,7 @@ bool Transposer::SetTransposition(const TransPitch &fromPitch, const std::string
     if (GetKeyTonic(toString, toPitch)) {
         // Determine proper octave offset.
         int numSigns = toPitch.m_oct;
-        m_transpose = Subtract(toPitch, fromPitch);
+        m_transpose = GetInterval(fromPitch, toPitch);
         // A transposition with n plus or minus signs should never be more than n octaves away.
         if (numSigns > 0 && m_transpose > PerfectOctaveClass() * numSigns) {
             m_transpose -= PerfectOctaveClass();
@@ -429,7 +431,7 @@ int Transposer::SemitonesToIntervalClass(int keyFifths, int semitones)
     }
 
     interval = sign < 0 ? "-" + interval : "+" + interval;
-    int intint = GetIntervalClass(interval);
+    int intint = GetInterval(interval);
     intint += sign * octave * m_base;
     return intint;
 }
@@ -464,9 +466,8 @@ int Transposer::IntervalToSemitones(int interval)
     int diatonic = 0;
     int chromatic = 0;
     IntervalToDiatonicChromatic(diatonic, chromatic, intervalClass);
-    std::vector<int> diatonic2semitone{ 0, 2, 4, 5, 7, 9, 11 };
     if ((diatonic != INVALID_INTERVAL_CLASS) && (chromatic != INVALID_INTERVAL_CLASS)) {
-        return (diatonic2semitone.at(diatonic) + chromatic) * sign + 12 * octave;
+        return (m_diatonic2semitone.at(diatonic) + chromatic) * sign + 12 * octave;
     }
     else {
         return INVALID_INTERVAL_CLASS;
@@ -477,7 +478,7 @@ int Transposer::IntervalToSemitones(int interval)
 
 int Transposer::IntervalToSemitones(const std::string &intervalName)
 {
-    int interval = GetIntervalClass(intervalName);
+    int interval = GetInterval(intervalName);
     return IntervalToSemitones(interval);
 }
 
@@ -510,7 +511,7 @@ std::string Transposer::GetTranspositionIntervalName()
 
 void Transposer::Transpose(TransPitch &pitch)
 {
-    int ipitch = PitchToInteger(pitch);
+    int ipitch = TransPitchToIntegerPitch(pitch);
     ipitch += m_transpose;
     pitch = IntegerPitchToTransPitch(ipitch);
 }
@@ -527,15 +528,15 @@ int Transposer::Transpose(int ipitch)
 
 void Transposer::Transpose(TransPitch &pitch, int transVal)
 {
-    int ipitch = PitchToInteger(pitch);
+    int ipitch = TransPitchToIntegerPitch(pitch);
     ipitch += transVal;
     pitch = IntegerPitchToTransPitch(ipitch);
 }
 
 void Transposer::Transpose(TransPitch &pitch, const std::string &transString)
 {
-    int transVal = GetIntervalClass(transString);
-    int ipitch = PitchToInteger(pitch);
+    int transVal = GetInterval(transString);
+    int ipitch = TransPitchToIntegerPitch(pitch);
     ipitch += transVal;
     pitch = IntegerPitchToTransPitch(ipitch);
 }
@@ -583,8 +584,8 @@ void Transposer::SetMaxAccid(int maxAccid)
 
 void Transposer::CalculateDiatonicMapping()
 {
-    int M2 = MajorSecondClass();
-    int m2 = M2 - 1;
+    int m2 = m_maxAccid * 2 + 1;
+    int M2 = m2 + 1;
     m_diatonicMapping.resize(7);
     m_diatonicMapping[dpc_C] = m_maxAccid;
     m_diatonicMapping[dpc_D] = m_diatonicMapping[dpc_C] + M2;
@@ -660,7 +661,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
 
 //////////////////////////////
 //
-// Transposer::GetIntervalClass -- Convert a diatonic interval with chromatic
+// Transposer::GetInterval -- Convert a diatonic interval with chromatic
 //     quality and direction into an integer interval class.   Input string
 //     is in the format: direction + quality + diatonic interval.
 //     Such as +M2 for up a major second, -P5 is down a perfect fifth.
@@ -668,7 +669,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
 //            (-|\+?)([Pp]|M|m|[aA]+|[dD]+)(\d+)
 //
 
-int Transposer::GetIntervalClass(const std::string &intervalName)
+int Transposer::GetInterval(const std::string &intervalName)
 {
     std::string direction;
     std::string quality;
@@ -897,7 +898,7 @@ int Transposer::PerfectUnisonClass()
 
 int Transposer::MinorSecondClass()
 {
-    return m_maxAccid * 2 + 1;
+    return m_diatonicMapping[3] - m_diatonicMapping[2]; // F - E
 }
 
 //////////////////////////////
@@ -908,7 +909,7 @@ int Transposer::MinorSecondClass()
 
 int Transposer::MajorSecondClass()
 {
-    return MinorSecondClass() + 1;
+    return m_diatonicMapping[1] - m_diatonicMapping[0]; // D - C
 }
 
 //////////////////////////////
@@ -919,7 +920,7 @@ int Transposer::MajorSecondClass()
 
 int Transposer::MinorThirdClass()
 {
-    return MajorThirdClass() - 1;
+    return m_diatonicMapping[3] - m_diatonicMapping[1]; // F - D
 }
 
 //////////////////////////////
@@ -930,7 +931,7 @@ int Transposer::MinorThirdClass()
 
 int Transposer::MajorThirdClass()
 {
-    return 2 * MajorSecondClass();
+    return m_diatonicMapping[2] - m_diatonicMapping[0]; // E - C
 }
 
 //////////////////////////////
@@ -941,7 +942,7 @@ int Transposer::MajorThirdClass()
 
 int Transposer::PerfectFourthClass()
 {
-    return PerfectOctaveClass() - PerfectFifthClass();
+    return m_diatonicMapping[3] - m_diatonicMapping[0]; // F - C
 }
 
 //////////////////////////////
@@ -952,7 +953,7 @@ int Transposer::PerfectFourthClass()
 
 int Transposer::PerfectFifthClass()
 {
-    return 3 * MajorSecondClass() + MinorSecondClass();
+    return m_diatonicMapping[4] - m_diatonicMapping[0]; // G - C
 }
 
 //////////////////////////////
@@ -963,7 +964,7 @@ int Transposer::PerfectFifthClass()
 
 int Transposer::MinorSixthClass()
 {
-    return PerfectOctaveClass() - MajorThirdClass();
+    return m_diatonicMapping[5] - m_diatonicMapping[0] - 1; // A - C - 1;
 }
 
 //////////////////////////////
@@ -974,7 +975,7 @@ int Transposer::MinorSixthClass()
 
 int Transposer::MajorSixthClass()
 {
-    return PerfectOctaveClass() - MinorThirdClass();
+    return m_diatonicMapping[5] - m_diatonicMapping[0]; // A - C
 }
 
 //////////////////////////////
@@ -985,7 +986,7 @@ int Transposer::MajorSixthClass()
 
 int Transposer::MinorSeventhClass()
 {
-    return PerfectOctaveClass() - MajorSecondClass();
+    return m_diatonicMapping[6] - m_diatonicMapping[0] - 1; // B - C - 1
 }
 
 //////////////////////////////
@@ -996,7 +997,7 @@ int Transposer::MinorSeventhClass()
 
 int Transposer::MajorSeventhClass()
 {
-    return PerfectOctaveClass() - MinorSecondClass();
+    return m_diatonicMapping[6] - m_diatonicMapping[0]; // B - C
 }
 
 //////////////////////////////
@@ -1010,18 +1011,13 @@ int Transposer::PerfectOctaveClass()
     return m_base;
 }
 
-int Transposer::Subtract(const TransPitch &minuend, const TransPitch &subtrahend)
-{
-    return PitchToInteger(minuend) - PitchToInteger(subtrahend);
-}
-
 //////////////////////////////
 //
-// Transposer::PitchToInteger -- Convert a pitch (octave/diatonic pitch class/chromatic
+// Transposer::TransPitchToIntegerPitch -- Convert a pitch (octave/diatonic pitch class/chromatic
 //     alteration) into an integer value according to the current base.
 //
 
-int Transposer::PitchToInteger(const TransPitch &pitch)
+int Transposer::TransPitchToIntegerPitch(const TransPitch &pitch)
 {
     return pitch.m_oct * m_base + m_diatonicMapping[pitch.m_pname] + pitch.m_accid;
 }
@@ -1100,22 +1096,22 @@ void Transposer::SetBase600()
 
 //////////////////////////////
 //
-// Transposer::GetIntervalClass -- Return the interval between two pitches.
+// Transposer::GetInterval -- Return the interval between two pitches.
 //    If the second pitch is higher than the first, then the interval will be
 //    positive; otherwise, the interval will be negative.
 //
 
-int Transposer::GetIntervalClass(const TransPitch &p1, const TransPitch &p2)
+int Transposer::GetInterval(const TransPitch &p1, const TransPitch &p2)
 {
-    return PitchToInteger(p2) - PitchToInteger(p1);
+    return TransPitchToIntegerPitch(p2) - TransPitchToIntegerPitch(p1);
 }
 
-// similar function, but the integer interval class is converted into a string
-// that is not dependent on a base.
+// Similar function to GetInterval, but the integer interval class is converted
+// into a string that is not dependent on a base:
 
 std::string Transposer::GetIntervalName(const TransPitch &p1, const TransPitch &p2)
 {
-    int iclass = GetIntervalClass(p1, p2);
+    int iclass = GetInterval(p1, p2);
     return GetIntervalName(iclass);
 }
 
@@ -1293,7 +1289,7 @@ std::string Transposer::GetIntervalName(int intervalClass)
 
 int Transposer::IntervalToCircleOfFifths(const std::string &transstring)
 {
-    int intervalClass = GetIntervalClass(transstring);
+    int intervalClass = GetInterval(transstring);
     return IntervalToCircleOfFifths(intervalClass);
 }
 
@@ -1618,7 +1614,7 @@ std::string Transposer::DiatonicChromaticToIntervalName(int diatonic, int chroma
 int Transposer::DiatonicChromaticToIntervalClass(int diatonic, int chromatic)
 {
     std::string intervalName = DiatonicChromaticToIntervalName(diatonic, chromatic);
-    return GetIntervalClass(intervalName);
+    return GetInterval(intervalName);
 }
 
 //////////////////////////////
@@ -1881,7 +1877,7 @@ void Transposer::IntervalToDiatonicChromatic(int &diatonic, int &chromatic, cons
 //                   are case sensitive, but P, A, and d are case insensitive.  This function
 //                   does not check the correct pairing of M/m and P for the diatonic intervals
 //                   (such as the invalid interval construct P3 for a perfect third).
-//                   Transposer::GetIntervalClass(const std::string &intervalName) will do a
+//                   Transposer::GetInterval(const std::string &intervalName) will do a
 //                   more thorough check for invalid pairings.  This function is used mainly to
 //                   determine whether an interval or a key tonic is being used in the --transpose
 //                   option for verovio.
