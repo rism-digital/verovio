@@ -579,7 +579,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    dc->DrawComplexBezierPath(bez1, bez2);
+    dc->DrawCubicBezierPathFilled(bez1, bez2);
 
     // on produit l'image reflet vers le bas: 0 est identique
     points[0].y = ToDeviceContextY(y2);
@@ -600,7 +600,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->DrawComplexBezierPath(bez1, bez2);
+    dc->DrawCubicBezierPathFilled(bez1, bez2);
 
     dc->ResetPen();
     dc->ResetBrush();
