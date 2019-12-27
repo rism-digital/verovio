@@ -696,7 +696,40 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     assert(pitchInflection);
     assert(staff);
 
-    int y1 = pitchInflection->GetDrawingY();
+    int topY = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+    Note *note1 = dynamic_cast<Note *>(pitchInflection->GetStart());
+    Note *note2 = dynamic_cast<Note *>(pitchInflection->GetEnd());
+
+    if (!note1 && !note2) {
+        // no note, obviously nothing to do...
+        // this also means that notes with tstamp events are not supported
+        return;
+    }
+
+    bool up = true;
+
+    int y1 = (up) ? note1->GetDrawingY() : topY;
+    int y2 = (up) ? topY : note2->GetDrawingY();
+
+    Point points[3];
+    points[0].x = ToDeviceContextX(x1);
+    points[0].y = ToDeviceContextY(y1);
+    points[1].x = ToDeviceContextX(x2);
+    points[1].y = ToDeviceContextY(y1);
+    points[2].x = ToDeviceContextX(x2);
+    points[2].y = ToDeviceContextY(y2);
+
+    int arrowWidth = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    int arrowHeight = arrowWidth * 3 / 2;
+    arrowHeight = (up) ? arrowHeight : -arrowHeight;
+    Point arrow[3];
+    arrow[0].x = ToDeviceContextX(x2 - arrowWidth);
+    arrow[0].y = ToDeviceContextY(y2 - arrowHeight);
+    arrow[1].x = ToDeviceContextX(x2 + arrowWidth);
+    arrow[1].y = ToDeviceContextY(y2 - arrowHeight);
+    arrow[2].x = ToDeviceContextX(x2);
+    arrow[2].y = ToDeviceContextY(y2);
 
     /************** draw it **************/
 
@@ -705,7 +738,14 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     else
         dc->StartGraphic(pitchInflection, "spanning-pinflection", "");
 
-    //
+    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    dc->SetBrush(m_currentColour, AxSOLID);
+
+    dc->DrawQuadBezierPath(points);
+    dc->DrawPolygon(3, arrow);
+
+    dc->ResetPen();
+    dc->ResetBrush();
 
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
