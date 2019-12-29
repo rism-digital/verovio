@@ -2608,35 +2608,68 @@ bool HumdrumInput::prepareHeader(
 //     Then any "LYR" (lyricist) will be displayed, and if LDT (lyric composition date)
 //     is found, then that will be added in parenthese after the lyricist's name.
 //     The linecount variable is used to align the lyricist with the composer, depending
-//     on whether or not the composer's date are displayed.
+//     on whether or not the composer's date are displayed.  For TiMP files, if there is
+//     an editor, then show on the top left automatically.
 //
 
 std::string HumdrumInput::automaticHeaderLeft(
     std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount)
 {
     std::string output;
-    std::string lyricist;
 
-    auto itL = refmap.find("LYR");
-    if (itL != refmap.end()) {
-        std::string name = itL->second;
-        auto pos = name.find(",");
-        if (pos == std::string::npos) {
-            lyricist = name;
-        }
-        else {
-            std::string lastname = name.substr(0, pos);
-            std::string firstname = name.substr(pos + 1);
-            lyricist = firstname + " " + lastname;
-        }
-        auto itLD = refmap.find("LDT");
-        if (itLD != refmap.end()) {
-            lyricist += " (" + itLD->second + ")";
+    auto PTL = refmap.find("PTL");
+    auto PPR = refmap.find("PTL");
+    auto PPP = refmap.find("PTL");
+    auto PDT = refmap.find("PTL");
+
+    int count = 0;
+    if (PTL != refmap.end()) {
+        count++;
+    }
+    if (PPR != refmap.end()) {
+        count++;
+    }
+    if (PPP != refmap.end()) {
+        count++;
+    }
+    if (PDT != refmap.end()) {
+        count++;
+    }
+
+    std::string person;
+    if (count == 4) {
+        auto EED = refmap.find("EED");
+        if (EED != refmap.end()) {
+            person = EED->second;
         }
     }
-    if (!lyricist.empty()) {
+    else {
+        auto itL = refmap.find("LYR");
+        if (itL != refmap.end()) {
+            person = itL->second;
+        }
+    }
+
+    auto pos = person.find(",");
+    if (pos != std::string::npos) {
+        std::string lastname = person.substr(0, pos);
+        std::string firstname = person.substr(pos + 1);
+        person = firstname + " " + lastname;
+    }
+
+    if ((count != 4) && (!person.empty())) {
+        auto itLD = refmap.find("LDT");
+        if (itLD != refmap.end()) {
+            person += " (" + itLD->second + ")";
+        }
+    }
+    else if ((count == 4) && (!person.empty())) {
+        person += ", <rend fontstyle=\"italic\">ed.</rend>";
+    }
+
+    if (!person.empty()) {
         output += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
-        output += unescapeHtmlEntities(lyricist);
+        output += unescapeHtmlEntities(person);
         output += "</rend>\n";
         if (linecount > 1) {
             output += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
@@ -2644,6 +2677,7 @@ std::string HumdrumInput::automaticHeaderLeft(
             output += "</rend>\n";
         }
     }
+
     return output;
 }
 
@@ -2720,33 +2754,46 @@ std::string HumdrumInput::automaticHeaderCenter(
     std::string PPR; // publisher
     std::string PPP; // publisher place
     std::string PDT; // publication date
+    std::string PUBformat; // publication format
 
     it = refmap.find("PTL");
     if (it != refmap.end()) {
         PTL = it->second;
         counter++;
     }
+
     it = refmap.find("PPR");
     if (it != refmap.end()) {
         PPR = it->second;
         counter++;
     }
+
     it = refmap.find("PPP");
     if (it != refmap.end()) {
         PPP = it->second;
         counter++;
     }
+
     it = refmap.find("PDT");
     if (it != refmap.end()) {
         PDT = it->second;
         counter++;
     }
+
+    it = refmap.find("PUB-format");
+    if (it != refmap.end()) {
+        PUBformat = it->second;
+    }
+
     std::string subtitle;
     if (counter == 4) {
+        if (!PUBformat.empty()) {
+            subtitle += "in ";
+        }
         subtitle += "<rend fontstyle=\"italic\">";
         subtitle += PTL;
         subtitle += "</rend>";
-        subtitle += ", (";
+        subtitle += " (";
         subtitle += PPP;
         subtitle += ": ";
         subtitle += PPR;
