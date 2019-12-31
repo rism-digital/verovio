@@ -5595,35 +5595,35 @@ void HumdrumInput::fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg
 {
     // triplet-whole + triplet-breve cases
     for (int i = 1; i < (int)tg.size(); i++) {
-        if ((tg[i].tupletstart == 2) && (tg[i].tupletend == 1) && (tg[i - 1].tupletstart == 1)
-            && (tg[i - 1].tupletend == 1)) {
-            tg[i].tupletstart = 0;
-            tg[i - 1].tupletend = 0;
+        if ((tg.at(i).tupletstart == 2) && (tg.at(i).tupletend == 1) && (tg.at(i - 1).tupletstart == 1)
+            && (tg.at(i - 1).tupletend == 1)) {
+            tg.at(i).tupletstart = 0;
+            tg.at(i - 1).tupletend = 0;
         }
     }
 
     // two triplet-halfs + triplet-breve case
     for (int i = 2; i < (int)tg.size(); i++) {
-        if ((tg[i].tupletstart == 2) && (tg[i].tupletend == 1) && (tg[i - 1].tupletstart == 0)
-            && (tg[i - 1].tupletend == 1) && (tg[i - 2].tupletstart == 1) && (tg[i - 2].tupletend == 0)) {
-            tg[i - 1].numscale = 1;
-            tg[i - 2].numscale = 1;
-            tg[i].tupletstart = 0;
-            tg[i - 1].tupletend = 0;
-            tg[i].numbase = 2;
+        if ((tg.at(i).tupletstart == 2) && (tg.at(i).tupletend == 1) && (tg.at(i - 1).tupletstart == 0)
+            && (tg.at(i - 1).tupletend == 1) && (tg.at(i - 2).tupletstart == 1) && (tg.at(i - 2).tupletend == 0)) {
+            tg.at(i - 1).numscale = 1;
+            tg.at(i - 2).numscale = 1;
+            tg.at(i).tupletstart = 0;
+            tg.at(i - 1).tupletend = 0;
+            tg.at(i).numbase = 2;
         }
     }
 
     // two triplet-halfs + triplet-breve case + two triplet-halfs
     for (int i = 2; i < (int)tg.size(); i++) {
-        if ((tg[i].tupletstart == 0) && (tg[i].tupletend == 2) && (tg[i - 1].tupletstart == 2)
-            && (tg[i - 1].tupletend == 0) && (tg[i - 2].tupletstart == 1) && (tg[i - 2].tupletend == 1)) {
-            tg[i].tupletend = 1;
-            tg[i - 1].tupletstart = 0;
-            tg[i - 2].tupletend = 0;
-            tg[i - 2].numbase = 2;
-            tg[i].numscale = 1;
-            tg[i - 1].numscale = 1;
+        if ((tg.at(i).tupletstart == 0) && (tg.at(i).tupletend == 2) && (tg.at(i - 1).tupletstart == 2)
+            && (tg.at(i - 1).tupletend == 0) && (tg.at(i - 2).tupletstart == 1) && (tg.at(i - 2).tupletend == 1)) {
+            tg.at(i).tupletend = 1;
+            tg.at(i - 1).tupletstart = 0;
+            tg.at(i - 2).tupletend = 0;
+            tg.at(i - 2).numbase = 2;
+            tg.at(i).numscale = 1;
+            tg.at(i - 1).numscale = 1;
         }
     }
 }
@@ -5646,18 +5646,18 @@ void HumdrumInput::printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg,
         if (layerdata[i]->size() < 8) {
             cerr << "\t";
         }
-        cerr << tg[i].group << "\t";
-        cerr << tg[i].bracket << "\t";
-        cerr << tg[i].num << "\t";
-        cerr << tg[i].numbase << "\t";
-        cerr << tg[i].numscale << "\t";
-        cerr << tg[i].beamstart << "\t";
-        cerr << tg[i].beamend << "\t";
-        cerr << tg[i].gbeamstart << "\t";
-        cerr << tg[i].gbeamend << "\t";
-        cerr << "TS:" << tg[i].tupletstart << "\t";
-        cerr << "TE:" << tg[i].tupletend << "\t";
-        cerr << tg[i].priority;
+        cerr << tg.at(i).group << "\t";
+        cerr << tg.at(i).bracket << "\t";
+        cerr << tg.at(i).num << "\t";
+        cerr << tg.at(i).numbase << "\t";
+        cerr << tg.at(i).numscale << "\t";
+        cerr << tg.at(i).beamstart << "\t";
+        cerr << tg.at(i).beamend << "\t";
+        cerr << tg.at(i).gbeamstart << "\t";
+        cerr << tg.at(i).gbeamend << "\t";
+        cerr << "TS:" << tg.at(i).tupletstart << "\t";
+        cerr << "TE:" << tg.at(i).tupletend << "\t";
+        cerr << tg.at(i).priority;
         cerr << endl;
     }
     cerr << "============================================" << endl;
@@ -5671,7 +5671,7 @@ void HumdrumInput::printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg,
 void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
     std::vector<hum::HTp> &layerdata, int layerindex, bool grace)
 {
-    const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
+    const humaux::HumdrumBeamAndTuplet &tg = tgs.at(layerindex);
     int beamstart = tg.beamstart;
     if (grace) {
         beamstart = tg.gbeamstart;
@@ -5679,9 +5679,9 @@ void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::Hum
     int beamend;
 
     for (int i = layerindex; i < (int)layerdata.size(); ++i) {
-        beamend = tgs[i].beamend;
+        beamend = tgs.at(i).beamend;
         if (grace) {
-            beamend = tgs[i].gbeamend;
+            beamend = tgs.at(i).gbeamend;
         }
         if (!layerdata[i]->isData()) {
             continue;
@@ -5719,13 +5719,13 @@ void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::Hum
 bool HumdrumInput::checkForTremolo(
     std::vector<hum::HTp> &layerdata, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, int startindex)
 {
-    int beamnumber = tgs[startindex].beamstart;
+    int beamnumber = tgs.at(startindex).beamstart;
     std::vector<hum::HTp> notes;
     for (int i = startindex; i < (int)layerdata.size(); i++) {
         if (layerdata[i]->isNote()) {
             notes.push_back(layerdata[i]);
         }
-        if (tgs[i].beamend == beamnumber) {
+        if (tgs.at(i).beamend == beamnumber) {
             break;
         }
     }
@@ -5865,7 +5865,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
     std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int layerindex)
 {
     Beam *beam;
-    const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
+    const humaux::HumdrumBeamAndTuplet &tg = tgs.at(layerindex);
     hum::HTp token = layerdata[layerindex];
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     int staffindex = m_currentstaff - 1;
@@ -6145,8 +6145,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     // ggg processGlobalDirections(token, staffindex);
 
     for (int i = 0; i < (int)layerdata.size(); ++i) {
-        if (prespace[i] > 0) {
-            addSpace(elements, pointers, prespace[i]);
+        if (prespace.at(i) > 0) {
+            addSpace(elements, pointers, prespace.at(i));
         }
         if (layerdata[i]->isData() && layerdata[i]->isNull()) {
             // print any global text directions attacked to the null token
@@ -6557,7 +6557,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDirections(layerdata[i], staffindex);
         }
 
-        handleGroupEnds(tgs[i], elements, pointers);
+        handleGroupEnds(tgs.at(i), elements, pointers);
     }
 
     if (prespace.size() > layerdata.size()) {
@@ -10571,18 +10571,18 @@ bool HumdrumInput::shouldHideBeamBracket(
         return false;
     }
     bool beamedge = false;
-    int targettup = tgs[layerindex].tupletstart;
+    int targettup = tgs.at(layerindex).tupletstart;
     int i = layerindex + 1;
     hum::HTp endtok = NULL;
     while (i < (int)layerdata.size()) {
-        if (tgs[i].tupletend == targettup) {
+        if (tgs.at(i).tupletend == targettup) {
             endtok = layerdata[i];
             break;
         }
-        if (tgs[i].beamstart) {
+        if (tgs.at(i).beamstart) {
             beamedge = true;
         }
-        if (tgs[i].beamend) {
+        if (tgs.at(i).beamend) {
             beamedge = true;
         }
         i++;
@@ -10611,7 +10611,7 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     hum::HTp token = layerdata[layerindex];
-    const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
+    const humaux::HumdrumBeamAndTuplet &tg = tgs.at(layerindex);
 
     Tuplet *tuplet = new Tuplet;
     setTupletLocationId(tuplet, tgs, layerdata, layerindex);
@@ -10911,13 +10911,13 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     if (!hastupletQ) {
         tg.resize(layerdata.size());
         for (int i = 0; i < (int)layerdata.size(); ++i) {
-            tg[i].gbeamstart = gbeamstart[i];
-            tg[i].gbeamend = gbeamend[i];
+            tg.at(i).gbeamstart = gbeamstart.at(i);
+            tg.at(i).gbeamend = gbeamend.at(i);
             if (indexmapping2[i] < 0) {
                 continue;
             }
-            tg[i].beamstart = beamstartboolean[indexmapping2[i]];
-            tg[i].beamend = beamendboolean[indexmapping2[i]];
+            tg.at(i).beamstart = beamstartboolean.at(indexmapping2.at(i));
+            tg.at(i).beamend = beamendboolean.at(indexmapping2.at(i));
         }
         return;
     }
@@ -10995,7 +10995,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                     continue;
                 }
                 ingroup = true;
-                tupletgroups[j] = tupletnum;
+                tupletgroups.at(j) = tupletnum;
                 if (tupletcount == 0) {
                     samedurtup = true;
                     tupletdur = fulldur[j];
@@ -11027,8 +11027,8 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (checkForTupletForcedBreak(duritems, i)) {
             tcorrection++;
         }
-        if (tupletgroups[i]) {
-            tupletgroups[i] += tcorrection;
+        if (tupletgroups.at(i)) {
+            tupletgroups.at(i) += tcorrection;
         }
     }
     if (tcorrection) {
@@ -11059,15 +11059,15 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     hum::HumNum groupdur;
     bool hasRest = false;
     for (int i = 0; i < (int)poweroftwo.size(); ++i) {
-        if ((!beamstarts.empty()) && beamstarts2[i]) {
+        if ((!beamstarts.empty()) && beamstarts2.at(i)) {
             // beamstate = true;
         }
 
-        if (poweroftwo[i]) {
+        if (poweroftwo.at(i)) {
             // not a tuplet
             continue;
         }
-        if (tupletgroups[i]) {
+        if (tupletgroups.at(i)) {
             // already in a tuplet group
             continue;
         }
@@ -11084,7 +11084,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 ending = j - 1;
                 break;
             }
-            if (tupletgroups[j]) {
+            if (tupletgroups.at(j)) {
                 ending = j - 1;
                 break;
             }
@@ -11098,7 +11098,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (ending >= 0) {
             // create a new tuplet group (which will require a bracket).
             for (j = i; j <= ending; ++j) {
-                tupletgroups[j] = tupletnum;
+                tupletgroups.at(j) = tupletnum;
                 // Only turn on a tuplet bracket if the tuplet is not inside
                 // of a beam (may have to change if a tuplet bracket is
                 // desired within a beam).
@@ -11122,29 +11122,29 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<bool> tstart(tupletgroups.size(), false);
     std::vector<bool> tend(tupletgroups.size(), false);
     for (int i = 0; i < (int)tupletgroups.size(); ++i) {
-        if (!tupletgroups[i]) {
+        if (!tupletgroups.at(i)) {
             continue;
         }
-        if (!tstart[tupletgroups[i] - 1]) {
-            tupletstartboolean[i] = tupletgroups[i];
-            tstart[tupletgroups[i] - 1] = true;
+        if (!tstart.at(tupletgroups.at(i) - 1)) {
+            tupletstartboolean[i] = tupletgroups.at(i);
+            tstart.at(tupletgroups.at(i) - 1) = true;
         }
     }
 
     for (int i = (int)tupletgroups.size() - 1; i >= 0; i--) {
-        if (!tupletgroups[i]) {
+        if (!tupletgroups.at(i)) {
             continue;
         }
-        if (!tend[tupletgroups[i] - 1]) {
-            tupletendboolean[i] = tupletgroups[i];
-            tend[tupletgroups[i] - 1] = true;
+        if (!tend.at(tupletgroups.at(i) - 1)) {
+            tupletendboolean.at(i) = tupletgroups.at(i);
+            tend.at(tupletgroups.at(i) - 1) = true;
         }
     }
 
     std::vector<int> tuptop(tupletgroups.size(), -1);
     std::vector<int> tupbot(tupletgroups.size(), -1);
     for (int i = 0; i < (int)tupletgroups.size(); ++i) {
-        if (!tupletgroups[i]) {
+        if (!tupletgroups.at(i)) {
             continue;
         }
         hum::HumNum nextpowoftwo;
@@ -11176,13 +11176,13 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
 
         if ((tuptop[i] != tuptop[i - 1]) || (tupbot[i] != tupbot[i - 1])) {
-            if (tupletgroups[i] == tupletgroups[i - 1]) {
+            if (tupletgroups.at(i) == tupletgroups.at(i - 1)) {
                 correction++;
                 tupletstartboolean[i] = true;
                 tupletendboolean[i - 1] = true;
             }
         }
-        tupletgroups[i] += correction;
+        tupletgroups.at(i) += correction;
     }
 
     for (int i = 0; i < (int)tuptop.size(); i++) {
@@ -11208,74 +11208,74 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     tg.resize(layerdata.size());
     for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (indexmapping2[i] < 0) {
-            tg[i].group = -1;
-            tg[i].bracket = -1;
-            tg[i].num = -1;
-            tg[i].numbase = -1;
-            tg[i].numscale = 1;
-            tg[i].beamstart = 0;
-            tg[i].beamend = 0;
-            tg[i].gbeamstart = gbeamstart[i];
-            tg[i].gbeamend = gbeamend[i];
-            tg[i].tupletstart = 0;
-            tg[i].tupletend = 0;
-            tg[i].priority = ' ';
+            tg.at(i).group = -1;
+            tg.at(i).bracket = -1;
+            tg.at(i).num = -1;
+            tg.at(i).numbase = -1;
+            tg.at(i).numscale = 1;
+            tg.at(i).beamstart = 0;
+            tg.at(i).beamend = 0;
+            tg.at(i).gbeamstart = gbeamstart.at(i);
+            tg.at(i).gbeamend = gbeamend.at(i);
+            tg.at(i).tupletstart = 0;
+            tg.at(i).tupletend = 0;
+            tg.at(i).priority = ' ';
         }
         else {
-            tg[i].group = tupletgroups.at(indexmapping2[i]);
-            tg[i].bracket = tupletbracket.at(indexmapping2[i]);
-            tg[i].num = tuptop.at(indexmapping2[i]);
-            tg[i].numbase = tupbot.at(indexmapping2[i]);
-            tg[i].beamstart = beamstartboolean.at(indexmapping2[i]);
-            tg[i].beamend = beamendboolean.at(indexmapping2[i]);
-            tg[i].gbeamstart = gbeamstart.at(i);
-            tg[i].gbeamend = gbeamend.at(i);
-            tg[i].tupletstart = tupletstartboolean.at(indexmapping2[i]);
-            tg[i].tupletend = tupletendboolean.at(indexmapping2[i]);
-            tg[i].numscale = 1; // initialize numscale
-            if (tg[i].group > 0) {
-                tg[i].numscale = tupletscale.at(indexmapping2[i]);
-                if (tg[i].numscale == 0) {
-                    tg[i].numscale = 1;
+            tg.at(i).group = tupletgroups.at(indexmapping2.at(i));
+            tg.at(i).bracket = tupletbracket.at(indexmapping2.at(i));
+            tg.at(i).num = tuptop.at(indexmapping2.at(i));
+            tg.at(i).numbase = tupbot.at(indexmapping2.at(i));
+            tg.at(i).beamstart = beamstartboolean.at(indexmapping2.at(i));
+            tg.at(i).beamend = beamendboolean.at(indexmapping2.at(i));
+            tg.at(i).gbeamstart = gbeamstart.at(i);
+            tg.at(i).gbeamend = gbeamend.at(i);
+            tg.at(i).tupletstart = tupletstartboolean.at(indexmapping2.at(i));
+            tg.at(i).tupletend = tupletendboolean.at(indexmapping2.at(i));
+            tg.at(i).numscale = 1; // initialize numscale
+            if (tg.at(i).group > 0) {
+                tg.at(i).numscale = tupletscale.at(indexmapping2.at(i));
+                if (tg.at(i).numscale == 0) {
+                    tg.at(i).numscale = 1;
                 }
-                else if (tg[i].numscale < 0) {
-                    tg[i].numscale *= -1;
+                else if (tg.at(i).numscale < 0) {
+                    tg.at(i).numscale *= -1;
                 }
             }
             else {
-                tg[i].numscale = 1;
-                if (tg[i].numscale == 0) {
-                    tg[i].numscale = 1;
+                tg.at(i).numscale = 1;
+                if (tg.at(i).numscale == 0) {
+                    tg.at(i).numscale = 1;
                 }
-                else if (tg[i].numscale < 0) {
-                    tg[i].numscale *= -1;
+                else if (tg.at(i).numscale < 0) {
+                    tg.at(i).numscale *= -1;
                 }
             }
-            if (tg[i].group > 0) {
-                if (tg[i].group < (int)adjustcount.size()) {
-                    if (adjustcount[tg[i].group] % tg[i].num == 0) {
-                        tg[i].numscale = adjustcount[tg[i].group] / tg[i].num;
+            if (tg.at(i).group > 0) {
+                if (tg.at(i).group < (int)adjustcount.size()) {
+                    if (adjustcount[tg.at(i).group] % tg.at(i).num == 0) {
+                        tg.at(i).numscale = adjustcount[tg.at(i).group] / tg.at(i).num;
                     }
-                    if (tg[i].numscale == 0) {
-                        tg[i].numscale = 1;
+                    if (tg.at(i).numscale == 0) {
+                        tg.at(i).numscale = 1;
                     }
-                    else if (tg[i].numscale < 0) {
-                        tg[i].numscale *= -1;
+                    else if (tg.at(i).numscale < 0) {
+                        tg.at(i).numscale *= -1;
                     }
                 }
             }
         }
     }
 
-    // Renumber tuplet groups in sequence (otherwise the mergeTupletCuttingBeam()
+    // Renumber tuplet groups in sequence (otherwise the mergeTupletsCuttingBeam()
     // function will delete the 1st group if it is not the first tuplet.
     int tcounter = 0;
     for (int i = 0; i < (int)tg.size(); i++) {
-        if (tg[i].tupletstart) {
-            tg[i].tupletstart = ++tcounter;
+        if (tg.at(i).tupletstart) {
+            tg.at(i).tupletstart = ++tcounter;
         }
-        else if (tg[i].tupletend) {
-            tg[i].tupletend = tcounter;
+        else if (tg.at(i).tupletend) {
+            tg.at(i).tupletend = tcounter;
         }
     }
 
@@ -11317,7 +11317,7 @@ bool HumdrumInput::checkForTupletForcedBreak(const std::vector<hum::HTp> &durite
 
 //////////////////////////////
 //
-// HumdrumInput::mergeTupletCuttingBeam -- When a tuplet ends on a beamed note,
+// HumdrumInput::mergeTupletsCuttingBeam -- When a tuplet ends on a beamed note,
 //     but it can be continued with another tuplet of the same type, then merge the
 //     two tuplets.  These cases are caused by groupings needed at a higher level
 //     than the beat according to the time signature.
@@ -11325,86 +11325,89 @@ bool HumdrumInput::checkForTupletForcedBreak(const std::vector<hum::HTp> &durite
 
 void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
+
+    // newtg is a list of only durational items, removing things like clefs and barlines.
     vector<humaux::HumdrumBeamAndTuplet *> newtg;
     for (int i = 0; i < (int)tg.size(); i++) {
-        if (tg[i].group >= 0) {
-            newtg.push_back(&tg[i]);
+        if (tg.at(i).group >= 0) {
+            newtg.push_back(&tg.at(i));
         }
     }
 
     std::vector<int> inbeam(newtg.size(), 0);
     for (int i = 0; i < (int)inbeam.size(); i++) {
-        if (newtg[i]->beamstart) {
-            inbeam[i] = newtg[i]->beamstart;
+        if (newtg.at(i)->beamstart) {
+            inbeam.at(i) = newtg.at(i)->beamstart;
         }
-        else if (newtg[i]->beamend) {
-            inbeam[i] = 0;
+        else if (newtg.at(i)->beamend) {
+            inbeam.at(i) = 0;
         }
         else if (i > 0) {
-            inbeam[i] = inbeam[i - 1];
+            inbeam.at(i) = inbeam.at(i - 1);
         }
         else {
-            inbeam[i] = 0;
+            inbeam.at(i) = 0;
         }
     }
 
     std::vector<int> scaleadj(newtg.size(), 1);
+
     for (int i = 0; i < (int)newtg.size(); i++) {
-        if (!(inbeam[i] && newtg[i]->tupletend)) {
+        if (!(inbeam.at(i) && newtg.at(i)->tupletend)) {
             continue;
         }
         if (i >= (int)newtg.size() - 1) {
             continue;
         }
-        if (!newtg[i + 1]->tupletstart) {
+        if (!newtg.at(i + 1)->tupletstart) {
             continue;
         }
-        if (newtg[i]->num != newtg[i + 1]->num) {
+        if (newtg.at(i)->num != newtg.at(i + 1)->num) {
             continue;
         }
-        if (newtg[i]->numbase != newtg[i + 1]->numbase) {
+        if (newtg.at(i)->numbase != newtg.at(i + 1)->numbase) {
             continue;
         }
         // Need to merge adjacent tuplets (only can merge one pair at a time
         // properly with scaleadj at the moment).
-        int target = newtg[i]->tupletend;
+        int target = newtg.at(i)->tupletend;
         for (int j = i; j >= 0; j--) {
-            if (!newtg[j]->tupletstart) {
-                scaleadj[j] = 2;
+            if (!newtg.at(j)->tupletstart) {
+                scaleadj.at(j) = 2;
                 continue;
             }
-            if (target == newtg[j]->tupletstart) {
-                scaleadj[j] = 2;
+            if (target == newtg.at(j)->tupletstart) {
+                scaleadj.at(j) = 2;
                 break;
             }
             cerr << "SOMETHING STANGE HAPPENED HERE" << endl;
         }
-        target = newtg[i + 1]->tupletstart;
-        scaleadj[i] = 2;
-        scaleadj[i + 1] = 2;
+        target = newtg.at(i + 1)->tupletstart;
+        scaleadj.at(i) = 2;
+        scaleadj.at(i + 1) = 2;
         for (int j = i + 1; j < (int)newtg.size(); j++) {
-            if (newtg[j]->group < 0) {
+            if (newtg.at(j)->group < 0) {
                 continue;
             }
-            if (!newtg[j]->tupletend) {
-                scaleadj[j] = 2;
+            if (!newtg.at(j)->tupletend) {
+                scaleadj.at(j) = 2;
                 continue;
             }
-            if (target == newtg[j]->tupletend) {
-                scaleadj[j] = 2;
+            if (target == newtg.at(j)->tupletend) {
+                scaleadj.at(j) = 2;
                 break;
             }
             cerr << "SOMETHING STANGE HAPPENED HERE2" << endl;
         }
 
-        newtg[i]->tupletend = 0;
-        newtg[i + 1]->tupletstart = 0;
+        newtg.at(i)->tupletend = 0;
+        newtg.at(i + 1)->tupletstart = 0;
         for (int j = i + 2; j < (int)newtg.size(); j++) {
-            if (newtg[j]->tupletstart) {
-                newtg[j]->tupletstart--;
+            if (newtg.at(j)->tupletstart) {
+                newtg.at(j)->tupletstart--;
             }
-            if (newtg[j]->tupletend) {
-                newtg[j]->tupletend--;
+            if (newtg.at(j)->tupletend) {
+                newtg.at(j)->tupletend--;
             }
         }
     }
@@ -11412,16 +11415,16 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
     if (m_debug) {
         cerr << "INDEX\tBEAM\tTSTART\tTEND\tNUM\tNUMBASE\n";
         for (int i = 0; i < (int)tg.size(); i++) {
-            cerr << "I " << i << ":\t" << inbeam[i] << "\t" << tg[i].tupletstart << "\t" << tg[i].tupletend << "\t"
-                 << tg[i].num << "\t" << tg[i].numbase << "\tSA=" << scaleadj[i] << endl;
+            cerr << "I " << i << ":\t" << inbeam.at(i) << "\t" << tg.at(i).tupletstart << "\t" << tg.at(i).tupletend
+                 << "\t" << tg.at(i).num << "\t" << tg.at(i).numbase << "\tSA=" << scaleadj.at(i) << endl;
         }
     }
 
-    for (int i = 0; i < (int)tg.size(); i++) {
-        if (tg[i].group < 0) {
+    for (int i = 0; i < (int)newtg.size(); i++) {
+        if (newtg.at(i)->group < 0) {
             continue;
         }
-        tg[i].numscale *= scaleadj[i];
+        newtg.at(i)->numscale *= scaleadj.at(i);
     }
 }
 
@@ -11435,14 +11438,14 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
 void HumdrumInput::resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
     for (int i = 0; i < (int)tg.size(); ++i) {
-        if (tg[i].beamstart && tg[i].tupletstart) {
+        if (tg.at(i).beamstart && tg.at(i).tupletstart) {
             resolveTupletBeamStartTie(tg, i);
         }
-        else if (tg[i].beamend && tg[i].tupletend) {
+        else if (tg.at(i).beamend && tg.at(i).tupletend) {
             resolveTupletBeamEndTie(tg, i);
         }
         else {
-            tg[i].priority = ' ';
+            tg.at(i).priority = ' ';
         }
     }
 }
@@ -11460,22 +11463,22 @@ void HumdrumInput::resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndT
 {
 
     // presumably tumnum and beamnum are non-zero...
-    int tupnum = tg[index].tupletstart;
-    int beamnum = tg[index].beamstart;
+    int tupnum = tg.at(index).tupletstart;
+    int beamnum = tg.at(index).beamstart;
     for (int i = index; i < (int)tg.size(); ++i) {
-        if (tg[i].beamend == beamnum) {
+        if (tg.at(i).beamend == beamnum) {
             // beam ends before tuplet does, so tuplet should be give priority.
-            tg[index].priority = 'T'; // open tuplet first
+            tg.at(index).priority = 'T'; // open tuplet first
             return;
         }
-        if (tg[i].tupletend == tupnum) {
+        if (tg.at(i).tupletend == tupnum) {
             // tuplet ends before beam does, so beam should be opened first.
-            tg[index].priority = 'B'; // open beam first
+            tg.at(index).priority = 'B'; // open beam first
             return;
         }
     }
     // strange problem
-    tg[index].priority = ' ';
+    tg.at(index).priority = ' ';
 }
 
 //////////////////////////////
@@ -11491,22 +11494,22 @@ void HumdrumInput::resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTup
 {
 
     // presumably tumnum and beamnum are non-zero...
-    int tupnum = tg[index].tupletend;
-    int beamnum = tg[index].beamend;
+    int tupnum = tg.at(index).tupletend;
+    int beamnum = tg.at(index).beamend;
     for (int i = index; i >= 0; i--) {
-        if (tg[i].beamstart == beamnum) {
+        if (tg.at(i).beamstart == beamnum) {
             // beam starts after tuplet does, so beam should be closed first.
-            tg[index].priority = 'B'; // close beam first
+            tg.at(index).priority = 'B'; // close beam first
             return;
         }
-        if (tg[i].tupletstart == tupnum) {
+        if (tg.at(i).tupletstart == tupnum) {
             // tuplet starts after beam does, so tuplet should be closed first.
-            tg[index].priority = 'T'; // close tuplet first
+            tg.at(index).priority = 'T'; // close tuplet first
             return;
         }
     }
     // strange problem
-    tg[index].priority = ' ';
+    tg.at(index).priority = ' ';
 }
 
 //////////////////////////////
