@@ -707,16 +707,43 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
         return;
     }
 
-    bool up = true;
+    bool up = false;
 
     int y1 = (up) ? note1->GetDrawingY() : topY;
     int y2 = (up) ? topY : note2->GetDrawingY();
+    int xControl = x2;
+    int yControl = y1;
+    bool drawArrow = true;
+    
+    if (spanningType == SPANNING_START) {
+        drawArrow = false;
+        // We need to re-calculate the y2 when going down
+        if (!up) {
+            y2 = staff->GetDrawingY() + note2->GetDrawingYRel();
+        }
+        y2 -= (y2 - y1) / 2;
+        yControl = y1 + (y2 - y1) / 4;
+        xControl = x2 - (x2 - x1) / 4;
+    }
+    else if (spanningType == SPANNING_END) {
+        // We need to recalcultate the y1 when going up
+        if (up) {
+            y1 = staff->GetDrawingY() + note1->GetDrawingYRel();
+        }
+        y1 += (y2 - y1) / 2;
+        yControl = y1 + (y2 - y1) / 4;
+        xControl = x2 - (x2 - x1) / 4;
+    }
+    else if (spanningType == SPANNING_MIDDLE) {
+        // For now just skip bend that span over an entire measure since they probably do not exist
+        return;
+    }
 
     Point points[3];
     points[0].x = ToDeviceContextX(x1);
     points[0].y = ToDeviceContextY(y1);
-    points[1].x = ToDeviceContextX(x2);
-    points[1].y = ToDeviceContextY(y1);
+    points[1].x = ToDeviceContextX(xControl);
+    points[1].y = ToDeviceContextY(yControl);
     points[2].x = ToDeviceContextX(x2);
     points[2].y = ToDeviceContextY(y2);
 
@@ -725,11 +752,11 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     arrowHeight = (up) ? arrowHeight : -arrowHeight;
     Point arrow[3];
     arrow[0].x = ToDeviceContextX(x2 - arrowWidth);
-    arrow[0].y = ToDeviceContextY(y2 - arrowHeight);
+    arrow[0].y = ToDeviceContextY(y2);
     arrow[1].x = ToDeviceContextX(x2 + arrowWidth);
-    arrow[1].y = ToDeviceContextY(y2 - arrowHeight);
+    arrow[1].y = ToDeviceContextY(y2);
     arrow[2].x = ToDeviceContextX(x2);
-    arrow[2].y = ToDeviceContextY(y2);
+    arrow[2].y = ToDeviceContextY(y2 + arrowHeight);
 
     /************** draw it **************/
 
@@ -742,7 +769,9 @@ void View::DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflecti
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawQuadBezierPath(points);
-    dc->DrawPolygon(3, arrow);
+    if (drawArrow) {
+        dc->DrawPolygon(3, arrow);
+    }
 
     dc->ResetPen();
     dc->ResetBrush();
