@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Dec 22 15:43:51 PST 2019
+// Last Modified: Thu Jan  2 23:02:54 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1241,6 +1241,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isLabel                   (void) const;
 		bool     hasRhythm                 (void) const;
 		bool     hasBeam                   (void) const;
+		bool     hasFermata                (void) const;
 		bool     equalTo                   (const std::string& pattern);
 
 		// kern-specific functions:
@@ -1257,6 +1258,9 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isTimeSignature           (void);
 		bool     isTempo                   (void);
 		bool     isMensurationSymbol       (void);
+		bool     isInstrumentDesignation   (void);
+		bool     isInstrumentName          (void);
+		bool     isInstrumentAbbreviation  (void);
 
 		bool     hasSlurStart              (void);
 		bool     hasSlurEnd                (void);
@@ -4166,7 +4170,7 @@ class MxmlEvent {
 		std::vector<MxmlEvent*> getLinkedNotes     (void);
 		void               attachToLastEvent  (void);
 		bool               isChord            (void) const;
-		ostream&           print              (ostream& out);
+		std::ostream&      print              (std::ostream& out);
 		int                getSequenceNumber  (void) const;
 		int                getVoiceNumber     (void) const;
 		void               setVoiceNumber     (int value);
@@ -6609,6 +6613,7 @@ class Tool_musicxml2hum : public HumTool {
 		void prepareRdfs       (std::vector<MxmlPart>& partdata);
 		void printRdfs         (ostream& out);
 		void printResult       (ostream& out, HumdrumFile& outfile);
+		void addMeasureOneNumber(HumdrumFile& infile);
 
 	public:
 
@@ -7039,31 +7044,31 @@ class Tool_ruthfix : public HumTool {
 
 class Tool_satb2gs : public HumTool {
 	public:
-		         Tool_satb2gs    (void);
-		        ~Tool_satb2gs    () {};
+		         Tool_satb2gs      (void);
+		        ~Tool_satb2gs      () {};
 
-		bool     run             (HumdrumFileSet& infiles);
-		bool     run             (HumdrumFile& infile);
-		bool     run             (const string& indata, ostream& out);
-		bool     run             (HumdrumFile& infile, ostream& out);
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void     initialize      (HumdrumFile& infile);
-		void     processFile     (HumdrumFile& infile);
-		void     example         (void);
-		void     usage           (const string& command);
-		void     convertData     (HumdrumFile& infile);
-		int      getSatbTracks   (vector<int>& tracks, HumdrumFile& infile);
-		void     printSpine      (HumdrumFile& infile, int row, int col,
-		                          vector<int>& satbtracks);
-		void     printExInterp   (HumdrumFile& infile, int line,
-		                          vector<int>& tracks);
-		void     printLastLine   (HumdrumFile& infile, int line,
-		                          vector<int>& tracks);
-	private:
-		int    debugQ    = 0;             // used with --debug option
-};
+		void    processFile        (HumdrumFile& infile);
+		void    initialize         (void);
+		void    getTrackInfo       (std::vector<std::vector<int>>& tracks,
+		                            HumdrumFile& infile);
 
+		void    printTerminatorLine(std::vector<std::vector<int>>& tracks);
+		int     getNewTrackCount   (std::vector<std::vector<int>>& tracks);
+		void    printRegularLine   (HumdrumFile& infile, int line,
+		                            std::vector<std::vector<int>>& tracks);
+		void    printSpineMergeLine(std::vector<std::vector<int>>& tracks);
+		void    printSpineSplitLine(std::vector<std::vector<int>>& tracks);
+		void    printHeaderLine    (HumdrumFile& infile, int line,
+		                            std::vector<std::vector<int>>& tracks);
+		bool    validateHeader     (HumdrumFile& infile);
+
+};
 
 
 class Tool_shed : public HumTool {
@@ -7077,12 +7082,16 @@ class Tool_shed : public HumTool {
 		bool     run               (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void    processFile        (HumdrumFile& infile);
-		void    searchAndReplaceInterpretation(HumdrumFile& infile);
-		void    searchAndReplaceExinterp(HumdrumFile& infile);
-		void    searchAndReplaceData(HumdrumFile& infile);
-		void    searchAndReplaceBarline(HumdrumFile& infile);
-		void    searchAndReplaceLocalComment(HumdrumFile& infile);
+		void    processFile                      (HumdrumFile& infile);
+		void    searchAndReplaceInterpretation   (HumdrumFile& infile);
+		void    searchAndReplaceExinterp         (HumdrumFile& infile);
+		void    searchAndReplaceData             (HumdrumFile& infile);
+		void    searchAndReplaceBarline          (HumdrumFile& infile);
+		void    searchAndReplaceLocalComment     (HumdrumFile& infile);
+		void    searchAndReplaceReferenceRecords (HumdrumFile& infile);
+		void    searchAndReplaceReferenceKeys    (HumdrumFile& infile);
+		void    searchAndReplaceReferenceValues  (HumdrumFile& infile);
+
 		void    initialize         (void);
 		void    initializeSegment  (HumdrumFile& infile);
 		bool    isValid            (HTp token);
@@ -7107,6 +7116,9 @@ class Tool_shed : public HumTool {
 		bool m_exinterp       = false; // process exclusive interpretations
 		bool m_interpretation = false; // process interpretations
 		bool m_localcomment   = false; // process local comments
+		bool m_reference      = false; // process reference records
+		bool m_referencekey   = false; // process reference records keys
+		bool m_referencevalue = false; // process reference records values
 		std::string m_xInterp; // used with -x option
 		std::string m_yInterp; // used with -y option
 		std::string m_zInterp; // used with -z option

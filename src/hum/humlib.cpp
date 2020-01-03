@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Dec 22 15:43:51 PST 2019
+// Last Modified: Thu Jan  2 23:02:54 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8572,7 +8572,7 @@ string HumGrid::createBarToken(int m, int barnum, GridMeasure* measure) {
 
 //////////////////////////////
 //
-// HumGrid::addMetricBarNumbers --
+// HumGrid::getMetricBarNumbers --
 //
 
 void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
@@ -8601,7 +8601,8 @@ void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
 		}
 	}
 
-	int counter = 1;
+	// int counter = 1;  // this was causing a problem https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/254
+	int counter = 0;
 	if (mdur[start] == tsdur[start]) {
 		m_pickup = false;
 		counter++;
@@ -25951,6 +25952,21 @@ bool HumdrumToken::hasBeam(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::hasFermata --
+//
+
+bool HumdrumToken::hasFermata(void) const {
+	if (this->find(';') != string::npos) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::equalTo --
 //
 
@@ -26214,6 +26230,59 @@ bool HumdrumToken::isMensurationSymbol(void) {
 		return false;
 	}
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isInstrumentDesignation -- Such as *Iclars for B-flat clarinet.
+//
+
+bool HumdrumToken::isInstrumentDesignation(void) {
+	if (this->compare(0, 2, "*I") != 0) {
+		return false;
+	}
+	for (int i=2; i<(int)this->size(); i++) {
+		if (!isalpha(this->at(i))) {
+			return false;
+		}
+		if (!islower(this->at(i))) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isInstrumentName -- True if an instrument name token.
+//
+
+bool HumdrumToken::isInstrumentName(void) {
+	if (this->compare(0, 3, "*I\"") != 0) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isInstrumentAbbreviation -- True if an instrument abbreviation token.
+//
+
+bool HumdrumToken::isInstrumentAbbreviation(void) {
+	if (this->compare(0, 3, "*I'") != 0) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 
@@ -52734,8 +52803,8 @@ void Tool_extract::expandSpines(vector<int>& field, vector<int>& subfield, vecto
 //   given exclusive interpretation.
 //
 
-void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield, vector<int>& model,
-		HumdrumFile& infile, const string& exinterp) {
+void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield,
+		vector<int>& model, HumdrumFile& infile, const string& exinterp) {
 
 	vector<int> target;
 	target.resize(infile.getMaxTrack()+1);
@@ -52746,21 +52815,20 @@ void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield, vect
 
 	for (int t=0; t<(int)trackstarts.size(); t++) {
 		if (trackstarts[t]->isDataType(exinterp)) {
-			target[t] = 1;
+			target.at(t + 1) = 1;
 		}
 	}
 
 	field.reserve(infile.getMaxTrack()*2);
 	field.resize(0);
 
-	int i, j;
 	int lasti = (int)target.size();
-	for (i=(int)target.size()-1; i>0; i--) {
+	for (int i=(int)target.size()-1; i>0; i--) {
 		if (target[i]) {
 			lasti = i;
 			field.push_back(i);
-			for (j=i+1; j<(int)target.size(); j++) {
-				if (!target[j]) {
+			for (int j=i+1; j<(int)target.size(); j++) {
+				if (!target.at(j)) {
 					field.push_back(j);
 				} else {
 					break;
@@ -52775,17 +52843,17 @@ void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield, vect
 	if (lasti != 1) {
 		extras = lasti - 1;
 		field.resize(field.size()+extras);
-		for (i=0; i<(int)field.size()-extras; i++) {
+		for (int i=0; i<(int)field.size()-extras; i++) {
 			field[(int)field.size()-1-i] = field[(int)field.size()-1-extras-i];
 		}
-		for (i=0; i<extras; i++) {
+		for (int i=0; i<extras; i++) {
 			field[i] = i+1;
 		}
 	}
 
 	if (debugQ) {
 		m_humdrum_text << "!!reverse: ";
-		for (i=0; i<(int)field.size(); i++) {
+		for (int i=0; i<(int)field.size(); i++) {
 			m_humdrum_text << field[i] << " ";
 		}
 		m_humdrum_text << endl;
@@ -52796,7 +52864,6 @@ void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield, vect
 
 	model.resize(field.size());
 	fill(model.begin(), model.end(), 0);
-
 }
 
 
@@ -54364,6 +54431,9 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(imitation, infile, commands[i].second, status);
 		} else if (commands[i].first == "extract") {
 			RUNTOOL(extract, infile, commands[i].second, status);
+		} else if (commands[i].first == "extractx") {
+			// Humdrum Extras emulation
+			RUNTOOL(extract, infile, commands[i].second, status);
 		} else if (commands[i].first == "melisma") {
 			RUNTOOL(melisma, infile, commands[i].second, status);
 		} else if (commands[i].first == "metlev") {
@@ -54375,6 +54445,9 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "restfill") {
 			RUNTOOL(restfill, infile, commands[i].second, status);
 		} else if (commands[i].first == "satb2gs") {
+			RUNTOOL(satb2gs, infile, commands[i].second, status);
+		} else if (commands[i].first == "satb2gsx") {
+			// humlib cli emulation
 			RUNTOOL(satb2gs, infile, commands[i].second, status);
 		} else if (commands[i].first == "simat") {
 			RUNTOOL2(simat, infile, infile, commands[i].second, status);
@@ -63587,6 +63660,10 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	Tool_ruthfix ruthfix;
 	ruthfix.run(outfile);
 
+	addMeasureOneNumber(outfile);
+
+	// Maybe implement barnum tool and apply here based on options.
+
 	Tool_chord chord;
 	chord.run(outfile);
 
@@ -63636,6 +63713,48 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	printRdfs(out);
 
 	return status;
+}
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addMeasureOneNumber -- For the first measure if it occurs before
+//    the first data, change = to =1.  Maybe check next measure for a number and
+//    addd one less than that number instead of 1.
+//
+
+void Tool_musicxml2hum::addMeasureOneNumber(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			break;
+		}
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		string value = *token;
+		bool hasdigit = false;
+		for (int j=0; j<(int)value.size(); j++) {
+			if (isdigit(value[j])) {
+				hasdigit = true;
+				break;
+			}
+		}
+		if (hasdigit) {
+			break;
+		}
+		// there is no digit on barline, so add one.
+		string newvalue = "=";
+		if (value.size() < 2) {
+			newvalue += "1";
+		} else if (value[1] != '=') {
+			newvalue += "1";
+			newvalue += value.substr(1);
+		}
+		token->setText(newvalue);
+		// add "1" to other spines here?
+		break;
+	}
 }
 
 
@@ -72562,18 +72681,14 @@ void Tool_ruthfix::createTiedNote(HTp left, HTp right) {
 //
 
 Tool_satb2gs::Tool_satb2gs(void) {
-   define("d|debug=b",    "Debugging information");
-   define("author=b",     "Program author");
-   define("version=b",    "Program version");
-   define("example=b",    "Program examples");
-   define("h|help=b",     "Short description");
+	// no options
 }
 
 
 
 /////////////////////////////////
 //
-// Tool_satb2gs::run -- Primary interfaces to the tool.
+// Tool_satb2gs::run -- Do the main work of the tool.
 //
 
 bool Tool_satb2gs::run(HumdrumFileSet& infiles) {
@@ -72607,14 +72722,10 @@ bool Tool_satb2gs::run(HumdrumFile& infile, ostream& out) {
 	return status;
 }
 
-//
-// In-place processing of file:
-//
 
 bool Tool_satb2gs::run(HumdrumFile& infile) {
-	initialize(infile);
+	initialize();
 	processFile(infile);
-	infile.createLinesFromTokens();
 	return true;
 }
 
@@ -72622,77 +72733,59 @@ bool Tool_satb2gs::run(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_satb2gs::initialize -- extract time signature lines for
-//    each **kern spine in file.
+// Tool_satb2gs::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
 //
 
-void Tool_satb2gs::initialize(HumdrumFile& infile) {
-   // handle basic options:
-   if (getBoolean("author")) {
-      m_free_text << "Written by Craig Stuart Sapp, "
-           << "craig@ccrma.stanford.edu, Feb 2011" << endl;
-      exit(0);
-   } else if (getBoolean("version")) {
-      m_free_text << getCommand() << ", version: 16 Dec 2016" << endl;
-      m_free_text << "compiled: " << __DATE__ << endl;
-      exit(0);
-   } else if (getBoolean("help")) {
-      usage(getCommand());
-      exit(0);
-   } else if (getBoolean("example")) {
-      example();
-      exit(0);
-   }
-
-   debugQ     =  getBoolean("debug");
+void Tool_satb2gs::initialize(void) {
+	// do nothing
 }
 
 
 
 //////////////////////////////
 //
-// Tool_satb2gs::processFile -- data is assumed to be in the order from
-// bass, tenor, alto, soprano, with non-**kern data found
-// in any order.  Only the first four **kern spines in the file
-// will be considered.
+// Tool_satb2gs::processFile --
 //
 
 void Tool_satb2gs::processFile(HumdrumFile& infile) {
-	vector<int> satbtracks;
-	satbtracks.resize(4);
-	int exinterpline = getSatbTracks(satbtracks, infile);
-	int lastline = -1;
-	for (int i=0; i<exinterpline; i++) {
-		m_humdrum_text << infile[i] << endl;
+	vector<vector<int>> tracks;
+	getTrackInfo(tracks, infile);
+
+	if ((tracks[1].size() != 2) || (tracks[3].size() != 2)) {
+		cerr << "Warning: not processing data since there must be at least four **kern spines" << endl;
+		return;
 	}
 
-	printExInterp(infile, exinterpline, satbtracks);
+	bool goodHeader = validateHeader(infile);
+	if (!goodHeader) {
+		cerr << "Warning: no spine manipulations allows within header, not processing file" << endl;
+		return;
+	}
 
-	for (int i=exinterpline+1; i<infile.getLineCount(); i++) {
-		if (infile[i].getFieldCount() == 1) {
+	bool dataQ = false;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
 			m_humdrum_text << infile[i] << endl;
 			continue;
 		}
-		if (*infile.token(i, 0) == "*-") {
-			lastline = i;
-			break;
-		}
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			printSpine(infile, i, j, satbtracks);
-			if (j < infile[i].getFieldCount() - 1) {
-				m_humdrum_text << '\t';
+		if (infile[i].isData()) {
+			if (!dataQ) {
+				printSpineSplitLine(tracks);
 			}
+			dataQ = true;
 		}
-		m_humdrum_text << '\n';
-	}
-
-	if (lastline < 0) {
-		return;
-	}
-	printLastLine(infile, lastline, satbtracks);
-
-	for (int i=lastline+1; i<infile.getLineCount(); i++) {
-		m_humdrum_text << infile[i] << endl;
+		if (!dataQ) {
+			printHeaderLine(infile, i, tracks);
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if (*token == "*-") {
+			printSpineMergeLine(tracks);
+			printTerminatorLine(tracks);
+			continue;
+		}
+		printRegularLine(infile, i, tracks);
 	}
 }
 
@@ -72700,301 +72793,503 @@ void Tool_satb2gs::processFile(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_satb2gs::printLastLine --
+// Tool_satb2gs::printRegularLine -- print a regular line
+//   (between first data line and before terminator line).
 //
 
-void Tool_satb2gs::printLastLine(HumdrumFile& infile, int line, vector<int>& tracks) {
+void Tool_satb2gs::printRegularLine(HumdrumFile& infile, int line,
+		vector<vector<int>>& tracks) {
+
+	int spinecount = infile[line].getFieldCount();
 	int track;
-
-	stringstream output;
-	for (int j=0; j<infile[line].getFieldCount() - 1; j++) {
-		track = infile.token(line, j)->getTrack();
-		if ((track == tracks[1]) || (track == tracks[3])) {
-			continue;
-		}
-		if (track == tracks[0])  {
-			output << "*v\t*v";
-		} else if (track == tracks[2])  {
-			output << "*\t*";
-		} else {
-			output << "*";
-		}
-		output << "\t";
+	HTp token;
+	vector<vector<vector<HTp>>> tokens;
+	tokens.resize(5);
+	for (int i=0; i<(int)tracks.size(); i++) {
+		tokens[i].resize(tracks[i].size());
 	}
 
-	string strang = output.str();
-	HumRegex hre;
-	hre.replaceDestructive(strang, "", "\t+$");
-	m_humdrum_text << strang;
-	m_humdrum_text << endl;
-
-	stringstream output2;
-	for (int j=0; j<infile[line].getFieldCount() - 1; j++) {
-		track = infile.token(line, j)->getTrack();
-		if ((track == tracks[1]) || (track == tracks[3])) {
-			continue;
+	// store tokens in output order:
+	for (int i=0; i<(int)tracks.size(); i++) {
+		for (int j=0; j<(int)tracks[i].size(); j++) {
+			int target = tracks[i][j];
+			for (int k=0; k<spinecount; k++) {
+				token = infile.token(line, k);
+				track = token->getTrack();
+				if (track != target) {
+					continue;
+				}
+				tokens[i][j].push_back(token);
+			}
 		}
-		if (track == tracks[2])  {
-			output2 << "*v\t*v";
-		} else if (track == tracks[0])  {
-			output2 << "*";
-		} else {
-			output2 << "*";
-		}
-		output2 << "\t";
 	}
 
-	output2 << ends;
-	strang = output2.str();
-	hre.replaceDestructive(strang, "", "\t+$");
-	m_humdrum_text << strang;
-	m_humdrum_text << endl;
+	int counter = 0;
+	HTp top;
+	HTp bot;
+	HTp inner;
+	HTp outer;
+	bool suppressQ;
 
-	for (int j=0; j<infile[line].getFieldCount()-2; j++) {
-		m_humdrum_text << infile.token(line, j);
-		if (j < infile[line].getFieldCount() - 3) {
+	// now print in output order, but hide fermatas
+	// in the alto and tenor parts if there are fermatas
+	// int the soprano and bass parts respectively.
+	for (int i=0; i<(int)tokens.size(); i++) {
+		for (int j=0; j<(int)tokens[i].size(); j++) {
+			switch (i) {
+				case 0:
+				case 2:
+				case 4:
+					// non-kern spines
+					for (int k=0; k<(int)tokens[i][j].size(); k++) {
+						m_humdrum_text << tokens[i][j][k];
+						counter++;
+						if (counter < spinecount) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
+
+				case 1:
+				case 3:
+					top = tokens[i][0][0];
+					bot = tokens[i][1][0];
+					if (i == 1) {
+						// tenor: top is inner
+						inner = top;
+						outer = bot;
+					} else {
+						// alto: bottom is inner
+						inner = bot;
+						outer = top;
+					}
+					if (inner->hasFermata() && outer->hasFermata()) {
+						suppressQ = true;
+					} else {
+						suppressQ = false;
+					}
+
+					for (int k=0; k<(int)tokens[i][j].size(); k++) {
+						token = tokens[i][j][k];
+						if (suppressQ && ((void*)token == (void*)inner)) {
+							string value = *token;
+							// Make fermata invisible by adding 'y' after it:
+							for (int m=0; m<(int)value.size(); m++) {
+								m_humdrum_text << value[m];
+								if (value[m] == ';') {
+									if (m < (int)value.size() - 1) {
+										if (value.at(m+1) != 'y') {
+											m_humdrum_text << 'y';
+										}
+									} else {
+											m_humdrum_text << 'y';
+									}
+								}
+							}
+						} else {
+							m_humdrum_text << token;
+						}
+						counter++;
+						if (counter < spinecount) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
+			}
+		}
+	}
+
+	m_humdrum_text << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_satb2gs::printTerminatorLine --  Print the terminator line in the
+//   output data.
+//
+
+void Tool_satb2gs::printTerminatorLine(vector<vector<int>>& tracks) {
+	int count = getNewTrackCount(tracks);
+	for (int i=0; i<count; i++) {
+		m_humdrum_text << "*-";
+		if (i < count - 1) {
 			m_humdrum_text << "\t";
 		}
 	}
-	m_humdrum_text << "\n";
-
+	m_humdrum_text << endl;
 }
 
 
 
 //////////////////////////////
 //
-// Tool_satb2gs::printExInterp -- print only tenor and soprano tracks
+// Tool_satb2gs::printSpineSplitLine --
 //
 
-void Tool_satb2gs::printExInterp(HumdrumFile& infile, int line,
-		vector<int>& tracks) {
-	stringstream output;
-	int j;
-	int track;
+void Tool_satb2gs::printSpineSplitLine(vector<vector<int>>& tracks) {
+	int count = getNewTrackCount(tracks);
+	int counter = 0;
 
-	// first print exclusive interpretations
-	for (j=0; j<infile[line].getFieldCount(); j++) {
-		track = infile.token(line, j)->getTrack();
-		if ((track == tracks[1]) || (track == tracks[3])) {
-			continue;
+	for (int i=0; i<(int)tracks.size(); i++) {
+		switch (i) {
+			case 0:
+			case 2:
+			case 4:
+				for (int j=0; j<(int)tracks[i].size(); j++) {
+					m_humdrum_text << "*";
+					counter++;
+					if (counter < count) {
+						m_humdrum_text << "\t";
+					}
+				}
+				break;
+			case 1:
+			case 3:
+				m_humdrum_text << "*^";
+				counter++;
+				if (counter < count) {
+					m_humdrum_text << "\t";
+				}
+				break;
 		}
-		output << infile.token(line, j) << "\t";
 	}
-	string strang = output.str();
-	HumRegex hre;
-	hre.replaceDestructive(strang, "", "\t+$");
-	m_humdrum_text << strang;
 	m_humdrum_text << endl;
-
-	stringstream output2;
-	stringstream output3;
-	for (j=0; j<infile[line].getFieldCount(); j++) {
-		track = infile.token(line, j)->getTrack();
-		if ((track == tracks[1]) || (track == tracks[3])) {
-			continue;
-		}
-		if (track == tracks[0]) {
-			output3 << "*clefF4";
-			output2 << "*^";
-		} else if (track == tracks[2]) {
-			output3 << "*clefG2";
-			output2 << "*^";
-		} else {
-			output3 << "*";
-			output2 << "*";
-		}
-		output3 << "\t";
-		output2 << "\t";
-	}
-
-	strang = output3.str();
-	hre.replaceDestructive(strang, "", "\t+$");
-	m_humdrum_text << strang;
-	m_humdrum_text << endl;
-
-	strang = output2.str();
-	hre.replaceDestructive(strang, "", "\t+$");
-	m_humdrum_text << strang;
-	m_humdrum_text << endl;
-
 }
 
 
 
-///////////////////////
+//////////////////////////////
 //
-// Tool_satb2gs::printSpine --
+// Tool_satb2gs::printSpineMergeLine --
 //
 
-void Tool_satb2gs::printSpine(HumdrumFile& infile, int row, int col,
-		vector<int>& satbtracks) {
-	int track = infile.token(row, col)->getTrack();
-	int target = -1;
-	for (int k=0; k<(int)satbtracks.size(); k++) {
-		if (track == satbtracks[k]) {
-			if (k % 2 == 0) {
-				target = satbtracks[k+1];
-			} else {
-				target = satbtracks[k-1];
+void Tool_satb2gs::printSpineMergeLine(vector<vector<int>>& tracks) {
+	int count = getNewTrackCount(tracks);
+	count += 2;
+	int counter;
+
+	if (!tracks[2].empty()) {
+		// do not need to place merges on separate lines since they are
+		// separated by non-kern spine(s) between bass and soprano subspines.
+
+		counter = 0;
+		for (int i=0; i<(int)tracks.size(); i++) {
+			switch (i) {
+				case 0:
+				case 2:
+				case 4:
+					for (int j=0; j<(int)tracks[i].size(); j++) {
+						m_humdrum_text << "*";
+						counter++;
+						if (counter < count) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
+				case 1:
+				case 3:
+					for (int j=0; j<(int)tracks[i].size(); j++) {
+						m_humdrum_text << "*v";
+						counter++;
+						if (counter < count) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
 			}
+		}
+		m_humdrum_text << endl;
+
+	} else {
+		// Merges for tenor/bass and soprano/alto need to be placed
+		// on separate lines.
+
+		// First merge tenor/bass (tracks[1])
+		counter = 0;
+		for (int i=0; i<(int)tracks.size(); i++) {
+			switch (i) {
+				case 0:
+				case 2:
+				case 3:
+				case 4:
+					for (int j=0; j<(int)tracks[i].size(); j++) {
+						m_humdrum_text << "*";
+						counter++;
+						if (counter < count) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
+				case 1:
+					for (int j=0; j<(int)tracks[i].size(); j++) {
+						m_humdrum_text << "*v";
+						counter++;
+						if (counter < count) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
+			}
+		}
+		m_humdrum_text << endl;
+
+		// Now merge soprano/alto (tracks[3])
+		count--;
+		counter = 0;
+		for (int i=0; i<(int)tracks.size(); i++) {
+			switch (i) {
+				case 0:
+				case 2:
+				case 4:
+					for (int j=0; j<(int)tracks[i].size(); j++) {
+						m_humdrum_text << "*";
+						counter++;
+						if (counter < count) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
+				case 1:
+					m_humdrum_text << "*";
+					m_humdrum_text << "\t";
+					counter++;
+					break;
+				case 3:
+					for (int j=0; j<(int)tracks[i].size(); j++) {
+						m_humdrum_text << "*v";
+						counter++;
+						if (counter < count) {
+							m_humdrum_text << "\t";
+						}
+					}
+					break;
+			}
+		}
+		m_humdrum_text << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_satb2gs::getNewTrackCount -- Return the number of tracks (spines)
+//   in the output data (not counting subspines).
+//
+
+int Tool_satb2gs::getNewTrackCount(vector<vector<int>>& tracks) {
+	int sum = 0;
+	for (int i=0; i<(int)tracks.size(); i++) {
+		for (int j=0; j<(int)tracks[i].size(); j++) {
+			sum++;
+		}
+	}
+	// remove two spines that were merged into two others:
+	sum -= 2;
+	return sum;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_satb2gs::printHeaderLine --
+//
+
+void Tool_satb2gs::printHeaderLine(HumdrumFile& infile, int line,
+		vector<vector<int>>& tracks) {
+	int count = infile.getMaxTrack() - 2;
+
+	HTp token;
+	int counter = 0;
+	for (int i=0; i<(int)tracks.size(); i++) {
+		switch (i) {
+			case 0:
+			case 2:
+			case 4:
+				for (int j=0; j<(int)tracks[i].size(); j++) {
+					token = infile.token(line, tracks[i][j]-1);
+					m_humdrum_text << token;
+					counter++;
+					if (counter < count) {
+						m_humdrum_text << "\t";
+					}
+				}
+				break;
+
+			case 1:
+			case 3:
+				token = infile.token(line, tracks[i][0]-1);
+				if (token->isInstrumentName()) {
+					// suppress instrument names, but keep blank name
+					// to force indent.
+					m_humdrum_text << "*I\"";
+				} else if (token->isInstrumentAbbreviation()) {
+					// suppress instrument abbreviations
+					m_humdrum_text << "*";
+				} else if (token->isInstrumentDesignation()) {
+					// suppress instrument designations (such as *Itenor)
+					m_humdrum_text << "*";
+				} else if (token->isClef()) {
+					if (i == 1) {
+						m_humdrum_text << "*clefF4";
+					} else {
+						m_humdrum_text << "*clefG2";
+					}
+				} else {
+					m_humdrum_text << token;
+				}
+				counter++;
+				if (counter < count) {
+					m_humdrum_text << "\t";
+				}
+				break;
+		}
+	}
+	m_humdrum_text << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_satb2gs::getTrackInfo --
+//     tracks 0 = list of spines before bass **kern spine
+//     tracks 1 = tenor and then bass **kern track numbers
+//     tracks 2 = aux. spines after after tenor and then after bass
+//     tracks 3 = soprano and then alto **kern track numbers
+//     tracks 4 = aux. spines after after soprano and then after alto
+//
+
+void Tool_satb2gs::getTrackInfo(vector<vector<int>>& tracks, HumdrumFile& infile) {
+	tracks.resize(5);
+	for (int i=0; i<(int)tracks.size(); i++) {
+		tracks[i].clear();
+	}
+	vector<HTp> sstarts;
+	infile.getSpineStartList(sstarts);
+	int track;
+
+	// fill in tracks[0]: spines before first **kern spine
+	for (int i=0; i<(int)sstarts.size(); i++) {
+		if (sstarts[i]->isKern()) {
 			break;
 		}
+		track = sstarts[i]->getTrack();
+		tracks[0].push_back(track);
 	}
 
-	if (target < 0) {
-		// does not need to be switched
-		m_humdrum_text << infile.token(row, col);
-		return;
-	}
+	int kcount = 0;
 
-	// print the SAT or B token(s) (there should be only one token for each)
-	//
-	// If a tenor has a fermata and a bass has a fermata and both are
-	// the same duration, then hide the tenor's fermata.
-	//
-	// If an alto has a fermata and a soprano has a fermata and both are
-	// the same duration, then hide the alto's fermata.
-	//
-
-
-	// first identify the column for each voice, considering only the first
-	// layer, if there are multiple layers.
-	vector<int> cols(4);
-	fill(cols.begin(), cols.end(), -1);
-	for (int j=0; j<infile[row].getFieldCount(); j++) {
-		track = infile.token(row, j)->getTrack();
-		for (int k=0; k<(int)satbtracks.size(); k++) {
-			if (cols[k] >= 0) {
-				continue;
-			}
-			if (track == satbtracks[k]) {
-				cols[k] = j;
-			}
+	kcount = 0;
+	// Store tracks related to the tenor part:
+	for (int i=0; i<(int)sstarts.size(); i++) {
+		if (sstarts[i]->isKern()) {
+			kcount++;
+		}
+		if (kcount > 2) {
+			break;
+		}
+		if (kcount < 2) {
+			continue;
+		}
+		track = sstarts[i]->getTrack();
+		if (sstarts[i]->isKern()) {
+			tracks[1].push_back(track);
+		} else {
+			tracks[2].push_back(track);
 		}
 	}
 
+	kcount = 0;
+	// Store tracks related to the bass part:
+	for (int i=0; i<(int)sstarts.size(); i++) {
+		if (sstarts[i]->isKern()) {
+			kcount++;
+		}
+		if (kcount > 1) {
+			break;
+		}
+		if (kcount < 1) {
+			continue;
+		}
+		track = sstarts[i]->getTrack();
+		if (sstarts[i]->isKern()) {
+			tracks[1].push_back(track);
+		} else {
+			tracks[2].push_back(track);
+		}
+	}
 
-	HumRegex hre;
-	string strang;
-	int count = 0;
-	bool foundnames = false;
-	bool foundabbreviations = false;
-	for (int j=0; j<infile[row].getFieldCount(); j++) {
-		track = infile.token(row, j)->getTrack();
-		if (track == target) {
-			if (count > 0) {
-				m_humdrum_text << '\t';
-			}
-			strang = *infile.token(row,j);
-			hre.replaceDestructive(strang, "!*clef", "^\\*clef");
-			if ((!foundnames) && hre.search(strang, R"(^\*I")")) {
-				foundnames = true;
-				hre.replaceDestructive(strang, R"(!*I"Soprano")", R"(^\*I"Soprano)");
-				hre.replaceDestructive(strang, R"(!*I"Alto")"   , R"(^\*I"Alto)");
-				hre.replaceDestructive(strang, R"(!*I"Tenor")"  , R"(^\*I"Tenor)");
-				hre.replaceDestructive(strang, R"(!*I\"Bass")"  , R"(^\*I"Bass)");
-			}
-			if ((!foundabbreviations) && hre.search(strang, R"(^\*I')")) {
-				foundabbreviations = true;
-				hre.replaceDestructive(strang, R"(!*I'S")", R"(^\*I'S)");
-				hre.replaceDestructive(strang, R"(!*I'A")", R"(^\*I'A)");
-				hre.replaceDestructive(strang, R"(!*I'T")", R"(^\*I'T)");
-				hre.replaceDestructive(strang, R"(!*I'B")", R"(^\*I'B)");
-			}
+	kcount = 0;
+	// Store tracks related to the soprano part:
+	for (int i=0; i<(int)sstarts.size(); i++) {
+		if (sstarts[i]->isKern()) {
+			kcount++;
+		}
+		if (kcount > 4) {
+			break;
+		}
+		if (kcount < 4) {
+			continue;
+		}
+		track = sstarts[i]->getTrack();
+		if (sstarts[i]->isKern()) {
+			tracks[3].push_back(track);
+		} else {
+			tracks[4].push_back(track);
+		}
+	}
 
-			if (infile[row].isData()) {
-				if ((cols[0] == col) &&
-							(infile.token(row, col)->find(';') != string::npos)) {
-					HumNum tenordur;
-					HumNum bassdur;
-					tenordur = Convert::recipToDuration(infile.token(row, cols[0]));
-					bassdur  = Convert::recipToDuration(infile.token(row, cols[1]));
-					if (tenordur == bassdur) {
-						hre.replaceDestructive(strang, ";y", ";", "g"); // hide fermata
-						// hre.replaceDestructive(strang, ";y", ";", "g"); // hide fermata
-					}
-				}
-
-				if ((cols[3] == col) && (infile.token(row, col)->find(';') != string::npos)) {
-					HumNum altodur;
-					HumNum sopranodur;
-					altodur = Convert::recipToDuration(infile.token(row, cols[3]));
-					sopranodur  = Convert::recipToDuration(infile.token(row, cols[2]));
-					if (altodur == sopranodur) {
-						hre.replaceDestructive(strang, ";y", ";", "g"); // hide fermata
-					}
-				}
-
-			}
-
-			m_humdrum_text << strang;
-			count++;
+	kcount = 0;
+	// Store tracks related to the alto part:
+	for (int i=0; i<(int)sstarts.size(); i++) {
+		if (sstarts[i]->isKern()) {
+			kcount++;
+		}
+		if (kcount > 3) {
+			break;
+		}
+		if (kcount < 3) {
+			continue;
+		}
+		track = sstarts[i]->getTrack();
+		if (sstarts[i]->isKern()) {
+			tracks[3].push_back(track);
+		} else {
+			tracks[4].push_back(track);
 		}
 	}
 }
 
 
 
-///////////////////////////////
+//////////////////////////////
 //
-// Tool_satb2gs::getSatbTracks -- return the primary track numbers of
-//     the satb spines.
+// Tool_satb2gs::validateHeader -- Header cannot contain
+//   spine manipulators.
 //
 
-int Tool_satb2gs::getSatbTracks(vector<int>& tracks, HumdrumFile& infile) {
-	tracks.clear();
-	int output = -1;
-	int track;
+bool Tool_satb2gs::validateHeader(HumdrumFile& infile) {
 	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			break;
+		}
 		if (!infile[i].isInterpretation()) {
 			continue;
 		}
-		output = i;
-		for (int j=0; j<infile[i].getFieldCount(); j++) {
-			if (!infile.token(i, j)->isKern()) {
-				continue;
-			}
-			track = infile.token(i, j)->getTrack();
-			tracks.push_back(track);
-			if (tracks.size() == 4) {
-				return output;
-			}
+		HTp token = infile.token(i, 0);
+		if (token->isExclusive()) {
+			continue;
 		}
-		break;
+		if (infile[i].isManipulator()) {
+			return false;
+		}
 	}
 
-	if (tracks.size() != 4) {
-		m_error_text << "Error: there are " << tracks.size() << " **kern spines"
-			  << " in input data (needs to be 4)" << endl;
-		exit(1);
-	}
-
-	return output;
-}
-
-
-
-
-//////////////////////////////
-//
-// Tool_satb2gs::example -- example function calls to the program.
-//
-
-void Tool_satb2gs::example(void) {
-
-
-}
-
-
-
-//////////////////////////////
-//
-// Tool_satb2gs::usage -- command-line usage description and brief summary
-//
-
-void Tool_satb2gs::usage(const string& command) {
-
+	return true;
 }
 
 
@@ -73058,6 +73353,10 @@ bool Tool_shed::run(HumdrumFile& infile, ostream& out) {
 bool Tool_shed::run(HumdrumFile& infile) {
 	initialize();
 	initializeSegment(infile);
+	if (m_options.empty()) {
+		cerr << "Error: -e option is required" << endl;
+		return false;
+	}
 	for (int i=0; i<(int)m_options.size(); i++) {
 		prepareSearch(i);
 		processFile(infile);
@@ -73133,6 +73432,20 @@ void Tool_shed::prepareSearch(int index) {
 	}
 	if (m_option.find("L") != std::string::npos) {
 		m_localcomment = true;
+		m_data = false;
+	}
+	if (m_option.find("K") != std::string::npos) {
+		m_referencekey = true;
+		m_data = false;
+	}
+	if (m_option.find("V") != std::string::npos) {
+		m_referencevalue = true;
+		m_data = false;
+	}
+	if (m_option.find("R") != std::string::npos) {
+		m_reference = true;
+		m_referencekey = false;
+		m_referencevalue = false;
 		m_data = false;
 	}
 	if (m_option.find("D") != std::string::npos) {
@@ -73352,6 +73665,18 @@ void Tool_shed::processFile(HumdrumFile& infile) {
 		searchAndReplaceLocalComment(infile);
 	}
 
+	if (m_reference) {
+		searchAndReplaceReferenceRecords(infile);
+	}
+
+	if (m_referencekey) {
+		searchAndReplaceReferenceKeys(infile);
+	}
+
+	if (m_referencevalue) {
+		searchAndReplaceReferenceValues(infile);
+	}
+
 	if (m_exinterp) {
 		searchAndReplaceExinterp(infile);
 	}
@@ -73488,6 +73813,93 @@ void Tool_shed::searchAndReplaceLocalComment(HumdrumFile& infile) {
 				token->setText(text);
 				m_modified = true;
 			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceReferenceRecords --
+//
+
+void Tool_shed::searchAndReplaceReferenceRecords(HumdrumFile& infile) {
+	string isearch;
+	if (m_search[0] == '^') {
+		isearch = "^!!!" + m_search.substr(1);
+	} else {
+		isearch = "^!!!.*" + m_search;
+	}
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isGlobalReference()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if (hre.search(token, isearch, m_grepoptions)) {
+			string text = token->getText().substr(1);
+			hre.replaceDestructive(text, m_replace, m_search, m_grepoptions);
+			hre.replaceDestructive(text, "", "^!+");
+			text = "!!!" + text;
+			token->setText(text);
+			m_modified = true;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceReferenceKeys --
+//
+
+void Tool_shed::searchAndReplaceReferenceKeys(HumdrumFile& infile) {
+	string isearch = m_search;
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isGlobalReference()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		string key = infile[i].getReferenceKey();
+		if (hre.search(key, isearch, m_grepoptions)) {
+			hre.replaceDestructive(key, m_replace, m_search, m_grepoptions);
+			hre.replaceDestructive(key, "", "^!+");
+			hre.replaceDestructive(key, "", ":+$");
+			string value = infile[i].getReferenceValue();
+			string text = "!!!" + key + ": " + value;
+			token->setText(text);
+			m_modified = true;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_shed::searchAndReplaceReferenceValues --
+//
+
+void Tool_shed::searchAndReplaceReferenceValues(HumdrumFile& infile) {
+	string isearch = m_search;
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isGlobalReference()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		string value = infile[i].getReferenceValue();
+		if (hre.search(value, isearch, m_grepoptions)) {
+			hre.replaceDestructive(value, m_replace, m_search, m_grepoptions);
+			hre.replaceDestructive(value, "", "^!+");
+			hre.replaceDestructive(value, "", ":+$");
+			string key = infile[i].getReferenceKey();
+			string text = "!!!" + key + ": " + value;
+			token->setText(text);
+			m_modified = true;
 		}
 	}
 }
