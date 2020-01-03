@@ -67,3 +67,4 @@ emscripten/npm-dev/node_modules
 .vscode/settings.json
 main
 DerivedData
+verovio.wasm
