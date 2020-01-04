@@ -254,6 +254,10 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
         rightAlignment = dynamic_cast<Alignment *>(*riter);
         assert(rightAlignment);
 
+        if (rightAlignment->IsOfType({ ALIGNMENT_FULLMEASURE, ALIGNMENT_FULLMEASURE2 })) {
+            continue;
+        }
+
         // Do not go beyond the left bar line
         if (rightAlignment->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
             maxRight = measure->GetLeftBarLineRight();
@@ -345,12 +349,12 @@ void GraceAligner::AlignStack()
         ClassIdsComparison matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
-        element->FindAllChildByComparison(&children, &matchType);
+        element->FindAllDescendantByComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignmnet to all children
         for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
-            // Trick : FindAllChildByComparison include the element, which is probably a problem.
+            // Trick : FindAllDescendantByComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
             if (*childrenIter == element) continue;
             LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
@@ -368,7 +372,7 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        Object *reference = this->FindChildByComparison(&matchStaff);
+        Object *reference = this->FindDescendantByComparison(&matchStaff);
         if (!reference) return -VRV_UNSET;
         // The alignment is its parent
         leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
@@ -469,13 +473,14 @@ void Alignment::AddChild(Object *child)
 bool Alignment::HasAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    return (this->FindChildByComparison(&matchStaff, 1) != NULL);
+    return (this->FindDescendantByComparison(&matchStaff, 1) != NULL);
 }
 
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference *>(this->FindChildByComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef
+        = dynamic_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
@@ -513,8 +518,8 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         }
         // Non cross staff normal case
         else {
-            layerRef = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstParent(STAFF));
+            layerRef = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
             if (staffRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
@@ -579,7 +584,7 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
             return reference;
         }
         else if (staffN == VRV_UNSET) {
-            if ((*iter)->HasChild(element, 1)) return reference;
+            if ((*iter)->HasDescendant(element, 1)) return reference;
         }
     }
     return reference;
@@ -825,7 +830,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         params->m_isGraceAlignment = true;
 
         // Get the parent measure Aligner
-        MeasureAligner *measureAligner = dynamic_cast<MeasureAligner *>(this->GetFirstParent(MEASURE_ALIGNER));
+        MeasureAligner *measureAligner = dynamic_cast<MeasureAligner *>(this->GetFirstAncestor(MEASURE_ALIGNER));
         assert(measureAligner);
 
         std::vector<int>::iterator iter;
@@ -1075,11 +1080,11 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     // Detect the octave and mark them
     std::vector<Accid *>::iterator iter, octaveIter;
     for (iter = m_accidSpace.begin(); iter != m_accidSpace.end() - 1; ++iter) {
-        Note *note = dynamic_cast<Note *>((*iter)->GetFirstParent(NOTE));
+        Note *note = dynamic_cast<Note *>((*iter)->GetFirstAncestor(NOTE));
         assert(note);
         if (!note) continue;
         for (octaveIter = iter + 1; octaveIter != m_accidSpace.end(); ++octaveIter) {
-            Note *octave = dynamic_cast<Note *>((*octaveIter)->GetFirstParent(NOTE));
+            Note *octave = dynamic_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
             assert(octave);
             if (!octave) continue;
             // Same pitch, different octave, same accid - for now?

@@ -228,7 +228,7 @@ bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+        Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
         if (!layer) return false;
         int oct;
         data_PITCHNAME pname
@@ -266,8 +266,8 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
 {
     if (!m_doc->GetDrawingPage()) return false;
 
-    Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
-    Object *end = m_doc->GetDrawingPage()->FindChildByUuid(endid);
+    Object *start = m_doc->GetDrawingPage()->FindDescendantByUuid(startid);
+    Object *end = m_doc->GetDrawingPage()->FindDescendantByUuid(endid);
     // Check if both start and end elements exist
     if (!start || !end) {
         LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
@@ -283,7 +283,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
         return false;
     }
 
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
+    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
@@ -314,7 +314,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
 {
     if (!m_doc->GetDrawingPage()) return false;
 
-    Object *start = m_doc->GetDrawingPage()->FindChildByUuid(startid);
+    Object *start = m_doc->GetDrawingPage()->FindDescendantByUuid(startid);
     // Check if both start and end elements exist
     if (!start) {
         LogMessage("Element start id '%s' could not be found", startid.c_str());
@@ -330,7 +330,7 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
 
     /*
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
+    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
@@ -411,11 +411,11 @@ Object *EditorToolkitCMN::GetElement(std::string &elementId)
 
     // Try to get the element on the current drawing page
     if (m_doc->GetDrawingPage()) {
-        element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+        element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
     }
     // If it wasn't there, try on the whole doc
     if (!element) {
-        element = m_doc->FindChildByUuid(elementId);
+        element = m_doc->FindDescendantByUuid(elementId);
     }
 
     return element;
@@ -457,7 +457,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
 
         ArrayOfObjects lyric;
         ClassIdsComparison lyricsComparison({ VERSE, SYL });
-        currentNote->FindAllChildByComparison(&lyric, &lyricsComparison);
+        currentNote->FindAllDescendantByComparison(&lyric, &lyricsComparison);
         if (!lyric.empty()) {
             LogMessage("Inserting a note where a note has lyric content is not possible");
             return false;
@@ -483,7 +483,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
 
         ArrayOfObjects artics;
         ClassIdComparison articComparison(ARTIC);
-        currentNote->FindAllChildByComparison(&artics, &articComparison);
+        currentNote->FindAllDescendantByComparison(&artics, &articComparison);
         for (auto &artic : artics) {
             artic->MoveItselfTo(chord);
         }
@@ -538,12 +538,12 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
 
             ArrayOfObjects artics;
             ClassIdComparison articComparison(ARTIC);
-            chord->FindAllChildByComparison(&artics, &articComparison, 1);
+            chord->FindAllDescendantByComparison(&artics, &articComparison, 1);
             for (auto &artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }
-            delete chord;
             this->m_chainedId = chord->GetUuid();
+            delete chord;
             return true;
         }
         else if (count > 2) {

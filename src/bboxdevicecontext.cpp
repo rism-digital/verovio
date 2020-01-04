@@ -35,8 +35,8 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_drawingText = false;
     m_textAlignment = HORIZONTALALIGNMENT_left;
 
-    SetBrush(AxBLACK, AxSOLID);
-    SetPen(AxBLACK, 1, AxSOLID);
+    SetBrush(AxNONE, AxSOLID);
+    SetPen(AxNONE, 1, AxSOLID);
 
     m_update = update;
 
@@ -119,6 +119,16 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 }
 
 // calculated better
+void BBoxDeviceContext::DrawSimpleBezierPath(Point bezier[4])
+{
+    Point pos;
+    int width, height;
+    int minYPos, maxYPos;
+
+    BoundingBox::ApproximateBezierBoundingBox(bezier, pos, width, height, minYPos, maxYPos);
+    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+}
 void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     Point pos;
@@ -258,6 +268,12 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
     if (alignment != HORIZONTALALIGNMENT_NONE) {
         m_textAlignment = alignment;
     }
+}
+
+void BBoxDeviceContext::MoveTextVerticallyTo(int y)
+{
+    assert(m_drawingText);
+    m_textY = y;
 }
 
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)

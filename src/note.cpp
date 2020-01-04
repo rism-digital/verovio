@@ -115,7 +115,7 @@ bool Note::HasToBeAligned() const
 {
     if (!this->IsInLigature()) return true;
     Note *note = const_cast<Note *>(this);
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
     return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
 }
@@ -125,12 +125,12 @@ void Note::AddChild(Object *child)
     // additional verification for accid and artic - this will no be raised with editorial markup, though
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindChildByComparison(&isAttributeComparison))
+        if (this->FindDescendantByComparison(&isAttributeComparison))
             LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
     }
     else if (child->Is(ARTIC)) {
         IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindChildByComparison(&isAttributeComparison))
+        if (this->FindDescendantByComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
 
@@ -173,18 +173,18 @@ void Note::AddChild(Object *child)
 
 Accid *Note::GetDrawingAccid()
 {
-    Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
+    Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
     return accid;
 }
 
 Chord *Note::IsChordTone() const
 {
-    return dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 int Note::GetDrawingDur() const
 {
-    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
@@ -311,7 +311,7 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         return 0;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
@@ -512,9 +512,9 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -562,7 +562,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     // Nothing to do for notes that are not in a cluster
@@ -622,7 +622,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -652,7 +652,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     }
     else if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
-        dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+        dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
         params->m_chordDrawingX = this->GetDrawingX();
 
@@ -691,7 +691,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (!this->IsVisible()) {
@@ -743,10 +743,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
 
     if (!this->IsChordTone() && !this->IsMensural()) {
         if (!currentStem) {
@@ -788,7 +788,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
         if (chord && (chord->GetDots() == this->GetDots())) {

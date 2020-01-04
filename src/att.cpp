@@ -150,6 +150,8 @@ std::string Att::DurationToStr(data_DURATION data) const
         case DURATION_64: value = "64"; break;
         case DURATION_128: value = "128"; break;
         case DURATION_256: value = "256"; break;
+        case DURATION_512: value = "512"; break;
+        case DURATION_1024: value = "1024"; break;
         default:
             LogWarning("Unknown dur '%d'", data);
             value = "4";
@@ -179,6 +181,8 @@ data_DURATION Att::StrToDuration(std::string value, bool logWarning) const
     if (value == "64") return DURATION_64;
     if (value == "128") return DURATION_128;
     if (value == "256") return DURATION_256;
+    if (value == "512") return DURATION_512;
+    if (value == "1024") return DURATION_1024;
     if ((value.length() > 0) && (value[value.length() - 1] == 'p')) {
         // if (logWarning)
         // LogWarning("PPQ duration dur_s are not supported"); // remove it for now

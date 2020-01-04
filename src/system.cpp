@@ -29,6 +29,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "trill.h"
+#include "verse.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -185,19 +186,19 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
     ClassIdsComparison matchType({ CHORD, NOTE });
     ArrayOfObjects children;
     ArrayOfObjects::iterator childrenIter;
-    this->FindAllChildBetween(&children, &matchType, start, end);
+    this->FindAllDescendantBetween(&children, &matchType, start, end);
 
-    Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+    Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
-    Staff *staffStart = dynamic_cast<Staff *>(layerStart->GetFirstParent(STAFF));
+    Staff *staffStart = dynamic_cast<Staff *>(layerStart->GetFirstAncestor(STAFF));
     assert(staffStart);
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
-        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstParent(LAYER));
+        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstAncestor(LAYER));
         assert(layer);
-        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstAncestor(STAFF));
         assert(staff);
 
         // If the slur is spanning over several measure, the the children list will include note and chords
@@ -399,7 +400,7 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     Alignment *left = objectX->GetAlignment();
-    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstParent(MEASURE));
+    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstAncestor(MEASURE));
     if (objectXMeasure != params->m_lastMeasure) {
         left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
     }
@@ -476,7 +477,7 @@ int System::AdjustSylSpacing(FunctorParams *functorParams)
 
     // reset it
     params->m_overlapingSyl.clear();
-    params->m_previousSyl = NULL;
+    params->m_previousVerse = NULL;
     params->m_previousMeasure = NULL;
     params->m_freeSpace = 0;
     params->m_staffSize = 100;
@@ -494,13 +495,13 @@ int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
     }
 
     // Here we also need to handle the last syl of the measure - we check the alignment with the right barline
-    if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetContentRight()
+    if (params->m_previousVerse && params->m_lastSyl) {
+        int overlap = params->m_lastSyl->GetContentRight()
             - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
-        params->m_previousSyl->CalcHorizontalAdjustment(overlap, params);
+        params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
         if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(),
+            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
                 params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
         }
     }

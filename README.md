@@ -8,19 +8,25 @@ See the JavaScript toolkit running in the [MEI Viewer](http://www.verovio.org/me
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/movies/reflow.gif)
 
-Verovio can also render Plain and Easy (PAE) code and DARMS code and has a basic MusicXML import function. It is designed as a tool usable as a one-step conversion tool and it is written in pure standard C++ with no dependencies on third-party frameworks and libraries.
+Verovio can also render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code) and imports MusicXML, Humdrum data, and ABC notation. It is designed as a tool usable as a one-step conversion tool and it is written in pure standard C++.
 
 Verovio follows the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
 The project page is http://www.verovio.org. Verovio is available under the LGPL license (see LICENSE.txt).
 
+Building and using instructions
+-------------------------------
 
-NPM
----
+See the [wiki](https://github.com/rism-ch/verovio/wiki/Building-instructions), with instructions for:
+* [Command-line tool](https://github.com/rism-ch/verovio/wiki/Building-instructions#command-line-tool)
+* [XCode](https://github.com/rism-ch/verovio/wiki/Building-instructions#xcode)
+* [Visual Studio](https://github.com/rism-ch/verovio/wiki/Building-instructions#visual-studio)
+* [JavaScript](https://github.com/rism-ch/verovio/wiki/Building-instructions#javascript-toolkit)
+* [NPM](https://github.com/rism-ch/verovio/wiki/Building-instructions#npm)
+* [Python](https://github.com/rism-ch/verovio/wiki/Building-instructions#building-the-python-toolkit)
+* [Java](https://github.com/rism-ch/verovio/wiki/Building-instructions#building-the-java-toolkit)
+* [CocoaPods](https://github.com/rism-ch/verovio/wiki/Building-instructions#cocoapods)
 
-The development version is available via [NPM](https://www.npmjs.com/package/verovio-dev)
-
-    $ npm install verovio-dev
 
 LibMEI
 ------
@@ -35,6 +41,6 @@ If you are willing to contribute to Verovio, please follow the [contribution](do
 Example output
 --------------
 
-This page was generated with version 0.9.13-dev-b953d3b
+This page was generated with version 2.4.0-dev-2748fed
 
-![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-0.9.13-dev.png)
+![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-2.4.0-dev.png)

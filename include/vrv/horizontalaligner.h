@@ -361,7 +361,7 @@ public:
     virtual ~HorizontalAligner();
     virtual void Reset();
     ///@}
-    
+
     /**
      * Do not copy children for HorizontalAligner
      */

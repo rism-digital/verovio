@@ -40,6 +40,13 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    /**
+     * Calculate the adjustment according to the overlap and the free space available before.
+     * Will move the verse accordingly.
+     * Called from Verse::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     */
+    int AdjustPosition(int &overlap, int freeSpace, Doc *doc);
+
     //----------//
     // Functors //
     //----------//
@@ -48,6 +55,11 @@ public:
      * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareProcessingLists

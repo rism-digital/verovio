@@ -60,7 +60,7 @@ int Surface::GetMaxX()
     int max = 0;
     ClassIdComparison ac(ZONE);
     ArrayOfObjects zones;
-    FindAllChildByComparison(&zones, &ac);
+    FindAllDescendantByComparison(&zones, &ac);
     for (auto iter = zones.begin(); iter != zones.end(); iter++) {
         Zone *zone = dynamic_cast<Zone *>(*iter);
         assert(zone);
@@ -75,7 +75,7 @@ int Surface::GetMaxY()
     int max = 0;
     ClassIdComparison ac(ZONE);
     ArrayOfObjects zones;
-    FindAllChildByComparison(&zones, &ac);
+    FindAllDescendantByComparison(&zones, &ac);
     for (auto iter = zones.begin(); iter != zones.end(); iter++) {
         Zone *zone = dynamic_cast<Zone *>(*iter);
         assert(zone);

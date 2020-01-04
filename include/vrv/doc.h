@@ -77,9 +77,14 @@ public:
     bool GenerateDocumentScoreDef();
 
     /**
+     * Generate a document pgFoot if none is provided
+     */
+    bool GenerateFooter();
+
+    /**
      * Generate a document pgHead from the MEI header if none is provided
      */
-    bool GenerateHeaderAndFooter();
+    bool GenerateHeader();
 
     /**
      * Generate measure numbers from measure attributes
@@ -155,6 +160,7 @@ public:
     ///@{
     int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
+    int GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
     int GetTextLineHeight(FontInfo *font, bool graceSize) const;
     ///@}

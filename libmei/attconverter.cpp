@@ -578,6 +578,7 @@ std::string AttConverter::ColornamesToStr(data_COLORNAMES data) const
         case COLORNAMES_plum: value = "plum"; break;
         case COLORNAMES_powderblue: value = "powderblue"; break;
         case COLORNAMES_purple: value = "purple"; break;
+        case COLORNAMES_rebeccapurple: value = "rebeccapurple"; break;
         case COLORNAMES_red: value = "red"; break;
         case COLORNAMES_rosybrown: value = "rosybrown"; break;
         case COLORNAMES_royalblue: value = "royalblue"; break;
@@ -735,6 +736,7 @@ data_COLORNAMES AttConverter::StrToColornames(std::string value, bool logWarning
     if (value == "plum") return COLORNAMES_plum;
     if (value == "powderblue") return COLORNAMES_powderblue;
     if (value == "purple") return COLORNAMES_purple;
+    if (value == "rebeccapurple") return COLORNAMES_rebeccapurple;
     if (value == "red") return COLORNAMES_red;
     if (value == "rosybrown") return COLORNAMES_rosybrown;
     if (value == "royalblue") return COLORNAMES_royalblue;
@@ -1614,6 +1616,33 @@ data_MENSURATIONSIGN AttConverter::StrToMensurationsign(std::string value, bool 
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.MENSURATIONSIGN", value.c_str());
     return MENSURATIONSIGN_NONE;
+}
+
+std::string AttConverter::MeterformToStr(data_METERFORM data) const
+{
+    std::string value;
+    switch (data) {
+        case METERFORM_num: value = "num"; break;
+        case METERFORM_denomsym: value = "denomsym"; break;
+        case METERFORM_norm: value = "norm"; break;
+        case METERFORM_invis: value = "invis"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.METERFORM", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_METERFORM AttConverter::StrToMeterform(std::string value, bool logWarning) const
+{
+    if (value == "num") return METERFORM_num;
+    if (value == "denomsym") return METERFORM_denomsym;
+    if (value == "norm") return METERFORM_norm;
+    if (value == "invis") return METERFORM_invis;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.METERFORM", value.c_str());
+    return METERFORM_NONE;
 }
 
 std::string AttConverter::MetersignToStr(data_METERSIGN data) const
@@ -3924,6 +3953,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
     std::string value;
     switch (data) {
         case meiVersion_MEIVERSION_4_0_0: value = "4.0.0"; break;
+        case meiVersion_MEIVERSION_4_0_1: value = "4.0.1"; break;
         default:
             LogWarning("Unknown value '%d' for att.meiVersion@meiversion", data);
             value = "";
@@ -3935,6 +3965,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
 meiVersion_MEIVERSION AttConverter::StrToMeiVersionMeiversion(std::string value, bool logWarning) const
 {
     if (value == "4.0.0") return meiVersion_MEIVERSION_4_0_0;
+    if (value == "4.0.1") return meiVersion_MEIVERSION_4_0_1;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meiVersion@meiversion", value.c_str());
     return meiVersion_MEIVERSION_NONE;
@@ -4009,60 +4040,6 @@ meterConformance_METCON AttConverter::StrToMeterConformanceMetcon(std::string va
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meterConformance@metcon", value.c_str());
     return meterConformance_METCON_NONE;
-}
-
-std::string AttConverter::MeterSigVisFormToStr(meterSigVis_FORM data) const
-{
-    std::string value;
-    switch (data) {
-        case meterSigVis_FORM_num: value = "num"; break;
-        case meterSigVis_FORM_denomsym: value = "denomsym"; break;
-        case meterSigVis_FORM_norm: value = "norm"; break;
-        case meterSigVis_FORM_invis: value = "invis"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.meterSig.vis@form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value, bool logWarning) const
-{
-    if (value == "num") return meterSigVis_FORM_num;
-    if (value == "denomsym") return meterSigVis_FORM_denomsym;
-    if (value == "norm") return meterSigVis_FORM_norm;
-    if (value == "invis") return meterSigVis_FORM_invis;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.meterSig.vis@form", value.c_str());
-    return meterSigVis_FORM_NONE;
-}
-
-std::string AttConverter::MeterSigDefaultVisMeterformToStr(meterSigDefaultVis_METERFORM data) const
-{
-    std::string value;
-    switch (data) {
-        case meterSigDefaultVis_METERFORM_num: value = "num"; break;
-        case meterSigDefaultVis_METERFORM_denomsym: value = "denomsym"; break;
-        case meterSigDefaultVis_METERFORM_norm: value = "norm"; break;
-        case meterSigDefaultVis_METERFORM_invis: value = "invis"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.meterSigDefault.vis@meter.form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-meterSigDefaultVis_METERFORM AttConverter::StrToMeterSigDefaultVisMeterform(std::string value, bool logWarning) const
-{
-    if (value == "num") return meterSigDefaultVis_METERFORM_num;
-    if (value == "denomsym") return meterSigDefaultVis_METERFORM_denomsym;
-    if (value == "norm") return meterSigDefaultVis_METERFORM_norm;
-    if (value == "invis") return meterSigDefaultVis_METERFORM_invis;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.form", value.c_str());
-    return meterSigDefaultVis_METERFORM_NONE;
 }
 
 std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const
@@ -4641,6 +4618,7 @@ std::string AttConverter::SylLogWordposToStr(sylLog_WORDPOS data) const
     switch (data) {
         case sylLog_WORDPOS_i: value = "i"; break;
         case sylLog_WORDPOS_m: value = "m"; break;
+        case sylLog_WORDPOS_s: value = "s"; break;
         case sylLog_WORDPOS_t: value = "t"; break;
         default:
             LogWarning("Unknown value '%d' for att.syl.log@wordpos", data);
@@ -4654,6 +4632,7 @@ sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value, bool logWarni
 {
     if (value == "i") return sylLog_WORDPOS_i;
     if (value == "m") return sylLog_WORDPOS_m;
+    if (value == "s") return sylLog_WORDPOS_s;
     if (value == "t") return sylLog_WORDPOS_t;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str());

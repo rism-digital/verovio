@@ -91,7 +91,7 @@ void RunningElement::FilterList(ArrayOfObjects *childList)
     while (iter != childList->end()) {
         // remove nested rend elements
         if ((*iter)->Is(REND)) {
-            if ((*iter)->GetFirstParent(REND)) {
+            if ((*iter)->GetFirstAncestor(REND)) {
                 iter = childList->erase(iter);
                 continue;
             }
@@ -158,7 +158,7 @@ int RunningElement::GetWidth() const
 {
     if (!m_drawingPage) return 0;
 
-    Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstAncestor(DOC));
     if (!doc) return 0;
 
     return (doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight);
@@ -333,10 +333,10 @@ void RunningElement::SetCurrentPageNum(Page *currentPage)
 
     int currentNum = currentPage->GetIdx() + 1;
 
-    Num *num = dynamic_cast<Num *>(this->FindChildByType(NUM));
+    Num *num = dynamic_cast<Num *>(this->FindDescendantByType(NUM));
     if (!num || (num->GetLabel() != "page")) return;
 
-    Text *text = dynamic_cast<Text *>(num->FindChildByType(TEXT));
+    Text *text = dynamic_cast<Text *>(num->FindDescendantByType(TEXT));
     if (!text || (text->GetText() != L"#")) return;
 
     Text *currentText = num->GetCurrentText();

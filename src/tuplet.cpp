@@ -233,14 +233,14 @@ void Tuplet::GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc)
 
 int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(this->FindChildByType(TUPLET_BRACKET, 1));
-    TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM, 1));
+    TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET, 1));
+    TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM, 1));
 
     bool beamed = false;
     // Are we contained in a beam?
-    if (this->GetFirstParent(BEAM, MAX_BEAM_DEPTH)) {
+    if (this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
         // is only the tuplet beamed? (will not work with nested tuplets)
-        Beam *currentBeam = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+        Beam *currentBeam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
         if (currentBeam->GetChildCount() == 1) {
             beamed = true;
         }
@@ -285,8 +285,9 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
     /*********** Get the left and right element ***********/
 
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
-    m_drawingLeft = dynamic_cast<LayerElement *>(this->FindChildByComparison(&comparison));
-    m_drawingRight = dynamic_cast<LayerElement *>(this->FindChildByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
+    m_drawingLeft = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&comparison));
+    m_drawingRight
+        = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
 
     return FUNCTOR_CONTINUE;
 }
@@ -309,12 +310,12 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 
     // Carefull: this will not work if the tuplet has editorial markup (one child) and then notes + one beam
-    Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     // Are we contained in a beam?
     if (beamParent) {
         m_bracketAlignedBeam = beamParent;
     }
-    Beam *beamChild = dynamic_cast<Beam *>(this->FindChildByType(BEAM));
+    Beam *beamChild = dynamic_cast<Beam *>(this->FindDescendantByType(BEAM));
     // Do we contain a beam?
     if (beamChild) {
         if ((this->GetChildCount(NOTE) == 0) && (this->GetChildCount(CHORD) == 0) && (this->GetChildCount(BEAM) == 1)) {
@@ -331,7 +332,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     }
     else if (m_bracketAlignedBeam
         && ((m_bracketAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
-               && (m_drawingBracketPos == STAFFREL_basic_above))) {
+            && (m_drawingBracketPos == STAFFREL_basic_above))) {
         m_bracketAlignedBeam = NULL;
     }
 
@@ -342,7 +343,7 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     }
     else if (m_numAlignedBeam
         && ((m_numAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
-               && (m_drawingNumPos == STAFFREL_basic_above))) {
+            && (m_drawingNumPos == STAFFREL_basic_above))) {
         m_numAlignedBeam = NULL;
     }
 
@@ -350,13 +351,13 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     int XRelRight;
     this->GetDrawingLeftRightXRel(XRelLeft, XRelRight, params->m_doc);
 
-    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindChildByType(TUPLET_BRACKET));
+    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
         tupletBracket->SetDrawingXRelLeft(XRelLeft);
         tupletBracket->SetDrawingXRelRight(XRelRight);
     }
 
-    TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM));
+    TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM));
     if (tupletNum && (this->GetNumVisible() != BOOLEAN_false)) {
         // We have a bracket and the num is not on its opposite side
         if (tupletBracket && (m_drawingNumPos == m_drawingBracketPos)) {
@@ -384,7 +385,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     int staffSize = staff->m_drawingStaffSize;
 
@@ -394,7 +395,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
     int verticalMargin = 2 * verticalLine;
     int yReference = staff->GetDrawingY();
 
-    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindChildByType(TUPLET_BRACKET));
+    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
     if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
 
         int bracketVerticalMargin = verticalMargin;
@@ -405,7 +406,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             // Check for possible articulations
             ArrayOfObjects artics;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART });
-            this->FindAllChildByComparison(&artics, &comparison);
+            this->FindAllDescendantByComparison(&artics, &comparison);
 
             int articPadding = 0;
             for (auto &artic : artics) {
@@ -441,11 +442,11 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             // Possible issue with beam above the tuplet - not sure this will be noticable
             ArrayOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
-            this->FindAllChildByComparison(&descendants, &comparison);
+            this->FindAllDescendantByComparison(&descendants, &comparison);
 
             // Possible fix for beam above tuplet
             /*
-            Object *parentBeam = this->GetFirstParent(BEAM);
+            Object *parentBeam = this->GetFirstAncestor(BEAM);
             if (parentBeam) {
                 descendants.push_back(parentBeam);
             }
@@ -467,7 +468,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         }
     }
 
-    TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindChildByType(TUPLET_NUM));
+    TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM));
     if (tupletNum && (this->GetNumVisible() != BOOLEAN_false)) {
         // The num is within a bracket
         if (tupletNum->GetAlignedBracket()) {
@@ -501,7 +502,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             // Check for overlap with content - beam is not taken into account
             ArrayOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, DOT, FLAG, NOTE, REST, STEM });
-            this->FindAllChildByComparison(&descendants, &comparison);
+            this->FindAllDescendantByComparison(&descendants, &comparison);
 
             for (auto &descendant : descendants) {
                 if (!descendant->HasSelfBB()) {

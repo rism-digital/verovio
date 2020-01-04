@@ -37,7 +37,7 @@ my $VEROVIO_ROOT  = "..";
 my $FLAGS = "-O3";
 $FLAGS .= " -DNDEBUG";
 $FLAGS .= " --memory-init-file 0";
-$FLAGS .= " -std=c++11";
+$FLAGS .= " -std=c++17";
 $FLAGS .= " -s ASM_JS=1";
 $FLAGS .= " -s TOTAL_MEMORY=256MB";
 $FLAGS .= " -s TOTAL_STACK=128MB";
@@ -91,13 +91,14 @@ if ($wasmQ) {
 	$FLAGS = "-O3";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
-	$FLAGS .= " -std=c++11";
+	$FLAGS .= " -std=c++17";
 	$FLAGS .= " -s WASM=1";
 	# tried this for find the integer overflow runtime error but g4 does not work, so line number is missing
 	# should be fixed in the next version of emscripten (https://github.com/kripken/emscripten/issues/5718)
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
 	# this is for now necessary to avoid integer overflow runtime error
-	$FLAGS .= " -s \"BINARYEN_TRAP_MODE='clamp'\"";
+    # used to be fixed with " -s \"BINARYEN_TRAP_MODE='clamp'\""
+	$FLAGS .= " -mnontrapping-fptoint";
 	$FLAGS .= " -s TOTAL_MEMORY=512MB";
 	$FLAGS .= " -s TOTAL_STACK=256MB";
 	$FLAGS .= " -s ALLOW_MEMORY_GROWTH=1";
@@ -106,7 +107,7 @@ if ($wasmQ) {
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1 -s WASM=0";
+	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++17 -s ASM_JS=1 -s WASM=0";
 	$FLAGS_NAME = "-light";
 }
 
@@ -206,11 +207,12 @@ if ($? == 0) {
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
 	`cat $BUILD_DIR/verovio.js verovio-js-start.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
 
-	# wrap the npm package (but not with wasm build for now)
-	if (!$wasmQ) {
+	# wrap the npm package (but not with wasm build and without humdrum for now)
+	if ($wasmQ && !$lightQ && $nohumdrum) {
 		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
+        `cp $BUILD_DIR/verovio.wasm $NPM/`;
 	}
 
 	# create a gzip version

@@ -147,24 +147,49 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     dc->StartGraphic(system, "", system->GetUuid());
 
+    Measure *firstMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1));
+
     // Draw system divider (from the second one) if scoreDef is optimized
-    if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
-        int x1 = system->GetDrawingX() - m_doc->GetDrawingUnit(100) * 3;
-        int y1 = system->GetDrawingY() - m_doc->GetDrawingUnit(100) * 1;
-        int x2 = system->GetDrawingX() + m_doc->GetDrawingUnit(100) * 3;
-        int y2 = system->GetDrawingY() + m_doc->GetDrawingUnit(100) * 3;
-        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
-        y1 += m_doc->GetDrawingUnit(100) * 2;
-        y2 += m_doc->GetDrawingUnit(100) * 2;
-        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+    if (firstMeasure && (m_options->m_systemDivider.GetValue() != SYSTEMDIVIDER_none)) {
+        if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
+            int y = system->GetDrawingY();
+            Staff *staff = firstMeasure->GetTopVisibleStaff();
+            if (staff) {
+                // Place them just above the measure number - in very tight layout this can collision with
+                // the staff above. To be improved
+                y = staff->GetDrawingY() + 3.0 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            }
+            int x1 = system->GetDrawingX() - m_doc->GetDrawingUnit(100) * 3;
+            int x2 = system->GetDrawingX() + m_doc->GetDrawingUnit(100) * 3;
+            int y1 = y - m_doc->GetDrawingUnit(100) * 1;
+            int y2 = y + m_doc->GetDrawingUnit(100) * 3;
+            int y3 = y1 + m_doc->GetDrawingUnit(100) * 2;
+            int y4 = y2 + m_doc->GetDrawingUnit(100) * 2;
+            // left and left-right
+            dc->StartCustomGraphic("systemDivider");
+
+            DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+            DrawObliquePolygon(dc, x1, y3, x2, y4, m_doc->GetDrawingUnit(100) * 1.5);
+            if (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_left_right) {
+                // Right divider is not taken into account in the layout calculation and can collision with the music
+                // content
+                Measure *lastMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+                assert(lastMeasure);
+                int x4 = lastMeasure->GetDrawingX() + lastMeasure->GetRightBarLineRight();
+                int x3 = x4 - m_doc->GetDrawingUnit(100) * 6;
+                DrawObliquePolygon(dc, x3, y1, x4, y2, m_doc->GetDrawingUnit(100) * 1.5);
+                DrawObliquePolygon(dc, x3, y3, x4, y4, m_doc->GetDrawingUnit(100) * 1.5);
+            }
+
+            dc->EndCustomGraphic();
+        }
     }
 
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
 
-    Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
-    if (systemStart) {
-        DrawScoreDef(dc, system->GetDrawingScoreDef(), systemStart, system->GetDrawingX(), NULL);
+    if (firstMeasure) {
+        DrawScoreDef(dc, system->GetDrawingScoreDef(), firstMeasure, system->GetDrawingX(), NULL);
     }
 
     DrawSystemChildren(dc, system, system);
@@ -238,7 +263,7 @@ void View::DrawScoreDef(
     // we need at least one measure to be able to draw the groups - we need access to the staff elements,
     assert(measure);
 
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(scoreDef->FindChildByType(STAFFGRP));
+    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP));
     if (!staffGrp) {
         return;
     }
@@ -280,7 +305,7 @@ void View::DrawStaffGrp(
 
     StaffDef *firstDef = NULL;
     ArrayOfObjects::const_iterator iter;
-    for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+    for (iter = staffDefs->begin(); iter != staffDefs->end(); ++iter) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -291,7 +316,7 @@ void View::DrawStaffGrp(
 
     StaffDef *lastDef = NULL;
     ArrayOfObjects::const_reverse_iterator riter;
-    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); ++riter) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
         assert(staffDef);
         if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
@@ -308,9 +333,9 @@ void View::DrawStaffGrp(
 
     // Get the corresponding staff looking at the previous (or first) measure
     AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
-    Staff *first = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparisonFirst, 1));
+    Staff *first = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
     AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
-    Staff *last = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparisonLast, 1));
+    Staff *last = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
 
     if (!first || !last) {
         LogDebug(
@@ -333,7 +358,7 @@ void View::DrawStaffGrp(
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
 
-    System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
 
     this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
 
@@ -382,8 +407,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         }
 
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
-        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparison, 1));
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+        System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
 
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
@@ -419,8 +444,8 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     assert(system);
     assert(object->Is({ STAFFDEF, STAFFGRP }));
 
-    Label *label = dynamic_cast<Label *>(object->FindChildByType(LABEL, 1));
-    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindChildByType(LABELABBR, 1));
+    Label *label = dynamic_cast<Label *>(object->FindDescendantByType(LABEL, 1));
+    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
     std::wstring labelStr = (label) ? label->GetText(label) : L"";
@@ -465,7 +490,7 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     // keep the widest width for the system - careful: this can be the label OR labelAbbr
     system->SetDrawingLabelsWidth(graphic->GetContentX2() - graphic->GetContentX1() + space);
     // also store in the system the maximum width with abbreviations for justification
-    if (!abbreviations && (labelAbbrStr.length() > 0)) {
+    if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
         std::vector<std::wstring> lines;
         labelAbbr->GetTextLines(labelAbbr, lines);
@@ -603,15 +628,26 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             }
             else if (childStaffDef) {
                 AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
-                Staff *staff = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparison, 1));
+                Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
                 if (!staff) {
                     LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
                     continue;
                 }
                 int yTop = staff->GetDrawingY();
+                if (measure->HasBarPlace()) {
+                    yTop += measure->GetBarPlace() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                }
                 // for the bottom position we need to take into account the number of lines and the staff size
                 int yBottom = staff->GetDrawingY()
                     - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                if (measure->HasBarLen()) {
+                    yBottom = yTop - (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+                }
+                // Make sure barlines are visible with a single line
+                if (childStaffDef->GetLines() == 1) {
+                    yTop += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                    yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                }
                 DrawBarLine(dc, yTop, yBottom, barLine);
                 if (barLine->HasRepetitionDots()) {
                     DrawBarLineDots(dc, childStaffDef, staff, barLine);
@@ -654,9 +690,9 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // Get the corresponding staff looking at the previous (or first) measure
         AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
-        Staff *first = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparisonFirst, 1));
+        Staff *first = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
         AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
-        Staff *last = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparisonLast, 1));
+        Staff *last = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
 
         if (!first || !last) {
             LogDebug("Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(),
@@ -685,7 +721,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
-                    Staff *staff = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparison, 1));
+                    Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
                     if (!staff) {
                         LogDebug(
                             "Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
@@ -703,7 +739,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     assert(dc);
     assert(barLine);
 
-    Staff *staff = dynamic_cast<Staff *>(barLine->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(barLine->GetFirstAncestor(STAFF));
     int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
 
     int x = barLine->GetDrawingX();
@@ -719,7 +755,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
     if (eraseIntersections && !dc->Is(BBOX_DEVICE_CONTEXT)) {
-        System *system = dynamic_cast<System *>(barLine->GetFirstParent(SYSTEM));
+        System *system = dynamic_cast<System *>(barLine->GetFirstAncestor(SYSTEM));
         if (system) {
             int minX = x1 - barLineWidth / 2;
             int maxX = x1 + barLineWidth / 2;
@@ -837,15 +873,13 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
-        MNum *mnum = dynamic_cast<MNum *>(measure->FindChildByType(MNUM));
+        MNum *mnum = dynamic_cast<MNum *>(measure->FindDescendantByType(MNUM));
         if (mnum) {
             // this should be an option
-            Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
-            if (measure == systemStart || !mnum->IsGenerated()) {
-                // Draw measure numbers > 1
-                if ((measure->GetN() != "0") && (measure->GetN()) != "1") {
-                    DrawMNum(dc, mnum, measure);
-                }
+            Measure *systemStart = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE));
+            // Draw non-generated measure numbers, and system starting measure numbers > 1.
+            if ((measure == systemStart && measure->GetN() != "0" && measure->GetN() != "1") || !mnum->IsGenerated()) {
+                DrawMNum(dc, mnum, measure);
             }
         }
     }
@@ -854,14 +888,14 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // Draw the barlines only with measured music
     if (measure->IsMeasuredMusic()) {
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
         assert(system);
         if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
             DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetLeftBarLine()->GetDrawingX(),
                 measure->GetLeftBarLine());
         }
         if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
-            bool isLast = (measure == system->FindChildByType(MEASURE, 1, BACKWARD)) ? true : false;
+            bool isLast = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD)) ? true : false;
             DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetRightBarLine()->GetDrawingX(),
                 measure->GetRightBarLine(), isLast);
         }
@@ -882,18 +916,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
     assert(measure);
     assert(mnum);
 
-    Staff *staff = NULL;
-    ArrayOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    measure->FindAllChildByComparison(&staves, &matchType, 1);
-    for (auto &child : staves) {
-        staff = dynamic_cast<Staff *>(child);
-        assert(staff);
-        if (staff->DrawingIsVisible()) {
-            break;
-        }
-        staff = NULL;
-    }
+    Staff *staff = measure->GetTopVisibleStaff();
     if (staff) {
 
         dc->StartGraphic(mnum, "", mnum->GetUuid());
@@ -1076,7 +1099,7 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     assert(measure);
 
     // StaffDef information is always in the first layer
-    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
     if (!layer || !layer->HasStaffDef()) return;
 
     // StaffDef staffDef;
@@ -1106,7 +1129,7 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
     assert(measure);
 
     // StaffDef cautionary information is always in the first layer
-    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
     if (!layer || !layer->HasCautionStaffDef()) return;
 
     // StaffDef staffDef;
@@ -1141,7 +1164,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
     assert(layer);
     assert(octave);
 
-    Staff *parentStaff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    Staff *parentStaff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(parentStaff); // Pointer to parent has to be a staff
 
     static int touches[]
@@ -1406,11 +1429,12 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
-
+    if (element->Is(APP)) {
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+    }
+    else if (element->Is(CHOICE)) {
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TOPLEVEL));
+    }
     std::string boundaryStart;
     if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
 
@@ -1429,10 +1453,12 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_MEASURE);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_MEASURE);
+    if (element->Is(APP)) {
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_MEASURE));
+    }
+    else if (element->Is(CHOICE)) {
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_MEASURE));
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1448,10 +1474,12 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_STAFF);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_STAFF);
+    if (element->Is(APP)) {
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_STAFF));
+    }
+    else if (element->Is(CHOICE)) {
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_STAFF));
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1468,10 +1496,12 @@ void View::DrawLayerEditorialElement(
         DrawAnnot(dc, element);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_LAYER);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_LAYER);
+    if (element->Is(APP)) {
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_LAYER));
+    }
+    else if (element->Is(CHOICE)) {
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_LAYER));
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1487,10 +1517,12 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
         DrawAnnot(dc, element, true);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TEXT);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TEXT);
+    if (element->Is(APP)) {
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_TEXT));
+    }
+    else if (element->Is(CHOICE)) {
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_TEXT));
+    }
 
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1506,10 +1538,12 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
         DrawAnnot(dc, element, true);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_FB);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_FB);
+    if (element->Is(APP)) {
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_FB));
+    }
+    else if (element->Is(CHOICE)) {
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_FB));
+    }
 
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1525,10 +1559,12 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
         DrawAnnot(dc, element, true);
         return;
     }
-    if (element->Is(APP))
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_RUNNING);
-    else if (element->Is(CHOICE))
-        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_RUNNING);
+    if (element->Is(APP)) {
+        assert(dynamic_cast<App *>(element) && (dynamic_cast<App *>(element)->GetLevel() == EDITORIAL_RUNNING));
+    }
+    else if (element->Is(CHOICE)) {
+        assert(dynamic_cast<Choice *>(element) && (dynamic_cast<Choice *>(element)->GetLevel() == EDITORIAL_RUNNING));
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {

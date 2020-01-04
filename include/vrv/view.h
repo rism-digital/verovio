@@ -481,14 +481,17 @@ protected:
     void DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength = 0);
     void DrawSmuflCode(
         DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
-    void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
+    void DrawThickBezierCurve(
+        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0, int penStyle = AxSOLID);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
-    void DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wstring s);
+    void DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams &params);
+    void DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend);
+    void DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams &params);
     void DrawSmuflLine(DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill,
         wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100,
         bool dimin = false, bool setBBGlyph = false);
-    void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
+    void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);

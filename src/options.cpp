@@ -22,8 +22,17 @@ namespace vrv {
 std::map<int, std::string> Option::s_breaks
     = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_encoded, "encoded" } };
 
+std::map<int, std::string> Option::s_footer
+    = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" } };
+
+std::map<int, std::string> Option::s_header
+    = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
+
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
+
+std::map<int, std::string> Option::s_systemDivider
+    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 //----------------------------------------------------------------------------
 // Option
@@ -534,13 +543,13 @@ Options::Options()
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
 
-    m_noFooter.SetInfo("No footer", "Do not add any footer");
-    m_noFooter.Init(false);
-    this->Register(&m_noFooter, "noFooter", &m_general);
+    m_footer.SetInfo("Footer", "Control footer layout");
+    m_footer.Init(FOOTER_auto, &Option::s_footer);
+    this->Register(&m_footer, "footer", &m_general);
 
-    m_noHeader.SetInfo("No header", "Do not add any header");
-    m_noHeader.Init(false);
-    this->Register(&m_noHeader, "noHeader", &m_general);
+    m_header.SetInfo("Header", "Control header layout");
+    m_header.Init(HEADER_auto, &Option::s_header);
+    this->Register(&m_header, "header", &m_general);
 
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
@@ -732,6 +741,10 @@ Options::Options()
     m_stemWidth.SetInfo("Stem width", "The stem width");
     m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
+
+    m_systemDivider.SetInfo("System divider", "The display of system dividers");
+    m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
+    this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);

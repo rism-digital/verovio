@@ -138,7 +138,7 @@ public:
     /** Init the SMufL music and text fonts */
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */
-    static bool InitTextFont();
+    static bool InitTextFont(std::string fontName);
     /** Select a particular font */
     static bool SetFont(std::string fontName);
     /** Returns the glyph (if exists) for the current SMuFL font */

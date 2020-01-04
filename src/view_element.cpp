@@ -81,7 +81,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         m_currentColour = AxRED;
     }
     else {
-        m_currentColour = AxBLACK;
+        m_currentColour = AxNONE;
     }
 
     if (element->Is(ACCID)) {
@@ -246,7 +246,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
-        Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+        Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             // Check if the note is on the top line or above (add a unit for the note head half size)
             if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -449,14 +449,14 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     bool drawingCueSize = false;
     int x, y;
 
-    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
+    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindDescendantByType(CHORD));
     // Get from the chord or note child
     if (childChord) {
         drawingDur = childChord->GetDur();
         childElement = childChord;
     }
     else {
-        childNote = dynamic_cast<Note *>(bTrem->FindChildByType(NOTE));
+        childNote = dynamic_cast<Note *>(bTrem->FindDescendantByType(NOTE));
         if (childNote) {
             drawingDur = childNote->GetDur();
             childElement = childNote;
@@ -698,13 +698,12 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int sym = 0;
     // Select glyph to use for this custos
     switch (staff->m_drawingNotationType) {
-        case NOTATIONTYPE_mensural:
-            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
-            break;
         case NOTATIONTYPE_neume:
             sym = SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
             break;
-        default: break;
+        default:
+            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
+            break;
     }
 
     // Calculate x and y position for custos graphic
@@ -720,7 +719,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     else {
         x = element->GetDrawingX();
-        y = staff->GetDrawingY();
+        y = element->GetDrawingY();
     }
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
@@ -732,6 +731,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     else if (clef->GetShape() == CLEFSHAPE_F) {
         pitchOffset = (custos->GetPname() - PITCHNAME_f) * (staffSize / 2);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_G) {
+        pitchOffset = (custos->GetPname() - PITCHNAME_g) * (staffSize / 2);
     }
     else {
         // This shouldn't happen
@@ -846,7 +848,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Flag *flag = dynamic_cast<Flag *>(element);
     assert(flag);
 
-    Stem *stem = dynamic_cast<Stem *>(flag->GetFirstParent(STEM));
+    Stem *stem = dynamic_cast<Stem *>(flag->GetFirstAncestor(STEM));
     assert(stem);
 
     int x = flag->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
@@ -1038,7 +1040,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
 
-    if (meterSig->GetForm() == meterSigVis_FORM_invis) {
+    if (meterSig->GetForm() == METERFORM_invis) {
         // just skip
     }
     else if (meterSig->HasSym()) {
@@ -1049,7 +1051,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
             DrawSmuflCode(dc, x, y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
         }
     }
-    else if (meterSig->GetForm() == meterSigVis_FORM_num) {
+    else if (meterSig->GetForm() == METERFORM_num) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {
@@ -1405,13 +1407,28 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
     DrawTextChildren(dc, syl, params);
+
+    if (syl->GetCon() == sylLog_CON_b) {
+        dc->ReactivateGraphic();
+        dc->DeactivateGraphic();
+        FontInfo vrvTxt;
+        vrvTxt.SetFaceName("VerovioText");
+        dc->SetFont(&vrvTxt);
+        std::wstring str;
+        str.push_back(VRV_TEXT_E551);
+        dc->DrawText(UTF16to8(str), str);
+        dc->ResetFont();
+        dc->ReactivateGraphic();
+        dc->DeactivateGraphicY();
+    }
+
     dc->EndText();
 
     dc->ResetFont();
     dc->ResetBrush();
 
     if (syl->GetStart() && syl->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        System *currentSystem = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
         if (currentSystem) {
@@ -1451,8 +1468,8 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     assert(stem);
     assert(staff);
 
-    dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
-    dc->SetBrush(AxBLACK, AxSOLID);
+    dc->SetPen(AxNONE, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    dc->SetBrush(AxNONE, AxSOLID);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift * 3 / 2;
@@ -1628,9 +1645,9 @@ int View::GetFYRel(F *f, Staff *staff)
 
     y = positioner->GetDrawingY();
 
-    Object *fb = f->GetFirstParent(FB);
+    Object *fb = f->GetFirstAncestor(FB);
     assert(fb);
-    int line = fb->GetChildIndex(f, FIGURE, UNLIMITED_DEPTH);
+    int line = fb->GetDescendantIndex(f, FIGURE, UNLIMITED_DEPTH);
 
     if (line > 0) {
         FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
