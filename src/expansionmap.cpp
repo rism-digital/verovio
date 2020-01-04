@@ -34,7 +34,7 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
 {
     for (std::string s : expansionList) {
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
-        Object *currSect = prevSect->GetParent()->FindChildByUuid(s); // find section pointer of reference string
+        Object *currSect = prevSect->GetParent()->FindDescendantByUuid(s); // find section pointer of reference string
         if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
             existingList = Expand(dynamic_cast<Expansion *>(currSect)->GetPlist(), existingList, prevSect);
         }
@@ -45,6 +45,7 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
+                assert(currSect->GetChild(0));
                 clonedObject->SetUuid(currSect->GetUuid() + "-rend"
                     + std::to_string(GetExpansionIdsForElement(currSect->GetChild(0)->GetUuid()).size() + 1));
 
@@ -55,8 +56,8 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
                 std::vector<std::string> clonedIds;
                 clonedIds.push_back(clonedObject->GetUuid());
                 this->GetUuidList(clonedObject, &clonedIds);
-                for (int i = 0; i < oldIds.size(); i++) {
-                    this->AddExpandedIdToExpansionMap(oldIds[i], clonedIds[i]);
+                for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
+                    this->AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
 
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
@@ -80,6 +81,7 @@ bool ExpansionMap::UpdateIds(Object *object)
         o->IsExpansion(true);
         if (o->HasInterface(INTERFACE_TIME_POINT)) {
             TimePointInterface *interface = o->GetTimePointInterface();
+            assert(interface);
             // @startid
             std::string oldStartId = interface->GetStartid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
@@ -88,6 +90,7 @@ bool ExpansionMap::UpdateIds(Object *object)
         }
         if (o->HasInterface(INTERFACE_TIME_SPANNING)) {
             TimeSpanningInterface *interface = o->GetTimeSpanningInterface();
+            assert(interface);
             // @startid
             std::string oldStartId = interface->GetStartid();
             if (oldStartId.rfind("#", 0) == 0) oldStartId = oldStartId.substr(1, oldStartId.size() - 1);
@@ -101,6 +104,7 @@ bool ExpansionMap::UpdateIds(Object *object)
         }
         if (o->HasInterface(INTERFACE_PLIST)) {
             PlistInterface *interface = o->GetPlistInterface(); // @plist
+            assert(interface);
             xsdAnyURI_List oldList = interface->GetPlist();
             xsdAnyURI_List newList;
             for (std::string oldRefString : oldList) {
@@ -111,6 +115,7 @@ bool ExpansionMap::UpdateIds(Object *object)
         }
         else if (o->HasInterface(INTERFACE_LINKING)) {
             LinkingInterface *interface = o->GetLinkingInterface();
+            assert(interface);
             // @sameas
             std::string oldIdString = interface->GetSameas();
             if (oldIdString.rfind("#", 0) == 0) oldIdString = oldIdString.substr(1, oldIdString.size() - 1);

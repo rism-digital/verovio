@@ -5,11 +5,14 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef expansionmap_hpp
-#define expansionmap_hpp
+#ifndef __VRV_EXPANSION_MAP_H__
+#define __VRV_EXPANSION_MAP_H__
+
+#include <map>
+
+//----------------------------------------------------------------------------
 
 #include "options.h"
-#include <stdio.h>
 
 namespace vrv {
 

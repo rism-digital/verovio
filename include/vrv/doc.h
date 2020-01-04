@@ -292,6 +292,11 @@ public:
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
     void ConvertAnalyticalMarkupDoc(bool permanent = false);
+    
+    /**
+     * Convert encoded <expansion> before rendering
+     */
+    void ExpandExpansions();
 
     /**
      * To be implemented.
