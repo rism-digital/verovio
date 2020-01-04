@@ -42,6 +42,7 @@
 #include "ending.h"
 #include "expan.h"
 #include "expansion.h"
+#include "expansionmap.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -2718,6 +2719,38 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         m_doc->ConvertScoreDefMarkupDoc();
     }
 
+    // Upon MEI import: use expansion ID, given by command line argument
+    std::string expansionId = m_doc->GetOptions()->m_expand.GetValue();
+    if (!expansionId.empty()) {
+        Expansion *start = dynamic_cast<Expansion *>(m_doc->FindChildByUuid(expansionId));
+        if (start == NULL) {
+            LogMessage("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
+        }
+        else {
+            xsdAnyURI_List expansionList = start->GetPlist();
+            // std::cout << "[expand] xml:id=\"" << expansionId.c_str() << "\" plist={";
+            // for (std::string s : expansionList) std::cout << s.c_str() << ((s != expansionList.back()) ? " " :
+            // "}.\n");
+            xsdAnyURI_List existingList;
+            existingList = m_doc->m_expansionMap.Expand(expansionList, existingList, start);
+            // save original/notated expansion as element in expanded MEI
+            Expansion *originalExpansion = new Expansion();
+            char rnd[35];
+            snprintf(rnd, 35, "expansion-notated-%016d", std::rand());
+            originalExpansion->SetUuid(rnd);
+            for (std::string ref : existingList) originalExpansion->GetPlistInterface()->AddRef("#" + ref);
+            start->GetParent()->InsertAfter(start, originalExpansion);
+            // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
+            //          << "\" plist={";
+            // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
+        }
+    }
+    // for (auto const &strVect : m_doc->m_expansionMap.m_map) { // DEBUG: display expansionMap on console
+    //     std::cout << strVect.first << ": <";
+    //     for (auto const &string : strVect.second)
+    //        std::cout << string << ((string != strVect.second.back()) ? ", " : ">.\n");
+    // }
+
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
         m_doc->ConvertAnalyticalMarkupDoc();
@@ -3004,6 +3037,7 @@ bool MeiInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 {
     Expansion *vrvExpansion = new Expansion();
     ReadSystemElement(expansion, vrvExpansion);
+    ReadPlistInterface(expansion, vrvExpansion);
 
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);

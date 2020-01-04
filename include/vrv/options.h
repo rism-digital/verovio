@@ -474,6 +474,7 @@ public:
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionString m_expand;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionInt m_unit;

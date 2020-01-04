@@ -18,9 +18,11 @@
 #include "beatrpt.h"
 #include "chord.h"
 #include "comparison.h"
+#include "expansion.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
+#include "iomei.h"
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
@@ -400,9 +402,9 @@ bool Doc::ExportTimemap(std::string &output)
     return true;
 }
 
-void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
-    std::map<int, std::vector<std::string> > &realTimeToOnElements,
-    std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo)
+void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
+    std::map<double, std::vector<std::string> > &realTimeToOnElements,
+    std::map<double, std::vector<std::string> > &realTimeToOffElements, std::map<double, int> &realTimeToTempo)
 {
 
     int currentTempo = -1000;

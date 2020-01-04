@@ -182,6 +182,16 @@ public:
     std::string GetElementAttr(const std::string &xmlId);
 
     /**
+     * Returns the ID string of the notated (the original) element
+     */
+    std::string GetNotatedIdForElement(const std::string &xmlId);
+
+    /**
+     * Returns a vector of ID strings of all elements (the notated and the expanded) for a given element
+     */
+    std::string GetExpansionIdsForElement(const std::string &xmlId);
+
+    /**
      * Redo the layout of the loaded data.
      * This can be called once the rendering option were changed,
      * For example with a new page (sceen) height or a new zoom level.
