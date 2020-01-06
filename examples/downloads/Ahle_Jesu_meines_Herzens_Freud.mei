@@ -556,13 +556,13 @@
                         <layer n="2">
                            <note xml:id="d23378e1218" pname="c" oct="4" dur="4" stem.dir="down">
                               <verse n="1">
-                                 <syl>1. mei-</syl>
+                                 <syl>mei-</syl>
                               </verse>
                               <verse n="2">
-                                 <syl>2. und</syl>
+                                 <syl>und</syl>
                               </verse>
                               <verse n="3">
-                                 <syl>3. trän-</syl>
+                                 <syl>trän-</syl>
                               </verse>
                            </note>
                            <note xml:id="d23378e1247" pname="b" oct="3" dur="4" stem.dir="down">
@@ -783,13 +783,13 @@
                         <layer n="2">
                            <note xml:id="d23378e2233" pname="e" oct="4" dur="4" stem.dir="down">
                               <verse n="1">
-                                 <syl>1. des</syl>
+                                 <syl>des</syl>
                               </verse>
                               <verse n="2">
-                                 <syl>2. seh-</syl>
+                                 <syl>seh-</syl>
                               </verse>
                               <verse n="3">
-                                 <syl>3. sei</syl>
+                                 <syl>sei</syl>
                               </verse>
                            </note>
                            <note xml:id="d23378e2262" pname="e" oct="4" dur="4" stem.dir="down">
@@ -1010,13 +1010,13 @@
                         <layer n="2">
                            <note xml:id="d23378e3230" pname="f" oct="4" dur="4" stem.dir="down">
                               <verse n="1">
-                                 <syl>1. Je-</syl>
+                                 <syl>Je-</syl>
                               </verse>
                               <verse n="2">
-                                 <syl>2. Je-</syl>
+                                 <syl>Je-</syl>
                               </verse>
                               <verse n="3">
-                                 <syl>3. Je-</syl>
+                                 <syl>Je-</syl>
                               </verse>
                            </note>
                            <note xml:id="d23378e3259" pname="e" oct="4" dur="4" stem.dir="down">
