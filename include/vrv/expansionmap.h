@@ -41,13 +41,13 @@ public:
     /**
      * Expand expansion recursively
      */
-    xsdAnyURI_List Expand(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSection);
+    void Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSection);
 
     bool UpdateIds(Object *object);
 
     std::vector<std::string> GetExpansionIdsForElement(const std::string &xmlId);
 
-    std::vector<std::string> *GetUuidList(Object *object, std::vector<std::string> *idList);
+    void GetUuidList(Object *object, std::vector<std::string> &idList);
 
 private:
     /** Ads an id string to an original/notated id */

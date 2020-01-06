@@ -1170,7 +1170,7 @@ void Doc::ExpandExpansions()
     
     xsdAnyURI_List expansionList = start->GetPlist();
     xsdAnyURI_List existingList;
-    existingList = this->m_expansionMap.Expand(expansionList, existingList, start);
+    this->m_expansionMap.Expand(expansionList, existingList, start);
     
     // save original/notated expansion as element in expanded MEI
     Expansion *originalExpansion = new Expansion();

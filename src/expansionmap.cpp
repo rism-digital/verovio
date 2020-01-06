@@ -30,13 +30,20 @@ void ExpansionMap::Reset()
     m_map.clear();
 }
 
-xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List existingList, Object *prevSect)
+void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSect)
 {
+    assert(prevSect);
+    
     for (std::string s : expansionList) {
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
         Object *currSect = prevSect->GetParent()->FindDescendantByUuid(s); // find section pointer of reference string
+        if (!currSect) {
+            return;
+        }
         if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
-            existingList = Expand(dynamic_cast<Expansion *>(currSect)->GetPlist(), existingList, prevSect);
+            Expansion *currExpansion = dynamic_cast<Expansion *>(currSect);
+            assert(currExpansion);
+            Expand(currExpansion->GetPlist(), existingList, prevSect);
         }
         else {
             if (std::find(existingList.begin(), existingList.end(), s)
@@ -45,6 +52,7 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
+                // are we sure there is always a child? If not, we should handle negative cases properly
                 assert(currSect->GetChild(0));
                 clonedObject->SetUuid(currSect->GetUuid() + "-rend"
                     + std::to_string(GetExpansionIdsForElement(currSect->GetChild(0)->GetUuid()).size() + 1));
@@ -52,10 +60,10 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
                 // get IDs of old and new sections and add them to m_map
                 std::vector<std::string> oldIds;
                 oldIds.push_back(currSect->GetUuid());
-                this->GetUuidList(currSect, &oldIds);
+                this->GetUuidList(currSect, oldIds);
                 std::vector<std::string> clonedIds;
                 clonedIds.push_back(clonedObject->GetUuid());
-                this->GetUuidList(clonedObject, &clonedIds);
+                this->GetUuidList(clonedObject, clonedIds);
                 for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
                     this->AddExpandedIdToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
@@ -63,6 +71,7 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
                 // go through cloned objects, find TimePointing/SpanningInterface, PListInterface, LinkingInterface
                 UpdateIds(clonedObject);
 
+                assert(prevSect->GetParent());
                 prevSect->GetParent()->InsertAfter(prevSect, clonedObject);
                 prevSect = clonedObject;
             }
@@ -72,7 +81,6 @@ xsdAnyURI_List ExpansionMap::Expand(xsdAnyURI_List expansionList, xsdAnyURI_List
             }
         }
     }
-    return existingList;
 }
 
 bool ExpansionMap::UpdateIds(Object *object)
@@ -191,13 +199,12 @@ bool ExpansionMap::HasExpansionMap()
     return (m_map.empty()) ? false : true;
 }
 
-std::vector<std::string> *ExpansionMap::GetUuidList(Object *object, std::vector<std::string> *idList)
+void ExpansionMap::GetUuidList(Object *object, std::vector<std::string> &idList)
 {
     for (Object *o : *object->GetChildren()) {
-        idList->push_back(o->GetUuid());
-        idList = GetUuidList(o, idList);
+        idList.push_back(o->GetUuid());
+        GetUuidList(o, idList);
     }
-    return idList;
 }
 
 } // namespace vrv
