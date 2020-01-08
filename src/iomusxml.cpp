@@ -2118,7 +2118,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
-                        syl->SetCon(sylLog_CON_s);
+                        // Do not set @con when the syllable has an ellision
+                        if (syl->GetCon() != sylLog_CON_b) {
+                            syl->SetCon(sylLog_CON_s);
+                        }
                     }
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
                     if (!textWeight.empty())
