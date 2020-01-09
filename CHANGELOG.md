@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.3.5] - 2020-01-09
+* Fix bug with NPM versionning
+
 ## [2.3.4] - 2020-01-03
 * Fix bug with NPM build (allow access to verovio.module and use wasm)
 
