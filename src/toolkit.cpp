@@ -1234,7 +1234,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Here we need to check that the midi timemap is done
     if (!m_doc.HasMidiTimemap()) {
-        return o.json();
+        // generate MIDI timemap before progressing
+        m_doc.CalculateMidiTimemap();
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);

@@ -369,7 +369,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     if (staves.empty()) LogDebug("Empty @staff array");
     return staves;
 }
-    
+
 Staff *Measure::GetTopVisibleStaff()
 {
     Staff *staff = NULL;

@@ -16,7 +16,7 @@ os.system("../../tools/get_git_commit.sh")
 
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
-    EXTRA_COMPILE_ARGS += ['-std=c++11',
+    EXTRA_COMPILE_ARGS += ['-std=c++17',
                            '-Wno-write-strings', '-Wno-overloaded-virtual']
 else:
     EXTRA_COMPILE_ARGS += ['-DNO_PAE_SUPPORT']

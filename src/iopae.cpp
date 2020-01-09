@@ -854,7 +854,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
             meter->SetCount(std::stoi(timesig_str));
             meter->SetUnit(1);
-            meter->SetForm(meterSigVis_FORM_num);
+            meter->SetForm(METERFORM_num);
         }
         else if (strcmp(timesig_str, "c") == 0) {
             // C
