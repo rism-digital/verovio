@@ -229,11 +229,11 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
 
     // temporary variables
     int shiftY;
-    int fullBars, polygonHeight;
+    int polygonHeight;
     double dy1, dy2;
 
     // loops
-    int i, j;
+    int i;
 
     const ArrayOfBeamElementCoords *beamElementCoords = beamSegment->GetElementCoordRefs();
 
@@ -241,12 +241,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     int last = elementCount - 1;
 
     /******************************************************************/
-    // Draw the beam full bars
-
-    // Number of bars to draw - if we do not have changing values, draw
-    // the number of bars according to the shortestDur value. Otherwise draw
-    // only one bar and the others will be drawn separately.
-    fullBars = 1; //!beamInterface->m_changingDur ? (beamInterface->m_shortestDur - DUR_4) : 1;
+    // Draw the beam full bar
 
     // Adjust the x position of the first and last element for taking into account the stem width
     beamElementCoords->at(0)->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -267,24 +262,8 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     // For acc and rit beam (see AttBeamingVis set
     // s_y = 0 and s_y2 = 0 respectively
 
-    for (j = 0; j < fullBars; ++j) {
-        polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
-        DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
-        y1 += polygonHeight;
-        y2 += polygonHeight;
-
-        // dy1 must == 0 for accelerando beams
-        if (!dy1)
-            y1 += (beamInterface->m_beamWidthBlack * shiftY) * -1;
-        else
-            y1 += dy1 * beamInterface->m_beamWidthWhite;
-
-        // reverse for retardendo beam
-        if (!dy2)
-            y2 += (beamInterface->m_beamWidthBlack * shiftY) * -1;
-        else
-            y2 += dy2 * beamInterface->m_beamWidthWhite;
-    }
+    polygonHeight = beamInterface->m_beamWidthBlack * shiftY;
+    DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
 
     /******************************************************************/
     // Draw the beam for partial bars (if any)
@@ -310,7 +289,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     int noteCount = (int)noteIndexes.size();
 
     if (noteCount > 0) {
-        int testDur = DUR_8 + fullBars;
+        int testDur = DUR_16;
         int barY = beamInterface->m_beamWidth;
 
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
@@ -351,7 +330,7 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
                         // or the previous one had no partial
                         else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_dur < (char)testDur) {
                             // if we are at the full bar level, put it left
-                            if (testDur == DUR_8 + fullBars) {
+                            if (testDur == DUR_16) {
                                 beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                             }
                             // if the previous level underneath was a partial through, put it left
