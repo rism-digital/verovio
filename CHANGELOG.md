@@ -8,6 +8,9 @@
 * Fix bug with tuplet number placement (@rettinghaus)
 * LibMEI output generated from MEI 4.0.1
 
+## [2.3.4] - 2020-01-03
+* Fix bug with NPM build (allow access to verovio.module and use wasm)
+
 ## [2.3.3] - 2019-11-26
 * Fix bug with NPM build (remove init function for adjusting memory)
 
