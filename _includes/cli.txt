@@ -1,4 +1,4 @@
-Verovio 2.4.0-dev-10d549c-dirty
+Verovio 2.4.0-dev-ce14133-dirty
 
 Example usage:
 
@@ -56,7 +56,6 @@ General layout options
  --grace-rhythm-align              Align grace notes rhythmically with all staves
  --grace-right-align               Align the right position of a grace group with all staves
  --hairpin-size <f>                The haripin size in MEI units (default: 3.00; min: 1.00; max: 8.00)
- --left-position <f>               The left position (default: 0.80; min: 0.00; max: 2.00)
  --lyric-hyphen-length <f>         The lyric hyphen and dash length (default: 1.20; min: 0.50; max: 3.00)
  --lyric-hyphen-width <f>          The lyric hyphen and dash width (default: 0.20; min: 0.10; max: 0.50)
  --lyric-no-start-hyphen           Do not show hyphens at the beginning of a system
