@@ -80,21 +80,10 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     int elementCount = (int)m_beamElementCoordRefs.size();
     assert(elementCount > 0);
 
-    int y1, y2, avgY, high, low, verticalCenter, verticalShift;
-    double xr, verticalShiftFactor;
+    int y1, y2, avgY, high, low, verticalCenter;
 
     // loop
     int i;
-
-    // position x for the stem (normal and cue-sized)
-    int stemX[2];
-
-    // For slope calculation and linear regression
-    double s_x = 0.0; // sum of all x(n) for n in beamElementCoord
-    double s_y = 0.0; // sum of all y(n)
-    double s_xy = 0.0; // sum of (x(n) * y(n))
-    double s_x2 = 0.0; // sum of all x(n)^2
-    double s_y2 = 0.0; // sum of all y(n)^2
 
     /******************************************************************/
     // initialization
@@ -103,19 +92,12 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         m_beamElementCoordRefs.at(i)->m_x = m_beamElementCoordRefs.at(i)->m_element->GetDrawingX();
     }
 
-    // make it relative to the first x / staff y
-    int xRel = m_beamElementCoordRefs.at(0)->m_x;
-    int yRel = staff->GetDrawingY();
-
     avgY = 0;
     high = VRV_UNSET;
     low = -VRV_UNSET;
 
-    verticalShiftFactor = 3.0;
     verticalCenter = staff->GetDrawingY()
         - (doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2); // center point of the staff
-
-    int last = elementCount - 1;
 
     /******************************************************************/
     // Calculate the extreme values
@@ -173,10 +155,10 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         if (beamInterface->m_hasMultipleStemDir && (place != BEAMPLACE_mixed)) {
             LogDebug("Stem directions (mixed) contradict beam placement (below or above)");
         }
-        else if ((beamInterface->m_noteStemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
+        else if ((beamInterface->m_notesStemDir == STEMDIRECTION_up) && (place == BEAMPLACE_below)) {
             LogDebug("Stem directions (up) contradict beam placement (below)");
         }
-        else if ((beamInterface->m_noteStemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
+        else if ((beamInterface->m_notesStemDir == STEMDIRECTION_down) && (place == BEAMPLACE_above)) {
             LogDebug("Stem directions (down) contradict beam placement (above)");
         }
         beamInterface->m_drawingPlace = place;
@@ -190,10 +172,10 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     }
     else {
         // Now look at the stem direction of the notes within the beam
-        if (beamInterface->m_noteStemDir == STEMDIRECTION_up) {
+        if (beamInterface->m_notesStemDir == STEMDIRECTION_up) {
             beamInterface->m_drawingPlace = BEAMPLACE_above;
         }
-        else if (beamInterface->m_noteStemDir == STEMDIRECTION_down) {
+        else if (beamInterface->m_notesStemDir == STEMDIRECTION_down) {
             beamInterface->m_drawingPlace = BEAMPLACE_below;
         }
         // Look at the layer direction or, finally, at the note position
@@ -211,9 +193,6 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         }
     }
     assert(beamInterface->m_drawingPlace != BEAMPLACE_NONE);
-    
-    // Temporary fix to set the stem dir
-    //beamInterface->m_stemDir = (beamInterface->m_beamPlace == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
 
     for (i = 0; i < elementCount; ++i) {
         if (!m_beamElementCoordRefs.at(i)->m_stem) continue;
@@ -224,28 +203,37 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
             m_beamElementCoordRefs.at(i)->m_stem->SetDrawingStemDir(STEMDIRECTION_down);
         }
-        // mixed
+        // cross-staff or beam@place=mixed
         else {
             if (beamInterface->m_crossStaff) {
+                // TODO - look at staff@n and set the stem direction
                 Staff *currentCrossStaff = m_beamElementCoordRefs.at(i)->m_element->m_crossStaff;
                 if (currentCrossStaff) {
                     // if (currentCrossStaff->GetN() < staff->GetN()
                 }
             }
+            else {
+                data_STEMDIRECTION stemDir = m_beamElementCoordRefs.at(i)->m_stem->GetStemDir();
+                // TODO - Handle cases where there is now given stem direction
+                m_beamElementCoordRefs.at(i)->m_stem->SetDrawingStemDir(stemDir);
+            }
         }
     }
-
-    if (beamInterface->m_drawingPlace == BEAMPLACE_above) { // set stem direction for all the notes
-        for (i = 0; i < elementCount; ++i) {
+    
+    ArrayOfBeamElementCoords stemUps;
+    ArrayOfBeamElementCoords stemDowns;
+    
+    for (i = 0; i < elementCount; ++i) {
+        if (!m_beamElementCoordRefs.at(i)->m_stem) continue;
+        
+        if (m_beamElementCoordRefs.at(i)->m_stem->GetDrawingStemDir() == STEMDIRECTION_up) {
+            m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yBottom;
+        }
+        else {
             m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yTop;
         }
     }
-    else {
-        for (i = 0; i < elementCount; ++i) {
-            m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yBottom;
-        }
-    }
-
+         
     beamInterface->m_beamWidthBlack = doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
     beamInterface->m_beamWidthWhite = doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
@@ -254,73 +242,9 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     // Calculate the slope doing a linear regression
 
     // The vertical shift depends on the shortestDur value we have in the beam
-    verticalShift = ((beamInterface->m_shortestDur - DUR_8) * (beamInterface->m_beamWidth));
+    this->CalcBeamSlope(layer, staff, doc, beamInterface);
 
-    // if the beam has smaller-size notes
-    if (m_beamElementCoordRefs.at(last)->m_element->GetDrawingCueSize()) {
-        verticalShift += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
-    }
-    else {
-        verticalShift += (beamInterface->m_shortestDur > DUR_8)
-            ? doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * verticalShiftFactor
-            : doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (verticalShiftFactor + 0.5);
-    }
-
-    // swap x position and verticalShift direction with stem down
-    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-        stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        stemX[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    }
-    else {
-        stemX[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        stemX[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        verticalShift = -verticalShift;
-    }
-
-    
-    for (i = 0; i < elementCount; ++i) {
-        // change the stem dir for all objects
-        if (m_beamElementCoordRefs.at(i)->m_element->Is(NOTE)) {
-           // ((Note *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
-        }
-        else if (m_beamElementCoordRefs.at(i)->m_element->Is(CHORD)) {
-           // ((Chord *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
-        }
-
-        m_beamElementCoordRefs.at(i)->m_yBeam = m_beamElementCoordRefs.at(i)->m_y + verticalShift;
-        m_beamElementCoordRefs.at(i)->m_x += stemX[beamInterface->m_cueSize];
-    }
-    
-
-    for (i = 0; i < elementCount; i++) {
-        s_y += m_beamElementCoordRefs.at(i)->m_yBeam - yRel;
-        s_y2 += pow(m_beamElementCoordRefs.at(i)->m_yBeam - yRel, 2);
-        s_x += m_beamElementCoordRefs.at(i)->m_x - xRel;
-        s_x2 += pow(m_beamElementCoordRefs.at(i)->m_x - xRel, 2);
-        s_xy += (m_beamElementCoordRefs.at(i)->m_x - xRel) * (m_beamElementCoordRefs.at(i)->m_yBeam - yRel);
-    }
-
-    y1 = elementCount * s_xy - s_x * s_y;
-    xr = elementCount * s_x2 - s_x * s_x;
-
-    // Prevent division by 0
-    if (y1 && xr) {
-        this->m_beamSlope = y1 / xr;
-    }
-    else {
-        this->m_beamSlope = 0.0;
-    }
-
-    /* Correction esthetique : */
-    if (fabs(this->m_beamSlope) < doc->m_drawingBeamMinSlope) this->m_beamSlope = 0.0;
-    if (fabs(this->m_beamSlope) > doc->m_drawingBeamMaxSlope)
-        this->m_beamSlope = (this->m_beamSlope > 0) ? doc->m_drawingBeamMaxSlope : -doc->m_drawingBeamMaxSlope;
-    /* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
-
-    this->m_startingX = xRel;
+    this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
     this->m_startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
 
     /******************************************************************/
@@ -409,6 +333,98 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     
 void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
 {
+    assert(layer);
+    assert(staff);
+    assert(doc);
+    assert(beamInterface);
+    
+    double xr;
+    
+    // position x for the stem (normal and cue-sized)
+    int stemX[2];
+
+    // For slope calculation and linear regression
+    double s_x = 0.0; // sum of all x(n) for n in beamElementCoord
+    double s_y = 0.0; // sum of all y(n)
+    double s_xy = 0.0; // sum of (x(n) * y(n))
+    double s_x2 = 0.0; // sum of all x(n)^2
+    double s_y2 = 0.0; // sum of all y(n)^2
+    
+    int elementCount = (int)m_beamElementCoordRefs.size();
+    assert(elementCount > 0);
+    int last = elementCount - 1;
+    
+    // make it relative to the first x / staff y
+    int xRel = m_beamElementCoordRefs.at(0)->m_x;
+    int yRel = staff->GetDrawingY();
+    
+    int i, y1;
+    double verticalShiftFactor = 3.0;
+    int verticalShift = ((beamInterface->m_shortestDur - DUR_8) * (beamInterface->m_beamWidth));
+
+    // if the beam has smaller-size notes
+    if (m_beamElementCoordRefs.at(last)->m_element->GetDrawingCueSize()) {
+        verticalShift += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
+    }
+    else {
+        verticalShift += (beamInterface->m_shortestDur > DUR_8)
+            ? doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * verticalShiftFactor
+            : doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (verticalShiftFactor + 0.5);
+    }
+
+    // swap x position and verticalShift direction with stem down
+    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+        stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        stemX[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    }
+    else {
+        stemX[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        stemX[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        verticalShift = -verticalShift;
+    }
+
+    
+    for (i = 0; i < elementCount; ++i) {
+        // change the stem dir for all objects
+        if (m_beamElementCoordRefs.at(i)->m_element->Is(NOTE)) {
+           // ((Note *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
+        }
+        else if (m_beamElementCoordRefs.at(i)->m_element->Is(CHORD)) {
+           // ((Chord *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
+        }
+
+        m_beamElementCoordRefs.at(i)->m_yBeam = m_beamElementCoordRefs.at(i)->m_y + verticalShift;
+        m_beamElementCoordRefs.at(i)->m_x += stemX[beamInterface->m_cueSize];
+    }
+    
+
+    for (i = 0; i < elementCount; i++) {
+        s_y += m_beamElementCoordRefs.at(i)->m_yBeam - yRel;
+        s_y2 += pow(m_beamElementCoordRefs.at(i)->m_yBeam - yRel, 2);
+        s_x += m_beamElementCoordRefs.at(i)->m_x - xRel;
+        s_x2 += pow(m_beamElementCoordRefs.at(i)->m_x - xRel, 2);
+        s_xy += (m_beamElementCoordRefs.at(i)->m_x - xRel) * (m_beamElementCoordRefs.at(i)->m_yBeam - yRel);
+    }
+
+    y1 = elementCount * s_xy - s_x * s_y;
+    xr = elementCount * s_x2 - s_x * s_x;
+
+    // Prevent division by 0
+    if (y1 && xr) {
+        this->m_beamSlope = y1 / xr;
+    }
+    else {
+        this->m_beamSlope = 0.0;
+    }
+
+    /* Correction esthetique : */
+    if (fabs(this->m_beamSlope) < doc->m_drawingBeamMinSlope) this->m_beamSlope = 0.0;
+    if (fabs(this->m_beamSlope) > doc->m_drawingBeamMaxSlope)
+        this->m_beamSlope = (this->m_beamSlope > 0) ? doc->m_drawingBeamMaxSlope : -doc->m_drawingBeamMaxSlope;
+    /* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
     
 }
     

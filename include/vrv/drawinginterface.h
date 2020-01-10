@@ -109,7 +109,7 @@ public:
     bool m_cueSize;
     bool m_crossStaff;
     int m_shortestDur;
-    data_STEMDIRECTION m_noteStemDir;
+    data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
     Staff *m_beamStaff;
 
