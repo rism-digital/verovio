@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jan  2 23:02:54 PST 2020
+// Last Modified: Sun Jan 12 00:49:39 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3777,6 +3777,8 @@ class GridMeasure : public std::list<GridSlice*> {
 
 		GridSlice*   addTempoToken  (const std::string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
+		GridSlice*   addTempoToken  (GridSlice* slice, int partindex,
+		                             const string& tempo);
 		GridSlice*   addTimeSigToken(const std::string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addMeterSigToken(const std::string& tok, HumNum timestamp,
@@ -4021,6 +4023,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		                                 GridSlice* startslice);
 		void addInvisibleRest           (std::vector<std::vector<GridSlice*>>& nextevent,
 		                                 int index, int p, int s);
+		void cleanTempos                (void);
+		void cleanTempos                (GridSlice* slice);
 
 	protected:
 		void calculateGridDurations        (void);
@@ -4210,7 +4214,9 @@ class MxmlEvent {
 		bool               isInvisible        (void);
 		void               setBarlineStyle    (xml_node node);
 		void               setTexts           (std::vector<std::pair<int, xml_node>>& nodes);
+		void               setTempos          (std::vector<std::pair<int, xml_node>>& nodes);
 		std::vector<std::pair<int, xml_node>>&  getTexts           (void);
+		std::vector<std::pair<int, xml_node>>&  getTempos          (void);
 		void               setDynamics        (xml_node node);
 		void               setHairpinEnding   (xml_node node);
 		void               addFiguredBass     (xml_node node);
@@ -4242,6 +4248,7 @@ class MxmlEvent {
 		xml_node          m_hairpin_ending; // hairpin <direction> starting just after note and before new measure
 		std::vector<xml_node>  m_figured_bass; // fb starting just before note
 		std::vector<std::pair<int, xml_node>>  m_text;   // text <direction> starting just before note
+		std::vector<std::pair<int, xml_node>>  m_tempo;   // tempo starting just before note
 
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
@@ -6592,6 +6599,10 @@ class Tool_musicxml2hum : public HumTool {
 		                        int staffindex, int voiceindex, MxmlEvent* event);
 		void addText           (GridSlice* slice, GridMeasure* measure, int partindex,
 		                        int staffindex, int voiceindex, pugi::xml_node node);
+		void addTempos         (GridSlice* slice, GridMeasure* measure, int partindex,
+		                        int staffindex, int voiceindex, MxmlEvent* event);
+		void addTempo          (GridSlice* slice, GridMeasure* measure, int partindex,
+		                        int staffindex, int voiceindex, pugi::xml_node node);
 		int         getHarmonyOffset(pugi::xml_node hnode);
 		std::string getHarmonyString(pugi::xml_node hnode);
 		std::string getDynamicString(pugi::xml_node element);
@@ -6623,12 +6634,13 @@ class Tool_musicxml2hum : public HumTool {
 		Options m_options;
 		bool DebugQ;
 		bool VoiceDebugQ;
-		bool m_recipQ       = false;
-		bool m_stemsQ       = false;
-		int  m_slurabove    = 0;
-		int  m_slurbelow    = 0;
-		char m_hasEditorial = '\0';
+		bool m_recipQ        = false;
+		bool m_stemsQ        = false;
+		int  m_slurabove     = 0;
+		int  m_slurbelow     = 0;
+		char m_hasEditorial  = '\0';
 		bool m_hasOrnamentsQ = false;
+		int  m_maxstaff      = 0;
 		std::vector<std::vector<std::string>> m_last_ottava_direction;
 		std::vector<MusicXmlHarmonyInfo> offsetHarmony;
 		std::vector<MusicXmlFiguredBassInfo> offsetFiguredBass;
@@ -6643,6 +6655,7 @@ class Tool_musicxml2hum : public HumTool {
 		std::vector<std::vector<pugi::xml_node>> m_current_dynamic;
 		std::vector<pugi::xml_node> m_current_figured_bass;
 		std::vector<std::pair<int, pugi::xml_node>> m_current_text;
+		std::vector<std::pair<int, pugi::xml_node>> m_current_tempo;
 
 		bool m_hasTransposition = false;
 
@@ -7127,6 +7140,7 @@ class Tool_shed : public HumTool {
 
 		// list of exclusive interpretations to process
 		std::vector<std::string> m_exinterps; 
+		std::string m_exclusion;
 
 		std::vector<bool> m_spines; // usar with -s option
 		std::string m_grepoptions;

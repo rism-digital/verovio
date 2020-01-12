@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jan  2 23:02:54 PST 2020
+// Last Modified: Sun Jan 12 00:49:39 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3888,6 +3888,70 @@ GridSlice* GridMeasure::addTempoToken(const string& tok, HumNum timestamp,
 
 //////////////////////////////
 //
+// GridMeasure::addTempoToken --
+//
+
+GridSlice* GridMeasure::addTempoToken(GridSlice* slice, int partindex,
+		const string& tempo) {
+	auto iter = this->rbegin();
+	if (iter == this->rend()) {
+		// something strange happened: expecting at least one item in measure.
+		return slice;
+	}
+	GridPart* part;
+	GridStaff* staff;
+	GridVoice* voice;
+
+	auto previous = iter;
+	previous++;
+	while (previous != this->rend()) {
+		if ((*previous)->isLayoutSlice()) {
+			part = (*previous)->at(partindex);
+			staff = part->at(0);
+			if (staff->size() == 0) {
+				GridVoice* v = new GridVoice;
+				staff->push_back(v);
+			}
+			voice = staff->at(0);
+			if (voice) {
+				if (voice->getToken() == NULL) {
+					// create a token with text
+					HTp newtoken = new HumdrumToken(tempo);
+					voice->setToken(newtoken);
+					return slice;
+				} else if (*voice->getToken() == "*") {
+					// replace token with text
+					HTp newtoken = new HumdrumToken(tempo);
+					voice->setToken(newtoken);
+					return slice;
+				}
+			} else {
+				previous++;
+				continue;
+			}
+		} else {
+			break;
+		}
+		previous++;
+	}
+
+	auto insertpoint = previous.base();
+	GridSlice* newslice = new GridSlice(this, (*iter)->getTimestamp(), SliceType::Layouts);
+	newslice->initializeBySlice(*iter);
+	this->insert(insertpoint, newslice);
+	HTp newtoken = new HumdrumToken(tempo);
+	if (newslice->at(partindex)->at(0)->size() == 0) {
+		GridVoice* v = new GridVoice;
+		newslice->at(partindex)->at(0)->push_back(v);
+	}
+	newslice->at(partindex)->at(0)->at(0)->setToken(newtoken);
+	return newslice;
+}
+
+
+
+//////////////////////////////
+//
 // GridMeasure::addTimeSigToken -- Add a time signature token in the data slice at
 //    the given timestamp (or create a new timesig slice at that timestamp), placing the
 //    token at the specified part, staff, and voice index.
@@ -4711,109 +4775,6 @@ void GridMeasure::addLayoutParameter(HumNum timestamp, int partindex,
 	newslice->at(partindex)->at(0)->at(0)->setToken(newtoken);
 }
 
-/*
-GridSlice* GridMeasure::addLayoutParameter(const string& tok, HumNum timestamp,
-	int part, int staff, int voice, int maxstaff, int gracenumber) {
-	if (gracenumber < 1) {
-		cerr << "ERROR: gracenumber " << gracenumber << " has to be larger than 0" << endl;
-		return NULL;
-	}
-
-	GridSlice* gs = NULL;
-	// GridSlice* datatarget = NULL;
-	auto iterator = this->begin();
-	if (this->empty()) {
-		// add a new GridSlice to an empty list or at end of list if timestamp
-		// is after last entry in list.
-		gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
-		gs->addToken(tok, part, staff, voice);
-		this->push_back(gs);
-	} else if (timestamp > this->back()->getTimestamp()) {
-
-		// Grace note needs to be added at the end of a measure:
-		auto it2 = this->end();
-		it2--;
-		int counter = 0;
-		while (it2 != this->end()) {
-			if ((*it2)->isGraceSlice()) {
-				counter++;
-				if (counter == gracenumber) {
-					// insert grace note into this slice
-					(*it2)->addToken(tok, part, staff, voice);
-					return *it2;
-				}
-			} else if ((*it2)->isLayoutSlice()) {
-				// skip over any layout paramter lines.
-				it2--;
-				continue;
-			} else if ((*it2)->isDataSlice()) {
-				// insert grace note after this note
-				gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
-				gs->addToken(tok, part, staff, voice);
-				it2++;
-				this->insert(it2, gs);
-				return gs;
-			}
-			it2--;
-		}
-		return NULL;
-
-	} else {
-		// search for existing line with same timestamp on a data slice:
-
-		while (iterator != this->end()) {
-			if (timestamp < (*iterator)->getTimestamp()) {
-				cerr << "STRANGE CASE 2 IN GRIDMEASURE::ADDGRACETOKEN" << endl;
-				cerr << "\tGRACE TIMESTAMP: " << timestamp << endl;
-				cerr << "\tTEST  TIMESTAMP: " << (*iterator)->getTimestamp() << endl;
-				return NULL;
-			}
-			if ((*iterator)->isDataSlice()) {
-				if ((*iterator)->getTimestamp() == timestamp) {
-					// found dataslice just before graceslice(s)
-					// datatarget = *iterator;
-					break;
-				}
-			}
-			iterator++;
-		}
-
-		auto it2 = iterator;
-		it2--;
-		int counter = 0;
-		while (it2 != this->end()) {
-			if ((*it2)->isGraceSlice()) {
-				counter++;
-				if (counter == gracenumber) {
-					// insert grace note into this slice
-					(*it2)->addToken(tok, part, staff, voice);
-					return *it2;
-				}
-			} else if ((*it2)->isLayoutSlice()) {
-				// skip over any layout paramter lines.
-				it2--;
-				continue;
-			} else if ((*it2)->isDataSlice()) {
-				// insert grace note after this note
-				gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
-				gs->addToken(tok, part, staff, voice);
-				it2++;
-				this->insert(it2, gs);
-				return gs;
-			}
-			it2--;
-		}
-
-		// grace note should be added at start of measure
-		gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
-		gs->addToken(tok, part, staff, voice);
-		this->insert(this->begin(), gs);
-
-	}
-
-	return NULL;
-}
-*/
 
 
 //////////////////////////////
@@ -7576,7 +7537,8 @@ bool HumGrid::transferTokens(HumdrumFile& outfile, int startbarnum) {
 	addNullTokens();
 	addInvisibleRestsInFirstTrack();
 	addMeasureLines();
-	buildSingleList();
+	buildSingleList();  // is this needed a second time?
+	cleanTempos();
 	addLastMeasure();
 	if (manipulatorCheck()) {
 		cleanupManipulators();
@@ -10162,6 +10124,70 @@ void HumGrid::removeRedundantClefChanges(void) {
 				slice->invalidate();
 			}
 
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::cleanTempos --
+//
+
+void HumGrid::cleanTempos(void) {
+//		std::vector<GridSlice*>       m_allslices;
+// ggg
+	for (int i=0; i<(int)m_allslices.size(); i++) {
+		if (!m_allslices[i]->isTempoSlice()) {
+			continue;
+		}
+		cleanTempos(m_allslices[i]);
+	}
+}
+
+
+void HumGrid::cleanTempos(GridSlice* slice) {
+	if (!slice->isTempoSlice()) {
+		return;
+	}
+	HTp token = NULL;
+
+	for (int part=0; part<(int)slice->size(); part++) {
+		GridPart* gp = slice->at(part);
+		for (int staff=0; staff<(int)gp->size(); staff++) {
+			GridStaff* gs = gp->at(staff);
+			for (int voice=0; voice<(int)gs->size(); voice++) {
+				GridVoice* gv = gs->at(voice);
+				token = gv->getToken();
+				if (token) {
+					break;
+				}
+			}
+			if (token) {
+				break;
+			}
+		}
+		if (token) {
+			break;
+		}
+	}
+
+	if (!token) {
+		return;
+	}
+
+	for (int part=0; part<(int)slice->size(); part++) {
+		GridPart* gp = slice->at(part);
+		for (int staff=0; staff<(int)gp->size(); staff++) {
+			GridStaff* gs = gp->at(staff);
+			for (int voice=0; voice<(int)gs->size(); voice++) {
+				GridVoice* gv = gs->at(voice);
+				if (gv->getToken()) {
+					continue;
+				}
+				gv->setToken(*token);
+			}
 		}
 	}
 }
@@ -38097,6 +38123,28 @@ vector<pair<int, xml_node>>&  MxmlEvent::getTexts(void) {
 
 //////////////////////////////
 //
+// MxmlEvent::setTempos --
+//
+
+void MxmlEvent::setTempos(vector<pair<int, xml_node>>& nodes) {
+	m_tempo = nodes;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getTempos --
+//
+
+vector<pair<int, xml_node>>&  MxmlEvent::getTempos(void) {
+	return m_tempo;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::setDynamics --
 //
 
@@ -63124,7 +63172,7 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 	}
 	
 	HumNum timestamp = mr.getAbsBeat();
-cerr << "CONVERTING LINE " << timestamp << "\t" << mr << endl;
+	// cerr << "CONVERTING LINE " << timestamp << "\t" << mr << endl;
 	string tok;
 	GridSlice* slice = NULL;
 
@@ -63579,9 +63627,11 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	// for debugging:
 	//printPartInfo(partids, partinfo, partcontent, partdata);
 
+	m_maxstaff = 0;
 	// check the voice info
 	for (int i=0; i<(int)partdata.size(); i++) {
 		partdata[i].prepareVoiceMapping();
+		m_maxstaff += partdata[i].getStaffCount();
 		// for debugging:
 		if (VoiceDebugQ) {
 			partdata[i].printStaffVoiceInfo();
@@ -65048,6 +65098,11 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		m_current_text.clear();
 		addTexts(slice, outdata, event->getPartIndex(), staffindex, voiceindex, event);
 	}
+	if (m_current_tempo.size() > 0) {
+		event->setTempos(m_current_tempo);
+		m_current_tempo.clear();
+		addTempos(slice, outdata, event->getPartIndex(), staffindex, voiceindex, event);
+	}
 
 	if (m_current_dynamic[partindex].size()) {
 		// only processing the first dynamic at the current time point for now.
@@ -65102,6 +65157,23 @@ void Tool_musicxml2hum::addTexts(GridSlice* slice, GridMeasure* measure, int par
 
 //////////////////////////////
 //
+// Tool_musicxml2hum::addTempos -- Add all text direction for a note.
+//
+
+void Tool_musicxml2hum::addTempos(GridSlice* slice, GridMeasure* measure, int partindex,
+		int staffindex, int voiceindex, MxmlEvent* event) {
+	vector<pair<int, xml_node>>& nodes = event->getTempos();
+	for (auto item : nodes) {
+		int newpartindex = item.first;
+		int newstaffindex = 0; // Not allowing addressing text by layer (could be changed).
+		addTempo(slice, measure, newpartindex, newstaffindex, voiceindex, item.second);
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_musicxml2hum::addText -- Add a text direction to the grid.
 //
 //      <direction placement="below">
@@ -65114,14 +65186,12 @@ void Tool_musicxml2hum::addTexts(GridSlice* slice, GridMeasure* measure, int par
 //
 // <direction placement="above">
 //         <direction-type>
-//           <words default-y="40.00" relative-x="-9.47" relative-y="2.71">note
-// </words>
+//           <words default-y="40.00" relative-x="-9.47" relative-y="2.71">note</words>
 //           <words>with newline</words>
 //         </direction-type>
 //       <staff>2</staff>
 //       </direction>
 // 
-
 
 void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int partindex,
 		int staffindex, int voiceindex, xml_node node) {
@@ -65133,6 +65203,9 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 			placementstring = ":a";
 		} else if (value == "below") {
 			placementstring = ":b";
+		} else {
+			// force above if no placement specified
+			placementstring = ":a";
 		}
 	}
 
@@ -65246,6 +65319,167 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 	// If there is already an empty layout slice before the current one (with no spine manipulators
 	// in between), then insert onto the existing layout slice; otherwise create a new layout slice.
 	measure->addLayoutParameter(slice, partindex, output);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addTempo -- Add a tempo direction to the grid.
+// 
+// <direction placement="above">
+//    <direction-type>
+//       <metronome parentheses="no" default-x="-35.96" relative-y="20.00">
+//          <beat-unit>half</beat-unit>
+//          <per-minute>80</per-minute>
+//       </metronome>
+//    </direction-type>
+//    <sound tempo="160"/>
+// </direction>
+//
+// Dotted tempo example:
+//
+// <direction placement="above">
+//    <direction-type>
+//       <metronome parentheses="no" default-x="-39.10" relative-y="20.00">
+//          <beat-unit>quarter</beat-unit>
+//          <beat-unit-dot/>
+//          <per-minute>80</per-minute>
+//       </metronome>
+//    </direction-type>
+//    <sound tempo="120"/>
+// </direction>
+//
+//
+
+void Tool_musicxml2hum::addTempo(GridSlice* slice, GridMeasure* measure, int partindex,
+		int staffindex, int voiceindex, xml_node node) {
+	string placementstring;
+	xml_attribute placement = node.attribute("placement");
+	if (placement) {
+		string value = placement.value();
+		if (value == "above") {
+			placementstring = ":a";
+		} else if (value == "below") {
+			placementstring = ":b";
+		} else {
+			// force above if no explicit placement:
+			placementstring = ":a";
+		}
+	}
+
+	xml_node child = node.first_child();
+	if (!child) {
+		return;
+	}
+	if (!nodeType(child, "direction-type")) {
+		return;
+	}
+
+	xml_node sound(NULL);
+	xml_node sibling = child;
+	while (sibling) {
+		if (nodeType(sibling, "sound")) {
+			sound = sibling;
+			break;
+		}
+		sibling = sibling.next_sibling();
+	}
+
+	// grandchild should be <metronome> (containing textual display)
+	// and <sound @tempo> which gives *MM data.
+	xml_node metronome(NULL);
+
+	xml_node grandchild = child.first_child();
+	if (!grandchild) {
+		return;
+	}
+	sibling = grandchild;
+
+	while (sibling) {
+		if (nodeType(sibling, "metronome")) {
+			metronome = sibling;
+		}
+		sibling = sibling.next_sibling();
+	}
+	
+	// get metronome parameters
+
+	xml_node beatunit(NULL);
+	xml_node beatunitdot(NULL);
+	xml_node perminute(NULL);
+
+	if (metronome) {
+		sibling = metronome.first_child();
+		while (sibling) {
+			if (nodeType(sibling, "beat-unit")) {
+				beatunit = sibling;
+			} else if (nodeType(sibling, "beat-unit-dot")) {
+				beatunitdot = sibling;
+			} else if (nodeType(sibling, "per-minute")) {
+				perminute = sibling;
+			}
+			sibling = sibling.next_sibling();
+		}
+	}
+
+	string mmvalue;
+	if (sound) {
+		mmvalue = getAttributeValue(sound, "tempo");
+	}
+
+	if (!beatunit) {
+		cerr << "Warning: missing beat-unit in tempo setting" << endl;
+		return;
+	}
+	if (!perminute) {
+		cerr << "Warning: missing per-minute in tempo setting" << endl;
+		return;
+	}
+
+	int staff = 0;
+	int voice = 0;
+
+	if (sound) {
+		string mmtok = "*MM";
+		double mmv = stod(mmvalue);
+		double mmi = int(mmv + 0.001);
+		if (fabs(mmv - mmi) < 0.01) {
+			stringstream sstream;
+			sstream << mmi;
+			mmtok += sstream.str();
+		} else {
+			mmtok += mmvalue;
+		}
+		HumNum timestamp = slice->getTimestamp();
+		measure->addTempoToken(mmtok, timestamp, partindex, staff, voice, m_maxstaff);
+	}
+
+	string butext = beatunit.child_value();
+	string pmtext = perminute.child_value();
+	string stylestring;
+
+	// create textual tempo marking
+	string text;
+	text = "[";
+	text += butext;
+	if (beatunitdot) {
+		text += "-dot";
+	}
+	text += "]";
+	text += "=";
+	text += pmtext;
+
+	string output = "!LO:TX";
+	output += placementstring;
+	output += stylestring;
+	output += ":t=";
+	output += text;
+
+	// The text direction needs to be added before the last line in the measure object.
+	// If there is already an empty layout slice before the current one (with no spine manipulators
+	// in between), then insert onto the existing layout slice; otherwise create a new layout slice.
+	measure->addTempoToken(slice, partindex, output);
 }
 
 
@@ -66380,6 +66614,8 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 					grandchild = child.first_child();
 					if (nodeType(grandchild, "words")) {
 						m_current_text.emplace_back(std::make_pair(pindex, element));
+					} else if (nodeType(grandchild, "metronome")) {
+						m_current_tempo.emplace_back(std::make_pair(pindex, element));
 					} else if (nodeType(grandchild, "dynamics")) {
 						m_current_dynamic[pindex].push_back(element);
 					} else if (nodeType(grandchild, "octave-shift")) {
@@ -73304,6 +73540,7 @@ bool Tool_satb2gs::validateHeader(HumdrumFile& infile) {
 Tool_shed::Tool_shed(void) {
 	define("s|spine|spines=s", "list of spines to process");
 	define("e|expression=s", "regular expression");
+	define("E|exclusion-expression=s", "regular expression to skip");
 	define("x|exclusive-interpretations=s", "apply only to spine types in list");
 	define("k|kern=b", "apply only to **kern data");
 	define("X=s", "defineable exclusive interpretation x");
@@ -73467,6 +73704,7 @@ void Tool_shed::initialize(void) {
 		string value = getString("expression");
 		parseExpression(value);
 	}
+	m_exclusion = getString("exclusion-expression");
 
 	if (getBoolean("X")) {
 		m_xInterp = getExInterp(getString("X"));
@@ -74008,7 +74246,7 @@ bool Tool_shed::isValidDataType(HTp token) {
 
 //////////////////////////////
 //
-// Tool_shed::isValidSpine -- usar with -s option.
+// Tool_shed::isValidSpine -- used with -s option.
 //
 
 bool Tool_shed::isValidSpine(HTp token) {
@@ -74027,6 +74265,12 @@ bool Tool_shed::isValidSpine(HTp token) {
 //
 
 bool Tool_shed::isValid(HTp token) {
+	if (!m_exclusion.empty()) {
+		HumRegex hre;
+		if (hre.search(token, m_exclusion)) {
+			return false;
+		}
+	}
 	if (isValidDataType(token) && isValidSpine(token)) {
 		return true;
 	}
