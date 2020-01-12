@@ -8162,6 +8162,122 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
 //////////////////////////////
 //
+// HumdrumInput::addTempoDirection --
+//
+bool HumdrumInput::addTempoDirection(const string &text, const string &placement, bool bold, bool italic,
+    hum::HTp token, int staffindex, int justification, const std::string &color)
+{
+    Tempo *tempo = new Tempo;
+    setStaff(tempo, m_currentstaff);
+    setLocationId(tempo, token);
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    if (token->isMens()) {
+        // Attach to note, not with measure timestamp.
+        // Need to handle text on chords (will currently have a problem attaching to chords)
+        string startid = getLocationId("note", token);
+        tempo->SetStartid("#" + startid);
+    }
+    else {
+        tempo->SetTstamp(tstamp.getFloat());
+    }
+
+    hum::HumRegex hre;
+    if (!hre.search(text, "(.*)\\[([^=]*)\\]\\s*=\\s*(\\d+.*)")) {
+        return false;
+    }
+    std::string first = hre.getMatch(1);
+    std::string second = hre.getMatch(2);
+    std::string third = hre.getMatch(3);
+    second = convertRhythmToVerovioText(second);
+
+    if (!first.empty()) {
+        addTextElement(tempo, first);
+    }
+
+    Rend *rend = new Rend;
+    addTextElement(rend, second);
+    tempo->AddChild(rend);
+    rend->SetFontname("VerovioText");
+
+    // forcing spaces around equals sign:
+    third = "\xc2\xa0=\xc2\xa0" + third;
+    addTextElement(tempo, third);
+
+    m_measure->AddChild(tempo);
+    if (placement == "above") {
+        setPlace(tempo, "above");
+    }
+    else if (placement == "below") {
+        setPlace(tempo, "below");
+    }
+
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertRhythmToVerovioText --
+//
+
+std::string HumdrumInput::convertRhythmToVerovioText(const std::string &text)
+{
+    hum::HumRegex hre;
+    bool dot = false;
+    std::string second = text;
+    if (hre.search(second, "-dot$")) {
+        dot = true;
+        second.resize((int)second.size() - 4);
+    }
+    else if (hre.search(second, "\\.$")) {
+        dot = true;
+        second.resize((int)second.size() - 1);
+    }
+
+    std::string output;
+    if ((second == "quarter") || (second == "4")) {
+        output += "&#xE1D5;";
+    }
+    else if ((second == "half") || (second == "2")) {
+        output += "&#xE1D3;";
+    }
+    else if ((second == "whole" || (second == "1"))) {
+        output += "&#xE1D2;";
+    }
+    else if ((second == "double-whole" || (second == "0"))) {
+        output += "&#xE1D1;";
+    }
+    else if ((second == "eighth" || (second == "8"))) {
+        output += "&#xE1D7;";
+    }
+    else if ((second == "sixteenth" || (second == "16"))) {
+        output += "&#xE1D9;";
+    }
+    else if (second == "32") {
+        output += "&#xE1DB;";
+    }
+    else if (second == "64") {
+        output += "&#xE1DD;";
+    }
+    else if (second == "128") {
+        output += "&#xE1DF;";
+    }
+    else if (second == "256") {
+        output += "&#xE1E1;";
+    }
+    else if (second == "512") {
+        output += "&#xE1E3;";
+    }
+    else if (second == "1024") {
+        output += "&#xE1E5;";
+    }
+    if (dot) {
+        output += "&#xE1E7;";
+    }
+    return output;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::addDirection --
 //     default value: color = "";
 //
@@ -8169,6 +8285,14 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 void HumdrumInput::addDirection(const string &text, const string &placement, bool bold, bool italic, hum::HTp token,
     int staffindex, int justification, const std::string &color)
 {
+
+    hum::HumRegex hre;
+    if (hre.search(text, "\\[[^=]*\\]\\s*=\\s*\\d+")) {
+        int status = addTempoDirection(text, placement, bold, italic, token, staffindex, justification, color);
+        if (status) {
+            return;
+        }
+    }
 
     Dir *dir = new Dir;
     setStaff(dir, m_currentstaff);

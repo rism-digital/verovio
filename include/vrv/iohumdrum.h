@@ -492,6 +492,9 @@ protected:
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
         int staffindex, int justification = 0, const std::string &color = "");
+    bool addTempoDirection(const string &text, const string &placement, bool bold, bool italic, hum::HTp token,
+        int staffindex, int justification, const std::string &color);
+    std::string convertRhythmToVerovioText(const std::string &text);
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);
