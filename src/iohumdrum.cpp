@@ -577,10 +577,10 @@ bool HumdrumInput::convertHumdrum()
 
     std::vector<hum::HTp> spinestarts;
     infile.getSpineStartList(spinestarts);
-    int spineindex = -1;
+    int staffindex = -1;
     for (auto it : spinestarts) {
         if (it->isDataType("**kern")) {
-            spineindex++;
+            staffindex++;
         }
         else if (it->isDataType("**mxhm")) {
             m_harm = true;
@@ -595,7 +595,7 @@ bool HumdrumInput::convertHumdrum()
             m_string = true;
         }
         else if (it->isDataType("**mens")) {
-            spineindex++;
+            staffindex++;
             m_mens = true;
         }
         else if (it->isDataType("**harm")) {
@@ -609,24 +609,24 @@ bool HumdrumInput::convertHumdrum()
         }
         else if (it->isDataType("**fb")) {
             m_fb = true;
-            if (spineindex >= 0) {
-                m_fbstates[spineindex] = -1;
-                m_fbstaff[spineindex] = true;
+            if (staffindex >= 0) {
+                m_fbstates[staffindex] = -1;
+                m_fbstaff[staffindex] = true;
             }
         }
         else if (it->isDataType("**fba")) {
             m_fb = true;
-            if (spineindex >= 0) {
-                m_fbstates[spineindex] = +1;
-                m_fbstaff[spineindex] = true;
+            if (staffindex >= 0) {
+                m_fbstates[staffindex] = +1;
+                m_fbstaff[staffindex] = true;
             }
         }
         else if (it->isDataType("**Bnum")) {
             // older name
             m_fb = true;
-            if (spineindex >= 0) {
-                m_fbstates[spineindex] = -1;
-                m_fbstaff[spineindex] = true;
+            if (staffindex >= 0) {
+                m_fbstates[staffindex] = -1;
+                m_fbstaff[staffindex] = true;
             }
         }
     }
@@ -4213,6 +4213,16 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
     int i;
 
+    if (m_fb) {
+        // This function needs to come before notes so that
+        // the *above/*below markers can be used to set
+        // the location of tuplets within each measure.
+        // But placing here will cause the figured bass
+        // elements to be added before <staff> in <measure>
+        // which is not the typical placement ordering.
+        addFiguredBassForMeasure(startline, endline);
+    }
+
     // pre-allocate
     std::vector<Staff *> stafflist(staffstarts.size());
     for (i = 0; i < (int)staffstarts.size(); ++i) {
@@ -4244,10 +4254,6 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
     if (m_string) {
         addStringNumbersForMeasure(startline, endline);
-    }
-
-    if (m_fb) {
-        addFiguredBassForMeasure(startline, endline);
     }
 
     return status;
@@ -4350,23 +4356,39 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
 
     for (int i = startline; i < endline; ++i) {
         if (infile[i].isInterpretation()) {
+            int staffindex = 0;
             for (int j = 0; j < infile[i].getFieldCount(); ++j) {
                 if (j >= 999) {
                     break;
                 }
                 hum::HTp token = infile.token(i, j);
+                if (token->isKern()) {
+                    staffindex++;
+                }
+                else if (token->isDataType("**mens")) {
+                    staffindex++;
+                }
                 if (!(token->isDataType("**fb") || token->isDataType("**fba") || token->isDataType("**Bnum"))) {
                     continue;
                 }
                 int track = token->getTrack();
                 if (token->compare("*above") == 0) {
                     m_placement[track] = +1;
+                    int index = staffindex - 1;
+                    index = index < 0 ? 0 : index;
+                    m_fbstates.at(index) = +1;
                 }
                 else if (token->compare("*below") == 0) {
                     m_placement[track] = -1;
+                    int index = staffindex - 1;
+                    index = index < 0 ? 0 : index;
+                    m_fbstates.at(index) = -1;
                 }
                 else if (token->compare("*auto") == 0) {
                     m_placement[track] = 0;
+                    int index = staffindex - 1;
+                    index = index < 0 ? 0 : index;
+                    m_fbstates.at(index) = 0;
                 }
                 else if (token->compare("*reverse") == 0) {
                     m_reverse[track] = +1;
