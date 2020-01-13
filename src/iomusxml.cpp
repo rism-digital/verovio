@@ -421,22 +421,69 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
 
 void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
-    std::string tempoText = "M.M.";
-    if (metronome.select_node("per-minute").node()) {
-        std::string mm = GetContent(metronome.select_node("per-minute").node());
-        if (atoi(mm.c_str())) tempo->SetMm(atoi(mm.c_str()));
-        tempoText = tempoText + StringFormat(" = %s", mm.c_str());
+    std::string rawText;
+    bool paren = false;
+    if (HasAttributeWithValue(metronome, "parentheses", "yes")) {
+        rawText = "(";
+        paren = true;
     }
-    if (metronome.select_node("beat-unit").node()) {
-        tempo->SetMmUnit(ConvertTypeToDur(GetContent(metronome.select_node("beat-unit").node())));
+    Text *text;
+    if (!rawText.empty()) {
+        text = new Text();
+        text->SetText(UTF8to16(rawText));
+        tempo->AddChild(text);
     }
+
+    int dotCount = 0;
     if (metronome.select_node("beat-unit-dot")) {
-        tempo->SetMmDots((int)metronome.select_nodes("beat-unit-dot").size());
+        dotCount = (int)metronome.select_nodes("beat-unit-dot").size();
+        tempo->SetMmDots(dotCount);
     }
-    if (HasAttributeWithValue(metronome, "parentheses", "yes")) tempoText = "(" + tempoText + ")";
-    Text *text = new Text();
-    text->SetText(UTF8to16(tempoText));
-    tempo->AddChild(text);
+
+    pugi::xml_node beatunit = metronome.select_node("beat-unit").node();
+    std::wstring verovioText;
+    if (beatunit) {
+        std::string content = GetContent(beatunit);
+        tempo->SetMmUnit(ConvertTypeToDur(content));
+        verovioText = ConvertTypeToVerovioText(content);
+        for (int i = 0; i < dotCount; i++) {
+            verovioText += L"\xE1E7"; // SMUFL augmentation dot
+        }
+    }
+    if (!verovioText.empty()) {
+        Rend *rend = new Rend;
+        rend->SetFontname("VerovioText");
+        text = new Text();
+        text->SetText(verovioText);
+        rend->AddChild(text);
+        tempo->AddChild(rend);
+    }
+
+    rawText = "";
+    pugi::xml_node perminute = metronome.select_node("per-minute").node();
+    if (perminute) {
+        std::string mm = GetContent(perminute);
+        double mmval = std::stod(mm); // Still need to handle cases such as "c. 108".
+        int mmint = 0;
+        if ((!isnan(mmval)) && (mmval > 0.5)) {
+            mmint = int(mmval + 0.5);
+            tempo->SetMm(mmint);
+        }
+        if (!mm.empty()) {
+            std::stringstream sstream;
+            sstream << " = " << mmint;
+            rawText = sstream.str();
+        }
+    }
+    if (paren) {
+        rawText += ")";
+    }
+
+    if (!rawText.empty()) {
+        text = new Text();
+        text->SetText(UTF8to16(rawText));
+        tempo->AddChild(text);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2656,6 +2703,38 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
     else {
         LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
         return DURATION_NONE;
+    }
+}
+
+std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
+{
+    if (value == "breve")
+        return L"\xE1D1";
+    else if (value == "whole")
+        return L"\xE1D2";
+    else if (value == "half")
+        return L"\xE1D3";
+    else if (value == "quarter")
+        return L"\xE1D5";
+    else if (value == "eighth")
+        return L"\xE1D7";
+    else if (value == "16th")
+        return L"\xE1D9";
+    else if (value == "32nd")
+        return L"\xE1DB";
+    else if (value == "64th")
+        return L"\xE1DD";
+    else if (value == "128th")
+        return L"\xE1DF";
+    else if (value == "256th")
+        return L"\xE1E1";
+    else if (value == "512th")
+        return L"\xE1E3";
+    else if (value == "1024th")
+        return L"\xE1E5";
+    else {
+        LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
+        return L"";
     }
 }
 
