@@ -33,6 +33,13 @@ void ExpansionMap::Reset()
 void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &existingList, Object *prevSect)
 {
     assert(prevSect);
+    // find all siblings of expansion element to know what in MEI file
+    const vrv::ArrayOfObjects* expansionSiblings = prevSect->GetParent()->GetChildren();
+    std::vector<std::string> reductionList;
+    for (auto o : *expansionSiblings) {
+        if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG))
+            reductionList.push_back(o->GetUuid());
+    }
     
     for (std::string s : expansionList) {
         if (s.rfind("#", 0) == 0) s = s.substr(1, s.size() - 1); // remove trailing hash from reference
@@ -41,9 +48,16 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
             return;
         }
         if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
+            // remove parent from reductionList, if expansion
+            for (auto it = begin(reductionList); it != end(reductionList);) {
+              if ((*it).compare(currSect->GetParent()->GetUuid()) == 0)
+                it = reductionList.erase(it);
+              else
+                ++it;
+            }
             Expansion *currExpansion = dynamic_cast<Expansion *>(currSect);
             assert(currExpansion);
-            Expand(currExpansion->GetPlist(), existingList, prevSect);
+            Expand(currExpansion->GetPlist(), existingList, currSect);
         }
         else {
             if (std::find(existingList.begin(), existingList.end(), s)
@@ -52,10 +66,8 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 // clone current section/ending/rdg/lem and rename it, adding -"rend2" for the first repetition etc.
                 Object *clonedObject = currSect->Clone();
                 clonedObject->CloneReset();
-                // are we sure there is always a child? If not, we should handle negative cases properly
-                assert(currSect->GetChild(0));
                 clonedObject->SetUuid(currSect->GetUuid() + "-rend"
-                    + std::to_string(GetExpansionIdsForElement(currSect->GetChild(0)->GetUuid()).size() + 1));
+                    + std::to_string(GetExpansionIdsForElement(currSect->GetUuid()).size() + 1));
 
                 // get IDs of old and new sections and add them to m_map
                 std::vector<std::string> oldIds;
@@ -79,6 +91,22 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 prevSect = currSect;
                 existingList.push_back(s);
             }
+            
+            // remove s from reductionList
+            for (auto it = begin(reductionList); it != end(reductionList);) {
+              if ((*it).compare(s) == 0)
+                it = reductionList.erase(it);
+              else
+                ++it;
+            }
+        }
+    }
+    // make unused sections hidden
+    for (std::string r : reductionList) {
+        Object *currSect = prevSect->GetParent()->FindDescendantByUuid(r);
+        if (currSect) {
+            // currSect->SetVisibility(HIDDEN); here, we will turn visibility off
+            std::cout << "Set |" << r.c_str() << "| to >>HIDDEN<<: " << currSect->GetUuid() << "\n"; // DEBUG, please delete
         }
     }
 }
