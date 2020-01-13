@@ -1517,11 +1517,6 @@ double Doc::GetTopMargin(const ClassId classId) const
     return m_options->m_defaultTopMargin.GetValue();
 }
 
-double Doc::GetLeftPosition() const
-{
-    return m_options->m_leftPosition.GetValue();
-}
-
 Page *Doc::SetDrawingPage(int pageIdx)
 {
     // out of range

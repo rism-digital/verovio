@@ -645,10 +645,6 @@ Options::Options()
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
 
-    m_leftPosition.SetInfo("Left position", "The left position");
-    m_leftPosition.Init(0.8, 0.0, 2.0);
-    this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
-
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
