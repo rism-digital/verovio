@@ -4078,7 +4078,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
             Tempo *tempo = new Tempo;
             setLocationId(tempo, infile.token(i, 0));
             m_measure->AddChildBack(tempo);
-            addTextElement(tempo, value);
+            setTempoContent(tempo, value);
             tempo->SetTstamp(1.0);
             setStaff(tempo, 1);
             m_omd = infile[i].getDurationFromStart();
@@ -8181,8 +8181,32 @@ bool HumdrumInput::addTempoDirection(const string &text, const string &placement
         tempo->SetTstamp(tstamp.getFloat());
     }
 
+    if (placement == "above") {
+        setPlace(tempo, "above");
+    }
+    else if (placement == "below") {
+        setPlace(tempo, "below");
+    }
+
+    bool status = setTempoContent(tempo, text);
+    if (status) {
+        m_measure->AddChild(tempo);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setTempoContent --
+//
+
+bool HumdrumInput::setTempoContent(Tempo *tempo, const string &text)
+{
     hum::HumRegex hre;
-    if (!hre.search(text, "(.*)\\[([^=]*)\\]\\s*=\\s*(\\d+.*)")) {
+    if (!hre.search(text, "(.*)\\[([^=\\]]*)\\]\\s*=\\s*(\\d+.*)")) {
         return false;
     }
     std::string first = hre.getMatch(1);
@@ -8199,17 +8223,9 @@ bool HumdrumInput::addTempoDirection(const string &text, const string &placement
     tempo->AddChild(rend);
     rend->SetFontname("VerovioText");
 
-    // forcing spaces around equals sign:
+    // Forcing spaces around equals sign:
     third = "\xc2\xa0=\xc2\xa0" + third;
     addTextElement(tempo, third);
-
-    m_measure->AddChild(tempo);
-    if (placement == "above") {
-        setPlace(tempo, "above");
-    }
-    else if (placement == "below") {
-        setPlace(tempo, "below");
-    }
 
     return true;
 }
@@ -8240,16 +8256,16 @@ std::string HumdrumInput::convertRhythmToVerovioText(const std::string &text)
     else if ((second == "half") || (second == "2")) {
         output += "&#xE1D3;";
     }
-    else if ((second == "whole" || (second == "1"))) {
+    else if ((second == "whole") || (second == "1")) {
         output += "&#xE1D2;";
     }
-    else if ((second == "double-whole" || (second == "0"))) {
+    else if ((second == "breve") || (second == "double-whole") || (second == "0")) {
         output += "&#xE1D1;";
     }
-    else if ((second == "eighth" || (second == "8"))) {
+    else if ((second == "eighth") || (second == "8")) {
         output += "&#xE1D7;";
     }
-    else if ((second == "sixteenth" || (second == "16"))) {
+    else if ((second == "sixteenth") || (second == "16")) {
         output += "&#xE1D9;";
     }
     else if (second == "32") {

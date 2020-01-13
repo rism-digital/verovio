@@ -27,6 +27,7 @@
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
+#include "tempo.h"
 #include "tie.h"
 #include "verse.h"
 #include "vrvdef.h"
@@ -276,20 +277,20 @@ public:
     char cuesize = '\0'; // !!!RDF**kern: @ = cue size
     char terminallong = '\0'; // !!!RDF**kern: l = terminal long
     vector<char> editacc; // !!!RDF**kern: i = editorial accidental
-    vector<string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+    vector<std::string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
 
     // for **dynam:
-    string cresctext; // !!!RDF**kern: > = "cresc."
-    string crescfontstyle; // !!!RDF**kern: < = "cresc." fontstyle="normal|italic|bold|bold-italic"
-    string decresctext; // !!!RDF**kern: > = "decresc."
-    string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
+    std::string cresctext; // !!!RDF**kern: > = "cresc."
+    std::string crescfontstyle; // !!!RDF**kern: < = "cresc." fontstyle="normal|italic|bold|bold-italic"
+    std::string decresctext; // !!!RDF**kern: > = "decresc."
+    std::string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
 
     char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
 
-    string phrase_color; // for global stying of phrase markers
-    string phrase_style; // for global stying of phrase markers
-    string phrase_slur; // for global stying of phrase markers
+    std::string phrase_color; // for global stying of phrase markers
+    std::string phrase_style; // for global stying of phrase markers
+    std::string phrase_slur; // for global stying of phrase markers
 
     std::string space_color; // !!!RDF**kern: show spaces color=hotpink
     std::string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
@@ -483,7 +484,7 @@ protected:
     void embedQstampInClass(vrv::Space *irest, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
-    void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
+    void splitSyllableBySpaces(vector<std::string> &vtext, char spacer = ' ');
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
     bool leftmostSystemArpeggio(hum::HTp token);
@@ -492,8 +493,9 @@ protected:
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
         int staffindex, int justification = 0, const std::string &color = "");
-    bool addTempoDirection(const string &text, const string &placement, bool bold, bool italic, hum::HTp token,
-        int staffindex, int justification, const std::string &color);
+    bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
+        hum::HTp token, int staffindex, int justification, const std::string &color);
+    bool setTempoContent(Tempo *tempo, const std::string &text);
     std::string convertRhythmToVerovioText(const std::string &text);
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
@@ -501,23 +503,25 @@ protected:
     void processStaffDecoration(const std::string &decoration);
     int getStaffNumberLabel(hum::HTp spinestart);
     bool isFirstTokenOnStaff(hum::HTp token);
-    bool hasAboveParameter(hum::HTp token, const string &category);
-    bool hasBelowParameter(hum::HTp token, const string &category);
-    bool hasBelowParameter(hum::HTp token, const string &category, int &output);
+    bool hasAboveParameter(hum::HTp token, const std::string &category);
+    bool hasBelowParameter(hum::HTp token, const std::string &category);
+    bool hasBelowParameter(hum::HTp token, const std::string &category, int &output);
     void prepareHeaderFooter();
-    bool prepareHeader(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
-    bool prepareFooter(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
-    std::string processReferenceTemplate(const std::string &input, std::vector<std::pair<string, string> > &biblist,
-        std::map<std::string, std::string> &refmap);
+    bool prepareHeader(
+        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
+    bool prepareFooter(
+        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string processReferenceTemplate(const std::string &input,
+        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
     std::string processTemplateOperator(const std::string &value, const std::string &op);
-    std::string automaticHeaderLeft(
-        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount);
+    std::string automaticHeaderLeft(std::vector<std::pair<std::string, std::string> > &biblist,
+        std::map<std::string, std::string> &refmap, int linecount);
     std::string automaticHeaderCenter(
-        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
-    std::string automaticHeaderRight(
-        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
+        std::vector<std::pair<std::string, std::string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string automaticHeaderRight(std::vector<std::pair<std::string, std::string> > &biblist,
+        std::map<std::string, std::string> &refmap, int &linecount);
     void convertMensuralToken(
-        std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
+        std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
     void initializeSpineColor(hum::HumdrumFile &infile);
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
@@ -545,8 +549,8 @@ protected:
     void assignVerticalGroup(Pedal *ped, hum::HTp token);
     void storeAcclev(const std::string value, int staffindex);
     void storeStemInterpretation(const std::string &value, int staffindex, int layernumber);
-    bool getBooleanParameter(hum::HTp token, const string &category, const string &key);
-    std::string getStringParameter(hum::HTp token, const string &category, const string &key);
+    bool getBooleanParameter(hum::HTp token, const std::string &category, const std::string &key);
+    std::string getStringParameter(hum::HTp token, const std::string &category, const std::string &key);
     bool shouldHideBeamBracket(
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int layerindex);
     void checkBeamWith(Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
@@ -561,7 +565,7 @@ protected:
     void fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void addSlurLineStyle(Slur *element, hum::HTp token, int slurindex);
     void addTieLineStyle(Tie *element, hum::HTp token, int noteindex);
-    void setAccid(Accid *accid, const string &loaccid);
+    void setAccid(Accid *accid, const std::string &loaccid);
     bool phraseIsInvisible(hum::HTp token, int pindex);
 
     // header related functions: ///////////////////////////////////////////
@@ -572,7 +576,7 @@ protected:
         const std::string &key, const std::string &role);
     void getRespPeople(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references);
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
-    void insertPeople(pugi::xml_node &work, std::vector<std::vector<string> > &respPeople);
+    void insertPeople(pugi::xml_node &work, std::vector<std::vector<std::string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
@@ -601,7 +605,7 @@ protected:
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
-    void popElementStack(std::vector<string> &elements, std::vector<void *> &pointers);
+    void popElementStack(std::vector<std::string> &elements, std::vector<void *> &pointers);
 
     template <class ELEMENT>
     void addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle = "");
@@ -638,7 +642,7 @@ protected:
     std::wstring cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
     std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
     std::wstring getVisualFBAccidental(int accidental);
-    std::wstring convertFBNumber(const string &input, hum::HTp token);
+    std::wstring convertFBNumber(const std::string &input, hum::HTp token);
     void checkForLineContinuations(hum::HTp token);
     std::wstring convertNumberToWstring(int number);
 
@@ -662,7 +666,7 @@ private:
     std::vector<Section *> m_sections;
 
     // m_lastsection == The section label of the previous measure
-    string m_lastsection;
+    std::string m_lastsection;
 
     //////////////////////////////
     //
@@ -798,7 +802,7 @@ private:
     bool m_has_color_spine = false;
 
     // m_spine_color == list of colors to apply to spine data
-    std::vector<string> m_spine_color;
+    std::vector<std::string> m_spine_color;
 
     // m_traspose == transposition to go from sounding to written pitch.
     vector<int> m_transpose;
