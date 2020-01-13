@@ -228,9 +228,11 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         
         if (m_beamElementCoordRefs.at(i)->m_stem->GetDrawingStemDir() == STEMDIRECTION_up) {
             m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yBottom;
+            stemUps.push_back(m_beamElementCoordRefs.at(i));
         }
         else {
             m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yTop;
+            stemDowns.push_back(m_beamElementCoordRefs.at(i));
         }
     }
          
