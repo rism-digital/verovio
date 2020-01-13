@@ -559,6 +559,11 @@ Options::Options()
     m_openControlEvents.Init(false);
     this->Register(&m_openControlEvents, "openControlEvents", &m_general);
 
+    m_outputSmuflXmlEntities.SetInfo(
+        "Output SMuFL XML entities", "Output SMuFL charachters as XML entities instead of byte codes");
+    m_outputSmuflXmlEntities.Init(false);
+    this->Register(&m_outputSmuflXmlEntities, "outputSmuflXmlEntities", &m_general);
+
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
     this->Register(&m_pageHeight, "pageHeight", &m_general);

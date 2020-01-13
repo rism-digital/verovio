@@ -3,6 +3,7 @@
 ## [unreleased]
 * Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
 * Support for dashed and dotted slurs and ties (@earboxer and @napulen)
+* Option to use xml entities for SMuFL charachters (--outputSmuflXmlEntities)
 * Options for controlling system divider display (--systemDivider "none|left|left-right")
 * Fix coloring of ties and slurs (@rettinghaus)
 * Fix bug with tuplet number placement (@rettinghaus)
