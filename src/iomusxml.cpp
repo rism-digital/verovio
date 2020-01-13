@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <regex>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -434,36 +435,40 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         tempo->AddChild(text);
     }
 
-    int dotCount = 0;
-    if (metronome.select_node("beat-unit-dot")) {
-        dotCount = (int)metronome.select_nodes("beat-unit-dot").size();
+    int dotCount = (int)metronome.select_nodes("beat-unit-dot").size();
+    if (dotCount) {
         tempo->SetMmDots(dotCount);
     }
 
     pugi::xml_node beatunit = metronome.select_node("beat-unit").node();
-    std::wstring verovioText;
     if (beatunit) {
+        std::wstring verovioText;
         std::string content = GetContent(beatunit);
         tempo->SetMmUnit(ConvertTypeToDur(content));
         verovioText = ConvertTypeToVerovioText(content);
         for (int i = 0; i < dotCount; i++) {
             verovioText += L"\xE1E7"; // SMUFL augmentation dot
         }
-    }
-    if (!verovioText.empty()) {
-        Rend *rend = new Rend;
-        rend->SetFontname("VerovioText");
-        text = new Text();
-        text->SetText(verovioText);
-        rend->AddChild(text);
-        tempo->AddChild(rend);
+        if (!verovioText.empty()) {
+            Rend *rend = new Rend;
+            rend->SetFontname("VerovioText");
+            text = new Text();
+            text->SetText(verovioText);
+            rend->AddChild(text);
+            tempo->AddChild(rend);
+        }
     }
 
     rawText = "";
     pugi::xml_node perminute = metronome.select_node("per-minute").node();
     if (perminute) {
         std::string mm = GetContent(perminute);
-        double mmval = std::stod(mm); // Still need to handle cases such as "c. 108".
+        double mmval = 0.0;
+        std::smatch matches;
+        // Use the first floating-point number on the line to set @mm:
+        if (std::regex_search(mm, matches, std::regex("(\\d+\\.?\\d*)"))) {
+            mmval = std::stod(matches[1]);
+        }
         int mmint = 0;
         if ((!isnan(mmval)) && (mmval > 0.5)) {
             mmint = int(mmval + 0.5);
@@ -471,7 +476,10 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         }
         if (!mm.empty()) {
             std::stringstream sstream;
-            sstream << " = " << mmint;
+            if (beatunit) {
+                sstream << " = ";
+            }
+            sstream << mm;
             rawText = sstream.str();
         }
     }
