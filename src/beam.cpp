@@ -390,20 +390,11 @@ void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
 
     
     for (i = 0; i < elementCount; ++i) {
-        // change the stem dir for all objects
-        if (m_beamElementCoordRefs.at(i)->m_element->Is(NOTE)) {
-           // ((Note *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
-        }
-        else if (m_beamElementCoordRefs.at(i)->m_element->Is(CHORD)) {
-           // ((Chord *)m_beamElementCoordRefs.at(i)->m_element)->SetDrawingStemDir(beamInterface->m_stemDir);
-        }
-
         m_beamElementCoordRefs.at(i)->m_yBeam = m_beamElementCoordRefs.at(i)->m_y + verticalShift;
         m_beamElementCoordRefs.at(i)->m_x += stemX[beamInterface->m_cueSize];
     }
-    
 
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         s_y += m_beamElementCoordRefs.at(i)->m_yBeam - yRel;
         s_y2 += pow(m_beamElementCoordRefs.at(i)->m_yBeam - yRel, 2);
         s_x += m_beamElementCoordRefs.at(i)->m_x - xRel;
