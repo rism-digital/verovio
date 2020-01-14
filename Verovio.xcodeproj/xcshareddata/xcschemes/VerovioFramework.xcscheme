@@ -83,6 +83,16 @@
             ReferencedContainer = "container:Verovio.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Users/werner/Goebl-OMR/Beethoven-Variationen/Op35/BreitkopfHaertel1860er/Beethoven-Op35-Eroica-Variationen-Breitkopf.mei"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-a -s 20 --expand expansion-default"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

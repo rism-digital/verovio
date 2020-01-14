@@ -5,6 +5,8 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include "expansionmap.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +37,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
     assert(prevSect);
     // find all siblings of expansion element to know what in MEI file
     std::vector<std::string> reductionList;
-    for (auto o : prevSect->GetParent()->GetChildren()) {
+    for (auto o : *prevSect->GetParent()->GetChildren()) {
         if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetUuid());
     }
 
@@ -104,7 +106,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
         Object *currSect = prevSect->GetParent()->FindDescendantByUuid(r);
         if (currSect) {
             // currSect->SetVisibility(HIDDEN); here, we will turn visibility off
-            std::cout << "Set " << r.c_str() << " to HIDDEN\n;" // DEBUG, please delete
+            std::cout << "Set " << r.c_str() << " to HIDDEN\n"; // DEBUG, please delete
         }
     }
 }
