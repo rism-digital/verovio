@@ -43,7 +43,7 @@ void SystemElement::Reset()
     FloatingObject::Reset();
     ResetTyped();
 
-    m_visibility = Hidden;
+    m_visibility = Visible;
 }
 
 //----------------------------------------------------------------------------
