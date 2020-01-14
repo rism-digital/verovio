@@ -36,8 +36,10 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 {
     assert(prevSect);
     // find all siblings of expansion element to know what in MEI file
+    const vrv::ArrayOfObjects *expansionSiblings = prevSect->GetParent()->GetChildren();
+    assert(expansionSiblings);
     std::vector<std::string> reductionList;
-    for (auto o : *prevSect->GetParent()->GetChildren()) {
+    for (auto o : *expansionSiblings) {
         if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetUuid());
     }
 
