@@ -254,7 +254,7 @@ public:
      */
     virtual int Transpose(FunctorParams *);
 
-private:                 
+private:
     /**
      * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
      */
