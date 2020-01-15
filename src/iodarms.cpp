@@ -129,7 +129,9 @@ void DarmsInput::UnrollKeysig(int quantity, char alter)
         accid = ACCIDENTAL_WRITTEN_s;
     }
 
-    KeySig *k = new KeySig(quantity, accid);
+    KeySig *k = new KeySig;
+    k->IsAttribute(true);
+    k->SetSig(std::make_pair(quantity, accid));
     m_layer->AddChild(k);
     return;
     //////

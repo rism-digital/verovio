@@ -34,12 +34,12 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 2
+#define VERSION_MINOR 5
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
 
-enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0 };
+enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1 };
 
 //----------------------------------------------------------------------------
 // Default midi values
@@ -174,8 +174,10 @@ enum ClassId {
     DOTS,
     FLAG,
     FTREM,
+    GRACEGRP,
     HALFMRPT,
     KEYSIG,
+    KEYACCID,
     LIGATURE,
     MENSUR,
     METERSIG,
@@ -272,8 +274,6 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
-typedef std::vector<Object *> ListOfObjects;
-
 typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
@@ -310,7 +310,11 @@ typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
 
+typedef std::map<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> MapOfPitchAccid;
+
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
+
+typedef std::vector<std::pair<std::wstring, bool> > ArrayOfStringDynamTypePairs;
 
 /**
  * Generic int map recursive structure for storing hierachy of values
@@ -510,17 +514,12 @@ enum {
 //----------------------------------------------------------------------------
 
 enum Accessor { SELF = 0, CONTENT };
-    
+
 //----------------------------------------------------------------------------
 // Some keys
 //----------------------------------------------------------------------------
 
-enum {
-    KEY_LEFT = 37,
-    KEY_UP = 38,
-    KEY_RIGHT = 39,
-    KEY_DOWN = 40
-};
+enum { KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40 };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
@@ -530,6 +529,10 @@ enum {
 
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7
+
+#define SUPER_SCRIPT_FACTOR 0.58
+#define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline
+#define SUB_SCRIPT_POSITION -0.17 // lowered down from the baseline
 
 } // namespace vrv
 

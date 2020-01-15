@@ -29,6 +29,7 @@ public:
     ///@{
     BTrem();
     virtual ~BTrem();
+    virtual Object *Clone() const { return new BTrem(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "BTrem"; }
     virtual ClassId GetClassId() const { return BTREM; }

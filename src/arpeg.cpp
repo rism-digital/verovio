@@ -64,7 +64,7 @@ int Arpeg::GetDrawingX() const
 
     // Otherwise get the measure - no cast to Measure is necessary
     LogDebug("Accessing an arpeg x without positionner");
-    Object *measure = this->GetFirstParent(MEASURE);
+    Object *measure = this->GetFirstAncestor(MEASURE);
     assert(measure);
 
     // This will be very arbitrary positionned...
@@ -201,10 +201,10 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     // We should have call DrawArpeg before
     assert(this->GetCurrentFloatingPositioner());
 
-    Staff *topStaff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
+    Staff *topStaff = dynamic_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
     assert(topStaff);
 
-    Staff *bottomStaff = dynamic_cast<Staff *>(bottomNote->GetFirstParent(STAFF));
+    Staff *bottomStaff = dynamic_cast<Staff *>(bottomNote->GetFirstAncestor(STAFF));
     assert(bottomStaff);
 
     int minTopLeft, maxTopRight;
@@ -230,16 +230,15 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Arpeg::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     ControlElement::ResetDrawing(functorParams);
-    
+
     PlistInterface *interface = this->GetPlistInterface();
     assert(interface);
     return interface->InterfaceResetDrawing(functorParams, this);
-    
 }
 
 } // namespace vrv

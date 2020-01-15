@@ -107,7 +107,7 @@ public:
 protected:
     InterfaceId m_interfaceId;
 };
-    
+
 //----------------------------------------------------------------------------
 // IsEditorialElementComparison
 //----------------------------------------------------------------------------
@@ -125,7 +125,7 @@ public:
         if (object->IsEditorialElement()) return true;
         return false;
     }
-    
+
     bool MatchesType(Object *object) { return true; }
 };
 

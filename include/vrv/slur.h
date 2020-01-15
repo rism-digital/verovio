@@ -17,7 +17,11 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature {
+class Slur : public ControlElement,
+             public TimeSpanningInterface,
+             public AttColor,
+             public AttCurvature,
+             public AttCurveRend {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -26,6 +30,7 @@ public:
     ///@{
     Slur();
     virtual ~Slur();
+    virtual Object *Clone() const { return new Slur(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Slur"; }
     virtual ClassId GetClassId() const { return SLUR; }

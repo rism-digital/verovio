@@ -56,7 +56,6 @@ public:
     bool ChangeStaff(std::string elementId);
     ///@}
 protected:
-
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -64,7 +63,7 @@ protected:
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
-        int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes);
+        int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
@@ -119,7 +118,8 @@ struct ClosestBB {
         return sqrt(xDiff * xDiff + yDiff * yDiff);
     }
 
-    bool operator() (Object *a, Object *b) {
+    bool operator()(Object *a, Object *b)
+    {
         if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
@@ -135,23 +135,24 @@ struct ClosestBB {
 struct StaffSort {
     // Sort staves left-to-right and top-to-bottom
     // Sort by y if there is no intersection, by x if there is
-    bool operator() (Object *a, Object *b) {
+    bool operator()(Object *a, Object *b)
+    {
         if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
         int aLowest, bLowest, aHighest, bHighest;
 
-        aLowest = zoneA->GetSkew() < 0 ? zoneA->GetLry() : 
+        aLowest = zoneA->GetSkew() < 0 ? zoneA->GetLry() :
             zoneA->GetLry() + (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetSkew() * M_PI / 180.0);
 
         aHighest = zoneA->GetSkew() < 0 ? zoneA->GetUly() :
             zoneA->GetUly() - (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetSkew() * M_PI / 180.0);
 
-        bLowest = zoneB->GetSkew() < 0 ? zoneB->GetLry() : 
+        bLowest = zoneB->GetSkew() < 0 ? zoneB->GetLry() :
             zoneB->GetLry() + (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetSkew() * M_PI / 180.0);
 
-        bHighest = zoneB->GetSkew() < 0 ? zoneB->GetUly() : 
+        bHighest = zoneB->GetSkew() < 0 ? zoneB->GetUly() :
             zoneB->GetUly() - (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetSkew() * M_PI / 180.0);
 
         // Check for y intersection

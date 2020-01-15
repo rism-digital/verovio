@@ -22,8 +22,17 @@ namespace vrv {
 std::map<int, std::string> Option::s_breaks
     = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_encoded, "encoded" } };
 
+std::map<int, std::string> Option::s_footer
+    = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" } };
+
+std::map<int, std::string> Option::s_header
+    = { { HEADER_none, "none" }, { HEADER_auto, "auto" }, { HEADER_encoded, "encoded" } };
+
 std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
+
+std::map<int, std::string> Option::s_systemDivider
+    = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
 //----------------------------------------------------------------------------
 // Option
@@ -454,7 +463,7 @@ bool OptionStaffrel::SetValue(std::string value)
 {
     Att converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
-    if (!staffrel.HasValue()) {
+    if (staffrel == STAFFREL_NONE) {
         LogError("Parameter '%s' not valid", value.c_str());
         return false;
     }
@@ -501,6 +510,18 @@ Options::Options()
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_general);
 
+    m_justifyIncludeLastPage.SetInfo("Justify including the last page", "Justify including the last page");
+    m_justifyIncludeLastPage.Init(false);
+    this->Register(&m_justifyIncludeLastPage, "justifyIncludeLastPage", &m_general);
+
+    m_justifySystemsOnly.SetInfo("Justify systems only", "Justify systems only and not staves");
+    m_justifySystemsOnly.Init(false);
+    this->Register(&m_justifySystemsOnly, "justifySystemsOnly", &m_general);
+
+    m_justifyVertically.SetInfo("Justify vertically", "Justify spacing vertically to fill the page");
+    m_justifyVertically.Init(false);
+    this->Register(&m_justifyVertically, "justifyVertically", &m_general);
+
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
@@ -522,13 +543,13 @@ Options::Options()
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
 
-    m_noFooter.SetInfo("No footer", "Do not add any footer");
-    m_noFooter.Init(false);
-    this->Register(&m_noFooter, "noFooter", &m_general);
+    m_footer.SetInfo("Footer", "Control footer layout");
+    m_footer.Init(FOOTER_auto, &Option::s_footer);
+    this->Register(&m_footer, "footer", &m_general);
 
-    m_noHeader.SetInfo("No header", "Do not add any header");
-    m_noHeader.Init(false);
-    this->Register(&m_noHeader, "noHeader", &m_general);
+    m_header.SetInfo("Header", "Control header layout");
+    m_header.Init(HEADER_auto, &Option::s_header);
+    this->Register(&m_header, "header", &m_general);
 
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
@@ -537,6 +558,11 @@ Options::Options()
     m_openControlEvents.SetInfo("Open control event", "Render open control events");
     m_openControlEvents.Init(false);
     this->Register(&m_openControlEvents, "openControlEvents", &m_general);
+
+    m_outputSmuflXmlEntities.SetInfo(
+        "Output SMuFL XML entities", "Output SMuFL charachters as XML entities instead of byte codes");
+    m_outputSmuflXmlEntities.Init(false);
+    this->Register(&m_outputSmuflXmlEntities, "outputSmuflXmlEntities", &m_general);
 
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
@@ -561,11 +587,11 @@ Options::Options()
     m_pageWidth.SetInfo("Page width", "The page width");
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
-    
+
     m_svgBoundingBoxes.SetInfo("Svg bounding boxes viewbox on svg root", "Include bounding boxes in SVG output");
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
-    
+
     m_svgViewBox.SetInfo("Use viewbox on svg root", "Use viewBox on svg root element for easy scaling of document");
     m_svgViewBox.Init(false);
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
@@ -574,7 +600,8 @@ Options::Options()
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
 
-    m_useFacsimile.SetInfo("Use facsimile for layout", "Use information in the <facsimile> element to control the layout");
+    m_useFacsimile.SetInfo(
+        "Use facsimile for layout", "Use information in the <facsimile> element to control the layout");
     m_useFacsimile.Init(false);
     this->Register(&m_useFacsimile, "useFacsimile", &m_general);
 
@@ -636,10 +663,6 @@ Options::Options()
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
-
-    m_leftPosition.SetInfo("Left position", "The left position");
-    m_leftPosition.Init(0.8, 0.0, 2.0);
-    this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
@@ -730,13 +753,17 @@ Options::Options()
     m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
 
+    m_systemDivider.SetInfo("System divider", "The display of system dividers");
+    m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
+    this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
+
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
 
     /********* selectors *********/
 
-    m_selectors.SetLabel("Element selectors", "3-selectors");
+    m_selectors.SetLabel("Element selectors and processing", "3-selectors");
     m_grps.push_back(&m_selectors);
 
     m_appXPathQuery.SetInfo("App xPath query",
@@ -762,6 +789,15 @@ Options::Options()
         "example: \"./del\"; by default the first child is selected");
     m_substXPathQuery.Init();
     this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
+
+    m_transpose.SetInfo("Transpose the content", "SUMMARY");
+    m_transpose.Init("");
+    this->Register(&m_transpose, "transpose", &m_selectors);
+
+    m_transposeSelectedOnly.SetInfo(
+        "Transpose selected only", "Transpose only the selected content and ignore unselected editorial content");
+    m_transposeSelectedOnly.Init(false);
+    this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
     /********* The layout left margin by element *********/
 

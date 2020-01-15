@@ -578,6 +578,7 @@ std::string AttConverter::ColornamesToStr(data_COLORNAMES data) const
         case COLORNAMES_plum: value = "plum"; break;
         case COLORNAMES_powderblue: value = "powderblue"; break;
         case COLORNAMES_purple: value = "purple"; break;
+        case COLORNAMES_rebeccapurple: value = "rebeccapurple"; break;
         case COLORNAMES_red: value = "red"; break;
         case COLORNAMES_rosybrown: value = "rosybrown"; break;
         case COLORNAMES_royalblue: value = "royalblue"; break;
@@ -735,6 +736,7 @@ data_COLORNAMES AttConverter::StrToColornames(std::string value, bool logWarning
     if (value == "plum") return COLORNAMES_plum;
     if (value == "powderblue") return COLORNAMES_powderblue;
     if (value == "purple") return COLORNAMES_purple;
+    if (value == "rebeccapurple") return COLORNAMES_rebeccapurple;
     if (value == "red") return COLORNAMES_red;
     if (value == "rosybrown") return COLORNAMES_rosybrown;
     if (value == "royalblue") return COLORNAMES_royalblue;
@@ -766,6 +768,41 @@ data_COLORNAMES AttConverter::StrToColornames(std::string value, bool logWarning
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.COLORNAMES", value.c_str());
     return COLORNAMES_NONE;
+}
+
+std::string AttConverter::CompassdirectionToStr(data_COMPASSDIRECTION data) const
+{
+    std::string value;
+    switch (data) {
+        case COMPASSDIRECTION_n: value = "n"; break;
+        case COMPASSDIRECTION_e: value = "e"; break;
+        case COMPASSDIRECTION_s: value = "s"; break;
+        case COMPASSDIRECTION_w: value = "w"; break;
+        case COMPASSDIRECTION_ne: value = "ne"; break;
+        case COMPASSDIRECTION_nw: value = "nw"; break;
+        case COMPASSDIRECTION_se: value = "se"; break;
+        case COMPASSDIRECTION_sw: value = "sw"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.COMPASSDIRECTION", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_COMPASSDIRECTION AttConverter::StrToCompassdirection(std::string value, bool logWarning) const
+{
+    if (value == "n") return COMPASSDIRECTION_n;
+    if (value == "e") return COMPASSDIRECTION_e;
+    if (value == "s") return COMPASSDIRECTION_s;
+    if (value == "w") return COMPASSDIRECTION_w;
+    if (value == "ne") return COMPASSDIRECTION_ne;
+    if (value == "nw") return COMPASSDIRECTION_nw;
+    if (value == "se") return COMPASSDIRECTION_se;
+    if (value == "sw") return COMPASSDIRECTION_sw;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.COMPASSDIRECTION", value.c_str());
+    return COMPASSDIRECTION_NONE;
 }
 
 std::string AttConverter::CompassdirectionBasicToStr(data_COMPASSDIRECTION_basic data) const
@@ -843,6 +880,41 @@ data_ENCLOSURE AttConverter::StrToEnclosure(std::string value, bool logWarning) 
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ENCLOSURE", value.c_str());
     return ENCLOSURE_NONE;
+}
+
+std::string AttConverter::EventrelToStr(data_EVENTREL data) const
+{
+    std::string value;
+    switch (data) {
+        case EVENTREL_above: value = "above"; break;
+        case EVENTREL_below: value = "below"; break;
+        case EVENTREL_left: value = "left"; break;
+        case EVENTREL_right: value = "right"; break;
+        case EVENTREL_above_left: value = "above-left"; break;
+        case EVENTREL_above_right: value = "above-right"; break;
+        case EVENTREL_below_left: value = "below-left"; break;
+        case EVENTREL_below_right: value = "below-right"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.EVENTREL", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_EVENTREL AttConverter::StrToEventrel(std::string value, bool logWarning) const
+{
+    if (value == "above") return EVENTREL_above;
+    if (value == "below") return EVENTREL_below;
+    if (value == "left") return EVENTREL_left;
+    if (value == "right") return EVENTREL_right;
+    if (value == "above-left") return EVENTREL_above_left;
+    if (value == "above-right") return EVENTREL_above_right;
+    if (value == "below-left") return EVENTREL_below_left;
+    if (value == "below-right") return EVENTREL_below_right;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.EVENTREL", value.c_str());
+    return EVENTREL_NONE;
 }
 
 std::string AttConverter::EventrelBasicToStr(data_EVENTREL_basic data) const
@@ -1154,6 +1226,57 @@ data_GRACE AttConverter::StrToGrace(std::string value, bool logWarning) const
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.GRACE", value.c_str());
     return GRACE_NONE;
+}
+
+std::string AttConverter::HeadshapeToStr(data_HEADSHAPE data) const
+{
+    std::string value;
+    switch (data) {
+        case HEADSHAPE_quarter: value = "quarter"; break;
+        case HEADSHAPE_half: value = "half"; break;
+        case HEADSHAPE_whole: value = "whole"; break;
+        case HEADSHAPE_backslash: value = "backslash"; break;
+        case HEADSHAPE_circle: value = "circle"; break;
+        case HEADSHAPE_plus: value = "+"; break;
+        case HEADSHAPE_diamond: value = "diamond"; break;
+        case HEADSHAPE_isotriangle: value = "isotriangle"; break;
+        case HEADSHAPE_oval: value = "oval"; break;
+        case HEADSHAPE_piewedge: value = "piewedge"; break;
+        case HEADSHAPE_rectangle: value = "rectangle"; break;
+        case HEADSHAPE_rtriangle: value = "rtriangle"; break;
+        case HEADSHAPE_semicircle: value = "semicircle"; break;
+        case HEADSHAPE_slash: value = "slash"; break;
+        case HEADSHAPE_square: value = "square"; break;
+        case HEADSHAPE_x: value = "x"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.HEADSHAPE", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_HEADSHAPE AttConverter::StrToHeadshape(std::string value, bool logWarning) const
+{
+    if (value == "quarter") return HEADSHAPE_quarter;
+    if (value == "half") return HEADSHAPE_half;
+    if (value == "whole") return HEADSHAPE_whole;
+    if (value == "backslash") return HEADSHAPE_backslash;
+    if (value == "circle") return HEADSHAPE_circle;
+    if (value == "+") return HEADSHAPE_plus;
+    if (value == "diamond") return HEADSHAPE_diamond;
+    if (value == "isotriangle") return HEADSHAPE_isotriangle;
+    if (value == "oval") return HEADSHAPE_oval;
+    if (value == "piewedge") return HEADSHAPE_piewedge;
+    if (value == "rectangle") return HEADSHAPE_rectangle;
+    if (value == "rtriangle") return HEADSHAPE_rtriangle;
+    if (value == "semicircle") return HEADSHAPE_semicircle;
+    if (value == "slash") return HEADSHAPE_slash;
+    if (value == "square") return HEADSHAPE_square;
+    if (value == "x") return HEADSHAPE_x;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.HEADSHAPE", value.c_str());
+    return HEADSHAPE_NONE;
 }
 
 std::string AttConverter::HeadshapeListToStr(data_HEADSHAPE_list data) const
@@ -1493,6 +1616,33 @@ data_MENSURATIONSIGN AttConverter::StrToMensurationsign(std::string value, bool 
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.MENSURATIONSIGN", value.c_str());
     return MENSURATIONSIGN_NONE;
+}
+
+std::string AttConverter::MeterformToStr(data_METERFORM data) const
+{
+    std::string value;
+    switch (data) {
+        case METERFORM_num: value = "num"; break;
+        case METERFORM_denomsym: value = "denomsym"; break;
+        case METERFORM_norm: value = "norm"; break;
+        case METERFORM_invis: value = "invis"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.METERFORM", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_METERFORM AttConverter::StrToMeterform(std::string value, bool logWarning) const
+{
+    if (value == "num") return METERFORM_num;
+    if (value == "denomsym") return METERFORM_denomsym;
+    if (value == "norm") return METERFORM_norm;
+    if (value == "invis") return METERFORM_invis;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.METERFORM", value.c_str());
+    return METERFORM_NONE;
 }
 
 std::string AttConverter::MetersignToStr(data_METERSIGN data) const
@@ -2035,6 +2185,45 @@ data_NOTATIONTYPE AttConverter::StrToNotationtype(std::string value, bool logWar
     return NOTATIONTYPE_NONE;
 }
 
+std::string AttConverter::NoteheadmodifierToStr(data_NOTEHEADMODIFIER data) const
+{
+    std::string value;
+    switch (data) {
+        case NOTEHEADMODIFIER_slash: value = "slash"; break;
+        case NOTEHEADMODIFIER_backslash: value = "backslash"; break;
+        case NOTEHEADMODIFIER_vline: value = "vline"; break;
+        case NOTEHEADMODIFIER_hline: value = "hline"; break;
+        case NOTEHEADMODIFIER_centerdot: value = "centerdot"; break;
+        case NOTEHEADMODIFIER_paren: value = "paren"; break;
+        case NOTEHEADMODIFIER_brack: value = "brack"; break;
+        case NOTEHEADMODIFIER_box: value = "box"; break;
+        case NOTEHEADMODIFIER_circle: value = "circle"; break;
+        case NOTEHEADMODIFIER_dblwhole: value = "dblwhole"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.NOTEHEADMODIFIER", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_NOTEHEADMODIFIER AttConverter::StrToNoteheadmodifier(std::string value, bool logWarning) const
+{
+    if (value == "slash") return NOTEHEADMODIFIER_slash;
+    if (value == "backslash") return NOTEHEADMODIFIER_backslash;
+    if (value == "vline") return NOTEHEADMODIFIER_vline;
+    if (value == "hline") return NOTEHEADMODIFIER_hline;
+    if (value == "centerdot") return NOTEHEADMODIFIER_centerdot;
+    if (value == "paren") return NOTEHEADMODIFIER_paren;
+    if (value == "brack") return NOTEHEADMODIFIER_brack;
+    if (value == "box") return NOTEHEADMODIFIER_box;
+    if (value == "circle") return NOTEHEADMODIFIER_circle;
+    if (value == "dblwhole") return NOTEHEADMODIFIER_dblwhole;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER", value.c_str());
+    return NOTEHEADMODIFIER_NONE;
+}
+
 std::string AttConverter::NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_list data) const
 {
     std::string value;
@@ -2097,6 +2286,148 @@ data_OTHERSTAFF AttConverter::StrToOtherstaff(std::string value, bool logWarning
     return OTHERSTAFF_NONE;
 }
 
+std::string AttConverter::RelationshipToStr(data_RELATIONSHIP data) const
+{
+    std::string value;
+    switch (data) {
+        case RELATIONSHIP_hasAbridgement: value = "hasAbridgement"; break;
+        case RELATIONSHIP_isAbridgementOf: value = "isAbridgementOf"; break;
+        case RELATIONSHIP_hasAdaptation: value = "hasAdaptation"; break;
+        case RELATIONSHIP_isAdaptationOf: value = "isAdaptationOf"; break;
+        case RELATIONSHIP_hasAlternate: value = "hasAlternate"; break;
+        case RELATIONSHIP_isAlternateOf: value = "isAlternateOf"; break;
+        case RELATIONSHIP_hasArrangement: value = "hasArrangement"; break;
+        case RELATIONSHIP_isArrangementOf: value = "isArrangementOf"; break;
+        case RELATIONSHIP_hasComplement: value = "hasComplement"; break;
+        case RELATIONSHIP_isComplementOf: value = "isComplementOf"; break;
+        case RELATIONSHIP_hasEmbodiment: value = "hasEmbodiment"; break;
+        case RELATIONSHIP_isEmbodimentOf: value = "isEmbodimentOf"; break;
+        case RELATIONSHIP_hasExemplar: value = "hasExemplar"; break;
+        case RELATIONSHIP_isExemplarOf: value = "isExemplarOf"; break;
+        case RELATIONSHIP_hasImitation: value = "hasImitation"; break;
+        case RELATIONSHIP_isImitationOf: value = "isImitationOf"; break;
+        case RELATIONSHIP_hasPart: value = "hasPart"; break;
+        case RELATIONSHIP_isPartOf: value = "isPartOf"; break;
+        case RELATIONSHIP_hasRealization: value = "hasRealization"; break;
+        case RELATIONSHIP_isRealizationOf: value = "isRealizationOf"; break;
+        case RELATIONSHIP_hasReconfiguration: value = "hasReconfiguration"; break;
+        case RELATIONSHIP_isReconfigurationOf: value = "isReconfigurationOf"; break;
+        case RELATIONSHIP_hasReproduction: value = "hasReproduction"; break;
+        case RELATIONSHIP_isReproductionOf: value = "isReproductionOf"; break;
+        case RELATIONSHIP_hasRevision: value = "hasRevision"; break;
+        case RELATIONSHIP_isRevisionOf: value = "isRevisionOf"; break;
+        case RELATIONSHIP_hasSuccessor: value = "hasSuccessor"; break;
+        case RELATIONSHIP_isSuccessorOf: value = "isSuccessorOf"; break;
+        case RELATIONSHIP_hasSummarization: value = "hasSummarization"; break;
+        case RELATIONSHIP_isSummarizationOf: value = "isSummarizationOf"; break;
+        case RELATIONSHIP_hasSupplement: value = "hasSupplement"; break;
+        case RELATIONSHIP_isSupplementOf: value = "isSupplementOf"; break;
+        case RELATIONSHIP_hasTransformation: value = "hasTransformation"; break;
+        case RELATIONSHIP_isTransformationOf: value = "isTransformationOf"; break;
+        case RELATIONSHIP_hasTranslation: value = "hasTranslation"; break;
+        case RELATIONSHIP_isTranslationOf: value = "isTranslationOf"; break;
+        case RELATIONSHIP_preceding: value = "preceding"; break;
+        case RELATIONSHIP_succeeding: value = "succeeding"; break;
+        case RELATIONSHIP_original: value = "original"; break;
+        case RELATIONSHIP_host: value = "host"; break;
+        case RELATIONSHIP_constituent: value = "constituent"; break;
+        case RELATIONSHIP_otherVersion: value = "otherVersion"; break;
+        case RELATIONSHIP_otherFormat: value = "otherFormat"; break;
+        case RELATIONSHIP_isReferencedBy: value = "isReferencedBy"; break;
+        case RELATIONSHIP_references: value = "references"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.RELATIONSHIP", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_RELATIONSHIP AttConverter::StrToRelationship(std::string value, bool logWarning) const
+{
+    if (value == "hasAbridgement") return RELATIONSHIP_hasAbridgement;
+    if (value == "isAbridgementOf") return RELATIONSHIP_isAbridgementOf;
+    if (value == "hasAdaptation") return RELATIONSHIP_hasAdaptation;
+    if (value == "isAdaptationOf") return RELATIONSHIP_isAdaptationOf;
+    if (value == "hasAlternate") return RELATIONSHIP_hasAlternate;
+    if (value == "isAlternateOf") return RELATIONSHIP_isAlternateOf;
+    if (value == "hasArrangement") return RELATIONSHIP_hasArrangement;
+    if (value == "isArrangementOf") return RELATIONSHIP_isArrangementOf;
+    if (value == "hasComplement") return RELATIONSHIP_hasComplement;
+    if (value == "isComplementOf") return RELATIONSHIP_isComplementOf;
+    if (value == "hasEmbodiment") return RELATIONSHIP_hasEmbodiment;
+    if (value == "isEmbodimentOf") return RELATIONSHIP_isEmbodimentOf;
+    if (value == "hasExemplar") return RELATIONSHIP_hasExemplar;
+    if (value == "isExemplarOf") return RELATIONSHIP_isExemplarOf;
+    if (value == "hasImitation") return RELATIONSHIP_hasImitation;
+    if (value == "isImitationOf") return RELATIONSHIP_isImitationOf;
+    if (value == "hasPart") return RELATIONSHIP_hasPart;
+    if (value == "isPartOf") return RELATIONSHIP_isPartOf;
+    if (value == "hasRealization") return RELATIONSHIP_hasRealization;
+    if (value == "isRealizationOf") return RELATIONSHIP_isRealizationOf;
+    if (value == "hasReconfiguration") return RELATIONSHIP_hasReconfiguration;
+    if (value == "isReconfigurationOf") return RELATIONSHIP_isReconfigurationOf;
+    if (value == "hasReproduction") return RELATIONSHIP_hasReproduction;
+    if (value == "isReproductionOf") return RELATIONSHIP_isReproductionOf;
+    if (value == "hasRevision") return RELATIONSHIP_hasRevision;
+    if (value == "isRevisionOf") return RELATIONSHIP_isRevisionOf;
+    if (value == "hasSuccessor") return RELATIONSHIP_hasSuccessor;
+    if (value == "isSuccessorOf") return RELATIONSHIP_isSuccessorOf;
+    if (value == "hasSummarization") return RELATIONSHIP_hasSummarization;
+    if (value == "isSummarizationOf") return RELATIONSHIP_isSummarizationOf;
+    if (value == "hasSupplement") return RELATIONSHIP_hasSupplement;
+    if (value == "isSupplementOf") return RELATIONSHIP_isSupplementOf;
+    if (value == "hasTransformation") return RELATIONSHIP_hasTransformation;
+    if (value == "isTransformationOf") return RELATIONSHIP_isTransformationOf;
+    if (value == "hasTranslation") return RELATIONSHIP_hasTranslation;
+    if (value == "isTranslationOf") return RELATIONSHIP_isTranslationOf;
+    if (value == "preceding") return RELATIONSHIP_preceding;
+    if (value == "succeeding") return RELATIONSHIP_succeeding;
+    if (value == "original") return RELATIONSHIP_original;
+    if (value == "host") return RELATIONSHIP_host;
+    if (value == "constituent") return RELATIONSHIP_constituent;
+    if (value == "otherVersion") return RELATIONSHIP_otherVersion;
+    if (value == "otherFormat") return RELATIONSHIP_otherFormat;
+    if (value == "isReferencedBy") return RELATIONSHIP_isReferencedBy;
+    if (value == "references") return RELATIONSHIP_references;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.RELATIONSHIP", value.c_str());
+    return RELATIONSHIP_NONE;
+}
+
+std::string AttConverter::RotationToStr(data_ROTATION data) const
+{
+    std::string value;
+    switch (data) {
+        case ROTATION_none: value = "none"; break;
+        case ROTATION_down: value = "down"; break;
+        case ROTATION_left: value = "left"; break;
+        case ROTATION_ne: value = "ne"; break;
+        case ROTATION_nw: value = "nw"; break;
+        case ROTATION_se: value = "se"; break;
+        case ROTATION_sw: value = "sw"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.ROTATION", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ROTATION AttConverter::StrToRotation(std::string value, bool logWarning) const
+{
+    if (value == "none") return ROTATION_none;
+    if (value == "down") return ROTATION_down;
+    if (value == "left") return ROTATION_left;
+    if (value == "ne") return ROTATION_ne;
+    if (value == "nw") return ROTATION_nw;
+    if (value == "se") return ROTATION_se;
+    if (value == "sw") return ROTATION_sw;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.ROTATION", value.c_str());
+    return ROTATION_NONE;
+}
+
 std::string AttConverter::RotationdirectionToStr(data_ROTATIONDIRECTION data) const
 {
     std::string value;
@@ -2128,6 +2459,83 @@ data_ROTATIONDIRECTION AttConverter::StrToRotationdirection(std::string value, b
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.ROTATIONDIRECTION", value.c_str());
     return ROTATIONDIRECTION_NONE;
+}
+
+std::string AttConverter::StaffitemToStr(data_STAFFITEM data) const
+{
+    std::string value;
+    switch (data) {
+        case STAFFITEM_accid: value = "accid"; break;
+        case STAFFITEM_annot: value = "annot"; break;
+        case STAFFITEM_artic: value = "artic"; break;
+        case STAFFITEM_dir: value = "dir"; break;
+        case STAFFITEM_dynam: value = "dynam"; break;
+        case STAFFITEM_harm: value = "harm"; break;
+        case STAFFITEM_ornam: value = "ornam"; break;
+        case STAFFITEM_sp: value = "sp"; break;
+        case STAFFITEM_stageDir: value = "stageDir"; break;
+        case STAFFITEM_tempo: value = "tempo"; break;
+        case STAFFITEM_beam: value = "beam"; break;
+        case STAFFITEM_bend: value = "bend"; break;
+        case STAFFITEM_bracketSpan: value = "bracketSpan"; break;
+        case STAFFITEM_breath: value = "breath"; break;
+        case STAFFITEM_cpMark: value = "cpMark"; break;
+        case STAFFITEM_fermata: value = "fermata"; break;
+        case STAFFITEM_fing: value = "fing"; break;
+        case STAFFITEM_hairpin: value = "hairpin"; break;
+        case STAFFITEM_harpPedal: value = "harpPedal"; break;
+        case STAFFITEM_lv: value = "lv"; break;
+        case STAFFITEM_mordent: value = "mordent"; break;
+        case STAFFITEM_octave: value = "octave"; break;
+        case STAFFITEM_pedal: value = "pedal"; break;
+        case STAFFITEM_reh: value = "reh"; break;
+        case STAFFITEM_tie: value = "tie"; break;
+        case STAFFITEM_trill: value = "trill"; break;
+        case STAFFITEM_tuplet: value = "tuplet"; break;
+        case STAFFITEM_turn: value = "turn"; break;
+        case STAFFITEM_ligature: value = "ligature"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STAFFITEM", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STAFFITEM AttConverter::StrToStaffitem(std::string value, bool logWarning) const
+{
+    if (value == "accid") return STAFFITEM_accid;
+    if (value == "annot") return STAFFITEM_annot;
+    if (value == "artic") return STAFFITEM_artic;
+    if (value == "dir") return STAFFITEM_dir;
+    if (value == "dynam") return STAFFITEM_dynam;
+    if (value == "harm") return STAFFITEM_harm;
+    if (value == "ornam") return STAFFITEM_ornam;
+    if (value == "sp") return STAFFITEM_sp;
+    if (value == "stageDir") return STAFFITEM_stageDir;
+    if (value == "tempo") return STAFFITEM_tempo;
+    if (value == "beam") return STAFFITEM_beam;
+    if (value == "bend") return STAFFITEM_bend;
+    if (value == "bracketSpan") return STAFFITEM_bracketSpan;
+    if (value == "breath") return STAFFITEM_breath;
+    if (value == "cpMark") return STAFFITEM_cpMark;
+    if (value == "fermata") return STAFFITEM_fermata;
+    if (value == "fing") return STAFFITEM_fing;
+    if (value == "hairpin") return STAFFITEM_hairpin;
+    if (value == "harpPedal") return STAFFITEM_harpPedal;
+    if (value == "lv") return STAFFITEM_lv;
+    if (value == "mordent") return STAFFITEM_mordent;
+    if (value == "octave") return STAFFITEM_octave;
+    if (value == "pedal") return STAFFITEM_pedal;
+    if (value == "reh") return STAFFITEM_reh;
+    if (value == "tie") return STAFFITEM_tie;
+    if (value == "trill") return STAFFITEM_trill;
+    if (value == "tuplet") return STAFFITEM_tuplet;
+    if (value == "turn") return STAFFITEM_turn;
+    if (value == "ligature") return STAFFITEM_ligature;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STAFFITEM", value.c_str());
+    return STAFFITEM_NONE;
 }
 
 std::string AttConverter::StaffitemBasicToStr(data_STAFFITEM_basic data) const
@@ -2245,6 +2653,33 @@ data_STAFFITEM_mensural AttConverter::StrToStaffitemMensural(std::string value, 
     return STAFFITEM_mensural_NONE;
 }
 
+std::string AttConverter::StaffrelToStr(data_STAFFREL data) const
+{
+    std::string value;
+    switch (data) {
+        case STAFFREL_above: value = "above"; break;
+        case STAFFREL_below: value = "below"; break;
+        case STAFFREL_between: value = "between"; break;
+        case STAFFREL_within: value = "within"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STAFFREL", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STAFFREL AttConverter::StrToStaffrel(std::string value, bool logWarning) const
+{
+    if (value == "above") return STAFFREL_above;
+    if (value == "below") return STAFFREL_below;
+    if (value == "between") return STAFFREL_between;
+    if (value == "within") return STAFFREL_within;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STAFFREL", value.c_str());
+    return STAFFREL_NONE;
+}
+
 std::string AttConverter::StaffrelBasicToStr(data_STAFFREL_basic data) const
 {
     std::string value;
@@ -2289,6 +2724,95 @@ data_STAFFREL_extended AttConverter::StrToStaffrelExtended(std::string value, bo
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.STAFFREL.extended", value.c_str());
     return STAFFREL_extended_NONE;
+}
+
+std::string AttConverter::StemdirectionToStr(data_STEMDIRECTION data) const
+{
+    std::string value;
+    switch (data) {
+        case STEMDIRECTION_up: value = "up"; break;
+        case STEMDIRECTION_down: value = "down"; break;
+        case STEMDIRECTION_left: value = "left"; break;
+        case STEMDIRECTION_right: value = "right"; break;
+        case STEMDIRECTION_ne: value = "ne"; break;
+        case STEMDIRECTION_se: value = "se"; break;
+        case STEMDIRECTION_nw: value = "nw"; break;
+        case STEMDIRECTION_sw: value = "sw"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STEMDIRECTION", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMDIRECTION AttConverter::StrToStemdirection(std::string value, bool logWarning) const
+{
+    if (value == "up") return STEMDIRECTION_up;
+    if (value == "down") return STEMDIRECTION_down;
+    if (value == "left") return STEMDIRECTION_left;
+    if (value == "right") return STEMDIRECTION_right;
+    if (value == "ne") return STEMDIRECTION_ne;
+    if (value == "se") return STEMDIRECTION_se;
+    if (value == "nw") return STEMDIRECTION_nw;
+    if (value == "sw") return STEMDIRECTION_sw;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STEMDIRECTION", value.c_str());
+    return STEMDIRECTION_NONE;
+}
+
+std::string AttConverter::StemdirectionBasicToStr(data_STEMDIRECTION_basic data) const
+{
+    std::string value;
+    switch (data) {
+        case STEMDIRECTION_basic_up: value = "up"; break;
+        case STEMDIRECTION_basic_down: value = "down"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STEMDIRECTION.basic", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMDIRECTION_basic AttConverter::StrToStemdirectionBasic(std::string value, bool logWarning) const
+{
+    if (value == "up") return STEMDIRECTION_basic_up;
+    if (value == "down") return STEMDIRECTION_basic_down;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STEMDIRECTION.basic", value.c_str());
+    return STEMDIRECTION_basic_NONE;
+}
+
+std::string AttConverter::StemdirectionExtendedToStr(data_STEMDIRECTION_extended data) const
+{
+    std::string value;
+    switch (data) {
+        case STEMDIRECTION_extended_left: value = "left"; break;
+        case STEMDIRECTION_extended_right: value = "right"; break;
+        case STEMDIRECTION_extended_ne: value = "ne"; break;
+        case STEMDIRECTION_extended_se: value = "se"; break;
+        case STEMDIRECTION_extended_nw: value = "nw"; break;
+        case STEMDIRECTION_extended_sw: value = "sw"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.STEMDIRECTION.extended", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMDIRECTION_extended AttConverter::StrToStemdirectionExtended(std::string value, bool logWarning) const
+{
+    if (value == "left") return STEMDIRECTION_extended_left;
+    if (value == "right") return STEMDIRECTION_extended_right;
+    if (value == "ne") return STEMDIRECTION_extended_ne;
+    if (value == "se") return STEMDIRECTION_extended_se;
+    if (value == "nw") return STEMDIRECTION_extended_nw;
+    if (value == "sw") return STEMDIRECTION_extended_sw;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.STEMDIRECTION.extended", value.c_str());
+    return STEMDIRECTION_extended_NONE;
 }
 
 std::string AttConverter::StemmodifierToStr(data_STEMMODIFIER data) const
@@ -2378,6 +2902,81 @@ data_TEMPERAMENT AttConverter::StrToTemperament(std::string value, bool logWarni
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.TEMPERAMENT", value.c_str());
     return TEMPERAMENT_NONE;
+}
+
+std::string AttConverter::TextrenditionToStr(data_TEXTRENDITION data) const
+{
+    std::string value;
+    switch (data) {
+        case TEXTRENDITION_quote: value = "quote"; break;
+        case TEXTRENDITION_quotedbl: value = "quotedbl"; break;
+        case TEXTRENDITION_italic: value = "italic"; break;
+        case TEXTRENDITION_oblique: value = "oblique"; break;
+        case TEXTRENDITION_smcaps: value = "smcaps"; break;
+        case TEXTRENDITION_bold: value = "bold"; break;
+        case TEXTRENDITION_bolder: value = "bolder"; break;
+        case TEXTRENDITION_lighter: value = "lighter"; break;
+        case TEXTRENDITION_box: value = "box"; break;
+        case TEXTRENDITION_circle: value = "circle"; break;
+        case TEXTRENDITION_dbox: value = "dbox"; break;
+        case TEXTRENDITION_tbox: value = "tbox"; break;
+        case TEXTRENDITION_bslash: value = "bslash"; break;
+        case TEXTRENDITION_fslash: value = "fslash"; break;
+        case TEXTRENDITION_line_through: value = "line-through"; break;
+        case TEXTRENDITION_none: value = "none"; break;
+        case TEXTRENDITION_overline: value = "overline"; break;
+        case TEXTRENDITION_overstrike: value = "overstrike"; break;
+        case TEXTRENDITION_strike: value = "strike"; break;
+        case TEXTRENDITION_sub: value = "sub"; break;
+        case TEXTRENDITION_sup: value = "sup"; break;
+        case TEXTRENDITION_superimpose: value = "superimpose"; break;
+        case TEXTRENDITION_underline: value = "underline"; break;
+        case TEXTRENDITION_x_through: value = "x-through"; break;
+        case TEXTRENDITION_ltr: value = "ltr"; break;
+        case TEXTRENDITION_rtl: value = "rtl"; break;
+        case TEXTRENDITION_lro: value = "lro"; break;
+        case TEXTRENDITION_rlo: value = "rlo"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.TEXTRENDITION", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_TEXTRENDITION AttConverter::StrToTextrendition(std::string value, bool logWarning) const
+{
+    if (value == "quote") return TEXTRENDITION_quote;
+    if (value == "quotedbl") return TEXTRENDITION_quotedbl;
+    if (value == "italic") return TEXTRENDITION_italic;
+    if (value == "oblique") return TEXTRENDITION_oblique;
+    if (value == "smcaps") return TEXTRENDITION_smcaps;
+    if (value == "bold") return TEXTRENDITION_bold;
+    if (value == "bolder") return TEXTRENDITION_bolder;
+    if (value == "lighter") return TEXTRENDITION_lighter;
+    if (value == "box") return TEXTRENDITION_box;
+    if (value == "circle") return TEXTRENDITION_circle;
+    if (value == "dbox") return TEXTRENDITION_dbox;
+    if (value == "tbox") return TEXTRENDITION_tbox;
+    if (value == "bslash") return TEXTRENDITION_bslash;
+    if (value == "fslash") return TEXTRENDITION_fslash;
+    if (value == "line-through") return TEXTRENDITION_line_through;
+    if (value == "none") return TEXTRENDITION_none;
+    if (value == "overline") return TEXTRENDITION_overline;
+    if (value == "overstrike") return TEXTRENDITION_overstrike;
+    if (value == "strike") return TEXTRENDITION_strike;
+    if (value == "sub") return TEXTRENDITION_sub;
+    if (value == "sup") return TEXTRENDITION_sup;
+    if (value == "superimpose") return TEXTRENDITION_superimpose;
+    if (value == "underline") return TEXTRENDITION_underline;
+    if (value == "x-through") return TEXTRENDITION_x_through;
+    if (value == "ltr") return TEXTRENDITION_ltr;
+    if (value == "rtl") return TEXTRENDITION_rtl;
+    if (value == "lro") return TEXTRENDITION_lro;
+    if (value == "rlo") return TEXTRENDITION_rlo;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.TEXTRENDITION", value.c_str());
+    return TEXTRENDITION_NONE;
 }
 
 std::string AttConverter::TextrenditionlistToStr(data_TEXTRENDITIONLIST data) const
@@ -3354,6 +3953,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
     std::string value;
     switch (data) {
         case meiVersion_MEIVERSION_4_0_0: value = "4.0.0"; break;
+        case meiVersion_MEIVERSION_4_0_1: value = "4.0.1"; break;
         default:
             LogWarning("Unknown value '%d' for att.meiVersion@meiversion", data);
             value = "";
@@ -3365,6 +3965,7 @@ std::string AttConverter::MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) 
 meiVersion_MEIVERSION AttConverter::StrToMeiVersionMeiversion(std::string value, bool logWarning) const
 {
     if (value == "4.0.0") return meiVersion_MEIVERSION_4_0_0;
+    if (value == "4.0.1") return meiVersion_MEIVERSION_4_0_1;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meiVersion@meiversion", value.c_str());
     return meiVersion_MEIVERSION_NONE;
@@ -3439,60 +4040,6 @@ meterConformance_METCON AttConverter::StrToMeterConformanceMetcon(std::string va
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.meterConformance@metcon", value.c_str());
     return meterConformance_METCON_NONE;
-}
-
-std::string AttConverter::MeterSigVisFormToStr(meterSigVis_FORM data) const
-{
-    std::string value;
-    switch (data) {
-        case meterSigVis_FORM_num: value = "num"; break;
-        case meterSigVis_FORM_denomsym: value = "denomsym"; break;
-        case meterSigVis_FORM_norm: value = "norm"; break;
-        case meterSigVis_FORM_invis: value = "invis"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.meterSig.vis@form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value, bool logWarning) const
-{
-    if (value == "num") return meterSigVis_FORM_num;
-    if (value == "denomsym") return meterSigVis_FORM_denomsym;
-    if (value == "norm") return meterSigVis_FORM_norm;
-    if (value == "invis") return meterSigVis_FORM_invis;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.meterSig.vis@form", value.c_str());
-    return meterSigVis_FORM_NONE;
-}
-
-std::string AttConverter::MeterSigDefaultVisMeterformToStr(meterSigDefaultVis_METERFORM data) const
-{
-    std::string value;
-    switch (data) {
-        case meterSigDefaultVis_METERFORM_num: value = "num"; break;
-        case meterSigDefaultVis_METERFORM_denomsym: value = "denomsym"; break;
-        case meterSigDefaultVis_METERFORM_norm: value = "norm"; break;
-        case meterSigDefaultVis_METERFORM_invis: value = "invis"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.meterSigDefault.vis@meter.form", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-meterSigDefaultVis_METERFORM AttConverter::StrToMeterSigDefaultVisMeterform(std::string value, bool logWarning) const
-{
-    if (value == "num") return meterSigDefaultVis_METERFORM_num;
-    if (value == "denomsym") return meterSigDefaultVis_METERFORM_denomsym;
-    if (value == "norm") return meterSigDefaultVis_METERFORM_norm;
-    if (value == "invis") return meterSigDefaultVis_METERFORM_invis;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.form", value.c_str());
-    return meterSigDefaultVis_METERFORM_NONE;
 }
 
 std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const
@@ -4071,6 +4618,7 @@ std::string AttConverter::SylLogWordposToStr(sylLog_WORDPOS data) const
     switch (data) {
         case sylLog_WORDPOS_i: value = "i"; break;
         case sylLog_WORDPOS_m: value = "m"; break;
+        case sylLog_WORDPOS_s: value = "s"; break;
         case sylLog_WORDPOS_t: value = "t"; break;
         default:
             LogWarning("Unknown value '%d' for att.syl.log@wordpos", data);
@@ -4084,6 +4632,7 @@ sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value, bool logWarni
 {
     if (value == "i") return sylLog_WORDPOS_i;
     if (value == "m") return sylLog_WORDPOS_m;
+    if (value == "s") return sylLog_WORDPOS_s;
     if (value == "t") return sylLog_WORDPOS_t;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str());

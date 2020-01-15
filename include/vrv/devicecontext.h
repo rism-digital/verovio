@@ -136,6 +136,7 @@ public:
      * @name Drawing methods
      */
     ///@{
+    virtual void DrawSimpleBezierPath(Point bezier[4]) = 0;
     virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]) = 0;
     virtual void DrawCircle(int x, int y, int radius) = 0;
     virtual void DrawEllipse(int x, int y, int width, int height) = 0;
@@ -170,10 +171,13 @@ public:
     virtual void EndText() = 0;
 
     /**
-     * Move a text to the specified position, for example when starting a new line.
-     * This method should be called only between a StartText and EndText call.
+     * @name Move a text to the specified position, for example when starting a new line.
+     * These methods should be called only between a StartText and EndText call.
      */
+    ///@{
     virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) = 0;
+    virtual void MoveTextVerticallyTo(int y) = 0;
+    ///@}
 
     /**
      * @name Temporarily deactivate a graphic

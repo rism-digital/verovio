@@ -29,6 +29,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "tie.h"
+#include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -115,7 +116,7 @@ bool Note::HasToBeAligned() const
 {
     if (!this->IsInLigature()) return true;
     Note *note = const_cast<Note *>(this);
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
     return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
 }
@@ -125,12 +126,12 @@ void Note::AddChild(Object *child)
     // additional verification for accid and artic - this will no be raised with editorial markup, though
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindChildByComparison(&isAttributeComparison))
+        if (this->FindDescendantByComparison(&isAttributeComparison))
             LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
     }
     else if (child->Is(ARTIC)) {
         IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindChildByComparison(&isAttributeComparison))
+        if (this->FindDescendantByComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
 
@@ -173,18 +174,18 @@ void Note::AddChild(Object *child)
 
 Accid *Note::GetDrawingAccid()
 {
-    Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
+    Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
     return accid;
 }
 
 Chord *Note::IsChordTone() const
 {
-    return dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 int Note::GetDrawingDur() const
 {
-    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
@@ -311,7 +312,7 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         return 0;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
@@ -419,6 +420,59 @@ char Note::GetMIDIPitch()
     return m_MIDIPitch;
 }
 
+int Note::GetChromaticAlteration()
+{
+    Accid *accid = this->GetDrawingAccid();
+
+    if (accid) {
+        return TransPitch::GetChromaticAlteration(accid->GetAccidGes(), accid->GetAccid());
+    }
+    return 0;
+}
+
+TransPitch Note::GetTransPitch()
+{
+    int pname = this->GetPname() - PITCHNAME_c;
+    return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
+}
+
+void Note::UpdateFromTransPitch(const TransPitch &tp)
+{
+    this->SetPname(tp.GetPitchName());
+
+    Accid *accid = this->GetDrawingAccid();
+    bool transposeGesturalAccid = false;
+    bool transposeWrittenAccid = false;
+    if (!accid) {
+        accid = new Accid();
+        this->AddChild(accid);
+    }
+    if (accid->HasAccidGes()) {
+        transposeGesturalAccid = true;
+    }
+    if (accid->HasAccid()) {
+        transposeWrittenAccid = true;
+    }
+    // TODO: Check the case of both existing but having unequal values.
+    if (!accid->HasAccidGes() && !accid->HasAccid()) {
+        transposeGesturalAccid = true;
+    }
+
+    if (transposeGesturalAccid) {
+        accid->SetAccidGes(tp.GetAccidG());
+    }
+    if (transposeWrittenAccid) {
+        accid->SetAccid(tp.GetAccidW());
+    }
+
+    if (this->GetOct() != tp.m_oct) {
+        if (this->HasOctGes()) {
+            this->SetOctGes(this->GetOctGes() + tp.m_oct - this->GetOct());
+        }
+        this->SetOct(tp.m_oct);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -510,9 +564,9 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -560,7 +614,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     // Nothing to do for notes that are not in a cluster
@@ -620,7 +674,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -650,7 +704,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     }
     else if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
-        dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+        dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
         assert(dots);
         params->m_chordDrawingX = this->GetDrawingX();
 
@@ -689,7 +743,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (!this->IsVisible()) {
@@ -741,10 +795,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
 
     if (!this->IsChordTone() && !this->IsMensural()) {
         if (!currentStem) {
@@ -786,7 +840,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
         if (chord && (chord->GetDots() == this->GetDots())) {
@@ -879,8 +933,6 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Accid *accid = note->GetDrawingAccid();
-
     // Create midi this
     int midiBase = 0;
     data_PITCHNAME pname = note->GetPname();
@@ -895,32 +947,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         case PITCHNAME_NONE: break;
     }
     // Check for accidentals
-    if (accid && accid->HasAccidGes()) {
-        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
-        switch (accImp) {
-            case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
-            case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
-            case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
-            case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
-            default: break;
-        }
-    }
-    else if (accid) {
-        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
-        switch (accExp) {
-            case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
-            case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
-            case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
-            case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
-            case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
-            case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
-            case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
-            case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
-            case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
-            case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
-            default: break;
-        }
-    }
+    midiBase += note->GetChromaticAlteration();
 
     // Adjustment for transposition intruments
     midiBase += params->m_transSemi;
@@ -975,6 +1002,20 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     params->realTimeToOffElements[realTimeEnd].push_back(this->GetUuid());
 
     params->realTimeToTempo[realTimeStart] = params->m_currentTempo;
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Note::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    LogDebug("Transposing note");
+
+    TransPitch pitch = this->GetTransPitch();
+    params->m_transposer->Transpose(pitch);
+    this->UpdateFromTransPitch(pitch);
 
     return FUNCTOR_SIBLINGS;
 }

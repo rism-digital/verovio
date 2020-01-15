@@ -36,6 +36,7 @@ public:
     ///@{
     Turn();
     virtual ~Turn();
+    virtual Object *Clone() const { return new Turn(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Turn"; }
     virtual ClassId GetClassId() const { return TURN; }
