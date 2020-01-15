@@ -33,6 +33,7 @@ class TimestampAttr;
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
 class Measure : public Object,
+                public AttBarring,
                 public AttMeasureLog,
                 public AttMeterConformanceBar,
                 public AttNNumberLike,
@@ -186,6 +187,12 @@ public:
      * Return the first staff of each staffGrp according to the scoreDef
      */
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
+
+    /**
+     * Return the top (first) visible staff in the measure (if any).
+     * Takes into account system optimization
+     */
+    Staff *GetTopVisibleStaff();
 
     /**
      * Check if the measure encloses the given time (in millisecond)

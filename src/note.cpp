@@ -29,6 +29,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "tie.h"
+#include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -417,6 +418,59 @@ double Note::GetScoreTimeDuration()
 char Note::GetMIDIPitch()
 {
     return m_MIDIPitch;
+}
+
+int Note::GetChromaticAlteration()
+{
+    Accid *accid = this->GetDrawingAccid();
+
+    if (accid) {
+        return TransPitch::GetChromaticAlteration(accid->GetAccidGes(), accid->GetAccid());
+    }
+    return 0;
+}
+
+TransPitch Note::GetTransPitch()
+{
+    int pname = this->GetPname() - PITCHNAME_c;
+    return TransPitch(pname, this->GetChromaticAlteration(), this->GetOct());
+}
+
+void Note::UpdateFromTransPitch(const TransPitch &tp)
+{
+    this->SetPname(tp.GetPitchName());
+
+    Accid *accid = this->GetDrawingAccid();
+    bool transposeGesturalAccid = false;
+    bool transposeWrittenAccid = false;
+    if (!accid) {
+        accid = new Accid();
+        this->AddChild(accid);
+    }
+    if (accid->HasAccidGes()) {
+        transposeGesturalAccid = true;
+    }
+    if (accid->HasAccid()) {
+        transposeWrittenAccid = true;
+    }
+    // TODO: Check the case of both existing but having unequal values.
+    if (!accid->HasAccidGes() && !accid->HasAccid()) {
+        transposeGesturalAccid = true;
+    }
+
+    if (transposeGesturalAccid) {
+        accid->SetAccidGes(tp.GetAccidG());
+    }
+    if (transposeWrittenAccid) {
+        accid->SetAccid(tp.GetAccidW());
+    }
+
+    if (this->GetOct() != tp.m_oct) {
+        if (this->HasOctGes()) {
+            this->SetOctGes(this->GetOctGes() + tp.m_oct - this->GetOct());
+        }
+        this->SetOct(tp.m_oct);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -879,8 +933,6 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Accid *accid = note->GetDrawingAccid();
-
     // Create midi this
     int midiBase = 0;
     data_PITCHNAME pname = note->GetPname();
@@ -895,32 +947,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         case PITCHNAME_NONE: break;
     }
     // Check for accidentals
-    if (accid && accid->HasAccidGes()) {
-        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
-        switch (accImp) {
-            case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
-            case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
-            case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
-            case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
-            default: break;
-        }
-    }
-    else if (accid) {
-        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
-        switch (accExp) {
-            case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
-            case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
-            case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
-            case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
-            case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
-            case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
-            case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
-            case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
-            case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
-            case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
-            default: break;
-        }
-    }
+    midiBase += note->GetChromaticAlteration();
 
     // Adjustment for transposition intruments
     midiBase += params->m_transSemi;
@@ -975,6 +1002,20 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     params->realTimeToOffElements[realTimeEnd].push_back(this->GetUuid());
 
     params->realTimeToTempo[realTimeStart] = params->m_currentTempo;
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Note::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    LogDebug("Transposing note");
+
+    TransPitch pitch = this->GetTransPitch();
+    params->m_transposer->Transpose(pitch);
+    this->UpdateFromTransPitch(pitch);
 
     return FUNCTOR_SIBLINGS;
 }

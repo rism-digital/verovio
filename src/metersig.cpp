@@ -40,30 +40,6 @@ void MeterSig::Reset()
     ResetMeterSigVis();
 }
 
-meterSigVis_FORM MeterSig::meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form)
-{
-    switch (form) {
-        case meterSigDefaultVis_METERFORM_NONE: return meterSigVis_FORM_NONE;
-        case meterSigDefaultVis_METERFORM_num: return meterSigVis_FORM_num;
-        case meterSigDefaultVis_METERFORM_denomsym: return meterSigVis_FORM_denomsym;
-        case meterSigDefaultVis_METERFORM_norm: return meterSigVis_FORM_norm;
-        case meterSigDefaultVis_METERFORM_invis: return meterSigVis_FORM_invis;
-        default: return meterSigVis_FORM_NONE;
-    }
-}
-
-meterSigDefaultVis_METERFORM MeterSig::meterSigVisToMeterSigDefaultVis(meterSigVis_FORM form)
-{
-    switch (form) {
-        case meterSigVis_FORM_NONE: return meterSigDefaultVis_METERFORM_NONE;
-        case meterSigVis_FORM_num: return meterSigDefaultVis_METERFORM_num;
-        case meterSigVis_FORM_denomsym: return meterSigDefaultVis_METERFORM_denomsym;
-        case meterSigVis_FORM_norm: return meterSigDefaultVis_METERFORM_norm;
-        case meterSigVis_FORM_invis: return meterSigDefaultVis_METERFORM_invis;
-        default: return meterSigDefaultVis_METERFORM_NONE;
-    }
-}
-
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

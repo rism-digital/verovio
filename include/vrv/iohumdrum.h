@@ -545,6 +545,7 @@ protected:
     void initializeIgnoreVector(hum::HumdrumFile &infile);
     bool hasIndent(hum::HTp tok);
     void prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::string &ks, hum::HTp keytok);
+    void fixLargeTuplets(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -592,6 +593,8 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
+    template <class ELEMENT>
+    void addLineFormStyle(ELEMENT element, hum::HTp token, const string &layout, int index = 0);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -730,6 +733,17 @@ private:
     // converted into <harm> element in the MEI conversion.
     bool m_fb = false;
 
+    // m_fbstaff == state variable for keeping track of whether or not
+    // a particular staff (index) has figured bass.  This is used by
+    // the tuplet@place parameter to avoid collision between tuplet numbers
+    // and figured bass.
+    std::vector<bool> m_fbstaff;
+
+    // m_fbstates == position of the figured bass in relation to
+    // each staff index.  0 = no figured bass, -1 = figured bass below staff,
+    // +1 = figured bass above staff.
+    std::vector<int> m_fbstates;
+
     // m_setrightstem == used for setting right-side stem of half notes
     bool m_setrightstem = false;
 
@@ -780,6 +794,7 @@ private:
     // -1 = *below marker encountered in spine.
     // 0 = *auto neither above or below explicitly given (leave up to renderer).
     // Up to 1000 spines can be processed (see constructor).
+    // Indexed by track number of the spine it revers to.
     std::vector<int> m_placement;
 
     // m_reverse == placement reversed or not reversed.  currently used for **fb,

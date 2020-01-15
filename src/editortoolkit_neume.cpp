@@ -71,7 +71,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction,
     }
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
-        int ulx, uly, lrx, lry;
+        int ulx = 0, uly = 0, lrx = 0, lry = 0;
         std::vector<std::pair<std::string, std::string> > attributes;
         if (this->ParseInsertAction(
                 json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &lrx, &lry, &attributes)) {
@@ -596,6 +596,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 else {
                     LogMessage("Unsupported character in contour.");
+                    delete newNc;
+                    delete newZone;
                     return false;
                 }
                 newZone->SetUlx(newUlx);
@@ -1255,6 +1257,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         parent->ReorderByXPos();
+        if (doubleParent == NULL) {
+            LogError("No second level parent!");
+            return false;
+        }
         doubleParent->AddChild(parent);
 
         Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
@@ -1279,13 +1285,15 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // unless we're just grouping NC's in which case no need to worry about syl's of course
     else {
         if (elementClass == NC) {
-            parent = new Neume();
-            for (auto it = elements.begin(); it != elements.end(); ++it) {
-                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
-                    (*it)->MoveItselfTo(parent);
+            if (doubleParent) {
+                parent = new Neume();
+                for (auto it = elements.begin(); it != elements.end(); ++it) {
+                    if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                        (*it)->MoveItselfTo(parent);
+                    }
                 }
+                doubleParent->AddChild(parent);
             }
-            doubleParent->AddChild(parent);
         }
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
@@ -1311,6 +1319,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     (*it)->MoveItselfTo(fullSyllable);
                 }
             }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->AddChild(fullSyllable);
             Layer *layer = dynamic_cast<Layer *>(fullSyllable->GetFirstAncestor(LAYER));
             assert(layer);
@@ -1323,6 +1335,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *obj = (*it).first;
         obj->ClearRelinquishedChildren();
         if (obj->GetChildCount() == 0) {
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->DeleteChild(obj);
         }
         else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
@@ -1330,11 +1346,18 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             while ((syl = obj->FindDescendantByType(SYL)) != NULL) {
                 obj->DeleteChild(syl);
             }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->DeleteChild(obj);
         }
     }
 
-    m_editInfo = parent->GetUuid();
+    if (parent) {
+        m_editInfo = parent->GetUuid();
+    }
+
     return true;
 }
 
@@ -1448,7 +1471,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 return false;
             }
         }
-        else {
+        else if (currentParent) {
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
@@ -1508,6 +1531,10 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
             el->DeleteChild(*it);
         }
     }
+    if (!firstChild) {
+        LogMessage("Unable to find first child.");
+        return false;
+    }
     // Get the coordinates of the remaining child.
     int initialUlx = firstChild->GetZone()->GetUlx();
     int initialUly = firstChild->GetZone()->GetUly();
@@ -1549,6 +1576,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         }
         else {
             LogMessage("Unsupported character in contour.");
+            delete newNc;
+            delete zone;
             return false;
         }
         zone->SetUlx(newUlx);
@@ -1647,6 +1676,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     }
     else {
         LogWarning("isLigature is invalid!");
+        delete zone;
         return false;
     }
     if (success1 && success2 && m_doc->GetType() != Facs) {

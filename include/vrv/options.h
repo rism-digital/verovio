@@ -71,6 +71,8 @@ enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
 enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
 
+enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
+
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
@@ -107,6 +109,7 @@ public:
     static std::map<int, std::string> s_footer;
     static std::map<int, std::string> s_header;
     static std::map<int, std::string> s_measureNumber;
+    static std::map<int, std::string> s_systemDivider;
 
 protected:
     std::string m_title;
@@ -523,6 +526,7 @@ public:
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
+    OptionIntMap m_systemDivider;
     OptionDbl m_tieThickness;
 
     /**
@@ -534,6 +538,8 @@ public:
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
+    OptionString m_transpose;
+    OptionBool m_transposeSelectedOnly;
 
     /**
      * Element margins

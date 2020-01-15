@@ -698,13 +698,12 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int sym = 0;
     // Select glyph to use for this custos
     switch (staff->m_drawingNotationType) {
-        case NOTATIONTYPE_mensural:
-            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
-            break;
         case NOTATIONTYPE_neume:
             sym = SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
             break;
-        default: break;
+        default:
+            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
+            break;
     }
 
     // Calculate x and y position for custos graphic
@@ -720,7 +719,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     else {
         x = element->GetDrawingX();
-        y = staff->GetDrawingY();
+        y = element->GetDrawingY();
     }
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
@@ -732,6 +731,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     else if (clef->GetShape() == CLEFSHAPE_F) {
         pitchOffset = (custos->GetPname() - PITCHNAME_f) * (staffSize / 2);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_G) {
+        pitchOffset = (custos->GetPname() - PITCHNAME_g) * (staffSize / 2);
     }
     else {
         // This shouldn't happen
@@ -1038,7 +1040,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
 
-    if (meterSig->GetForm() == meterSigVis_FORM_invis) {
+    if (meterSig->GetForm() == METERFORM_invis) {
         // just skip
     }
     else if (meterSig->HasSym()) {
@@ -1049,7 +1051,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
             DrawSmuflCode(dc, x, y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
         }
     }
-    else if (meterSig->GetForm() == meterSigVis_FORM_num) {
+    else if (meterSig->GetForm() == METERFORM_num) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), 0, staff);
     }
     else if (meterSig->HasCount()) {

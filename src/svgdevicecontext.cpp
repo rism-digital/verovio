@@ -208,6 +208,9 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
         if (att->HasColor()) {
+            if (object->IsControlElement()) {
+                m_currentNode.append_attribute("color") = att->GetColor().c_str();
+            }
             m_currentNode.append_attribute("fill") = att->GetColor().c_str();
         }
     }
@@ -474,6 +477,26 @@ pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
 }
 
 // Drawing methods
+void SvgDeviceContext::DrawSimpleBezierPath(Point bezier[4])
+{
+    pugi::xml_node pathChild = AppendChild("path");
+    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d", // Base string
+        bezier[0].x, bezier[0].y, // M Command
+        bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y, bezier[3].x, bezier[3].y // Remaining bezier points.
+        )
+                                          .c_str();
+    pathChild.append_attribute("fill") = "none";
+    pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
+    pathChild.append_attribute("stroke-linecap") = "round";
+    pathChild.append_attribute("stroke-linejoin") = "round";
+    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
+    if (m_penStack.top().GetDashLength() > 0) {
+        // Since we have stroke-linecap=round, change the dash length to be the percieved length.
+        int dashOn = std::max(m_penStack.top().GetDashLength() - m_penStack.top().GetWidth(), 0);
+        int dashOff = m_penStack.top().GetDashLength() + m_penStack.top().GetWidth();
+        pathChild.append_attribute("stroke-dasharray") = StringFormat("%d, %d", dashOn, dashOff).c_str();
+    }
+}
 void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = AppendChild("path");

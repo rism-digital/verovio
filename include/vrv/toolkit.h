@@ -32,6 +32,7 @@ enum FileFormat {
     MUSICXML,
     MUSICXMLHUM,
     MEIHUM,
+    MUSEDATAHUM,
     ESAC,
     MIDI,
     TIMEMAP

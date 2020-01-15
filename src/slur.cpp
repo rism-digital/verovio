@@ -29,11 +29,12 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature()
+Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
 
     Reset();
 }
@@ -46,6 +47,7 @@ void Slur::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetCurvature();
+    ResetCurveRend();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }
@@ -205,8 +207,8 @@ int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedEl
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist
         / (maxHeightFactor
-              * (doc->GetOptions()->m_slurCurveFactor.GetValue()
-                    + 5)); // 5 is the minimum - can be increased for limiting curvature
+            * (doc->GetOptions()->m_slurCurveFactor.GetValue()
+                + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
     maxHeight = std::min(maxHeight, doc->GetDrawingOctaveSize(staffSize));

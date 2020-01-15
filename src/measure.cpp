@@ -44,8 +44,15 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-"), AttMeasureLog(), AttMeterConformanceBar(), AttNNumberLike(), AttPointing(), AttTyped()
+    : Object("measure-")
+    , AttBarring()
+    , AttMeasureLog()
+    , AttMeterConformanceBar()
+    , AttNNumberLike()
+    , AttPointing()
+    , AttTyped()
 {
+    RegisterAttClass(ATT_BARRING);
     RegisterAttClass(ATT_MEASURELOG);
     RegisterAttClass(ATT_METERCONFORMANCEBAR);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -361,6 +368,23 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     }
     if (staves.empty()) LogDebug("Empty @staff array");
     return staves;
+}
+
+Staff *Measure::GetTopVisibleStaff()
+{
+    Staff *staff = NULL;
+    ArrayOfObjects staves;
+    ClassIdComparison matchType(STAFF);
+    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    for (auto &child : staves) {
+        staff = dynamic_cast<Staff *>(child);
+        assert(staff);
+        if (staff->DrawingIsVisible()) {
+            break;
+        }
+        staff = NULL;
+    }
+    return staff;
 }
 
 int Measure::EnclosesTime(int time) const

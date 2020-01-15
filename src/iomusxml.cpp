@@ -17,6 +17,7 @@
 #include "arpeg.h"
 #include "beam.h"
 #include "beatrpt.h"
+#include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
 #include "chord.h"
@@ -654,6 +655,8 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     assert(root);
     pugi::xpath_node workTitle = root.select_node("/score-partwise/work/work-title");
     pugi::xpath_node movementTitle = root.select_node("/score-partwise/movement-title");
+    pugi::xpath_node workNumber = root.select_node("/score-partwise/work/work-number");
+    pugi::xpath_node movementNumber = root.select_node("/score-partwise/movement-number");
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
     // <fileDesc> /////////////
@@ -664,6 +667,17 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
         meiTitle.text().set(movementTitle.node().text().as_string());
     else if (workTitle)
         meiTitle.text().set(workTitle.node().text().as_string());
+
+    if (movementNumber) {
+        pugi::xml_node meiSubtitle = titleStmt.append_child("title");
+        meiSubtitle.text().set(movementNumber.node().text().as_string());
+        meiSubtitle.append_attribute("type").set_value("subordinate");
+    }
+    else if (workNumber) {
+        pugi::xml_node meiSubtitle = titleStmt.append_child("title");
+        meiSubtitle.text().set(workNumber.node().text().as_string());
+        meiSubtitle.append_attribute("type").set_value("subordinate");
+    }
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
@@ -876,9 +890,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     if (symbol == "cut" || symbol == "common")
                         meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                     else if (symbol == "single-number")
-                        meterSig->SetForm(meterSigVis_FORM_num);
+                        meterSig->SetForm(METERFORM_num);
                     else
-                        meterSig->SetForm(meterSigVis_FORM_norm);
+                        meterSig->SetForm(METERFORM_norm);
                 }
                 if (time.node().select_nodes("beats").size() > 1) {
                     LogWarning("MusicXML import: Compound meter signatures are not supported");
@@ -1002,6 +1016,13 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         }
         m_openDashesStack.clear();
     }
+    if (!m_bracketStack.empty()) { // open brackets without ending
+        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+            LogWarning("MusicXML import: BracketSpan for '%s' could not be closed.", iter->first->GetUuid().c_str());
+        }
+        m_bracketStack.clear();
+    }
 
     return false;
 }
@@ -1094,7 +1115,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -1206,6 +1227,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
         }
         else if (key.node().child("key-step")) {
+            if (!keySig) keySig = new KeySig();
             keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
             for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
                  keyStep = keyStep.next_sibling("key-step")) {
@@ -1242,9 +1264,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 if (symbol == "cut" || symbol == "common")
                     meterSig->SetSym(meterSig->AttMeterSigVis::StrToMetersign(symbol.c_str()));
                 else if (symbol == "single-number")
-                    meterSig->SetForm(meterSigVis_FORM_num);
+                    meterSig->SetForm(METERFORM_num);
                 else
-                    meterSig->SetForm(meterSigVis_FORM_norm);
+                    meterSig->SetForm(METERFORM_norm);
             }
             if (time.node().select_nodes("beats").size() > 1) {
                 LogWarning("MusicXML import: Compound meter signatures are not supported");
@@ -1305,8 +1327,11 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     pugi::xpath_node nextNote = node.next_sibling("note");
     if (nextNote && m_durTotal > 0) {
         // We need a <space> if a note follows that starts not at the beginning of the measure
-        Layer *layer = new Layer();
-        if (!node.select_node("voice")) layer = SelectLayer(nextNote.node(), measure);
+        Layer *layer;
+        if (node.select_node("voice"))
+            layer = new Layer();
+        else
+            layer = SelectLayer(nextNote.node(), measure);
         FillSpace(layer, m_durTotal);
     }
 }
@@ -1331,6 +1356,13 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
         }
         else {
             measure->SetRight(barRendition);
+            if (barStyle == "short" || barStyle == "tick") {
+                measure->SetBarLen(4);
+                if (barStyle == "short")
+                    measure->SetBarPlace(2);
+                else
+                    measure->SetBarPlace(-2);
+            }
         }
     }
     // parse endings (prima volta, seconda volta...)
@@ -1519,7 +1551,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
-            std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+            std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> >::iterator iter;
             for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
                 if (iter->second.m_dirN == hairpinNumber) {
                     int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
@@ -1529,12 +1561,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 }
             }
             // ...or push on hairpin stop stack, if not matched.
-            m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenHairpin>(
-                0, timeStamp, musicxml::OpenHairpin(hairpinNumber, m_measureCounts.at(measure))));
+            m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenSpanner>(
+                0, timeStamp, musicxml::OpenSpanner(hairpinNumber, m_measureCounts.at(measure))));
         }
         else {
             Hairpin *hairpin = new Hairpin();
-            musicxml::OpenHairpin openHairpin(hairpinNumber, m_measureCounts.at(measure));
+            musicxml::OpenSpanner openHairpin(hairpinNumber, m_measureCounts.at(measure));
             if (HasAttributeWithValue(wedge.node(), "type", "crescendo")) {
                 hairpin->SetForm(hairpinLog_FORM_cres);
             }
@@ -1553,7 +1585,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             hairpin->SetVgrp(defaultY);
             // match new hairpin to existing hairpin stop
-            std::vector<std::tuple<int, double, musicxml::OpenHairpin> >::iterator iter;
+            std::vector<std::tuple<int, double, musicxml::OpenSpanner> >::iterator iter;
             for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
                     int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
@@ -1635,6 +1667,30 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
     }
 
+    // Principal voice
+    pugi::xpath_node lead = type.node().select_node("principal-voice");
+    if (lead) {
+        int voiceNumber = wedge.node().attribute("number").as_int();
+        voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
+        if (HasAttributeWithValue(lead.node(), "type", "stop")) {
+            int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
+            m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+            m_bracketStack.erase(m_bracketStack.begin());
+        }
+        else {
+            std::string symbol = lead.node().attribute("symbol").as_string();
+            BracketSpan *bracketSpan = new BracketSpan();
+            musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
+            bracketSpan->SetColor(lead.node().attribute("color").as_string());
+            // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            bracketSpan->SetFunc("analytical");
+            bracketSpan->SetTstamp(timeStamp);
+            bracketSpan->SetType("principal-voice");
+            m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
+            m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
+        }
+    }
+
     // Tempo
     pugi::xpath_node metronome = type.node().select_node("metronome");
     if (node.select_node("sound[@tempo]") || metronome) {
@@ -1653,7 +1709,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes) {
+    if (words.size() == 0 && !dynamics && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
@@ -2062,7 +2118,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "end") {
                         syl->SetWordpos(sylLog_WORDPOS_t);
-                        syl->SetCon(sylLog_CON_s);
+                        // Do not set @con when the syllable has an ellision
+                        if (syl->GetCon() != sylLog_CON_b) {
+                            syl->SetCon(sylLog_CON_s);
+                        }
                     }
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
                     if (!textWeight.empty())
@@ -2096,6 +2155,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
                 tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             }
+            tie->SetLform(tie->AttCurveRend::StrToLineform(startTie.node().attribute("line-type").as_string()));
+
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(note, tie);
@@ -2350,7 +2411,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             meiSlur->SetColor(slur.attribute("color").as_string());
             // lineform
-            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(slur.attribute("line-type ").as_string()));
+            meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
             meiSlur->SetCurvedir(
@@ -2426,6 +2487,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
         m_pedalStack.clear();
     }
+    if (!m_bracketStack.empty()) {
+        std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
+            if (!(iter->first)->HasStaff()) {
+                iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            }
+        }
+    }
     if (!m_tempoStack.empty()) {
         std::vector<Tempo *>::iterator iter;
         for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
@@ -2436,14 +2505,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     }
     // add staff to hairpins
     if (!m_hairpinStack.empty()) {
-        std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+        std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
             if (!iter->first->HasStaff())
                 iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
     }
     if (!m_hairpinStopStack.empty()) {
-        std::vector<std::tuple<int, double, musicxml::OpenHairpin> >::iterator iter;
+        std::vector<std::tuple<int, double, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
             if (std::get<0>(*iter) == 0) std::get<0>(*iter) = staff->GetN();
         }
@@ -2542,8 +2611,8 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     // if (value == "") return BARRENDITION_rptboth;
     if ((value == "light-heavy") && repeat) return BARRENDITION_rptend;
     if (value == "regular") return BARRENDITION_single;
-    // if (value == "short") return; // TODO: Support 'short' barlines.
-    // if (value == "tick") return; // TODO: Support 'tick' barlines.
+    if (value == "short") return BARRENDITION_single;
+    if (value == "tick") return BARRENDITION_single;
     LogWarning("MusicXML import: Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;
 }
