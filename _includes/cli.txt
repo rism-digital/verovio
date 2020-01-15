@@ -1,4 +1,4 @@
-Verovio 2.4.0-dev-10d549c-dirty
+Verovio 2.4.0-dev-85cf079-dirty
 
 Example usage:
 
@@ -33,6 +33,7 @@ Input and page layout options
  --header <s>                      Control header layout (default: "auto"; other values: "none", "encoded")
  --no-justification                Do not justify the system
  --open-control-events             Render open control events
+ --output-smufl-xml-entities       Output SMuFL charachters as XML entities instead of byte codes
  --page-height <i>                 The page height (default: 2970; min: 100; max: 60000)
  --page-margin-bottom <i>          The page bottom margin (default: 50; min: 0; max: 500)
  --page-margin-left <i>            The page left margin (default: 50; min: 0; max: 500)
@@ -56,7 +57,6 @@ General layout options
  --grace-rhythm-align              Align grace notes rhythmically with all staves
  --grace-right-align               Align the right position of a grace group with all staves
  --hairpin-size <f>                The haripin size in MEI units (default: 3.00; min: 1.00; max: 8.00)
- --left-position <f>               The left position (default: 0.80; min: 0.00; max: 2.00)
  --lyric-hyphen-length <f>         The lyric hyphen and dash length (default: 1.20; min: 0.50; max: 3.00)
  --lyric-hyphen-width <f>          The lyric hyphen and dash width (default: 0.20; min: 0.10; max: 0.50)
  --lyric-no-start-hyphen           Do not show hyphens at the beginning of a system
@@ -82,11 +82,13 @@ General layout options
  --system-divider <s>              The display of system dividers (default: "left"; other values: "none", "left-right")
  --tie-thickness <f>               The tie thickness in MEI units (default: 0.50; min: 0.20; max: 1.00)
 
-Element selectors
+Element selectors and processing
  --app-x-path-query* <s>           Set the xPath query for selecting <app> child elements, for example: "./rdg[contains(@source, 'source-id')]"; by default the <lem> or the first <rdg> is selected
  --choice-x-path-query* <s>        Set the xPath query for selecting <choice> child elements, for example: "./orig"; by default the first child is selected
  --mdiv-x-path-query <s>           Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered (default: "")
  --subst-x-path-query* <s>         Set the xPath query for selecting <subst> child elements, for example: "./del"; by default the first child is selected
+ --transpose <s>                   SUMMARY (default: "")
+ --transpose-selected-only         Transpose only the selected content and ignore unselected editorial content
 
 Element margins
  --default-bottom-margin <f>       The default bottom margin (default: 0.50; min: 0.00; max: 5.00)
