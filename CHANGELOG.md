@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.0] - 2020-01-15
+* Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
+* Support for dashed and dotted slurs and ties (@earboxer and @napulen)
+* Options for controlling system divider display (--systemDivider "none|left|left-right")
+* Fix coloring of ties and slurs (@rettinghaus)
+* Fix bug with tuplet number placement (@rettinghaus)
+* LibMEI output generated from MEI 4.0.1
+
 ## [2.3.5] - 2020-01-09
 * Fix bug with NPM versionning
 
