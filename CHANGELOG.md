@@ -1,7 +1,8 @@
 # Changelog
 
 ## [unreleased]
-* Support for transposition (@craigsapp and @earboxer)
+
+## [2.4.0] - 2020-01-15
 * Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
 * Support for dashed and dotted slurs and ties (@earboxer and @napulen)
 * Option to use xml entities for SMuFL charachters (--outputSmuflXmlEntities)
