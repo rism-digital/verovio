@@ -82,6 +82,17 @@ public:
     static data_PITCHNAME GetAccidPnameAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
     static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef);
 
+    int GetFifthsInt();
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *);
+
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
