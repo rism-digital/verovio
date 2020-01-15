@@ -27,8 +27,8 @@
         breaks: "auto",
         pageHeight: 2970,
         pageWidth: 2100,
-        header: "none",
-        footer: "none",
+        noHeader: true,
+        noFooter: true,
         scale: 40,
         spacingSystem: 0,
         spacingStaff: 4,
@@ -37,7 +37,19 @@
     // Same as before
     var defaultOptions_2_1 = defaultOptions_2_0;	
     var defaultOptions_2_2 = defaultOptions_2_1;
-    var defaultOptions_2_3 = defaultOptions_2_2;
+
+    var defaultOptions_2_3 = {
+        adjustPageHeight: "true",
+        breaks: "auto",
+        pageHeight: 2970,
+        pageWidth: 2100,
+        header: "none",
+        footer: "none",
+        scale: 40,
+        spacingSystem: 0,
+        spacingStaff: 4,
+    };
+
     var defaultOptions_2_4 = defaultOptions_2_3;
     var defaultOptions_2_5 = defaultOptions_2_5;
 
@@ -94,6 +106,7 @@
     }
     
     function loadCustomFile() {
+        console.log(vrvVersion);
         options = window["defaultOptions_" + vrvVersion];
         options.pageWidth = ($("#00").width()) * 100 / options.scale ;
         
@@ -118,6 +131,7 @@
     function onVerovioLoaded() {
 
         vrvToolkit = new verovio.toolkit();
+        console.log(vrvToolkit.getVersion());
         vrvVersion = vrvToolkit.getVersion().slice(0,3).replace(".", "_");
 
         var strVersion = vrvToolkit.getVersion();
