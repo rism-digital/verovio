@@ -81,23 +81,23 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    Neume *neume = dynamic_cast<Neume*>(nc->GetFirstParent(NEUME));
+    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstAncestor(NEUME));
     assert(neume);
     int position = neume->GetChildIndex(element);
 
     // Check if nc is part of a ligature or is an inclinatum
-    if (nc->HasTilt() && nc->GetTilt().GetExtended() == COMPASSDIRECTION_extended_se) {
+    if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
         params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
     }
     else if (nc->GetLigated() == BOOLEAN_true) {
-        int pitchDifference;
+        int pitchDifference = 0;
         bool isFirst;
         // Check if this is the first or second part of a ligature
         Object *nextSibling = neume->GetChild(position + 1);
         if (nextSibling != NULL) {
-            Nc *nextNc = dynamic_cast<Nc*>(nextSibling);
+            Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
             assert(nextNc);
-            if (nextNc->GetLigated() == BOOLEAN_true) { //first part of the ligature
+            if (nextNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
                 isFirst = true;
                 pitchDifference = nextNc->PitchDifferenceTo(nc);
                 params.at(0).yOffset = pitchDifference;
@@ -138,7 +138,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
-    if (nc->GetTilt().GetBasic() == COMPASSDIRECTION_basic_n && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
+    if (nc->GetTilt() == COMPASSDIRECTION_n && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
         params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
     }
 
@@ -183,8 +183,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     yValue = clefYPosition + pitchOffset + octaveOffset + skewOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
-        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
-               it->fontNo, staff->m_drawingStaffSize, false, true);
+        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
+            staff->m_drawingStaffSize, false, true);
     }
 
     // adjust facsimile values of element based on where it is rendered if necessary

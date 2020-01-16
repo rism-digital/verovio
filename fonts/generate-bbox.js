@@ -70,7 +70,7 @@ function serialize(glyphAnchors) {
             if (anchor) {
                 impl += ">";
                 Object.keys(anchor).forEach(function(key) {
-                    impl += "\n\t\t<a n=\"" + key + "\" x=\"" + anchor[key][0] + "\" y=\"" + anchor[key][1] + "\"/>"
+                    impl += "\n\t\t<a n=\"" + key + "\" x=\"" + anchor[key][0] + "\" y=\"" + anchor[key][1] + "\"/>";
                 });
                 impl += "\n\t</g>\n";
             }
@@ -109,4 +109,4 @@ function extract() {
     };
 }
 
-page.open(address, extract());
+page.open("file://" + fs.absolute(address), extract());

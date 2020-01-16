@@ -42,20 +42,16 @@ public:
     ///@{
     Staff(int n = 1);
     virtual ~Staff();
+    virtual Object *Clone() const { return new Staff(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Staff"; }
     virtual ClassId GetClassId() const { return STAFF; }
     ///@}
 
     /**
-     * Do not copy children for layers
+     * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual bool CopyChildren() const { return false; }
-
-    /**
-     * Overriding CopyReset() method to be called after copy / assignment calls.
-     */
-    virtual void CopyReset();
+    virtual void CloneReset();
 
     virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
 

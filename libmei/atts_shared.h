@@ -1923,14 +1923,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSig(std::string sig_) { m_sig = sig_; }
-    std::string GetSig() const { return m_sig; }
+    void SetSig(data_KEYSIGNATURE sig_) { m_sig = sig_; }
+    data_KEYSIGNATURE GetSig() const { return m_sig; }
     bool HasSig() const;
     ///@}
 
 private:
     /** Written key signature. **/
-    std::string m_sig;
+    data_KEYSIGNATURE m_sig;
 
     /* include <attsig> */
 };
@@ -3226,16 +3226,16 @@ public:
     std::string GetHeadFillcolor() const { return m_headFillcolor; }
     bool HasHeadFillcolor() const;
     //
-    void SetHeadMod(std::string headMod_) { m_headMod = headMod_; }
-    std::string GetHeadMod() const { return m_headMod; }
+    void SetHeadMod(data_NOTEHEADMODIFIER headMod_) { m_headMod = headMod_; }
+    data_NOTEHEADMODIFIER GetHeadMod() const { return m_headMod; }
     bool HasHeadMod() const;
     //
-    void SetHeadRotation(std::string headRotation_) { m_headRotation = headRotation_; }
-    std::string GetHeadRotation() const { return m_headRotation; }
+    void SetHeadRotation(data_ROTATION headRotation_) { m_headRotation = headRotation_; }
+    data_ROTATION GetHeadRotation() const { return m_headRotation; }
     bool HasHeadRotation() const;
     //
-    void SetHeadShape(data_HEADSHAPE_list headShape_) { m_headShape = headShape_; }
-    data_HEADSHAPE_list GetHeadShape() const { return m_headShape; }
+    void SetHeadShape(data_HEADSHAPE headShape_) { m_headShape = headShape_; }
+    data_HEADSHAPE GetHeadShape() const { return m_headShape; }
     bool HasHeadShape() const;
     //
     void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; }
@@ -3261,15 +3261,15 @@ private:
     /** Captures the fill color of a notehead if different from the overall note color. **/
     std::string m_headFillcolor;
     /** Records any additional symbols applied to the notehead. **/
-    std::string m_headMod;
+    data_NOTEHEADMODIFIER m_headMod;
     /**
      * Describes rotation applied to the basic notehead shape.
      * A positive value rotates the notehead in a counter-clockwise fashion, while
      * negative values produce clockwise rotation.
      **/
-    std::string m_headRotation;
+    data_ROTATION m_headRotation;
     /** Used to override the head shape normally used for the given duration. **/
-    data_HEADSHAPE_list m_headShape;
+    data_HEADSHAPE m_headShape;
     /**
      * Indicates if a feature should be rendered when the notation is presented
      * graphically or sounded when it is presented in an aural form.
@@ -3837,8 +3837,6 @@ public:
     void SetPlace(data_STAFFREL place_) { m_place = place_; }
     data_STAFFREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFREL *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:
@@ -4533,20 +4531,14 @@ public:
     void SetAboveorder(data_STAFFITEM aboveorder_) { m_aboveorder = aboveorder_; }
     data_STAFFITEM GetAboveorder() const { return m_aboveorder; }
     bool HasAboveorder() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFITEM *GetAboveorderAlternate() { return &m_aboveorder; }
     //
     void SetBeloworder(data_STAFFITEM beloworder_) { m_beloworder = beloworder_; }
     data_STAFFITEM GetBeloworder() const { return m_beloworder; }
     bool HasBeloworder() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFITEM *GetBeloworderAlternate() { return &m_beloworder; }
     //
     void SetBetweenorder(data_STAFFITEM betweenorder_) { m_betweenorder = betweenorder_; }
     data_STAFFITEM GetBetweenorder() const { return m_betweenorder; }
     bool HasBetweenorder() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFITEM *GetBetweenorderAlternate() { return &m_betweenorder; }
     ///@}
 
 private:
@@ -5048,8 +5040,8 @@ public:
     std::string GetAltrend() const { return m_altrend; }
     bool HasAltrend() const;
     //
-    void SetRend(std::string rend_) { m_rend = rend_; }
-    std::string GetRend() const { return m_rend; }
+    void SetRend(data_TEXTRENDITION rend_) { m_rend = rend_; }
+    data_TEXTRENDITION GetRend() const { return m_rend; }
     bool HasRend() const;
     ///@}
 
@@ -5057,7 +5049,7 @@ private:
     /** Used to extend the values of the rend attribute. **/
     std::string m_altrend;
     /** Captures the appearance of the element's contents using MEI-defined descriptors. **/
-    std::string m_rend;
+    data_TEXTRENDITION m_rend;
 
     /* include <attrend> */
 };

@@ -32,13 +32,12 @@ int Toolkit::adjustedDisplayHeightForPage(int page)
 
     Q_ASSERT(page <= m_adjustedDisplayHeights.count());
 
-    int defaultPageHeight = 1000;
-
     if (m_adjustedDisplayHeights[page - 1] != 0) {
         return m_adjustedDisplayHeights[page - 1];
     }
     else {
         int averagePageHeight = 0;
+        int defaultPageHeight = 1000;
         int num = 0;
         for (auto height : m_adjustedDisplayHeights) {
             if (height != 0) {

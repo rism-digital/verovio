@@ -2456,14 +2456,14 @@ AttKeySigLog::~AttKeySigLog()
 
 void AttKeySigLog::ResetKeySigLog()
 {
-    m_sig = "";
+    m_sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
 }
 
 bool AttKeySigLog::ReadKeySigLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("sig")) {
-        this->SetSig(StrToStr(element.attribute("sig").value()));
+        this->SetSig(StrToKeysignature(element.attribute("sig").value()));
         element.remove_attribute("sig");
         hasAttribute = true;
     }
@@ -2474,7 +2474,7 @@ bool AttKeySigLog::WriteKeySigLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasSig()) {
-        element.append_attribute("sig") = StrToStr(this->GetSig()).c_str();
+        element.append_attribute("sig") = KeysignatureToStr(this->GetSig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2482,7 +2482,7 @@ bool AttKeySigLog::WriteKeySigLog(pugi::xml_node element)
 
 bool AttKeySigLog::HasSig() const
 {
-    return (m_sig != "");
+    return (m_sig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
 /* include <attsig> */
@@ -2502,7 +2502,7 @@ AttKeySigDefaultLog::~AttKeySigDefaultLog()
 
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
 {
-    m_keySig = KEYSIGNATURE_NONE;
+    m_keySig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
 }
 
 bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element)
@@ -2528,7 +2528,7 @@ bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element)
 
 bool AttKeySigDefaultLog::HasKeySig() const
 {
-    return (m_keySig != KEYSIGNATURE_NONE);
+    return (m_keySig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
 /* include <attkey.sig> */
@@ -4199,9 +4199,9 @@ void AttNoteHeads::ResetNoteHeads()
     m_headColor = "";
     m_headFill = FILL_NONE;
     m_headFillcolor = "";
-    m_headMod = "";
-    m_headRotation = "";
-    m_headShape = HEADSHAPE_list_NONE;
+    m_headMod = NOTEHEADMODIFIER_NONE;
+    m_headRotation = ROTATION_NONE;
+    m_headShape = HEADSHAPE_NONE;
     m_headVisible = BOOLEAN_NONE;
 }
 
@@ -4234,17 +4234,17 @@ bool AttNoteHeads::ReadNoteHeads(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("head.mod")) {
-        this->SetHeadMod(StrToStr(element.attribute("head.mod").value()));
+        this->SetHeadMod(StrToNoteheadmodifier(element.attribute("head.mod").value()));
         element.remove_attribute("head.mod");
         hasAttribute = true;
     }
     if (element.attribute("head.rotation")) {
-        this->SetHeadRotation(StrToStr(element.attribute("head.rotation").value()));
+        this->SetHeadRotation(StrToRotation(element.attribute("head.rotation").value()));
         element.remove_attribute("head.rotation");
         hasAttribute = true;
     }
     if (element.attribute("head.shape")) {
-        this->SetHeadShape(StrToHeadshapeList(element.attribute("head.shape").value()));
+        this->SetHeadShape(StrToHeadshape(element.attribute("head.shape").value()));
         element.remove_attribute("head.shape");
         hasAttribute = true;
     }
@@ -4280,15 +4280,15 @@ bool AttNoteHeads::WriteNoteHeads(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasHeadMod()) {
-        element.append_attribute("head.mod") = StrToStr(this->GetHeadMod()).c_str();
+        element.append_attribute("head.mod") = NoteheadmodifierToStr(this->GetHeadMod()).c_str();
         wroteAttribute = true;
     }
     if (this->HasHeadRotation()) {
-        element.append_attribute("head.rotation") = StrToStr(this->GetHeadRotation()).c_str();
+        element.append_attribute("head.rotation") = RotationToStr(this->GetHeadRotation()).c_str();
         wroteAttribute = true;
     }
     if (this->HasHeadShape()) {
-        element.append_attribute("head.shape") = HeadshapeListToStr(this->GetHeadShape()).c_str();
+        element.append_attribute("head.shape") = HeadshapeToStr(this->GetHeadShape()).c_str();
         wroteAttribute = true;
     }
     if (this->HasHeadVisible()) {
@@ -4325,17 +4325,17 @@ bool AttNoteHeads::HasHeadFillcolor() const
 
 bool AttNoteHeads::HasHeadMod() const
 {
-    return (m_headMod != "");
+    return (m_headMod != NOTEHEADMODIFIER_NONE);
 }
 
 bool AttNoteHeads::HasHeadRotation() const
 {
-    return (m_headRotation != "");
+    return (m_headRotation != ROTATION_NONE);
 }
 
 bool AttNoteHeads::HasHeadShape() const
 {
-    return (m_headShape != HEADSHAPE_list_NONE);
+    return (m_headShape != HEADSHAPE_NONE);
 }
 
 bool AttNoteHeads::HasHeadVisible() const
@@ -5103,7 +5103,7 @@ bool AttPlacement::WritePlacement(pugi::xml_node element)
 
 bool AttPlacement::HasPlace() const
 {
-    return (m_place.HasValue());
+    return (m_place != data_STAFFREL());
 }
 
 /* include <attplace> */
@@ -6024,17 +6024,17 @@ bool AttStaffItems::WriteStaffItems(pugi::xml_node element)
 
 bool AttStaffItems::HasAboveorder() const
 {
-    return (m_aboveorder.HasValue());
+    return (m_aboveorder != data_STAFFITEM());
 }
 
 bool AttStaffItems::HasBeloworder() const
 {
-    return (m_beloworder.HasValue());
+    return (m_beloworder != data_STAFFITEM());
 }
 
 bool AttStaffItems::HasBetweenorder() const
 {
-    return (m_betweenorder.HasValue());
+    return (m_betweenorder != data_STAFFITEM());
 }
 
 /* include <attbetweenorder> */
@@ -6680,7 +6680,7 @@ AttTextRendition::~AttTextRendition()
 void AttTextRendition::ResetTextRendition()
 {
     m_altrend = "";
-    m_rend = "";
+    m_rend = TEXTRENDITION_NONE;
 }
 
 bool AttTextRendition::ReadTextRendition(pugi::xml_node element)
@@ -6692,7 +6692,7 @@ bool AttTextRendition::ReadTextRendition(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("rend")) {
-        this->SetRend(StrToStr(element.attribute("rend").value()));
+        this->SetRend(StrToTextrendition(element.attribute("rend").value()));
         element.remove_attribute("rend");
         hasAttribute = true;
     }
@@ -6707,7 +6707,7 @@ bool AttTextRendition::WriteTextRendition(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasRend()) {
-        element.append_attribute("rend") = StrToStr(this->GetRend()).c_str();
+        element.append_attribute("rend") = TextrenditionToStr(this->GetRend()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6720,7 +6720,7 @@ bool AttTextRendition::HasAltrend() const
 
 bool AttTextRendition::HasRend() const
 {
-    return (m_rend != "");
+    return (m_rend != TEXTRENDITION_NONE);
 }
 
 /* include <attrend> */
@@ -8401,7 +8401,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttKeySigLog *att = dynamic_cast<AttKeySigLog *>(element);
         assert(att);
         if (attrType == "sig") {
-            att->SetSig(att->StrToStr(attrValue));
+            att->SetSig(att->StrToKeysignature(attrValue));
             return true;
         }
     }
@@ -8765,15 +8765,15 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "head.mod") {
-            att->SetHeadMod(att->StrToStr(attrValue));
+            att->SetHeadMod(att->StrToNoteheadmodifier(attrValue));
             return true;
         }
         if (attrType == "head.rotation") {
-            att->SetHeadRotation(att->StrToStr(attrValue));
+            att->SetHeadRotation(att->StrToRotation(attrValue));
             return true;
         }
         if (attrType == "head.shape") {
-            att->SetHeadShape(att->StrToHeadshapeList(attrValue));
+            att->SetHeadShape(att->StrToHeadshape(attrValue));
             return true;
         }
         if (attrType == "head.visible") {
@@ -9241,7 +9241,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "rend") {
-            att->SetRend(att->StrToStr(attrValue));
+            att->SetRend(att->StrToTextrendition(attrValue));
             return true;
         }
     }
@@ -9868,7 +9868,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttKeySigLog *att = dynamic_cast<const AttKeySigLog *>(element);
         assert(att);
         if (att->HasSig()) {
-            attributes->push_back(std::make_pair("sig", att->StrToStr(att->GetSig())));
+            attributes->push_back(std::make_pair("sig", att->KeysignatureToStr(att->GetSig())));
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
@@ -10169,13 +10169,13 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("head.fillcolor", att->StrToStr(att->GetHeadFillcolor())));
         }
         if (att->HasHeadMod()) {
-            attributes->push_back(std::make_pair("head.mod", att->StrToStr(att->GetHeadMod())));
+            attributes->push_back(std::make_pair("head.mod", att->NoteheadmodifierToStr(att->GetHeadMod())));
         }
         if (att->HasHeadRotation()) {
-            attributes->push_back(std::make_pair("head.rotation", att->StrToStr(att->GetHeadRotation())));
+            attributes->push_back(std::make_pair("head.rotation", att->RotationToStr(att->GetHeadRotation())));
         }
         if (att->HasHeadShape()) {
-            attributes->push_back(std::make_pair("head.shape", att->HeadshapeListToStr(att->GetHeadShape())));
+            attributes->push_back(std::make_pair("head.shape", att->HeadshapeToStr(att->GetHeadShape())));
         }
         if (att->HasHeadVisible()) {
             attributes->push_back(std::make_pair("head.visible", att->BooleanToStr(att->GetHeadVisible())));
@@ -10566,7 +10566,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("altrend", att->StrToStr(att->GetAltrend())));
         }
         if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->StrToStr(att->GetRend())));
+            attributes->push_back(std::make_pair("rend", att->TextrenditionToStr(att->GetRend())));
         }
     }
     if (element->HasAttClass(ATT_TEXTSTYLE)) {

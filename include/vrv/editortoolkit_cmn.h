@@ -34,7 +34,6 @@ public:
     virtual std::string EditInfo();
 
 protected:
-
     /**
      * Parse JSON instructions for experimental editor functions.
      */
@@ -62,7 +61,6 @@ protected:
     bool InsertNote(Object *object);
 
     bool DeleteNote(Note *note);
-
 
     Object *GetElement(std::string &elementId);
 

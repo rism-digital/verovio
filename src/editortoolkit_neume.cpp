@@ -9,9 +9,9 @@
 
 //--------------------------------------------------------------------------------
 
+#include <codecvt>
 #include <limits.h>
 #include <locale>
-#include <codecvt>
 #include <set>
 
 //--------------------------------------------------------------------------------
@@ -48,8 +48,8 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         return false;
     }
 
-    if (!json.has<jsonxx::String>("action") ||
-            (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param"))) {
+    if (!json.has<jsonxx::String>("action")
+        || (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param"))) {
         LogWarning("Incorrectly formatted JSON action");
         return false;
     }
@@ -63,7 +63,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
     if (action == "drag") {
         std::string elementId;
-        int x,y;
+        int x, y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
             return this->Drag(elementId, x, y);
         }
@@ -71,10 +71,10 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
     }
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
-        int ulx, uly, lrx, lry;
-        std::vector<std::pair<std::string, std::string>> attributes;
-        if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly,
-                    &lrx, &lry, &attributes)) {
+        int ulx = 0, uly = 0, lrx = 0, lry = 0;
+        std::vector<std::pair<std::string, std::string> > attributes;
+        if (this->ParseInsertAction(
+                json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &lrx, &lry, &attributes)) {
             return this->Insert(elementType, staffId, ulx, uly, lrx, lry, attributes);
         }
         LogWarning("Could not parse the insert action");
@@ -95,7 +95,7 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
     }
     else if (action == "setClef") {
         std::string elementId, shape;
-        if(this->ParseSetClefAction(json.get<jsonxx::Object>("param"), &elementId, &shape)) {
+        if (this->ParseSetClefAction(json.get<jsonxx::Object>("param"), &elementId, &shape)) {
             return this->SetClef(elementId, shape);
         }
         LogWarning("Could not parse the set clef action");
@@ -125,14 +125,14 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "group") {
         std::string groupType;
         std::vector<std::string> elementIds;
-        if (this->ParseGroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+        if (this->ParseGroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)) {
             return this->Group(groupType, elementIds);
         }
     }
     else if (action == "ungroup") {
         std::string groupType;
         std::vector<std::string> elementIds;
-        if(this->ParseUngroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+        if (this->ParseUngroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)) {
             return this->Ungroup(groupType, elementIds);
         }
     }
@@ -151,18 +151,18 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse split action");
     }
-    else if (action == "changeGroup"){
+    else if (action == "changeGroup") {
         std::string elementId;
         std::string contour;
-        if(this->ParseChangeGroupAction(json.get<jsonxx::Object>("param"), &elementId, &contour)) {
+        if (this->ParseChangeGroupAction(json.get<jsonxx::Object>("param"), &elementId, &contour)) {
             return this->ChangeGroup(elementId, contour);
         }
         LogWarning("Could not parse change group action");
     }
-    else if (action == "toggleLigature"){
+    else if (action == "toggleLigature") {
         std::vector<std::string> elementIds;
         std::string isLigature;
-        if(this->ParseToggleLigatureAction(json.get<jsonxx::Object>("param"), &elementIds, &isLigature)){
+        if (this->ParseToggleLigatureAction(json.get<jsonxx::Object>("param"), &elementIds, &isLigature)) {
             return this->ToggleLigature(elementIds, isLigature);
         }
         LogWarning("Could not parse toggle ligature action");
@@ -221,11 +221,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
 
     // Try to get the element on the current drawing page
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
 
     // If it wasn't there, go back up to the whole doc
     if (!element) {
-        element = m_doc->FindChildByUuid(elementId);
+        element = m_doc->FindDescendantByUuid(elementId);
     }
     if (!element) {
         LogWarning("element is null");
@@ -235,7 +235,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     assert(element);
 
     if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+        Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
         if (!layer) {
             LogError("Element does not have Layer parent. This should not happen.");
             m_infoObject.import("status", "FAILURE");
@@ -243,14 +243,14 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             return false;
         }
 
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
         assert(staff);
 
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
         Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element)) :
-            dynamic_cast<Syllable *>(element->GetFirstParent(SYLLABLE)));
+            dynamic_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
@@ -266,7 +266,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             if (element->Is(NC)) {
                 Nc *nc = dynamic_cast<Nc *>(element);
                 if (nc->GetLigated() == BOOLEAN_true) {
-                    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
+                    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstAncestor(NEUME));
                     Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
                     if (nextNc != NULL && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone()) {
                         ignoreFacs = true;
@@ -283,7 +283,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
         else {
             ArrayOfObjects facsChildren;
-            element->FindAllChildByComparison(&facsChildren, &facsIC);
+            element->FindAllDescendantByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
                 // dont change the text bbox position
                 if ((*it)->Is(SYL) || !(*it)->GetFacsimileInterface()->HasFacs()) {
@@ -305,10 +305,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
         assert(clef);
-        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
         if (!layer) return false;
 
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
         assert(staff);
         // Note that y param is relative to initial position for clefs
         int initialClefLine = clef->GetLine();
@@ -397,10 +397,10 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
         Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefBefore, &ic, clef,
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefBefore, &ic, clef,
             (nextClefBefore != layer->GetCurrentClef()) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
 
         if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
             Zone *zone = clef->GetZone();
@@ -419,9 +419,9 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ArrayOfObjects withThisClefAfter;
             ArrayOfObjects withPrecedingClefAfter;
 
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withThisClefAfter, &ic, clef,
+            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefAfter, &ic, clef,
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
+            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
 
             if (withPrecedingClefBefore.size() > withPrecedingClefAfter.size()) {
                 ArrayOfObjects newlyWithThisClef;
@@ -479,13 +479,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             ArrayOfObjects noLongerWithThisClef;
             ArrayOfObjects newlyWithThisClef;
 
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
+            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
                 (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
+            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
 
-            m_doc->GetDrawingPage()->FindAllChildBetween(&withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
+            m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
 
             std::set_difference(withOldPrecedingClefAfter.begin(), withOldPrecedingClefAfter.end(),
                 withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
@@ -521,14 +521,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // Move staff and all staff children with facsimiles
         ArrayOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
-        staff->FindAllChildByComparison(&children, &ic);
+        staff->FindAllDescendantByComparison(&children, &ic);
         std::set<Zone *> zones;
         zones.insert(staff->GetZone());
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             assert(fi);
-            if (fi->GetZone() != NULL)
-                zones.insert(fi->GetZone());
+            if (fi->GetZone() != NULL) zones.insert(fi->GetZone());
         }
         for (auto it = zones.begin(); it != zones.end(); ++it) {
             // Transform y to device context
@@ -559,15 +558,15 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         m_infoObject.import("message", "Unsupported element for dragging.");
         return false;
     }
-    Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
     layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
     m_infoObject.import("status", status);
     m_infoObject.import("message", message);
     return true;
 }
 
-bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly,
-        int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes)
+bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
+    std::vector<std::pair<std::string, std::string> > attributes)
 {
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
@@ -587,12 +586,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
     std::string status = "OK", message = "";
 
-
     // Find closest valid staff
     if (staffId == "auto") {
         ArrayOfObjects staves;
         ClassIdComparison ac(STAFF);
-        m_doc->FindAllChildByComparison(&staves, &ac);
+        m_doc->FindAllDescendantByComparison(&staves, &ac);
 
         ClosestBB comp;
         comp.x = ulx;
@@ -607,12 +605,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
     }
     else {
-        staff = dynamic_cast<Staff *>(m_doc->FindChildByUuid(staffId));
+        staff = dynamic_cast<Staff *>(m_doc->FindDescendantByUuid(staffId));
     }
 
     Facsimile *facsimile = m_doc->GetFacsimile();
     Zone *zone = new Zone();
-
 
     if (elementType == "staff") {
         Object *parent;
@@ -628,10 +625,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             newStaff->m_drawingLines = staff->m_drawingLines;
         }
         else {
-            parent = m_doc->GetDrawingPage()->FindChildByType(MEASURE);
+            parent = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
             assert(parent);
             newStaff = new Staff(1);
-            newStaff->m_drawingStaffDef = dynamic_cast<StaffDef *>(m_doc->m_scoreDef.FindChildByType(STAFFDEF));
+            newStaff->m_drawingStaffDef = dynamic_cast<StaffDef *>(m_doc->m_scoreDef.FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -640,7 +637,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUly(uly);
         zone->SetLrx(lrx);
         zone->SetLry(lry);
-        Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindChildByType(SURFACE));
+        Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
         newStaff->SetZone(zone);
@@ -650,7 +647,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         // Find index to insert new staff
         ArrayOfObjects staves;
         ClassIdComparison ac(STAFF);
-        parent->FindAllChildByComparison(&staves, &ac);
+        parent->FindAllDescendantByComparison(&staves, &ac);
         staves.push_back(newStaff);
         StaffSort staffSort;
         std::stable_sort(staves.begin(), staves.end(), staffSort);
@@ -685,7 +682,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         m_infoObject.import("message", "A staff must exist in the page to add a non-staff element.");
         return false;
     }
-    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
     assert(layer);
 
     if (elementType == "nc" || elementType == "grouping") {
@@ -696,7 +693,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         std::string contour = "";
         nc->SetZone(zone);
 
-        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         surface->AddChild(zone);
         zone->SetUlx(ulx);
 
@@ -756,14 +753,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "tilt") {
                 if (it->second == "n") {
-                    data_COMPASSDIRECTION direction;
-                    direction.SetBasic(COMPASSDIRECTION_basic_n);
-                    nc->SetTilt(direction);
+                    nc->SetTilt(COMPASSDIRECTION_n);
                 }
                 else if (it->second == "se") {
-                    data_COMPASSDIRECTION direction;
-                    direction.SetExtended(COMPASSDIRECTION_extended_se);
-                    nc->SetTilt(direction);
+                    nc->SetTilt(COMPASSDIRECTION_se);
                 }
             }
             else if (it->first == "contour") {
@@ -774,7 +767,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         //If inserting grouping, add the remaining nc children to the neume.
         if(contour != ""){
             Nc *prevNc = nc;
-            for(auto it = contour.begin(); it != contour.end(); ++it) {
+            for (auto it = contour.begin(); it != contour.end(); ++it) {
                 Nc *newNc = new Nc();
                 Zone *newZone = new Zone();
                 int newUlx = ulx + noteWidth;
@@ -783,15 +776,15 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 newNc->SetPname(prevNc->GetPname());
                 newNc->SetOct(prevNc->GetOct());
 
-                if((*it) == 'u'){
+                if ((*it) == 'u') {
                     newUly = uly - noteHeight;
                     newNc->AdjustPitchByOffset(1);
                 }
-                else if((*it) == 'd'){
+                else if ((*it) == 'd') {
                     newUly = uly + noteHeight;
                     newNc->AdjustPitchByOffset(-1);
                 }
-                else if((*it) == 's'){
+                else if ((*it) == 's') {
                     newUly = uly;
                 }
                 else{
@@ -804,7 +797,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 // Apply offset due to skew
                 newUly += (newUlx - ulx) * tan(staff->GetDrawingSkew() * M_PI / 180.0);
                 newZone->SetUlx(newUlx);
-                newZone->SetUly(newUly);;
+                newZone->SetUly(newUly);
+                ;
                 newZone->SetLrx(newUlx + noteWidth);
                 newZone->SetLry(newUly + noteHeight);
 
@@ -865,7 +859,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLrx(ulx + staffSize / 1.4);
         zone->SetLry(uly + staffSize / 2);
         clef->SetZone(zone);
-        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
         layer->AddChild(clef);
@@ -887,7 +881,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         ArrayOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef,
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&elements, &ic, clef,
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
@@ -948,10 +942,10 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     // Get the staves by element ID and fail if a staff does not exist.
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Staff *obj = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(*it));
+        Staff *obj = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(*it));
         if (obj != NULL && obj->Is(STAFF)) {
             staves.push_back(obj);
-            int height = obj->GetZone()->GetLry() + (obj->GetZone()->GetLrx() - obj->GetZone()->GetUlx()) * 
+            int height = obj->GetZone()->GetLry() + (obj->GetZone()->GetLrx() - obj->GetZone()->GetUlx()) *
                 tan(obj->GetZone()->GetSkew() * M_PI / 180.0) - obj->GetZone()->GetUly();
             avgHeight += height;
         }
@@ -968,7 +962,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         m_infoObject.import("message", "At least two staves must be provided.");
         return false;
     }
-    
+
     StaffSort staffSort;
     std::sort(staves.begin(), staves.end(), staffSort);
 
@@ -1023,7 +1017,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
 {
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
     bool success = false;
     if (Att::SetAnalytical(element, attrType, attrValue))
         success = true;
@@ -1066,14 +1060,14 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
     m_infoObject.reset();
     std::string status = "OK", message = "";
     std::wstring wtext;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
     wtext = conv.from_bytes(text);
     if (!m_doc->GetDrawingPage()) {
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Could not find drawing page.");
         return false;
     }
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
     if (element == NULL) {
         LogWarning("No element with ID '%s' exists", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
@@ -1086,14 +1080,14 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
         Syl *syl = dynamic_cast<Syl *>(element);
         assert(syl);
         Object *child = syl->GetFirst();
-        if(child == NULL) {
+        if (child == NULL) {
             Text *text = new Text();
             syl->AddChild(text);
             text->SetText(wtext);
             success = true;
         }
         else {
-            while(child != NULL) {
+            while (child != NULL) {
                 if (child->Is(TEXT)) {
                     Text *text = dynamic_cast<Text *>(child);
                     text->SetText(wtext);
@@ -1112,7 +1106,6 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                 child = syl->Object::GetNext();
             }
         }
-
     }
     else if (element->Is(SYLLABLE)) {
         Syllable *syllable = dynamic_cast<Syllable *>(element);
@@ -1133,7 +1126,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                     zone->SetUly(uly);
                     zone->SetLrx(lrx);
                     zone->SetLry(lry);
-                    Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindChildByType(SURFACE));
+                    Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                     surface->AddChild(zone);
                     syl->SetZone(zone);
                 }
@@ -1175,19 +1168,19 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
     bool success = false;
     data_CLEFSHAPE clefShape = CLEFSHAPE_NONE;
     int shift = 0;
-    Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
     assert(clef);
 
     if (shape == "C") {
         clefShape = CLEFSHAPE_C;
         shift = -3;
     }
-    else if (shape== "F") {
+    else if (shape == "F") {
         clefShape = CLEFSHAPE_F;
         shift = 3;
     }
 
-    if(clef->GetShape() != clefShape){
+    if (clef->GetShape() != clefShape) {
         success = Att::SetShared(clef, "shape", shape);
         if(!success){
             LogError("Unable to set clef shape");
@@ -1196,15 +1189,15 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
             return false;
         }
 
-        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
         assert(layer);
 
         Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
         assert(nextClef);
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
-            (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(
+            &objects, &ic, clef, (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         // Adjust all elements who are positioned relative to clef by pitch
         for (auto it = objects.begin(); it != objects.end(); ++it) {
@@ -1233,7 +1226,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
-    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
     // Validate parameters
     if (staff == NULL) {
         LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
@@ -1263,7 +1256,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         m_infoObject.import("message", "Failed to create a second staff.");
         return false;
     }
-    Staff *splitStaff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(m_infoObject.get<jsonxx::String>("uuid")));
+    Staff *splitStaff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(m_infoObject.get<jsonxx::String>("uuid")));
     assert(splitStaff);
     if (splitStaff == NULL) {
         LogError("Split staff is null");
@@ -1279,7 +1272,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     if (staff->GetZone()->GetSkew() != 0) {
         staff->GetZone()->SetLry(staff->GetZone()->GetLry() + (newLrx - x) * tan(staff->GetZone()->GetSkew() * M_PI / 180.0));
     }
-    
+
     Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
     Layer *splitLayer = dynamic_cast<Layer *>(splitStaff->GetFirst(LAYER));
 
@@ -1291,7 +1284,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
             fi = NULL;
             ArrayOfObjects facsimileInterfaces;
             InterfaceComparison ic(INTERFACE_FACSIMILE);
-            child->FindAllChildByComparison(&facsimileInterfaces, &ic);
+            child->FindAllDescendantByComparison(&facsimileInterfaces, &ic);
 
             for (auto it = facsimileInterfaces.begin(); it != facsimileInterfaces.end(); ++it) {
                 FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
@@ -1325,7 +1318,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
-    Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    Object *obj = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
     assert(obj);
     bool result = false;
     bool isNeumeOrNc, isNc, isClef;
@@ -1338,7 +1331,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     // Remove Zone for element (if any)
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     ArrayOfObjects fiChildren;
-    obj->FindAllChildByComparison(&fiChildren, &ic);
+    obj->FindAllDescendantByComparison(&fiChildren, &ic);
     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(obj);
     if (fi != NULL && fi->HasFacs()) {
         fi->SetZone(NULL);
@@ -1353,7 +1346,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         // y position of pitched elements (like neumes) is determined by their pitches
         // so when deleting a clef, the position on a page that a pitch value is associated with could change
         // so we need to change the pitch value of any elements whose clef is going to change
-        Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+        Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
         assert(clef);
         ClassIdComparison ac(CLEF);
         Clef *previousClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
@@ -1361,14 +1354,14 @@ bool EditorToolkitNeume::Remove(std::string elementId)
 
         if (previousClef == NULL) {
             // if there is no previous clef, get the default one from the staff def
-            Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+            Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
             previousClef = layer->GetCurrentClef();
         }
 
         ArrayOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef,
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&elements, &ic, clef,
             (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
         result = parent->DeleteChild(obj);
@@ -1379,7 +1372,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to delete the desired element (" + elementId + ").");
             return false;
-        }   
+        }
 
         for (auto it = elements.begin(); it != elements.end(); ++it) {
             PitchInterface *pi = (*it)->GetPitchInterface();
@@ -1406,7 +1399,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         assert(parent->Is(NEUME));
         obj = parent;
         parent = parent->GetParent();
-        if (obj->FindChildByType(NC) == NULL) {
+        if (obj->FindDescendantByType(NC) == NULL) {
             // Delete the empty neume
             std::string neumeId = obj->GetUuid();
             result &= parent->DeleteChild(obj);
@@ -1423,7 +1416,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         assert(parent->Is(SYLLABLE));
         obj = parent;
         parent = parent->GetParent();
-        if (obj->FindChildByType(NC) == NULL) {
+        if (obj->FindDescendantByType(NC) == NULL) {
             // Delete the syllable empty of neumes
             std::string syllableId = obj->GetUuid();
             result &= parent->DeleteChild(obj);
@@ -1458,7 +1451,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         return false;
     }
 
-    Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    Object *obj = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
     if (obj == NULL) {
         LogError("Object with ID '%s' not found.", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
@@ -1523,7 +1516,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     std::string status = "OK", message = "";
 
-    //Get the current drawing page
+    // Get the current drawing page
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");
@@ -1541,9 +1534,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     ClassId elementClass;
     if (groupType == "nc") {
         elementClass = NC;
-    } else if (groupType == "neume") {
+    }
+    else if (groupType == "neume") {
         elementClass = NEUME;
-    } else {
+    }
+    else {
         LogError("Invalid groupType: %s", groupType.c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Invalid groupType: " + groupType);
@@ -1553,7 +1548,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // Determine what the parents are
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         // Verify that the children are of the same type
-        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
         if (el == NULL) {
             LogError("Could not get element with ID %s", it->c_str());
             m_infoObject.import("status", "FAILURE");
@@ -1614,8 +1609,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     InterfaceComparison pitchComp(INTERFACE_PITCH);
     Clef *newClef;
 
-    m_doc->GetDrawingPage()->FindAllChildBetween(&clefs, &clefComp,
-        sortedElements.front()->GetFirstParent(SYLLABLE), sortedElements.back()->GetFirstParent(SYLLABLE));
+    m_doc->GetDrawingPage()->FindAllDescendantBetween(&clefs, &clefComp,
+        sortedElements.front()->GetFirstAncestor(SYLLABLE), sortedElements.back()->GetFirstAncestor(SYLLABLE));
 
     // if there are clefs between the elements getting grouped
     // some elements will need their pitch adjusted for the new clef
@@ -1627,7 +1622,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 syllables.insert(dynamic_cast<Object *>(*it));
             }
             else {
-                syllables.insert((*it)->GetFirstParent(SYLLABLE));
+                syllables.insert((*it)->GetFirstAncestor(SYLLABLE));
             }
         }
         std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
@@ -1635,7 +1630,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
             tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
             if (tempClef == NULL) {
-                Layer *layer = dynamic_cast<Layer *>((*it)->GetFirstParent(LAYER));
+                Layer *layer = dynamic_cast<Layer *>((*it)->GetFirstAncestor(LAYER));
                 tempClef = layer->GetCurrentClef();
             }
             clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it), tempClef));
@@ -1650,7 +1645,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         int expected;
         if (par->GetClassId() == SYLLABLE) {
             expected = par->GetChildCount(NEUME);
-        } else {
+        }
+        else {
             expected = par->GetChildCount();
         }
         if (parentPair.second == expected) {
@@ -1684,8 +1680,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
                     // if it's syllable parent has position values just use those
                     FacsimileInterface *syllableFi = NULL;
-                    if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
-                        syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
+                    if (syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
+                        syllableFi = syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface();
                         Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
                         zone->SetUlx(tempZone->GetUlx());
                         zone->SetUly(tempZone->GetUly());
@@ -1696,7 +1692,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     else {
                         ArrayOfObjects children;
                         InterfaceComparison comp(INTERFACE_FACSIMILE);
-                        syl->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
+                        syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantByComparison(&children, &comp);
                         for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
                             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
                             assert(temp);
@@ -1737,7 +1733,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     zone->SetLry(zone->GetLry() + offSetLry);
 
                     assert(m_doc->GetFacsimile());
-                    m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
+                    m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
                     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
                     assert(fi);
                     fi->SetZone(zone);
@@ -1749,16 +1745,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
 
         parent->ReorderByXPos();
+        if (doubleParent == NULL) {
+            LogError("No second level parent!");
+            return false;
+        }
         doubleParent->AddChild(parent);
 
-        Layer *layer = dynamic_cast<Layer *> (parent->GetFirstParent(LAYER));
+        Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
         assert(layer);
         layer->ReorderByXPos();
     }
 
     // if there's only one full parent we just add the other elements to it
     // except don't move syl tags since we want them to stay attached to the first parent
-    else if(fullParents.size() == 1) {
+    else if (fullParents.size() == 1) {
         auto iter = fullParents.begin();
         parent = *iter;
         for (auto it = elements.begin(); it != elements.end(); ++it) {
@@ -1774,27 +1774,29 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // also in this case we need to make sure that the facsimile of the resulting syl is correct
     else {
         if (elementClass == NC) {
-            parent = new Neume();
-            for (auto it = elements.begin(); it != elements.end(); ++it) {
-                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
-                    (*it)->MoveItselfTo(parent);
+            if (doubleParent) {
+                parent = new Neume();
+                for (auto it = elements.begin(); it != elements.end(); ++it) {
+                    if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                        (*it)->MoveItselfTo(parent);
+                    }
                 }
+                doubleParent->AddChild(parent);
             }
-            doubleParent->AddChild(parent);
         }
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
             Syllable *fullSyllable = new Syllable();
             Syl *fullSyl;
 
-            //construct concatenated string of all the syls
+            // construct concatenated string of all the syls
             std::wstring fullString = L"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                Syl *syl = dynamic_cast<Syl *> ((*it)->FindChildByType(SYL));
+                Syl *syl = dynamic_cast<Syl *> ((*it)->FindDescendantByType(SYL));
                 if (fullSyl == NULL && syl != NULL) {
                     fullSyl = syl;
                 }
-                Text *text = dynamic_cast<Text *> (syl->FindChildByType(TEXT));
+                Text *text = dynamic_cast<Text *> (syl->FindDescendantByType(TEXT));
                 if (text != NULL) {
                     std::wstring currentString = text->GetText();
                     fullString = fullString + currentString;
@@ -1803,7 +1805,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             //find the new boundingbox comprising all of the text
             int ulx = -1, uly = -1, lrx = -1, lry = -1;
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *> ((*it)->FindChildByType(SYL)->GetFacsimileInterface());
+                FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *> ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
                 if (facsInter != NULL) {
                     if (ulx == -1) {
                         ulx = facsInter->GetDrawingX();
@@ -1817,7 +1819,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     }
                 }
             }
-            Text *text = dynamic_cast<Text *> (fullSyl->FindChildByType(TEXT));
+            Text *text = dynamic_cast<Text *> (fullSyl->FindDescendantByType(TEXT));
             assert(text);
             text->SetText(fullString);
             fullSyllable->AddChild(fullSyl);
@@ -1826,8 +1828,12 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     (*it)->MoveItselfTo(fullSyllable);
                 }
             }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->AddChild(fullSyllable);
-            Layer *layer = dynamic_cast<Layer *> (fullSyllable->GetFirstParent(LAYER));
+            Layer *layer = dynamic_cast<Layer *>(fullSyllable->GetFirstAncestor(LAYER));
             assert(layer);
             if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
                 FacsimileInterface *facsInter = dynamic_cast <FacsimileInterface *> (fullSyl->GetFacsimileInterface());
@@ -1855,7 +1861,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
             Syllable *syllable = dynamic_cast<Syllable *>(*it);
             if (clefsBefore[syllable] != newClef) {
-                syllable->FindAllChildByComparison(&pitchedChildren, &pitchComp);
+                syllable->FindAllDescendantByComparison(&pitchedChildren, &pitchComp);
                 for (auto child = pitchedChildren.begin(); child != pitchedChildren.end(); ++child) {
                     (*child)->GetPitchInterface()->AdjustPitchForNewClef(clefsBefore[(syllable)], newClef);
                 }
@@ -1868,11 +1874,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *obj = (*it).first;
         obj->ClearRelinquishedChildren();
         if (obj->GetChildCount() == 0) {
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
+            }
             doubleParent->DeleteChild(obj);
-        } else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
+        }
+        else if (obj->GetChildCount() == obj->GetChildCount(SYL)) {
             Object *syl;
-            while ((syl = obj->FindChildByType(SYL)) != NULL) {
+            while ((syl = obj->FindDescendantByType(SYL)) != NULL) {
                 obj->DeleteChild(syl);
+            }
+            if (doubleParent == NULL) {
+                LogError("No second level parent!");
+                return false;
             }
             doubleParent->DeleteChild(obj);
         }
@@ -1901,7 +1916,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
     jsonxx::Array uuidArray;
 
-    //Check if you can get drawing page
+    // Check if you can get drawing page
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");
@@ -1909,7 +1924,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         return false;
     }
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
 
         // Check for ligatures and toggle them before ungrouping
         // only if the ligature is the entire selection
@@ -1918,20 +1933,20 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             if(nc->HasLigated() && nc->GetLigated() == BOOLEAN_true){
                 nc->SetLigated(BOOLEAN_false);
                 ligCount++;
-                if(ligCount == 1){
+                if (ligCount == 1) {
                     firstNc = nc;
                     assert(firstNc);
                 }
-                else if(ligCount == 2){
+                else if (ligCount == 2) {
                     secondNc = nc;
                     assert(secondNc);
                     Zone *zone = new Zone();
 
-                    Staff *staff = dynamic_cast<Staff *> (firstNc->GetFirstParent(STAFF));
+                    Staff *staff = dynamic_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
                     assert(staff);
                     Facsimile *facsimile = m_doc->GetFacsimile();
                     assert(facsimile);
-                    Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+                    Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
                     assert(surface);
 
                     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -1956,7 +1971,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     secondNc->ResetFacsimile();
 
                     if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
-                    if(success1 && success2){
+                    if (success1 && success2) {
                         ligCount = 0;
                         firstNc = NULL;
                         secondNc = NULL;
@@ -1978,20 +1993,20 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 continue;
             }
             else if (groupType == "nc"){
-                fparent = el->GetFirstParent(NEUME);
+                fparent = el->GetFirstAncestor(NEUME);
                 assert(fparent);
                 uuidArray << fparent->GetUuid();
-                sparent = fparent->GetFirstParent(SYLLABLE);
+                sparent = fparent->GetFirstAncestor(SYLLABLE);
                 assert(sparent);
                 currentParent = dynamic_cast<Neume *>(fparent);
                 assert(currentParent);
                 firstIsSyl = false;
             }
             else if (groupType == "neume"){
-                fparent = el->GetFirstParent(SYLLABLE);
+                fparent = el->GetFirstAncestor(SYLLABLE);
                 assert(fparent);
                 uuidArray << fparent->GetUuid();
-                sparent = fparent->GetFirstParent(LAYER);
+                sparent = fparent->GetFirstAncestor(LAYER);
                 assert(sparent);
                 currentParent = dynamic_cast<Syllable *>(fparent);
                 assert(currentParent);
@@ -2001,26 +2016,27 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     oldClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
                 }
             }
-            else{
+            else {
                 LogError("Invalid groupType for ungrouping");
                 m_infoObject.import("status", "FAILURE");
                 m_infoObject.import("message", "Invalid groupType for ungrouping.");
                 return false;
             }
         }
-        else {
+        else if (currentParent) {
             if (groupType == "nc") {
-                Nc *nc = dynamic_cast<Nc*>(el);
+                Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
                 if (nc->HasLigated()) continue;
             }
 
-            //if the element is a syl then we want to keep it attached to the first node
+            // if the element is a syl then we want to keep it attached to the first node
 
             if (el->Is(SYL)) {
                 continue;
             }
             Object *newParent = currentParent->Clone();
+            newParent->CloneReset();
             assert(newParent);
             newParent->ClearChildren();
 
@@ -2043,8 +2059,8 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
                     // if it's syllable parent has position values just use those
                     FacsimileInterface *syllableFi = NULL;
-                    if (syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
-                        syllableFi = syl->GetFirstParent(SYLLABLE)->GetFacsimileInterface();
+                    if (syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
+                        syllableFi = syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface();
                         Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
                         zone->SetUlx(tempZone->GetUlx());
                         zone->SetUly(tempZone->GetUly());
@@ -2055,7 +2071,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     else {
                         ArrayOfObjects children;
                         InterfaceComparison comp(INTERFACE_FACSIMILE);
-                        syl->GetFirstParent(SYLLABLE)->FindAllChildByComparison(&children, &comp);
+                        syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantByComparison(&children, &comp);
                         for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
                             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*iter2);
                             assert(temp);
@@ -2092,7 +2108,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     zone->SetLry(zone->GetLry() + 200);
 
                     assert(m_doc->GetFacsimile());
-                    m_doc->GetFacsimile()->FindChildByType(SURFACE)->AddChild(zone);
+                    m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
                     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
                     assert(fi);
                     fi->SetZone(zone);
@@ -2118,7 +2134,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     currentClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
                 }
             if (currentClef != oldClef) {
-                (*it)->FindAllChildByComparison(&pitchedChildren, &ic);
+                (*it)->FindAllDescendantByComparison(&pitchedChildren, &ic);
                 for (auto pChild = pitchedChildren.begin(); pChild != pitchedChildren.end(); ++pChild) {
                     (*pChild)->GetPitchInterface()->AdjustPitchForNewClef(oldClef, currentClef);
                 }
@@ -2142,8 +2158,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
-    Neume *el = dynamic_cast<Neume *> (m_doc->GetDrawingPage()->FindChildByUuid(elementId));
-    if(el == NULL){
+    Neume *el = dynamic_cast<Neume *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
+    if (el == NULL) {
         LogError("Unable to find neume with id %s", elementId.c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Unable to find neume with id " + elementId + ".");
@@ -2152,25 +2168,29 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     Nc *firstChild = NULL;
     Nc *prevNc = NULL;
 
-    //Get children of neume. Keep the first child and delete the others.
+    // Get children of neume. Keep the first child and delete the others.
     ClassIdComparison ac(NC);
     ArrayOfObjects children;
-    el->FindAllChildByComparison(&children, &ac);
+    el->FindAllDescendantByComparison(&children, &ac);
     for (auto it = children.begin(); it != children.end(); ++it) {
-        if(children.begin() == it){
-            firstChild = dynamic_cast<Nc *> (*it);
+        if (children.begin() == it) {
+            firstChild = dynamic_cast<Nc *>(*it);
         }
-        else{
+        else {
             el->DeleteChild(*it);
         }
     }
-    //Get the coordinates of the remaining child.
+    if (!firstChild) {
+        LogMessage("Unable to find first child.");
+        return false;
+    }
+    // Get the coordinates of the remaining child.
     int initialUlx = firstChild->GetZone()->GetUlx();
     int initialUly = firstChild->GetZone()->GetUly();
     int initialLrx = firstChild->GetZone()->GetLrx();
     int initialLry = firstChild->GetZone()->GetLry();
 
-    Staff *staff = dynamic_cast<Staff *> (el->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(el->GetFirstAncestor(STAFF));
     assert(staff);
     Facsimile *facsimile = m_doc->GetFacsimile();
 
@@ -2178,8 +2198,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     prevNc = firstChild;
 
-    //Iterate throught the contour and build the new grouping.
-    for(auto it = contour.begin(); it != contour.end(); ++it) {
+    // Iterate throught the contour and build the new grouping.
+    for (auto it = contour.begin(); it != contour.end(); ++it) {
         Nc *newNc = new Nc();
         Zone *zone = new Zone();
         int newUlx = initialUlx + noteWidth;
@@ -2189,34 +2209,35 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         newNc->SetPname(prevNc->GetPname());
         newNc->SetOct(prevNc->GetOct());
 
-        if((*it) == 'u'){
+        if ((*it) == 'u') {
             newUly = initialUly - noteHeight;
             newLry = initialLry - noteHeight;
             newNc->AdjustPitchByOffset(1);
         }
-        else if((*it) == 'd'){
+        else if ((*it) == 'd') {
             newUly = initialUly + noteHeight;
             newLry = initialLry + noteHeight;
             newNc->AdjustPitchByOffset(-1);
         }
-        else if((*it) == 's'){
+        else if ((*it) == 's') {
             newUly = initialUly;
             newLry = initialLry;
         }
-        else{
+        else {
             LogMessage("Unsupported character in contour.");
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Unsupported character in contour.");
             return false;
         }
         zone->SetUlx(newUlx);
-        zone->SetUly(newUly);;
+        zone->SetUly(newUly);
+        ;
         zone->SetLrx(newLrx);
         zone->SetLry(newLry);
 
         newNc->SetZone(zone);
 
-        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
 
@@ -2242,25 +2263,25 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     bool success2 = false;
     Facsimile *facsimile = m_doc->GetFacsimile();
     assert(facsimile);
-    Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+    Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
     assert(surface);
     std::string firstNcId = elementIds[0];
     std::string secondNcId = elementIds[1];
-    //Check if you can get drawing page
-    if(!m_doc->GetDrawingPage()) {
+    // Check if you can get drawing page
+    if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Could not get the drawing page.");
         return false;
     }
 
-    Nc *firstNc = dynamic_cast<Nc *> (m_doc->GetDrawingPage()->FindChildByUuid(firstNcId));
+    Nc *firstNc = dynamic_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByUuid(firstNcId));
     assert(firstNc);
-    Nc *secondNc = dynamic_cast<Nc *> (m_doc->GetDrawingPage()->FindChildByUuid(secondNcId));
+    Nc *secondNc = dynamic_cast<Nc *>(m_doc->GetDrawingPage()->FindDescendantByUuid(secondNcId));
     assert(secondNc);
     Zone *zone = new Zone();
-    //set ligature to false and update zone of second Nc
-    if(isLigature == "true"){
+    // set ligature to false and update zone of second Nc
+    if (isLigature == "true") {
         if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
         int ligUlx = firstNc->GetZone()->GetUlx();
@@ -2268,7 +2289,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
         int ligLrx = firstNc->GetZone()->GetLrx();
         int ligLry = firstNc->GetZone()->GetLry();
 
-        Staff *staff = dynamic_cast<Staff *> (firstNc->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
         assert(staff);
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -2283,8 +2304,8 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
 
         if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
     }
-    //set ligature to true and update zones to be the same
-    else if (isLigature == "false"){
+    // set ligature to true and update zones to be the same
+    else if (isLigature == "false") {
         if (Att::SetNeumes(firstNc, "ligated", "true")) success1 = true;
 
         zone->SetUlx(firstNc->GetZone()->GetUlx());
@@ -2333,7 +2354,7 @@ bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSid
         m_infoObject.import("message", "Resizing is only available in facsimile mode.");
         return false;
     }
-    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
     assert(staff);
     if (staff == NULL) {
         LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
@@ -2399,7 +2420,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
     assert(element);
     if (element == NULL) {
         LogError("No element exists with ID '%s'.", elementId.c_str());
@@ -2418,7 +2439,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
     ArrayOfObjects staves;
     ClassIdComparison ac(STAFF);
-    m_doc->FindAllChildByComparison(&staves, &ac);
+    m_doc->FindAllDescendantByComparison(&staves, &ac);
 
     ClosestBB comp;
 
@@ -2459,8 +2480,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    Layer *parent = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-    Staff *sParent = dynamic_cast<Staff *>(parent->GetFirstParent(STAFF));
+    Layer *parent = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+    Staff *sParent = dynamic_cast<Staff *>(parent->GetFirstAncestor(STAFF));
     assert(parent);
     if (parent == NULL || sParent == NULL) {
         LogError("Couldn't find staff parent of element with id '%s'", elementId.c_str());
@@ -2469,7 +2490,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
     assert(LAYER);
     if (layer == NULL) {
         LogError("Couldn't find layer child of staff. This should not happen");
@@ -2505,7 +2526,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
         nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
 
-        m_doc->GetDrawingPage()->FindAllChildBetween(&oldPitchChildren, &ic, clef, 
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&oldPitchChildren, &ic, clef,
             (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
         PitchInterface *pi;
@@ -2536,7 +2557,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             previousClefAfter = layer->GetCurrentClef();
         }
         Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
-        m_doc->GetDrawingPage()->FindAllChildBetween(&newPitchChildren, &ic, clef, 
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&newPitchChildren, &ic, clef,
             (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = newPitchChildren.begin(); it != newPitchChildren.end(); ++it) {
@@ -2592,9 +2613,8 @@ bool EditorToolkitNeume::ParseInsertAction(
     return true;
 }
 
-bool EditorToolkitNeume::ParseInsertAction(
-    jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
-    int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes)
+bool EditorToolkitNeume::ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId,
+    int *ulx, int *uly, int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
     (*elementType) = param.get<jsonxx::String>("elementType");
@@ -2629,8 +2649,7 @@ bool EditorToolkitNeume::ParseInsertAction(
     return true;
 }
 
-bool EditorToolkitNeume::ParseMergeAction(
-    jsonxx::Object param, std::vector<std::string> *elementIds)
+bool EditorToolkitNeume::ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
@@ -2640,8 +2659,7 @@ bool EditorToolkitNeume::ParseMergeAction(
     return true;
 }
 
-bool EditorToolkitNeume::ParseSplitAction(
-    jsonxx::Object param, std::string *elementId, int *x)
+bool EditorToolkitNeume::ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x)
 {
     if (!param.has<jsonxx::String>("elementId")) {
         LogWarning("Could not parse 'elementId'.");
@@ -2679,15 +2697,14 @@ bool EditorToolkitNeume::ParseSetAction(
     return true;
 }
 
-bool EditorToolkitNeume::ParseSetTextAction(
-    jsonxx::Object param, std::string *elementId, std::string *text)
+bool EditorToolkitNeume::ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text)
 {
     if (!param.has<jsonxx::String>("elementId")) {
         LogWarning("Could not parse 'elementId'");
         return false;
     }
     *elementId = param.get<jsonxx::String>("elementId");
-    if(!param.has<jsonxx::String>("text")) {
+    if (!param.has<jsonxx::String>("text")) {
         LogWarning("Could not parse 'text'");
         return false;
     }
@@ -2695,15 +2712,14 @@ bool EditorToolkitNeume::ParseSetTextAction(
     return true;
 }
 
-bool EditorToolkitNeume::ParseSetClefAction(
-    jsonxx::Object param, std::string *elementId, std::string *shape)
+bool EditorToolkitNeume::ParseSetClefAction(jsonxx::Object param, std::string *elementId, std::string *shape)
 {
-    if(!param.has<jsonxx::String>("elementId")) {
+    if (!param.has<jsonxx::String>("elementId")) {
         LogWarning("Could not parse 'elementId'");
         return false;
     }
     *elementId = param.get<jsonxx::String>("elementId");
-    if(!param.has<jsonxx::String>("shape")) {
+    if (!param.has<jsonxx::String>("shape")) {
         LogWarning("Could not parse 'shape'");
         return false;
     }
@@ -2711,8 +2727,7 @@ bool EditorToolkitNeume::ParseSetClefAction(
     return true;
 }
 
-bool EditorToolkitNeume::ParseRemoveAction(
-    jsonxx::Object param, std::string *elementId)
+bool EditorToolkitNeume::ParseRemoveAction(jsonxx::Object param, std::string *elementId)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
@@ -2722,15 +2737,15 @@ bool EditorToolkitNeume::ParseRemoveAction(
 bool EditorToolkitNeume::ParseResizeAction(
     jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry)
 {
-    if(!param.has<jsonxx::String>("elementId")) return false;
+    if (!param.has<jsonxx::String>("elementId")) return false;
     *elementId = param.get<jsonxx::String>("elementId");
-    if(!param.has<jsonxx::Number>("ulx")) return false;
+    if (!param.has<jsonxx::Number>("ulx")) return false;
     *ulx = param.get<jsonxx::Number>("ulx");
-    if(!param.has<jsonxx::Number>("uly")) return false;
+    if (!param.has<jsonxx::Number>("uly")) return false;
     *uly = param.get<jsonxx::Number>("uly");
-    if(!param.has<jsonxx::Number>("lrx")) return false;
+    if (!param.has<jsonxx::Number>("lrx")) return false;
     *lrx = param.get<jsonxx::Number>("lrx");
-    if(!param.has<jsonxx::Number>("lry")) return false;
+    if (!param.has<jsonxx::Number>("lry")) return false;
     *lry = param.get<jsonxx::Number>("lry");
     return true;
 }
@@ -2738,9 +2753,9 @@ bool EditorToolkitNeume::ParseResizeAction(
 bool EditorToolkitNeume::ParseGroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
-    if(!param.has<jsonxx::String>("groupType")) return false;
+    if (!param.has<jsonxx::String>("groupType")) return false;
     (*groupType) = param.get<jsonxx::String>("groupType");
-    if(!param.has<jsonxx::Array>("elementIds")) return false;
+    if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
     for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
@@ -2752,9 +2767,9 @@ bool EditorToolkitNeume::ParseGroupAction(
 bool EditorToolkitNeume::ParseUngroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
-    if(!param.has<jsonxx::String>("groupType")) return false;
+    if (!param.has<jsonxx::String>("groupType")) return false;
     (*groupType) = param.get<jsonxx::String>("groupType");
-    if(!param.has<jsonxx::Array>("elementIds")) return false;
+    if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
     for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
@@ -2763,12 +2778,11 @@ bool EditorToolkitNeume::ParseUngroupAction(
     return true;
 }
 
-bool EditorToolkitNeume::ParseChangeGroupAction(
-    jsonxx::Object param, std::string *elementId, std::string *contour)
+bool EditorToolkitNeume::ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour)
 {
-    if(!param.has<jsonxx::String>("elementId")) return false;
+    if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
-    if(!param.has<jsonxx::String>("contour")) return false;
+    if (!param.has<jsonxx::String>("contour")) return false;
     (*contour) = param.get<jsonxx::String>("contour");
     return true;
 }
@@ -2776,12 +2790,12 @@ bool EditorToolkitNeume::ParseChangeGroupAction(
 bool EditorToolkitNeume::ParseToggleLigatureAction(
     jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature)
 {
-    if(!param.has<jsonxx::Array>("elementIds")) return false;
+    if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
     for (int i = 0; i < (int)array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
-    if(!param.has<jsonxx::String>("isLigature")) return false;
+    if (!param.has<jsonxx::String>("isLigature")) return false;
     (*isLigature) = param.get<jsonxx::String>("isLigature");
 
     return true;
@@ -2809,7 +2823,7 @@ bool EditorToolkitNeume::ParseChangeStaffAction(
     return true;
 }
 
-bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef) 
+bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 {
     // remember to reorderbyxpos! (not called in function so that it can be used in loops)
     // clef re-association is done at the syllable level (not neume or nc)
@@ -2821,7 +2835,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
     if (obj->Is(CUSTOS)) {
         Custos *custos = dynamic_cast<Custos *>(obj);
-        Staff *staff = dynamic_cast<Staff *>(custos->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(custos->GetFirstAncestor(STAFF));
         assert(staff);
 
         // Check interfaces
@@ -2842,12 +2856,12 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
             if (clef == NULL) {
-                Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+                Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
                 assert(layer);
                 clef = layer->GetCurrentClef();
             }
         }
-    
+
         assert(clef);
 
         // Reset pitch to be "on clef"
@@ -2882,12 +2896,12 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
     else if (obj->Is(SYLLABLE)) {
         Syllable *syl = dynamic_cast<Syllable *>(obj);
-        Staff *staff = dynamic_cast<Staff *>(syl->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(syl->GetFirstAncestor(STAFF));
         assert(staff);
 
         ArrayOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
-        syl->FindAllChildByComparison(&pitchedChildren, &ic);
+        syl->FindAllDescendantByComparison(&pitchedChildren, &ic);
 
         if (pitchedChildren.empty()) {
             LogWarning("Syllable had no pitched children to reorder for syllable %s", obj->GetUuid().c_str());
@@ -2898,12 +2912,12 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             ClassIdComparison ac(CLEF);
             clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, obj));
             if (clef == NULL) {
-                Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+                Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
                 assert(layer);
                 clef = layer->GetCurrentClef();
             }
         }
-    
+
         assert(clef);
 
         data_PITCHNAME pname;
@@ -2944,7 +2958,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
     }
 
     else {
-        LogError("AdjustPitchFromPosition should only be called on custos or syllables." 
+        LogError("AdjustPitchFromPosition should only be called on custos or syllables."
             "It has been called on %s, whose id is %s", obj->GetClassName().c_str(), obj->GetUuid().c_str());
         return false;
     }
@@ -2955,7 +2969,7 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
     assert(clef);
 
     if (staff == NULL) {
-        staff = dynamic_cast<Staff *>(clef->GetFirstParent(STAFF));
+        staff = dynamic_cast<Staff *>(clef->GetFirstAncestor(STAFF));
     }
     assert(staff);
 

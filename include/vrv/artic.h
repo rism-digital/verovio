@@ -28,6 +28,7 @@ public:
     ///@{
     Artic();
     virtual ~Artic();
+    virtual Object *Clone() const { return new Artic(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Artic"; }
     virtual ClassId GetClassId() const { return ARTIC; }

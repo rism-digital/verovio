@@ -89,7 +89,7 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         return;
     }
 
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletBracket->GetFirstParent(TUPLET));
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletBracket->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
     if (!tuplet->GetDrawingLeft() || !tuplet->GetDrawingRight()) {
@@ -148,7 +148,7 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     TupletNum *tupletNum = dynamic_cast<TupletNum *>(element);
     assert(tupletNum);
 
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletNum->GetFirstParent(TUPLET));
+    Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletNum->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
     if ((tuplet->GetNum() == 0) || (tuplet->GetNumVisible() == BOOLEAN_false)) {

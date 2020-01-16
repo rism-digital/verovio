@@ -24,6 +24,7 @@
 namespace vrv {
 
 class Arpeg;
+class BracketSpan;
 class Clef;
 class ControlElement;
 class Dir;
@@ -68,9 +69,9 @@ namespace musicxml {
         int m_number;
     };
 
-    class OpenHairpin {
+    class OpenSpanner {
     public:
-        OpenHairpin(const int &dirN, const int &lastMeasureCount)
+        OpenSpanner(const int &dirN, const int &lastMeasureCount)
         {
             m_dirN = dirN;
             m_lastMeasureCount = lastMeasureCount;
@@ -121,6 +122,20 @@ namespace musicxml {
         Clef *m_clef;
         int m_scoreOnset; // the score position of clef change
         bool isFirst = true; // insert clef change at first layer, others use @sameas
+    };
+
+    class OpenDashes {
+    public:
+        OpenDashes(const int &dirN, int &staffNum, const int &measureCount)
+        {
+            m_dirN = dirN;
+            m_staffNum = staffNum;
+            m_measureCount = measureCount;
+        }
+
+        int m_dirN; // direction number
+        int m_staffNum;
+        int m_measureCount; // measure number of dashes start
     };
 
 } // namespace musicxml
@@ -281,6 +296,7 @@ private:
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
+    std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
     fermataVis_SHAPE ConvertFermataShape(std::string);
@@ -288,6 +304,7 @@ private:
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
     std::string ConvertAlterToSymbol(std::string value);
     std::string ConvertKindToSymbol(std::string value);
+    std::string ConvertKindToText(std::string value);
     ///@}
 
 private:
@@ -321,12 +338,15 @@ private:
     /* The stack for tie stops that might come before that tie was opened */
     std::vector<Note *> m_tieStopStack;
     /* The stack for hairpins */
-    std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
+    std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> > m_hairpinStack;
     /* The stack for hairpin stops that might occur before a hairpin was started staffNumber, tStamp2, (hairpinNumber,
      * measureCount) */
-    std::vector<std::tuple<int, double, musicxml::OpenHairpin> > m_hairpinStopStack;
+    std::vector<std::tuple<int, double, musicxml::OpenSpanner> > m_hairpinStopStack;
+    std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> > m_bracketStack;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
+    /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */
+    std::vector<std::pair<ControlElement *, musicxml::OpenDashes> > m_openDashesStack;
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;

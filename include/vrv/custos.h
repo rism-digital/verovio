@@ -29,6 +29,7 @@ public:
     ///@{
     Custos();
     virtual ~Custos();
+    virtual Object *Clone() const { return new Custos(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Custos"; }
     virtual ClassId GetClassId() const { return CUSTOS; }

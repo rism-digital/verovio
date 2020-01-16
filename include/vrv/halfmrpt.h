@@ -31,6 +31,7 @@ public:
     ///@{
     HalfmRpt();
     virtual ~HalfmRpt();
+    virtual Object *Clone() const { return new HalfmRpt(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "HalfmRpt"; }
     virtual ClassId GetClassId() const { return HALFMRPT; }

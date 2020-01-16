@@ -1,12 +1,57 @@
 # Changelog
 
 ## [unreleased]
+
+## [2.4.0] - 2020-01-15
+* Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
+* Support for dashed and dotted slurs and ties (@earboxer and @napulen)
+* Option to use xml entities for SMuFL charachters (--outputSmuflXmlEntities)
+* Options for controlling system divider display (--systemDivider "none|left|left-right")
+* Fix coloring of ties and slurs (@rettinghaus)
+* Fix bug with tuplet number placement (@rettinghaus)
+* LibMEI output generated from MEI 4.0.1
+
+## [2.3.4] - 2020-01-03
+* Fix bug with NPM build (allow access to verovio.module and use wasm)
+
+## [2.3.3] - 2019-11-26
+* Fix bug with NPM build (remove init function for adjusting memory)
+
+## [2.3.2] - 2019-11-20
+* Fix bug with mordent when loading MEI 3.0 files
+
+## [2.3.1] - 2019-11-16
+* Fix  bug with scoreDef / staffDef redefinition
+
+## [2.3.0] - 2019-11-04
+* Support for 512th and 1024th duration
+* Support for iOS cocoapods build (@eltiren)
+* Support for SVG currentColor (@rettinghaus)
+* Options for controlling header and footer (--header / --footer "auto|none|encoded") (@rettinghaus)
+* Bug fix with grace notes and mRests
+
+### Changes
+* Options --no-header and --no-footer deprecated
+
+## [2.2.1] - 2019-10-23
+* Fix bug with mensural notation layout
+
+## [2.2.0] - 2019-10-17
+* Support for superscript and subscript in `<rend>`
+* Support for chord-symbol parsing in MusicXML (@earboxer)
+* Support for dynamics with mixed text and music fonts
+* Support for non-standard keys from MusicXML (@rettinghaus)
+* Support for `<graceGrp>` (@rettinghaus)
+* Support for `<keyAccid>` for custom key signatures
 * Support for `@vel` on `<note>` in MIDI playback (@rettinghaus)
 * Support for `<turn>` in MusicXML import (@wergo)
 * Support for `<arpgeg>` in MusicXML import (@wergo)
 * Support iOS Framework build (@Noroxs)
 * Improved support for pedal marks in MusicXML import (@wergo)
+* Improved import of key signatures from PAE (show cancellation accidentals)
 * Improved import of tuplets from PAE
+* Improved element attribute access also when not rendered in a page
+* Options for vertical justication (--justify-include-last-page, --justify-system-only, --justify-vertically)
 * Option to set minimum width for justification (--min-last-justification) (@earboxer).
 
 ### Changed

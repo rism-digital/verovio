@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-    
+
 class EditorToolkit;
 
 enum FileFormat {
@@ -32,6 +32,7 @@ enum FileFormat {
     MUSICXML,
     MUSICXMLHUM,
     MEIHUM,
+    MUSEDATAHUM,
     ESAC,
     MIDI,
     TIMEMAP

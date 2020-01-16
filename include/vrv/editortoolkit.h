@@ -27,7 +27,12 @@ namespace vrv {
 
 class EditorToolkit {
 public:
-    EditorToolkit(Doc *doc, View *view) { m_doc = doc; m_view = view; m_editInfo = ""; }
+    EditorToolkit(Doc *doc, View *view)
+    {
+        m_doc = doc;
+        m_view = view;
+        m_editInfo = "";
+    }
     virtual ~EditorToolkit() {}
 
     /**

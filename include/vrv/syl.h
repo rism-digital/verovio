@@ -43,6 +43,7 @@ public:
     ///@{
     Syl();
     virtual ~Syl();
+    virtual Object *Clone() const { return new Syl(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Syl"; }
     virtual ClassId GetClassId() const { return SYL; }
@@ -66,11 +67,9 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * Calculate the adjustment according to the overlap and the free space available before.
-     * Will move the syllable accordingly.
-     * Called from Syl::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     * Calculate the spacing needed depending on the @worpos and @con
      */
-    int CalcHorizontalAdjustment(int &overlap, AdjustSylSpacingParams *params);
+    int CalcConnectorSpacing(Doc *doc, int staffSize);
 
     virtual int GetDrawingWidth() const;
     virtual int GetDrawingHeight() const;
@@ -88,11 +87,6 @@ public:
      * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing

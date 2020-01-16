@@ -86,6 +86,8 @@ wchar_t Rest::GetRestGlyph() const
         case DUR_64: symc = SMUFL_E4E9_rest64th; break;
         case DUR_128: symc = SMUFL_E4EA_rest128th; break;
         case DUR_256: symc = SMUFL_E4EB_rest256th; break;
+        case DUR_512: symc = SMUFL_E4EC_rest512th; break;
+        case DUR_1024: symc = SMUFL_E4ED_rest1024th; break;
     }
     return symc;
 }
@@ -130,7 +132,7 @@ int Rest::ConvertAnalyticalMarkup(FunctorParams *functorParams)
 
 int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
         if (!currentDots) {
@@ -169,7 +171,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -178,7 +180,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     int staffSize = staff->m_drawingStaffSize;
 
     // For single rests we need here to set the dot loc
-    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
     std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);

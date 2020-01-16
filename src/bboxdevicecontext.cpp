@@ -35,8 +35,8 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_drawingText = false;
     m_textAlignment = HORIZONTALALIGNMENT_left;
 
-    SetBrush(AxBLACK, AxSOLID);
-    SetPen(AxBLACK, 1, AxSOLID);
+    SetBrush(AxNONE, AxSOLID);
+    SetPen(AxNONE, 1, AxSOLID);
 
     m_update = update;
 
@@ -119,6 +119,16 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 }
 
 // calculated better
+void BBoxDeviceContext::DrawSimpleBezierPath(Point bezier[4])
+{
+    Point pos;
+    int width, height;
+    int minYPos, maxYPos;
+
+    BoundingBox::ApproximateBezierBoundingBox(bezier, pos, width, height, minYPos, maxYPos);
+    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+}
 void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     Point pos;
@@ -260,11 +270,17 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
     }
 }
 
+void BBoxDeviceContext::MoveTextVerticallyTo(int y)
+{
+    assert(m_drawingText);
+    m_textY = y;
+}
+
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
 
-    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) 
+    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET)
         && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
         m_textX = x;
         m_textY = y;
@@ -300,7 +316,7 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
         }
         UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
     }
-    
+
 }
 
 void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)

@@ -31,6 +31,7 @@ public:
     ///@{
     AnchoredText();
     virtual ~AnchoredText();
+    virtual Object *Clone() const { return new AnchoredText(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "AnchoredText"; }
     virtual ClassId GetClassId() const { return ANCHORED_TEXT; }
