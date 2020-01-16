@@ -633,6 +633,9 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
                     continue;
                 }
+                if (staff->GetVisible() == BOOLEAN_false) {
+                    continue;
+                }
                 int yTop = staff->GetDrawingY();
                 if (measure->HasBarPlace()) {
                     yTop += measure->GetBarPlace() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
