@@ -1733,7 +1733,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_bracketStack.erase(m_bracketStack.begin());
         }
         else {
-            std::string symbol = lead.node().attribute("symbol").as_string();
+            // std::string symbol = lead.node().attribute("symbol").as_string();
             BracketSpan *bracketSpan = new BracketSpan();
             musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
             bracketSpan->SetColor(lead.node().attribute("color").as_string());
