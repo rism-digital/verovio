@@ -34,8 +34,8 @@ def validateGlyph(glyph):
             report += '- missing extrema'
         if result & 0x80:
             report += '- too many points'
-       # if result & 0x200:
-       #    report += '- invalid glyph name'
+        # if result & 0x200:
+        #    report += '- invalid glyph name'
         if result & 0x40000:
             report += '- points too far apart'
         if result & 0x200000:
@@ -65,7 +65,7 @@ if fontFileName == '':
 try:
     font = fontforge.open(path)
 except EnvironmentError:
-    print ("Aargh... Error opening font file %s!" % fontFileName)
+    print("Aargh... Error opening font file %s!" % fontFileName)
     sys.exit(1)
 
 fontName = os.path.splitext(os.path.basename(fontFileName))[0]
