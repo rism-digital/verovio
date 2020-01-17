@@ -144,7 +144,7 @@ for anyLine in line_iter:
                     if item != 'AltUni2:':
                         alternate = item.split('.')
                         value = "%#06X" % int(alternate[0], 16)
-                        if found == False and int(initialCodepoint, 16) <= 0xff and int(value, 16) >= 0xE000 and int(value, 16) < 0xF800:
+                        if not found and int(initialCodepoint, 16) <= 0xff and int(value, 16) >= 0xE000 and int(value, 16) < 0xF800:
                             if int(value, 16) < 0xF000 or int(value, 16) > 0xF0FF:
                                 found = True
                             temp = mainCodepoint
@@ -169,7 +169,6 @@ glyphBBoxes = dict()
 glyphsWithAnchors = dict()
 count = 0
 undefCount = 0
-started = False
 for glyph in font:
     g = font[glyph]
     if g.unicode != -1 and g.unicode > 31:
