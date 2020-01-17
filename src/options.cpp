@@ -288,8 +288,8 @@ void OptionArray::CopyTo(Option *option)
 
 void OptionArray::Init()
 {
-    m_values.empty();
-    m_defaultValues.empty();
+    m_values.clear();
+    m_defaultValues.clear();
 }
 
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
