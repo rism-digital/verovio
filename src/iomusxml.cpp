@@ -469,9 +469,8 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         if (std::regex_search(mm, matches, std::regex("(\\d+\\.?\\d*)"))) {
             mmval = std::stod(matches[1]);
         }
-        int mmint = 0;
         if ((!isnan(mmval)) && (mmval > 0.5)) {
-            mmint = int(mmval + 0.5);
+            int mmint = int(mmval + 0.5);
             tempo->SetMm(mmint);
         }
         if (!mm.empty()) {
