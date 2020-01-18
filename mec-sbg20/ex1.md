@@ -4,7 +4,7 @@ title: Digital IAML 2019 - Verovio workshop
 active: home
 ---
 
-### Music Engraving Conference – Exercise 2 – Make a tour of the MEI Viewer
+### Music Engraving Conference – Exercise 1 – Make a tour of the MEI Viewer
 
 #### Data import
 
