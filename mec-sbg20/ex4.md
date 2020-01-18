@@ -1,10 +1,10 @@
 ---
 layout: iaml19
-title: Digital IAML 2019 - Verovio workshop
+title: Music Engraving Conference - Verovio workshop
 active: none
 ---
 
-### Digital-IAML 2019 – Exercise 4 – MEI editing with Verovio
+### Music Engraving Conference – Exercise 4 – MEI editing with Verovio
 
 In this exercise, you can try to do some MEI encoding using the Verovio online editor. It allows you to enter MEI code and to have it rendered in realtime.
 

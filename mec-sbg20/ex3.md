@@ -1,15 +1,15 @@
 ---
 layout: iaml19
-title: Digital IAML 2019 - Verovio workshop
+title: Music Engraving Conference - Verovio workshop
 active: home
 ---
 
-### Digital-IAML 2019 – Exercise 3 – Hands-on with the Verovio toolkit
+### Music Engraving Conference – Exercise 3 – Hands-on with the Verovio toolkit
 
 The following links refer to the [Verovio tutorial](https://www.verovio.org/tutorial.xhtml){:target="_blank"} published on the Verovio website. In the links below, some steps of the tutorial are published through the W3C editor where they can be edited and completed inline.
 
 [Getting started](https://www.verovio.org/tutorial.xhtml?id=topic00){:target="_blank"} |
-[Try to fill it!](https://www.w3schools.com/code/tryit.asp?filename=G63VG3JYMNSW){:target="_blank"}
+[Try to fill it!](https://jsfiddle.net/lpugin/en3mLc9q/3/){:target="_blank"}
 
 [Passing options](https://www.verovio.org/tutorial.xhtml?id=topic01){:target="_blank"} |
 [Try to fill it!](https://www.w3schools.com/code/tryit.asp?filename=G63VH414P2YU){:target="_blank"}
