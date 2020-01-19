@@ -288,8 +288,8 @@ void OptionArray::CopyTo(Option *option)
 
 void OptionArray::Init()
 {
-    m_values.empty();
-    m_defaultValues.empty();
+    m_values.clear();
+    m_defaultValues.clear();
 }
 
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
@@ -749,7 +749,7 @@ Options::Options()
 
     /********* selectors *********/
 
-    m_selectors.SetLabel("Element selectors", "3-selectors");
+    m_selectors.SetLabel("Element selectors and processing", "3-selectors");
     m_grps.push_back(&m_selectors);
 
     m_appXPathQuery.SetInfo("App xPath query",
@@ -775,6 +775,15 @@ Options::Options()
         "example: \"./del\"; by default the first child is selected");
     m_substXPathQuery.Init();
     this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
+
+    m_transpose.SetInfo("Transpose the content", "SUMMARY");
+    m_transpose.Init("");
+    this->Register(&m_transpose, "transpose", &m_selectors);
+
+    m_transposeSelectedOnly.SetInfo(
+        "Transpose selected only", "Transpose only the selected content and ignore unselected editorial content");
+    m_transposeSelectedOnly.Init(false);
+    this->Register(&m_transposeSelectedOnly, "transposeSelectedOnly", &m_selectors);
 
     /********* The layout left margin by element *********/
 

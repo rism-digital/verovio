@@ -11,6 +11,7 @@
 #include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
+#include "transposition.h"
 
 namespace vrv {
 
@@ -58,6 +59,14 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    /**
+     * Transposition related. The int tracks where we have iterated through the string.
+     */
+    bool GetRootPitch(TransPitch &pitch, unsigned int &pos);
+    void SetRootPitch(const TransPitch &pitch, unsigned int endPos);
+    bool GetBassPitch(TransPitch &pitch);
+    void SetBassPitch(const TransPitch &pitch);
+
     //----------//
     // Functors //
     //----------//
@@ -71,6 +80,11 @@ public:
      * See Object::AdjustHarmGrpsSpacing
      */
     virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
+
+    /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *functorParams);
 
 protected:
     //

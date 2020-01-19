@@ -538,6 +538,8 @@ public:
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
+    OptionString m_transpose;
+    OptionBool m_transposeSelectedOnly;
 
     /**
      * Element margins

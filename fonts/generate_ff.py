@@ -2,7 +2,7 @@
 import os
 import fontforge
 
-fontFileName = sys.argv[1]
+fontFileName = os.sys.argv[1]
 path = fontFileName
 try:
     font = fontforge.open(path)
@@ -12,5 +12,5 @@ try:
     font.generate(os.path.splitext(fontFileName)[0] + ".woff")
 
 except EnvironmentError:
-    print ("Aargh... Error opening font file %s!" % fontFileName)
-    sys.exit(1)
+    print("Error opening font file %s!" % fontFileName)
+    os.sys.exit(1)
