@@ -469,9 +469,8 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
         if (std::regex_search(mm, matches, std::regex("(\\d+\\.?\\d*)"))) {
             mmval = std::stod(matches[1]);
         }
-        int mmint = 0;
         if ((!isnan(mmval)) && (mmval > 0.5)) {
-            mmint = int(mmval + 0.5);
+            int mmint = int(mmval + 0.5);
             tempo->SetMm(mmint);
         }
         if (!mm.empty()) {
@@ -1733,7 +1732,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_bracketStack.erase(m_bracketStack.begin());
         }
         else {
-            std::string symbol = lead.node().attribute("symbol").as_string();
+            // std::string symbol = lead.node().attribute("symbol").as_string();
             BracketSpan *bracketSpan = new BracketSpan();
             musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
             bracketSpan->SetColor(lead.node().attribute("color").as_string());
@@ -1774,11 +1773,11 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    int durOffset = 0;
-
     if (!HasAttributeWithValue(node, "print-object", "no")) {
         Harm *harm = new Harm();
         Fb *fb = new Fb();
+
+        int durOffset = 0;
 
         // std::string textColor = node.attribute("color").as_string();
         // std::string textStyle = node.attribute("font-style").as_string();
