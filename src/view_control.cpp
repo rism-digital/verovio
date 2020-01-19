@@ -1195,9 +1195,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         // no dash if the distance is smaller than a dash length
         if (dist < dashLength) {
             LogDebug("Hyphen space under the limit");
+            nbDashes = 0;
         }
-
-        if (nbDashes < 2) {
+        else if (nbDashes < 2) {
             nbDashes = 1;
         }
         else {
