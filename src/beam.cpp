@@ -506,9 +506,6 @@ void Beam::InitCoords(ArrayOfObjects *childList)
         return;
     }
 
-    // duration variables
-    int lastDur, currentDur;
-
     m_beamElementCoords.reserve(childList->size());
     int i;
     for (i = 0; i < (int)childList->size(); ++i) {
@@ -520,7 +517,7 @@ void Beam::InitCoords(ArrayOfObjects *childList)
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
-    lastDur = (current->GetDurationInterface())->GetActualDur();
+    int lastDur = (current->GetDurationInterface())->GetActualDur();
 
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
@@ -537,7 +534,7 @@ void Beam::InitCoords(ArrayOfObjects *childList)
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
-        currentDur = (current->GetDurationInterface())->GetActualDur();
+        int currentDur = (current->GetDurationInterface())->GetActualDur();
 
         if (current->Is(CHORD)) {
             m_drawingParams.m_beamHasChord = true;

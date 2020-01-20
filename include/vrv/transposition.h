@@ -34,9 +34,14 @@ class Transposer;
 
 class TransPitch {
 public:
-    int m_pname; // diatonic pitch class name: C = 0, D = 1, ... B = 6.
-    int m_accid; // chromatic alteration: 0 = natural, 1 = sharp, -2 = flat, +2 = double sharp
-    int m_oct; // octave number: 4 = middle-C octave
+    // diatonic pitch class name of pitch: C = 0, D = 1, ... B = 6.
+    int m_pname;
+
+    // chromatic alteration of pitch: 0 = natural, 1 = sharp, -2 = flat, +2 = double sharp
+    int m_accid;
+
+    // octave number of pitch: 4 = middle-C octave
+    int m_oct;
 
     TransPitch(){};
     TransPitch(int aPname, int anAccid, int anOct);
@@ -65,34 +70,58 @@ public:
     Transposer();
     ~Transposer();
 
-    int GetBase();
-    int GetMaxAccid();
+    // Set the interval class for an octave (default is 40, +/- two sharps/flats).
     void SetMaxAccid(int maxAccid);
+    int GetMaxAccid();
     void SetBase40();
     void SetBase600();
-    int GetIntervalClass(const std::string &intervalName);
-    int Subtract(const TransPitch &minuend, const TransPitch &subtrahend);
-    int PitchToInteger(const TransPitch &pitch);
-    TransPitch IntegerPitchToTransPitch(int ipitch);
+    int GetBase();
+
+    // Set the transposition amount for use with Transpose() functions.  These functions
+    // need to be rerun after SetMaxAccid() or SetBase*() are called; otherwise, the
+    // transposition will be 0/P1/unison.
     bool SetTransposition(int transVal);
     bool SetTransposition(const std::string &transString);
     bool SetTransposition(const TransPitch &fromPitch, const std::string &toString);
     bool SetTransposition(int keyFifths, int semitones);
     bool SetTransposition(int keyFifths, const std::string &semitones);
+
+    // Accessor functions for retrieving stored transposition interval.
     int GetTranspositionIntervalClass();
     std::string GetTranspositionIntervalName();
+
+    // Transpostion based on stored transposition interval.
     void Transpose(TransPitch &pitch);
     int Transpose(int iPitch);
+
+    // Transpose based on second input parameter (not with stored transposition interval).
     void Transpose(TransPitch &pitch, int transVal);
     void Transpose(TransPitch &pitch, const std::string &transString);
-    bool GetKeyTonic(const std::string &keyTonic, TransPitch &tonic);
-    int GetIntervalClass(const TransPitch &p1, const TransPitch &p2);
+
+    // Convert between integer intervals and interval name strings:
     std::string GetIntervalName(const TransPitch &p1, const TransPitch &p2);
     std::string GetIntervalName(int intervalClass);
+    int GetInterval(const std::string &intervalName);
+
+    // Convert between TransPitch class and integer pitch and interval representations.
+    int TransPitchToIntegerPitch(const TransPitch &pitch);
+    TransPitch IntegerPitchToTransPitch(int ipitch);
+    int GetInterval(const TransPitch &p1, const TransPitch &p2);
+
+    // Convert between Semitones and integer interval representation.
+    std::string SemitonesToIntervalName(int keyFifths, int semitones);
+    int SemitonesToIntervalClass(int keyFifths, int semitones);
+    int IntervalToSemitones(int intervalClass);
+    int IntervalToSemitones(const std::string &intervalName);
+
+    // Circle-of-fifths related functions.
     int IntervalToCircleOfFifths(const std::string &transString);
     int IntervalToCircleOfFifths(int transval);
     std::string CircleOfFifthsToIntervalName(int fifths);
     int CircleOfFifthsToIntervalClass(int fifths);
+
+    // Key-signature related functions.
+    bool GetKeyTonic(const std::string &keyTonic, TransPitch &tonic);
     TransPitch CircleOfFifthsToMajorTonic(int fifths);
     TransPitch CircleOfFifthsToMinorTonic(int fifths);
     TransPitch CircleOfFifthsToDorianTonic(int fifths);
@@ -100,14 +129,15 @@ public:
     TransPitch CircleOfFifthsToLydianTonic(int fifths);
     TransPitch CircleOfFifthsToMixolydianTonic(int fifths);
     TransPitch CircleOfFifthsToLocrianTonic(int fifths);
+
+    // Conversions between diatonic/chromatic system and integer system of intervals.
     std::string DiatonicChromaticToIntervalName(int diatonic, int chromatic);
     int DiatonicChromaticToIntervalClass(int diatonic, int chromatic);
     void IntervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass);
     void IntervalToDiatonicChromatic(int &diatonic, int &chromatic, const std::string &intervalName);
 
-    // Convenience functions for calculating common interval classes.
-    // augmented classes can be calculated by adding 1 to
-    // perfect/major classes, and diminished classes can be
+    // Convenience functions for calculating common interval classes.  Augmented classes
+    // can be calculated by adding 1 to perfect/major classes, and diminished classes can be
     // calcualted by subtracting 1 from perfect/minor classes.
     int PerfectUnisonClass();
     int MinorSecondClass();
@@ -122,7 +152,7 @@ public:
     int MajorSeventhClass();
     int PerfectOctaveClass();
 
-    // Convenience functions for acessing m_diatonicMapping:
+    // Convenience functions for acessing m_diatonicMapping.
     int GetCPitchClass() { return m_diatonicMapping[0]; }
     int GetDPitchClass() { return m_diatonicMapping[1]; }
     int GetEPitchClass() { return m_diatonicMapping[2]; }
@@ -131,15 +161,26 @@ public:
     int GetAPitchClass() { return m_diatonicMapping[5]; }
     int GetBPitchClass() { return m_diatonicMapping[6]; }
 
+    // Input string validity helper functions.
     static bool IsValidIntervalName(const std::string &name);
     static bool IsValidKeyTonic(const std::string &name);
     static bool IsValidSemitones(const std::string &name);
 
 protected:
-    int m_base; // integer representation for perfect octave
-    int m_maxAccid; // maximum allowable sharp/flats for transposing
-    int m_transpose; // integer interval class for transposing
-    std::vector<int> m_diatonicMapping; // pitch integers for each natural diatonic pitch class
+    // integer representation for perfect octave:
+    int m_base;
+
+    // maximum allowable sharp/flats for transposing:
+    int m_maxAccid;
+
+    // integer interval class for transposing:
+    int m_transpose;
+
+    // pitch integers for each natural diatonic pitch class:
+    std::vector<int> m_diatonicMapping;
+
+    // used to calculate semitones between diatonic pitch classes:
+    const std::vector<int> m_diatonic2semitone{ 0, 2, 4, 5, 7, 9, 11 };
 
 private:
     void CalculateDiatonicMapping();
