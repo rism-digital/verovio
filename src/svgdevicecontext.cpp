@@ -623,7 +623,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     if (m_penStack.top().GetLineCap() > 0) {
         pathChild.append_attribute("stroke-linecap") = "round";
         pathChild.append_attribute("stroke-dasharray")
-                = StringFormat("1, %d", int(2.5 * m_penStack.top().GetDashLength())).c_str();
+            = StringFormat("1, %d", int(2.5 * m_penStack.top().GetDashLength())).c_str();
     }
     else if (m_penStack.top().GetDashLength() > 0)
         pathChild.append_attribute("stroke-dasharray")
