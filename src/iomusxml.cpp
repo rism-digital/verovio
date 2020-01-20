@@ -2222,8 +2222,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
              articulations = articulations.next_sibling("articulations")) {
             Artic *artic = new Artic();
             if (articulations.select_node("accent")) artics.push_back(ARTICULATION_acc);
-            // Removed in MEI 4.0
-            // if (articulations.select_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
             if (articulations.select_node("spiccato")) artics.push_back(ARTICULATION_spicc);
             if (articulations.select_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
             if (articulations.select_node("staccato")) artics.push_back(ARTICULATION_stacc);
