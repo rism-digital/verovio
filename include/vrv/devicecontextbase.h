@@ -51,9 +51,9 @@ enum {
 
 class Pen {
 public:
-    Pen() : m_penColour(0), m_penWidth(0), m_dashLength(0), m_penOpacity(0.0), m_lineCap(0) {}
+    Pen() : m_penColour(0), m_penWidth(0), m_dashLength(0), m_lineCap(0), m_penOpacity(0.0) {}
     Pen(int colour, int width, float opacity, int dashLength, int lineCap)
-    : m_penColour(colour), m_penWidth(width), m_dashLength(dashLength), m_lineCap(lineCap), m_penOpacity(opacity)
+        : m_penColour(colour), m_penWidth(width), m_dashLength(dashLength), m_lineCap(lineCap), m_penOpacity(opacity)
     {
     }
 
