@@ -17027,6 +17027,21 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     //	==	==	0
     //	*-	*-	0
 
+	if (!barindex.empty()) {
+		int firstbar = barindex[0];
+		if ((firstbar == 0) && (barindex.size() >= 1)) {
+			firstbar = barindex[1];
+		}
+		hum::HumNum bardur = infile[firstbar].getDurationFromStart();
+		if (bardur == 0) {
+			// Extend first non-zero number in list backwards to start of output.
+			// This allows a multibar rest at the start of the music.
+			for (int i=0; i<firstbar; i++) {
+				output[i] = output[firstbar];
+			}
+		}
+	}
+
     return output;
 }
 

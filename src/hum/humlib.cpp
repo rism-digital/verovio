@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 19 20:22:19 PST 2020
+// Last Modified: Sun Jan 19 21:09:51 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -66977,7 +66977,7 @@ void Tool_musicxml2hum::storeOttava(int pindex, xml_node octaveShift, xml_node d
 		}
 	}
 	// ottavas presumed to be allocated by part, but not by staff.
-	if (ottavas[pindex].size() <= staffindex) {
+	if ((int)ottavas[pindex].size() <= staffindex) {
 		ottavas[pindex].resize(staffindex+1);
 	}
 	ottavas[pindex][staffindex].push_back(octaveShift);
