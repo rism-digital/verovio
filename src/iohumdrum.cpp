@@ -28,6 +28,7 @@
 #include <locale>
 #include <regex>
 #include <sstream>
+#include <tuple>
 #include <vector>
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -5552,14 +5553,70 @@ bool HumdrumInput::replace(std::wstring &str, const std::wstring &oldStr, const 
 bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline, int n, int layercount)
 {
     bool status = true;
+    m_clef_buffer.clear();
     for (int i = 0; i < layercount; ++i) {
         status &= convertStaffLayer(track, startline, endline, i);
         if (!status) {
             break;
         }
     }
-
+    checkClefBufferForSameAs();
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkClefBufferForSameAs -- identify clefs that should not be printed.
+//     This information was calculated when processing the layers, so now check through
+//     the list of clefs to see if any are marked for suppression.
+//
+// tuple elements:
+//    0 = boolean (true = bad)
+//    1 = HumNum timestamp of clef
+//    2 = Clef*
+//
+
+void HumdrumInput::checkClefBufferForSameAs()
+{
+    for (int i = 0; i < (int)m_clef_buffer.size(); i++) {
+        if (std::get<0>(m_clef_buffer[i])) {
+            suppressBufferedClef(i);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::suppressBufferedClef -- Mark the given class as "sameas" provided that
+//     there is another clef at the same timestamp that is not also a "sameas" clef.
+//     The input index is the position of the bad clef in the buffered list for the
+//     staff measure.
+//
+
+void HumdrumInput::suppressBufferedClef(int index)
+{
+    hum::HumNum target = std::get<1>(m_clef_buffer.at(index));
+    Clef *goodclef = NULL;
+    for (int i = 0; i < (int)m_clef_buffer.size(); i++) {
+        if (std::get<0>(m_clef_buffer[i])) {
+            // don't look at bad clefs
+            continue;
+        }
+        if (target == std::get<1>(m_clef_buffer[i])) {
+            goodclef = std::get<2>(m_clef_buffer[i]);
+            break;
+        }
+    }
+    if (!goodclef) {
+        return;
+    }
+
+    Clef *badclef = std::get<2>(m_clef_buffer.at(index));
+    if (!badclef) {
+        return;
+    }
+
+    badclef->SetSameas("#" + goodclef->GetUuid());
 }
 
 //////////////////////////////
@@ -6166,7 +6223,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     hum::HumRegex hre;
     // ggg processGlobalDirections(token, staffindex);
 
+    hum::HTp lastnote = NULL;
     for (int i = 0; i < (int)layerdata.size(); ++i) {
+        if (layerdata[i]->isData()) {
+            lastnote = layerdata[i];
+        }
         if (prespace.at(i) > 0) {
             addSpace(elements, pointers, prespace.at(i));
         }
@@ -6206,7 +6267,26 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         // use the one in the primary track
                         continue;
                     }
+
+                    bool sameas = false;
+                    hum::HumNum clefpos = -1;
+                    if (lastnote) {
+                        clefpos = layerdata[i]->getDurationFromBarline();
+                        hum::HumNum notepos = lastnote->getDurationFromBarline();
+                        hum::HumNum duration = hum::Convert::recipToDuration(lastnote);
+                        if (notepos + duration != clefpos) {
+                            sameas = true;
+                        }
+                    }
+
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
+                    // Store all of the clefs for later sameas analysis:
+                    m_clef_buffer.push_back(std::make_tuple(sameas, clefpos, clef));
+                    if (sameas) {
+                        // make 100% transparent red in case sameas method changes:
+                        clef->SetColor("#ff000000");
+                        // clef->SetType("sameas");
+                    }
                     setLocationId(clef, layerdata[i]);
                     int diff = layerindex - subtrack;
                     if (diff > 0) {

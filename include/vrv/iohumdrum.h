@@ -10,6 +10,7 @@
 
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -569,6 +570,8 @@ protected:
     void setAccid(Accid *accid, const std::string &loaccid);
     bool phraseIsInvisible(hum::HTp token, int pindex);
     hum::HumNum getLeftNoteDuration(hum::HTp token);
+    void checkClefBufferForSameAs();
+    void suppressBufferedClef(int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -858,6 +861,9 @@ private:
     // m_ignore == limit conversion range of data (for speeding up editing of
     // larger files).
     std::vector<bool> m_ignore;
+
+    // m_clef_buffer == used to identify clefs that should not be printed.
+    std::vector<std::tuple<bool, hum::HumNum, Clef *> > m_clef_buffer;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
