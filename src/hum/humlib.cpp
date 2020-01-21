@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 19 21:09:51 PST 2020
+// Last Modified: Mon Jan 20 20:38:04 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -5454,6 +5454,7 @@ void GridSide::setHarmony(const string& token) {
 	HTp newtoken = new HumdrumToken(token);
 	setHarmony(newtoken);
 }
+
 
 
 //////////////////////////////
@@ -37846,6 +37847,13 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 					upbow = true;
 				} else if (strcmp(grandchild.name(), "down-bow") == 0) {
 					downbow = true;
+				} else if (strcmp(grandchild.name(), "harmonic") == 0) {
+					// check of not an artificial harmonic
+					xml_node artificial = grandchild.select_node("artificial").node();
+					if (!artificial) {
+						// natural harmonic
+						harmonic = true;
+					}
 				}
 				grandchild = grandchild.next_sibling();
 			}
@@ -38246,7 +38254,7 @@ vector<pair<int, xml_node>>&  MxmlEvent::getTempos(void) {
 //
 
 void MxmlEvent::setDynamics(xml_node node) {
-	m_dynamics = node;
+	m_dynamics.push_back(node);
 }
 
 
@@ -38278,7 +38286,7 @@ void MxmlEvent::addFiguredBass(xml_node node) {
 // MxmlEvent::getDynamics --
 //
 
-xml_node MxmlEvent::getDynamics(void) {
+vector<xml_node> MxmlEvent::getDynamics(void) {
 	return m_dynamics;
 }
 
@@ -63873,6 +63881,8 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	map<string, xml_node> partcontent; // mapping of IDs to part elements
 
 	getPartInfo(partinfo, partids, doc);
+	m_used_hairpins.resize(partinfo.size());
+
 	m_current_dynamic.resize(partids.size());
 	m_stop_char.resize(partids.size(), "[");
 
@@ -64072,6 +64082,7 @@ void Tool_musicxml2hum::addMeasureOneNumber(HumdrumFile& infile) {
 			break;
 		}
 		// there is no digit on barline, so add one.
+
 		string newvalue = "=";
 		if (value.size() < 2) {
 			newvalue += "1";
@@ -64080,7 +64091,12 @@ void Tool_musicxml2hum::addMeasureOneNumber(HumdrumFile& infile) {
 			newvalue += value.substr(1);
 		}
 		token->setText(newvalue);
-		// add "1" to other spines here?
+
+		// Add "1" to other spines here:
+		for (int j=1; j<infile[i].getFieldCount(); j++) {
+			HTp tok = infile.token(i, j);
+			tok->setText(newvalue);
+		}
 		break;
 	}
 }
@@ -65387,21 +65403,22 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		// Fix later so that multiple dynamics are handleded in the part at the
 		// same time.  The LO parameters for multiple dynamics will need to be
 		// qualified with "n=#".
-		event->setDynamics(m_current_dynamic[partindex][0]);
-		string dparam = getDynamicsParameters(m_current_dynamic[partindex][0]);
+		for (int i=0; i<(int)m_current_dynamic[partindex].size(); i++) {
+			event->setDynamics(m_current_dynamic[partindex][i]);
+			string dparam = getDynamicsParameters(m_current_dynamic[partindex][i]);
 
-		m_current_dynamic[partindex].clear();
-
-		event->reportDynamicToOwner();
-		addDynamic(slice->at(partindex), event, partindex);
-		if (dparam != "") {
-			GridMeasure *gm = slice->getMeasure();
-			string fullparam = "!LO:DY" + dparam;
-			if (gm) {
-				gm->addDynamicsLayoutParameters(slice, partindex, fullparam);
+			event->reportDynamicToOwner();
+			addDynamic(slice->at(partindex), event, partindex);
+			if (dparam != "") {
+				// deal with multiple layout entries here...
+				GridMeasure *gm = slice->getMeasure();
+				string fullparam = "!LO:DY" + dparam;
+				if (gm) {
+					gm->addDynamicsLayoutParameters(slice, partindex, fullparam);
+				}
 			}
 		}
-
+		m_current_dynamic[partindex].clear();
 	}
 
 	// see if a hairpin ending needs to be added before end of measure:
@@ -65883,55 +65900,108 @@ void Tool_musicxml2hum::setEditorialAccidental(int accidental, GridSlice* slice,
 //
 
 void Tool_musicxml2hum::addDynamic(GridPart* part, MxmlEvent* event, int partindex) {
-	xml_node direction = event->getDynamics();
-	if (!direction) {
-		return;
-	}
-	xml_attribute placement = direction.attribute("placement");
-	bool above = false;
-	if (placement) {
-		string value = placement.value();
-		if (value == "above") {
-			above = true;
-		}
-	}
-	xml_node child = direction.first_child();
-	if (!child) {
-		return;
-	}
-	if (!nodeType(child, "direction-type")) {
-		return;
-	}
-	xml_node grandchild = child.first_child();
-	if (!grandchild) {
+	vector<xml_node> directions = event->getDynamics();
+	if (directions.empty()) {
 		return;
 	}
 
-	if (!(nodeType(grandchild, "dynamics") || nodeType(grandchild, "wedge"))) {
-		return;
-	}
+	HTp tok = NULL;
 
-	if (nodeType(grandchild, "dynamics")) {
-		xml_node dynamic = grandchild.first_child();
-		if (!dynamic) {
-			return;
+	for (int i=0; i<(int)directions.size(); i++) { 
+		xml_node direction = directions[i];
+		xml_attribute placement = direction.attribute("placement");
+		bool above = false;
+		if (placement) {
+			string value = placement.value();
+			if (value == "above") {
+				above = true;
+			}
 		}
-		string dstring = getDynamicString(dynamic);
-		HTp dtok = new HumdrumToken(dstring);
-		part->setDynamics(dtok);
-	} else if (nodeType(grandchild, "wedge")) {
-		xml_node hairpin = grandchild;
-		if (!hairpin) {
-			return;
+		xml_node child = direction.first_child();
+		if (!child) {
+			continue;
 		}
-		string hstring = getHairpinString(hairpin, partindex);
-		HTp htok = new HumdrumToken(hstring);
-		if ((hstring != "[") && (hstring != "]") && above) {
-			htok->setValue("LO", "HP", "a", "true");
+		if (!nodeType(child, "direction-type")) {
+			continue;
 		}
-		part->setDynamics(htok);
+		xml_node grandchild = child.first_child();
+		if (!grandchild) {
+			continue;
+		}
+
+		if (!(nodeType(grandchild, "dynamics") || nodeType(grandchild, "wedge"))) {
+			continue;
+		}
+
+		if (nodeType(grandchild, "dynamics")) {
+			xml_node dynamic = grandchild.first_child();
+			if (!dynamic) {
+				continue;
+			}
+			string dstring = getDynamicString(dynamic);
+			if (!tok) {
+				tok = new HumdrumToken(dstring);
+			} else {
+				string oldtext = tok->getText();
+				string newtext = oldtext + " " + dstring;
+				tok->setText(newtext);
+			}
+		} else if ( nodeType(grandchild, "wedge")) {
+			xml_node hairpin = grandchild;
+
+			if (isUsedHairpin(hairpin, partindex)) {
+				// need to suppress wedge ending if already used in [[ or ]]
+				continue;
+			}
+			if (!hairpin) {
+				cerr << "Warning: Expecting a hairpin, but found nothing" << endl;
+				continue;
+			}
+			string hstring = getHairpinString(hairpin, partindex);
+			if (!tok) {
+				tok = new HumdrumToken(hstring);
+			} else {
+				string oldtext = tok->getText();
+				string newtext = oldtext + " " + hstring;
+				tok->setText(newtext);
+			}
+
+			// Deal here with adding an index if there is more than one hairpin.
+			if ((hstring != "[") && (hstring != "]") && above) {
+				tok->setValue("LO", "HP", "a", "true");
+			}
+		}
+	}
+	if (tok) {
+		part->setDynamics(tok);
 	}
 }
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml::isUsedHairpin --  Needed to avoid double-insertion
+//    of hairpins which were stored before a barline so that they
+//    are not also repeated on the first beat of the next barline.
+//    This fuction will remove the hairpin from the used array
+//    when it is checked.  The used array is only for storing 
+//    hairpins that end on measures, so in theory there should not
+//    be too many, and they will be removed fairly quickly.
+//
+
+bool Tool_musicxml2hum::isUsedHairpin(xml_node hairpin, int partindex) {
+	for (int i=0; i<(int)m_used_hairpins.at(partindex).size(); i++) {
+		if (hairpin == m_used_hairpins.at(partindex).at(i)) {
+			// Cannot delete yet: the hairpin endings are being double accessed somewhere.
+			//m_used_hairpins[partindex].erase(m_used_hairpins[partindex].begin() + i);
+			return true;
+		}
+	}
+	return false;
+}
+
+
 
 //////////////////////////////
 //
@@ -65947,6 +66017,7 @@ void Tool_musicxml2hum::addDynamic(GridPart* part, MxmlEvent* event, int partind
 //
 
 void Tool_musicxml2hum::addHairpinEnding(GridPart* part, MxmlEvent* event, int partindex) {
+
 	xml_node direction = event->getHairpinEnding();
 	if (!direction) {
 		return;
@@ -65979,8 +66050,27 @@ void Tool_musicxml2hum::addHairpinEnding(GridPart* part, MxmlEvent* event, int p
 		} else if (hstring == "]") {
 			hstring = "]]";
 		}
-		HTp htok = new HumdrumToken(hstring);
-		part->setDynamics(htok);
+		m_used_hairpins.at(partindex).push_back(hairpin);
+		HTp current = part->getDynamics();
+		if (!current) {
+			HTp htok = new HumdrumToken(hstring);
+			part->setDynamics(htok);
+		} else {
+			string text = current->getText();
+			text += " ";
+			text += hstring;
+			// Set single-note crescendos
+			if (text == "< [[") {
+				text = "<[";
+			} else if (text == "> ]]") {
+				text = ">]";
+			} else if (text == "< [") {
+				text = "<[";
+			} else if (text == "> ]") {
+				text = ">]";
+			}
+			current->setText(text);
+		}
 	}
 }
 

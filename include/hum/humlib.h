@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 19 21:09:51 PST 2020
+// Last Modified: Mon Jan 20 20:38:04 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4226,7 +4226,7 @@ class MxmlEvent {
 		void               setDynamics        (xml_node node);
 		void               setHairpinEnding   (xml_node node);
 		void               addFiguredBass     (xml_node node);
-		xml_node           getDynamics        (void);
+		std::vector<xml_node> getDynamics     (void);
 		xml_node           getHairpinEnding   (void);
 		int                getFiguredBassCount(void);
 		xml_node           getFiguredBass     (int index);
@@ -4250,7 +4250,7 @@ class MxmlEvent {
 		bool               m_invisible;  // for forceInvisible();
 		bool               m_stems;      // for preserving stems
 
-		xml_node          m_dynamics;    // dynamics <direction> starting just before note
+		std::vector<xml_node> m_dynamics;   // dynamics <direction> starting just before note
 		xml_node          m_hairpin_ending; // hairpin <direction> starting just after note and before new measure
 		std::vector<xml_node>  m_figured_bass; // fb starting just before note
 		std::vector<std::pair<int, xml_node>>  m_text;   // text <direction> starting just before note
@@ -6637,6 +6637,7 @@ class Tool_musicxml2hum : public HumTool {
 		void printRdfs         (ostream& out);
 		void printResult       (ostream& out, HumdrumFile& outfile);
 		void addMeasureOneNumber(HumdrumFile& infile);
+		bool isUsedHairpin     (pugi::xml_node hairpin, int partindex);
 
 	public:
 
@@ -6665,6 +6666,7 @@ class Tool_musicxml2hum : public HumTool {
 		std::string m_systemDecoration;
 
 		std::vector<std::vector<pugi::xml_node>> m_current_dynamic;
+		std::vector<std::vector<pugi::xml_node>> m_used_hairpins;
 		std::vector<pugi::xml_node> m_current_figured_bass;
 		std::vector<std::pair<int, pugi::xml_node>> m_current_text;
 		std::vector<std::pair<int, pugi::xml_node>> m_current_tempo;
