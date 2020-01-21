@@ -8766,7 +8766,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         if (hairpins.find("<") != string::npos) {
             int endline = false;
             hum::HTp endtok = NULL;
+            hum::HumNum duration = 0;
             if (hairpins.find("<[") != string::npos) {
+                duration = getLeftNoteDuration(token);
                 endtok = token;
                 endline = true;
             }
@@ -8789,8 +8791,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setStaff(hairpin, m_currentstaff + belowadj);
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
-                hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
-                if (endline || (endtok->find("[[") != std::string::npos)) {
+                hum::HumNum tstamp2;
+                if (duration > 0) {
+                    tstamp2 = getMeasureTstamp(line->token(i), duration, staffindex);
+                }
+                else {
+                    tstamp2 = getMeasureTstamp(endtok, staffindex);
+                }
+                if ((duration == 0) && (endline || (endtok->find("[[") != std::string::npos))) {
                     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
                     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
                     tstamp2 += endtok->getLine()->getDuration() * mfactor;
@@ -8848,7 +8856,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         else if (hairpins.find(">") != string::npos) {
             int endline = false;
             hum::HTp endtok = NULL;
+            hum::HumNum duration = 0;
             if (hairpins.find(">]") != string::npos) {
+                duration = getLeftNoteDuration(token);
                 endtok = token;
                 endline = true;
             }
@@ -8870,8 +8880,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setStaff(hairpin, m_currentstaff + belowadj);
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
-                hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
-                if (endline || (endtok->find("]]") != std::string::npos)) {
+                hum::HumNum tstamp2;
+                if (duration > 0) {
+                    tstamp2 = getMeasureTstamp(line->token(i), duration, staffindex);
+                }
+                else {
+                    tstamp2 = getMeasureTstamp(endtok, staffindex);
+                }
+                if ((duration == 0) && (endline || (endtok->find("]]") != std::string::npos))) {
                     tstamp2 += endtok->getLine()->getDuration();
                 }
                 int measures = getMeasureDifference(line->token(i), endtok);
@@ -8944,6 +8960,30 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
     processDynamics(token, staffindex);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLeftNoteDuration --
+//
+
+hum::HumNum HumdrumInput::getLeftNoteDuration(hum::HTp token)
+{
+    hum::HumNum output = 0;
+    hum::HTp current = token;
+    while (current) {
+        if (!current->isKern()) {
+            current = current->getPreviousFieldToken();
+            continue;
+        }
+        if (current->isNull()) {
+            current = current->getPreviousFieldToken();
+            continue;
+        }
+        output = hum::Convert::recipToDuration(current);
+        break;
+    }
+    return output;
 }
 
 //////////////////////////////
@@ -9159,6 +9199,24 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum qbeat = token->getDurationFromBarline();
+    if (fract > 0) {
+        // what is this for? Causes problems with pedal markings.
+        // qbeat += fract * token->getDuration().getAbs();
+    }
+    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+    // if (ss[staffindex].meter_bottom == 0) {
+    //  mfactor = 1;
+    //  mfactor /= 8;
+    // }
+    hum::HumNum mbeat = qbeat * mfactor + 1;
+    return mbeat;
+}
+
+hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, hum::HumNum extraduration, int staffindex, hum::HumNum fract)
+{
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    hum::HumNum qbeat = token->getDurationFromBarline();
+    qbeat += extraduration;
     if (fract > 0) {
         // what is this for? Causes problems with pedal markings.
         // qbeat += fract * token->getDuration().getAbs();
@@ -17027,20 +17085,20 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     //	==	==	0
     //	*-	*-	0
 
-	if (!barindex.empty()) {
-		int firstbar = barindex[0];
-		if ((firstbar == 0) && (barindex.size() >= 1)) {
-			firstbar = barindex[1];
-		}
-		hum::HumNum bardur = infile[firstbar].getDurationFromStart();
-		if (bardur == 0) {
-			// Extend first non-zero number in list backwards to start of output.
-			// This allows a multibar rest at the start of the music.
-			for (int i=0; i<firstbar; i++) {
-				output[i] = output[firstbar];
-			}
-		}
-	}
+    if (!barindex.empty()) {
+        int firstbar = barindex[0];
+        if ((firstbar == 0) && (barindex.size() >= 1)) {
+            firstbar = barindex[1];
+        }
+        hum::HumNum bardur = infile[firstbar].getDurationFromStart();
+        if (bardur == 0) {
+            // Extend first non-zero number in list backwards to start of output.
+            // This allows a multibar rest at the start of the music.
+            for (int i = 0; i < firstbar; i++) {
+                output[i] = output[firstbar];
+            }
+        }
+    }
 
     return output;
 }

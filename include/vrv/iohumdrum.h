@@ -434,6 +434,7 @@ protected:
     void processGlobalDirections(hum::HTp token, int staffindex);
     void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
+    hum::HumNum getMeasureTstamp(hum::HTp token, hum::HumNum extraduration, int staffindex, hum::HumNum frac = 0);
     hum::HumNum getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
     hum::HumNum getMeasureFactor(int staffindex);
@@ -567,6 +568,7 @@ protected:
     void addTieLineStyle(Tie *element, hum::HTp token, int noteindex);
     void setAccid(Accid *accid, const std::string &loaccid);
     bool phraseIsInvisible(hum::HTp token, int pindex);
+    hum::HumNum getLeftNoteDuration(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
