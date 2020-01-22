@@ -417,7 +417,8 @@ protected:
     void removeTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers);
     void removeGBeam(std::vector<std::string> &elements, std::vector<void *> &pointers);
     void removeBeam(std::vector<std::string> &elements, std::vector<void *> &pointers);
-    vrv::Clef *insertClefElement(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp clef);
+    vrv::Clef *insertClefElement(
+        std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp clef, hum::HTp lastnote);
     void insertMeterSigElement(std::vector<std::string> &elements, std::vector<void *> &pointers,
         std::vector<hum::HTp> &layeritems, int index);
     void processSlurs(hum::HTp token);

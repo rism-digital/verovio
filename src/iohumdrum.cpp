@@ -6177,14 +6177,18 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         // Basic compensation for clef change (can be improved later):
+        hum::HTp lastnote = NULL;
         for (int i = 0; i < (int)layerdata.size(); ++i) {
+            if (layerdata[i]->isData() && !layerdata[i]->isNull()) {
+                lastnote = layerdata[i];
+            }
             if (!layerdata[i]->isClef()) {
                 continue;
             }
             if (layerdata[i]->getDurationFromBarline() > 0) {
                 // only insert a clef change after the whole-note rest
                 // if the clef change is not really an initial clef.
-                insertClefElement(elements, pointers, layerdata[i]);
+                insertClefElement(elements, pointers, layerdata[i], lastnote);
             }
         }
 
@@ -6251,7 +6255,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (layerdata[i]->isMens()) {
                 if (layerdata[i]->isClef()) {
                     if (ss.at(m_currentstaff - 1).last_clef != *layerdata[i]) {
-                        Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
+                        Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
                         setLocationId(clef, layerdata[i]);
                     }
                 }
@@ -6268,25 +6272,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         continue;
                     }
 
-                    bool sameas = false;
-                    hum::HumNum clefpos = -1;
-                    if (lastnote) {
-                        clefpos = layerdata[i]->getDurationFromBarline();
-                        hum::HumNum notepos = lastnote->getDurationFromBarline();
-                        hum::HumNum duration = hum::Convert::recipToDuration(lastnote);
-                        if (notepos + duration != clefpos) {
-                            sameas = true;
-                        }
-                    }
+                    Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
 
-                    Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
-                    // Store all of the clefs for later sameas analysis:
-                    m_clef_buffer.push_back(std::make_tuple(sameas, clefpos, clef));
-                    if (sameas) {
-                        // make 100% transparent red in case sameas method changes:
-                        clef->SetColor("#ff000000");
-                        // clef->SetType("sameas");
-                    }
                     setLocationId(clef, layerdata[i]);
                     int diff = layerindex - subtrack;
                     if (diff > 0) {
@@ -6330,7 +6317,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                             int ttrack = tok->getTrack();
                             if (ttrack == xtrack) {
                                 if (tok->isClef()) {
-                                    Clef *clef = insertClefElement(elements, pointers, tok);
+                                    Clef *clef = insertClefElement(elements, pointers, tok, lastnote);
                                     setLocationId(clef, layerdata[i]);
                                     // Uncomment when clef->SetSameas() is available:
                                     // std::string sameas = "#clef-L";
@@ -10568,11 +10555,32 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 // the movement.
 //
 
-Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token)
+Clef *HumdrumInput::insertClefElement(
+    std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, hum::HTp lastnote)
 {
     bool iseditorial = getBooleanParameter(token, "CL", "ed");
     std::string color = getStringParameter(token, "CL", "color");
     Clef *clef = new Clef;
+
+    bool sameas = false;
+    hum::HumNum clefpos = -1;
+    if (lastnote) {
+        clefpos = token->getDurationFromBarline();
+        hum::HumNum notepos = lastnote->getDurationFromBarline();
+        hum::HumNum duration = hum::Convert::recipToDuration(lastnote);
+        if (notepos + duration != clefpos) {
+            sameas = true;
+        }
+    }
+
+    // Store all of the clefs for later sameas analysis:
+    m_clef_buffer.push_back(std::make_tuple(sameas, clefpos, clef));
+    if (sameas) {
+        // make 100% transparent red in case sameas method changes:
+        clef->SetColor("#ff000000");
+        // clef->SetType("sameas");
+    }
+
     if (iseditorial) {
         Supplied *supplied = new Supplied;
         appendElement(supplied, clef);
