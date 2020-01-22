@@ -223,15 +223,31 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     ArrayOfBeamElementCoords stemUps;
     ArrayOfBeamElementCoords stemDowns;
     
+    // position x for the stem (normal and cue-sized)
+    int stemXAbove[2];
+    int stemXBelow[2];
+    
+    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+    stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    stemXBelow[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+
+    
     for (i = 0; i < elementCount; ++i) {
         if (!m_beamElementCoordRefs.at(i)->m_stem) continue;
         
         if (m_beamElementCoordRefs.at(i)->m_stem->GetDrawingStemDir() == STEMDIRECTION_up) {
             m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yBottom;
+            m_beamElementCoordRefs.at(i)->m_x += stemXAbove[beamInterface->m_cueSize];
             stemUps.push_back(m_beamElementCoordRefs.at(i));
+            
         }
         else {
             m_beamElementCoordRefs.at(i)->m_y = m_beamElementCoordRefs.at(i)->m_yTop;
+            m_beamElementCoordRefs.at(i)->m_x += stemXBelow[beamInterface->m_cueSize];
             stemDowns.push_back(m_beamElementCoordRefs.at(i));
         }
     }
@@ -341,9 +357,6 @@ void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
     assert(beamInterface);
     
     double xr;
-    
-    // position x for the stem (normal and cue-sized)
-    int stemX[2];
 
     // For slope calculation and linear regression
     double s_x = 0.0; // sum of all x(n) for n in beamElementCoord
@@ -374,27 +387,13 @@ void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
             : doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (verticalShiftFactor + 0.5);
     }
 
-    // swap x position and verticalShift direction with stem down
-    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-        stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        stemX[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    }
-    else {
-        stemX[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-        stemX[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    // swap verticalShift direction with stem down
+    if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
         verticalShift = -verticalShift;
     }
 
-    
     for (i = 0; i < elementCount; ++i) {
         m_beamElementCoordRefs.at(i)->m_yBeam = m_beamElementCoordRefs.at(i)->m_y + verticalShift;
-        m_beamElementCoordRefs.at(i)->m_x += stemX[beamInterface->m_cueSize];
-    }
-
-    for (i = 0; i < elementCount; ++i) {
         s_y += m_beamElementCoordRefs.at(i)->m_yBeam - yRel;
         s_y2 += pow(m_beamElementCoordRefs.at(i)->m_yBeam - yRel, 2);
         s_x += m_beamElementCoordRefs.at(i)->m_x - xRel;
