@@ -390,8 +390,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
     }
     else {
-        baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
-        if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
+        baseStem = -params->m_interface->GetStemLength(params->m_doc, params->m_staff, drawingCueSize);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
     // Also, the given stem length is understood as being measured from the center of the note.

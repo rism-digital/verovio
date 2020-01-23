@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Adjust stem length with double-stemmed writing
 
 ## [2.4.0] - 2020-01-15
 * Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)

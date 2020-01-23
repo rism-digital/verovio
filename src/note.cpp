@@ -301,6 +301,34 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
+int Note::GetStemLength(Doc *doc, Staff *staff, bool graceSize)
+{
+    assert(doc);
+    assert(staff);
+    
+    int baseStem = doc->GetDrawingUnit(staff->m_drawingStaffSize) * STANDARD_STEMLENGTH;
+    
+    int halfUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    int shortening = 0;
+
+    int unitToLine = (this->GetDrawingStemDir() == STEMDIRECTION_up) ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2 : this->GetDrawingLoc();
+    if (unitToLine < 5) {
+        this->SetColor("red");
+        switch (unitToLine) {
+            case 4: shortening = 1; break;
+            case 3: shortening = 2; break;
+            case 2: shortening = 3; break;
+            case 1: shortening = 4; break;
+            default: shortening = 4;
+        }
+    }
+    baseStem -= (shortening * halfUnit);
+
+    if (graceSize) baseStem = doc->GetCueSize(baseStem);
+    
+    return baseStem;
+}
+
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
