@@ -42,7 +42,7 @@ public:
     void Reset();
 
     void CalcBeam(
-        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place = BEAMPLACE_NONE);
+        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
 
     /**
      *
@@ -61,13 +61,21 @@ public:
     void ClearCoordRefs();
     
 private:
+    void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+    
     void CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    
+    void CalcStemLength(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    
+    void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
 public:
     // values set by CalcBeam
     int m_startingX; // the initial X position of the beam
     int m_startingY; // the initial Y position of the beam
     double m_beamSlope; // the slope of the beam
+    int m_verticalCenter;
+    int m_avgY;
 
     /**
      * An array of coordinates for each element
