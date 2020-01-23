@@ -93,6 +93,8 @@ public:
      * This is called by Beam::FilterList
      */
     void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
+    
+    bool IsRepeatedPattern();
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.

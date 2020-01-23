@@ -228,6 +228,67 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     }
 }
 
+bool BeamDrawingInterface::IsRepeatedPattern()
+{
+    if (m_drawingPlace == BEAMPLACE_mixed) return false;
+    
+    if (m_drawingPlace == BEAMPLACE_NONE) return false;
+    
+    int elementCount = (int)m_beamElementCoords.size();
+    
+    // No pattern with at least 4 elements
+    if (elementCount < 4) return false;
+    
+    std::vector<int> items;
+    items.reserve(m_beamElementCoords.size());
+    
+    int i;
+    for (i = 0; i < elementCount; ++i) {
+        if (!m_beamElementCoords.at(i)->m_stem) continue;
+        
+        if (m_drawingPlace == BEAMPLACE_above) {
+            items.push_back(m_beamElementCoords.at(i)->m_yBottom);
+        }
+        else {
+            items.push_back(m_beamElementCoords.at(i)->m_yTop);
+        }
+    }
+    int nbItems = (int)items.size();
+    
+    // No pattern with at least 4 elements or if all elements are the same
+    if ((nbItems < 4) || (std::equal(items.begin() + 1, items.end(), items.begin()))) {
+        return false;
+    }
+
+    // Find all possible dividers for the sequence (without 1 and its size)
+    std::vector<int> dividers;
+    for (i = 2; i <= nbItems / 2; ++i) {
+        if (nbItems % i == 0) dividers.push_back(i);
+    }
+    
+    // Correlate a sub-array for each divider until a sequence is found (if any)
+    for (i = 0; i < (int)dividers.size(); ++i) {
+        int divider = dividers.at(i);
+        int j;
+        bool pattern = true;
+        std::vector<int>::iterator iter = items.begin();
+        std::vector<int> v1 = std::vector<int>(iter, iter + divider);
+        for (j = 1; j < (nbItems / divider); ++j) {
+            std::vector<int> v2 = std::vector<int>(iter + j * divider, iter + (j + 1) * divider);
+            if (v1 != v2) {
+                pattern = false;
+                break;
+            }
+        }
+        if (pattern) {
+            LogDebug("Pattern found %d", divider);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
