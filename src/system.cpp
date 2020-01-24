@@ -281,7 +281,9 @@ int System::OptimizeScoreDef(FunctorParams *functorParams)
 
     if (params->m_firstScoreDef) {
         params->m_firstScoreDef = false;
-        return FUNCTOR_SIBLINGS;
+        if (!params->m_doc->GetOptions()->m_condenseFirstPage.GetValue()) {
+            return FUNCTOR_SIBLINGS;
+        }
     }
 
     params->m_currentScoreDef = this->GetDrawingScoreDef();

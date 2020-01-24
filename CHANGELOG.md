@@ -1,6 +1,9 @@
 # Changelog
 
 ## [unreleased]
+* Option for forcing first page to be condensed (--condense-first-page)
+* Option for forcing pages qwith tempo to be condensed (--condense-tempo-pages)
+* Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ## [2.4.0] - 2020-01-15
 * Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)

@@ -429,8 +429,8 @@ void View::DrawBracketSpan(
             int x2Dotted
                 = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
             int yDotted = y + lineWidth / 2;
-            dc->DrawLine(ToDeviceContextX(x1Dotted + 1.5 * lineWidth), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted),
-                ToDeviceContextY(yDotted));
+            dc->DrawLine(ToDeviceContextX(x1Dotted + 1.5 * lineWidth), ToDeviceContextY(yDotted),
+                ToDeviceContextX(x2Dotted), ToDeviceContextY(yDotted));
             dc->ResetPen();
             dc->ResetBrush();
         }

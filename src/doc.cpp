@@ -763,7 +763,7 @@ void Doc::SetCurrentScoreDefDoc(bool force)
 
 void Doc::OptimizeScoreDefDoc(bool encoded)
 {
-    if (encoded) {
+    if (encoded && !m_options->m_condenseEncoded.GetValue()) {
         return;
     }
 
