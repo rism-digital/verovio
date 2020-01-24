@@ -224,7 +224,7 @@ public:
     /**
      * Optimize the scoreDef once the document is cast-off.
      */
-    void OptimizeScoreDefDoc(bool encoded = false);
+    void OptimizeScoreDefDoc();
 
     /**
      * Prepare the document for drawing.
