@@ -313,7 +313,6 @@ int Note::GetStemLength(Doc *doc, Staff *staff, bool graceSize)
 
     int unitToLine = (this->GetDrawingStemDir() == STEMDIRECTION_up) ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2 : this->GetDrawingLoc();
     if (unitToLine < 5) {
-        this->SetColor("red");
         switch (unitToLine) {
             case 4: shortening = 1; break;
             case 3: shortening = 2; break;
@@ -322,6 +321,17 @@ int Note::GetStemLength(Doc *doc, Staff *staff, bool graceSize)
             default: shortening = 4;
         }
     }
+   
+    // Limit shortening with duration shorter than quarter not when not in a beam
+    if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            shortening = std::min(3, shortening);
+        }
+        else {
+            shortening = std::min(2, shortening);
+        }
+    }
+    
     baseStem -= (shortening * halfUnit);
 
     if (graceSize) baseStem = doc->GetCueSize(baseStem);
