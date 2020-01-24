@@ -1,4 +1,4 @@
-Verovio 2.5.0-dev-7cbc098-dirty
+Verovio 2.5.0-dev-d3ef851-dirty
 
 Example usage:
 
@@ -20,6 +20,9 @@ Options (marked as * are repeatable)
 Input and page layout options
  --adjust-page-height              Crop the page height to the height of the content
  --breaks <s>                      Define page and system breaks layout (default: "auto"; other values: "none", "encoded")
+ --condense-encoded                Condense encoded layout rendering
+ --condense-first-page             When condensing a score also condense the first page
+ --condense-tempo-pages            When condensing a score also condense pages with a tempo change
  --even-note-spacing               Specify the linear spacing factor
  --hum-type                        Include type attributes when importing from Humdrum
  --justify-include-last-page       Justify including the last page
