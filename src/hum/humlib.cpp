@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan 20 20:38:04 PST 2020
+// Last Modified: Sat Jan 25 10:34:52 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10308,6 +10308,95 @@ void HumGrid::deleteMeasure(int index) {
 	delete this->at(index);
 	this->at(index) = NULL;
 	this->erase(this->begin() + index);
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::expandLocalCommentLayers -- Walk backwards in the
+//   data list, and match the layer count for local comments
+//   to have them match to the next data line.  This is needed
+//   to attach layout parameters properly to data tokens.  Layout
+//   parameters cannot pass through spine manipulator lines, so
+//   this function is necessary to prevent spine manipulators
+//   from orphaning local layout parameter lines.
+//
+//   For now just adjust local layout parameter slices, but maybe
+//   later do all types of local comments.
+//
+
+void HumGrid::expandLocalCommentLayers(void) {
+	GridSlice *dataslice = NULL;
+	GridSlice *localslice = NULL;
+	for (int i=(int)m_allslices.size() - 1; i>=0; i--) {
+		if (m_allslices[i]->isDataSlice()) {
+			dataslice = m_allslices[i];
+		} else if (m_allslices[i]->isMeasureSlice()) {
+			dataslice = m_allslices[i];
+		}
+		// Other slice types should be considered as well,
+		// but definitely not manipulator slices:
+		if (m_allslices[i]->isManipulatorSlice()) {
+			dataslice = m_allslices[i];
+		}
+
+		if (!m_allslices[i]->isLocalLayoutSlice()) {
+			continue;
+		}
+		localslice = m_allslices[i];
+		if (!dataslice) {
+			continue;
+		}
+		matchLayers(localslice, dataslice);
+	}
+}
+
+
+//////////////////////////////
+//
+// HumGrid::matchLayers -- Make sure every staff in both inputs
+//   have the same number of voices.
+//
+
+void HumGrid::matchLayers(GridSlice* output, GridSlice* input) {
+	if (output->size() != input->size()) {
+		// something wrong or one of the slices
+		// could be a non-spined line.
+		return;
+	}
+	int partcount = (int)input->size();
+	for (int part=0; part<partcount; part++) {
+		GridPart* ipart = input->at(part);
+		GridPart* opart = output->at(part);
+		if (ipart->size() != opart->size()) {
+			// something string that should never happen
+			continue;
+		}
+		int scount = (int)ipart->size();
+		for (int staff=0; staff<scount; staff++) {
+			GridStaff* istaff = ipart->at(staff);
+			GridStaff* ostaff = opart->at(staff);
+			matchLayers(ostaff, istaff);
+		}
+	}
+}
+
+
+void HumGrid::matchLayers(GridStaff* output, GridStaff* input) {
+	if (input->size() == output->size()) {
+		// The voice counts match so nothing to do.
+		return;
+	}
+	if (input->size() < output->size()) {
+		// Ignore potentially strange case.
+	}
+
+	int diff = (int)input->size() - (int)output->size();
+	for (int i=0; i<diff; i++) {
+		GridVoice* voice = new GridVoice("!", 0);
+		output->push_back(voice);
+	}
 }
 
 
@@ -36843,7 +36932,12 @@ bool MxmlEvent::hasGraceSlash(void) {
 
 //////////////////////////////
 //
-// MxmlEvent::hasSlurStart --
+// MxmlEvent::hasSlurStart -- Returns 0 if no slur; otherwise, return the 
+//  slur@number (this value could be used to encode & prefixes on slurs).
+//  Need to deal with multiple slur starts on one event.
+// 
+//   number: used to keep track of overlapping slurs.
+//
 //   direction: 0=unspecified, 1=positive curvature, -1=negative curvature.
 //
 //  <note>
@@ -36859,9 +36953,9 @@ bool MxmlEvent::hasGraceSlash(void) {
 //          <slur number="1" placement="below" type="start"/>
 //
 
-bool MxmlEvent::hasSlurStart(int& direction) {
+int MxmlEvent::hasSlurStart(int& direction) {
 	direction = 0;
-	bool output = false;
+	bool output = 0;
 	xml_node child = this->getNode();
 	if (!nodeType(child, "note")) {
 		return output;
@@ -36875,7 +36969,14 @@ bool MxmlEvent::hasSlurStart(int& direction) {
 					xml_attribute slurtype = grandchild.attribute("type");
 					if (slurtype) {
 						if (strcmp(slurtype.value(), "start") == 0) {
-							output = true;
+							output = -1;
+						}
+					}
+					string number = grandchild.attribute("number").value();
+					if (!number.empty()) {
+						int num = stoi(number);
+						if (num != 0) {
+							output = num;
 						}
 					}
 					xml_attribute orientation = grandchild.attribute("orientation");
@@ -36908,17 +37009,17 @@ bool MxmlEvent::hasSlurStart(int& direction) {
 
 //////////////////////////////
 //
-// MxmlEvent::hasSlurStop --
+// MxmlEvent::hasSlurStop -- Need to deal with multiple slur stops on same event.
 //
 //  <note>
 //     <notations>
 //         <slur type="start" orientation="under" number="1">
 //
 
-bool MxmlEvent::hasSlurStop(void) {
+int MxmlEvent::hasSlurStop(void) {
 	xml_node child = this->getNode();
 	if (!nodeType(child, "note")) {
-		return false;
+		return 0;
 	}
 	child = child.first_child();
 	while (child) {
@@ -36929,7 +37030,15 @@ bool MxmlEvent::hasSlurStop(void) {
 					xml_attribute slurtype = grandchild.attribute("type");
 					if (slurtype) {
 						if (strcmp(slurtype.value(), "stop") == 0) {
-							return true;
+							string number = grandchild.attribute("number").value();
+							if (!number.empty()) {
+								int num = stoi(number);
+								if (num != 0) {
+									return num;
+								} else {
+									return 1;
+								}
+							}
 						}
 					}
 				}
@@ -36938,7 +37047,7 @@ bool MxmlEvent::hasSlurStop(void) {
 		}
 		child = child.next_sibling();
 	}
-	return false;
+	return 0;
 }
 
 
@@ -63968,6 +64077,9 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		outdata.enableRecipSpine();
 	}
 
+	outdata.buildSingleList();
+	outdata.expandLocalCommentLayers();
+
 	// set the duration of the last slice
 
 	HumdrumFile outfile;
@@ -65498,9 +65610,6 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 			placementstring = ":a";
 		} else if (value == "below") {
 			placementstring = ":b";
-		} else {
-			// force above if no placement specified
-			placementstring = ":a";
 		}
 	}
 
@@ -65519,10 +65628,25 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 
 	xml_node sibling = grandchild;
 
+	bool dyQ = false;
+	xml_attribute defaulty;
+
 	string text;
 	while (sibling) {
 		if (nodeType(sibling, "words")) {
 			text += sibling.child_value();
+			if (!dyQ) {
+				defaulty = sibling.attribute("default-y");
+				if (defaulty) {
+					dyQ = true;
+					double number = std::stod(defaulty.value());
+					if (number >= 0.0) {
+						placementstring = ":a";
+					} else if (number < 0.0) {
+						placementstring = ":b";
+					}
+				}
+			}
 		}
 		sibling = sibling.next_sibling();
 	}
@@ -65602,6 +65726,11 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 	if (text.empty()) {
 		// no text to display after removing whitespace
 		return;
+	}
+
+	if (placementstring.empty()) {
+		// force above if no placement specified
+		placementstring = ":a";
 	}
 
 	string output = "!LO:TX";
@@ -65697,7 +65826,7 @@ void Tool_musicxml2hum::addTempo(GridSlice* slice, GridMeasure* measure, int par
 		}
 		sibling = sibling.next_sibling();
 	}
-	
+
 	// get metronome parameters
 
 	xml_node beatunit(NULL);

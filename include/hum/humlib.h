@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan 20 20:38:04 PST 2020
+// Last Modified: Sat Jan 25 10:34:52 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3784,7 +3784,7 @@ class GridMeasure : public std::list<GridSlice*> {
 		GridSlice*   addTempoToken  (const std::string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addTempoToken  (GridSlice* slice, int partindex,
-		                             const string& tempo);
+		                             const std::string& tempo);
 		GridSlice*   addTimeSigToken(const std::string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addMeterSigToken(const std::string& tok, HumNum timestamp,
@@ -4031,6 +4031,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		                                 int index, int p, int s);
 		void cleanTempos                (void);
 		void cleanTempos                (GridSlice* slice);
+		void expandLocalCommentLayers   (void);
+		bool buildSingleList            (void);
 
 	protected:
 		void calculateGridDurations        (void);
@@ -4053,7 +4055,6 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void fillInNullTokensForClefChanges (GridSlice* clefslice,
 		                                    GridSlice* lastnote, GridSlice* nextnote);
 		void adjustClefChanges             (void);
-		bool buildSingleList               (void);
 		void extendDurationToken           (int slicei, int parti,
 		                                    int staffi, int voicei);
 		GridVoice* getGridVoice(int slicei, int parti, int staffi, int voicei);
@@ -4097,6 +4098,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void matchVoices                   (GridSlice* current, GridSlice* last);
 		void adjustVoices                  (GridSlice* curr, GridSlice* newmanip, int partsplit);
 		void createMatchedVoiceCount       (GridStaff* snew, GridStaff* sold, int p, int s);
+		void matchLayers                   (GridSlice* output, GridSlice* input);
+		void matchLayers                   (GridStaff* output, GridStaff* input);
 
 	private:
 		std::vector<GridSlice*>       m_allslices;
@@ -4174,8 +4177,8 @@ class MxmlEvent {
 		bool               isGrace            (void);
 		bool               hasGraceSlash      (void);
 		bool               isFloating         (void);
-		bool               hasSlurStart       (int& direction);
-		bool               hasSlurStop        (void);
+		int                hasSlurStart       (int& direction);
+		int                hasSlurStop        (void);
 		void               setLinked          (void);
 		std::vector<MxmlEvent*> getLinkedNotes     (void);
 		void               attachToLastEvent  (void);
