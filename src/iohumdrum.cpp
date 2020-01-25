@@ -7958,6 +7958,9 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
             placement = "above";
         }
     }
+    else {
+        placement = "above";
+    }
 
     Dir *dir = new Dir;
     setStaff(dir, m_currentstaff);
@@ -8051,6 +8054,8 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         italic = true;
     }
 
+    std::string color = token->getValue("LO", "TX", "color");
+
     double Y = 0.0;
     double Z = 0.0;
     std::string placement;
@@ -8078,8 +8083,11 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
             placement = "above";
         }
     }
+    else {
+        placement = "above";
+    }
 
-    addDirection(text, placement, bold, italic, token, staffindex, justification);
+    addDirection(text, placement, bold, italic, token, staffindex, justification, color);
 }
 
 //////////////////////////////
@@ -8153,7 +8161,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     int justification = 0;
 
     string text;
-
+    string color;
     string key;
     string value;
     for (int i = 0; i < hps->getCount(); ++i) {
@@ -8204,6 +8212,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         if (key == "rj") {
             justification = 1;
         }
+        if (key == "color") {
+            color = value;
+        }
     }
 
     double Y = 0.0;
@@ -8233,19 +8244,22 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             placement = "above";
         }
     }
+    else {
+        placement = "above";
+    }
 
     if (token->linkedParameterIsGlobal(index)) {
         int maxstaff = (int)m_staffstarts.size() - 1;
 
         if ((placement == "below") && (staffindex == maxstaff)) {
-            addDirection(text, placement, bold, italic, token, staffindex, justification);
+            addDirection(text, placement, bold, italic, token, staffindex, justification, color);
         }
         else if ((placement == "above") && (staffindex == 0)) {
-            addDirection(text, placement, bold, italic, token, staffindex, justification);
+            addDirection(text, placement, bold, italic, token, staffindex, justification, color);
         }
     }
     else {
-        addDirection(text, placement, bold, italic, token, staffindex, justification);
+        addDirection(text, placement, bold, italic, token, staffindex, justification, color);
     }
 }
 
@@ -8413,6 +8427,7 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         dir->SetTstamp(tstamp.getFloat());
     }
 
+    // convert to HPS input value:
     bool problemQ = false;
     std::string problem = token->getLayoutParameter("TX", "problem");
     if (problem == "true") {
@@ -8420,12 +8435,11 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         dir->SetType("problem");
     }
 
+    // convert to HPS input value:
     std::string typevalue = token->getLayoutParameter("TX", "type");
     if (!typevalue.empty()) {
         dir->SetType(typevalue);
     }
-
-    std::string tcolor = token->getLayoutParameter("TX", "color");
 
     m_measure->AddChild(dir);
     if (placement == "above") {
@@ -8435,13 +8449,10 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         setPlace(dir, "below");
     }
     bool plain = !(italic || bold);
-    bool needrend = plain || bold || justification || tcolor.size();
+    bool needrend = plain || bold || justification || color.size();
     if (needrend) {
         Rend *rend = new Rend;
-        if (!tcolor.empty()) {
-            rend->SetColor(tcolor);
-        }
-        else if (!color.empty()) {
+        if (!color.empty()) {
             rend->SetColor(color);
         }
         else if (problemQ) {
