@@ -116,6 +116,7 @@ namespace vrv {
 
 #define VGRP_DYNAM_DEFAULT 100
 #define VGRP_PEDAL_DEFAULT 200
+#define MAXCOLORSUBTRACK 30
 
 //----------------------------------------------------------------------------
 // namespace for local IoHumdrum classes
@@ -553,6 +554,10 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeRScale();
     infile.analyzeCrossStaffStemDirections();
     m_spine_color.resize(infile.getMaxTrack() + 1);
+    for (int i = 0; i < (int)m_spine_color.size(); i++) {
+        // hard-wire max subtrack count to MAXCOLORSUBTRACK for each spine for now.
+        m_spine_color[i].resize(MAXCOLORSUBTRACK);
+    }
     initializeSpineColor(infile);
     initializeIgnoreVector(infile);
 
@@ -898,7 +903,18 @@ void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
             for (int j = 0; j < infile[i].getFieldCount(); j++) {
                 if (hre.search(infile.token(i, j), "^\\*color:(.*)")) {
                     int ctrack = infile.token(i, j)->getTrack();
-                    m_spine_color[ctrack] = hre.getMatch(1);
+                    int strack = infile.token(i, j)->getSubtrack();
+                    if (strack < MAXCOLORSUBTRACK) {
+                        m_spine_color[ctrack][strack] = hre.getMatch(1);
+                        if (strack == 1) {
+                            m_spine_color[ctrack][0] = m_spine_color[ctrack][1];
+                        }
+                        else if (strack == 0) {
+                            for (int z = 1; z < (int)m_spine_color[ctrack].size(); z++) {
+                                m_spine_color[ctrack][z] = m_spine_color[ctrack][0];
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -4759,7 +4775,16 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             for (int j = 0; j < infile[i].getFieldCount(); j++) {
                 if (hre.search(infile.token(i, j), "^\\*color:(.*)")) {
                     int ctrack = infile.token(i, j)->getTrack();
-                    m_spine_color[ctrack] = hre.getMatch(1);
+                    int strack = infile.token(i, j)->getSubtrack();
+                    m_spine_color[ctrack][strack] = hre.getMatch(1);
+                    if (strack == 1) {
+                        m_spine_color[ctrack][0] = m_spine_color[ctrack][1];
+                    }
+                    else if (strack == 0) {
+                        for (int z = 1; z < (int)m_spine_color[ctrack].size(); z++) {
+                            m_spine_color[ctrack][z] = m_spine_color[ctrack][0];
+                        }
+                    }
                 }
             }
         }
@@ -6249,8 +6274,17 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handleStaffStateVariables(layerdata[i]);
             handleStaffDynamStateVariables(layerdata[i]);
             if (hre.search(layerdata[i], "^\\*color:(.*)")) {
-                int track = layerdata[i]->getTrack();
-                m_spine_color[track] = hre.getMatch(1);
+                int ctrack = layerdata[i]->getTrack();
+                int strack = layerdata[i]->getSubtrack();
+                m_spine_color[ctrack][strack] = hre.getMatch(1);
+                if (strack == 1) {
+                    m_spine_color[ctrack][0] = m_spine_color[ctrack][1];
+                }
+                else if (strack == 0) {
+                    for (int z = 1; z < (int)m_spine_color[ctrack].size(); z++) {
+                        m_spine_color[ctrack][z] = m_spine_color[ctrack][0];
+                    }
+                }
             }
             if (layerdata[i]->isMens()) {
                 if (layerdata[i]->isClef()) {
@@ -7674,10 +7708,11 @@ string HumdrumInput::getSpineColor(int line, int field)
     hum::HumdrumFile &infile = m_infiles[0];
     std::string output;
     int track = infile.token(line, field)->getTrack();
-    if (!m_spine_color[track].empty()) {
-        if ((m_spine_color[track] != "black") && (m_spine_color[track] != "#000000")
-            && (m_spine_color[track] != "#000")) {
-            output = m_spine_color[track];
+    int strack = infile.token(line, field)->getSubtrack();
+    if (!m_spine_color[track].at(strack).empty()) {
+        if ((m_spine_color[track].at(strack) != "black") && (m_spine_color[track].at(strack) != "#000000")
+            && (m_spine_color[track].at(strack) != "#000")) {
+            output = m_spine_color[track].at(strack);
         }
     }
     if (!m_has_color_spine) {
@@ -13759,6 +13794,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         vtoks.clear();
         vcolor.clear();
         int track = line.token(i)->getTrack();
+        int strack = line.token(i)->getSubtrack();
         if (line.token(i)->isDataType("**silbe")) {
             vtoks.push_back(line.token(i));
             string value = line.token(i)->getText();
@@ -13767,12 +13803,12 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             hre.replaceDestructive(value, "&auml;", "a2", "g");
             hre.replaceDestructive(value, "&ouml;", "o2", "g");
             vtexts.push_back(value);
-            vcolor = m_spine_color[track];
+            vcolor = m_spine_color[track].at(strack);
         }
         else {
             vtoks.push_back(line.token(i));
             vtexts.push_back(*line.token(i));
-            vcolor = m_spine_color[track];
+            vcolor = m_spine_color[track].at(strack);
         }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);

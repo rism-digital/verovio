@@ -808,7 +808,8 @@ private:
     bool m_has_color_spine = false;
 
     // m_spine_color == list of colors to apply to spine data
-    std::vector<std::string> m_spine_color;
+    // first dimension is the spine/track (staff), and second is subspine/subtrack (layer).
+    std::vector<std::vector<std::string> > m_spine_color;
 
     // m_traspose == transposition to go from sounding to written pitch.
     vector<int> m_transpose;
