@@ -2098,7 +2098,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 chord->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
-                if (cue) chord->SetCue(BOOLEAN_true);
                 if (tremSlashNum != 0)
                     chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
                 AddLayerElement(layer, chord);
@@ -2122,6 +2121,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 note->SetGrace(GRACE_unknown);
             }
         }
+        if (cue) note->SetCue(BOOLEAN_true);
 
         // set attributes to the note if we are not in a chord
         if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
@@ -2129,7 +2129,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
-            if (cue) note->SetCue(BOOLEAN_true);
             if (tremSlashNum != 0)
                 note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
         }
