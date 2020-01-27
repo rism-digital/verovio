@@ -301,14 +301,12 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::GetStemLength(Doc *doc, Staff *staff, bool graceSize)
+int Note::CalcStemLenInHalfUnits(Staff *staff)
 {
-    assert(doc);
     assert(staff);
     
-    int baseStem = doc->GetDrawingUnit(staff->m_drawingStaffSize) * STANDARD_STEMLENGTH;
+    int baseStem = STANDARD_STEMLENGTH * 2;
     
-    int halfUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     int shortening = 0;
 
     int unitToLine = (this->GetDrawingStemDir() == STEMDIRECTION_up) ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2 : this->GetDrawingLoc();
@@ -332,9 +330,7 @@ int Note::GetStemLength(Doc *doc, Staff *staff, bool graceSize)
         }
     }
     
-    baseStem -= (shortening * halfUnit);
-
-    if (graceSize) baseStem = doc->GetCueSize(baseStem);
+    baseStem -= shortening;
     
     return baseStem;
 }

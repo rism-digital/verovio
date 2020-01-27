@@ -65,7 +65,7 @@ private:
     
     void CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
     
-    void CalcStemLength(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
     
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
@@ -181,7 +181,6 @@ public:
     virtual ~BeamElementCoord();
 
     int m_x;
-    int m_y; // represents the point farthest from the beam
     int m_yTop; // y value of topmost note
     int m_yBottom; // y value of bottom-most note
     int m_yBeam; // y value of stem top position
