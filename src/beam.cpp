@@ -101,10 +101,10 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
         if (!coord->m_stem) continue;
 
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-            coord->m_stem->SetDrawingStemDir(STEMDIRECTION_up);
+            coord->SetDrawingStemDir(STEMDIRECTION_up, staff, doc, beamInterface);
         }
         else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
-            coord->m_stem->SetDrawingStemDir(STEMDIRECTION_down);
+            coord->SetDrawingStemDir(STEMDIRECTION_down, staff, doc, beamInterface);
         }
         // cross-staff or beam@place=mixed
         else {
@@ -118,7 +118,7 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
             else {
                 data_STEMDIRECTION stemDir = coord->m_stem->GetStemDir();
                 // TODO - Handle cases where there is no given stem direction (here we can still have NONE)
-                coord->m_stem->SetDrawingStemDir(stemDir);
+                coord->SetDrawingStemDir(stemDir, staff, doc, beamInterface);
             }
         }
     }
@@ -126,34 +126,29 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     ArrayOfBeamElementCoords stemUps;
     ArrayOfBeamElementCoords stemDowns;
     
-    // position x for the stem (normal and cue-sized)
-    int stemXAbove[2];
-    int stemXBelow[2];
-    
-    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    stemXBelow[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
-            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    /*
+    int halfUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         if (!coord->m_stem) continue;
         
+        int stemLen = coord->m_element->GetStemmedDrawingInterface()->CalcStemLenInHalfUnits(staff);
+        stemLen *= halfUnit;
+        
         if (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_up) {
-            coord->m_yBeam = coord->m_yTop + coord->m_element->GetStemmedDrawingInterface()->CalcStemLenInHalfUnits(staff);
+            coord->m_yBeam = coord->m_yTop + stemLen;
             coord->m_x += stemXAbove[beamInterface->m_cueSize];
             stemUps.push_back(coord);
             
         }
         else {
-            coord->m_yBeam = coord->m_yBottom - coord->m_element->GetStemmedDrawingInterface()->CalcStemLenInHalfUnits(staff);
+            coord->m_yBeam = coord->m_yBottom - stemLen;
             coord->m_x += stemXBelow[beamInterface->m_cueSize];
             stemDowns.push_back(coord);
         }
     }
+    */
     
     /******************************************************************/
     // Calculate the slope doing a linear regression
@@ -214,9 +209,9 @@ void BeamSegment::CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInte
     }
 
     if (minDistToCenter < 0) {
-        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         this->m_startingY += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
         for (i = 0; i < elementCount; ++i) {
+            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
             coord->m_yBeam
                 += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
         }
@@ -279,7 +274,19 @@ void BeamSegment::CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawing
     
     beamInterface->m_beamWidthBlack = doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
     beamInterface->m_beamWidthWhite = doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
+    if (beamInterface->m_shortestDur == DUR_64) {
+        beamInterface->m_beamWidthWhite *= 4;
+        beamInterface->m_beamWidthWhite /= 3;
+    }
     beamInterface->m_beamWidth = beamInterface->m_beamWidthBlack + beamInterface->m_beamWidthWhite;
+    
+    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+    beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    beamInterface->m_stemXBelow[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
 
     /******************************************************************/
     // Calculate the extreme values
@@ -677,6 +684,88 @@ int Beam::ResetDrawing(FunctorParams *functorParams)
     this->Modify();
 
     return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// BeamElementCoord
+//----------------------------------------------------------------------------
+
+
+void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamDrawingInterface *interface)
+{
+    assert(staff);
+    assert(doc);
+    assert(interface);
+    
+    if (!this->m_stem) return;
+    
+    this->m_stem->SetDrawingStemDir(stemDir);
+    this->m_onStaffLine = false;
+
+    Note *note = NULL;
+    if (this->m_element->Is(NOTE)) {
+        note = dynamic_cast<Note *>(this->m_element);
+    }
+    
+    int stemLen = 1;
+    
+    if (stemDir == STEMDIRECTION_up) {
+        this->m_yBeam = this->m_yTop;
+        this->m_x += interface->m_stemXAbove[interface->m_cueSize];
+        if (this->m_element->Is(CHORD)) {
+            Chord *chord = dynamic_cast<Chord *>(this->m_element);
+            assert(chord);
+            note = chord->GetTopNote();
+        }
+        if (note) this->m_onStaffLine = (note->GetDrawingLoc() % 2);
+    }
+    else {
+        this->m_yBeam = this->m_yBottom;
+        this->m_x += interface->m_stemXBelow[interface->m_cueSize];
+        if (this->m_element->Is(CHORD)) {
+            Chord *chord = dynamic_cast<Chord *>(this->m_element);
+            assert(chord);
+            note = chord->GetBottomNote();
+        }
+        if (note) this->m_onStaffLine = (note->GetDrawingLoc() % 2);
+        stemLen = -1;
+    }
+    
+    if (!note) return;
+    
+    bool extend = this->m_onStaffLine;
+    // Check if the stem has to be shortened because outside the staff
+    // In this case, Note::CalcStemLenInHalfUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
+    int stemLenInHalfUnits = note->CalcStemLenInHalfUnits(staff);
+    // Do not extend when on the staff line
+    if (stemLenInHalfUnits != STANDARD_STEMLENGTH * 2) {
+        extend = false;
+    }
+    
+    // For 8th notes, use the shortened stem (if shortened)
+    if (this->m_dur == DUR_8) {
+        if (stemLenInHalfUnits != STANDARD_STEMLENGTH * 2) {
+            stemLen *= stemLenInHalfUnits;
+        }
+        else {
+            stemLen *= (this->m_onStaffLine) ? 14 : 13;
+        }
+    }
+    else
+    {
+        switch (this->m_dur) {
+            case (DUR_16) : stemLen *= (extend) ? 14 : 13; break;
+            case (DUR_32) : stemLen *= (extend) ? 18 : 16; break;
+            case (DUR_64) : stemLen *= (extend) ? 22 : 20; break;
+            case (DUR_128) : stemLen *= (extend) ? 26 : 24; break;
+            case (DUR_256) : stemLen *= (extend) ? 30 : 28; break;
+            case (DUR_512) : stemLen *= (extend) ? 34 : 32; break;
+            case (DUR_1024) : stemLen *= (extend) ? 38 : 36; break;
+            default: stemLen *= 14;
+        }
+    }
+    this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+    
 }
 
 } // namespace vrv

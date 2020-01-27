@@ -179,6 +179,8 @@ public:
         m_stem = NULL;
     }
     virtual ~BeamElementCoord();
+    
+    void SetDrawingStemDir(data_STEMDIRECTION stemDir, Staff *staff,  Doc *doc, BeamDrawingInterface *interface);
 
     int m_x;
     int m_yTop; // y value of topmost note
@@ -186,6 +188,7 @@ public:
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration
     int m_breaksec;
+    bool m_onStaffLine;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;

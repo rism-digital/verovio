@@ -119,6 +119,10 @@ public:
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
+    
+    // position x for the stem (normal and cue-sized)
+    int m_stemXAbove[2];
+    int m_stemXBelow[2];
 
     /**
      * An array of coordinates for each element
