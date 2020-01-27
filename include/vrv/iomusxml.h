@@ -323,8 +323,8 @@ private:
     /* measure time */
     int m_durTotal = 0;
     /* meter signature */
-    int m_meterCount = 0;
-    int m_meterUnit = 0;
+    int m_meterCount = 4;
+    int m_meterUnit = 4;
     /* LastElementID */
     std::string m_ID;
     /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
