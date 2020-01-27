@@ -230,8 +230,8 @@ public:
      */
     ///@{
     bool SetInputFrom(std::string const &inputFrom);
-    void SetFormat(FileFormat format) { m_inputFrom = format; }
-    int GetFormat() { return m_inputFrom; }
+    void SetInputFrom(FileFormat format) { m_inputFrom = format; }
+    int GetInputFrom() { return m_inputFrom; }
     ///@}
 
     /**
