@@ -761,12 +761,8 @@ void Doc::SetCurrentScoreDefDoc(bool force)
     m_currentScoreDefDone = true;
 }
 
-void Doc::OptimizeScoreDefDoc(bool encoded)
+void Doc::OptimizeScoreDefDoc()
 {
-    if (encoded) {
-        return;
-    }
-
     Functor optimizeScoreDef(&Object::OptimizeScoreDef);
     Functor optimizeScoreDefEnd(&Object::OptimizeScoreDefEnd);
     OptimizeScoreDefParams optimizeScoreDefParams(this, &optimizeScoreDef, &optimizeScoreDefEnd);
@@ -817,7 +813,7 @@ void Doc::CastOffDoc()
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDefDoc(true);
     if (optimize) {
-        this->OptimizeScoreDefDoc(false);
+        this->OptimizeScoreDefDoc();
     }
 
     // Here we redo the alignment because of the new scoreDefs
@@ -840,7 +836,7 @@ void Doc::CastOffDoc()
 
     this->SetCurrentScoreDefDoc(true);
     if (optimize) {
-        this->OptimizeScoreDefDoc(false);
+        this->OptimizeScoreDefDoc();
     }
 }
 
@@ -940,6 +936,10 @@ void Doc::CastOffEncodingDoc()
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->SetCurrentScoreDefDoc(true);
+
+    if (this->m_options->m_condenseEncoded.GetValue()) {
+        this->OptimizeScoreDefDoc();
+    }
 }
 
 void Doc::ConvertToPageBasedDoc()

@@ -212,23 +212,25 @@ int main(int argc, char **argv)
 
     static struct option base_options[]
         = { { "all-pages", no_argument, 0, 'a' },
-            { "format", required_argument, 0, 'f' },
+            { "from", required_argument, 0, 'f' },
             { "help", no_argument, 0, '?' },
             { "outfile", required_argument, 0, 'o' },
             { "page", required_argument, 0, 'p' },
             { "resources", required_argument, 0, 'r' },
             { "scale", required_argument, 0, 's' },
-            { "type", required_argument, 0, 't' },
+            { "to", required_argument, 0, 't' },
             { "version", no_argument, 0, 'v' },
             { "xml-id-seed", required_argument, 0, 'x' },
             // deprecated - some use undocumented short options to catch them as such
             { "border", required_argument, 0, 'b' },
+            { "format", required_argument, 0, 'd' },
             { "ignore-layout", no_argument, 0, 'd' },
             { "no-footer", no_argument, 0, 'd' },
             { "no-header", no_argument, 0, 'd' },
             { "no-layout", no_argument, 0, 'd' },
             { "page-height-deprecated", required_argument, 0, 'h' },
             { "page-width-deprecated", required_argument, 0, 'w' },
+            { "type", required_argument, 0, 'd' },
             { 0, 0, 0, 0 }
         };
 
@@ -308,7 +310,13 @@ int main(int argc, char **argv)
                 break;
 
             case 'd':
-                if (!strcmp(long_options[option_index].name, "ignore-layout")) {
+                if (!strcmp(long_options[option_index].name, "format")) {
+                    vrv::LogWarning("Option --format is deprecated; use --from");
+                    if (!toolkit.SetInputFrom(std::string(optarg))) {
+                        exit(1);
+                    };
+                }
+                else if (!strcmp(long_options[option_index].name, "ignore-layout")) {
                     vrv::LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
                     options->m_breaks.SetValue(vrv::BREAKS_auto);
                 }
@@ -324,10 +332,15 @@ int main(int argc, char **argv)
                     vrv::LogWarning("Option --no-layout is deprecated; use --breaks none");
                     options->m_breaks.SetValue(vrv::BREAKS_none);
                 }
+                else if (!strcmp(long_options[option_index].name, "type")) {
+                    vrv::LogWarning("Option --type is deprecated; use --to");
+                    outformat = std::string(optarg);
+                    toolkit.SetOutputTo(std::string(optarg));
+                }
                 break;
 
             case 'f':
-                if (!toolkit.SetFormat(std::string(optarg))) {
+                if (!toolkit.SetInputFrom(std::string(optarg))) {
                     exit(1);
                 };
                 break;
@@ -345,7 +358,7 @@ int main(int argc, char **argv)
 
             case 't':
                 outformat = std::string(optarg);
-                toolkit.SetOutputFormat(std::string(optarg));
+                toolkit.SetOutputTo(std::string(optarg));
                 break;
 
             case 's':
@@ -454,7 +467,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if (toolkit.GetOutputFormat() != vrv::HUMDRUM) {
+    if (toolkit.GetOutputTo() != vrv::HUMDRUM) {
         // Check the page range
         if (page > toolkit.GetPageCount()) {
             std::cerr << "The page requested (" << page << ") is not in the page range (max is "

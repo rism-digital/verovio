@@ -595,6 +595,10 @@ int Measure::OptimizeScoreDef(FunctorParams *functorParams)
     OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
 
+    if (!params->m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
+        return FUNCTOR_CONTINUE;
+    }
+
     params->m_hasFermata = (this->FindDescendantByType(FERMATA));
     params->m_hasTempo = (this->FindDescendantByType(TEMPO));
 

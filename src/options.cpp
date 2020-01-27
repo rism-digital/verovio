@@ -502,6 +502,19 @@ Options::Options()
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
 
+    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
+    m_condenseEncoded.Init(false);
+    this->Register(&m_condenseEncoded, "condenseEncoded", &m_general);
+
+    m_condenseFirstPage.SetInfo("Condense first page", "When condensing a score also condense the first page");
+    m_condenseFirstPage.Init(false);
+    this->Register(&m_condenseFirstPage, "condenseFirstPage", &m_general);
+
+    m_condenseTempoPages.SetInfo(
+        "Condense tempo pages", "When condensing a score also condense pages with a tempo change");
+    m_condenseTempoPages.Init(false);
+    this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
+
     m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);

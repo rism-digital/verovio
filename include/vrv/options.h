@@ -463,6 +463,9 @@ public:
 
     OptionBool m_adjustPageHeight;
     OptionIntMap m_breaks;
+    OptionBool m_condenseEncoded;
+    OptionBool m_condenseFirstPage;
+    OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
     OptionBool m_justifyIncludeLastPage;

@@ -229,9 +229,9 @@ public:
      * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
-    bool SetFormat(std::string const &informat);
-    void SetFormat(FileFormat format) { m_format = format; }
-    int GetFormat() { return m_format; }
+    bool SetInputFrom(std::string const &inputFrom);
+    void SetFormat(FileFormat format) { m_inputFrom = format; }
+    int GetFormat() { return m_inputFrom; }
     ///@}
 
     /**
@@ -239,16 +239,15 @@ public:
      * The SetOutputFormat with FileFormat does not perform any validation
      */
     ///@{
-    bool SetOutputFormat(std::string const &outformat);
-    void SetOutputFormat(FileFormat format) { m_outformat = format; }
-    int GetOutputFormat() { return m_outformat; }
+    bool SetOutputTo(std::string const &outputTo);
+    int GetOutputTo() { return m_outputTo; }
     ///@}
 
     /**
      * @name Identify the input file type for auto loading of input data
      */
     ///@{
-    FileFormat IdentifyInputFormat(const std::string &data);
+    FileFormat IdentifyInputFrom(const std::string &data);
     ///@}
 
     /**
@@ -287,8 +286,8 @@ private:
     Doc m_doc;
     View m_view;
     int m_scale;
-    FileFormat m_format;
-    FileFormat m_outformat;
+    FileFormat m_inputFrom;
+    FileFormat m_outputTo;
     bool m_scoreBasedMei;
 
     static char *m_humdrumBuffer;
