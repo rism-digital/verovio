@@ -244,13 +244,14 @@ bool BeamDrawingInterface::IsRepeatedPattern()
     
     int i;
     for (i = 0; i < elementCount; ++i) {
-        if (!m_beamElementCoords.at(i)->m_stem) continue;
+        BeamElementCoord *coord = m_beamElementCoords.at(i);
+        if (!coord->m_stem) continue;
         
         if (m_drawingPlace == BEAMPLACE_above) {
-            items.push_back(m_beamElementCoords.at(i)->m_yBottom);
+            items.push_back(coord->m_yBottom * DUR_MAX + coord->m_dur);
         }
         else {
-            items.push_back(m_beamElementCoords.at(i)->m_yTop);
+            items.push_back(coord->m_yTop * DUR_MAX + coord->m_dur);
         }
     }
     int nbItems = (int)items.size();
