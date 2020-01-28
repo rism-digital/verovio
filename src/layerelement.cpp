@@ -112,7 +112,7 @@ void LayerElement::CloneReset()
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
-    
+
     m_crossStaff = NULL;
     m_crossLayer = NULL;
 }

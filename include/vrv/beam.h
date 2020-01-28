@@ -15,12 +15,12 @@
 namespace vrv {
 
 class BeamElementCoord;
-    
+
 // the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
 
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
-    
+
 //----------------------------------------------------------------------------
 // BeamSegment
 //----------------------------------------------------------------------------
@@ -41,8 +41,8 @@ public:
 
     void Reset();
 
-    void CalcBeam(
-        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
+    void CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
+        data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
 
     /**
      *
@@ -59,14 +59,14 @@ public:
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoordRefs();
-    
+
 private:
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
-    
+
     void CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
-    
+
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
-    
+
     void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
 public:
@@ -179,8 +179,8 @@ public:
         m_stem = NULL;
     }
     virtual ~BeamElementCoord();
-    
-    void SetDrawingStemDir(data_STEMDIRECTION stemDir, Staff *staff,  Doc *doc, BeamDrawingInterface *interface);
+
+    void SetDrawingStemDir(data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamDrawingInterface *interface);
 
     int m_x;
     int m_yTop; // y value of topmost note

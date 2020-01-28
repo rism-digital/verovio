@@ -331,7 +331,8 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
         m_bracketAlignedBeam = NULL;
     }
     else if (m_bracketAlignedBeam
-        && ((m_bracketAlignedBeam->m_drawingPlace == BEAMPLACE_below) && (m_drawingBracketPos == STAFFREL_basic_above))) {
+        && ((m_bracketAlignedBeam->m_drawingPlace == BEAMPLACE_below)
+            && (m_drawingBracketPos == STAFFREL_basic_above))) {
         m_bracketAlignedBeam = NULL;
     }
 

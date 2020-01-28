@@ -103,7 +103,7 @@ void FTrem::FilterList(ArrayOfObjects *childList)
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    
+
     InitCoords(childList, staff, BEAMPLACE_NONE);
 }
 

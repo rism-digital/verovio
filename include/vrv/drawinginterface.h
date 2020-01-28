@@ -93,7 +93,7 @@ public:
      * This is called by Beam::FilterList
      */
     void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
-    
+
     bool IsRepeatedPattern();
 
     /**
@@ -119,7 +119,7 @@ public:
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
-    
+
     // position x for the stem (normal and cue-sized)
     int m_stemXAbove[2];
     int m_stemXBelow[2];

@@ -351,7 +351,7 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 int Chord::CalcStemLenInHalfUnits(Staff *staff)
 {
     assert(staff);
-    
+
     if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
         Note *topNote = this->GetTopNote();
         assert(topNote);
