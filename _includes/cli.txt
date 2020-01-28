@@ -1,4 +1,4 @@
-Verovio 2.5.0-dev-69141c9
+Verovio 2.5.0-dev-1e3f9a3-dirty
 
 Example usage:
 
@@ -43,6 +43,7 @@ Input and page layout options
  --page-margin-right <i>           The page right margin (default: 50; min: 0; max: 500)
  --page-margin-top <i>             The page top margin (default: 50; min: 0; max: 500)
  --page-width <i>                  The page width (default: 2100; min: 100; max: 60000)
+ --expand <s>                      Expand all referenced elements in the expansion <xml:id> (default: "")
  --svg-bounding-boxes              Include bounding boxes in SVG output
  --svg-view-box                    Use viewBox on svg root element for easy scaling of document
  --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
