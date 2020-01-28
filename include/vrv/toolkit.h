@@ -226,7 +226,7 @@ public:
 
     /**
      * @name Get the input file format (defined as FileFormat)
-     * The SetFormat with FileFormat does not perform any validation
+     * The SetInputFrom with FileFormat does not perform any validation
      */
     ///@{
     bool SetInputFrom(std::string const &inputFrom);
@@ -236,7 +236,7 @@ public:
 
     /**
      * @name Get the output file format (defined as FileFormat)
-     * The SetOutputFormat with FileFormat does not perform any validation
+     * The SetOutputTo with FileFormat does not perform any validation
      */
     ///@{
     bool SetOutputTo(std::string const &outputTo);
@@ -260,7 +260,6 @@ public:
 
     /**
      * @name Get the pages for a loaded file
-     * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
     int GetPageCount();
