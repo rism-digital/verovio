@@ -18,9 +18,11 @@
 #include "beatrpt.h"
 #include "chord.h"
 #include "comparison.h"
+#include "expansion.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
+#include "iomei.h"
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
@@ -407,9 +409,9 @@ bool Doc::ExportTimemap(std::string &output)
     return true;
 }
 
-void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
-    std::map<int, std::vector<std::string> > &realTimeToOnElements,
-    std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo)
+void Doc::PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
+    std::map<double, std::vector<std::string> > &realTimeToOnElements,
+    std::map<double, std::vector<std::string> > &realTimeToOffElements, std::map<double, int> &realTimeToTempo)
 {
 
     int currentTempo = -1000;
@@ -1214,6 +1216,45 @@ void Doc::TransposeDoc()
 
     m_scoreDef.Process(&transpose, &transposeParams);
     this->Process(&transpose, &transposeParams);
+}
+
+void Doc::ExpandExpansions()
+{
+    // Upon MEI import: use expansion ID, given by command line argument
+    std::string expansionId = this->GetOptions()->m_expand.GetValue();
+    if (expansionId.empty()) return;
+
+    Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByUuid(expansionId));
+    if (start == NULL) {
+        LogMessage("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
+        return;
+    }
+
+    xsdAnyURI_List expansionList = start->GetPlist();
+    xsdAnyURI_List existingList;
+    this->m_expansionMap.Expand(expansionList, existingList, start);
+
+    // save original/notated expansion as element in expanded MEI
+    // Expansion *originalExpansion = new Expansion();
+    // char rnd[35];
+    // snprintf(rnd, 35, "expansion-notated-%016d", std::rand());
+    // originalExpansion->SetUuid(rnd);
+
+    // for (std::string ref : existingList) {
+    //    originalExpansion->GetPlistInterface()->AddRef("#" + ref);
+    //}
+
+    // start->GetParent()->InsertAfter(start, originalExpansion);
+
+    // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
+    //          << "\" plist={";
+    // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
+
+    // for (auto const &strVect : m_doc->m_expansionMap.m_map) { // DEBUG: display expansionMap on console
+    //     std::cout << strVect.first << ": <";
+    //     for (auto const &string : strVect.second)
+    //        std::cout << string << ((string != strVect.second.back()) ? ", " : ">.\n");
+    // }
 }
 
 bool Doc::HasPage(int pageIdx)
