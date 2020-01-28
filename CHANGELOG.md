@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for expansion implementation with --expand option (@wergo)
 * Option for forcing first page to be condensed (--condense-first-page)
 * Option for forcing pages qwith tempo to be condensed (--condense-tempo-pages)
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
