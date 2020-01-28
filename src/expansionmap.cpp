@@ -11,6 +11,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
 #include "expansion.h"
 #include "linkinginterface.h"
 #include "plistinterface.h"
@@ -106,9 +107,14 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
     // make unused sections hidden
     for (std::string r : reductionList) {
         Object *currSect = prevSect->GetParent()->FindDescendantByUuid(r);
-        if (currSect) {
-            // currSect->SetVisibility(HIDDEN); here, we will turn visibility off
-            std::cout << "Set " << r.c_str() << " to HIDDEN\n"; // DEBUG, please delete
+        assert(currSect);
+        if (currSect->Is(ENDING) || currSect->Is(SECTION)) {
+            SystemElement *tmp = dynamic_cast<SystemElement *>(currSect);
+            tmp->m_visibility = Hidden;
+        }
+        else if (currSect->Is(LEM) || currSect->Is(RDG)) {
+            EditorialElement *tmp = dynamic_cast<EditorialElement *>(currSect);
+            tmp->m_visibility = Hidden;
         }
     }
 }

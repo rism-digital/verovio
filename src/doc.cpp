@@ -1173,16 +1173,16 @@ void Doc::ExpandExpansions()
     this->m_expansionMap.Expand(expansionList, existingList, start);
 
     // save original/notated expansion as element in expanded MEI
-    Expansion *originalExpansion = new Expansion();
-    char rnd[35];
-    snprintf(rnd, 35, "expansion-notated-%016d", std::rand());
-    originalExpansion->SetUuid(rnd);
+    // Expansion *originalExpansion = new Expansion();
+    // char rnd[35];
+    // snprintf(rnd, 35, "expansion-notated-%016d", std::rand());
+    // originalExpansion->SetUuid(rnd);
 
-    for (std::string ref : existingList) {
-        originalExpansion->GetPlistInterface()->AddRef("#" + ref);
-    }
+    // for (std::string ref : existingList) {
+    //    originalExpansion->GetPlistInterface()->AddRef("#" + ref);
+    //}
 
-    start->GetParent()->InsertAfter(start, originalExpansion);
+    // start->GetParent()->InsertAfter(start, originalExpansion);
 
     // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetUuid().c_str()
     //          << "\" plist={";
