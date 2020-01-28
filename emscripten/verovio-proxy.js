@@ -24,6 +24,9 @@ verovio.vrvToolkit.getElementAttr = Module.cwrap('vrvToolkit_getElementAttr', 's
 // char *getElementsAtTime(Toolkit *ic, int time)
 verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'number']);
 
+// char *vrvToolkit_getExpansionIdsForElement(Toolkit *tk, const char *xmlId);
+verovio.vrvToolkit.getExpansionIdsForElement = Module.cwrap('vrvToolkit_getExpansionIdsForElement', 'string', ['number', 'string']);
+
 // char *getHumdrum(Toolkit *ic)
 verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
 
@@ -32,6 +35,9 @@ verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number
 
 // char *getMEI(Toolkit *ic, int pageNo, int scoreBased)
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
+
+// char *vrvToolkit_getNotatedIdForElement(Toolkit *tk, const char *xmlId);
+verovio.vrvToolkit.getNotatedIdForElement = Module.cwrap('vrvToolkit_getNotatedIdForElement', 'string', ['number', 'string']);
 
 // char *getOptions(Toolkit *ic, int defaultValues)
 verovio.vrvToolkit.getOptions = Module.cwrap('vrvToolkit_getOptions', 'string', ['number', 'number']);
@@ -112,6 +118,10 @@ verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
 	return JSON.parse(verovio.vrvToolkit.getElementsAtTime(this.ptr, millisec));
 };
 
+verovio.toolkit.prototype.getExpansionIdsForElement = function (xmlId) {
+	return JSON.parse(verovio.vrvToolkit.getExpansionIdsForElement(this.ptr, xmlId));
+};
+
 verovio.toolkit.prototype.getHumdrum = function () {
 	return verovio.vrvToolkit.getHumdrum(this.ptr);
 };
@@ -126,6 +136,10 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 
 verovio.toolkit.prototype.getMIDIValuesForElement = function (xmlId) {
 	return JSON.parse(verovio.vrvToolkit.getMIDIValuesForElement(this.ptr, xmlId));
+};
+
+verovio.toolkit.prototype.getNotatedIdForElement = function (xmlId) {
+	return verovio.vrvToolkit.getNotatedIdForElement(this.ptr, xmlId);
 };
 
 verovio.toolkit.prototype.getOptions = function (defaultValues) {

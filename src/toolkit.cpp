@@ -296,6 +296,8 @@ bool Toolkit::LoadFile(const std::string &filename)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
+    m_doc.m_expansionMap.Reset();
+
     return LoadData(content);
 }
 
@@ -1038,6 +1040,28 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
         // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
     return o.json();
+}
+
+std::string Toolkit::GetNotatedIdForElement(const std::string &xmlId)
+{
+    if (m_doc.m_expansionMap.HasExpansionMap())
+        return m_doc.m_expansionMap.GetExpansionIdsForElement(xmlId).front();
+    else
+        return xmlId;
+}
+
+std::string Toolkit::GetExpansionIdsForElement(const std::string &xmlId)
+{
+    jsonxx::Array a;
+    if (m_doc.m_expansionMap.HasExpansionMap()) {
+        for (std::string id : m_doc.m_expansionMap.GetExpansionIdsForElement(xmlId)) {
+            a << id;
+        }
+    }
+    else {
+        a << "";
+    }
+    return a.json();
 }
 
 bool Toolkit::Edit(const std::string &json_editorAction)

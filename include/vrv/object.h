@@ -469,6 +469,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter of the expansion flag
+     */
+    ///@{
+    bool IsExpansion() const { return m_isExpansion; }
+    void IsExpansion(bool isExpansion) { m_isExpansion = isExpansion; }
+    ///@}
+
+    /**
      * Return true if the object contains any editorial content
      */
     bool HasEditorialContent();
@@ -1199,6 +1207,11 @@ private:
      * For example, a Artic child in Note for an original @artic
      */
     bool m_isAttribute;
+
+    /**
+     * A flag indicating if the Object is a copy created by an expanded expansion element.
+     */
+    bool m_isExpansion;
 
     /**
      * A static counter for uuid generation.
