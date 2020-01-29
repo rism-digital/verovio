@@ -56,6 +56,9 @@ void BeamSegment::Reset()
     m_beamSlope = 0.0;
     m_verticalCenter = 0;
     m_avgY = 0;
+    
+    m_firstNoteOrChord = NULL;
+    m_lastNoteOrChord = NULL;
 }
 
 const ArrayOfBeamElementCoords *BeamSegment::GetElementCoordRefs()
@@ -90,7 +93,7 @@ void BeamSegment::CalcBeam(
         this->CalcBeamInit(layer, staff, doc, beamInterface, place);
     }
 
-    beamInterface->IsRepeatedPattern();
+    bool horizontal = beamInterface->IsRepeatedPattern();
 
     // Beam@place has precedence - however, in some cases, CalcBeam is called recusively because we need to change the
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
@@ -154,9 +157,11 @@ void BeamSegment::CalcBeam(
     /******************************************************************/
     // Calculate the slope doing a linear regression
 
-    // The vertical shift depends on the shortestDur value we have in the beam
-    // this->CalcBeamSlope(layer, staff, doc, beamInterface);
     this->m_beamSlope = 0.0;
+    // The vertical shift depends on the shortestDur value we have in the beam
+    if (!horizontal) {
+        this->CalcBeamSlope(layer, staff, doc, beamInterface);
+    }
 
     this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
     this->m_startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
@@ -164,6 +169,7 @@ void BeamSegment::CalcBeam(
     /******************************************************************/
     // Calculate the stem lengths
 
+    /*
     // first check that the stem length is long enough (to be improved?)
     double oldYPos; // holds y position before calculation to determine if beam needs extra height
     double expectedY;
@@ -187,11 +193,14 @@ void BeamSegment::CalcBeam(
 
     // Now adjust the startingY position and all the elements
     this->m_startingY += verticalAdjustment;
+     
+    */
     for (i = 0; i < elementCount; i++) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = this->m_startingY + this->m_beamSlope * (coord->m_x - this->m_startingX);
     }
 
+    /*
     // then check that the stem length reaches the center for the staff
     double minDistToCenter = -VRV_UNSET;
 
@@ -214,6 +223,10 @@ void BeamSegment::CalcBeam(
             coord->m_yBeam += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
         }
     }
+    */
+    
+    /******************************************************************/
+    // Set the stem lengths
 
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
@@ -294,11 +307,21 @@ void BeamSegment::CalcBeamInit(
     int yMax = 0, yMin = 0;
     int curY;
     int nbRests = 0;
-    this->m_avgY = 0;
+    
+    m_avgY = 0;
+    m_nbNotesOrChords = 0;
+    
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = 0;
+        
+        if (coord->m_element->Is({CHORD, NOTE})) {
+            if (!m_firstNoteOrChord) m_firstNoteOrChord = coord;
+            m_lastNoteOrChord = coord;
+            m_nbNotesOrChords++;
+        }
+        
         if (coord->m_element->Is(CHORD)) {
             Chord *chord = dynamic_cast<Chord *>(coord->m_element);
             assert(chord);
@@ -342,6 +365,56 @@ void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
     assert(staff);
     assert(doc);
     assert(beamInterface);
+    
+    m_beamSlope = 0.0;
+    
+    if (m_nbNotesOrChords < 2) {
+        return;
+    }
+    assert(m_firstNoteOrChord && m_lastNoteOrChord);
+    
+    this->m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam), Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
+    LogDebug("Slope (original) %f", m_beamSlope);
+    
+    if (m_beamSlope == 0.0) return;
+    
+    int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int maxStep = unit * 4;
+    int curStep = abs(m_firstNoteOrChord->m_yBeam - m_lastNoteOrChord->m_yBeam);
+    
+    if (m_nbNotesOrChords == 2) {
+        maxStep = unit * 2;
+        int dist = m_lastNoteOrChord->m_x - m_firstNoteOrChord->m_x;
+        if (dist <= unit * 6) {
+            dist = maxStep = unit / 2;
+        }
+    }
+    
+    // We can keep the current slope
+    if (curStep < maxStep) return;
+
+    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+        // upward
+        if (m_beamSlope > 0.0) {
+            m_firstNoteOrChord->m_yBeam = m_lastNoteOrChord->m_yBeam - maxStep;
+        }
+        else {
+            m_lastNoteOrChord->m_yBeam = m_firstNoteOrChord->m_yBeam - maxStep;
+        }
+    }
+    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+        if (m_beamSlope > 0.0) {
+            m_lastNoteOrChord->m_yBeam = m_firstNoteOrChord->m_yBeam + maxStep;
+        }
+        else {
+            m_firstNoteOrChord->m_yBeam = m_lastNoteOrChord->m_yBeam + maxStep;
+        }
+    }
+
+    this->m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam), Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
+    LogDebug("Slope (adjusted) %f", m_beamSlope);
+    
+    /*
 
     double xr;
 
@@ -400,11 +473,13 @@ void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
         this->m_beamSlope = 0.0;
     }
 
-    /* Correction esthetique : */
+    //// Correction esthetique
     if (fabs(this->m_beamSlope) < doc->m_drawingBeamMinSlope) this->m_beamSlope = 0.0;
     if (fabs(this->m_beamSlope) > doc->m_drawingBeamMaxSlope)
         this->m_beamSlope = (this->m_beamSlope > 0) ? doc->m_drawingBeamMaxSlope : -doc->m_drawingBeamMaxSlope;
-    /* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
+    ///// pente correcte: entre 0 et env 0.4 (0.2 a 0.4)
+     
+    */
 }
 
 void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
@@ -700,6 +775,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
     this->m_stem->SetDrawingStemDir(stemDir);
     this->m_onStaffLine = false;
+    this->m_shortenable = 0;
 
     Note *note = NULL;
     if (this->m_element->Is(NOTE)) {
@@ -762,6 +838,16 @@ void BeamElementCoord::SetDrawingStemDir(
             default: stemLen *= 14;
         }
     }
+    //this->m_shortenable = abs(stemLen - 10);
+    if (stemLen % 2) {
+        Note *note = dynamic_cast<Note *>(this->m_element);
+        if (note) note->SetColor("red");
+    }
+    else {
+        Note *note = dynamic_cast<Note *>(this->m_element);
+        if (note) note->SetColor("");
+    }
+    LogMessage("%d", this->m_shortenable);
     this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 }
 
