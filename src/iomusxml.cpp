@@ -1415,7 +1415,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
                 if (barStyle == "short")
                     measure->SetBarPlace(2);
                 else
-                    measure->SetBarPlace(-2);
+                    // bar.place counts in note order (high values are vertically higher).
+                    measure->SetBarPlace(6);
             }
         }
     }
