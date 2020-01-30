@@ -1150,7 +1150,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             ReadMusicXmlHarmony(*it, measure, measureNum);
         }
         else if (IsElement(*it, "note")) {
-            ReadMusicXmlNote(*it, measure, measureNum, staffOffset);
+            ReadMusicXmlNote(*it, measure, measureNum, staffOffset, section);
         }
         // for now only check first part
         else if (IsElement(*it, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
@@ -1257,7 +1257,14 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal));
+            bool afterBarline = false;
+            std::string afterBarlineText = clef.node().attribute("after-barline").as_string();
+            if (!afterBarlineText.empty()) {
+                LogMessage("Measure: %s %s, Clef: %s, after-barline: %s, durTotal: %d", measure->GetN().c_str(),
+                    measure->GetUuid().c_str(), meiClef->GetUuid().c_str(), afterBarlineText.c_str(), m_durTotal);
+                if (afterBarlineText.compare("yes") == 0) afterBarline = true;
+            }
+            m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
 
@@ -1868,7 +1875,8 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     m_harmStack.push_back(harm);
 }
 
-void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset)
+void MusicXmlInput::ReadMusicXmlNote(
+    pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset, Section *section)
 {
     assert(node);
     assert(measure);
@@ -1888,7 +1896,28 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal
                 && !isChord) {
                 if (iter->isFirst) { // add clef when first in staff
-                    AddLayerElement(layer, iter->m_clef);
+                    // if afterBarline is false at beginning of measure, move before barline
+                    if (!iter->m_afterBarline && m_durTotal == 0) {
+                        ArrayOfObjects objects;
+                        ClassIdComparison matchClassId(LAYER);
+                        section->FindAllDescendantByComparison(&objects, &matchClassId);
+                        Layer *prevLayer = NULL;
+                        ArrayOfObjects::reverse_iterator rit = objects.rbegin();
+                        for (; rit != objects.rend(); ++rit) {
+                            prevLayer = dynamic_cast<Layer *>(*rit);
+                            if (prevLayer->GetN() == layer->GetN()) break;
+                        }
+                        if (prevLayer == NULL)
+                            AddLayerElement(layer, iter->m_clef);
+                        else {
+                            AddLayerElement(prevLayer, iter->m_clef);
+                            LogMessage("afterbarline Measure: %s %s, Previous measure: %d %s ", measure->GetN().c_str(),
+                                measure->GetUuid().c_str(), prevLayer->GetN(), prevLayer->GetUuid().c_str());
+                        }
+                    }
+                    else {
+                        AddLayerElement(layer, iter->m_clef);
+                    }
                     iter->isFirst = false;
                 }
                 else {
