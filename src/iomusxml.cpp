@@ -2111,7 +2111,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (chord == NULL && m_elementStack.back()->Is(CHORD)) {
                 chord = dynamic_cast<Chord *>(m_elementStack.back());
             }
-            // A chord should be marked as cue=true if and only if all its child notes are cue.
+            assert(chord);
+            // Mark a chord as cue=true if and only if all its child notes are cue.
             // (This causes it to have a smaller stem).
             if (!cue) {
                 chord->SetCue(BOOLEAN_false);
