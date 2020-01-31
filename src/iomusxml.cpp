@@ -1257,13 +1257,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            bool afterBarline = false;
+            bool afterBarline = false; // read after-barline attribute of clef; default is false (thus: before barline)
             std::string afterBarlineText = clef.node().attribute("after-barline").as_string();
-            if (!afterBarlineText.empty()) {
-                LogMessage("Measure: %s %s, Clef: %s, after-barline: %s, durTotal: %d", measure->GetN().c_str(),
-                    measure->GetUuid().c_str(), meiClef->GetUuid().c_str(), afterBarlineText.c_str(), m_durTotal);
-                if (afterBarlineText.compare("yes") == 0) afterBarline = true;
-            }
+            if (!afterBarlineText.empty() && afterBarlineText.compare("yes") == 0) afterBarline = true;
             m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
@@ -1909,11 +1905,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                         }
                         if (prevLayer == NULL)
                             AddLayerElement(layer, iter->m_clef);
-                        else {
+                        else
                             AddLayerElement(prevLayer, iter->m_clef);
-                            LogMessage("afterbarline Measure: %s %s, Previous measure: %d %s ", measure->GetN().c_str(),
-                                measure->GetUuid().c_str(), prevLayer->GetN(), prevLayer->GetUuid().c_str());
-                        }
                     }
                     else {
                         AddLayerElement(layer, iter->m_clef);
