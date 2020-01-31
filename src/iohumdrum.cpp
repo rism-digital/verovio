@@ -8013,10 +8013,18 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     }
 
     bool problemQ = false;
+    bool sicQ = false;
+
     std::string problem = token->getLayoutParameter("TX", "problem");
     if (problem == "true") {
         problemQ = true;
         dir->SetType("problem");
+    }
+
+    std::string sic = token->getLayoutParameter("TX", "sic");
+    if (sic == "true") {
+        sicQ = true;
+        dir->SetType("sic");
     }
 
     std::string typevalue = token->getLayoutParameter("TX", "type");
@@ -8045,6 +8053,9 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         }
         else if (problemQ) {
             rend->SetColor("red");
+        }
+        else if (sicQ) {
+            rend->SetColor("limegreen");
         }
         dir->AddChild(rend);
         addTextElement(rend, text);
