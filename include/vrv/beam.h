@@ -73,11 +73,11 @@ public:
     // values set by CalcBeam
     int m_startingX; // the initial X position of the beam
     int m_startingY; // the initial Y position of the beam
-    int m_nbNotesOrChords; 
+    int m_nbNotesOrChords;
     double m_beamSlope; // the slope of the beam
     int m_verticalCenter;
     int m_avgY;
-    
+
     BeamElementCoord *m_firstNoteOrChord;
     BeamElementCoord *m_lastNoteOrChord;
 
@@ -192,8 +192,7 @@ public:
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration
     int m_breaksec;
-    bool m_onStaffLine;
-    char m_shortenable; // the number of half units the stem can be shortened
+    bool m_centered; // beam is centered on the line
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;

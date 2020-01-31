@@ -170,7 +170,7 @@ public:
      * This is useful for example when calculating bezier positions.
      */
     static void SwapPoints(Point &p1, Point &p2);
-    
+
     /**
      * Calculate the slope represented by two points
      */
