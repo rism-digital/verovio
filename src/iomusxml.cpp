@@ -1719,6 +1719,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
+        else LogWarning("MusicXML import: pedal lines are not supported");
     }
 
     // Principal voice
