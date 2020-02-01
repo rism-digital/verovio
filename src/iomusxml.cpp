@@ -314,6 +314,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
         Space *space = new Space();
         space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
+        space->SetDurPpq(dur);
         AddLayerElement(layer, space);
         dur -= m_ppq * quaters;
     }
@@ -1719,6 +1720,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
+        else LogWarning("MusicXML import: pedal lines are not supported");
     }
 
     // Principal voice
@@ -1983,7 +1985,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
-            space->SetDur(ConvertTypeToDur(typeStr));
+            if (!typeStr.empty()) {
+                space->SetDur(ConvertTypeToDur(typeStr));
+            }
+            // this should be mSpace
+            else space->SetDur(DURATION_1);
             AddLayerElement(layer, space);
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
