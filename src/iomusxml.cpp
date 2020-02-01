@@ -314,6 +314,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
         Space *space = new Space();
         space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
+        space->SetDurPpq(dur);
         AddLayerElement(layer, space);
         dur -= m_ppq * quaters;
     }
