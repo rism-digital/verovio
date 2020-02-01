@@ -1983,7 +1983,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
-            space->SetDur(ConvertTypeToDur(typeStr));
+            if (!typeStr.empty()) {
+                space->SetDur(ConvertTypeToDur(typeStr));
+            }
+            // this should be mSpace
+            else space->SetDur(DURATION_1);
             AddLayerElement(layer, space);
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
