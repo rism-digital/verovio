@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jan 25 10:34:52 PST 2020
+// Last Modified: Sun Feb  2 01:53:08 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -207,10 +207,16 @@ class HumHash {
 		void           deleteValue         (const std::string& ns2, const std::string& key);
 		void           deleteValue         (const std::string& ns1, const std::string& ns2,
 		                                    const std::string& key);
-		std::vector<std::string> getKeys             (void) const;
-		std::vector<std::string> getKeys             (const std::string& ns) const;
-		std::vector<std::string> getKeys             (const std::string& ns1,
+
+		std::vector<std::string> getKeys   (void) const;
+		std::vector<std::string> getKeys   (const std::string& ns) const;
+		std::vector<std::string> getKeys   (const std::string& ns1,
 		                                    const std::string& ns2) const;
+
+		std::map<std::string, std::string> getParameters(std::string& ns1);
+		std::map<std::string, std::string> getParameters(const std::string& ns1,
+		                                    const std::string& ns2);
+
 		bool           hasParameters       (void) const;
 		bool           hasParameters       (const std::string& ns) const;
 		bool           hasParameters       (const std::string& ns1,
@@ -662,8 +668,8 @@ class HumParamSet {
 		              HumParamSet        (HTp token);
 		             ~HumParamSet        ();
 
-		const std::string& getNamespace1      (void);
-		const std::string& getNamespace2      (void);
+		const std::string& getNamespace1 (void);
+		const std::string& getNamespace2 (void);
 		std::string   getNamespace       (void);
 		void          setNamespace1      (const std::string& name);
 		void          setNamespace2      (const std::string& name);
@@ -1335,7 +1341,7 @@ class HumdrumToken : public std::string, public HumHash {
 		HTp      getSlurEndToken           (int number = 0);
 		HTp      getPhraseStartToken       (int number = 0);
 		HTp      getPhraseEndToken         (int number = 0);
-		void     storeLinkedParameters     (void);
+		void     storeParameterSet         (void);
 		bool     linkedParameterIsGlobal   (int index);
 		std::ostream& printCsv             (std::ostream& out = std::cout);
 		std::ostream& printXml             (std::ostream& out = std::cout, int level = 0,
@@ -1346,10 +1352,10 @@ class HumdrumToken : public std::string, public HumHash {
 		std::string   getXmlIdPrefix       (void) const;
 		void     setText                   (const std::string& text);
 		std::string   getText              (void) const;
-		int      addLinkedParameter        (HTp token);
-		int      getLinkedParameterCount   (void);
-		HumParamSet* getLinkedParameter    (int index);
-		HumParamSet* getLinkedParameter    (void);
+		int      addLinkedParameterSet     (HTp token);
+		int      getLinkedParameterSetCount(void);
+		HumParamSet* getLinkedParameterSet (int index);
+		HumParamSet* getParameterSet       (void);
 		std::string getSlurLayoutParameter (const std::string& keyname, int subtokenindex = -1);
 		std::string getPhraseLayoutParameter(const std::string& keyname, int subtokenindex = -1);
 		std::string getLayoutParameter     (const std::string& category, const std::string& keyname,
@@ -1476,13 +1482,14 @@ class HumdrumToken : public std::string, public HumHash {
 		// refers to.
 		HTp m_nullresolve;
 
-		// m_linkedParameters: List of Humdrum tokens which are parameters
+		// m_linkedParameterTokens: List of Humdrum tokens which are parameters
 		// (mostly only layout parameters at the moment).
-		std::vector<HTp> m_linkedParameters;
+		// Was previously called m_linkedParameters;
+		std::vector<HTp> m_linkedParameterTokens;
 
-		// m_linkedParameter: A single parameter encoded in the text of the
-		// token.
-		HumParamSet* m_linkedParameter = NULL;
+		// m_parameterSet: A single parameter encoded in the text of the
+		// token.  Was previously called m_linkedParameter.
+		HumParamSet* m_parameterSet = NULL;
 
 		// m_rhythm_analyzed: Set to true when HumdrumFile assigned duration
 		bool m_rhythm_analyzed = false;
@@ -1939,7 +1946,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 
 		// rhythmic analysis related functionality:
 		HumNum        getScoreDuration             (void) const;
-		std::ostream&      printDurationInfo       (std::ostream& out = std::cout);
+		std::ostream& printDurationInfo            (std::ostream& out = std::cout);
 		int           tpq                          (void);
 
 		// strand functionality:
@@ -1980,6 +1987,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		bool          analyzeTokenDurations        (void);
 		bool          analyzeGlobalParameters      (void);
 		bool          analyzeLocalParameters       (void);
+		bool          analyzeParameters            (void);
 		bool          analyzeDurationsOfNonRhythmicSpines(void);
 		HumNum        getMinDur                    (std::vector<HumNum>& durs,
 		                                            std::vector<HumNum>& durstate);
@@ -3841,6 +3849,8 @@ class GridMeasure : public std::list<GridSlice*> {
 		                  { return m_style == MeasureStyle::RepeatForward; }
 		bool         isRepeatBoth(void)
 		                  { return m_style == MeasureStyle::RepeatBoth; }
+		void         addInterpretationBefore(GridSlice* slice, int partindex, const std::string& interpretation);
+		void         addInterpretationAfter(GridSlice* slice, int partindex, const std::string& interpretation, HumNum timestamp);
 		void         addLayoutParameter(GridSlice* slice, int partindex, const std::string& locomment);
 		void         addLayoutParameter(HumNum timestamp, int partindex, int staffindex, const std::string& locomment);
 		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
@@ -4177,7 +4187,7 @@ class MxmlEvent {
 		bool               isGrace            (void);
 		bool               hasGraceSlash      (void);
 		bool               isFloating         (void);
-		int                hasSlurStart       (int& direction);
+		int                hasSlurStart       (std::vector<int>& directions);
 		int                hasSlurStop        (void);
 		void               setLinked          (void);
 		std::vector<MxmlEvent*> getLinkedNotes     (void);
@@ -7161,6 +7171,36 @@ class Tool_shed : public HumTool {
 
 		std::vector<bool> m_spines; // usar with -s option
 		std::string m_grepoptions;
+
+};
+
+
+class Tool_sic : public HumTool {
+	public:
+		         Tool_sic       (void);
+		        ~Tool_sic       () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		void     insertOriginalToken(HTp sictok);
+		void     insertSubstitutionToken(HTp sictok);
+		HTp      getTargetToken     (HTp stok);
+		void     addVerboseParameter(HTp token);
+		void     removeVerboseParameter(HTp token);
+
+	private:
+		bool     m_substituteQ = false;
+		bool     m_originalQ   = false;
+		bool     m_removeQ     = false;
+		bool     m_verboseQ    = false;
+		bool     m_quietQ      = false;
+		bool     m_modifiedQ   = false;
 
 };
 
