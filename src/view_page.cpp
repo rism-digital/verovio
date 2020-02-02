@@ -636,15 +636,16 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 if (staff->GetVisible() == BOOLEAN_false) {
                     continue;
                 }
-                int yTop = staff->GetDrawingY();
-                if (measure->HasBarPlace()) {
-                    yTop += measure->GetBarPlace() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-                }
                 // for the bottom position we need to take into account the number of lines and the staff size
                 int yBottom = staff->GetDrawingY()
                     - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                if (measure->HasBarPlace()) {
+                    // bar.place counts upwards (note order).
+                    yBottom += measure->GetBarPlace() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                }
+                int yTop = staff->GetDrawingY();
                 if (measure->HasBarLen()) {
-                    yBottom = yTop - (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+                    yTop = yBottom + (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
                 }
                 // Make sure barlines are visible with a single line
                 if (childStaffDef->GetLines() == 1) {
