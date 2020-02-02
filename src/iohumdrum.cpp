@@ -4187,7 +4187,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             if (infile[i].token(j)->isData() && infile[i].token(j)->isNull()) {
                 // keeping null interpretations to search for clef
                 // in primary layer for secondary layer duplication.
-                if (infile[i].token(j)->getLinkedParameterCount() == 0) {
+                if (infile[i].token(j)->getLinkedParameterSetCount() == 0) {
                     continue;
                 }
             }
@@ -8037,7 +8037,7 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 
 void HumdrumInput::processDirections(hum::HTp token, int staffindex)
 {
-    int lcount = token->getLinkedParameterCount();
+    int lcount = token->getLinkedParameterSetCount();
     for (int i = 0; i < lcount; ++i) {
         processLinkedDirection(i, token, staffindex);
     }
@@ -8170,7 +8170,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         return;
     }
 
-    hum::HumParamSet *hps = token->getLinkedParameter(index);
+    hum::HumParamSet *hps = token->getLinkedParameterSet(index);
     if (hps == NULL) {
         return;
     }
@@ -8178,7 +8178,13 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     if (hps->getNamespace1() != "LO") {
         return;
     }
-    if (hps->getNamespace2() != "TX") {
+
+    std::string namespace2 = hps->getNamespace2();
+    bool textQ = namespace2 == "TX";
+    bool sicQ = namespace2 == "SIC";
+
+    if (!(textQ || sicQ)) {
+        // not a text direction so ignore
         return;
     }
 
@@ -8195,10 +8201,19 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     // justification == 1 means right justified
     int justification = 0;
 
-    string text;
     string color;
+    if (sicQ) {
+        // default color for sic text directions (set to black if not wanted)
+        color = "limegreen";
+    }
+
+    bool problemQ = false;
+    bool verboseQ = false;
+    string text;
     string key;
     string value;
+    string typevalue;
+
     for (int i = 0; i < hps->getCount(); ++i) {
         key = hps->getParameterName(i);
         value = hps->getParameterValue(i);
@@ -8250,6 +8265,19 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         if (key == "color") {
             color = value;
         }
+        if (key == "v") {
+            verboseQ = true;
+        }
+        if (key == "problem") {
+            problemQ = true;
+        }
+        if (key == "type") {
+            typevalue = value;
+        }
+    }
+
+    if ((namespace2 == "SIC") && !verboseQ) {
+        return;
     }
 
     double Y = 0.0;
@@ -8283,18 +8311,93 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         placement = "above";
     }
 
-    if (token->linkedParameterIsGlobal(index)) {
-        int maxstaff = (int)m_staffstarts.size() - 1;
+    if (sicQ) {
+        text = "S";
+    }
 
-        if ((placement == "below") && (staffindex == maxstaff)) {
-            addDirection(text, placement, bold, italic, token, staffindex, justification, color);
+    int maxstaff = (int)m_staffstarts.size() - 1;
+
+    if (token->linkedParameterIsGlobal(index)) {
+        if ((placement == "below") && (staffindex != maxstaff)) {
+            // For system-text, do not place on any staff except the bottom staff.
+            // This will probably change in the future to place at the bottom
+            // of each staff group only.
+            return;
         }
-        else if ((placement == "above") && (staffindex == 0)) {
-            addDirection(text, placement, bold, italic, token, staffindex, justification, color);
+        else if ((placement == "above") && (staffindex != 0)) {
+            // For system-text, do not place on any staff except the top staff.
+            // This will probably change in the future to place at the top
+            // of each staff group only.
+            return;
+        }
+    }
+
+    hum::HumRegex hre;
+    if (hre.search(text, "\\[[^=]*\\]\\s*=\\s*\\d+")) {
+        int status = addTempoDirection(text, placement, bold, italic, token, staffindex, justification, color);
+        if (status) {
+            return;
+        }
+    }
+
+    Dir *dir = new Dir;
+    setStaff(dir, m_currentstaff);
+    setLocationId(dir, token);
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    if (token->isMens()) {
+        // Attach to note, not with measure timestamp.
+        // Need to handle text on chords (will currently have a problem attaching to chords)
+        string startid = getLocationId("note", token);
+        dir->SetStartid("#" + startid);
+    }
+    else {
+        dir->SetTstamp(tstamp.getFloat());
+    }
+
+    if (!typevalue.empty()) {
+        dir->SetType(typevalue);
+    }
+    else if (problemQ) {
+        dir->SetType("problem");
+    }
+    else if (sicQ) {
+        dir->SetType("sic");
+    }
+
+    m_measure->AddChild(dir);
+    if (placement == "above") {
+        setPlace(dir, "above");
+    }
+    else if (placement == "below") {
+        setPlace(dir, "below");
+    }
+    bool plain = !(italic || bold);
+    bool needrend = plain || bold || justification || color.size();
+    if (needrend) {
+        Rend *rend = new Rend;
+        if (!color.empty()) {
+            rend->SetColor(color);
+        }
+        else if (problemQ) {
+            rend->SetColor("red");
+        }
+        else if (sicQ) {
+            rend->SetColor("limegreen");
+        }
+        dir->AddChild(rend);
+        addTextElement(rend, text);
+        if (!italic) {
+            rend->SetFontstyle(FONTSTYLE_normal);
+        }
+        if (bold) {
+            rend->SetFontweight(FONTWEIGHT_bold);
+        }
+        if (justification == 1) {
+            rend->SetHalign(HORIZONTALALIGNMENT_right);
         }
     }
     else {
-        addDirection(text, placement, bold, italic, token, staffindex, justification, color);
+        addTextElement(dir, text);
     }
 }
 
@@ -8435,6 +8538,11 @@ std::string HumdrumInput::convertRhythmToVerovioText(const std::string &text)
 // HumdrumInput::addDirection --
 //     default value: color = "";
 //
+//     token->getLayoutParameter() should not be used in this function.  Instead
+//     paste the parameter set that generate a text direction (there could be multiple
+//     text directions attached to the note, and using getPayoutParameter() will merge
+//     all of their parameters incorrectly.
+//
 
 void HumdrumInput::addDirection(const string &text, const string &placement, bool bold, bool italic, hum::HTp token,
     int staffindex, int justification, const std::string &color)
@@ -8462,7 +8570,7 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         dir->SetTstamp(tstamp.getFloat());
     }
 
-    // convert to HPS input value:
+    // convert to HPS input value in the future:
     bool problemQ = false;
     std::string problem = token->getLayoutParameter("TX", "problem");
     if (problem == "true") {
@@ -8470,7 +8578,14 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         dir->SetType("problem");
     }
 
-    // convert to HPS input value:
+    bool sicQ = false;
+    std::string sic = token->getLayoutParameter("SIC", "sic");
+    if (sic == "true") {
+        sicQ = true;
+        dir->SetType("sic");
+    }
+
+    // convert to HPS input value in the future:
     std::string typevalue = token->getLayoutParameter("TX", "type");
     if (!typevalue.empty()) {
         dir->SetType(typevalue);
@@ -8492,6 +8607,9 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         }
         else if (problemQ) {
             rend->SetColor("red");
+        }
+        else if (sicQ) {
+            rend->SetColor("limegreen");
         }
         dir->AddChild(rend);
         addTextElement(rend, text);
@@ -8698,7 +8816,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
         line->token(i)->setValue("auto", "DY", "processed", "true");
 
-        // int pcount = line->token(i)->getLinkedParameterCount();
+        // int pcount = line->token(i)->getLinkedParameterSetCount();
 
         std::string hairpins;
         std::string letters;
@@ -9106,13 +9224,13 @@ hum::HumNum HumdrumInput::getLeftNoteDuration(hum::HTp token)
 
 bool HumdrumInput::hasAboveParameter(hum::HTp token, const string &category)
 {
-    int lcount = token->getLinkedParameterCount();
+    int lcount = token->getLinkedParameterSetCount();
     if (lcount == 0) {
         return 0;
     }
 
-    for (int p = 0; p < token->getLinkedParameterCount(); ++p) {
-        hum::HumParamSet *hps = token->getLinkedParameter(p);
+    for (int p = 0; p < token->getLinkedParameterSetCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
         if (hps == NULL) {
             continue;
         }
@@ -9143,13 +9261,13 @@ bool HumdrumInput::hasAboveParameter(hum::HTp token, const string &category)
 
 bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category)
 {
-    int lcount = token->getLinkedParameterCount();
+    int lcount = token->getLinkedParameterSetCount();
     if (lcount == 0) {
         return 0;
     }
 
-    for (int p = 0; p < token->getLinkedParameterCount(); ++p) {
-        hum::HumParamSet *hps = token->getLinkedParameter(p);
+    for (int p = 0; p < token->getLinkedParameterSetCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
         if (hps == NULL) {
             continue;
         }
@@ -9176,13 +9294,13 @@ bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category)
 bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category, int &output)
 {
     output = 0;
-    int lcount = token->getLinkedParameterCount();
+    int lcount = token->getLinkedParameterSetCount();
     if (lcount == 0) {
         return 0;
     }
 
-    for (int p = 0; p < token->getLinkedParameterCount(); ++p) {
-        hum::HumParamSet *hps = token->getLinkedParameter(p);
+    for (int p = 0; p < token->getLinkedParameterSetCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
         if (hps == NULL) {
             continue;
         }
@@ -10690,9 +10808,9 @@ Clef *HumdrumInput::insertClefElement(
 
 bool HumdrumInput::getBooleanParameter(hum::HTp token, const string &category, const string &key)
 {
-    int lcount = token->getLinkedParameterCount();
+    int lcount = token->getLinkedParameterSetCount();
     for (int i = 0; i < lcount; ++i) {
-        hum::HumParamSet *hps = token->getLinkedParameter(i);
+        hum::HumParamSet *hps = token->getLinkedParameterSet(i);
         if (hps == NULL) {
             continue;
         }
@@ -10722,9 +10840,9 @@ bool HumdrumInput::getBooleanParameter(hum::HTp token, const string &category, c
 
 std::string HumdrumInput::getStringParameter(hum::HTp token, const string &category, const string &key)
 {
-    int lcount = token->getLinkedParameterCount();
+    int lcount = token->getLinkedParameterSetCount();
     for (int i = 0; i < lcount; ++i) {
-        hum::HumParamSet *hps = token->getLinkedParameter(i);
+        hum::HumParamSet *hps = token->getLinkedParameterSet(i);
         if (hps == NULL) {
             continue;
         }
@@ -15145,11 +15263,11 @@ void HumdrumInput::addTrill(hum::HTp token)
     // for a double sharp, or
     //    !LO:TR:acc=none
     // for no accidental
-    int lcount = token->getLinkedParameterCount();
+    int lcount = token->getLinkedParameterSetCount();
     bool foundQ = false;
     std::string value;
     for (int p = 0; p < lcount; ++p) {
-        hum::HumParamSet *hps = token->getLinkedParameter(p);
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
         if (hps == NULL) {
             continue;
         }
