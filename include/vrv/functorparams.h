@@ -50,6 +50,7 @@ class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
+class Transposer;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -1198,12 +1199,12 @@ public:
         m_currentTempo = 120;
         m_functor = functor;
     }
-    std::map<int, double> realTimeToScoreTime;
-    std::map<int, std::vector<std::string> > realTimeToOnElements;
-    std::map<int, std::vector<std::string> > realTimeToOffElements;
-    std::map<int, int> realTimeToTempo;
+    std::map<double, double> realTimeToScoreTime;
+    std::map<double, std::vector<std::string> > realTimeToOnElements;
+    std::map<double, std::vector<std::string> > realTimeToOffElements;
+    std::map<double, int> realTimeToTempo;
     double m_scoreTimeOffset;
-    int m_realTimeOffsetMilliseconds;
+    double m_realTimeOffsetMilliseconds;
     int m_currentTempo;
     Functor *m_functor;
 };
@@ -1765,6 +1766,26 @@ public:
     bool m_mensur;
     bool m_meterSig;
     bool m_applyToAll;
+};
+
+//----------------------------------------------------------------------------
+// TransposeParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the transposer
+ * member 1: a pointer to document
+ **/
+
+class TransposeParams : public FunctorParams {
+public:
+    TransposeParams(Doc *doc, Transposer *transposer)
+    {
+        m_transposer = transposer;
+        m_doc = doc;
+    }
+    Transposer *m_transposer;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

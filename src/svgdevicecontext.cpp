@@ -209,7 +209,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         assert(att);
         if (att->HasColor()) {
             if (object->IsControlElement()) {
-              m_currentNode.append_attribute("color") = att->GetColor().c_str();
+                m_currentNode.append_attribute("color") = att->GetColor().c_str();
             }
             m_currentNode.append_attribute("fill") = att->GetColor().c_str();
         }
@@ -620,7 +620,12 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
     pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
-    if (m_penStack.top().GetDashLength() > 0)
+    if (m_penStack.top().GetLineCap() > 0) {
+        pathChild.append_attribute("stroke-linecap") = "round";
+        pathChild.append_attribute("stroke-dasharray")
+            = StringFormat("1, %d", int(2.5 * m_penStack.top().GetDashLength())).c_str();
+    }
+    else if (m_penStack.top().GetDashLength() > 0)
         pathChild.append_attribute("stroke-dasharray")
             = StringFormat("%d, %d", m_penStack.top().GetDashLength(), m_penStack.top().GetDashLength()).c_str();
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();

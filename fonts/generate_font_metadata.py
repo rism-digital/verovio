@@ -34,8 +34,8 @@ def validateGlyph(glyph):
             report += '- missing extrema'
         if result & 0x80:
             report += '- too many points'
-       # if result & 0x200:
-       #    report += '- invalid glyph name'
+        # if result & 0x200:
+        #    report += '- invalid glyph name'
         if result & 0x40000:
             report += '- points too far apart'
         if result & 0x200000:
@@ -65,7 +65,7 @@ if fontFileName == '':
 try:
     font = fontforge.open(path)
 except EnvironmentError:
-    print ("Aargh... Error opening font file %s!" % fontFileName)
+    print("Aargh... Error opening font file %s!" % fontFileName)
     sys.exit(1)
 
 fontName = os.path.splitext(os.path.basename(fontFileName))[0]
@@ -144,7 +144,7 @@ for anyLine in line_iter:
                     if item != 'AltUni2:':
                         alternate = item.split('.')
                         value = "%#06X" % int(alternate[0], 16)
-                        if found == False and int(initialCodepoint, 16) <= 0xff and int(value, 16) >= 0xE000 and int(value, 16) < 0xF800:
+                        if not found and int(initialCodepoint, 16) <= 0xff and int(value, 16) >= 0xE000 and int(value, 16) < 0xF800:
                             if int(value, 16) < 0xF000 or int(value, 16) > 0xF0FF:
                                 found = True
                             temp = mainCodepoint
@@ -169,7 +169,6 @@ glyphBBoxes = dict()
 glyphsWithAnchors = dict()
 count = 0
 undefCount = 0
-started = False
 for glyph in font:
     g = font[glyph]
     if g.unicode != -1 and g.unicode > 31:

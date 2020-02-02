@@ -759,6 +759,13 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                 processChildren = false;
             }
         }
+        else if (this->IsSystemElement()) {
+            SystemElement *systemElement = dynamic_cast<SystemElement *>(this);
+            assert(systemElement);
+            if (systemElement->m_visibility == Hidden) {
+                processChildren = false;
+            }
+        }
     }
 
     functor->Call(this, functorParams);

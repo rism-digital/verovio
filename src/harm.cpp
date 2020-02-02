@@ -21,6 +21,7 @@
 #include "measure.h"
 #include "system.h"
 #include "text.h"
+#include "transposition.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -76,6 +77,80 @@ void Harm::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+
+bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)
+{
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return false;
+    std::wstring text = textObject->GetText();
+
+    if (text.length() > pos && text.at(pos) >= 'A' && text.at(pos) <= 'G') {
+        int pname = (text.at(pos) - 'C' + 7) % 7;
+        int accid = 0;
+        for (pos++; pos < text.length(); pos++) {
+            if (text.at(pos) == L'𝄫')
+                accid -= 2;
+            else if (text.at(pos) == 'b' || text.at(pos) == L'♭')
+                accid--;
+            else if (text.at(pos) == '#' || text.at(pos) == L'♯')
+                accid++;
+            else if (text.at(pos) == L'𝄪')
+                accid += 2;
+            else
+                break;
+        }
+        pitch = TransPitch(pname, accid, 4);
+        return true;
+    }
+    LogWarning("Failed to extract a pitch.");
+    return false;
+}
+
+void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
+{
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return;
+    std::wstring text = textObject->GetText();
+
+    if (text.length() > endPos) {
+        textObject->SetText(pitch.GetPitchString() + &text.at(endPos));
+    }
+    else {
+        textObject->SetText(pitch.GetPitchString());
+    }
+}
+
+bool Harm::GetBassPitch(TransPitch &pitch)
+{
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return false;
+    std::wstring text = textObject->GetText();
+    if (!text.length()) return false;
+
+    for (unsigned int pos = 0; pos < text.length(); pos++) {
+        if (text.at(pos) == L'/') {
+            pos++;
+            return GetRootPitch(pitch, pos);
+        }
+    }
+    return false;
+}
+
+void Harm::SetBassPitch(const TransPitch &pitch)
+{
+    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    if (!textObject) return;
+    std::wstring text = textObject->GetText();
+    unsigned int pos;
+    for (pos = 0; pos < text.length(); pos++) {
+        if (text.at(pos) == L'/') {
+            break;
+        }
+    }
+
+    text = text.substr(0, pos) + L"/" + pitch.GetPitchString();
+    textObject->SetText(text);
 }
 
 //----------------------------------------------------------------------------
@@ -205,6 +280,29 @@ int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
     params->m_previousHarmStart = this->GetStart();
     params->m_previousHarmPositioner = harmPositioner;
     params->m_previousMeasure = NULL;
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Harm::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    LogDebug("Transposing harm");
+
+    unsigned int position = 0;
+    TransPitch pitch;
+    if (this->GetRootPitch(pitch, position)) {
+        params->m_transposer->Transpose(pitch);
+        this->SetRootPitch(pitch, position);
+    }
+
+    // Transpose bass notes (the "/F#" in "G#m7/F#")
+    if (this->GetBassPitch(pitch)) {
+        params->m_transposer->Transpose(pitch);
+        this->SetBassPitch(pitch);
+    }
 
     return FUNCTOR_SIBLINGS;
 }

@@ -187,7 +187,7 @@ public:
      * Return the first staff of each staffGrp according to the scoreDef
      */
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
-                    
+
     /**
      * Return the top (first) visible staff in the measure (if any).
      * Takes into account system optimization
@@ -203,7 +203,7 @@ public:
     /**
      * Return the real time offset in millisecond for the repeat (1-based).
      */
-    int GetRealTimeOffsetMilliseconds(int repeat) const;
+    double GetRealTimeOffsetMilliseconds(int repeat) const;
 
     //----------//
     // Functors //
@@ -460,7 +460,7 @@ private:
      * Start time state variables.
      */
     std::vector<double> m_scoreTimeOffset;
-    std::vector<int> m_realTimeOffsetMilliseconds;
+    std::vector<double> m_realTimeOffsetMilliseconds;
     int m_currentTempo;
 };
 

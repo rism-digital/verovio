@@ -21,6 +21,7 @@
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
+#include "transposition.h"
 
 namespace vrv {
 
@@ -28,6 +29,7 @@ class Accid;
 class Chord;
 class Slur;
 class Tie;
+class TransPitch;
 class Verse;
 class Note;
 typedef std::vector<Note *> ChordCluster;
@@ -174,14 +176,15 @@ public:
     void SetScoreTimeTiedDuration(double timeInSeconds);
     void SetMIDIPitch(char pitch);
     double GetScoreTimeOnset();
-    int GetRealTimeOnsetMilliseconds();
+    double GetRealTimeOnsetMilliseconds();
     double GetScoreTimeOffset();
     double GetScoreTimeTiedDuration();
-    int GetRealTimeOffsetMilliseconds();
+    double GetRealTimeOffsetMilliseconds();
     double GetScoreTimeDuration();
     char GetMIDIPitch();
     ///@}
 
+public:
     //----------//
     // Functors //
     //----------//
@@ -246,8 +249,21 @@ public:
      */
     virtual int GenerateTimemap(FunctorParams *functorParams);
 
+    /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *);
+
 private:
-    //
+    /**
+     * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
+     */
+    int GetChromaticAlteration();
+
+    TransPitch GetTransPitch();
+
+    void UpdateFromTransPitch(const TransPitch &tp);
+
 public:
     //
 private:
@@ -290,14 +306,14 @@ private:
     /**
      * The time in milliseconds since the start of the measure element that contains the note.
      */
-    int m_realTimeOnsetMilliseconds;
+    double m_realTimeOnsetMilliseconds;
 
     /**
      * The time in milliseconds since the start of the measure element to end of printed note.
      * The real-time duration of a tied group is not currently tracked (this gets complicated
      * if there is a tempo change during a note sustain, which is currently not supported).
      */
-    int m_realTimeOffsetMilliseconds;
+    double m_realTimeOffsetMilliseconds;
 
     /**
      * If the note is the first in a tied group, then m_scoreTimeTiedDuration contains the

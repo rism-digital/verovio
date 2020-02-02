@@ -70,7 +70,7 @@ enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded };
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
 enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
-    
+
 enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
@@ -463,6 +463,9 @@ public:
 
     OptionBool m_adjustPageHeight;
     OptionIntMap m_breaks;
+    OptionBool m_condenseEncoded;
+    OptionBool m_condenseFirstPage;
+    OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
     OptionBool m_justifyIncludeLastPage;
@@ -477,12 +480,14 @@ public:
     OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
+    OptionBool m_outputSmuflXmlEntities;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;
     OptionInt m_pageMarginLeft;
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionString m_expand;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionInt m_unit;
@@ -503,7 +508,6 @@ public:
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
-    OptionDbl m_leftPosition;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricHyphenWidth;
     OptionBool m_lyricNoStartHyphen;
@@ -538,6 +542,8 @@ public:
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
+    OptionString m_transpose;
+    OptionBool m_transposeSelectedOnly;
 
     /**
      * Element margins
