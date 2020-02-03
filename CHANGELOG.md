@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [2.5.0] - 2020-02-03
 * Support for expansion implementation with --expand option (@wergo)
 * Option for forcing first page to be condensed (--condense-first-page)
 * Option for forcing pages qwith tempo to be condensed (--condense-tempo-pages)
