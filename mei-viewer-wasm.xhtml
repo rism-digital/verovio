@@ -628,17 +628,9 @@ downloads:
       }
     };
     
-
-    var xhr=new XMLHttpRequest();
-    xhr.open( 'GET','{{ site.baseurl }}/javascript/develop/verovio.wasm',true );
-    xhr.responseType='arraybuffer';
-    xhr.onload=function(){
-        Module.wasmBinary=xhr.response;
-        var script=document.createElement( 'script' );
-        script.src="{{ site.baseurl }}/javascript/develop/verovio-toolkit-wasm.js";
-        document.body.appendChild(script);
-    };
-    xhr.send( null );
+    var script=document.createElement( 'script' );
+    script.src="{{ site.baseurl }}/javascript/verovio-toolkit-wasm.js";
+    document.body.appendChild(script);
     
 //]]>
 </script>
