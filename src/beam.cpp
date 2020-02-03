@@ -923,15 +923,21 @@ void BeamElementCoord::SetDrawingStemDir(
     this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
     
     if (stemDir == STEMDIRECTION_up) {
-        if (this->m_yBeam < segment->m_verticalCenter) {
+        if (this->m_yBeam <= segment->m_verticalCenter) {
             this->m_yBeam = segment->m_verticalCenter;
             segment->m_extendedToCenter = true;
         }
+        else {
+            segment->m_extendedToCenter = false;
+        }
     }
     else {
-        if (segment->m_verticalCenter < this->m_yBeam) {
+        if (segment->m_verticalCenter <= this->m_yBeam) {
             this->m_yBeam  = segment->m_verticalCenter;
             segment->m_extendedToCenter = true;
+        }
+        else {
+            segment->m_extendedToCenter = false;
         }
     }
     
