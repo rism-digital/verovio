@@ -109,12 +109,13 @@ namespace musicxml {
 
     class ClefChange {
     public:
-        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset)
+        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset, bool afterBarline)
         {
             m_measureNum = measureNum;
             m_staff = staff;
             m_clef = clef;
             m_scoreOnset = scoreOnset;
+            m_afterBarline = afterBarline;
         }
 
         std::string m_measureNum;
@@ -122,6 +123,7 @@ namespace musicxml {
         Clef *m_clef;
         int m_scoreOnset; // the score position of clef change
         bool isFirst = true; // insert clef change at first layer, others use @sameas
+        bool m_afterBarline = false; // musicXML attribute
     };
 
     class OpenDashes {
@@ -189,7 +191,7 @@ private:
     void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset);
+    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     ///@}
 

@@ -314,6 +314,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
         Space *space = new Space();
         space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
+        space->SetDurPpq(dur);
         AddLayerElement(layer, space);
         dur -= m_ppq * quaters;
     }
@@ -1150,7 +1151,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             ReadMusicXmlHarmony(*it, measure, measureNum);
         }
         else if (IsElement(*it, "note")) {
-            ReadMusicXmlNote(*it, measure, measureNum, staffOffset);
+            ReadMusicXmlNote(*it, measure, measureNum, staffOffset, section);
         }
         // for now only check first part
         else if (IsElement(*it, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
@@ -1257,7 +1258,10 @@ void MusicXmlInput::ReadMusicXmlAttributes(
                 else
                     meiClef->SetDisPlace(STAFFREL_basic_above);
             }
-            m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal));
+            bool afterBarline = false; // read after-barline attribute of clef; default is false (thus: before barline)
+            std::string afterBarlineText = clef.node().attribute("after-barline").as_string();
+            if (!afterBarlineText.empty() && afterBarlineText.compare("yes") == 0) afterBarline = true;
+            m_ClefChangeStack.push_back(musicxml::ClefChange(measureNum, staff, meiClef, m_durTotal, afterBarline));
         }
     }
 
@@ -1415,7 +1419,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
                 if (barStyle == "short")
                     measure->SetBarPlace(2);
                 else
-                    measure->SetBarPlace(-2);
+                    // bar.place counts in note order (high values are vertically higher).
+                    measure->SetBarPlace(6);
             }
         }
     }
@@ -1719,6 +1724,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
+        else LogWarning("MusicXML import: pedal lines are not supported");
     }
 
     // Principal voice
@@ -1868,7 +1874,8 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     m_harmStack.push_back(harm);
 }
 
-void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset)
+void MusicXmlInput::ReadMusicXmlNote(
+    pugi::xml_node node, Measure *measure, std::string measureNum, int staffOffset, Section *section)
 {
     assert(node);
     assert(measure);
@@ -1888,7 +1895,25 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal
                 && !isChord) {
                 if (iter->isFirst) { // add clef when first in staff
-                    AddLayerElement(layer, iter->m_clef);
+                    // if afterBarline is false at beginning of measure, move before barline
+                    if (!iter->m_afterBarline && m_durTotal == 0) {
+                        ArrayOfObjects objects;
+                        ClassIdComparison matchClassId(LAYER);
+                        section->FindAllDescendantByComparison(&objects, &matchClassId);
+                        Layer *prevLayer = NULL;
+                        ArrayOfObjects::reverse_iterator rit = objects.rbegin();
+                        for (; rit != objects.rend(); ++rit) {
+                            prevLayer = dynamic_cast<Layer *>(*rit);
+                            if (prevLayer->GetN() == layer->GetN()) break;
+                        }
+                        if (prevLayer == NULL)
+                            AddLayerElement(layer, iter->m_clef);
+                        else
+                            AddLayerElement(prevLayer, iter->m_clef);
+                    }
+                    else {
+                        AddLayerElement(layer, iter->m_clef);
+                    }
                     iter->isFirst = false;
                 }
                 else {
@@ -1983,7 +2008,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
-            space->SetDur(ConvertTypeToDur(typeStr));
+            if (!typeStr.empty()) {
+                space->SetDur(ConvertTypeToDur(typeStr));
+            }
+            // this should be mSpace
+            else space->SetDur(DURATION_1);
             AddLayerElement(layer, space);
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
@@ -2090,10 +2119,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // look at the next note to see if we are starting or ending a chord
         pugi::xpath_node nextNote = node.select_node("./following-sibling::note");
         if (nextNote.node().select_node("chord")) nextIsChord = true;
-        // create the chord if we are starting a new chord
+        Chord *chord = NULL;
         if (nextIsChord) {
+            // create the chord if we are starting a new chord
             if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
-                Chord *chord = new Chord();
+                chord = new Chord();
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 chord->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
                 if (dots > 0) chord->SetDots(dots);
@@ -2103,6 +2133,21 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
                 element = chord;
+            }
+        }
+        // If the current note is part of a chord.
+        if (nextIsChord || node.select_node("chord")) {
+            if (chord == NULL && m_elementStack.back()->Is(CHORD)) {
+                chord = dynamic_cast<Chord *>(m_elementStack.back());
+            }
+            assert(chord);
+            // Mark a chord as cue=true if and only if all its child notes are cue.
+            // (This causes it to have a smaller stem).
+            if (!cue) {
+                chord->SetCue(BOOLEAN_false);
+            }
+            else if (cue && chord->GetCue() != BOOLEAN_false) {
+                chord->SetCue(BOOLEAN_true);
             }
         }
 

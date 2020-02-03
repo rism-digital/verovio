@@ -315,7 +315,7 @@ public:
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(FunctorParams *);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);

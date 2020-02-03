@@ -1676,9 +1676,14 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::ResetDrawing(FunctorParams *)
+int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_drawingCueSize = false;
+    
+    // Pass it to the pseudo functor of the interface
+    LinkingInterface *interface = this->GetLinkingInterface();
+    assert(interface);
+    interface->InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

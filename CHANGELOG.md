@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [2.5.0] - 2020-02-03
 * Support for expansion implementation with --expand option (@wergo)
 * Adjust stem length with double-stemmed writing
 * Option for forcing first page to be condensed (--condense-first-page)
@@ -8,6 +10,7 @@
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ### Changed
+* Single file buundle for WASM build
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15
