@@ -42,6 +42,7 @@
 #include "ending.h"
 #include "expan.h"
 #include "expansion.h"
+#include "expansionmap.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -202,13 +203,17 @@ bool MeiOutput::ExportFile()
 
             page->Save(this);
         }
+
+        unsigned int output_flags = pugi::format_default;
+        if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
+            output_flags |= pugi::format_no_escapes;
+        }
+
         if (m_writeToStreamString) {
-            // meiDoc.save(m_streamStringOutput, "    ", pugi::format_default | pugi::format_no_escapes);
-            meiDoc.save(m_streamStringOutput, "    ");
+            meiDoc.save(m_streamStringOutput, "    ", output_flags);
         }
         else {
-            // meiDoc.save_file(m_filename.c_str(), "    ", pugi::format_default | pugi::format_no_escapes);
-            meiDoc.save_file(m_filename.c_str(), "    ");
+            meiDoc.save_file(m_filename.c_str(), "    ", output_flags);
         }
     }
     catch (char *str) {
@@ -1877,8 +1882,12 @@ void MeiOutput::WriteText(pugi::xml_node element, Text *text)
 {
     if (!text->GetText().empty()) {
         pugi::xml_node nodechild = element.append_child(pugi::node_pcdata);
-        // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
-        nodechild.text() = UTF16to8(text->GetText()).c_str();
+        if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
+            nodechild.text() = UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
+        }
+        else {
+            nodechild.text() = UTF16to8(text->GetText()).c_str();
+        }
     }
 }
 
@@ -2739,6 +2748,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         m_doc->ConvertScoreDefMarkupDoc();
     }
 
+    if (success) {
+        m_doc->ExpandExpansions();
+    }
+
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
         m_doc->ConvertAnalyticalMarkupDoc();
@@ -3025,6 +3038,7 @@ bool MeiInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 {
     Expansion *vrvExpansion = new Expansion();
     ReadSystemElement(expansion, vrvExpansion);
+    ReadPlistInterface(expansion, vrvExpansion);
 
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);

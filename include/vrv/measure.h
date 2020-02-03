@@ -203,7 +203,7 @@ public:
     /**
      * Return the real time offset in millisecond for the repeat (1-based).
      */
-    int GetRealTimeOffsetMilliseconds(int repeat) const;
+    double GetRealTimeOffsetMilliseconds(int repeat) const;
 
     //----------//
     // Functors //
@@ -460,7 +460,7 @@ private:
      * Start time state variables.
      */
     std::vector<double> m_scoreTimeOffset;
-    std::vector<int> m_realTimeOffsetMilliseconds;
+    std::vector<double> m_realTimeOffsetMilliseconds;
     int m_currentTempo;
 };
 

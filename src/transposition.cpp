@@ -167,15 +167,16 @@ data_PITCHNAME TransPitch::GetPitchName() const
 
 std::wstring TransPitch::GetPitchString() const
 {
-    char pitchLetter = (m_pname + ('C' - 'A')) % 7 + 'A';
+    wchar_t pitchLetter = (m_pname + ('C' - 'A')) % 7 + 'A';
     switch (m_accid) {
         case -2: return std::wstring({ pitchLetter, L'𝄫' });
         case -1: return std::wstring({ pitchLetter, L'♭' });
-        default: LogError("Transposition: Could not get Accidental for %i", m_accid);
         case 0: return std::wstring({ pitchLetter });
         case 1: return std::wstring({ pitchLetter, L'♯' });
         case 2: return std::wstring({ pitchLetter, L'♯', L'♯' });
+        default: LogError("Transposition: Could not get Accidental for %i", m_accid);
     }
+    return L"";
 }
 //////////////////////////////
 //

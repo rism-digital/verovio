@@ -42,6 +42,8 @@ void SystemElement::Reset()
 {
     FloatingObject::Reset();
     ResetTyped();
+
+    m_visibility = Visible;
 }
 
 //----------------------------------------------------------------------------

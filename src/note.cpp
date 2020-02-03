@@ -362,7 +362,8 @@ void Note::SetScoreTimeOnset(double scoreTime)
 
 void Note::SetRealTimeOnsetSeconds(double timeInSeconds)
 {
-    m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    // m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    m_realTimeOnsetMilliseconds = timeInSeconds * 1000.0;
 }
 
 void Note::SetScoreTimeOffset(double scoreTime)
@@ -372,7 +373,8 @@ void Note::SetScoreTimeOffset(double scoreTime)
 
 void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
 {
-    m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    // m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+    m_realTimeOffsetMilliseconds = timeInSeconds * 1000.0;
 }
 
 void Note::SetScoreTimeTiedDuration(double scoreTime)
@@ -390,7 +392,7 @@ double Note::GetScoreTimeOnset()
     return m_scoreTimeOnset;
 }
 
-int Note::GetRealTimeOnsetMilliseconds()
+double Note::GetRealTimeOnsetMilliseconds()
 {
     return m_realTimeOnsetMilliseconds;
 }
@@ -400,7 +402,7 @@ double Note::GetScoreTimeOffset()
     return m_scoreTimeOffset;
 }
 
-int Note::GetRealTimeOffsetMilliseconds()
+double Note::GetRealTimeOffsetMilliseconds()
 {
     return m_realTimeOffsetMilliseconds;
 }
@@ -981,10 +983,10 @@ int Note::GenerateTimemap(FunctorParams *functorParams)
     Note *note = dynamic_cast<Note *>(this->ThisOrSameasAsLink());
     assert(note);
 
-    int realTimeStart = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOnsetMilliseconds();
+    double realTimeStart = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOnsetMilliseconds();
     double scoreTimeStart = params->m_scoreTimeOffset + note->GetScoreTimeOnset();
 
-    int realTimeEnd = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOffsetMilliseconds();
+    double realTimeEnd = params->m_realTimeOffsetMilliseconds + note->GetRealTimeOffsetMilliseconds();
     double scoreTimeEnd = params->m_scoreTimeOffset + note->GetScoreTimeOffset();
 
     // Should check if value for realTimeStart already exists and if so, then

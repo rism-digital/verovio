@@ -15,6 +15,7 @@
 #import <VerovioFramework/bboxdevicecontext.h>
 #import <VerovioFramework/damage.h>
 #import <VerovioFramework/beatrpt.h>
+#import <VerovioFramework/expansionmap.h>
 #import <VerovioFramework/page.h>
 #import <VerovioFramework/bracketspan.h>
 #import <VerovioFramework/reg.h>

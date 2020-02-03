@@ -23,29 +23,6 @@
 use strict;
 use Getopt::Long;
 
-chomp (my $EMCC = `which emcc`);
-chomp (my $PYTHON = `which python`);
-die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
-die "ERROR: python interpreter not found.\n" unless $PYTHON;
-
-my $VEROVIO_ROOT  = "..";
-
-# Default compiling uses ASM and large file support.
-# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
-# Empirically, the memory amount required is roughly 5 times the file size.
-# This can be disabled in the light version, which uses the default memory settings.
-my $FLAGS = "-O3";
-$FLAGS .= " -DNDEBUG";
-$FLAGS .= " --memory-init-file 0";
-$FLAGS .= " -std=c++17";
-$FLAGS .= " -s ASM_JS=1";
-$FLAGS .= " -s TOTAL_MEMORY=256MB";
-$FLAGS .= " -s TOTAL_STACK=128MB";
-$FLAGS .= " -s WASM=0";
-
-my ($FLAGS_NAME, $VERSION, $CHATTY);
-
-
 sub print_help {
 print <<"EOT";
 
@@ -64,12 +41,22 @@ Options:
 EOT
 }
 
+chomp (my $EMCC = `which emcc`);
+chomp (my $PYTHON = `which python`);
+die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
+die "ERROR: python interpreter not found.\n" unless $PYTHON;
 
 # Parse command-line options
 my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
+my ($FLAGS_NAME, $VERSION, $CHATTY);
+
+my $cpp = 17;             # c++ version to compile (11, 14, 17)
+my $VEROVIO_ROOT  = ".."; 
+
 Getopt::Long::Configure("bundling");
 GetOptions (
+   'C|cpp=s'       => \$cpp,
    'c|chatty'      => \$chattyQ,
    'h|?|help'      => \$helpQ,
    'l|light'       => \$lightQ,
@@ -77,12 +64,25 @@ GetOptions (
    'v|version=s'   => \$VERSION,
    'x|exclusion=s' => \$exclusion,
    'w|wasm'        => \$wasmQ,
-
    'D|no-darms'    => \$nodarms,
    'H|no-humdrum'  => \$nohumdrum,
    'P|no-pae'      => \$nopae,
    'X|no-musicxml' => \$nomusicxml
 );
+
+# Default compiling uses ASM and large file support.
+# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
+# Empirically, the memory amount required is roughly 5 times the file size.
+# This can be disabled in the light version, which uses the default memory settings.
+my $FLAGS = "-O3";
+$FLAGS .= " -DNDEBUG";
+$FLAGS .= " --memory-init-file 0";
+$FLAGS .= " -std=c++$cpp";
+$FLAGS .= " -s ASM_JS=1";
+$FLAGS .= " -s TOTAL_MEMORY=256MB";
+$FLAGS .= " -s TOTAL_STACK=128MB";
+$FLAGS .= " -s WASM=0";
+
 
 # Process command-line options:
 
@@ -91,7 +91,7 @@ if ($wasmQ) {
 	$FLAGS = "-O3";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
-	$FLAGS .= " -std=c++17";
+	$FLAGS .= " -std=c++$cpp";
 	$FLAGS .= " -s WASM=1";
 	# tried this for find the integer overflow runtime error but g4 does not work, so line number is missing
 	# should be fixed in the next version of emscripten (https://github.com/kripken/emscripten/issues/5718)
@@ -102,12 +102,13 @@ if ($wasmQ) {
 	$FLAGS .= " -s TOTAL_MEMORY=512MB";
 	$FLAGS .= " -s TOTAL_STACK=256MB";
 	$FLAGS .= " -s ALLOW_MEMORY_GROWTH=1";
+    $FLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";
 }
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++17 -s ASM_JS=1 -s WASM=0";
+	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++$cpp -s ASM_JS=1 -s WASM=0";
 	$FLAGS_NAME = "-light";
 }
 
@@ -212,7 +213,6 @@ if ($? == 0) {
 		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
-        `cp $BUILD_DIR/verovio.wasm $NPM/`;
 	}
 
 	# create a gzip version

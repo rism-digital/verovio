@@ -288,8 +288,8 @@ void OptionArray::CopyTo(Option *option)
 
 void OptionArray::Init()
 {
-    m_values.empty();
-    m_defaultValues.empty();
+    m_values.clear();
+    m_defaultValues.clear();
 }
 
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
@@ -502,6 +502,19 @@ Options::Options()
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
 
+    m_condenseEncoded.SetInfo("Condense encoded", "Condense encoded layout rendering");
+    m_condenseEncoded.Init(false);
+    this->Register(&m_condenseEncoded, "condenseEncoded", &m_general);
+
+    m_condenseFirstPage.SetInfo("Condense first page", "When condensing a score also condense the first page");
+    m_condenseFirstPage.Init(false);
+    this->Register(&m_condenseFirstPage, "condenseFirstPage", &m_general);
+
+    m_condenseTempoPages.SetInfo(
+        "Condense tempo pages", "When condensing a score also condense pages with a tempo change");
+    m_condenseTempoPages.Init(false);
+    this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
+
     m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
@@ -559,6 +572,11 @@ Options::Options()
     m_openControlEvents.Init(false);
     this->Register(&m_openControlEvents, "openControlEvents", &m_general);
 
+    m_outputSmuflXmlEntities.SetInfo(
+        "Output SMuFL XML entities", "Output SMuFL charachters as XML entities instead of byte codes");
+    m_outputSmuflXmlEntities.Init(false);
+    this->Register(&m_outputSmuflXmlEntities, "outputSmuflXmlEntities", &m_general);
+
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
     this->Register(&m_pageHeight, "pageHeight", &m_general);
@@ -582,6 +600,10 @@ Options::Options()
     m_pageWidth.SetInfo("Page width", "The page width");
     m_pageWidth.Init(2100, 100, 60000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
+
+    m_expand.SetInfo("Expand expansion", "Expand all referenced elements in the expansion <xml:id>");
+    m_expand.Init("");
+    this->Register(&m_expand, "expand", &m_general);
 
     m_svgBoundingBoxes.SetInfo("Svg bounding boxes viewbox on svg root", "Include bounding boxes in SVG output");
     m_svgBoundingBoxes.Init(false);
@@ -644,10 +666,6 @@ Options::Options()
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
-
-    m_leftPosition.SetInfo("Left position", "The left position");
-    m_leftPosition.Init(0.8, 0.0, 2.0);
-    this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
 
     m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
