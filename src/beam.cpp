@@ -56,6 +56,7 @@ void BeamSegment::Reset()
     m_beamSlope = 0.0;
     m_verticalCenter = 0;
     m_avgY = 0;
+    m_extendedToCenter = false;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -105,10 +106,10 @@ void BeamSegment::CalcBeam(
         if (!coord->m_stem) continue;
 
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-            coord->SetDrawingStemDir(STEMDIRECTION_up, staff, doc, beamInterface);
+            coord->SetDrawingStemDir(STEMDIRECTION_up, staff, doc, this, beamInterface);
         }
         else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
-            coord->SetDrawingStemDir(STEMDIRECTION_down, staff, doc, beamInterface);
+            coord->SetDrawingStemDir(STEMDIRECTION_down, staff, doc, this, beamInterface);
         }
         // cross-staff or beam@place=mixed
         else {
@@ -122,10 +123,24 @@ void BeamSegment::CalcBeam(
             else {
                 data_STEMDIRECTION stemDir = coord->m_stem->GetStemDir();
                 // TODO - Handle cases where there is no given stem direction (here we can still have NONE)
-                coord->SetDrawingStemDir(stemDir, staff, doc, beamInterface);
+                coord->SetDrawingStemDir(stemDir, staff, doc, this, beamInterface);
             }
         }
     }
+    
+    /*
+    for (i = 0; i < elementCount; ++i) {
+        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+        if ((beamInterface->m_drawingPlace == BEAMPLACE_above)
+            && (coord->m_yBeam < this->m_verticalCenter)) {
+            coord->m_yBeam = this->m_verticalCenter;
+        }
+        else if ((beamInterface->m_drawingPlace == BEAMPLACE_below)
+            && (this->m_verticalCenter < coord->m_yBeam)) {
+            coord->m_yBeam  = this->m_verticalCenter;
+        }
+    }
+    */
 
     ArrayOfBeamElementCoords stemUps;
     ArrayOfBeamElementCoords stemDowns;
@@ -268,7 +283,7 @@ void BeamSegment::CalcBeamInit(
     assert(doc);
     assert(beamInterface);
 
-    int i, high, low;
+    int i;
 
     int elementCount = (int)m_beamElementCoordRefs.size();
     assert(elementCount > 0);
@@ -310,6 +325,7 @@ void BeamSegment::CalcBeamInit(
 
     m_avgY = 0;
     m_nbNotesOrChords = 0;
+    m_extendedToCenter = false;
 
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
@@ -408,7 +424,11 @@ void BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
     // Indicates if we have a short step of half a unit
     // This occurs with 8th and 16th only and with a reduced distance of 3 stave-spaces (6 units)
     bool shortStep = false;
-    if (m_nbNotesOrChords == 2) {
+    if (m_extendedToCenter) {
+        step = unit / 2;
+        shortStep = true;
+    }
+    else if (m_nbNotesOrChords == 2) {
         step = unit * 2;
         if ((dist <= unit * 6) && (dur < DUR_32)) {
             step = unit / 2;
@@ -790,7 +810,7 @@ int Beam::ResetDrawing(FunctorParams *functorParams)
 //----------------------------------------------------------------------------
 
 void BeamElementCoord::SetDrawingStemDir(
-    data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamDrawingInterface *interface)
+    data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface)
 {
     assert(staff);
     assert(doc);
@@ -800,6 +820,7 @@ void BeamElementCoord::SetDrawingStemDir(
 
     this->m_stem->SetDrawingStemDir(stemDir);
     bool onStaffLine = false;
+    int ledgerLines = 0;
     this->m_centered = false;
 
     Note *note = NULL;
@@ -817,7 +838,10 @@ void BeamElementCoord::SetDrawingStemDir(
             assert(chord);
             note = chord->GetTopNote();
         }
-        if (note) onStaffLine = (note->GetDrawingLoc() % 2);
+        if (note) {
+          onStaffLine = (note->GetDrawingLoc() % 2);
+          ledgerLines = -(note->GetDrawingLoc()) / 2;
+        }
     }
     else {
         this->m_yBeam = this->m_yBottom;
@@ -827,24 +851,28 @@ void BeamElementCoord::SetDrawingStemDir(
             assert(chord);
             note = chord->GetBottomNote();
         }
-        if (note) onStaffLine = (note->GetDrawingLoc() % 2);
+        if (note) {
+            onStaffLine = (note->GetDrawingLoc() % 2);
+            ledgerLines = (note->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+        }
         stemLen = -1;
     }
 
     if (!note) return;
 
     bool extend = onStaffLine;
+    const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
     // In this case, Note::CalcStemLenInHalfUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
     int stemLenInHalfUnits = note->CalcStemLenInHalfUnits(staff);
     // Do not extend when on the staff line
-    if (stemLenInHalfUnits != STANDARD_STEMLENGTH * 2) {
+    if (stemLenInHalfUnits != standardStemLen) {
         extend = false;
     }
 
     // For 8th notes, use the shortened stem (if shortened)
     if (this->m_dur == DUR_8) {
-        if (stemLenInHalfUnits != STANDARD_STEMLENGTH * 2) {
+        if (stemLenInHalfUnits != standardStemLen) {
             stemLen *= stemLenInHalfUnits;
         }
         else {
@@ -863,8 +891,50 @@ void BeamElementCoord::SetDrawingStemDir(
             default: stemLen *= 14;
         }
     }
+    
+    
+    /*
+    // then check that the stem length reaches the center for the staff
+    double minDistToCenter = -VRV_UNSET;
+
+    for (i = 0; i < elementCount; ++i) {
+        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+        if ((beamInterface->m_drawingPlace == BEAMPLACE_above)
+            && (coord->m_yBeam - this->m_verticalCenter < minDistToCenter)) {
+            minDistToCenter = coord->m_yBeam - this->m_verticalCenter;
+        }
+        else if ((beamInterface->m_drawingPlace == BEAMPLACE_below)
+            && (this->m_verticalCenter - coord->m_yBeam < minDistToCenter)) {
+            minDistToCenter = this->m_verticalCenter - coord->m_yBeam;
+        }
+    }
+
+    if (minDistToCenter < 0) {
+        this->m_startingY += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
+        for (i = 0; i < elementCount; ++i) {
+            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+            coord->m_yBeam += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
+        }
+    }
+    */
+    
+    
     if (stemLen % 2) this->m_centered = true;
     this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
+    
+    if (stemDir == STEMDIRECTION_up) {
+        if (this->m_yBeam < segment->m_verticalCenter) {
+            this->m_yBeam = segment->m_verticalCenter;
+            segment->m_extendedToCenter = true;
+        }
+    }
+    else {
+        if (segment->m_verticalCenter < this->m_yBeam) {
+            this->m_yBeam  = segment->m_verticalCenter;
+            segment->m_extendedToCenter = true;
+        }
+    }
+    
 }
 
 } // namespace vrv

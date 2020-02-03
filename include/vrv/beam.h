@@ -74,6 +74,7 @@ public:
     int m_startingX; // the initial X position of the beam
     int m_startingY; // the initial Y position of the beam
     int m_nbNotesOrChords;
+    bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam
     int m_verticalCenter;
     int m_avgY;
@@ -184,7 +185,7 @@ public:
     }
     virtual ~BeamElementCoord();
 
-    void SetDrawingStemDir(data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamDrawingInterface *interface);
+    void SetDrawingStemDir(data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
 
     int m_x;
     int m_yTop; // y value of topmost note
