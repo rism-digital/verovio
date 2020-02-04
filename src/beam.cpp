@@ -817,6 +817,8 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(interface);
 
     if (!this->m_stem) return;
+    
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     this->m_stem->SetDrawingStemDir(stemDir);
     bool onStaffLine = false;
@@ -892,40 +894,16 @@ void BeamElementCoord::SetDrawingStemDir(
         }
     }
     
-    
-    /*
-    // then check that the stem length reaches the center for the staff
-    double minDistToCenter = -VRV_UNSET;
-
-    for (i = 0; i < elementCount; ++i) {
-        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-        if ((beamInterface->m_drawingPlace == BEAMPLACE_above)
-            && (coord->m_yBeam - this->m_verticalCenter < minDistToCenter)) {
-            minDistToCenter = coord->m_yBeam - this->m_verticalCenter;
-        }
-        else if ((beamInterface->m_drawingPlace == BEAMPLACE_below)
-            && (this->m_verticalCenter - coord->m_yBeam < minDistToCenter)) {
-            minDistToCenter = this->m_verticalCenter - coord->m_yBeam;
-        }
-    }
-
-    if (minDistToCenter < 0) {
-        this->m_startingY += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
-        for (i = 0; i < elementCount; ++i) {
-            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-            coord->m_yBeam += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
-        }
-    }
-    */
-    
-    
     if (stemLen % 2) this->m_centered = true;
     this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
     
+    // Make sure the stem reaches the center of the staff
+    // Mark the segment as extendedToCenter since we then want a reduced slope
     if (stemDir == STEMDIRECTION_up) {
         if (this->m_yBeam <= segment->m_verticalCenter) {
             this->m_yBeam = segment->m_verticalCenter;
             segment->m_extendedToCenter = true;
+            this->m_centered = false;
         }
         else {
             segment->m_extendedToCenter = false;
@@ -935,10 +913,19 @@ void BeamElementCoord::SetDrawingStemDir(
         if (segment->m_verticalCenter <= this->m_yBeam) {
             this->m_yBeam  = segment->m_verticalCenter;
             segment->m_extendedToCenter = true;
+            this->m_centered = false;
         }
         else {
             segment->m_extendedToCenter = false;
         }
+    }
+
+    // Make sure there is a at least one staff space before the ledger lines
+    if ((ledgerLines > 2) && (this->m_dur > DUR_32)) {
+        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
+    }
+    else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
+        this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
     
 }
