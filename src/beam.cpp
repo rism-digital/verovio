@@ -127,7 +127,7 @@ void BeamSegment::CalcBeam(
             }
         }
     }
-    
+
     /*
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
@@ -817,7 +817,7 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(interface);
 
     if (!this->m_stem) return;
-    
+
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     this->m_stem->SetDrawingStemDir(stemDir);
@@ -841,8 +841,8 @@ void BeamElementCoord::SetDrawingStemDir(
             note = chord->GetTopNote();
         }
         if (note) {
-          onStaffLine = (note->GetDrawingLoc() % 2);
-          ledgerLines = -(note->GetDrawingLoc()) / 2;
+            onStaffLine = (note->GetDrawingLoc() % 2);
+            ledgerLines = -(note->GetDrawingLoc()) / 2;
         }
     }
     else {
@@ -893,10 +893,10 @@ void BeamElementCoord::SetDrawingStemDir(
             default: stemLen *= 14;
         }
     }
-    
+
     if (stemLen % 2) this->m_centered = true;
     this->m_yBeam += (stemLen * doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
-    
+
     // Make sure the stem reaches the center of the staff
     // Mark the segment as extendedToCenter since we then want a reduced slope
     if (stemDir == STEMDIRECTION_up) {
@@ -911,7 +911,7 @@ void BeamElementCoord::SetDrawingStemDir(
     }
     else {
         if (segment->m_verticalCenter <= this->m_yBeam) {
-            this->m_yBeam  = segment->m_verticalCenter;
+            this->m_yBeam = segment->m_verticalCenter;
             segment->m_extendedToCenter = true;
             this->m_centered = false;
         }
@@ -927,7 +927,6 @@ void BeamElementCoord::SetDrawingStemDir(
     else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
-    
 }
 
 } // namespace vrv
