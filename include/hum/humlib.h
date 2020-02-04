@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Feb  2 01:53:08 PST 2020
+// Last Modified: Sun Feb  2 23:42:11 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1019,6 +1019,7 @@ class HumdrumLine : public std::string, public HumHash {
 		bool        isManipulator          (void) const;
 		bool        hasSpines              (void) const;
 		bool        isGlobal               (void) const;
+		bool        equalFieldsQ           (const string& exinterp, const string& value);
 		HTp         token                  (int index) const;
 		void        getTokens              (std::vector<HTp>& list);
 		int         getTokenCount          (void) const;
@@ -7060,6 +7061,43 @@ class Tool_restfill : public HumTool {
 	private:
 		bool        m_hiddenQ  = false;
 		std::string m_exinterp = "**kern";
+
+};
+
+
+class Tool_rid : public HumTool {
+	public:
+		         Tool_rid          (void);
+		        ~Tool_rid          () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+
+	private:
+
+		// User interface variables:
+		int      option_D = 0;   // used with -D option
+		int      option_d = 0;   // used with -d option
+		int      option_G = 0;   // used with -G option
+		int      option_g = 0;   // used with -g option
+		int      option_I = 0;   // used with -I option
+		int      option_i = 0;   // used with -i option
+		int      option_L = 0;   // used with -L option
+		int      option_l = 0;   // used with -l option
+		int      option_T = 0;   // used with -T option
+		int      option_U = 0;   // used with -U and -u option
+
+		int      option_M = 0;   // used with -M option
+		int      option_C = 0;   // used with -C option
+		int      option_c = 0;   // used with -c option
+		int      option_k = 0;   // used with -k option
+		int      option_V = 0;   // used with -V option
 
 };
 
