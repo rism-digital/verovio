@@ -2995,6 +2995,8 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HTp labeltok = NULL;
     std::string abbreviation;
     hum::HTp abbrtok = NULL;
+    std::string stria; // number of staff lines
+    hum::HTp striatok = NULL;
     std::string clef;
     hum::HTp cleftok = NULL;
     hum::HTp keytok = NULL;
@@ -3023,6 +3025,10 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             if (hre.search(part, 6, "\\d")) {
                 m_oclef.emplace_back(partnumber, part);
             }
+        }
+        else if (part->compare(0, 6, "*stria") == 0) {
+            stria = *part;
+            striatok = part;
         }
         else if (part->compare(0, 5, "*omet") == 0) {
             m_omet.emplace_back(partnumber, part);
@@ -3117,7 +3123,26 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     m_staffdef.back()->SetN(partnumber);
-    m_staffdef.back()->SetLines(5);
+
+    if (!stria.empty()) {
+        hum::HumRegex hre;
+        if (hre.search(stria, "^\\*stria(\\d+)")) {
+            int number = hre.getMatchInt(1);
+            if (number < 33) {
+                // Just to avoid cases where the staff number is something like 14532
+                m_staffdef.back()->SetLines(number);
+            }
+            else {
+                m_staffdef.back()->SetLines(5);
+            }
+        }
+        else {
+            m_staffdef.back()->SetLines(5);
+        }
+    }
+    else {
+        m_staffdef.back()->SetLines(5);
+    }
 
     if (clef.size() > 0) {
         setClef(m_staffdef.back(), clef, cleftok);
