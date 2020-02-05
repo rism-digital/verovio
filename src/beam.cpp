@@ -94,7 +94,7 @@ void BeamSegment::CalcBeam(
         this->CalcBeamInit(layer, staff, doc, beamInterface, place);
     }
 
-    bool horizontal = beamInterface->IsRepeatedPattern();
+    bool horizontal = beamInterface->IsHorizontal();
 
     // Beam@place has precedence - however, in some cases, CalcBeam is called recusively because we need to change the
     // place This occurs when mixed makes no sense and the beam is placed above or below instead.
@@ -177,6 +177,25 @@ void BeamSegment::CalcBeam(
     if (!horizontal) {
         this->CalcBeamSlope(layer, staff, doc, beamInterface);
     }
+    else {
+
+        // then check that the stem length reaches the center for the staff
+        int maxLength = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? VRV_UNSET : -VRV_UNSET;
+
+        for (i = 0; i < elementCount; ++i) {
+            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+            if (!coord->m_stem) continue;
+            
+            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+                if (maxLength < coord->m_yBeam) maxLength = coord->m_yBeam;
+            }
+            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+                if (maxLength > coord->m_yBeam) maxLength = coord->m_yBeam;
+            }
+        }
+        
+        m_beamElementCoordRefs.at(0)->m_yBeam = maxLength;
+    }
 
     this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
     this->m_startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
@@ -184,61 +203,10 @@ void BeamSegment::CalcBeam(
     /******************************************************************/
     // Calculate the stem lengths
 
-    /*
-    // first check that the stem length is long enough (to be improved?)
-    double oldYPos; // holds y position before calculation to determine if beam needs extra height
-    double expectedY;
-    int verticalAdjustment = 0;
-    for (i = 0; i < elementCount; i++) {
-        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-        if (coord->m_element->Is(REST)) {
-            // Here we need to take into account the bounding box of the rest
-            continue;
-        }
-
-        oldYPos = coord->m_yBeam;
-        expectedY = this->m_startingY + verticalAdjustment + this->m_beamSlope * (coord->m_x - this->m_startingX);
-
-        // if the stem is not long enough, add extra stem length needed to all members of the beam
-        if ((beamInterface->m_drawingPlace == BEAMPLACE_above && (oldYPos > expectedY))
-            || (beamInterface->m_drawingPlace == BEAMPLACE_below && (oldYPos < expectedY))) {
-            verticalAdjustment += oldYPos - expectedY;
-        }
-    }
-
-    // Now adjust the startingY position and all the elements
-    this->m_startingY += verticalAdjustment;
-
-    */
     for (i = 0; i < elementCount; i++) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = this->m_startingY + this->m_beamSlope * (coord->m_x - this->m_startingX);
     }
-
-    /*
-    // then check that the stem length reaches the center for the staff
-    double minDistToCenter = -VRV_UNSET;
-
-    for (i = 0; i < elementCount; ++i) {
-        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-        if ((beamInterface->m_drawingPlace == BEAMPLACE_above)
-            && (coord->m_yBeam - this->m_verticalCenter < minDistToCenter)) {
-            minDistToCenter = coord->m_yBeam - this->m_verticalCenter;
-        }
-        else if ((beamInterface->m_drawingPlace == BEAMPLACE_below)
-            && (this->m_verticalCenter - coord->m_yBeam < minDistToCenter)) {
-            minDistToCenter = this->m_verticalCenter - coord->m_yBeam;
-        }
-    }
-
-    if (minDistToCenter < 0) {
-        this->m_startingY += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
-        for (i = 0; i < elementCount; ++i) {
-            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-            coord->m_yBeam += (beamInterface->m_drawingPlace == BEAMPLACE_below) ? minDistToCenter : -minDistToCenter;
-        }
-    }
-    */
 
     /******************************************************************/
     // Set the stem lengths

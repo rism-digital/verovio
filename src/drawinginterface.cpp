@@ -228,6 +228,56 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
     }
 }
 
+bool BeamDrawingInterface::IsHorizontal()
+{
+    if (this->IsRepeatedPattern()) {
+        return true;
+    }
+    
+    if (m_drawingPlace == BEAMPLACE_mixed) return true;
+
+    if (m_drawingPlace == BEAMPLACE_NONE) return true;
+
+    int elementCount = (int)m_beamElementCoords.size();
+    
+    std::vector<int> items;
+    items.reserve(m_beamElementCoords.size());
+
+    int i;
+    for (i = 0; i < elementCount; ++i) {
+        BeamElementCoord *coord = m_beamElementCoords.at(i);
+        if (!coord->m_stem) continue;
+
+        if (m_drawingPlace == BEAMPLACE_above) {
+            items.push_back(coord->m_yBottom);
+        }
+        else {
+            items.push_back(coord->m_yTop);
+        }
+    }
+    int itemCount = (int)items.size();
+    
+    if (itemCount < 2) return true;
+    
+    const int first = items.front();
+    const int last = items.back();
+    
+    // First note and last note have the same postion
+    if (first == last) return true;
+    
+    // Detect concave shapes
+    for (i = 1; i < itemCount - 1; ++i) {
+        if (m_drawingPlace == BEAMPLACE_above) {
+            if ((items.at(i) > first) && (items.at(i) > last)) return true;
+        }
+        else {
+            if ((items.at(i) < first) && (items.at(i) < last)) return true;
+        }
+    }
+    
+    return false;
+}
+
 bool BeamDrawingInterface::IsRepeatedPattern()
 {
     if (m_drawingPlace == BEAMPLACE_mixed) return false;
@@ -254,17 +304,17 @@ bool BeamDrawingInterface::IsRepeatedPattern()
             items.push_back(coord->m_yTop * DUR_MAX + coord->m_dur);
         }
     }
-    int nbItems = (int)items.size();
+    int itemCount = (int)items.size();
 
     // No pattern with at least 4 elements or if all elements are the same
-    if ((nbItems < 4) || (std::equal(items.begin() + 1, items.end(), items.begin()))) {
+    if ((itemCount < 4) || (std::equal(items.begin() + 1, items.end(), items.begin()))) {
         return false;
     }
 
     // Find all possible dividers for the sequence (without 1 and its size)
     std::vector<int> dividers;
-    for (i = 2; i <= nbItems / 2; ++i) {
-        if (nbItems % i == 0) dividers.push_back(i);
+    for (i = 2; i <= itemCount / 2; ++i) {
+        if (itemCount % i == 0) dividers.push_back(i);
     }
 
     // Correlate a sub-array for each divider until a sequence is found (if any)
@@ -274,7 +324,7 @@ bool BeamDrawingInterface::IsRepeatedPattern()
         bool pattern = true;
         std::vector<int>::iterator iter = items.begin();
         std::vector<int> v1 = std::vector<int>(iter, iter + divider);
-        for (j = 1; j < (nbItems / divider); ++j) {
+        for (j = 1; j < (itemCount / divider); ++j) {
             std::vector<int> v2 = std::vector<int>(iter + j * divider, iter + (j + 1) * divider);
             if (v1 != v2) {
                 pattern = false;
@@ -282,7 +332,7 @@ bool BeamDrawingInterface::IsRepeatedPattern()
             }
         }
         if (pattern) {
-            LogDebug("Pattern found %d", divider);
+            //LogDebug("Pattern found %d", divider);
             return true;
         }
     }
