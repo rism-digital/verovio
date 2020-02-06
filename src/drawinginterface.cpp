@@ -275,6 +275,29 @@ bool BeamDrawingInterface::IsHorizontal()
         }
     }
     
+    // Detect beam with two pitches only and as step at the beginning or at the end
+    const bool firstStep = (first != items.at(1));
+    const bool lastStep = (last != items.at(items.size() - 2));
+    if (firstStep || lastStep) {
+        std::vector<int> pitches;
+        std::unique_copy(items.begin(), items.end(), std::back_inserter(pitches));
+        if (pitches.size() == 2) {
+            //if (firstStep)
+            if (m_drawingPlace == BEAMPLACE_above) {
+                // Single note at the beginning as lower first
+                if (firstStep && (std::is_sorted(items.begin(), items.end()))) return true;
+                // Single note at the end and lower last
+                if (lastStep && (std::is_sorted(items.rbegin(), items.rend()))) return true;
+            }
+            else {
+                // Single note at the end and higher last
+                if (lastStep && (std::is_sorted(items.begin(), items.end()))) return true;
+                // Single note at the beginning and higher first
+                if (firstStep && (std::is_sorted(items.rbegin(), items.rend()))) return true;
+             }
+        }
+    }
+    
     return false;
 }
 
