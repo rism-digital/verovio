@@ -42,6 +42,7 @@
 #include "ending.h"
 #include "expan.h"
 #include "expansion.h"
+#include "expansionmap.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -2747,6 +2748,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         m_doc->ConvertScoreDefMarkupDoc();
     }
 
+    if (success) {
+        m_doc->ExpandExpansions();
+    }
+
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
         m_doc->ConvertAnalyticalMarkupDoc();
@@ -3033,6 +3038,7 @@ bool MeiInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 {
     Expansion *vrvExpansion = new Expansion();
     ReadSystemElement(expansion, vrvExpansion);
+    ReadPlistInterface(expansion, vrvExpansion);
 
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);

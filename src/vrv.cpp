@@ -48,7 +48,7 @@
 #include "pugixml.hpp"
 #include "unchecked.h"
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -246,7 +246,7 @@ struct timeval start;
 /** For disabling log */
 bool noLog = false;
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 std::vector<std::string> logBuffer;
 #endif
 
@@ -269,7 +269,7 @@ void LogDebug(const char *fmt, ...)
 {
     if (noLog) return;
 #if defined(DEBUG)
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -290,7 +290,7 @@ void LogDebug(const char *fmt, ...)
 void LogError(const char *fmt, ...)
 {
     if (noLog) return;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -310,7 +310,7 @@ void LogError(const char *fmt, ...)
 void LogMessage(const char *fmt, ...)
 {
     if (noLog) return;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -330,7 +330,7 @@ void LogMessage(const char *fmt, ...)
 void LogWarning(const char *fmt, ...)
 {
     if (noLog) return;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -352,7 +352,7 @@ void DisableLog()
     noLog = true;
 }
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 bool LogBufferContains(const std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
