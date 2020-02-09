@@ -233,13 +233,13 @@ bool BeamDrawingInterface::IsHorizontal()
     if (this->IsRepeatedPattern()) {
         return true;
     }
-    
+
     if (m_drawingPlace == BEAMPLACE_mixed) return true;
 
     if (m_drawingPlace == BEAMPLACE_NONE) return true;
 
     int elementCount = (int)m_beamElementCoords.size();
-    
+
     std::vector<int> items;
     items.reserve(m_beamElementCoords.size());
 
@@ -251,15 +251,15 @@ bool BeamDrawingInterface::IsHorizontal()
         items.push_back(coord->m_closestNote->GetDrawingY());
     }
     int itemCount = (int)items.size();
-    
+
     if (itemCount < 2) return true;
-    
+
     const int first = items.front();
     const int last = items.back();
-    
+
     // First note and last note have the same postion
     if (first == last) return true;
-    
+
     // Detect concave shapes
     for (i = 1; i < itemCount - 1; ++i) {
         if (m_drawingPlace == BEAMPLACE_above) {
@@ -269,7 +269,7 @@ bool BeamDrawingInterface::IsHorizontal()
             if ((items.at(i) < first) && (items.at(i) < last)) return true;
         }
     }
-    
+
     // Detect beam with two pitches only and as step at the beginning or at the end
     const bool firstStep = (first != items.at(1));
     const bool lastStep = (last != items.at(items.size() - 2));
@@ -277,7 +277,7 @@ bool BeamDrawingInterface::IsHorizontal()
         std::vector<int> pitches;
         std::unique_copy(items.begin(), items.end(), std::back_inserter(pitches));
         if (pitches.size() == 2) {
-            //if (firstStep)
+            // if (firstStep)
             if (m_drawingPlace == BEAMPLACE_above) {
                 // Single note at the beginning as lower first
                 if (firstStep && (std::is_sorted(items.begin(), items.end()))) return true;
@@ -289,10 +289,10 @@ bool BeamDrawingInterface::IsHorizontal()
                 if (lastStep && (std::is_sorted(items.begin(), items.end()))) return true;
                 // Single note at the beginning and higher first
                 if (firstStep && (std::is_sorted(items.rbegin(), items.rend()))) return true;
-             }
+            }
         }
     }
-    
+
     return false;
 }
 
@@ -346,7 +346,7 @@ bool BeamDrawingInterface::IsRepeatedPattern()
             }
         }
         if (pattern) {
-            //LogDebug("Pattern found %d", divider);
+            // LogDebug("Pattern found %d", divider);
             return true;
         }
     }

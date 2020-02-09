@@ -94,9 +94,8 @@ public:
      */
     void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
 
-    
     bool IsHorizontal();
-    
+
     bool IsRepeatedPattern();
 
     /**
