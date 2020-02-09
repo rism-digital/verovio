@@ -278,7 +278,7 @@ bool BeamDrawingInterface::IsHorizontal()
     // Detect beam with two pitches only and as step at the beginning or at the end
     const bool firstStep = (first != items.at(1));
     const bool lastStep = (last != items.at(items.size() - 2));
-    if (firstStep || lastStep) {
+    if ((items.size() > 2) && (firstStep || lastStep)) {
         std::vector<int> pitches;
         std::unique_copy(items.begin(), items.end(), std::back_inserter(pitches));
         if (pitches.size() == 2) {

@@ -63,7 +63,7 @@ public:
 private:
     void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
 
-    void CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+    bool CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
     void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
 
@@ -181,6 +181,7 @@ public:
     BeamElementCoord()
     {
         m_element = NULL;
+        m_closestNote = NULL;
         m_stem = NULL;
     }
     virtual ~BeamElementCoord();
@@ -195,9 +196,11 @@ public:
     int m_dur; // drawing duration
     int m_breaksec;
     bool m_centered; // beam is centered on the line
+    bool m_shortened; // stem is shortened because pointing oustide the staff
     char m_partialFlags[MAX_DURATION_PARTIALS];
     data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;
+    Note *m_closestNote;
     Stem *m_stem; // a pointer to the stem in order to avoid to have to re-cast it
 };
 
