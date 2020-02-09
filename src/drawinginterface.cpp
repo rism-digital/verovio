@@ -246,14 +246,9 @@ bool BeamDrawingInterface::IsHorizontal()
     int i;
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoords.at(i);
-        if (!coord->m_stem) continue;
+        if (!coord->m_stem || !coord->m_closestNote) continue;
 
-        if (m_drawingPlace == BEAMPLACE_above) {
-            items.push_back(coord->m_yBottom);
-        }
-        else {
-            items.push_back(coord->m_yTop);
-        }
+        items.push_back(coord->m_closestNote->GetDrawingY());
     }
     int itemCount = (int)items.size();
     
@@ -318,14 +313,10 @@ bool BeamDrawingInterface::IsRepeatedPattern()
     int i;
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoords.at(i);
-        if (!coord->m_stem) continue;
+        if (!coord->m_stem || !coord->m_closestNote) continue;
 
-        if (m_drawingPlace == BEAMPLACE_above) {
-            items.push_back(coord->m_yBottom * DUR_MAX + coord->m_dur);
-        }
-        else {
-            items.push_back(coord->m_yTop * DUR_MAX + coord->m_dur);
-        }
+        // Could this be an overflow with 32 bits?
+        items.push_back(coord->m_closestNote->GetDrawingY() * DUR_MAX + coord->m_dur);
     }
     int itemCount = (int)items.size();
 

@@ -221,16 +221,17 @@ void BeamSegment::CalcBeam(
         if ((el->Is(NOTE)) || (el->Is(CHORD))) {
             StemmedDrawingInterface *stemmedInterface = el->GetStemmedDrawingInterface();
             assert(beamInterface);
-
+            
+            assert(coord->m_closestNote);
+            y1 = coord->m_yBeam;
+            y2 = coord->m_closestNote->GetDrawingY();
             if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-                y1 = coord->m_yBeam - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                y2 = coord->m_yBottom
-                    + stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+                y1 -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                y2 += stemmedInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
             else {
-                y1 = coord->m_yBeam + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-                y2 = coord->m_yTop
-                    + stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
+                y1 += doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                y2 += stemmedInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, beamInterface->m_cueSize).y;
             }
 
             Stem *stem = stemmedInterface->GetDrawingStem();
@@ -313,8 +314,6 @@ void BeamSegment::CalcBeamInit(
             Chord *chord = dynamic_cast<Chord *>(coord->m_element);
             assert(chord);
             chord->GetYExtremes(yMax, yMin);
-            coord->m_yTop = yMax;
-            coord->m_yBottom = yMin;
 
             this->m_avgY += ((yMax + yMin) / 2);
 
@@ -328,14 +327,10 @@ void BeamSegment::CalcBeamInit(
             // low = std::min(coord->m_y, low);
 
             curY = coord->m_element->GetDrawingY();
-            coord->m_yTop = curY;
-            coord->m_yBottom = curY;
             this->m_avgY += curY;
         }
         else {
             curY = coord->m_element->GetDrawingY();
-            coord->m_yTop = curY;
-            coord->m_yBottom = curY;
             nbRests++;
         }
     }
@@ -364,16 +359,11 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
         Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
 
     int noteStep;
-    double noteSlope;
-    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
-        noteSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBottom),
-            Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBottom));
-        noteStep = abs(m_firstNoteOrChord->m_yTop - m_lastNoteOrChord->m_yTop);
-    }
-    else {
-        noteSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yTop),
-            Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yTop));
-        noteStep = abs(m_firstNoteOrChord->m_yBottom - m_lastNoteOrChord->m_yBottom);
+    double noteSlope = 0.0;
+    if (m_firstNoteOrChord->m_closestNote && m_lastNoteOrChord->m_closestNote) {
+        noteSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_closestNote->GetDrawingY()),
+            Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_closestNote->GetDrawingY()));
+        noteStep = abs(m_firstNoteOrChord->m_closestNote->GetDrawingY() - m_lastNoteOrChord->m_closestNote->GetDrawingY());
     }
 
     // LogDebug("Slope (original) %f %f", m_beamSlope, noteSlope);
@@ -843,6 +833,8 @@ void BeamElementCoord::SetDrawingStemDir(
     this->m_shortened = false;
     this->m_closestNote = NULL;
     
+    this->m_yBeam = this->m_element->GetDrawingY();
+    
     if (this->m_element->Is(NOTE)) {
         m_closestNote = dynamic_cast<Note *>(this->m_element);
     }
@@ -850,7 +842,6 @@ void BeamElementCoord::SetDrawingStemDir(
     int stemLen = 1;
 
     if (stemDir == STEMDIRECTION_up) {
-        this->m_yBeam = this->m_yTop;
         this->m_x += interface->m_stemXAbove[interface->m_cueSize];
         if (this->m_element->Is(CHORD)) {
             Chord *chord = dynamic_cast<Chord *>(this->m_element);
@@ -858,12 +849,12 @@ void BeamElementCoord::SetDrawingStemDir(
             m_closestNote = chord->GetTopNote();
         }
         if (m_closestNote) {
+            this->m_yBeam = m_closestNote->GetDrawingY();
             onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             ledgerLines = -(m_closestNote->GetDrawingLoc()) / 2;
         }
     }
     else {
-        this->m_yBeam = this->m_yBottom;
         this->m_x += interface->m_stemXBelow[interface->m_cueSize];
         if (this->m_element->Is(CHORD)) {
             Chord *chord = dynamic_cast<Chord *>(this->m_element);
@@ -871,6 +862,7 @@ void BeamElementCoord::SetDrawingStemDir(
             m_closestNote = chord->GetBottomNote();
         }
         if (m_closestNote) {
+            this->m_yBeam = m_closestNote->GetDrawingY();
             onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
             ledgerLines = (m_closestNote->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
         }

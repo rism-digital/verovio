@@ -190,8 +190,6 @@ public:
         data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
 
     int m_x;
-    int m_yTop; // y value of topmost note
-    int m_yBottom; // y value of bottom-most note
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration
     int m_breaksec;
