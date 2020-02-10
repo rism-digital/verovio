@@ -2974,7 +2974,7 @@ void HumdrumInput::addDefaultTempo(ScoreDef &m_scoreDef)
         sum += infile[i].getDuration().getFloat();
     }
     double avgdur = sum / count;
-    if (avgdur > 1.0) {
+    if (avgdur > 2.0) {
         m_scoreDef.SetMidiBpm(400);
     }
 }
