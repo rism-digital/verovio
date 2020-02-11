@@ -523,7 +523,8 @@ inline const Object& Value::get<Object>() const {
 
 template<typename T>
 inline Object &Object::operator<<(const T &value) {
-  return *this << Value(value), *this;
+  *this << Value(value);
+  return *this;
 }
 
 }  // namespace jsonxx

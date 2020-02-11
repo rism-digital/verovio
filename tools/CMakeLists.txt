@@ -36,9 +36,54 @@ if(MSVC)
     include_directories(../include/win32)
 else()
     # jsonxx raises -Wdollar-in-identifier-extension
+    # gcc 8.3.1 does not like -Wdollar-in-identifier-extension option.
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
     add_definitions(-g)
-    add_definitions(-std=c++11)
+    add_definitions(-std=c++17)
+
+    # extra warnings similar to Xcode compiling settings (most probably covered by -Wall):
+    # https://github.com/llvm-mirror/clang/blob/master/include/clang/Basic/DiagnosticGroups.td
+    # non-gcc: add_definitions(-Wblock-capture-autoreleasing)
+    # non-gcc: add_definitions(-Wbool-conversion)
+    # non-gcc: add_definitions(-Wconstant-conversion)
+    add_definitions(-Wdeprecated-declarations)
+    add_definitions(-Wempty-body)
+    # non-gcc: add_definitions(-Wenum-conversion)
+    # non-gcc: add_definitions(-Winfinite-recursion)
+    # non-gcc (ObjC only): add_definitions(-Wint-conversion)
+    add_definitions(-Winvalid-offsetof)
+    # non-gcc: add_definitions(-Wmove)
+    # non-gcc: add_definitions(-Wno-c++11-extensions)
+    # non-gcc: add_definitions(-Wno-comma)
+    add_definitions(-Wno-conversion)
+    # non-gcc: add_definitions(-Wno-exit-time-destructors)
+    add_definitions(-Wno-float-conversion)
+    # non-gcc: add_definitions(-Wno-four-char-constants)
+    add_definitions(-Wno-missing-braces)
+    add_definitions(-Wno-missing-field-initializers)
+    # non-gcc (ObjC only): add_definitions(-Wno-missing-prototypes)
+    # non-gcc: add_definitions(-Wno-newline-eof)
+    # non-gcc: add_definitions(-Wno-non-virtual-dtor)
+    add_definitions(-Wno-overloaded-virtual)
+    # non-gcc: add_definitions(-Wno-semicolon-before-method-body)
+    add_definitions(-Wno-shadow)
+    add_definitions(-Wno-sign-conversion)
+    add_definitions(-Wno-trigraphs)
+    add_definitions(-Wno-unknown-pragmas)
+    add_definitions(-Wno-unused-label)
+    # non-gcc: add_definitions(-Wnon-literal-null-conversion)
+    # non-gcc: add_definitions(-Wobjc-literal-conversion)
+    add_definitions(-Wparentheses)
+    # non-gcc: add_definitions(-Wrange-loop-analysis)
+    # non-gcc: add_definitions(-Wshorten-64-to-32)
+    # non-gcc (ObjC only: add_definitions(-Wstrict-prototypes)
+    add_definitions(-Wswitch)
+    add_definitions(-Wuninitialized)
+    add_definitions(-Wunreachable-code)
+    add_definitions(-Wunused-function)
+    add_definitions(-Wunused-value)
+    add_definitions(-Wunused-variable)
+
 endif()
 
 execute_process(
@@ -83,9 +128,11 @@ set(all_SRC
     ../libmei/atts_critapp.cpp
     ../libmei/atts_gestural.cpp
     ../libmei/atts_externalsymbols.cpp
+    ../libmei/atts_facsimile.cpp
     ../libmei/atts_mei.cpp
     ../libmei/atts_mensural.cpp
     ../libmei/atts_midi.cpp
+    ../libmei/atts_neumes.cpp
     ../libmei/atts_pagebased.cpp
     ../libmei/atts_shared.cpp
     ../libmei/atts_visual.cpp
@@ -96,6 +143,7 @@ if (BUILD_AS_LIBRARY)
     add_library (
         verovio
         SHARED
+		./c_wrapper.cpp
         ${all_SRC}
     )
 else()

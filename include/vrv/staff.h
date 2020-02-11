@@ -9,6 +9,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
+#include "facsimileinterface.h"
 #include "object.h"
 
 namespace vrv {
@@ -31,7 +32,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
  */
-class Staff : public Object, public AttNInteger, public AttTyped, public AttVisibility {
+class Staff : public Object, public FacsimileInterface, public AttNInteger, public AttTyped, public AttVisibility {
 
 public:
     /**
@@ -41,20 +42,18 @@ public:
     ///@{
     Staff(int n = 1);
     virtual ~Staff();
+    virtual Object *Clone() const { return new Staff(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Staff"; }
     virtual ClassId GetClassId() const { return STAFF; }
     ///@}
 
     /**
-     * Do not copy children for layers
+     * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual bool CopyChildren() const { return false; }
+    virtual void CloneReset();
 
-    /**
-     * Overriding CopyReset() method to be called after copy / assignment calls.
-     */
-    virtual void CopyReset();
+    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
 
     /**
      * Delete all the legder line arrays.
@@ -69,11 +68,11 @@ public:
     ///@}
 
     /**
-     * @name Get the Y drawing position
+     * @name Get the X and Y drawing position
      */
     ///@{
     virtual int GetDrawingY() const;
-
+    virtual int GetDrawingX() const;
     /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
@@ -174,6 +173,23 @@ public:
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * Set staff parameters based on
+     * facsimile information (if it
+     * exists).
+     */
+    virtual void SetFromFacsimile(Doc *doc);
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *);
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
 private:
     /**

@@ -340,6 +340,7 @@ enum data_COLORNAMES {
     COLORNAMES_plum,
     COLORNAMES_powderblue,
     COLORNAMES_purple,
+    COLORNAMES_rebeccapurple,
     COLORNAMES_red,
     COLORNAMES_rosybrown,
     COLORNAMES_royalblue,
@@ -369,6 +370,22 @@ enum data_COLORNAMES {
     COLORNAMES_yellow,
     COLORNAMES_yellowgreen,
     COLORNAMES_MAX
+};
+
+/**
+ * MEI data.COMPASSDIRECTION
+ */
+enum data_COMPASSDIRECTION {
+    COMPASSDIRECTION_NONE = 0,
+    COMPASSDIRECTION_n,
+    COMPASSDIRECTION_e,
+    COMPASSDIRECTION_s,
+    COMPASSDIRECTION_w,
+    COMPASSDIRECTION_ne,
+    COMPASSDIRECTION_nw,
+    COMPASSDIRECTION_se,
+    COMPASSDIRECTION_sw,
+    COMPASSDIRECTION_MAX
 };
 
 /**
@@ -403,6 +420,22 @@ enum data_ENCLOSURE {
     ENCLOSURE_paren,
     ENCLOSURE_brack,
     ENCLOSURE_MAX
+};
+
+/**
+ * MEI data.EVENTREL
+ */
+enum data_EVENTREL {
+    EVENTREL_NONE = 0,
+    EVENTREL_above,
+    EVENTREL_below,
+    EVENTREL_left,
+    EVENTREL_right,
+    EVENTREL_above_left,
+    EVENTREL_above_right,
+    EVENTREL_below_left,
+    EVENTREL_below_right,
+    EVENTREL_MAX
 };
 
 /**
@@ -545,6 +578,30 @@ enum data_GRACE {
     GRACE_unacc,
     GRACE_unknown,
     GRACE_MAX
+};
+
+/**
+ * MEI data.HEADSHAPE
+ */
+enum data_HEADSHAPE {
+    HEADSHAPE_NONE = 0,
+    HEADSHAPE_quarter,
+    HEADSHAPE_half,
+    HEADSHAPE_whole,
+    HEADSHAPE_backslash,
+    HEADSHAPE_circle,
+    HEADSHAPE_plus,
+    HEADSHAPE_diamond,
+    HEADSHAPE_isotriangle,
+    HEADSHAPE_oval,
+    HEADSHAPE_piewedge,
+    HEADSHAPE_rectangle,
+    HEADSHAPE_rtriangle,
+    HEADSHAPE_semicircle,
+    HEADSHAPE_slash,
+    HEADSHAPE_square,
+    HEADSHAPE_x,
+    HEADSHAPE_MAX
 };
 
 /**
@@ -701,6 +758,18 @@ enum data_MENSURATIONSIGN {
     MENSURATIONSIGN_C,
     MENSURATIONSIGN_O,
     MENSURATIONSIGN_MAX
+};
+
+/**
+ * MEI data.METERFORM
+ */
+enum data_METERFORM {
+    METERFORM_NONE = 0,
+    METERFORM_num,
+    METERFORM_denomsym,
+    METERFORM_norm,
+    METERFORM_invis,
+    METERFORM_MAX
 };
 
 /**
@@ -965,6 +1034,24 @@ enum data_NOTATIONTYPE {
 };
 
 /**
+ * MEI data.NOTEHEADMODIFIER
+ */
+enum data_NOTEHEADMODIFIER {
+    NOTEHEADMODIFIER_NONE = 0,
+    NOTEHEADMODIFIER_slash,
+    NOTEHEADMODIFIER_backslash,
+    NOTEHEADMODIFIER_vline,
+    NOTEHEADMODIFIER_hline,
+    NOTEHEADMODIFIER_centerdot,
+    NOTEHEADMODIFIER_paren,
+    NOTEHEADMODIFIER_brack,
+    NOTEHEADMODIFIER_box,
+    NOTEHEADMODIFIER_circle,
+    NOTEHEADMODIFIER_dblwhole,
+    NOTEHEADMODIFIER_MAX
+};
+
+/**
  * MEI data.NOTEHEADMODIFIER.list
  */
 enum data_NOTEHEADMODIFIER_list {
@@ -993,6 +1080,74 @@ enum data_OTHERSTAFF {
 };
 
 /**
+ * MEI data.RELATIONSHIP
+ */
+enum data_RELATIONSHIP {
+    RELATIONSHIP_NONE = 0,
+    RELATIONSHIP_hasAbridgement,
+    RELATIONSHIP_isAbridgementOf,
+    RELATIONSHIP_hasAdaptation,
+    RELATIONSHIP_isAdaptationOf,
+    RELATIONSHIP_hasAlternate,
+    RELATIONSHIP_isAlternateOf,
+    RELATIONSHIP_hasArrangement,
+    RELATIONSHIP_isArrangementOf,
+    RELATIONSHIP_hasComplement,
+    RELATIONSHIP_isComplementOf,
+    RELATIONSHIP_hasEmbodiment,
+    RELATIONSHIP_isEmbodimentOf,
+    RELATIONSHIP_hasExemplar,
+    RELATIONSHIP_isExemplarOf,
+    RELATIONSHIP_hasImitation,
+    RELATIONSHIP_isImitationOf,
+    RELATIONSHIP_hasPart,
+    RELATIONSHIP_isPartOf,
+    RELATIONSHIP_hasRealization,
+    RELATIONSHIP_isRealizationOf,
+    RELATIONSHIP_hasReconfiguration,
+    RELATIONSHIP_isReconfigurationOf,
+    RELATIONSHIP_hasReproduction,
+    RELATIONSHIP_isReproductionOf,
+    RELATIONSHIP_hasRevision,
+    RELATIONSHIP_isRevisionOf,
+    RELATIONSHIP_hasSuccessor,
+    RELATIONSHIP_isSuccessorOf,
+    RELATIONSHIP_hasSummarization,
+    RELATIONSHIP_isSummarizationOf,
+    RELATIONSHIP_hasSupplement,
+    RELATIONSHIP_isSupplementOf,
+    RELATIONSHIP_hasTransformation,
+    RELATIONSHIP_isTransformationOf,
+    RELATIONSHIP_hasTranslation,
+    RELATIONSHIP_isTranslationOf,
+    RELATIONSHIP_preceding,
+    RELATIONSHIP_succeeding,
+    RELATIONSHIP_original,
+    RELATIONSHIP_host,
+    RELATIONSHIP_constituent,
+    RELATIONSHIP_otherVersion,
+    RELATIONSHIP_otherFormat,
+    RELATIONSHIP_isReferencedBy,
+    RELATIONSHIP_references,
+    RELATIONSHIP_MAX
+};
+
+/**
+ * MEI data.ROTATION
+ */
+enum data_ROTATION {
+    ROTATION_NONE = 0,
+    ROTATION_none,
+    ROTATION_down,
+    ROTATION_left,
+    ROTATION_ne,
+    ROTATION_nw,
+    ROTATION_se,
+    ROTATION_sw,
+    ROTATION_MAX
+};
+
+/**
  * MEI data.ROTATIONDIRECTION
  */
 enum data_ROTATIONDIRECTION {
@@ -1005,6 +1160,43 @@ enum data_ROTATIONDIRECTION {
     ROTATIONDIRECTION_se,
     ROTATIONDIRECTION_sw,
     ROTATIONDIRECTION_MAX
+};
+
+/**
+ * MEI data.STAFFITEM
+ */
+enum data_STAFFITEM {
+    STAFFITEM_NONE = 0,
+    STAFFITEM_accid,
+    STAFFITEM_annot,
+    STAFFITEM_artic,
+    STAFFITEM_dir,
+    STAFFITEM_dynam,
+    STAFFITEM_harm,
+    STAFFITEM_ornam,
+    STAFFITEM_sp,
+    STAFFITEM_stageDir,
+    STAFFITEM_tempo,
+    STAFFITEM_beam,
+    STAFFITEM_bend,
+    STAFFITEM_bracketSpan,
+    STAFFITEM_breath,
+    STAFFITEM_cpMark,
+    STAFFITEM_fermata,
+    STAFFITEM_fing,
+    STAFFITEM_hairpin,
+    STAFFITEM_harpPedal,
+    STAFFITEM_lv,
+    STAFFITEM_mordent,
+    STAFFITEM_octave,
+    STAFFITEM_pedal,
+    STAFFITEM_reh,
+    STAFFITEM_tie,
+    STAFFITEM_trill,
+    STAFFITEM_tuplet,
+    STAFFITEM_turn,
+    STAFFITEM_ligature,
+    STAFFITEM_MAX
 };
 
 /**
@@ -1061,6 +1253,18 @@ enum data_STAFFITEM_mensural {
 };
 
 /**
+ * MEI data.STAFFREL
+ */
+enum data_STAFFREL {
+    STAFFREL_NONE = 0,
+    STAFFREL_above,
+    STAFFREL_below,
+    STAFFREL_between,
+    STAFFREL_within,
+    STAFFREL_MAX
+};
+
+/**
  * MEI data.STAFFREL.basic
  */
 enum data_STAFFREL_basic {
@@ -1078,6 +1282,46 @@ enum data_STAFFREL_extended {
     STAFFREL_extended_between,
     STAFFREL_extended_within,
     STAFFREL_extended_MAX
+};
+
+/**
+ * MEI data.STEMDIRECTION
+ */
+enum data_STEMDIRECTION {
+    STEMDIRECTION_NONE = 0,
+    STEMDIRECTION_up,
+    STEMDIRECTION_down,
+    STEMDIRECTION_left,
+    STEMDIRECTION_right,
+    STEMDIRECTION_ne,
+    STEMDIRECTION_se,
+    STEMDIRECTION_nw,
+    STEMDIRECTION_sw,
+    STEMDIRECTION_MAX
+};
+
+/**
+ * MEI data.STEMDIRECTION.basic
+ */
+enum data_STEMDIRECTION_basic {
+    STEMDIRECTION_basic_NONE = 0,
+    STEMDIRECTION_basic_up,
+    STEMDIRECTION_basic_down,
+    STEMDIRECTION_basic_MAX
+};
+
+/**
+ * MEI data.STEMDIRECTION.extended
+ */
+enum data_STEMDIRECTION_extended {
+    STEMDIRECTION_extended_NONE = 0,
+    STEMDIRECTION_extended_left,
+    STEMDIRECTION_extended_right,
+    STEMDIRECTION_extended_ne,
+    STEMDIRECTION_extended_se,
+    STEMDIRECTION_extended_nw,
+    STEMDIRECTION_extended_sw,
+    STEMDIRECTION_extended_MAX
 };
 
 /**
@@ -1118,6 +1362,42 @@ enum data_TEMPERAMENT {
     TEMPERAMENT_mean,
     TEMPERAMENT_pythagorean,
     TEMPERAMENT_MAX
+};
+
+/**
+ * MEI data.TEXTRENDITION
+ */
+enum data_TEXTRENDITION {
+    TEXTRENDITION_NONE = 0,
+    TEXTRENDITION_quote,
+    TEXTRENDITION_quotedbl,
+    TEXTRENDITION_italic,
+    TEXTRENDITION_oblique,
+    TEXTRENDITION_smcaps,
+    TEXTRENDITION_bold,
+    TEXTRENDITION_bolder,
+    TEXTRENDITION_lighter,
+    TEXTRENDITION_box,
+    TEXTRENDITION_circle,
+    TEXTRENDITION_dbox,
+    TEXTRENDITION_tbox,
+    TEXTRENDITION_bslash,
+    TEXTRENDITION_fslash,
+    TEXTRENDITION_line_through,
+    TEXTRENDITION_none,
+    TEXTRENDITION_overline,
+    TEXTRENDITION_overstrike,
+    TEXTRENDITION_strike,
+    TEXTRENDITION_sub,
+    TEXTRENDITION_sup,
+    TEXTRENDITION_superimpose,
+    TEXTRENDITION_underline,
+    TEXTRENDITION_x_through,
+    TEXTRENDITION_ltr,
+    TEXTRENDITION_rtl,
+    TEXTRENDITION_lro,
+    TEXTRENDITION_rlo,
+    TEXTRENDITION_MAX
 };
 
 /**
@@ -1179,6 +1459,15 @@ enum accidLog_FUNC {
 };
 
 /**
+ * MEI att.anchoredText.log@func
+ */
+enum anchoredTextLog_FUNC {
+    anchoredTextLog_FUNC_NONE = 0,
+    anchoredTextLog_FUNC_unknown,
+    anchoredTextLog_FUNC_MAX
+};
+
+/**
  * MEI att.arpeg.log@order
  */
 enum arpegLog_ORDER {
@@ -1233,6 +1522,17 @@ enum beamingVis_BEAMREND {
 };
 
 /**
+ * MEI att.bracketSpan.log@func
+ */
+enum bracketSpanLog_FUNC {
+    bracketSpanLog_FUNC_NONE = 0,
+    bracketSpanLog_FUNC_coloration,
+    bracketSpanLog_FUNC_cross_rhythm,
+    bracketSpanLog_FUNC_ligature,
+    bracketSpanLog_FUNC_MAX
+};
+
+/**
  * MEI att.curvature@curvedir
  */
 enum curvature_CURVEDIR {
@@ -1241,6 +1541,15 @@ enum curvature_CURVEDIR {
     curvature_CURVEDIR_below,
     curvature_CURVEDIR_mixed,
     curvature_CURVEDIR_MAX
+};
+
+/**
+ * MEI att.curve.log@func
+ */
+enum curveLog_FUNC {
+    curveLog_FUNC_NONE = 0,
+    curveLog_FUNC_unknown,
+    curveLog_FUNC_MAX
 };
 
 /**
@@ -1281,6 +1590,26 @@ enum episemaVis_FORM {
     episemaVis_FORM_h,
     episemaVis_FORM_v,
     episemaVis_FORM_MAX
+};
+
+/**
+ * MEI att.evidence@evidence
+ */
+enum evidence_EVIDENCE {
+    evidence_EVIDENCE_NONE = 0,
+    evidence_EVIDENCE_internal,
+    evidence_EVIDENCE_external,
+    evidence_EVIDENCE_conjecture,
+    evidence_EVIDENCE_MAX
+};
+
+/**
+ * MEI att.extSym@glyph.auth
+ */
+enum extSym_GLYPHAUTH {
+    extSym_GLYPHAUTH_NONE = 0,
+    extSym_GLYPHAUTH_smufl,
+    extSym_GLYPHAUTH_MAX
 };
 
 /**
@@ -1455,6 +1784,17 @@ enum harpPedalLog_G {
 };
 
 /**
+ * MEI att.line.log@func
+ */
+enum lineLog_FUNC {
+    lineLog_FUNC_NONE = 0,
+    lineLog_FUNC_coloration,
+    lineLog_FUNC_ligature,
+    lineLog_FUNC_unknown,
+    lineLog_FUNC_MAX
+};
+
+/**
  * MEI att.liquescent.vis@curve
  */
 enum liquescentVis_CURVE {
@@ -1465,11 +1805,37 @@ enum liquescentVis_CURVE {
 };
 
 /**
+ * MEI att.measurement@unit
+ */
+enum measurement_UNIT {
+    measurement_UNIT_NONE = 0,
+    measurement_UNIT_byte,
+    measurement_UNIT_char,
+    measurement_UNIT_cm,
+    measurement_UNIT_deg,
+    measurement_UNIT_in,
+    measurement_UNIT_issue,
+    measurement_UNIT_ft,
+    measurement_UNIT_m,
+    measurement_UNIT_mm,
+    measurement_UNIT_page,
+    measurement_UNIT_pc,
+    measurement_UNIT_pt,
+    measurement_UNIT_px,
+    measurement_UNIT_rad,
+    measurement_UNIT_record,
+    measurement_UNIT_vol,
+    measurement_UNIT_vu,
+    measurement_UNIT_MAX
+};
+
+/**
  * MEI att.meiVersion@meiversion
  */
 enum meiVersion_MEIVERSION {
     meiVersion_MEIVERSION_NONE = 0,
     meiVersion_MEIVERSION_4_0_0,
+    meiVersion_MEIVERSION_4_0_1,
     meiVersion_MEIVERSION_MAX
 };
 
@@ -1502,30 +1868,6 @@ enum meterConformance_METCON {
     meterConformance_METCON_i,
     meterConformance_METCON_o,
     meterConformance_METCON_MAX
-};
-
-/**
- * MEI att.meterSig.vis@form
- */
-enum meterSigVis_FORM {
-    meterSigVis_FORM_NONE = 0,
-    meterSigVis_FORM_num,
-    meterSigVis_FORM_denomsym,
-    meterSigVis_FORM_norm,
-    meterSigVis_FORM_invis,
-    meterSigVis_FORM_MAX
-};
-
-/**
- * MEI att.meterSigDefault.vis@meter.form
- */
-enum meterSigDefaultVis_METERFORM {
-    meterSigDefaultVis_METERFORM_NONE = 0,
-    meterSigDefaultVis_METERFORM_num,
-    meterSigDefaultVis_METERFORM_denomsym,
-    meterSigDefaultVis_METERFORM_norm,
-    meterSigDefaultVis_METERFORM_invis,
-    meterSigDefaultVis_METERFORM_MAX
 };
 
 /**
@@ -1601,6 +1943,15 @@ enum noteGes_EXTREMIS {
 };
 
 /**
+ * MEI att.noteHeads@head.auth
+ */
+enum noteHeads_HEADAUTH {
+    noteHeads_HEADAUTH_NONE = 0,
+    noteHeads_HEADAUTH_smufl,
+    noteHeads_HEADAUTH_MAX
+};
+
+/**
  * MEI att.octave.log@coll
  */
 enum octaveLog_COLL {
@@ -1629,6 +1980,18 @@ enum pedalLog_DIR {
     pedalLog_DIR_half,
     pedalLog_DIR_bounce,
     pedalLog_DIR_MAX
+};
+
+/**
+ * MEI att.pedal.log@func
+ */
+enum pedalLog_FUNC {
+    pedalLog_FUNC_NONE = 0,
+    pedalLog_FUNC_sustain,
+    pedalLog_FUNC_soft,
+    pedalLog_FUNC_sostenuto,
+    pedalLog_FUNC_silent,
+    pedalLog_FUNC_MAX
 };
 
 /**
@@ -1766,6 +2129,7 @@ enum sylLog_WORDPOS {
     sylLog_WORDPOS_NONE = 0,
     sylLog_WORDPOS_i,
     sylLog_WORDPOS_m,
+    sylLog_WORDPOS_s,
     sylLog_WORDPOS_t,
     sylLog_WORDPOS_MAX
 };

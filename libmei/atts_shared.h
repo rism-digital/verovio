@@ -55,7 +55,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     accidLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -973,16 +973,18 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
-    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
-    std::string GetLwidth() const { return m_lwidth; }
+    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
+    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
     ///@}
 
 private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
     /** Width of a curved line. **/
-    std::string m_lwidth;
+    data_LINEWIDTH m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -1143,29 +1145,29 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDynamDist(std::string dynamDist_) { m_dynamDist = dynamDist_; }
-    std::string GetDynamDist() const { return m_dynamDist; }
+    void SetDynamDist(data_MEASUREMENTREL dynamDist_) { m_dynamDist = dynamDist_; }
+    data_MEASUREMENTREL GetDynamDist() const { return m_dynamDist; }
     bool HasDynamDist() const;
     //
-    void SetHarmDist(std::string harmDist_) { m_harmDist = harmDist_; }
-    std::string GetHarmDist() const { return m_harmDist; }
+    void SetHarmDist(data_MEASUREMENTREL harmDist_) { m_harmDist = harmDist_; }
+    data_MEASUREMENTREL GetHarmDist() const { return m_harmDist; }
     bool HasHarmDist() const;
     //
-    void SetTextDist(std::string textDist_) { m_textDist = textDist_; }
-    std::string GetTextDist() const { return m_textDist; }
+    void SetTextDist(data_MEASUREMENTREL textDist_) { m_textDist = textDist_; }
+    data_MEASUREMENTREL GetTextDist() const { return m_textDist; }
     bool HasTextDist() const;
     ///@}
 
 private:
     /** Records the default distance from the staff for dynamic marks. **/
-    std::string m_dynamDist;
+    data_MEASUREMENTREL m_dynamDist;
     /**
      * Records the default distance from the staff of harmonic indications, such as
      * guitar chord grids or functional labels.
      **/
-    std::string m_harmDist;
+    data_MEASUREMENTREL m_harmDist;
     /** Determines how far from the staff to render text elements. **/
-    std::string m_textDist;
+    data_MEASUREMENTREL m_textDist;
 
     /* include <atttext.dist> */
 };
@@ -1762,14 +1764,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHeight(std::string height_) { m_height = height_; }
-    std::string GetHeight() const { return m_height; }
+    void SetHeight(data_MEASUREMENTABS height_) { m_height = height_; }
+    data_MEASUREMENTABS GetHeight() const { return m_height; }
     bool HasHeight() const;
     ///@}
 
 private:
     /** Measurement of the vertical dimension of an entity. **/
-    std::string m_height;
+    data_MEASUREMENTABS m_height;
 
     /* include <attheight> */
 };
@@ -1917,14 +1919,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSig(std::string sig_) { m_sig = sig_; }
-    std::string GetSig() const { return m_sig; }
+    void SetSig(data_KEYSIGNATURE sig_) { m_sig = sig_; }
+    data_KEYSIGNATURE GetSig() const { return m_sig; }
     bool HasSig() const;
     ///@}
 
 private:
     /** Written key signature. **/
-    std::string m_sig;
+    data_KEYSIGNATURE m_sig;
 
     /* include <attsig> */
 };
@@ -2245,9 +2247,11 @@ public:
     int GetLsegs() const { return m_lsegs; }
     bool HasLsegs() const;
     //
-    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
-    std::string GetLwidth() const { return m_lwidth; }
+    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
+    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
     ///@}
 
 private:
@@ -2262,7 +2266,7 @@ private:
      **/
     int m_lsegs;
     /** Width of a curved line. **/
-    std::string m_lwidth;
+    data_LINEWIDTH m_lwidth;
 
     /* include <attlwidth> */
 };
@@ -2381,8 +2385,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLyricAlign(std::string lyricAlign_) { m_lyricAlign = lyricAlign_; }
-    std::string GetLyricAlign() const { return m_lyricAlign; }
+    void SetLyricAlign(data_MEASUREMENTREL lyricAlign_) { m_lyricAlign = lyricAlign_; }
+    data_MEASUREMENTREL GetLyricAlign() const { return m_lyricAlign; }
     bool HasLyricAlign() const;
     //
     void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; }
@@ -2410,7 +2414,7 @@ public:
 
 private:
     /** Describes the alignment of lyric syllables associated with a note or chord. **/
-    std::string m_lyricAlign;
+    data_MEASUREMENTREL m_lyricAlign;
     /** Sets the font family default value for lyrics. **/
     std::string m_lyricFam;
     /** Sets the font name default value for lyrics. **/
@@ -3220,16 +3224,16 @@ public:
     std::string GetHeadFillcolor() const { return m_headFillcolor; }
     bool HasHeadFillcolor() const;
     //
-    void SetHeadMod(std::string headMod_) { m_headMod = headMod_; }
-    std::string GetHeadMod() const { return m_headMod; }
+    void SetHeadMod(data_NOTEHEADMODIFIER headMod_) { m_headMod = headMod_; }
+    data_NOTEHEADMODIFIER GetHeadMod() const { return m_headMod; }
     bool HasHeadMod() const;
     //
-    void SetHeadRotation(std::string headRotation_) { m_headRotation = headRotation_; }
-    std::string GetHeadRotation() const { return m_headRotation; }
+    void SetHeadRotation(data_ROTATION headRotation_) { m_headRotation = headRotation_; }
+    data_ROTATION GetHeadRotation() const { return m_headRotation; }
     bool HasHeadRotation() const;
     //
-    void SetHeadShape(data_HEADSHAPE_list headShape_) { m_headShape = headShape_; }
-    data_HEADSHAPE_list GetHeadShape() const { return m_headShape; }
+    void SetHeadShape(data_HEADSHAPE headShape_) { m_headShape = headShape_; }
+    data_HEADSHAPE GetHeadShape() const { return m_headShape; }
     bool HasHeadShape() const;
     //
     void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; }
@@ -3255,15 +3259,15 @@ private:
     /** Captures the fill color of a notehead if different from the overall note color. **/
     std::string m_headFillcolor;
     /** Records any additional symbols applied to the notehead. **/
-    std::string m_headMod;
+    data_NOTEHEADMODIFIER m_headMod;
     /**
      * Describes rotation applied to the basic notehead shape.
      * A positive value rotates the notehead in a counter-clockwise fashion, while
      * negative values produce clockwise rotation.
      **/
-    std::string m_headRotation;
+    data_ROTATION m_headRotation;
     /** Used to override the head shape normally used for the given duration. **/
-    data_HEADSHAPE_list m_headShape;
+    data_HEADSHAPE m_headShape;
     /**
      * Indicates if a feature should be rendered when the notation is presented
      * graphically or sounded when it is presented in an aural form.
@@ -3660,28 +3664,28 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPageHeight(std::string pageHeight_) { m_pageHeight = pageHeight_; }
-    std::string GetPageHeight() const { return m_pageHeight; }
+    void SetPageHeight(data_MEASUREMENTABS pageHeight_) { m_pageHeight = pageHeight_; }
+    data_MEASUREMENTABS GetPageHeight() const { return m_pageHeight; }
     bool HasPageHeight() const;
     //
-    void SetPageWidth(std::string pageWidth_) { m_pageWidth = pageWidth_; }
-    std::string GetPageWidth() const { return m_pageWidth; }
+    void SetPageWidth(data_MEASUREMENTABS pageWidth_) { m_pageWidth = pageWidth_; }
+    data_MEASUREMENTABS GetPageWidth() const { return m_pageWidth; }
     bool HasPageWidth() const;
     //
-    void SetPageTopmar(std::string pageTopmar_) { m_pageTopmar = pageTopmar_; }
-    std::string GetPageTopmar() const { return m_pageTopmar; }
+    void SetPageTopmar(data_MEASUREMENTABS pageTopmar_) { m_pageTopmar = pageTopmar_; }
+    data_MEASUREMENTABS GetPageTopmar() const { return m_pageTopmar; }
     bool HasPageTopmar() const;
     //
-    void SetPageBotmar(std::string pageBotmar_) { m_pageBotmar = pageBotmar_; }
-    std::string GetPageBotmar() const { return m_pageBotmar; }
+    void SetPageBotmar(data_MEASUREMENTABS pageBotmar_) { m_pageBotmar = pageBotmar_; }
+    data_MEASUREMENTABS GetPageBotmar() const { return m_pageBotmar; }
     bool HasPageBotmar() const;
     //
-    void SetPageLeftmar(std::string pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
-    std::string GetPageLeftmar() const { return m_pageLeftmar; }
+    void SetPageLeftmar(data_MEASUREMENTABS pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
+    data_MEASUREMENTABS GetPageLeftmar() const { return m_pageLeftmar; }
     bool HasPageLeftmar() const;
     //
-    void SetPageRightmar(std::string pageRightmar_) { m_pageRightmar = pageRightmar_; }
-    std::string GetPageRightmar() const { return m_pageRightmar; }
+    void SetPageRightmar(data_MEASUREMENTABS pageRightmar_) { m_pageRightmar = pageRightmar_; }
+    data_MEASUREMENTABS GetPageRightmar() const { return m_pageRightmar; }
     bool HasPageRightmar() const;
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; }
@@ -3698,20 +3702,20 @@ private:
      * Specifies the height of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    std::string m_pageHeight;
+    data_MEASUREMENTABS m_pageHeight;
     /**
      * Describes the width of the page; may be expressed in real-world units or staff
      * steps.
      **/
-    std::string m_pageWidth;
+    data_MEASUREMENTABS m_pageWidth;
     /** Indicates the amount of whitespace at the top of a page. **/
-    std::string m_pageTopmar;
+    data_MEASUREMENTABS m_pageTopmar;
     /** Indicates the amount of whitespace at the bottom of a page. **/
-    std::string m_pageBotmar;
+    data_MEASUREMENTABS m_pageBotmar;
     /** Indicates the amount of whitespace at the left side of a page. **/
-    std::string m_pageLeftmar;
+    data_MEASUREMENTABS m_pageLeftmar;
     /** Indicates the amount of whitespace at the right side of a page. **/
-    std::string m_pageRightmar;
+    data_MEASUREMENTABS m_pageRightmar;
     /** Indicates the number of logical pages to be rendered on a single physical page. **/
     std::string m_pagePanels;
     /** Indicates how the page should be scaled when rendered. **/
@@ -3831,8 +3835,6 @@ public:
     void SetPlace(data_STAFFREL place_) { m_place = place_; }
     data_STAFFREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFREL *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:
@@ -4321,12 +4323,12 @@ public:
     double GetSpacingPackfact() const { return m_spacingPackfact; }
     bool HasSpacingPackfact() const;
     //
-    void SetSpacingStaff(std::string spacingStaff_) { m_spacingStaff = spacingStaff_; }
-    std::string GetSpacingStaff() const { return m_spacingStaff; }
+    void SetSpacingStaff(data_MEASUREMENTREL spacingStaff_) { m_spacingStaff = spacingStaff_; }
+    data_MEASUREMENTREL GetSpacingStaff() const { return m_spacingStaff; }
     bool HasSpacingStaff() const;
     //
-    void SetSpacingSystem(std::string spacingSystem_) { m_spacingSystem = spacingSystem_; }
-    std::string GetSpacingSystem() const { return m_spacingSystem; }
+    void SetSpacingSystem(data_MEASUREMENTREL spacingSystem_) { m_spacingSystem = spacingSystem_; }
+    data_MEASUREMENTREL GetSpacingSystem() const { return m_spacingSystem; }
     bool HasSpacingSystem() const;
     ///@}
 
@@ -4340,14 +4342,14 @@ private:
      * system; measured from the bottom line of the staff above to the top line of the
      * staff below.
      **/
-    std::string m_spacingStaff;
+    data_MEASUREMENTREL m_spacingStaff;
     /**
      * Describes the space between adjacent systems; a pair of space-separated values
      * (minimum and maximum, respectively) provides a range between which a rendering
      * system-supplied value may fall, while a single value indicates a fixed amount of
      * space; that is, the minimum and maximum values are equal.
      **/
-    std::string m_spacingSystem;
+    data_MEASUREMENTREL m_spacingSystem;
 
     /* include <attspacing.system> */
 };
@@ -4527,20 +4529,14 @@ public:
     void SetAboveorder(data_STAFFITEM aboveorder_) { m_aboveorder = aboveorder_; }
     data_STAFFITEM GetAboveorder() const { return m_aboveorder; }
     bool HasAboveorder() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFITEM *GetAboveorderAlternate() { return &m_aboveorder; }
     //
     void SetBeloworder(data_STAFFITEM beloworder_) { m_beloworder = beloworder_; }
     data_STAFFITEM GetBeloworder() const { return m_beloworder; }
     bool HasBeloworder() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFITEM *GetBeloworderAlternate() { return &m_beloworder; }
     //
     void SetBetweenorder(data_STAFFITEM betweenorder_) { m_betweenorder = betweenorder_; }
     data_STAFFITEM GetBetweenorder() const { return m_betweenorder; }
     bool HasBetweenorder() const;
-    /** Getter for reference (for alternate type only) */
-    data_STAFFITEM *GetBetweenorderAlternate() { return &m_betweenorder; }
     ///@}
 
 private:
@@ -4900,16 +4896,16 @@ public:
     data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; }
     bool HasSystemLeftline() const;
     //
-    void SetSystemLeftmar(std::string systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
-    std::string GetSystemLeftmar() const { return m_systemLeftmar; }
+    void SetSystemLeftmar(data_MEASUREMENTABS systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
+    data_MEASUREMENTABS GetSystemLeftmar() const { return m_systemLeftmar; }
     bool HasSystemLeftmar() const;
     //
-    void SetSystemRightmar(std::string systemRightmar_) { m_systemRightmar = systemRightmar_; }
-    std::string GetSystemRightmar() const { return m_systemRightmar; }
+    void SetSystemRightmar(data_MEASUREMENTABS systemRightmar_) { m_systemRightmar = systemRightmar_; }
+    data_MEASUREMENTABS GetSystemRightmar() const { return m_systemRightmar; }
     bool HasSystemRightmar() const;
     //
-    void SetSystemTopmar(std::string systemTopmar_) { m_systemTopmar = systemTopmar_; }
-    std::string GetSystemTopmar() const { return m_systemTopmar; }
+    void SetSystemTopmar(data_MEASUREMENTABS systemTopmar_) { m_systemTopmar = systemTopmar_; }
+    data_MEASUREMENTABS GetSystemTopmar() const { return m_systemTopmar; }
     bool HasSystemTopmar() const;
     ///@}
 
@@ -4924,17 +4920,17 @@ private:
      * Describes the amount of whitespace at the left system margin relative to
      * page.leftmar.
      **/
-    std::string m_systemLeftmar;
+    data_MEASUREMENTABS m_systemLeftmar;
     /**
      * Describes the amount of whitespace at the right system margin relative to
      * page.rightmar.
      **/
-    std::string m_systemRightmar;
+    data_MEASUREMENTABS m_systemRightmar;
     /**
      * Describes the distance from page's top edge to the first system; used for first
      * page only.
      **/
-    std::string m_systemTopmar;
+    data_MEASUREMENTABS m_systemTopmar;
 
     /* include <attsystem.topmar> */
 };
@@ -5008,7 +5004,7 @@ public:
     ///@}
 
 private:
-    /** Function of the meter signature group. **/
+    /** Describes the function of the bracketed event sequence. **/
     tempoLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -5042,8 +5038,8 @@ public:
     std::string GetAltrend() const { return m_altrend; }
     bool HasAltrend() const;
     //
-    void SetRend(std::string rend_) { m_rend = rend_; }
-    std::string GetRend() const { return m_rend; }
+    void SetRend(data_TEXTRENDITION rend_) { m_rend = rend_; }
+    data_TEXTRENDITION GetRend() const { return m_rend; }
     bool HasRend() const;
     ///@}
 
@@ -5051,7 +5047,7 @@ private:
     /** Used to extend the values of the rend attribute. **/
     std::string m_altrend;
     /** Captures the appearance of the element's contents using MEI-defined descriptors. **/
-    std::string m_rend;
+    data_TEXTRENDITION m_rend;
 
     /* include <attrend> */
 };
@@ -5577,8 +5573,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHo(std::string ho_) { m_ho = ho_; }
-    std::string GetHo() const { return m_ho; }
+    void SetHo(data_MEASUREMENTREL ho_) { m_ho = ho_; }
+    data_MEASUREMENTREL GetHo() const { return m_ho; }
     bool HasHo() const;
     ///@}
 
@@ -5588,7 +5584,7 @@ private:
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
-    std::string m_ho;
+    data_MEASUREMENTREL m_ho;
 
     /* include <attho> */
 };
@@ -5656,8 +5652,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVo(std::string vo_) { m_vo = vo_; }
-    std::string GetVo() const { return m_vo; }
+    void SetVo(data_MEASUREMENTREL vo_) { m_vo = vo_; }
+    data_MEASUREMENTREL GetVo() const { return m_vo; }
     bool HasVo() const;
     ///@}
 
@@ -5667,7 +5663,7 @@ private:
      * location in terms of staff interline distance; that is, in units of 1/2 the
      * distance between adjacent staff lines.
      **/
-    std::string m_vo;
+    data_MEASUREMENTREL m_vo;
 
     /* include <attvo> */
 };
@@ -5696,12 +5692,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStartho(std::string startho_) { m_startho = startho_; }
-    std::string GetStartho() const { return m_startho; }
+    void SetStartho(data_MEASUREMENTREL startho_) { m_startho = startho_; }
+    data_MEASUREMENTREL GetStartho() const { return m_startho; }
     bool HasStartho() const;
     //
-    void SetEndho(std::string endho_) { m_endho = endho_; }
-    std::string GetEndho() const { return m_endho; }
+    void SetEndho(data_MEASUREMENTREL endho_) { m_endho = endho_; }
+    data_MEASUREMENTREL GetEndho() const { return m_endho; }
     bool HasEndho() const;
     ///@}
 
@@ -5710,12 +5706,12 @@ private:
      * Records the horizontal adjustment of a feature's programmatically-determined
      * start point.
      **/
-    std::string m_startho;
+    data_MEASUREMENTREL m_startho;
     /**
      * Records the horizontal adjustment of a feature's programmatically-determined end
      * point.
      **/
-    std::string m_endho;
+    data_MEASUREMENTREL m_endho;
 
     /* include <attendho> */
 };
@@ -5792,12 +5788,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStartvo(std::string startvo_) { m_startvo = startvo_; }
-    std::string GetStartvo() const { return m_startvo; }
+    void SetStartvo(data_MEASUREMENTREL startvo_) { m_startvo = startvo_; }
+    data_MEASUREMENTREL GetStartvo() const { return m_startvo; }
     bool HasStartvo() const;
     //
-    void SetEndvo(std::string endvo_) { m_endvo = endvo_; }
-    std::string GetEndvo() const { return m_endvo; }
+    void SetEndvo(data_MEASUREMENTREL endvo_) { m_endvo = endvo_; }
+    data_MEASUREMENTREL GetEndvo() const { return m_endvo; }
     bool HasEndvo() const;
     ///@}
 
@@ -5806,12 +5802,12 @@ private:
      * Records a vertical adjustment of a feature's programmatically-determined start
      * point.
      **/
-    std::string m_startvo;
+    data_MEASUREMENTREL m_startvo;
     /**
      * Records a vertical adjustment of a feature's programmatically-determined end
      * point.
      **/
-    std::string m_endvo;
+    data_MEASUREMENTREL m_endvo;
 
     /* include <attendvo> */
 };
@@ -5912,14 +5908,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetWidth(std::string width_) { m_width = width_; }
-    std::string GetWidth() const { return m_width; }
+    void SetWidth(data_MEASUREMENTABS width_) { m_width = width_; }
+    data_MEASUREMENTABS GetWidth() const { return m_width; }
     bool HasWidth() const;
     ///@}
 
 private:
     /** Measurement of the horizontal dimension of an entity. **/
-    std::string m_width;
+    data_MEASUREMENTABS m_width;
 
     /* include <attwidth> */
 };

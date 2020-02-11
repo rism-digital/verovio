@@ -25,21 +25,6 @@ namespace vrv {
 
 MeterSig::MeterSig() : LayerElement("msig-"), AttMeterSigLog(), AttMeterSigVis()
 {
-    Init();
-}
-
-MeterSig::MeterSig(const ScoreDefInterface *meterSigAttr) : LayerElement("msig-"), AttMeterSigLog(), AttMeterSigVis()
-{
-    Init();
-
-    this->SetCount(meterSigAttr->GetMeterCount());
-    this->SetForm(meterSigDefaultVisToMeterSigVis(meterSigAttr->GetMeterForm()));
-    this->SetSym(meterSigAttr->GetMeterSym());
-    this->SetUnit(meterSigAttr->GetMeterUnit());
-}
-
-void MeterSig::Init()
-{
     RegisterAttClass(ATT_METERSIGLOG);
     RegisterAttClass(ATT_METERSIGVIS);
 
@@ -55,25 +40,13 @@ void MeterSig::Reset()
     ResetMeterSigVis();
 }
 
-meterSigVis_FORM MeterSig::meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form)
-{
-    switch (form) {
-        case meterSigDefaultVis_METERFORM_NONE: return meterSigVis_FORM_NONE;
-        case meterSigDefaultVis_METERFORM_num: return meterSigVis_FORM_num;
-        case meterSigDefaultVis_METERFORM_denomsym: return meterSigVis_FORM_denomsym;
-        case meterSigDefaultVis_METERFORM_norm: return meterSigVis_FORM_norm;
-        case meterSigDefaultVis_METERFORM_invis: return meterSigVis_FORM_invis;
-        default: return meterSigVis_FORM_NONE;
-    }
-}
-
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSig::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     params->m_meterSig = this;

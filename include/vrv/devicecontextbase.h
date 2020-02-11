@@ -17,6 +17,7 @@
 
 namespace vrv {
 
+#define AxNONE -1
 #define AxWHITE 255 << 16 | 255 << 8 | 255
 #define AxBLACK 0
 #define AxRED 255 << 16
@@ -50,9 +51,9 @@ enum {
 
 class Pen {
 public:
-    Pen() : m_penColour(0), m_penWidth(0), m_dashLength(0), m_penOpacity(0.0) {}
-    Pen(int colour, int width, float opacity, int dashLength)
-        : m_penColour(colour), m_penWidth(width), m_dashLength(dashLength), m_penOpacity(opacity)
+    Pen() : m_penColour(0), m_penWidth(0), m_dashLength(0), m_lineCap(0), m_penOpacity(0.0) {}
+    Pen(int colour, int width, float opacity, int dashLength, int lineCap)
+        : m_penColour(colour), m_penWidth(width), m_dashLength(dashLength), m_lineCap(lineCap), m_penOpacity(opacity)
     {
     }
 
@@ -62,11 +63,13 @@ public:
     void SetWidth(int width) { m_penWidth = width; }
     int GetDashLength() const { return m_dashLength; }
     void SetDashLength(int dashLength) { m_dashLength = dashLength; }
+    int GetLineCap() const { return m_lineCap; }
+    void SetLineCap(int lineCap) { m_lineCap = lineCap; }
     float GetOpacity() const { return m_penOpacity; }
     void SetOpacity(float opacity) { m_penOpacity = opacity; }
 
 private:
-    int m_penColour, m_penWidth, m_dashLength;
+    int m_penColour, m_penWidth, m_dashLength, m_lineCap;
     float m_penOpacity;
 };
 
@@ -102,6 +105,7 @@ public:
         m_style = FONTSTYLE_NONE;
         m_weight = FONTWEIGHT_NONE;
         m_underlined = false;
+        m_supSubScript = false;
         m_faceName.clear();
         m_encoding = 0; // was wxFONTENCODING_DEFAULT;
     }
@@ -112,6 +116,7 @@ public:
     int GetStyle() { return m_style; }
     int GetWeight() { return m_weight; }
     bool GetUnderlined() { return m_underlined; }
+    bool GetSupSubScript() { return m_supSubScript; }
     std::string GetFaceName() { return m_faceName; }
     int GetFamily() { return m_family; }
     int GetEncoding() { return m_encoding; }
@@ -120,6 +125,7 @@ public:
     void SetStyle(data_FONTSTYLE style) { m_style = style; }
     void SetWeight(data_FONTWEIGHT weight) { m_weight = weight; }
     void SetUnderlined(bool underlined) { m_underlined = underlined; }
+    void SetSupSubScript(bool supSubScript) { m_supSubScript = supSubScript; }
     void SetFaceName(const char *faceName) { m_faceName = faceName; }
     void SetFamily(int family) { m_family = family; }
     void SetEncoding(int encoding) { m_encoding = encoding; }
@@ -130,6 +136,7 @@ private:
     data_FONTSTYLE m_style;
     data_FONTWEIGHT m_weight;
     bool m_underlined;
+    bool m_supSubScript;
     std::string m_faceName;
     int m_encoding;
 };

@@ -14,10 +14,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "layer.h"
 #include "note.h"
 #include "rest.h"
@@ -283,7 +285,7 @@ void BeamDrawingParams::CalcBeam(
 
     // then check that the stem length reaches the center for the staff
     double minDistToCenter = -VRV_UNSET;
-    
+
     for (i = 0; i < elementCount; ++i) {
         if ((this->m_stemDir == STEMDIRECTION_up)
             && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
@@ -338,10 +340,11 @@ void BeamDrawingParams::CalcBeam(
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttBeamedWith()
+Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttBeamedWith(), AttBeamRend()
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_BEAMEDWITH);
+    RegisterAttClass(ATT_BEAMREND);
 
     Reset();
 }
@@ -356,6 +359,7 @@ void Beam::Reset()
     LayerElement::Reset();
     ResetColor();
     ResetBeamedWith();
+    ResetBeamRend();
 
     ClearCoords();
 }
@@ -366,13 +370,16 @@ void Beam::AddChild(Object *child)
         assert(dynamic_cast<Beam *>(child));
     }
     else if (child->Is(BTREM)) {
-        assert(dynamic_cast<Chord *>(child));
+        assert(dynamic_cast<BTrem *>(child));
     }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(GRACEGRP)) {
+        assert(dynamic_cast<GraceGrp *>(child));
     }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
@@ -399,12 +406,12 @@ void Beam::AddChild(Object *child)
     Modify();
 }
 
-void Beam::FilterList(ListOfObjects *childList)
+void Beam::FilterList(ArrayOfObjects *childList)
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->IsLayerElement()) {
@@ -485,16 +492,19 @@ bool Beam::IsLastInBeam(LayerElement *element)
     return false;
 }
 
-void Beam::InitCoords(ListOfObjects *childList)
+const ArrayOfBeamElementCoords *Beam::GetElementCoords()
+{
+    this->GetList(this);
+    return &m_beamElementCoords;
+}
+
+void Beam::InitCoords(ArrayOfObjects *childList)
 {
     ClearCoords();
 
     if (childList->empty()) {
         return;
     }
-
-    // duration variables
-    int lastDur, currentDur;
 
     m_beamElementCoords.reserve(childList->size());
     int i;
@@ -507,7 +517,7 @@ void Beam::InitCoords(ListOfObjects *childList)
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
-    lastDur = (current->GetDurationInterface())->GetActualDur();
+    int lastDur = (current->GetDurationInterface())->GetActualDur();
 
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
@@ -520,11 +530,11 @@ void Beam::InitCoords(ListOfObjects *childList)
 
     int elementCount = 0;
 
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
-        currentDur = (current->GetDurationInterface())->GetActualDur();
+        int currentDur = (current->GetDurationInterface())->GetActualDur();
 
         if (current->Is(CHORD)) {
             m_drawingParams.m_beamHasChord = true;
@@ -633,7 +643,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ListOfObjects *beamChildren = this->GetList(this);
+    const ArrayOfObjects *beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (beamChildren->empty()) {
@@ -643,9 +653,9 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
     int elementCount = (int)beamChildren->size();
 
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
@@ -655,8 +665,14 @@ int Beam::CalcStem(FunctorParams *functorParams)
 
 int Beam::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    this->m_drawingParams.Reset();
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
+
     return FUNCTOR_CONTINUE;
 }
 

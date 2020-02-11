@@ -321,9 +321,9 @@ public:
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
     /**
-     * See Object::FindSpaceInReferenceAlignments
+     * See Object::UnsetCurrentScoreDef
      */
-    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
 private:
     //
@@ -361,6 +361,11 @@ public:
     virtual ~HorizontalAligner();
     virtual void Reset();
     ///@}
+
+    /**
+     * Do not copy children for HorizontalAligner
+     */
+    virtual bool CopyChildren() const { return false; }
 
     int GetAlignmentCount() const { return (int)m_children.size(); }
 

@@ -129,7 +129,9 @@ void DarmsInput::UnrollKeysig(int quantity, char alter)
         accid = ACCIDENTAL_WRITTEN_s;
     }
 
-    KeySig *k = new KeySig(quantity, accid);
+    KeySig *k = new KeySig;
+    k->IsAttribute(true);
+    k->SetSig(std::make_pair(quantity, accid));
     m_layer->AddChild(k);
     return;
     //////
@@ -471,7 +473,7 @@ bool DarmsInput::ImportFile()
     return ImportString(data);
 }
 
-bool DarmsInput::ImportString(std::string const &data_str)
+bool DarmsInput::ImportString(const std::string &data_str)
 {
     int len;
     int res;

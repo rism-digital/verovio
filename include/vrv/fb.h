@@ -29,6 +29,7 @@ public:
     ///@{
     Fb();
     virtual ~Fb();
+    virtual Object *Clone() const { return new Fb(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Fb"; }
     virtual ClassId GetClassId() const { return FB; }
@@ -44,41 +45,6 @@ private:
     //
 public:
     //
-private:
-};
-
-//----------------------------------------------------------------------------
-// F (figure)
-//----------------------------------------------------------------------------
-
-/**
- * This class models the MEI <f> element.
- */
-class F : public TextElement {
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    F();
-    virtual ~F();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "F"; }
-    virtual ClassId GetClassId() const { return FIGURE; }
-    ///@}
-
-    /**
-     * Add an element (text, rend. etc.) to a rend.
-     * Only supported elements will be actually added to the child list.
-     */
-    virtual void AddChild(Object *object);
-
-private:
-    //
-public:
-    //
-protected:
 private:
 };
 

@@ -34,6 +34,7 @@ public:
     ///@{
     Ligature();
     virtual ~Ligature();
+    virtual Object *Clone() const { return new Ligature(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Ligature"; }
     virtual ClassId GetClassId() const { return LIGATURE; }
@@ -79,7 +80,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ListOfObjects *childlist);
+    virtual void FilterList(ArrayOfObjects *childlist);
 
 public:
 };

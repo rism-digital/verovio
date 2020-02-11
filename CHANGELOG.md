@@ -1,7 +1,109 @@
 # Changelog
 
-## [Unreleased]
+## [unreleased]
+
+## [2.5.0] - 2020-02-03
+* Support for expansion implementation with --expand option (@wergo)
+* Option for forcing first page to be condensed (--condense-first-page)
+* Option for forcing pages qwith tempo to be condensed (--condense-tempo-pages)
+* Option for forcing encoded layout rendering to be condensed (--condense-encoded)
+
+### Changed
+* Single file buundle for WASM build
+* Options --format and --type deprecated (use --from and --to instead)
+
+## [2.4.0] - 2020-01-15
+* Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
+* Support for dashed and dotted slurs and ties (@earboxer and @napulen)
+* Option to use xml entities for SMuFL charachters (--outputSmuflXmlEntities)
+* Options for controlling system divider display (--systemDivider "none|left|left-right")
+* Fix coloring of ties and slurs (@rettinghaus)
+* Fix bug with tuplet number placement (@rettinghaus)
+* LibMEI output generated from MEI 4.0.1
+
+## [2.3.4] - 2020-01-03
+* Fix bug with NPM build (allow access to verovio.module and use wasm)
+
+## [2.3.3] - 2019-11-26
+* Fix bug with NPM build (remove init function for adjusting memory)
+
+## [2.3.2] - 2019-11-20
+* Fix bug with mordent when loading MEI 3.0 files
+
+## [2.3.1] - 2019-11-16
+* Fix  bug with scoreDef / staffDef redefinition
+
+## [2.3.0] - 2019-11-04
+* Support for 512th and 1024th duration
+* Support for iOS cocoapods build (@eltiren)
+* Support for SVG currentColor (@rettinghaus)
+* Options for controlling header and footer (--header / --footer "auto|none|encoded") (@rettinghaus)
+* Bug fix with grace notes and mRests
+
+### Changes
+* Options --no-header and --no-footer deprecated
+
+## [2.2.1] - 2019-10-23
+* Fix bug with mensural notation layout
+
+## [2.2.0] - 2019-10-17
+* Support for superscript and subscript in `<rend>`
+* Support for chord-symbol parsing in MusicXML (@earboxer)
+* Support for dynamics with mixed text and music fonts
+* Support for non-standard keys from MusicXML (@rettinghaus)
+* Support for `<graceGrp>` (@rettinghaus)
+* Support for `<keyAccid>` for custom key signatures
+* Support for `@vel` on `<note>` in MIDI playback (@rettinghaus)
+* Support for `<turn>` in MusicXML import (@wergo)
+* Support for `<arpgeg>` in MusicXML import (@wergo)
+* Support iOS Framework build (@Noroxs)
+* Improved support for pedal marks in MusicXML import (@wergo)
+* Improved import of key signatures from PAE (show cancellation accidentals)
+* Improved import of tuplets from PAE
+* Improved element attribute access also when not rendered in a page
+* Options for vertical justication (--justify-include-last-page, --justify-system-only, --justify-vertically)
+* Option to set minimum width for justification (--min-last-justification) (@earboxer).
+
+### Changed
+* Method getMIDIValuesForElement (JS) return a JSON object
+
+## [2.1.0] - 2019-05-25
+* Update pugixml
+* Support for SMUFL figured bass figures
+* Support for `@spacing` on `<staffDef>`
+* Support for `@sameas` on `<beam>`, `<chord>`, `<layer>`, `<note>`, `<rest>`, and `<tuplet>`
+* Support for editorial markup in `<label>` and `<labelAbbr>`
+* Support of ties and slurs starting or ending with timestamp (but not both)
+* Support for ABC notation import (@rettinghaus)
+* Improved cross-staff MusicXML import (@wergo)
+* Improved clef changes in MusicXML import (@wergo)
+* Improved hairpin MusicXML import (@wergo)
+* Improved slur MusicXML import (@wergo)
+* Support for `<ending>` in MusicXML import (@wergo)
+* Preserve MusicXML `<duration>` on notes, rests, and chords (@rettinghaus)
+* Import MusicXML `<division>` with `@ppq` on `<staffDef>` (@rettinghaus)
+* Avoid system optimisation when a tempo change occurs
+* Improved tuplets and support for additional attributes
+* Improved slur placement
+* Option to use svg viewBox on root node (@dchisolm)
+* Option for adjusting MIDI tempo output (--midi-tempo-adjustment)
+* Option for top/bottom margin `<harm>` (--top/bottom-margin-harm)
+* Option to use first footer / header for all pages (--use-pg-footer/header-for-all)
+* Embedding of Petaluma font (1.055) from Steinberg
+
+### Changed
+* Option inputFormat (JS) deprecated (use input instead)
+
+## [2.0.2] - 2019-02-06
+* Fix issue with <app> and multiple <mdiv>
+
+## [2.0.1] - 2019-02-04
+* Fix for Plaine & Easie empty beams
+
+## [2.0.0] - 2019-01-21
 ### Added
+* Support for `<bracketSpan>`
+* Support for extending line in `<f>`
 * Support for `@beam.with` on `<beam>`
 * Support for `@stem.pos` values "left" and "right" (@rettinghaus)
 * Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
@@ -36,7 +138,7 @@
 * Adding getAvailableOptions and getOptions(bool) methods to the JS toolkit
 * Adding several layout options
 * Support for `<pgHead>`, `<pgHead2>`, `<pgFoot>` and `<pgFoot2>`
-* Support for `<lb>` within `<rend>`
+* Support for `<lb>` within `<rend>`, `<dir>`, `<label>` and `<labelAbbr>`
 * Generation of header and footer form the MEI header when none provided
 * Support for `<fig>` and `<svg>`
 * Distribution as NPM package

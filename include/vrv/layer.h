@@ -44,20 +44,16 @@ public:
     ///@{
     Layer(int n = 1);
     virtual ~Layer();
+    virtual Object *Clone() const { return new Layer(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Layer"; }
     virtual ClassId GetClassId() const { return LAYER; }
     ///@}
 
     /**
-     * Do not copy children for layers
+     * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual bool CopyChildren() const { return false; }
-
-    /**
-     * Overriding CopyReset() method to be called after copy / assignment calls.
-     */
-    virtual void CopyReset();
+    virtual void CloneReset();
 
     /**
      * @name Methods for adding allowed content
@@ -85,6 +81,13 @@ public:
     Clef *GetClef(LayerElement *test);
 
     /**
+     * Get the current clef based on facsimile for the test element.
+     * This goes back by facsimile position until a clef is found.
+     * Returns NULL if a clef cannot be found via this method.
+     */
+    Clef *GetClefFacs(LayerElement *test);
+
+    /**
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */
@@ -98,8 +101,19 @@ public:
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
     data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
     data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
-    data_STEMDIRECTION GetDrawingStemDir(double time, double duration, Measure *measure, int staff);
     ///@}
+
+    /**
+     * Get the number of layer used for the duration of an element.
+     * Takes into account cross-staff situations.
+     */
+    int GetLayerCountForTimeSpanOf(LayerElement *element);
+
+    /**
+     * Get the number of layer used within a time span.
+     * Takes into account cross-staff situations.
+     */
+    int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
 
     Clef *GetCurrentClef() const;
     KeySig *GetCurrentKeySig() const;
@@ -183,21 +197,23 @@ public:
     virtual int PrepareRpt(FunctorParams *functorParams);
 
     /**
-     * See Object::CalcStem
-     */
-    virtual int CalcStem(FunctorParams *);
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
-
-    /**
      * See Object::CalcOnsetOffset
      */
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::GenerateTimemap
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int GenerateTimemap(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int ResetDrawing(FunctorParams *);
 
 private:
     //

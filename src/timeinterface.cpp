@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
+#include "comparison.h"
 #include "functorparams.h"
 #include "layerelement.h"
 #include "measure.h"
@@ -82,7 +82,7 @@ void TimePointInterface::SetUuidStr()
 Measure *TimePointInterface::GetStartMeasure()
 {
     if (!m_start) return NULL;
-    return dynamic_cast<Measure *>(this->m_start->GetFirstParent(MEASURE));
+    return dynamic_cast<Measure *>(this->m_start->GetFirstAncestor(MEASURE));
 }
 
 bool TimePointInterface::IsOnStaff(int n)
@@ -96,7 +96,7 @@ bool TimePointInterface::IsOnStaff(int n)
         return false;
     }
     else if (m_start) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
         if (staff && (staff->GetN() == n)) return true;
     }
     return false;
@@ -111,7 +111,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         staffList = this->GetStaff();
     }
     else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
         if (staff) staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
@@ -120,7 +120,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
     }
     for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison comparison(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparison, 1));
+        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
             continue;
@@ -186,7 +186,7 @@ bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 Measure *TimeSpanningInterface::GetEndMeasure()
 {
     if (!m_end) return NULL;
-    return dynamic_cast<Measure *>(this->m_end->GetFirstParent(MEASURE));
+    return dynamic_cast<Measure *>(this->m_end->GetFirstAncestor(MEASURE));
 }
 
 bool TimeSpanningInterface::IsSpanningMeasures()
@@ -282,6 +282,7 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
     }
 
     // We can now add the pair to our stack
+    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
     params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
 
     return TimePointInterface::InterfacePrepareTimestamps(params, object);

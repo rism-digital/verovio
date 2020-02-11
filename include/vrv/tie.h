@@ -20,7 +20,11 @@ namespace vrv {
 /**
  * This class models the MEI <tie> element.
  */
-class Tie : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature {
+class Tie : public ControlElement,
+            public TimeSpanningInterface,
+            public AttColor,
+            public AttCurvature,
+            public AttCurveRend {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -29,6 +33,7 @@ public:
     ///@{
     Tie();
     virtual ~Tie();
+    virtual Object *Clone() const { return new Tie(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tie"; }
     virtual ClassId GetClassId() const { return TIE; }
@@ -52,6 +57,11 @@ public:
     ///@{
     virtual int ResolveMIDITies(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::FindSpannedLayerElements
+     */
+    virtual int FindSpannedLayerElements(FunctorParams *functorParams);
 
 private:
     //

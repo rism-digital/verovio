@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "arpeg.h"
-#include "attcomparison.h"
+#include "comparison.h"
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
@@ -179,8 +179,8 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         Alignment *end = std::get<1>(*iter);
         assert(end);
         int dist = std::get<2>(*iter);
-        if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
-            LogDebug("Trying to adjust alignment at the same position or with a distance of 0;");
+        if (dist == 0) {
+            LogDebug("Trying to adjust alignment with a distance of 0;");
             continue;
         }
         // We need to store them because they are going to be changed in the loop below
@@ -253,6 +253,10 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
 
         rightAlignment = dynamic_cast<Alignment *>(*riter);
         assert(rightAlignment);
+
+        if (rightAlignment->IsOfType({ ALIGNMENT_FULLMEASURE, ALIGNMENT_FULLMEASURE2 })) {
+            continue;
+        }
 
         // Do not go beyond the left bar line
         if (rightAlignment->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
@@ -342,15 +346,15 @@ void GraceAligner::AlignStack()
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
         element->SetGraceAlignment(alignment);
 
-        AttComparisonAny matchType({ ACCID, FLAG, NOTE, STEM });
+        ClassIdsComparison matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
-        element->FindAllChildByComparison(&children, &matchType);
+        element->FindAllDescendantByComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignmnet to all children
         for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
-            // Trick : FindAllChildByComparison include the element, which is probably a problem.
+            // Trick : FindAllDescendantByComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
             if (*childrenIter == element) continue;
             LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
@@ -368,7 +372,7 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        Object *reference = this->FindChildByComparison(&matchStaff);
+        Object *reference = this->FindDescendantByComparison(&matchStaff);
         if (!reference) return -VRV_UNSET;
         // The alignment is its parent
         leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
@@ -469,13 +473,14 @@ void Alignment::AddChild(Object *child)
 bool Alignment::HasAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    return (this->FindChildByComparison(&matchStaff, 1) != NULL);
+    return (this->FindDescendantByComparison(&matchStaff, 1) != NULL);
 }
 
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference *>(this->FindChildByComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef
+        = dynamic_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
@@ -513,8 +518,8 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         }
         // Non cross staff normal case
         else {
-            layerRef = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstParent(STAFF));
+            layerRef = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
             if (staffRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
@@ -579,7 +584,7 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
             return reference;
         }
         else if (staffN == VRV_UNSET) {
-            if ((*iter)->HasChild(element, 1)) return reference;
+            if ((*iter)->HasDescendant(element, 1)) return reference;
         }
     }
     return reference;
@@ -636,13 +641,17 @@ void AlignmentReference::AddChild(Object *child)
     LayerElement *childElement = dynamic_cast<LayerElement *>(child);
     assert(childElement);
 
-    ArrayOfObjects::iterator childrenIter;
-    // Check if the we will have a reference with multiple layers
-    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
-        LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
-        if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) break;
+    if (!childElement->HasSameas()) {
+        ArrayOfObjects::iterator childrenIter;
+        // Check if the we will have a reference with multiple layers
+        for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
+            LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
+            if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) {
+                break;
+            }
+        }
+        if (childrenIter == m_children.end()) m_layerCount++;
     }
-    if (childrenIter == m_children.end()) m_layerCount++;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
@@ -821,7 +830,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         params->m_isGraceAlignment = true;
 
         // Get the parent measure Aligner
-        MeasureAligner *measureAligner = dynamic_cast<MeasureAligner *>(this->GetFirstParent(MEASURE_ALIGNER));
+        MeasureAligner *measureAligner = dynamic_cast<MeasureAligner *>(this->GetFirstAncestor(MEASURE_ALIGNER));
         assert(measureAligner);
 
         std::vector<int>::iterator iter;
@@ -1071,11 +1080,11 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     // Detect the octave and mark them
     std::vector<Accid *>::iterator iter, octaveIter;
     for (iter = m_accidSpace.begin(); iter != m_accidSpace.end() - 1; ++iter) {
-        Note *note = dynamic_cast<Note *>((*iter)->GetFirstParent(NOTE));
+        Note *note = dynamic_cast<Note *>((*iter)->GetFirstAncestor(NOTE));
         assert(note);
         if (!note) continue;
         for (octaveIter = iter + 1; octaveIter != m_accidSpace.end(); ++octaveIter) {
-            Note *octave = dynamic_cast<Note *>((*octaveIter)->GetFirstParent(NOTE));
+            Note *octave = dynamic_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
             assert(octave);
             if (!octave) continue;
             // Same pitch, different octave, same accid - for now?
@@ -1122,18 +1131,24 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int AlignmentReference::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+int AlignmentReference::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
-    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
-    assert(params);
+    Alignment *alignment = dynamic_cast<Alignment *>(this->GetParent());
+    assert(alignment);
 
-    if (!this->HasMultipleLayer()) {
-        return FUNCTOR_SIBLINGS;
+    switch (alignment->GetType()) {
+        case ALIGNMENT_SCOREDEF_CLEF:
+        case ALIGNMENT_SCOREDEF_KEYSIG:
+        case ALIGNMENT_SCOREDEF_MENSUR:
+        case ALIGNMENT_SCOREDEF_METERSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_CLEF:
+        case ALIGNMENT_SCOREDEF_CAUTION_KEYSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_MENSUR:
+        case ALIGNMENT_SCOREDEF_CAUTION_METERSIG: this->ClearChildren(); break;
+        default: break;
     }
 
-    params->m_layerCount = this->m_layerCount;
-
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

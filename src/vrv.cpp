@@ -29,7 +29,11 @@
 
 // Windows has no Bourne shell (sh), therefore no "git_commit.h" is created.
 #ifndef _WIN32
+#ifdef COCOAPODS
+#define GIT_COMMIT "[cocoapods]"
+#else
 #include "git_commit.h"
+#endif
 #else
 #define GIT_COMMIT "[undefined]"
 #endif
@@ -44,7 +48,7 @@
 #include "pugixml.hpp"
 #include "unchecked.h"
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -77,7 +81,7 @@ bool Resources::InitFonts()
         return false;
     }
 
-    if (!InitTextFont()) {
+    if (!InitTextFont("Times") || !InitTextFont("VerovioText-1.0")) {
         LogError("Text font could not be initialized.");
         return false;
     }
@@ -190,13 +194,13 @@ bool Resources::LoadFont(std::string fontName)
     return true;
 }
 
-bool Resources::InitTextFont()
+bool Resources::InitTextFont(std::string fontName)
 {
     // For the text font, we load the bounding boxes only
     pugi::xml_document doc;
     // For now, we have only Times bounding boxes for ASCII chars
     // For any other char, we currently use 'o' bounding box
-    std::string filename = Resources::GetPath() + "/text/Times.xml";
+    std::string filename = Resources::GetPath() + "/text/" + fontName + ".xml";
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result) {
         // File not found, default bounding boxes will be used
@@ -224,6 +228,9 @@ bool Resources::InitTextFont()
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph.SetBoundingBox(x, y, width, height);
             if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
+            if (m_textFont.count(code) > 0) {
+                LogDebug("Redefining %d with %s", code, fontName.c_str());
+            }
             m_textFont[code] = glyph;
         }
     }
@@ -239,7 +246,7 @@ struct timeval start;
 /** For disabling log */
 bool noLog = false;
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 std::vector<std::string> logBuffer;
 #endif
 
@@ -262,7 +269,7 @@ void LogDebug(const char *fmt, ...)
 {
     if (noLog) return;
 #if defined(DEBUG)
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -283,7 +290,7 @@ void LogDebug(const char *fmt, ...)
 void LogError(const char *fmt, ...)
 {
     if (noLog) return;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -303,7 +310,7 @@ void LogError(const char *fmt, ...)
 void LogMessage(const char *fmt, ...)
 {
     if (noLog) return;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -323,7 +330,7 @@ void LogMessage(const char *fmt, ...)
 void LogWarning(const char *fmt, ...)
 {
     if (noLog) return;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     std::string s;
     va_list args;
     va_start(args, fmt);
@@ -345,7 +352,7 @@ void DisableLog()
     noLog = true;
 }
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 bool LogBufferContains(const std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
@@ -362,10 +369,10 @@ void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel l
     logBuffer.push_back(message);
 
     switch (level) {
-        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(Pointer_stringify($0)); }, message.c_str()); break;
-        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(Pointer_stringify($0)); }, message.c_str()); break;
-        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(Pointer_stringify($0)); }, message.c_str()); break;
-        default: EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
+        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
+        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
+        default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
     }
 }
 
@@ -414,7 +421,7 @@ std::string ExtractUuidFragment(std::string refUuid)
     return refUuid;
 }
 
-std::string UTF16to8(const std::wstring in)
+std::string UTF16to8(const std::wstring &in)
 {
     std::string out;
 
@@ -423,7 +430,7 @@ std::string UTF16to8(const std::wstring in)
     return out;
 }
 
-std::wstring UTF8to16(const std::string in)
+std::wstring UTF8to16(const std::string &in)
 {
     std::wstring out;
     std::stringstream sin(in.c_str());

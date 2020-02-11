@@ -233,7 +233,7 @@ bool AttNcForm::HasSShape() const
 
 bool AttNcForm::HasTilt() const
 {
-    return (m_tilt.HasValue());
+    return (m_tilt != data_COMPASSDIRECTION());
 }
 
 /* include <atttilt> */

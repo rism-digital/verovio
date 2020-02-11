@@ -29,6 +29,7 @@ class FileOutputStream;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
+class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class ScoreDefInterface;
@@ -36,6 +37,7 @@ class StemmedDrawingInterface;
 class TextDirInterface;
 class TimePointInterface;
 class TimeSpanningInterface;
+class Zone;
 
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true
@@ -68,7 +70,7 @@ public:
      */
     ///@{
     void SetAsReferenceObject();
-    bool IsReferenceObject() const { return m_isReferencObject; }
+    bool IsReferenceObject() const { return m_isReferenceObject; }
     ///@}
 
     /**
@@ -132,6 +134,7 @@ public:
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual LinkingInterface *GetLinkingInterface() { return NULL; }
+    virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
@@ -178,6 +181,22 @@ public:
     void ReplaceChild(Object *currentChild, Object *replacingChild);
 
     /**
+     * @name Insert an object before or after a given child
+     */
+    ///@{
+    void InsertBefore(Object *child, Object *newChild);
+    void InsertAfter(Object *child, Object *newChild);
+    ///@}
+
+    /**
+     * Sort children by a function that takes two arguments and
+     * returns true if the first argument is less than the second.
+     * If the order of children changes, this returns true.
+     */
+    typedef bool (*binaryComp)(Object *, Object *);
+    void SortChildren(binaryComp comp);
+
+    /**
      * Move an object to another parent.
      * The object is relinquished from its current parent - see Object::Relinquish
      */
@@ -200,7 +219,7 @@ public:
      * This methods has to be called expicitly when overriden because it is not called from the constructors.
      * Do not forget to call base-class equivalent whenever applicable (e.g, with more than one hierarchy level).
      */
-    virtual void CopyReset(){};
+    virtual void CloneReset();
 
     std::string GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);
@@ -220,14 +239,15 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
-    int GetChildCount(const ClassId, int deepth);
+    int GetChildCount(const ClassId classId, int deepth);
     ///@}
 
     /**
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
-    
+    Object *GetChild(int idx, const ClassId classId);
+
     /**
      * Return a cont pointer to the children
      */
@@ -321,6 +341,11 @@ public:
     int GetChildIndex(const Object *child);
 
     /**
+     * Look for all Objects of a class and return its position (-1 if not found)
+     */
+    int GetDescendantIndex(const Object *child, const ClassId classId, int deepth);
+
+    /**
      * Insert an element at the idx position.
      */
     void InsertChild(Object *element, int idx);
@@ -332,48 +357,49 @@ public:
     Object *DetachChild(int idx);
 
     /**
-     * Return true if the object has the child Object as child (reference of direct).
+     * Return true if the object has the child Object as descendant (reference of direct).
      * Processes in depth-first.
      */
-    bool HasChild(Object *child, int deepness = UNLIMITED_DEPTH) const;
+    bool HasDescendant(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
-     * Look for a child with the specified uuid (returns NULL if not found)
+     * Look for a descendant with the specified uuid (returns NULL if not found)
      * This method is a wrapper for the Object::FindByUuid functor.
      */
-    Object *FindChildByUuid(std::string uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindDescendantByUuid(std::string uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Look for a child with the specified type (returns NULL if not found)
+     * Look for a descendant with the specified type (returns NULL if not found)
      * This method is a wrapper for the Object::FindByType functor.
      */
-    Object *FindChildByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindDescendantByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return the first element matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByComparison(Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindDescendantByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return the element matching the extreme value with an Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildExtremeByComparison(
+    Object *FindDescendantExtremeByComparison(
         Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllChildByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
-    void FindAllChildBetween(
+    void FindAllDescendantBetween(
         ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
@@ -405,24 +431,24 @@ public:
     bool DeleteChild(Object *child);
 
     /**
-     * Return the first parent of the specified type.
+     * Return the first ancestor of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
+    Object *GetFirstAncestor(const ClassId classId, int maxSteps = -1) const;
 
-    Object *GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
+    Object *GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
 
     /**
-     * Return the last parent that is NOT of the specified type.
+     * Return the last ancestor that is NOT of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetLastParentNot(const ClassId classId, int maxSteps = -1);
+    Object *GetLastAncestorNot(const ClassId classId, int maxSteps = -1);
 
     /**
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */
-    void FillFlatList(ListOfObjects *list);
+    void FillFlatList(ArrayOfObjects *list);
 
     /**
      * Check if the content was modified or not
@@ -443,11 +469,25 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter of the expansion flag
+     */
+    ///@{
+    bool IsExpansion() const { return m_isExpansion; }
+    void IsExpansion(bool isExpansion) { m_isExpansion = isExpansion; }
+    ///@}
+
+    /**
+     * Return true if the object contains any editorial content
+     */
+    bool HasEditorialContent();
+
+    /**
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
     virtual int Save(FileOutputStream *output);
 
+    virtual void ReorderByXPos();
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -502,12 +542,12 @@ public:
     /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
      */
-    virtual int FindSpaceInReferenceAlignments(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Retrieve the time spanning layer elements between two points
+     * Retrieve the layer elements spanned by two points
      */
-    virtual int FindTimeSpanningLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int FindSpannedLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.
@@ -546,6 +586,14 @@ public:
     ///@{
     virtual int ConvertAnalyticalMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int ConvertAnalyticalMarkupEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Convert scoreDef / staffDef markup (@clef.*, @key.*) to elements.
+     * See Doc::ConvertScoreDefMarkupDoc
+     */
+    ///@{
+    virtual int ConvertScoreDefMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -627,7 +675,7 @@ public:
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Lay out the X positions of the grace notes looking at the bounding boxes.
+     * @name Lay out the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
      */
@@ -637,12 +685,20 @@ public:
     ///@}
 
     /**
+     * @name Adjust the horizontal position of harms by groups in order to avoid overlapping
+     */
+    ///@{
+    virtual int AdjustHarmGrpsSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    ///@}
+
+    /**
      * Adjust the x position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the x position of a right barline in order to make sure the is no text content
+     * @name Adjust the x position of a right barline in order to make sure the is no text content
      * overlflowing in the right margin
      */
     ///@{
@@ -667,6 +723,11 @@ public:
     virtual int AdjustSylSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
     virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
     ///@}
+
+    /**
+     * Calculate the x position of tuplet brackets and num
+     */
+    virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -695,9 +756,14 @@ public:
     virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the position the outside articulations.
+     * Calcultate the position the outside articulations.
      */
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the postion position of slurs.
+     */
+    virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position the outside articulations with slur.
@@ -705,19 +771,33 @@ public:
     virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * @name Adjust the position of cross-staff element after the adjustment of the staves.
+     * This is called by Chords and Tuplets with cross-staff content
+     */
+    ///@{
+    virtual int AdjustCrossStaffYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustCrossStaffYPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Adjust the position of all floating positionner, staff by staff.
      */
-    virtual int AdjustFloatingPostioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustFloatingPositioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner that are grouped, staff by staff.
      */
-    virtual int AdjustFloatingPostionerGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustFloatingPositionerGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
     virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Calculate the y position of tuplet brackets and num
+     */
+    virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.
@@ -735,9 +815,12 @@ public:
     virtual int SetOverflowBBoxesEnd(FunctorParams *functorParams);
 
     /**
-     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
+     * @name Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
+    ///@{
     virtual int AlignSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     ///@}
 
@@ -1021,6 +1104,23 @@ public:
 
     ///@}
 
+    /**
+     * Reorder elements by x-position.
+     */
+    virtual int ReorderByXPos(FunctorParams *);
+
+    /**
+     * Associate child objects with zones.
+     */
+    virtual int SetChildZones(FunctorParams *);
+
+    /**
+     * Transpose the content.
+     */
+    virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    static bool sortByUlx(Object *a, Object *b);
+
 protected:
     //
 private:
@@ -1066,7 +1166,7 @@ private:
      * A reference object do not own children.
      * Destructor will not delete them.
      */
-    bool m_isReferencObject;
+    bool m_isReferenceObject;
 
     /**
      * Indicates whether the object content is up-to-date or not.
@@ -1107,6 +1207,11 @@ private:
      * For example, a Artic child in Note for an original @artic
      */
     bool m_isAttribute;
+
+    /**
+     * A flag indicating if the Object is a copy created by an expanded expansion element.
+     */
+    bool m_isExpansion;
 
     /**
      * A static counter for uuid generation.
@@ -1159,18 +1264,18 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    const ListOfObjects *GetList(Object *node);
+    const ArrayOfObjects *GetList(Object *node);
 
 private:
-    mutable ListOfObjects m_list;
-    ListOfObjects::iterator m_iteratorCurrent;
+    mutable ArrayOfObjects m_list;
+    ArrayOfObjects::iterator m_iteratorCurrent;
 
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfObjects *childList){};
+    virtual void FilterList(ArrayOfObjects *childList){};
 
 public:
     /**
@@ -1201,12 +1306,17 @@ public:
      */
     std::wstring GetText(Object *node);
 
+    /**
+     * Fill an array of lines with concatenated content of each line
+     */
+    void GetTextLines(Object *node, std::vector<std::wstring> &lines);
+
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfObjects *childList);
+    virtual void FilterList(ArrayOfObjects *childList);
 
 private:
     //

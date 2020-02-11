@@ -19,6 +19,7 @@
 #include "boundary.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -42,6 +43,7 @@
 #include "text.h"
 #include "textelement.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -81,10 +83,11 @@ Object::Object(const Object &object) : BoundingBox(object)
 
     m_classid = object.m_classid;
     m_parent = NULL;
+
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
-    m_isReferencObject = object.m_isReferencObject;
+    m_isReferenceObject = object.m_isReferenceObject;
 
     // Also copy attribute classes
     m_attClasses = object.m_attClasses;
@@ -101,13 +104,20 @@ Object::Object(const Object &object) : BoundingBox(object)
     int i;
     for (i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
-        Object *copy = current->Clone();
-        if (copy) {
-            copy->Modify();
-            copy->SetParent(this);
-            m_children.push_back(copy);
+        Object *clone = current->Clone();
+        if (clone) {
+            clone->SetParent(this);
+            clone->CloneReset();
+            m_children.push_back(clone);
         }
     }
+}
+
+void Object::CloneReset()
+{
+    this->Modify();
+    FunctorParams voidParams;
+    this->ResetDrawing(&voidParams);
 }
 
 Object &Object::operator=(const Object &object)
@@ -122,7 +132,7 @@ Object &Object::operator=(const Object &object)
         // Flags
         m_isAttribute = object.m_isAttribute;
         m_isModified = true;
-        m_isReferencObject = object.m_isReferencObject;
+        m_isReferenceObject = object.m_isReferenceObject;
 
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
@@ -136,10 +146,10 @@ Object &Object::operator=(const Object &object)
             int i;
             for (i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
-                Object *copy = current->Clone();
-                copy->Modify();
-                copy->SetParent(this);
-                m_children.push_back(copy);
+                Object *clone = current->Clone();
+                clone->SetParent(this);
+                clone->CloneReset();
+                m_children.push_back(clone);
             }
         }
     }
@@ -158,7 +168,7 @@ void Object::Init(std::string classid)
     // Flags
     m_isAttribute = false;
     m_isModified = true;
-    m_isReferencObject = false;
+    m_isReferenceObject = false;
 
     this->GenerateUuid();
 
@@ -176,7 +186,7 @@ void Object::SetAsReferenceObject()
 {
     assert(m_children.empty());
 
-    m_isReferencObject = true;
+    m_isReferenceObject = true;
 }
 
 void Object::Reset()
@@ -236,6 +246,36 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
     this->Modify();
 }
 
+void Object::InsertBefore(Object *child, Object *newChild)
+{
+    assert(this->GetChildIndex(child) != -1);
+    assert(this->GetChildIndex(newChild) == -1);
+
+    int idx = this->GetChildIndex(child);
+    newChild->SetParent(this);
+    this->InsertChild(newChild, idx);
+
+    this->Modify();
+}
+
+void Object::InsertAfter(Object *child, Object *newChild)
+{
+    assert(this->GetChildIndex(child) != -1);
+    assert(this->GetChildIndex(newChild) == -1);
+
+    int idx = this->GetChildIndex(child);
+    newChild->SetParent(this);
+    this->InsertChild(newChild, idx + 1);
+
+    this->Modify();
+}
+
+void Object::SortChildren(Object::binaryComp comp)
+{
+    std::stable_sort(m_children.begin(), m_children.end(), comp);
+    this->Modify();
+}
+
 void Object::MoveItselfTo(Object *targetParent)
 {
     assert(targetParent);
@@ -262,7 +302,7 @@ void Object::SwapUuid(Object *other)
 
 void Object::ClearChildren()
 {
-    if (m_isReferencObject) {
+    if (m_isReferenceObject) {
         m_children.clear();
         return;
     }
@@ -286,8 +326,8 @@ int Object::GetChildCount(const ClassId classId) const
 int Object::GetChildCount(const ClassId classId, int deepth)
 {
     ArrayOfObjects objects;
-    AttComparison matchClassId(classId);
-    this->FindAllChildByComparison(&objects, &matchClassId);
+    ClassIdComparison matchClassId(classId);
+    this->FindAllDescendantByComparison(&objects, &matchClassId);
     return (int)objects.size();
 }
 
@@ -305,6 +345,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
+    Att::GetNeumes(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);
@@ -348,19 +389,19 @@ Object *Object::GetNext(Object *child, const ClassId classId)
     iteratorEnd = m_children.end();
     iteratorCurrent = std::find(m_children.begin(), iteratorEnd, child);
     if (iteratorCurrent != iteratorEnd) {
-        iteratorCurrent++;
+        ++iteratorCurrent;
         iteratorCurrent = std::find_if(iteratorCurrent, iteratorEnd, ObjectComparison(classId));
     }
     return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;
 }
-    
+
 Object *Object::GetPrevious(Object *child, const ClassId classId)
 {
     ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
     riteratorEnd = m_children.rend();
     riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
     if (riteratorCurrent != riteratorEnd) {
-        riteratorCurrent++;
+        ++riteratorCurrent;
         riteratorCurrent = std::find_if(riteratorCurrent, riteratorEnd, ObjectComparison(classId));
     }
     return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
@@ -404,7 +445,7 @@ Object *Object::DetachChild(int idx)
     return child;
 }
 
-bool Object::HasChild(Object *child, int deepness) const
+bool Object::HasDescendant(Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
@@ -413,7 +454,7 @@ bool Object::HasChild(Object *child, int deepness) const
             return true;
         else if (deepness == 0)
             return false;
-        else if ((*iter)->HasChild(child, deepness - 1))
+        else if ((*iter)->HasDescendant(child, deepness - 1))
             return true;
     }
 
@@ -442,7 +483,7 @@ void Object::ClearRelinquishedChildren()
     }
 }
 
-Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
+Object *Object::FindDescendantByUuid(std::string uuid, int deepness, bool direction)
 {
     Functor findByUuid(&Object::FindByUuid);
     FindByUuidParams findbyUuidParams;
@@ -451,13 +492,13 @@ Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
     return findbyUuidParams.m_element;
 }
 
-Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
+Object *Object::FindDescendantByType(ClassId classId, int deepness, bool direction)
 {
-    AttComparison comparison(classId);
-    return FindChildByComparison(&comparison, deepness, direction);
+    ClassIdComparison comparison(classId);
+    return FindDescendantByComparison(&comparison, deepness, direction);
 }
 
-Object *Object::FindChildByComparison(Comparison *comparison, int deepness, bool direction)
+Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction)
 {
     Functor findByComparison(&Object::FindByComparison);
     FindByComparisonParams findByComparisonParams(comparison);
@@ -465,7 +506,7 @@ Object *Object::FindChildByComparison(Comparison *comparison, int deepness, bool
     return findByComparisonParams.m_element;
 }
 
-Object *Object::FindChildExtremeByComparison(Comparison *comparison, int deepness, bool direction)
+Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction)
 {
     Functor findExtremeByComparison(&Object::FindExtremeByComparison);
     FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
@@ -473,7 +514,7 @@ Object *Object::FindChildExtremeByComparison(Comparison *comparison, int deepnes
     return findExtremeByComparisonParams.m_element;
 }
 
-void Object::FindAllChildByComparison(
+void Object::FindAllDescendantByComparison(
     ArrayOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
@@ -484,7 +525,7 @@ void Object::FindAllChildByComparison(
     this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction);
 }
 
-void Object::FindAllChildBetween(
+void Object::FindAllDescendantBetween(
     ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
 {
     assert(objects);
@@ -503,12 +544,25 @@ Object *Object::GetChild(int idx) const
     return m_children.at(idx);
 }
 
+Object *Object::GetChild(int idx, const ClassId classId)
+{
+    ArrayOfObjects objects;
+    ClassIdComparison matchClassId(classId);
+    this->FindAllDescendantByComparison(&objects, &matchClassId, 1);
+    if ((idx < 0) || (idx >= (int)objects.size())) {
+        return NULL;
+    }
+    return objects.at(idx);
+}
+
 bool Object::DeleteChild(Object *child)
 {
     auto it = std::find(m_children.begin(), m_children.end(), child);
     if (it != m_children.end()) {
         m_children.erase(it);
-        delete child;
+        if (!m_isReferenceObject) {
+            delete child;
+        }
         this->Modify();
         return true;
     }
@@ -601,6 +655,21 @@ int Object::GetChildIndex(const Object *child)
     return -1;
 }
 
+int Object::GetDescendantIndex(const Object *child, const ClassId classId, int deepth)
+{
+    ArrayOfObjects objects;
+    ClassIdComparison matchClassId(classId);
+    this->FindAllDescendantByComparison(&objects, &matchClassId);
+    ArrayOfObjects::iterator iter;
+    int i;
+    for (iter = objects.begin(), i = 0; iter != objects.end(); ++iter, ++i) {
+        if (child == *iter) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void Object::Modify(bool modified)
 {
     // if we have a parent and a new modification, propagate it
@@ -610,14 +679,14 @@ void Object::Modify(bool modified)
     m_isModified = modified;
 }
 
-void Object::FillFlatList(ListOfObjects *flatList)
+void Object::FillFlatList(ArrayOfObjects *flatList)
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
+Object *Object::GetFirstAncestor(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -627,11 +696,11 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
         return m_parent;
     }
     else {
-        return (m_parent->GetFirstParent(classId, maxDepth - 1));
+        return (m_parent->GetFirstAncestor(classId, maxDepth - 1));
     }
 }
 
-Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
+Object *Object::GetFirstAncestorInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -641,11 +710,11 @@ Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId cl
         return m_parent;
     }
     else {
-        return (m_parent->GetFirstParentInRange(classIdMin, classIdMax, maxDepth - 1));
+        return (m_parent->GetFirstAncestorInRange(classIdMin, classIdMax, maxDepth - 1));
     }
 }
 
-Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
+Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -655,8 +724,16 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
         return this;
     }
     else {
-        return (m_parent->GetLastParentNot(classId, maxDepth - 1));
+        return (m_parent->GetLastAncestorNot(classId, maxDepth - 1));
     }
+}
+
+bool Object::HasEditorialContent()
+{
+    ArrayOfObjects editorial;
+    IsEditorialElementComparison editorialComparison;
+    this->FindAllDescendantByComparison(&editorial, &editorialComparison);
+    return (!editorial.empty());
 }
 
 void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
@@ -679,6 +756,13 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
             Mdiv *mdiv = dynamic_cast<Mdiv *>(this);
             assert(mdiv);
             if (mdiv->m_visibility == Hidden) {
+                processChildren = false;
+            }
+        }
+        else if (this->IsSystemElement()) {
+            SystemElement *systemElement = dynamic_cast<SystemElement *>(this);
+            assert(systemElement);
+            if (systemElement->m_visibility == Hidden) {
                 processChildren = false;
             }
         }
@@ -722,7 +806,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                     // if yes, we will use it (*comparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    AttComparison *attComparison = dynamic_cast<AttComparison *>(*comparisonIter);
+                    ClassIdComparison *attComparison = dynamic_cast<ClassIdComparison *>(*comparisonIter);
                     assert(attComparison);
                     if (o->GetClassId() == attComparison->GetType()) {
                         hasComparison = true;
@@ -763,6 +847,13 @@ int Object::Save(FileOutputStream *output)
     return true;
 }
 
+void Object::ReorderByXPos()
+{
+    ReorderByXPosParams params;
+    Functor reorder(&Object::ReorderByXPos);
+    this->Process(&reorder, &params);
+}
+
 //----------------------------------------------------------------------------
 // ObjectListInterface
 //----------------------------------------------------------------------------
@@ -795,7 +886,7 @@ void ObjectListInterface::ResetList(Object *node)
     this->FilterList(&m_list);
 }
 
-const ListOfObjects *ObjectListInterface::GetList(Object *node)
+const ArrayOfObjects *ObjectListInterface::GetList(Object *node)
 {
     ResetList(node);
     return &m_list;
@@ -803,7 +894,7 @@ const ListOfObjects *ObjectListInterface::GetList(Object *node)
 
 int ObjectListInterface::GetListIndex(const Object *listElement)
 {
-    ListOfObjects::iterator iter;
+    ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -815,7 +906,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
-    ListOfObjects::iterator it = m_list.begin();
+    ArrayOfObjects::iterator it = m_list.begin();
     int idx = GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
@@ -825,18 +916,18 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
-    ListOfObjects::iterator it = m_list.begin();
+    ArrayOfObjects::iterator it = m_list.begin();
     int idx = GetListIndex(startFrom);
     if (idx == -1) return NULL;
     std::advance(it, idx);
-    ListOfObjects::reverse_iterator rit(it);
+    ArrayOfObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
 }
 
 Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
-    ListOfObjects::iterator iter;
+    ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -853,7 +944,7 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
 
 Object *ObjectListInterface::GetListNext(Object *listElement)
 {
-    ListOfObjects::reverse_iterator iter;
+    ArrayOfObjects::reverse_iterator iter;
     int i;
     for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
@@ -876,8 +967,11 @@ std::wstring TextListInterface::GetText(Object *node)
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+        if ((*it)->Is(LB)) {
+            continue;
+        }
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
@@ -885,12 +979,32 @@ std::wstring TextListInterface::GetText(Object *node)
     return concatText;
 }
 
-void TextListInterface::FilterList(ListOfObjects *childList)
+void TextListInterface::GetTextLines(Object *node, std::vector<std::wstring> &lines)
 {
-    ListOfObjects::iterator iter = childList->begin();
+    // alternatively we could cache the concatString in the interface and instantiate it in FilterList
+    std::wstring concatText;
+    const ArrayOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+        if ((*it)->Is(LB) && !concatText.empty()) {
+            lines.push_back(concatText);
+            concatText.clear();
+            continue;
+        }
+        Text *text = dynamic_cast<Text *>(*it);
+        assert(text);
+        concatText += text->GetText();
+    }
+    if (!concatText.empty()) {
+        lines.push_back(concatText);
+    }
+}
+
+void TextListInterface::FilterList(ArrayOfObjects *childList)
+{
+    ArrayOfObjects::iterator iter = childList->begin();
     while (iter != childList->end()) {
-        if (!(*iter)->Is(TEXT)) {
-            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+        if (!(*iter)->Is({ LB, TEXT })) {
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc. but keep Lb)
             iter = childList->erase(iter);
             continue;
         }
@@ -1067,11 +1181,11 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         i->first->SetNextLink(this);
         params->m_nextUuidPairs.erase(i);
     }
-    
+
     // @sameas
     std::string sameas = this->GetUuid();
     auto j = std::find_if(params->m_sameasUuidPairs.begin(), params->m_sameasUuidPairs.end(),
-                          [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+        [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
     if (j != params->m_sameasUuidPairs.end()) {
         j->first->SetSameasLink(this);
         params->m_sameasUuidPairs.erase(j);
@@ -1236,8 +1350,13 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new clef
     if (this->Is(CLEF)) {
-        Clef *clef = dynamic_cast<Clef *>(this);
+        LayerElement *element = dynamic_cast<LayerElement *>(this);
+        assert(element);
+        Clef *clef = dynamic_cast<Clef *>(element->ThisOrSameasAsLink());
         assert(clef);
+        if (clef->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
@@ -1248,12 +1367,15 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new keysig
     if (this->Is(KEYSIG)) {
-        KeySig *keysig = dynamic_cast<KeySig *>(this);
-        assert(keysig);
+        KeySig *keySig = dynamic_cast<KeySig *>(this);
+        assert(keySig);
+        if (keySig->IsScoreDefElement()) {
+            return FUNCTOR_CONTINUE;
+        }
         assert(params->m_currentStaffDef);
         StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
-        upcomingStaffDef->SetCurrentKeySig(keysig);
+        upcomingStaffDef->SetCurrentKeySig(keySig);
         params->m_upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
@@ -1353,7 +1475,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     bool skipAbove = false;
     bool skipBelow = false;
-    Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chord && params->m_staffAlignment) {
         chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
@@ -1428,6 +1550,79 @@ int Object::SaveEnd(FunctorParams *functorParams)
 
     if (!params->m_output->WriteObjectEnd(this)) {
         return FUNCTOR_STOP;
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+bool Object::sortByUlx(Object *a, Object *b)
+{
+    FacsimileInterface *fa = NULL, *fb = NULL;
+    InterfaceComparison comp(INTERFACE_FACSIMILE);
+    if (a->GetFacsimileInterface())
+        fa = a->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        a->FindAllDescendantByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+                fa = temp;
+            }
+        }
+    }
+    if (b->GetFacsimileInterface())
+        fb = b->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        b->FindAllDescendantByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+                fb = temp;
+            }
+        }
+    }
+
+    if (fa == NULL || fb == NULL) {
+        LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
+        return false;
+    }
+
+    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+}
+
+int Object::ReorderByXPos(FunctorParams *functorParams)
+{
+    if (this->GetFacsimileInterface() != NULL) {
+        if (this->GetFacsimileInterface()->HasFacs()) {
+            return FUNCTOR_SIBLINGS; // This would have already been reordered.
+        }
+    }
+
+    std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::SetChildZones(FunctorParams *functorParams)
+{
+    SetChildZonesParams *params = dynamic_cast<SetChildZonesParams *>(functorParams);
+    assert(params);
+
+    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(this->GetFacsimileInterface());
+    if (fi != NULL) {
+        if (fi->HasFacs()) {
+            assert(params->m_doc);
+            assert(params->m_doc->GetFacsimile());
+            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(fi->GetFacs());
+            if (zone == NULL) {
+                LogError("Could not find a zone of UUID %s", fi->GetFacs().c_str());
+                return FUNCTOR_STOP;
+            }
+            fi->SetZone(zone);
+        }
     }
     return FUNCTOR_CONTINUE;
 }

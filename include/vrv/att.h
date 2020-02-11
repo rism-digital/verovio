@@ -51,7 +51,7 @@ public:
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
     // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
     static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
+    static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFingering(Object *element, std::string attrType, std::string attrValue);
     static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
@@ -60,6 +60,7 @@ public:
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
     static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
     static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
+    static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
     static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
     static bool SetShared(Object *element, std::string attrType, std::string attrValue);
@@ -75,7 +76,7 @@ public:
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetEdittrans(const Object *element, ArrayOfStrAttr *attributes);
     static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
     static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
@@ -84,12 +85,19 @@ public:
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetNeumes(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
     static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
     ///@}
+
+    static data_ACCIDENTAL_WRITTEN AccidentalGesturalToWritten(data_ACCIDENTAL_GESTURAL accid);
+    static data_ACCIDENTAL_GESTURAL AccidentalWrittenToGestural(data_ACCIDENTAL_WRITTEN accid);
+
+    static data_STAFFREL StaffrelBasicToStaffrel(data_STAFFREL_basic staffrelBasic);
+    static data_STAFFREL_basic StaffrelToStaffrelBasic(data_STAFFREL staffrel);
 
 public:
     /** Dummy string converter */
@@ -99,12 +107,14 @@ public:
     ///@{
     std::string DblToStr(double data) const;
     std::string IntToStr(int data) const;
+    std::string VUToStr(data_VU data) const;
     ///@}
 
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
+    data_VU StrToVU(std::string value, bool logWarning = true) const;
     ///@}
 
     /** @name Converters for writing and reading */
@@ -129,6 +139,18 @@ public:
 
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
     data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
+
+    std::string MeasurementabsToStr(data_MEASUREMENTABS data) const { return VUToStr(data); }
+    data_MEASUREMENTABS StrToMeasurementabs(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
+
+    std::string MeasurementrelToStr(data_MEASUREMENTREL data) const { return VUToStr(data); }
+    data_MEASUREMENTREL StrToMeasurementrel(std::string value, bool logWarning = true) const
+    {
+        return StrToVU(value, logWarning);
+    }
 
     std::string ModusmaiorToStr(data_MODUSMAIOR data) const;
     data_MODUSMAIOR StrToModusmaior(std::string value, bool logWarning = true) const;
@@ -175,9 +197,6 @@ public:
     std::string ProlatioToStr(data_PROLATIO data) const;
     data_PROLATIO StrToProlatio(std::string value, bool logWarning = true) const;
 
-    std::string StemdirectionToStr(data_STEMDIRECTION data) const;
-    data_STEMDIRECTION StrToStemdirection(std::string value, bool logWarning = true) const;
-
     std::string TempusToStr(data_TEMPUS data) const;
     data_TEMPUS StrToTempus(std::string value, bool logWarning = true) const;
 
@@ -193,26 +212,17 @@ public:
 
     /** @name Converters for writing and reading alternate data types not generated by LibMEI */
     ///@{
-    std::string CompassdirectionToStr(data_COMPASSDIRECTION data) const;
-    data_COMPASSDIRECTION StrToCompassdirection(std::string value, bool logWarning = true) const;
-    
-    std::string EventrelToStr(data_EVENTREL data) const;
-    data_EVENTREL StrToEventrel(std::string value, bool logWarning = true) const;
-    
     std::string FontsizeToStr(data_FONTSIZE data) const;
     data_FONTSIZE StrToFontsize(std::string value, bool logWarning = true) const;
+
+    std::string LinewidthToStr(data_LINEWIDTH data) const;
+    data_LINEWIDTH StrToLinewidth(std::string value, bool logWarning = true) const;
 
     std::string MidivalueNameToStr(data_MIDIVALUE_NAME data) const;
     data_MIDIVALUE_NAME StrToMidivalueName(std::string value, bool logWarning = true) const;
 
     std::string MidivaluePanToStr(data_MIDIVALUE_PAN data) const;
     data_MIDIVALUE_PAN StrToMidivaluePan(std::string value, bool logWarning = true) const;
-
-    std::string StaffitemToStr(data_STAFFITEM data) const;
-    data_STAFFITEM StrToStaffitem(std::string value, bool logWarning = true) const;
-
-    std::string StaffrelToStr(data_STAFFREL data) const;
-    data_STAFFREL StrToStaffrel(std::string value, bool logWarning = true) const;
     ///@}
 
     /** @name Converters for writing and reading alternate data types unsing other alternate data types */
@@ -266,55 +276,6 @@ private:
      * A vector for storing all the MEI att classes grouped in the interface
      */
     std::vector<AttClassId> m_interfaceAttClasses;
-};
-
-//----------------------------------------------------------------------------
-// Comparison
-//----------------------------------------------------------------------------
-
-class Comparison {
-
-public:
-    virtual bool operator()(Object *object) = 0;
-    virtual bool MatchesType(Object *object) = 0;
-};
-
-//----------------------------------------------------------------------------
-// AttComparison
-//----------------------------------------------------------------------------
-
-class AttComparison : public Comparison {
-
-public:
-    AttComparison(ClassId classId) { m_classId = classId; }
-
-    virtual bool operator()(Object *object);
-
-    ClassId GetType() { return m_classId; }
-
-    bool MatchesType(Object *object);
-
-protected:
-    ClassId m_classId;
-};
-
-//----------------------------------------------------------------------------
-// InterfaceComparison
-//----------------------------------------------------------------------------
-
-class InterfaceComparison : public Comparison {
-
-public:
-    InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
-
-    virtual bool operator()(Object *object);
-
-    InterfaceId GetInterface() { return m_interfaceId; }
-
-    bool MatchesType(Object *object);
-
-protected:
-    InterfaceId m_interfaceId;
 };
 
 } // namespace vrv

@@ -26,7 +26,7 @@ class TextElement;
 class MNum : public ControlElement,
              public TextListInterface,
              public TextDirInterface,
-             public TimeSpanningInterface,
+             public TimePointInterface,
              public AttColor,
              public AttLang,
              public AttTypography {
@@ -38,6 +38,7 @@ public:
     ///@{
     MNum();
     virtual ~MNum();
+    virtual Object *Clone() const { return new MNum(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MNum"; }
     virtual ClassId GetClassId() const { return MNUM; }
@@ -49,7 +50,6 @@ public:
     ///@{
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**

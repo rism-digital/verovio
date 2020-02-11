@@ -49,8 +49,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFacs(data_URIS facs_) { m_facs = facs_; }
-    data_URIS GetFacs() const { return m_facs; }
+    void SetFacs(std::string facs_) { m_facs = facs_; }
+    std::string GetFacs() const { return m_facs; }
     bool HasFacs() const;
     ///@}
 
@@ -59,7 +59,7 @@ private:
      * Permits the current element to reference a facsimile image or image zone which
      * corresponds to it.
      **/
-    data_URIS m_facs;
+    std::string m_facs;
 
     /* include <attfacs> */
 };

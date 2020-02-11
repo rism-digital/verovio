@@ -23,30 +23,6 @@
 use strict;
 use Getopt::Long;
 
-chomp (my $EMCC = `which emcc`);
-chomp (my $PYTHON = `which python`);
-die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
-die "ERROR: python interpreter not found.\n" unless $PYTHON;
-
-my $VEROVIO_ROOT  = "..";
-
-# Default compiling uses ASM and large file support.
-# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
-# Empirically, the memory amount required is roughly 5 times the file size.
-# This can be disabled in the light version, which uses the default memory settings.
-my $FLAGS = "-O3";
-$FLAGS .= " -DNDEBUG";
-$FLAGS .= " --memory-init-file 0";
-$FLAGS .= " -std=c++11";
-$FLAGS .= " -s ASM_JS=1";
-$FLAGS .= " -s OUTLINING_LIMIT=10000";
-$FLAGS .= " -s TOTAL_MEMORY=192*1024*1024";
-$FLAGS .= " -s TOTAL_STACK=96*1024*1024";
-$FLAGS .= " -s WASM=0";
-
-my ($FLAGS_NAME, $VERSION, $CHATTY);
-
-
 sub print_help {
 print <<"EOT";
 
@@ -65,12 +41,22 @@ Options:
 EOT
 }
 
+chomp (my $EMCC = `which emcc`);
+chomp (my $PYTHON = `which python`);
+die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
+die "ERROR: python interpreter not found.\n" unless $PYTHON;
 
 # Parse command-line options
 my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
+my ($FLAGS_NAME, $VERSION, $CHATTY);
+
+my $cpp = 17;             # c++ version to compile (11, 14, 17)
+my $VEROVIO_ROOT  = ".."; 
+
 Getopt::Long::Configure("bundling");
 GetOptions (
+   'C|cpp=s'       => \$cpp,
    'c|chatty'      => \$chattyQ,
    'h|?|help'      => \$helpQ,
    'l|light'       => \$lightQ,
@@ -78,12 +64,25 @@ GetOptions (
    'v|version=s'   => \$VERSION,
    'x|exclusion=s' => \$exclusion,
    'w|wasm'        => \$wasmQ,
-
    'D|no-darms'    => \$nodarms,
    'H|no-humdrum'  => \$nohumdrum,
    'P|no-pae'      => \$nopae,
    'X|no-musicxml' => \$nomusicxml
 );
+
+# Default compiling uses ASM and large file support.
+# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
+# Empirically, the memory amount required is roughly 5 times the file size.
+# This can be disabled in the light version, which uses the default memory settings.
+my $FLAGS = "-O3";
+$FLAGS .= " -DNDEBUG";
+$FLAGS .= " --memory-init-file 0";
+$FLAGS .= " -std=c++$cpp";
+$FLAGS .= " -s ASM_JS=1";
+$FLAGS .= " -s TOTAL_MEMORY=256MB";
+$FLAGS .= " -s TOTAL_STACK=128MB";
+$FLAGS .= " -s WASM=0";
+
 
 # Process command-line options:
 
@@ -92,18 +91,22 @@ if ($wasmQ) {
 	$FLAGS = "-O3";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
-	$FLAGS .= " -std=c++11";
+	$FLAGS .= " -std=c++$cpp";
 	$FLAGS .= " -s WASM=1";
-	$FLAGS .= " -s OUTLINING_LIMIT=10000";
-	$FLAGS .= " -s TOTAL_MEMORY=256*1024*1024";
-	$FLAGS .= " -s TOTAL_STACK=128*1024*1024";
-	$FLAGS .= " -s ALLOW_MEMORY_GROWTH=1";	
+    $FLAGS .= " -s STRICT=1"; 
+	# We can try to find the cause of integer overflow runtime errors with
+	# $FLAGS = " -g4 -O0 --emit-symbol-map";
+    # For now, trapping them (followign option does not work with Safari)
+	#$FLAGS .= " -mnontrapping-fptoint";
+	$FLAGS .= " -s TOTAL_MEMORY=512MB";
+	$FLAGS .= " -s TOTAL_STACK=256MB";
+    $FLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";
 }
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1 -s WASM=0";
+	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++$cpp -s ASM_JS=1 -s WASM=0";
 	$FLAGS_NAME = "-light";
 }
 
@@ -167,12 +170,14 @@ my $exports = "-s EXPORTED_FUNCTIONS=\"[";
 $exports .= "'_vrvToolkit_constructor',";
 $exports .= "'_vrvToolkit_destructor',";
 $exports .= "'_vrvToolkit_edit',";
+$exports .= "'_vrvToolkit_editInfo',";
 $exports .= "'_vrvToolkit_getAvailableOptions',";
 $exports .= "'_vrvToolkit_getElementAttr',";
 $exports .= "'_vrvToolkit_getElementsAtTime',";
 $exports .= "'_vrvToolkit_getHumdrum',";
 $exports .= "'_vrvToolkit_getLog',";
 $exports .= "'_vrvToolkit_getMEI',";
+$exports .= "'_vrvToolkit_getMIDIValuesForElement',";
 $exports .= "'_vrvToolkit_getOptions',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
@@ -201,9 +206,9 @@ if ($? == 0) {
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
 	`cat $BUILD_DIR/verovio.js verovio-js-start.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
 
-	# wrap the npm package (but not with wasm build for now)
-	if (!$wasmQ) {
-		print "Building $NPM package";
+	# wrap the npm package (but not with wasm build and without humdrum for now)
+	if ($wasmQ && !$lightQ && $nohumdrum) {
+		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
 	}
@@ -238,7 +243,7 @@ exit 0;
 
 sub getSources {
 	my @sources;
-	push @sources, "./emscripten_main.cpp";
+	push @sources, "$VEROVIO_ROOT/tools/c_wrapper.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
 	if ($nohumdrum) {
@@ -253,12 +258,14 @@ sub getSources {
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_gestural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_externalsymbols.cpp";
+    push @sources, "$VEROVIO_ROOT/libmei/atts_facsimile.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_gestural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_neumes.cpp";
+    push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_visual.cpp";
 
@@ -296,6 +303,3 @@ sub syncSvgResources {
 		}
 	}
 }
-
-
-

@@ -28,9 +28,9 @@ namespace vrv {
 // FTrem
 //----------------------------------------------------------------------------
 
-FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttSlashCount(), AttTremMeasured()
+FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttFTremVis(), AttTremMeasured()
 {
-    RegisterAttClass(ATT_SLASHCOUNT);
+    RegisterAttClass(ATT_FTREMVIS);
     RegisterAttClass(ATT_TREMMEASURED);
 
     Reset();
@@ -44,7 +44,7 @@ FTrem::~FTrem()
 void FTrem::Reset()
 {
     LayerElement::Reset();
-    ResetSlashCount();
+    ResetFTremVis();
     ResetTremMeasured();
 }
 
@@ -72,9 +72,9 @@ void FTrem::AddChild(Object *child)
     Modify();
 }
 
-void FTrem::FilterList(ListOfObjects *childList)
+void FTrem::FilterList(ArrayOfObjects *childList)
 {
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if (!(*iter)->Is(NOTE) && !(*iter)->Is(CHORD)) {
@@ -97,7 +97,7 @@ void FTrem::FilterList(ListOfObjects *childList)
     InitCoords(childList);
 }
 
-void FTrem::InitCoords(ListOfObjects *childList)
+void FTrem::InitCoords(ArrayOfObjects *childList)
 {
     ClearCoords();
 
@@ -129,7 +129,7 @@ void FTrem::InitCoords(ListOfObjects *childList)
     this->m_drawingParams.m_hasMultipleStemDir = false;
     this->m_drawingParams.m_cueSize = false;
     // adjust beam->m_drawingParams.m_shortestDur depending on the number of slashes
-    this->m_drawingParams.m_shortestDur = std::max(DUR_8, DUR_1 + this->GetSlash());
+    this->m_drawingParams.m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
     this->m_drawingParams.m_stemDir = STEMDIRECTION_NONE;
 
     if (firstElement->m_element->Is(CHORD)) {
@@ -165,7 +165,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    const ListOfObjects *fTremChildren = this->GetList(this);
+    const ArrayOfObjects *fTremChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {
@@ -177,9 +177,9 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
     int elementCount = 2;
 
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
     this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
@@ -189,6 +189,11 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
 int FTrem::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    this->m_drawingParams.Reset();
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
     return FUNCTOR_CONTINUE;

@@ -589,10 +589,10 @@
             <glyph glyph-code="E249" smufl-name="flag128thDown"/>
             <glyph glyph-code="E24A" smufl-name="flag256thUp"/>
             <glyph glyph-code="E24B" smufl-name="flag256thDown"/>
-            <!--<glyph glyph-code="E24C" smufl-name="flag512thUp"/>-->
-            <!--<glyph glyph-code="E24D" smufl-name="flag512thDown"/>-->
-            <!--<glyph glyph-code="E24E" smufl-name="flag1024thUp"/>-->
-            <!--<glyph glyph-code="E24F" smufl-name="flag1024thDown"/>-->
+            <glyph glyph-code="E24C" smufl-name="flag512thUp"/>
+            <glyph glyph-code="E24D" smufl-name="flag512thDown"/>
+            <glyph glyph-code="E24E" smufl-name="flag1024thUp"/>
+            <glyph glyph-code="E24F" smufl-name="flag1024thDown"/>
             <!--<glyph glyph-code="E250" smufl-name="flagInternalUp"/>-->
             <!--<glyph glyph-code="E251" smufl-name="flagInternalDown"/>-->
             <range_end>U+E25F</range_end>
@@ -1184,8 +1184,8 @@
             <glyph glyph-code="E4E9" smufl-name="rest64th"/>
             <glyph glyph-code="E4EA" smufl-name="rest128th"/>
             <glyph glyph-code="E4EB" smufl-name="rest256th"/>
-            <!--<glyph glyph-code="E4EC" smufl-name="rest512th"/>-->
-            <!--<glyph glyph-code="E4ED" smufl-name="rest1024th"/>-->
+            <glyph glyph-code="E4EC" smufl-name="rest512th"/>
+            <glyph glyph-code="E4ED" smufl-name="rest1024th"/>
             <!--<glyph glyph-code="E4EE" smufl-name="restHBar"/>-->
             <!--<glyph glyph-code="E4EF" smufl-name="restHBarLeft"/>-->
             <!--<glyph glyph-code="E4F0" smufl-name="restHBarMiddle"/>-->
@@ -2281,16 +2281,16 @@
             <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
             <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->
             <!--<glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>-->
-            <!--<glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>-->
+            <glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>
             <!--<glyph glyph-code="E997" smufl-name="chantPunctumVirgaReversed"/>-->
             <!--<glyph glyph-code="E998" smufl-name="chantPunctumCavum"/>-->
             <!--<glyph glyph-code="E999" smufl-name="chantPunctumLinea"/>-->
             <!--<glyph glyph-code="E99A" smufl-name="chantPunctumLineaCavum"/>-->
-            <!--<glyph glyph-code="E99B" smufl-name="chantQuilisma"/>-->
+            <glyph glyph-code="E99B" smufl-name="chantQuilisma"/>
             <!--<glyph glyph-code="E99C" smufl-name="chantOriscusAscending"/>-->
             <!--<glyph glyph-code="E99D" smufl-name="chantOriscusDescending"/>-->
-            <!--<glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>-->
-            <!--<glyph glyph-code="E99F" smufl-name="chantStrophicus"/>-->
+            <glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>
+            <glyph glyph-code="E99F" smufl-name="chantStrophicus"/>
             <!--<glyph glyph-code="E9A0" smufl-name="chantStrophicusAuctus"/>-->
             <!--<glyph glyph-code="E9A1" smufl-name="chantPunctumDeminutum"/>-->
             <range_end>U+E9AF</range_end>
@@ -2311,10 +2311,10 @@
             <glyph glyph-code="E9BA" smufl-name="chantLigaturaDesc3rd"/>
             <glyph glyph-code="E9BB" smufl-name="chantLigaturaDesc4th"/>
             <glyph glyph-code="E9BC" smufl-name="chantLigaturaDesc5th"/>
-            <glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>
-            <glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>
-            <glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>
-            <glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>
+            <!--<glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>-->
+            <!--<glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>-->
+            <!--<glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>-->
+            <!--<glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>-->
             <!--<glyph glyph-code="E9C1" smufl-name="chantConnectingLineAsc6th"/>-->
             <!--<glyph glyph-code="E9C2" smufl-name="chantStrophicusLiquescens2nd"/>-->
             <!--<glyph glyph-code="E9C3" smufl-name="chantStrophicusLiquescens3rd"/>-->
@@ -2764,12 +2764,12 @@
             <!--<glyph glyph-code="EBA4" smufl-name="luteBarlineEndRepeat"/>-->
             <!--<glyph glyph-code="EBA5" smufl-name="luteBarlineFinal"/>-->
             <!--<glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole"/>-->
-            <!--<glyph glyph-code="EBA7" smufl-name="luteDurationWhole"/>-->
-            <!--<glyph glyph-code="EBA8" smufl-name="luteDurationHalf"/>-->
-            <!--<glyph glyph-code="EBA9" smufl-name="luteDurationQuarter"/>-->
-            <!--<glyph glyph-code="EBAA" smufl-name="luteDuration8th"/>-->
-            <!--<glyph glyph-code="EBAB" smufl-name="luteDuration16th"/>-->
-            <!--<glyph glyph-code="EBAC" smufl-name="luteDuration32nd"/>-->
+            <glyph glyph-code="EBA7" smufl-name="luteDurationWhole"/>
+            <glyph glyph-code="EBA8" smufl-name="luteDurationHalf"/>
+            <glyph glyph-code="EBA9" smufl-name="luteDurationQuarter"/>
+            <glyph glyph-code="EBAA" smufl-name="luteDuration8th"/>
+            <glyph glyph-code="EBAB" smufl-name="luteDuration16th"/>
+            <glyph glyph-code="EBAC" smufl-name="luteDuration32nd"/>
             <!--<glyph glyph-code="EBAD" smufl-name="luteFingeringRHThumb"/>-->
             <!--<glyph glyph-code="EBAE" smufl-name="luteFingeringRHFirst"/>-->
             <!--<glyph glyph-code="EBAF" smufl-name="luteFingeringRHSecond"/>-->
@@ -2806,16 +2806,16 @@
         </frenchAndEnglishRenaissanceLuteTablature>
         <italianAndSpanishRenaissanceLuteTablature>
             <description>Italian and Spanish Renaissance lute tablature</description>
-            <!--<glyph glyph-code="EBE0" smufl-name="luteItalianFret0"/>-->
-            <!--<glyph glyph-code="EBE1" smufl-name="luteItalianFret1"/>-->
-            <!--<glyph glyph-code="EBE2" smufl-name="luteItalianFret2"/>-->
-            <!--<glyph glyph-code="EBE3" smufl-name="luteItalianFret3"/>-->
-            <!--<glyph glyph-code="EBE4" smufl-name="luteItalianFret4"/>-->
-            <!--<glyph glyph-code="EBE5" smufl-name="luteItalianFret5"/>-->
-            <!--<glyph glyph-code="EBE6" smufl-name="luteItalianFret6"/>-->
-            <!--<glyph glyph-code="EBE7" smufl-name="luteItalianFret7"/>-->
-            <!--<glyph glyph-code="EBE8" smufl-name="luteItalianFret8"/>-->
-            <!--<glyph glyph-code="EBE9" smufl-name="luteItalianFret9"/>-->
+            <glyph glyph-code="EBE0" smufl-name="luteItalianFret0"/>
+            <glyph glyph-code="EBE1" smufl-name="luteItalianFret1"/>
+            <glyph glyph-code="EBE2" smufl-name="luteItalianFret2"/>
+            <glyph glyph-code="EBE3" smufl-name="luteItalianFret3"/>
+            <glyph glyph-code="EBE4" smufl-name="luteItalianFret4"/>
+            <glyph glyph-code="EBE5" smufl-name="luteItalianFret5"/>
+            <glyph glyph-code="EBE6" smufl-name="luteItalianFret6"/>
+            <glyph glyph-code="EBE7" smufl-name="luteItalianFret7"/>
+            <glyph glyph-code="EBE8" smufl-name="luteItalianFret8"/>
+            <glyph glyph-code="EBE9" smufl-name="luteItalianFret9"/>
             <!--<glyph glyph-code="EBEA" smufl-name="luteItalianTempoFast"/>-->
             <!--<glyph glyph-code="EBEB" smufl-name="luteItalianTempoSomewhatFast"/>-->
             <!--<glyph glyph-code="EBEC" smufl-name="luteItalianTempoNeitherFastNorSlow"/>-->

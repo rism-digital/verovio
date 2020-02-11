@@ -65,7 +65,12 @@ public:
 // Beam
 //----------------------------------------------------------------------------
 
-class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface, public AttColor, public AttBeamedWith {
+class Beam : public LayerElement,
+             public ObjectListInterface,
+             public DrawingListInterface,
+             public AttColor,
+             public AttBeamedWith,
+             public AttBeamRend {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -74,6 +79,7 @@ public:
     ///@{
     Beam();
     virtual ~Beam();
+    virtual Object *Clone() const { return new Beam(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Beam"; }
     virtual ClassId GetClassId() const { return BEAM; }
@@ -99,7 +105,7 @@ public:
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+    const ArrayOfBeamElementCoords *GetElementCoords();
 
     //----------//
     // Functors //
@@ -120,12 +126,12 @@ protected:
      * Filter the flat list and keep only Note and Chords elements.
      * This also initializes the m_beamElementCoords vector
      */
-    virtual void FilterList(ListOfObjects *childList);
+    virtual void FilterList(ArrayOfObjects *childList);
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
-    void InitCoords(ListOfObjects *childList);
+    void InitCoords(ArrayOfObjects *childList);
 
     /**
      * Return the position of the element in the beam.

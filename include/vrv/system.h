@@ -116,6 +116,12 @@ public:
     void IsDrawingOptimized(bool drawingIsOptimized) { m_drawingIsOptimized = drawingIsOptimized; }
     ///@}
 
+    /**
+     * Add an object to the drawing list but only if necessary.
+     * Check types but also links (dynam, dir) and extensions (trill).
+     */
+    void AddToDrawingListIfNeccessary(Object *object);
+
     //----------//
     // Functors //
     //----------//
@@ -162,6 +168,22 @@ public:
     ///@}
 
     /**
+     * See Object::AdjustHarmGrpsSpacing
+     */
+    ///@{
+    virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
+    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    ///@{
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
+    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * See Object::AlignVertically
      */
     ///@{
@@ -191,14 +213,24 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
+     * See Object::JustifyY
+     */
+    virtual int JustifyY(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustStaffOverlap
      */
     virtual int AdjustStaffOverlap(FunctorParams *functorParams);
 
     /**
-     * See Object::AdjustFloatingPostioners
+     * See Object::AdjustFloatingPositioners
      */
-    virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
+    virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustSlurs
+     */
+    virtual int AdjustSlurs(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffPages

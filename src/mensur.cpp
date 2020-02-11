@@ -36,32 +36,6 @@ Mensur::Mensur()
     , AttSlashCount()
     , AttStaffLoc()
 {
-    Init();
-}
-
-Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
-{
-    Init();
-
-    this->SetColor(mensurAttr->GetMensurColor());
-    this->SetDot(mensurAttr->GetMensurDot());
-    this->SetOrient(mensurAttr->GetMensurOrient());
-    this->SetSign(mensurAttr->GetMensurSign());
-    this->SetSlash(mensurAttr->GetMensurSlash());
-    //
-    this->SetModusmaior(mensurAttr->GetModusmaior());
-    this->SetModusminor(mensurAttr->GetModusminor());
-    this->SetProlatio(mensurAttr->GetProlatio());
-    this->SetTempus(mensurAttr->GetTempus());
-    //
-    this->SetNum(mensurAttr->GetProportNum());
-    this->SetNumbase(mensurAttr->GetProportNumbase());
-    // It is unclear why we don't have mensur.num and mensur.numbase attributes
-    // in att.mensura.default.log - ask Perry...
-}
-
-void Mensur::Init()
-{
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_DURATIONRATIO);
@@ -93,9 +67,9 @@ void Mensur::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Mensur::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+int Mensur::LayerCountInTimeSpan(FunctorParams *functorParams)
 {
-    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
     assert(params);
 
     params->m_mensur = this;

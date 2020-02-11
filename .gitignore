@@ -1,4 +1,5 @@
 # xcode
+Verovio.xcodeproj
 Verovio.xccheckout
 Verovio.xcodeproj/project.xcworkspace/xcshareddata
 Verovio.xcodeproj/project.xcworkspace/xcuserdata
@@ -15,6 +16,7 @@ doc/pae-tests.html
 
 # include file generated at compilation
 include/vrv/git_commit.h
+bindings/iOS/all.h
 
 # cmake build
 tools/CMakeCache.txt
@@ -60,3 +62,9 @@ output.svg
 output.mei
 index.js
 emscripten/npm-dev/node_modules
+
+# VS Code files
+.vscode/settings.json
+main
+DerivedData
+verovio.wasm

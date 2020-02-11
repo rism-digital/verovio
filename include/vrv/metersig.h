@@ -31,29 +31,27 @@ public:
      */
     ///@{
     MeterSig();
-    MeterSig(const ScoreDefInterface *meterSigAttr);
-    void Init();
     virtual ~MeterSig();
+    virtual Object *Clone() const { return new MeterSig(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MeterSig"; }
     virtual ClassId GetClassId() const { return METERSIG; }
-    virtual Object *Clone() const { return new MeterSig(*this); }
     ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
-    /** Convert rendition to form */
-    meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form);
+    /** Override the method since check is required */
+    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::FindSpaceInReferenceAlignments
+     * See Object::LayerCountInTimeSpan
      */
-    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
 
 private:
     //

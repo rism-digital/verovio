@@ -13,8 +13,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "bboxdevicecontext.h"
+#include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
 #include "pages.h"
@@ -56,6 +56,10 @@ void Page::Reset()
     m_pageMarginRight = 0;
     m_pageMarginTop = 0;
     m_PPUFactor = 1.0;
+
+    m_drawingJustifiableHeight = 0;
+    m_drawingJustifiableSystems = 0;
+    m_drawingJustifiableStaves = 0;
 }
 
 void Page::AddChild(Object *child)
@@ -75,16 +79,16 @@ void Page::AddChild(Object *child)
 
 RunningElement *Page::GetHeader() const
 {
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    if (!doc || doc->GetOptions()->m_noHeader.GetValue()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
 
     Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page?
-    if (pages->GetFirst() == this) {
+    // first page or use the pgHeader for all pages?
+    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
         return doc->m_scoreDef.GetPgHead();
     }
     else {
@@ -94,16 +98,16 @@ RunningElement *Page::GetHeader() const
 
 RunningElement *Page::GetFooter() const
 {
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    if (!doc || doc->GetOptions()->m_noFooter.GetValue()) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
 
     Pages *pages = doc->GetPages();
     assert(pages);
 
-    // first page?
-    if (pages->GetFirst() == this) {
+    // first page or use the pgFooter for all pages?
+    if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
         return doc->m_scoreDef.GetPgFoot();
     }
     else {
@@ -123,6 +127,18 @@ void Page::LayOut(bool force)
     this->LayOutHorizontally();
     this->JustifyHorizontally();
     this->LayOutVertically();
+    this->JustifyVertically();
+
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    assert(doc);
+    if (doc->GetOptions()->m_svgBoundingBoxes.GetValue()) {
+        View view;
+        view.SetDoc(doc);
+        BBoxDeviceContext bBoxDC(&view, 0, 0);
+        // Do not do the layout in this view - otherwise we will loop...
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
 
     m_layoutDone = true;
 }
@@ -133,7 +149,7 @@ void Page::LayOutTranscription(bool force)
         return;
     }
 
-    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -201,7 +217,7 @@ void Page::LayOutTranscription(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -236,14 +252,18 @@ void Page::LayOutHorizontally()
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
         int longestActualDur = DUR_4;
-        // Get the longest duration in the piece
-        AttDurExtreme durExtremeComparison(LONGEST);
-        Object *longestDur = this->FindChildExtremeByComparison(&durExtremeComparison);
-        if (longestDur) {
-            DurationInterface *interface = longestDur->GetDurationInterface();
-            assert(interface);
-            longestActualDur = interface->GetActualDur();
-            // LogDebug("Longest duration is DUR_* code %d", longestActualDur);
+
+        // Detect the longest duration in order to adjust the spacing (false by default)
+        if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
+            // Get the longest duration in the piece
+            AttDurExtremeComparison durExtremeComparison(LONGEST);
+            Object *longestDur = this->FindDescendantExtremeByComparison(&durExtremeComparison);
+            if (longestDur) {
+                DurationInterface *interface = longestDur->GetDurationInterface();
+                assert(interface);
+                longestActualDur = interface->GetActualDur();
+                // LogDebug("Longest duration is DUR_* code %d", longestActualDur);
+            }
         }
 
         Functor setAlignmentX(&Object::SetAlignmentXPos);
@@ -311,11 +331,21 @@ void Page::LayOutHorizontally()
 
     this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
 
+    Functor adjustHarmGrpsSpacing(&Object::AdjustHarmGrpsSpacing);
+    Functor adjustHarmGrpsSpacingEnd(&Object::AdjustHarmGrpsSpacingEnd);
+    AdjustHarmGrpsSpacingParams adjustHarmGrpsSpacingParams(doc, &adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingEnd);
+    this->Process(&adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingParams, &adjustHarmGrpsSpacingEnd);
+
     // Adjust the arpeg
     Functor adjustArpeg(&Object::AdjustArpeg);
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+
+    // Adjust the position of the tuplets
+    FunctorDocParams adjustTupletsXParams(doc);
+    Functor adjustTupletsX(&Object::AdjustTupletsX);
+    this->Process(&adjustTupletsX, &adjustTupletsXParams);
 
     // Prevent a margin overflow
     Functor adjustXOverlfow(&Object::AdjustXOverflow);
@@ -332,7 +362,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -373,6 +403,22 @@ void Page::LayOutVertically()
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
+    // Adjust the position of the tuplets
+    FunctorDocParams adjustTupletsYParams(doc);
+    Functor adjustTupletsY(&Object::AdjustTupletsY);
+    this->Process(&adjustTupletsY, &adjustTupletsYParams);
+
+    // Adjust the position of the slurs
+    Functor adjustSlurs(&Object::AdjustSlurs);
+    AdjustSlursParams adjustSlursParams(doc, &adjustSlurs);
+    this->Process(&adjustSlurs, &adjustSlursParams);
+
+    // If slurs were adjusted we need to redraw to adjust the bounding boxes
+    if (adjustSlursParams.m_adjusted) {
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
+
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);
     Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
@@ -380,9 +426,9 @@ void Page::LayOutVertically()
     this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
 
     // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
-    Functor adjustFloatingPostioners(&Object::AdjustFloatingPostioners);
-    AdjustFloatingPostionersParams adjustFloatingPostionersParams(doc, &adjustFloatingPostioners);
-    this->Process(&adjustFloatingPostioners, &adjustFloatingPostionersParams);
+    Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
+    AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
+    this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
 
     // Adjust the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
@@ -395,6 +441,11 @@ void Page::LayOutVertically()
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
 
+    Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
+    Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
+    FunctorDocParams adjustCrossStaffYPosParams(doc);
+    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
+
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();
     }
@@ -404,16 +455,17 @@ void Page::LayOutVertically()
     }
 
     // Adjust system Y position
-    AlignSystemsParams alignSystemsParams;
+    AlignSystemsParams alignSystemsParams(doc);
     alignSystemsParams.m_shift = doc->m_drawingPageHeight;
     alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
-    this->Process(&alignSystems, &alignSystemsParams);
+    Functor alignSystemsEnd(&Object::AlignSystemsEnd);
+    this->Process(&alignSystems, &alignSystemsParams, &alignSystemsEnd);
 }
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     if ((doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) || doc->GetOptions()->m_noJustification.GetValue()) {
@@ -426,15 +478,67 @@ void Page::JustifyHorizontally()
 
     // Justify X position
     Functor justifyX(&Object::JustifyX);
-    JustifyXParams justifyXParams(&justifyX);
+    JustifyXParams justifyXParams(&justifyX, doc);
     justifyXParams.m_systemFullWidth
         = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyX, &justifyXParams);
 }
 
+void Page::JustifyVertically()
+{
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
+    assert(doc);
+
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+
+    // Nothing to justify
+    if (this->m_drawingJustifiableHeight < 0) {
+        return;
+    }
+
+    // Vertical justificaiton is not enabled
+    if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
+        return;
+    }
+
+    bool systemsOnly = doc->GetOptions()->m_justifySystemsOnly.GetValue();
+    int stepSize = this->CalcJustificationStepSize(systemsOnly);
+
+    // Last page and justification of last page is not enabled
+    Pages *pages = doc->GetPages();
+    assert(pages);
+    if (pages->GetLast() == this) {
+        if (!doc->GetOptions()->m_justifyIncludeLastPage.GetValue()) {
+            return;
+        }
+        int idx = this->GetIdx();
+        if (idx > 0) {
+            Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
+            assert(penultimatePage);
+            if (!penultimatePage->m_layoutDone) {
+                doc->SetDrawingPage(idx - 1);
+                penultimatePage->LayOut();
+                doc->SetDrawingPage(idx);
+            }
+            int previousStepSize = penultimatePage->CalcJustificationStepSize(systemsOnly);
+            if (previousStepSize < stepSize) {
+                stepSize = previousStepSize;
+            }
+        }
+    }
+
+    // Justify Y position
+    Functor justifyY(&Object::JustifyY);
+    JustifyYParams justifyYParams(&justifyY, doc);
+    justifyYParams.m_stepSize = stepSize;
+    this->Process(&justifyY, &justifyYParams);
+}
+
 void Page::LayOutPitchPos()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -453,7 +557,7 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -474,7 +578,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(GetFirstAncestor(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;
@@ -491,6 +595,28 @@ int Page::GetContentWidth() const
 
     // we include the left margin and the right margin
     return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
+}
+
+int Page::CalcJustificationStepSize(bool systemsOnly) const
+{
+    if (this->m_drawingJustifiableHeight < 0) {
+        return 0;
+    }
+
+    int stepCount = 0;
+    if (systemsOnly) {
+        stepCount = this->m_drawingJustifiableSystems - 1;
+    }
+    else {
+        stepCount = this->m_drawingJustifiableStaves - 1;
+    }
+
+    // Step should be greater than one...
+    if (stepCount == 0) {
+        return 0;
+    }
+
+    return this->m_drawingJustifiableHeight / stepCount;
 }
 
 void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
@@ -596,6 +722,9 @@ int Page::AlignSystems(FunctorParams *functorParams)
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
+    params->m_justifiableSystems = 0;
+    params->m_justifiableStaves = 0;
+
     RunningElement *header = this->GetHeader();
     if (header) {
         header->SetDrawingYRel(params->m_shift);
@@ -603,10 +732,27 @@ int Page::AlignSystems(FunctorParams *functorParams)
     }
     RunningElement *footer = this->GetFooter();
     if (footer) {
-        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-        assert(doc);
         // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageMarginTop + doc->m_drawingPageMarginBot);
+        footer->SetDrawingYRel(
+            footer->GetTotalHeight() + params->m_doc->m_drawingPageMarginTop + params->m_doc->m_drawingPageMarginBot);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::AlignSystemsEnd(FunctorParams *functorParams)
+{
+    AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
+    assert(params);
+
+    this->m_drawingJustifiableHeight
+        = params->m_shift - params->m_doc->m_drawingPageMarginBot - params->m_doc->m_drawingPageMarginTop;
+    this->m_drawingJustifiableSystems = params->m_justifiableSystems;
+    this->m_drawingJustifiableStaves = params->m_justifiableStaves;
+
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        this->m_drawingJustifiableHeight -= footer->GetTotalHeight();
     }
 
     return FUNCTOR_CONTINUE;

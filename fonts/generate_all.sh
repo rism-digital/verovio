@@ -13,8 +13,12 @@ if [ ! -e tmp ]; then
 fi
 
 if ! command -v saxon9ee >/dev/null 2>&1 ; then
-	echo >&2 "Saxon9ee is required.  Aborting.";
-	exit 1;
+	if command -v saxonb-xslt >/dev/null 2>&1 ; then
+		alias saxon9ee='saxonb-xslt -ext:on'
+	else
+		echo >&2 "Saxon9ee or saxonb-xslt is required.  Aborting.";
+		exit 1;
+	fi
 fi
 
 if ! command -v phantomjs >/dev/null 2>&1 ; then
@@ -39,5 +43,9 @@ phantomjs generate-bbox.js tmp/Leipzig-bounding-boxes.svg ../data/Leipzig.xml js
 echo "Generating Gootville files ..."
 saxon9ee Gootville.svg extract-glyphs.xsl > tmp/Gootville-bounding-boxes.svg
 phantomjs generate-bbox.js tmp/Gootville-bounding-boxes.svg ../data/Gootville.xml json/gootville-1.2_metadata.json
+
+echo "Generating Petaluma files ..."
+saxon9ee Petaluma.svg extract-glyphs.xsl > tmp/Petaluma-bounding-boxes.svg
+phantomjs generate-bbox.js tmp/Petaluma-bounding-boxes.svg ../data/Petaluma.xml json/petaluma_metadata.json
 
 echo "Done!"

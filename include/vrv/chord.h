@@ -48,6 +48,7 @@ public:
     ///@{
     Chord();
     virtual ~Chord();
+    virtual Object *Clone() const { return new Chord(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Chord"; }
     virtual ClassId GetClassId() const { return CHORD; }
@@ -85,6 +86,14 @@ public:
     Note *GetBottomNote();
     int GetYTop();
     int GetYBottom();
+    ///@}
+
+    /**
+     * Return min or max note X position
+     */
+    ///@{
+    int GetXMin();
+    int GetXMax();
     ///@}
 
     /**
@@ -140,6 +149,11 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustCrossStaffYPos
+     */
+    virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertAnalyticalMarkup
      */
     ///@{
@@ -163,7 +177,7 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDIEnd
+     * See Object::CalcOnsetOffsetEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
 
@@ -181,7 +195,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ListOfObjects *childlist);
+    virtual void FilterList(ArrayOfObjects *childlist);
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

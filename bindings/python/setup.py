@@ -16,7 +16,7 @@ os.system("../../tools/get_git_commit.sh")
 
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
-    EXTRA_COMPILE_ARGS += ['-std=c++11',
+    EXTRA_COMPILE_ARGS += ['-std=c++17',
                            '-Wno-write-strings', '-Wno-overloaded-virtual']
 else:
     EXTRA_COMPILE_ARGS += ['-DNO_PAE_SUPPORT']
@@ -38,9 +38,11 @@ verovio_module = Extension('_verovio',
                                '../../libmei/atts_critapp.cpp',
                                '../../libmei/atts_gestural.cpp',
                                '../../libmei/atts_externalsymbols.cpp',
+                               '../../libmei/atts_facsimile.cpp',
                                '../../libmei/atts_mei.cpp',
                                '../../libmei/atts_mensural.cpp',
                                '../../libmei/atts_midi.cpp',
+                               '../../libmei/atts_neumes.cpp',
                                '../../libmei/atts_pagebased.cpp',
                                '../../libmei/atts_shared.cpp',
                                '../../libmei/atts_visual.cpp',
@@ -60,7 +62,7 @@ verovio_module = Extension('_verovio',
                            )
 
 setup(name='verovio',
-      version='2.0.0',
+      version='2.6.0-dev',
       url="www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       ext_modules=[verovio_module],

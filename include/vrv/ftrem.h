@@ -22,7 +22,7 @@ namespace vrv {
 /**
  * This class models the MEI <fTrem> element.
  */
-class FTrem : public LayerElement, public ObjectListInterface, public AttSlashCount, public AttTremMeasured {
+class FTrem : public LayerElement, public ObjectListInterface, public AttFTremVis, public AttTremMeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -31,6 +31,7 @@ public:
     ///@{
     FTrem();
     virtual ~FTrem();
+    virtual Object *Clone() const { return new FTrem(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "FTrem"; }
     virtual ClassId GetClassId() const { return FTREM; }
@@ -46,7 +47,7 @@ public:
      * Initializes the m_beamElementCoords vector objects.
      * This is called by FTrem::FilterList
      */
-    void InitCoords(ListOfObjects *childList);
+    void InitCoords(ArrayOfObjects *childList);
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
@@ -78,7 +79,7 @@ protected:
     /**
      * Filter the flat list and keep only Note or Chords elements.
      */
-    virtual void FilterList(ListOfObjects *childList);
+    virtual void FilterList(ArrayOfObjects *childList);
 
 public:
     /** */

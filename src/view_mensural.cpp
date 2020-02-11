@@ -387,8 +387,9 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     // stem
     if (note->GetActualDur() < DUR_BR) {
         bool up = false;
-        if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            up = (note->GetDrawingStemDir() == STEMDIRECTION_up) ? true : false;
+        // Mensural notes have no Stem child - rely on the MEI @stem.dir
+        if (note->GetStemDir() != STEMDIRECTION_NONE) {
+            up = (note->GetStemDir() == STEMDIRECTION_up) ? true : false;
         }
         if (!up) {
             y3 = yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 8;
@@ -437,7 +438,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
 
     Note *firstNote = ligature->GetFirstNote();

@@ -28,6 +28,7 @@ public:
     ///@{
     Artic();
     virtual ~Artic();
+    virtual Object *Clone() const { return new Artic(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Artic"; }
     virtual ClassId GetClassId() const { return ARTIC; }
@@ -145,7 +146,7 @@ public:
      */
     bool AlwaysAbove();
 
-    void AddSlurPositioner(FloatingPositioner *positioner, bool start);
+    void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
     //----------//
     // Functors //
@@ -178,8 +179,8 @@ private:
     ArticPartType m_type;
 
 public:
-    std::vector<FloatingPositioner *> m_startSlurPositioners;
-    std::vector<FloatingPositioner *> m_endSlurPositioners;
+    std::vector<FloatingCurvePositioner *> m_startSlurPositioners;
+    std::vector<FloatingCurvePositioner *> m_endSlurPositioners;
 };
 
 } // namespace vrv

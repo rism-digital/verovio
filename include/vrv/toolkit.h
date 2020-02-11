@@ -17,13 +17,26 @@
 
 //----------------------------------------------------------------------------
 
-#ifdef USE_EMSCRIPTEN
-#include "jsonxx.h"
-#endif
-
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MEIHUM, ESAC, MIDI, TIMEMAP };
+class EditorToolkit;
+
+enum FileFormat {
+    UNKNOWN = 0,
+    AUTO,
+    MEI,
+    HUMDRUM,
+    PAE,
+    ABC,
+    DARMS,
+    MUSICXML,
+    MUSICXMLHUM,
+    MEIHUM,
+    MUSEDATAHUM,
+    ESAC,
+    MIDI,
+    TIMEMAP
+};
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -89,6 +102,8 @@ public:
      * Only available for Emscripten-based compiles
      **/
     bool Edit(const std::string &json_editorAction);
+
+    std::string EditInfo();
 
     /**
      * Concatenates the vrv::logBuffer into a string an returns it.
@@ -168,6 +183,16 @@ public:
     std::string GetElementAttr(const std::string &xmlId);
 
     /**
+     * Returns the ID string of the notated (the original) element
+     */
+    std::string GetNotatedIdForElement(const std::string &xmlId);
+
+    /**
+     * Returns a vector of ID strings of all elements (the notated and the expanded) for a given element
+     */
+    std::string GetExpansionIdsForElement(const std::string &xmlId);
+
+    /**
      * Redo the layout of the loaded data.
      * This can be called once the rendering option were changed,
      * For example with a new page (sceen) height or a new zoom level.
@@ -196,6 +221,12 @@ public:
     int GetTimeForElement(const std::string &xmlId);
 
     /**
+     * Return MIDI values of the element with the ID (xml:id).
+     * RenderToMidi() must be called prior to using this method.
+     */
+    std::string GetMIDIValuesForElement(const std::string &xmlId);
+
+    /**
      * @name Set and get the scale
      */
     ///@{
@@ -205,29 +236,28 @@ public:
 
     /**
      * @name Get the input file format (defined as FileFormat)
-     * The SetFormat with FileFormat does not perform any validation
+     * The SetInputFrom with FileFormat does not perform any validation
      */
     ///@{
-    bool SetFormat(std::string const &informat);
-    void SetFormat(FileFormat format) { m_format = format; }
-    int GetFormat() { return m_format; }
+    bool SetInputFrom(std::string const &inputFrom);
+    void SetInputFrom(FileFormat format) { m_inputFrom = format; }
+    int GetInputFrom() { return m_inputFrom; }
     ///@}
 
     /**
      * @name Get the output file format (defined as FileFormat)
-     * The SetOutputFormat with FileFormat does not perform any validation
+     * The SetOutputTo with FileFormat does not perform any validation
      */
     ///@{
-    bool SetOutputFormat(std::string const &outformat);
-    void SetOutputFormat(FileFormat format) { m_outformat = format; }
-    int GetOutputFormat() { return m_outformat; }
+    bool SetOutputTo(std::string const &outputTo);
+    int GetOutputTo() { return m_outputTo; }
     ///@}
 
     /**
      * @name Identify the input file type for auto loading of input data
      */
     ///@{
-    FileFormat IdentifyInputFormat(const std::string &data);
+    FileFormat IdentifyInputFrom(const std::string &data);
     ///@}
 
     /**
@@ -240,19 +270,9 @@ public:
 
     /**
      * @name Get the pages for a loaded file
-     * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
     int GetPageCount();
-    ///@}
-
-    /**
-     * Experimental editor methods
-     */
-    ///@{
-    bool Drag(std::string elementId, int x, int y);
-    bool Insert(std::string elementType, std::string startId, std::string endId);
-    bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
 
     /**
@@ -269,26 +289,14 @@ private:
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
 
-protected:
-#ifdef USE_EMSCRIPTEN
-    /**
-     * Experimental editor methods
-     */
-    ///@{
-    bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
-    bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid);
-    bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
-///@}
-#endif
-
 public:
     //
 private:
     Doc m_doc;
     View m_view;
     int m_scale;
-    FileFormat m_format;
-    FileFormat m_outformat;
+    FileFormat m_inputFrom;
+    FileFormat m_outputTo;
     bool m_scoreBasedMei;
 
     static char *m_humdrumBuffer;
@@ -299,6 +307,8 @@ private:
      * The C buffer string.
      */
     char *m_cString;
+
+    EditorToolkit *m_editorToolkit;
 };
 
 } // namespace vrv

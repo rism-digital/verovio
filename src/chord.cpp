@@ -126,10 +126,10 @@ void Chord::AddChild(Object *child)
     Modify();
 }
 
-void Chord::FilterList(ListOfObjects *childList)
+void Chord::FilterList(ArrayOfObjects *childList)
 {
     // Retain only note children of chords
-    ListOfObjects::iterator iter = childList->begin();
+    ArrayOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
         if ((*iter)->Is(NOTE))
@@ -198,7 +198,7 @@ int Chord::PositionInChord(Note *note)
 
 void Chord::GetYExtremes(int &yMax, int &yMin)
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -209,7 +209,7 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
 
 int Chord::GetYTop()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The last note is the top
@@ -218,7 +218,7 @@ int Chord::GetYTop()
 
 int Chord::GetYBottom()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -227,7 +227,7 @@ int Chord::GetYBottom()
 
 Note *Chord::GetTopNote()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     Note *topNote = dynamic_cast<Note *>(childList->back());
@@ -237,13 +237,41 @@ Note *Chord::GetTopNote()
 
 Note *Chord::GetBottomNote()
 {
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
     Note *bottomNote = dynamic_cast<Note *>(childList->front());
     assert(bottomNote);
     return bottomNote;
+}
+
+int Chord::GetXMin()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    int x = -VRV_UNSET;
+    ArrayOfObjects::const_iterator iter = childList->begin();
+    while (iter != childList->end()) {
+        if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
+        ++iter;
+    }
+    return x;
+}
+
+int Chord::GetXMax()
+{
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    int x = VRV_UNSET;
+    ArrayOfObjects::const_iterator iter = childList->begin();
+    while (iter != childList->end()) {
+        if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
+        ++iter;
+    }
+    return x;
 }
 
 void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
@@ -327,7 +355,7 @@ bool Chord::IsVisible()
     }
 
     // if the chord doens't have it, see if all the children are invisible
-    const ListOfObjects *notes = this->GetList(this);
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
     for (auto &iter : *notes) {
@@ -343,7 +371,7 @@ bool Chord::IsVisible()
 
 bool Chord::HasNoteWithDots()
 {
-    const ListOfObjects *notes = this->GetList(this);
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
     for (auto &iter : *notes) {
@@ -360,6 +388,25 @@ bool Chord::HasNoteWithDots()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
+
+    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
+    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+
+    CalcStemParams calcStemParams(params->m_doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
+
+    return FUNCTOR_SIBLINGS;
+}
 
 int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
 {
@@ -413,18 +460,11 @@ int Chord::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // No stem
-    if (this->GetActualDur() < DUR_2) {
-        // Duration is longer than halfnote, there should be no stem
-        assert(!this->GetDrawingStem());
-        return FUNCTOR_SIBLINGS;
-    }
-
     Stem *stem = this->GetDrawingStem();
     assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
@@ -490,15 +530,15 @@ int Chord::CalcDots(FunctorParams *functorParams)
         }
     }
 
-    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
     assert(dots);
 
     params->m_chordDots = dots;
     params->m_chordDrawingX = this->GetDrawingX();
     params->m_chordStemDir = this->GetDrawingStemDir();
 
-    ListOfObjects::const_reverse_iterator rit;
-    const ListOfObjects *notes = this->GetList(this);
+    ArrayOfObjects::const_reverse_iterator rit;
+    const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
 
     assert(this->GetTopNote());
@@ -570,29 +610,22 @@ int Chord::CalcDots(FunctorParams *functorParams)
 
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
 
-    if (this->GetActualDur() > DUR_1) {
-        if (!currentStem) {
-            currentStem = new Stem();
-            this->AddChild(currentStem);
-        }
-        currentStem->AttGraced::operator=(*this);
-        currentStem->AttStems::operator=(*this);
-        currentStem->AttStemsCmn::operator=(*this);
+    if (!currentStem) {
+        currentStem = new Stem();
+        this->AddChild(currentStem);
     }
-    // This will happen only if the duration has changed
-    else if (currentStem) {
-        if (this->DeleteChild(currentStem)) {
-            currentStem = NULL;
-            // The currentFlag (if any) will have been deleted above
-            currentFlag = NULL;
-        }
+    currentStem->AttGraced::operator=(*this);
+    currentStem->AttStems::operator=(*this);
+    currentStem->AttStemsCmn::operator=(*this);
+    if (this->GetActualDur() < DUR_2) {
+        currentStem->IsVirtual(true);
     }
 
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
@@ -609,8 +642,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     SetDrawingStem(currentStem);
 
     // Also set the drawing stem object (or NULL) to all child notes
-    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
+    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
+    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         assert((*it)->Is(NOTE));
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
@@ -619,7 +652,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
         if (!currentDots) {
@@ -648,8 +681,10 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    double incrementScoreTime
-        = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+    LayerElement *element = this->ThisOrSameasAsLink();
+
+    double incrementScoreTime = element->GetAlignmentDuration(
+        params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
     incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
     double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 
@@ -661,6 +696,9 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 
 int Chord::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();
     return FUNCTOR_CONTINUE;

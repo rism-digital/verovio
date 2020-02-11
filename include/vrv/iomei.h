@@ -34,6 +34,7 @@ class BarLine;
 class Beam;
 class BeatRpt;
 class BoundaryEnd;
+class BracketSpan;
 class Breath;
 class BTrem;
 class Choice;
@@ -57,8 +58,12 @@ class Fig;
 class Fermata;
 class FloatingElement;
 class FTrem;
+class GraceGrp;
 class Hairpin;
+class HalfmRpt;
 class Harm;
+class KeyAccid;
+class KeySig;
 class LinkingInterface;
 class InstrDef;
 class Label;
@@ -116,6 +121,7 @@ class Space;
 class Staff;
 class Subst;
 class Supplied;
+class Surface;
 class Svg;
 class Syl;
 class Syllable;
@@ -133,6 +139,7 @@ class Turn;
 class Tuplet;
 class Unclear;
 class Verse;
+class Zone;
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -243,6 +250,9 @@ private:
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
+    void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
+    void WriteHalfmRpt(pugi::xml_node currentNode, HalfmRpt *halfmRpt);
+    void WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid);
     void WriteKeySig(pugi::xml_node currentNode, KeySig *keySig);
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
@@ -268,6 +278,7 @@ private:
     ///@{
     void WriteAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
     void WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
+    void WriteBracketSpan(pugi::xml_node currentNode, BracketSpan *bracketSpan);
     void WriteBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
@@ -329,6 +340,9 @@ private:
     ///@{
     void WriteVerse(pugi::xml_node currentNode, Verse *verse);
     void WriteSyl(pugi::xml_node currentNode, Syl *syl);
+    void WriteZone(pugi::xml_node currentNode, Zone *zone);
+    void WriteSurface(pugi::xml_node currentNode, Surface *surface);
+    void WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile);
     ///@}
 
     /**
@@ -352,6 +366,7 @@ private:
     void WriteAreaPosInterface(pugi::xml_node currentNode, AreaPosInterface *interface);
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
+    void WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -404,7 +419,7 @@ public:
     virtual ~MeiInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &mei);
+    virtual bool ImportString(const std::string &mei);
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -483,6 +498,9 @@ private:
     bool ReadCustos(Object *parent, pugi::xml_node custos);
     bool ReadDot(Object *parent, pugi::xml_node dot);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
+    bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);
+    bool ReadHalfmRpt(Object *parent, pugi::xml_node halfmRpt);
+    bool ReadKeyAccid(Object *parent, pugi::xml_node keyAccid);
     bool ReadKeySig(Object *parent, pugi::xml_node keySig);
     bool ReadLigature(Object *parent, pugi::xml_node ligature);
     bool ReadMensur(Object *parent, pugi::xml_node mensur);
@@ -510,6 +528,7 @@ private:
     ///@{
     bool ReadAnchoredText(Object *parent, pugi::xml_node anchoredText);
     bool ReadArpeg(Object *parent, pugi::xml_node arpeg);
+    bool ReadBracketSpan(Object *parent, pugi::xml_node bracketSpan);
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
@@ -585,6 +604,7 @@ private:
     bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
+    bool ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
@@ -598,7 +618,10 @@ private:
      * @name Methods for reading other MEI elements.
      */
     ///@{
+    bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
+    bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
+    bool ReadZone(Surface *parent, pugi::xml_node zone);
     ///@}
 
     /**
@@ -633,9 +656,12 @@ private:
      */
     ///@{
     // to MEI 4.0.0
-    void UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef);
+    void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
+    void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
+    void UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
     void UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp);
+    void UpgradeTurnTo_4_0_0(pugi::xml_node turn, Turn *vrvTurn);
     // to MEI 3.0.0 (Page-Based MEI only)
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);

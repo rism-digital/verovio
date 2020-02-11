@@ -68,6 +68,7 @@ namespace pae {
 
             tuplet_notes = old.tuplet_notes;
             tuplet_note = old.tuplet_note;
+            tuplet_val = old.tuplet_val;
         }
         Note() { clear(); }
         void clear()
@@ -80,12 +81,13 @@ namespace pae {
             pitch = PITCHNAME_NONE;
             duration = DURATION_NONE;
             accidental = ACCIDENTAL_WRITTEN_NONE;
-            accidGes = ACCIDENTAL_GESTURAL_NONE;
+            accidGes = false;
             dots = 0;
             rest = false;
 
             tuplet_notes = 0;
             tuplet_note = 0;
+            tuplet_val = 0;
 
             clef = NULL;
             mensur = NULL;
@@ -120,6 +122,7 @@ namespace pae {
 
             tuplet_notes = d.tuplet_notes;
             tuplet_note = d.tuplet_note;
+            tuplet_val = d.tuplet_val;
 
             return *this;
         }
@@ -130,6 +133,7 @@ namespace pae {
         // tuplet stuff
         int tuplet_notes; // quantity of notes in the tuplet
         int tuplet_note; // indicates this note is the nth in the tuplet
+        int tuplet_val; // indicates the num in the tuplet (value after ;)
 
         bool acciaccatura;
         int appoggiatura;
@@ -143,7 +147,7 @@ namespace pae {
         data_PITCHNAME pitch;
         data_DURATION duration;
         data_ACCIDENTAL_WRITTEN accidental;
-        data_ACCIDENTAL_GESTURAL accidGes;
+        bool accidGes;
         unsigned int dots;
         bool rest;
 
@@ -239,7 +243,7 @@ public:
     virtual ~PaeInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string const &pae);
+    virtual bool ImportString(const std::string &pae);
 
 #ifndef NO_PAE_SUPPORT
 
@@ -288,7 +292,10 @@ private:
     Tie *m_tie;
     bool m_is_in_chord;
     bool m_is_mensural;
-    std::string m_keySigString;
+
+    MapOfPitchAccid m_currentAccids;
+    KeySig *m_currentKeySig;
+    std::pair<data_PITCHNAME, data_ACCIDENTAL_WRITTEN> m_tieAccid;
 
     std::vector<LayerElement *> m_nested_objects;
 };
