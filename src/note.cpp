@@ -184,13 +184,13 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
         staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
         assert(staff);
     }
-    
+
     linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
     linesBelow = -(this->GetDrawingLoc()) / 2;
-    
+
     linesAbove = std::max(linesAbove, 0);
     linesBelow = std::max(linesBelow, 0);
-    
+
     return ((linesAbove > 0) || (linesBelow > 0));
 }
 
@@ -815,7 +815,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     int linesAbove = 0;
     int linesBelow = 0;
-    
+
     if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
 
     // HARDCODED

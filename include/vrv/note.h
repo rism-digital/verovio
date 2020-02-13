@@ -109,7 +109,7 @@ public:
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
     ///@}
-                 
+
     /**
      * Check if the note has leger lines.
      * If staff is passed, use it for getting the staff line number.

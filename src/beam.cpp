@@ -57,6 +57,8 @@ void BeamSegment::Reset()
     m_verticalCenter = 0;
     m_avgY = 0;
     m_extendedToCenter = false;
+    m_ledgerLinesAbove = 0;
+    m_ledgerLinesBelow = 0;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -300,12 +302,13 @@ void BeamSegment::CalcBeamInit(
     // Calculate the extreme values
 
     int yMax = 0, yMin = 0;
-    int curY;
     int nbRests = 0;
 
     m_avgY = 0;
     m_nbNotesOrChords = 0;
     m_extendedToCenter = false;
+    m_ledgerLinesAbove = 0;
+    m_ledgerLinesBelow = 0;
 
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
@@ -325,20 +328,32 @@ void BeamSegment::CalcBeamInit(
 
             this->m_avgY += ((yMax + yMin) / 2);
 
-            // highest and lowest value;
-            // high = std::max(yMax, high);
-            // low = std::min(yMin, low);
+            int linesAbove = 0;
+            int linesBelow = 0;
+            Note *bottomNote = chord->GetBottomNote();
+            assert(bottomNote);
+            if (bottomNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
+                m_ledgerLinesBelow += linesBelow;
+            }
+            Note *topNote = chord->GetTopNote();
+            assert(topNote);
+            if (topNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
+                m_ledgerLinesAbove += linesAbove;
+            }
         }
         else if (coord->m_element->Is(NOTE)) {
-            // highest and lowest value;
-            // high = std::max(coord->m_y, high);
-            // low = std::min(coord->m_y, low);
+            Note *note = dynamic_cast<Note *>(coord->m_element);
+            assert(note);
+            this->m_avgY += note->GetDrawingY();
 
-            curY = coord->m_element->GetDrawingY();
-            this->m_avgY += curY;
+            int linesAbove = 0;
+            int linesBelow = 0;
+            if (note->HasLedgerLines(linesAbove, linesBelow, staff)) {
+                m_ledgerLinesBelow += linesBelow;
+                m_ledgerLinesAbove += linesAbove;
+            }
         }
         else {
-            curY = coord->m_element->GetDrawingY();
             nbRests++;
         }
     }
@@ -586,8 +601,14 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
             data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
             // Layer direction ?
             if (layerStemDir == STEMDIRECTION_NONE) {
-                beamInterface->m_drawingPlace
-                    = (this->m_avgY < this->m_verticalCenter) ? BEAMPLACE_above : BEAMPLACE_below;
+                if (this->m_ledgerLinesBelow != this->m_ledgerLinesAbove) {
+                    beamInterface->m_drawingPlace
+                        = (this->m_ledgerLinesBelow > this->m_ledgerLinesAbove) ? BEAMPLACE_above : BEAMPLACE_below;
+                }
+                else {
+                    beamInterface->m_drawingPlace
+                        = (this->m_avgY < this->m_verticalCenter) ? BEAMPLACE_above : BEAMPLACE_below;
+                }
             }
             // Look at the note position
             else {
