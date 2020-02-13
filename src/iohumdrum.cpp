@@ -6330,7 +6330,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         // use the one in the primary track
                         continue;
                     }
-
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
 
                     setLocationId(clef, layerdata[i]);

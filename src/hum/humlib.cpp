@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Feb 12 21:53:19 PST 2020
+// Last Modified: Wed Feb 12 23:38:48 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -7315,7 +7315,9 @@ int HumAddress::getSubtrack(void) const {
 	if (m_subtrackcount == 1) {
 		return 0;
 	} else {
-		return m_subtrack + 1;
+		// return m_subtrack + 1;
+		// Should already be indexed from one.
+		return m_subtrack;
 	}
 }
 
