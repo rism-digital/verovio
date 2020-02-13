@@ -1432,7 +1432,6 @@ bool EditorToolkitNeume::Remove(std::string elementId)
 
 bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float rotate)
 {
-    LogMessage("ulx: %d, uly: %d, lrx: %d, lry %d, rotate %f", ulx, uly, lrx, lry, rotate);
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1470,7 +1469,6 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         zone->SetLrx(lrx);
         zone->SetLry(lry);
         if (!isnan(rotate)) {
-            LogMessage("Rotate (%f) is not NaN", rotate);
             zone->SetRotate(rotate);
         }
         zone->Modify();
