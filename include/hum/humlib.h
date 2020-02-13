@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Feb  2 23:42:11 PST 2020
+// Last Modified: Wed Feb 12 21:53:19 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1385,8 +1385,10 @@ class HumdrumToken : public std::string, public HumHash {
 		std::vector<HTp> getPreviousTokens (void) const;
 
 		// next/previous token on line:
-		HTp      getNextFieldToken         (void) const;
-		HTp      getPreviousFieldToken     (void) const;
+		HTp      getNextFieldToken     (void) const;
+		HTp      getPreviousFieldToken (void) const;
+		HTp      getNextField          (void) const { return getNextFieldToken(); }
+		HTp      getPreviousField      (void) const { return getPreviousFieldToken(); }
 
 		int      getPreviousNonNullDataTokenCount(void);
 		int      getPreviousNNDTCount      (void)
@@ -1951,13 +1953,17 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		int           tpq                          (void);
 
 		// strand functionality:
-		HTp           getStrandStart               (int index);
-		HTp           getStrandEnd                 (int index);
-		HTp           getStrandStart               (int sindex, int index);
-		HTp           getStrandEnd                 (int sindex, int index);
-		int           getStrandCount               (void);
-		int           getStrandCount               (int spineindex);
-		void          resolveNullTokens            (void);
+		HTp           getStrandStart    (int index);
+		HTp           getStrandBegin    (int index) { return getStrandStart(index); }
+		HTp           getStrandEnd      (int index);
+		HTp           getStrandStop     (int index) { return getStrandEnd(index); }
+		HTp           getStrandStart    (int sindex, int index);
+		HTp           getStrandBegin    (int sindex, int index) { return getStrandStart(sindex, index); }
+		HTp           getStrandEnd      (int sindex, int index);
+		HTp           getStrandStop     (int sindex, int index) { return getStrandEnd(sindex, index); }
+		int           getStrandCount    (void);
+		int           getStrandCount    (int spineindex);
+		void          resolveNullTokens (void);
 
 		HTp           getStrand                    (int index)
 		                                        { return getStrandStart(index); }
@@ -1988,7 +1994,8 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		bool          analyzeTokenDurations        (void);
 		bool          analyzeGlobalParameters      (void);
 		bool          analyzeLocalParameters       (void);
-		bool          analyzeParameters            (void);
+		// bool          analyzeParameters            (void);
+		bool          analyzeStrophes              (void);
 		bool          analyzeDurationsOfNonRhythmicSpines(void);
 		HumNum        getMinDur                    (std::vector<HumNum>& durs,
 		                                            std::vector<HumNum>& durstate);
