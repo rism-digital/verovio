@@ -1680,9 +1680,11 @@ int Object::SetChildZones(FunctorParams *functorParams)
         if (fi->HasFacs()) {
             assert(params->m_doc);
             assert(params->m_doc->GetFacsimile());
-            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(fi->GetFacs());
+            // Facs should be a URI so check for # fragment identifier and strip it
+            std::string facsUuid = fi->GetFacs()[0] == '#' ? fi->GetFacs().substr(1) : fi->GetFacs();
+            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(facsUuid);
             if (zone == NULL) {
-                LogError("Could not find a zone of UUID %s", fi->GetFacs().c_str());
+                LogError("Could not find a zone of UUID %s", facsUuid.c_str());
                 return FUNCTOR_STOP;
             }
             fi->SetZone(zone);

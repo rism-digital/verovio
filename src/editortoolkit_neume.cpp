@@ -722,8 +722,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             sylZone->SetLry(uly + offSetLry);
             surface->AddChild(sylZone);
             fi->SetZone(sylZone);
-            syl->SetFacs(zone->GetUuid());
-
         }
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -803,7 +801,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 newZone->SetLry(newUly + noteHeight);
 
                 newNc->SetZone(newZone);
-                newNc->SetFacs(newZone->GetUuid());
 
                 assert(surface);
                 surface->AddChild(newZone);
@@ -896,7 +893,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
         custos->SetZone(zone);
-        custos->SetFacs(zone->GetUuid());
         layer->AddChild(custos);
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1738,8 +1734,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     assert(fi);
                     fi->SetZone(zone);
 
-                    syl->ResetFacsimile();
-                    syl->SetFacs(zone->GetUuid());
+                    // syl->ResetFacsimile();
+                    // syl->SetFacs(zone->GetUuid());
                 }
             }
         }
@@ -1968,7 +1964,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     surface->DeleteChild(origZoneUuid);
 
                     secondNc->SetZone(zone);
-                    secondNc->ResetFacsimile();
+                    // secondNc->ResetFacsimile();
 
                     if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
                     if (success1 && success2) {
@@ -2113,8 +2109,8 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     assert(fi);
                     fi->SetZone(zone);
 
-                    syl->ResetFacsimile();
-                    syl->SetFacs(zone->GetUuid());
+                    // syl->ResetFacsimile();
+                    // syl->SetFacs(zone->GetUuid());
                 }
             }
             uuidArray << newParent->GetUuid();

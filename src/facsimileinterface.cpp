@@ -96,7 +96,7 @@ void FacsimileInterface::SetZone(Zone *zone)
         this->SetFacs("");
     }
     else {
-        this->SetFacs(m_zone->GetUuid());
+        this->SetFacs("#" + m_zone->GetUuid());
     }
 }
 } // namespace vrv
