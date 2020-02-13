@@ -255,9 +255,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
         InterfaceComparison pitchIC(INTERFACE_PITCH);
 
-        int pitchDifference = round ( ((double) y - x * tan(staff->GetDrawingRotate() * M_PI / 180.0))
-            / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-
         FacsimileInterface *fi = element->GetFacsimileInterface();
         if (fi && fi->HasFacs()) {
             bool ignoreFacs = false;
@@ -404,7 +401,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
             Zone *zone = clef->GetZone();
             assert(zone);
-            zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize +
+            zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize -
                 x * tan(staff->GetDrawingRotate() * M_PI / 180.0));
         }
 
@@ -2831,7 +2828,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         const int pitchDifference = round((double) (staff->GetZone()->GetUly() +
             (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
             centerY - ((centerX - staff->GetZone()->GetUlx()) *
-            tan(staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));
+            tan(-staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));
 
         pi->AdjustPitchByOffset(pitchDifference);
         return true;
@@ -2892,7 +2889,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             int pitchDifference = round((double) (staff->GetZone()->GetUly() +
                 (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
                 fi->GetZone()->GetUly() - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
-                tan(staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));
+                tan(-staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));
 
             pi->AdjustPitchByOffset(pitchDifference);
         }
