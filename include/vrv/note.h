@@ -109,6 +109,14 @@ public:
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
     ///@}
+                 
+    /**
+     * Check if the note has leger lines.
+     * If staff is passed, use it for getting the staff line number.
+     * Otherwise, it will look for the Staff ancestor.
+     * Set the value of ledger lines above or below.
+     */
+    bool HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff = NULL);
 
     /**
      * Overriding functions to return information from chord parent if any

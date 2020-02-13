@@ -178,6 +178,22 @@ Accid *Note::GetDrawingAccid()
     return accid;
 }
 
+bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+{
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+    }
+    
+    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+    linesBelow = -(this->GetDrawingLoc()) / 2;
+    
+    linesAbove = std::max(linesAbove, 0);
+    linesBelow = std::max(linesBelow, 0);
+    
+    return ((linesAbove > 0) || (linesBelow > 0));
+}
+
 Chord *Note::IsChordTone() const
 {
     return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
@@ -797,10 +813,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     /************** Ledger lines: **************/
 
-    int linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    int linesBelow = -(this->GetDrawingLoc()) / 2;
-
-    if ((linesAbove <= 0) && (linesBelow <= 0)) return FUNCTOR_CONTINUE;
+    int linesAbove = 0;
+    int linesBelow = 0;
+    
+    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
 
     // HARDCODED
     int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);

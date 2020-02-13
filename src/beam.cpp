@@ -843,6 +843,7 @@ void BeamElementCoord::SetDrawingStemDir(
     this->m_stem->SetDrawingStemDir(stemDir);
     bool onStaffLine = false;
     int ledgerLines = 0;
+    int ledgerLinesOpposite = 0;
     this->m_centered = false;
     this->m_shortened = false;
     this->m_closestNote = NULL;
@@ -865,7 +866,7 @@ void BeamElementCoord::SetDrawingStemDir(
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
             onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
-            ledgerLines = -(m_closestNote->GetDrawingLoc()) / 2;
+            m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
         }
     }
     else {
@@ -878,7 +879,7 @@ void BeamElementCoord::SetDrawingStemDir(
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
             onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
-            ledgerLines = (m_closestNote->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+            m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
         }
         stemLen = -1;
     }
