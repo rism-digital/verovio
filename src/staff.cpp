@@ -175,29 +175,29 @@ int Staff::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-double Staff::GetDrawingSkew() const
+double Staff::GetDrawingRotate() const
 {
-    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstAncestor(DOC))->GetOptions()->m_useSkew.GetValue()) {
+    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstAncestor(DOC))->GetOptions()->m_useRotate.GetValue()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
-            return FacsimileInterface::GetDrawingSkew();
+            return FacsimileInterface::GetDrawingRotate();
         }
     }
-    LogWarning("This staff (or its doc) doesn't have facsimile data, or you haven't enabled the useSkew option.");
+    LogWarning("This staff (or its doc) doesn't have facsimile data, or you haven't enabled the useRotate option.");
     return 0;
 }
 
 void Staff::AdjustDrawingStaffSize()
 {
-    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstAncestor(DOC))->GetOptions()->m_useSkew.GetValue()) {
+    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstAncestor(DOC))->GetOptions()->m_useRotate.GetValue()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
         if (doc->GetType() == Facs) {
-            double skew = this->GetDrawingSkew();
+            double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
-            int yDiff = zone->GetLry() - zone->GetUly() +
-                (zone->GetLrx() - zone->GetUlx()) * tan(skew * M_PI / 180.0);
+            int yDiff = zone->GetLry() - zone->GetUly() -
+                (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
             this->m_drawingStaffSize = 100 * yDiff /
                 (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
         }

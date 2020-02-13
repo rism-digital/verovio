@@ -47,12 +47,11 @@ public:
     bool SetClef(std::string elementId, std::string shape);
     bool Split(std::string elementId, int x);
     bool Remove(std::string elementId);
-    bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry);
+    bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float resize=NAN);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds, std::string isLigature);
-    bool ChangeSkew(std::string elementId, int dy, bool rightSide);
     bool ChangeStaff(std::string elementId);
     ///@}
 protected:
@@ -71,11 +70,11 @@ protected:
     bool ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
     bool ParseResizeAction(jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry);
+    bool ParseResizeRotateAction(jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry, float *rotate);
     bool ParseGroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
     bool ParseUngroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
     bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature);
-    bool ParseChangeSkewAction(jsonxx::Object param, std::string *elementId, int *dy, bool *rightSide);
     bool ParseChangeStaffAction(jsonxx::Object param, std::string *elementId);
     ///@}
 
@@ -101,9 +100,9 @@ struct ClosestBB {
     int x;
     int y;
 
-    int distanceToBB(int ulx, int uly, int lrx, int lry, double skew = 0)
+    int distanceToBB(int ulx, int uly, int lrx, int lry, double rotate = 0)
     {
-        int offset = (x - ulx) * tan(skew * M_PI / 180.0);
+        int offset = (x - ulx) * tan(rotate * M_PI / 180.0);
         uly = uly - offset;
         lry = lry - offset;
         int xDiff = std::max(
@@ -124,8 +123,8 @@ struct ClosestBB {
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
-        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(), zoneA->GetSkew());
-        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(), zoneB->GetSkew());
+        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(), zoneA->GetRotate());
+        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(), zoneB->GetRotate());
         return (distA < distB);
     }
 };
@@ -143,17 +142,17 @@ struct StaffSort {
 
         int aLowest, bLowest, aHighest, bHighest;
 
-        aLowest = zoneA->GetSkew() < 0 ? zoneA->GetLry() :
-            zoneA->GetLry() + (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetSkew() * M_PI / 180.0);
+        aLowest = zoneA->GetRotate() < 0 ? zoneA->GetLry() :
+            zoneA->GetLry() + (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetRotate() * M_PI / 180.0);
 
-        aHighest = zoneA->GetSkew() < 0 ? zoneA->GetUly() :
-            zoneA->GetUly() - (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetSkew() * M_PI / 180.0);
+        aHighest = zoneA->GetRotate() < 0 ? zoneA->GetUly() :
+            zoneA->GetUly() - (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetRotate() * M_PI / 180.0);
 
-        bLowest = zoneB->GetSkew() < 0 ? zoneB->GetLry() :
-            zoneB->GetLry() + (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetSkew() * M_PI / 180.0);
+        bLowest = zoneB->GetRotate() < 0 ? zoneB->GetLry() :
+            zoneB->GetLry() + (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetRotate() * M_PI / 180.0);
 
-        bHighest = zoneB->GetSkew() < 0 ? zoneB->GetUly() :
-            zoneB->GetUly() - (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetSkew() * M_PI / 180.0);
+        bHighest = zoneB->GetRotate() < 0 ? zoneB->GetUly() :
+            zoneB->GetUly() - (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetRotate() * M_PI / 180.0);
 
         // Check for y intersection
         if ((aLowest <= bLowest && aLowest >= bHighest) ||

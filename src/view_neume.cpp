@@ -159,18 +159,18 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         noteX = element->GetDrawingX();
         noteY = element->GetDrawingY();
     }
-    // Calculating proper y offset based on pname, clef, staff, and staff skew
+    // Calculating proper y offset based on pname, clef, staff, and staff rotate
     int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset = 0;
     int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
-    int skewOffset;
-    if (staff->GetDrawingSkew() != 0) {
-        double deg = staff->GetDrawingSkew();
+    int rotateOffset;
+    if (staff->GetDrawingRotate() != 0) {
+        double deg = staff->GetDrawingRotate();
         int xDiff = noteX - staff->GetDrawingX();
-        skewOffset =  int(xDiff * tan(deg * M_PI / 180.0));
+        rotateOffset =  int(xDiff * tan(deg * M_PI / 180.0));
     }
     else {
-        skewOffset = 0;
+        rotateOffset = 0;
     }
 
     if (clef->GetShape() == CLEFSHAPE_C) {
@@ -180,7 +180,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
     }
 
-    yValue = clefYPosition + pitchOffset + octaveOffset + skewOffset;
+    yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
         DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,

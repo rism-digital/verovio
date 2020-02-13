@@ -11,6 +11,7 @@
 
 #include <codecvt>
 #include <limits.h>
+#include <math.h>
 #include <locale>
 #include <set>
 
@@ -115,6 +116,14 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse the resize action");
     }
+    else if (action == "resizeRotate") {
+        std::string elementId;
+        int ulx, uly, lrx, lry;
+        float rotate;
+        if (this->ParseResizeRotateAction(json.get<jsonxx::Object>("param"), &elementId, &ulx, &uly, &lrx, &lry, &rotate)) {
+            return this->Resize(elementId, ulx, uly, lrx, lry, rotate);
+        }
+    }
     else if (action == "chain") {
         if (!json.has<jsonxx::Array>("param")) {
             LogError("Incorrectly formatted JSON action");
@@ -166,16 +175,6 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
             return this->ToggleLigature(elementIds, isLigature);
         }
         LogWarning("Could not parse toggle ligature action");
-    }
-
-    else if (action == "changeSkew"){
-        std::string elementId;
-        int dy;
-        bool rightSide;
-        if(this->ParseChangeSkewAction(json.get<jsonxx::Object>("param"), &elementId, &dy, &rightSide)) {
-            return this->ChangeSkew(elementId, dy, rightSide);
-        }
-        LogWarning("Could not parse change skew action");
     }
     else if (action == "changeStaff") {
         std::string elementId;
@@ -256,7 +255,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
         InterfaceComparison pitchIC(INTERFACE_PITCH);
 
-        int pitchDifference = round ( ((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0))
+        int pitchDifference = round ( ((double) y - x * tan(staff->GetDrawingRotate() * M_PI / 180.0))
             / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
@@ -312,7 +311,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         assert(staff);
         // Note that y param is relative to initial position for clefs
         int initialClefLine = clef->GetLine();
-        int clefLine = round(((double) y - x * tan(staff->GetDrawingSkew() * M_PI / 180.0))
+        int clefLine = round(((double) y - x * tan(staff->GetDrawingRotate() * M_PI / 180.0))
             / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -406,7 +405,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             Zone *zone = clef->GetZone();
             assert(zone);
             zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize +
-                x * tan(staff->GetDrawingSkew() * M_PI / 180.0));
+                x * tan(staff->GetDrawingRotate() * M_PI / 180.0));
         }
 
         layer->ReorderByXPos();
@@ -792,8 +791,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     return false;
                 }
 
-                // Apply offset due to skew
-                newUly += (newUlx - ulx) * tan(staff->GetDrawingSkew() * M_PI / 180.0);
+                // Apply offset due to rotate
+                newUly += (newUlx - ulx) * tan(staff->GetDrawingRotate() * M_PI / 180.0);
                 newZone->SetUlx(newUlx);
                 newZone->SetUly(newUly);
                 ;
@@ -846,7 +845,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         clef->SetShape(clefShape);
         const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         int yDiff = -staff->GetZone()->GetUly() + uly;
-        yDiff += ((ulx - staff->GetZone()->GetUlx())) * tan(staff->GetDrawingSkew() * M_PI / 180.0); // Subtract distance due to skew.
+        yDiff += ((ulx - staff->GetZone()->GetUlx())) * tan(staff->GetDrawingRotate() * M_PI / 180.0); // Subtract distance due to rotate.
         int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
         clef->SetLine(clefLine);
 
@@ -933,7 +932,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     ArrayOfObjects staves;
-    double skew;
+    double rotate;
     int avgHeight = 0;
 
     // Get the staves by element ID and fail if a staff does not exist.
@@ -942,7 +941,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         if (obj != NULL && obj->Is(STAFF)) {
             staves.push_back(obj);
             int height = obj->GetZone()->GetLry() + (obj->GetZone()->GetLrx() - obj->GetZone()->GetUlx()) *
-                tan(obj->GetZone()->GetSkew() * M_PI / 180.0) - obj->GetZone()->GetUly();
+                tan(obj->GetZone()->GetRotate() * M_PI / 180.0) - obj->GetZone()->GetUly();
             avgHeight += height;
         }
         else {
@@ -968,11 +967,11 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     int lrx = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLrx();
     int lry = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLry();
 
-    skew = atan( (double) (uly + avgHeight - lry) / (double) (lrx - ulx) ) * 180.0 / M_PI;
-    if (skew > 12 || skew < -12) {
-        LogError("Merging these staves would require too large a skew");
+    rotate = atan( (double) (uly + avgHeight - lry) / (double) (lrx - ulx) ) * 180.0 / M_PI;
+    if (rotate > 12 || rotate < -12) {
+        LogError("Merging these staves would require too large a rotate");
         m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Merging these staves would require too large a skew");
+        m_infoObject.import("message", "Merging these staves would require too large a rotate");
         return false;
     }
 
@@ -996,7 +995,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     staffZone->SetUly(uly);
     staffZone->SetLrx(lrx);
     staffZone->SetLry(lry);
-    staffZone->SetSkew(skew);
+    staffZone->SetRotate(rotate);
 
     fillLayer->ReorderByXPos();
 
@@ -1241,8 +1240,8 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     // Resize current staff and insert new one filling remaining area.
     int newUlx = x;
     int newLrx = staff->GetZone()->GetLrx();
-    int newUly = staff->GetZone()->GetUly() - ((x - staff->GetZone()->GetUlx()) * tan(staff->GetZone()->GetSkew() * M_PI / 180.0));
-    int newLry = staff->GetZone()->GetLry(); // don't need to maintain height since we're setting skew manually
+    int newUly = staff->GetZone()->GetUly() - ((x - staff->GetZone()->GetUlx()) * tan(staff->GetZone()->GetRotate() * M_PI / 180.0));
+    int newLry = staff->GetZone()->GetLry(); // don't need to maintain height since we're setting rotate manually
     std::vector<std::pair<std::string, std::string>> v;
 
     if (!this->Insert("staff", "auto", newUlx, newUly, newLrx, newLry, v)) {
@@ -1262,11 +1261,11 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         return false;
     }
 
-    splitStaff->GetZone()->SetSkew(staff->GetZone()->GetSkew());
+    splitStaff->GetZone()->SetRotate(staff->GetZone()->GetRotate());
 
     staff->GetZone()->SetLrx(x);
-    if (staff->GetZone()->GetSkew() != 0) {
-        staff->GetZone()->SetLry(staff->GetZone()->GetLry() + (newLrx - x) * tan(staff->GetZone()->GetSkew() * M_PI / 180.0));
+    if (staff->GetZone()->GetRotate() != 0) {
+        staff->GetZone()->SetLry(staff->GetZone()->GetLry() + (newLrx - x) * tan(staff->GetZone()->GetRotate() * M_PI / 180.0));
     }
 
     Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
@@ -1431,8 +1430,9 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     return true;
 }
 
-bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx, int lry)
+bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float rotate)
 {
+    LogMessage("ulx: %d, uly: %d, lrx: %d, lry %d, rotate %f", ulx, uly, lrx, lry, rotate);
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -1469,6 +1469,10 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         zone->SetUly(uly);
         zone->SetLrx(lrx);
         zone->SetLry(lry);
+        if (!isnan(rotate)) {
+            LogMessage("Rotate (%f) is not NaN", rotate);
+            zone->SetRotate(rotate);
+        }
         zone->Modify();
         staff->GetParent()->StableSort(StaffSort());
     }
@@ -1487,6 +1491,9 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         zone->SetUly(uly);
         zone->SetLrx(lrx);
         zone->SetLry(lry);
+        if (!isnan(rotate)) {
+            zone->SetRotate(rotate);
+        }
         zone->Modify();
     }
     else {
@@ -2335,70 +2342,6 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     return success1 && success2;
 }
 
-bool EditorToolkitNeume::ChangeSkew(std::string elementId, int dy, bool rightSide)
-{
-    m_infoObject.reset();
-    if (!m_doc->GetDrawingPage()) {
-        LogError("Could not get the drawing page");
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Could not get the drawing page.");
-        return false;
-    }
-    if (m_doc->GetType() != Facs) {
-        LogWarning("Resizing is only available in facsimile mode.");
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Resizing is only available in facsimile mode.");
-        return false;
-    }
-    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(elementId));
-    assert(staff);
-    if (staff == NULL) {
-        LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Either no element exists with ID '" +
-            elementId + "' or it is not a staff.");
-        return false;
-    }
-    if (!staff->HasFacs()) {
-        LogError("This staff does not have a facsimile.");
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "This staff does not have a facsimile.");
-        return false;
-    }
-    Zone *zone = staff->GetZone();
-    assert(zone);
-
-    // ~~ magic triangles ~~
-
-    int adj = zone->GetLrx() - zone->GetUlx();
-    double currentSkew = zone->GetSkew();
-    double newSkew = (atan((adj * tan(currentSkew * M_PI / 180.0) + (rightSide ? -dy : dy)) / adj)) * 180.0 / M_PI;
-
-    if (newSkew > 12 || newSkew < -12) {
-        LogError("Cannot set skew to be larger than 12 degrees");
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Cannot set skew to be larger than 12 degrees");
-        return false;
-    }
-    zone->SetSkew(newSkew);
-
-    if (rightSide) {
-        zone->SetLry(zone->GetLry() + dy);
-    }
-    else {
-        zone->SetUly(zone->GetUly() + dy);
-    }
-
-    zone->Modify();
-
-    staff->GetParent()->StableSort(StaffSort());
-
-    m_infoObject.import("status", "OK");
-    m_infoObject.import("message", "");
-    m_infoObject.import("skew", newSkew);
-    return true;
-}
-
 bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 {
     m_infoObject.reset();
@@ -2746,6 +2689,25 @@ bool EditorToolkitNeume::ParseResizeAction(
     return true;
 }
 
+bool EditorToolkitNeume::ParseResizeRotateAction(
+    jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry, float *rotate)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    *elementId = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::Number>("ulx")) return false;
+    *ulx = param.get<jsonxx::Number>("ulx");
+    if (!param.has<jsonxx::Number>("uly")) return false;
+    *uly = param.get<jsonxx::Number>("uly");
+    if (!param.has<jsonxx::Number>("lrx")) return false;
+    *lrx = param.get<jsonxx::Number>("lrx");
+    if (!param.has<jsonxx::Number>("lry")) return false;
+    *lry = param.get<jsonxx::Number>("lry");
+    if (!param.has<jsonxx::Number>("rotate")) return false;
+    *rotate = param.get<jsonxx::Number>("rotate");
+    return true;
+}
+
+
 bool EditorToolkitNeume::ParseGroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
@@ -2793,19 +2755,6 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
     }
     if (!param.has<jsonxx::String>("isLigature")) return false;
     (*isLigature) = param.get<jsonxx::String>("isLigature");
-
-    return true;
-}
-
-bool EditorToolkitNeume::ParseChangeSkewAction(
-    jsonxx::Object param, std::string *elementId, int *dy, bool *rightSide)
-{
-    if(!param.has<jsonxx::String>("elementId")) return false;
-    (*elementId) = param.get<jsonxx::String>("elementId");
-    if(!param.has<jsonxx::Number>("dy")) return false;
-    (*dy) = param.get<jsonxx::Number>("dy");
-    if(!param.has<jsonxx::Boolean>("rightSide")) return false;
-    (*rightSide) = param.get<jsonxx::Boolean>("rightSide");
 
     return true;
 }
@@ -2884,7 +2833,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         const int pitchDifference = round((double) (staff->GetZone()->GetUly() +
             (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
             centerY - ((centerX - staff->GetZone()->GetUlx()) *
-            tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
+            tan(staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));
 
         pi->AdjustPitchByOffset(pitchDifference);
         return true;
@@ -2945,7 +2894,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             int pitchDifference = round((double) (staff->GetZone()->GetUly() +
                 (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
                 fi->GetZone()->GetUly() - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
-                tan(staff->GetDrawingSkew() * M_PI / 180.0))) / (double) (staffSize));
+                tan(staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));
 
             pi->AdjustPitchByOffset(pitchDifference);
         }
@@ -2976,7 +2925,7 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
     const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     int yDiff = clef->GetZone()->GetUly() - staff->GetZone()->GetUly()
         + (clef->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
-        tan(staff->GetDrawingSkew() * M_PI / 180.0);
+        tan(staff->GetDrawingRotate() * M_PI / 180.0);
     int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
     clef->SetLine(clefLine);
     return true;

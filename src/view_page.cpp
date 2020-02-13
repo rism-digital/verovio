@@ -1017,12 +1017,12 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     double d;
 
     if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
-        d = staff->GetDrawingSkew();
+        d = staff->GetDrawingRotate();
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();
         y1 = ToLogicalY(staff->GetDrawingY());
         staff->AdjustDrawingStaffSize();
-        y2 = y1 + staff->GetWidth() * tan(d * M_PI / 180.0);
+        y2 = y1 - staff->GetWidth() * tan(d * M_PI / 180.0);
     }
     else {
         x1 = measure->GetDrawingX();

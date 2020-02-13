@@ -73,11 +73,11 @@ public:
     ///@{
     virtual int GetDrawingY() const;
     virtual int GetDrawingX() const;
-    virtual double GetDrawingSkew() const;
+    virtual double GetDrawingRotate() const;
     ///@}
 
     /**
-     * Adjust drawingStaffSize based on skew angle
+     * Adjust drawingStaffSize based on rotate angle
      */
     void AdjustDrawingStaffSize();
 

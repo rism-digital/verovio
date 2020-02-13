@@ -44,7 +44,15 @@ int FacsimileInterface::GetDrawingX() const
 int FacsimileInterface::GetDrawingY() const
 {
     assert(m_zone);
-    int y = (m_zone->GetLogicalUly());
+    int y;
+    if (m_zone->GetRotate() >= 0) {
+        y = m_zone->GetLogicalUly();
+    }
+    else {
+        y = m_zone->GetLogicalUly() -
+            (m_zone->GetLrx() - m_zone->GetUlx()) *
+            tan(m_zone->GetRotate() * M_PI / 180.0);
+    }
     return y;
 }
 
@@ -60,14 +68,14 @@ int FacsimileInterface::GetHeight() const
     return m_zone->GetLogicalLry() - m_zone->GetLogicalUly();
 }
 
-double FacsimileInterface::GetDrawingSkew() const
+double FacsimileInterface::GetDrawingRotate() const
 {
-    // this method should only be called in staff->GetDrawingSkew()
-    // since this method cannot validate the m_useSkew option
-    // while the staff->GetDrawingSkew() method can
+    // this method should only be called in staff->GetDrawingRotate()
+    // since this method cannot validate the m_useRotate option
+    // while the staff->GetDrawingRotate() method can
 
     assert(m_zone);
-    return m_zone->GetSkew();
+    return m_zone->GetRotate();
 }
 
 int FacsimileInterface::GetSurfaceY() const
