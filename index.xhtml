@@ -11,7 +11,9 @@ projects:
     - [["http://dme.mozarteum.at/DME/main/index.php", "dme"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], ["http://www.gluck-gesamtausgabe.de/impressum.html", "gga"]]
     - [["http://opac.sbn.it/opacsbn/opac/iccu/musica.jsp", "iccu"],["http://www.tassomusic.org/", "tasso"], ["https://www.bach-digital.de", "bach"]]
     - [["http://folksong.eu", "folk-song-index"], ["http://mac.kaist.ac.kr/research.html", "kaist-maclab"], ["http://www.motetcycles.com/", "mcb"]]
-    - [["http://ricercar.cesr.univ-tours.fr/", "cesr"], ["http://measuringpolyphony.org/", "measuringpolyphony"], []]
+    - [["http://ricercar.cesr.univ-tours.fr/", "cesr"], ["http://measuringpolyphony.org/", "measuringpolyphony"], ["https://www.audiolabs-erlangen.de/resources/MIR/2018-ISMIR-LBD-Carus", "audiolabs"]]
+    - [["https://nomadplay-app.com/", "nomadplay"], ["https://trompamusic.eu/", "trompa"], ["https://koha-community.org/", "koha"]]
+    - [["https://vitry.org/", "vitry"], [], []]
 ---
 <div class="row home-row home-row-flex">
     <div class="col-md-5 col-sm-12">
@@ -50,9 +52,9 @@ projects:
 </div>
 
 <div class="row home-row">
-    <div class="col-md-6 col-sm-12">
+    <div class="col-md-7 col-sm-12">
         <h4>News</h4>
-        {% for p in site.posts limit:4 %}
+        {% for p in site.posts limit:3 %}
         <hr class="news-row"/>
         <h5>{{ p.date | date: '%B %d, %Y' }} – {{ p.title }}</h5>
         <div class="content">
@@ -64,11 +66,11 @@ projects:
             <a href="news.xhtml">See all news ...</a>
         </p>
     </div>
-    <div class="col-md-6 col-sm-12">  
+    <div class="col-md-5 col-sm-12">  
         <hr class="hidden-lg hidden-md"/>
         
         <p>
-            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> with the support of the Swiss National Science Foundation. The project receives dedicated financial support from the Digital Mozart Edition, a joint project of the Salzburg Mozarteum Foundation and the Packard Humanities Institute, Los Altos/CA. It also receives in-kind support from the Saxon Academy of Sciences in Leipzig.
+            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> with the support of the Swiss National Science Foundation. The project receives dedicated financial support from the Digital Mozart Edition, a joint project of the Salzburg Mozarteum Foundation and the Packard Humanities Institute, Los Altos/CA. It also received in-kind support from the Saxon Academy of Sciences in Leipzig from 2017 to 2019.
         </p>
         
         <div style="float: right;">
@@ -93,18 +95,16 @@ projects:
                         <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" class="support-logo img-responsive"/>
                     </a>
                 </td>
-            </tr>
-            <tr>
                 <td>
                     <a href="http://www.mozarteum.at" target="_blank">
                         <img alt="Mozarteum logo" src="{{ site.baseurl }}/images/mozarteum.png" class="support-logo img-responsive"/>
                     </a>
                 </td>
-                <td>
+                <!--><td>
                     <a href="http://www.mozarteum.at" target="_blank">
                         <img alt="SNF logo" src="{{ site.baseurl }}/images/saw.png" class="support-logo img-responsive"/>
                     </a>
-                </td>
+                </td>-->
             </tr>
         </table>
         
@@ -174,7 +174,7 @@ projects:
                 Verovio is designed to be usable in a wide range of technical environments (<a href="{{ site.baseurl }}/command-line.xhtml">C++</a>, <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript</a>, <a href="{{ site.baseurl }}/python.xhtml">Python</a>).
             </p>
             <p>
-                It works on desktop computers but also tablets and mobile devices. Verovio also provides basic support for other music notation format, such as <a href="{{ site.baseurl }}/musicxml.xhtml">MusicXML import</a> and <a href="{{ site.baseurl }}/midi.xhtml">MIDI output</a>.
+                It works on desktop computers but also tablets and mobile devices. Verovio also provides basic support for other music notation format, such as <a href="{{ site.baseurl }}/musicxml.html">MusicXML import</a> and <a href="{{ site.baseurl }}/midi.xhtml">MIDI output</a>.
             </p>
         </div>
     </div>

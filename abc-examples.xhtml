@@ -1,0 +1,227 @@
+---
+layout: verovio
+verovio-light: true
+title: Verovio ABC Examples
+active: other-formats
+other-active: abc-examples
+version-footer: true
+---
+
+<script type="text/javascript">
+//<![CDATA[
+
+    var zoom = 40;
+    var pageHeight = 2000;
+    var pageWidth = 2000;
+    var spacingStaff = 0;
+    var border = 20;
+    var adjustPageHeight = 1;
+    var vrvToolkit = new verovio.toolkit();
+
+    function load_data(data, output_div) {
+        options = {
+                    inputFormat: 'abc',
+                    breaks: 'encoded',
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    adjustPageHeight: adjustPageHeight,
+                    spacingStaff: spacingStaff,
+                    pageMarginLeft: border,
+                    pageMarginRight: border,
+                    scale: zoom
+                };
+        var svg = vrvToolkit.renderData( data + "\n", options );
+        console.log( options );
+        output_div.html(svg);
+    }
+
+    var examples = [
+
+"X: 99\n\
+T:Short tune\n\
+C:K. Rettinghaus\n\
+M:4/4\n\
+L:1/4\n\
+K:G\n\
+D|G>ABG|A>BAD|G>ABA|G3|]",
+
+"X: 99\n\
+T:Short tune\n\
+C:K. Rettinghaus\n\
+M:4/4\n\
+L:1/4\n\
+Q:\"Andante\"\n\
+K:G\n\
+\"D\"!mf!D|\"G\"G>A \"Em\"B {/A/}G|\"Am\"A>B \"D7\"A{/E/}D|\"G\"G>A \"C\"B \"D\"A|\"G\"G3|]",
+
+"X:1\n\
+T:Dusty Miller, The\n\
+T:Binny's Jig\n\
+C:Trad.\n\
+R:DH\n\
+M:3/4\n\
+K:G\n\
+B>cd BAG|FA Ac BA|B>cd BAG|DG GB AG:|\n\
+Bdd gfg|aA Ac BA|Bdd gfa|gG GB AG:|\n\
+BG G/2G/2G BG|FA Ac BA|BG G/2G/2G BG|DG GB AG:|",
+
+"X:2\n\
+T:Old Sir Simon the King\n\
+C:Trad.\n\
+S:Offord MSS          % from Offord manuscript\n\
+N:see also Playford   % reference note\n\
+M:9/8\n\
+R:SJ                  % slip jig\n\
+N:originally in C     % transcription note\n\
+K:G\n\
+D|GFG GAG G2D|GFG GAG F2D|EFE EFE EFG|A2G F2E D2:|\n\
+D|GAG GAB d2D|GAG GAB c2D|[1 EFE EFE EFG|A2G F2E D2:|\\\ % no line-break in score\n\
+M:12/8                % change of meter\n\
+[2 E2E EFE E2E EFG|\\\  % no line-break in score\n\
+M:9/8                 % change of meter\n\
+A2G F2E D2|]",
+
+"X:1\n\
+T:Broken rhythm markers\n\
+M:C\n\
+K:C\n\
+A>A A2>A2 A>>A A2>>>A2|]",
+
+"X:1\n\
+T:Ties and Slurs\n\
+M:C\n\
+K:C\n\
+(AA) (A(A)A) ((AA)A) (A|A) A-A A-A-A A2-|A4|]",
+
+"X:1\n\
+T:Accidentals\n\
+M:C\n\
+K:C\n\
+__A _A =A ^A ^^A|]",
+
+"X:1\n\
+T:Chords\n\
+M:2/4\n\
+K:C\n\
+[CEGc] [C2G2] [CE][DF]|[D2F2][EG][FA] [A4d4]|]",
+
+    ];
+
+
+//]]>
+</script>
+
+<div class="row">
+
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include other-sidebar.html %}
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="panel-body">
+
+            <h3>ABC Music Input</h3>
+
+            <p>
+                Abc is a text-based music notation system originally designed for use with folk and traditional tunes and used throughout the web. You can find the documentation on the <a href="http://abcnotation.com/wiki/abc:standard" target="_blank">ABC notation</a> website.
+            </p>
+            <p>
+                The following examples show some features of the ABC importer. They are all rendered dynamically in the web-browser with the <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version of Verovio.
+            </p>
+
+            <h4>Example</h4>
+            <p>
+                Let's start with a simple little tune.
+            </p>
+            <div id="svg_abc0" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc0"></code></pre></div>
+            </p>
+            <p>
+                Verovio takes several information fields into account, e.g. the reference number <code>X</code>, the tune title <code>T</code>, the meter <code>M</code>, the unit note length <code>L</code>, the key <code>K</code>.
+                As you can see, Verovio prints the header as expected by default. You may suppress this behaviour with the <code>--no-header</code> option.
+            </p>
+            <p>
+                Now let's add a literal tempo as well as some grace notes and chord symbols. Dynamics are also very important!
+                Note that chord symbols are put above the melody.
+            </p>
+            <div id="svg_abc1" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc1"></code></pre></div>
+            </p>
+            <p>
+                With the option <code>breaks: 'encoded'</code> Verovio keeps the encoded layout, as you can see on this page. The default value is <code>'auto'</code>, which lets Verovio to decide where to put a line-break.
+            </p>
+            <div id="svg_abc2" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc2"></code></pre></div>
+            </p>
+            <p>
+                Alternatively it is always possible to suppress score line-breaks. Meter changes are also supported.
+            </p>
+            <div id="svg_abc3" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc3"></code></pre></div>
+            </p>
+
+            <h4>Broken rhythm markers</h4>
+            <div id="svg_abc4" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc4"></code></pre></div>
+            </p>
+
+            <h4>Ties and slurs</h4>
+            <div id="svg_abc5" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc5"></code></pre></div>
+            </p>
+            <p>
+                Verovio correctly differentiates between ties and slurs.
+            </p>
+
+            <h4>Accidentals</h4>
+            <div id="svg_abc6" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc6"></code></pre></div>
+            </p>
+
+            <h4>Chords</h4>
+            <div id="svg_abc7" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="code_abc7"></code></pre></div>
+            </p>
+
+            <h4>Known limitations</h4>
+            <ul>
+              <li>Verovio imports only the first tune in a collection</li>
+              <li>Tuplets are not supported</li>
+              <li>User defined symbols are not supported</li>
+              <li>Multi-voice music is not supported</li>
+              <li>Lyrics are not supported yet</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+    $( document ).ready(function() {
+
+        // adjust the zoom for small screens
+        width = $('#svg_abc1').width();
+        if ( width < zoom * pageWidth / 100 ) {
+            zoom = width * 100 / pageWidth;
+        }
+
+        for (i = 0; i < examples.length; i++) {
+            load_data( examples[i], $('#svg_abc' + i) );
+            $('#code_abc' + i).html( examples[i] );
+        }
+
+    });
+//]]>
+</script>

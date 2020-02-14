@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-5b37cd0
+Verovio 2.6.0-dev-a14424e-dirty
 
 Example usage:
 
@@ -8,7 +8,7 @@ Options (marked as * are repeatable)
  -                     Use "-" as input file for reading from the standard input
  -?, --help            Display this message
  -a, --all-pages       Output all pages
- -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)
+ -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)
  -o, --outfile <s>     Output file name (use "-" for standard output)
  -p, --page <i>        Select the page to engrave (default is 1)
  -r, --resources <s>   Path to SVG resources (default is /usr/local/share/verovio)
@@ -20,23 +20,39 @@ Options (marked as * are repeatable)
 Input and page layout options
  --adjust-page-height              Crop the page height to the height of the content
  --breaks <s>                      Define page and system breaks layout (default: "auto"; other values: "none", "encoded")
+ --condense-encoded                Condense encoded layout rendering
+ --condense-first-page             When condensing a score also condense the first page
+ --condense-tempo-pages            When condensing a score also condense pages with a tempo change
  --even-note-spacing               Specify the linear spacing factor
  --hum-type                        Include type attributes when importing from Humdrum
+ --justify-include-last-page       Justify including the last page
+ --justify-systems-only            Justify systems only and not staves
+ --justify-vertically              Justify spacing vertically to fill the page
  --landscape                       The landscape paper orientation flag
  --mensural-to-measure             Convert mensural sections to measure-based MEI
+ --min-last-justification <f>      The last system is only justified if the unjustified width is greater than this percent (default: 0.80; min: 0.00; max: 1.00)
  --mm-output                       Specify that the output in the SVG is given in mm (default is px)
- --no-footer                       Do not add any footer
- --no-header                       Do not add any header
+ --footer <s>                      Control footer layout (default: "auto"; other values: "none", "encoded")
+ --header <s>                      Control header layout (default: "auto"; other values: "none", "encoded")
  --no-justification                Do not justify the system
+ --open-control-events             Render open control events
+ --output-smufl-xml-entities       Output SMuFL charachters as XML entities instead of byte codes
  --page-height <i>                 The page height (default: 2970; min: 100; max: 60000)
  --page-margin-bottom <i>          The page bottom margin (default: 50; min: 0; max: 500)
  --page-margin-left <i>            The page left margin (default: 50; min: 0; max: 500)
  --page-margin-right <i>           The page right margin (default: 50; min: 0; max: 500)
  --page-margin-top <i>             The page top margin (default: 50; min: 0; max: 500)
  --page-width <i>                  The page width (default: 2100; min: 100; max: 60000)
+ --expand <s>                      Expand all referenced elements in the expansion <xml:id> (default: "")
+ --svg-bounding-boxes              Include bounding boxes in SVG output
+ --svg-view-box                    Use viewBox on svg root element for easy scaling of document
  --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
+ --use-facsimile                   Use information in the <facsimile> element to control the layout
+ --use-pg-footer-for-all           Use the pgFooter for all pages
+ --use-pg-header-for-all           Use the pgHeader for all pages
 
 General layout options
+ --midi-tempo-adjustment <f>       The MIDI tempo adjustment factor (default: 1.00; min: 0.20; max: 4.00)
  --bar-line-width <f>              The barLine width (default: 0.30; min: 0.10; max: 0.80)
  --beam-max-slope <i>              The maximum beam slope (default: 10; min: 1; max: 20)
  --beam-min-slope <i>              The minimum beam slope (default: 0; min: 0; max: 0)
@@ -45,40 +61,52 @@ General layout options
  --grace-rhythm-align              Align grace notes rhythmically with all staves
  --grace-right-align               Align the right position of a grace group with all staves
  --hairpin-size <f>                The haripin size in MEI units (default: 3.00; min: 1.00; max: 8.00)
- --left-position <f>               The left position (default: 0.80; min: 0.00; max: 2.00)
+ --lyric-hyphen-length <f>         The lyric hyphen and dash length (default: 1.20; min: 0.50; max: 3.00)
  --lyric-hyphen-width <f>          The lyric hyphen and dash width (default: 0.20; min: 0.10; max: 0.50)
+ --lyric-no-start-hyphen           Do not show hyphens at the beginning of a system
  --lyric-size <f>                  The lyrics size in MEI units (default: 4.50; min: 2.00; max: 8.00)
  --lyric-top-min-margin <f>        The minmal margin above the lyrics in MEI units (default: 2.00; min: 0.00; max: 8.00)
+ --lyric-word-space <f>            The lyric word space length (default: 1.20; min: 0.50; max: 3.00)
  --min-measure-width <i>           The minimal measure width in MEI units (default: 15; min: 1; max: 30)
  --measure-number <s>              The measure numbering rule (unused) (default: "system"; other values: "interval")
+ --slur-control-pointsr <i>        Slur control points - higher value means more curved at the end (default: 5; min: 1; max: 10)
+ --slur-curve-factor <i>           Slur curve factor - high value means rounder slurs (default: 10; min: 1; max: 100)
+ --slur-height-factor <i>          Slur height factor -  high value means flatter slurs (default: 5; min: 1; max: 100)
  --slur-min-height <f>             The minimum slur height in MEI units (default: 1.20; min: 0.30; max: 2.00)
- --slur-max-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 4.00)
+ --slur-max-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 6.00)
+ --slur-max-slope <i>              The maximum slur slope in degrees (default: 20; min: 0; max: 45)
  --slur-thickness <f>              The slur thickness in MEI units (default: 0.60; min: 0.20; max: 1.20)
+ --spacing-dur-detection           Detect long duration for adjusting spacing
  --spacing-linear <f>              Specify the linear spacing factor (default: 0.25; min: 0.00; max: 1.00)
  --spacing-non-linear <f>          Specify the non-linear spacing factor (default: 0.60; min: 0.00; max: 1.00)
  --spacing-staff <i>               The staff minimal spacing in MEI units (default: 8; min: 0; max: 24)
  --spacing-system <i>              The system minimal spacing in MEI units (default: 3; min: 0; max: 12)
  --staff-line-width <f>            The staff line width in unit (default: 0.15; min: 0.10; max: 0.30)
  --stem-width <f>                  The stem width (default: 0.20; min: 0.10; max: 0.50)
+ --system-divider <s>              The display of system dividers (default: "left"; other values: "none", "left-right")
  --tie-thickness <f>               The tie thickness in MEI units (default: 0.50; min: 0.20; max: 1.00)
 
-Element selectors
+Element selectors and processing
  --app-x-path-query* <s>           Set the xPath query for selecting <app> child elements, for example: "./rdg[contains(@source, 'source-id')]"; by default the <lem> or the first <rdg> is selected
  --choice-x-path-query* <s>        Set the xPath query for selecting <choice> child elements, for example: "./orig"; by default the first child is selected
  --mdiv-x-path-query <s>           Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered (default: "")
+ --subst-x-path-query* <s>         Set the xPath query for selecting <subst> child elements, for example: "./del"; by default the first child is selected
+ --transpose <s>                   SUMMARY (default: "")
+ --transpose-selected-only         Transpose only the selected content and ignore unselected editorial content
 
 Element margins
  --default-bottom-margin <f>       The default bottom margin (default: 0.50; min: 0.00; max: 5.00)
  --default-left-margin <f>         The default left margin (default: 0.00; min: 0.00; max: 2.00)
  --default-right-margin <f>        The default right margin (default: 0.00; min: 0.00; max: 2.00)
  --default-top-margin <f>          The default top margin (default: 0.50; min: 0.00; max: 6.00)
+ --bottom-margin-harm <f>          The margin for harm in MEI units (default: 0.50; min: 0.00; max: 10.00)
  --left-margin-accid <f>           The margin for accid in MEI units (default: 1.00; min: 0.00; max: 2.00)
  --left-margin-bar-line <f>        The margin for barLine in MEI units (default: 0.00; min: 0.00; max: 2.00)
  --left-margin-beat-rpt <f>        The margin for beatRpt in MEI units (default: 2.00; min: 0.00; max: 2.00)
  --left-margin-chord <f>           The margin for chord in MEI units (default: 1.00; min: 0.00; max: 2.00)
  --left-margin-clef <f>            The margin for clef in MEI units (default: 1.00; min: 0.00; max: 2.00)
  --left-margin-key-sig <f>         The margin for keySig in MEI units (default: 1.00; min: 0.00; max: 2.00)
- --left-margin-left-bar-line <f>   The margin for left barLine in MEI units (default: 0.00; min: 0.00; max: 2.00)
+ --left-margin-left-bar-line <f>   The margin for left barLine in MEI units (default: 1.00; min: 0.00; max: 2.00)
  --left-margin-mensur <f>          The margin for mensur in MEI units (default: 1.00; min: 0.00; max: 2.00)
  --left-margin-meter-sig <f>       The margin for meterSig in MEI units (default: 1.00; min: 0.00; max: 2.00)
  --left-margin-m-rest <f>          The margin for mRest in MEI units (default: 0.00; min: 0.00; max: 2.00)
@@ -104,3 +132,4 @@ Element margins
  --right-margin-note <f>           The right margin for note in MEI units (default: 0.00; min: 0.00; max: 2.00)
  --right-margin-rest <f>           The right margin for rest in MEI units (default: 0.00; min: 0.00; max: 2.00)
  --right-margin-right-bar-line <f> The right margin for right barLine in MEI units (default: 0.00; min: 0.00; max: 2.00)
+ --top-margin-harm <f>             The margin for harm in MEI units (default: 0.50; min: 0.00; max: 10.00)

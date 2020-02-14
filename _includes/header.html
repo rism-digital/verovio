@@ -26,6 +26,9 @@
                 <li {% if page.active == "mei-viewer" %}class="active"{% endif %}>
                     <a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a>
                 </li>
+                <li {% if page.active == "app" %}class="active"{% endif %}>
+                    <a href="{{ site.baseurl }}/app.html">Verovio App</a>
+                </li>
                 <li {% if page.active == "other-formats" %}class="active"{% endif %}>
                     <a href="{{ site.baseurl }}/musicxml.html">Other formats</a>
                 </li>
@@ -38,9 +41,6 @@
                     </ul>
                 </li>
                 -->
-                <li {% if page.active == "download" %}class="active"{% endif %}>
-                    <a href="{{ site.baseurl }}/download.xhtml">Download</a>
-                </li>
               </ul>
         </div>
         <!-- /.navbar-collapse -->

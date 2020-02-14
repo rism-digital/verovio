@@ -54,7 +54,8 @@ downloads:
     var pdfOrientation = "portrait";
     var savedOptions = undefined;
     var customOptions = undefined;
-    var disabledOptions = ["adjustPageHeight", "breaks", "landscape", "pageHeight", "pageWidth", "mmOutput", "noFooter"];
+    var target = "";
+    var disabledOptions = ["adjustPageHeight", "breaks", "landscape", "pageHeight", "pageWidth", "mmOutput", "footer"];
 
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
@@ -81,7 +82,7 @@ downloads:
                     breaks: "auto",
                     inputFormat: format,
                     mmOutput: "false",
-                    noFooter: "true",
+                    footer: "none",
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     scale: zoom
@@ -103,6 +104,8 @@ downloads:
 
     function upload_file() {
 
+        format = 'mei';
+        $("#mei_download").hide();
         $('#submit-btn').popover('hide');
         var f = $("#mei_files").prop('files')[0];
         var reader = new FileReader();
@@ -136,7 +139,17 @@ downloads:
             else {
                 $("#total_text").html(vrvToolkit.getPageCount());
                 page = 1;
+                var pageTarget = 0;
+                if (target != "") {
+                    pageTarget = vrvToolkit.getPageWithElement(target.substr(1));
+                    if (pageTarget != 0) {
+                        page = pageTarget;
+                    }
+                }
                 load_page();
+                if (pageTarget != 0) {
+                    $(target).attr("fill", "#d00").attr("stroke", "#d00");
+                }
                 $("#play-button").show();
                 $("#pdf-button").show();
                 $("#options-button").show();
@@ -415,7 +428,7 @@ downloads:
                     adjustPageHeight: false,
                     breaks: "auto",
                     mmOutput: true,
-                    noFooter: false,
+                    footer: "auto",
                     pageHeight: pdfHeight,
                     pageWidth: pdfWidth,
                     scale: 100
@@ -606,10 +619,10 @@ downloads:
         </button>
         <div class="btn-group">
             <button id="pdf-button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#pdfDialog" type="button" data-loading-text="Generating PDF..." style="display: none;">
-                <span>PDF </span><span class="glyphicon glyphicon-book"/>
+                <span class="hidden-xs">PDF </span><span class="glyphicon glyphicon-book"/>
             </button>
-            <button id="options-button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#optionDialog" type="button" data-loading-text="Style editor..." style="display: none;">
-                <span>Options </span><span class="glyphicon glyphicon-wrench"/>
+            <button id="options-button" class="btn btn-sm btn-default hidden-xs" data-toggle="modal" data-target="#optionDialog" type="button" data-loading-text="Style editor..." style="display: none;">
+                <span class="hidden-xs">Options </span><span class="glyphicon glyphicon-wrench"/>
             </button>
             <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button" style="display: none;">
                 <span class="glyphicon glyphicon-volume-up"/>
@@ -773,12 +786,15 @@ downloads:
             if (!file || (file.length == 0)) {
                 file = "examples/downloads/Chopin_Etude_op.10_no.9.mei";
             }
+            else {
+                target = window.location.hash;
+            }
             $("#overlay").show();
             $.ajax({
                 url: file
                 , dataType: "text"
                 , success: function(data) {
-                    outputFilename = file.replace(/^.*[\\\/]/, '')
+                    outputFilename = file.replace(/^.*[\\\/]/, '');
                     load_data( data );
                 }
             });

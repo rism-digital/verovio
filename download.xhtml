@@ -2,48 +2,58 @@
 layout: verovio
 verovio-light: true
 title: Verovio – Download
-active: download
+active: how
+how-active: how-download
 ---
 
-<div class="panel-body">
+<div class="row">
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include how-sidebar.html %}
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel-body">
 
-    <table>
-        <tr>
-            <td>
-                <img src="{{ site.baseurl }}/images/github.png" style="padding: 0px 5px;"/>
-            </td>
-            <td>
-                Verovio source code is available on GitHub at <a href="https://github.com/rism-ch/verovio">https://github.com/rism-ch/verovio</a>
-            </td>
-        </tr>
-    </table> 
+            <table>
+                <tr>
+                    <td>
+                        <img src="{{ site.baseurl }}/images/github.png" style="padding: 0px 5px;"/>
+                    </td>
+                    <td>
+                        Verovio source code is available on GitHub at <a href="https://github.com/rism-ch/verovio">https://github.com/rism-ch/verovio</a>
+                    </td>
+                </tr>
+            </table> 
     
-    <h4>Wiki</h4>
-    <p>
-        The  GitHub repository also includes a Wiki with specific documentation <a href="https://github.com/rism-ch/verovio/wiki">https://github.com/rism-ch/verovio/wiki</a> 
-    </p>
+            <h4>Wiki</h4>
+            <p>
+                The  GitHub repository also includes a Wiki with specific documentation <a href="https://github.com/rism-ch/verovio/wiki">https://github.com/rism-ch/verovio/wiki</a> 
+            </p>
     
-    <h4>JavaScript toolkit</h4>
-    <p>
-        The  GitHub repository also provides a compiled version of the JavaScript toolkit for each release at <a href="https://github.com/rism-ch/verovio/releases">https://github.com/rism-ch/verovio/releases</a> 
-    </p>
-    <p>
-        Instructions for using the JavaScript toolkit are given on the <a href="{{ site.baseurl }}/javascript.xhtml">toolkit page</a>.
-    </p>
-    <p>
-        The latest release is always available from:
-    </p>
-    {% highlight bash %}http://www.verovio.org/javascript/latest/verovio-toolkit.js{% endhighlight %}
-    <p>
-        The latest development version is available from:
-    </p>
-    {% highlight bash %}http://www.verovio.org/javascript/develop/verovio-toolkit.js{% endhighlight %}
-    <p>
-        Previous releases are available from their corresponding directory, e.g.:
-    </p>
-    {% highlight bash %}http://www.verovio.org/javascript/0.9.9/verovio-toolkit.js{% endhighlight %}
+            <h4>JavaScript toolkit</h4>
+            <p>
+                The  GitHub repository also provides a compiled version of the JavaScript toolkit for each release at <a href="https://github.com/rism-ch/verovio/releases">https://github.com/rism-ch/verovio/releases</a> 
+            </p>
+            <p>
+                Instructions for using the JavaScript toolkit are given on the <a href="{{ site.baseurl }}/javascript.xhtml">toolkit page</a>.
+            </p>
+            <p>
+                The latest release is always available from:
+            </p>
+            {% highlight bash %}http://www.verovio.org/javascript/latest/verovio-toolkit.js{% endhighlight %}
+            <p>
+                The latest development version is available from:
+            </p>
+            {% highlight bash %}http://www.verovio.org/javascript/develop/verovio-toolkit.js{% endhighlight %}
+            <p>
+                Previous releases are available from their corresponding directory, e.g.:
+            </p>
+            {% highlight bash %}http://www.verovio.org/javascript/0.9.9/verovio-toolkit.js{% endhighlight %}
+        </div>
+    </div>
 </div>
-
 
 <script type="text/javascript">
 //<![CDATA[

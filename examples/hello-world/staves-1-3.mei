@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title></title>
+            </titleStmt>
+            <pubStmt></pubStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="3" meter.unit="4">
+                        <staffGrp>
+                        	<staffGrp symbol="bracket">
+                            	<staffDef n="1" lines="5" clef.line="2" clef.shape="G">
+                                	<label>Oboe, I, II</label>
+                                </staffDef>
+                           		<staffDef n="2" lines="5" clef.line="4" clef.shape="F">
+                                	<label>Fagotto, I, II</label>
+                                </staffDef>
+                        	</staffGrp>
+                        	<staffGrp symbol="bracket">
+                            	<staffDef n="3" lines="5" clef.line="2" clef.shape="G">
+                                	<label>Corno, I, II<lb/>in Do|C</label>
+                                </staffDef>
+                        	</staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1" xml:id="m1s1l1">
+                                    <beam>
+                                    	<note pname="c" dur="8" oct="5"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="c" dur="32" oct="5"></note>
+                                    </beam>
+                                    <beam>
+                                    	<note pname="e" dur="8" oct="5"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="e" dur="32" oct="5"></note>
+                                    </beam>
+                                    <beam>
+                                    	<note pname="a" dur="8" oct="5"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="a" dur="32" oct="5"></note>
+                                    </beam>
+                                </layer>
+                                <layer n="2" xml:id="m1s1l2">
+                                    <beam>
+                                    	<note pname="c" dur="8" oct="5"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="c" dur="32" oct="5"></note>
+                                    </beam>
+                                    <beam>
+                                    	<note pname="e" dur="8" oct="5"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="e" dur="32" oct="5"></note>
+                                    </beam>
+                                    <beam>
+                                    	<note pname="a" dur="8" oct="5"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="a" dur="32" oct="5"></note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1" xml:id="m1s2l1">
+                                    <beam>
+                                    	<note pname="c" dur="8" oct="3"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="c" dur="32" oct="3"></note>
+                                    </beam>
+                                    <beam>
+                                    	<note pname="e" dur="8" oct="3"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="e" dur="32" oct="3"></note>
+                                    </beam>
+                                    <beam>
+                                    	<note pname="a" dur="8" oct="3"></note>
+                                        <rest dur="16" dots="1"></rest>
+                                        <note pname="a" dur="32" oct="3"></note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1" xml:id="m1s3l1">
+                                    <beam>
+                                        <chord dur="8">
+                                        	<note pname="c" oct="5"></note>
+                                            <note pname="c" oct="4"></note>
+                                        </chord>
+                                    	<rest dur="16" dots="1"></rest>
+                                        <chord dur="32">
+                                        	<note pname="c" oct="5"></note>
+                                            <note pname="c" oct="4"></note>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                    	<chord dur="8">
+                                        	<note pname="e" oct="5"></note>
+                                            <note pname="e" oct="4"></note>
+                                        </chord>
+                                    	<rest dur="16" dots="1"></rest>
+                                        <chord dur="32">
+                                        	<note pname="e" oct="5"></note>
+                                            <note pname="e" oct="4"></note>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                    	<chord dur="8">
+                                        	<note pname="c" oct="5"></note>
+                                            <note pname="c" oct="4"></note>
+                                        </chord>
+                                    	<rest dur="16" dots="1"></rest>
+                                        <chord dur="32">
+                                        	<note pname="c" oct="5"></note>
+                                            <note pname="c" oct="4"></note>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <tempo tstamp="1" staff="1">Adagio</tempo>
+                            <dynam tstamp="1" staff="1 2 3">f</dynam>
+                            <dir staff="2" tstamp="1" place="above"><rend fontstyle="italic">a 2</rend></dir>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
