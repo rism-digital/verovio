@@ -789,7 +789,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
 
                 // Apply offset due to rotate
-                newUly += (newUlx - ulx) * tan(staff->GetDrawingRotate() * M_PI / 180.0);
+                newUly += (newUlx - ulx) * tan(-staff->GetDrawingRotate() * M_PI / 180.0);
                 newZone->SetUlx(newUlx);
                 newZone->SetUly(newUly);
                 ;
@@ -842,7 +842,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         clef->SetShape(clefShape);
         const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         int yDiff = -staff->GetZone()->GetUly() + uly;
-        yDiff += ((ulx - staff->GetZone()->GetUlx())) * tan(staff->GetDrawingRotate() * M_PI / 180.0); // Subtract distance due to rotate.
+        yDiff += ((ulx - staff->GetZone()->GetUlx())) * tan(-staff->GetDrawingRotate() * M_PI / 180.0); // Subtract distance due to rotate.
         int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
         clef->SetLine(clefLine);
 
@@ -2886,7 +2886,11 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             pi->SetPname(pname);
             pi->SetOct(3);
 
-            int pitchDifference = round((double) (staff->GetZone()->GetUly() +
+            /*int pitchDifference = round((double) (staff->GetZone()->GetUly() +
+                (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
+                fi->GetZone()->GetUly() - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
+                tan(-staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));*/
+            int pitchDifference = round((double) (staff->GetDrawingY() +
                 (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) -
                 fi->GetZone()->GetUly() - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx()) *
                 tan(-staff->GetDrawingRotate() * M_PI / 180.0))) / (double) (staffSize));
