@@ -278,7 +278,7 @@ void BeamSegment::CalcBeamInit(
     // x-offset values for stem bases, dx[y] where y = element->m_cueSize
     beamInterface->m_stemXAbove[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
         - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    beamInterface->m_stemXBelow[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
+    beamInterface->m_stemXAbove[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
         - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     beamInterface->m_stemXBelow[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     beamInterface->m_stemXBelow[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
