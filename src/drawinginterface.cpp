@@ -164,14 +164,6 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         }
         currentStaff = staff;
 
-        if (current->Is({ CHORD, NOTE })) {
-            StemmedDrawingInterface *interface = current->GetStemmedDrawingInterface();
-            assert(interface);
-            Stem *stem = interface->GetDrawingStem();
-            // This can be NULL but should not
-            m_beamElementCoords.at(elementCount)->m_stem = stem;
-        }
-
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
             // look at the stemDir to see if we have multiple stem Dir

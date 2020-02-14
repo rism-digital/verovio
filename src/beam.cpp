@@ -105,7 +105,6 @@ void BeamSegment::CalcBeam(
     // Set drawing stem positions
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-        if (!coord->m_stem) continue;
 
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             coord->SetDrawingStemDir(STEMDIRECTION_up, staff, doc, this, beamInterface);
@@ -129,20 +128,6 @@ void BeamSegment::CalcBeam(
             }
         }
     }
-
-    /*
-    for (i = 0; i < elementCount; ++i) {
-        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-        if ((beamInterface->m_drawingPlace == BEAMPLACE_above)
-            && (coord->m_yBeam < this->m_verticalCenter)) {
-            coord->m_yBeam = this->m_verticalCenter;
-        }
-        else if ((beamInterface->m_drawingPlace == BEAMPLACE_below)
-            && (this->m_verticalCenter < coord->m_yBeam)) {
-            coord->m_yBeam  = this->m_verticalCenter;
-        }
-    }
-    */
 
     ArrayOfBeamElementCoords stemUps;
     ArrayOfBeamElementCoords stemDowns;
@@ -419,8 +404,8 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
     }
     else if (m_nbNotesOrChords == 2) {
         step = unit * 2;
-        // Short distance but values not shorter than a 16th
-        if ((dist <= unit * 6) && (dur < DUR_32)) {
+        // Short distance
+        if (dist <= unit * 6) {
             step = unit / 2;
             shortStep = true;
         }
@@ -446,6 +431,12 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
         else if (noteStep <= unit * 4) {
             step = unit * 2;
         }
+    }
+    
+    // Prevent short step with values not shorter than a 16th
+    if (shortStep && (dur >= DUR_32)) {
+        step = unit * 2;
+        shortStep = false;
     }
 
     // We can keep the current slope but only if curStep is not 0 and smaller than the step
@@ -857,7 +848,13 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(doc);
     assert(interface);
 
-    if (!this->m_stem) return;
+    
+    if (!this->m_element->Is({ CHORD, NOTE })) return;
+    
+    StemmedDrawingInterface *stemInterface = this->m_element->GetStemmedDrawingInterface();
+    assert(stemInterface);
+    m_stem = stemInterface->GetDrawingStem();
+    assert(m_stem);
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
