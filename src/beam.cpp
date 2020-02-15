@@ -122,18 +122,18 @@ void BeamSegment::CalcBeam(
                 }
             }
             else {
-                data_STEMDIRECTION stemDir = coord->m_stem->GetStemDir();
+                data_STEMDIRECTION stemDir = coord->GetStemDir();
                 // TODO - Handle cases where there is no given stem direction (here we can still have NONE)
                 coord->SetDrawingStemDir(stemDir, staff, doc, this, beamInterface);
             }
         }
     }
 
-    ArrayOfBeamElementCoords stemUps;
-    ArrayOfBeamElementCoords stemDowns;
+    //ArrayOfBeamElementCoords stemUps;
+    //ArrayOfBeamElementCoords stemDowns;
 
     /******************************************************************/
-    // Calculate the slope doing a linear regression
+    // Calculate the slope is necessary
 
     bool shorten = false;
     this->m_beamSlope = 0.0;
@@ -607,6 +607,9 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
             }
         }
     }
+    
+    // For now force it above
+    if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
 
 //----------------------------------------------------------------------------
@@ -796,50 +799,28 @@ const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 
 BeamElementCoord::~BeamElementCoord() {}
 
-//----------------------------------------------------------------------------
-// Functors methods
-//----------------------------------------------------------------------------
-
-int Beam::CalcStem(FunctorParams *functorParams)
+data_STEMDIRECTION BeamElementCoord::GetStemDir()
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    const ArrayOfObjects *beamChildren = this->GetList(this);
-
-    // Should we assert this at the beginning?
-    if (beamChildren->empty()) {
-        return FUNCTOR_CONTINUE;
+    // m_stem is not necssary set, so we need to look at the Note / Chord original value
+    // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
+    if (m_stem) {
+        return m_stem->GetStemDir();
+    }
+ 
+    if (!m_element) {
+        LogDebug("Element not set in BeamElementCoord");
+        return STEMDIRECTION_NONE;
+    }
+    
+    AttStems *stemInterface = dynamic_cast<AttStems *>(m_element);
+    
+    if (!stemInterface) {
+        LogDebug("Element is not an AttStems");
+        return STEMDIRECTION_NONE;
     }
 
-    this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());
-
-    return FUNCTOR_CONTINUE;
+    return stemInterface->GetStemDir();
 }
-
-int Beam::ResetDrawing(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-
-    this->m_beamSegment.Reset();
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-
-    return FUNCTOR_CONTINUE;
-}
-
-//----------------------------------------------------------------------------
-// BeamElementCoord
-//----------------------------------------------------------------------------
 
 void BeamElementCoord::SetDrawingStemDir(
     data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface)
@@ -970,6 +951,47 @@ void BeamElementCoord::SetDrawingStemDir(
     else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Beam::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    const ArrayOfObjects *beamChildren = this->GetList(this);
+
+    // Should we assert this at the beginning?
+    if (beamChildren->empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
+
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(layer);
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Beam::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    this->m_beamSegment.Reset();
+
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
