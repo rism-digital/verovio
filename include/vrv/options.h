@@ -462,6 +462,7 @@ public:
     OptionGrp m_general;
 
     OptionBool m_adjustPageHeight;
+    OptionBool m_adjustPageWidth;
     OptionIntMap m_breaks;
     OptionBool m_condenseEncoded;
     OptionBool m_condenseFirstPage;
