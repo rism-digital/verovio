@@ -494,9 +494,13 @@ Options::Options()
     m_general.SetLabel("Input and page layout options", "1-general");
     m_grps.push_back(&m_general);
 
-    m_adjustPageHeight.SetInfo("Adjust page height", "Crop the page height to the height of the content");
+    m_adjustPageHeight.SetInfo("Adjust page height", "Adjust the page height to the height of the content");
     m_adjustPageHeight.Init(false);
     this->Register(&m_adjustPageHeight, "adjustPageHeight", &m_general);
+
+    m_adjustPageWidth.SetInfo("Adjust page width", "Adjust the page width to the width of the content");
+    m_adjustPageWidth.Init(false);
+    this->Register(&m_adjustPageWidth, "adjustPageWidth", &m_general);
 
     m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
