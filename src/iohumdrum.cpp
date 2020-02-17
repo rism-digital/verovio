@@ -4022,6 +4022,8 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
     auto status = convertMeasureStaves(startline, endline);
 
+    addFTremSlurs();
+
     if (m_breaks) {
         checkForLayoutBreak(endline);
     }
@@ -6495,6 +6497,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                     appendElement(elements, pointers, ftrem);
                     addExplicitStemDirection(ftrem, layerdata[i]);
+                    addSlur(ftrem, layerdata[i]);
                 }
                 else {
                     appendElement(elements, pointers, chord);
@@ -6681,6 +6684,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 appendElement(elements, pointers, ftrem);
                 addExplicitStemDirection(ftrem, layerdata[i]);
+                addSlur(ftrem, layerdata[i]);
             }
             else {
                 appendElement(elements, pointers, note);
@@ -6747,6 +6751,75 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// Check if there is a slur start and end at the start/end of the tremolo
+//    group.
+//
+
+void HumdrumInput::addSlur(FTrem *ftrem, hum::HTp start)
+{
+    if (start->find('(') == std::string::npos) {
+        // no slur start
+        return;
+    }
+    if (start->find('L') == std::string::npos) {
+        // no beam start (there could be weird unbeamed cases perhaps)
+        return;
+    }
+
+    int count = ftrem->GetChildCount();
+    if (count != 2) {
+        // strange situation, or unitialized ftrem.
+        return;
+    }
+    hum::HTp current = start->getNextToken();
+    hum::HTp found = NULL;
+    while (current) {
+        if (current->isBarline()) {
+            break;
+        }
+        if (!current->isData()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->find("J") != std::string::npos) {
+            found = current;
+            break;
+        }
+        current = current->getNextToken();
+    }
+    if (!found) {
+        // ignore slur for now unless it ends at end of tremolo group.
+        return;
+    }
+
+    string firstid = ftrem->GetChild(0)->GetUuid();
+    string secondid = ftrem->GetChild(1)->GetUuid();
+
+    // should also deal with chord notes in ID.
+    int endline = found->getLineNumber();
+    int endfield = found->getFieldNumber();
+    std::string lastid = "";
+    lastid += "-L" + to_string(endline);
+    lastid += "F" + to_string(endfield);
+
+    string slurid = firstid;
+    slurid += lastid;
+    hum::HumRegex hre;
+    hre.replaceDestructive(slurid, "slur", "^note");
+
+    Slur *slur = new Slur;
+    slur->SetUuid(slurid);
+    slur->SetEndid("#" + secondid);
+    slur->SetStartid("#" + firstid);
+    // check for slur direction here
+
+    slur->SetType("ftrem");
+    setStaff(slur, m_currentstaff);
+    m_ftrem_slurs.push_back(slur);
 }
 
 //////////////////////////////
@@ -16007,6 +16080,25 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     setSystemMeasureStyle(startline, endline);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addFTremSlurs --
+//
+
+void HumdrumInput::addFTremSlurs()
+{
+    if (m_ftrem_slurs.empty()) {
+        return;
+    }
+    if (!m_measure) {
+        return;
+    }
+    for (int i = 0; i < (int)m_ftrem_slurs.size(); i++) {
+        m_measure->AddChildBack(m_ftrem_slurs.at(i));
+    }
+    m_ftrem_slurs.clear();
 }
 
 //////////////////////////////

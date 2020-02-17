@@ -575,6 +575,8 @@ protected:
     void checkClefBufferForSameAs();
     void suppressBufferedClef(int index);
     void addExplicitStemDirection(FTrem *ftrem, hum::HTp start);
+    void addSlur(FTrem *ftrem, hum::HTp start);
+    void addFTremSlurs();
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -868,6 +870,10 @@ private:
 
     // m_clef_buffer == used to identify clefs that should not be printed.
     std::vector<std::tuple<bool, hum::HumNum, Clef *> > m_clef_buffer;
+
+    // m_ftrem_slurs == used to store ftrem-generated slurs for later insertion
+    // into measure element.
+    std::vector<Slur *> m_ftrem_slurs;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
