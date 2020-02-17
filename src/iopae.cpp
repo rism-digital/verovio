@@ -26,6 +26,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
+#include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"
 #include "layer.h"
@@ -39,6 +40,7 @@
 #include "score.h"
 #include "scoredef.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
@@ -72,6 +74,164 @@ char data_line[10001] = { 0 };
 #define MAX_DATA_LEN 1024 // One line of the pae file would not be that long!
 char data_key[MAX_DATA_LEN];
 char data_value[MAX_DATA_LEN]; // ditto as above
+
+//----------------------------------------------------------------------------
+// PaeOutput
+//----------------------------------------------------------------------------
+
+PaeOutput::PaeOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
+{
+    m_filename = filename;
+}
+
+PaeOutput::~PaeOutput() {}
+
+bool PaeOutput::ExportFile()
+{
+    m_doc->Save(this);
+
+    return true;
+}
+
+bool PaeOutput::WriteObject(Object *object)
+{
+    if (object->Is(SCOREDEF)) {
+        WriteScoreDef(dynamic_cast<ScoreDef *>(object));
+    }
+    else if (object->Is(STAFFDEF)) {
+        WriteStaffDef(dynamic_cast<StaffDef *>(object));
+    }
+    else if (object->Is(MEASURE)) {
+        WriteMeasure(dynamic_cast<Measure *>(object));
+    }
+
+    // Measure elements
+    else if (object->Is(FERMATA)) {
+        if (!object->IsAttribute()) {
+            WriteFermata(dynamic_cast<Fermata *>(object));
+        }
+    }
+    else if (object->Is(TIE)) {
+        if (!object->IsAttribute()) {
+            WriteTie(dynamic_cast<Tie *>(object));
+        }
+    }
+    else if (object->Is(TRILL)) {
+        WriteTrill(dynamic_cast<Trill *>(object));
+    }
+
+    // Layer elements
+    else if (object->Is(ACCID)) {
+        // Do not add a node for object representing an attribute
+        WriteAccid(dynamic_cast<Accid *>(object));
+    }
+    else if (object->Is(BARLINE)) {
+        WriteBarLine(dynamic_cast<BarLine *>(object));
+    }
+    else if (object->Is(BEAM)) {
+        WriteBeam(dynamic_cast<Beam *>(object));
+    }
+    else if (object->Is(CHORD)) {
+        WriteChord(dynamic_cast<Chord *>(object));
+    }
+    else if (object->Is(CLEF)) {
+        WriteClef(dynamic_cast<Clef *>(object));
+    }
+    else if (object->Is(GRACEGRP)) {
+        WriteGraceGrp(dynamic_cast<GraceGrp *>(object));
+    }
+    else if (object->Is(KEYACCID)) {
+        WriteKeyAccid(dynamic_cast<KeyAccid *>(object));
+    }
+    else if (object->Is(KEYSIG)) {
+        WriteKeySig(dynamic_cast<KeySig *>(object));
+    }
+    else if (object->Is(MENSUR)) {
+        WriteMensur(dynamic_cast<Mensur *>(object));
+    }
+    else if (object->Is(METERSIG)) {
+        WriteMeterSig(dynamic_cast<MeterSig *>(object));
+    }
+    else if (object->Is(MREST)) {
+        WriteMRest(dynamic_cast<MRest *>(object));
+    }
+    else if (object->Is(MULTIREST)) {
+        WriteMultiRest(dynamic_cast<MultiRest *>(object));
+    }
+    else if (object->Is(NOTE)) {
+        WriteNote(dynamic_cast<Note *>(object));
+    }
+    else if (object->Is(REST)) {
+        WriteRest(dynamic_cast<Rest *>(object));
+    }
+    else if (object->Is(SPACE)) {
+        WriteSpace(dynamic_cast<Space *>(object));
+    }
+    else if (object->Is(TUPLET)) {
+        WriteTuplet(dynamic_cast<Tuplet *>(object));
+    }
+
+    // Text elements
+
+    // Editorial markup
+
+    // BoundaryEnd - nothing to add - only
+
+    else {
+        // Log something?
+    }
+
+    return true;
+}
+
+bool PaeOutput::WriteObjectEnd(Object *object)
+{
+    return true;
+}
+
+void PaeOutput::WriteScoreDef(ScoreDef *scoreDef) {}
+
+void PaeOutput::WriteStaffDef(StaffDef *staffDef) {}
+
+void PaeOutput::WriteMeasure(Measure *measure) {}
+
+void PaeOutput::WriteAccid(Accid *accid) {}
+
+void PaeOutput::WriteBarLine(BarLine *barLine) {}
+
+void PaeOutput::WriteBeam(Beam *beam) {}
+
+void PaeOutput::WriteChord(Chord *chord) {}
+
+void PaeOutput::WriteClef(Clef *clef) {}
+
+void PaeOutput::WriteGraceGrp(GraceGrp *graceGrp) {}
+
+void PaeOutput::WriteKeyAccid(KeyAccid *keyAccid) {}
+
+void PaeOutput::WriteKeySig(KeySig *keySig) {}
+
+void PaeOutput::WriteMensur(Mensur *mensur) {}
+
+void PaeOutput::WriteMeterSig(MeterSig *meterSig) {}
+
+void PaeOutput::WriteMRest(MRest *mRest) {}
+
+void PaeOutput::WriteMultiRest(MultiRest *multiRest) {}
+
+void PaeOutput::WriteNote(Note *note) {}
+
+void PaeOutput::WriteRest(Rest *rest) {}
+
+void PaeOutput::WriteSpace(Space *space) {}
+
+void PaeOutput::WriteTuplet(Tuplet *tuplet) {}
+
+void PaeOutput::WriteFermata(Fermata *fermata) {}
+
+void PaeOutput::WriteTie(Tie *tie) {}
+
+void PaeOutput::WriteTrill(Trill *trill) {}
 
 //----------------------------------------------------------------------------
 // PaeInput

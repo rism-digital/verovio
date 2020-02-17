@@ -18,16 +18,28 @@
 
 namespace vrv {
 
+class Accid;
 class Beam;
+class Chord;
 class Clef;
+class Fermata;
+class GraceGrp;
+class KeyAccid;
 class Layer;
 class LayerElement;
 class Measure;
 class MeterSig;
 class Mensur;
+class MRest;
+class MultiRest;
 class Note;
+class Rest;
+class ScoreDef;
+class Space;
 class Staff;
+class StaffDef;
 class Tie;
+class Trill;
 class Tuplet;
 class KeySig;
 class BarLine;
@@ -231,6 +243,111 @@ namespace pae {
     };
 
 } // namespace pae
+
+//----------------------------------------------------------------------------
+// PaeOutput
+//----------------------------------------------------------------------------
+
+/**
+ * This class is a file output stream for writing PAE files.
+ */
+class PaeOutput : public FileOutputStream {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    PaeOutput(Doc *doc, std::string filename);
+    virtual ~PaeOutput();
+    ///@}
+
+    /**
+     * The main method for exporting the file to PAE.
+     */
+    virtual bool ExportFile();
+
+    /**
+     * The main method for write objects.
+     */
+    virtual bool WriteObject(Object *object);
+
+    /**
+     * Writing object method that must be overridden in the child class.
+     */
+    virtual bool WriteObjectEnd(Object *object);
+
+private:
+    bool WriteDoc(Doc *doc);
+
+    /**
+     * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
+     */
+    ///@{
+    void WriteScoreDef(ScoreDef *scoreDef);
+    void WriteStaffDef(StaffDef *staffDef);
+    void WriteMeasure(Measure *measure);
+    ///@}
+
+    /**
+     * @name Methods for writing LayerElement children.
+     * Called from WriteLayerElement.
+     */
+    ///@{
+    void WriteAccid(Accid *accid);
+    void WriteBarLine(BarLine *barLine);
+    void WriteBeam(Beam *beam);
+    void WriteChord(Chord *chord);
+    void WriteClef(Clef *clef);
+    void WriteGraceGrp(GraceGrp *graceGrp);
+    void WriteKeyAccid(KeyAccid *keyAccid);
+    void WriteKeySig(KeySig *keySig);
+    void WriteMensur(Mensur *mensur);
+    void WriteMeterSig(MeterSig *meterSig);
+    void WriteMRest(MRest *mRest);
+    void WriteMultiRest(MultiRest *multiRest);
+    void WriteNote(Note *note);
+    void WriteRest(Rest *rest);
+    void WriteSpace(Space *space);
+    void WriteTuplet(Tuplet *tuplet);
+    ///@}
+
+    /**
+     * @name Methods for writing ControlElement
+     */
+    ///@{
+    void WriteFermata(Fermata *fermata);
+    void WriteTie(Tie *tie);
+    void WriteTrill(Trill *trill);
+    ///@}
+
+    /**
+     * @name Methods for writing text and figure elements
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing editorial markup
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing other mei elements
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing LayerElement, EditorialElement and interfaces.
+     * Call WriteDurationInferface from WriteNote, for example.
+     */
+    ///@{
+    ///@}
+
+public:
+    //
+private:
+    std::string m_filename;
+};
 
 //----------------------------------------------------------------------------
 // PaeInput
