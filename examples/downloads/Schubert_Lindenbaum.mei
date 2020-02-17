@@ -185,6 +185,18 @@
                 </changeDesc>
                 <date isodate="2016-12-12"/>
             </change>
+            <change n="10" resp="#LP">
+                <changeDesc>
+                    <p>Add page header and page footer</p>
+                </changeDesc>
+                <date isodate="2018-03-06"/>
+            </change>
+            <change n="11" resp="#KR">
+                <changeDesc>
+                    <p>Fix typos</p>
+                </changeDesc>
+                <date isodate="2020-02-14"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -203,9 +215,9 @@
                         </staffGrp>
                         <pgHead>
                             <rend halign="center" valign="top">
-                                <rend fontsize="large">Der Winterreise</rend>
+                                <rend fontsize="large">Die Winterreise</rend>
                                 <lb/>
-                                <rend fontsize="small">Text: Wilhelm Müllter</rend>
+                                <rend fontsize="small">Text: Wilhelm Müller (1794–1827)</rend>
                             </rend>
                             <fig halign="center" valign="top">
                                 <svg
