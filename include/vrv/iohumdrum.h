@@ -20,6 +20,7 @@
 #include "clef.h"
 #include "dir.h"
 #include "ending.h"
+#include "ftrem.h"
 #include "io.h"
 #include "keysig.h"
 #include "metersig.h"
@@ -573,6 +574,7 @@ protected:
     hum::HumNum getLeftNoteDuration(hum::HTp token);
     void checkClefBufferForSameAs();
     void suppressBufferedClef(int index);
+    void addExplicitStemDirection(FTrem *ftrem, hum::HTp start);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

@@ -6494,6 +6494,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         }
                     }
                     appendElement(elements, pointers, ftrem);
+                    addExplicitStemDirection(ftrem, layerdata[i]);
                 }
                 else {
                     appendElement(elements, pointers, chord);
@@ -6679,6 +6680,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
                 appendElement(elements, pointers, ftrem);
+                addExplicitStemDirection(ftrem, layerdata[i]);
             }
             else {
                 appendElement(elements, pointers, note);
@@ -6745,6 +6747,61 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// addExplicitStemDirection -- Check if there is an explicit direction for
+//   the FTrem element.  This can be either an above/below signifier
+//   after the beam on the first token of the ftrem group, or it can be
+//   the stem direction on the first note of the tremolo group.
+//
+
+void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
+{
+    int direction = 0;
+    if (start->find('/') != std::string::npos) {
+        direction = +1;
+    }
+    else if (start->find('\\') != std::string::npos) {
+        direction = -1;
+    }
+    else {
+        hum::HumRegex hre;
+        if (m_signifiers.above) {
+            std::string value = "[LJkK]+";
+            value += m_signifiers.above;
+            if (hre.search(start, value)) {
+                direction = +1;
+            }
+        }
+        else if (m_signifiers.below) {
+            std::string value = "[LJkK]+";
+            value += m_signifiers.below;
+            if (hre.search(start, value)) {
+                direction = -1;
+            }
+        }
+    }
+
+    if (direction == 0) {
+        return;
+    }
+
+    int count = ftrem->GetChildCount();
+
+    // also deal with chords later
+    for (int i = 0; i < count; i++) {
+        Object *obj = ftrem->GetChild(i);
+        if (obj->GetClassName() == "Note") {
+            if (direction > 0) {
+                ((Note *)obj)->SetStemDir(STEMDIRECTION_up);
+            }
+            else {
+                ((Note *)obj)->SetStemDir(STEMDIRECTION_down);
+            }
+        }
+    }
 }
 
 //////////////////////////////
