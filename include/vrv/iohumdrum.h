@@ -506,6 +506,7 @@ protected:
     std::string getSystemDecoration(const std::string &tag);
     void processStaffDecoration(const std::string &decoration);
     int getStaffNumberLabel(hum::HTp spinestart);
+    int getGroupNumberLabel(hum::HTp spinestart);
     bool isFirstTokenOnStaff(hum::HTp token);
     bool hasAboveParameter(hum::HTp token, const std::string &category);
     bool hasBelowParameter(hum::HTp token, const std::string &category);
@@ -874,6 +875,18 @@ private:
     // m_ftrem_slurs == used to store ftrem-generated slurs for later insertion
     // into measure element.
     std::vector<Slur *> m_ftrem_slurs;
+
+    // m_group_name == used to store group names, such as *I""trumpets
+    std::map<int, string> m_group_name;
+
+    // m_group_name_tok == used to store group names, such as *I""trumpets
+    std::map<int, hum::HTp> m_group_name_tok;
+
+    // m_group_abbr == used to store group abbreviations, such as *I""trps.
+    std::map<int, string> m_group_abbr;
+
+    // m_group_abbr_tok == used to store group abbreviations, such as *I""trps.
+    std::map<int, hum::HTp> m_group_abbr_tok;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

@@ -1904,13 +1904,25 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     // enumeration in the decoration is not monotonic covering every staff
     // in the score, then the results may have problems.
 
+    map<int, vector<int> > groupToStaffMapping;
     map<int, int> staffToSpineMapping;
+    map<int, int> staffToGroupMapping;
+    map<int, int> spineToGroupMapping;
+
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         int staff = getStaffNumberLabel(staffstarts[i]);
-        if (staff <= 0) {
-            continue;
+        int group = getGroupNumberLabel(staffstarts[i]);
+
+        if (group > 0) {
+            groupToStaffMapping[group].push_back(staff);
+            spineToGroupMapping[i] = group;
         }
-        staffToSpineMapping[staff] = i;
+        if (staff > 0) {
+            staffToSpineMapping[staff] = i;
+        }
+        if ((group > 0) && (staff > 0)) {
+            staffToGroupMapping[staff] = group;
+        }
     }
 
     vector<int> spine; // kernstart index
@@ -1919,6 +1931,28 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
     string d = decoration;
     d += ' ';
+
+    // The group-to-staff substitution is limited to single-digit group
+    // numbers for now.
+    if (!groupToStaffMapping.empty()) {
+        hum::HumRegex hre;
+        // substitute spine groupings with staff numbers.
+        // example:   {(g1}} will be expanded to {(s1,s2,s3)} if
+        // group1 is given to staff1, staff2, and staff3.
+        string gstring;
+        string sstring;
+        for (auto const &it : groupToStaffMapping) {
+            gstring = "g" + to_string(it.first);
+            sstring = "";
+            for (int i = 0; i < (int)it.second.size(); i++) {
+                sstring += "s" + to_string(it.second.at(i));
+                if (i < (int)it.second.size() - 1) {
+                    sstring += ",";
+                }
+            }
+        }
+        hre.replaceDestructive(d, sstring, gstring);
+    }
 
     vector<vector<int> > bargroups;
     vector<char> groupstyle;
@@ -2005,7 +2039,6 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
     }
 
-    // probably also require the spine indexes to be monotonic.
     for (int i = 0; i < (int)found.size(); ++i) {
         if (found[i] != 1) {
             cerr << "I:" << i << "\t=\t" << found[i] << endl;
@@ -2016,6 +2049,9 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
     if (!validQ) {
         cerr << "DECORATION IS INVALID " << decoration << endl;
+        if (d != decoration) {
+            cerr << "\tStaff version: " << d << endl;
+        }
         StaffGrp *sg = new StaffGrp();
         sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
         m_doc->m_scoreDef.AddChild(sg);
@@ -2030,6 +2066,21 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         // only one group
         StaffGrp *sg = new StaffGrp();
         m_doc->m_scoreDef.AddChild(sg);
+
+        string groupName = "";
+        hum::HTp groupNameTok = NULL;
+        int mygroup = -1;
+        if (!newgroups[0].empty()) {
+            mygroup = spineToGroupMapping[newgroups[0][0]];
+            if (mygroup > 0) {
+                groupName = m_group_name[mygroup];
+                groupNameTok = m_group_name_tok[mygroup];
+            }
+        }
+        if ((!groupName.empty()) && (groupNameTok != NULL)) {
+            setInstrumentName(sg, groupName, groupNameTok);
+        }
+
         // currently required to be barred:
         sg->SetBarThru(BOOLEAN_true);
         if (newstyles[0] == '[') {
@@ -2062,6 +2113,21 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 StaffGrp *sg = new StaffGrp();
                 root_sg->AddChild(sg);
                 sg->SetBarThru(BOOLEAN_true);
+
+                string groupName = "";
+                hum::HTp groupNameTok = NULL;
+                int mygroup = -1;
+                if (!newgroups[i].empty()) {
+                    mygroup = spineToGroupMapping[newgroups[i][0]];
+                    if (mygroup > 0) {
+                        groupName = m_group_name[mygroup];
+                        groupNameTok = m_group_name_tok[mygroup];
+                    }
+                }
+                if ((!groupName.empty()) && (groupNameTok != NULL)) {
+                    setInstrumentName(sg, groupName, groupNameTok);
+                }
+
                 if (newstyles[i] == '[') {
                     sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
                 }
@@ -2071,6 +2137,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 for (int j = 0; j < (int)newgroups[i].size(); ++j) {
                     sg->AddChild(m_staffdef[newgroups[i][j]]);
                 }
+                // add label and label abbreviation to group
             }
         }
     }
@@ -2894,6 +2961,40 @@ int HumdrumInput::getStaffNumberLabel(hum::HTp spinestart)
 
 //////////////////////////////
 //
+// HumdrumInput::getGroupNumberLabel -- Return number 7 in pattern *group7.
+//
+
+int HumdrumInput::getGroupNumberLabel(hum::HTp spinestart)
+{
+    hum::HTp tok = spinestart;
+    while (tok) {
+        if (tok->isData()) {
+            break;
+        }
+        if (!tok->isInterpretation()) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        if (tok->compare(0, 6, "*group") != 0) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        if (tok->size() <= 6) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        string number = tok->substr(6, string::npos);
+        if (!std::isdigit(number[0])) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        return stoi(number);
+    }
+    return 0;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::getSystemDecoration --
 //
 
@@ -2990,11 +3091,21 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     std::string primarymensuration;
+
+    int group = getGroupNumberLabel(partstart);
+
+    bool hasglabel = false;
+    std::string glabel;
+    hum::HTp glabeltok = NULL;
+    std::string gabbreviation;
+    hum::HTp gabbrtok = NULL;
+
     bool haslabel = false;
     std::string label;
     hum::HTp labeltok = NULL;
     std::string abbreviation;
     hum::HTp abbrtok = NULL;
+
     std::string stria; // number of staff lines
     hum::HTp striatok = NULL;
     std::string clef;
@@ -3046,12 +3157,33 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         else if (part->compare(0, 5, "*ITrd") == 0) {
             itranspose = *part;
         }
+        else if (part->compare(0, 4, "*I''") == 0) {
+            if (partcount > 1) {
+                // Avoid encoding the part group abbreviation when there is only one
+                // part in order to suppress the display of the abbreviation.
+                gabbreviation = part->substr(4);
+                gabbrtok = part;
+                if ((group > 0) && !gabbreviation.empty()) {
+                    m_group_abbr[group] = gabbreviation;
+                    m_group_abbr_tok[group] = gabbrtok;
+                }
+            }
+        }
         else if (part->compare(0, 3, "*I'") == 0) {
             if (partcount > 1) {
                 // Avoid encoding the part abbreviation when there is only one
                 // part in order to suppress the display of the abbreviation.
                 abbreviation = part->substr(3);
                 abbrtok = part;
+            }
+        }
+        else if (part->compare(0, 4, "*I\"\"") == 0) {
+            glabel = part->substr(4);
+            glabeltok = part;
+            hasglabel = true;
+            if ((group > 0) && !glabel.empty()) {
+                m_group_name[group] = glabel;
+                m_group_name_tok[group] = glabeltok;
             }
         }
         else if (part->compare(0, 3, "*I\"") == 0) {
