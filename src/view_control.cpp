@@ -1792,20 +1792,16 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     TextDrawingParams params;
 
-    // If we have not timestamp
-    params.m_x = measure->GetDrawingX();
-    // First try to see if we have a meter sig attribute for this measure
+    // see if we have a meter signature for this measure
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
         = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
-    if (!pos) {
-        // if not, try to get the first beat element
-        alignmentComparison.SetType(ALIGNMENT_DEFAULT);
-        pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
-    }
-    // if we found one, use it
-    if (pos) {
-        params.m_x += pos->GetXRel();
+    params.m_x = tempo->GetStart()->GetDrawingX();
+    if (!tempo->HasStartid()) {
+        if ((tempo->GetTstamp() <= 1) && pos)
+            params.m_x = measure->GetDrawingX() + pos->GetXRel();
+        else
+            params.m_x -= 2 * tempo->GetStart()->GetDrawingRadius(m_doc);
     }
 
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
