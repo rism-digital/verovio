@@ -723,7 +723,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
         ulx -= noteWidth / 2;
-        uly -= noteHeight / 2;
+        // uly -= noteHeight / 2;
         // Set up facsimile
         zone->SetUlx(ulx);
         zone->SetUly(uly);
@@ -841,7 +841,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
         clef->SetShape(clefShape);
         const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        int yDiff = -staff->GetZone()->GetUly() + uly;
+        int yDiff = -staff->GetDrawingY() + uly;
         yDiff += ((ulx - staff->GetZone()->GetUlx())) * tan(-staff->GetDrawingRotate() * M_PI / 180.0); // Subtract distance due to rotate.
         int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
         clef->SetLine(clefLine);
