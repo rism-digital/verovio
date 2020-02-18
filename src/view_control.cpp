@@ -1797,9 +1797,11 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     Alignment *pos
         = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
     params.m_x = tempo->GetStart()->GetDrawingX();
-    if (tempo->HasTstamp()) {
-        params.m_x -= 2 * tempo->GetStart()->GetDrawingRadius(m_doc);
-        if ((tempo->GetTstamp() <= 1) && pos) params.m_x = measure->GetDrawingX() + pos->GetXRel();
+    if (!tempo->HasStartid()) {
+        if ((tempo->GetTstamp() <= 1) && pos)
+            params.m_x = measure->GetDrawingX() + pos->GetXRel();
+        else
+            params.m_x -= 2 * tempo->GetStart()->GetDrawingRadius(m_doc);
     }
 
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
