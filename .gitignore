@@ -36,6 +36,7 @@ emscripten/build/
 # npm build
 emscripten/npm/node_modules
 emscripten/npm/dist
+emscripten/npm/src/VerovioEmscriptenModule.js
 
 # python build
 bindings/python/verovio_wrap.cpp
