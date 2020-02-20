@@ -1730,7 +1730,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     // Principal voice
     pugi::xpath_node lead = type.node().select_node("principal-voice");
     if (lead) {
-        int voiceNumber = wedge.node().attribute("number").as_int();
+        int voiceNumber = lead.node().attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(lead.node(), "type", "stop")) {
             int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
@@ -1744,6 +1744,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             bracketSpan->SetColor(lead.node().attribute("color").as_string());
             // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
             bracketSpan->SetFunc("analytical");
+            bracketSpan->SetLstartsym(ConvertLineEndSymbol(lead.node().attribute("symbol").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             bracketSpan->SetType("principal-voice");
             m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
@@ -2784,6 +2785,23 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
     else {
         LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
         return L"";
+    }
+}
+
+data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(std::string value)
+{
+    if (value == "arrow")
+        return LINESTARTENDSYMBOL_arrow;
+    else if (value == "Hauptstimme")
+        return LINESTARTENDSYMBOL_H;
+    else if (value == "Nebenstimme")
+        return LINESTARTENDSYMBOL_N;
+    else if (value == "none")
+        return LINESTARTENDSYMBOL_none;
+    else if (value == "plain")
+        return LINESTARTENDSYMBOL_NONE;
+    else {
+        return LINESTARTENDSYMBOL_NONE;
     }
 }
 
