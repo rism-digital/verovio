@@ -416,8 +416,9 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             rend->AddChild(text);
             element->AddChild(rend);
         }
-        else
+        else {
             element->AddChild(text);
+        }
     }
 }
 
@@ -640,6 +641,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             staffOffset += nbStaves;
         }
         else {
+            // do nothing
         }
     }
     // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
@@ -1724,7 +1726,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
-        else LogWarning("MusicXML import: pedal lines are not supported");
+        else {
+            LogWarning("MusicXML import: pedal lines are not supported");
+        }
     }
 
     // Principal voice
@@ -1763,8 +1767,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (words.size() != 0) TextRendition(words, tempo);
         if (metronome)
             PrintMetronome(metronome.node(), tempo);
-        else
+        else {
             tempo->SetMidiBpm(node.select_node("sound").node().attribute("tempo").as_int());
+        }
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
         m_tempoStack.push_back(tempo);
     }
@@ -1907,10 +1912,12 @@ void MusicXmlInput::ReadMusicXmlNote(
                             prevLayer = dynamic_cast<Layer *>(*rit);
                             if (prevLayer->GetN() == layer->GetN()) break;
                         }
-                        if (prevLayer == NULL)
+                        if (prevLayer == NULL) {
                             AddLayerElement(layer, iter->m_clef);
-                        else
+                        }
+                        else {
                             AddLayerElement(prevLayer, iter->m_clef);
+                        }
                     }
                     else {
                         AddLayerElement(layer, iter->m_clef);
@@ -2012,8 +2019,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!typeStr.empty()) {
                 space->SetDur(ConvertTypeToDur(typeStr));
             }
-            // this should be mSpace
-            else space->SetDur(DURATION_1);
+            else {
+                // this should be mSpace
+                space->SetDur(DURATION_1);
+            }
             AddLayerElement(layer, space);
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
@@ -2096,8 +2105,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     note->SetOct(atoi(octaveStr.c_str()) - m_octDis[staff->GetN()]);
                     note->SetOctGes(atoi(octaveStr.c_str()));
                 }
-                else
+                else {
                     note->SetOct(atoi(octaveStr.c_str()));
+                }
             }
             std::string alterStr = GetContentOfChild(pitch.node(), "alter");
             if (!alterStr.empty()) {
@@ -2489,8 +2499,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     arpeggio->SetOrder(arpegLog_ORDER_up);
                 else if (direction == "down")
                     arpeggio->SetOrder(arpegLog_ORDER_down);
-                else
+                else {
                     arpeggio->SetOrder(arpegLog_ORDER_NONE);
+                }
             }
             m_ArpeggioStack.push_back(std::make_pair(arpeggio, musicxml::OpenArpeggio(arpegN, onset)));
             m_controlElements.push_back(std::make_pair(measureNum, arpeggio));
