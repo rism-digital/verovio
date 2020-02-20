@@ -24,6 +24,9 @@
   "engines": {
     "node": ">= 7.0.0"
   },
+  "scripts": {
+    "build": "webpack --mode production"
+  },
   "devDependencies": {
     "@babel/core": "^7.8.4",
     "babel-loader": "^8.0.6",
