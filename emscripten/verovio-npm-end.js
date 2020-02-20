@@ -1,6 +1,1 @@
-
-module.exports = {
-    toolkit: verovio.toolkit,
-    module: Module
-};
-
+export default Module;
