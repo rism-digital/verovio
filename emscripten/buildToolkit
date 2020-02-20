@@ -52,7 +52,7 @@ my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
 my $cpp = 17;             # c++ version to compile (11, 14, 17)
-my $VEROVIO_ROOT  = ".."; 
+my $VEROVIO_ROOT  = "..";
 
 Getopt::Long::Configure("bundling");
 GetOptions (
@@ -93,7 +93,7 @@ if ($wasmQ) {
 	$FLAGS .= " --memory-init-file 0";
 	$FLAGS .= " -std=c++$cpp";
 	$FLAGS .= " -s WASM=1";
-    $FLAGS .= " -s STRICT=1"; 
+    $FLAGS .= " -s STRICT=1";
 	# We can try to find the cause of integer overflow runtime errors with
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
     # For now, trapping them (followign option does not work with Safari)
