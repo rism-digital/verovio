@@ -68,3 +68,6 @@ emscripten/npm-dev/node_modules
 main
 DerivedData
 verovio.wasm
+
+# PHPStorm files
+.idea
