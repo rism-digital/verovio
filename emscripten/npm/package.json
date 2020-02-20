@@ -1,36 +1,36 @@
 {
-  "name": "verovio",
-  "version": "2.5.0",
-  "description": "This is the stable version of the verovio package",
-  "main": "dist/index.js",
-  "keywords": [
-    "music",
-    "music notation",
-    "music engraving",
-    "mei",
-    "music encoding",
-    "svg"
-  ],
-  "author": "Laurent Pugin",
-  "license": "LGPL 3",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/rism-ch/verovio.git"
-  },
-  "bugs": {
-    "url": "https://github.com/rism-ch/verovio/issues"
-  },
-  "homepage": "https://www.verovio.org",
-  "engines": {
-    "node": ">= 7.0.0"
-  },
-  "scripts": {
-    "build": "webpack --mode production"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.8.4",
-    "babel-loader": "^8.0.6",
-    "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11"
-  }
+    "name": "verovio",
+    "version": "2.5.0",
+    "description": "This is the stable version of the verovio package",
+    "main": "dist/index.js",
+    "keywords": [
+        "music",
+        "music notation",
+        "music engraving",
+        "mei",
+        "music encoding",
+        "svg"
+    ],
+    "author": "Laurent Pugin",
+    "license": "LGPL 3",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/rism-ch/verovio.git"
+    },
+    "bugs": {
+        "url": "https://github.com/rism-ch/verovio/issues"
+    },
+    "homepage": "https://www.verovio.org",
+    "engines": {
+        "node": ">= 7.0.0"
+    },
+    "scripts": {
+        "build": "webpack --mode production"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.8.4",
+        "babel-loader": "^8.0.6",
+        "webpack": "^4.41.6",
+        "webpack-cli": "^3.3.11"
+    }
 }
