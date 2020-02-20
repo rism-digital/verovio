@@ -66,7 +66,6 @@ bindings/qt/build-demo
 # Output files
 output.svg
 output.mei
-index.js
 emscripten/npm-dev/node_modules
 
 # VS Code files
