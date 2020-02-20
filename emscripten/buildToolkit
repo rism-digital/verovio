@@ -214,6 +214,9 @@ if ($? == 0) {
 
         print "Installing node modules\n";
         `(cd $NPM && npm install)`;
+
+        print "Building JavaScript for npm with webpack\n";
+        `(cd $NPM && npm run build)`;
 	}
 
 	# create a gzip version
