@@ -211,6 +211,9 @@ if ($? == 0) {
 		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-npm-end.js > $NPM/src/VerovioEmscriptenModule.js`;
+
+        print "Installing node modules\n";
+        `(cd $NPM && npm install)`;
 	}
 
 	# create a gzip version
