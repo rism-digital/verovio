@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/rism-ch/verovio/issues"
   },
-  "homepage": "http://www.verovio.org",
+  "homepage": "https://www.verovio.org",
   "engines": {
     "node": ">= 7.0.0"
   }
