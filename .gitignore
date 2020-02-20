@@ -33,6 +33,10 @@ tools/libverovio.so
 emscripten/data/
 emscripten/build/
 
+# npm build
+emscripten/npm/node_modules
+emscripten/npm/dist
+
 # python build
 bindings/python/verovio_wrap.cpp
 bindings/python/verovio.pyc
