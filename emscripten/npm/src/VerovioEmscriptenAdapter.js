@@ -1,3 +1,5 @@
+import Module from './VerovioEmscriptenModule';
+
 const VerovioEmscriptenAdapter = {};
 
 // Proxy the exported c++ methods
