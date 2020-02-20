@@ -20,4 +20,7 @@ module.exports = {
     resolve: {
         extensions: ['.js'],
     },
+    node: {
+        fs: 'empty',
+    },
 };
