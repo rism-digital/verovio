@@ -1610,6 +1610,9 @@ void HumdrumInput::prepareStaffGroups()
     string decoration = getSystemDecoration("system-decoration");
 
     if (decoration == "") {
+        // Set a default decoration style depending on the staff count.
+        // If there are two staves, presume that it is for a grand staff
+        // and a brace should be displayed.
         if (staffstarts.size() == 2) {
             StaffGrp *sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(sg);
@@ -1619,6 +1622,8 @@ void HumdrumInput::prepareStaffGroups()
             sg->AddChild(m_staffdef[1]);
         }
 
+        // If there are more than two staves then
+        // add a bracket around the staves.
         else if (staffstarts.size() > 2) {
             StaffGrp *sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(sg);
@@ -1628,6 +1633,7 @@ void HumdrumInput::prepareStaffGroups()
             }
         }
 
+        // If there is one staff, then no extra decoration.
         else if (staffstarts.size() == 1) {
             StaffGrp *sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(sg);
@@ -1889,6 +1895,9 @@ std::string HumdrumInput::getInstrumentAbbreviation(StaffDef *sd)
 
 void HumdrumInput::processStaffDecoration(const string &decoration)
 {
+    if (decoration.empty()) {
+        return;
+    }
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     bool validQ = true;
@@ -1925,17 +1934,14 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
     }
 
-    vector<int> spine; // kernstart index
-    vector<bool> barstart; // true if bar group starts at staff.
-    vector<bool> barend; // true if bar group stops at staff.
-
+    // Expand groupings into staves.  The d variable contains the expansions
+    // and the decoration variable contains the original decoration string.
     string d = decoration;
-    d += ' ';
 
-    // The group-to-staff substitution is limited to single-digit group
-    // numbers for now.
+    // The group-to-staff substitution is limited
+    // to single-digit group numbers for now.
+    hum::HumRegex hre;
     if (!groupToStaffMapping.empty()) {
-        hum::HumRegex hre;
         // substitute spine groupings with staff numbers.
         // example:   {(g1}} will be expanded to {(s1,s2,s3)} if
         // group1 is given to staff1, staff2, and staff3.
@@ -1953,35 +1959,212 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
         hre.replaceDestructive(d, sstring, gstring);
     }
+    // Remove any invalid characters:
+    hre.replaceDestructive(d, "", "[^0-9s(){}\\][]", "g");
+    if (d.empty()) {
+        return;
+    }
+
+    // Remove an staff numbers that are no longer present (or invalid):
+    vector<int> deconums = getStaffNumbers(d);
+    for (int i = 0; i < (int)deconums.size(); i++) {
+        auto it = staffToSpineMapping.find(deconums.at(i));
+        if (it != staffToSpineMapping.end()) {
+            continue;
+        }
+        // The staff number in the decoration string is not present
+        // in the list so remove it.
+        string target = "s";
+        target += to_string(deconums.at(i));
+        target += "(?!\\d)";
+        hre.replaceDestructive(d, "", target);
+    }
+    // Remove any empty groups:
+    hre.replaceDestructive(d, "", "\\(\\)", "g");
+    hre.replaceDestructive(d, "", "\\{\\}", "g");
+    hre.replaceDestructive(d, "", "\\[\\]}", "g");
+    // Do it again to be safe (for one recursion):
+    hre.replaceDestructive(d, "", "\\(\\)", "g");
+    hre.replaceDestructive(d, "", "\\{\\}", "g");
+    hre.replaceDestructive(d, "", "\\[\\]}", "g");
+
+    // Now pair (), {}, and [] parentheses in the d string.
+    vector<pair<int, char> > stack;
+    pair<int, char> item;
+    vector<int> pairing(d.size(), -1);
+    for (int i = 0; i < (int)d.size(); i++) {
+        if (d[i] == '(') {
+            item.first = i;
+            item.second = d[i];
+            stack.push_back(item);
+        }
+        else if (d[i] == '{') {
+            item.first = i;
+            item.second = d[i];
+            stack.push_back(item);
+        }
+        else if (d[i] == '[') {
+            item.first = i;
+            item.second = d[i];
+            stack.push_back(item);
+        }
+        else if (d[i] == ')') {
+            if (stack.empty()) {
+                validQ = false;
+                break;
+            }
+            if (stack.back().second != '(') {
+                validQ = false;
+                break;
+            }
+            pairing.at(stack.back().first) = i;
+            pairing.at(i) = stack.back().first;
+            stack.resize((int)stack.size() - 1);
+        }
+        else if (d[i] == '}') {
+            if (stack.empty()) {
+                validQ = false;
+                break;
+            }
+            if (stack.back().second != '{') {
+                validQ = false;
+                break;
+            }
+            pairing.at(stack.back().first) = i;
+            pairing.at(i) = stack.back().first;
+            stack.resize((int)stack.size() - 1);
+        }
+        else if (d[i] == ']') {
+            if (stack.empty()) {
+                validQ = false;
+                break;
+            }
+            if (stack.back().second != '[') {
+                validQ = false;
+                break;
+            }
+            pairing.at(stack.back().first) = i;
+            pairing.at(i) = stack.back().first;
+            stack.resize((int)stack.size() - 1);
+        }
+    }
+    if (!stack.empty()) {
+        // open/close not paired correctly
+        validQ = false;
+    }
+
+    // print analysis:
+    // for (int i=0; i<(int)d.size(); i++) {
+    //	cerr << "D[" << i << "] =\t" << d[i] << " pairing: " << pairing[i] << endl;
+    //}
+
+    bool skipfirst = false;
+    bool skipsecond = false;
+    StaffGrp *root = NULL;
+    if (pairing.back() != 0) {
+        // There is no barline across the staves in this case.
+        root = new StaffGrp();
+        root->SetBarThru(BOOLEAN_false);
+        m_doc->m_scoreDef.AddChild(root);
+    }
+    else if (d[0] == '(') {
+        // The outer group is not bracketed, but bar goes all of
+        // the way through system.
+        root = new StaffGrp();
+        root->SetBarThru(BOOLEAN_true);
+        m_doc->m_scoreDef.AddChild(root);
+    }
+    else if (pairing.back() == 0) {
+        skipfirst = true;
+        // some sort of grouping for the entire system
+        root = new StaffGrp();
+        if ((pairing.size() > 1) && (d[1] == '(')) {
+            skipsecond = true;
+            root->SetBarThru(BOOLEAN_true);
+        }
+        if (d[0] == '{') {
+            root->SetSymbol(staffGroupingSym_SYMBOL_brace);
+        }
+        else if (d[0] == '[') {
+            root->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+        }
+        m_doc->m_scoreDef.AddChild(root);
+    }
+
+    vector<int> spine; // kernstart index
+    vector<bool> barstart; // true if bar group starts at staff.
+    vector<bool> barend; // true if bar group stops at staff.
 
     vector<vector<int> > bargroups;
-    vector<char> groupstyle;
+    vector<string> groupstyle;
 
     groupstyle.resize(1);
-    groupstyle.back() = ' ';
+    groupstyle.back() = " ";
     bargroups.resize(1);
 
     bool staffQ = false;
     int value = 0;
+    bool bargrpQ = false;
 
-    for (int i = 0; i < (int)d.size() - 1; ++i) {
+    int start = 0;
+    int ending = (int)d.size();
+    if (skipfirst) {
+        start = 1;
+        ending--;
+    }
+    if (skipsecond) {
+        start = 2;
+        ending--;
+    }
+
+    for (int i = start; i < ending; ++i) {
         if (d[i] == '[') {
-            groupstyle.back() = '[';
+            groupstyle.back() = "[";
+            if (i < (int)d.size() - 1) {
+                if (d[i + 1] == '(') {
+                    groupstyle.back() += "(";
+                    i++;
+                }
+            }
         }
         else if (d[i] == '{') {
-            groupstyle.back() = '{';
+            groupstyle.back() = "{";
+            if (i < (int)d.size() - 1) {
+                if (d[i + 1] == '(') {
+                    groupstyle.back() += "(";
+                    i++;
+                }
+            }
+        }
+        else if (d[i] == '}') {
+            groupstyle.push_back(" ");
+            bargroups.resize(bargroups.size() + 1);
+        }
+        else if (d[i] == ']') {
+            groupstyle.push_back(" ");
+            bargroups.resize(bargroups.size() + 1);
         }
         else if (d[i] == 's') {
             staffQ = true;
         }
+        else if (d[i] == '(') {
+            bargrpQ = true;
+            groupstyle.back() = "(";
+        }
         else if (d[i] == ')') {
-            // end of a bar group
-            bargroups.resize(bargroups.size() + 1);
-            groupstyle.push_back(' ');
+            if ((groupstyle.back().size() > 1) && (groupstyle.back().at(1) == '(')) {
+                // ignore since it does not indicate a group.
+            }
+            else {
+                // End of a bar group without extra decoration:
+                bargroups.resize(bargroups.size() + 1);
+                groupstyle.push_back(" ");
+                bargrpQ = false;
+            }
         }
         else if (std::isdigit(d[i])) {
             value = value * 10 + (d[i] - '0');
-            if (!std::isdigit(d[i + 1])) {
+            if ((i == (int)d.size() - 1) || !std::isdigit(d[i + 1])) {
                 if (staffQ) {
                     auto it = staffToSpineMapping.find(value);
                     if (it != staffToSpineMapping.end()) {
@@ -2011,16 +2194,18 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
     }
 
-    // Remove bracket/brace for any group which has only a single staff:
-    for (int i = 0; i < (int)bargroups.size(); ++i) {
-        if (bargroups.size() <= 1) {
-            groupstyle[i] = ' ';
-        }
-    }
+    // cerr << "BAR GROUPS" << endl;
+    // for (int i=0; i<(int)bargroups.size(); i++) {
+    // 	cerr << "\tgroup_style=" << groupstyle[i] << "\tgroup = " << i << ":\t";
+    // 	for (int j=0; j<(int)bargroups[i].size(); j++) {
+    // 		cerr << " " << bargroups[i][j];
+    // 	}
+    // 	cerr << endl;
+    // }
 
     // Pull out all non-zero staff groups:
     vector<vector<int> > newgroups;
-    vector<char> newstyles;
+    vector<string> newstyles;
     for (int i = 0; i < (int)bargroups.size(); ++i) {
         if (bargroups[i].empty()) {
             continue;
@@ -2054,7 +2239,12 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
         StaffGrp *sg = new StaffGrp();
         sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
-        m_doc->m_scoreDef.AddChild(sg);
+        if (root) {
+            root->AddChild(sg);
+        }
+        else {
+            m_doc->m_scoreDef.AddChild(sg);
+        }
         for (int i = 0; i < (int)m_staffdef.size(); ++i) {
             sg->AddChild(m_staffdef[i]);
         }
@@ -2065,7 +2255,12 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     if (newgroups.size() == 1) {
         // only one group
         StaffGrp *sg = new StaffGrp();
-        m_doc->m_scoreDef.AddChild(sg);
+        if (root) {
+            root->AddChild(sg);
+        }
+        else {
+            m_doc->m_scoreDef.AddChild(sg);
+        }
 
         string groupName = "";
         hum::HTp groupNameTok = NULL;
@@ -2083,10 +2278,10 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
         // currently required to be barred:
         sg->SetBarThru(BOOLEAN_true);
-        if (newstyles[0] == '[') {
+        if (newstyles.at(0).at(0) == '[') {
             sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
         }
-        else if (newstyles[0] == '{') {
+        else if (newstyles.at(0).at(0) == '{') {
             sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
         }
         for (int i = 0; i < (int)newgroups[0].size(); ++i) {
@@ -2102,7 +2297,12 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         // staffDef in the root_sg group.
         StaffGrp *root_sg = new StaffGrp();
         root_sg->SetBarThru(BOOLEAN_false);
-        m_doc->m_scoreDef.AddChild(root_sg);
+        if (root) {
+            root->AddChild(root_sg);
+        }
+        else {
+            m_doc->m_scoreDef.AddChild(root_sg);
+        }
         for (int i = 0; i < (int)newgroups.size(); ++i) {
             if (newgroups[i].size() == 1) {
                 // insert staffDef directly in root_sg:
@@ -2112,7 +2312,12 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 // create staffGrp and then insert staffDefs for group
                 StaffGrp *sg = new StaffGrp();
                 root_sg->AddChild(sg);
-                sg->SetBarThru(BOOLEAN_true);
+                if (groupstyle[i].find("(") != std::string::npos) {
+                    sg->SetBarThru(BOOLEAN_true);
+                }
+                else {
+                    sg->SetBarThru(BOOLEAN_false);
+                }
 
                 string groupName = "";
                 hum::HTp groupNameTok = NULL;
@@ -2128,10 +2333,10 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                     setInstrumentName(sg, groupName, groupNameTok);
                 }
 
-                if (newstyles[i] == '[') {
+                if (newstyles.at(i).at(0) == '[') {
                     sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
                 }
-                else if (newstyles[i] == '{') {
+                else if (newstyles.at(i).at(0) == '{') {
                     sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
                 }
                 for (int j = 0; j < (int)newgroups[i].size(); ++j) {
@@ -2141,6 +2346,27 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
             }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getStaffNumbers -- Extract numbers from list.
+//
+
+vector<int> HumdrumInput::getStaffNumbers(string &deco)
+{
+    vector<int> output;
+    for (int i = 0; i < (int)deco.size(); i++) {
+        if (isdigit(deco[i])) {
+            int value = 0;
+            while ((i < (int)deco.size()) && (isdigit(deco[i]))) {
+                value = value * 10 + (deco[i] - '0');
+                i++;
+            }
+            output.push_back(value);
+        }
+    }
+    return output;
 }
 
 //////////////////////////////

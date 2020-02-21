@@ -578,6 +578,7 @@ protected:
     void addExplicitStemDirection(FTrem *ftrem, hum::HTp start);
     void addSlur(FTrem *ftrem, hum::HTp start);
     void addFTremSlurs();
+    std::vector<int> getStaffNumbers(std::string &deco);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
