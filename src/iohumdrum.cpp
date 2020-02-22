@@ -2147,6 +2147,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     bool staffQ = false;
     int value = 0;
     bool grouper = false;
+    int glevel = 0;
 
     int start = 0;
     int ending = (int)d.size();
@@ -2162,8 +2163,13 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     for (int i = start; i < ending; ++i) {
         if (d[i] == '[') {
             if (!grouper) {
-                groupstyle.push_back("[");
-                bargroups.resize(bargroups.size() + 1);
+                if (bargroups.back().empty()) {
+                    groupstyle.back() = "[";
+                }
+                else {
+                    groupstyle.push_back("[");
+                    bargroups.resize(bargroups.size() + 1);
+                }
             }
             groupstyle.back() = "[";
             if (i < (int)d.size() - 1) {
@@ -2173,11 +2179,17 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 }
             }
             grouper = true;
+            glevel++;
         }
         else if (d[i] == '{') {
             if (!grouper) {
-                groupstyle.push_back("{");
-                bargroups.resize(bargroups.size() + 1);
+                if (bargroups.back().empty()) {
+                    groupstyle.back() = "{";
+                }
+                else {
+                    groupstyle.push_back("{");
+                    bargroups.resize(bargroups.size() + 1);
+                }
             }
             groupstyle.back() = "{";
             if (i < (int)d.size() - 1) {
@@ -2187,14 +2199,23 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 }
             }
             grouper = true;
+            glevel++;
         }
         else if (d[i] == '}') {
             groupstyle.push_back(" ");
             bargroups.resize(bargroups.size() + 1);
+            glevel--;
+            if (glevel == 0) {
+                grouper = false;
+            }
         }
         else if (d[i] == ']') {
             groupstyle.push_back(" ");
             bargroups.resize(bargroups.size() + 1);
+            glevel--;
+            if (glevel == 0) {
+                grouper = false;
+            }
         }
         else if (d[i] == 's') {
             staffQ = true;
@@ -2211,6 +2232,10 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 // End of a bar group without extra decoration:
                 bargroups.resize(bargroups.size() + 1);
                 groupstyle.push_back(" ");
+            }
+            glevel--;
+            if (glevel == 0) {
+                grouper = false;
             }
         }
         else if (std::isdigit(d[i])) {
