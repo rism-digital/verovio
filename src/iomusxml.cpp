@@ -1492,6 +1492,40 @@ void MusicXmlInput::ReadMusicXmlDirection(
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
+    // Bracket
+    pugi::xpath_node bracket = type.node().select_node("bracket");
+    if (bracket) {
+        int voiceNumber = bracket.node().attribute("number").as_int();
+        voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
+        if (HasAttributeWithValue(bracket.node(), "type", "stop")) {
+            if (m_bracketStack.empty()) {
+                // if this is empty, most likely we're dealing with an extender
+            }
+            else {
+                int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
+                m_bracketStack.front().first->SetLendsym(
+                    m_bracketStack.front().first->AttLineRend::StrToLinestartendsymbol(
+                        bracket.node().attribute("line-end").as_string()));
+                m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                m_bracketStack.erase(m_bracketStack.begin());
+            }
+        }
+        else {
+            BracketSpan *bracketSpan = new BracketSpan();
+            musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
+            bracketSpan->SetColor(bracket.node().attribute("color").as_string());
+            bracketSpan->SetLform(
+                bracketSpan->AttLineRendBase::StrToLineform(bracket.node().attribute("line-type").as_string()));
+            // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            bracketSpan->SetFunc("unclear");
+            bracketSpan->SetLstartsym(
+                bracketSpan->AttLineRend::StrToLinestartendsymbol(bracket.node().attribute("line-end").as_string()));
+            bracketSpan->SetTstamp(timeStamp);
+            m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
+            m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
+        }
+    }
+
     // Directive
     std::string dynamStr = ""; // string containing dynamics information
     int defaultY = 0; // y position attribute, only for directives and dynamics
