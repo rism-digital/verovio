@@ -1956,13 +1956,17 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                     sstring += ",";
                 }
             }
+            hre.replaceDestructive(d, sstring, gstring);
         }
-        hre.replaceDestructive(d, sstring, gstring);
     }
     // Remove any invalid characters:
     hre.replaceDestructive(d, "", "[^0-9s(){}\\][]", "g");
     if (d.empty()) {
         return;
+    }
+    if ((0)) {
+        cerr << "INPUT DECORATION: " << decoration << endl;
+        cerr << "     PROCESSED:   " << d << endl;
     }
 
     // Remove an staff numbers that are no longer present (or invalid):
@@ -2053,10 +2057,12 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         validQ = false;
     }
 
-    // print analysis:
-    // for (int i=0; i<(int)d.size(); i++) {
-    //	cerr << "D[" << i << "] =\t" << d[i] << " pairing: " << pairing[i] << endl;
-    //}
+    if ((0)) {
+        // print analysis:
+        for (int i = 0; i < (int)d.size(); i++) {
+            cerr << "D[" << i << "] =\t" << d[i] << " pairing: " << pairing[i] << endl;
+        }
+    }
 
     bool skipfirst = false;
     bool skipsecond = false;
@@ -2194,14 +2200,16 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
     }
 
-    // cerr << "BAR GROUPS" << endl;
-    // for (int i=0; i<(int)bargroups.size(); i++) {
-    // 	cerr << "\tgroup_style=" << groupstyle[i] << "\tgroup = " << i << ":\t";
-    // 	for (int j=0; j<(int)bargroups[i].size(); j++) {
-    // 		cerr << " " << bargroups[i][j];
-    // 	}
-    // 	cerr << endl;
-    // }
+    if ((0)) {
+        cerr << "BAR GROUPS" << endl;
+        for (int i = 0; i < (int)bargroups.size(); i++) {
+            cerr << "\tgroup_style=" << groupstyle[i] << "\tgroup = " << i << ":\t";
+            for (int j = 0; j < (int)bargroups[i].size(); j++) {
+                cerr << " " << bargroups[i][j];
+            }
+            cerr << endl;
+        }
+    }
 
     // Pull out all non-zero staff groups:
     vector<vector<int> > newgroups;
@@ -2235,9 +2243,10 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     if (!validQ) {
         cerr << "DECORATION IS INVALID " << decoration << endl;
         if (d != decoration) {
-            cerr << "\tStaff version: " << d << endl;
+            cerr << "\tSTAFF VERSION: " << d << endl;
         }
         StaffGrp *sg = new StaffGrp();
+        sg->SetUuid("GOT_HERE_MMM");
         sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
         if (root) {
             root->AddChild(sg);
@@ -2253,13 +2262,20 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
     // Build system groups based on system decoration instructions
     if (newgroups.size() == 1) {
-        // only one group
-        StaffGrp *sg = new StaffGrp();
+        // only one group, but already added
+        StaffGrp *sg = NULL;
         if (root) {
-            root->AddChild(sg);
+            sg = root;
         }
         else {
-            m_doc->m_scoreDef.AddChild(sg);
+            sg = new StaffGrp();
+            sg->SetUuid("GOT_HERE_NNN");
+            if (root) {
+                root->AddChild(sg);
+            }
+            else {
+                m_doc->m_scoreDef.AddChild(sg);
+            }
         }
 
         string groupName = "";
@@ -2289,24 +2305,26 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
     }
     else {
-        // multiple barred groups, the outer currently cannot be styled, so just plain
-        // and no barring, so outer group is:
-        //    <staffGrp barthru="false">
-        //    </staffGrp>
-        // If there is only one staff in a group, it will be given as a bare
-        // staffDef in the root_sg group.
-        StaffGrp *root_sg = new StaffGrp();
-        root_sg->SetBarThru(BOOLEAN_false);
+        // An all-staff group should have already been created.
+        StaffGrp *root_sg = NULL;
         if (root) {
-            root->AddChild(root_sg);
+            root_sg = root;
         }
         else {
+            root_sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(root_sg);
+            root_sg->SetBarThru(BOOLEAN_false);
         }
         for (int i = 0; i < (int)newgroups.size(); ++i) {
             if (newgroups[i].size() == 1) {
                 // insert staffDef directly in root_sg:
                 root_sg->AddChild(m_staffdef[newgroups[i][0]]);
+                if (groupstyle[i].find("(") != std::string::npos) {
+                    root_sg->SetBarThru(BOOLEAN_true);
+                }
+                else {
+                    root_sg->SetBarThru(BOOLEAN_false);
+                }
             }
             else {
                 // create staffGrp and then insert staffDefs for group
@@ -3642,6 +3660,9 @@ template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, 
 template <class ELEMENT>
 void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const string &name, hum::HTp abbrtok)
 {
+    if (name.empty()) {
+        return;
+    }
     LabelAbbr *label = new LabelAbbr();
     Text *text = new Text;
     if (abbrtok) {
