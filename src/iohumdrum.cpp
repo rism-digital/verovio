@@ -2110,7 +2110,6 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
     bool staffQ = false;
     int value = 0;
-    bool bargrpQ = false;
 
     int start = 0;
     int ending = (int)d.size();
@@ -2154,7 +2153,6 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
             staffQ = true;
         }
         else if (d[i] == '(') {
-            bargrpQ = true;
             groupstyle.back() = "(";
         }
         else if (d[i] == ')') {
@@ -2165,7 +2163,6 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 // End of a bar group without extra decoration:
                 bargroups.resize(bargroups.size() + 1);
                 groupstyle.push_back(" ");
-                bargrpQ = false;
             }
         }
         else if (std::isdigit(d[i])) {
@@ -3338,7 +3335,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
     int group = getGroupNumberLabel(partstart);
 
-    bool hasglabel = false;
+    // bool hasglabel = false;
     std::string glabel;
     hum::HTp glabeltok = NULL;
     std::string gabbreviation;
@@ -3351,7 +3348,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HTp abbrtok = NULL;
 
     std::string stria; // number of staff lines
-    hum::HTp striatok = NULL;
+    // hum::HTp striatok = NULL;
     std::string clef;
     hum::HTp cleftok = NULL;
     hum::HTp keytok = NULL;
@@ -3383,7 +3380,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 6, "*stria") == 0) {
             stria = *part;
-            striatok = part;
+            // striatok = part;
         }
         else if (part->compare(0, 5, "*omet") == 0) {
             m_omet.emplace_back(partnumber, part);
@@ -3424,7 +3421,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         else if (part->compare(0, 4, "*I\"\"") == 0) {
             glabel = part->substr(4);
             glabeltok = part;
-            hasglabel = true;
+            // hasglabel = true;
             if ((group > 0) && !glabel.empty()) {
                 m_group_name[group] = glabel;
                 m_group_name_tok[group] = glabeltok;
