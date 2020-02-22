@@ -1914,23 +1914,34 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     // in the score, then the results may have problems.
 
     map<int, vector<int> > groupToStaffMapping;
+    map<int, vector<int> > partToStaffMapping;
     map<int, int> staffToSpineMapping;
     map<int, int> staffToGroupMapping;
     map<int, int> spineToGroupMapping;
+    map<int, int> staffToPartMapping;
+    map<int, int> spineToPartMapping;
 
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         int staff = getStaffNumberLabel(staffstarts[i]);
         int group = getGroupNumberLabel(staffstarts[i]);
+        int part = getPartNumberLabel(staffstarts[i]);
 
         if (group > 0) {
             groupToStaffMapping[group].push_back(staff);
             spineToGroupMapping[i] = group;
+        }
+        if (part > 0) {
+            partToStaffMapping[part].push_back(staff);
+            spineToPartMapping[i] = part;
         }
         if (staff > 0) {
             staffToSpineMapping[staff] = i;
         }
         if ((group > 0) && (staff > 0)) {
             staffToGroupMapping[staff] = group;
+        }
+        if ((part > 0) && (staff > 0)) {
+            staffToGroupMapping[staff] = part;
         }
     }
 
@@ -1959,6 +1970,31 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
             hre.replaceDestructive(d, sstring, gstring);
         }
     }
+
+    // Expand parts to staves.
+    if (!partToStaffMapping.empty()) {
+        // substitute spine parts with staff numbers.
+        // example:   {(p1}} will be expanded to {(s1,s2)} if
+        // part1 is given to staff1 and staff2.
+        string pstring;
+        string sstring;
+        for (auto const &it : partToStaffMapping) {
+            pstring = "p" + to_string(it.first);
+            sstring = "";
+            for (int i = 0; i < (int)it.second.size(); i++) {
+                sstring += "s" + to_string(it.second.at(i));
+                if (i < (int)it.second.size() - 1) {
+                    sstring += ",";
+                }
+            }
+            hre.replaceDestructive(d, sstring, pstring);
+        }
+    }
+
+    // remove unexpanded groups and parts
+    hre.replaceDestructive(d, "", "p\\d+", "g");
+    hre.replaceDestructive(d, "", "g\\d+", "g");
+
     // Remove any invalid characters:
     hre.replaceDestructive(d, "", "[^0-9s(){}\\][]", "g");
     if (d.empty()) {
@@ -2110,6 +2146,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
     bool staffQ = false;
     int value = 0;
+    bool grouper = false;
 
     int start = 0;
     int ending = (int)d.size();
@@ -2124,6 +2161,10 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
     for (int i = start; i < ending; ++i) {
         if (d[i] == '[') {
+            if (!grouper) {
+                groupstyle.push_back("[");
+                bargroups.resize(bargroups.size() + 1);
+            }
             groupstyle.back() = "[";
             if (i < (int)d.size() - 1) {
                 if (d[i + 1] == '(') {
@@ -2131,8 +2172,13 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                     i++;
                 }
             }
+            grouper = true;
         }
         else if (d[i] == '{') {
+            if (!grouper) {
+                groupstyle.push_back("{");
+                bargroups.resize(bargroups.size() + 1);
+            }
             groupstyle.back() = "{";
             if (i < (int)d.size() - 1) {
                 if (d[i + 1] == '(') {
@@ -2140,6 +2186,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                     i++;
                 }
             }
+            grouper = true;
         }
         else if (d[i] == '}') {
             groupstyle.push_back(" ");
@@ -2154,6 +2201,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         }
         else if (d[i] == '(') {
             groupstyle.back() = "(";
+            grouper = true;
         }
         else if (d[i] == ')') {
             if ((groupstyle.back().size() > 1) && (groupstyle.back().at(1) == '(')) {
@@ -2195,6 +2243,10 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 value = 0;
             }
         }
+    }
+
+    if ((!bargroups.empty()) && bargroups.back().empty()) {
+        bargroups.resize((int)bargroups.size() - 1);
     }
 
     if ((0)) {
@@ -3191,6 +3243,40 @@ int HumdrumInput::getStaffNumberLabel(hum::HTp spinestart)
             continue;
         }
         string number = tok->substr(6, string::npos);
+        if (!std::isdigit(number[0])) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        return stoi(number);
+    }
+    return 0;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getPartNumberLabel -- Return number 2 in pattern *part2.
+//
+
+int HumdrumInput::getPartNumberLabel(hum::HTp spinestart)
+{
+    hum::HTp tok = spinestart;
+    while (tok) {
+        if (tok->isData()) {
+            break;
+        }
+        if (!tok->isInterpretation()) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        if (tok->compare(0, 5, "*part") != 0) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        if (tok->size() <= 5) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        string number = tok->substr(5, string::npos);
         if (!std::isdigit(number[0])) {
             tok = tok->getNextToken();
             continue;
