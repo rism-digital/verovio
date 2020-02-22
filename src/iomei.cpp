@@ -5331,7 +5331,7 @@ bool MeiInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
 
 bool MeiInput::ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef) {
+    if (!m_hasScoreDef && m_useScoreDefForDoc) {
         LogError("<choice> before any <scoreDef> is not supported");
         return false;
     }
