@@ -1487,6 +1487,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     pugi::xpath_node type = node.select_node("direction-type");
+    pugi::xpath_node extender = type.node().next_sibling("direction-type").first_child();
     std::string placeStr = node.attribute("placement").as_string();
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
@@ -1508,15 +1509,29 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
+            int staffNum = 1;
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode)
-                dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
-                    std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+            dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
             TextRendition(words, dir);
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             dir->SetVgrp(defaultY);
             m_controlElements.push_back(std::make_pair(measureNum, dir));
             m_dirStack.push_back(dir);
+            if (extender) {
+                int extNumber = extender.node().attribute("number").as_int();
+                extNumber = (extNumber < 1) ? 1 : extNumber;
+                dir->SetExtender(BOOLEAN_true);
+                if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
+                    dir->SetLform(
+                        dir->AttLineRendBase::StrToLineform(extender.node().attribute("line-type").as_string()));
+                }
+                else {
+                    dir->SetLform(LINEFORM_dashed);
+                }
+                musicxml::OpenDashes openDashes(extNumber, staffNum, m_measureCounts.at(measure));
+                m_openDashesStack.push_back(std::make_pair(dir, openDashes));
+            }
         }
     }
 
@@ -1531,20 +1546,34 @@ void MusicXmlInput::ReadMusicXmlDirection(
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
         dynam->SetTstamp(timeStamp);
+        int staffNum = 1;
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode)
-            dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
-                std::to_string(staffNode.node().text().as_int() + staffOffset)));
+        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+        dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         if (defaultY == 0) defaultY = dynamics.node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
         defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
         dynam->SetVgrp(defaultY);
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         m_dynamStack.push_back(dynam);
+        if (extender) {
+            int extNumber = extender.node().attribute("number").as_int();
+            extNumber = (extNumber < 1) ? 1 : extNumber;
+            dynam->SetExtender(BOOLEAN_true);
+            if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
+                dynam->SetLform(
+                    dynam->AttLineRendBase::StrToLineform(extender.node().attribute("line-type").as_string()));
+            }
+            else {
+                dynam->SetLform(LINEFORM_dashed);
+            }
+            musicxml::OpenDashes openDashes(extNumber, staffNum, m_measureCounts.at(measure));
+            m_openDashesStack.push_back(std::make_pair(dynam, openDashes));
+        }
     }
 
     // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
-    pugi::xpath_node dashes = type.node().select_node("dashes");
+    pugi::xpath_node dashes = type.node().select_node("bracket|dashes");
     if (dashes) {
         int dashesNumber = dashes.node().attribute("number").as_int();
         dashesNumber = (dashesNumber < 1) ? 1 : dashesNumber;
@@ -1564,43 +1593,6 @@ void MusicXmlInput::ReadMusicXmlDirection(
                             ->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                     m_openDashesStack.erase(iter--);
                 }
-            }
-        }
-        else {
-            ControlElement *controlElement = nullptr;
-            // find last ControlElement of type dynam or dir and activate extender
-            std::vector<std::pair<std::string, ControlElement *> >::reverse_iterator riter;
-            for (riter = m_controlElements.rbegin(); riter != m_controlElements.rend(); ++riter) {
-                if (riter->second->Is(DYNAM)) {
-                    Dynam *dynam = dynamic_cast<Dynam *>(riter->second);
-                    std::vector<int> staffAttr = dynam->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
-                        && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())
-                        && riter->first == measureNum) {
-                        dynam->SetExtender(BOOLEAN_true);
-                        controlElement = dynam;
-                        break;
-                    }
-                }
-                else if (riter->second->Is(DIR)) {
-                    Dir *dir = dynamic_cast<Dir *>(riter->second);
-                    std::vector<int> staffAttr = dir->GetStaff();
-                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
-                        && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())
-                        && riter->first == measureNum) {
-                        dir->SetExtender(BOOLEAN_true);
-                        controlElement = dir;
-                        break;
-                    }
-                }
-            }
-            if (controlElement != nullptr) {
-                musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
-                m_openDashesStack.push_back(std::make_pair(controlElement, openDashes));
-            }
-            else {
-                LogMessage("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
-                    measureNum.c_str());
             }
         }
     }
