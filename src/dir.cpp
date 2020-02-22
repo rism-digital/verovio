@@ -31,12 +31,14 @@ Dir::Dir()
     , TextDirInterface()
     , TimeSpanningInterface()
     , AttLang()
+    , AttLineRendBase()
     , AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_EXTENDER);
+    RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
@@ -49,8 +51,9 @@ void Dir::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
-    ResetLang();
     ResetExtender();
+    ResetLang();
+    ResetLineRendBase();
     ResetVerticalGroup();
 }
 

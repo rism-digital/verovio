@@ -38,11 +38,13 @@ Dynam::Dynam()
     , TextDirInterface()
     , TimeSpanningInterface()
     , AttExtender()
+    , AttLineRendBase()
     , AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_EXTENDER);
+    RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
@@ -56,6 +58,7 @@ void Dynam::Reset()
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
     ResetExtender();
+    ResetLineRendBase();
     ResetVerticalGroup();
 }
 
