@@ -506,7 +506,7 @@ protected:
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);
-    void processStaffDecoration(const std::string &decoration);
+    bool processStaffDecoration(const std::string &decoration);
     int getStaffNumberLabel(hum::HTp spinestart);
     int getGroupNumberLabel(hum::HTp spinestart);
     int getPartNumberLabel(hum::HTp spinestart);

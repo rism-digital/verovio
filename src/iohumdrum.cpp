@@ -1642,7 +1642,16 @@ void HumdrumInput::prepareStaffGroups()
         // do something if there is no staff in the score?
     }
     else {
-        processStaffDecoration(decoration);
+        bool status = processStaffDecoration(decoration);
+        if (!status) {
+            StaffGrp *sg = new StaffGrp();
+            m_doc->m_scoreDef.AddChild(sg);
+            sg->SetBarThru(BOOLEAN_false);
+            // sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+            for (int i = 0; i < (int)m_staffdef.size(); ++i) {
+                sg->AddChild(m_staffdef[i]);
+            }
+        }
     }
 }
 
@@ -1888,10 +1897,10 @@ std::string HumdrumInput::getInstrumentAbbreviation(StaffDef *sd)
 //    a common staff).
 //
 
-void HumdrumInput::processStaffDecoration(const string &decoration)
+bool HumdrumInput::processStaffDecoration(const string &decoration)
 {
     if (decoration.empty()) {
-        return;
+        return false;
     }
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
@@ -1993,7 +2002,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     // Remove any invalid characters:
     hre.replaceDestructive(d, "", "[^0-9s(){}\\][]", "g");
     if (d.empty()) {
-        return;
+        return false;
     }
     if ((0)) {
         cerr << "INPUT DECORATION: " << decoration << endl;
@@ -2088,11 +2097,19 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         validQ = false;
     }
 
+    if (!validQ) {
+        return false;
+    }
+
     if ((0)) {
         // print analysis:
         for (int i = 0; i < (int)d.size(); i++) {
             cerr << "D[" << i << "] =\t" << d[i] << " pairing: " << pairing[i] << endl;
         }
+    }
+
+    if (pairing.empty()) {
+        return false;
     }
 
     bool skipfirst = false;
@@ -2326,7 +2343,9 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         for (int i = 0; i < (int)m_staffdef.size(); ++i) {
             sg->AddChild(m_staffdef[i]);
         }
-        return;
+        // returning true since the staff groups are
+        // dealt with at this point.
+        return true;
     }
 
     // Build system groups based on system decoration instructions
@@ -2433,6 +2452,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
             }
         }
     }
+    return true;
 }
 
 //////////////////////////////
