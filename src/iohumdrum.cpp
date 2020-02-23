@@ -16974,15 +16974,6 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
 {
     hum::HumdrumFile &infile = m_infiles[0];
 
-    if (infile[startline].getTokenString(0).compare(0, 2, "**") == 0) {
-        // create hum::HumdrumFile.hasPickup() function and uncomment out below:
-        // if (infile.hasPickup()) {
-        //    return 1;
-        // } else {
-        return 0;
-        // }
-    }
-
     int number;
     if (infile[startline].isBarline()) {
         if (sscanf(infile[startline].getTokenString(0).c_str(), "=%d", &number) == 1) {
@@ -17007,6 +16998,10 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
             else if (infile[i].isData()) {
                 found = false;
                 linenum = -1;
+                // if (infile.hasPickup()) {
+                // 		// set the first implicit measure to 0
+                // 		return 0;
+                // }
                 break;
             }
         }
