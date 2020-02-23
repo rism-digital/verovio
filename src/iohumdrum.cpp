@@ -16984,11 +16984,43 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
     }
 
     int number;
-    if (sscanf(infile[startline].getTokenString(0).c_str(), "=%d", &number) == 1) {
-        return number;
+    if (infile[startline].isBarline()) {
+        if (sscanf(infile[startline].getTokenString(0).c_str(), "=%d", &number) == 1) {
+            return number;
+        }
+        else {
+            return -1;
+        }
     }
     else {
-        return -1;
+        // at the start of the score (most likely).  Search through the first
+        // spine for the first barline, provided that it starts before the first
+        // data line.
+        bool found = false;
+        int linenum = -1;
+        for (int i = 0; i < infile.getLineCount(); i++) {
+            if (infile[i].isBarline()) {
+                found = true;
+                linenum = i;
+                break;
+            }
+            else if (infile[i].isData()) {
+                found = false;
+                linenum = -1;
+                break;
+            }
+        }
+        if (found) {
+            if (sscanf(infile[linenum].getTokenString(0).c_str(), "=%d", &number) == 1) {
+                return number;
+            }
+            else {
+                return -1;
+            }
+        }
+        else {
+            return -1;
+        }
     }
 }
 
