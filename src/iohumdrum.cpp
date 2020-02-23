@@ -3745,18 +3745,17 @@ template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, 
     // "\xc2\xa0" is a non-breaking space
     string newname;
     Label *label = new Label();
-    Text *text = new Text;
     if (name == "   ") {
+        Text *text = new Text;
         text->SetText(L"\u00a0\u00a0\u00a0");
+        label->AddChild(text);
     }
     else {
-        // newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
-        text->SetText(UTF8to16(name));
+        setLabelContent(label, name);
     }
     if (labeltok) {
         setLocationId(label, labeltok);
     }
-    label->AddChild(text);
     element->InsertChild(label, 0);
 }
 
@@ -3776,7 +3775,21 @@ void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const string &nam
     if (abbrtok) {
         setLocationId(label, abbrtok);
     }
-    text->SetText(UTF8to16(name));
+
+    std::string name8 = name;
+    // Substitute b and "-flat" for Unicode flat symbol:
+    std::regex exp1("\\b([A-G])b\\b");
+    std::regex exp2("\\b([A-Ga-g])-flat\\b");
+    name8 = std::regex_replace(name8, exp1, "$1\xe2\x99\xad");
+    name8 = std::regex_replace(name8, exp2, "$1\xe2\x99\xad");
+    // Substitute # and "-sharp" for Unicode sharp symbol:
+    std::regex exp3("\\b([A-G])#\\b");
+    std::regex exp4("\\b([A-Ga-g])-sharp\\b");
+    name8 = std::regex_replace(name8, exp3, "$1\xe2\x99\xaf");
+    name8 = std::regex_replace(name8, exp4, "$1\xe2\x99\xaf");
+
+    std::wstring name16 = UTF8to16(name8);
+    text->SetText(name16);
     label->AddChild(text);
     element->InsertChild(label, 0);
 }
@@ -9082,10 +9095,76 @@ bool HumdrumInput::addTempoDirection(const string &text, const string &placement
 
 //////////////////////////////
 //
+// HumdrumInput::setLabelContent -- Will convert one Eb, E-flat, C#, C-sharp
+//   encoded accidental into a VeorvioText (SMUFL) accidental.
+//
+
+bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
+{
+
+    std::string name2 = name;
+
+    std::string prestring;
+    std::wstring symbol;
+    std::string poststring;
+
+    hum::HumRegex hre;
+    if (hre.search(name, "(.*)-flat\\b(.*)")) {
+        prestring = hre.getMatch(1);
+        poststring = hre.getMatch(2);
+        symbol = L"\uE260"; // SMUFL flat
+    }
+    else if (hre.search(name, "(.*)-sharp\\b(.*)")) {
+        prestring = hre.getMatch(1);
+        poststring = hre.getMatch(2);
+        symbol = L"\uE262"; // SMUFL sharp
+    }
+    else if (hre.search(name, "(.*\\b[A-G])b\\b(.*)")) {
+        prestring = hre.getMatch(1);
+        poststring = hre.getMatch(2);
+        symbol = L"\uE260"; // SMUFL flat
+    }
+    else if (hre.search(name2, "(.*[A-G])\x23(.*)")) {
+        prestring = hre.getMatch(1);
+        poststring = hre.getMatch(2);
+        symbol = L"\uE262"; // SMUFL sharp
+    }
+
+    if (symbol.empty()) {
+        Text *text = new Text;
+        text->SetText(UTF8to16(name));
+        label->AddChild(text);
+    }
+    else {
+        if (!prestring.empty()) {
+            Text *text = new Text;
+            text->SetText(UTF8to16(prestring));
+            label->AddChild(text);
+        }
+        Rend *rend = new Rend;
+        Text *text = new Text;
+        text->SetText(symbol);
+        rend->AddChild(text);
+        label->AddChild(rend);
+        rend->SetFontname("VerovioText");
+        if (!poststring.empty()) {
+            Text *text = new Text;
+            text->SetText(UTF8to16(poststring));
+            label->AddChild(text);
+        }
+        // verovio probably eats the space surronding the
+        // rend, so may need to force to be non-breaking space.
+    }
+
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::setTempoContent --
 //
 
-bool HumdrumInput::setTempoContent(Tempo *tempo, const string &text)
+bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 {
     hum::HumRegex hre;
     if (!hre.search(text, "(.*)\\[([^=\\]]*)\\]\\s*=\\s*(\\d+.*)")) {

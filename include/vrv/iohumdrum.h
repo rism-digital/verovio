@@ -23,6 +23,7 @@
 #include "ftrem.h"
 #include "io.h"
 #include "keysig.h"
+#include "label.h"
 #include "metersig.h"
 #include "options.h"
 #include "pedal.h"
@@ -500,6 +501,7 @@ protected:
     bool addTempoDirection(const std::string &text, const std::string &placement, bool bold, bool italic,
         hum::HTp token, int staffindex, int justification, const std::string &color);
     bool setTempoContent(Tempo *tempo, const std::string &text);
+    bool setLabelContent(Label *label, const std::string &text);
     std::string convertRhythmToVerovioText(const std::string &text);
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
