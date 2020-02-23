@@ -1649,7 +1649,7 @@ void HumdrumInput::prepareStaffGroups()
 //////////////////////////////
 //
 // HumdrumInput::promoteInstrumentNamesToGroup -- If two staves are in a staff group and only one
-//    has an instrument label (or both have identical labels), then move the label to the group
+//    has an instrument label, or both have identical labels, then move the label to the group
 //    level, so that the instrument name/abbreviation is centered between the staves.
 //
 // scoreDef
@@ -1704,15 +1704,14 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
         std::string label = getInstrumentName(sd);
         names.push_back(label);
     }
-    bool allsame = true;
     if (names.size() <= 1) {
-        allsame = false;
+        return;
     }
     if (sds.size() != 2) {
         return;
     }
     string nonempty = names[0];
-    for (int i = 1; i < (int)names[i].size(); i++) {
+    for (int i = 1; i < (int)names.size(); i++) {
         if (names[i] == "") {
             continue;
         }
@@ -1721,15 +1720,14 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
             continue;
         }
         if (names[i] != nonempty) {
-            allsame = false;
+            return;
             break;
         }
     }
-    if (allsame) {
-        setInstrumentName(group, nonempty);
-        for (int i = 0; i < (int)sds.size(); i++) {
-            removeInstrumentName(sds[i]);
-        }
+
+    setInstrumentName(group, nonempty);
+    for (int i = 0; i < (int)sds.size(); i++) {
+        removeInstrumentName(sds[i]);
     }
 }
 
@@ -1781,15 +1779,14 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
         std::string label = getInstrumentAbbreviation(sd);
         names.push_back(label);
     }
-    bool allsame = true;
     if (names.size() <= 1) {
-        allsame = false;
+        return;
     }
     if (sds.size() != 2) {
         return;
     }
     string nonempty = names[0];
-    for (int i = 1; i < (int)names[i].size(); i++) {
+    for (int i = 1; i < (int)names.size(); i++) {
         if (names[i] == "") {
             continue;
         }
@@ -1798,18 +1795,16 @@ void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
             continue;
         }
         if (names[i] != nonempty) {
-            allsame = false;
-            break;
+            return;
         }
     }
-    if (allsame) {
-        setInstrumentAbbreviation(group, nonempty, NULL);
-        for (int i = 0; i < (int)sds.size(); i++) {
-            if (names.at(i).empty()) {
-                continue;
-            }
-            removeInstrumentAbbreviation(sds[i]);
+
+    setInstrumentAbbreviation(group, nonempty, NULL);
+    for (int i = 0; i < (int)sds.size(); i++) {
+        if (names.at(i).empty()) {
+            continue;
         }
+        removeInstrumentAbbreviation(sds[i]);
     }
 }
 
