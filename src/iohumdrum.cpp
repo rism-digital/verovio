@@ -1674,7 +1674,9 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
 {
     ScoreDef &sdf = m_doc->m_scoreDef;
     int count = sdf.GetChildCount();
-
+    if (count < 2) {
+        return;
+    }
     for (int i = 0; i < count; i++) {
         Object *obj = sdf.GetChild(i);
         std::string name = obj->GetClassName();
@@ -2032,6 +2034,20 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     hre.replaceDestructive(d, "", "\\{\\}", "g");
     hre.replaceDestructive(d, "", "\\[\\]}", "g");
 
+    int scount = 0;
+    for (int i = 0; i < (int)d.size(); i++) {
+        if (d[i] == 's') {
+            scount++;
+        }
+    }
+    if (scount == 0) {
+        return false;
+    }
+    if (scount == 1) {
+        // Remove decoration when a single staff on system.
+        hre.replaceDestructive(d, "", "[^s\\d]", "g");
+    }
+
     // Now pair (), {}, and [] parentheses in the d string.
     vector<pair<int, char> > stack;
     pair<int, char> item;
@@ -2097,15 +2113,15 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         validQ = false;
     }
 
-    if (!validQ) {
-        return false;
-    }
-
     if ((0)) {
         // print analysis:
         for (int i = 0; i < (int)d.size(); i++) {
             cerr << "D[" << i << "] =\t" << d[i] << " pairing: " << pairing[i] << endl;
         }
+    }
+
+    if (!validQ) {
+        return false;
     }
 
     if (pairing.empty()) {
@@ -2332,7 +2348,6 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             cerr << "\tSTAFF VERSION: " << d << endl;
         }
         StaffGrp *sg = new StaffGrp();
-        sg->SetUuid("GOT_HERE_MMM");
         sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
         if (root) {
             root->AddChild(sg);
@@ -2357,7 +2372,6 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         }
         else {
             sg = new StaffGrp();
-            sg->SetUuid("GOT_HERE_NNN");
             if (root) {
                 root->AddChild(sg);
             }
@@ -2380,14 +2394,32 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             setInstrumentName(sg, groupName, groupNameTok);
         }
 
-        // currently required to be barred:
-        sg->SetBarThru(BOOLEAN_true);
-        if (newstyles.at(0).at(0) == '[') {
-            sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+        if ((!newstyles.at(0).empty()) && (newstyles.at(0).at(0) == '[')) {
+            if (newgroups.at(0).size() > 1) {
+                sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+            }
+            if (newstyles.at(0).find('(') != std::string::npos) {
+                sg->SetBarThru(BOOLEAN_true);
+            }
+            else {
+                sg->SetBarThru(BOOLEAN_false);
+            }
         }
-        else if (newstyles.at(0).at(0) == '{') {
-            sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+        else if ((!newstyles.at(0).empty()) && (newstyles.at(0).at(0) == '{')) {
+            if (newgroups.at(0).size() > 1) {
+                sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+            }
+            if (newstyles.at(0).find('(') != std::string::npos) {
+                sg->SetBarThru(BOOLEAN_true);
+            }
+            else {
+                sg->SetBarThru(BOOLEAN_false);
+            }
         }
+        else if ((!newstyles.at(0).empty()) && (newstyles.at(0).at(0) == '(')) {
+            sg->SetBarThru(BOOLEAN_true);
+        }
+
         for (int i = 0; i < (int)newgroups[0].size(); ++i) {
             sg->AddChild(m_staffdef[newgroups[0][i]]);
         }
@@ -2404,52 +2436,40 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             root_sg->SetBarThru(BOOLEAN_false);
         }
         for (int i = 0; i < (int)newgroups.size(); ++i) {
-            if (newgroups[i].size() == 1) {
-                // insert staffDef directly in root_sg:
-                root_sg->AddChild(m_staffdef[newgroups[i][0]]);
-                if (groupstyle[i].find("(") != std::string::npos) {
-                    root_sg->SetBarThru(BOOLEAN_true);
-                }
-                else {
-                    root_sg->SetBarThru(BOOLEAN_false);
-                }
+            // create staffGrp and then insert staffDefs for group
+            StaffGrp *sg = new StaffGrp();
+            root_sg->AddChild(sg);
+            if (groupstyle[i].find("(") != std::string::npos) {
+                sg->SetBarThru(BOOLEAN_true);
             }
             else {
-                // create staffGrp and then insert staffDefs for group
-                StaffGrp *sg = new StaffGrp();
-                root_sg->AddChild(sg);
-                if (groupstyle[i].find("(") != std::string::npos) {
-                    sg->SetBarThru(BOOLEAN_true);
-                }
-                else {
-                    sg->SetBarThru(BOOLEAN_false);
-                }
-
-                string groupName = "";
-                hum::HTp groupNameTok = NULL;
-                int mygroup = -1;
-                if (!newgroups[i].empty()) {
-                    mygroup = spineToGroupMapping[newgroups[i][0]];
-                    if (mygroup > 0) {
-                        groupName = m_group_name[mygroup];
-                        groupNameTok = m_group_name_tok[mygroup];
-                    }
-                }
-                if ((!groupName.empty()) && (groupNameTok != NULL)) {
-                    setInstrumentName(sg, groupName, groupNameTok);
-                }
-
-                if (newstyles.at(i).at(0) == '[') {
-                    sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
-                }
-                else if (newstyles.at(i).at(0) == '{') {
-                    sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
-                }
-                for (int j = 0; j < (int)newgroups[i].size(); ++j) {
-                    sg->AddChild(m_staffdef[newgroups[i][j]]);
-                }
-                // add label and label abbreviation to group
+                sg->SetBarThru(BOOLEAN_false);
             }
+
+            string groupName = "";
+            hum::HTp groupNameTok = NULL;
+            int mygroup = -1;
+            if (!newgroups[i].empty()) {
+                mygroup = spineToGroupMapping[newgroups[i][0]];
+                if (mygroup > 0) {
+                    groupName = m_group_name[mygroup];
+                    groupNameTok = m_group_name_tok[mygroup];
+                }
+            }
+            if ((!groupName.empty()) && (groupNameTok != NULL)) {
+                setInstrumentName(sg, groupName, groupNameTok);
+            }
+
+            if (newstyles.at(i).at(0) == '[') {
+                sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+            }
+            else if (newstyles.at(i).at(0) == '{') {
+                sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+            }
+            for (int j = 0; j < (int)newgroups[i].size(); ++j) {
+                sg->AddChild(m_staffdef[newgroups[i][j]]);
+            }
+            // add label and label abbreviation to group
         }
     }
     return true;
