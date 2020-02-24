@@ -1629,6 +1629,44 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 }
             }
         }
+        else if (std::strncmp(dashes.node().name(), "dashes", 6) == 0) {
+            ControlElement *controlElement = nullptr;
+            // find last ControlElement of type dynam or dir and activate extender
+            // this is bad MusicXML and shouldn't happen
+            std::vector<std::pair<std::string, ControlElement *> >::reverse_iterator riter;
+            for (riter = m_controlElements.rbegin(); riter != m_controlElements.rend(); ++riter) {
+                if (riter->second->Is(DYNAM)) {
+                    Dynam *dynam = dynamic_cast<Dynam *>(riter->second);
+                    std::vector<int> staffAttr = dynam->GetStaff();
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
+                        && dynam->GetPlace() == dynam->AttPlacement::StrToStaffrel(placeStr.c_str())
+                        && riter->first == measureNum) {
+                        dynam->SetExtender(BOOLEAN_true);
+                        controlElement = dynam;
+                        break;
+                    }
+                }
+                else if (riter->second->Is(DIR)) {
+                    Dir *dir = dynamic_cast<Dir *>(riter->second);
+                    std::vector<int> staffAttr = dir->GetStaff();
+                    if (std::find(staffAttr.begin(), staffAttr.end(), staffNum + staffOffset) != staffAttr.end()
+                        && dir->GetPlace() == dir->AttPlacement::StrToStaffrel(placeStr.c_str())
+                        && riter->first == measureNum) {
+                        dir->SetExtender(BOOLEAN_true);
+                        controlElement = dir;
+                        break;
+                    }
+                }
+            }
+            if (controlElement != nullptr) {
+                musicxml::OpenDashes openDashes(dashesNumber, staffNum, m_measureCounts.at(measure));
+                m_openDashesStack.push_back(std::make_pair(controlElement, openDashes));
+            }
+            else {
+                LogMessage("MusicXmlImport: dashes could not be matched to <dir> or <dynam> in measure %s.",
+                    measureNum.c_str());
+            }
+        }
     }
 
     // Hairpins
