@@ -3254,7 +3254,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
         start = m_doc->FindDescendantByUuid(startUuid);
     }
     if (!start) {
-        LogError("Could not find start element '%s' for boundaryEnd", startUuid.c_str());
+        LogError("Could not find start element <%s> for boundaryEnd", startUuid.c_str());
         return false;
     }
 
@@ -3571,7 +3571,7 @@ bool MeiInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         // unknown
         else {
-            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }
@@ -4316,7 +4316,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         // unknown
         else {
-            LogWarning("Element '%s' is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
     }
 
@@ -4944,7 +4944,7 @@ bool MeiInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         }
         // unknown
         else {
-            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }
@@ -5987,7 +5987,7 @@ bool MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
             ReadZone(vrvSurface, child);
         }
         else {
-            LogWarning("Unsupported element '%s' in <surface>", child.name());
+            LogWarning("Unsupported element <%s> in <surface>", child.name());
         }
     }
     parent->AddChild(vrvSurface);
@@ -6017,7 +6017,7 @@ bool MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
             ReadSurface(vrvFacsimile, child);
         }
         else {
-            LogWarning("Unsupported element '%s' in <facsimile>", child.name());
+            LogWarning("Unsupported element <%s> in <facsimile>", child.name());
         }
     }
     doc->SetFacsimile(vrvFacsimile);
