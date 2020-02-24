@@ -1926,6 +1926,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
 
     map<int, vector<int> > groupToStaffMapping;
     map<int, vector<int> > partToStaffMapping;
+    map<int, int> trackToSpineMapping;
     map<int, int> staffToSpineMapping;
     map<int, int> staffToGroupMapping;
     map<int, int> spineToGroupMapping;
@@ -1936,6 +1937,9 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         int staff = getStaffNumberLabel(staffstarts[i]);
         int group = getGroupNumberLabel(staffstarts[i]);
         int part = getPartNumberLabel(staffstarts[i]);
+        int track = staffstarts[i]->getTrack();
+
+        trackToSpineMapping[track] = i;
 
         if (group > 0) {
             groupToStaffMapping[group].push_back(staff);
@@ -2010,12 +2014,14 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     hre.replaceDestructive(d, "", "[^0-9s(){}*\\][]", "g");
 
     // Expand * to mean all staves present in score.
+    bool hasstar = false;
     if (hre.search(d, "\\*")) {
         std::string tstring;
-        for (int i = (int)tracklist.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < (int)tracklist.size(); i++) {
             tstring += "t" + to_string(tracklist[i]);
         }
         hre.replaceDestructive(d, tstring, "\\*");
+        hasstar = true;
     }
     hre.replaceDestructive(d, "", "[*]", "g");
 
@@ -2292,6 +2298,9 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             }
         }
         else if (std::isdigit(d[i])) {
+            if (value < 0) {
+                value = 0;
+            }
             value = value * 10 + (d[i] - '0');
             if ((i == (int)d.size() - 1) || !std::isdigit(d[i + 1])) {
                 if (staffQ) {
@@ -2304,10 +2313,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                     }
                 }
                 else if (trackQ) {
-                    value = value - 1;
-                    if (value >= (int)staffstarts.size()) {
-                        value = -1;
-                    }
+                    value = trackToSpineMapping[value];
                 }
                 staffQ = false;
                 trackQ = false;
@@ -2353,18 +2359,23 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     // Check to see that all staffstarts are represented in system decoration;
     // otherwise, declare that it is invalid and print a simple decoration.
     vector<int> found(staffstarts.size(), 0);
-
-    for (int i = 0; i < (int)newgroups.size(); ++i) {
-        for (int j = 0; j < (int)newgroups[i].size(); ++j) {
-            found.at(newgroups[i][j])++;
-        }
+    if (hasstar) {
+        std::fill(found.begin(), found.end(), 1);
     }
+    else {
 
-    for (int i = 0; i < (int)found.size(); ++i) {
-        if (found[i] != 1) {
-            cerr << "I:" << i << "\t=\t" << found[i] << endl;
-            validQ = false;
-            break;
+        for (int i = 0; i < (int)newgroups.size(); ++i) {
+            for (int j = 0; j < (int)newgroups[i].size(); ++j) {
+                found.at(newgroups[i][j])++;
+            }
+        }
+
+        for (int i = 0; i < (int)found.size(); ++i) {
+            if (found[i] != 1) {
+                cerr << "I:" << i << "\t=\t" << found[i] << endl;
+                validQ = false;
+                break;
+            }
         }
     }
 
