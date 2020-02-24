@@ -1905,6 +1905,11 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         return false;
     }
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
+    vector<int> tracklist;
+    for (int i = 0; i < (int)staffstarts.size(); i++) {
+        int track = staffstarts[i]->getTrack();
+        tracklist.push_back(track);
+    }
 
     bool validQ = true;
 
@@ -2002,7 +2007,18 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     hre.replaceDestructive(d, "", "g\\d+", "g");
 
     // Remove any invalid characters:
-    hre.replaceDestructive(d, "", "[^0-9s(){}\\][]", "g");
+    hre.replaceDestructive(d, "", "[^0-9s(){}*\\][]", "g");
+
+    // Expand * to mean all staves present in score.
+    if (hre.search(d, "\\*")) {
+        std::string tstring;
+        for (int i = (int)tracklist.size() - 1; i >= 0; i--) {
+            tstring += "t" + to_string(tracklist[i]);
+        }
+        hre.replaceDestructive(d, tstring, "\\*");
+    }
+    hre.replaceDestructive(d, "", "[*]", "g");
+
     if (d.empty()) {
         return false;
     }
@@ -2011,7 +2027,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         cerr << "     PROCESSED:   " << d << endl;
     }
 
-    // Remove an staff numbers that are no longer present (or invalid):
+    // Remove any staff numbers that are no longer present (or invalid):
     vector<int> deconums = getStaffNumbers(d);
     for (int i = 0; i < (int)deconums.size(); i++) {
         auto it = staffToSpineMapping.find(deconums.at(i));
@@ -2039,13 +2055,16 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         if (d[i] == 's') {
             scount++;
         }
+        else if (d[i] == 't') {
+            scount++;
+        }
     }
     if (scount == 0) {
         return false;
     }
     if (scount == 1) {
         // Remove decoration when a single staff on system.
-        hre.replaceDestructive(d, "", "[^s\\d]", "g");
+        hre.replaceDestructive(d, "", "[^ts\\d]", "g");
     }
 
     // Now pair (), {}, and [] parentheses in the d string.
@@ -2173,6 +2192,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     bargroups.resize(1);
 
     bool staffQ = false;
+    bool trackQ = false;
     int value = 0;
     bool grouper = false;
     int glevel = 0;
@@ -2247,6 +2267,11 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         }
         else if (d[i] == 's') {
             staffQ = true;
+            trackQ = false;
+        }
+        else if (d[i] == 't') {
+            staffQ = false;
+            trackQ = true;
         }
         else if (d[i] == '(') {
             groupstyle.back() = "(";
@@ -2278,13 +2303,14 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                         value = -1;
                     }
                 }
-                else {
+                else if (trackQ) {
                     value = value - 1;
                     if (value >= (int)staffstarts.size()) {
                         value = -1;
                     }
                 }
                 staffQ = false;
+                trackQ = false;
                 if (value < 0) {
                     // Spine does not exist in score, so skip
                     value = 0;
