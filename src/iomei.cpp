@@ -1154,6 +1154,7 @@ void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
     dir->WriteLang(currentNode);
+    dir->WriteLineRendBase(currentNode);
     dir->WriteExtender(currentNode);
     dir->WriteVerticalGroup(currentNode);
 }
@@ -1166,6 +1167,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
     dynam->WriteExtender(currentNode);
+    dynam->WriteLineRendBase(currentNode);
     dynam->WriteVerticalGroup(currentNode);
 }
 
@@ -3252,7 +3254,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
         start = m_doc->FindDescendantByUuid(startUuid);
     }
     if (!start) {
-        LogError("Could not find start element '%s' for boundaryEnd", startUuid.c_str());
+        LogError("Could not find start element <%s> for boundaryEnd", startUuid.c_str());
         return false;
     }
 
@@ -3569,7 +3571,7 @@ bool MeiInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         // unknown
         else {
-            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }
@@ -3869,6 +3871,7 @@ bool MeiInput::ReadDir(Object *parent, pugi::xml_node dir)
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
     vrvDir->ReadLang(dir);
+    vrvDir->ReadLineRendBase(dir);
     vrvDir->ReadExtender(dir);
     vrvDir->ReadVerticalGroup(dir);
 
@@ -3885,6 +3888,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
     vrvDynam->ReadExtender(dynam);
+    vrvDynam->ReadLineRendBase(dynam);
     vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
@@ -4312,7 +4316,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         // unknown
         else {
-            LogWarning("Element '%s' is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
     }
 
@@ -4940,7 +4944,7 @@ bool MeiInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         }
         // unknown
         else {
-            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }
@@ -5983,7 +5987,7 @@ bool MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
             ReadZone(vrvSurface, child);
         }
         else {
-            LogWarning("Unsupported element '%s' in <surface>", child.name());
+            LogWarning("Unsupported element <%s> in <surface>", child.name());
         }
     }
     parent->AddChild(vrvSurface);
@@ -6013,7 +6017,7 @@ bool MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
             ReadSurface(vrvFacsimile, child);
         }
         else {
-            LogWarning("Unsupported element '%s' in <facsimile>", child.name());
+            LogWarning("Unsupported element <%s> in <facsimile>", child.name());
         }
     }
     doc->SetFacsimile(vrvFacsimile);

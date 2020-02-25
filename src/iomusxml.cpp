@@ -416,8 +416,9 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             rend->AddChild(text);
             element->AddChild(rend);
         }
-        else
+        else {
             element->AddChild(text);
+        }
     }
 }
 
@@ -640,6 +641,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             staffOffset += nbStaves;
         }
         else {
+            // do nothing
         }
     }
     // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
@@ -1485,9 +1487,44 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     pugi::xpath_node type = node.select_node("direction-type");
+    pugi::xpath_node extender = type.node().next_sibling("direction-type").first_child();
     std::string placeStr = node.attribute("placement").as_string();
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
+
+    // Bracket
+    pugi::xpath_node bracket = type.node().select_node("bracket");
+    if (bracket) {
+        int voiceNumber = bracket.node().attribute("number").as_int();
+        voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
+        if (HasAttributeWithValue(bracket.node(), "type", "stop")) {
+            if (m_bracketStack.empty()) {
+                // if this is empty, most likely we're dealing with an extender
+            }
+            else {
+                int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
+                m_bracketStack.front().first->SetLendsym(
+                    m_bracketStack.front().first->AttLineRend::StrToLinestartendsymbol(
+                        bracket.node().attribute("line-end").as_string()));
+                m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                m_bracketStack.erase(m_bracketStack.begin());
+            }
+        }
+        else {
+            BracketSpan *bracketSpan = new BracketSpan();
+            musicxml::OpenSpanner openBracket(voiceNumber, m_measureCounts.at(measure));
+            bracketSpan->SetColor(bracket.node().attribute("color").as_string());
+            bracketSpan->SetLform(
+                bracketSpan->AttLineRendBase::StrToLineform(bracket.node().attribute("line-type").as_string()));
+            // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            bracketSpan->SetFunc("unclear");
+            bracketSpan->SetLstartsym(
+                bracketSpan->AttLineRend::StrToLinestartendsymbol(bracket.node().attribute("line-end").as_string()));
+            bracketSpan->SetTstamp(timeStamp);
+            m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
+            m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
+        }
+    }
 
     // Directive
     std::string dynamStr = ""; // string containing dynamics information
@@ -1506,15 +1543,29 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
+            int staffNum = 1;
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode)
-                dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
-                    std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+            dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
             TextRendition(words, dir);
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             dir->SetVgrp(defaultY);
             m_controlElements.push_back(std::make_pair(measureNum, dir));
             m_dirStack.push_back(dir);
+            if (extender) {
+                int extNumber = extender.node().attribute("number").as_int();
+                extNumber = (extNumber < 1) ? 1 : extNumber;
+                dir->SetExtender(BOOLEAN_true);
+                if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
+                    dir->SetLform(
+                        dir->AttLineRendBase::StrToLineform(extender.node().attribute("line-type").as_string()));
+                }
+                else {
+                    dir->SetLform(LINEFORM_dashed);
+                }
+                musicxml::OpenDashes openDashes(extNumber, staffNum, m_measureCounts.at(measure));
+                m_openDashesStack.push_back(std::make_pair(dir, openDashes));
+            }
         }
     }
 
@@ -1529,20 +1580,34 @@ void MusicXmlInput::ReadMusicXmlDirection(
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
         dynam->SetTstamp(timeStamp);
+        int staffNum = 1;
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode)
-            dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
-                std::to_string(staffNode.node().text().as_int() + staffOffset)));
+        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+        dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         if (defaultY == 0) defaultY = dynamics.node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
         defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
         dynam->SetVgrp(defaultY);
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         m_dynamStack.push_back(dynam);
+        if (extender) {
+            int extNumber = extender.node().attribute("number").as_int();
+            extNumber = (extNumber < 1) ? 1 : extNumber;
+            dynam->SetExtender(BOOLEAN_true);
+            if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
+                dynam->SetLform(
+                    dynam->AttLineRendBase::StrToLineform(extender.node().attribute("line-type").as_string()));
+            }
+            else {
+                dynam->SetLform(LINEFORM_dashed);
+            }
+            musicxml::OpenDashes openDashes(extNumber, staffNum, m_measureCounts.at(measure));
+            m_openDashesStack.push_back(std::make_pair(dynam, openDashes));
+        }
     }
 
     // Dashes (to be connected with previous <dir> or <dynam> as @extender and @tstamp2 attribute
-    pugi::xpath_node dashes = type.node().select_node("dashes");
+    pugi::xpath_node dashes = type.node().select_node("bracket|dashes");
     if (dashes) {
         int dashesNumber = dashes.node().attribute("number").as_int();
         dashesNumber = (dashesNumber < 1) ? 1 : dashesNumber;
@@ -1564,9 +1629,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 }
             }
         }
-        else {
+        else if (std::strncmp(dashes.node().name(), "dashes", 6) == 0) {
             ControlElement *controlElement = nullptr;
             // find last ControlElement of type dynam or dir and activate extender
+            // this is bad MusicXML and shouldn't happen
             std::vector<std::pair<std::string, ControlElement *> >::reverse_iterator riter;
             for (riter = m_controlElements.rbegin(); riter != m_controlElements.rend(); ++riter) {
                 if (riter->second->Is(DYNAM)) {
@@ -1724,13 +1790,15 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
-        else LogWarning("MusicXML import: pedal lines are not supported");
+        else {
+            LogWarning("MusicXML import: pedal lines are not supported");
+        }
     }
 
     // Principal voice
     pugi::xpath_node lead = type.node().select_node("principal-voice");
     if (lead) {
-        int voiceNumber = wedge.node().attribute("number").as_int();
+        int voiceNumber = lead.node().attribute("number").as_int();
         voiceNumber = (voiceNumber < 1) ? 1 : voiceNumber;
         if (HasAttributeWithValue(lead.node(), "type", "stop")) {
             int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
@@ -1744,6 +1812,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             bracketSpan->SetColor(lead.node().attribute("color").as_string());
             // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
             bracketSpan->SetFunc("analytical");
+            bracketSpan->SetLstartsym(ConvertLineEndSymbol(lead.node().attribute("symbol").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             bracketSpan->SetType("principal-voice");
             m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
@@ -1762,8 +1831,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (words.size() != 0) TextRendition(words, tempo);
         if (metronome)
             PrintMetronome(metronome.node(), tempo);
-        else
+        else {
             tempo->SetMidiBpm(node.select_node("sound").node().attribute("tempo").as_int());
+        }
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
         m_tempoStack.push_back(tempo);
     }
@@ -1906,10 +1976,12 @@ void MusicXmlInput::ReadMusicXmlNote(
                             prevLayer = dynamic_cast<Layer *>(*rit);
                             if (prevLayer->GetN() == layer->GetN()) break;
                         }
-                        if (prevLayer == NULL)
+                        if (prevLayer == NULL) {
                             AddLayerElement(layer, iter->m_clef);
-                        else
+                        }
+                        else {
                             AddLayerElement(prevLayer, iter->m_clef);
+                        }
                     }
                     else {
                         AddLayerElement(layer, iter->m_clef);
@@ -2011,8 +2083,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!typeStr.empty()) {
                 space->SetDur(ConvertTypeToDur(typeStr));
             }
-            // this should be mSpace
-            else space->SetDur(DURATION_1);
+            else {
+                // this should be mSpace
+                space->SetDur(DURATION_1);
+            }
             AddLayerElement(layer, space);
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
@@ -2095,8 +2169,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     note->SetOct(atoi(octaveStr.c_str()) - m_octDis[staff->GetN()]);
                     note->SetOctGes(atoi(octaveStr.c_str()));
                 }
-                else
+                else {
                     note->SetOct(atoi(octaveStr.c_str()));
+                }
             }
             std::string alterStr = GetContentOfChild(pitch.node(), "alter");
             if (!alterStr.empty()) {
@@ -2488,8 +2563,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     arpeggio->SetOrder(arpegLog_ORDER_up);
                 else if (direction == "down")
                     arpeggio->SetOrder(arpegLog_ORDER_down);
-                else
+                else {
                     arpeggio->SetOrder(arpegLog_ORDER_NONE);
+                }
             }
             m_ArpeggioStack.push_back(std::make_pair(arpeggio, musicxml::OpenArpeggio(arpegN, onset)));
             m_controlElements.push_back(std::make_pair(measureNum, arpeggio));
@@ -2784,6 +2860,23 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
     else {
         LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
         return L"";
+    }
+}
+
+data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(std::string value)
+{
+    if (value == "arrow")
+        return LINESTARTENDSYMBOL_arrow;
+    else if (value == "Hauptstimme")
+        return LINESTARTENDSYMBOL_H;
+    else if (value == "Nebenstimme")
+        return LINESTARTENDSYMBOL_N;
+    else if (value == "none")
+        return LINESTARTENDSYMBOL_none;
+    else if (value == "plain")
+        return LINESTARTENDSYMBOL_NONE;
+    else {
+        return LINESTARTENDSYMBOL_NONE;
     }
 }
 
