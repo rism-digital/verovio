@@ -39,6 +39,7 @@
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
+#include "lb.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mnum.h"
@@ -400,8 +401,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         std::string textStyle = textNode.attribute("font-style").as_string();
         std::string textWeight = textNode.attribute("font-weight").as_string();
         std::string lang = textNode.attribute("xml:lang").as_string();
-        Text *text = new Text();
-        text->SetText(UTF8to16(textStr));
+        Object *textParent = element;
         if (!textColor.empty() || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
             Rend *rend = new Rend();
             if (words.size() > 1 && !lang.empty()) {
@@ -413,11 +413,21 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
             if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
             if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
-            rend->AddChild(text);
             element->AddChild(rend);
+            textParent = rend;
         }
-        else {
-            element->AddChild(text);
+        // Whitespace line breaks are significant in MusicXML => split into lines
+        std::stringstream sstream(textStr);
+        std::string line;
+        bool firstLine;
+        while (std::getline(sstream, line)) {
+            if (!firstLine) {
+                textParent->AddChild(new Lb());
+            }
+            Text *text = new Text();
+            text->SetText(UTF8to16(line));
+            textParent->AddChild(text);
+            firstLine = false;
         }
     }
 }
