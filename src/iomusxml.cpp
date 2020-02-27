@@ -420,7 +420,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         // Whitespace line breaks are significant in MusicXML => split into lines
         std::stringstream sstream(textStr);
         std::string line;
-        bool firstLine;
+        bool firstLine = true;
         while (std::getline(sstream, line)) {
             if (!firstLine) {
                 textParent->AddChild(new Lb());
