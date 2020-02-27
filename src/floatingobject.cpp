@@ -28,6 +28,7 @@
 #include "pedal.h"
 #include "slur.h"
 #include "staff.h"
+#include "reh.h"
 #include "tempo.h"
 #include "timeinterface.h"
 #include "trill.h"
@@ -211,6 +212,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(pedal);
         // pedal below by default
         m_place = (pedal->GetPlace() != STAFFREL_NONE) ? pedal->GetPlace() : STAFFREL_below;
+    }
+    else if (object->Is(REH)) {
+        Reh *reh = dynamic_cast<Reh *>(object);
+        assert(reh);
+        // reh above by default
+        m_place = (reh->GetPlace() != STAFFREL_NONE) ? reh->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(TEMPO)) {
         Tempo *tempo = dynamic_cast<Tempo *>(object);
