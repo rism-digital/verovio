@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Feb 12 23:38:48 PST 2020
+// Last Modified: Thu Feb 27 04:50:24 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -10,7 +10,7 @@
 // Description:   Include file for humlib library.
 //
 /*
-Copyright (c) 2015, 2016, 2017, 2018 Craig Stuart Sapp
+Copyright (c) 2015-2020 Craig Stuart Sapp
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -1019,7 +1019,7 @@ class HumdrumLine : public std::string, public HumHash {
 		bool        isManipulator          (void) const;
 		bool        hasSpines              (void) const;
 		bool        isGlobal               (void) const;
-		bool        equalFieldsQ           (const string& exinterp, const string& value);
+		bool        equalFieldsQ           (const std::string& exinterp, const std::string& value);
 		HTp         token                  (int index) const;
 		void        getTokens              (std::vector<HTp>& list);
 		int         getTokenCount          (void) const;
@@ -4065,6 +4065,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 		void addNullTokensForGraceNotes    (void);
 		void addNullTokensForClefChanges   (void);
 		void addNullTokensForLayoutComments(void);
+		void checkForNullDataHoles         (void);
 
 		void fillInNullTokensForGraceNotes(GridSlice* graceslice, GridSlice* lastnote,
 		                                   GridSlice* nextnote);
@@ -5845,6 +5846,38 @@ class Tool_humdiff : public HumTool {
 ostream& operator<<(ostream& out, TimePoint& tp);
 ostream& operator<<(ostream& out, NotePoint& np);
 
+
+
+class Tool_humsheet : public HumTool {
+	public:
+		         Tool_humsheet       (void);
+		        ~Tool_humsheet       () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+		void     printRowClasses   (HumdrumFile& infile, int row);
+		void     printRowContents  (HumdrumFile& infile, int row);
+      void     printCellClasses  (HTp token);
+      void     printHtmlHeader   (void);
+      void     printHtmlFooter   (void);
+      void     printStyle        (void);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		void     analyzeTracks     (HumdrumFile& infile);
+		void     printColSpan      (HTp token);
+
+	private:
+		bool             m_htmlQ           = false;
+		std::vector<int> m_max_subtrack;
+		int              m_max_track       = 0;
+		int              m_max_field       = 0;
+
+};
 
 
 class Tool_humsort : public HumTool {

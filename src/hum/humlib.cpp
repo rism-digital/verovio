@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Feb 12 23:38:48 PST 2020
+// Last Modified: Thu Feb 27 04:50:24 PST 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10,7 +10,7 @@
 // Description:   Source file for humlib library.
 //
 /*
-Copyright (c) 2015, 2016, 2017, 2018 Craig Stuart Sapp
+Copyright (c) 2015-2020 Craig Stuart Sapp
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -9312,6 +9312,7 @@ void HumGrid::addNullTokens(void) {
 	}
 
 	for (i=0; i<(int)m_allslices.size(); i++) {
+
 		GridSlice& slice = *m_allslices.at(i);
 		if (!slice.isNoteSlice()) {
 			// probably need to deal with grace note slices here
@@ -9337,12 +9338,85 @@ void HumGrid::addNullTokens(void) {
 				}
 			}
 		}
+
 	}
 
 	addNullTokensForGraceNotes();
 	adjustClefChanges();
 	addNullTokensForClefChanges();
 	addNullTokensForLayoutComments();
+	checkForNullDataHoles();
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::checkForNullData -- identify any spots in the grid which are NULL
+//     pointers and allocate invisible rests for them by finding the next
+//     durational item in the particular staff/layer.
+//
+
+void HumGrid::checkForNullDataHoles(void) {
+	for (int i=0; i<(int)m_allslices.size(); i++) {
+		GridSlice& slice = *m_allslices.at(i);
+		if (!slice.isNoteSlice()) {
+			continue;
+		}
+      for (int p=0; p<(int)slice.size(); p++) {
+			GridPart& part = *slice.at(p);
+      	for (int s=0; s<(int)part.size(); s++) {
+				GridStaff& staff = *part.at(s);
+      		for (int v=0; v<(int)staff.size(); v++) {
+					if (!staff.at(v)) {
+						staff.at(v) = new GridVoice();
+						// Calculate duration of void by searching
+						// for the next non-null voice in the current part/staff/voice
+						HumNum duration = slice.getDuration();
+						GridPart *pp;
+						GridStaff *sp;
+						GridVoice *vp;
+						for (int q=i+1; q<m_allslices.size(); q++) {
+							GridSlice *slicep = m_allslices.at(q);
+							if (!slicep->isNoteSlice()) {
+								// or isDataSlice()?
+								continue;
+							}
+							if (p >= (int)slicep->size() - 1) {
+								continue;
+							}
+							pp = slicep->at(p);
+							if (s >= (int)pp->size() - 1) {
+								continue;
+							}
+							sp = pp->at(s);
+							if (v >= (int)sp->size() - 1) {
+								// Found a data line with no data at given voice, so
+								// add slice duration to cumulative duration.
+								duration += slicep->getDuration();
+								continue;
+							}
+							vp = sp->at(v);
+							if (!vp) {
+								// found another null spot which should be dealt with later.
+								break;
+							} else {
+								// there is a token at the same part/staff/voice position.
+								// Maybe check if a null token, but if not a null token,
+								// then break here also.
+								break;
+							}
+						}
+						string recip = Convert::durationToRecip(duration);
+						// ggg @ marker is added to keep track of them for more debugging.
+						recip += "ryy@";
+						staff.at(v)->setToken(recip);
+						continue;
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -9379,6 +9453,7 @@ void HumGrid::setPartStaffDimensions(vector<vector<GridSlice*>>& nextevent,
 //    timing gaps in the first track of a **kern spine, then
 //    fill in with invisible rests.
 //
+// ggg
 
 void HumGrid::addInvisibleRestsInFirstTrack(void) {
 	int i; // slice index
@@ -9434,10 +9509,11 @@ void HumGrid::addInvisibleRestsInFirstTrack(void) {
 //
 // HumGrid::addInvisibleRest --
 //
+// ggg
 
 void HumGrid::addInvisibleRest(vector<vector<GridSlice*>>& nextevent,
 		int index, int p, int s) {
-	GridSlice *ending = nextevent[p][s];
+	GridSlice *ending = nextevent.at(p).at(s);
 	if (ending == NULL) {
 		cerr << "Not handling this case yet at end of data." << endl;
 		return;
@@ -9452,7 +9528,7 @@ void HumGrid::addInvisibleRest(vector<vector<GridSlice*>>& nextevent,
 	HumNum gap = difference - duration;
 	if (gap == 0) {
 		// nothing to do
-		nextevent[p][s] = starting;
+		nextevent.at(p).at(s) = starting;
 		return;
 	}
 	HumNum target = starttime + duration;
@@ -9475,17 +9551,19 @@ void HumGrid::addInvisibleRest(vector<vector<GridSlice*>>& nextevent,
 			return;
 		}
 		// At timestamp for adding new token.
-		if (!m_allslices.at(i)->at(p)->at(s)->at(0)) {
+		if ((m_allslices.at(i)->at(p)->at(s)->size() > 0) && !m_allslices.at(i)->at(p)->at(s)->at(0)) {
 			// Element is null where an invisible rest should be
 			// so allocate space for it.
 			m_allslices.at(i)->at(p)->at(s)->at(0) = new GridVoice();
 		}
-		m_allslices.at(i)->at(p)->at(s)->at(0)->setToken(kern);
+		if (m_allslices.at(i)->at(p)->at(s)->size() > 0) {
+			m_allslices.at(i)->at(p)->at(s)->at(0)->setToken(kern);
+		}
 		break;
 	}
 
 	// Store the current event in the buffer
-	nextevent[p][s] = starting;
+	nextevent.at(p).at(s) = starting;
 }
 
 
@@ -23669,6 +23747,17 @@ bool HumdrumLine::isCommentGlobal(void) const {
 
 //////////////////////////////
 //
+// HumdrumLine::isCommentUniversal -- Returns true if a universal comment.
+//
+
+bool HumdrumLine::isCommentUniversal(void) const {
+	return equalChar(3, '!') && equalChar(2, '!') && equalChar(1, '!') && equalChar(0, '!');
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumLine::isReference -- Returns true if a reference record.
 //
 
@@ -37709,6 +37798,19 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel, HumNum starttime) {
 			tempvoice = -1;
 			m_staff = -1;
 			tempstaff = -1;
+		} else {
+			// xml_node nel = el.next_sibling();
+			// Need to check if the forward element should be interpreted
+			// as an invisible rests.  Check to see if the previous and next
+			// element are notes.  If so, then check their voice numbers and
+			// if equal, then this forward element should be an invisible rest.
+			// But this is true only if there is no other event happening
+			// at the current position in the other voice(s) on the staff (or
+			// perhaps include other staves on the system and/or part.
+
+			// So this case might need to be addressed at a later stage when
+			// the score is assembled, such as when adding null tokens, and a
+			// null spot is located in the score.
 		}
 	}
 
@@ -37754,7 +37856,11 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel, HumNum starttime) {
 					m_eventtype = mevent_unknown;
 				}
 			} else if (tempduration < 4) {
-				cerr << "FORWARD WITH A SMALL VALUE " << tempduration << endl;
+				// Warn about possible other errors:
+				double fraction = (double)tempduration / getQTicks();
+				if (fraction < 0.01) {
+					cerr << "WARNING: FORWARD WITH A SMALL VALUE " << tempduration << endl;
+				}
 			}
 			setDurationByTicks(tempduration);
 			break;
@@ -44769,7 +44875,7 @@ void Tool_autostem::removeStem2(HumdrumFile& infile, int row, int col) {
 void Tool_autostem::addStem(string& input, const string& piece) {
 	string output;
 	HumRegex hre;
-	if (hre.search(input, "(.*[ABCDEFG][n#-]*)(.*)$", "i")) {
+	if (hre.search(input, "(.*[ABCDEFG][n#-]*[xyXY<>]*)(.*)$", "i")) {
 		output = hre.getMatch(1);
 		output += piece;
 		output += hre.getMatch(2);
@@ -55227,6 +55333,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(homorhythm2, infile, commands[i].second, status);
 		} else if (commands[i].first == "hproof") {
 			RUNTOOL(hproof, infile, commands[i].second, status);
+		} else if (commands[i].first == "humsheet") {
+			RUNTOOL(humsheet, infile, commands[i].second, status);
 		} else if (commands[i].first == "shed") {
 			RUNTOOL(shed, infile, commands[i].second, status);
 		} else if (commands[i].first == "imitation") {
@@ -56727,6 +56835,312 @@ ostream& operator<<(ostream& out, NotePoint& np) {
 		out << "\t\tindex " << i << " is:\t" << np.matched[i] << endl;
 	}
 	return out;
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_humsheet::Tool_humsheet -- Set the recognized options for the tool.
+//
+
+Tool_humsheet::Tool_humsheet(void) {
+	define("H|html=b", "output table in HTML wrapper");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_humsheet::run -- Do the main work of the tool.
+//
+
+bool Tool_humsheet::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_humsheet::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humsheet::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humsheet::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsheet::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_humsheet::initialize(void) {
+	m_htmlQ = getBoolean("html");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsheet::processFile --
+//
+
+void Tool_humsheet::processFile(HumdrumFile& infile) {
+	analyzeTracks(infile);
+	if (m_htmlQ) {
+		printHtmlHeader();
+		printStyle();
+	}
+	m_free_text << "<table class=\"humdrum\">\n";
+	for (int i=0; i<infile.getLineCount(); i++) {
+		m_free_text << "<tr";
+		printRowClasses(infile, i);
+		m_free_text << ">";
+		printRowContents(infile, i);
+		m_free_text << "</tr>\n";
+	}
+	m_free_text << "</table>";
+	if (m_htmlQ) {
+		printHtmlFooter();
+	}
+}
+
+
+
+///////////////////////////////
+//
+// printHtmlHeader --
+//
+
+void Tool_humsheet::printHtmlHeader(void) {
+	m_free_text << "<html>\n";
+	m_free_text << "<head>\n";
+	m_free_text << "<title>\n";
+	m_free_text << "UNTITLED\n";
+	m_free_text << "</title>\n";
+	m_free_text << "</head>\n";
+	m_free_text << "<body>\n";
+}
+
+
+
+///////////////////////////////
+//
+// printHtmlFooter --
+//
+
+void Tool_humsheet::printHtmlFooter(void) {
+	m_free_text << "</body>\n";
+	m_free_text << "</html>\n";
+}
+
+
+
+///////////////////////////////
+//
+// printRowClasses --
+//
+
+void Tool_humsheet::printRowClasses(HumdrumFile& infile, int row) {
+	string classes;
+	HumdrumLine* hl = &infile[row];
+	if (hl->hasSpines()) {
+		classes += "spined ";
+	}
+	if (hl->isEmpty()) {
+		classes += "empty ";
+	}
+	if (hl->isData()) {
+		classes += "data ";
+	}
+	if (hl->isInterpretation()) {
+		classes += "interp ";
+	}
+	if (hl->isLocalComment()) {
+		classes += "lcomment ";
+	}
+
+	if (hl->isUniversalReference()) {
+		classes += "ureference ";
+	} else if (hl->isCommentUniversal()) {
+		classes += "ucomment ";
+	} else if (hl->isReference()) {
+		classes += "reference ";
+	} else if (hl->isGlobalComment()) {
+		classes += "gcomment ";
+	}
+
+	if (hl->isBarline()) {
+		classes += "barline ";
+	}
+	if (hl->isManipulator()) {
+		classes += "manip ";
+	}
+	if (!classes.empty()) {
+      // remove space.
+		classes.resize((int)classes.size() - 1);
+		m_free_text << " class=\"" << classes << "\"";
+	}
+}
+
+
+
+///////////////////////////////
+//
+// Tool_humsheet::printRowContents --
+//
+
+void Tool_humsheet::printRowContents(HumdrumFile& infile, int row) {
+	int fieldcount = infile[row].getFieldCount();
+	for (int i=0; i<fieldcount; i++) {
+		HTp token = infile.token(row, i);
+		m_free_text << "<td";
+		printCellClasses(token);
+		printColSpan(token);
+		m_free_text << " contenteditable=\"true\">";
+		m_free_text << token;
+		m_free_text << "</td>";
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsheet::printColspan -- print any necessary colspan values for
+//    token (to align by primary spines)
+//
+
+void Tool_humsheet::printColSpan(HTp token) {
+	if (!token->getOwner()->hasSpines()) {
+		m_free_text << " colspan=\"" << m_max_field << "\"";
+		return;
+	}
+	int track = token->getTrack() - 1;
+	int scount = m_max_subtrack.at(track);
+	int subtrack = token->getSubtrack();
+	if (subtrack > 1) {
+		subtrack--;
+	}
+	HTp nexttok = token->getNextFieldToken();
+	int ntrack = -1;
+	if (nexttok) {
+		ntrack = nexttok->getTrack() - 1;
+	}
+	if ((ntrack < 0) || (ntrack != track)) {
+		// at the end of a primary spine, so do a colspan with the remaining subtracks
+		if (subtrack < scount-1) {
+			int colspan = scount - subtrack;
+			m_free_text << " colspan=\"" << colspan << "\"";
+		}
+	} else {
+		// do nothing
+	}
+}
+
+
+
+///////////////////////////////
+//
+// printCellClasses --
+//
+
+void Tool_humsheet::printCellClasses(HTp token) {
+
+}
+
+
+//////////////////////////////
+//
+// Tool_humsheet::printStyle --
+//
+
+void Tool_humsheet::printStyle(void) {
+	m_free_text << "<style>\n";
+	m_free_text << "table.humdrum {\n";
+	m_free_text << "	border-collapse: collapse;\n";
+	m_free_text << "}\n";
+	m_free_text << "tr.ucomment {\n";
+	m_free_text << "	color: chocolate;\n";
+	m_free_text << "}\n";
+	m_free_text << "tr.ureference {\n";
+	m_free_text << "	color: chocolate;\n";
+	m_free_text << "	background: rgb(255,99,71,0.25);\n";
+	m_free_text << "}\n";
+	m_free_text << "tr.reference {\n";
+	m_free_text << "	color: green;\n";
+	m_free_text << "}\n";
+	m_free_text << "tr.interp {\n";
+	m_free_text << "	color: darkviolet;\n";
+	m_free_text << "}\n";
+	m_free_text << "tr.barline {\n";
+	m_free_text << "	color: gray;\n";
+	m_free_text << "	background: rgba(0, 0, 0, 0.06);\n";
+	m_free_text << "}\n";
+	m_free_text << "</style>\n";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humsheet::analyzeTracks --
+//
+
+void Tool_humsheet::analyzeTracks(HumdrumFile& infile) {
+	m_max_track = infile.getMaxTrack();
+	m_max_subtrack.resize(m_max_track);
+	std::fill(m_max_subtrack.begin(), m_max_subtrack.end(), 0);
+	vector<int> current(m_max_track, 0);
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		fill(current.begin(), current.end(), 0);
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			track--;  // 0-indexing tracks
+			current.at(track)++;
+			if (current.at(track) > m_max_subtrack.at(track)) {
+				m_max_subtrack[track] = current[track];
+			}
+		}
+	}
+
+	m_max_field = 0;
+	for (int i=0; i<(int)m_max_subtrack.size(); i++) {
+		m_max_field += m_max_subtrack[i];
+	}
 }
 
 
@@ -65257,6 +65671,10 @@ void Tool_musicxml2hum::insertPartNames(HumGrid& outdata, vector<MxmlPart>& part
 			}
 			if (partname.find("Part_") != string::npos) {
 				// ignore SharpEye dummy part names
+				continue;
+			}
+			if (partname.find("Unnamed") != string::npos) {
+				// ignore Sibelius dummy part names
 				continue;
 			}
 			string name = "*I\"" + partname;
