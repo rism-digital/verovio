@@ -24,13 +24,7 @@ namespace vrv {
 // Reh
 //----------------------------------------------------------------------------
 
-Reh::Reh()
-    : ControlElement("reh-")
-    , TextDirInterface()
-    , TimePointInterface()
-    , AttColor()
-    , AttLang()
-    , AttVerticalGroup()
+Reh::Reh() : ControlElement("reh-"), TextDirInterface(), TimePointInterface(), AttColor(), AttLang(), AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
