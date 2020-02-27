@@ -356,7 +356,6 @@ private:
     std::vector<Harm *> m_harmStack;
     std::vector<Octave *> m_octaveStack;
     std::vector<Pedal *> m_pedalStack;
-    std::vector<Tempo *> m_tempoStack;
     /*
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
