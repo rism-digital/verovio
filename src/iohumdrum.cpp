@@ -514,7 +514,7 @@ bool HumdrumInput::convertHumdrum()
         return false;
     }
 
-    // apply Humdrum tools if there are any filters in the file.
+    // Apply Humdrum tools if there are any filters in the file.
     hum::Tool_filter filter;
     for (int i = 0; i < m_infiles.getCount(); i++) {
         if (m_infiles[i].hasGlobalFilters()) {
@@ -555,7 +555,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeCrossStaffStemDirections();
     m_spine_color.resize(infile.getMaxTrack() + 1);
     for (int i = 0; i < (int)m_spine_color.size(); i++) {
-        // hard-wire max subtrack count to MAXCOLORSUBTRACK for each spine for now.
+        // Hardwire max subtrack count to MAXCOLORSUBTRACK for each spine for now.
         m_spine_color[i].resize(MAXCOLORSUBTRACK);
     }
     initializeSpineColor(infile);
@@ -638,7 +638,7 @@ bool HumdrumInput::convertHumdrum()
     }
 
     if (staffstarts.size() == 0) {
-        // no parts in file, give up.  Perhaps return an error.
+        // No parts in file, give up.  Perhaps return an error.
         return status;
     }
 
@@ -687,9 +687,7 @@ bool HumdrumInput::convertHumdrum()
     }
 
     createHeader();
-
     // calculateLayout();
-
     m_doc->ConvertToPageBasedDoc();
     promoteInstrumentAbbreviationsToGroup();
     promoteInstrumentNamesToGroup();
@@ -2419,13 +2417,20 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
 
         string groupName = "";
         hum::HTp groupNameTok = NULL;
+        string groupAbbr = "";
+        hum::HTp groupAbbrTok = NULL;
         int mygroup = -1;
         if (!newgroups[0].empty()) {
             mygroup = spineToGroupMapping[newgroups[0][0]];
             if (mygroup > 0) {
                 groupName = m_group_name[mygroup];
                 groupNameTok = m_group_name_tok[mygroup];
+                groupAbbr = m_group_abbr[mygroup];
+                groupAbbrTok = m_group_abbr_tok[mygroup];
             }
+        }
+        if ((!groupAbbr.empty()) && (groupAbbrTok != NULL)) {
+            setInstrumentAbbreviation(sg, groupAbbr, groupAbbrTok);
         }
         if ((!groupName.empty()) && (groupNameTok != NULL)) {
             setInstrumentName(sg, groupName, groupNameTok);
@@ -2485,13 +2490,20 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
 
             string groupName = "";
             hum::HTp groupNameTok = NULL;
+            string groupAbbr = "";
+            hum::HTp groupAbbrTok = NULL;
             int mygroup = -1;
             if (!newgroups[i].empty()) {
                 mygroup = spineToGroupMapping[newgroups[i][0]];
                 if (mygroup > 0) {
                     groupName = m_group_name[mygroup];
                     groupNameTok = m_group_name_tok[mygroup];
+                    groupAbbr = m_group_abbr[mygroup];
+                    groupAbbrTok = m_group_abbr_tok[mygroup];
                 }
+            }
+            if ((!groupAbbr.empty()) && (groupAbbrTok != NULL)) {
+                setInstrumentAbbreviation(sg, groupAbbr, groupAbbrTok);
             }
             if ((!groupName.empty()) && (groupNameTok != NULL)) {
                 setInstrumentName(sg, groupName, groupNameTok);
@@ -16848,6 +16860,12 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
 {
     hum::HumdrumFile &infile = m_infiles[0];
 
+    hum::HTp token = infile.token(endline, 0);
+    if (!token->isBarline()) {
+        m_measure->SetRight(BARRENDITION_invis);
+        return;
+    }
+
     std::string endbar = infile[endline].getTokenString(0);
     std::string startbar = infile[startline].getTokenString(0);
     if (endbar.compare(0, 2, "==") == 0) {
@@ -18178,7 +18196,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 
     if (!barindex.empty()) {
         int firstbar = barindex[0];
-        if ((firstbar == 0) && (barindex.size() >= 1)) {
+        if ((firstbar == 0) && (barindex.size() >= 2)) {
             firstbar = barindex[1];
         }
         hum::HumNum bardur = infile[firstbar].getDurationFromStart();
