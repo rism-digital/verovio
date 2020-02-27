@@ -1842,6 +1842,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
         std::string textStr = GetContent(rehearsal.node());
         reh->SetColor(rehearsal.node().attribute("color").as_string());
         reh->SetTstamp(timeStamp);
+        int staffNum = 1;
+        pugi::xpath_node staffNode = node.select_node("staff");
+        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
@@ -1863,8 +1867,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
         else {
             tempo->SetMidiBpm(node.select_node("sound").node().attribute("tempo").as_int());
         }
+        tempo->SetTstamp(timeStamp);
+        int staffNum = 1;
+        pugi::xpath_node staffNode = node.select_node("staff");
+        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
+        tempo->SetStaff(tempo->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
-        m_tempoStack.push_back(tempo);
     }
 
     // other cases
@@ -2695,14 +2703,6 @@ void MusicXmlInput::ReadMusicXmlNote(
                 iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             }
         }
-    }
-    if (!m_tempoStack.empty()) {
-        std::vector<Tempo *>::iterator iter;
-        for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            (*iter)->SetStartid(m_ID);
-        }
-        m_tempoStack.clear();
     }
     // add staff to hairpins
     if (!m_hairpinStack.empty()) {
