@@ -1554,10 +1554,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
-            int staffNum = 1;
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
-            dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
+            if (staffNode)
+                dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(staffNode.node().text().as_int() + staffOffset)));
             TextRendition(words, dir);
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             dir->SetVgrp(defaultY);
@@ -1566,6 +1566,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (extender) {
                 int extNumber = extender.node().attribute("number").as_int();
                 extNumber = (extNumber < 1) ? 1 : extNumber;
+                int staffNum = staffNode.node().text().as_int() + staffOffset;
+                staffNum = (staffNum < 1) ? 1 : staffNum;
                 dir->SetExtender(BOOLEAN_true);
                 if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
                     dir->SetLform(
@@ -1591,10 +1593,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
         dynam->SetTstamp(timeStamp);
-        int staffNum = 1;
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
-        dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
+        if (staffNode)
+            dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
+                std::to_string(staffNode.node().text().as_int() + staffOffset)));
         if (defaultY == 0) defaultY = dynamics.node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
         defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1604,6 +1606,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (extender) {
             int extNumber = extender.node().attribute("number").as_int();
             extNumber = (extNumber < 1) ? 1 : extNumber;
+            int staffNum = staffNode.node().text().as_int() + staffOffset;
+            staffNum = (staffNum < 1) ? 1 : staffNum;
             dynam->SetExtender(BOOLEAN_true);
             if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
                 dynam->SetLform(
@@ -1838,14 +1842,15 @@ void MusicXmlInput::ReadMusicXmlDirection(
         reh->SetPlace(reh->AttPlacement::StrToStaffrel(placeStr.c_str()));
         std::string halign = rehearsal.node().attribute("halign").as_string();
         std::string lang = rehearsal.node().attribute("xml:lang").as_string();
-        if (lang.empty()) lang="it";
+        if (lang.empty()) lang = "it";
         std::string textStr = GetContent(rehearsal.node());
         reh->SetColor(rehearsal.node().attribute("color").as_string());
         reh->SetTstamp(timeStamp);
-        int staffNum = 1;
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
-        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
+        int staffNum = staffNode.node().text().as_int() + staffOffset;
+        staffNum = (staffNum < 1) ? 1 : staffNum;
+        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(
+            std::to_string(staffNum)));
         reh->SetLang(lang);
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
@@ -1868,15 +1873,17 @@ void MusicXmlInput::ReadMusicXmlDirection(
             tempo->SetMidiBpm(node.select_node("sound").node().attribute("tempo").as_int());
         }
         tempo->SetTstamp(timeStamp);
-        int staffNum = 1;
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
-        tempo->SetStaff(tempo->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
+        if (staffNode)
+            tempo->SetStaff(tempo->AttStaffIdent::StrToXsdPositiveIntegerList(
+                std::to_string(staffNode.node().text().as_int() + staffOffset)));
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
+        m_tempoStack.push_back(tempo);
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !bracket && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes && !rehearsal) {
+    if (words.size() == 0 && !dynamics && !bracket && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes
+        && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
@@ -2699,10 +2706,17 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (!m_bracketStack.empty()) {
         std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            if (!(iter->first)->HasStaff()) {
+            if (!(iter->first)->HasStaff())
                 iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            }
         }
+    }
+    if (!m_tempoStack.empty()) {
+        std::vector<Tempo *>::iterator iter;
+        for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
+            if (!(*iter)->HasStaff())
+                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        }
+        m_tempoStack.clear();
     }
     // add staff to hairpins
     if (!m_hairpinStack.empty()) {
