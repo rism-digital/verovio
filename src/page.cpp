@@ -477,9 +477,7 @@ void Page::JustifyHorizontally()
     assert(this == doc->GetDrawingPage());
 
     if ((doc->GetOptions()->m_adjustPageWidth.GetValue()))
-        doc->m_drawingPageWidth = GetContentWidth()
-            + doc->m_drawingPageMarginLeft
-            + doc->m_drawingPageMarginRight;
+        doc->m_drawingPageWidth = GetContentWidth() + doc->m_drawingPageMarginLeft + doc->m_drawingPageMarginRight;
 
     // Justify X position
     Functor justifyX(&Object::JustifyX);
