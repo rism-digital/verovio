@@ -1144,10 +1144,8 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     bool adjustHeight = m_options->m_adjustPageHeight.GetValue();
     bool adjustWidth = m_options->m_adjustPageWidth.GetValue();
 
-    if (adjustWidth || (breaks == BREAKS_none))
-        width = m_doc.GetAdjustedDrawingPageWidth();
-    if (adjustHeight || (breaks == BREAKS_none))
-        height = m_doc.GetAdjustedDrawingPageHeight();
+    if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
     if (m_doc.GetType() == Transcription) {
         width = m_doc.GetAdjustedDrawingPageWidth();
