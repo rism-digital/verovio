@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Feb 27 04:50:24 PST 2020
+// Last Modified: Sun Mar  1 11:36:23 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3578,6 +3578,11 @@ class Convert {
 		static double  coefficientOfVariationSample(const std::vector<double>& x);
 		static double  coefficientOfVariationPopulation(const std::vector<double>& x);
 		static double  nPvi                 (const std::vector<double>& x);
+
+		// Reference record functions defined in Convert-reference.cpp
+		static std::string getReferenceKeyMeaning(HTp token);
+		static std::string getReferenceKeyMeaning(const string& token);
+		static std::string getLanguageName(const string& abbreviation);
 };
 
 
@@ -5860,19 +5865,33 @@ class Tool_humsheet : public HumTool {
 
 		void     printRowClasses   (HumdrumFile& infile, int row);
 		void     printRowContents  (HumdrumFile& infile, int row);
+		void     printRowData      (HumdrumFile& infile, int line);
       void     printCellClasses  (HTp token);
       void     printHtmlHeader   (void);
       void     printHtmlFooter   (void);
-      void     printStyle        (void);
+      void     printStyle        (HumdrumFile& infile);
+      void     printJavascript   (void);
+		void     printTitle        (HumdrumFile& infile, int line);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
 		void     initialize        (void);
 		void     analyzeTracks     (HumdrumFile& infile);
 		void     printColSpan      (HTp token);
+		void     printTabIndex     (HTp token);
+		void     analyzeTabIndex   (HumdrumFile& infile);
+		void     printId           (HTp token);
+		void     printToken        (HTp token);
+		void     printCellData     (HTp token);
+		bool     isLayout          (HumdrumLine* line);
 
 	private:
+		bool             m_exinterpQ       = false;
+		bool             m_javascriptQ     = false;
+		bool             m_idQ             = false;
 		bool             m_htmlQ           = false;
+		bool             m_zebraQ          = false;
+		bool             m_tabindexQ       = false;
 		std::vector<int> m_max_subtrack;
 		int              m_max_track       = 0;
 		int              m_max_field       = 0;
