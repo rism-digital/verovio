@@ -306,18 +306,18 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
 void MusicXmlInput::FillSpace(Layer *layer, int dur)
 {
     std::string durStr;
-    while (dur != 0) {
-        float quaters = (double)dur / (double)m_ppq;
-        if (quaters > 1) quaters = (int)quaters;
+    while (dur > 0) {
+        double quarters = (double)dur / (double)m_ppq;
+        quarters = pow(2, floor(log(quarters) / log(2)));
         // limit space for now
-        if (quaters > 2) quaters = 2;
-        durStr = std::to_string(int(4 / quaters));
+        if (quarters > 2) quarters = 2;
+        durStr = std::to_string(int(4 / quarters));
 
         Space *space = new Space();
         space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
-        space->SetDurPpq(dur);
+        space->SetDurPpq(m_ppq * quarters);
         AddLayerElement(layer, space);
-        dur -= m_ppq * quaters;
+        dur -= m_ppq * quarters;
     }
 }
 
@@ -2092,12 +2092,14 @@ void MusicXmlInput::ReadMusicXmlNote(
             element = space;
             if (!typeStr.empty()) {
                 space->SetDur(ConvertTypeToDur(typeStr));
+                space->SetDurPpq(duration);
+                if (dots > 0) space->SetDots(dots);
+                AddLayerElement(layer, space);
             }
             else {
                 // this should be mSpace
-                space->SetDur(DURATION_1);
+                FillSpace(layer, duration);
             }
-            AddLayerElement(layer, space);
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
         else if (typeStr.empty() || duration == (m_ppq * 4 * m_meterCount / m_meterUnit)
