@@ -4313,7 +4313,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 
     // if the current parent is a syllable then we need to make sure that a syl got added
     // if not then add a blank one
-    if (std::string{parentNode.name()}.compare("syllable") == 0) {
+    /*if (std::string{parentNode.name()}.compare("syllable") == 0) {
         auto testSyl = parent->FindDescendantByType(SYL);
         if(testSyl == NULL && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
             Syl *syl = new Syl();
@@ -4321,7 +4321,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             syl->AddChild(text);
             parent->AddChild(syl);
         }
-    }
+    }*/
     return success;
 }
 
@@ -4850,7 +4850,8 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     if((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
         Object *obj = vrvSyllable->FindDescendantByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
-        if (syl == NULL && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
+        if ((syl == NULL) && m_doc->GetOptions()->m_createDefaultSyl.GetValue() &&
+        (std::string{"undefined"}.compare(syllable.attribute("follows").as_string("undefined")) != 0)) {
             syl = new Syl();
             Text *text = new Text();
             syl->AddChild(text);
