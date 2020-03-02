@@ -91,6 +91,7 @@
 #include "rdg.h"
 #include "ref.h"
 #include "reg.h"
+#include "reh.h"
 #include "rend.h"
 #include "rest.h"
 #include "restore.h"
@@ -416,6 +417,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(PEDAL)) {
         m_currentNode = m_currentNode.append_child("pedal");
         WritePedal(m_currentNode, dynamic_cast<Pedal *>(object));
+    }
+    else if (object->Is(REH)) {
+        m_currentNode = m_currentNode.append_child("reh");
+        WriteReh(m_currentNode, dynamic_cast<Reh *>(object));
     }
     else if (object->Is(SLUR)) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -1252,6 +1257,18 @@ void MeiOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
     pedal->WriteVerticalGroup(currentNode);
+}
+
+void MeiOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
+{
+    assert(reh);
+
+    WriteControlElement(currentNode, reh);
+    WriteTextDirInterface(currentNode, reh);
+    WriteTimePointInterface(currentNode, reh);
+    reh->WriteColor(currentNode);
+    reh->WriteLang(currentNode);
+    reh->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -3765,6 +3782,9 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "pedal") {
             success = ReadPedal(parent, current);
         }
+        else if (std::string(current.name()) == "reh") {
+            success = ReadReh(parent, current);
+        }
         else if (std::string(current.name()) == "slur") {
             success = ReadSlur(parent, current);
         }
@@ -4008,6 +4028,22 @@ bool MeiInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     parent->AddChild(vrvPedal);
     ReadUnsupportedAttr(pedal, vrvPedal);
     return true;
+}
+
+bool MeiInput::ReadReh(Object *parent, pugi::xml_node reh)
+{
+    Reh *vrvReh = new Reh();
+    ReadControlElement(reh, vrvReh);
+
+    ReadTextDirInterface(reh, vrvReh);
+    ReadTimePointInterface(reh, vrvReh);
+    vrvReh->ReadColor(reh);
+    vrvReh->ReadLang(reh);
+    vrvReh->ReadVerticalGroup(reh);
+
+    parent->AddChild(vrvReh);
+    ReadUnsupportedAttr(reh, vrvReh);
+    return ReadTextChildren(vrvReh, reh, vrvReh);
 }
 
 bool MeiInput::ReadSlur(Object *parent, pugi::xml_node slur)

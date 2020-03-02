@@ -51,6 +51,7 @@
 #include "octave.h"
 #include "pb.h"
 #include "pedal.h"
+#include "reh.h"
 #include "rend.h"
 #include "rest.h"
 #include "sb.h"
@@ -419,7 +420,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         // Whitespace line breaks are significant in MusicXML => split into lines
         std::stringstream sstream(textStr);
         std::string line;
-        bool firstLine;
+        bool firstLine = true;
         while (std::getline(sstream, line)) {
             if (!firstLine) {
                 textParent->AddChild(new Lb());
@@ -1553,10 +1554,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
-            int staffNum = 1;
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
-            dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
+            if (staffNode) {
+                dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
             TextRendition(words, dir);
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             dir->SetVgrp(defaultY);
@@ -1565,6 +1567,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (extender) {
                 int extNumber = extender.node().attribute("number").as_int();
                 extNumber = (extNumber < 1) ? 1 : extNumber;
+                int staffNum = staffNode.node().text().as_int() + staffOffset;
+                staffNum = (staffNum < 1) ? 1 : staffNum;
                 dir->SetExtender(BOOLEAN_true);
                 if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
                     dir->SetLform(
@@ -1590,10 +1594,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
         dynam->SetTstamp(timeStamp);
-        int staffNum = 1;
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode) staffNum = staffNode.node().text().as_int() + staffOffset;
-        dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
+        if (staffNode) {
+            dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
+                std::to_string(staffNode.node().text().as_int() + staffOffset)));
+        }
         if (defaultY == 0) defaultY = dynamics.node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
         defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1603,6 +1608,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         if (extender) {
             int extNumber = extender.node().attribute("number").as_int();
             extNumber = (extNumber < 1) ? 1 : extNumber;
+            int staffNum = staffNode.node().text().as_int() + staffOffset;
+            staffNum = (staffNum < 1) ? 1 : staffNum;
             dynam->SetExtender(BOOLEAN_true);
             if (std::strncmp(extender.node().name(), "bracket", 7) == 0) {
                 dynam->SetLform(
@@ -1712,9 +1719,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             hairpin->SetTstamp(timeStamp);
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode)
+            if (staffNode) {
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
             int defaultY = wedge.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align hairpins
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1790,9 +1798,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
             if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode)
+            if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1830,6 +1839,29 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
     }
 
+    // Rehearsal
+    pugi::xpath_node rehearsal = type.node().select_node("rehearsal");
+    if (rehearsal) {
+        Reh *reh = new Reh();
+        reh->SetPlace(reh->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        std::string halign = rehearsal.node().attribute("halign").as_string();
+        std::string lang = rehearsal.node().attribute("xml:lang").as_string();
+        if (lang.empty()) lang = "it";
+        std::string textStr = GetContent(rehearsal.node());
+        reh->SetColor(rehearsal.node().attribute("color").as_string());
+        reh->SetTstamp(timeStamp);
+        pugi::xpath_node staffNode = node.select_node("staff");
+        int staffNum = staffNode.node().text().as_int() + staffOffset;
+        staffNum = (staffNum < 1) ? 1 : staffNum;
+        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(
+            std::to_string(staffNum)));
+        reh->SetLang(lang);
+        Text *text = new Text();
+        text->SetText(UTF8to16(textStr));
+        reh->AddChild(text);
+        m_controlElements.push_back(std::make_pair(measureNum, reh));
+    }
+
     // Tempo
     pugi::xpath_node metronome = type.node().select_node("metronome");
     if (node.select_node("sound[@tempo]") || metronome) {
@@ -1844,12 +1876,19 @@ void MusicXmlInput::ReadMusicXmlDirection(
         else {
             tempo->SetMidiBpm(node.select_node("sound").node().attribute("tempo").as_int());
         }
+        tempo->SetTstamp(timeStamp);
+        pugi::xpath_node staffNode = node.select_node("staff");
+        if (staffNode) {
+            tempo->SetStaff(tempo->AttStaffIdent::StrToXsdPositiveIntegerList(
+                std::to_string(staffNode.node().text().as_int() + staffOffset)));
+        }
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
         m_tempoStack.push_back(tempo);
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes) {
+    if (words.size() == 0 && !dynamics && !bracket && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes
+        && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
@@ -2674,16 +2713,15 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (!m_bracketStack.empty()) {
         std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            if (!(iter->first)->HasStaff()) {
+            if (!(iter->first)->HasStaff())
                 iter->first->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            }
         }
     }
     if (!m_tempoStack.empty()) {
         std::vector<Tempo *>::iterator iter;
         for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); ++iter) {
-            (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-            (*iter)->SetStartid(m_ID);
+            if (!(*iter)->HasStaff())
+                (*iter)->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         }
         m_tempoStack.clear();
     }
