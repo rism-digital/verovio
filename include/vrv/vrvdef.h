@@ -295,9 +295,9 @@ typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
 
-typedef std::vector<std::pair<TimePointInterface *, ClassId> > ArrayOfPointingInterClassIdPairs;
+typedef std::list<std::pair<TimePointInterface *, ClassId> > ArrayOfPointingInterClassIdPairs;
 
-typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpanningInterClassIdPairs;
+typedef std::list<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpanningInterClassIdPairs;
 
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 

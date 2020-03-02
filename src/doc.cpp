@@ -58,6 +58,8 @@
 #include "verse.h"
 #include "vrv.h"
 
+
+
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
@@ -534,7 +536,6 @@ void Doc::PrepareDrawing()
     PrepareLinkingParams prepareLinkingParams;
     Functor prepareLinking(&Object::PrepareLinking);
     this->Process(&prepareLinking, &prepareLinkingParams);
-
     // If we have some left process again backward
     if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
         prepareLinkingParams.m_fillList = false;

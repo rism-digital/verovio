@@ -221,7 +221,8 @@ public:
      */
     virtual void CloneReset();
 
-    std::string GetUuid() const { return m_uuid; }
+    const std::string &GetUuid() const { return m_uuid; }
+    size_t GetUuidHash() const { return m_uuidHash; }
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
@@ -1159,6 +1160,7 @@ private:
      */
     ///@{
     std::string m_uuid;
+    size_t m_uuidHash;
     std::string m_classid;
     ///@}
 

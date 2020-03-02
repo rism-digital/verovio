@@ -290,6 +290,8 @@ void Object::MoveItselfTo(Object *targetParent)
 void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
+    std::hash<std::string> h;
+    m_uuidHash = h(uuid);
 }
 
 void Object::SwapUuid(Object *other)

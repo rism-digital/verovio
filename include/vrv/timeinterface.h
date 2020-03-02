@@ -118,6 +118,7 @@ public:
 protected:
     LayerElement *m_start;
     std::string m_startUuid;
+    size_t m_startUuidHash;
 
 private:
 };
@@ -217,6 +218,7 @@ public:
 private:
     LayerElement *m_end;
     std::string m_endUuid;
+    size_t m_endUuidHash;
 };
 
 } // namespace vrv

@@ -76,6 +76,8 @@ void TimePointInterface::SetUuidStr()
 {
     if (this->HasStartid()) {
         m_startUuid = ExtractUuidFragment(this->GetStartid());
+        std::hash<std::string> h1;
+        m_startUuidHash = h1(m_startUuid);
     }
 }
 
@@ -168,16 +170,18 @@ void TimeSpanningInterface::SetUuidStr()
     TimePointInterface::SetUuidStr();
     if (this->HasEndid()) {
         m_endUuid = ExtractUuidFragment(this->GetEndid());
+        std::hash<std::string> h;
+        m_endUuidHash = h(m_endUuid);
     }
 }
 
 bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 {
     // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
-    if (!m_start && !m_startUuid.empty() && (element->GetUuid() == m_startUuid)) {
+    if (!m_start && !m_startUuid.empty() && (element->GetUuidHash() == m_startUuidHash)) {
         this->SetStart(element);
     }
-    else if (!m_end && !m_endUuid.empty() && (element->GetUuid() == m_endUuid)) {
+    else if (!m_end && !m_endUuid.empty() && (element->GetUuidHash() == m_endUuidHash)) {
         this->SetEnd(element);
     }
     return (m_start && m_end);

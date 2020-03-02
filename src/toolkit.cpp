@@ -44,6 +44,7 @@
 #include "jsonxx.h"
 #include "unchecked.h"
 
+
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
@@ -546,6 +547,7 @@ bool Toolkit::LoadData(const std::string &data)
         LogMessage("Unsupported format");
         return false;
     }
+    // Record start time
 
     // something went wrong
     if (!input) {
