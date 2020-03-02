@@ -287,7 +287,7 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
-typedef std::list<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
+typedef std::map<std::string, LinkingInterface *> ArrayOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 
