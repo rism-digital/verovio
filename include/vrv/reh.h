@@ -21,7 +21,7 @@ class TextElement;
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <dir> element.
+ * This class models the MEI <reh> element.
  */
 class Reh : public ControlElement,
             public TextDirInterface,
@@ -52,7 +52,7 @@ public:
     ///@}
 
     /**
-     * Add an element (text, rend. etc.) to a dynam.
+     * Add an element (text, rend. etc.) to a reh.
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
