@@ -1555,9 +1555,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode)
+            if (staffNode) {
                 dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
             TextRendition(words, dir);
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             dir->SetVgrp(defaultY);
@@ -1594,9 +1595,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dynam->AddChild(text);
         dynam->SetTstamp(timeStamp);
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode)
+        if (staffNode) {
             dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
                 std::to_string(staffNode.node().text().as_int() + staffOffset)));
+        }
         if (defaultY == 0) defaultY = dynamics.node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
         defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1717,9 +1719,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             hairpin->SetTstamp(timeStamp);
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode)
+            if (staffNode) {
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
             int defaultY = wedge.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align hairpins
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1795,9 +1798,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
             if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             pugi::xpath_node staffNode = node.select_node("staff");
-            if (staffNode)
+            if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1874,9 +1878,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
         tempo->SetTstamp(timeStamp);
         pugi::xpath_node staffNode = node.select_node("staff");
-        if (staffNode)
+        if (staffNode) {
             tempo->SetStaff(tempo->AttStaffIdent::StrToXsdPositiveIntegerList(
                 std::to_string(staffNode.node().text().as_int() + staffOffset)));
+        }
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
         m_tempoStack.push_back(tempo);
     }
