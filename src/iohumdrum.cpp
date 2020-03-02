@@ -585,7 +585,8 @@ bool HumdrumInput::convertHumdrum()
     infile.getSpineStartList(spinestarts);
     int staffindex = -1;
     for (auto it : spinestarts) {
-        if (it->isDataType("**kern")) {
+        std::string datatype = it->getDataType();
+        if (datatype.find("kern") != std::string::npos) {
             staffindex++;
         }
         else if (it->isDataType("**mxhm")) {
@@ -5045,11 +5046,20 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
         }
         int kerntrack = 0;
         int spinetrack = 0;
+        int active = true;
 
         for (int j = 0; j < infile[i].getFieldCount(); ++j) {
             hum::HTp token = infile.token(i, j);
+            std::string exinterp = token->getDataType();
+            if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
+                active = false;
+            }
             if (token->isDataType("**kern")) {
                 kerntrack = token->getTrack();
+                active = true;
+            }
+            if (!active) {
+                continue;
             }
             if (!(token->isDataType("**fb") || token->isDataType("**fba") || token->isDataType("**Bnum"))) {
                 continue;
@@ -5403,10 +5413,20 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             continue;
         }
         int track = 0;
+        int active = true;
         for (int j = 0; j < infile[i].getFieldCount(); ++j) {
             hum::HTp token = infile.token(i, j);
+            std::string exinterp = token->getDataType();
+            if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
+                active = false;
+                continue;
+            }
             if (token->isDataType("**kern")) {
                 track = token->getTrack();
+                active = true;
+            }
+            if (!active) {
+                continue;
             }
             if (token->isNull()) {
                 continue;
@@ -9583,9 +9603,15 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
     }
 
+    bool active = true;
     for (int i = startfield; i < line->getFieldCount(); ++i) {
         belowadj = 0;
+        string exinterp = line->token(i)->getDataType();
+        if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
+            active = false;
+        }
         if (line->token(i)->isKern()) {
+            active = true;
             ttrack = line->token(i)->getTrack();
             if (ttrack != track) {
                 if (ttrack != lasttrack) {
@@ -9603,6 +9629,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (!line->token(i)->isNull()) {
                 break;
             }
+        }
+        if (!active) {
+            continue;
         }
         if (!(line->token(i)->isDataType("**dynam") || line->token(i)->isDataType("**dyn"))) {
             continue;
@@ -14672,7 +14701,8 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
     bool lyricQ;
     int startfield = token->getFieldIndex() + 1;
     for (int i = startfield; i < line.getFieldCount(); ++i) {
-        if (line.token(i)->isKern()) {
+        std::string exinterp = line.token(i)->getDataType();
+        if (line.token(i)->isKern() || (exinterp.find("kern") != std::string::npos)) {
             ttrack = line.token(i)->getTrack();
             if (ttrack != track) {
                 break;

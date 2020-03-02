@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Mar  1 11:36:23 PST 2020
+// Last Modified: Sun Mar  1 23:01:25 PST 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3581,8 +3581,8 @@ class Convert {
 
 		// Reference record functions defined in Convert-reference.cpp
 		static std::string getReferenceKeyMeaning(HTp token);
-		static std::string getReferenceKeyMeaning(const string& token);
-		static std::string getLanguageName(const string& abbreviation);
+		static std::string getReferenceKeyMeaning(const std::string& token);
+		static std::string getLanguageName(const std::string& abbreviation);
 };
 
 
@@ -6004,6 +6004,27 @@ class Tool_kern2mens : public HumTool {
 		bool     m_invisibleQ = true;      // used with -I option
 		bool     m_doublebarQ = true;      // used with -D option
 		string   m_clef;                   // used with -c option
+
+};
+
+
+class Tool_kernview : public HumTool {
+	public:
+		         Tool_kernview      (void);
+		        ~Tool_kernview      () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+
+	private:
+		std::string m_view_string;
+		std::string m_hide_string;
 
 };
 
