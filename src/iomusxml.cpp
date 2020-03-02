@@ -188,6 +188,8 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
     assert(layer);
     assert(element);
 
+    if (layer->GetChildren()->size() == 0 && m_durTotal > 0) FillSpace(layer, m_durTotal);
+
     if (m_elementStack.empty()) {
         layer->AddChild(element);
     }
@@ -295,7 +297,11 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         Space *space = new Space();
         space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
         space->SetDurPpq(m_ppq * quarters);
-        AddLayerElement(layer, space);
+        if (m_elementStack.empty()) {
+            layer->AddChild(space);
+        }
+        else
+            m_elementStack.back()->AddChild(space);
         dur -= m_ppq * quarters;
     }
 }
@@ -1375,17 +1381,6 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     assert(measure);
 
     m_durTotal -= atoi(GetContentOfChild(node, "duration").c_str());
-
-    pugi::xpath_node nextNote = node.next_sibling("note");
-    if (nextNote && m_durTotal > 0) {
-        // We need a <space> if a note follows that starts not at the beginning of the measure
-        Layer *layer;
-        if (node.select_node("voice"))
-            layer = new Layer();
-        else
-            layer = SelectLayer(nextNote.node(), measure);
-        FillSpace(layer, m_durTotal);
-    }
 }
 
 void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, std::string measureNum)
