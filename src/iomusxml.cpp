@@ -308,6 +308,8 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
 
 void MusicXmlInput::FillSpace(Layer *layer, int dur)
 {
+    assert(layer);
+
     std::string durStr;
     while (dur > 0) {
         double quarters = (double)dur / (double)m_ppq;
@@ -319,9 +321,8 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
         Space *space = new Space();
         space->SetDur(space->AttDurationLogical::StrToDuration(durStr));
         space->SetDurPpq(m_ppq * quarters);
-        if (m_elementStack.empty()) {
+        if (m_elementStack.empty())
             layer->AddChild(space);
-        }
         else
             m_elementStack.back()->AddChild(space);
         dur -= m_ppq * quarters;
