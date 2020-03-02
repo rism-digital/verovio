@@ -1268,6 +1268,7 @@ void MeiOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
     WriteTimePointInterface(currentNode, reh);
     reh->WriteColor(currentNode);
     reh->WriteLang(currentNode);
+    reh->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -4038,6 +4039,7 @@ bool MeiInput::ReadReh(Object *parent, pugi::xml_node reh)
     ReadTimePointInterface(reh, vrvReh);
     vrvReh->ReadColor(reh);
     vrvReh->ReadLang(reh);
+    vrvReh->ReadVerticalGroup(reh);
 
     parent->AddChild(vrvReh);
     ReadUnsupportedAttr(reh, vrvReh);
