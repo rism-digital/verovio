@@ -9,6 +9,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include <algorithm>
 #include <codecvt>
 #include <limits.h>
 #include <math.h>
@@ -929,8 +930,6 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     ArrayOfObjects staves;
-    double rotate;
-    int avgHeight = 0;
 
     // Get the staves by element ID and fail if a staff does not exist.
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
@@ -939,7 +938,6 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
             staves.push_back(obj);
             int height = obj->GetZone()->GetLry() + (obj->GetZone()->GetLrx() - obj->GetZone()->GetUlx()) *
                 tan(obj->GetZone()->GetRotate() * M_PI / 180.0) - obj->GetZone()->GetUly();
-            avgHeight += height;
         }
         else {
             LogError("Staff with ID '%s' does not exist!", it->c_str());
@@ -955,22 +953,22 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         return false;
     }
 
-    StaffSort staffSort;
-    std::sort(staves.begin(), staves.end(), staffSort);
+    // avgHeight /= staves.size();
+    int ulx = dynamic_cast<Staff *>(*std::min_element(staves.begin(), staves.end(), [](Object *a, Object *b) {
+        return (dynamic_cast<Staff *>(a)->GetZone()->GetUlx() < dynamic_cast<Staff *>(b)->GetZone()->GetUlx());
+    }))->GetZone()->GetUlx();
 
-    avgHeight /= staves.size();
-    int ulx = dynamic_cast<Staff *>(staves.front())->GetZone()->GetUlx();
-    int uly = dynamic_cast<Staff *>(staves.front())->GetZone()->GetUly();
-    int lrx = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLrx();
-    int lry = dynamic_cast<Staff *>(staves.back())->GetZone()->GetLry();
+    int uly = dynamic_cast<Staff *>(*std::min_element(staves.begin(), staves.end(), [](Object *a, Object *b) {
+        return (dynamic_cast<Staff *>(a)->GetZone()->GetUly() < dynamic_cast<Staff *>(b)->GetZone()->GetUly());
+    }))->GetZone()->GetUly();
 
-    rotate = atan( (double) (uly + avgHeight - lry) / (double) (lrx - ulx) ) * 180.0 / M_PI;
-    if (rotate > 12 || rotate < -12) {
-        LogError("Merging these staves would require too large a rotate");
-        m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "Merging these staves would require too large a rotate");
-        return false;
-    }
+    int lrx = dynamic_cast<Staff *>(*std::max_element(staves.begin(), staves.end(), [](Object *a, Object *b) {
+        return (dynamic_cast<Staff *>(a)->GetZone()->GetLrx() < dynamic_cast<Staff *>(b)->GetZone()->GetLrx());
+    }))->GetZone()->GetLrx();
+
+    int lry = dynamic_cast<Staff *>(*std::max_element(staves.begin(), staves.end(), [](Object *a, Object *b) {
+        return (dynamic_cast<Staff *>(a)->GetZone()->GetLry() < dynamic_cast<Staff *>(b)->GetZone()->GetLry());
+    }))->GetZone()->GetLry();
 
     // Move children to the first staff (in order)
     auto stavesIt = staves.begin();
@@ -992,7 +990,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     staffZone->SetUly(uly);
     staffZone->SetLrx(lrx);
     staffZone->SetLry(lry);
-    staffZone->SetRotate(rotate);
+    staffZone->SetRotate(0);
 
     fillLayer->ReorderByXPos();
 
