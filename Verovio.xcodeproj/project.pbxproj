@@ -10,6 +10,8 @@
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
+		36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
+		36E0442E2347A9290054F141 /* expansionmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E0442D2347A9290054F141 /* expansionmap.h */; };
 		400FEDD3206FA743000D3233 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
 		400FEDD4206FA74A000D3233 /* gracegrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 400FEDD1206FA742000D3233 /* gracegrp.h */; };
 		400FEDD5206FA74D000D3233 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
@@ -36,6 +38,12 @@
 		409B3DD91F2D1C2A0098A265 /* ftrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DD81F2D1C2A0098A265 /* ftrem.cpp */; };
 		409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DDA1F2D1C550098A265 /* btrem.cpp */; };
 		40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
+		40ACDEA624079F6900F82B8C /* reh.h in Headers */ = {isa = PBXBuildFile; fileRef = 40ACDEA524079F5E00F82B8C /* reh.h */; };
+		40ACDEA724079F6900F82B8C /* reh.h in Headers */ = {isa = PBXBuildFile; fileRef = 40ACDEA524079F5E00F82B8C /* reh.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		40ACDEA924079F9000F82B8C /* reh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ACDEA824079F9000F82B8C /* reh.cpp */; };
+		40ACDEAA24079F9000F82B8C /* reh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ACDEA824079F9000F82B8C /* reh.cpp */; };
+		40ACDEAB24079F9000F82B8C /* reh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ACDEA824079F9000F82B8C /* reh.cpp */; };
+		40ACDEAC24079F9000F82B8C /* reh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ACDEA824079F9000F82B8C /* reh.cpp */; };
 		40BD9390206B95060037BF8E /* annot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40BD938E206B95050037BF8E /* annot.cpp */; };
 		40BD9391206B950B0037BF8E /* annot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40BD938E206B95050037BF8E /* annot.cpp */; };
 		40BD9392206B950C0037BF8E /* annot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40BD938E206B95050037BF8E /* annot.cpp */; };
@@ -1152,6 +1160,8 @@
 		1579B3421B15033100B16F5C /* proport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = proport.cpp; path = src/proport.cpp; sourceTree = "<group>"; };
 		2D2A79991A69812C000A441B /* chord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chord.cpp; path = src/chord.cpp; sourceTree = "<group>"; };
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
+		36E0442B2347A9150054F141 /* expansionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansionmap.cpp; path = src/expansionmap.cpp; sourceTree = "<group>"; };
+		36E0442D2347A9290054F141 /* expansionmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansionmap.h; path = include/vrv/expansionmap.h; sourceTree = "<group>"; };
 		400FEDD1206FA742000D3233 /* gracegrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gracegrp.h; path = include/vrv/gracegrp.h; sourceTree = "<group>"; };
 		400FEDD2206FA743000D3233 /* gracegrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gracegrp.cpp; path = src/gracegrp.cpp; sourceTree = "<group>"; };
 		402197921F2E09CB00182DF1 /* ioabc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioabc.h; path = include/vrv/ioabc.h; sourceTree = "<group>"; };
@@ -1176,6 +1186,8 @@
 		409B3DDA1F2D1C550098A265 /* btrem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = btrem.cpp; path = src/btrem.cpp; sourceTree = "<group>"; };
 		40ABF1FD1E5DF23B00F32F41 /* expansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansion.h; path = include/vrv/expansion.h; sourceTree = "<group>"; };
 		40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansion.cpp; path = src/expansion.cpp; sourceTree = "<group>"; };
+		40ACDEA524079F5E00F82B8C /* reh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = reh.h; path = include/vrv/reh.h; sourceTree = "<group>"; };
+		40ACDEA824079F9000F82B8C /* reh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reh.cpp; path = src/reh.cpp; sourceTree = "<group>"; };
 		40BD938E206B95050037BF8E /* annot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = annot.cpp; path = src/annot.cpp; sourceTree = "<group>"; };
 		40BD938F206B95060037BF8E /* annot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = annot.h; path = include/vrv/annot.h; sourceTree = "<group>"; };
 		40C2E41A2052A6DF0003625F /* sb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sb.cpp; path = src/sb.cpp; sourceTree = "<group>"; };
@@ -1887,6 +1899,8 @@
 				4D5572411CF3F33C008D06A0 /* octave.h */,
 				4D5572431CF57B5C008D06A0 /* pedal.cpp */,
 				4D5572421CF57B4C008D06A0 /* pedal.h */,
+				40ACDEA824079F9000F82B8C /* reh.cpp */,
+				40ACDEA524079F5E00F82B8C /* reh.h */,
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
 				4DB351121C8040B1002DD057 /* tempo.cpp */,
@@ -1953,6 +1967,8 @@
 				4D9234F11A586AE100763251 /* comparison.h */,
 				8F086EBD188539540037FD8E /* doc.cpp */,
 				8F59291418854BF800FE51AD /* doc.h */,
+				36E0442B2347A9150054F141 /* expansionmap.cpp */,
+				36E0442D2347A9290054F141 /* expansionmap.h */,
 				4DF28A041A754DF000BA9F7D /* floatingobject.cpp */,
 				4D95D4F41D7185DE00B2B856 /* floatingobject.h */,
 				4DF440791D3D085600152B7E /* functorparams.h */,
@@ -2242,6 +2258,7 @@
 				4DB3D8AD1F83D04A00B5FC2B /* atts_mensural.h in Headers */,
 				4D4FCD0A1F5455F10009C455 /* staffgrp.h in Headers */,
 				4DB3D8C41F83D0F300B5FC2B /* anchoredtext.h in Headers */,
+				40ACDEA624079F6900F82B8C /* reh.h in Headers */,
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
 				4D6331F91F46DBF200A0D6BF /* plistinterface.h in Headers */,
 				4DB3D8CB1F83D10A00B5FC2B /* fermata.h in Headers */,
@@ -2277,6 +2294,7 @@
 				4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */,
 				4DB3D8F21F83D1B100B5FC2B /* svg.h in Headers */,
 				4DEC4DDC21C8295700D1D273 /* choice.h in Headers */,
+				36E0442E2347A9290054F141 /* expansionmap.h in Headers */,
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
 				4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */,
 				4DA0EAD722BB77AF00A7EBEB /* editortoolkit_cmn.h in Headers */,
@@ -2455,6 +2473,7 @@
 				BB4C4B5022A932D7001F6AF0 /* elementpart.h in Headers */,
 				BB4C4B6222A932D7001F6AF0 /* mrpt.h in Headers */,
 				BB4C4AB422A932A6001F6AF0 /* iohumdrum.h in Headers */,
+				40ACDEA724079F6900F82B8C /* reh.h in Headers */,
 				BB4C4B6822A932D7001F6AF0 /* multirpt.h in Headers */,
 				BB4C4B0822A932C3001F6AF0 /* pgfoot2.h in Headers */,
 				4DA0EAD822BB77AF00A7EBEB /* editortoolkit_cmn.h in Headers */,
@@ -2881,6 +2900,7 @@
 				4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */,
 				4D1694521E3A44F300569BF4 /* syl.cpp in Sources */,
 				4DC3B9E7239E2AE1007F185E /* transposition.cpp in Sources */,
+				40ACDEAA24079F9000F82B8C /* reh.cpp in Sources */,
 				4D1694531E3A44F300569BF4 /* atts_cmn.cpp in Sources */,
 				4D6DF9F720E1074100C12BBD /* subst.cpp in Sources */,
 				4D1694541E3A44F300569BF4 /* floatingobject.cpp in Sources */,
@@ -2999,6 +3019,7 @@
 				4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */,
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				4DEC4DAA21C81EEC00D1D273 /* restore.cpp in Sources */,
+				36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */,
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
@@ -3071,6 +3092,7 @@
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4D4335C91ECF2310003BE1A9 /* atts_visual.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
+				40ACDEA924079F9000F82B8C /* reh.cpp in Sources */,
 				40BD9390206B95060037BF8E /* annot.cpp in Sources */,
 				4DC12A591F716E27000440E9 /* pghead.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
@@ -3262,6 +3284,7 @@
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4D4335CB1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
 				4DC3B9E9239E2AE3007F185E /* transposition.cpp in Sources */,
+				40ACDEAB24079F9000F82B8C /* reh.cpp in Sources */,
 				4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				40D45EC4204EEB03009C1EC9 /* instrdef.cpp in Sources */,
 				4D766F0420ACAD6E006875D8 /* syllable.cpp in Sources */,
@@ -3453,6 +3476,7 @@
 				BB4C4A9C22A9328F001F6AF0 /* options.cpp in Sources */,
 				BB4C4A6222A9321F001F6AF0 /* atts_cmn.cpp in Sources */,
 				4DC3B9E8239E2AE2007F185E /* transposition.cpp in Sources */,
+				40ACDEAC24079F9000F82B8C /* reh.cpp in Sources */,
 				BB4C4A9822A9328F001F6AF0 /* horizontalaligner.cpp in Sources */,
 				BB4C4BAC22A932EB001F6AF0 /* view_control.cpp in Sources */,
 				BB4C4B2B22A932CF001F6AF0 /* mordent.cpp in Sources */,

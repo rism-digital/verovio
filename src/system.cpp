@@ -281,7 +281,9 @@ int System::OptimizeScoreDef(FunctorParams *functorParams)
 
     if (params->m_firstScoreDef) {
         params->m_firstScoreDef = false;
-        return FUNCTOR_SIBLINGS;
+        if (!params->m_doc->GetOptions()->m_condenseFirstPage.GetValue()) {
+            return FUNCTOR_SIBLINGS;
+        }
     }
 
     params->m_currentScoreDef = this->GetDrawingScoreDef();
@@ -735,6 +737,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
     adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
     m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+
+    params->m_classId = REH;
+    m_systemAligner.Process(params->m_functor, params);
 
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;

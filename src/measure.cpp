@@ -392,7 +392,7 @@ int Measure::EnclosesTime(int time) const
     int repeat = 1;
     int timeDuration = int(
         m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
-    std::vector<int>::const_iterator iter;
+    std::vector<double>::const_iterator iter;
     for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
         repeat++;
@@ -400,7 +400,7 @@ int Measure::EnclosesTime(int time) const
     return 0;
 }
 
-int Measure::GetRealTimeOffsetMilliseconds(int repeat) const
+double Measure::GetRealTimeOffsetMilliseconds(int repeat) const
 {
     if ((repeat < 1) || repeat > (int)m_realTimeOffsetMilliseconds.size()) return 0;
     return m_realTimeOffsetMilliseconds.at(repeat - 1);
@@ -594,6 +594,10 @@ int Measure::OptimizeScoreDef(FunctorParams *functorParams)
 {
     OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
+
+    if (!params->m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
+        return FUNCTOR_CONTINUE;
+    }
 
     params->m_hasFermata = (this->FindDescendantByType(FERMATA));
     params->m_hasTempo = (this->FindDescendantByType(TEMPO));
@@ -1222,7 +1226,8 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
 
     m_realTimeOffsetMilliseconds.clear();
-    m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
+    // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
+    m_realTimeOffsetMilliseconds.push_back(params->m_maxCurrentRealTimeSeconds * 1000.0);
     params->m_maxCurrentRealTimeSeconds
         += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
 

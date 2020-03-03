@@ -56,6 +56,7 @@ class PgFoot;
 class PgFoot;
 class PgHead;
 class PgHead2;
+class Reh;
 class Rend;
 class RunningElement;
 class Slur;
@@ -392,6 +393,7 @@ protected:
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
     void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
+    void DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);

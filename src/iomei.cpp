@@ -42,6 +42,7 @@
 #include "ending.h"
 #include "expan.h"
 #include "expansion.h"
+#include "expansionmap.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
@@ -90,6 +91,7 @@
 #include "rdg.h"
 #include "ref.h"
 #include "reg.h"
+#include "reh.h"
 #include "rend.h"
 #include "rest.h"
 #include "restore.h"
@@ -415,6 +417,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(PEDAL)) {
         m_currentNode = m_currentNode.append_child("pedal");
         WritePedal(m_currentNode, dynamic_cast<Pedal *>(object));
+    }
+    else if (object->Is(REH)) {
+        m_currentNode = m_currentNode.append_child("reh");
+        WriteReh(m_currentNode, dynamic_cast<Reh *>(object));
     }
     else if (object->Is(SLUR)) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -1153,6 +1159,7 @@ void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
     dir->WriteLang(currentNode);
+    dir->WriteLineRendBase(currentNode);
     dir->WriteExtender(currentNode);
     dir->WriteVerticalGroup(currentNode);
 }
@@ -1165,6 +1172,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
     dynam->WriteExtender(currentNode);
+    dynam->WriteLineRendBase(currentNode);
     dynam->WriteVerticalGroup(currentNode);
 }
 
@@ -1249,6 +1257,18 @@ void MeiOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
     pedal->WriteVerticalGroup(currentNode);
+}
+
+void MeiOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
+{
+    assert(reh);
+
+    WriteControlElement(currentNode, reh);
+    WriteTextDirInterface(currentNode, reh);
+    WriteTimePointInterface(currentNode, reh);
+    reh->WriteColor(currentNode);
+    reh->WriteLang(currentNode);
+    reh->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -2748,6 +2768,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         m_doc->ConvertScoreDefMarkupDoc();
     }
 
+    if (success) {
+        m_doc->ExpandExpansions();
+    }
+
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
         m_doc->ConvertAnalyticalMarkupDoc();
@@ -3034,6 +3058,7 @@ bool MeiInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 {
     Expansion *vrvExpansion = new Expansion();
     ReadSystemElement(expansion, vrvExpansion);
+    ReadPlistInterface(expansion, vrvExpansion);
 
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);
@@ -3247,7 +3272,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
         start = m_doc->FindDescendantByUuid(startUuid);
     }
     if (!start) {
-        LogError("Could not find start element '%s' for boundaryEnd", startUuid.c_str());
+        LogError("Could not find start element <%s> for boundaryEnd", startUuid.c_str());
         return false;
     }
 
@@ -3564,7 +3589,7 @@ bool MeiInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         // unknown
         else {
-            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }
@@ -3758,6 +3783,9 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "pedal") {
             success = ReadPedal(parent, current);
         }
+        else if (std::string(current.name()) == "reh") {
+            success = ReadReh(parent, current);
+        }
         else if (std::string(current.name()) == "slur") {
             success = ReadSlur(parent, current);
         }
@@ -3864,6 +3892,7 @@ bool MeiInput::ReadDir(Object *parent, pugi::xml_node dir)
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
     vrvDir->ReadLang(dir);
+    vrvDir->ReadLineRendBase(dir);
     vrvDir->ReadExtender(dir);
     vrvDir->ReadVerticalGroup(dir);
 
@@ -3880,6 +3909,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
     vrvDynam->ReadExtender(dynam);
+    vrvDynam->ReadLineRendBase(dynam);
     vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
@@ -3999,6 +4029,22 @@ bool MeiInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     parent->AddChild(vrvPedal);
     ReadUnsupportedAttr(pedal, vrvPedal);
     return true;
+}
+
+bool MeiInput::ReadReh(Object *parent, pugi::xml_node reh)
+{
+    Reh *vrvReh = new Reh();
+    ReadControlElement(reh, vrvReh);
+
+    ReadTextDirInterface(reh, vrvReh);
+    ReadTimePointInterface(reh, vrvReh);
+    vrvReh->ReadColor(reh);
+    vrvReh->ReadLang(reh);
+    vrvReh->ReadVerticalGroup(reh);
+
+    parent->AddChild(vrvReh);
+    ReadUnsupportedAttr(reh, vrvReh);
+    return ReadTextChildren(vrvReh, reh, vrvReh);
 }
 
 bool MeiInput::ReadSlur(Object *parent, pugi::xml_node slur)
@@ -4307,7 +4353,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         // unknown
         else {
-            LogWarning("Element '%s' is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
     }
 
@@ -4942,7 +4988,7 @@ bool MeiInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         }
         // unknown
         else {
-            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+            LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }
@@ -5339,7 +5385,7 @@ bool MeiInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
 
 bool MeiInput::ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter)
 {
-    if (!m_hasScoreDef) {
+    if (!m_hasScoreDef && m_useScoreDefForDoc) {
         LogError("<choice> before any <scoreDef> is not supported");
         return false;
     }
@@ -5991,7 +6037,7 @@ bool MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
             ReadZone(vrvSurface, child);
         }
         else {
-            LogWarning("Unsupported element '%s' in <surface>", child.name());
+            LogWarning("Unsupported element <%s> in <surface>", child.name());
         }
     }
     parent->AddChild(vrvSurface);
@@ -6021,7 +6067,7 @@ bool MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
             ReadSurface(vrvFacsimile, child);
         }
         else {
-            LogWarning("Unsupported element '%s' in <facsimile>", child.name());
+            LogWarning("Unsupported element <%s> in <facsimile>", child.name());
         }
     }
     doc->SetFacsimile(vrvFacsimile);
