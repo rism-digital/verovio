@@ -11593,6 +11593,7 @@ int HumdrumInput::insertRepetitionElement(
     if (diff == 0) {
         // Add an mRep to the layer's data and return the index of the *Xrep.
         MRpt *mrpt = new MRpt;
+        setLocationId(mrpt, token);
         appendElement(elements, pointers, mrpt);
         return outindex;
     }
@@ -11602,12 +11603,14 @@ int HumdrumInput::insertRepetitionElement(
     if (ratio == 2) {
         // The repeat is 1/2 measure long, so insert halfmRpt element.
         HalfmRpt *halfmrpt = new HalfmRpt;
+        setLocationId(halfmrpt, token);
         appendElement(elements, pointers, halfmrpt);
         return outindex;
     }
 
     // The repeat is a beat repeat (presumed, not checking carefully yet).
     BeatRpt *beatrpt = new BeatRpt;
+    setLocationId(beatrpt, token);
     appendElement(elements, pointers, beatrpt);
     return outindex;
 }
