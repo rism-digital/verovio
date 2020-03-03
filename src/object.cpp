@@ -1677,7 +1677,7 @@ int Object::SetChildZones(FunctorParams *functorParams)
 
     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(this->GetFacsimileInterface());
     if (fi != NULL) {
-        if (fi->HasFacs()) {
+        if (fi->HasFacs() && fi->GetZone() == NULL) {
             assert(params->m_doc);
             assert(params->m_doc->GetFacsimile());
             // Facs should be a URI so check for # fragment identifier and strip it
