@@ -1992,7 +1992,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (!m_ClefChangeStack.empty()) {
         std::vector<musicxml::ClefChange>::iterator iter;
         for (iter = m_ClefChangeStack.begin(); iter != m_ClefChangeStack.end(); ++iter) {
-            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset == m_durTotal
+            if (iter->m_measureNum == measureNum && iter->m_staff == staff && iter->m_scoreOnset <= m_durTotal
                 && !isChord) {
                 if (iter->isFirst) { // add clef when first in staff
                     // if afterBarline is false at beginning of measure, move before barline
@@ -2018,10 +2018,22 @@ void MusicXmlInput::ReadMusicXmlNote(
                     }
                     iter->isFirst = false;
                 }
-                else {
-                    Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
-                    sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
-                    AddLayerElement(layer, sameasClef);
+                else { // add clef with @sameas attribute, if not already added to that layer
+                    bool addSameas = true;
+                    ArrayOfObjects objects;
+                    ClassIdComparison matchClassId(CLEF);
+                    layer->FindAllDescendantByComparison(&objects, &matchClassId);
+                    ArrayOfObjects::iterator it = objects.begin();
+                    for (; it != objects.end(); ++it) {
+                        if ((dynamic_cast<Clef *>(*it))->GetSameas() == "#" + iter->m_clef->GetUuid())
+                            addSameas = false;
+                    }
+                    Object * earlierClef = layer->FindDescendantByUuid(iter->m_clef->GetUuid());
+                    if (!earlierClef && addSameas) {
+                        Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
+                        sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
+                        AddLayerElement(layer, sameasClef);
+                    }
                 }
             }
         }
