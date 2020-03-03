@@ -76,6 +76,7 @@
 #include "measure.h"
 #include "mordent.h"
 #include "mrest.h"
+#include "mrpt.h"
 #include "multirest.h"
 #include "note.h"
 #include "num.h"
@@ -6904,6 +6905,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handlePedalMark(layerdata[i]);
             handleStaffStateVariables(layerdata[i]);
             handleStaffDynamStateVariables(layerdata[i]);
+            if (*layerdata[i] == "*rep") {
+                i = insertRepetitionElement(elements, pointers, layerdata, i);
+            }
             if (hre.search(layerdata[i], "^\\*color:(.*)")) {
                 int ctrack = layerdata[i]->getTrack();
                 int strack = layerdata[i]->getSubtrack();
@@ -11544,6 +11548,53 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         // eventually allow decoupling of keysig and key.
         setKeySig(-1, scoreDef, *((string *)keysigtok), keysigtok, keytok, true);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertRepetitionElement --
+//
+
+int HumdrumInput::insertRepetitionElement(
+    std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index)
+{
+    hum::HTp token = tokens.at(index);
+    if (*token != "*rep") {
+        // nothing to do
+        return index;
+    }
+    hum::HTp repend = NULL;
+    int outindex = index;
+    for (int i = index + 1; i < (int)tokens.size(); i++) {
+        if (*tokens[i] == "*Xrep") {
+            repend = tokens[i];
+            outindex = i;
+            break;
+        }
+    }
+    if (!repend) {
+        // Cannot find end.  It may be a multi-measure repeat which is not yet handled.
+        return index;
+    }
+    // Figure out if it is a whole measure rest by comparing the timestamps
+    // to the width of the layer data.
+    hum::HumNum r1time = token->getDurationFromBarline();
+    if (r1time != 0) {
+        // *rep does not start at beginning of meausre, so ignore for now.
+        return index;
+    }
+    hum::HumNum r2time = repend->getDurationFromBarline();
+    hum::HumNum endtime = tokens.back()->getDurationFromBarline();
+    hum::HumNum diff = r2time - endtime;
+    if (diff != 0) {
+        // The *Xrep does not end at the end of the measure. Not an mRep,
+        // so ignore for now.
+    }
+
+    // add an mRep to the layer's data and return the index of the *Xrep.
+    MRpt *mrpt = new MRpt;
+    appendElement(elements, pointers, mrpt);
+    return outindex;
 }
 
 /////////////////////////////
