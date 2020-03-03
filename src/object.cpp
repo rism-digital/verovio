@@ -61,7 +61,7 @@ Object::Object() : BoundingBox()
     }
 }
 
-Object::Object(std::string classid) : BoundingBox()
+Object::Object(const std::string& classid) : BoundingBox()
 {
     Init(classid);
     if (s_objectCounter++ == 0) {
@@ -161,7 +161,7 @@ Object::~Object()
     ClearChildren();
 }
 
-void Object::Init(std::string classid)
+void Object::Init(const std::string& classid)
 {
     m_classid = classid;
     m_parent = NULL;
@@ -786,46 +786,43 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     deepness--;
 
     if (processChildren) {
-        ArrayOfObjects::iterator iter;
-        // We need a pointer to the array for the option to work on a reversed copy
-        ArrayOfObjects *children = &this->m_children;
-        ArrayOfObjects reversed;
-        // For processing backwards, we operated on a copied reversed version
-        // Since we hold pointers, only addresses are copied
-        if (direction == BACKWARD) {
-            reversed = (*children);
-            std::reverse(reversed.begin(), reversed.end());
-            children = &reversed;
-        }
-        for (iter = children->begin(); iter != children->end(); ++iter) {
+        auto filterPredicate = [filters] (Object *iter) -> bool {
             if (filters && !filters->empty()) {
-                bool hasComparison = false;
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
-                ArrayOfComparisons::iterator comparisonIter;
-                for (comparisonIter = filters->begin(); comparisonIter != filters->end(); ++comparisonIter) {
-                    // if yes, we will use it (*comparisonIter) for evaluating if the object matches
-                    // the attribute (see below)
-                    Object *o = *iter;
-                    ClassIdComparison *attComparison = dynamic_cast<ClassIdComparison *>(*comparisonIter);
+                auto classId = iter->GetClassId();
+                ArrayOfComparisons::iterator comparisonIter = std::find_if (filters->begin(), filters->end(), [classId] (Comparison* iter)->bool {
+                    ClassIdComparison* attComparison = dynamic_cast<ClassIdComparison*>(iter);
                     assert(attComparison);
-                    if (o->GetClassId() == attComparison->GetType()) {
-                        hasComparison = true;
-                        break;
-                    }
-                }
-                if (hasComparison) {
+                    return classId == attComparison->GetType();
+                });
+
+                if (comparisonIter != filters->end()) {
                     // use the operator of the Comparison object to evaluate the attribute
-                    if ((**comparisonIter)(*iter)) {
-                        // the attribute value matches, process the object
-                        // LogDebug("%s ", (*iter)->GetClassName().c_str());
-                        (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                    if (!(**comparisonIter)(iter)) {
+                        // the attribute value doesn't match
+                        return false;
                     }
-                    // continue to the next child
-                    continue;
                 }
             }
-            // we will end here if there is no filter at all or for the current child type
-            (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+            return true;
+        };
+
+        // We need a pointer to the array for the option to work on a reversed copy
+        ArrayOfObjects *children = &this->m_children;
+        if (direction == BACKWARD) {
+            for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter!=children->rend(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (filterPredicate(*iter)) {
+                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                }
+            }
+        } else {
+            for (ArrayOfObjects::iterator iter = children->begin(); iter!=children->end(); ++iter) {
+                // we will end here if there is no filter at all or for the current child type
+                if (filterPredicate(*iter)) {
+                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                }
+            }
         }
     }
 
