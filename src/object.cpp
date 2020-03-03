@@ -1177,18 +1177,23 @@ int Object::PrepareLinking(FunctorParams *functorParams)
 
     // @next
     std::string uuid = this->GetUuid();
-    auto i = params->m_nextUuidPairs.find(uuid);
-    if (i != params->m_nextUuidPairs.end()) {
-        i->second->SetNextLink(this);
-        params->m_nextUuidPairs.erase(i);
+    auto r1 = params->m_nextUuidPairs.equal_range(uuid);
+    if (r1.first != params->m_nextUuidPairs.end()) {
+        for (auto i = r1.first; i != r1.second; ++i) {
+            i->second->SetNextLink(this);
+        }
+        params->m_nextUuidPairs.erase(r1.first, r1.second);
     }
 
     // @sameas
     std::string sameas = this->GetUuid();
-    auto j = params->m_sameasUuidPairs.find(uuid);
-    if (j != params->m_sameasUuidPairs.end()) {
-        j->second->SetSameasLink(this);
-        params->m_sameasUuidPairs.erase(j);
+
+    auto r2 = params->m_sameasUuidPairs.equal_range(uuid);
+    if (r2.first != params->m_sameasUuidPairs.end()) {
+        for (auto j = r2.first; j != r2.second;  ++j) {
+            j->second->SetSameasLink(this);
+        }
+        params->m_sameasUuidPairs.erase(r2.first, r2.second);
     }
 
     return FUNCTOR_CONTINUE;
