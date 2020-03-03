@@ -4836,6 +4836,8 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
 
 bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 {
+    bool hasFollows = std::string{"follows"}.compare(syllable.attribute("follows").name()) == 0;
+
     bool success;
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
@@ -4851,7 +4853,7 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
         Object *obj = vrvSyllable->FindDescendantByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
         if ((syl == NULL) && m_doc->GetOptions()->m_createDefaultSyl.GetValue() &&
-        (std::string{"undefined"}.compare(syllable.attribute("follows").as_string("undefined")) != 0)) {
+        !hasFollows) {
             syl = new Syl();
             Text *text = new Text();
             syl->AddChild(text);
