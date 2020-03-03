@@ -582,7 +582,8 @@ protected:
     void addSlur(FTrem *ftrem, hum::HTp start);
     void addFTremSlurs();
     std::vector<int> getStaffNumbers(std::string &deco);
-    int insertRepetitionElement(std::vector<string> &elements, std::vector<void*>&pointers, std::vector<hum::HTp> tokens, int index);
+    int insertRepetitionElement(
+        std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

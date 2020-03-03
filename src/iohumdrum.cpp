@@ -45,6 +45,7 @@
 #include "artic.h"
 #include "att.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "bracketspan.h"
 #include "breath.h"
 #include "btrem.h"
@@ -61,6 +62,7 @@
 #include "fig.h"
 #include "ftrem.h"
 #include "hairpin.h"
+#include "halfmrpt.h"
 #include "harm.h"
 #include "instrdef.h"
 #include "iomei.h"
@@ -11576,24 +11578,37 @@ int HumdrumInput::insertRepetitionElement(
         // Cannot find end.  It may be a multi-measure repeat which is not yet handled.
         return index;
     }
+
     // Figure out if it is a whole measure rest by comparing the timestamps
     // to the width of the layer data.
     hum::HumNum r1time = token->getDurationFromBarline();
-    if (r1time != 0) {
-        // *rep does not start at beginning of meausre, so ignore for now.
-        return index;
-    }
     hum::HumNum r2time = repend->getDurationFromBarline();
-    hum::HumNum endtime = tokens.back()->getDurationFromBarline();
-    hum::HumNum diff = r2time - endtime;
-    if (diff != 0) {
-        // The *Xrep does not end at the end of the measure. Not an mRep,
-        // so ignore for now.
+    hum::HumNum mdur = tokens.back()->getDurationFromBarline();
+    if (tokens.back()->isData()) {
+        mdur += tokens.back()->getDuration();
+    }
+    hum::HumNum repdur = r2time - r1time;
+    hum::HumNum diff = mdur - repdur;
+
+    if (diff == 0) {
+        // Add an mRep to the layer's data and return the index of the *Xrep.
+        MRpt *mrpt = new MRpt;
+        appendElement(elements, pointers, mrpt);
+        return outindex;
     }
 
-    // add an mRep to the layer's data and return the index of the *Xrep.
-    MRpt *mrpt = new MRpt;
-    appendElement(elements, pointers, mrpt);
+    // Check to see if it is a 1/2 measure repeat
+    hum::HumNum ratio = mdur / repdur;
+    if (ratio == 2) {
+        // The repeat is 1/2 measure long, so insert halfmRpt element.
+        HalfmRpt *halfmrpt = new HalfmRpt;
+        appendElement(elements, pointers, halfmrpt);
+        return outindex;
+    }
+
+    // The repeat is a beat repeat (presumed, not checking carefully yet).
+    BeatRpt *beatrpt = new BeatRpt;
+    appendElement(elements, pointers, beatrpt);
     return outindex;
 }
 
