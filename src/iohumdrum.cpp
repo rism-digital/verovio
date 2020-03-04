@@ -11627,6 +11627,8 @@ int HumdrumInput::insertRepetitionElement(
 void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, vector<hum::HTp> &tokens, int index)
 {
     hum::HTp item;
+    vector<int> repvalues;
+    repvalues.reserve(32);
     for (int i = index + 1; i < (int)tokens.size(); i++) {
         item = tokens.at(i);
         if (!item->isData()) {
@@ -11644,23 +11646,35 @@ void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, vector<hum::HTp> &tokens, i
             return;
         }
         double value = hre.getMatchInt(1);
-        if (value < 16) {
-            // default value will be used: one slash
-            return;
-        }
         // remove any tupletness from the rhythm.
-        int intvalue = (int)(log(value) / log(2)) - 2;
-        switch (intvalue) {
-                // default is BEATRPT_REND_1
-            case 2: repeat->SetSlash(BEATRPT_REND_2); break;
-            case 3: repeat->SetSlash(BEATRPT_REND_3); break;
-            case 4: repeat->SetSlash(BEATRPT_REND_4); break;
-            case 5:
-                repeat->SetSlash(BEATRPT_REND_5);
-                break;
-                // add mixed rhythm case BEATRPT_REND_MIXED
+        int logvalue = (int)(log(value) / log(2)) - 2;
+        repvalues.push_back(logvalue);
+    }
+
+    if (repvalues.empty()) {
+        // no notes/rests in repetition group for some reason.
+        return;
+    }
+
+    bool allequal = true;
+    for (int i = 1; i < (int)repvalues.size(); i++) {
+        if (repvalues[i] != repvalues[0]) {
+            allequal = false;
+            break;
         }
-        break;
+    }
+    if (!allequal) {
+        // set to mixed rhythm case
+        repeat->SetSlash(BEATRPT_REND_mixed);
+        return;
+    }
+
+    switch (repvalues[0]) {
+        // default is BEATRPT_REND_1 (one slash)
+        case 2: repeat->SetSlash(BEATRPT_REND_2); break;
+        case 3: repeat->SetSlash(BEATRPT_REND_3); break;
+        case 4: repeat->SetSlash(BEATRPT_REND_4); break;
+        case 5: repeat->SetSlash(BEATRPT_REND_5); break;
     }
 }
 
