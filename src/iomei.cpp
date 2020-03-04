@@ -4467,6 +4467,10 @@ bool MeiInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
 
     vrvBeatRpt->ReadColor(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
+    
+    if (m_version < MEI_4_0_0) {
+        UpgradeBeatRptTo_4_0_0(beatRpt, vrvBeatRpt);
+    }
 
     parent->AddChild(vrvBeatRpt);
     ReadUnsupportedAttr(beatRpt, vrvBeatRpt);
@@ -5861,6 +5865,38 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MeiInput::s_editorialElementNames.begin(), MeiInput::s_editorialElementNames.end(), elementName);
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MeiInput::UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt)
+{
+    std::string value;
+    if (beatRpt.attribute("rend")) {
+        value = beatRpt.attribute("rend").value();
+        beatRpt.remove_attribute("rend");
+    }
+    else if (beatRpt.attribute("form")) {
+        value = beatRpt.attribute("form").value();
+        beatRpt.remove_attribute("form");
+    }
+    if (value.empty()) return;
+    if ((value == "4") || (value == "8")) {
+        vrvBeatRpt->SetSlash(BEATRPT_REND_1);
+    }
+    else if (value == "16") {
+        vrvBeatRpt->SetSlash(BEATRPT_REND_2);
+    }
+    else if (value == "32") {
+        vrvBeatRpt->SetSlash(BEATRPT_REND_3);
+    }
+    else if (value == "64") {
+        vrvBeatRpt->SetSlash(BEATRPT_REND_4);
+    }
+    else if (value == "128") {
+        vrvBeatRpt->SetSlash(BEATRPT_REND_5);
+    }
+    else if (value == "mixed") {
+        vrvBeatRpt->SetSlash(BEATRPT_REND_mixed);
+    }
 }
 
 void MeiInput::UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem)

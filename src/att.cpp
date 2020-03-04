@@ -99,12 +99,11 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 {
     std::string value;
     switch (data) {
+        case BEATRPT_REND_1: value = "1"; break;
+        case BEATRPT_REND_2: value = "2"; break;
+        case BEATRPT_REND_3: value = "3"; break;
         case BEATRPT_REND_4: value = "4"; break;
-        case BEATRPT_REND_8: value = "8"; break;
-        case BEATRPT_REND_16: value = "16"; break;
-        case BEATRPT_REND_32: value = "32"; break;
-        case BEATRPT_REND_64: value = "64"; break;
-        case BEATRPT_REND_128: value = "128"; break;
+        case BEATRPT_REND_5: value = "5"; break;
         case BEATRPT_REND_mixed: value = "mixed"; break;
         default:
             LogWarning("Unknown beatrpt rend '%d'", data);
@@ -116,12 +115,11 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 
 data_BEATRPT_REND Att::StrToBeatrptRend(std::string value, bool logWarning) const
 {
+    if (value == "1") return BEATRPT_REND_1;
+    if (value == "2") return BEATRPT_REND_2;
+    if (value == "3") return BEATRPT_REND_3;
     if (value == "4") return BEATRPT_REND_4;
-    if (value == "8") return BEATRPT_REND_8;
-    if (value == "16") return BEATRPT_REND_16;
-    if (value == "32") return BEATRPT_REND_32;
-    if (value == "64") return BEATRPT_REND_64;
-    if (value == "128") return BEATRPT_REND_128;
+    if (value == "5") return BEATRPT_REND_5;
     if (value == "mixed") return BEATRPT_REND_mixed;
     if (logWarning && !value.empty()) LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
     return BEATRPT_REND_NONE;
