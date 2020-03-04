@@ -105,6 +105,7 @@ class Proport;
 class Rdg;
 class Ref;
 class Reg;
+class Reh;
 class Rend;
 class Rest;
 class Restore;
@@ -289,6 +290,7 @@ private:
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
+    void WriteReh(pugi::xml_node currentNode, Reh *reh);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteTie(pugi::xml_node currentNode, Tie *tie);
@@ -539,6 +541,7 @@ private:
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
+    bool ReadReh(Object *parent, pugi::xml_node reh);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
     bool ReadTempo(Object *parent, pugi::xml_node tempo);
     bool ReadTie(Object *parent, pugi::xml_node tie);
@@ -656,6 +659,7 @@ private:
      */
     ///@{
     // to MEI 4.0.0
+    void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement);

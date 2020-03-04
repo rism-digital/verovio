@@ -298,6 +298,7 @@ private:
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
+    data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
     std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
