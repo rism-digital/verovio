@@ -738,6 +738,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
     m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
 
+    params->m_classId = REH;
+    m_systemAligner.Process(params->m_functor, params);
+
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
     m_systemAligner.Process(params->m_functor, params);

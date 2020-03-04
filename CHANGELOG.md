@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Fix Leipzig font validation issues
 
 ## [2.5.0] - 2020-02-03
 * Support for expansion implementation with --expand option (@wergo)
