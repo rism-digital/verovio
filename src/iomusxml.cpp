@@ -2037,18 +2037,23 @@ void MusicXmlInput::ReadMusicXmlNote(
                     }
                     iter->isFirst = false;
                 }
-                else { // add clef with @sameas attribute, if not already added to that layer
+                else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
                     bool addSameas = true;
                     ArrayOfObjects objects;
                     ClassIdComparison matchClassId(CLEF);
                     layer->FindAllDescendantByComparison(&objects, &matchClassId);
-                    ArrayOfObjects::iterator it = objects.begin();
-                    for (; it != objects.end(); ++it) {
-                        if ((dynamic_cast<Clef *>(*it))->GetSameas() == "#" + iter->m_clef->GetUuid())
+                    for (auto o : objects) {
+                        Clef *clef = dynamic_cast<Clef *>(o);
+                        if (strcmp(clef->GetSameas().c_str(), ("#" + iter->m_clef->GetUuid()).c_str()) == 0) {
                             addSameas = false;
+                            break;
+                        }
+                        if (strcmp(o->GetUuid().c_str(), iter->m_clef->GetUuid().c_str()) == 0) {
+                            addSameas = false;
+                            break;
+                        }
                     }
-                    Object * earlierClef = layer->FindDescendantByUuid(iter->m_clef->GetUuid());
-                    if (!earlierClef && addSameas) {
+                    if (addSameas) {
                         Clef *sameasClef = new Clef(); // add clef with @sameas referring to original clef
                         sameasClef->SetSameas("#" + iter->m_clef->GetUuid());
                         AddLayerElement(layer, sameasClef);
