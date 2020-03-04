@@ -1140,10 +1140,12 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // Adjusting page width and height according to the options
     int width = m_options->m_pageWidth.GetUnfactoredValue();
     int height = m_options->m_pageHeight.GetUnfactoredValue();
+    int breaks = m_options->m_breaks.GetValue();
+    bool adjustHeight = m_options->m_adjustPageHeight.GetValue();
+    bool adjustWidth = m_options->m_adjustPageWidth.GetValue();
 
-    if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
-    if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
-        height = m_doc.GetAdjustedDrawingPageHeight();
+    if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
     if (m_doc.GetType() == Transcription) {
         width = m_doc.GetAdjustedDrawingPageWidth();

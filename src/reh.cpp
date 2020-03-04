@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dir.cpp
-// Author:      Laurent Pugin
-// Created:     2016
+// Name:        reh.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2020
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "dir.h"
+#include "reh.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "functorparams.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -22,42 +21,33 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Dir
+// Reh
 //----------------------------------------------------------------------------
 
-Dir::Dir()
-    : ControlElement("dir-")
-    , TextListInterface()
-    , TextDirInterface()
-    , TimeSpanningInterface()
-    , AttLang()
-    , AttLineRendBase()
-    , AttVerticalGroup()
+Reh::Reh() : ControlElement("reh-"), TextDirInterface(), TimePointInterface(), AttColor(), AttLang(), AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_EXTENDER);
-    RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
 }
 
-Dir::~Dir() {}
+Reh::~Reh() {}
 
-void Dir::Reset()
+void Reh::Reset()
 {
     ControlElement::Reset();
     TextDirInterface::Reset();
-    TimeSpanningInterface::Reset();
-    ResetExtender();
+    TimePointInterface::Reset();
+    ResetColor();
     ResetLang();
-    ResetLineRendBase();
     ResetVerticalGroup();
 }
 
-void Dir::AddChild(Object *child)
+void Reh::AddChild(Object *child)
 {
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -73,19 +63,6 @@ void Dir::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
-}
-
-//----------------------------------------------------------------------------
-// Dir functor methods
-//----------------------------------------------------------------------------
-
-int Dir::PrepareFloatingGrps(FunctorParams *)
-{
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
