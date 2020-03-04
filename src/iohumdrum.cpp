@@ -11649,13 +11649,16 @@ void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, vector<hum::HTp> &tokens, i
             return;
         }
         // remove any tupletness from the rhythm.
-        int intvalue = (int)(log(value) / log(2));
-        intvalue = 1 << intvalue;
+        int intvalue = (int)(log(value) / log(2)) - 2;
         switch (intvalue) {
-            case 16: repeat->SetSlash(BEATRPT_REND_16); break;
-            case 32: repeat->SetSlash(BEATRPT_REND_32); break;
-            case 64: repeat->SetSlash(BEATRPT_REND_64); break;
-            case 128: repeat->SetSlash(BEATRPT_REND_128); break;
+                // default is BEATRPT_REND_1
+            case 2: repeat->SetSlash(BEATRPT_REND_2); break;
+            case 3: repeat->SetSlash(BEATRPT_REND_3); break;
+            case 4: repeat->SetSlash(BEATRPT_REND_4); break;
+            case 5:
+                repeat->SetSlash(BEATRPT_REND_5);
+                break;
+                // add mixed rhythm case BEATRPT_REND_MIXED
         }
         break;
     }
