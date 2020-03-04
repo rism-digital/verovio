@@ -11611,8 +11611,54 @@ int HumdrumInput::insertRepetitionElement(
     // The repeat is a beat repeat (presumed, not checking carefully yet).
     BeatRpt *beatrpt = new BeatRpt;
     setLocationId(beatrpt, token);
+    setRepeatSlashes(beatrpt, tokens, index);
     appendElement(elements, pointers, beatrpt);
     return outindex;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setRepeatSlashes -- Check for the next note/rest after
+//     the given token and set the slash attribute on the repeat to
+//     the power-of-two duration for that rhythm.
+//
+//
+
+void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, vector<hum::HTp> &tokens, int index)
+{
+    hum::HTp item;
+    for (int i = index + 1; i < (int)tokens.size(); i++) {
+        item = tokens.at(i);
+        if (!item->isData()) {
+            continue;
+        }
+        if (item->isNull()) {
+            // should not happen, but being careful
+            continue;
+        }
+        if (item->isGrace()) {
+            continue;
+        }
+        hum::HumRegex hre;
+        if (!hre.search(item, "(\\d+)")) {
+            return;
+        }
+        double value = hre.getMatchInt(1);
+        if (value < 16) {
+            // default value will be used: one slash
+            return;
+        }
+        // remove any tupletness from the rhythm.
+        int intvalue = (int)(log(value) / log(2));
+        intvalue = 1 << intvalue;
+        switch (intvalue) {
+            case 16: repeat->SetSlash(BEATRPT_REND_16); break;
+            case 32: repeat->SetSlash(BEATRPT_REND_32); break;
+            case 64: repeat->SetSlash(BEATRPT_REND_64); break;
+            case 128: repeat->SetSlash(BEATRPT_REND_128); break;
+        }
+        break;
+    }
 }
 
 /////////////////////////////

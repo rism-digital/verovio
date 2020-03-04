@@ -17,6 +17,7 @@
 
 #include "accid.h"
 #include "attdef.h"
+#include "beatrpt.h"
 #include "clef.h"
 #include "dir.h"
 #include "ending.h"
@@ -584,6 +585,7 @@ protected:
     std::vector<int> getStaffNumbers(std::string &deco);
     int insertRepetitionElement(
         std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
+    void setRepeatSlashes(BeatRpt *repeat, std::vector<hum::HTp> &tokens, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
