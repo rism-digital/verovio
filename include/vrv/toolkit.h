@@ -152,7 +152,7 @@ public:
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
     std::string RenderToMIDI();
-    
+
     /**
      * Export the content to a Plaine and Easie file.
      */

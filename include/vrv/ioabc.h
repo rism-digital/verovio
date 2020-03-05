@@ -43,11 +43,10 @@ class Tie;
 class AbcInput : public Input {
 public:
     // constructors and destructors
-    AbcInput(Doc *doc, std::string filename);
+    AbcInput(Doc *doc);
     virtual ~AbcInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &abc);
+    virtual bool Import(const std::string &abc);
 
 #ifndef NO_ABC_SUPPORT
 

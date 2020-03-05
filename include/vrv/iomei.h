@@ -162,7 +162,7 @@ public:
     /**
      * The main method for exporting the file to MEI.
      */
-    virtual bool ExportFile();
+    bool Export();
 
     /**
      * The main method for write objects.
@@ -420,8 +420,7 @@ public:
     MeiInput(Doc *doc, std::string filename);
     virtual ~MeiInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &mei);
+    virtual bool Import(const std::string &mei);
 
 private:
     bool ReadDoc(pugi::xml_node root);

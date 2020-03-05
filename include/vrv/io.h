@@ -33,11 +33,6 @@ public:
     virtual ~Output();
 
     /**
-     * Dummy export method that must be overridden in child class.
-     */
-    virtual bool ExportFile() { return true; }
-
-    /**
      * Dummy object method that must be overridden in child class.
      */
     virtual bool WriteObject(Object *object) { return true; }
@@ -61,10 +56,9 @@ protected:
  * This class is a base class for input classes.
  * It is not an abstract class but should not be instanciated directly.
  */
-class Input  {
+class Input {
 public:
     // constructors and destructors
-    Input(Doc *doc, std::string filename);
     Input(Doc *doc);
     virtual ~Input();
 
@@ -72,8 +66,7 @@ public:
     std::string GetOutputFormat() { return m_outformat; }
 
     // read
-    virtual bool ImportFile() { return true; }
-    virtual bool ImportString(std::string const &data) { return true; }
+    virtual bool Import(std::string const &data) { return true; }
 
     /**
      * Getter for layoutInformation flag that is set to true during import
