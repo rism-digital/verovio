@@ -78,7 +78,7 @@ namespace vrv {
 // MusicXmlInput
 //----------------------------------------------------------------------------
 
-MusicXmlInput::MusicXmlInput(Doc *doc, std::string filename) : FileInputStream(doc)
+MusicXmlInput::MusicXmlInput(Doc *doc, std::string filename) : Input(doc)
 {
     m_filename = filename;
 }

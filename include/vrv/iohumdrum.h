@@ -312,7 +312,7 @@ public:
 // HumdrumInput
 //----------------------------------------------------------------------------
 
-class HumdrumInput : public vrv::FileInputStream {
+class HumdrumInput : public vrv::Input {
 public:
     // constructors and destructors
     HumdrumInput(vrv::Doc *doc, std::string filename);

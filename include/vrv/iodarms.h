@@ -34,7 +34,7 @@ typedef struct _pitchmap {
     data_PITCHNAME pitch;
 } pitchmap;
 
-class DarmsInput : public FileInputStream {
+class DarmsInput : public Input {
 public:
     // constructors and destructors
     DarmsInput(Doc *doc, std::string filename);

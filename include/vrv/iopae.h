@@ -8,6 +8,7 @@
 #ifndef __VRV_IOPAE_H__
 #define __VRV_IOPAE_H__
 
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -251,7 +252,7 @@ namespace pae {
 /**
  * This class is a file output stream for writing PAE files.
  */
-class PaeOutput : public FileOutputStream {
+class PaeOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
@@ -273,6 +274,11 @@ public:
      * Writing object method that must be overridden in the child class.
      */
     virtual bool WriteObjectEnd(Object *object);
+    
+    /**
+     * Return the output as a string by writing it to the stringstream member.
+     */
+    std::string GetOutput();
 
 private:
     bool WriteDoc(Doc *doc);
@@ -347,13 +353,15 @@ public:
     //
 private:
     std::string m_filename;
+    std::ostringstream m_streamStringOutput;
+    bool m_writeToStreamString;
 };
 
 //----------------------------------------------------------------------------
 // PaeInput
 //----------------------------------------------------------------------------
 
-class PaeInput : public FileInputStream {
+class PaeInput : public Input {
 public:
     // constructors and destructors
     PaeInput(Doc *doc, std::string filename);

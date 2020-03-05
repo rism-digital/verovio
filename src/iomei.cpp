@@ -131,7 +131,7 @@ std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "a
 // MeiOutput
 //----------------------------------------------------------------------------
 
-MeiOutput::MeiOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
+MeiOutput::MeiOutput(Doc *doc, std::string filename) : Output(doc)
 {
     m_filename = filename;
     m_writeToStreamString = false;
@@ -2233,7 +2233,7 @@ std::string MeiOutput::DocTypeToStr(DocType type)
 // MeiInput
 //----------------------------------------------------------------------------
 
-MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
+MeiInput::MeiInput(Doc *doc, std::string filename) : Input(doc)
 {
     m_filename = filename;
     //

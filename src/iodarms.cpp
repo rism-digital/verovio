@@ -9,6 +9,8 @@
 
 //----------------------------------------------------------------------------
 
+#include <fstream>
+
 //----------------------------------------------------------------------------
 
 #ifndef NO_DARMS_SUPPORT
@@ -98,7 +100,7 @@ pitchmap DarmsInput::PitchMap[] = {
     { 8, PITCHNAME_b },
 };
 
-DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
+DarmsInput::DarmsInput(Doc *doc, std::string filename) : Input(doc)
 {
     m_layer = NULL;
     m_measure = NULL;

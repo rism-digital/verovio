@@ -40,7 +40,7 @@ class Tie;
 // AbcInput
 //----------------------------------------------------------------------------
 
-class AbcInput : public FileInputStream {
+class AbcInput : public Input {
 public:
     // constructors and destructors
     AbcInput(Doc *doc, std::string filename);
