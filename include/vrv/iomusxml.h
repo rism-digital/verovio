@@ -146,7 +146,7 @@ namespace musicxml {
 // MusicXmlInput
 //----------------------------------------------------------------------------
 
-class MusicXmlInput : public FileInputStream {
+class MusicXmlInput : public Input {
 public:
     // constructors and destructors
     MusicXmlInput(Doc *doc, std::string filename);

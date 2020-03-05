@@ -354,7 +354,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 bool Toolkit::LoadData(const std::string &data)
 {
     std::string newData;
-    FileInputStream *input = NULL;
+    Input *input = NULL;
 
     auto inputFormat = m_inputFrom;
     if (inputFormat == AUTO) {
@@ -443,7 +443,7 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        Input *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data (2)");
             delete tempinput;
@@ -473,7 +473,7 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        Input *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data (3)");
             delete tempinput;
@@ -501,7 +501,7 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        Input *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data (4)");
             delete tempinput;
@@ -529,7 +529,7 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        Input *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data (5)");
             delete tempinput;
@@ -1256,6 +1256,28 @@ std::string Toolkit::RenderToMIDI()
         reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
 
     return outputstr;
+}
+
+std::string Toolkit::RenderToPAE()
+{
+    if (GetPageCount() == 0) {
+        LogWarning("No data loaded");
+        return "";
+    }
+
+    PaeOutput paeOutput(&m_doc, "");
+    std::string output = paeOutput.GetOutput();
+    return output;
+}
+
+bool Toolkit::RenderToPAEFile(const std::string &filename)
+{
+    PaeOutput paeOutput(&m_doc, filename.c_str());
+    if (!paeOutput.ExportFile()) {
+        LogError("Unknown error");
+        return false;
+    }
+    return true;
 }
 
 std::string Toolkit::RenderToTimemap()

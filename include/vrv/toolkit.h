@@ -152,6 +152,17 @@ public:
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
     std::string RenderToMIDI();
+    
+    /**
+     * Export the content to a Plaine and Easie file.
+     */
+    bool RenderToPAEFile(const std::string &filename);
+
+    /**
+     * Render the content to Plaine and Easie.
+     * Only the top staff / layer is exported.
+     */
+    std::string RenderToPAE();
 
     /**
      * Creates a timemap file, and return it as a JSON string.

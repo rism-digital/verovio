@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -77,7 +78,7 @@ int keyPitchAlterAmount = 0;
 // AbcInput
 //----------------------------------------------------------------------------
 
-AbcInput::AbcInput(Doc *doc, std::string filename) : FileInputStream(doc)
+AbcInput::AbcInput(Doc *doc, std::string filename) : Input(doc)
 {
     m_filename = filename;
     m_hasLayoutInformation = true;

@@ -14,56 +14,50 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// FileOutputStream
+// Output
 //----------------------------------------------------------------------------
 
-FileOutputStream::FileOutputStream(Doc *doc, std::string filename) : std::ofstream(filename.c_str())
+Output::Output(Doc *doc, std::string filename)
 {
     assert(doc);
     m_doc = doc;
 }
 
-FileOutputStream::FileOutputStream(Doc *doc) : std::ofstream()
+Output::Output(Doc *doc)
 {
     assert(doc);
     m_doc = doc;
 }
 
-FileOutputStream::~FileOutputStream()
+Output::~Output()
 {
-    if (this->is_open()) {
-        this->close();
-    }
 }
 
 //----------------------------------------------------------------------------
-// FileInputStream
+// Input
 //----------------------------------------------------------------------------
 
-FileInputStream::FileInputStream(Doc *doc, std::string filename) : std::ifstream(filename.c_str())
+Input::Input(Doc *doc, std::string filename)
 {
     assert(doc);
     m_doc = doc;
     Init();
 }
 
-FileInputStream::FileInputStream(Doc *doc) : std::ifstream()
+Input::Input(Doc *doc)
 {
     assert(doc);
     m_doc = doc;
     Init();
 }
 
-void FileInputStream::Init()
+void Input::Init()
 {
     m_hasLayoutInformation = false;
 }
 
-FileInputStream::~FileInputStream()
+Input::~Input()
 {
-    if (this->is_open()) {
-        this->close();
-    }
 }
 
 } // namespace vrv

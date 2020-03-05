@@ -342,7 +342,7 @@ namespace humaux {
 // HumdrumInput::HumdrumInput -- Constructor.
 //
 
-HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc)
+HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : Input(doc)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT

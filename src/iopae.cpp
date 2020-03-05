@@ -12,6 +12,7 @@
 #ifndef NO_PAE_SUPPORT
 
 #include <assert.h>
+#include <fstream>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -79,7 +80,7 @@ char data_value[MAX_DATA_LEN]; // ditto as above
 // PaeOutput
 //----------------------------------------------------------------------------
 
-PaeOutput::PaeOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
+PaeOutput::PaeOutput(Doc *doc, std::string filename) : Output(doc)
 {
     m_filename = filename;
 }
@@ -89,8 +90,32 @@ PaeOutput::~PaeOutput() {}
 bool PaeOutput::ExportFile()
 {
     m_doc->Save(this);
+    
+    if (!m_writeToStreamString) {
+        /*
+        if (this->is_open()) {
+            std::string output = m_streamStringOutput.str();
+            std::ofstream str("");
+            str << output;
+            this->std::ofstream << out;
+            //this << output.c_str();
+           // this->write(output, output.size());
+            //m_streamStringOutput.str();
+        }
+        meiDoc.save(m_streamStringOutput, "    ", output_flags);
+        */
+    }
 
     return true;
+}
+
+std::string PaeOutput::GetOutput()
+{
+    m_writeToStreamString = true;
+    this->ExportFile();
+    m_writeToStreamString = false;
+
+    return m_streamStringOutput.str();
 }
 
 bool PaeOutput::WriteObject(Object *object)
@@ -239,7 +264,7 @@ void PaeOutput::WriteTrill(Trill *trill) {}
 
 PaeInput::PaeInput(Doc *doc, std::string filename)
     : // This is pretty bad. We open a bad fileoinputstream as we don't use it
-    FileInputStream(doc)
+    Input(doc)
 {
     m_filename = filename;
     m_staff = NULL;
