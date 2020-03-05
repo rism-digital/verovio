@@ -78,33 +78,11 @@ namespace vrv {
 // MusicXmlInput
 //----------------------------------------------------------------------------
 
-MusicXmlInput::MusicXmlInput(Doc *doc, std::string filename) : Input(doc)
-{
-    m_filename = filename;
-}
+MusicXmlInput::MusicXmlInput(Doc *doc) : Input(doc) {}
 
 MusicXmlInput::~MusicXmlInput() {}
 
-bool MusicXmlInput::ImportFile()
-{
-    try {
-        m_doc->Reset();
-        m_doc->SetType(Raw);
-        pugi::xml_document xmlDoc;
-        pugi::xml_parse_result result = xmlDoc.load_file(m_filename.c_str());
-        if (!result) {
-            return false;
-        }
-        pugi::xml_node root = xmlDoc.first_child();
-        return ReadMusicXml(root);
-    }
-    catch (char *str) {
-        LogError("%s", str);
-        return false;
-    }
-}
-
-bool MusicXmlInput::ImportString(std::string const &musicxml)
+bool MusicXmlInput::Import(std::string const &musicxml)
 {
     try {
         m_doc->Reset();
@@ -1853,8 +1831,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         pugi::xpath_node staffNode = node.select_node("staff");
         int staffNum = staffNode.node().text().as_int() + staffOffset;
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(
-            std::to_string(staffNum)));
+        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));

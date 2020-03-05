@@ -256,14 +256,14 @@ class PaeOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
-    PaeOutput(Doc *doc, std::string filename);
+    PaeOutput(Doc *doc);
     virtual ~PaeOutput();
     ///@}
 
     /**
-     * The main method for exporting the file to PAE.
+     * The main method for exporting to PAE.
      */
-    virtual bool ExportFile();
+    bool Export(std::string &output);
 
     /**
      * The main method for write objects.
@@ -274,11 +274,6 @@ public:
      * Writing object method that must be overridden in the child class.
      */
     virtual bool WriteObjectEnd(Object *object);
-    
-    /**
-     * Return the output as a string by writing it to the stringstream member.
-     */
-    std::string GetOutput();
 
 private:
     bool WriteDoc(Doc *doc);
@@ -352,9 +347,7 @@ private:
 public:
     //
 private:
-    std::string m_filename;
     std::ostringstream m_streamStringOutput;
-    bool m_writeToStreamString;
 };
 
 //----------------------------------------------------------------------------
@@ -364,11 +357,10 @@ private:
 class PaeInput : public Input {
 public:
     // constructors and destructors
-    PaeInput(Doc *doc, std::string filename);
+    PaeInput(Doc *doc);
     virtual ~PaeInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &pae);
+    virtual bool Import(const std::string &pae);
 
 #ifndef NO_PAE_SUPPORT
 
@@ -410,7 +402,6 @@ private:
 public:
     //
 private:
-    std::string m_filename;
     Staff *m_staff;
     Measure *m_measure;
     Layer *m_layer;

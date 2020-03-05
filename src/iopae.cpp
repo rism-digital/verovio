@@ -80,42 +80,28 @@ char data_value[MAX_DATA_LEN]; // ditto as above
 // PaeOutput
 //----------------------------------------------------------------------------
 
-PaeOutput::PaeOutput(Doc *doc, std::string filename) : Output(doc)
-{
-    m_filename = filename;
-}
+PaeOutput::PaeOutput(Doc *doc) : Output(doc) {}
 
 PaeOutput::~PaeOutput() {}
 
-bool PaeOutput::ExportFile()
+bool PaeOutput::Export(std::string &output)
 {
     m_doc->Save(this);
-    
-    if (!m_writeToStreamString) {
-        /*
-        if (this->is_open()) {
-            std::string output = m_streamStringOutput.str();
-            std::ofstream str("");
-            str << output;
-            this->std::ofstream << out;
-            //this << output.c_str();
-           // this->write(output, output.size());
-            //m_streamStringOutput.str();
-        }
-        meiDoc.save(m_streamStringOutput, "    ", output_flags);
-        */
+
+    /*
+    if (this->is_open()) {
+        std::string output = m_streamStringOutput.str();
+        std::ofstream str("");
+        str << output;
+        this->std::ofstream << out;
+        //this << output.c_str();
+       // this->write(output, output.size());
+        //m_streamStringOutput.str();
     }
+    meiDoc.save(m_streamStringOutput, "    ", output_flags);
+    */
 
     return true;
-}
-
-std::string PaeOutput::GetOutput()
-{
-    m_writeToStreamString = true;
-    this->ExportFile();
-    m_writeToStreamString = false;
-
-    return m_streamStringOutput.str();
 }
 
 bool PaeOutput::WriteObject(Object *object)
@@ -262,11 +248,10 @@ void PaeOutput::WriteTrill(Trill *trill) {}
 // PaeInput
 //----------------------------------------------------------------------------
 
-PaeInput::PaeInput(Doc *doc, std::string filename)
+PaeInput::PaeInput(Doc *doc)
     : // This is pretty bad. We open a bad fileoinputstream as we don't use it
     Input(doc)
 {
-    m_filename = filename;
     m_staff = NULL;
     m_measure = NULL;
     m_layer = NULL;
@@ -283,15 +268,7 @@ PaeInput::~PaeInput() {}
 
 //////////////////////////////////////////////////////////////////////////
 
-bool PaeInput::ImportFile()
-{
-    std::ifstream infile;
-    infile.open(m_filename.c_str());
-    parsePlainAndEasy(infile);
-    return true;
-}
-
-bool PaeInput::ImportString(const std::string &pae)
+bool PaeInput::Import(const std::string &pae)
 {
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);

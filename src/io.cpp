@@ -17,32 +17,17 @@ namespace vrv {
 // Output
 //----------------------------------------------------------------------------
 
-Output::Output(Doc *doc, std::string filename)
-{
-    assert(doc);
-    m_doc = doc;
-}
-
 Output::Output(Doc *doc)
 {
     assert(doc);
     m_doc = doc;
 }
 
-Output::~Output()
-{
-}
+Output::~Output() {}
 
 //----------------------------------------------------------------------------
 // Input
 //----------------------------------------------------------------------------
-
-Input::Input(Doc *doc, std::string filename)
-{
-    assert(doc);
-    m_doc = doc;
-    Init();
-}
 
 Input::Input(Doc *doc)
 {
@@ -56,8 +41,6 @@ void Input::Init()
     m_hasLayoutInformation = false;
 }
 
-Input::~Input()
-{
-}
+Input::~Input() {}
 
 } // namespace vrv

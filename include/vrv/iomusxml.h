@@ -149,15 +149,14 @@ namespace musicxml {
 class MusicXmlInput : public Input {
 public:
     // constructors and destructors
-    MusicXmlInput(Doc *doc, std::string filename);
+    MusicXmlInput(Doc *doc);
     virtual ~MusicXmlInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(std::string const &musicxml);
+    virtual bool Import(std::string const &musicxml);
 
 private:
     /*
-     * Top level method called from ImportFile or ImportString
+     * Top level method called from ImportFile or Import
      */
     bool ReadMusicXml(pugi::xml_node root);
 
@@ -311,8 +310,6 @@ private:
     ///@}
 
 private:
-    /* The filename */
-    std::string m_filename;
     /* octave offset */
     std::vector<int> m_octDis;
     /* measure repeats */

@@ -93,7 +93,7 @@ public:
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValueArray(const std::vector<std::string> &values);
-    virtual bool SetValue(const std::string& value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -136,7 +136,7 @@ public:
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(const std::string& value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
