@@ -15,6 +15,7 @@
 #include "measure.h"
 #include "note.h"
 #include "object.h"
+#include "timeinterface.h"
 
 namespace vrv {
 
@@ -109,6 +110,30 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// PointingToComparison
+//----------------------------------------------------------------------------
+
+class PointingToComparison : public ClassIdComparison {
+
+public:
+    PointingToComparison(ClassId classId, Object *pointingTo) : ClassIdComparison(classId)
+    {
+        m_pointingTo = pointingTo;
+    }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        TimePointInterface *interface = object->GetTimePointInterface();
+        if (!interface) return false;
+        return (interface->GetStart() == m_pointingTo);
+    }
+
+protected:
+    Object *m_pointingTo;
+};
+
+//----------------------------------------------------------------------------
 // IsEditorialElementComparison
 //----------------------------------------------------------------------------
 
@@ -139,7 +164,7 @@ public:
 class IsEmptyComparison : public ClassIdComparison {
 
 public:
-    IsEmptyComparison(ClassId ClassId, bool reverse = false) : ClassIdComparison(ClassId) { m_reverse = reverse; }
+    IsEmptyComparison(ClassId classId, bool reverse = false) : ClassIdComparison(classId) { m_reverse = reverse; }
 
     virtual bool operator()(Object *object)
     {
@@ -167,7 +192,7 @@ private:
 class IsAttributeComparison : public ClassIdComparison {
 
 public:
-    IsAttributeComparison(ClassId ClassId) : ClassIdComparison(ClassId) {}
+    IsAttributeComparison(ClassId classId) : ClassIdComparison(classId) {}
 
     virtual bool operator()(Object *object)
     {
@@ -187,7 +212,7 @@ public:
 class AttNIntegerComparison : public ClassIdComparison {
 
 public:
-    AttNIntegerComparison(ClassId ClassId, const int n) : ClassIdComparison(ClassId) { m_n = n; }
+    AttNIntegerComparison(ClassId classId, const int n) : ClassIdComparison(classId) { m_n = n; }
 
     void SetN(int n) { m_n = n; }
 
@@ -215,7 +240,7 @@ private:
 class AttNIntegerAnyComparison : public ClassIdComparison {
 
 public:
-    AttNIntegerAnyComparison(ClassId ClassId, std::vector<int> ns) : ClassIdComparison(ClassId) { m_ns = ns; }
+    AttNIntegerAnyComparison(ClassId classId, std::vector<int> ns) : ClassIdComparison(classId) { m_ns = ns; }
 
     void SetNs(std::vector<int> ns) { m_ns = ns; }
 
@@ -243,7 +268,7 @@ private:
 class AttNNumberLikeComparison : public ClassIdComparison {
 
 public:
-    AttNNumberLikeComparison(ClassId ClassId, const std::string n) : ClassIdComparison(ClassId) { m_n = n; }
+    AttNNumberLikeComparison(ClassId classId, const std::string n) : ClassIdComparison(classId) { m_n = n; }
 
     void SetN(std::string n) { m_n = n; }
 

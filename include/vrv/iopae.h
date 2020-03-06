@@ -19,12 +19,10 @@
 
 namespace vrv {
 
-class Accid;
 class Beam;
 class Chord;
 class Clef;
 class DurationInterface;
-class Fermata;
 class GraceGrp;
 class KeyAccid;
 class Layer;
@@ -41,7 +39,6 @@ class Space;
 class Staff;
 class StaffDef;
 class Tie;
-class Trill;
 class Tuplet;
 class KeySig;
 class BarLine;
@@ -51,6 +48,8 @@ class BarLine;
 //----------------------------------------------------------------------------
 
 namespace pae {
+
+    // static char keySigFlats[7];
 
     class Note {
 
@@ -286,6 +285,7 @@ private:
     void WriteScoreDef(ScoreDef *scoreDef);
     void WriteStaffDef(StaffDef *staffDef);
     void WriteMeasure(Measure *measure);
+    void WriteMeasureEnd(Measure *measure);
     void WriteStaff(Staff *staff);
     void WriteLayer(Layer *layer);
     ///@}
@@ -295,9 +295,9 @@ private:
      * Called from WriteLayerElement.
      */
     ///@{
-    void WriteAccid(Accid *accid);
     void WriteBarLine(BarLine *barLine);
     void WriteBeam(Beam *beam);
+    void WriteBeamEnd(Beam *beam);
     void WriteChord(Chord *chord);
     void WriteClef(Clef *clef);
     void WriteGraceGrp(GraceGrp *graceGrp);
@@ -317,9 +317,6 @@ private:
      * @name Methods for writing ControlElement
      */
     ///@{
-    void WriteFermata(Fermata *fermata);
-    void WriteTie(Tie *tie);
-    void WriteTrill(Trill *trill);
     ///@}
 
     /**
@@ -346,7 +343,7 @@ private:
      */
     ///@{
     ///@}
-    
+
     /**
      * @name Other private methods
      */
@@ -365,6 +362,8 @@ private:
     int m_staffN; // The @n of the first staff (initial staffDef)
     int m_currentOct; // The current octave
     int m_currentDur; // The current duration
+    int m_currentDots;
+    Measure *m_currentMeasure;
 };
 
 //----------------------------------------------------------------------------
