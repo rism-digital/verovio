@@ -207,11 +207,18 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
 {
+    AddLayerElement(layer, element, 0);
+}
+
+void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int duration)
+{
     assert(layer);
     assert(element);
 
-    if (layer->GetChildren()->size() == 0 && m_durTotal > 0) {
-        FillSpace(layer, m_durTotal);
+    int currTime = 0;
+    if (m_layerEndTimes.count(layer) > 0) currTime = m_layerEndTimes.at(layer);
+    if ((layer->GetChildren()->size() == 0 && m_durTotal > 0) || currTime < m_durTotal) {
+        FillSpace(layer, m_durTotal - currTime);
     }
 
     if (m_elementStackMap.at(layer).empty()) {
@@ -220,6 +227,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
     else {
         m_elementStackMap.at(layer).back()->AddChild(element);
     }
+    m_layerEndTimes[layer] = m_durTotal + duration;
 }
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
@@ -1930,23 +1938,6 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, s
     assert(measure);
 
     m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
-
-    Layer *layer = SelectLayer(node, measure);
-
-    pugi::xpath_node prevNote = node.select_node("preceding-sibling::note[1]");
-    pugi::xpath_node nextNote = node.select_node("following-sibling::note[1]");
-    if (nextNote) {
-        // We need a <space> if a note follows
-        if (!node.select_node("voice")) layer = SelectLayer(nextNote.node(), measure);
-        FillSpace(layer, atoi(GetContentOfChild(node, "duration").c_str()));
-    }
-    else if (!prevNote && !node.select_node("preceding-sibling::backup")) {
-        // If there is no previous or following note in the first layer, the measure seems to be empty
-        // an invisible mRest is used, which should be replaced by mSpace, when available
-        MRest *mRest = new MRest();
-        mRest->SetVisible(BOOLEAN_false);
-        AddLayerElement(layer, mRest);
-    }
 }
 
 void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, std::string measureNum)
@@ -2001,10 +1992,8 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(node);
     assert(measure);
 
-    int barNumber = m_measureCounts.at(measure);
-
     Layer *layer;
-    if (!node.select_node("voice")) { // GetContentOfChild(node, "voice")
+    if (!node.select_node("voice")) { // if no layer info, stay at previous layer
         layer = m_prevLayer;
     }
     else {
@@ -2161,7 +2150,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 space->SetDur(ConvertTypeToDur(typeStr));
                 space->SetDurPpq(duration);
                 if (dots > 0) space->SetDots(dots);
-                AddLayerElement(layer, space);
+                AddLayerElement(layer, space, duration);
             }
             else {
                 // this should be mSpace
@@ -2174,7 +2163,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (m_slash) {
                 for (int i = m_meterCount; i > 0; --i) {
                     BeatRpt *slash = new BeatRpt;
-                    AddLayerElement(layer, slash);
+                    AddLayerElement(layer, slash, duration);
                 }
                 return;
             }
@@ -2184,7 +2173,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 if (cue) mRest->SetCue(BOOLEAN_true);
                 if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
                 if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
-                AddLayerElement(layer, mRest);
+                AddLayerElement(layer, mRest, duration);
             }
         }
         else {
@@ -2196,7 +2185,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (cue) rest->SetCue(BOOLEAN_true);
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
-            AddLayerElement(layer, rest);
+            AddLayerElement(layer, rest, duration);
         }
     }
     else {
@@ -2284,7 +2273,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 chord->SetStemDir(stemDir);
                 if (tremSlashNum != 0)
                     chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
-                AddLayerElement(layer, chord);
+                AddLayerElement(layer, chord, duration);
                 m_elementStackMap.at(layer).push_back(chord);
                 element = chord;
             }
@@ -2445,7 +2434,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // add the note to the layer or to the current container
-        AddLayerElement(layer, note);
+        AddLayerElement(layer, note, duration);
 
         // if we are ending a chord remove it from the stack
         if (!nextIsChord) {
