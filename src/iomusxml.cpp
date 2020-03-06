@@ -1503,6 +1503,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     std::string placeStr = node.attribute("placement").as_string();
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
+    pugi::xpath_node voice = node.select_node("voice");
+    if (voice) m_prevLayer = SelectLayer(node, measure);
 
     // Bracket
     pugi::xpath_node bracket = type.node().select_node("bracket");
@@ -1999,8 +2001,17 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(node);
     assert(measure);
 
-    Layer *layer = SelectLayer(node, measure);
+    int barNumber = m_measureCounts.at(measure);
+
+    Layer *layer;
+    if (!node.select_node("voice")) { // GetContentOfChild(node, "voice")
+        layer = m_prevLayer;
+    }
+    else {
+        layer = SelectLayer(node, measure);
+    }
     assert(layer);
+    m_prevLayer = layer;
 
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);

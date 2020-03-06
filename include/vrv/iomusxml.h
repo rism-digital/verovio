@@ -332,6 +332,8 @@ private:
     std::string m_ID;
     /* A map of stacks for piling open LayerElements (beams, tuplets, chords, etc.) separately per layer */
     std::map<Layer *, std::vector<LayerElement *> > m_elementStackMap;
+    /* To remember layer of last element (note) to handle chords */
+    Layer * m_prevLayer;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */
