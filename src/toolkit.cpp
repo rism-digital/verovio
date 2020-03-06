@@ -122,6 +122,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "timemap") {
         m_outputTo = TIMEMAP;
     }
+    else if (outputTo == "pae") {
+        m_outputTo = PAE;
+    }
     else if (outputTo != "svg") {
         LogError("Output format can only be: mei, humdrum, midi, timemap or svg");
         return false;

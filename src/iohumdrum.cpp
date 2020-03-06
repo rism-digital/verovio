@@ -342,7 +342,7 @@ namespace humaux {
 // HumdrumInput::HumdrumInput -- Constructor.
 //
 
-HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : Input(doc)
+HumdrumInput::HumdrumInput(Doc *doc) : Input(doc)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
@@ -373,38 +373,10 @@ HumdrumInput::~HumdrumInput()
 
 //////////////////////////////
 //
-// HumdrumInput::ImportFile -- Read a Humdrum file from a file.
-//
-
-bool HumdrumInput::ImportFile()
-{
-
-#ifndef NO_HUMDRUM_SUPPORT
-    try {
-        m_doc->Reset();
-        hum::HumdrumFileSet &infiles = m_infiles;
-        bool result = infiles.readFile(m_filename);
-        if (!result) {
-            return false;
-        }
-
-        return convertHumdrum();
-    }
-    catch (char *str) {
-        LogError("%s", str);
-        return false;
-    }
-#else
-    return true;
-#endif /* NO_HUMDRUM_SUPPORT */
-}
-
-//////////////////////////////
-//
 // HumdrumInput::ImportString -- Read a Humdrum file set from a text string.
 //
 
-bool HumdrumInput::ImportString(const std::string &content)
+bool HumdrumInput::Import(const std::string &content)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
