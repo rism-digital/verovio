@@ -23,6 +23,7 @@ class Accid;
 class Beam;
 class Chord;
 class Clef;
+class DurationInterface;
 class Fermata;
 class GraceGrp;
 class KeyAccid;
@@ -285,6 +286,8 @@ private:
     void WriteScoreDef(ScoreDef *scoreDef);
     void WriteStaffDef(StaffDef *staffDef);
     void WriteMeasure(Measure *measure);
+    void WriteStaff(Staff *staff);
+    void WriteLayer(Layer *layer);
     ///@}
 
     /**
@@ -343,11 +346,25 @@ private:
      */
     ///@{
     ///@}
+    
+    /**
+     * @name Other private methods
+     */
+    ///@{
+    void WriteDur(DurationInterface *interface);
+    ///@}
 
 public:
     //
 private:
     std::ostringstream m_streamStringOutput;
+    bool m_docScoreDef; // Indicates that we are writing the document scoreDef
+    bool m_mensural; // Indicates that the incipit is mensural (initial staffDef)
+    bool m_skip; // Processing a staff or a layer to skip
+    int m_layerN; // The @n of the first layer within the first staff
+    int m_staffN; // The @n of the first staff (initial staffDef)
+    int m_currentOct; // The current octave
+    int m_currentDur; // The current duration
 };
 
 //----------------------------------------------------------------------------

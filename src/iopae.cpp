@@ -86,26 +86,27 @@ PaeOutput::~PaeOutput() {}
 
 bool PaeOutput::Export(std::string &output)
 {
+    m_docScoreDef = true;
+    m_mensural = false;
+    m_skip = false;
+    m_layerN = -1;
+    m_staffN = -1;
+    m_currentOct = -1;
+    m_currentDur = -1;
+    
+    m_doc->m_scoreDef.Save(this);
+    
+    m_docScoreDef = false;
+    
     m_doc->Save(this);
 
-    /*
-    if (this->is_open()) {
-        std::string output = m_streamStringOutput.str();
-        std::ofstream str("");
-        str << output;
-        this->std::ofstream << out;
-        //this << output.c_str();
-       // this->write(output, output.size());
-        //m_streamStringOutput.str();
-    }
-    meiDoc.save(m_streamStringOutput, "    ", output_flags);
-    */
+    output = m_streamStringOutput.str();
 
     return true;
 }
 
 bool PaeOutput::WriteObject(Object *object)
-{
+{   
     if (object->Is(SCOREDEF)) {
         WriteScoreDef(dynamic_cast<ScoreDef *>(object));
     }
@@ -114,6 +115,12 @@ bool PaeOutput::WriteObject(Object *object)
     }
     else if (object->Is(MEASURE)) {
         WriteMeasure(dynamic_cast<Measure *>(object));
+    }
+    else if (object->Is(STAFF)) {
+        WriteStaff(dynamic_cast<Staff *>(object));
+    }
+    else if (object->Is(LAYER)) {
+        WriteLayer(dynamic_cast<Layer *>(object));
     }
 
     // Measure elements
@@ -202,9 +209,50 @@ bool PaeOutput::WriteObjectEnd(Object *object)
 
 void PaeOutput::WriteScoreDef(ScoreDef *scoreDef) {}
 
-void PaeOutput::WriteStaffDef(StaffDef *staffDef) {}
+void PaeOutput::WriteStaffDef(StaffDef *staffDef)
+{
+    assert(staffDef);
+    
+    if (m_staffN != -1) return;
+    
+    m_staffN = staffDef->GetN();
+    
+    if (staffDef->HasNotationtype() && staffDef->GetNotationtype() == NOTATIONTYPE_mensural) {
+        m_mensural = true;
+    }
+}
 
 void PaeOutput::WriteMeasure(Measure *measure) {}
+
+void PaeOutput::WriteStaff(Staff *staff)
+{
+    assert(staff);
+    
+    if (m_staffN == staff->GetN()) {
+        m_skip = false;
+        return;
+    }
+    
+    m_skip = true;
+}
+
+void PaeOutput::WriteLayer(Layer *layer)
+{
+    assert(layer);
+    
+    if (m_layerN == -1) {
+        m_layerN = layer->GetN();
+        m_streamStringOutput << "@data:";
+        m_skip = false;
+        return;
+    }
+    
+    // second layer in the staff
+    if (!m_skip && (m_layerN != layer->GetN())) {
+        m_skip = true;
+        return;
+    }
+}
 
 void PaeOutput::WriteAccid(Accid *accid) {}
 
@@ -212,25 +260,112 @@ void PaeOutput::WriteBarLine(BarLine *barLine) {}
 
 void PaeOutput::WriteBeam(Beam *beam) {}
 
-void PaeOutput::WriteChord(Chord *chord) {}
+void PaeOutput::WriteChord(Chord *chord)
+{
+    assert(chord);
+    
+    std::string oct;
 
-void PaeOutput::WriteClef(Clef *clef) {}
+    WriteDur(chord);
+}
+
+void PaeOutput::WriteClef(Clef *clef)
+{
+    assert(clef);
+    
+    if (m_skip) return;
+    
+    std::string outStart = (m_docScoreDef) ? "@clef:" : " %";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+    
+    std::string shape;
+    if ((clef->GetShape() == CLEFSHAPE_G) && (clef->GetDis() == OCTAVE_DIS_8)) {
+        shape = "g";
+    }
+    else {
+        switch (clef->GetShape()) {
+            case (CLEFSHAPE_C): shape = "C"; break;
+            case (CLEFSHAPE_F): shape = "F"; break;
+            case (CLEFSHAPE_G): shape = "G"; break;
+            default: shape = "G";
+        }
+    }
+    std::string sign = (m_mensural) ? "+" : "-";
+    std::string line = StringFormat("%d", clef->GetLine());
+    
+    m_streamStringOutput << outStart << shape << sign << line << outEnd;
+}
 
 void PaeOutput::WriteGraceGrp(GraceGrp *graceGrp) {}
 
 void PaeOutput::WriteKeyAccid(KeyAccid *keyAccid) {}
 
-void PaeOutput::WriteKeySig(KeySig *keySig) {}
+void PaeOutput::WriteKeySig(KeySig *keySig)
+{
+    assert(keySig);
+    
+    if (m_skip) return;
+    
+    std::string outStart = (m_docScoreDef) ? "@keysig:" : " $";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+    
+    m_streamStringOutput << outStart << outEnd;
+}
 
-void PaeOutput::WriteMensur(Mensur *mensur) {}
+void PaeOutput::WriteMensur(Mensur *mensur)
+{
+    assert(mensur);
+    
+    if (m_skip) return;
+    
+    std::string outStart = (m_docScoreDef) ? "@timesig:" : " @";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+    
+    m_streamStringOutput << outStart << outEnd;
+}
 
-void PaeOutput::WriteMeterSig(MeterSig *meterSig) {}
+void PaeOutput::WriteMeterSig(MeterSig *meterSig)
+{
+    assert(meterSig);
+    
+    if (m_skip) return;
+    
+    std::string outStart = (m_docScoreDef) ? "@timesig:" : " @";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+    
+    m_streamStringOutput << outStart << outEnd;
+}
 
 void PaeOutput::WriteMRest(MRest *mRest) {}
 
 void PaeOutput::WriteMultiRest(MultiRest *multiRest) {}
 
-void PaeOutput::WriteNote(Note *note) {}
+void PaeOutput::WriteNote(Note *note)
+{
+    assert(note);
+    
+    std::string oct;
+    
+    // For chords, only output the top note
+    Chord *chord = note->IsChordTone();
+    if (chord) {
+        if (note != chord->GetTopNote()) return;
+    }
+    else {
+        WriteDur(note);
+    }
+
+    if (note->GetOct() != m_currentOct) {
+        m_currentOct = note->GetOct();
+        char octSign = (m_currentOct > 3) ? '\'' : ',';
+        int signCount = (m_currentOct > 3) ? (m_currentOct - 3) : (4 - m_currentOct);
+        m_streamStringOutput << std::string(signCount, octSign);
+    }
+    
+    std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
+    std::transform(pname.begin(), pname.end(), pname.begin(), ::toupper);
+    m_streamStringOutput << pname << std::nouppercase;
+}
 
 void PaeOutput::WriteRest(Rest *rest) {}
 
@@ -243,6 +378,40 @@ void PaeOutput::WriteFermata(Fermata *fermata) {}
 void PaeOutput::WriteTie(Tie *tie) {}
 
 void PaeOutput::WriteTrill(Trill *trill) {}
+
+void PaeOutput::WriteDur(DurationInterface *interface)
+{
+    assert(interface);
+    
+    if (interface->GetDur() != m_currentDur) {
+        m_currentDur = interface->GetDur();
+        std::string dur;
+        switch (m_currentDur) {
+            case (DURATION_long): dur = "0"; break;
+            case (DURATION_breve): dur = "9"; break;
+            case (DURATION_1): dur = "1"; break;
+            case (DURATION_2): dur = "2"; break;
+            case (DURATION_4): dur = "4"; break;
+            case (DURATION_8): dur = "8"; break;
+            case (DURATION_16): dur = "6"; break;
+            case (DURATION_32): dur = "3"; break;
+            case (DURATION_64): dur = "5"; break;
+            case (DURATION_128): dur = "7"; break;
+            case (DURATION_maxima): dur = "0"; break;
+            case (DURATION_longa): dur = "0"; break;
+            case (DURATION_brevis): dur = "9"; break;
+            case (DURATION_semibrevis): dur = "1"; break;
+            case (DURATION_minima): dur = "2"; break;
+            case (DURATION_semiminima): dur = "4"; break;
+            case (DURATION_fusa): dur = "8"; break;
+            case (DURATION_semifusa): dur = "6"; break;
+            default:
+                LogWarning("Unsupported duration");
+                dur = "4";
+        }
+        m_streamStringOutput << dur;
+    }
+}
 
 //----------------------------------------------------------------------------
 // PaeInput
