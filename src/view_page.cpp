@@ -515,14 +515,19 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     x2 = x - m_doc->GetDrawingBeamWidth(staffSize, false);
     x1 = x2 - m_doc->GetDrawingBeamWidth(staffSize, false);
 
+    dc->StartCustomGraphic("grpSym");
+
     DrawSmuflCode(dc, x1, y1, SMUFL_E003_bracketTop, staffSize, false);
-    DrawSmuflCode(dc, x1, y2, SMUFL_E004_bracketBottom, staffSize, false);
 
     // adjust to top and bottom position so we make sure there is no white space between
     // the glyphs and the line
     y1 += m_doc->GetDrawingStemWidth(staffSize);
     y2 -= m_doc->GetDrawingStemWidth(staffSize);
     DrawFilledRectangle(dc, x1, y1, x2, y2);
+
+    DrawSmuflCode(dc, x1, y2, SMUFL_E004_bracketBottom, staffSize, false);
+
+    dc->EndCustomGraphic();
 
     return;
 }
@@ -572,6 +577,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
+    dc->StartCustomGraphic("grpSym");
+
     dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
@@ -600,6 +607,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     dc->ResetPen();
     dc->ResetBrush();
+
+    dc->EndCustomGraphic();
 
     return;
 }
