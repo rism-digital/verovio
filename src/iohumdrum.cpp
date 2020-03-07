@@ -6607,7 +6607,7 @@ bool HumdrumInput::checkForTremolo(
         // Ready to mark internal bTrem configuration.
 
         // First suppress printing of all non-primary tremolo notes:
-        for (int i = 0; i < (int)groupings.size() - 1; i++) {
+        for (int i = 0; i < (int)groupings.size(); i++) {
             for (int j = 1; j < (int)groupings[i].size(); j++) {
                 groupings[i][j]->setValue("auto", "suppress", "1");
             }
@@ -6617,10 +6617,11 @@ bool HumdrumInput::checkForTremolo(
 
         for (int i = 0; i < (int)groupings.size(); i++) {
             hum::HumNum tdur = duration * (int)groupings[i].size();
-            int slashcount = -(int)(log(tdur.getFloat()) / log(2.0));
+            std::string recip = hum::Convert::durationToRecip(tdur);
+            int slashcount = -(int)(log(duration.getFloat() / tdur.getFloat()) / log(2.0));
             groupings[i][0]->setValue("auto", "tremolo", "1");
             groupings[i][0]->setValue("auto", "slashes", slashcount);
-            groupings[i][0]->setValue("auto", "recip", "8");
+            groupings[i][0]->setValue("auto", "recip", recip);
         }
 
         // Preserve the beam on the group of tremolos.  The beam can
@@ -7125,6 +7126,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         if (layerdata[i]->getValueInt("auto", "suppress")) {
+            // This element is not supposed to be printed,
+            // probably due to being in a tremolo.
             continue;
         }
 
