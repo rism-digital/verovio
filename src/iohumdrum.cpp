@@ -6474,30 +6474,43 @@ bool HumdrumInput::checkForTremolo(
     hum::HumNum duration = notes[0]->getDuration();
     hum::HumNum testdur = duration;
     std::vector<std::vector<int> > pitches(notes.size());
+    // std::vector<HumNum> durations(notes.size());
 
     for (int i = 0; i < (int)notes.size(); i++) {
+        if ((notes[i]->find('_') != std::string::npos) || (notes[i]->find('[') != std::string::npos)
+            || (notes[i]->find(']') != std::string::npos)) {
+            // Note/chord involved a tie is present,
+            // so disallow any tremolo on this beamed group.
+            return false;
+        }
+
+        // durations.at(i) = notes[i]->getDuration();
+
         if (i > 0) {
             testdur = notes[i]->getDuration();
             if (testdur != duration) {
-                // All durations must be the same for a tremolo.
+                // All durations in beam must be the same for a tremolo.
+                // (at least for now).
                 return false;
             }
         }
+
+        // Store all notes in chord for comparing in next loop.
         int scount = notes[i]->getSubtokenCount();
         for (int j = 0; j < scount; j++) {
             std::string subtok = notes[i]->getSubtoken(j);
             pitches[i].emplace_back(hum::Convert::kernToBase40(subtok));
         }
     }
-    // Should also disallow any case where there is a tie present.
 
     // Check for <bTrem> case.
+    std::vector<bool> nextsame(notes.size(), true);
     bool allpequal = true;
     for (int i = 1; i < (int)pitches.size(); i++) {
-
         if (pitches[i].size() != pitches[i - 1].size()) {
             allpequal = false;
-            break;
+            nextsame.at(i - 1) = false;
+            // break;
         }
         // Check if each note in the successive chords is the same.
         // The ordering of notes in each chord is assumed to be the same
@@ -6506,12 +6519,13 @@ bool HumdrumInput::checkForTremolo(
         for (int j = 0; j < (int)pitches[i].size(); j++) {
             if (pitches[i][j] != pitches[i - 1][j]) {
                 allpequal = false;
-                break;
+                nextsame.at(i - 1) = false;
+                // break;
             }
         }
-        if (allpequal == false) {
-            break;
-        }
+        // if (allpequal == false) {
+        //   break;
+        //}
     }
 
     if (allpequal) {
@@ -6538,6 +6552,85 @@ bool HumdrumInput::checkForTremolo(
         }
 
         return true;
+    }
+
+    // Check for multiple bTrem embedded in single beam group.
+    // The current requirement is that all subgroups must have the
+    // same duration (this requirement can be loosened in the future
+    // if necessary).
+    bool hasInternalTrem = true;
+    for (int i = 1; i < (int)nextsame.size() - 1; i++) {
+        if (nextsame.at(i) == 1) {
+            continue;
+        }
+        if (nextsame.at(i - 1) == 0) {
+            hasInternalTrem = false;
+            break;
+        }
+        else if (nextsame.at(i + 1) == 0) {
+            hasInternalTrem = false;
+            break;
+        }
+    }
+
+    // Group separate tremolo groups within a single beam.
+    std::vector<std::vector<hum::HTp> > groupings;
+    if (hasInternalTrem) {
+        groupings.reserve(16);
+        groupings.resize(1);
+        groupings.back().push_back(notes[0]);
+        for (int i = 0; i < (int)notes.size() - 1; i++) {
+            if (nextsame[i]) {
+                groupings.back().push_back(notes[i + 1]);
+            }
+            else {
+                groupings.resize(groupings.size() + 1);
+                groupings.back().push_back(notes[i + 1]);
+            }
+        }
+    }
+
+    // Current requirement is that the internal tremolos are power-of-two
+    // (deal with dotted internal tremolos as needed in the future).
+    bool allpow2 = true;
+    if (hasInternalTrem) {
+        for (int i = 0; i < (int)groupings.size(); i++) {
+            hum::HumNum count = (int)groupings[i].size();
+            if (!count.isPowerOfTwo()) {
+                allpow2 = false;
+                break;
+            }
+        }
+    }
+
+    if (hasInternalTrem && allpow2) {
+        // Ready to mark internal bTrem configuration.
+
+        // First suppress printing of all non-primary tremolo notes:
+        for (int i = 0; i < (int)groupings.size() - 1; i++) {
+            for (int j = 1; j < (int)groupings[i].size(); j++) {
+                groupings[i][j]->setValue("auto", "suppress", "1");
+            }
+        }
+
+        // Now add tremolo slash(es) on the first notes.
+
+        for (int i = 0; i < (int)groupings.size(); i++) {
+            hum::HumNum tdur = duration * (int)groupings[i].size();
+            int slashcount = -(int)(log(tdur.getFloat()) / log(2.0));
+            groupings[i][0]->setValue("auto", "tremolo", "1");
+            groupings[i][0]->setValue("auto", "slashes", slashcount);
+            groupings[i][0]->setValue("auto", "recip", "8");
+        }
+
+        // Preserve the beam on the group of tremolos.  The beam can
+        // only be an eighth-note beam for now (this should be the
+        // general rule for beamed tremolos).
+        groupings.at(0).at(0)->setValue("auto", "tremoloBeam", "8");
+        groupings.back().back()->setValue("auto", "tremoloBeam", "8");
+
+        // returning false in order to keep the beam.
+        return false;
     }
 
     // Check for <fTrem> case.
@@ -7021,6 +7114,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
         handleGroupStarts(tgs, elements, pointers, layerdata, i);
 
+        if (layerdata[i]->getValueBool("auto", "tremoloBeam")) {
+            if (layerdata[i]->find("L") == std::string::npos) {
+                // ignore the ending note of a beamed group
+                // of tremolos (a previous note in the tremolo
+                // replaces display of this note).
+                handleGroupEnds(tgs.at(i), elements, pointers);
+                continue;
+            }
+        }
+
         if (layerdata[i]->getValueInt("auto", "suppress")) {
             continue;
         }
@@ -7238,6 +7341,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         else {
             // should be a note
+
             note = new Note;
             setStemLength(note, layerdata[i]);
             setLocationId(note, layerdata[i]);
