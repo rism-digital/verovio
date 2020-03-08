@@ -1432,7 +1432,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             measure->SetLeft(barRendition);
         }
         else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("MusicXML import: Unsupported barline location 'middle'");
+            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s.", measure->GetN().c_str());
         }
         else {
             measure->SetRight(barRendition);
@@ -1446,6 +1446,18 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             }
         }
     }
+    if (barStyle.empty() && repeat) { // add repeat information, also when bar-style is not provided
+        if (HasAttributeWithValue(node, "location", "left")) {
+            measure->SetLeft(BARRENDITION_rptstart);
+        }
+        else if (HasAttributeWithValue(node, "location", "middle")) {
+            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s.", measure->GetN().c_str());
+        }
+        else {
+            measure->SetRight(BARRENDITION_rptend);
+        }
+    }
+
     // parse endings (prima volta, seconda volta...)
     pugi::xpath_node ending = node.select_node("ending");
     if (ending) {
@@ -1469,6 +1481,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             }
         }
     }
+
     // fermatas
     pugi::xpath_node xmlFermata = node.select_node("fermata");
     if (xmlFermata) {
@@ -2655,8 +2668,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
-            meiSlur->SetCurvedir(
-                meiSlur->AttCurvature::StrToCurvatureCurvedir(slur.attribute("placement").as_string()));
+            std::string placement = slur.attribute("placement").as_string();
+            if (!placement.empty())
+                meiSlur->SetCurvedir(meiSlur->AttCurvature::StrToCurvatureCurvedir(placement.c_str()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(measure, slurNumber, meiSlur);
