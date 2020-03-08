@@ -362,19 +362,27 @@ void View::DrawStaffGrp(
 
     this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
 
-    // actually draw the line, the brace or the bracket
-    if (topStaffGrp && ((firstDef != lastDef) || (staffGrp->GetSymbol() != staffGroupingSym_SYMBOL_NONE))) {
+    // draw the system start bar line
+    if (topStaffGrp
+        && ((((firstDef != lastDef) || staffGrp->HasSymbol())
+                && (m_doc->m_scoreDef.GetSystemLeftline() != BOOLEAN_false))
+            || (m_doc->m_scoreDef.GetSystemLeftline() == BOOLEAN_true))) {
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
-    // this will need to be changed with the next version of MEI will line means additional thick line
+    // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
-        DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
+        DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * m_doc->GetDrawingBeamWidth(staffSize, false),
+            m_doc->GetDrawingBeamWidth(staffSize, false));
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
         DrawBrace(dc, x, yTop, yBottom, last->m_drawingStaffSize);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
         DrawBracket(dc, x, yTop, yBottom, last->m_drawingStaffSize);
+        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false) - m_doc->GetDrawingBeamWhiteWidth(staffSize, false);
+    }
+    else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracketsq) {
+        DrawBracketsq(dc, x, yTop, yBottom, last->m_drawingStaffSize);
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false) - m_doc->GetDrawingBeamWhiteWidth(staffSize, false);
     }
 
@@ -510,27 +518,48 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
 
-    int x1, x2;
+    int x1, x2, offset;
 
     x2 = x - m_doc->GetDrawingBeamWidth(staffSize, false);
     x1 = x2 - m_doc->GetDrawingBeamWidth(staffSize, false);
+    offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
 
     dc->StartCustomGraphic("grpSym");
 
-    DrawSmuflCode(dc, x1, y1, SMUFL_E003_bracketTop, staffSize, false);
+    DrawSmuflCode(dc, x1, y1 + offset, SMUFL_E003_bracketTop, staffSize, false);
+    DrawSmuflCode(dc, x1, y2 - offset, SMUFL_E004_bracketBottom, staffSize, false);
 
-    // adjust to top and bottom position so we make sure there is no white space between
-    // the glyphs and the line
-    y1 += m_doc->GetDrawingStemWidth(staffSize);
-    y2 -= m_doc->GetDrawingStemWidth(staffSize);
-    DrawFilledRectangle(dc, x1, y1, x2, y2);
-
-    DrawSmuflCode(dc, x1, y2, SMUFL_E004_bracketBottom, staffSize, false);
+    DrawFilledRectangle(
+        dc, x1, y1 + 2 * offset, x2, y2 - 2 * offset);
 
     dc->EndCustomGraphic();
 
     return;
 }
+
+void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+{
+    assert(dc);
+
+    int offset;
+
+    x -= m_doc->GetDrawingBeamWidth(staffSize, false);
+    offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
+
+    dc->StartCustomGraphic("grpSym");
+
+    DrawFilledRectangle(
+        dc, x - 3 * offset, y1 + offset, x + 3 * offset, y2 - offset);
+    DrawFilledRectangle(
+        dc, x, y1 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y1 - offset);
+    DrawFilledRectangle(
+        dc, x, y2 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y2 - offset);
+
+    dc->EndCustomGraphic();
+
+    return;
+}
+
 
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
@@ -549,7 +578,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     int ymed, xdec, fact;
 
-    x -= m_doc->GetDrawingBeamWhiteWidth(staffSize, false); // distance entre barre et debut accolade
+    x -= m_doc->GetDrawingBeamWhiteWidth(staffSize, false); // distance between bar and start brace
 
     ymed = (y1 + y2) / 2;
     fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
