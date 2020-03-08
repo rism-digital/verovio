@@ -11736,8 +11736,12 @@ void HumdrumInput::setRepeatSlashes(BeatRpt *repeat, vector<hum::HTp> &tokens, i
     hum::HTp item;
     vector<int> repvalues;
     repvalues.reserve(32);
+
     for (int i = index + 1; i < (int)tokens.size(); i++) {
         item = tokens.at(i);
+        if (*item == "*Xrep") {
+            break;
+        }
         if (!item->isData()) {
             continue;
         }
