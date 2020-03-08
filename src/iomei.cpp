@@ -971,6 +971,7 @@ void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
 
     WriteXmlId(currentNode, scoreDefElement);
     scoreDefElement->WriteMeasureNumbers(currentNode);
+    scoreDefElement->WriteSystems(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -3286,6 +3287,7 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 {
     SetMeiUuid(element, object);
     object->ReadMeasureNumbers(element);
+    object->ReadSystems(element);
     object->ReadTyped(element);
 
     AttCleffingLog cleffingLog;
@@ -4467,7 +4469,7 @@ bool MeiInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
 
     vrvBeatRpt->ReadColor(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeBeatRptTo_4_0_0(beatRpt, vrvBeatRpt);
     }
