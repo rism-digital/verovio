@@ -78,33 +78,11 @@ namespace vrv {
 // MusicXmlInput
 //----------------------------------------------------------------------------
 
-MusicXmlInput::MusicXmlInput(Doc *doc, std::string filename) : FileInputStream(doc)
-{
-    m_filename = filename;
-}
+MusicXmlInput::MusicXmlInput(Doc *doc) : Input(doc) {}
 
 MusicXmlInput::~MusicXmlInput() {}
 
-bool MusicXmlInput::ImportFile()
-{
-    try {
-        m_doc->Reset();
-        m_doc->SetType(Raw);
-        pugi::xml_document xmlDoc;
-        pugi::xml_parse_result result = xmlDoc.load_file(m_filename.c_str());
-        if (!result) {
-            return false;
-        }
-        pugi::xml_node root = xmlDoc.first_child();
-        return ReadMusicXml(root);
-    }
-    catch (char *str) {
-        LogError("%s", str);
-        return false;
-    }
-}
-
-bool MusicXmlInput::ImportString(std::string const &musicxml)
+bool MusicXmlInput::Import(std::string const &musicxml)
 {
     try {
         m_doc->Reset();
@@ -552,14 +530,17 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 StaffGrp *staffGrp = new StaffGrp();
                 // read the group-symbol (MEI @symbol)
                 std::string groupGymbol = GetContentOfChild(xpathNode.node(), "group-symbol");
-                if (groupGymbol == "bracket") {
-                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracket);
-                }
-                else if (groupGymbol == "brace") {
+                if (groupGymbol == "brace") {
                     staffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
                 }
                 else if (groupGymbol == "line") {
                     staffGrp->SetSymbol(staffGroupingSym_SYMBOL_line);
+                }
+                else if (groupGymbol == "bracket") {
+                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+                }
+                else if (groupGymbol == "square") {
+                    staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
                 }
                 // now stack it
                 m_staffGrpStack.back()->AddChild(staffGrp);
@@ -1853,8 +1834,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         pugi::xpath_node staffNode = node.select_node("staff");
         int staffNum = staffNode.node().text().as_int() + staffOffset;
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(
-            std::to_string(staffNum)));
+        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
@@ -2326,10 +2306,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                     if (lyric.select_node("extend")) {
                         syl->SetCon(sylLog_CON_u);
                     }
-                    if (textNode.next_sibling("elision")) {
+                    else if (textNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
                     }
-                    if (GetContentOfChild(lyric, "syllabic") == "single") {
+                    else if (GetContentOfChild(lyric, "syllabic") == "single") {
                         syl->SetCon(sylLog_CON_s);
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "begin") {

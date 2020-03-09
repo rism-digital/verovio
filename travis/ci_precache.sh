@@ -28,8 +28,7 @@ git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
 
 echo "Installing emscripten"
 cd $EMSCRIPTEN_DIRECTORY
-# latest (1.39.8) causes problems - use 1.39.7 instead of latest
-./emsdk install sdk-1.39.7
+./emsdk install latest
 
 # Return to the root
 cd ..
