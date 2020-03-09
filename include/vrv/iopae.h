@@ -311,6 +311,7 @@ private:
     void WriteRest(Rest *rest);
     void WriteSpace(Space *space);
     void WriteTuplet(Tuplet *tuplet);
+    void WriteTupletEnd(Tuplet *tuplet);
     ///@}
 
     /**
