@@ -39,6 +39,7 @@
 #include "octave.h"
 #include "options.h"
 #include "pedal.h"
+#include "reh.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -115,6 +116,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Pedal *pedal = dynamic_cast<Pedal *>(element);
         assert(pedal);
         DrawPedal(dc, pedal, measure, system);
+    }
+    else if (element->Is(REH)) {
+        Reh *reh = dynamic_cast<Reh *>(element);
+        assert(reh);
+        DrawReh(dc, reh, measure, system);
     }
     else if (element->Is(TEMPO)) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);
@@ -1770,6 +1776,58 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     }
 
     dc->EndGraphic(pedal, this);
+}
+
+void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(reh);
+
+    // Reh should be drawn at measure start
+    if (!reh->GetStart()) return;
+
+    dc->StartGraphic(reh, "", reh->GetUuid());
+
+    FontInfo rehTxt;
+    if (!dc->UseGlobalStyling()) {
+        rehTxt.SetFaceName("Times");
+        rehTxt.SetWeight(FONTWEIGHT_bold);
+    }
+
+    TextDrawingParams params;
+
+    params.m_x = reh->GetStart()->GetDrawingX();
+
+    data_HORIZONTALALIGNMENT alignment = reh->GetChildRendAlignment();
+    // Rehearsal marks are center aligned by default;
+    if (alignment == 0) alignment = HORIZONTALALIGNMENT_center;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = reh->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), reh, reh->GetStart(), *staffIter)) {
+            continue;
+        }
+
+        params.m_y = reh->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+
+        rehTxt.SetPointSize(params.m_pointSize);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&rehTxt);
+
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, reh, params);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(reh, this);
 }
 
 void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system)
