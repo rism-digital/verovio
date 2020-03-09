@@ -4,6 +4,7 @@
 * Container brackets and braces in grpSym (@rettinghaus)
 * Support for reh elements (@rettinghaus)
 * Improved extender lines in MusicXML import (@rettinghaus)
+* Fix overlapping group symbols (@rettinghaus)
 * Fix bug with choice and mdiv (@rettinghaus)
 * Fix tempo placement (@rettinghaus)
 * Fix Leipzig font validation issues
