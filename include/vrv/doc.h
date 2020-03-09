@@ -495,7 +495,7 @@ private:
     /**
      * A flag to indicate whereas the document contains analytical markup to be converted.
      * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
-     * is converted during the import in MeiInput.
+     * is converted during the import in MEIInput.
      */
     bool m_hasAnalyticalMarkup;
 

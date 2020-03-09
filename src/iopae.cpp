@@ -78,14 +78,14 @@ char data_key[MAX_DATA_LEN];
 char data_value[MAX_DATA_LEN]; // ditto as above
 
 //----------------------------------------------------------------------------
-// PaeOutput
+// PAEOutput
 //----------------------------------------------------------------------------
 
-PaeOutput::PaeOutput(Doc *doc) : Output(doc) {}
+PAEOutput::PAEOutput(Doc *doc) : Output(doc) {}
 
-PaeOutput::~PaeOutput() {}
+PAEOutput::~PAEOutput() {}
 
-bool PaeOutput::Export(std::string &output)
+bool PAEOutput::Export(std::string &output)
 {
     m_docScoreDef = true;
     m_mensural = false;
@@ -107,7 +107,7 @@ bool PaeOutput::Export(std::string &output)
     return true;
 }
 
-bool PaeOutput::WriteObject(Object *object)
+bool PAEOutput::WriteObject(Object *object)
 {
     if (object->Is(SCOREDEF)) {
         WriteScoreDef(dynamic_cast<ScoreDef *>(object));
@@ -187,7 +187,7 @@ bool PaeOutput::WriteObject(Object *object)
     return true;
 }
 
-bool PaeOutput::WriteObjectEnd(Object *object)
+bool PAEOutput::WriteObjectEnd(Object *object)
 {
     if (object->Is(MEASURE)) {
         WriteMeasureEnd(dynamic_cast<Measure *>(object));
@@ -199,9 +199,9 @@ bool PaeOutput::WriteObjectEnd(Object *object)
     return true;
 }
 
-void PaeOutput::WriteScoreDef(ScoreDef *scoreDef) {}
+void PAEOutput::WriteScoreDef(ScoreDef *scoreDef) {}
 
-void PaeOutput::WriteStaffDef(StaffDef *staffDef)
+void PAEOutput::WriteStaffDef(StaffDef *staffDef)
 {
     assert(staffDef);
 
@@ -214,14 +214,14 @@ void PaeOutput::WriteStaffDef(StaffDef *staffDef)
     }
 }
 
-void PaeOutput::WriteMeasure(Measure *measure)
+void PAEOutput::WriteMeasure(Measure *measure)
 {
     assert(measure);
 
     m_currentMeasure = measure;
 }
 
-void PaeOutput::WriteMeasureEnd(Measure *measure)
+void PAEOutput::WriteMeasureEnd(Measure *measure)
 {
     assert(measure);
 
@@ -238,7 +238,7 @@ void PaeOutput::WriteMeasureEnd(Measure *measure)
     m_streamStringOutput << barLine;
 }
 
-void PaeOutput::WriteStaff(Staff *staff)
+void PAEOutput::WriteStaff(Staff *staff)
 {
     assert(staff);
 
@@ -250,7 +250,7 @@ void PaeOutput::WriteStaff(Staff *staff)
     m_skip = true;
 }
 
-void PaeOutput::WriteLayer(Layer *layer)
+void PAEOutput::WriteLayer(Layer *layer)
 {
     assert(layer);
 
@@ -268,7 +268,7 @@ void PaeOutput::WriteLayer(Layer *layer)
     }
 }
 
-void PaeOutput::WriteBarLine(BarLine *barLine)
+void PAEOutput::WriteBarLine(BarLine *barLine)
 {
     assert(barLine);
 
@@ -278,7 +278,7 @@ void PaeOutput::WriteBarLine(BarLine *barLine)
     m_streamStringOutput << "/";
 }
 
-void PaeOutput::WriteBeam(Beam *beam)
+void PAEOutput::WriteBeam(Beam *beam)
 {
     assert(beam);
 
@@ -287,7 +287,7 @@ void PaeOutput::WriteBeam(Beam *beam)
     m_streamStringOutput << "{";
 }
 
-void PaeOutput::WriteBeamEnd(Beam *beam)
+void PAEOutput::WriteBeamEnd(Beam *beam)
 {
     assert(beam);
 
@@ -296,7 +296,7 @@ void PaeOutput::WriteBeamEnd(Beam *beam)
     m_streamStringOutput << "}";
 }
 
-void PaeOutput::WriteChord(Chord *chord)
+void PAEOutput::WriteChord(Chord *chord)
 {
     assert(chord);
 
@@ -307,7 +307,7 @@ void PaeOutput::WriteChord(Chord *chord)
     WriteDur(chord);
 }
 
-void PaeOutput::WriteClef(Clef *clef)
+void PAEOutput::WriteClef(Clef *clef)
 {
     assert(clef);
 
@@ -334,14 +334,14 @@ void PaeOutput::WriteClef(Clef *clef)
     m_streamStringOutput << outStart << shape << sign << line << outEnd;
 }
 
-void PaeOutput::WriteGraceGrp(GraceGrp *graceGrp) {}
+void PAEOutput::WriteGraceGrp(GraceGrp *graceGrp) {}
 
-void PaeOutput::WriteKeyAccid(KeyAccid *keyAccid)
+void PAEOutput::WriteKeyAccid(KeyAccid *keyAccid)
 {
     // To do for cases when key signature have []
 }
 
-void PaeOutput::WriteKeySig(KeySig *keySig)
+void PAEOutput::WriteKeySig(KeySig *keySig)
 {
     assert(keySig);
 
@@ -362,7 +362,7 @@ void PaeOutput::WriteKeySig(KeySig *keySig)
     m_streamStringOutput << outStart << sig << outEnd;
 }
 
-void PaeOutput::WriteMensur(Mensur *mensur)
+void PAEOutput::WriteMensur(Mensur *mensur)
 {
     assert(mensur);
 
@@ -374,7 +374,7 @@ void PaeOutput::WriteMensur(Mensur *mensur)
     m_streamStringOutput << outStart << outEnd;
 }
 
-void PaeOutput::WriteMeterSig(MeterSig *meterSig)
+void PAEOutput::WriteMeterSig(MeterSig *meterSig)
 {
     assert(meterSig);
 
@@ -397,7 +397,7 @@ void PaeOutput::WriteMeterSig(MeterSig *meterSig)
     m_streamStringOutput << outStart << sig << outEnd;
 }
 
-void PaeOutput::WriteMRest(MRest *mRest)
+void PAEOutput::WriteMRest(MRest *mRest)
 {
     assert(mRest);
 
@@ -406,7 +406,7 @@ void PaeOutput::WriteMRest(MRest *mRest)
     m_streamStringOutput << "=";
 }
 
-void PaeOutput::WriteMultiRest(MultiRest *multiRest)
+void PAEOutput::WriteMultiRest(MultiRest *multiRest)
 {
     assert(multiRest);
 
@@ -415,7 +415,7 @@ void PaeOutput::WriteMultiRest(MultiRest *multiRest)
     m_streamStringOutput << "=" << multiRest->GetNum();
 }
 
-void PaeOutput::WriteNote(Note *note)
+void PAEOutput::WriteNote(Note *note)
 {
     assert(note);
     assert(m_currentMeasure);
@@ -475,7 +475,7 @@ void PaeOutput::WriteNote(Note *note)
     if (tie) m_streamStringOutput << "+";
 }
 
-void PaeOutput::WriteRest(Rest *rest)
+void PAEOutput::WriteRest(Rest *rest)
 {
     assert(rest);
 
@@ -485,7 +485,7 @@ void PaeOutput::WriteRest(Rest *rest)
     m_streamStringOutput << "-";
 }
 
-void PaeOutput::WriteSpace(Space *space)
+void PAEOutput::WriteSpace(Space *space)
 {
     assert(space);
 
@@ -496,9 +496,9 @@ void PaeOutput::WriteSpace(Space *space)
     m_streamStringOutput << "-";
 }
 
-void PaeOutput::WriteTuplet(Tuplet *tuplet) {}
+void PAEOutput::WriteTuplet(Tuplet *tuplet) {}
 
-void PaeOutput::WriteDur(DurationInterface *interface)
+void PAEOutput::WriteDur(DurationInterface *interface)
 {
     assert(interface);
 
@@ -533,10 +533,10 @@ void PaeOutput::WriteDur(DurationInterface *interface)
 }
 
 //----------------------------------------------------------------------------
-// PaeInput
+// PAEInput
 //----------------------------------------------------------------------------
 
-PaeInput::PaeInput(Doc *doc)
+PAEInput::PAEInput(Doc *doc)
     : // This is pretty bad. We open a bad fileoinputstream as we don't use it
     Input(doc)
 {
@@ -552,11 +552,11 @@ PaeInput::PaeInput(Doc *doc)
     m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
 }
 
-PaeInput::~PaeInput() {}
+PAEInput::~PAEInput() {}
 
 //////////////////////////////////////////////////////////////////////////
 
-bool PaeInput::Import(const std::string &pae)
+bool PAEInput::Import(const std::string &pae)
 {
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);
@@ -568,7 +568,7 @@ bool PaeInput::Import(const std::string &pae)
 // parsePlainAndEasy --
 //
 
-void PaeInput::parsePlainAndEasy(std::istream &infile)
+void PAEInput::parsePlainAndEasy(std::istream &infile)
 {
     // buffers
     char c_clef[1024] = { 0 };
@@ -951,7 +951,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 // getOctave --
 //
 #define BASE_OCT 4
-int PaeInput::getOctave(const char *incipit, char *octave, int index)
+int PAEInput::getOctave(const char *incipit, char *octave, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -979,7 +979,7 @@ int PaeInput::getOctave(const char *incipit, char *octave, int index)
 // getDuration --
 //
 
-int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot, int index)
+int PAEInput::getDuration(const char *incipit, data_DURATION *duration, int *dot, int index)
 {
 
     int i = index;
@@ -1040,7 +1040,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
 // getDurations --
 //
 
-int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index)
+int PAEInput::getDurations(const char *incipit, pae::Measure *measure, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -1074,7 +1074,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
 // getAccidental --
 //
 
-int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index)
+int PAEInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -1104,7 +1104,7 @@ int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accide
 // getTupletOrFermata --
 //
 
-int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
+int PAEInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -1188,7 +1188,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 // getTupletFermataEnd --
 //
 // this can be deleted in the future?
-int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int index)
+int PAEInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     // int length = strlen(incipit);
@@ -1206,7 +1206,7 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
 // getGraceNote --
 //
 
-int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
+int PAEInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -1238,7 +1238,7 @@ int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 // getPitch --
 //
 
-data_PITCHNAME PaeInput::getPitch(char c_note)
+data_PITCHNAME PAEInput::getPitch(char c_note)
 {
     data_PITCHNAME pitch = PITCHNAME_c;
 
@@ -1261,7 +1261,7 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 // getTimeInfo -- read the time signature.
 //
 
-int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index)
+int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -1376,7 +1376,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
 // getClefInfo -- read the clef.
 //
 
-int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
+int PAEInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 {
     // a clef is maximum 3 character length
     // go through the 3 character and retrieve the letter (clef) and the line
@@ -1430,7 +1430,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 // getWholeRest -- read the getWholeRest.
 //
 
-int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
+int PAEInput::getWholeRest(const char *incipit, int *wholerest, int index)
 {
     int length = (int)strlen(incipit);
     int i = index;
@@ -1459,7 +1459,7 @@ int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
  BARRENDITION_dbl        //
  */
 
-int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
+int PAEInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
 {
 
     bool is_barline_rptboth = false;
@@ -1512,7 +1512,7 @@ int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int ind
 // getAbbreviation -- read abbreviation
 //
 
-int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
+int PAEInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
 {
     int length = (int)strlen(incipit);
     int i = index;
@@ -1539,7 +1539,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 // getKeyInfo -- read the key signature.
 //
 
-int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
+int PAEInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
     key->Reset();
 
@@ -1632,7 +1632,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 // getNote --
 //
 
-int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
+int PAEInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
 {
     int oct;
     int i = index;
@@ -1760,7 +1760,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
 // convertMeasure --
 //
 
-void PaeInput::convertMeasure(pae::Measure *measure)
+void PAEInput::convertMeasure(pae::Measure *measure)
 {
     if (measure->clef != NULL) {
         m_layer->AddChild(measure->clef);
@@ -1789,7 +1789,7 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     m_measure->SetRight(measure->barLine);
 }
 
-void PaeInput::parseNote(pae::Note *note)
+void PAEInput::parseNote(pae::Note *note)
 {
 
     LayerElement *element;
@@ -1968,13 +1968,13 @@ void PaeInput::parseNote(pae::Note *note)
     }
 }
 
-void PaeInput::pushContainer(LayerElement *container)
+void PAEInput::pushContainer(LayerElement *container)
 {
     addLayerElement(container);
     m_nested_objects.push_back(container);
 }
 
-void PaeInput::popContainer()
+void PAEInput::popContainer()
 {
     // assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
@@ -1986,7 +1986,7 @@ void PaeInput::popContainer()
     }
 }
 
-void PaeInput::addLayerElement(LayerElement *element)
+void PAEInput::addLayerElement(LayerElement *element)
 {
     if (m_nested_objects.size() > 0) {
         m_nested_objects.back()->AddChild(element);
@@ -2007,7 +2007,7 @@ void PaeInput::addLayerElement(LayerElement *element)
 //   only one per line
 //
 
-void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
+void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 {
 
 #define SKIPSPACE                                                                                                      \

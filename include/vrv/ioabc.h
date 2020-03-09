@@ -37,14 +37,14 @@ class Staff;
 class Tie;
 
 //----------------------------------------------------------------------------
-// AbcInput
+// ABCInput
 //----------------------------------------------------------------------------
 
-class AbcInput : public Input {
+class ABCInput : public Input {
 public:
     // constructors and destructors
-    AbcInput(Doc *doc);
-    virtual ~AbcInput();
+    ABCInput(Doc *doc);
+    virtual ~ABCInput();
 
     virtual bool Import(const std::string &abc);
 

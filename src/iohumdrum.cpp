@@ -2364,13 +2364,13 @@ bool HumdrumInput::prepareFooter(
     meifile += "</scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
-    MeiInput input(&tempdoc, "");
+    MEIInput input(&tempdoc, "");
     if (!input.ImportString(meifile)) {
         LogError("Error importing data");
         return false;
     }
 
-    // MeiOutput meioutput(&tempdoc, "");
+    // MEIOutput meioutput(&tempdoc, "");
     // meioutput.SetScoreBasedMEI(true);
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
@@ -2538,13 +2538,13 @@ bool HumdrumInput::prepareHeader(
     meifile += "</pgHead></scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
-    MeiInput input(&tempdoc, "");
+    MEIInput input(&tempdoc, "");
     if (!input.ImportString(meifile)) {
         LogError("Error importing data");
         return false;
     }
 
-    // MeiOutput meioutput(&tempdoc, "");
+    // MEIOutput meioutput(&tempdoc, "");
     // meioutput.SetScoreBasedMEI(true);
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
@@ -15160,7 +15160,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
 
 std::string HumdrumInput::GetMeiString()
 {
-    MeiOutput meioutput(m_doc, "");
+    MEIOutput meioutput(m_doc, "");
     meioutput.SetScoreBasedMEI(true);
     return meioutput.GetOutput();
 }

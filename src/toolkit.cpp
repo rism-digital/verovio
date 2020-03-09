@@ -365,7 +365,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     if (inputFormat == ABC) {
 #ifndef NO_ABC_SUPPORT
-        input = new AbcInput(&m_doc);
+        input = new ABCInput(&m_doc);
 #else
         LogError("ABC import is not supported in this build.");
         return false;
@@ -373,7 +373,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     else if (inputFormat == PAE) {
 #ifndef NO_PAE_SUPPORT
-        input = new PaeInput(&m_doc);
+        input = new PAEInput(&m_doc);
 #else
         LogError("Plaine & Easie import is not supported in this build.");
         return false;
@@ -410,7 +410,7 @@ bool Toolkit::LoadData(const std::string &data)
             return true;
         }
 
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
 
@@ -418,11 +418,11 @@ bool Toolkit::LoadData(const std::string &data)
         tempinput->parseEmbeddedOptions(m_doc);
         delete tempinput;
 
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc, "");
     }
 #endif
     else if (inputFormat == MEI) {
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc, "");
     }
     else if (inputFormat == MUSICXML) {
         // This is the direct converter from MusicXML to MEI using iomusicxml:
@@ -452,11 +452,11 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc, "");
     }
 
     else if (inputFormat == MEIHUM) {
@@ -482,11 +482,11 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc, "");
     }
 
     else if (inputFormat == MUSEDATAHUM) {
@@ -510,11 +510,11 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc, "");
     }
 
     else if (inputFormat == ESAC) {
@@ -538,11 +538,11 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc, "");
     }
 #endif
     else {
@@ -640,7 +640,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
-    MeiOutput meioutput(&m_doc, "");
+    MEIOutput meioutput(&m_doc, "");
     meioutput.SetScoreBasedMEI(scoreBased);
     std::string output = meioutput.GetOutput(pageNo);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
@@ -649,7 +649,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
 
 bool Toolkit::SaveFile(const std::string &filename)
 {
-    MeiOutput meioutput(&m_doc, filename.c_str());
+    MEIOutput meioutput(&m_doc, filename.c_str());
     meioutput.SetScoreBasedMEI(m_scoreBasedMei);
     if (!meioutput.Export()) {
         LogError("Unknown error");
@@ -1268,7 +1268,7 @@ std::string Toolkit::RenderToPAE()
         return "";
     }
 
-    PaeOutput paeOutput(&m_doc);
+    PAEOutput paeOutput(&m_doc);
     std::string output;
     if (!paeOutput.Export(output)) {
         LogError("Export to PAE failed");
