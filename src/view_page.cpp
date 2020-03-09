@@ -531,8 +531,7 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     DrawSmuflCode(dc, x1, y1 + offset, SMUFL_E003_bracketTop, staffSize, false);
     DrawSmuflCode(dc, x1, y2 - offset, SMUFL_E004_bracketBottom, staffSize, false);
 
-    DrawFilledRectangle(
-        dc, x1, y1 + 2 * offset, x2, y2 - 2 * offset);
+    DrawFilledRectangle(dc, x1, y1 + 2 * offset, x2, y2 - 2 * offset);
 
     dc->EndCustomGraphic();
 
@@ -550,18 +549,14 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 
     dc->StartCustomGraphic("grpSym");
 
-    DrawFilledRectangle(
-        dc, x - 3 * offset, y1 + offset, x + 3 * offset, y2 - offset);
-    DrawFilledRectangle(
-        dc, x, y1 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y1 - offset);
-    DrawFilledRectangle(
-        dc, x, y2 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y2 - offset);
+    DrawFilledRectangle(dc, x - 3 * offset, y1 + offset, x + 3 * offset, y2 - offset);
+    DrawFilledRectangle(dc, x, y1 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y1 - offset);
+    DrawFilledRectangle(dc, x, y2 + offset, x + m_doc->GetDrawingBeamWidth(staffSize, false), y2 - offset);
 
     dc->EndCustomGraphic();
 
     return;
 }
-
 
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
