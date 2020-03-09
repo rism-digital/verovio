@@ -195,6 +195,9 @@ bool PAEOutput::WriteObjectEnd(Object *object)
     else if (object->Is(BEAM)) {
         WriteBeamEnd(dynamic_cast<Beam *>(object));
     }
+    else if (object->Is(TUPLET)) {
+        WriteTupletEnd(dynamic_cast<Tuplet *>(object));
+    }
 
     return true;
 }
@@ -496,7 +499,44 @@ void PAEOutput::WriteSpace(Space *space)
     m_streamStringOutput << "-";
 }
 
-void PAEOutput::WriteTuplet(Tuplet *tuplet) {}
+void PAEOutput::WriteTuplet(Tuplet *tuplet)
+{
+    assert(tuplet);
+
+    Staff *staff = dynamic_cast<Staff *>(tuplet->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
+    // content = DUR_MAX / 2^(dur - 2)
+    int tupletDur = (content != 0.0) ? log2(DUR_MAX / content) + 2 : 4;
+    // We should be looking for dotted values
+
+    std::string dur;
+    switch (tupletDur) {
+        case (DUR_LG): dur = "0"; break;
+        case (DUR_BR): dur = "9"; break;
+        case (DUR_1): dur = "1"; break;
+        case (DUR_2): dur = "2"; break;
+        case (DUR_4): dur = "4"; break;
+        case (DUR_8): dur = "8"; break;
+        case (DUR_16): dur = "6"; break;
+        case (DUR_32): dur = "3"; break;
+        case (DUR_64): dur = "5"; break;
+        case (DUR_128): dur = "7"; break;
+        default: LogWarning("Unsupported tuplet duration"); dur = "4";
+    }
+
+    // For duration to be written within the tuplet
+    m_currentDur = -1;
+    m_streamStringOutput << dur << "(";
+}
+
+void PAEOutput::WriteTupletEnd(Tuplet *tuplet)
+{
+    assert(tuplet);
+
+    m_streamStringOutput << ";" << tuplet->GetNum() << ")";
+}
 
 void PAEOutput::WriteDur(DurationInterface *interface)
 {
