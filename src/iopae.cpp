@@ -9,14 +9,13 @@
 
 //----------------------------------------------------------------------------
 
-#ifndef NO_PAE_SUPPORT
-
 #include <assert.h>
 #include <fstream>
-#include <regex>
 #include <sstream>
 #include <string>
 
+#ifndef NO_PAE_SUPPORT
+#include <regex>
 #endif /* NO_PAE_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -54,28 +53,6 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-
-#ifndef NO_PAE_SUPPORT
-
-#define BEAM_INITIAL 0x01
-#define BEAM_MEDIAL 0x02
-#define BEAM_TUPLET 0x03
-#define BEAM_TERMINAL 0x04
-
-// User interface variables:
-int debugQ = 0; // used with --debug option
-int stdoutQ = 0;
-char outdir[1024] = { 0 }; // used with -d option
-char extension[1024] = { 0 }; // used with -e option
-char hum2abc[1024] = { 0 }; // used with -a option
-int quietQ = 0; // used with -q option
-int quiet2Q = 0; // used with -Q option
-
-// Global variables:
-char data_line[10001] = { 0 };
-#define MAX_DATA_LEN 1024 // One line of the pae file would not be that long!
-char data_key[MAX_DATA_LEN];
-char data_value[MAX_DATA_LEN]; // ditto as above
 
 //----------------------------------------------------------------------------
 // PAEOutput
@@ -606,6 +583,30 @@ void PAEOutput::WriteGrace(AttGraced *attGraced)
     }
 }
 
+#ifndef NO_PAE_SUPPORT
+
+#define BEAM_INITIAL 0x01
+#define BEAM_MEDIAL 0x02
+#define BEAM_TUPLET 0x03
+#define BEAM_TERMINAL 0x04
+
+// User interface variables:
+int debugQ = 0; // used with --debug option
+int stdoutQ = 0;
+char outdir[1024] = { 0 }; // used with -d option
+char extension[1024] = { 0 }; // used with -e option
+char hum2abc[1024] = { 0 }; // used with -a option
+int quietQ = 0; // used with -q option
+int quiet2Q = 0; // used with -Q option
+
+// Global variables:
+char data_line[10001] = { 0 };
+#define MAX_DATA_LEN 1024 // One line of the pae file would not be that long!
+char data_key[MAX_DATA_LEN];
+char data_value[MAX_DATA_LEN]; // ditto as above
+
+#endif /* NO_PAE_SUPPORT */
+
 //----------------------------------------------------------------------------
 // PAEInput
 //----------------------------------------------------------------------------
@@ -627,6 +628,8 @@ PAEInput::PAEInput(Doc *doc)
 }
 
 PAEInput::~PAEInput() {}
+
+#ifndef NO_PAE_SUPPORT
 
 //////////////////////////////////////////////////////////////////////////
 
