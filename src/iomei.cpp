@@ -2233,10 +2233,8 @@ std::string MEIOutput::DocTypeToStr(DocType type)
 // MEIInput
 //----------------------------------------------------------------------------
 
-MEIInput::MEIInput(Doc *doc, std::string filename) : Input(doc)
+MEIInput::MEIInput(Doc *doc) : Input(doc)
 {
-    m_filename = filename;
-    //
     m_hasScoreDef = false;
     m_useScoreDefForDoc = false;
     m_readingScoreBased = false;

@@ -346,7 +346,6 @@ HumdrumInput::HumdrumInput(Doc *doc) : Input(doc)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
-    m_filename = filename;
     m_placement.resize(1000);
     std::fill(m_placement.begin(), m_placement.end(), 0);
     m_reverse.resize(1000);
@@ -2364,8 +2363,8 @@ bool HumdrumInput::prepareFooter(
     meifile += "</scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
-    MEIInput input(&tempdoc, "");
-    if (!input.ImportString(meifile)) {
+    MEIInput input(&tempdoc);
+    if (!input.Import(meifile)) {
         LogError("Error importing data");
         return false;
     }
@@ -2538,8 +2537,8 @@ bool HumdrumInput::prepareHeader(
     meifile += "</pgHead></scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
-    MEIInput input(&tempdoc, "");
-    if (!input.ImportString(meifile)) {
+    MEIInput input(&tempdoc);
+    if (!input.Import(meifile)) {
         LogError("Error importing data");
         return false;
     }

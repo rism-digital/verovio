@@ -418,11 +418,11 @@ bool Toolkit::LoadData(const std::string &data)
         tempinput->parseEmbeddedOptions(m_doc);
         delete tempinput;
 
-        input = new MEIInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 #endif
     else if (inputFormat == MEI) {
-        input = new MEIInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
     else if (inputFormat == MUSICXML) {
         // This is the direct converter from MusicXML to MEI using iomusicxml:
@@ -456,7 +456,7 @@ bool Toolkit::LoadData(const std::string &data)
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MEIInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 
     else if (inputFormat == MEIHUM) {
@@ -486,7 +486,7 @@ bool Toolkit::LoadData(const std::string &data)
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MEIInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 
     else if (inputFormat == MUSEDATAHUM) {
@@ -514,7 +514,7 @@ bool Toolkit::LoadData(const std::string &data)
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MEIInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 
     else if (inputFormat == ESAC) {
@@ -542,7 +542,7 @@ bool Toolkit::LoadData(const std::string &data)
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MEIInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 #endif
     else {
