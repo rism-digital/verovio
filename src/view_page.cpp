@@ -376,15 +376,15 @@ void View::DrawStaffGrp(
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
-        DrawBrace(dc, x, yTop, yBottom, last->m_drawingStaffSize);
+        DrawBrace(dc, x, yTop, yBottom, staffSize);
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
-        DrawBracket(dc, x, yTop, yBottom, last->m_drawingStaffSize);
+        DrawBracket(dc, x, yTop, yBottom, staffSize);
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracketsq) {
-        DrawBracketsq(dc, x, yTop, yBottom, last->m_drawingStaffSize);
+        DrawBracketsq(dc, x, yTop, yBottom, staffSize);
         x -= m_doc->GetDrawingBeamWidth(staffSize, false) + 1.5 * m_doc->GetDrawingStaffLineWidth(staffSize);
     }
 
