@@ -4467,7 +4467,7 @@ bool MeiInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
 
     vrvBeatRpt->ReadColor(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeBeatRptTo_4_0_0(beatRpt, vrvBeatRpt);
     }
