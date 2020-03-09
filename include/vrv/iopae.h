@@ -246,18 +246,18 @@ namespace pae {
 } // namespace pae
 
 //----------------------------------------------------------------------------
-// PaeOutput
+// PAEOutput
 //----------------------------------------------------------------------------
 
 /**
  * This class is a file output stream for writing PAE files.
  */
-class PaeOutput : public Output {
+class PAEOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
-    PaeOutput(Doc *doc);
-    virtual ~PaeOutput();
+    PAEOutput(Doc *doc);
+    virtual ~PAEOutput();
     ///@}
 
     /**
@@ -367,14 +367,14 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// PaeInput
+// PAEInput
 //----------------------------------------------------------------------------
 
-class PaeInput : public Input {
+class PAEInput : public Input {
 public:
     // constructors and destructors
-    PaeInput(Doc *doc);
-    virtual ~PaeInput();
+    PAEInput(Doc *doc);
+    virtual ~PAEInput();
 
     virtual bool Import(const std::string &pae);
 
