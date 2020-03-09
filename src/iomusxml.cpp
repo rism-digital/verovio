@@ -1853,8 +1853,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         pugi::xpath_node staffNode = node.select_node("staff");
         int staffNum = staffNode.node().text().as_int() + staffOffset;
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(
-            std::to_string(staffNum)));
+        reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
