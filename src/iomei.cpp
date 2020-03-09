@@ -971,6 +971,7 @@ void MEIOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
 
     WriteXmlId(currentNode, scoreDefElement);
     scoreDefElement->WriteMeasureNumbers(currentNode);
+    scoreDefElement->WriteSystems(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -3265,6 +3266,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 {
     SetMeiUuid(element, object);
     object->ReadMeasureNumbers(element);
+    object->ReadSystems(element);
     object->ReadTyped(element);
 
     AttCleffingLog cleffingLog;
