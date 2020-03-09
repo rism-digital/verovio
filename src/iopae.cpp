@@ -95,6 +95,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentOct = -1;
     m_currentDur = -1;
     m_currentDots = -1;
+    m_grace = false;
 
     m_doc->m_scoreDef.Save(this);
 
@@ -286,6 +287,17 @@ void PAEOutput::WriteBeam(Beam *beam)
     assert(beam);
 
     if (m_skip) return;
+    
+    m_grace = false;
+    
+    ClassIdsComparison matchType({ NOTE, CHORD });
+    ArrayOfObjects children;
+    LayerElement *child = dynamic_cast<LayerElement *>(beam->FindDescendantByComparison(&matchType));
+    if (child && child->IsGraceNote()) {
+        m_streamStringOutput << "qq";
+        m_grace = true;
+    }
+
 
     m_streamStringOutput << "{";
 }
@@ -297,6 +309,11 @@ void PAEOutput::WriteBeamEnd(Beam *beam)
     if (m_skip) return;
 
     m_streamStringOutput << "}";
+    
+    if (m_grace) {
+        m_streamStringOutput << "r";
+        m_grace = false;
+    }
 }
 
 void PAEOutput::WriteChord(Chord *chord)
@@ -308,6 +325,7 @@ void PAEOutput::WriteChord(Chord *chord)
     std::string oct;
 
     WriteDur(chord);
+    WriteGrace(chord);
 }
 
 void PAEOutput::WriteClef(Clef *clef)
@@ -434,6 +452,7 @@ void PAEOutput::WriteNote(Note *note)
     }
     else {
         WriteDur(note);
+        WriteGrace(note);
     }
 
     if (note->GetOct() != m_currentOct) {
@@ -569,6 +588,21 @@ void PAEOutput::WriteDur(DurationInterface *interface)
         }
         m_streamStringOutput << dur;
         m_streamStringOutput << std::string(m_currentDots, '.');
+    }
+}
+
+void PAEOutput::WriteGrace(AttGraced *attGraced)
+{
+    assert(attGraced);
+    
+    // We are in a beam of grace notes;
+    if (m_grace) return;
+    
+    if (attGraced->GetGrace() == GRACE_unacc) {
+        m_streamStringOutput << "g";
+    }
+    else if (attGraced->HasGrace()) {
+        m_streamStringOutput << "q";
     }
 }
 
