@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Fix overlapping group symbols (@rettinghaus)
 * Container brackets and braces in grpSym (@rettinghaus)
 * Support for reh elements (@rettinghaus)
 * Improved extender lines in MusicXML import (@rettinghaus)
