@@ -312,14 +312,13 @@ public:
 // HumdrumInput
 //----------------------------------------------------------------------------
 
-class HumdrumInput : public vrv::FileInputStream {
+class HumdrumInput : public vrv::Input {
 public:
     // constructors and destructors
-    HumdrumInput(vrv::Doc *doc, std::string filename);
+    HumdrumInput(vrv::Doc *doc);
     virtual ~HumdrumInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &humdrum);
+    virtual bool Import(const std::string &humdrum);
 
     void parseEmbeddedOptions(vrv::Doc &doc);
 

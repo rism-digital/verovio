@@ -131,7 +131,7 @@ std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "a
 // MeiOutput
 //----------------------------------------------------------------------------
 
-MeiOutput::MeiOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
+MeiOutput::MeiOutput(Doc *doc, std::string filename) : Output(doc)
 {
     m_filename = filename;
     m_writeToStreamString = false;
@@ -141,7 +141,7 @@ MeiOutput::MeiOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
 
 MeiOutput::~MeiOutput() {}
 
-bool MeiOutput::ExportFile()
+bool MeiOutput::Export()
 {
     try {
         pugi::xml_document meiDoc;
@@ -229,7 +229,7 @@ std::string MeiOutput::GetOutput(int page)
 {
     m_writeToStreamString = true;
     m_page = page;
-    this->ExportFile();
+    this->Export();
     m_writeToStreamString = false;
     m_page = -1;
 
@@ -2233,7 +2233,7 @@ std::string MeiOutput::DocTypeToStr(DocType type)
 // MeiInput
 //----------------------------------------------------------------------------
 
-MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
+MeiInput::MeiInput(Doc *doc, std::string filename) : Input(doc)
 {
     m_filename = filename;
     //
@@ -2245,26 +2245,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
 
 MeiInput::~MeiInput() {}
 
-bool MeiInput::ImportFile()
-{
-    try {
-        m_doc->Reset();
-        m_doc->SetType(Raw);
-        pugi::xml_document doc;
-        pugi::xml_parse_result result = doc.load_file(m_filename.c_str(), pugi::parse_default & ~pugi::parse_eol);
-        if (!result) {
-            return false;
-        }
-        pugi::xml_node root = doc.first_child();
-        return ReadDoc(root);
-    }
-    catch (char *str) {
-        LogError("%s", str);
-        return false;
-    }
-}
-
-bool MeiInput::ImportString(const std::string &mei)
+bool MeiInput::Import(const std::string &mei)
 {
     try {
         m_doc->Reset();

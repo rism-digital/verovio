@@ -151,7 +151,7 @@ class Zone;
  * It uses the libmei C++ library.
  * Not implemented.
  */
-class MeiOutput : public FileOutputStream {
+class MeiOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
@@ -162,7 +162,7 @@ public:
     /**
      * The main method for exporting the file to MEI.
      */
-    virtual bool ExportFile();
+    bool Export();
 
     /**
      * The main method for write objects.
@@ -414,14 +414,13 @@ private:
  * It uses the libmei C++ library.
  * Under development.
  */
-class MeiInput : public FileInputStream {
+class MeiInput : public Input {
 public:
     // constructors and destructors
     MeiInput(Doc *doc, std::string filename);
     virtual ~MeiInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &mei);
+    virtual bool Import(const std::string &mei);
 
 private:
     bool ReadDoc(pugi::xml_node root);

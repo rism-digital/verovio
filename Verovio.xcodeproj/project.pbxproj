@@ -71,6 +71,8 @@
 		4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
 		4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */; };
+		4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
+		4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E0442D2347A9290054F141 /* expansionmap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -2411,6 +2413,7 @@
 				BB4C4B1822A932CF001F6AF0 /* controlelement.h in Headers */,
 				BB4C4AA522A9328F001F6AF0 /* vrvdef.h in Headers */,
 				BB4C4BA022A932E5001F6AF0 /* positioninterface.h in Headers */,
+				4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */,
 				BB4C4A6522A9321F001F6AF0 /* atts_cmnornaments.h in Headers */,
 				BB4C4B9622A932E5001F6AF0 /* drawinginterface.h in Headers */,
 				BB4C4A5E22A9321F001F6AF0 /* attconverter.h in Headers */,
@@ -2800,6 +2803,7 @@
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
 				4DC12A7D1F740FB9000440E9 /* view_running.cpp in Sources */,
+				4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */,
 				4D1694191E3A44F300569BF4 /* drawinginterface.cpp in Sources */,
 				4D16947A1E41DCE000569BF4 /* atts_cmnornaments.cpp in Sources */,
 				4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */,

@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -77,9 +78,8 @@ int keyPitchAlterAmount = 0;
 // AbcInput
 //----------------------------------------------------------------------------
 
-AbcInput::AbcInput(Doc *doc, std::string filename) : FileInputStream(doc)
+AbcInput::AbcInput(Doc *doc) : Input(doc)
 {
-    m_filename = filename;
     m_hasLayoutInformation = true;
 }
 
@@ -87,15 +87,7 @@ AbcInput::~AbcInput() {}
 
 //////////////////////////////////////////////////////////////////////////
 
-bool AbcInput::ImportFile()
-{
-    std::ifstream infile;
-    infile.open(m_filename.c_str());
-    parseABC(infile);
-    return true;
-}
-
-bool AbcInput::ImportString(const std::string &abc)
+bool AbcInput::Import(const std::string &abc)
 {
     std::istringstream in_stream(abc);
     parseABC(in_stream);
