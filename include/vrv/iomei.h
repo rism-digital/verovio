@@ -417,7 +417,7 @@ private:
 class MEIInput : public Input {
 public:
     // constructors and destructors
-    MEIInput(Doc *doc, std::string filename);
+    MEIInput(Doc *doc);
     virtual ~MEIInput();
 
     virtual bool Import(const std::string &mei);
