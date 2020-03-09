@@ -380,9 +380,9 @@ public:
     PAEInput(Doc *doc);
     virtual ~PAEInput();
 
-    virtual bool Import(const std::string &pae);
 
 #ifndef NO_PAE_SUPPORT
+    virtual bool Import(const std::string &pae);
 
 private:
     // function declarations:
