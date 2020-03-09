@@ -373,17 +373,19 @@ void View::DrawStaffGrp(
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * m_doc->GetDrawingBeamWidth(staffSize, false),
             m_doc->GetDrawingBeamWidth(staffSize, false));
+        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
         DrawBrace(dc, x, yTop, yBottom, last->m_drawingStaffSize);
+        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
         DrawBracket(dc, x, yTop, yBottom, last->m_drawingStaffSize);
-        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false) - m_doc->GetDrawingBeamWhiteWidth(staffSize, false);
+        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracketsq) {
         DrawBracketsq(dc, x, yTop, yBottom, last->m_drawingStaffSize);
-        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false) - m_doc->GetDrawingBeamWhiteWidth(staffSize, false);
+        x -= m_doc->GetDrawingBeamWidth(staffSize, false) + 1.5 * m_doc->GetDrawingStaffLineWidth(staffSize);
     }
 
     // recursively draw the children
