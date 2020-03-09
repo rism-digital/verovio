@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <cctype>
 #include <fstream>
 #include <sstream>
 #include <string>
