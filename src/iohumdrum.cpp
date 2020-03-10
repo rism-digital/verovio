@@ -1647,9 +1647,6 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
 {
     ScoreDef &sdf = m_doc->m_scoreDef;
     int count = sdf.GetChildCount();
-    if (count < 2) {
-        return;
-    }
     for (int i = 0; i < count; i++) {
         Object *obj = sdf.GetChild(i);
         std::string name = obj->GetClassName();
