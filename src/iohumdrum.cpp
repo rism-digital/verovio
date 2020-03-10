@@ -1587,23 +1587,13 @@ void HumdrumInput::prepareStaffGroups()
         // If there are two staves, presume that it is for a grand staff
         // and a brace should be displayed.
         if (staffstarts.size() == 2) {
-            StaffGrp *sg = new StaffGrp();
-            m_doc->m_scoreDef.AddChild(sg);
-            sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
-            sg->SetBarThru(BOOLEAN_true);
-            sg->AddChild(m_staffdef[0]);
-            sg->AddChild(m_staffdef[1]);
+            processStaffDecoration("{(*)}");
         }
 
         // If there are more than two staves then
         // add a bracket around the staves.
         else if (staffstarts.size() > 2) {
-            StaffGrp *sg = new StaffGrp();
-            m_doc->m_scoreDef.AddChild(sg);
-            sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
-            for (int i = 0; i < (int)m_staffdef.size(); ++i) {
-                sg->AddChild(m_staffdef[i]);
-            }
+            processStaffDecoration("[*]");
         }
 
         // If there is one staff, then no extra decoration.
