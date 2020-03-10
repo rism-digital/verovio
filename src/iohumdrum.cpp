@@ -1884,11 +1884,13 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     // enumeration in the decoration is not monotonic covering every staff
     // in the score, then the results may have problems.
 
+    map<std::string, vector<int> > classToStaffMapping;
     map<int, vector<int> > groupToStaffMapping;
     map<int, vector<int> > partToStaffMapping;
     map<int, int> trackToSpineMapping;
     map<int, int> staffToSpineMapping;
     map<int, int> staffToGroupMapping;
+    map<int, std::string> staffToClassMapping;
     map<int, int> spineToGroupMapping;
     map<int, int> staffToPartMapping;
     map<int, int> spineToPartMapping;
@@ -1898,9 +1900,14 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         int group = getGroupNumberLabel(staffstarts[i]);
         int part = getPartNumberLabel(staffstarts[i]);
         int track = staffstarts[i]->getTrack();
+        std::string instrumentClass = getInstrumentClass(staffstarts[i]);
 
         trackToSpineMapping[track] = i;
 
+        if (!instrumentClass.empty()) {
+            classToStaffMapping[instrumentClass].push_back(staff);
+            staffToClassMapping[i] = instrumentClass;
+        }
         if (group > 0) {
             groupToStaffMapping[group].push_back(staff);
             spineToGroupMapping[i] = group;
@@ -1916,7 +1923,10 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             staffToGroupMapping[staff] = group;
         }
         if ((part > 0) && (staff > 0)) {
-            staffToGroupMapping[staff] = part;
+            staffToPartMapping[staff] = part;
+        }
+        if ((!instrumentClass.empty()) && (staff > 0)) {
+            staffToClassMapping[staff] = instrumentClass;
         }
     }
 
@@ -1924,9 +1934,21 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     // and the decoration variable contains the original decoration string.
     string d = decoration;
 
+    // Instrument class expansion to staff numbers:
+    hum::HumRegex hre;
+    if (!classToStaffMapping.empty()) {
+        for (auto it = classToStaffMapping.begin(); it != classToStaffMapping.end(); it++) {
+            std::string pattern = it->first;
+            std::string replacement = "";
+            for (int i = 0; i < (int)it->second.size(); i++) {
+                replacement += "s" + to_string(it->second[i]);
+            }
+            hre.replaceDestructive(d, replacement, pattern, "g");
+        }
+    }
+
     // The group-to-staff substitution is limited
     // to single-digit group numbers for now.
-    hum::HumRegex hre;
     if (!groupToStaffMapping.empty()) {
         // substitute spine groupings with staff numbers.
         // example:   {(g1}} will be expanded to {(s1,s2,s3)} if
@@ -2484,6 +2506,34 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         }
     }
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getInstrumentClass -- Get the string after *IC at the start
+//   of a spine before any data or spine splits.
+//
+
+std::string HumdrumInput::getInstrumentClass(hum::HTp start)
+{
+    hum::HTp current = start;
+    std::string output;
+    while (current) {
+        if (current->isData()) {
+            break;
+        }
+        if (!current->isInterpretation()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->compare(0, 3, "*IC") == 0) {
+            output = current->substr(3);
+            break;
+        }
+        current = current->getNextToken();
+    }
+
+    return output;
 }
 
 //////////////////////////////

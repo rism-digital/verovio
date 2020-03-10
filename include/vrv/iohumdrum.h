@@ -543,6 +543,7 @@ protected:
     void promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group);
     std::string getInstrumentName(StaffDef *sd);
     std::string getInstrumentAbbreviation(StaffDef *sd);
+    std::string getInstrumentClass(hum::HTp start);
     void removeInstrumentName(StaffDef *sd);
     void removeInstrumentAbbreviation(StaffDef *sd);
     std::string getEndIdForOttava(hum::HTp token);
