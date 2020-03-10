@@ -14811,7 +14811,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
-    convertVerses(note, token, subtoken);
+    if (subtoken <= 0) {
+        convertVerses(note, token, subtoken);
+    }
 
     // maybe organize by sub-token index, but consider as chord for now
     if (!chordQ) {
