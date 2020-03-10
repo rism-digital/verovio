@@ -4356,18 +4356,6 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
     }
-
-    // if the current parent is a syllable then we need to make sure that a syl got added
-    // if not then add a blank one
-    /*if (std::string{parentNode.name()}.compare("syllable") == 0) {
-        auto testSyl = parent->FindDescendantByType(SYL);
-        if(testSyl == NULL && m_doc->GetOptions()->m_createDefaultSyl.GetValue()) {
-            Syl *syl = new Syl();
-            Text *text = new Text();
-            syl->AddChild(text);
-            parent->AddChild(syl);
-        }
-    }*/
     return success;
 }
 
@@ -4376,25 +4364,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
-    } /*else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
-        Zone zone = this->m_doc->GetZone(element.attribute("facs").value());
-        AttCoordinated *att = dynamic_cast<AttCoordinated *>(object);
-        assert(att);
-        LogMessage("%d, %d, %d, %d", zone.ulx, zone.uly, zone.lrx, zone.lry);
-        if (zone.ulx > 0) {
-            att->SetUlx(zone.ulx);
-        }
-        if (zone.uly > 0) {
-            att->SetUly(zone.uly);
-        }
-        if (zone.lrx > 0) {
-            att->SetLrx(zone.lrx);
-        }
-        if (zone.lry > 0) {
-            att->SetLry(zone.lry);
-        }
-        LogMessage("Set att_coordinated based on zone %s", zone.xmlId.c_str());
-    }*/
+    }
 
     SetMeiUuid(element, object);
     ReadLinkingInterface(element, object);

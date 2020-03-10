@@ -184,7 +184,6 @@ double Staff::GetDrawingRotate() const
             return FacsimileInterface::GetDrawingRotate();
         }
     }
-    LogWarning("This staff (or its doc) doesn't have facsimile data, or you haven't enabled the useRotate option.");
     return 0;
 }
 
