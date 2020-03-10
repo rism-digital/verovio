@@ -20,7 +20,7 @@
         <xsl:text>&#10;</xsl:text>
         
         <!-- end of vrv namespace and of #ifdef -->
-        <xsl:text>&#10;} // vrv namespace&#10;&#10;#endif&#10;</xsl:text>
+        <xsl:text>&#10;} // namespace vrv&#10;&#10;#endif&#10;</xsl:text>
         
     </xsl:template>
 
