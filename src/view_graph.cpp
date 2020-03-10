@@ -272,7 +272,7 @@ void View::DrawLyricString(DeviceContext *dc, TextDrawingParams &params, std::ws
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
+        dc->DrawText(UTF16to8(str), str, params.m_x, params.m_y, params.m_width, params.m_height);
         dc->ResetFont();
     }
 
