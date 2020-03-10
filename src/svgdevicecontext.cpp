@@ -691,7 +691,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }
 
-    pugi::xml_node rectChild = AppendChild("sylTextRect");
+    pugi::xml_node rectChild = AppendChild("rect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
     rectChild.append_attribute("height") = height;
@@ -780,7 +780,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     assert(m_fontStack.top());
 
     std::string svgText = text;
-    
+
     // Because IE does not support xml:space="preserve", we need to replace the initial
     // space with a non breakable space
     if ((svgText.length() > 0) && (svgText[0] == ' ')) {
@@ -820,7 +820,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     textChild.append_attribute("class") = "text";
     textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
 
-    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) 
+    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET)
         && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
         pugi::xml_node g = m_currentNode.parent().parent();
         pugi::xml_node rectChild = g.append_child("rect");
@@ -834,7 +834,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         textChild.append_attribute("x") = StringFormat("%d", x).c_str();
         textChild.append_attribute("y") = StringFormat("%d", y).c_str();
     }
- 
+
 }
 
 void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)
