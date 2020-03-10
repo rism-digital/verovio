@@ -117,12 +117,13 @@ int StaffGrp::GetMaxStaffSize()
     for (auto &child : *childList) {
         staffDef = dynamic_cast<StaffDef *>(child);
         assert(staffDef);
-        if (staffDef->GetScale() > max) {
+        if (staffDef->HasScale() && staffDef->GetScale() >= max) {
             max = staffDef->GetScale();
         }
+        else {
+            max = 100;
+        }
     }
-
-    if (max == 0) return 100;
 
     return max;
 }

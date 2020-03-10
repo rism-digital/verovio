@@ -839,7 +839,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 }
 
-int Object::Save(FileOutputStream *output)
+int Object::Save(Output *output)
 {
     SaveParams saveParams(output);
 
