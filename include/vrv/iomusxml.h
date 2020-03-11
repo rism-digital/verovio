@@ -205,6 +205,7 @@ private:
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
     void AddLayerElement(Layer *layer, LayerElement *element);
+    void AddLayerElement(Layer *layer, LayerElement *element, int duration);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
@@ -227,7 +228,7 @@ private:
      * For example, when closing a beam, we need to remove it from the stack, but it is not
      * necessary the top one (for example we can have an opened chord there).
      */
-    void RemoveLastFromStack(ClassId classId);
+    void RemoveLastFromStack(ClassId classId, Layer *layer);
 
     /*
      * @name Helper methods for checking presence of values of attributes or elements
@@ -327,8 +328,12 @@ private:
     int m_meterUnit = 4;
     /* LastElementID */
     std::string m_ID;
-    /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
-    std::vector<LayerElement *> m_elementStack;
+    /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
+    std::map<Layer *, std::vector<LayerElement *> > m_elementStackMap;
+    /* A maps of time stamps (score time) to indicate write pointer of a given layer */
+    std::map<Layer *, int> m_layerEndTimes;
+    /* To remember layer of last element (note) to handle chords */
+    Layer *m_prevLayer;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */
