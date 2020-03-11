@@ -1153,6 +1153,11 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 }
                 else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
                     continue;
+                // check if the next note is simultaneous and put in with adjustable space
+                if (dynamic_cast<Staff *>(GetFirstAncestor(STAFF)) != nullptr) {
+                    // adjust space if necessary
+                    horizontalMargin = 0;
+                }
             }
 
             if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
