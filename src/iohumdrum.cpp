@@ -3562,6 +3562,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string keysig;
     hum::HTp keysigtok = NULL;
     std::string key;
+    hum::HTp icode = NULL;
     std::string transpose;
     std::string itranspose;
     std::string timesig;
@@ -3639,6 +3640,14 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             labeltok = part;
             haslabel = true;
         }
+        else if (part->compare(0, 2, "*I") == 0) {
+            // check to see if an instrument code
+            int len = (int)part->size();
+            if ((len > 2) && ::islower(part->at(2))) {
+                icode = part;
+                haslabel = true;
+            }
+        }
         else if (part->compare(0, 5, "*met(") == 0) {
             auto ploc = part->rfind(")");
             if (ploc != string::npos) {
@@ -3684,6 +3693,13 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
 
         part = part->getNextToken();
+    }
+
+    if (labeltok == NULL) {
+        // try to infer the name of the part automatically
+        if (icode) {
+            label = getLabelFromInstrumentCode(icode, itranspose);
+        }
     }
 
     // short-circuit *clef with *oclef for **mens data
@@ -3748,7 +3764,10 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (haslabel) {
-        if (hasIndent(labeltok)) {
+        if ((labeltok == NULL) && !icode->empty()) {
+            setInstrumentName(m_staffdef.back(), label, icode);
+        }
+        else if (hasIndent(labeltok)) {
             setInstrumentName(m_staffdef.back(), "   ");
         }
         else {
@@ -3802,6 +3821,107 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
 //////////////////////////////
 //
+// HumdrumInput::getLabelFromInstrumentCode -- Can be expanded to output
+//   instrument names in a specific language.
+//   Example: *Iclars  *ITrd1c2  == Clarinet in B-flat
+//
+
+std::string HumdrumInput::getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose)
+{
+    std::string output;
+    std::string name = icode->substr(2);
+
+    if (name == "piano") {
+        output = "Piano";
+    }
+    else if (name == "flt") {
+        output = "Flute";
+    }
+    else if (name == "picco") {
+        output = "Piccolo";
+    }
+    else if (name == "oboe") {
+        output = "Oboe";
+    }
+    else if (name == "clars") {
+        output = "Clarinet";
+    }
+    else if (name == "clara") {
+        output = "Alto Clarinet";
+    }
+    else if (name == "clarb") {
+        output = "Bass Clarinet";
+    }
+    else if (name == "fagot") {
+        output = "Bassoon";
+    }
+    else if (name == "fagot") {
+        output = "Bassoon";
+    }
+    else if (name == "tromp") {
+        output = "Trumpet";
+    }
+    else if (name == "tromb") {
+        output = "Trombone";
+    }
+    else if (name == "violine") {
+        // Deal with Violin 1 versus Violin 2, but need more info to do that.
+        output = "Violin";
+    }
+    else if (name == "viola") {
+        output = "Viola";
+    }
+    else if (name == "cello") {
+        output = "Violoncello";
+    }
+    else if (name == "cemba") {
+        output = "Harpsichord";
+    }
+    else if (name == "organ") {
+        output = "Organ";
+    }
+    else if (name == "clavi") {
+        output = "Clavichord";
+    }
+    else if (name == "forte") {
+        output = "Fortepiano";
+    }
+    else if (name == "guitr") {
+        output = "Guitar";
+    }
+    else if (name == "cbass") {
+        output = "Contrabass";
+    }
+    else if (name == "koto") {
+        output = "Koto";
+    }
+
+    if (output.empty()) {
+        // could not find an automatic name for the instrument.
+        return output;
+    }
+
+    // Some instruments always have a specific key, such as
+    // alto flute, which is in G, but the transposition is
+    // often not given in the name.
+    if (transpose == "*ITrd1c2") {
+        output += " in B-flat";
+    }
+    else if (transpose == "*ITrd2c3") {
+        output += " in A";
+    }
+    else if (transpose == "*ITrd-2c-3") {
+        output += " in E-flat";
+    }
+    else if (transpose == "*ITrd-5c-9") {
+        output += " in E-flat";
+    }
+
+    return output;
+}
+
+//////////////////////////////
+//
 // hasIndent -- true if *indent tandem interpretation before first data token.
 //
 
@@ -3839,7 +3959,6 @@ template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, 
     }
     // hum::HumRegex hre;
     // "\xc2\xa0" is a non-breaking space
-    string newname;
     Label *label = new Label();
     if (name == "   ") {
         Text *text = new Text;
@@ -4011,7 +4130,10 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
                 continue;
             }
             if (!::islower((*partstart)[2])) {
-                // instrument class, name, abbrevation or similar
+                // Instrument class, name, abbrevation or similar.
+                // The first letter of the instrument code must
+                // be a lowercase letter, but it is not, so keep
+                // searching.
                 partstart = partstart->getNextToken();
                 continue;
             }
