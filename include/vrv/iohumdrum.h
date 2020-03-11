@@ -386,7 +386,6 @@ protected:
         hum::HumNum layerstarttime, hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token, int staffindex);
     void prepareVerses();
-    void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HTp token, Note *note);
     void handlePedalMark(hum::HTp token);
@@ -622,6 +621,7 @@ protected:
         std::vector<pair<int, bool> > &phrasestartnoteinfo, std::vector<pair<int, bool> > &phraseendnoteinfo, int ndex,
         std::vector<std::vector<int> > &phraseindex, int i, int j, std::vector<int> &startpitches,
         std::vector<int> &endpitches, std::vector<bool> &indexused);
+    template <class ELEMENT> void convertVerses(ELEMENT element, hum::HTp token);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);

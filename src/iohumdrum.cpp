@@ -14006,6 +14006,8 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     if (breaksec) {
         chord->SetBreaksec(breaksec);
     }
+
+    convertVerses(chord, token);
 }
 
 //////////////////////////////
@@ -14933,8 +14935,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
-    if (subtoken <= 0) {
-        convertVerses(note, token, subtoken);
+    if (subtoken < 0) {
+        convertVerses(note, token);
     }
 
     // maybe organize by sub-token index, but consider as chord for now
@@ -15040,7 +15042,7 @@ void HumdrumInput::setAccid(Accid *accid, const string &loaccid)
 // HumdrumInput::convertVerses --
 //
 
-void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
+template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::HTp token)
 {
     int staff = m_rkern[token->getTrack()];
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
@@ -15159,7 +15161,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             else {
                 setLocationId(verse, line.token(i), -1);
             }
-            appendElement(note, verse);
+            appendElement(element, verse);
             verse->SetN(versenum);
             Syl *syl = new Syl;
             string datatype = line.token(i)->getDataType();
