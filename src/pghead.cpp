@@ -79,6 +79,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
             personRend->SetHalign(HORIZONTALALIGNMENT_left);
         }
         else {
+            // composer, harmonizer, and arranger get placed on the right side.
             personRend->SetHalign(HORIZONTALALIGNMENT_right);
         }
         personRend->SetValign(VERTICALALIGNMENT_bottom);
