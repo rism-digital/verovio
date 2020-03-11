@@ -918,6 +918,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // add it if necessary
             if (keySig) {
+                keySig->IsAttribute(true);
                 staffDef->AddChild(keySig);
             }
 
