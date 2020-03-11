@@ -1153,6 +1153,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 }
                 else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
                     continue;
+                
                 // Offset when two voices are closer than a third should be adjustable. 
                 // Adjust space if necessary
                 horizontalMargin = 0;
