@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dir.h
-// Author:      Laurent Pugin
-// Created:     2016
+// Name:        reh.h
+// Author:      Klaus Rettinghaus
+// Created:     2020
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_DIR_H__
-#define __VRV_DIR_H__
+#ifndef __VRV_REH_H__
+#define __VRV_REH_H__
 
 #include "controlelement.h"
 #include "textdirinterface.h"
@@ -17,19 +17,17 @@ namespace vrv {
 class TextElement;
 
 //----------------------------------------------------------------------------
-// Dir (directive)
+// Reh (rehearsal mark)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <dir> element.
+ * This class models the MEI <reh> element.
  */
-class Dir : public ControlElement,
-            public TextListInterface,
+class Reh : public ControlElement,
             public TextDirInterface,
-            public TimeSpanningInterface,
-            public AttExtender,
+            public TimePointInterface,
+            public AttColor,
             public AttLang,
-            public AttLineRendBase,
             public AttVerticalGroup {
 public:
     /**
@@ -37,12 +35,12 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Dir();
-    virtual ~Dir();
-    virtual Object *Clone() const { return new Dir(*this); }
+    Reh();
+    virtual ~Reh();
+    virtual Object *Clone() const { return new Reh(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Dir"; }
-    virtual ClassId GetClassId() const { return DIR; }
+    virtual std::string GetClassName() const { return "Reh"; }
+    virtual ClassId GetClassId() const { return REH; }
     ///@}
 
     /**
@@ -51,11 +49,10 @@ public:
     ///@{
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
     /**
-     * Add an element (text, rend. etc.) to a dir.
+     * Add an element (text, rend. etc.) to a reh.
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
@@ -63,11 +60,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::PrepareFloatingGrps
-     */
-    virtual int PrepareFloatingGrps(FunctorParams *);
 
 protected:
     //

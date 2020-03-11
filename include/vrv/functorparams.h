@@ -27,7 +27,7 @@ class Dot;
 class Dots;
 class Dynam;
 class Ending;
-class FileOutputStream;
+class Output;
 class Functor;
 class Hairpin;
 class Harm;
@@ -1617,8 +1617,8 @@ public:
 
 class SaveParams : public FunctorParams {
 public:
-    SaveParams(FileOutputStream *output) { m_output = output; }
-    FileOutputStream *m_output;
+    SaveParams(Output *output) { m_output = output; }
+    Output *m_output;
 };
 
 //----------------------------------------------------------------------------

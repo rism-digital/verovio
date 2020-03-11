@@ -1,5 +1,17 @@
 # Changelog
 
+## [unreleased]
+* Support for Plaine and Easie output (limited features)
+* Support for lyrics on chords (@rettinghaus)
+* Support for reh elements (@rettinghaus)
+* Improved extender lines in MusicXML import (@rettinghaus)
+* Improved backup handling in MusicXML import (@wergo)
+* Options for adjusting page with (--adjust-page-width) (@palgranum)
+* Fix overlapping group symbols (@rettinghaus)
+* Fix bug with choice and mdiv (@rettinghaus)
+* Fix tempo placement (@rettinghaus)
+* Fix Leipzig font validation issues
+
 ## [2.5.0] - 2020-02-03
 * Support for expansion implementation with --expand option (@wergo)
 * Option for forcing first page to be condensed (--condense-first-page)
@@ -11,16 +23,13 @@
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15
-* Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
+* Support for short and tick barlines with `measure@bar.len` and `measure@bar.place` (@earboxer)
 * Support for dashed and dotted slurs and ties (@earboxer and @napulen)
 * Option to use xml entities for SMuFL charachters (--outputSmuflXmlEntities)
 * Options for controlling system divider display (--systemDivider "none|left|left-right")
 * Fix coloring of ties and slurs (@rettinghaus)
 * Fix bug with tuplet number placement (@rettinghaus)
 * LibMEI output generated from MEI 4.0.1
-
-## [2.3.5] - 2020-01-09
-* Fix bug with NPM versionning
 
 ## [2.3.4] - 2020-01-03
 * Fix bug with NPM build (allow access to verovio.module and use wasm)

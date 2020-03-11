@@ -580,19 +580,29 @@ double LayerElement::GetAlignmentDuration(
     }
 }
 
-double LayerElement::GetContentAlignmentDuration(
+double LayerElement::GetSameAsContentAlignmentDuration(
     Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
     }
 
-    double duration = 0.0;
-
     LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
     assert(sameas);
 
-    for (auto child : *sameas->GetChildren()) {
+    return sameas->GetContentAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+}
+
+double LayerElement::GetContentAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+{
+    if (!this->Is({ BEAM, FTREM, TUPLET })) {
+        return 0.0;
+    }
+
+    double duration = 0.0;
+
+    for (auto child : *this->GetChildren()) {
         // Skip everything that does not have a duration interface and notes in chords
         if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH) != NULL)) {
             continue;
@@ -674,7 +684,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
-        double duration = this->GetContentAlignmentDuration(
+        double duration = this->GetSameAsContentAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         params->m_time += duration;
         return FUNCTOR_CONTINUE;
@@ -1640,7 +1650,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && this->HasSameasLink()) {
-        incrementScoreTime = this->GetContentAlignmentDuration(
+        incrementScoreTime = this->GetSameAsContentAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
@@ -1687,7 +1697,7 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_drawingCueSize = false;
-    
+
     // Pass it to the pseudo functor of the interface
     LinkingInterface *interface = this->GetLinkingInterface();
     assert(interface);

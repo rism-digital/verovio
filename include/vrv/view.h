@@ -55,6 +55,7 @@ class PgFoot;
 class PgFoot;
 class PgHead;
 class PgHead2;
+class Reh;
 class Rend;
 class RunningElement;
 class Slur;
@@ -191,6 +192,7 @@ protected:
     void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
         bool abbreviations, int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
+    void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
     void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, bool eraseIntersections = false);
@@ -391,6 +393,7 @@ protected:
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
     void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
+    void DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);

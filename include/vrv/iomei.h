@@ -105,6 +105,7 @@ class Proport;
 class Rdg;
 class Ref;
 class Reg;
+class Reh;
 class Rend;
 class Rest;
 class Restore;
@@ -142,7 +143,7 @@ class Verse;
 class Zone;
 
 //----------------------------------------------------------------------------
-// MeiOutput
+// MEIOutput
 //----------------------------------------------------------------------------
 
 /**
@@ -150,18 +151,18 @@ class Zone;
  * It uses the libmei C++ library.
  * Not implemented.
  */
-class MeiOutput : public FileOutputStream {
+class MEIOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
-    MeiOutput(Doc *doc, std::string filename);
-    virtual ~MeiOutput();
+    MEIOutput(Doc *doc, std::string filename);
+    virtual ~MEIOutput();
     ///@}
 
     /**
      * The main method for exporting the file to MEI.
      */
-    virtual bool ExportFile();
+    bool Export();
 
     /**
      * The main method for write objects.
@@ -289,6 +290,7 @@ private:
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
+    void WriteReh(pugi::xml_node currentNode, Reh *reh);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteTie(pugi::xml_node currentNode, Tie *tie);
@@ -404,7 +406,7 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// MeiInput
+// MEIInput
 //----------------------------------------------------------------------------
 
 /**
@@ -412,14 +414,13 @@ private:
  * It uses the libmei C++ library.
  * Under development.
  */
-class MeiInput : public FileInputStream {
+class MEIInput : public Input {
 public:
     // constructors and destructors
-    MeiInput(Doc *doc, std::string filename);
-    virtual ~MeiInput();
+    MEIInput(Doc *doc);
+    virtual ~MEIInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &mei);
+    virtual bool Import(const std::string &mei);
 
 private:
     bool ReadDoc(pugi::xml_node root);
@@ -449,7 +450,7 @@ private:
      * reading the element and one method for reading its children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
      * for example. The filter object is optional and can be set for filtering the allowed
-     * children (see MeiInput::IsAllowed)
+     * children (see MEIInput::IsAllowed)
      */
     ///@{
     bool ReadPage(Object *parent, pugi::xml_node parentNode);
@@ -539,6 +540,7 @@ private:
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
+    bool ReadReh(Object *parent, pugi::xml_node reh);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
     bool ReadTempo(Object *parent, pugi::xml_node tempo);
     bool ReadTie(Object *parent, pugi::xml_node tie);
@@ -637,7 +639,7 @@ private:
     /**
      * Read score-based MEI.
      * The data is read into an object, which is then converted to page-based MEI.
-     * See MeiInput::ReadDoc, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc
+     * See MEIInput::ReadDoc, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc
      */
     bool ReadScoreBasedMei(pugi::xml_node element, Score *parent);
 
@@ -656,6 +658,7 @@ private:
      */
     ///@{
     // to MEI 4.0.0
+    void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement);
