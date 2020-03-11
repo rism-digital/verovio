@@ -3864,7 +3864,7 @@ std::string HumdrumInput::getLabelFromInstrumentCode(hum::HTp icode, const std::
     else if (name == "tromb") {
         output = "Trombone";
     }
-    else if (name == "violine") {
+    else if (name == "violin") {
         // Deal with Violin 1 versus Violin 2, but need more info to do that.
         output = "Violin";
     }
