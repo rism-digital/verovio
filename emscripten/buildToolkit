@@ -37,17 +37,20 @@ Options:
 -H      Disable Humdrum importer
 -P      Disable PAE importer
 -X      Disable MusicXML importer
+-M      Clean existing makefile
 
 EOT
 }
 
 chomp (my $EMCC = `which emcc`);
-chomp (my $PYTHON = `which python`);
+chomp (my $EMCMAKE = `which emcmake`);
+chomp (my $EMMAKE = `which emmake`);
 die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
-die "ERROR: python interpreter not found.\n" unless $PYTHON;
+die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
+die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
-my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ);
+my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
@@ -67,7 +70,8 @@ GetOptions (
    'D|no-darms'    => \$nodarms,
    'H|no-humdrum'  => \$nohumdrum,
    'P|no-pae'      => \$nopae,
-   'X|no-musicxml' => \$nomusicxml
+   'X|no-musicxml' => \$nomusicxml,
+   'M|make' => \$makeQ
 );
 
 # Default compiling uses ASM and large file support.
@@ -112,7 +116,6 @@ if ($lightQ) {
 
 if ($chattyQ) {
 	$CHATTY = "-v";
-	print "Emscripten compile script: $EMCC\n";
 }
 
 if (!$nohumdrum) {
@@ -143,26 +146,14 @@ syncSvgResources($exclusion);
 print "Creating commit version header file...\n";
 `$VEROVIO_ROOT/tools/get_git_commit.sh`;
 
-my $VEROVIO_INCLUDE = "$VEROVIO_ROOT/include";
-my $VEROVIO_LIBMEI  = "$VEROVIO_ROOT/libmei";
-
-my $includes = "";
-$includes .= " -I$VEROVIO_INCLUDE";
-$includes .= " -I$VEROVIO_INCLUDE/vrv";
-$includes .= " -I$VEROVIO_INCLUDE/hum" if !$nohumdrum;
-$includes .= " -I$VEROVIO_INCLUDE/json";
-$includes .= " -I$VEROVIO_INCLUDE/midi";
-$includes .= " -I$VEROVIO_INCLUDE/pugi";
-$includes .= " -I$VEROVIO_INCLUDE/utf8";
-$includes .= " -I$VEROVIO_LIBMEI";
-
 my $defines = "-DUSE_EMSCRIPTEN";
-$defines .= " -DNO_PAE_SUPPORT"      if $nopae;
-$defines .= " -DNO_DARMS_SUPPORT"    if $nodarms;
-$defines .= " -DNO_HUMDRUM_SUPPORT"  if $nohumdrum;
-$defines .= " -DNO_MUSICXML_SUPPORT" if $nomusicxml;
 
-my $sources = getSources();
+my $cmake = "-DBUILD_AS_WASM=ON -DEMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES=ON";
+$cmake .= " -DNO_PAE_SUPPORT=ON" if ($nopae);
+$cmake .= " -DNO_DARMS_SUPPORT=ON" if ($nodarms);
+$cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
+$cmake .= " -DNO_MUSICXML_SUPPORT=ON" if ($nomusicxml);
+
 my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";
 
@@ -197,10 +188,23 @@ $exports .= "]\"";
 
 my $extra_exports = "-s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
-my $command = "$PYTHON $EMCC $CHATTY $includes $defines $FLAGS $sources $embed $exports $extra_exports $output";
-print "Compiling...";
-print "$command\n" if $CHATTY;
-`$command`;
+if ($makeQ) {
+    print "*************\nBuilding makefile...\n";
+    system("rm -rf CMakeFiles/");
+    system("rm CMakeCache.txt");
+    my $cmakeCmd = "$EMCMAKE cmake ../tools $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
+    system($cmakeCmd);
+}
+
+print "*************\nCompiling...\n";
+my $makeCmd = "$EMMAKE make -j 8";
+system($makeCmd);
+
+print "*************\nLinking...\n";
+my $ccCmd = "$EMCC $CHATTY libverovio.bc $FLAGS $embed $exports $extra_exports $output";
+print "$ccCmd\n" if $CHATTY;
+
+system($ccCmd);
 
 if ($? == 0) {
 	print " Done.\n";
@@ -235,45 +239,6 @@ exit 0;
 
 
 ###########################################################################
-
-
-##############################
-##
-## getSources -- return a list of code to be compiled.  This could be generalized
-##    to automatically extract a list of the code from the source directory.
-##
-
-sub getSources {
-	my @sources;
-	push @sources, "$VEROVIO_ROOT/tools/c_wrapper.cpp";
-	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
-	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
-	if ($nohumdrum) {
-		push @sources, grep(!/src\/hum\//, glob "$VEROVIO_ROOT/src/*/*.cpp");
-	} else {
-		push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
-	}
-
-	# libmei: only a subset is included:
-	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_analytical.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_externalsymbols.cpp";
-    push @sources, "$VEROVIO_ROOT/libmei/atts_facsimile.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_gestural.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_neumes.cpp";
-    push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_visual.cpp";
-
-	return join " ", @sources
-}
-
 
 
 ##############################
