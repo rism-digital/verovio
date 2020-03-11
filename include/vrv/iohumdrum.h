@@ -28,6 +28,7 @@
 #include "metersig.h"
 #include "options.h"
 #include "pedal.h"
+#include "reh.h"
 #include "runningelement.h"
 #include "section.h"
 #include "slur.h"
@@ -586,6 +587,7 @@ protected:
         std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> tokens, int index);
     void setRepeatSlashes(BeatRpt *repeat, std::vector<hum::HTp> &tokens, int index);
     std::string getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose);
+    void checkForRehearsal(int line);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

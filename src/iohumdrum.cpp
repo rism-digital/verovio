@@ -88,6 +88,7 @@
 #include "pedal.h"
 #include "pghead.h"
 #include "rdg.h"
+#include "reh.h"
 #include "rend.h"
 #include "rest.h"
 #include "sb.h"
@@ -4739,6 +4740,8 @@ bool HumdrumInput::convertSystemMeasure(int &line)
     storeStaffLayerTokensForMeasure(startline, endline);
 
     auto status = convertMeasureStaves(startline, endline);
+
+    checkForRehearsal(startline);
 
     addFTremSlurs();
 
@@ -17137,6 +17140,67 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     setSystemMeasureStyle(startline, endline);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForRehearsal -- Only attached to barlines for now.
+//     Also required to be global layout for now, add note attachment
+//     later.
+//
+
+void HumdrumInput::checkForRehearsal(int line)
+{
+    hum::HumdrumFile &infile = m_infiles[0];
+    if (!infile[line].isBarline()) {
+        return;
+    }
+
+    hum::HTp token = infile.token(line, 0);
+    int lcount = token->getLinkedParameterSetCount();
+    for (int i = 0; i < lcount; ++i) {
+        bool globalQ = token->linkedParameterIsGlobal(i);
+        if (!globalQ) {
+            continue;
+        }
+        hum::HumParamSet *hps = token->getLinkedParameterSet(i);
+        if (hps == NULL) {
+            return;
+        }
+        if (hps->getNamespace1() != "LO") {
+            return;
+        }
+        std::string namespace2 = hps->getNamespace2();
+        bool rehQ = namespace2 == "REH";
+        if (!rehQ) {
+            continue;
+        }
+        std::string tvalue;
+        std::string key;
+        std::string value;
+        for (int j = 0; j < hps->getCount(); ++j) {
+            key = hps->getParameterName(j);
+            value = hps->getParameterValue(j);
+            if (key == "t") {
+                tvalue = value;
+                break;
+            }
+        }
+        if (tvalue.empty()) {
+            continue;
+        }
+        Reh *reh = new Reh;
+        Text *text = new Text;
+        std::wstring wtext = UTF8to16(tvalue);
+        text->SetText(wtext);
+        reh->AddChild(text);
+        m_measure->AddChildBack(reh);
+        // Add to top staff for now, but add to top of
+        // each instrumentalgoup probably in the future.
+        setStaff(reh, 1);
+        // Only attached to barline for now:
+        reh->SetTstamp(0.0);
+    }
 }
 
 //////////////////////////////
