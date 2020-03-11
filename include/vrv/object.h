@@ -25,7 +25,7 @@ namespace vrv {
 class Doc;
 class DurationInterface;
 class EditorialElement;
-class FileOutputStream;
+class Output;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
@@ -485,7 +485,7 @@ public:
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
-    virtual int Save(FileOutputStream *output);
+    virtual int Save(Output *output);
 
     virtual void ReorderByXPos();
     /**
