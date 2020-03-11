@@ -1,10 +1,12 @@
 # Changelog
 
 ## [unreleased]
+* Support for Plaine and Easie output (limited features)
 * Support for lyrics on chords (@rettinghaus)
-* Container brackets and braces in grpSym (@rettinghaus)
 * Support for reh elements (@rettinghaus)
 * Improved extender lines in MusicXML import (@rettinghaus)
+* Improved backup handling in MusicXML import (@wergo)
+* Options for adjusting page with (--adjust-page-width) (@palgranum)
 * Fix overlapping group symbols (@rettinghaus)
 * Fix bug with choice and mdiv (@rettinghaus)
 * Fix tempo placement (@rettinghaus)
