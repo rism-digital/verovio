@@ -2455,7 +2455,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "artic") {
             return true;
         }
-        if (element == "verse") {
+        else if (element == "verse") {
             return true;
         }
         else {
