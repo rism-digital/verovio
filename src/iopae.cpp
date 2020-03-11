@@ -9,14 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#ifndef NO_PAE_SUPPORT
-
 #include <assert.h>
+#include <cctype>
 #include <fstream>
-#include <regex>
 #include <sstream>
 #include <string>
 
+#ifndef NO_PAE_SUPPORT
+#include <regex>
 #endif /* NO_PAE_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -55,28 +55,6 @@
 
 namespace vrv {
 
-#ifndef NO_PAE_SUPPORT
-
-#define BEAM_INITIAL 0x01
-#define BEAM_MEDIAL 0x02
-#define BEAM_TUPLET 0x03
-#define BEAM_TERMINAL 0x04
-
-// User interface variables:
-int debugQ = 0; // used with --debug option
-int stdoutQ = 0;
-char outdir[1024] = { 0 }; // used with -d option
-char extension[1024] = { 0 }; // used with -e option
-char hum2abc[1024] = { 0 }; // used with -a option
-int quietQ = 0; // used with -q option
-int quiet2Q = 0; // used with -Q option
-
-// Global variables:
-char data_line[10001] = { 0 };
-#define MAX_DATA_LEN 1024 // One line of the pae file would not be that long!
-char data_key[MAX_DATA_LEN];
-char data_value[MAX_DATA_LEN]; // ditto as above
-
 //----------------------------------------------------------------------------
 // PAEOutput
 //----------------------------------------------------------------------------
@@ -95,6 +73,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentOct = -1;
     m_currentDur = -1;
     m_currentDots = -1;
+    m_grace = false;
 
     m_doc->m_scoreDef.Save(this);
 
@@ -195,6 +174,9 @@ bool PAEOutput::WriteObjectEnd(Object *object)
     else if (object->Is(BEAM)) {
         WriteBeamEnd(dynamic_cast<Beam *>(object));
     }
+    else if (object->Is(TUPLET)) {
+        WriteTupletEnd(dynamic_cast<Tuplet *>(object));
+    }
 
     return true;
 }
@@ -283,6 +265,17 @@ void PAEOutput::WriteBeam(Beam *beam)
     assert(beam);
 
     if (m_skip) return;
+    
+    m_grace = false;
+    
+    ClassIdsComparison matchType({ NOTE, CHORD });
+    ArrayOfObjects children;
+    LayerElement *child = dynamic_cast<LayerElement *>(beam->FindDescendantByComparison(&matchType));
+    if (child && child->IsGraceNote()) {
+        m_streamStringOutput << "qq";
+        m_grace = true;
+    }
+
 
     m_streamStringOutput << "{";
 }
@@ -294,6 +287,11 @@ void PAEOutput::WriteBeamEnd(Beam *beam)
     if (m_skip) return;
 
     m_streamStringOutput << "}";
+    
+    if (m_grace) {
+        m_streamStringOutput << "r";
+        m_grace = false;
+    }
 }
 
 void PAEOutput::WriteChord(Chord *chord)
@@ -305,6 +303,7 @@ void PAEOutput::WriteChord(Chord *chord)
     std::string oct;
 
     WriteDur(chord);
+    WriteGrace(chord);
 }
 
 void PAEOutput::WriteClef(Clef *clef)
@@ -431,6 +430,7 @@ void PAEOutput::WriteNote(Note *note)
     }
     else {
         WriteDur(note);
+        WriteGrace(note);
     }
 
     if (note->GetOct() != m_currentOct) {
@@ -496,7 +496,44 @@ void PAEOutput::WriteSpace(Space *space)
     m_streamStringOutput << "-";
 }
 
-void PAEOutput::WriteTuplet(Tuplet *tuplet) {}
+void PAEOutput::WriteTuplet(Tuplet *tuplet)
+{
+    assert(tuplet);
+
+    Staff *staff = dynamic_cast<Staff *>(tuplet->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
+    // content = DUR_MAX / 2^(dur - 2)
+    int tupletDur = (content != 0.0) ? log2(DUR_MAX / content) + 2 : 4;
+    // We should be looking for dotted values
+
+    std::string dur;
+    switch (tupletDur) {
+        case (DUR_LG): dur = "0"; break;
+        case (DUR_BR): dur = "9"; break;
+        case (DUR_1): dur = "1"; break;
+        case (DUR_2): dur = "2"; break;
+        case (DUR_4): dur = "4"; break;
+        case (DUR_8): dur = "8"; break;
+        case (DUR_16): dur = "6"; break;
+        case (DUR_32): dur = "3"; break;
+        case (DUR_64): dur = "5"; break;
+        case (DUR_128): dur = "7"; break;
+        default: LogWarning("Unsupported tuplet duration"); dur = "4";
+    }
+
+    // For duration to be written within the tuplet
+    m_currentDur = -1;
+    m_streamStringOutput << dur << "(";
+}
+
+void PAEOutput::WriteTupletEnd(Tuplet *tuplet)
+{
+    assert(tuplet);
+
+    m_streamStringOutput << ";" << tuplet->GetNum() << ")";
+}
 
 void PAEOutput::WriteDur(DurationInterface *interface)
 {
@@ -532,6 +569,45 @@ void PAEOutput::WriteDur(DurationInterface *interface)
     }
 }
 
+void PAEOutput::WriteGrace(AttGraced *attGraced)
+{
+    assert(attGraced);
+    
+    // We are in a beam of grace notes;
+    if (m_grace) return;
+    
+    if (attGraced->GetGrace() == GRACE_unacc) {
+        m_streamStringOutput << "g";
+    }
+    else if (attGraced->HasGrace()) {
+        m_streamStringOutput << "q";
+    }
+}
+
+#ifndef NO_PAE_SUPPORT
+
+#define BEAM_INITIAL 0x01
+#define BEAM_MEDIAL 0x02
+#define BEAM_TUPLET 0x03
+#define BEAM_TERMINAL 0x04
+
+// User interface variables:
+int debugQ = 0; // used with --debug option
+int stdoutQ = 0;
+char outdir[1024] = { 0 }; // used with -d option
+char extension[1024] = { 0 }; // used with -e option
+char hum2abc[1024] = { 0 }; // used with -a option
+int quietQ = 0; // used with -q option
+int quiet2Q = 0; // used with -Q option
+
+// Global variables:
+char data_line[10001] = { 0 };
+#define MAX_DATA_LEN 1024 // One line of the pae file would not be that long!
+char data_key[MAX_DATA_LEN];
+char data_value[MAX_DATA_LEN]; // ditto as above
+
+#endif /* NO_PAE_SUPPORT */
+
 //----------------------------------------------------------------------------
 // PAEInput
 //----------------------------------------------------------------------------
@@ -553,6 +629,8 @@ PAEInput::PAEInput(Doc *doc)
 }
 
 PAEInput::~PAEInput() {}
+
+#ifndef NO_PAE_SUPPORT
 
 //////////////////////////////////////////////////////////////////////////
 

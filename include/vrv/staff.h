@@ -206,7 +206,7 @@ public:
     /**
      * Notation type (CMN, mensural, black mensural, etc.), from the staffDef
      */
-    int m_drawingNotationType;
+    data_NOTATIONTYPE m_drawingNotationType;
 
     /**
      * The drawing staff size (scale), from the staffDef

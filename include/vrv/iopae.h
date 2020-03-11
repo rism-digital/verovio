@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "atts_cmn.h"
 #include "io.h"
 #include "vrvdef.h"
 
@@ -311,6 +312,7 @@ private:
     void WriteRest(Rest *rest);
     void WriteSpace(Space *space);
     void WriteTuplet(Tuplet *tuplet);
+    void WriteTupletEnd(Tuplet *tuplet);
     ///@}
 
     /**
@@ -349,6 +351,7 @@ private:
      */
     ///@{
     void WriteDur(DurationInterface *interface);
+    void WriteGrace(AttGraced *attGraced);
     ///@}
 
 public:
@@ -363,6 +366,7 @@ private:
     int m_currentOct; // The current octave
     int m_currentDur; // The current duration
     int m_currentDots;
+    bool m_grace;
     Measure *m_currentMeasure;
 };
 
@@ -376,9 +380,9 @@ public:
     PAEInput(Doc *doc);
     virtual ~PAEInput();
 
-    virtual bool Import(const std::string &pae);
 
 #ifndef NO_PAE_SUPPORT
+    virtual bool Import(const std::string &pae);
 
 private:
     // function declarations:
