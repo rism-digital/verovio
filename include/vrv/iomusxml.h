@@ -146,18 +146,17 @@ namespace musicxml {
 // MusicXmlInput
 //----------------------------------------------------------------------------
 
-class MusicXmlInput : public FileInputStream {
+class MusicXmlInput : public Input {
 public:
     // constructors and destructors
-    MusicXmlInput(Doc *doc, std::string filename);
+    MusicXmlInput(Doc *doc);
     virtual ~MusicXmlInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(std::string const &musicxml);
+    virtual bool Import(std::string const &musicxml);
 
 private:
     /*
-     * Top level method called from ImportFile or ImportString
+     * Top level method called from ImportFile or Import
      */
     bool ReadMusicXml(pugi::xml_node root);
 
@@ -206,6 +205,7 @@ private:
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
     void AddLayerElement(Layer *layer, LayerElement *element);
+    void AddLayerElement(Layer *layer, LayerElement *element, int duration);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
@@ -228,7 +228,7 @@ private:
      * For example, when closing a beam, we need to remove it from the stack, but it is not
      * necessary the top one (for example we can have an opened chord there).
      */
-    void RemoveLastFromStack(ClassId classId);
+    void RemoveLastFromStack(ClassId classId, Layer *layer);
 
     /*
      * @name Helper methods for checking presence of values of attributes or elements
@@ -298,6 +298,7 @@ private:
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
+    data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
     std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
@@ -310,8 +311,6 @@ private:
     ///@}
 
 private:
-    /* The filename */
-    std::string m_filename;
     /* octave offset */
     std::vector<int> m_octDis;
     /* measure repeats */
@@ -329,8 +328,12 @@ private:
     int m_meterUnit = 4;
     /* LastElementID */
     std::string m_ID;
-    /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
-    std::vector<LayerElement *> m_elementStack;
+    /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
+    std::map<Layer *, std::vector<LayerElement *> > m_elementStackMap;
+    /* A maps of time stamps (score time) to indicate write pointer of a given layer */
+    std::map<Layer *, int> m_layerEndTimes;
+    /* To remember layer of last element (note) to handle chords */
+    Layer *m_prevLayer;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */

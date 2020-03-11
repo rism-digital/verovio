@@ -37,17 +37,16 @@ class Staff;
 class Tie;
 
 //----------------------------------------------------------------------------
-// AbcInput
+// ABCInput
 //----------------------------------------------------------------------------
 
-class AbcInput : public FileInputStream {
+class ABCInput : public Input {
 public:
     // constructors and destructors
-    AbcInput(Doc *doc, std::string filename);
-    virtual ~AbcInput();
+    ABCInput(Doc *doc);
+    virtual ~ABCInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &abc);
+    virtual bool Import(const std::string &abc);
 
 #ifndef NO_ABC_SUPPORT
 

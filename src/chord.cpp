@@ -25,6 +25,7 @@
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "verse.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -107,6 +108,9 @@ void Chord::AddChild(Object *child)
     }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
+    }
+    else if (child->Is(VERSE)) {
+        assert(dynamic_cast<Verse *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
