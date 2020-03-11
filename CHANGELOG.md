@@ -1,12 +1,14 @@
 # Changelog
 
 ## [unreleased]
+
+## [2.6.0] - 2020-03-11
 * Support for Plaine and Easie output (limited features)
 * Support for lyrics on chords (@rettinghaus)
 * Support for reh elements (@rettinghaus)
 * Improved extender lines in MusicXML import (@rettinghaus)
 * Improved backup handling in MusicXML import (@wergo)
-* Options for adjusting page with (--adjust-page-width) (@palgranum)
+* Options for adjusting page width (--adjust-page-width) (@palgranum)
 * Fix overlapping group symbols (@rettinghaus)
 * Fix bug with choice and mdiv (@rettinghaus)
 * Fix tempo placement (@rettinghaus)
