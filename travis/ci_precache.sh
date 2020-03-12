@@ -29,6 +29,7 @@ git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
 echo "Installing emscripten"
 cd $EMSCRIPTEN_DIRECTORY
 ./emsdk install latest
+./emsdk activate latest
 
 # Return to the root
 cd ..
