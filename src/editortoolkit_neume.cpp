@@ -243,9 +243,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             return false;
         }
 
-        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-        assert(staff);
-
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
@@ -892,7 +889,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         custos->SetZone(zone);
         layer->AddChild(custos);
 
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
@@ -936,8 +932,6 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         Staff *obj = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(*it));
         if (obj != NULL && obj->Is(STAFF)) {
             staves.push_back(obj);
-            int height = obj->GetZone()->GetLry() + (obj->GetZone()->GetLrx() - obj->GetZone()->GetUlx()) *
-                tan(obj->GetZone()->GetRotate() * M_PI / 180.0) - obj->GetZone()->GetUly();
         }
         else {
             LogError("Staff with ID '%s' does not exist!", it->c_str());
