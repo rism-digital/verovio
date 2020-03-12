@@ -55,14 +55,14 @@ jobs:
       osx_image: xcode11.1
       script:
         - cd tools
-        - cmake .
-        - make
+        - cmake ../cmake
+        - make -j 8
     - name: linux-g++
       os: linux
       script:
         - cd tools
-        - cmake .
-        - make
+        - cmake ../cmake
+        - make -j 8
 
     ################
     # PRECACHE STAGE

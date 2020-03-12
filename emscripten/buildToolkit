@@ -189,12 +189,13 @@ $exports .= "]\"";
 my $extra_exports = "-s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
 if ($makeQ) {
-    print "*************\nBuilding makefile...\n";
     system("rm -rf CMakeFiles/");
     system("rm CMakeCache.txt");
-    my $cmakeCmd = "$EMCMAKE cmake ../tools $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
-    system($cmakeCmd);
 }
+ 
+ print "*************\nBuilding makefile...\n";
+ my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
+ system($cmakeCmd);
 
 print "*************\nCompiling...\n";
 my $makeCmd = "$EMMAKE make -j 8";

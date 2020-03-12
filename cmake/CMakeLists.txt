@@ -143,7 +143,7 @@ if (BUILD_AS_LIBRARY)
     add_library (
         verovio
         SHARED
-		./c_wrapper.cpp
+		../tools/c_wrapper.cpp
         ${all_SRC}
     )
 elseif (BUILD_AS_WASM)
@@ -151,14 +151,14 @@ elseif (BUILD_AS_WASM)
     add_library (
         verovio
         STATIC
-		./c_wrapper.cpp
+		../tools/c_wrapper.cpp
         ${all_SRC}
     )
 else()
     message(STATUS "build verovio as executable")
     add_executable (
         verovio
-        main.cpp
+        ../tools/main.cpp
         ${all_SRC}
     )
 endif()
