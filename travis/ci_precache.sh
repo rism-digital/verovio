@@ -60,8 +60,8 @@ cd ..
 #############
 cd ./tools
 
-cmake .
-make -j8
+cmake ../cmake
+make -j 8
 
 echo "Update the documentation of the option list"
 ./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
