@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Improved header generatation with additional names (@earboxer)
 
 ## [2.6.0] - 2020-03-11
 * Support for Plaine and Easie output (limited features)
