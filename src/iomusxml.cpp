@@ -918,6 +918,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             }
             // add it if necessary
             if (keySig) {
+                keySig->IsAttribute(true);
                 staffDef->AddChild(keySig);
             }
 
@@ -2369,7 +2370,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                     verse->AddChild(syl);
                 }
             }
-            note->AddChild(verse);
+            if (element->Is(CHORD) || element->Is(NOTE)) {
+                element->AddChild(verse);
+            }
+            else {
+                // this should not happen
+                delete verse;
+            }
         }
 
         // ties
