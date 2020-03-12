@@ -68,3 +68,6 @@ emscripten/npm-dev/node_modules
 main
 DerivedData
 verovio.wasm
+Makefile
+libverovio.bc
+cmake_install.cmake
