@@ -304,8 +304,6 @@ void View::DrawStaffGrp(
         return;
     }
 
-    TextExtend extend;
-
     const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
     if (staffDefs->empty()) {
         return;
@@ -365,15 +363,6 @@ void View::DrawStaffGrp(
     // adjust the top and bottom according to staffline width
     x += barLineWidth / 2;
 
-    // HARDCODED
-    int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
-    int xLabel = x - space;
-    int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-
-    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
-
-    this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
-
     // draw the system start bar line
     if (topStaffGrp
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
@@ -384,7 +373,7 @@ void View::DrawStaffGrp(
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * m_doc->GetDrawingBeamWidth(staffSize, false),
-            m_doc->GetDrawingBeamWidth(staffSize, false));
+                         m_doc->GetDrawingBeamWidth(staffSize, false));
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
@@ -409,6 +398,13 @@ void View::DrawStaffGrp(
             DrawStaffGrp(dc, measure, childStaffGrp, x, false, abbreviations);
         }
     }
+
+    // DrawStaffGrpLabel
+    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+    int space = 3 * m_doc->GetDrawingBeamWidth(staffGrp->GetMaxStaffSize(), false);
+    int xLabel = x - space;
+    int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+    this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, -space);
 }
 
 void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations)
