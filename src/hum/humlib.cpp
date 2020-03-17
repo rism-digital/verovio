@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Mar 13 21:09:28 PDT 2020
+// Last Modified: Mon Mar 16 10:16:42 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -57804,6 +57804,7 @@ Tool_humsheet::Tool_humsheet(void) {
 	define("h|H|html|HTML=b", "output table in HTML wrapper");
 	define("i|id|ID=b", "include ID for each cell");
 	define("z|zebra=b", "add zebra striping by spine to style");
+	define("y|z2|zebra2|zebra-2=b", "zebra striping by data type");
 	define("t|tab-index=b", "vertical tab indexing");
 	define("X|no-exinterp=b", "do not embed exclusive interp data");
 	define("J|no-javascript=b", "do not embed javascript code");
@@ -57867,6 +57868,7 @@ void Tool_humsheet::initialize(void) {
 	m_idQ         = getBoolean("id");
 	m_htmlQ       = getBoolean("html");
 	m_zebraQ      = getBoolean("zebra");
+	m_zebra2Q     = getBoolean("zebra2");
 	m_exinterpQ   = !getBoolean("no-exinterp");
 	m_javascriptQ = !getBoolean("no-javascript");
 	m_tabindexQ   = getBoolean("tab-index");
@@ -57998,9 +58000,14 @@ void Tool_humsheet::printRowClasses(HumdrumFile& infile, int row) {
 			classes += "layout ";
 		}
 	}
+	HTp token = hl->token(0);
+	if (token->compare(0, 2, "!!") == 0) {
+		if ((token->size() == 2) || (token->at(3) != '!')) {
+			classes += "gcommet ";
+		}
+	}
 
 	if (hl->isUniversalReference()) {
-		HTp token = hl->token(0);
 		if (token->compare(0, 11, "!!!!filter:") == 0) {
 			classes += "ufilter ";
 		} else if (token->compare(0, 12, "!!!!Xfilter:") == 0) {
@@ -58236,8 +58243,11 @@ void Tool_humsheet::printColSpan(HTp token) {
 void Tool_humsheet::printCellClasses(HTp token) {
 	int track = token->getTrack();
 	string classlist;
-	if (track % 2 == 0) {
-		classlist = "zebra ";
+
+	if (m_zebraQ) {
+		if (track % 2 == 0) {
+			classlist = "zebra ";
+		}
 	}
 
 	if (token->getOwner()->hasSpines()) {
@@ -58301,6 +58311,15 @@ void Tool_humsheet::printStyle(HumdrumFile& infile) {
 	m_free_text << "table.humdrum tr.reference {\n";
 	m_free_text << "	color: green;\n";
 	m_free_text << "}\n";
+	m_free_text << "table.humdrum tr.gcomment {\n";
+	m_free_text << "	color: blue;\n";
+	m_free_text << "}\n";
+	m_free_text << "table.humdrum tr.ucomment {\n";
+	m_free_text << "	color: violet;\n";
+	m_free_text << "}\n";
+	m_free_text << "table.humdrum tr.lcomment {\n";
+	m_free_text << "	color: $#2fc584;\n";
+	m_free_text << "}\n";
 	m_free_text << "table.humdrum tr.interp.manip {\n";
 	m_free_text << "	color: magenta;\n";
 	m_free_text << "}\n";
@@ -58342,8 +58361,18 @@ void Tool_humsheet::printStyle(HumdrumFile& infile) {
 	m_free_text << "}\n";
 
 	if (m_zebraQ) {
-		m_free_text << ".zebra {\n";
+		m_free_text << "table.humdrum .zebra {\n";
 		m_free_text << "	background: #ccccff33;\n";
+		m_free_text << "}\n";
+	} else if (m_zebra2Q) {
+		m_free_text << "table.humdrum td[data-x='kern'] {\n";
+		m_free_text << "	background: #ffcccc33;\n";
+		m_free_text << "}\n";
+		m_free_text << "table.humdrum td[data-x='dynam'] {\n";
+		m_free_text << "	background: #ccccff33;\n";
+		m_free_text << "}\n";
+		m_free_text << "table.humdrum td[data-x='text'] {\n";
+		m_free_text << "	background: #ccffcc33;\n";
 		m_free_text << "}\n";
 	}
 
@@ -59974,6 +60003,8 @@ void Tool_kern2mens::printBarline(HumdrumFile& infile, int line) {
 
 Tool_kernview::Tool_kernview(void) {
 	define("v|view|s|show=s", "view the list of spines");
+	define("g=s", "Regular expression of kern spines to view");
+	define("G=s", "Regular expression of kern spines to hide");
 	define("h|hide|r|remove=s", "hide the list of spines");
 }
 
@@ -60017,7 +60048,7 @@ bool Tool_kernview::run(HumdrumFile& infile, ostream& out) {
 
 
 bool Tool_kernview::run(HumdrumFile& infile) {
-	initialize();
+	initialize(infile);
 	processFile(infile);
 	return true;
 }
@@ -60030,9 +60061,65 @@ bool Tool_kernview::run(HumdrumFile& infile) {
 //    for all HumdrumFile segments.
 //
 
-void Tool_kernview::initialize(void) {
+void Tool_kernview::initialize(HumdrumFile& infile) {
 	m_view_string = getString("view");
 	m_hide_string = getString("hide");
+	if (getBoolean("g")) {
+		m_view_string = getKernString(infile, getString("g"));
+	}
+	if (getBoolean("G")) {
+		m_hide_string = getKernString(infile, getString("G"));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernview::getKernString -- Return a list of the **kern spines that match to the given
+//    comman-separated list of patterns.
+//
+
+string Tool_kernview::getKernString(HumdrumFile& infile, const string& list) {
+	HumRegex hre;
+	vector<string> pieces;
+	hre.split(pieces, list, "\\s*,\\s*");
+	string output;
+	vector<HTp> starts = infile.getKernSpineStartList();
+	vector<bool> targets(starts.size(), false);
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces.empty()) {
+			continue;
+		}
+		for (int j=0; j<(int)starts.size(); j++) {
+			if (targets[j]) {
+				continue;
+			}
+			HTp current = starts[j];
+			while (current) {
+				if (current->isData()) {
+					break;
+				}
+				if (hre.search(current, pieces[i])) {
+					targets[j] = true;
+					break;
+				}
+				current = current->getNextToken();
+			}
+		}
+	}
+
+	for (int i=0; i<(int)targets.size(); i++) {
+		if (targets[i]) {
+			if (output.empty()) {
+				output += to_string(i+1);
+			} else {
+				output += "," + to_string(i+1);
+			}
+		}
+	}
+
+	return output;
 }
 
 
@@ -64923,6 +65010,9 @@ void Tool_melisma::getNoteCountsForLyric(vector<vector<int>>& counts, HTp lyricS
 //
 
 int Tool_melisma::getCountForSyllable(HTp token) {
+	if (token->back() == '&') {
+		return 1;
+	}
 	HTp nexttok = token->getNextToken();
 	int eline   = token->getLineIndex();
 	int efield  = token->getFieldIndex();
@@ -81116,7 +81206,9 @@ void Tool_transpose::processFile(HumdrumFile& infile,
 				}
 
 				// check for key signature in a spine which is being
-				// transposed, and adjust it.
+				// transposed, and adjust it. 
+				// Should also check tandem spines for updating
+				// key signatures in non-kern spines.
 				if (spineprocess[infile.token(i, j)->getTrack()] &&
 						hre.search(infile.token(i, j),
 							"^\\*k\\[([a-gA-G#-]*)\\]", "i")) {
@@ -81128,10 +81220,12 @@ void Tool_transpose::processFile(HumdrumFile& infile,
 						continue;
 				}
 
-				// check for key tandem interpretation and tranpose
+				// Check for key designations and tranpose
 				// if the spine data is being transposed.
-
-				if (hre.search(infile.token(i, j), "^\\*([A-G])[#-]?:", "i")) {
+				// Should also check tandem spines for updating
+				// key designations in non-kern spines.
+				if (spineprocess[infile.token(i, j)->getTrack()] &&
+						hre.search(infile.token(i, j), "^\\*([A-G])[#-]?:", "i")) {
 					diatonic = tolower(hre.getMatch(1)[0]) - 'a';
 					if (diatonic >= 0 && diatonic <= 6) {
 					  	printNewKeyInterpretation(infile[i], j, transval);
@@ -82010,7 +82104,6 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 	ssettonic    =  Convert::kernToBase40(getString("settonic").c_str());
 	autoQ        =  getBoolean("auto");
 	debugQ       =  getBoolean("debug");
-	spineQ       =  getBoolean("spines");
 	spinestring  =  getString("spines");
 	octave       =  getInteger("octave");
 	concertQ     =  getBoolean("concert");
