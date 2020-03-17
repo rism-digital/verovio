@@ -141,7 +141,10 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     Mensur *mensur = dynamic_cast<Mensur *>(element);
     assert(mensur);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    if (!mensur->HasSign()) {
+        // only react to visual attributes
+        return;
+    }
 
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
@@ -152,37 +155,24 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y = staff->GetDrawingY()
             - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
     }
+    
+    if (mensur->GetSign() == MENSURATIONSIGN_O) {
+        code = SMUFL_E911_mensuralProlation2;
+    }
+    else if (mensur->GetSign() == MENSURATIONSIGN_C) {
+        if (mensur->GetOrient() == ORIENTATION_reversed) {
+            code = SMUFL_E916_mensuralProlation7;
+            // additional offset
+            // perfectRadius -= 2 * perfectRadius - m_doc->GetGlyphWidth(SMUFL_E916_mensuralProlation7,
+            // staff->m_drawingStaffSize, false);
+        }
+        else {
+            code = SMUFL_E915_mensuralProlation6;
+        }
+    }
 
-    if (mensur->HasSign()) {
-        if (mensur->GetSign() == MENSURATIONSIGN_O) {
-            code = SMUFL_E911_mensuralProlation2;
-        }
-        else if (mensur->GetSign() == MENSURATIONSIGN_C) {
-            if (mensur->GetOrient() == ORIENTATION_reversed) {
-                code = SMUFL_E916_mensuralProlation7;
-                // additional offset
-                // perfectRadius -= 2 * perfectRadius - m_doc->GetGlyphWidth(SMUFL_E916_mensuralProlation7,
-                // staff->m_drawingStaffSize, false);
-            }
-            else {
-                code = SMUFL_E915_mensuralProlation6;
-            }
-        }
-    }
-    else if (mensur->HasTempus()) {
-        if (mensur->GetTempus() == TEMPUS_3) {
-            if (mensur->GetProlatio() == PROLATIO_3)
-                code = SMUFL_E910_mensuralProlation1;
-            else
-                code = SMUFL_E911_mensuralProlation2;
-        }
-        else if (mensur->GetTempus() == TEMPUS_2) {
-            if (mensur->GetProlatio() == PROLATIO_3)
-                code = SMUFL_E914_mensuralProlation5;
-            else
-                code = SMUFL_E915_mensuralProlation6;
-        }
-    }
+    dc->StartGraphic(element, "", element->GetUuid());
+
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
 
     x += perfectRadius;
