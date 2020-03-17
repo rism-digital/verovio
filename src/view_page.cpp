@@ -28,6 +28,7 @@
 #include "fb.h"
 #include "fig.h"
 #include "functorparams.h"
+#include "glyph.h"
 #include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -48,8 +49,6 @@
 #include "text.h"
 #include "tuplet.h"
 #include "vrv.h"
-#include "glyph.h"
-#include "doc.h"
 
 namespace vrv {
 
@@ -534,23 +533,20 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     assert(dc);
     if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
         Glyph *glyph = Resources::GetGlyph(SMUFL_E000_brace);
-        if (glyph) {
-            FontInfo* font = m_doc->GetDrawingSmuflFont(staffSize, false);
-            int dummy, g_w, g_h;
-            glyph->GetBoundingBox(dummy, dummy, g_w, g_h);
-            const float ratio = static_cast<float>(glyph->GetUnitsPerEm()) / font->GetPointSize();
-            const float scale = static_cast<float>(y1 - y2) / g_h;
-            int braceWidth =  m_doc->GetDrawingDoubleUnit(staffSize);
-            x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + m_doc->GetDrawingUnit(staffSize);
-            const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
-            const float widthAfterScalling = g_w * scale;
-            font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
-            DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * ratio * scale, false);
-            font->SetWidthToHeightRatio(currentWidthToHeightRatio);
-            return;
-        } else {
-            LogError("Cant find brace glyph(SMUFL_E000_brace). Use the standart brace pattern.");
-        }
+        assert(glyph);
+        FontInfo* font = m_doc->GetDrawingSmuflFont(staffSize, false);
+        int dummy, g_w, g_h;
+        glyph->GetBoundingBox(dummy, dummy, g_w, g_h);
+        const float ratio = static_cast<float>(glyph->GetUnitsPerEm()) / font->GetPointSize();
+        const float scale = static_cast<float>(y1 - y2) / g_h;
+        int braceWidth =  m_doc->GetDrawingDoubleUnit(staffSize);
+        x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + m_doc->GetDrawingUnit(staffSize);
+        const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
+        const float widthAfterScalling = g_w * scale;
+        font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
+        DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * ratio * scale, false);
+        font->SetWidthToHeightRatio(currentWidthToHeightRatio);
+        return;
     }
     // int new_coords[2][6];
     Point points[4];
