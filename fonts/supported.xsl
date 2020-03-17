@@ -3,7 +3,7 @@
     <xsl:variable name="supported">
         <staffBracketsAndDividers>
             <description>Staff brackets and dividers</description>
-            <!--<glyph glyph-code="E000" smufl-name="brace"/>-->
+            <glyph glyph-code="E000" smufl-name="brace"/>
             <!--<glyph glyph-code="E001" smufl-name="reversedBrace"/>-->
             <!--<glyph glyph-code="E002" smufl-name="bracket"/>-->
             <glyph glyph-code="E003" smufl-name="bracketTop"/>
