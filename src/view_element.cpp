@@ -714,6 +714,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     else {
         x = element->GetDrawingX();
         y = element->GetDrawingY();
+        // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
+        // This will remain approximate
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
