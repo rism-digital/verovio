@@ -354,9 +354,9 @@ protected:
     void setSystemMeasureStyle(int startline, int endline);
     std::vector<int> getStaffLayerCounts();
     void prepareStaffGroups();
-    void setClef(StaffDef *part, const std::string &clef, hum::HTp cleftok = NULL);
-    void setTransposition(StaffDef *part, const std::string &transpose);
-    void setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose);
+    void setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok = NULL);
+    void setDynamicTransposition(int staffindex, StaffDef *staff, const std::string &itranspose);
+    void setTransposition(StaffDef *staffDef, const std::string &transpose);
     void setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig = "",
         hum::HTp partstart = NULL, hum::HTp timetok = NULL);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
@@ -624,6 +624,8 @@ protected:
         std::vector<std::vector<int> > &phraseindex, int i, int j, std::vector<int> &startpitches,
         std::vector<int> &endpitches, std::vector<bool> &indexused);
     template <class ELEMENT> void convertVerses(ELEMENT element, hum::HTp token);
+    template <class ELEMENT>
+    void setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);

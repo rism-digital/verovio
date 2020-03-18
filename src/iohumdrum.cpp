@@ -4346,9 +4346,8 @@ void HumdrumInput::setTimeSig(
 
 template <class ELEMENT>
 void HumdrumInput::setKeySig(
-    int partindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary)
+    int staffindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary)
 {
-
     std::string ks = keysig;
     auto pos = ks.find("]");
     if (pos != std::string::npos) {
@@ -4406,6 +4405,12 @@ void HumdrumInput::setKeySig(
         keynum = +7;
     }
 
+    int fifthsAdjust = 0;
+    if (staffindex >= 0) {
+        fifthsAdjust = hum::Convert::base40IntervalToLineOfFifths(m_transpose[staffindex]);
+    }
+    keynum += fifthsAdjust;
+
     // Search for a KeySig child in StaffDef and add one if it does not exist.
     KeySig *vrvkeysig = getKeySig(element);
     if (!vrvkeysig) {
@@ -4416,9 +4421,7 @@ void HumdrumInput::setKeySig(
     }
 
     int keyvalue = keynum;
-    if ((partindex >= 0) && (m_transpose[partindex] != 0)) {
-        keyvalue += hum::Convert::base40IntervalToLineOfFifths(m_transpose[partindex]);
-    }
+
     if ((keyvalue >= -7) && (keyvalue <= +7)) {
         // standard key signature
         if (keyvalue < 0) {
@@ -4589,7 +4592,7 @@ void HumdrumInput::prepareNonStandardKeySignature(KeySig *vrvkeysig, const std::
 // HumdrumInput::setTransposition -- Set the transposition to sounding score.
 //
 
-void HumdrumInput::setTransposition(StaffDef *part, const std::string &transpose)
+void HumdrumInput::setTransposition(StaffDef *staffDef, const std::string &transpose)
 {
     int chromatic = 0;
     int diatonic = 0;
@@ -4597,8 +4600,8 @@ void HumdrumInput::setTransposition(StaffDef *part, const std::string &transpose
         // Transposition is not formatted correctly
         return;
     }
-    part->SetTransDiat(-diatonic);
-    part->SetTransSemi(-chromatic);
+    staffDef->SetTransDiat(-diatonic);
+    staffDef->SetTransSemi(-chromatic);
 }
 
 //////////////////////////////
@@ -4606,7 +4609,7 @@ void HumdrumInput::setTransposition(StaffDef *part, const std::string &transpose
 // HumdrumInput::setDynamicTransposition --
 //
 
-void HumdrumInput::setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose)
+void HumdrumInput::setDynamicTransposition(int staffindex, StaffDef *staff, const std::string &itranspose)
 {
     int chromatic = 0;
     int diatonic = 0;
@@ -4614,11 +4617,11 @@ void HumdrumInput::setDynamicTransposition(int partindex, StaffDef *part, const 
         // Transposition is not formatted correctly
         return;
     }
-    part->SetTransDiat(-diatonic);
-    part->SetTransSemi(-chromatic);
+    staff->SetTransDiat(-diatonic);
+    staff->SetTransSemi(-chromatic);
 
     // Store dynamic transposition to go from sounding score to written:
-    m_transpose[partindex] = hum::Convert::transToBase40(itranspose);
+    m_transpose[staffindex] = hum::Convert::transToBase40(itranspose);
 }
 
 //////////////////////////////
@@ -4626,10 +4629,10 @@ void HumdrumInput::setDynamicTransposition(int partindex, StaffDef *part, const 
 // HumdrumInput::setClef -- Convert a Humdrum clef to an MEI clef.
 //
 
-void HumdrumInput::setClef(StaffDef *part, const std::string &clef, hum::HTp cleftok)
+void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok)
 {
     // Search for a Clef child in StaffDef and add one if it does not exist.
-    Clef *vrvclef = getClef(part);
+    Clef *vrvclef = getClef(staff);
     if (!vrvclef) {
         return;
     }
@@ -11695,10 +11698,18 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     hum::HumdrumFile &infile = m_infiles[0];
     hum::HumRegex hre;
 
-    hum::HTp keytok = NULL;
-    hum::HTp keysigtok = NULL;
-    hum::HTp timesigtok = NULL;
-    hum::HTp metersigtok = NULL;
+    // Keep track of any key and time signature changes for each staff:
+    std::vector<hum::HTp> keytok(ss.size(), NULL);
+    std::vector<hum::HTp> keysigtok(ss.size(), NULL);
+    std::vector<hum::HTp> timesigtok(ss.size(), NULL);
+    std::vector<hum::HTp> metersigtok(ss.size(), NULL);
+    std::vector<hum::HTp> transposetok(ss.size(), NULL);
+
+    bool empty = true;
+    bool hasTimeSig = false;
+    bool hasMeterSig = false;
+    bool hasKeySig = false;
+    bool hasTranspose = false;
 
     for (int i = startline; i <= endline; ++i) {
         if (infile[i].isData()) {
@@ -11709,86 +11720,334 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         }
         for (int j = 0; j < infile[i].getFieldCount(); ++j) {
             hum::HTp token = infile.token(i, j);
+            int track = token->getTrack();
+            int staffindex = m_rkern.at(track);
+            if (staffindex < 0) {
+                // not a notational spine for a staff
+                continue;
+            }
 
             if (hre.search(token, "^\\*M\\d+/\\d+")) {
-                timesigtok = token;
-            }
-            else if (hre.search(token, "^\\*M\\d+/\\d+")) {
-                timesigtok = token;
+                timesigtok.at(staffindex) = token;
+                empty = false;
+                hasTimeSig = true;
             }
             else if (hre.search(token, "^\\*k\\[.*\\]")) {
-                keysigtok = token;
+                keysigtok.at(staffindex) = token;
+                empty = false;
+                hasKeySig = true;
             }
             else if (hre.search(token, "^\\*[a-gA-G][#-]*:([a-z]{3})?$")) {
-                keytok = token;
+                keytok.at(staffindex) = token;
+            }
+            else if (hre.search(token, "^\\*ITrd([-+\\d]+)c([-+\\d]+)")) {
+                // update the transposition for notes folling this
+                // transposition change.
+                m_transpose.at(staffindex) = hum::Convert::transToBase40(*token);
+                transposetok.at(staffindex) = token;
+                hasTranspose = true;
+                empty = false;
             }
 
-            // meter signature will only be used if immediately following a time signature
-            if (timesigtok && hre.search(token, "^\\*met\\(.*\\)")) {
-                metersigtok = infile.token(i, j);
+            // Meter signature will only be used if immediately following
+            // a time signature, so do not set to nonempty by itself.
+            if (timesigtok.at(staffindex) && hre.search(token, "^\\*met\\(.*\\)")) {
+                metersigtok.at(staffindex) = token;
+                hasMeterSig = true;
             }
         }
     }
 
-    if ((keysigtok == NULL) && (timesigtok == NULL)) {
-        // no key or time signature changes.
+    if (empty) {
+        // No transposition, key or time signature changes.
         return;
     }
 
+    // A score def needs to be added for the key/time sig changes:
     ScoreDef *scoreDef = new ScoreDef;
     m_sections.back()->AddChild(scoreDef);
 
-    //    <scoreDef meter.count="6" meter.unit="8" key.sig="1f"/>
+    // Now need to identifiy if all staves on the system
+    // change at the same time, in which case the change
+    // is applied at the scoreDef level; otherwise, apply
+    // at individual staff level with a staffGrp containing
+    // individual changes in separate staffDefs.
+    bool allSameTranspose = true;
+    bool allSameKeySig = true;
+    bool allSameTimeSig = true;
+    bool allSameMeterSig = true;
 
-    if (timesigtok) {
-        // cerr << "TIMESIG = " << timesigtok << endl;
-        int count = -1;
-        int unit = -1;
-        std::smatch matches;
-        if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
-            if (!metersigtok) {
-                count = stoi(matches[1]);
-                unit = stoi(matches[2]);
-                MeterSig *vrvmetersig = getMeterSig(scoreDef);
-                vrvmetersig->SetCount(count);
-                vrvmetersig->SetUnit(unit);
-            }
-            else if (metersigtok && (metersigtok->find('C') == std::string::npos)
-                && (metersigtok->find('O') == std::string::npos)) {
-                // Only storing the time signature if there is no mensuration
-                // otherwise verovio will display both.
-                count = stoi(matches[1]);
-                unit = stoi(matches[2]);
-                MeterSig *vrvmetersig = getMeterSig(scoreDef);
-                vrvmetersig->SetCount(count);
-                vrvmetersig->SetUnit(unit);
-            }
-            else {
-                // But always need to provide @meter.unit since timestamps
-                // are in reference to it (can't add meter.count since
-                // this will also print a time signature.
-                unit = stoi(matches[2]);
-                MeterSig *vrvmetersig = getMeterSig(scoreDef);
-                vrvmetersig->SetUnit(unit);
-            }
-            if (metersigtok) {
-                auto ploc = metersigtok->rfind(")");
-                if (ploc != string::npos) {
-                    string mstring = metersigtok->substr(5, ploc - 5);
-                    setMeterSymbol(scoreDef, mstring);
+    if (hasKeySig) {
+        if (keysigtok[0] == NULL) {
+            allSameKeySig = false;
+        }
+        else {
+            for (int i = 1; i < (int)keysigtok.size(); i++) {
+                if (keysigtok[i] == NULL) {
+                    allSameKeySig = false;
+                    break;
                 }
-            }
-
-            for (int i = 0; i < (int)ss.size(); ++i) {
-                // assuming only a single time sig. at a time.
-                ss[i].meter_top = count;
-                ss[i].meter_bottom = unit;
+                else if (*keysigtok[0] != *keysigtok[i]) {
+                    allSameKeySig = false;
+                    break;
+                }
             }
         }
     }
-    if (keysigtok) {
+    else {
+        allSameKeySig = false;
+    }
+    // Don't care about keytok status.
+
+    if (hasTimeSig) {
+        if (timesigtok[0] == NULL) {
+            allSameTimeSig = false;
+        }
+        else {
+            for (int i = 1; i < (int)timesigtok.size(); i++) {
+                if (timesigtok[i] == NULL) {
+                    allSameTimeSig = false;
+                    break;
+                }
+                else if (*timesigtok[0] != *timesigtok[i]) {
+                    allSameTimeSig = false;
+                    break;
+                }
+            }
+        }
+    }
+    else {
+        allSameTimeSig = false;
+    }
+
+    if (hasMeterSig) {
+        if (metersigtok[0] == NULL) {
+            allSameMeterSig = false;
+        }
+        else {
+            for (int i = 1; i < (int)metersigtok.size(); i++) {
+                if (metersigtok[i] == NULL) {
+                    allSameMeterSig = false;
+                    break;
+                }
+                else if (*metersigtok[0] != *metersigtok[i]) {
+                    allSameMeterSig = false;
+                    break;
+                }
+            }
+        }
+    }
+    else {
+        allSameMeterSig = false;
+    }
+
+    if (hasTranspose) {
+        if (transposetok[0] == NULL) {
+            allSameTranspose = false;
+        }
+        else {
+            for (int i = 1; i < (int)transposetok.size(); i++) {
+                if (transposetok[i] == NULL) {
+                    allSameTranspose = false;
+                    break;
+                }
+                else if (*transposetok[0] != *transposetok[i]) {
+                    allSameTranspose = false;
+                    break;
+                }
+            }
+        }
+    }
+    else {
+        allSameTranspose = false;
+    }
+
+    // If there are different active non-zero transpositions
+    // then key signatures need to be done individually.
+    for (int i = 0; i < (int)m_transpose.size(); i++) {
+        if (m_transpose[i]) {
+            allSameKeySig = false;
+            break;
+        }
+    }
+
+    // If the transpositions are different but the key signatures are the
+    // same, then make key signatures not the same, since they will be changed
+    // by transposition.
+    if (allSameKeySig && hasTranspose && !allSameTranspose) {
+        allSameKeySig = false;
+    }
+    if (allSameTimeSig && hasMeterSig && !allSameMeterSig) {
+        allSameTimeSig = false;
+    }
+    if (hasTranspose) {
+        // Transposition information cannot be attached to scoreDef, so force onto staffDef:
+        allSameTranspose = false;
+        allSameKeySig = false;
+    }
+
+    bool setAllKeySig = false;
+    bool setAllTimeSig = false;
+
+    // First insert changes the affect all staves first.
+    if (hasKeySig && allSameKeySig) {
         // eventually allow decoupling of keysig and key.
-        setKeySig(-1, scoreDef, *((string *)keysigtok), keysigtok, keytok, true);
+        setKeySig(-1, scoreDef, *((string *)keysigtok[0]), keysigtok[0], keytok[0], true);
+        setAllKeySig = true;
+    }
+    if (hasTimeSig && allSameTimeSig) {
+        setTimeSig(scoreDef, timesigtok[0], metersigtok[0], -1);
+        setAllTimeSig = true;
+    }
+
+    // Need to add individual staffDefs for changes that do not affect all staves.
+    std::vector<bool> needStaffDef(ss.size(), false);
+    bool need = false;
+
+    if (!setAllKeySig) {
+        for (int i = 0; i < (int)keysigtok.size(); i++) {
+            if (keysigtok[i] != NULL) {
+                need = true;
+                needStaffDef.at(i) = true;
+            }
+        }
+    }
+    if (!setAllTimeSig) {
+        for (int i = 0; i < (int)timesigtok.size(); i++) {
+            if (timesigtok[i] != NULL) {
+                need = true;
+                needStaffDef.at(i) = true;
+            }
+        }
+    }
+    for (int i = 0; i < (int)transposetok.size(); i++) {
+        if (transposetok[i] != NULL) {
+            need = true;
+            needStaffDef.at(i) = true;
+        }
+    }
+    if (!need) {
+        return;
+    }
+
+    StaffGrp *staffGrp = new StaffGrp;
+    scoreDef->AddChild(staffGrp);
+    std::vector<StaffDef *> staves(ss.size(), NULL);
+    for (int i = 0; i < (int)needStaffDef.size(); i++) {
+        if (!needStaffDef[i]) {
+            continue;
+        }
+        StaffDef *staffDef = new StaffDef;
+        staffDef->SetN(i + 1);
+        staffGrp->AddChild(staffDef);
+        staves[i] = staffDef;
+    }
+
+    if (!setAllTimeSig) {
+        // add individual time signatures to each staff as needed
+        for (int i = 0; i < (int)timesigtok.size(); i++) {
+            if (timesigtok[i] == NULL) {
+                continue;
+            }
+            if (staves[i] == NULL) {
+                // should not happen
+                continue;
+            }
+            setTimeSig(staves[i], timesigtok[i], metersigtok[i], i);
+        }
+    }
+
+    if (!setAllKeySig) {
+        // add individual key signatures to each staff as needed
+        for (int i = 0; i < (int)keysigtok.size(); i++) {
+            if (keysigtok[i] == NULL) {
+                continue;
+            }
+            if (staves[i] == NULL) {
+                // should not happen
+                continue;
+            }
+            setKeySig(i, staves[i], *((string *)keysigtok[i]), keysigtok[i], keytok[i], true);
+        }
+    }
+
+    // Process any transposition changes:
+    for (int i = 0; i < (int)transposetok.size(); i++) {
+        if (transposetok[i] == NULL) {
+            continue;
+        }
+        if (staves[i] == NULL) {
+            // should not happen
+            continue;
+        }
+        setTransposition(staves[i], *transposetok[i]);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setTimeSig --
+//
+
+template <class ELEMENT>
+void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp metersigtok, int staffindex)
+{
+    if (!timesigtok) {
+        // Not allowing meter signatures without a time signature.
+        return;
+    }
+
+    int count = -1;
+    int unit = -1;
+    std::smatch matches;
+    if (regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
+        if (!metersigtok) {
+            count = stoi(matches[1]);
+            unit = stoi(matches[2]);
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount(count);
+            vrvmetersig->SetUnit(unit);
+        }
+        else if (metersigtok && (metersigtok->find('C') == std::string::npos)
+            && (metersigtok->find('O') == std::string::npos)) {
+            // Only storing the time signature if there is no mensuration
+            // otherwise verovio will display both.
+            count = stoi(matches[1]);
+            unit = stoi(matches[2]);
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetCount(count);
+            vrvmetersig->SetUnit(unit);
+        }
+        else {
+            // But always need to provide @meter.unit since timestamps
+            // are in reference to it (can't add meter.count since
+            // this will also print a time signature.
+            unit = stoi(matches[2]);
+            MeterSig *vrvmetersig = getMeterSig(element);
+            vrvmetersig->SetUnit(unit);
+        }
+        if (metersigtok) {
+            auto ploc = metersigtok->rfind(")");
+            if (ploc != string::npos) {
+                string mstring = metersigtok->substr(5, ploc - 5);
+                setMeterSymbol(element, mstring);
+            }
+        }
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    if (staffindex < 0) {
+        // store time signature change for all staves:
+        for (int i = 0; i < (int)ss.size(); ++i) {
+            // assuming only a single time sig. at a time.
+            ss[i].meter_top = count;
+            ss[i].meter_bottom = unit;
+        }
+    }
+    else {
+        ss.at(staffindex).meter_top = count;
+        ss.at(staffindex).meter_bottom = unit;
     }
 }
 
