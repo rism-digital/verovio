@@ -138,7 +138,8 @@ int PitchInterface::CalcLoc(
         if (custos->HasLoc()) {
             return custos->GetLoc();
         }
-        return PitchInterface::CalcLoc(custos->GetPname(), custos->GetOct(), layer->GetClefLocOffset(crossStaffElement));
+        return PitchInterface::CalcLoc(
+            custos->GetPname(), custos->GetOct(), layer->GetClefLocOffset(crossStaffElement));
     }
     else {
         assert(false);
