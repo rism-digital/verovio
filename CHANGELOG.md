@@ -1,6 +1,17 @@
 # Changelog
 
 ## [unreleased]
+
+## [2.6.0] - 2020-03-11
+* Support for Plaine and Easie output (limited features)
+* Support for lyrics on chords (@rettinghaus)
+* Support for reh elements (@rettinghaus)
+* Improved extender lines in MusicXML import (@rettinghaus)
+* Improved backup handling in MusicXML import (@wergo)
+* Options for adjusting page width (--adjust-page-width) (@palgranum)
+* Fix overlapping group symbols (@rettinghaus)
+* Fix bug with choice and mdiv (@rettinghaus)
+* Fix tempo placement (@rettinghaus)
 * Fix Leipzig font validation issues
 
 ## [2.5.0] - 2020-02-03
@@ -14,7 +25,7 @@
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15
-* Support for short and tick barlines  with `measure@bar.len` and `measure@bar.place` (@earboxer)
+* Support for short and tick barlines with `measure@bar.len` and `measure@bar.place` (@earboxer)
 * Support for dashed and dotted slurs and ties (@earboxer and @napulen)
 * Option to use xml entities for SMuFL charachters (--outputSmuflXmlEntities)
 * Options for controlling system divider display (--systemDivider "none|left|left-right")
@@ -32,7 +43,7 @@
 * Fix bug with mordent when loading MEI 3.0 files
 
 ## [2.3.1] - 2019-11-16
-* Fix  bug with scoreDef / staffDef redefinition
+* Fix bug with scoreDef / staffDef redefinition
 
 ## [2.3.0] - 2019-11-04
 * Support for 512th and 1024th duration

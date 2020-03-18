@@ -38,7 +38,7 @@ public:
     /**
      * @name Set and get the text content.
      * The text content is a std::wstring that needs to be converted to UTF16.
-     * See MeiInput::ReadText and MeiInput ::WriteText
+     * See MEIInput::ReadText and MEIInput ::WriteText
      */
     ///@{
     void SetText(std::wstring text) { m_text = text; }

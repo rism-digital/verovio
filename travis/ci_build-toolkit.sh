@@ -40,22 +40,22 @@ cd ./emscripten
 # build toolkit depending on build target
 if [[ "$BUILDTARGET" == nohumdrum ]]; then
     echo "Building toolkit without humdrum"
-    ./buildToolkit -c -H
+    ./buildToolkit -c -H -M
     cp build/verovio-toolkit.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 elif [[ "$BUILDTARGET" == light ]]; then
     echo "Building toolkit without humdrum as light version"
-    ./buildToolkit -c -H -l
+    ./buildToolkit -c -H -l -M
     cp build/verovio-toolkit-light.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 elif [[ "$BUILDTARGET" == wasm ]]; then
     echo "Building toolkit without humdrum as wasm"
-    ./buildToolkit -c -H -w
+    ./buildToolkit -c -H -w -M
     cp build/verovio*wasm* $OUTPUT_DIRECTORY/javascript/develop/
 
 elif [[ "$BUILDTARGET" == default ]]; then
     echo "Building default toolkit (with humdrum)"
-    ./buildToolkit -c
+    ./buildToolkit -c -M
     cp build/*-hum.js* $OUTPUT_DIRECTORY/javascript/develop/
 
 else

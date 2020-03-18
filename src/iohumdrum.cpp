@@ -342,11 +342,10 @@ namespace humaux {
 // HumdrumInput::HumdrumInput -- Constructor.
 //
 
-HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc)
+HumdrumInput::HumdrumInput(Doc *doc) : Input(doc)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
-    m_filename = filename;
     m_placement.resize(1000);
     std::fill(m_placement.begin(), m_placement.end(), 0);
     m_reverse.resize(1000);
@@ -373,38 +372,10 @@ HumdrumInput::~HumdrumInput()
 
 //////////////////////////////
 //
-// HumdrumInput::ImportFile -- Read a Humdrum file from a file.
-//
-
-bool HumdrumInput::ImportFile()
-{
-
-#ifndef NO_HUMDRUM_SUPPORT
-    try {
-        m_doc->Reset();
-        hum::HumdrumFileSet &infiles = m_infiles;
-        bool result = infiles.readFile(m_filename);
-        if (!result) {
-            return false;
-        }
-
-        return convertHumdrum();
-    }
-    catch (char *str) {
-        LogError("%s", str);
-        return false;
-    }
-#else
-    return true;
-#endif /* NO_HUMDRUM_SUPPORT */
-}
-
-//////////////////////////////
-//
 // HumdrumInput::ImportString -- Read a Humdrum file set from a text string.
 //
 
-bool HumdrumInput::ImportString(const std::string &content)
+bool HumdrumInput::Import(const std::string &content)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
@@ -2392,13 +2363,13 @@ bool HumdrumInput::prepareFooter(
     meifile += "</scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
-    MeiInput input(&tempdoc, "");
-    if (!input.ImportString(meifile)) {
+    MEIInput input(&tempdoc);
+    if (!input.Import(meifile)) {
         LogError("Error importing data");
         return false;
     }
 
-    // MeiOutput meioutput(&tempdoc, "");
+    // MEIOutput meioutput(&tempdoc, "");
     // meioutput.SetScoreBasedMEI(true);
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
@@ -2566,13 +2537,13 @@ bool HumdrumInput::prepareHeader(
     meifile += "</pgHead></scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
-    MeiInput input(&tempdoc, "");
-    if (!input.ImportString(meifile)) {
+    MEIInput input(&tempdoc);
+    if (!input.Import(meifile)) {
         LogError("Error importing data");
         return false;
     }
 
-    // MeiOutput meioutput(&tempdoc, "");
+    // MEIOutput meioutput(&tempdoc, "");
     // meioutput.SetScoreBasedMEI(true);
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
@@ -15188,7 +15159,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
 
 std::string HumdrumInput::GetMeiString()
 {
-    MeiOutput meioutput(m_doc, "");
+    MEIOutput meioutput(m_doc, "");
     meioutput.SetScoreBasedMEI(true);
     return meioutput.GetOutput();
 }
