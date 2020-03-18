@@ -706,12 +706,6 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
             break;
     }
 
-    // Calculate x and y position for custos graphic
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
-
     int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
@@ -722,27 +716,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y = element->GetDrawingY();
     }
 
-    int clefY = y - (staffSize * (staffLineNumber - clefLine));
-    int pitchOffset;
-    int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
-
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_c) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_f) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_G) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_g) * (staffSize / 2);
-    }
-    else {
-        // This shouldn't happen
-        pitchOffset = 0;
-    }
-
-    int actualY = clefY + pitchOffset + octaveOffset;
-
-    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }
