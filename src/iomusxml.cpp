@@ -46,6 +46,7 @@
 #include "mordent.h"
 #include "mrest.h"
 #include "mrpt.h"
+#include "mspace.h"
 #include "multirest.h"
 #include "note.h"
 #include "octave.h"
@@ -2183,8 +2184,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                 AddLayerElement(layer, space, duration);
             }
             else {
-                // this should be mSpace
-                FillSpace(layer, duration);
+                MSpace *mspace = new MSpace();
+                AddLayerElement(layer, mspace);
             }
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
