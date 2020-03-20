@@ -40,6 +40,7 @@
 #include "mrest.h"
 #include "mrpt.h"
 #include "mrpt2.h"
+#include "mspace.h"
 #include "multirest.h"
 #include "multirpt.h"
 #include "neume.h"
@@ -152,6 +153,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(MRPT2)) {
         DrawMRpt2(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(MSPACE)) {
+        DrawMSpace(dc, element, layer, staff, measure);
     }
     else if (element->Is(MULTIREST)) {
         DrawMultiRest(dc, element, layer, staff, measure);
@@ -1104,6 +1108,22 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff);
 
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    MSpace *mSpace = dynamic_cast<MSpace *>(element);
+    assert(mSpace);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+    // nothing to draw here
     dc->EndGraphic(element, this);
 }
 
