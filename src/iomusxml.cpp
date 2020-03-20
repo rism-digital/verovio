@@ -51,6 +51,7 @@
 #include "octave.h"
 #include "pb.h"
 #include "pedal.h"
+#include "pghead.h"
 #include "reh.h"
 #include "rend.h"
 #include "rest.h"
@@ -529,6 +530,31 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         // always start with a new page
         Pb *pb = new Pb();
         section->AddChild(pb);
+    }
+
+    // generate page head
+    pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
+    if (!credits.empty()) {
+        PgHead *head = new PgHead();
+        for (pugi::xpath_node_set::const_iterator it = credits.begin(); it != credits.end(); ++it) {
+            pugi::xpath_node words = *it;
+            Rend *rend = new Rend();
+            Text *text = new Text();
+            text->SetText(UTF8to16(words.node().text().as_string()));
+            std::string lang = words.node().attribute("xml:lang").as_string();
+            rend->SetColor(words.node().attribute("color").as_string());
+            rend->SetHalign(
+                rend->AttHorizontalAlign::StrToHorizontalalignment(words.node().attribute("justify").as_string()));
+            rend->SetValign(
+                rend->AttVerticalAlign::StrToVerticalalignment(words.node().attribute("valign").as_string()));
+            rend->SetFontstyle(rend->AttTypography::StrToFontstyle(words.node().attribute("font-style").as_string()));
+            // rend->SetFontsize(rend->AttTypography::StrToFontsize(words.node().attribute("font-size").as_string()+std::string("pt")));
+            rend->SetFontweight(
+                rend->AttTypography::StrToFontweight(words.node().attribute("font-weight").as_string()));
+            rend->AddChild(text);
+            head->AddChild(rend);
+        }
+        m_doc->m_scoreDef.AddChild(head);
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
@@ -2334,7 +2360,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
-            //verse->SetPlace(verse->AttPlacement::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
+            // verse->SetPlace(verse->AttPlacement::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
             for (pugi::xml_node textNode = lyric.child("text"); textNode; textNode = textNode.next_sibling("text")) {
