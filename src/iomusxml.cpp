@@ -597,9 +597,18 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             pugi::xpath_node midiVolume = midiInstrument.node().select_node("volume");
             if (!partName.empty()) {
                 label = new Label();
-                Text *text = new Text();
-                text->SetText(UTF8to16(partName));
-                label->AddChild(text);
+                std::stringstream sstream(partName);
+                std::string line;
+                bool firstLine = true;
+                while (std::getline(sstream, line)) {
+                    if (!firstLine) {
+                        label->AddChild(new Lb());
+                    }
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(line));
+                    label->AddChild(text);
+                    firstLine = false;
+                }
             }
             if (!partAbbr.empty()) {
                 labelAbbr = new LabelAbbr();
