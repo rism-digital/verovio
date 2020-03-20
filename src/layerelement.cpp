@@ -871,10 +871,21 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         int loc = PitchInterface::CalcLoc(this, layerY, layerElementY, true);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
-    else if (this->Is({ CUSTOS, DOT })) {
+    else if (this->Is(DOT)) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, interface->CalcDrawingLoc(layerY, layerElementY)));
+    }
+    else if (this->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(this);
+        assert(custos);
+        int loc = 0;
+        if (custos->HasPname()) {
+            loc = PitchInterface::CalcLoc(custos, layerY, layerElementY);
+        }
+        int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
+        custos->SetDrawingLoc(loc);
+        this->SetDrawingYRel(yRel);
     }
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
@@ -1143,8 +1154,12 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                         && (previousNote->GetDrawingDur() == DUR_1))
                         horizontalMargin = 0;
                 }
-                else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() > 1) {
                     continue;
+                }
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
+                    horizontalMargin = 0;
+                }
             }
 
             if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
