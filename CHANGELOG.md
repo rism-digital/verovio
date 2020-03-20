@@ -1,7 +1,8 @@
 # Changelog
 
 ## [unreleased]
-* Improved header generatation with additional names (@earboxer)
+* Improved header in MusicXML import (@rettinghaus)
+* Improved header generation with additional names (@earboxer)
 
 ## [2.6.0] - 2020-03-11
 * Support for Plaine and Easie output (limited features)

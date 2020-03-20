@@ -1162,8 +1162,12 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                         && (previousNote->GetDrawingDur() == DUR_1))
                         horizontalMargin = 0;
                 }
-                else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() > 1) {
                     continue;
+                }
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
+                    horizontalMargin = 0;
+                }
             }
 
             if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
