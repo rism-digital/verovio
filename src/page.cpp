@@ -591,7 +591,7 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto & child : m_children) {
+    for (auto &child : m_children) {
         System *system = dynamic_cast<System *>(child);
         if (system) {
             // we include the left margin and the right margin
