@@ -1857,7 +1857,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
-    if (pedal->GetDir() == pedalLog_DIR_bounce) {
+    if (pedal->GetDir() == pedalLog_DIR_bounce && pedal->GetForm() != pedalVis_FORM_altpedstar) {
         str.push_back(code);
         // Get the staff size of the first staff
         int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
