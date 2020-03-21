@@ -74,6 +74,12 @@ const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getExpansionIdsForElement(Toolkit *tk, const char *xmlId)
+{
+    tk->SetCString(tk->GetExpansionIdsForElement(xmlId));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_getHumdrum(Toolkit *tk)
 {
     const char *buffer = tk->GetHumdrumBuffer();
@@ -95,6 +101,12 @@ const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
 const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId)
 {
     tk->SetCString(tk->GetMIDIValuesForElement(xmlId));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_getNotatedIdForElement(Toolkit *tk, const char *xmlId)
+{
+    tk->SetCString(tk->GetNotatedIdForElement(xmlId));
     return tk->GetCString();
 }
 

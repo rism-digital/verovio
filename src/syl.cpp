@@ -124,6 +124,10 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
     }
 
     this->SetStart(dynamic_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
+    // If there isn't an ancestor note, it should be a chord
+    if (!this->GetStart()) {
+        this->SetStart(dynamic_cast<LayerElement *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
+    }
 
     // At this stage currentSyl is actually the previous one that is ending here
     if (params->m_currentSyl) {

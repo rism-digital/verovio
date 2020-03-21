@@ -23,29 +23,6 @@
 use strict;
 use Getopt::Long;
 
-chomp (my $EMCC = `which emcc`);
-chomp (my $PYTHON = `which python`);
-die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
-die "ERROR: python interpreter not found.\n" unless $PYTHON;
-
-my $VEROVIO_ROOT  = "..";
-
-# Default compiling uses ASM and large file support.
-# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
-# Empirically, the memory amount required is roughly 5 times the file size.
-# This can be disabled in the light version, which uses the default memory settings.
-my $FLAGS = "-O3";
-$FLAGS .= " -DNDEBUG";
-$FLAGS .= " --memory-init-file 0";
-$FLAGS .= " -std=c++17";
-$FLAGS .= " -s ASM_JS=1";
-$FLAGS .= " -s TOTAL_MEMORY=256MB";
-$FLAGS .= " -s TOTAL_STACK=128MB";
-$FLAGS .= " -s WASM=0";
-
-my ($FLAGS_NAME, $VERSION, $CHATTY);
-
-
 sub print_help {
 print <<"EOT";
 
@@ -60,16 +37,29 @@ Options:
 -H      Disable Humdrum importer
 -P      Disable PAE importer
 -X      Disable MusicXML importer
+-M      Clean existing makefile
 
 EOT
 }
 
+chomp (my $EMCC = `which emcc`);
+chomp (my $EMCMAKE = `which emcmake`);
+chomp (my $EMMAKE = `which emmake`);
+die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
+die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
+die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
-my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ);
+my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
+my ($FLAGS_NAME, $VERSION, $CHATTY);
+
+my $cpp = 17;             # c++ version to compile (11, 14, 17)
+my $VEROVIO_ROOT  = ".."; 
+
 Getopt::Long::Configure("bundling");
 GetOptions (
+   'C|cpp=s'       => \$cpp,
    'c|chatty'      => \$chattyQ,
    'h|?|help'      => \$helpQ,
    'l|light'       => \$lightQ,
@@ -77,12 +67,26 @@ GetOptions (
    'v|version=s'   => \$VERSION,
    'x|exclusion=s' => \$exclusion,
    'w|wasm'        => \$wasmQ,
-
    'D|no-darms'    => \$nodarms,
    'H|no-humdrum'  => \$nohumdrum,
    'P|no-pae'      => \$nopae,
-   'X|no-musicxml' => \$nomusicxml
+   'X|no-musicxml' => \$nomusicxml,
+   'M|make' => \$makeQ
 );
+
+# Default compiling uses ASM and large file support.
+# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
+# Empirically, the memory amount required is roughly 5 times the file size.
+# This can be disabled in the light version, which uses the default memory settings.
+my $FLAGS = "-O3";
+$FLAGS .= " -DNDEBUG";
+$FLAGS .= " --memory-init-file 0";
+$FLAGS .= " -std=c++$cpp";
+$FLAGS .= " -s ASM_JS=1";
+$FLAGS .= " -s TOTAL_MEMORY=256MB";
+$FLAGS .= " -s TOTAL_STACK=128MB";
+$FLAGS .= " -s WASM=0";
+
 
 # Process command-line options:
 
@@ -91,29 +95,27 @@ if ($wasmQ) {
 	$FLAGS = "-O3";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
-	$FLAGS .= " -std=c++17";
+	$FLAGS .= " -std=c++$cpp";
 	$FLAGS .= " -s WASM=1";
-	# tried this for find the integer overflow runtime error but g4 does not work, so line number is missing
-	# should be fixed in the next version of emscripten (https://github.com/kripken/emscripten/issues/5718)
+    $FLAGS .= " -s STRICT=1"; 
+	# We can try to find the cause of integer overflow runtime errors with
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
-	# this is for now necessary to avoid integer overflow runtime error
-    # used to be fixed with " -s \"BINARYEN_TRAP_MODE='clamp'\""
-	$FLAGS .= " -mnontrapping-fptoint";
+    # For now, trapping them (followign option does not work with Safari)
+	#$FLAGS .= " -mnontrapping-fptoint";
 	$FLAGS .= " -s TOTAL_MEMORY=512MB";
 	$FLAGS .= " -s TOTAL_STACK=256MB";
-	$FLAGS .= " -s ALLOW_MEMORY_GROWTH=1";
+    $FLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";
 }
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++17 -s ASM_JS=1 -s WASM=0";
+	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++$cpp -s ASM_JS=1 -s WASM=0";
 	$FLAGS_NAME = "-light";
 }
 
 if ($chattyQ) {
 	$CHATTY = "-v";
-	print "Emscripten compile script: $EMCC\n";
 }
 
 if (!$nohumdrum) {
@@ -144,26 +146,14 @@ syncSvgResources($exclusion);
 print "Creating commit version header file...\n";
 `$VEROVIO_ROOT/tools/get_git_commit.sh`;
 
-my $VEROVIO_INCLUDE = "$VEROVIO_ROOT/include";
-my $VEROVIO_LIBMEI  = "$VEROVIO_ROOT/libmei";
-
-my $includes = "";
-$includes .= " -I$VEROVIO_INCLUDE";
-$includes .= " -I$VEROVIO_INCLUDE/vrv";
-$includes .= " -I$VEROVIO_INCLUDE/hum" if !$nohumdrum;
-$includes .= " -I$VEROVIO_INCLUDE/json";
-$includes .= " -I$VEROVIO_INCLUDE/midi";
-$includes .= " -I$VEROVIO_INCLUDE/pugi";
-$includes .= " -I$VEROVIO_INCLUDE/utf8";
-$includes .= " -I$VEROVIO_LIBMEI";
-
 my $defines = "-DUSE_EMSCRIPTEN";
-$defines .= " -DNO_PAE_SUPPORT"      if $nopae;
-$defines .= " -DNO_DARMS_SUPPORT"    if $nodarms;
-$defines .= " -DNO_HUMDRUM_SUPPORT"  if $nohumdrum;
-$defines .= " -DNO_MUSICXML_SUPPORT" if $nomusicxml;
 
-my $sources = getSources();
+my $cmake = "-DBUILD_AS_WASM=ON -DEMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES=ON";
+$cmake .= " -DNO_PAE_SUPPORT=ON" if ($nopae);
+$cmake .= " -DNO_DARMS_SUPPORT=ON" if ($nodarms);
+$cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
+$cmake .= " -DNO_MUSICXML_SUPPORT=ON" if ($nomusicxml);
+
 my $embed   = "--embed-file $DATA_DIR/";
 my $output  = "-o $BUILD_DIR/verovio.js";
 
@@ -175,10 +165,12 @@ $exports .= "'_vrvToolkit_editInfo',";
 $exports .= "'_vrvToolkit_getAvailableOptions',";
 $exports .= "'_vrvToolkit_getElementAttr',";
 $exports .= "'_vrvToolkit_getElementsAtTime',";
+$exports .= "'_vrvToolkit_getExpansionIdsForElement',";
 $exports .= "'_vrvToolkit_getHumdrum',";
 $exports .= "'_vrvToolkit_getLog',";
 $exports .= "'_vrvToolkit_getMEI',";
 $exports .= "'_vrvToolkit_getMIDIValuesForElement',";
+$exports .= "'_vrvToolkit_getNotatedIdForElement',";
 $exports .= "'_vrvToolkit_getOptions',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
@@ -196,10 +188,24 @@ $exports .= "]\"";
 
 my $extra_exports = "-s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
 
-my $command = "$PYTHON $EMCC $CHATTY $includes $defines $FLAGS $sources $embed $exports $extra_exports $output";
-print "Compiling...";
-print "$command\n" if $CHATTY;
-`$command`;
+if ($makeQ) {
+    system("rm -rf CMakeFiles/");
+    system("rm CMakeCache.txt");
+}
+ 
+ print "*************\nBuilding makefile...\n";
+ my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
+ system($cmakeCmd);
+
+print "*************\nCompiling...\n";
+my $makeCmd = "$EMMAKE make -j 8";
+system($makeCmd);
+
+print "*************\nLinking...\n";
+my $ccCmd = "$EMCC $CHATTY libverovio.bc $FLAGS $embed $exports $extra_exports $output";
+print "$ccCmd\n" if $CHATTY;
+
+system($ccCmd);
 
 if ($? == 0) {
 	print " Done.\n";
@@ -212,7 +218,6 @@ if ($? == 0) {
 		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
-        `cp $BUILD_DIR/verovio.wasm $NPM/`;
 	}
 
 	# create a gzip version
@@ -235,46 +240,6 @@ exit 0;
 
 
 ###########################################################################
-
-
-##############################
-##
-## getSources -- return a list of code to be compiled.  This could be generalized
-##    to automatically extract a list of the code from the source directory.
-##
-
-sub getSources {
-	my @sources;
-	push @sources, "$VEROVIO_ROOT/tools/c_wrapper.cpp";
-	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
-	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
-	if ($nohumdrum) {
-		push @sources, grep(!/src\/hum\//, glob "$VEROVIO_ROOT/src/*/*.cpp");
-	} else {
-		push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
-	}
-
-	# libmei: only a subset is included:
-	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_analytical.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_frettab.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_gestural.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_externalsymbols.cpp";
-    push @sources, "$VEROVIO_ROOT/libmei/atts_facsimile.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_neumes.cpp";
-    push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_visual.cpp";
-
-	return join " ", @sources
-}
-
 
 
 ##############################

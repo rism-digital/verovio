@@ -9,6 +9,7 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
+#include "expansionmap.h"
 #include "facsimile.h"
 #include "options.h"
 #include "scoredef.h"
@@ -209,9 +210,9 @@ public:
      * Run trough all the layers and fill the timemap file content.
      */
     bool ExportTimemap(std::string &output);
-    void PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
-        std::map<int, std::vector<std::string> > &realTimeToOnElements,
-        std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo);
+    void PrepareJsonTimemap(std::string &output, std::map<double, double> &realTimeToScoreTime,
+        std::map<double, std::vector<std::string> > &realTimeToOnElements,
+        std::map<double, std::vector<std::string> > &realTimeToOffElements, std::map<double, int> &realTimeToTempo);
 
     /**
      * Set the initial scoreDef of each page.
@@ -224,7 +225,7 @@ public:
     /**
      * Optimize the scoreDef once the document is cast-off.
      */
-    void OptimizeScoreDefDoc(bool encoded = false);
+    void OptimizeScoreDefDoc();
 
     /**
      * Prepare the document for drawing.
@@ -291,6 +292,16 @@ public:
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
     void ConvertAnalyticalMarkupDoc(bool permanent = false);
+
+    /**
+     * Transpose the content of the doc.
+     */
+    void TransposeDoc();
+
+    /**
+     * Convert encoded <expansion> before rendering
+     */
+    void ExpandExpansions();
 
     /**
      * To be implemented.
@@ -415,6 +426,9 @@ public:
     /** Record notation type for document */
     data_NOTATIONTYPE m_notationType;
 
+    /** An expansion map that contains  */
+    ExpansionMap m_expansionMap;
+
 private:
     /**
      * The type of document indicates how to deal with the layout information.
@@ -481,7 +495,7 @@ private:
     /**
      * A flag to indicate whereas the document contains analytical markup to be converted.
      * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
-     * is converted during the import in MeiInput.
+     * is converted during the import in MEIInput.
      */
     bool m_hasAnalyticalMarkup;
 

@@ -27,8 +27,9 @@ class Dir : public ControlElement,
             public TextListInterface,
             public TextDirInterface,
             public TimeSpanningInterface,
-            public AttLang,
             public AttExtender,
+            public AttLang,
+            public AttLineRendBase,
             public AttVerticalGroup {
 public:
     /**
@@ -54,7 +55,7 @@ public:
     ///@}
 
     /**
-     * Add an element (text, rend. etc.) to a dynam.
+     * Add an element (text, rend. etc.) to a dir.
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);

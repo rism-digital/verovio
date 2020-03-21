@@ -87,17 +87,17 @@ public:
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
 
-    void SetKey(std::string key) { m_key = key; }
+    void SetKey(const std::string &key) { m_key = key; }
     std::string GetKey() const { return m_key; }
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValueArray(const std::vector<std::string> &values);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
-    void SetInfo(std::string title, std::string description);
+    void SetInfo(const std::string &title, const std::string &description);
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
 
@@ -136,7 +136,7 @@ public:
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -169,7 +169,7 @@ public:
     void Init(double defaultValue, double minValue, double maxValue);
 
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -206,7 +206,7 @@ public:
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
 
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -242,9 +242,9 @@ public:
     OptionString() {}
     virtual ~OptionString() {}
     virtual void CopyTo(Option *option);
-    void Init(std::string defaultValue);
+    void Init(const std::string &defaultValue);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const { return m_value; }
     virtual std::string GetDefaultStrValue() const { return m_defaultValue; }
 
@@ -276,7 +276,7 @@ public:
     void Init();
 
     virtual bool SetValueArray(const std::vector<std::string> &values);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -308,7 +308,7 @@ public:
     virtual void CopyTo(Option *option);
     void Init(int defaultValue, std::map<int, std::string> *values);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -345,7 +345,7 @@ public:
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -378,7 +378,7 @@ public:
     virtual void CopyTo(Option *option);
     void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -449,7 +449,7 @@ public:
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
 
 private:
-    void Register(Option *option, std::string key, OptionGrp *grp);
+    void Register(Option *option, const std::string &key, OptionGrp *grp);
 
 public:
     /**
@@ -462,7 +462,11 @@ public:
     OptionGrp m_general;
 
     OptionBool m_adjustPageHeight;
+    OptionBool m_adjustPageWidth;
     OptionIntMap m_breaks;
+    OptionBool m_condenseEncoded;
+    OptionBool m_condenseFirstPage;
+    OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
     OptionBool m_justifyIncludeLastPage;
@@ -477,12 +481,14 @@ public:
     OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
+    OptionBool m_outputSmuflXmlEntities;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;
     OptionInt m_pageMarginLeft;
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionString m_expand;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionInt m_unit;
@@ -503,7 +509,6 @@ public:
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
-    OptionDbl m_leftPosition;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricHyphenWidth;
     OptionBool m_lyricNoStartHyphen;
@@ -538,6 +543,8 @@ public:
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
+    OptionString m_transpose;
+    OptionBool m_transposeSelectedOnly;
 
     /**
      * Element margins

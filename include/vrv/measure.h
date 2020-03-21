@@ -99,8 +99,8 @@ public:
     /**
      * @name Set and get the left and right barline types
      * This somehow conflicts with AttMeasureLog, which is transfered from and to the
-     * Barline object when reading and writing MEI. See MeiInput::ReadMeasure and
-     * MeiOutput::WriteMeasure
+     * Barline object when reading and writing MEI. See MEIInput::ReadMeasure and
+     * MEIOutput::WriteMeasure
      * Alternatively, we could keep them in sync here:
      * data_BARRENDITION GetDrawingLeftBarLine() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); }
      * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); }
@@ -203,7 +203,7 @@ public:
     /**
      * Return the real time offset in millisecond for the repeat (1-based).
      */
-    int GetRealTimeOffsetMilliseconds(int repeat) const;
+    double GetRealTimeOffsetMilliseconds(int repeat) const;
 
     //----------//
     // Functors //
@@ -460,7 +460,7 @@ private:
      * Start time state variables.
      */
     std::vector<double> m_scoreTimeOffset;
-    std::vector<int> m_realTimeOffsetMilliseconds;
+    std::vector<double> m_realTimeOffsetMilliseconds;
     int m_currentTempo;
 };
 

@@ -395,7 +395,7 @@ void SvgDeviceContext::StartPage()
             .set_value("g.page-margin{font-family:Times;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                       "g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                       "g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
                        "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
     }
@@ -640,7 +640,12 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
     pathChild.append_attribute("stroke") = GetColour(m_penStack.top().GetColour()).c_str();
-    if (m_penStack.top().GetDashLength() > 0)
+    if (m_penStack.top().GetLineCap() > 0) {
+        pathChild.append_attribute("stroke-linecap") = "round";
+        pathChild.append_attribute("stroke-dasharray")
+            = StringFormat("1, %d", int(2.5 * m_penStack.top().GetDashLength())).c_str();
+    }
+    else if (m_penStack.top().GetDashLength() > 0)
         pathChild.append_attribute("stroke-dasharray")
             = StringFormat("%d, %d", m_penStack.top().GetDashLength(), m_penStack.top().GetDashLength()).c_str();
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -856,7 +861,6 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
         useChild.append_attribute("xlink:href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
-        useChild.append_attribute("href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();

@@ -25,7 +25,7 @@ namespace vrv {
 class Doc;
 class DurationInterface;
 class EditorialElement;
-class FileOutputStream;
+class Output;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
@@ -469,6 +469,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter of the expansion flag
+     */
+    ///@{
+    bool IsExpansion() const { return m_isExpansion; }
+    void IsExpansion(bool isExpansion) { m_isExpansion = isExpansion; }
+    ///@}
+
+    /**
      * Return true if the object contains any editorial content
      */
     bool HasEditorialContent();
@@ -477,7 +485,7 @@ public:
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
-    virtual int Save(FileOutputStream *output);
+    virtual int Save(Output *output);
 
     virtual void ReorderByXPos();
     /**
@@ -1106,6 +1114,11 @@ public:
      */
     virtual int SetChildZones(FunctorParams *);
 
+    /**
+     * Transpose the content.
+     */
+    virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
     static bool sortByUlx(Object *a, Object *b);
 
 protected:
@@ -1194,6 +1207,11 @@ private:
      * For example, a Artic child in Note for an original @artic
      */
     bool m_isAttribute;
+
+    /**
+     * A flag indicating if the Object is a copy created by an expanded expansion element.
+     */
+    bool m_isExpansion;
 
     /**
      * A static counter for uuid generation.

@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -74,28 +75,19 @@ std::string keyPitchAlter = "";
 int keyPitchAlterAmount = 0;
 
 //----------------------------------------------------------------------------
-// AbcInput
+// ABCInput
 //----------------------------------------------------------------------------
 
-AbcInput::AbcInput(Doc *doc, std::string filename) : FileInputStream(doc)
+ABCInput::ABCInput(Doc *doc) : Input(doc)
 {
-    m_filename = filename;
     m_hasLayoutInformation = true;
 }
 
-AbcInput::~AbcInput() {}
+ABCInput::~ABCInput() {}
 
 //////////////////////////////////////////////////////////////////////////
 
-bool AbcInput::ImportFile()
-{
-    std::ifstream infile;
-    infile.open(m_filename.c_str());
-    parseABC(infile);
-    return true;
-}
-
-bool AbcInput::ImportString(const std::string &abc)
+bool ABCInput::Import(const std::string &abc)
 {
     std::istringstream in_stream(abc);
     parseABC(in_stream);
@@ -107,7 +99,7 @@ bool AbcInput::ImportString(const std::string &abc)
 // parseABC --
 //
 
-void AbcInput::parseABC(std::istream &infile)
+void ABCInput::parseABC(std::istream &infile)
 {
     // initialize doc
     m_doc->Reset();
@@ -265,7 +257,7 @@ void AbcInput::parseABC(std::istream &infile)
  BARRENDITION_dbl        ||
  */
 
-int AbcInput::SetBarLine(const std::string &musicCode, int i)
+int ABCInput::SetBarLine(const std::string &musicCode, int i)
 {
     data_BARRENDITION barLine = BARRENDITION_NONE;
     if (i >= 1 && musicCode.at(i - 1) == ':')
@@ -297,7 +289,7 @@ int AbcInput::SetBarLine(const std::string &musicCode, int i)
     return i;
 }
 
-void AbcInput::CalcUnitNoteLength()
+void ABCInput::CalcUnitNoteLength()
 {
     MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
@@ -312,7 +304,7 @@ void AbcInput::CalcUnitNoteLength()
     }
 }
 
-void AbcInput::AddBeam()
+void ABCInput::AddBeam()
 {
     if (!m_noteStack.size()) {
         return;
@@ -337,7 +329,7 @@ void AbcInput::AddBeam()
     m_noteStack.clear();
 }
 
-void AbcInput::AddTuplet()
+void ABCInput::AddTuplet()
 {
     if (!m_noteStack.size()) {
         return;
@@ -352,7 +344,7 @@ void AbcInput::AddTuplet()
     m_noteStack.clear();
 }
 
-void AbcInput::AddAnnot(std::string remark)
+void ABCInput::AddAnnot(std::string remark)
 {
     // remarks
     Annot *annot = new Annot();
@@ -363,7 +355,7 @@ void AbcInput::AddAnnot(std::string remark)
     m_layer->AddChild(annot);
 }
 
-void AbcInput::AddArticulation(LayerElement *element)
+void ABCInput::AddArticulation(LayerElement *element)
 {
     assert(element);
 
@@ -374,7 +366,7 @@ void AbcInput::AddArticulation(LayerElement *element)
     m_artic.clear();
 }
 
-void AbcInput::AddDynamic(LayerElement *element)
+void ABCInput::AddDynamic(LayerElement *element)
 {
     assert(element);
 
@@ -390,7 +382,7 @@ void AbcInput::AddDynamic(LayerElement *element)
     m_dynam.clear();
 }
 
-void AbcInput::AddFermata(LayerElement *element)
+void ABCInput::AddFermata(LayerElement *element)
 {
     assert(element);
 
@@ -402,7 +394,7 @@ void AbcInput::AddFermata(LayerElement *element)
     m_fermata = STAFFREL_NONE;
 }
 
-void AbcInput::AddOrnaments(LayerElement *element)
+void ABCInput::AddOrnaments(LayerElement *element)
 {
     assert(element);
 
@@ -441,7 +433,7 @@ void AbcInput::AddOrnaments(LayerElement *element)
     m_ornam.clear();
 }
 
-void AbcInput::AddTie()
+void ABCInput::AddTie()
 {
     if (!m_tieStack.empty()) {
         LogWarning("ABC input: '%s' already tied", m_ID.c_str());
@@ -455,14 +447,14 @@ void AbcInput::AddTie()
     }
 }
 
-void AbcInput::StartSlur()
+void ABCInput::StartSlur()
 {
     Slur *openSlur = new Slur();
     m_slurStack.push_back(openSlur);
     m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), openSlur));
 }
 
-void AbcInput::EndSlur()
+void ABCInput::EndSlur()
 {
     if (!m_slurStack.empty()) {
         if (!m_slurStack.back()->HasStartid()) {
@@ -482,7 +474,7 @@ void AbcInput::EndSlur()
     LogWarning("ABC input: Closing slur for element '%s' could not be matched", m_ID.c_str());
 }
 
-void AbcInput::parseDecoration(std::string decorationString)
+void ABCInput::parseDecoration(std::string decorationString)
 {
     // shorthand decorations hard-coded !
     if (isdigit(decorationString[0])) {
@@ -543,7 +535,7 @@ void AbcInput::parseDecoration(std::string decorationString)
 // parse information fields
 //
 
-void AbcInput::parseInstruction(std::string instruction)
+void ABCInput::parseInstruction(std::string instruction)
 {
     if (!strncmp(instruction.c_str(), "abc-include", 11)) {
         LogWarning("ABC input: Include field is ignored");
@@ -564,7 +556,7 @@ void AbcInput::parseInstruction(std::string instruction)
     }
 }
 
-void AbcInput::parseKey(std::string keyString)
+void ABCInput::parseKey(std::string keyString)
 {
     int i = 0;
     m_ID = "";
@@ -721,7 +713,7 @@ void AbcInput::parseKey(std::string keyString)
     }
 }
 
-void AbcInput::parseUnitNoteLength(std::string unitNoteLength)
+void ABCInput::parseUnitNoteLength(std::string unitNoteLength)
 {
     if (unitNoteLength.find('/'))
         m_unitDur = atoi(&unitNoteLength[unitNoteLength.find('/') + 1]);
@@ -742,7 +734,7 @@ void AbcInput::parseUnitNoteLength(std::string unitNoteLength)
     // m_doc->m_scoreDef.SetDurDefault(m_durDefault);
 }
 
-void AbcInput::parseMeter(std::string meterString)
+void ABCInput::parseMeter(std::string meterString)
 {
     m_meter = new MeterSig();
     if (meterString.find('C') != std::string::npos) {
@@ -767,7 +759,7 @@ void AbcInput::parseMeter(std::string meterString)
     }
 }
 
-void AbcInput::parseTempo(std::string tempoString)
+void ABCInput::parseTempo(std::string tempoString)
 {
     Tempo *tempo = new Tempo();
     if (tempoString.find('=') != std::string::npos) {
@@ -789,7 +781,7 @@ void AbcInput::parseTempo(std::string tempoString)
     LogWarning("ABC input: Tempo definitions are not fully supported yet");
 }
 
-void AbcInput::parseReferenceNumber(std::string referenceNumberString)
+void ABCInput::parseReferenceNumber(std::string referenceNumberString)
 {
     // The X: field is also used to indicate the start of the tune
     m_mdiv = new Mdiv();
@@ -814,7 +806,7 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
     m_title.clear();
 }
 
-void AbcInput::PrintInformationFields()
+void ABCInput::PrintInformationFields()
 {
     PgHead *pgHead = new PgHead();
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
@@ -857,7 +849,7 @@ void AbcInput::PrintInformationFields()
     m_doc->m_scoreDef.AddChild(pgHead);
 }
 
-void AbcInput::CreateHeader()
+void ABCInput::CreateHeader()
 {
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
@@ -909,7 +901,7 @@ void AbcInput::CreateHeader()
     m_workList = meiHead.append_child("workList");
 }
 
-void AbcInput::CreateWorkEntry()
+void ABCInput::CreateWorkEntry()
 {
     // <work> //
     pugi::xml_node work = m_workList.append_child("work");
@@ -964,7 +956,7 @@ void AbcInput::CreateWorkEntry()
 // followed by a single colon
 //
 
-void AbcInput::readInformationField(char dataKey, std::string value)
+void ABCInput::readInformationField(char dataKey, std::string value)
 {
     // remove comments and trim
     if (dataKey == '%' || dataKey == '\0')
@@ -1011,7 +1003,7 @@ void AbcInput::readInformationField(char dataKey, std::string value)
 // parse abc music code
 //
 
-void AbcInput::readMusicCode(const std::string &musicCode, Section *section)
+void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
 {
     assert(section);
 

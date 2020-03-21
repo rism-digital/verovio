@@ -109,12 +109,13 @@ namespace musicxml {
 
     class ClefChange {
     public:
-        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset)
+        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset, bool afterBarline)
         {
             m_measureNum = measureNum;
             m_staff = staff;
             m_clef = clef;
             m_scoreOnset = scoreOnset;
+            m_afterBarline = afterBarline;
         }
 
         std::string m_measureNum;
@@ -122,6 +123,7 @@ namespace musicxml {
         Clef *m_clef;
         int m_scoreOnset; // the score position of clef change
         bool isFirst = true; // insert clef change at first layer, others use @sameas
+        bool m_afterBarline = false; // musicXML attribute
     };
 
     class OpenDashes {
@@ -144,18 +146,17 @@ namespace musicxml {
 // MusicXmlInput
 //----------------------------------------------------------------------------
 
-class MusicXmlInput : public FileInputStream {
+class MusicXmlInput : public Input {
 public:
     // constructors and destructors
-    MusicXmlInput(Doc *doc, std::string filename);
+    MusicXmlInput(Doc *doc);
     virtual ~MusicXmlInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(std::string const &musicxml);
+    virtual bool Import(std::string const &musicxml);
 
 private:
     /*
-     * Top level method called from ImportFile or ImportString
+     * Top level method called from ImportFile or Import
      */
     bool ReadMusicXml(pugi::xml_node root);
 
@@ -189,7 +190,7 @@ private:
     void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset);
+    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     ///@}
 
@@ -204,6 +205,7 @@ private:
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
     void AddLayerElement(Layer *layer, LayerElement *element);
+    void AddLayerElement(Layer *layer, LayerElement *element, int duration);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
@@ -226,7 +228,7 @@ private:
      * For example, when closing a beam, we need to remove it from the stack, but it is not
      * necessary the top one (for example we can have an opened chord there).
      */
-    void RemoveLastFromStack(ClassId classId);
+    void RemoveLastFromStack(ClassId classId, Layer *layer);
 
     /*
      * @name Helper methods for checking presence of values of attributes or elements
@@ -296,8 +298,10 @@ private:
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
+    data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
+    std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
-    curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
+    curvature_CURVEDIR InferCurvedir(pugi::xml_node slurOrTie);
     fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
@@ -307,8 +311,6 @@ private:
     ///@}
 
 private:
-    /* The filename */
-    std::string m_filename;
     /* octave offset */
     std::vector<int> m_octDis;
     /* measure repeats */
@@ -322,12 +324,16 @@ private:
     /* measure time */
     int m_durTotal = 0;
     /* meter signature */
-    int m_meterCount = 0;
-    int m_meterUnit = 0;
+    int m_meterCount = 4;
+    int m_meterUnit = 4;
     /* LastElementID */
     std::string m_ID;
-    /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
-    std::vector<LayerElement *> m_elementStack;
+    /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
+    std::map<Layer *, std::vector<LayerElement *> > m_elementStackMap;
+    /* A maps of time stamps (score time) to indicate write pointer of a given layer */
+    std::map<Layer *, int> m_layerEndTimes;
+    /* To remember layer of last element (note) to handle chords */
+    Layer *m_prevLayer;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */

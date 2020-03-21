@@ -154,6 +154,17 @@ public:
     std::string RenderToMIDI();
 
     /**
+     * Export the content to a Plaine and Easie file.
+     */
+    bool RenderToPAEFile(const std::string &filename);
+
+    /**
+     * Render the content to Plaine and Easie.
+     * Only the top staff / layer is exported.
+     */
+    std::string RenderToPAE();
+
+    /**
      * Creates a timemap file, and return it as a JSON string.
      */
     std::string RenderToTimemap();
@@ -181,6 +192,16 @@ public:
      * Return element attributes as a JSON string
      */
     std::string GetElementAttr(const std::string &xmlId);
+
+    /**
+     * Returns the ID string of the notated (the original) element
+     */
+    std::string GetNotatedIdForElement(const std::string &xmlId);
+
+    /**
+     * Returns a vector of ID strings of all elements (the notated and the expanded) for a given element
+     */
+    std::string GetExpansionIdsForElement(const std::string &xmlId);
 
     /**
      * Redo the layout of the loaded data.
@@ -226,29 +247,28 @@ public:
 
     /**
      * @name Get the input file format (defined as FileFormat)
-     * The SetFormat with FileFormat does not perform any validation
+     * The SetInputFrom with FileFormat does not perform any validation
      */
     ///@{
-    bool SetFormat(std::string const &informat);
-    void SetFormat(FileFormat format) { m_format = format; }
-    int GetFormat() { return m_format; }
+    bool SetInputFrom(std::string const &inputFrom);
+    void SetInputFrom(FileFormat format) { m_inputFrom = format; }
+    int GetInputFrom() { return m_inputFrom; }
     ///@}
 
     /**
      * @name Get the output file format (defined as FileFormat)
-     * The SetOutputFormat with FileFormat does not perform any validation
+     * The SetOutputTo with FileFormat does not perform any validation
      */
     ///@{
-    bool SetOutputFormat(std::string const &outformat);
-    void SetOutputFormat(FileFormat format) { m_outformat = format; }
-    int GetOutputFormat() { return m_outformat; }
+    bool SetOutputTo(std::string const &outputTo);
+    int GetOutputTo() { return m_outputTo; }
     ///@}
 
     /**
      * @name Identify the input file type for auto loading of input data
      */
     ///@{
-    FileFormat IdentifyInputFormat(const std::string &data);
+    FileFormat IdentifyInputFrom(const std::string &data);
     ///@}
 
     /**
@@ -261,7 +281,6 @@ public:
 
     /**
      * @name Get the pages for a loaded file
-     * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
     int GetPageCount();
@@ -287,8 +306,8 @@ private:
     Doc m_doc;
     View m_view;
     int m_scale;
-    FileFormat m_format;
-    FileFormat m_outformat;
+    FileFormat m_inputFrom;
+    FileFormat m_outputTo;
     bool m_scoreBasedMei;
 
     static char *m_humdrumBuffer;
