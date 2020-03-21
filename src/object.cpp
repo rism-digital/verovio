@@ -300,6 +300,22 @@ void Object::SwapUuid(Object *other)
     other->SetUuid(swapUuid);
 }
 
+/**
+ * Constructs classes that are used for objects that span multiple systems and
+ * are therefore rendered as multiple elements. Only one of the rendered
+ * elements can "inherit" the unique id of the object. Subsequent rendered
+ * elements are given a class of the for "id-" + id to make them identifiable as
+ * belonging together.
+ */
+std::string Object::GetSpanningClasses()
+{
+    std::string spanningClass = "spanning-" + m_classid;
+    // Remove trailing "-"
+    spanningClass.pop_back();
+    if (m_uuid.empty()) return spanningClass;
+    return spanningClass + " id-" + m_uuid;
+}
+
 void Object::ClearChildren()
 {
     if (m_isReferenceObject) {

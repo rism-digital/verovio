@@ -227,6 +227,8 @@ public:
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
+    std::string GetSpanningClasses();
+
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
     bool HasComment() { return !m_comment.empty(); }
