@@ -2430,11 +2430,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             // color
             tie->SetColor(startTie.node().attribute("color").as_string());
             // placement and orientation
-            tie->SetCurvedir(
-                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
-            if (!startTie.node().attribute("orientation").empty()) { // override only with non-empty attribute
-                tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
-            }
+            tie->SetCurvedir(InferCurvedir(startTie.node()));
             tie->SetLform(tie->AttCurveRend::StrToLineform(startTie.node().attribute("line-type").as_string()));
 
             // add it to the stack
@@ -2692,10 +2688,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             // lineform
             meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
-            meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
-            std::string placement = slur.attribute("placement").as_string();
-            if (!placement.empty())
-                meiSlur->SetCurvedir(meiSlur->AttCurvature::StrToCurvatureCurvedir(placement.c_str()));
+            meiSlur->SetCurvedir(InferCurvedir(slur));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(measure, slurNumber, meiSlur);
@@ -3009,14 +3002,21 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
     }
 }
 
-curvature_CURVEDIR MusicXmlInput::ConvertOrientationToCurvedir(std::string value)
+curvature_CURVEDIR MusicXmlInput::InferCurvedir(pugi::xml_node slurOrTie)
 {
-    if (value == "over")
+    std::string orientation = slurOrTie.attribute("orientation").as_string();
+    if (orientation == "over")
         return curvature_CURVEDIR_above;
-    else if (value == "under")
+    if (orientation == "under")
         return curvature_CURVEDIR_below;
-    else
-        return curvature_CURVEDIR_NONE;
+
+    std::string placement = slurOrTie.attribute("placement").as_string();
+    if (placement == "above")
+        return curvature_CURVEDIR_above;
+    if (placement == "below")
+        return curvature_CURVEDIR_below;
+
+    return curvature_CURVEDIR_NONE;
 }
 
 fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(std::string value)

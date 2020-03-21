@@ -301,7 +301,7 @@ private:
     data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
     std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
-    curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
+    curvature_CURVEDIR InferCurvedir(pugi::xml_node slurOrTie);
     fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
