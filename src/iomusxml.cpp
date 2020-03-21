@@ -532,12 +532,17 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         section->AddChild(pb);
     }
 
+    pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
+    float bottom = layout.node().select_node("page-margins/bottom-margin").node().text().as_float();
+    LogWarning("%f", bottom);
+
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
     if (!credits.empty()) {
         PgHead *head = new PgHead();
         for (pugi::xpath_node_set::const_iterator it = credits.begin(); it != credits.end(); ++it) {
             pugi::xpath_node words = *it;
+            if (words.node().attribute("default-y").as_float() < 2 * bottom) continue;
             Rend *rend = new Rend();
             Text *text = new Text();
             text->SetText(UTF8to16(words.node().text().as_string()));
