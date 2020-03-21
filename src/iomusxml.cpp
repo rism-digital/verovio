@@ -2963,16 +2963,12 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 curvature_CURVEDIR MusicXmlInput::InferCurvedir(pugi::xml_node slurOrTie)
 {
     std::string orientation = slurOrTie.attribute("orientation").as_string();
-    if (orientation == "over")
-        return curvature_CURVEDIR_above;
-    if (orientation == "under")
-        return curvature_CURVEDIR_below;
+    if (orientation == "over") return curvature_CURVEDIR_above;
+    if (orientation == "under") return curvature_CURVEDIR_below;
 
     std::string placement = slurOrTie.attribute("placement").as_string();
-    if (placement == "above")
-        return curvature_CURVEDIR_above;
-    if (placement == "below")
-        return curvature_CURVEDIR_below;
+    if (placement == "above") return curvature_CURVEDIR_above;
+    if (placement == "below") return curvature_CURVEDIR_below;
 
     return curvature_CURVEDIR_NONE;
 }
