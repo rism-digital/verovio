@@ -2537,8 +2537,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
     }
 
-    // mordent
-    pugi::xpath_node xmlMordent = notations.node().select_node("ornaments/mordent");
+    // mordents
+    pugi::xpath_node xmlMordent = notations.node().select_node("ornaments/*[contains(name(), 'mordent')]");
     if (xmlMordent) {
         Mordent *mordent = new Mordent();
         m_controlElements.push_back(std::make_pair(measureNum, mordent));
@@ -2546,28 +2546,15 @@ void MusicXmlInput::ReadMusicXmlNote(
         mordent->SetStartid(m_ID);
         // color
         mordent->SetColor(xmlMordent.node().attribute("color").as_string());
-        // form
-        mordent->SetForm(mordentLog_FORM_lower);
         // long
         mordent->SetLong(ConvertWordToBool(xmlMordent.node().attribute("long").as_string()));
         // place
         mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlMordent.node().attribute("placement").as_string()));
-    }
-    pugi::xpath_node xmlMordentInv = notations.node().select_node("ornaments/inverted-mordent");
-    if (xmlMordentInv) {
-        Mordent *mordent = new Mordent();
-        m_controlElements.push_back(std::make_pair(measureNum, mordent));
-        mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        mordent->SetStartid(m_ID);
-        // color
-        mordent->SetColor(xmlMordentInv.node().attribute("color").as_string());
         // form
-        mordent->SetForm(mordentLog_FORM_upper);
-        // long
-        mordent->SetLong(ConvertWordToBool(xmlMordentInv.node().attribute("long").as_string()));
-        // place
-        mordent->SetPlace(
-            mordent->AttPlacement::StrToStaffrel(xmlMordentInv.node().attribute("placement").as_string()));
+        mordent->SetForm(mordentLog_FORM_lower);
+        if (!std::strncmp(xmlMordent.node().name(), "inverted", 7)) {
+            mordent->SetForm(mordentLog_FORM_upper);
+        }
     }
 
     // trill
