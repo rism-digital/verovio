@@ -71,6 +71,7 @@
 #include "mrest.h"
 #include "mrpt.h"
 #include "mrpt2.h"
+#include "mspace.h"
 #include "multirest.h"
 #include "multirpt.h"
 #include "nc.h"
@@ -531,6 +532,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(MRPT2)) {
         m_currentNode = m_currentNode.append_child("mRpt2");
         WriteMRpt2(m_currentNode, dynamic_cast<MRpt2 *>(object));
+    }
+    else if (object->Is(MSPACE)) {
+        m_currentNode = m_currentNode.append_child("mspace");
+        WriteMSpace(m_currentNode, dynamic_cast<MSpace *>(object));
     }
     else if (object->Is(MULTIREST)) {
         m_currentNode = m_currentNode.append_child("multiRest");
@@ -1657,6 +1662,13 @@ void MEIOutput::WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2)
     assert(mRpt2);
 
     WriteLayerElement(currentNode, mRpt2);
+}
+
+void MEIOutput::WriteMSpace(pugi::xml_node currentNode, MSpace *mSpace)
+{
+    assert(mSpace);
+
+    WriteLayerElement(currentNode, mSpace);
 }
 
 void MEIOutput::WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest)
@@ -4310,6 +4322,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "mRpt2") {
             success = ReadMRpt2(parent, xmlElement);
         }
+        else if (elementName == "mSpace") {
+            success = ReadMSpace(parent, xmlElement);
+        }
         else if (elementName == "multiRest") {
             success = ReadMultiRest(parent, xmlElement);
         }
@@ -4703,6 +4718,16 @@ bool MEIInput::ReadMRpt2(Object *parent, pugi::xml_node mRpt2)
 
     parent->AddChild(vrvMRpt2);
     ReadUnsupportedAttr(mRpt2, vrvMRpt2);
+    return true;
+}
+
+bool MEIInput::ReadMSpace(Object *parent, pugi::xml_node mSpace)
+{
+    MSpace *vrvMSpace = new MSpace();
+    ReadLayerElement(mSpace, vrvMSpace);
+
+    parent->AddChild(vrvMSpace);
+    ReadUnsupportedAttr(mSpace, vrvMSpace);
     return true;
 }
 
