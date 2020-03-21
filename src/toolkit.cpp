@@ -1257,6 +1257,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
         svg.SetSvgViewBox(true);
     }
 
+    svg.SetHtml5(m_options->m_svgHtml5.GetValue());
+
     // render the page
     RenderToDeviceContext(pageNo, &svg);
 
