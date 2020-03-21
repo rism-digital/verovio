@@ -626,7 +626,6 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         this->m_chainedId = rest->GetUuid();
         return true;
     }
-    return false;
 }
 
 } // namespace vrv
