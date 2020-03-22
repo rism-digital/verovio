@@ -30,6 +30,7 @@ class ControlElement;
 class Dir;
 class Dynam;
 class F;
+class Fermata;
 class Fb;
 class Hairpin;
 class Harm;
@@ -288,6 +289,13 @@ private:
     ///@{
     ///@}
     void GenerateUuid(pugi::xml_node node);
+
+    /*
+     * @name Helper method for styling fermatas
+     */
+    ///@{
+    ///@}
+    void ShapeFermata(Fermata *fermata, pugi::xml_node node);
 
     /*
      * @name Methods for converting MusicXML string values to MEI attributes.
