@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Complete beam refactoring
 * Support for mSpace elements (@rettinghaus)
 * Improved header in MusicXML import (@rettinghaus)
 * Improved header generation with additional names (@earboxer)
