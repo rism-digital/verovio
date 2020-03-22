@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Mar 16 10:16:42 PDT 2020
+// Last Modified: Sat Mar 21 18:41:21 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -887,6 +887,23 @@ bool Convert::isNaN(double value) {
 	ieee754.f = value;
 	return ( (unsigned)(ieee754.u >> 32) & 0x7fffffff ) +
            ( (unsigned)ieee754.u != 0 ) > 0x7ff00000;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::isPowerOfTwo --
+//
+
+bool Convert::isPowerOfTwo(int value) {
+	if (value < 0) {
+		return (-value & (-value - 1)) == 0;
+	} else if (value > 0) {
+		return (value & (value - 1)) == 0;
+	} else {
+		return false;
+	}
 }
 
 
@@ -5629,7 +5646,7 @@ void GridMeasure::appendInitialBarline(HumdrumFile& infile, int startbarline) {
 		startbarline = getMeasureNumber();
 	}
 	int fieldcount = infile.back()->getFieldCount();
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	string tstring = "=";
 //	if (startbarline) {
 //		tstring += to_string(startbarline);
@@ -6972,7 +6989,7 @@ bool GridSlice::isDataSlice(void) {
 
 void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 	HTp token = NULL;
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	GridVoice* voice;
 	string empty = ".";
 	if (isMeasureSlice()) {
@@ -8297,7 +8314,7 @@ string HumAddress::getTrackString(string separator) const {
 //   a HumdrumLine, the parameter's value should be NULL.
 //
 
-void HumAddress::setOwner(HumdrumLine* aLine) {
+void HumAddress::setOwner(HLp aLine) {
 	m_owner = aLine;
 }
 
@@ -8310,7 +8327,7 @@ void HumAddress::setOwner(HumdrumLine* aLine) {
 //    to a HumdrumLine object.
 //
 
-HumdrumLine* HumAddress::getLine(void) const {
+HLp HumAddress::getLine(void) const {
 	return m_owner;
 }
 
@@ -10774,7 +10791,7 @@ void HumGrid::insertExclusiveInterpretationLine(HumdrumFile& outfile) {
 		return;
 	}
 
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	HTp token;
 
 	if (m_recip) {
@@ -10804,7 +10821,7 @@ void HumGrid::insertExclusiveInterpretationLine(HumdrumFile& outfile) {
 // HumGrid::insertExInterpSides --
 //
 
-void HumGrid::insertExInterpSides(HumdrumLine* line, int part, int staff) {
+void HumGrid::insertExInterpSides(HLp line, int part, int staff) {
 
 	if (staff >= 0) {
 		int versecount = getVerseCount(part, staff); // verses related to staff
@@ -10845,7 +10862,7 @@ void HumGrid::insertPartNames(HumdrumFile& outfile) {
 	if (m_partnames.size() == 0) {
 		return;
 	}
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	HTp token;
 
 	if (m_recip) {
@@ -10894,7 +10911,7 @@ void HumGrid::insertPartIndications(HumdrumFile& outfile) {
 	if (this->at(0)->empty()) {
 		return;
 	}
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	HTp token;
 
 	if (m_recip) {
@@ -10927,7 +10944,7 @@ void HumGrid::insertPartIndications(HumdrumFile& outfile) {
 // HumGrid::insertSideNullInterpretations --
 //
 
-void HumGrid::insertSideNullInterpretations(HumdrumLine* line,
+void HumGrid::insertSideNullInterpretations(HLp line,
 		int part, int staff) {
 	HTp token;
 	string text;
@@ -10966,7 +10983,7 @@ void HumGrid::insertSideNullInterpretations(HumdrumLine* line,
 // HumGrid::insertSidePartInfo --
 //
 
-void HumGrid::insertSidePartInfo(HumdrumLine* line, int part, int staff) {
+void HumGrid::insertSidePartInfo(HLp line, int part, int staff) {
 	HTp token;
 	string text;
 
@@ -11020,7 +11037,7 @@ void HumGrid::insertStaffIndications(HumdrumFile& outfile) {
 		return;
 	}
 
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	HTp token;
 
 	if (m_recip) {
@@ -11059,7 +11076,7 @@ void HumGrid::insertStaffIndications(HumdrumFile& outfile) {
 // HumGrid::insertSideStaffInfo --
 //
 
-void HumGrid::insertSideStaffInfo(HumdrumLine* line, int part, int staff,
+void HumGrid::insertSideStaffInfo(HLp line, int part, int staff,
 		int staffnum) {
 	HTp token;
 	string text;
@@ -11117,7 +11134,7 @@ void HumGrid::insertDataTerminationLine(HumdrumFile& outfile) {
 	if (this->at(0)->empty()) {
 		return;
 	}
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	HTp token;
 
 	if (m_recip) {
@@ -11147,7 +11164,7 @@ void HumGrid::insertDataTerminationLine(HumdrumFile& outfile) {
 // HumGrid::insertSideTerminals --
 //
 
-void HumGrid::insertSideTerminals(HumdrumLine* line, int part, int staff) {
+void HumGrid::insertSideTerminals(HLp line, int part, int staff) {
 	HTp token;
 
 	if (staff < 0) {
@@ -16580,7 +16597,7 @@ bool HumdrumFileBase::read(istream& contents) {
 	clear();
 	m_displayError = true;
 	char buffer[123123] = {0};
-	HumdrumLine* s;
+	HLp s;
 	while (contents.getline(buffer, sizeof(buffer), '\n')) {
 		s = new HumdrumLine(buffer);
 		s->setOwner(this);
@@ -16630,7 +16647,7 @@ bool HumdrumFileBase::readCsv(const char* filename, const string& separator) {
 bool HumdrumFileBase::readCsv(istream& contents, const string& separator) {
 	m_displayError = true;
 	char buffer[123123] = {0};
-	HumdrumLine* s;
+	HLp s;
 	while (contents.getline(buffer, sizeof(buffer), '\n')) {
 		s = new HumdrumLine;
 		s->setLineFromCsv(buffer);
@@ -16924,7 +16941,7 @@ ostream& HumdrumFileBase::printFieldIndex(int fieldind, ostream& out) {
 //     given index in the data storage.
 //
 
-HumdrumLine* HumdrumFileBase::getLine(int index) {
+HLp HumdrumFileBase::getLine(int index) {
 	if (index < 0) {
 		return NULL;
 	} else if (index >= (int)m_lines.size()) {
@@ -17036,18 +17053,18 @@ void HumdrumFileBase::createLinesFromTokens(void) {
 //
 
 void HumdrumFileBase::appendLine(const char* line) {
-	HumdrumLine* s = new HumdrumLine(line);
+	HLp s = new HumdrumLine(line);
 	m_lines.push_back(s);
 }
 
 
 void HumdrumFileBase::appendLine(const string& line) {
-	HumdrumLine* s = new HumdrumLine(line);
+	HLp s = new HumdrumLine(line);
 	m_lines.push_back(s);
 }
 
 
-void HumdrumFileBase::appendLine(HumdrumLine* line) {
+void HumdrumFileBase::appendLine(HLp line) {
 	// deletion will be handled by class.
 	m_lines.push_back(line);
 }
@@ -17056,27 +17073,43 @@ void HumdrumFileBase::appendLine(HumdrumLine* line) {
 
 ////////////////////////////
 //
-// HumdrumFileBase::appendLine -- Add a line to the file's contents.  The file's
+// HumdrumFileBase::insertLine -- Add a line to the file's contents.  The file's
 //    spine and rhythmic structure should be recalculated after an append.
 //
 
 
 void HumdrumFileBase::insertLine(int index, const char* line) {
-	HumdrumLine* s = new HumdrumLine(line);
+	HLp s = new HumdrumLine(line);
 	m_lines.insert(m_lines.begin() + index, s);
+
+	// Update the line indexes for this line and the following ones:
+	for (int i=index; i<(int)m_lines.size(); i++) {
+		m_lines[i]->setLineIndex(i);
+	}
 }
 
 
 void HumdrumFileBase::insertLine(int index, const string& line) {
-	HumdrumLine* s = new HumdrumLine(line);
+	HLp s = new HumdrumLine(line);
 	m_lines.insert(m_lines.begin() + index, s);
+
+	// Update the line indexes for this line and the following ones:
+	for (int i=index; i<(int)m_lines.size(); i++) {
+		m_lines[i]->setLineIndex(i);
+	}
 }
 
 
-void HumdrumFileBase::insertLine(int index, HumdrumLine* line) {
+void HumdrumFileBase::insertLine(int index, HLp line) {
 	// deletion will be handled by class.
 	m_lines.insert(m_lines.begin() + index, line);
+
+	// Update the line indexes for this line and the following ones:
+	for (int i=index; i<(int)m_lines.size(); i++) {
+		m_lines[i]->setLineIndex(i);
+	}
 }
+
 
 
 //////////////////////////////
@@ -17107,7 +17140,7 @@ void HumdrumFileBase::deleteLine(int index) {
 // HumdrumFileBase::back --
 //
 
-HumdrumLine* HumdrumFileBase::back(void) {
+HLp HumdrumFileBase::back(void) {
 	return m_lines.back();
 }
 
@@ -17118,10 +17151,10 @@ HumdrumLine* HumdrumFileBase::back(void) {
 // HumdrumFileBase::getReferenceRecords --
 //
 
-vector<HumdrumLine*> HumdrumFileBase::getReferenceRecords(void) {
-	vector<HumdrumLine*> hlps;
+vector<HLp> HumdrumFileBase::getReferenceRecords(void) {
+	vector<HLp> hlps;
 	hlps.reserve(32);
-	HumdrumLine* hlp;
+	HLp hlp;
 	auto& infile = *this;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (infile[i].isReference()) {
@@ -17139,10 +17172,10 @@ vector<HumdrumLine*> HumdrumFileBase::getReferenceRecords(void) {
 // HumdrumFileBase::getGlobalReferenceRecords --
 //
 
-vector<HumdrumLine*> HumdrumFileBase::getGlobalReferenceRecords(void) {
-	vector<HumdrumLine*> hlps;
+vector<HLp> HumdrumFileBase::getGlobalReferenceRecords(void) {
+	vector<HLp> hlps;
 	hlps.reserve(32);
-	HumdrumLine* hlp;
+	HLp hlp;
 	auto& infile = *this;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (infile[i].isGlobalReference()) {
@@ -17160,10 +17193,10 @@ vector<HumdrumLine*> HumdrumFileBase::getGlobalReferenceRecords(void) {
 // HumdrumFileBase::getUniversalReferenceRecords --
 //
 
-vector<HumdrumLine*> HumdrumFileBase::getUniversalReferenceRecords(void) {
-	vector<HumdrumLine*> hlps;
+vector<HLp> HumdrumFileBase::getUniversalReferenceRecords(void) {
+	vector<HLp> hlps;
 	hlps.reserve(32);
-	HumdrumLine* hlp;
+	HLp hlp;
 	HumdrumFileBase& infile = *this;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (infile[i].isUniversalReference()) {
@@ -17670,8 +17703,8 @@ bool HumdrumFileBase::analyzeTracks(void) {
 //
 
 bool HumdrumFileBase::analyzeLinks(void) {
-	HumdrumLine* next     = NULL;
-	HumdrumLine* previous = NULL;
+	HLp next     = NULL;
+	HLp previous = NULL;
 
 	for (int i=0; i<(int)m_lines.size(); i++) {
 		if (!m_lines[i]->hasSpines()) {
@@ -18426,7 +18459,7 @@ void HumdrumFileBase::fixMerges(int linei) {
 // new          o    o         *v   *v   *    *v   *v
 // track:       1    2         3    3    4    5    5
 
-	HumdrumLine* newline = new HumdrumLine;
+	HLp newline = new HumdrumLine;
 	newline->setOwner(this);
 	bool foundboundary = false;
 	HTp token;
@@ -18636,6 +18669,290 @@ std::string HumdrumFileBase::getReferenceRecord(const std::string& key) {
 		}
 	}
 	return "";
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::insertNullDataLine -- Add a null data line at
+//     the given absolute quarter-note timestamp in the file.  If there
+//     is already a data line at the given timestamp, then do not create
+//     a line and instead return a pointer to the existing line.  Returns
+//     NULL if there was a problem.
+//
+
+HLp HumdrumFileBase::insertNullDataLine(HumNum timestamp) {
+	// for now do a linear search for the insertion point, but later
+	// do something more efficient.
+	HumdrumFileBase& infile = *this;
+	HumNum beforet(-1);
+	HumNum aftert(-1);
+	int beforei = -1;
+	int afteri = -1;
+	HumNum current;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		current = infile[i].getDurationFromStart();
+		if (current == timestamp) {
+			return &infile[i];
+		} else if (current < timestamp) {
+			beforet = current;
+			beforei = i;
+		} else if (current > timestamp) {
+			aftert = current;
+			afteri = i;
+			break;
+		}
+	}
+
+	if (beforei < 0) {
+		return NULL;
+	}
+	HLp newline = new HumdrumLine;
+	// copyStructure will add null tokens automatically
+	newline->copyStructure(&infile[beforei], ".");
+
+	infile.insertLine(beforei+1, newline);
+
+	// Set the timestamp information for inserted line:
+	HumNum delta = timestamp - beforet;
+	HumNum durationFromStart = infile[beforei].getDurationFromStart() + delta;
+	HumNum durationFromBarline = infile[beforei].getDurationFromBarline() + delta;
+	HumNum durationToBarline = infile[beforei].getDurationToBarline() - delta;
+
+	newline->m_durationFromStart = durationFromStart;
+	newline->m_durationFromBarline = durationFromBarline;
+	newline->m_durationToBarline = durationToBarline;
+
+	newline->m_duration = infile[beforei].m_duration - delta;
+	infile[beforei].m_duration = delta;
+
+	for (int i=0; i<infile[beforei].getFieldCount(); i++) {
+		HTp token = infile.token(beforei, i);
+		HTp newtoken = newline->token(i);
+		token->insertTokenAfter(newtoken);
+	}
+
+	return newline;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::insertNullInterpretationLine -- Add a null interpretation
+//     line at the given absolute quarter-note timestamp in the file.  The line will
+//     be added after any other interpretation lines at that timestamp, but before any
+//     local comments that appear immediately before the data line(s) at that timestamp.
+//     Returns NULL if there was a problem.
+//
+
+HLp HumdrumFileBase::insertNullInterpretationLine(HumNum timestamp) {
+	// for now do a linear search for the insertion point, but later
+	// do something more efficient.
+	HumdrumFileBase& infile = *this;
+	HumNum beforet(-1);
+	HumNum aftert(-1);
+	int beforei = -1;
+	int afteri = -1;
+	HumNum current;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		current = infile[i].getDurationFromStart();
+		if (current == timestamp) {
+			beforei = i;
+			break;
+		} else if (current < timestamp) {
+			beforet = current;
+			beforei = i;
+		} else if (current > timestamp) {
+			aftert = current;
+			afteri = i;
+			break;
+		}
+	}
+
+	if (beforei < 0) {
+		return NULL;
+	}
+
+	HLp target = getLineForInterpretationInsertion(beforei);
+
+	HLp newline = new HumdrumLine;
+	// copyStructure will add null tokens automatically
+	newline->copyStructure(target, "*");
+
+	int targeti = target->getLineIndex();
+
+	// There will be problems with linking to previous line if it is
+	// a manipulator.
+	// infile.insertLine(targeti-1, newline);
+	infile.insertLine(targeti, newline);
+
+	// inserted line will increment beforei by one:
+	beforei++;
+
+	// Set the timestamp information for inserted line:
+	HumNum durationFromStart = infile[beforei].getDurationFromStart();
+	HumNum durationFromBarline = infile[beforei].getDurationFromBarline();
+	HumNum durationToBarline = infile[beforei].getDurationToBarline();
+
+	newline->m_durationFromStart = durationFromStart;
+	newline->m_durationFromBarline = durationFromBarline;
+	newline->m_durationToBarline = durationToBarline;
+
+	newline->m_duration = 0;
+
+	// Problems here if targeti line is a manipulator.
+	for (int i=0; i<infile[targeti].getFieldCount(); i++) {
+		HTp token = infile.token(targeti, i);
+		HTp newtoken = newline->token(i);
+		token->insertTokenAfter(newtoken);
+	}
+
+	return newline;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::insertNullInterpretationLineAbove -- Add a null interpretation
+//     line at the given absolute quarter-note timestamp in the file.  The line will
+//     be added before any other lines at that timestamp.
+//     Returns NULL if there was a problem.
+//
+
+HLp HumdrumFileBase::insertNullInterpretationLineAbove(HumNum timestamp) {
+	// for now do a linear search for the insertion point, but later
+	// do something more efficient.
+	HumdrumFileBase& infile = *this;
+	HumNum beforet(-1);
+	HumNum aftert(-1);
+	int beforei = -1;
+	int afteri = -1;
+	HumNum current;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		current = infile[i].getDurationFromStart();
+		if (current == timestamp) {
+			beforei = i;
+			break;
+		} else if (current < timestamp) {
+			beforet = current;
+			beforei = i;
+		} else if (current > timestamp) {
+			aftert = current;
+			afteri = i;
+			break;
+		}
+	}
+
+	if (beforei < 0) {
+		return NULL;
+	}
+
+	HLp target = getLineForInterpretationInsertionAbove(beforei);
+
+	HLp newline = new HumdrumLine;
+	// copyStructure will add null tokens automatically
+	newline->copyStructure(target, "*");
+
+	int targeti = target->getLineIndex();
+
+	// There will be problems with linking to previous line if it is
+	// a manipulator.
+	// infile.insertLine(targeti-1, newline);
+	infile.insertLine(targeti, newline);
+
+	// inserted line will increment beforei by one:
+	beforei++;
+
+	// Set the timestamp information for inserted line:
+	HumNum durationFromStart = infile[beforei].getDurationFromStart();
+	HumNum durationFromBarline = infile[beforei].getDurationFromBarline();
+	HumNum durationToBarline = infile[beforei].getDurationToBarline();
+
+	newline->m_durationFromStart = durationFromStart;
+	newline->m_durationFromBarline = durationFromBarline;
+	newline->m_durationToBarline = durationToBarline;
+
+	newline->m_duration = 0;
+
+	// Problems here if targeti line is a manipulator.
+	for (int i=0; i<infile[targeti].getFieldCount(); i++) {
+		HTp token = infile.token(targeti, i);
+		HTp newtoken = newline->token(i);
+		token->insertTokenAfter(newtoken);
+	}
+
+	return newline;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getLineForInterpretationInsertion --  Search backwards
+//    in the file for the first local comment immediately before a data line
+//    index given as input.  If there are no local comments, then return the
+//    data line.  If there are local comment lines immediately before the data
+//    line, then keep searching for the first local comment.  Non-spined lines
+//    (global or empty lines) are ignored.  This function is used to insert
+//    an empty interpretation before a data line at a specific data line.
+//
+
+HLp HumdrumFileBase::getLineForInterpretationInsertion(int index) {
+	HumdrumFileBase& infile = *this;
+	int current = index - 1;
+	int previous = index;
+	while (current > 0) {
+		if (!infile[current].hasSpines()) {
+			current--;
+			continue;
+		}
+		if (infile[current].isCommentLocal()) {
+			previous = current;
+			current--;
+			continue;
+		}
+		return &infile[previous];
+	}
+	return &infile[index];
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getLineForInterpretationInsertionAbove --  Search backwards
+//    in the file for the first line at the same timestamp as the starting line.
+//
+
+HLp HumdrumFileBase::getLineForInterpretationInsertionAbove(int index) {
+	HumdrumFileBase& infile = *this;
+	HumNum timestamp = infile[index].getDurationFromStart();
+	HumNum teststamp;
+	int current = index - 1;
+	int previous = index;
+	while (current > 0) {
+		if (!infile[current].hasSpines()) {
+			current--;
+			continue;
+		}
+		teststamp = infile[current].getDurationFromStart();
+		if (teststamp == timestamp) {
+			previous = current;
+			current--;
+			continue;
+		}
+		return &infile[previous];
+	}
+	return &infile[index];
 }
 
 
@@ -19551,7 +19868,7 @@ void HumdrumFileContent::analyzeOttavas(void) {
 	vector<int> activeOttava(tcount+1, 0);
 	vector<int> octavestate(tcount+1, 0);
 	for (int i=0; i<getLineCount(); i++) {
-		HumdrumLine* line = getLine(i);
+		HLp line = getLine(i);
 		if (line->isInterpretation()) {
 			int fcount = getLine(i)->getFieldCount();
 			for (int j=0; j<fcount; j++) {
@@ -22064,10 +22381,10 @@ bool HumdrumFileSet::hasUniversalFilters(void) {
 // HumdrumFileSet::getUniversalReferenceRecords --
 //
 
-vector<HumdrumLine*> HumdrumFileSet::getUniversalReferenceRecords(void) {
-	vector<HumdrumLine*> hlps;
+vector<HLp> HumdrumFileSet::getUniversalReferenceRecords(void) {
+	vector<HLp> hlps;
 	hlps.reserve(32);
-	HumdrumLine* hlp;
+	HLp hlp;
 	HumdrumFileSet& infiles = *this;
 	for (int i=0; i<infiles.getCount(); i++) {
 		HumdrumFileBase& infile = infiles[i];
@@ -23096,10 +23413,10 @@ ostream& HumdrumFileStructure::printDurationInfo(ostream& out) {
 // HumdrumFileStructure::getBarline -- Return the given barline from the file
 //   based on the index number.  Negative index accesses from the end of the
 //   list.  If the first barline is a pickup measure, then the returned
-//   HumdrumLine* will not be an actual barline line.
+//   HLp will not be an actual barline line.
 //
 
-HumdrumLine* HumdrumFileStructure::getBarline(int index) const {
+HLp HumdrumFileStructure::getBarline(int index) const {
 	if (index < 0) {
 		index += (int)m_barlines.size();
 	}
@@ -23345,7 +23662,7 @@ bool HumdrumFileStructure::analyzeTokenDurations (void) {
 //
 
 bool HumdrumFileStructure::analyzeGlobalParameters(void) {
-	vector<HumdrumLine*> globals;
+	vector<HLp> globals;
 
 //	for (int i=0; i<(int)m_lines.size(); i++) {
 //		if (m_lines[i]->isCommentGlobal()) {
@@ -23656,7 +23973,7 @@ bool HumdrumFileStructure::setLineDurationFromStart(HTp token,
 		// undefined rhythm, so don't assign line duration information:
 		return isValid();
 	}
-	HumdrumLine* line = token->getOwner();
+	HLp line = token->getOwner();
 	if (line->getDurationFromStart().isNegative()) {
 		line->setDurationFromStart(dursum);
 	} else if (line->getDurationFromStart() != dursum) {
@@ -23733,9 +24050,9 @@ bool HumdrumFileStructure::analyzeRhythmOfFloatingSpine(
 //
 
 bool HumdrumFileStructure::analyzeNullLineRhythms(void) {
-	vector<HumdrumLine*> nulllines;
-	HumdrumLine* previous = NULL;
-	HumdrumLine* next = NULL;
+	vector<HLp> nulllines;
+	HLp previous = NULL;
+	HLp next = NULL;
 	HumNum dur;
 	HumNum startdur;
 	HumNum enddur;
@@ -24235,7 +24552,7 @@ HTp HumdrumFileStructure::getStrandEnd(int sindex, int index) {
 
 bool HumdrumFileStructure::hasFilters(void) {
 	HumdrumFileBase& infile = *this;
-	vector<HumdrumLine*> refs  = infile.getGlobalReferenceRecords();
+	vector<HLp> refs  = infile.getGlobalReferenceRecords();
 	for (int i=0; i<(int)refs.size(); i++) {
 		if (refs[i]->getGlobalReferenceKey() == "filter") {
 			return true;
@@ -24276,7 +24593,7 @@ bool HumdrumFileStructure::hasGlobalFilters(void) {
 
 bool HumdrumFileStructure::hasUniversalFilters(void) {
 	HumdrumFileBase& infile = *this;
-	vector<HumdrumLine*> refs  = infile.getUniversalReferenceRecords();
+	vector<HLp> refs  = infile.getUniversalReferenceRecords();
 	for (int i=0; i<(int)refs.size(); i++) {
 		if (refs[i]->getUniversalReferenceKey() == "filter") {
 			return true;
@@ -24331,7 +24648,7 @@ std::string HumdrumFileStructure::getKernAboveSignifier(void) {
 
 //////////////////////////////
 //
-// HumdrumFileStructure::getKernBelowSignifier -- used to place things
+// HumdrumFileStructure::getKernBelowSignifier -- Used to place things
 //     "below" (note on staff above, slurs/ties with an "below" orientation,
 //     etc.
 //
@@ -26432,6 +26749,34 @@ int HumdrumLine::getBarNumber(void) {
 
 //////////////////////////////
 //
+// HumdrumLine::copyStructure -- For data lines only at the moment.
+//
+
+void HumdrumLine::copyStructure(HLp line, const string& empty) {
+		m_tokens.resize(line->m_tokens.size());
+		for (int i=0; i<(int)m_tokens.size(); i++) {
+			m_tokens[i] = new HumdrumToken(empty);
+			m_tokens[i]->setOwner(this);
+			m_tokens[i]->copyStructure(line->m_tokens[i]);
+		}
+		createLineFromTokens();
+
+		m_tabs = line->m_tabs;
+		m_linkedParameters.clear();
+		m_rhythm_analyzed = line->m_rhythm_analyzed;
+		m_owner = line->m_owner;
+
+		// Other information that should be set later:
+		//    int m_lineindex;
+		//    HumNum m_durationFromStart;
+		//    HumNum m_durationFromBarline;
+		//    HumNum m_durationToBarline;
+}
+
+
+
+//////////////////////////////
+//
 // operator<< -- Print a HumdrumLine. Needed to avoid interaction with
 //     HumHash parent class.
 //
@@ -26441,7 +26786,7 @@ ostream& operator<<(ostream& out, HumdrumLine& line) {
 	return out;
 }
 
-ostream& operator<< (ostream& out, HumdrumLine* line) {
+ostream& operator<< (ostream& out, HLp line) {
 	out << (string)(*line);
 	return out;
 }
@@ -26526,7 +26871,7 @@ HumdrumToken::HumdrumToken(HumdrumToken* token) :
 
 
 
-HumdrumToken::HumdrumToken(const HumdrumToken& token, HumdrumLine* owner) :
+HumdrumToken::HumdrumToken(const HumdrumToken& token, HLp owner) :
 		string((string)token), HumHash((HumHash)token) {
 	m_address         = token.m_address;
 	m_address.m_owner = owner;
@@ -26542,7 +26887,7 @@ HumdrumToken::HumdrumToken(const HumdrumToken& token, HumdrumLine* owner) :
 }
 
 
-HumdrumToken::HumdrumToken(HumdrumToken* token, HumdrumLine* owner) :
+HumdrumToken::HumdrumToken(HumdrumToken* token, HLp owner) :
 		string((string)(*token)), HumHash((HumHash)(*token)) {
 	m_address         = token->m_address;
 	m_address.m_owner = owner;
@@ -26670,6 +27015,33 @@ bool HumdrumToken::equalChar(int index, char ch) const {
 
 int HumdrumToken::getPreviousNonNullDataTokenCount(void) {
 	return (int)m_previousNonNullTokens.size();
+}
+
+
+//////////////////////////////
+//
+// HumdrumToken::insertTokenAfter -- Insert the given token after the this token.
+//    This will sever the link from this token to its next token.  There is only
+//    presumed to be one next token, at least for the moment.
+//
+//
+
+void HumdrumToken::insertTokenAfter(HTp newtoken) {
+	if (m_nextTokens.empty()) {
+		m_nextTokens.push_back(newtoken);
+	} else {
+		HTp oldnexttoken = m_nextTokens[0];
+		m_nextTokens[0] = newtoken;
+		newtoken->m_previousTokens.clear();
+		newtoken->m_previousTokens.push_back(this);
+		newtoken->m_nextTokens.clear();
+		newtoken->m_nextTokens.push_back(oldnexttoken);
+		if (oldnexttoken->m_previousTokens.empty()) {
+			oldnexttoken->m_previousTokens.push_back(newtoken);
+		} else {
+			oldnexttoken->m_previousTokens[0] = newtoken;
+		}
+	}
 }
 
 
@@ -27094,7 +27466,7 @@ HumdrumToken* HumdrumToken::getPreviousToken(int index) const {
 //
 
 HTp HumdrumToken::getNextFieldToken(void) const {
-	HumdrumLine* line = getLine();
+	HLp line = getLine();
 	if (!line) {
 		return NULL;
 	}
@@ -27113,7 +27485,7 @@ HTp HumdrumToken::getNextFieldToken(void) const {
 //
 
 HTp HumdrumToken::getPreviousFieldToken(void) const {
-	HumdrumLine* line = getLine();
+	HLp line = getLine();
 	if (!line) {
 		return NULL;
 	}
@@ -27382,7 +27754,7 @@ HumNum HumdrumToken::getDurationToEnd(HumNum scale) {
 //
 
 HumNum HumdrumToken::getBarlineDuration(void) {
-	HumdrumLine* own = getOwner();
+	HLp own = getOwner();
 	if (own == NULL) {
 		return 0;
 	}
@@ -27391,7 +27763,7 @@ HumNum HumdrumToken::getBarlineDuration(void) {
 
 
 HumNum HumdrumToken::getBarlineDuration(HumNum scale) {
-	HumdrumLine* own = getOwner();
+	HLp own = getOwner();
 	if (own == NULL) {
 		return 0;
 	}
@@ -27408,7 +27780,7 @@ HumNum HumdrumToken::getBarlineDuration(HumNum scale) {
 //
 
 HumNum HumdrumToken::getDurationToBarline(void) {
-	HumdrumLine* own = getOwner();
+	HLp own = getOwner();
 	if (own == NULL) {
 		return 0;
 	}
@@ -27416,7 +27788,7 @@ HumNum HumdrumToken::getDurationToBarline(void) {
 }
 
 HumNum HumdrumToken::getDurationToBarline(HumNum scale) {
-	HumdrumLine* own = getOwner();
+	HLp own = getOwner();
 	if (own == NULL) {
 		return 0;
 	}
@@ -27433,7 +27805,7 @@ HumNum HumdrumToken::getDurationToBarline(HumNum scale) {
 //
 
 HumNum HumdrumToken::getDurationFromBarline(void) {
-	HumdrumLine* own = getOwner();
+	HLp own = getOwner();
 	if (own == NULL) {
 		return 0;
 	}
@@ -27441,7 +27813,7 @@ HumNum HumdrumToken::getDurationFromBarline(void) {
 }
 
 HumNum HumdrumToken::getDurationFromBarline(HumNum scale) {
-	HumdrumLine* own = getOwner();
+	HLp own = getOwner();
 	if (own == NULL) {
 		return 0;
 	}
@@ -27875,7 +28247,7 @@ bool HumdrumToken::hasSlurEnd(void) {
 //
 
 int HumdrumToken::hasVisibleAccidental(int subtokenIndex) const {
-	HumdrumLine* humrec = getOwner();
+	HLp humrec = getOwner();
 	if (humrec == NULL) {
 		return -1;
 	}
@@ -27905,7 +28277,7 @@ int HumdrumToken::hasVisibleAccidental(int subtokenIndex) const {
 //
 
 int HumdrumToken::hasCautionaryAccidental(int subtokenIndex) const {
-	HumdrumLine* humrec = getOwner();
+	HLp humrec = getOwner();
 	if (humrec == NULL) {
 		return -1;
 	}
@@ -28343,7 +28715,7 @@ bool HumdrumToken::noteInLowerSubtrack(void) {
 	int field = this->getFieldIndex();
 	int track = this->getTrack();
 
-	HumdrumLine* owner = this->getOwner();
+	HLp owner = this->getOwner();
 	if (owner == NULL) {
 		return false;
 	}
@@ -29112,7 +29484,7 @@ std::string HumdrumToken::getLayoutParameterNote(const std::string& category,
 // HumdrumToken::setOwner -- Sets the HumdrumLine owner of this token.
 //
 
-void HumdrumToken::setOwner(HumdrumLine* aLine) {
+void HumdrumToken::setOwner(HLp aLine) {
 	m_address.setOwner(aLine);
 }
 
@@ -29124,7 +29496,7 @@ void HumdrumToken::setOwner(HumdrumLine* aLine) {
 //    owns this token.
 //
 
-HumdrumLine* HumdrumToken::getOwner(void) const {
+HLp HumdrumToken::getOwner(void) const {
 	return m_address.getOwner();
 }
 
@@ -29386,7 +29758,7 @@ ostream& HumdrumToken::printXmlLinkedParameterInfo(ostream& out, int level, cons
 		out << Convert::repeatString(indent, level);
 		out << "<linked-parameter";
 		out << " idref=\"";
-		HumdrumLine* owner = m_linkedParameterTokens[i]->getOwner();
+		HLp owner = m_linkedParameterTokens[i]->getOwner();
 		if (owner && owner->isGlobalComment()) {
 			out << owner->getXmlId();
 		} else {
@@ -29714,7 +30086,7 @@ HTp HumdrumToken::getPhraseEndToken(int number) {
 
 HTp HumdrumToken::resolveNull(void) {
 	if (m_nullresolve == NULL) {
-		HumdrumLine* hline = getOwner();
+		HLp hline = getOwner();
 		if (hline) {
 			HumdrumFile* infile = hline->getOwner();
 			infile->resolveNullTokens();
@@ -29739,6 +30111,22 @@ HTp HumdrumToken::resolveNull(void) {
 
 void HumdrumToken::setNullResolution(HTp resolution) {
 	m_nullresolve = resolution;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::copyStucture --
+//
+
+void HumdrumToken::copyStructure(HTp token) {
+	m_strand = token->m_strand;
+	HLp temp_owner = m_address.m_owner;
+	m_address = token->m_address;
+	m_address.m_owner = NULL;  // This will in general be different, so do not copy.
+	m_address.m_owner = temp_owner; // But preserve in case already set.
+	// m_nullresolve: set this?
 }
 
 
@@ -39228,8 +39616,7 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
 	}
 
 	stringstream ss;
-
-	addNotations(ss, notations);
+	addNotations(ss, notations, beamstarts);
 
 	if (primarynote) {
 		// only add these signifiers if this is the first
@@ -39272,7 +39659,8 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
 //   TrillTurn (TR or tR).
 //
 
-void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
+void MxmlEvent::addNotations(stringstream& ss, xml_node notations,
+		int beamstarts) const {
 	if (!notations) {
 		return;
 	}
@@ -39287,6 +39675,8 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 	bool strongaccent   = false;
 	bool fermata        = false;
 	bool trill          = false;
+	int  tremolo        = 0;
+	bool fingered       = false;
 	bool umordent       = false;
 	bool lmordent       = false;
 	bool upbow          = false;
@@ -39348,6 +39738,22 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 					trill = true;
 				}
 
+            //  <ornaments>
+            //     <tremolo type="single">2</tremolo>
+            //  </ornaments>
+				if (strcmp(grandchild.name(), "tremolo") == 0) {
+					string ttype = grandchild.attribute("type").value();
+					if (ttype == "start") {
+						fingered = true;
+					} else {
+						fingered = false;
+					}
+					if (ttype != "stop") {
+						string tstring = grandchild.child_value();
+						tremolo = 1 << (stoi(tstring) + 2);
+					}
+				}
+
 				// umordent
           	// <ornaments>
           	//   <inverted-mordent default-x="-4" default-y="-65" placement="below"/>
@@ -39381,6 +39787,7 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 		// figure out whole-tone trills later via trillspell tool:
 		reportOrnamentToOwner();
 	}
+
 	if (fermata)      { ss << ";";  }
 	if (upbow)        { ss << "v";  }
 	if (downbow)      { ss << "u";  }
@@ -39401,6 +39808,17 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 	}
 	if (arpeggio)     { ss << ":";  }
 
+	if (tremolo >= 8) {
+		int tvalue = tremolo;
+		if (fingered) {
+			if (beamstarts) {
+				tvalue *= (1 << beamstarts);
+			}
+			ss << "@@" << tvalue << "@@";
+		} else {
+			ss << "@" << tvalue << "@";
+		}
+	}
 }
 
 
@@ -56341,6 +56759,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(tassoize, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
 			RUNTOOL(transpose, infile, commands[i].second, status);
+		} else if (commands[i].first == "tremolo") {
+			RUNTOOL(tremolo, infile, commands[i].second, status);
 		} else if (commands[i].first == "trillspell") {
 			RUNTOOL(trillspell, infile, commands[i].second, status);
 		} else if (commands[i].first == "binroll") {
@@ -56417,7 +56837,7 @@ void Tool_filter::removeUniversalFilterLines(HumdrumFileSet& infiles) {
 void Tool_filter::getCommandList(vector<pair<string, string> >& commands,
 		HumdrumFile& infile) {
 
-	vector<HumdrumLine*> refs = infile.getReferenceRecords();
+	vector<HLp> refs = infile.getReferenceRecords();
 	pair<string, string> entry;
 	string tag = "filter";
 	vector<string> clist;
@@ -56452,7 +56872,7 @@ void Tool_filter::getCommandList(vector<pair<string, string> >& commands,
 void Tool_filter::getUniversalCommandList(vector<pair<string, string> >& commands,
 		HumdrumFileSet& infiles) {
 
-	vector<HumdrumLine*> refs = infiles.getUniversalReferenceRecords();
+	vector<HLp> refs = infiles.getUniversalReferenceRecords();
 	pair<string, string> entry;
 	string tag = "filter";
 	vector<string> clist;
@@ -57977,7 +58397,7 @@ void Tool_humsheet::printHtmlFooter(void) {
 
 void Tool_humsheet::printRowClasses(HumdrumFile& infile, int row) {
 	string classes;
-	HumdrumLine* hl = &infile[row];
+	HLp hl = &infile[row];
 	if (hl->hasSpines()) {
 		classes += "spined ";
 	}
@@ -58062,7 +58482,7 @@ void Tool_humsheet::printRowClasses(HumdrumFile& infile, int row) {
 //    starts with "!LO:".
 //
 
-bool Tool_humsheet::isLayout(HumdrumLine* line) {
+bool Tool_humsheet::isLayout(HLp line) {
 	if (line->hasSpines()) {
 		if (!line->isCommentLocal()) {
 			return false;
@@ -59395,7 +59815,7 @@ void Tool_imitation::analyzeImitation(vector<vector<string>>& results,
 						}
 						data = true;
 						results.at(v1).at(line1) += "b";
-						HumdrumLine* humline = attacks.at(v1).at(i)->getToken()->getOwner();
+						HLp humline = attacks.at(v1).at(i)->getToken()->getOwner();
 						stringstream ss;
 						ss.str("");
 						ss << humline->getBeat().getFloat();
@@ -59502,7 +59922,7 @@ void Tool_imitation::analyzeImitation(vector<vector<string>>& results,
 						}
 						data2 = true;
 						results.at(v2).at(line2) += "b";
-						HumdrumLine* humline = attacks.at(v2).at(j)->getToken()->getOwner();
+						HLp humline = attacks.at(v2).at(j)->getToken()->getOwner();
 						stringstream ss;
 						ss.str("");
 						ss << humline->getBeat().getFloat();
@@ -66863,6 +67283,11 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		trillspell.run(outfile);
 	}
 
+	if (m_hasTremoloQ) {
+		Tool_tremolo tremolo;
+		tremolo.run(outfile);
+	}
+
 	if (m_software == "sibelius") {
 		// Needed at least for Sibelius 19.5/Dolet 6.6 for Sibelius
 		// where grace note groups are not beamed in the MusicXML export.
@@ -67701,7 +68126,7 @@ bool Tool_musicxml2hum::stitchParts(HumGrid& outdata,
 //
 
 void Tool_musicxml2hum::cleanupMeasures(HumdrumFile& outfile,
-		vector<HumdrumLine*> measures) {
+		vector<HLp> measures) {
 
    HumdrumToken* token;
 	for (int i=0; i<outfile.getLineCount(); i++) {
@@ -67726,7 +68151,7 @@ void Tool_musicxml2hum::cleanupMeasures(HumdrumFile& outfile,
 //
 
 void Tool_musicxml2hum::insertSingleMeasure(HumdrumFile& outfile) {
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	HumdrumToken* token;
 	token = new HumdrumToken("=");
 	line->appendToken(token);
@@ -67744,7 +68169,7 @@ void Tool_musicxml2hum::insertSingleMeasure(HumdrumFile& outfile) {
 void Tool_musicxml2hum::insertAllToken(HumdrumFile& outfile,
 		vector<MxmlPart>& partdata, const string& common) {
 
-	HumdrumLine* line = new HumdrumLine;
+	HLp line = new HumdrumLine;
 	HumdrumToken* token;
 
 	int i, j;
@@ -68231,6 +68656,9 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		pitch     = event->getKernPitch();
 		prefix    = event->getPrefixNoteInfo();
 		postfix   = event->getPostfixNoteInfo(primarynote);
+		if (postfix.find("@") != string::npos) {
+			m_hasTremoloQ = true;
+		}
 		bool grace     = event->isGrace();
 		int slurstarts = event->hasSlurStart(slurdirs);
 		int slurstops = event->hasSlurStop();
@@ -71253,7 +71681,7 @@ bool Tool_musicxml2hum::nodeType(xml_node node, const char* testname) {
 // Tool_musicxml2hum::appendNullTokens --
 //
 
-void Tool_musicxml2hum::appendNullTokens(HumdrumLine* line,
+void Tool_musicxml2hum::appendNullTokens(HLp line,
 		MxmlPart& part) {
 	int i;
 	int staffcount = part.getStaffCount();
@@ -80116,8 +80544,8 @@ void Tool_tassoize::deleteBreaks(HumdrumFile& infile) {
 //
 
 void Tool_tassoize::addBibliographicRecords(HumdrumFile& infile) {
-	std::vector<HumdrumLine*> refinfo = infile.getReferenceRecords();
-	std::map<string, HumdrumLine*> refs;
+	std::vector<HLp> refinfo = infile.getReferenceRecords();
+	std::map<string, HLp> refs;
 	for (int i=0; i<(int)refinfo.size(); i++) {
 		string key = refinfo[i]->getReferenceKey();
 		refs[key] = refinfo[i];
@@ -82133,6 +82561,563 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 
 	transval += 40 * octave;
 }
+
+
+
+
+/////////////////////////////////
+//
+// Tool_tremolo::Tool_tremolo -- Set the recognized options for the tool.
+//
+
+Tool_tremolo::Tool_tremolo(void) {
+	define("k|keep=b", "Keep tremolo rhythm markup");
+	define("F|no-fill=b", "Do not fill in tremolo spaces");
+	define("T|no-tremolo-interpretation=b", "Do not add *tremolo/*Xtremolo marks");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_tremolo::run -- Do the main work of the tool.
+//
+
+bool Tool_tremolo::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_tremolo::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_tremolo::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_tremolo::run(HumdrumFile& infile) {
+	processFile(infile);
+
+	// Force reprocessing of file for now (does not seem to be
+	// completely updated in javascript):
+	stringstream ss;
+	ss << infile;
+	infile.readString(ss.str());
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tremolo::processFile --
+//
+
+void Tool_tremolo::processFile(HumdrumFile& infile) {
+	m_keepQ = getBoolean("keep");
+	m_first_tremolo_time.clear();
+	m_last_tremolo_time.clear();
+	int maxtrack = infile.getMaxTrack();
+	m_first_tremolo_time.resize(maxtrack+1);
+	m_last_tremolo_time.resize(maxtrack+1);
+	fill(m_first_tremolo_time.begin(), m_first_tremolo_time.end(), -1);
+	fill(m_last_tremolo_time.begin(), m_last_tremolo_time.end(), -1);
+	HumRegex hre;
+	m_markup_tokens.reserve(1000);
+	for (int i=infile.getLineCount()-1; i>=0; i--) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		if (infile[i].getDuration() == 0) {
+			// don't deal with grace notes
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+
+			if (hre.search(token, "@(\\d+)@")) {
+				m_markup_tokens.push_back(token);
+				int value = hre.getMatchInt(1);
+				HumNum duration = Convert::recipToDuration(token);
+				HumNum count = duration;
+				count *= value;
+				count /= 4;
+				HumNum increment = 4;
+				increment /= value;
+
+				if (token->find("@@") != string::npos) {
+					count *= 2;
+				}
+
+				if (!count.isInteger()) {
+					cerr << "Error: time value cannot be used: " << value << endl;
+					continue;
+				}
+				int kcount = count.getNumerator();
+				HumNum starttime = token->getDurationFromStart();
+				HumNum timestamp;
+				for (int k=1; k<kcount; k++) {
+					timestamp = starttime + (increment * k);
+					infile.insertNullDataLine(timestamp);
+				}
+			}
+
+		}
+	}
+
+	if (!getBoolean("no-fill")) {
+		expandTremolos();
+		if (!getBoolean("no-tremolo-interpretation")) {
+			addTremoloInterpretations(infile);
+		}
+	} else if (!m_keepQ) {
+		removeMarkup();
+	}
+
+	if (m_modifiedQ) {
+		infile.createLinesFromTokens();
+	}
+
+	// m_humdrum_text << infile;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tremolo::addTremoloInterpretations --
+//
+
+void Tool_tremolo::addTremoloInterpretations(HumdrumFile& infile) {
+
+	// Insert starting *tremolo
+	for (int i=0; i<(int)m_first_tremolo_time.size(); i++) {
+		if (m_first_tremolo_time[i] < 0) {
+			continue;
+		}
+		HLp line = infile.insertNullInterpretationLine(m_first_tremolo_time[i]);
+		if (line != NULL) {
+			for (int j=0; j<line->getFieldCount(); j++) {
+				HTp token = line->token(j);
+				int track = token->getTrack();
+				int subtrack = token->getSubtrack();
+				if (subtrack > 1) {
+					// Currently *tremolo affects all subtracks, but this
+					// will probably change in the future.
+					continue;
+				}
+				if (track == i) {
+					token->setText("*tremolo");
+					line->createLineFromTokens();
+				}
+			}
+		}
+	}
+
+	// Insert ending *Xtremolo
+	for (int i=0; i<(int)m_last_tremolo_time.size(); i++) {
+		if (m_last_tremolo_time[i] < 0) {
+			continue;
+		}
+		HLp line = infile.insertNullInterpretationLineAbove(m_last_tremolo_time[i]);
+		if (line != NULL) {
+			for (int j=0; j<line->getFieldCount(); j++) {
+				HTp token = line->token(j);
+				int track = token->getTrack();
+				int subtrack = token->getSubtrack();
+				if (subtrack > 1) {
+					// Currently *tremolo affects all subtracks, but this
+					// will probably change in the future.
+					continue;
+				}
+				if (track == i) {
+					token->setText("*Xtremolo");
+					line->createLineFromTokens();
+				}
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tremolo::expandTremolos --
+//
+
+void Tool_tremolo::expandTremolos(void) {
+	for (int i=0; i<(int)m_markup_tokens.size(); i++) {
+		if (m_markup_tokens[i]->find("@@") != string::npos) {
+			expandFingerTremolo(m_markup_tokens[i]);
+		} else {
+			expandTremolo(m_markup_tokens[i]);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tremolo::expandTremolos --
+//
+
+void Tool_tremolo::expandTremolo(HTp token) {
+	HumRegex hre;
+	int value = 0;
+	HumNum duration;
+	HumNum repeat;
+	HumNum increment;
+	int tnotes = -1;
+	if (hre.search(token, "@(\\d+)@")) {
+		value = hre.getMatchInt(1);
+		if (!Convert::isPowerOfTwo(value)) {
+			cerr << "Error: not a power of two: " << token << endl;
+			return;
+		}
+		if (value < 8) {
+			cerr << "Error: tremolo can only be eighth-notes or shorter" << endl;
+			return;
+		}
+		duration = Convert::recipToDuration(token);
+		repeat = duration;
+		repeat *= value;
+		repeat /= 4;
+		increment = 4;
+		increment /= value;
+		if (!repeat.isInteger()) {
+			cerr << "Error: tremolo repetition count must be an integer: " << token << endl;
+			return;
+		}
+		tnotes = repeat.getNumerator();
+	} else {
+		return;
+	}
+
+	storeFirstTremoloNoteInfo(token);
+
+	int beams = log((double)(value))/log(2.0) - 2;
+	string markup = "@" + to_string(value) + "@";
+	string base = token->getText();
+	hre.replaceDestructive(base, "", markup, "g");
+	// Currently not allowed to add tremolo to beamed notes, so remove all beaming:
+	hre.replaceDestructive(base, "", "[LJKk]+", "g");
+	string startbeam;
+	string endbeam;
+	for (int i=0; i<beams; i++) {
+		startbeam += 'L';
+		endbeam   += 'J';
+	}
+	// Set the rhythm of the tremolo notes.
+	// Augmentation dot is expected adjacent to regular rhythm value.
+	// Maybe allow anywhere?
+	hre.replaceDestructive(base, to_string(value), "\\d+%?\\d*\\.*", "g");
+	string initial = base + startbeam;
+	// remove slur end from start of tremolo:
+	hre.replaceDestructive(initial, "", "[)]+[<>]?", "g");
+	if (m_keepQ) {
+		initial += markup;
+	}
+	string terminal = base + endbeam;
+	// remove slur start information from end of tremolo:
+	hre.replaceDestructive(terminal, "", "[(]+[<>]?", "g");
+
+	// remove slur information from middle of tremolo:
+	hre.replaceDestructive(base, "", "[()]+[<>]?", "g");
+
+	token->setText(initial);
+	token->getOwner()->createLineFromTokens();
+
+	// Now fill in the rest of the tremolos.
+	HumNum starttime = token->getDurationFromStart();
+	HumNum timestamp = starttime + increment;
+	HTp current = token->getNextToken();
+	int counter = 1;
+	while (current) {
+		if (!current->isData()) {
+			// Also check if line is non-zero duration (not a grace-note line).
+			current = current->getNextToken();
+			continue;
+		}
+		HumNum cstamp = current->getDurationFromStart();
+		if (cstamp < timestamp) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (cstamp > timestamp) {
+			cerr << "\tWarning: terminating tremolo insertion early" << endl;
+			cerr << "\tCSTAMP : " << cstamp << " TSTAMP " << timestamp << endl;
+			break;
+		}
+		counter++;
+		if (tnotes == counter) {
+			current->setText(terminal);
+			storeLastTremoloNoteInfo(current);
+		} else {
+			current->setText(base);
+		}
+		current->getOwner()->createLineFromTokens();
+		if (counter >= tnotes) {
+			// done with inserting of tremolo notes.
+			break;
+		}
+		timestamp += increment;
+		current = current->getNextToken();
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_tremolo::getNextNote --
+//
+
+HTp Tool_tremolo::getNextNote(HTp token) {
+	HTp output = NULL;
+	HTp current = token->getNextToken();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->getDuration() == 0) {
+			// ignore grace notes
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull() || current->isRest()) {
+			current = current->getNextToken();
+			continue;
+		}
+		output = current;
+		break;
+	}
+
+	return output;
+}
+
+
+//////////////////////////////
+//
+// Tool_tremolo::expandFingerTremolos --
+//
+
+void Tool_tremolo::expandFingerTremolo(HTp token1) {
+	HTp token2 = getNextNote(token1);
+	if (token2 == NULL) {
+		return;
+	}
+	HumRegex hre;
+	int value = 0;
+	HumNum duration;
+	HumNum repeat;
+	HumNum increment;
+	int tnotes = -1;
+	if (hre.search(token1, "@@(\\d+)@@")) {
+		value = hre.getMatchInt(1);
+		if (!Convert::isPowerOfTwo(value)) {
+			cerr << "Error: not a power of two: " << token1 << endl;
+			return;
+		}
+		if (value < 8) {
+			cerr << "Error: tremolo can only be eighth-notes or shorter" << endl;
+			return;
+		}
+		duration = Convert::recipToDuration(token1);
+		HumNum count = duration;
+
+		count *= value;
+		count /= 4;
+		if (!count.isInteger()) {
+			cerr << "Error: tremolo repetition count must be an integer: " << token1 << endl;
+			return;
+		}
+		increment = 4;
+		increment /= value;
+
+		tnotes = count.getNumerator() * 2;
+	} else {
+		return;
+	}
+
+	storeFirstTremoloNoteInfo(token1);
+
+	int beams = log((double)(value))/log(2.0) - 2;
+	string markup = "@@" + to_string(value) + "@@";
+
+	string base1 = token1->getText();
+	hre.replaceDestructive(base1, "", markup, "g");
+	// Currently not allowed to add tremolo to beamed notes, so remove all beaming:
+	hre.replaceDestructive(base1, "", "[LJKk]+", "g");
+	string startbeam;
+	string endbeam;
+	for (int i=0; i<beams; i++) {
+		startbeam += 'L';
+		endbeam   += 'J';
+	}
+
+	// Set the rhythm of the tremolo notes.
+	// Augmentation dot is expected adjacent to regular rhythm value.
+	// Maybe allow anywhere?
+	hre.replaceDestructive(base1, to_string(value), "\\d+%?\\d*\\.*", "g");
+	string initial = base1 + startbeam;
+	// remove slur end from start of tremolo:
+	hre.replaceDestructive(initial, "", "[)]+[<>]?", "g");
+	if (m_keepQ) {
+		initial += markup;
+	}
+
+	// remove slur information from middle of tremolo:
+	hre.replaceDestructive(base1, "", "[()]+[<>]?", "g");
+
+	token1->setText(initial);
+	token1->getOwner()->createLineFromTokens();
+
+	string base2 = token2->getText();
+	hre.replaceDestructive(base2, "", "[LJKk]+", "g");
+	hre.replaceDestructive(base2, to_string(value), "\\d+%?\\d*\\.*", "g");
+
+	string terminal = base2 + endbeam;
+	// remove slur start information from end of tremolo:
+	hre.replaceDestructive(terminal, "", "[(]+[<>]?", "g");
+
+	bool state = false;
+
+	// Now fill in the rest of the tremolos.
+	HumNum starttime = token1->getDurationFromStart();
+	HumNum timestamp = starttime + increment;
+	HTp current = token1->getNextToken();
+	int counter = 1;
+	while (current) {
+		if (!current->isData()) {
+			// Also check if line is non-zero duration (not a grace-note line).
+			current = current->getNextToken();
+			continue;
+		}
+		HumNum cstamp = current->getDurationFromStart();
+		if (cstamp < timestamp) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (cstamp > timestamp) {
+			cerr << "\tWarning: terminating tremolo insertion early" << endl;
+			cerr << "\tCSTAMP : " << cstamp << " TSTAMP " << timestamp << endl;
+			break;
+		}
+		counter++;
+		if (tnotes == counter) {
+			current->setText(terminal);
+			storeLastTremoloNoteInfo(current);
+		} else {
+			if (state) {
+				current->setText(base1);
+			} else {
+				current->setText(base2);
+			}
+			state = !state;
+		}
+		current->getOwner()->createLineFromTokens();
+		if (counter >= tnotes) {
+			// done with inserting of tremolo notes.
+			break;
+		}
+		timestamp += increment;
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tremolo::removeMarkup --  Remove markup such as "@16@" from tokens.
+//
+
+void Tool_tremolo::removeMarkup(void) {
+	if (m_markup_tokens.empty()) {
+		return;
+	}
+	HumRegex hre;
+	for (int i=0; i<(int)m_markup_tokens.size(); i++) {
+		HTp token = m_markup_tokens[i];
+		string text = *token;
+		hre.replaceDestructive(text, "", "@+\\d+@+");
+		token->setText(text);
+		token->getOwner()->createLineFromTokens();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tremolo::storeFirstTremoloNote --
+//
+
+void Tool_tremolo::storeFirstTremoloNoteInfo(HTp token) {
+	int track = token->getTrack();
+	HumNum timestamp = token->getDurationFromStart();
+	if (m_first_tremolo_time.at(track) < 0) {
+		m_first_tremolo_time.at(track) = timestamp;
+	} else if (timestamp < m_first_tremolo_time.at(track)) {
+		// This case is probably not necessary.
+		m_first_tremolo_time.at(track) = timestamp;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tremolo::storeLastTremoloNote --
+//
+
+void Tool_tremolo::storeLastTremoloNoteInfo(HTp token) {
+	if (!token) {
+		return;
+	}
+	int track = token->getTrack();
+	if (track < 1) {
+		cerr << "Track is not set for token: " << track << endl;
+		return;
+	}
+	HumNum timestamp = token->getDurationFromStart();
+	timestamp += token->getDuration();
+	if (m_last_tremolo_time.at(track) < 0) {
+		m_last_tremolo_time.at(track) = timestamp;
+	} else if (timestamp > m_last_tremolo_time.at(track)) {
+		m_last_tremolo_time.at(track) = timestamp;
+	}
+}
+
 
 
 
