@@ -178,6 +178,22 @@ Accid *Note::GetDrawingAccid()
     return accid;
 }
 
+bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+{
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+    }
+
+    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+    linesBelow = -(this->GetDrawingLoc()) / 2;
+
+    linesAbove = std::max(linesAbove, 0);
+    linesBelow = std::max(linesBelow, 0);
+
+    return ((linesAbove > 0) || (linesBelow > 0));
+}
+
 Chord *Note::IsChordTone() const
 {
     return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
@@ -299,6 +315,42 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     }
 
     return p;
+}
+
+int Note::CalcStemLenInHalfUnits(Staff *staff)
+{
+    assert(staff);
+
+    int baseStem = STANDARD_STEMLENGTH * 2;
+
+    int shortening = 0;
+
+    int unitToLine = (this->GetDrawingStemDir() == STEMDIRECTION_up)
+        ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
+        : this->GetDrawingLoc();
+    if (unitToLine < 5) {
+        switch (unitToLine) {
+            case 4: shortening = 1; break;
+            case 3: shortening = 2; break;
+            case 2: shortening = 3; break;
+            case 1: shortening = 4; break;
+            default: shortening = 4;
+        }
+    }
+
+    // Limit shortening with duration shorter than quarter not when not in a beam
+    if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            shortening = std::min(3, shortening);
+        }
+        else {
+            shortening = std::min(2, shortening);
+        }
+    }
+
+    baseStem -= shortening;
+
+    return baseStem;
 }
 
 wchar_t Note::GetMensuralSmuflNoteHead()
@@ -761,10 +813,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     /************** Ledger lines: **************/
 
-    int linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    int linesBelow = -(this->GetDrawingLoc()) / 2;
+    int linesAbove = 0;
+    int linesBelow = 0;
 
-    if ((linesAbove <= 0) && (linesBelow <= 0)) return FUNCTOR_CONTINUE;
+    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
 
     // HARDCODED
     int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
