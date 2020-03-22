@@ -378,7 +378,14 @@ int main(int argc, char **argv)
 
             case '?':
                 display_usage();
-                exit(0);
+                // Unless the found option is "help", we're here because the
+                // option was not recognized. Exit with error in that case.
+                if (!strcmp(long_options[option_index].name, "help")) {
+                    exit(0);
+                }
+                else {
+                    exit(1);
+                }
                 break;
 
             default: break;

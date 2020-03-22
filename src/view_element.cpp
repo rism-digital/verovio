@@ -40,6 +40,7 @@
 #include "mrest.h"
 #include "mrpt.h"
 #include "mrpt2.h"
+#include "mspace.h"
 #include "multirest.h"
 #include "multirpt.h"
 #include "neume.h"
@@ -152,6 +153,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(MRPT2)) {
         DrawMRpt2(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(MSPACE)) {
+        DrawMSpace(dc, element, layer, staff, measure);
     }
     else if (element->Is(MULTIREST)) {
         DrawMultiRest(dc, element, layer, staff, measure);
@@ -706,12 +710,6 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
             break;
     }
 
-    // Calculate x and y position for custos graphic
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
-
     int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();
@@ -720,29 +718,12 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     else {
         x = element->GetDrawingX();
         y = element->GetDrawingY();
+        // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
+        // This will remain approximate
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    int clefY = y - (staffSize * (staffLineNumber - clefLine));
-    int pitchOffset;
-    int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
-
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_c) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_f) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_G) {
-        pitchOffset = (custos->GetPname() - PITCHNAME_g) * (staffSize / 2);
-    }
-    else {
-        // This shouldn't happen
-        pitchOffset = 0;
-    }
-
-    int actualY = clefY + pitchOffset + octaveOffset;
-
-    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }
@@ -1127,6 +1108,22 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff);
 
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    MSpace *mSpace = dynamic_cast<MSpace *>(element);
+    assert(mSpace);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+    // nothing to draw here
     dc->EndGraphic(element, this);
 }
 

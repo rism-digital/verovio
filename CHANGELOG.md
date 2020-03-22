@@ -1,6 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Complete beam refactoring
+* Support for mSpace elements (@rettinghaus)
+* Improved header in MusicXML import (@rettinghaus)
+* Improved header generation with additional names (@earboxer)
 
 ## [2.6.0] - 2020-03-11
 * Support for Plaine and Easie output (limited features)
@@ -16,6 +20,7 @@
 
 ## [2.5.0] - 2020-02-03
 * Support for expansion implementation with --expand option (@wergo)
+* Adjust stem length with double-stemmed writing
 * Option for forcing first page to be condensed (--condense-first-page)
 * Option for forcing pages qwith tempo to be condensed (--condense-tempo-pages)
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)

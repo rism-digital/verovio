@@ -34,7 +34,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 6
+#define VERSION_MINOR 7
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -185,6 +185,7 @@ enum ClassId {
     MREST,
     MRPT,
     MRPT2,
+    MSPACE,
     MULTIREST,
     MULTIRPT,
     NC,

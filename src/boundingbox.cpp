@@ -698,6 +698,13 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     return point;
 }
 
+double BoundingBox::CalcSlope(Point const &p1, Point const &p2)
+{
+    if ((p1.y == p2.y) || (p1.x == p2.x)) return 0.0;
+
+    return (double)(p2.y - p1.y) / (double)(p2.x - p1.x);
+}
+
 /*
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x) {
 

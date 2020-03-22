@@ -82,6 +82,7 @@ class Mordent;
 class MRest;
 class MRpt;
 class MRpt2;
+class MSpace;
 class MultiRest;
 class MultiRpt;
 class Nc;
@@ -261,6 +262,7 @@ private:
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
     void WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt);
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
+    void WriteMSpace(pugi::xml_node currentNode, MSpace *mSpace);
     void WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
     void WriteNc(pugi::xml_node currentNode, Nc *nc);
@@ -509,6 +511,7 @@ private:
     bool ReadMRest(Object *parent, pugi::xml_node mRest);
     bool ReadMRpt(Object *parent, pugi::xml_node mRpt);
     bool ReadMRpt2(Object *parent, pugi::xml_node mRpt2);
+    bool ReadMSpace(Object *parent, pugi::xml_node mSpace);
     bool ReadMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMultiRpt(Object *parent, pugi::xml_node multiRpt);
     bool ReadNc(Object *parent, pugi::xml_node nc);

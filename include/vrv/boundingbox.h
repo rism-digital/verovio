@@ -172,6 +172,11 @@ public:
     static void SwapPoints(Point &p1, Point &p2);
 
     /**
+     * Calculate the slope represented by two points
+     */
+    static double CalcSlope(Point const &p1, Point const &p2);
+
+    /**
      * Calculate the position of a point after a rotation of alpha (in radian) around the center
      */
     static Point CalcPositionAfterRotation(Point point, float alpha, Point center);

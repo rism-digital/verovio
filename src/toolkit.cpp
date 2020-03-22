@@ -188,7 +188,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     FileFormat musicxmlDefault = MUSICXML;
 #endif
 
-    if (data.size() == 0) {
+    if (data.empty()) {
         return UNKNOWN;
     }
     if (data[0] == 0) {

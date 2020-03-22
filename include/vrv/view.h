@@ -19,7 +19,7 @@ class Accid;
 class Arpeg;
 class BarLine;
 class Beam;
-class BeamDrawingParams;
+class BeamSegment;
 class BracketSpan;
 class Breath;
 class ControlElement;
@@ -296,6 +296,7 @@ protected:
     void DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -525,10 +526,17 @@ private:
     /**
      * @name Internal methods used for calculating slurs
      */
+    ///@{
     void DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
     float CalcInitialSlur(FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN,
         curvature_CURVEDIR curveDir, Point points[4]);
     ///@}
+
+    /**
+     * Internal method for drawing a BeamSegment
+     */
+    void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
+        Staff *staff, Measure *measure);
 
     /**
      * Used for calculating clustered information/dot position
