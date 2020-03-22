@@ -39,7 +39,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "magic_enum.hpp"
 #include "MidiFile.h"
 #include "checked.h"
 #include "jsonxx.h"
@@ -353,20 +352,6 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
 
     return LoadData(utf8line);
-}
-
-void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
-{
-    for (auto str : classStrings) {
-        auto classId = magic_enum::enum_cast<ClassId>(str);
-        if (classId.has_value()) {
-            classIds.push_back(classId.value());
-          // color.value() -> Color::GREEN
-        }
-        else {
-            LogError("Class name '%s' could not be matched", str.c_str());
-        }
-    }
 }
 
 bool Toolkit::LoadData(const std::string &data)

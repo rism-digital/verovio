@@ -48,9 +48,8 @@ This page was generated with version 2.4.0-dev-2748fed
 Used libraries
 --------------
 
-The following libraries are embedded in Verovio:
-* [Magic Enum C++](https://github.com/Neargye/magic_enum)
-* [JSON++](https://github.com/hjiang/jsonxx)
-* [MidiFile](https://github.com/craigsapp/midifile)
+The following libraries are embedded and used in Verovio:
+* [jsonxx](https://github.com/hjiang/jsonxx)
+* [midifile](https://github.com/craigsapp/midifile)
 * [pugixml](https://pugixml.org/)
-* [UTF-CPP](http://utfcpp.sourceforge.net/)
+* [utf-cpp](http://utfcpp.sourceforge.net/)
