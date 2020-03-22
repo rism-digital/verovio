@@ -4,13 +4,12 @@
 setup.py file for Verovio
 """
 
-
-from setuptools import setup, Extension
 from glob import glob
+import os
 import platform
+from setuptools import setup, Extension
 
 # generate the git commit include file
-import os
 os.system("../../tools/get_git_commit.sh")
 
 
