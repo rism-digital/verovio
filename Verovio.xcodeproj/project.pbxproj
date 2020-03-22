@@ -308,6 +308,8 @@
 		4D766F0620ACAD74006875D8 /* nc.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D766EF320ACAD40006875D8 /* nc.h */; };
 		4D766F0720ACAD74006875D8 /* neume.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D766EF420ACAD41006875D8 /* neume.h */; };
 		4D766F0820ACAD74006875D8 /* syllable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D766EF220ACAD3F006875D8 /* syllable.h */; };
+		4D76B10F2427CB4F0041B492 /* magic_enum.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D76B10E2427CB4F0041B492 /* magic_enum.hpp */; };
+		4D76B1102427CB4F0041B492 /* magic_enum.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D76B10E2427CB4F0041B492 /* magic_enum.hpp */; };
 		4D7927D020ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
 		4D7927D120ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
 		4D7927D220ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
@@ -1294,6 +1296,7 @@
 		4D766EF720ACAD62006875D8 /* nc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nc.cpp; path = src/nc.cpp; sourceTree = "<group>"; };
 		4D766EF820ACAD62006875D8 /* view_neume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_neume.cpp; path = src/view_neume.cpp; sourceTree = "<group>"; };
 		4D766EF920ACAD63006875D8 /* neume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = neume.cpp; path = src/neume.cpp; sourceTree = "<group>"; };
+		4D76B10E2427CB4F0041B492 /* magic_enum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = magic_enum.hpp; path = include/enum/magic_enum.hpp; sourceTree = "<group>"; };
 		4D7927CF20ECCC6D0002A45D /* view_slur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_slur.cpp; path = src/view_slur.cpp; sourceTree = "<group>"; };
 		4D796B5C1D78641200A15238 /* harm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = harm.h; path = include/vrv/harm.h; sourceTree = "<group>"; };
 		4D796B5D1D78641900A15238 /* harm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = harm.cpp; path = src/harm.cpp; sourceTree = "<group>"; };
@@ -1681,6 +1684,14 @@
 			name = editorialelements;
 			sourceTree = "<group>";
 		};
+		4D76B10D2427CB2E0041B492 /* enum */ = {
+			isa = PBXGroup;
+			children = (
+				4D76B10E2427CB4F0041B492 /* magic_enum.hpp */,
+			);
+			name = enum;
+			sourceTree = "<group>";
+		};
 		4D7D8A3C1886E36200D78B62 /* tools */ = {
 			isa = PBXGroup;
 			children = (
@@ -1932,6 +1943,7 @@
 				4DEE28EC1940BCA100C76319 /* libmei */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
+				4D76B10D2427CB2E0041B492 /* enum */,
 				4DB787602022EFA700394520 /* json */,
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
@@ -2351,6 +2363,7 @@
 				4DB3D8FF1F83D20800B5FC2B /* options.h in Headers */,
 				4DA60EE11B6307A8006E2DFC /* textdirinterface.h in Headers */,
 				4DEC4D5A21C800A000D1D273 /* abbr.h in Headers */,
+				4D76B10F2427CB4F0041B492 /* magic_enum.hpp in Headers */,
 				4DB0B0191C4412A400DBDCC3 /* timestamp.h in Headers */,
 				4DB3D8F71F83D1E500B5FC2B /* attalternates.h in Headers */,
 				4D6122BC1F77E1B900FC90A0 /* rend.h in Headers */,
@@ -2510,6 +2523,7 @@
 				BB4C4B7422A932D7001F6AF0 /* space.h in Headers */,
 				4DA0EADC22BB77AF00A7EBEB /* editortoolkit_neume.h in Headers */,
 				BB4C4B8222A932DF001F6AF0 /* f.h in Headers */,
+				4D76B1102427CB4F0041B492 /* magic_enum.hpp in Headers */,
 				BB4C4B2622A932CF001F6AF0 /* fermata.h in Headers */,
 				BB4C4B0022A932BC001F6AF0 /* supplied.h in Headers */,
 				BB4C4B8622A932DF001F6AF0 /* lb.h in Headers */,
@@ -3651,6 +3665,7 @@
 					"$(inherited)",
 					NO_HUMDRUM_SUPPORT,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -3661,6 +3676,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				GCC_PREPROCESSOR_DEFINITIONS = NO_HUMDRUM_SUPPORT;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};

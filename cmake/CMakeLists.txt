@@ -20,6 +20,7 @@ endif()
 
 include_directories(
     ../include
+    ../include/enum
     ../include/midi
     ../include/hum
     ../include/json
