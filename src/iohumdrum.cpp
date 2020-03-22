@@ -6708,6 +6708,11 @@ bool HumdrumInput::checkForTremolo(
             break;
         }
     }
+    if (nextsame.size() == 2) {
+        if ((nextsame[0] == 0) && (nextsame[1] == 1)) {
+            hasInternalTrem = false;
+        }
+    }
 
     // Group separate tremolo groups within a single beam.
     std::vector<std::vector<hum::HTp> > groupings;
