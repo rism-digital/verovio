@@ -83,7 +83,7 @@ $FLAGS .= " -DNDEBUG";
 $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++$cpp";
 $FLAGS .= " -s ASM_JS=1";
-$FLAGS .= " -s TOTAL_MEMORY=256MB";
+$FLAGS .= " -s INITIAL_MEMORY=256MB";
 $FLAGS .= " -s TOTAL_STACK=128MB";
 $FLAGS .= " -s WASM=0";
 
@@ -102,7 +102,7 @@ if ($wasmQ) {
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
     # For now, trapping them (followign option does not work with Safari)
 	#$FLAGS .= " -mnontrapping-fptoint";
-	$FLAGS .= " -s TOTAL_MEMORY=512MB";
+	$FLAGS .= " -s INITIAL_MEMORY=512MB";
 	$FLAGS .= " -s TOTAL_STACK=256MB";
     $FLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";

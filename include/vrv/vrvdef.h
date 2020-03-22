@@ -185,6 +185,7 @@ enum ClassId {
     MREST,
     MRPT,
     MRPT2,
+    MSPACE,
     MULTIREST,
     MULTIRPT,
     NC,

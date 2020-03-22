@@ -841,7 +841,6 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
         useChild.append_attribute("xlink:href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
-        useChild.append_attribute("href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
