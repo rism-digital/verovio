@@ -135,11 +135,16 @@ void BeamSegment::CalcBeam(
     /******************************************************************/
     // Calculate the slope is necessary
 
-    bool shorten = false;
     this->m_beamSlope = 0.0;
-    // The vertical shift depends on the shortestDur value we have in the beam
     if (!horizontal) {
-        shorten = this->CalcBeamSlope(layer, staff, doc, beamInterface);
+        bool shorten;
+        int step;
+        if (this->CalcBeamSlope(layer, staff, doc, beamInterface, shorten, step)) {
+            this->CalcAdjustSlope(staff, doc, beamInterface, shorten, step, elementCount);
+        }
+        else {
+            this->CalcSetValues(elementCount);
+        }
     }
     else {
 
@@ -159,47 +164,12 @@ void BeamSegment::CalcBeam(
         }
 
         m_beamElementCoordRefs.at(0)->m_yBeam = maxLength;
-    }
 
-    this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
-    this->m_startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
-
-    /******************************************************************/
-    // Set the stem lengths
-
-    for (i = 0; i < elementCount; i++) {
-        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-        coord->m_yBeam = this->m_startingY + this->m_beamSlope * (coord->m_x - this->m_startingX);
+        this->CalcSetValues(elementCount);
     }
 
     /******************************************************************/
-    // Shorten the stem length when possible
-
-    if (shorten) {
-        const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // First check that we actually can check, which means that all stem are at least 7 units
-        for (i = 0; i < elementCount; i++) {
-            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-            if (coord->m_stem && coord->m_closestNote) {
-                int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
-                if ((len / unit) < 7) {
-                    shorten = false;
-                    break;
-                }
-            }
-        }
-        // If we can, shorten by two units
-        if (shorten) {
-            int shortening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? 2 * unit : -2 * unit;
-            for (i = 0; i < elementCount; i++) {
-                BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
-                coord->m_yBeam += shortening;
-            }
-        }
-    }
-
-    /******************************************************************/
-    // Set the stem lengths
+    // Set the stem lengths to stem objects
 
     for (i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
@@ -349,7 +319,7 @@ void BeamSegment::CalcBeamInit(
     }
 }
 
-bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface)
+bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step)
 {
     assert(layer);
     assert(staff);
@@ -386,7 +356,7 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
 
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Default (maximum) step is two stave-spaces (4 units)
-    int step = unit * 4;
+    step = unit * 4;
     // The current step according to stems - this can be flat because of the stem extended
     int curStep = abs(m_firstNoteOrChord->m_yBeam - m_lastNoteOrChord->m_yBeam);
     // The distance between the two extremes
@@ -469,7 +439,7 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
         }
     }
 
-    bool shorten = false;
+    shorten = false;
 
     // Now adjust the stem - for short steps, we need to adjust both side when the shorter one is not centered
     if (place == BEAMPLACE_above) {
@@ -548,9 +518,159 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
     if (m_nbNotesOrChords == 2) {
         // For now do not shorten beams with two note
         shorten = false;
+        return false;
     }
 
-    return shorten;
+    return true;
+}
+
+void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step, const int &elementCount)
+{
+    assert(staff);
+    assert(doc);
+    assert(beamInterface);
+    
+    this->CalcSetValues(elementCount);
+    
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    int refLen = 0;
+    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+        // upwards
+        if (m_beamSlope > 0.0) {
+            refLen = m_lastNoteOrChord->m_yBeam - m_lastNoteOrChord->m_closestNote->GetDrawingY();
+        }
+        // downwards
+        else {
+            refLen = m_firstNoteOrChord->m_yBeam - m_firstNoteOrChord->m_closestNote->GetDrawingY();
+        }
+    }
+    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+        // downwards
+        if (m_beamSlope < 0.0) {
+            refLen = m_lastNoteOrChord->m_closestNote->GetDrawingY() - m_lastNoteOrChord->m_yBeam;
+        }
+        // upwards
+        else {
+            refLen = m_firstNoteOrChord->m_closestNote->GetDrawingY() - m_firstNoteOrChord->m_yBeam;
+        }
+    }
+    //LogMessage("RefLen %d", refLen);
+    
+    int lengthen = 0;
+    for (int i = 0; i < elementCount; i++) {
+        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+        if (coord->m_stem && coord->m_closestNote) {
+            // Here we should look at duration to because longer values in the middle could actually be OK as they are
+            int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
+            if (len < refLen) lengthen = std::max(lengthen, refLen - len);
+        }
+    }
+    // We need to legthen the stems
+    if (lengthen > 0) {
+        // First if the slope step is 4 units (or more?) reduce it to 2 units and try again (recursive call)
+        if (step >= 4 * unit) {
+            step = 2 * unit;
+            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+                // upwards
+                if (m_beamSlope > 0.0) {
+                    m_firstNoteOrChord->m_yBeam += 2 * unit;
+                }
+                // downwards
+                else {
+                    m_lastNoteOrChord->m_yBeam += 2 * unit;
+                }
+            }
+            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+                // downwards
+                if (m_beamSlope < 0.0) {
+                    m_firstNoteOrChord->m_yBeam -= 2 * unit;
+                }
+                // upwards
+                else {
+                    m_lastNoteOrChord->m_yBeam -= 2 * unit;
+                }
+            }
+        
+            // Reset the slop and the value
+            this->m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
+                                                   Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
+        
+            this->CalcSetValues(elementCount);
+            // Try again - shortening will obviously be false at this stage
+            return this->CalcAdjustSlope(staff, doc, beamInterface, false, step, elementCount);
+        }
+        // Do lengthen the stems
+        /*
+        else {
+            // We blindly extend it by unit. This can break the rule of the beam touching staff lines. To be improved
+            int count = ceil( (double)lengthen/double(unit) );
+            int lengthening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? -count * unit : count * unit;
+            for (int i = 0; i < elementCount; i++) {
+                BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+                coord->m_yBeam += lengthening;
+            }
+            this->CalcSetValues(elementCount);
+            return;
+        }
+        */
+        // Other handling possibility by simply making the beam horizontal - not sure which one is best
+        else {
+            if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+                // upwards
+                if (m_beamSlope > 0.0) {
+                    m_firstNoteOrChord->m_yBeam = m_lastNoteOrChord->m_yBeam;
+                }
+                // downwards
+                else {
+                    m_lastNoteOrChord->m_yBeam = m_firstNoteOrChord->m_yBeam;
+                }
+            }
+            else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+                // downwards
+                if (m_beamSlope < 0.0) {
+                    m_firstNoteOrChord->m_yBeam = m_lastNoteOrChord->m_yBeam;
+                }
+                // upwards
+                else {
+                    m_lastNoteOrChord->m_yBeam = m_firstNoteOrChord->m_yBeam;
+                }
+            }
+        
+            // Reset the slop and the value
+            this->m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
+                                                   Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
+        
+            this->CalcSetValues(elementCount);
+            // Simply ignore shortening
+            return;
+        }
+    }
+
+    /******************************************************************/
+    // Shorten the stem length when possible
+
+    if (shorten) {
+        // First check that we actually can short, which means that all stem are at least 7 units
+        for (int i = 0; i < elementCount; i++) {
+            BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+            if (coord->m_stem && coord->m_closestNote) {
+                int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
+                if ((len / unit) < 7) {
+                    shorten = false;
+                    break;
+                }
+            }
+        }
+        // If we can, shorten by two units
+        if (shorten) {
+            int shortening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? 2 * unit : -2 * unit;
+            for (int i = 0; i < elementCount; i++) {
+                BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+                coord->m_yBeam += shortening;
+            }
+        }
+    }
 }
 
 void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
@@ -610,6 +730,18 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     
     // For now force it above
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
+}
+
+void BeamSegment::CalcSetValues(const int &elementCount)
+{
+    this->m_startingX = m_beamElementCoordRefs.at(0)->m_x;
+    this->m_startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
+
+    for (int i = 0; i < elementCount; i++) {
+        BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
+        coord->m_yBeam = this->m_startingY + this->m_beamSlope * (coord->m_x - this->m_startingX);
+    }
+    
 }
 
 //----------------------------------------------------------------------------
