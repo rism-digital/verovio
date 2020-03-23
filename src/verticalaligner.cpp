@@ -21,6 +21,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "tie.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -370,6 +371,11 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
                 Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
                 slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
+            }
+            else if ((*iter)->GetObject()->Is(TIE)) {
+                Tie *tie = dynamic_cast<Tie *>((*iter)->GetObject());
+                assert(tie);
+                tie->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
 
             int overflowAbove = 0;

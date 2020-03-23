@@ -1453,6 +1453,12 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     if (!this->IsLayerElement()) {
         return FUNCTOR_CONTINUE;
     }
+    
+    // Ignore beam in cross-staff situation
+    if (this->Is(BEAM)) {
+        Beam *beam = dynamic_cast<Beam *>(this);
+        if (beam && beam->m_isCrossStaff) return FUNCTOR_CONTINUE;
+    }
 
     // Ignore stem for notes in cross-staff situation and in beams
     if (this->Is(STEM)) {

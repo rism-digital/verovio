@@ -114,7 +114,7 @@ void BeamSegment::CalcBeam(
         }
         // cross-staff or beam@place=mixed
         else {
-            if (beamInterface->m_crossStaff) {
+            if (beamInterface->m_isCrossStaff) {
                 // TODO - look at staff@n and set the stem direction
                 Staff *currentCrossStaff = coord->m_element->m_crossStaff;
                 if (currentCrossStaff) {
@@ -706,7 +706,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
     else if (beamInterface->m_notesStemDir == STEMDIRECTION_down) {
         beamInterface->m_drawingPlace = BEAMPLACE_below;
     }
-    else if (beamInterface->m_crossStaff) {
+    else if (beamInterface->m_isCrossStaff) {
         beamInterface->m_drawingPlace = BEAMPLACE_mixed;
     }
     // Look at the layer direction or, finally, at the note position
