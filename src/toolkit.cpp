@@ -39,7 +39,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "magic_enum.hpp"
 #include "MidiFile.h"
 #include "checked.h"
 #include "jsonxx.h"
@@ -49,6 +48,18 @@ namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
+
+std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap = {
+    {"chord", CHORD},
+    {"rest", REST},
+    {"mRest", MREST},
+    {"mRpt", MRPT},
+    {"mRpt2", MRPT2},
+    {"multiRest", MULTIREST},
+    {"mulitRpt", MULTIRPT},
+    {"note", NOTE},
+    {"space", SPACE}
+};
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -357,7 +368,10 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
 void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
+    // one we use magic_enum.hpp we can do :
+    /*
     for (auto str : classStrings) {
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
         auto classId = magic_enum::enum_cast<ClassId>(str);
         if (classId.has_value()) {
             classIds.push_back(classId.value());
@@ -365,6 +379,16 @@ void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vec
         }
         else {
             LogError("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+    */
+    // For now, map a few by hand... - there must be a better way to do this
+    for (auto str : classStrings) {
+        if (Toolkit::s_MEItoClassIdMap.count(str) > 0) {
+            classIds.push_back(Toolkit::s_MEItoClassIdMap.at(str));
+        }
+        else {
+            LogDebug("Class name '%s' could not be matched", str.c_str());
         }
     }
 }

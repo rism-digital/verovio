@@ -49,7 +49,6 @@ Used libraries
 --------------
 
 The following libraries are embedded in Verovio:
-* [Magic Enum C++](https://github.com/Neargye/magic_enum)
 * [JSON++](https://github.com/hjiang/jsonxx)
 * [MidiFile](https://github.com/craigsapp/midifile)
 * [pugixml](https://pugixml.org/)
