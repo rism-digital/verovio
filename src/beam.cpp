@@ -557,7 +557,8 @@ void BeamSegment::CalcAdjustSlope(
             refLen = m_firstNoteOrChord->m_closestNote->GetDrawingY() - m_firstNoteOrChord->m_yBeam;
         }
     }
-    // LogMessage("RefLen %d", refLen);
+    // We can actually tolerate a stem slightly shorter within the beam
+    refLen -= unit;
 
     int lengthen = 0;
     for (int i = 0; i < elementCount; i++) {
