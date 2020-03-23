@@ -670,6 +670,28 @@ bool Toolkit::LoadData(const std::string &data)
 
 std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
 {
+    LogWarning("GetMEI with separate parameters is deprecated; use the version with JSON string parameter instead");
+    std::string boolStr = (scoreBased) ? "true" : "false";
+    std::string jsonOptions = StringFormat("{'pageNo': %d, 'scoreBased': %s}", pageNo, boolStr.c_str());
+    return this->GetMEI(jsonOptions);
+}
+
+std::string Toolkit::GetMEI(const std::string &jsonOptions)
+{
+    bool scoreBased = true;
+    int pageNo = 0;
+
+    jsonxx::Object json;
+
+    // Read JSON options
+    if (!json.parse(jsonOptions)) {
+        LogWarning("Can not parse JSON std::string. Using default options.");
+    }
+    else {
+        if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+        if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+    }
+
     if (GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
@@ -839,12 +861,12 @@ std::string Toolkit::GetAvailableOptions() const
     return o.json();
 }
 
-bool Toolkit::SetOptions(const std::string &json_options)
+bool Toolkit::SetOptions(const std::string &jsonOptions)
 {
     jsonxx::Object json;
 
     // Read JSON options
-    if (!json.parse(json_options)) {
+    if (!json.parse(jsonOptions)) {
         LogError("Can not parse JSON std::string.");
         return false;
     }
