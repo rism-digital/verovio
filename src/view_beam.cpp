@@ -148,8 +148,9 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // Number of bars to draw
-    int fullBars = fTrem->GetBeams();
+    int allBars = fTrem->GetBeams();
     int floatingBars = fTrem->GetBeamsFloat();
+    int fullBars = allBars - floatingBars;
 
     // Adjust the x position of the first and last element for taking into account the stem width
     firstElement->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -175,12 +176,19 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y1 += 2 * space * fTrem->m_beamSegment.m_beamSlope;
         x2 -= 2 * space;
         y2 -= 2 * space * fTrem->m_beamSegment.m_beamSlope;
+        // floating bars make no sense here
+        fullBars = allBars;
+        floatingBars = 0;
     }
     else if (dur == DUR_4) {
         x1 += space;
         y1 += space * fTrem->m_beamSegment.m_beamSlope;
         x2 -= space;
         y2 -= space * fTrem->m_beamSegment.m_beamSlope;
+    }
+    else if ((dur > DUR_4) && !floatingBars) {
+      fullBars = dur - 4;
+      floatingBars = allBars - fullBars;
     }
 
     for (int j = 0; j < fullBars; ++j) {

@@ -5,6 +5,7 @@
 * Support for mSpace elements (@rettinghaus)
 * Improved header in MusicXML import (@rettinghaus)
 * Improved header generation with additional names (@earboxer)
+* Fix tremolo beaming (@rettinghaus)
 
 ## [2.6.0] - 2020-03-11
 * Support for Plaine and Easie output (limited features)

@@ -2326,7 +2326,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!cue) {
                 chord->SetCue(BOOLEAN_false);
             }
-            else if (cue && chord->GetCue() != BOOLEAN_false) {
+            else if (chord->GetCue() != BOOLEAN_false) {
                 chord->SetCue(BOOLEAN_true);
             }
         }
