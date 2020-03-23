@@ -683,8 +683,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     yTop = yBottom + (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
                 }
                 // Make sure barlines are visible with a single line
-                if (childStaffDef->GetLines() == 1) {
-                    yTop += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                if (childStaffDef->GetLines() <= 1) {
+                    yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                     yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 }
                 DrawBarLine(dc, yTop, yBottom, barLine);
