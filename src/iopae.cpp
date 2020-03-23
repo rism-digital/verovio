@@ -265,9 +265,9 @@ void PAEOutput::WriteBeam(Beam *beam)
     assert(beam);
 
     if (m_skip) return;
-    
+
     m_grace = false;
-    
+
     ClassIdsComparison matchType({ NOTE, CHORD });
     ArrayOfObjects children;
     LayerElement *child = dynamic_cast<LayerElement *>(beam->FindDescendantByComparison(&matchType));
@@ -275,7 +275,6 @@ void PAEOutput::WriteBeam(Beam *beam)
         m_streamStringOutput << "qq";
         m_grace = true;
     }
-
 
     m_streamStringOutput << "{";
 }
@@ -287,7 +286,7 @@ void PAEOutput::WriteBeamEnd(Beam *beam)
     if (m_skip) return;
 
     m_streamStringOutput << "}";
-    
+
     if (m_grace) {
         m_streamStringOutput << "r";
         m_grace = false;
@@ -572,10 +571,10 @@ void PAEOutput::WriteDur(DurationInterface *interface)
 void PAEOutput::WriteGrace(AttGraced *attGraced)
 {
     assert(attGraced);
-    
+
     // We are in a beam of grace notes;
     if (m_grace) return;
-    
+
     if (attGraced->GetGrace() == GRACE_unacc) {
         m_streamStringOutput << "g";
     }

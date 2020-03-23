@@ -49,17 +49,9 @@ namespace vrv {
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 
-std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap = {
-    {"chord", CHORD},
-    {"rest", REST},
-    {"mRest", MREST},
-    {"mRpt", MRPT},
-    {"mRpt2", MRPT2},
-    {"multiRest", MULTIREST},
-    {"mulitRpt", MULTIRPT},
-    {"note", NOTE},
-    {"space", SPACE}
-};
+std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
+    = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
+          { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
 
 //----------------------------------------------------------------------------
 // Toolkit

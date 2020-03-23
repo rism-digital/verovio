@@ -179,14 +179,14 @@ public:
      *
      */
     void SetUuidStr();
-    
+
     /**
-     * Check if the slur or tie needs to be taken into account as overflow above or below in case of cross-staff end points.
-     * This methods assumes staff@n to be greater for the staff below.
+     * Check if the slur or tie needs to be taken into account as overflow above or below in case of cross-staff end
+     * points. This methods assumes staff@n to be greater for the staff below.
      */
 
     void GetCrossStaffOverflows(
-                                StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
+        StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
 
     //-----------------//
     // Pseudo functors //
