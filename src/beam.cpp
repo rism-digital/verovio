@@ -695,38 +695,36 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
         beamInterface->m_drawingPlace = place;
     }
     // Default with cross-staff
-    else if (beamInterface->m_crossStaff) {
-        beamInterface->m_drawingPlace = BEAMPLACE_mixed;
-    }
     else if (beamInterface->m_hasMultipleStemDir) {
         beamInterface->m_drawingPlace = BEAMPLACE_mixed;
     }
+    // Now look at the stem direction of the notes within the beam
+    else if (beamInterface->m_notesStemDir == STEMDIRECTION_up) {
+        beamInterface->m_drawingPlace = BEAMPLACE_above;
+    }
+    else if (beamInterface->m_notesStemDir == STEMDIRECTION_down) {
+        beamInterface->m_drawingPlace = BEAMPLACE_below;
+    }
+    else if (beamInterface->m_crossStaff) {
+        beamInterface->m_drawingPlace = BEAMPLACE_mixed;
+    }
+    // Look at the layer direction or, finally, at the note position
     else {
-        // Now look at the stem direction of the notes within the beam
-        if (beamInterface->m_notesStemDir == STEMDIRECTION_up) {
-            beamInterface->m_drawingPlace = BEAMPLACE_above;
-        }
-        else if (beamInterface->m_notesStemDir == STEMDIRECTION_down) {
-            beamInterface->m_drawingPlace = BEAMPLACE_below;
-        }
-        // Look at the layer direction or, finally, at the note position
-        else {
-            data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
-            // Layer direction ?
-            if (layerStemDir == STEMDIRECTION_NONE) {
-                if (this->m_ledgerLinesBelow != this->m_ledgerLinesAbove) {
-                    beamInterface->m_drawingPlace
-                        = (this->m_ledgerLinesBelow > this->m_ledgerLinesAbove) ? BEAMPLACE_above : BEAMPLACE_below;
-                }
-                else {
-                    beamInterface->m_drawingPlace
-                        = (this->m_avgY < this->m_verticalCenter) ? BEAMPLACE_above : BEAMPLACE_below;
-                }
+        data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
+        // Layer direction ?
+        if (layerStemDir == STEMDIRECTION_NONE) {
+            if (this->m_ledgerLinesBelow != this->m_ledgerLinesAbove) {
+                beamInterface->m_drawingPlace
+                    = (this->m_ledgerLinesBelow > this->m_ledgerLinesAbove) ? BEAMPLACE_above : BEAMPLACE_below;
             }
-            // Look at the note position
             else {
-                beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
+                beamInterface->m_drawingPlace
+                    = (this->m_avgY < this->m_verticalCenter) ? BEAMPLACE_above : BEAMPLACE_below;
             }
+        }
+        // Look at the note position
+        else {
+            beamInterface->m_drawingPlace = (layerStemDir == STEMDIRECTION_up) ? BEAMPLACE_above : BEAMPLACE_below;
         }
     }
 
