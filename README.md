@@ -44,3 +44,12 @@ Example output
 This page was generated with version 2.4.0-dev-2748fed
 
 ![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-2.4.0-dev.png)
+
+Used libraries
+--------------
+
+The following libraries are embedded in Verovio:
+* [JSON++](https://github.com/hjiang/jsonxx)
+* [MidiFile](https://github.com/craigsapp/midifile)
+* [pugixml](https://pugixml.org/)
+* [UTF-CPP](http://utfcpp.sourceforge.net/)

@@ -1119,8 +1119,8 @@ void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    MSpace *mSpace = dynamic_cast<MSpace *>(element);
-    assert(mSpace);
+    // MSpace *mSpace = dynamic_cast<MSpace *>(element);
+    // assert(mSpace);
 
     dc->StartGraphic(element, "", element->GetUuid());
     // nothing to draw here
