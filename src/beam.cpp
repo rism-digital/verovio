@@ -129,8 +129,8 @@ void BeamSegment::CalcBeam(
         }
     }
 
-    //ArrayOfBeamElementCoords stemUps;
-    //ArrayOfBeamElementCoords stemDowns;
+    // ArrayOfBeamElementCoords stemUps;
+    // ArrayOfBeamElementCoords stemDowns;
 
     /******************************************************************/
     // Calculate the slope is necessary
@@ -319,7 +319,8 @@ void BeamSegment::CalcBeamInit(
     }
 }
 
-bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step)
+bool BeamSegment::CalcBeamSlope(
+    Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step)
 {
     assert(layer);
     assert(staff);
@@ -336,7 +337,7 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
     m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
         Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
 
-    int noteStep;
+    int noteStep = 0;
     double noteSlope = 0.0;
     if (m_firstNoteOrChord->m_closestNote && m_lastNoteOrChord->m_closestNote) {
         noteSlope
@@ -402,7 +403,7 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
             step = unit * 2;
         }
     }
-    
+
     // Prevent short step with values not shorter than a 16th
     if (shortStep && (dur >= DUR_32)) {
         step = unit * 2;
@@ -524,14 +525,15 @@ bool BeamSegment::CalcBeamSlope(Layer *layer, Staff *staff, Doc *doc, BeamDrawin
     return true;
 }
 
-void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step, const int &elementCount)
+void BeamSegment::CalcAdjustSlope(
+    Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step, const int &elementCount)
 {
     assert(staff);
     assert(doc);
     assert(beamInterface);
-    
+
     this->CalcSetValues(elementCount);
-    
+
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     int refLen = 0;
@@ -555,8 +557,8 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
             refLen = m_firstNoteOrChord->m_closestNote->GetDrawingY() - m_firstNoteOrChord->m_yBeam;
         }
     }
-    //LogMessage("RefLen %d", refLen);
-    
+    // LogMessage("RefLen %d", refLen);
+
     int lengthen = 0;
     for (int i = 0; i < elementCount; i++) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
@@ -591,11 +593,11 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
                     m_lastNoteOrChord->m_yBeam -= 2 * unit;
                 }
             }
-        
+
             // Reset the slop and the value
             this->m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
-                                                   Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
-        
+                Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
+
             this->CalcSetValues(elementCount);
             // Try again - shortening will obviously be false at this stage
             return this->CalcAdjustSlope(staff, doc, beamInterface, false, step, elementCount);
@@ -636,11 +638,11 @@ void BeamSegment::CalcAdjustSlope(Staff *staff, Doc *doc, BeamDrawingInterface *
                     m_lastNoteOrChord->m_yBeam = m_firstNoteOrChord->m_yBeam;
                 }
             }
-        
+
             // Reset the slop and the value
             this->m_beamSlope = BoundingBox::CalcSlope(Point(m_firstNoteOrChord->m_x, m_firstNoteOrChord->m_yBeam),
-                                                   Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
-        
+                Point(m_lastNoteOrChord->m_x, m_lastNoteOrChord->m_yBeam));
+
             this->CalcSetValues(elementCount);
             // Simply ignore shortening
             return;
@@ -727,7 +729,7 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
             }
         }
     }
-    
+
     // For now force it above
     if (beamInterface->m_drawingPlace == BEAMPLACE_mixed) beamInterface->m_drawingPlace = BEAMPLACE_above;
 }
@@ -741,7 +743,6 @@ void BeamSegment::CalcSetValues(const int &elementCount)
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = this->m_startingY + this->m_beamSlope * (coord->m_x - this->m_startingX);
     }
-    
 }
 
 //----------------------------------------------------------------------------
@@ -938,14 +939,14 @@ data_STEMDIRECTION BeamElementCoord::GetStemDir()
     if (m_stem) {
         return m_stem->GetStemDir();
     }
- 
+
     if (!m_element) {
         LogDebug("Element not set in BeamElementCoord");
         return STEMDIRECTION_NONE;
     }
-    
+
     AttStems *stemInterface = dynamic_cast<AttStems *>(m_element);
-    
+
     if (!stemInterface) {
         LogDebug("Element is not an AttStems");
         return STEMDIRECTION_NONE;
@@ -961,9 +962,8 @@ void BeamElementCoord::SetDrawingStemDir(
     assert(doc);
     assert(interface);
 
-    
     if (!this->m_element->Is({ CHORD, NOTE })) return;
-    
+
     StemmedDrawingInterface *stemInterface = this->m_element->GetStemmedDrawingInterface();
     assert(stemInterface);
     m_stem = stemInterface->GetDrawingStem();
