@@ -328,7 +328,8 @@ bool BeamSegment::CalcBeamSlope(
     assert(beamInterface);
 
     m_beamSlope = 0.0;
-
+    shorten = false;
+    
     if (m_nbNotesOrChords < 2) {
         return false;
     }
@@ -440,17 +441,17 @@ bool BeamSegment::CalcBeamSlope(
         }
     }
 
-    shorten = false;
-
     // Now adjust the stem - for short steps, we need to adjust both side when the shorter one is not centered
     if (place == BEAMPLACE_above) {
         // upwards
         if (m_beamSlope > 0.0) {
-            // For 8th note groups, reduce the length of the last note if possible
+            // For 8th note groups, reduce the length of the last note if possible - disabled because not working well
+            /*
             if ((beamInterface->m_shortestDur == DUR_8) && !m_lastNoteOrChord->m_shortened
                 && !this->m_extendedToCenter) {
                 shorten = true;
             }
+            */
             m_firstNoteOrChord->m_centered = m_lastNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_lastNoteOrChord->m_centered) {
@@ -462,11 +463,13 @@ bool BeamSegment::CalcBeamSlope(
         }
         // downwards
         else {
-            // For 8th note groups, reduce the length of the first note if possible
+            // For 8th note groups, reduce the length of the first note if possible - disabled because not working well
+            /*
             if ((beamInterface->m_shortestDur == DUR_8) && !m_firstNoteOrChord->m_shortened
                 && !this->m_extendedToCenter) {
-                shorten = true;
+                //shorten = true;
             }
+            */
             m_lastNoteOrChord->m_centered = m_firstNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_firstNoteOrChord->m_centered) {
@@ -480,11 +483,13 @@ bool BeamSegment::CalcBeamSlope(
     else if (place == BEAMPLACE_below) {
         // downwards
         if (m_beamSlope < 0.0) {
-            // For 8th note groups, reduce the length of the last note if possible
+            // For 8th note groups, reduce the length of the last note if possible - disabled because not working well
+            /*
             if ((beamInterface->m_shortestDur == DUR_8) && !m_lastNoteOrChord->m_shortened
                 && !this->m_extendedToCenter) {
-                shorten = true;
+                //shorten = true;
             }
+            */
             m_firstNoteOrChord->m_centered = m_lastNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_lastNoteOrChord->m_centered) {
@@ -496,11 +501,13 @@ bool BeamSegment::CalcBeamSlope(
         }
         // upwards
         else {
-            // For 8th note groups, reduce the length of the first note if possible
+            // For 8th note groups, reduce the length of the first note if possible - disabled because not working well
+            /*
             if ((beamInterface->m_shortestDur == DUR_8) && !m_firstNoteOrChord->m_shortened
                 && !this->m_extendedToCenter) {
-                shorten = true;
+                //shorten = true;
             }
+            */
             m_lastNoteOrChord->m_centered = m_firstNoteOrChord->m_centered;
             if (shortStep) {
                 if (!m_firstNoteOrChord->m_centered) {
@@ -519,6 +526,7 @@ bool BeamSegment::CalcBeamSlope(
     if (m_nbNotesOrChords == 2) {
         // For now do not shorten beams with two note
         shorten = false;
+        // Also, we never have to adjust the slope with two notes
         return false;
     }
 
@@ -653,18 +661,23 @@ void BeamSegment::CalcAdjustSlope(
     /******************************************************************/
     // Shorten the stem length when possible
 
+    // Diabled anyway - see CalcBeamSlope that never sets shorten to true
+    /*
     if (shorten) {
+        // LogDebug("Shorten true if %d", unit * 7);
         // First check that we actually can short, which means that all stem are at least 7 units
         for (int i = 0; i < elementCount; i++) {
             BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
             if (coord->m_stem && coord->m_closestNote) {
                 int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
                 if ((len / unit) < 7) {
+                    // LogDebug("Shorten false: %d", len);
                     shorten = false;
                     break;
                 }
             }
         }
+        
         // If we can, shorten by two units
         if (shorten) {
             int shortening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? 2 * unit : -2 * unit;
@@ -674,6 +687,7 @@ void BeamSegment::CalcAdjustSlope(
             }
         }
     }
+    */
 }
 
 void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place)
