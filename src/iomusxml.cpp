@@ -535,7 +535,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
     float bottom = layout.node().select_node("page-margins/bottom-margin").node().text().as_float();
-    LogWarning("%f", bottom);
 
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
@@ -1520,19 +1519,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             fermata->SetTstamp(m_meterCount + 1);
         }
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        // color
-        fermata->SetColor(xmlFermata.node().attribute("color").as_string());
-        // shape
-        fermata->SetShape(ConvertFermataShape(xmlFermata.node().text().as_string()));
-        // form and place
-        if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
-            fermata->SetForm(fermataVis_FORM_inv);
-            fermata->SetPlace(STAFFREL_below);
-        }
-        else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
-            fermata->SetForm(fermataVis_FORM_norm);
-            fermata->SetPlace(STAFFREL_above);
-        }
+        ShapeFermata(fermata, xmlFermata.node());
     }
 }
 
@@ -2520,21 +2507,9 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (xmlFermata) {
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
-        fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         fermata->SetStartid(m_ID);
-        // color
-        fermata->SetColor(xmlFermata.node().attribute("color").as_string());
-        // shape
-        fermata->SetShape(ConvertFermataShape(xmlFermata.node().text().as_string()));
-        // form and place
-        if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
-            fermata->SetForm(fermataVis_FORM_inv);
-            fermata->SetPlace(STAFFREL_below);
-        }
-        else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
-            fermata->SetForm(fermataVis_FORM_norm);
-            fermata->SetPlace(STAFFREL_above);
-        }
+        fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        ShapeFermata(fermata, xmlFermata.node());
     }
 
     // mordents
@@ -3149,6 +3124,24 @@ bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
         }
     }
     return true;
+}
+
+void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node) {
+  assert(fermata);
+
+  // color
+  fermata->SetColor(node.attribute("color").as_string());
+  // shape
+  fermata->SetShape(ConvertFermataShape(node.text().as_string()));
+  // form and place
+  if (HasAttributeWithValue(node, "type", "inverted")) {
+      fermata->SetForm(fermataVis_FORM_inv);
+      fermata->SetPlace(STAFFREL_below);
+  }
+  else if (HasAttributeWithValue(node, "type", "upright")) {
+      fermata->SetForm(fermataVis_FORM_norm);
+      fermata->SetPlace(STAFFREL_above);
+  }
 }
 
 } // namespace vrv
