@@ -808,6 +808,17 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
         persName.append_attribute("role").set_value(creator.node().attribute("type").as_string());
     }
 
+    // Convert rights into availability
+    pugi::xml_node availability = pubStmt.append_child("availability");
+
+    pugi::xpath_node_set rightses = root.select_nodes("/score-partwise/identification/rights");
+    for (pugi::xpath_node_set::const_iterator it = rightses.begin(); it != rightses.end(); ++it) {
+        pugi::xpath_node rights = *it;
+        availability.append_child("distributor")
+            .append_child(pugi::node_pcdata)
+            .set_value(rights.node().text().as_string());
+    }
+
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
     GenerateUuid(encodingDesc);
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
