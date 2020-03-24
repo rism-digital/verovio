@@ -317,11 +317,11 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::CalcStemLenInHalfUnits(Staff *staff)
+int Note::CalcStemLenInThirdUnits(Staff *staff)
 {
     assert(staff);
 
-    int baseStem = STANDARD_STEMLENGTH * 2;
+    int baseStem = STANDARD_STEMLENGTH * 3;
 
     int shortening = 0;
 
@@ -334,7 +334,8 @@ int Note::CalcStemLenInHalfUnits(Staff *staff)
             case 3: shortening = 2; break;
             case 2: shortening = 3; break;
             case 1: shortening = 4; break;
-            default: shortening = 4;
+            case 0: shortening = 5; break;
+            default: shortening = 6;
         }
     }
 
