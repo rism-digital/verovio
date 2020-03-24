@@ -535,7 +535,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     pugi::xpath_node layout = root.select_node("/score-partwise/defaults/page-layout");
     float bottom = layout.node().select_node("page-margins/bottom-margin").node().text().as_float();
-    LogWarning("%f", bottom);
 
     // generate page head
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
