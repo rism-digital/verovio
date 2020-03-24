@@ -33,8 +33,8 @@ verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
 // char *getLog(Toolkit *ic)
 verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number']);
 
-// char *getMEI(Toolkit *ic, int pageNo, int scoreBased)
-verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
+// char *getMEI(Toolkit *ic, const char *options)
+verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'string']);
 
 // char *vrvToolkit_getNotatedIdForElement(Toolkit *tk, const char *xmlId);
 verovio.vrvToolkit.getNotatedIdForElement = Module.cwrap('vrvToolkit_getNotatedIdForElement', 'string', ['number', 'string']);
@@ -131,7 +131,13 @@ verovio.toolkit.prototype.getLog = function () {
 };
 
 verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
-	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
+	console.warn( "Parameters deprecated; use JSON string options instead" );
+	options = { "pageNo": pageNo, "scoreBased": scoreBased }; 
+	return verovio.vrvToolkit.getMEI(this.ptr, JSON.stringyfy(options));
+};
+
+verovio.toolkit.prototype.getMEI = function (options) {
+	return verovio.vrvToolkit.getMEI(this.ptr, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.getMIDIValuesForElement = function (xmlId) {

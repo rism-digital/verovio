@@ -78,7 +78,7 @@ void BeamDrawingInterface::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
-    m_crossStaff = false;
+    m_isCrossStaff = false;
     m_shortestDur = 0;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
@@ -160,7 +160,7 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
 
         Staff *staff = current->GetCrossStaff(layer);
         if (staff != currentStaff) {
-            this->m_crossStaff = true;
+            this->m_isCrossStaff = true;
         }
         currentStaff = staff;
 
@@ -168,8 +168,9 @@ void BeamDrawingInterface::InitCoords(ArrayOfObjects *childList, Staff *staff, d
         if (current->Is({ NOTE, CHORD })) {
             // Look at the stemDir to see if we have multiple stem Dir
             if (!this->m_hasMultipleStemDir) {
-                // At this stage, BeamCoord::m_stem is not necssary set, so we need to look at the Note / Chord original value
-                // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
+                // At this stage, BeamCoord::m_stem is not necssary set, so we need to look at the Note / Chord original
+                // value Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the
+                // beam
                 currentStemDir = m_beamElementCoords.at(elementCount)->GetStemDir();
                 if (currentStemDir != STEMDIRECTION_NONE) {
                     if ((this->m_notesStemDir != STEMDIRECTION_NONE) && (this->m_notesStemDir != currentStemDir)) {

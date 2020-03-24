@@ -86,7 +86,7 @@ public:
     ///@{
     std::string GetOptions(bool defaultValues) const;
     std::string GetAvailableOptions() const;
-    bool SetOptions(const std::string &json_options);
+    bool SetOptions(const std::string &jsonOptions);
     ///@}
 
     /**
@@ -184,9 +184,19 @@ public:
 
     /**
      * Get the MEI as a string.
-     * Get all the pages unless a page number (1-based) is specified
+     * Get all the pages unless a page number (1-based) is specified.
+     * Deprecated: use the version options passed as a string
      */
     std::string GetMEI(int pageNo = 0, bool scoreBased = true);
+
+    /**
+     * Get the MEI as a string.
+     * Options (JSON) can be:
+     * pageNo: integer; (1-based), all pages if none (or 0) specified
+     * scoreBased: true|false; true by default
+     * (noXmlIds: true|false; false by default - remove all @xml:id not used in the data - not implemented)
+     */
+    std::string GetMEI(const std::string &jsonOptions);
 
     /**
      * Return element attributes as a JSON string
@@ -303,6 +313,7 @@ private:
 
 public:
     static std::map<std::string, ClassId> s_MEItoClassIdMap;
+
 private:
     Doc m_doc;
     View m_view;
