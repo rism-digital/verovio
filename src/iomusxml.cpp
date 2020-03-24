@@ -52,6 +52,7 @@
 #include "octave.h"
 #include "pb.h"
 #include "pedal.h"
+#include "pgfoot.h"
 #include "pghead.h"
 #include "reh.h"
 #include "rend.h"
@@ -540,9 +541,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     pugi::xpath_node_set credits = root.select_nodes("/score-partwise/credit[@page='1']/credit-words");
     if (!credits.empty()) {
         PgHead *head = new PgHead();
+        PgFoot *foot = new PgFoot();
         for (pugi::xpath_node_set::const_iterator it = credits.begin(); it != credits.end(); ++it) {
             pugi::xpath_node words = *it;
-            if (words.node().attribute("default-y").as_float() < 2 * bottom) continue;
             Rend *rend = new Rend();
             Text *text = new Text();
             text->SetText(UTF8to16(words.node().text().as_string()));
@@ -557,9 +558,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             rend->SetFontweight(
                 rend->AttTypography::StrToFontweight(words.node().attribute("font-weight").as_string()));
             rend->AddChild(text);
-            head->AddChild(rend);
+            if (words.node().attribute("default-y").as_float() < 2 * bottom) {
+                foot->AddChild(rend);
+            }
+            else {
+                head->AddChild(rend);
+            }
         }
         m_doc->m_scoreDef.AddChild(head);
+        m_doc->m_scoreDef.AddChild(foot);
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
