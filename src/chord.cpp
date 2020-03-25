@@ -352,19 +352,19 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-int Chord::CalcStemLenInThirdUnits(Staff *staff)
+int Chord::CalcStemLenInHalfUnits(Staff *staff)
 {
     assert(staff);
 
     if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
         Note *topNote = this->GetTopNote();
         assert(topNote);
-        return topNote->CalcStemLenInThirdUnits(staff);
+        return topNote->CalcStemLenInHalfUnits(staff);
     }
     else {
         Note *bottomNote = this->GetBottomNote();
         assert(bottomNote);
-        return bottomNote->CalcStemLenInThirdUnits(staff);
+        return bottomNote->CalcStemLenInHalfUnits(staff);
     }
 }
 
