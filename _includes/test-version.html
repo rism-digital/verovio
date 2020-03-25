@@ -104,7 +104,7 @@
         vrvToolkit.setOptions( options );
         try {
             vrvToolkit.loadData(data);
-            $(div + '-meiCode pre').text(vrvToolkit.getMEI( ));
+            $(div + '-meiCode pre').text(vrvToolkit.getMEI( {} ));
             $(div + '-meiDiv').show();
         }
         catch(err) {
@@ -212,7 +212,7 @@
                 
                 <div id="{{ id }}-meiDiv" style="display: none;">
                     <p>
-                        <a href="javascript:return false;" data-toggle="collapse" data-target="#{{ id }}-meiCode" aria-expanded="false" aria-controls="{{ id }}-meiCode">Show MEI</a> | 
+                        <a data-toggle="collapse" data-target="#{{ id }}-meiCode" aria-expanded="false" aria-controls="{{ id }}-meiCode">Show MEI</a> | 
                         <a href="{{ site.tests-edit-path }}/{{ f.path }}" target="_blank">Edit MEI</a>
                     </p>
                 </div>
@@ -222,7 +222,7 @@
                 <div id="{{ id }}-errDiv" style="display: none;">
                     <p>
                     <div class="alert alert-danger" role="alert" id="{{ id }}-err">Verovio failed to render the MEI file.</div>
-                        <a href="javascript: return false;" data-toggle="collapse" data-target="#{{ id }}-errLog" aria-expanded="false" aria-controls="{{ id }}-errLog">Show the error log</a>
+                        <a data-toggle="collapse" data-target="#{{ id }}-errLog" aria-expanded="false" aria-controls="{{ id }}-errLog">Show the error log</a>
                     </p>
                     <div class="collapse" id="{{ id }}-errLog">
                         <pre></pre>
