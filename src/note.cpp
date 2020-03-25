@@ -342,10 +342,10 @@ int Note::CalcStemLenInThirdUnits(Staff *staff)
     // Limit shortening with duration shorter than quarter not when not in a beam
     if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            shortening = std::min(3, shortening);
+            shortening = std::min(4, shortening);
         }
         else {
-            shortening = std::min(2, shortening);
+            shortening = std::min(3, shortening);
         }
     }
 
