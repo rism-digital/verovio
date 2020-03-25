@@ -130,10 +130,20 @@ verovio.toolkit.prototype.getLog = function () {
 	return verovio.vrvToolkit.getLog(this.ptr);
 };
 
-verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
-	console.warn( "Parameters deprecated; use JSON string options instead" );
-	options = { "pageNo": pageNo, "scoreBased": scoreBased }; 
-	return verovio.vrvToolkit.getMEI(this.ptr, JSON.stringyfy(options));
+verovio.toolkit.prototype.getMEI = function (param1, scoreBased) {
+    if ( params1 === undefined )
+    {
+        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringyfy( {} ) );
+    }
+    else if ( param1 instanceof Object )
+    {
+        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringyfy( param1 ) );
+    }
+    else {
+        console.warn( "Parameters deprecated; use JSON string options instead" );
+        options = { "pageNo": pageNo, "scoreBased": scoreBased };
+        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringyfy( options ) );
+    }
 };
 
 verovio.toolkit.prototype.getMEI = function (options) {
