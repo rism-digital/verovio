@@ -130,19 +130,21 @@ verovio.toolkit.prototype.getLog = function () {
 	return verovio.vrvToolkit.getLog(this.ptr);
 };
 
-verovio.toolkit.prototype.getMEI = function (param1, scoreBased) {
-    if ( params1 === undefined )
+verovio.toolkit.prototype.getMEI = function ( param1, scoreBased )
+{
+    if ( typeof param1 === 'undefined' )
     {
-        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringyfy( {} ) );
+        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringify( {} ) );
     }
     else if ( param1 instanceof Object )
     {
-        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringyfy( param1 ) );
+        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringify( param1 ) );
     }
-    else {
+    else
+    {
         console.warn( "Parameters deprecated; use JSON string options instead" );
-        options = { "pageNo": pageNo, "scoreBased": scoreBased };
-        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringyfy( options ) );
+        options = { "pageNo": param1, "scoreBased": scoreBased };
+        return verovio.vrvToolkit.getMEI( this.ptr, JSON.stringify( options ) );
     }
 };
 
