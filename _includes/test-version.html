@@ -104,7 +104,7 @@
         vrvToolkit.setOptions( options );
         try {
             vrvToolkit.loadData(data);
-            $(div + '-meiCode pre').text(vrvToolkit.getMEI( {} ));
+            $(div + '-meiCode pre').text(vrvToolkit.getMEI( ));
             $(div + '-meiDiv').show();
         }
         catch(err) {
