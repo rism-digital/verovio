@@ -1,7 +1,6 @@
 # Changelog
 
 ## [unreleased]
-* Improve automatic stem shertening (@rettinghaus)
 * Complete beam refactoring
 * Support for mSpace elements (@rettinghaus)
 * Improved header in MusicXML import (@rettinghaus)
