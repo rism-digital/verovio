@@ -390,8 +390,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
         baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
     }
     else {
-        int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
-        baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff) * thirdUnit);
+        int halfUnit = params->m_doc->GetDrawingUnit(staffSize) / 2;
+        baseStem = -(params->m_interface->CalcStemLenInHalfUnits(params->m_staff) * halfUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
