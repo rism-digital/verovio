@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead meiversion="4.0.0">
+		<fileDesc>
+			<titleStmt>
+				<title>Four beams</title>
+			</titleStmt>
+			<pubStmt></pubStmt>
+			<notesStmt>
+				<annot>Place beams further appart so that each is attached to a stave-line</annot>
+			</notesStmt>
+			<sourceDesc>
+				<source>
+					<bibl>Behind Bars, p. 18, example 3</bibl>
+				</source>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="unknown">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music meiversion="4.0.0">
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef n="1" lines="5" clef.shape="G" clef.line="2"></staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<measure n="1">
+							<staff n="1">
+								<layer n="1">
+									<beam>
+										<note dur="64" oct="5" pname="b"/>
+										<note dur="64" oct="5" pname="b"/>
+									</beam>
+									<beam>
+										<note dur="64" oct="4" pname="c"/>
+										<note dur="64" oct="4" pname="c"/>
+									</beam>
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

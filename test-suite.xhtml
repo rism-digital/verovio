@@ -2,12 +2,50 @@
 layout: verovio
 title: Test suite
 verovio: false
+active: how
+how-active: how-test-suite
 ---
 
 <div class="row">
-    <div class="col-lg-12">
-        
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include how-sidebar.html %}
+        </div>
+
+        <div class="panel panel-default">
+            <div class="list-group sublist-group">
+                {% assign categories = "" | split: ',' %}
+                {% for collection in site.collections %}
+                    {% unless collection.label == "posts" %}
+                        {% for file in collection.files %}
+                            {% assign path = file.path | split: '/' %}
+                            {% assign categories = categories | push: path[1] %}
+                        {% endfor %}
+                    {% endunless %}
+                {% endfor %}
+    
+                {% assign categories = categories | uniq | sort %}
+                {% for category in categories %}
+                    <a class="list-group-item" href="{{ site.baseurl }}/test-suite.xhtml?cat={{category}}">{{ category | capitalize }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+
+        <div class="panel-body">
+            <h3>Feature test suite</h3>
+            <p>
+                This section provides a test suite for some of the features of Verovio. The tests are rendered with the latest develop version of the <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a>.
+            </p>
+            <p>
+                It is also possible to compare these tests, or selected files, with previous versions in the <a href="{{ site.baseurl }}/comparison.xhtml">comparison page</a>.
+            </p>
+        </div>
+
+
         {%include test-version.html %}
-        
+
     </div>
 </div>

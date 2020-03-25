@@ -1,0 +1,53 @@
+<mei meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Connector of dynam</title>
+			</titleStmt>
+			<pubStmt/>
+		</fileDesc>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef meter.count="4" meter.unit="4" meter.sym="common">
+						<staffGrp>
+							<staffDef xml:id="sd" n="1" lines="5" clef.shape="G" clef.line="2"/>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<measure xml:id="m1">
+							<staff n="1">
+								<layer xml:id="l1" n="1">
+									<note xml:id="n1" pname="c" oct="4" dur="2"/>
+									<note xml:id="n2" pname="e" oct="4" dur="2"/>
+								</layer>
+							</staff>
+							<dynam xml:id="dyn1" staff="1" tstamp="1" extender="true" next="#dyn2" vgrp="1">cre</dynam>							
+							<dynam xml:id="dyn2" staff="1" tstamp="4" extender="true" next="#dyn3" vgrp="1">sc</dynam>
+						</measure>
+						<measure xml:id="m2">
+							<staff n="1">
+								<layer xml:id="sd1" n="1">
+									<note xml:id="n5" pname="g" oct="4" dur="2" dots="1"/>
+									<note xml:id="n7" pname="a" oct="4" dur="8" artic="stacc"/>
+									<note xml:id="n7" pname="b" oct="4" dur="8" artic="stacc" stem.dir="up"/>
+								</layer>
+							</staff>
+							<dynam xml:id="dyn3" staff="1" tstamp="2" extender="true" next="#dyn4" vgrp="1" >en</dynam>
+						</measure>
+						<measure xml:id="sdm">
+							<staff n="1">
+								<layer xml:id="sd2" n="1">
+									<note xml:id="n1a" pname="c" oct="5" dur="1"/>
+								</layer>
+							</staff>
+							<dynam xml:id="dyn4" staff="1" tstamp="2" extender="true" vgrp="1">do</dynam>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

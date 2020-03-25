@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Stem shortening on chords with double stem writing </title>
+			</titleStmt>
+			<pubStmt/>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="unknown">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef n="1" lines="5" clef.shape="G" clef.line="2"/>
+							<staffDef n="2" lines="5" clef.shape="G" clef.line="2"/>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<measure n="1">
+							<staff n="1">
+								<layer n="1">
+									<chord dur="4" stem.dir="up">
+										<note oct="3" pname="b"/>
+										<note oct="3" pname="g"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="4" pname="c"/>
+										<note oct="3" pname="a"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="4" pname="d"/>
+										<note oct="3" pname="b"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="4" pname="e"/>
+										<note oct="4" pname="c"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="4" pname="f"/>
+										<note oct="4" pname="d"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="4" pname="g"/>
+										<note oct="4" pname="e"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="4" pname="a"/>
+										<note oct="4" pname="f"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="4" pname="b"/>
+										<note oct="4" pname="g"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="5" pname="c"/>
+										<note oct="4" pname="a"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="5" pname="d"/>
+										<note oct="4" pname="b"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="5" pname="e"/>
+										<note oct="5" pname="c"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="5" pname="f"/>
+										<note oct="5" pname="d"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="5" pname="g"/>
+										<note oct="5" pname="e"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="5" pname="a"/>
+										<note oct="5" pname="f"/>
+									</chord>
+									<chord dur="4" stem.dir="up">
+										<note oct="5" pname="b"/>
+										<note oct="5" pname="g"/>
+									</chord>
+								</layer>
+							</staff>
+							<staff n="2">
+								<layer n="1">
+									<chord dur="4" stem.dir="down">
+										<note oct="3" pname="b"/>
+										<note oct="3" pname="g"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="4" pname="c"/>
+										<note oct="3" pname="a"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="4" pname="d"/>
+										<note oct="3" pname="b"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="4" pname="e"/>
+										<note oct="4" pname="c"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="4" pname="f"/>
+										<note oct="4" pname="d"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="4" pname="g"/>
+										<note oct="4" pname="e"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="4" pname="a"/>
+										<note oct="4" pname="f"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="4" pname="b"/>
+										<note oct="4" pname="g"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="5" pname="c"/>
+										<note oct="4" pname="a"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="5" pname="d"/>
+										<note oct="4" pname="b"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="5" pname="e"/>
+										<note oct="5" pname="c"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="5" pname="f"/>
+										<note oct="5" pname="d"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="5" pname="g"/>
+										<note oct="5" pname="e"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="5" pname="a"/>
+										<note oct="5" pname="f"/>
+									</chord>
+									<chord dur="4" stem.dir="down">
+										<note oct="5" pname="b"/>
+										<note oct="5" pname="g"/>
+									</chord>
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

@@ -1,3 +1,0 @@
-<Files *.mei>
-Header set Content-Disposition attachment
-</Files>

@@ -83,6 +83,27 @@ versions:
                         <option value="{{ v.url }}">{{ v.name }}</option>
                         {% endfor %}
                     </select>
+
+
+                    <h4>Select a test category</h4>
+
+                    {% assign categories = "" | split: ',' %}
+                    {% for collection in site.collections %}
+                        {% unless collection.label == "posts" %}
+                            {% for file in collection.files %}
+                                {% assign path = file.path | split: '/' %}
+                                {% assign categories = categories | push: path[1] %}
+                            {% endfor %}
+                        {% endunless %}
+                    {% endfor %}
+
+                    {% assign categories = categories | uniq | sort %}
+                    <select class="form-control" id="catSelect">
+                        <option value=""></option>
+                        {% for category in categories %}
+                        <option value="{{ category }}">{{ category | capitalize }}</option>
+                        {% endfor %}
+                    </select>
                     
                     <h4>Select an MEI file</h4>
                     
@@ -123,6 +144,12 @@ versions:
     $("#versionSelect").change(function() {
         console.log($(this).val());
         localStorage['iframe2'] = $(this).val();
+        location.reload();
+    });
+
+    $("#catSelect").change(function() {
+        console.log($(this).val());
+        localStorage['testCat'] = $(this).val();
         location.reload();
     });
     

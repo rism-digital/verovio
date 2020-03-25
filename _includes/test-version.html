@@ -99,13 +99,33 @@
     loadExample_2_4 = loadExample_2_3;
     loadExample_2_5 = loadExample_2_4;
     loadExample_2_6 = loadExample_2_5;
-    loadExample_2_7 = loadExample_2_6;
+
+    function loadExample_2_7(data, div, options, page = 1) {
+        vrvToolkit.setOptions( options );
+        try {
+            vrvToolkit.loadData(data);
+            $(div + '-meiCode pre').text(vrvToolkit.getMEI( ));
+            $(div + '-meiDiv').show();
+        }
+        catch(err) {
+            $(div + '-errLog pre').html(err);
+            $(div + '-errDiv').show();
+        }
+        svg = vrvToolkit.renderToSVG(page, {});
+        $(div).html(svg);
+    }
     
     /////////////////////////////
     
     function loadExamples() {
+        var cat = getParameterByName("cat");
+        // no parameter - load what was set in the storage for the comparison
+        if (cat === null) cat = localStorage.getItem('testCat');
         for(i in examples) {
-            examples[i].load();
+            if (examples[i].file.startsWith("tests/" + cat + "/")) {
+                $('#example-' + examples[i].id ).show();
+                examples[i].load();
+            }
         }
     }
     
@@ -149,7 +169,7 @@
             loadExamples();    
         }
         else {
-             loadCustomFile();
+            loadCustomFile();
         }
        
     }
@@ -172,41 +192,28 @@
         <h2 class="text-center"><span id="loading">Loading ...</span><a href="" id="version"></a></h2>
     </div>
     
-    {% for t in site.data.mei-tests.tests %}
-    <div class="panel test-group" id="{{ t.id }}">
+    {% assign categories = "" | split: ',' %}
+    {% for collection in site.collections %}
+        {% unless collection.label == "posts" %}
+    <div class="panel test-group" id="examples">
 
-        <h3 class="text-center">
-            {{ t.chapter }} 
-        </h3>
-
-        <div>
-            {% for f in t.files %}
-                {% assign id = f.file | remove:'.mei' %}
-                <h4 class="test-xmlfile">{{ f.title }}</h4>
+        {% for f in collection.files %}
+            {% assign id = f.name | remove:'.mei' %}
+            <div id="example-{{ id }}" style="display: none;">
+                
+                <h4 class="test-xmlfile">{{ f.name }}</h4>
                 <p id="note-{{ id }}"></p>
 
-                {% if f.comment %}
-                <p><strong>Additional comment:</strong> {{ f.comment }}</p>
-                {% endif %}
-
                 <p>
-                {% if f.verovio == 0 %}
-                    <span class="label label-danger">Failed – {{ f.version }}</span>
-                {% elsif f.verovio == 1 %}
-                    <span class="label label-warning">To improve – {{ f.version }}</span>
-                {% elsif f.verovio == 2 %}
-                    <span class="label label-success">OK – {{ f.version }}</span>
-                {% else %}
-                    <span class="label label-default">Status unknown</span>
-                {% endif %}
+                    <span id="label-{{ id }}" class="label"></span>
                 </p>
+
+                {% assign filePath = f.path | remove_first: "_" %}
                 
                 <div id="{{ id }}-meiDiv" style="display: none;">
                     <p>
                         <a href="javascript:return false;" data-toggle="collapse" data-target="#{{ id }}-meiCode" aria-expanded="false" aria-controls="{{ id }}-meiCode">Show MEI</a> | 
-                        <a href="{{ site.data.mei-tests.edit-path }}/{{ f.file }}" target="_blank">Edit MEI</a> | 
-                        <a href="{{ site.data.mei-tests.status-path }}" target="_blank">Edit status</a> |
-                        <a href="{{ site.data.mei-tests.mei-path }}/{{ f.link }}" target="_blank">MEI Guidelines</a>
+                        <a href="{{ site.tests-edit-path }}/{{ f.path }}" target="_blank">Edit MEI</a>
                     </p>
                 </div>
 
@@ -231,28 +238,45 @@
                 <script type="text/javascript">
                 //<![CDATA[
                     examples.push({
+                        id: "{{ id }}",
+                        file: "{{ filePath }}",
                         load: function() {
                             $.ajax({
-                                url: "examples/features/{{ f.file }}"
+                                url: "{{ filePath }}"
                                 , dataType: "text"
                                 , success: function(data) {
-                                    
-                                    // Get the description from the /notesStmt/annot
+                                    //console.log(data);
                                     xml = new window.DOMParser().parseFromString(data, "text/xml")
+                                    // Get the description from the /notesStmt/annot
                                     var nodes = xml.evaluate("//mei:notesStmt/mei:annot", xml, nsResolver, XPathResult.ANY_TYPE, null);
                                     var result = nodes.iterateNext();
                                     var txt = "";
                                     while (result) {
-                                        txt += result.childNodes[0].nodeValue + "<br />";
+                                        if (result.childNodes[0]) txt += result.childNodes[0].nodeValue + "<br />";
                                         result = nodes.iterateNext();
                                     }
                                     $('#note-{{ id }}').html(txt);
-                                    
+                                    // Get the version from the /appInfo/application@version
+                                    var appVersion = xml.evaluate("//mei:appInfo/mei:application/@version", xml, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                                    txt = "unknown";
+                                    if (appVersion.singleNodeValue) txt = appVersion.singleNodeValue.value;
+                                    $('#label-{{ id }}').html(txt);
+                                    // Get the status (currently in @n)
+                                    var appLabel = xml.evaluate("//mei:appInfo/mei:application/@label", xml, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                                    txt = "-1";
+                                    if (appLabel.singleNodeValue) txt = appLabel.singleNodeValue.value;
+                                    switch (txt) {
+                                        case ("0"): $('#label-{{ id }}').addClass("label-error"); break;
+                                        case ("1"): $('#label-{{ id }}').addClass("label-warning"); break;
+                                        case ("2"): $('#label-{{ id }}').addClass("label-success"); break;
+                                        default: $('#label-{{ id }}').addClass("label-default");
+                                    }
+
                                     // default options for the current version
                                     options = window["defaultOptions_" + vrvVersion];
                                     options.pageWidth = ($("#{{ id }}").width()) * 100 / options.scale ;
                                     // load function for the current version
-                                    loadFunction = window["loadExample_" + vrvVersion]; 
+                                    loadFunction = window["loadExample_" + vrvVersion];
                                     loadFunction(data, "#{{ id }}", options );
                                 }
                             });
@@ -260,11 +284,11 @@
                     });
                 //]]>
                 </script>
-
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
 
     </div>
+        {% endunless %}
     {% endfor %}
     
 </div>
@@ -274,12 +298,22 @@
 <script type="text/javascript">
     //<![CDATA[
     $(document).ready(function() {
+
+        // Could not find a way to have the Jekyll collection not ordered by name ...
+        // Order the divs by hand
+        $("#examples > div").sort(function (a, b) {
+            return (a.id > b.id);
+        }).each(function(){
+            var elem = $(this);
+            elem.remove();
+            $(elem).appendTo("#examples");
+        })
         
         // The default is the latest develop build
         vrv = "{{ site.baseurl }}/javascript/develop/verovio-toolkit.js";
         
         // Hide the custom file placeholder
-        $(".test-group").last().hide();
+        //$(".test-group").last().hide();
         
         var iframe = getParameterByName("iframe");
         // IFrame loading and custom file stored

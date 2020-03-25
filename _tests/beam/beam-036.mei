@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead meiversion="4.0.0">
+		<fileDesc>
+			<titleStmt>
+				<title>Beams with groups of 32nd notes</title>
+			</titleStmt>
+			<pubStmt></pubStmt>
+			<sourceDesc>
+				<source>
+					<bibl>Dorico, Making Notes, Development diary, part 10</bibl>
+				</source>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="unknown">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music meiversion="4.0.0">
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="1" meter.unit="4"></staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<measure n="1">
+							<staff n="1">
+								<layer n="1">
+									<beam>
+										<note dur="64" oct="5" pname="a"/>
+										<note dur="64" oct="5" pname="a"/>
+										<note dur="64" oct="5" pname="a"/>
+										<note dur="64" oct="5" pname="a"/>
+									</beam>
+									<beam>
+										<note dur="64" oct="5" pname="a"/>
+										<note dur="64" oct="5" pname="a"/>
+										<note dur="64" oct="5" pname="b"/>
+										<note dur="64" oct="5" pname="b"/>
+									</beam>
+									<beam>
+										<note dur="64" oct="5" pname="b"/>
+										<note dur="64" oct="6" pname="c"/>
+										<note dur="64" oct="6" pname="e"/>
+										<note dur="64" oct="6" pname="f"/>
+									</beam>
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

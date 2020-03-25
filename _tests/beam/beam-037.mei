@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead meiversion="4.0.0">
+		<fileDesc>
+			<titleStmt>
+				<title>Beam with chords</title>
+			</titleStmt>
+			<pubStmt></pubStmt>
+			<notesStmt>
+				<annot>The note closest to the beam determine the beam angle</annot>
+			</notesStmt>
+			<sourceDesc>
+				<source>
+					<bibl>Behind Bars, p. 24, example 1</bibl>
+				</source>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="unknown">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>		
+	</meiHead>
+	<music meiversion="4.0.0">
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef n="1" lines="5" clef.shape="G" clef.line="2"></staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<measure n="1">
+							<staff n="1">
+								<layer n="1">
+									<beam>
+										<chord dur="8">
+											<note oct="5" pname="c"/>
+											<note oct="5" pname="e"/>
+										</chord>
+										<chord dur="8">
+											<note oct="4" pname="c"/>
+											<note oct="5" pname="e"/>
+										</chord>
+									</beam>
+									<beam>
+										<chord dur="16">
+											<note oct="4" pname="e"/>
+											<note oct="4" pname="g"/>
+										</chord>
+										<chord dur="16">
+											<note oct="4" pname="e"/>
+											<note oct="4" pname="a"/>
+										</chord>
+										<chord dur="8">
+											<note oct="4" pname="e"/>
+											<note oct="4" pname="b"/>
+										</chord>
+									</beam>
+									<beam>
+										<chord dur="8">
+											<note oct="5" pname="e"/>
+											<note oct="5" pname="f"/>
+										</chord>
+										<chord dur="8">
+											<note oct="4" pname="b"/>
+											<note oct="5" pname="f"/>
+										</chord>
+										<chord dur="8">
+											<note oct="4" pname="g"/>
+											<note oct="5" pname="f"/>
+										</chord>
+										<chord dur="8">
+											<note oct="4" pname="f"/>
+											<note oct="5" pname="f"/>
+										</chord>
+									</beam>
+									<beam>
+										<chord dur="8">
+											<note oct="4" pname="b"/>
+											<note oct="5" pname="b"/>
+										</chord>
+										<note dur="8" oct="5" pname="e"/>
+									</beam>
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

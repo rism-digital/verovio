@@ -6,3 +6,9 @@ exclude: []
 webrick:
   headers:
     Access-Control-Allow-Origin: "*"
+
+tests-edit-path: "https://github.com/rism-ch/verovio/edit/gh-pages"
+
+collections:
+    tests:
+        output: true
