@@ -317,11 +317,11 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
-int Note::CalcStemLenInHalfUnits(Staff *staff)
+int Note::CalcStemLenInThirdUnits(Staff *staff)
 {
     assert(staff);
 
-    int baseStem = STANDARD_STEMLENGTH * 2;
+    int baseStem = STANDARD_STEMLENGTH * 3;
 
     int shortening = 0;
 
@@ -334,17 +334,18 @@ int Note::CalcStemLenInHalfUnits(Staff *staff)
             case 3: shortening = 2; break;
             case 2: shortening = 3; break;
             case 1: shortening = 4; break;
-            default: shortening = 4;
+            case 0: shortening = 5; break;
+            default: shortening = 6;
         }
     }
 
     // Limit shortening with duration shorter than quarter not when not in a beam
     if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            shortening = std::min(3, shortening);
+            shortening = std::min(4, shortening);
         }
         else {
-            shortening = std::min(2, shortening);
+            shortening = std::min(3, shortening);
         }
     }
 
