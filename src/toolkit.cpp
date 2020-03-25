@@ -660,14 +660,6 @@ bool Toolkit::LoadData(const std::string &data)
     return true;
 }
 
-std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
-{
-    LogWarning("GetMEI with separate parameters is deprecated; use the version with JSON string parameter instead");
-    std::string boolStr = (scoreBased) ? "true" : "false";
-    std::string jsonOptions = StringFormat("{'pageNo': %d, 'scoreBased': %s}", pageNo, boolStr.c_str());
-    return this->GetMEI(jsonOptions);
-}
-
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
