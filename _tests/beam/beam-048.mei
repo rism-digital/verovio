@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Beam slope regularity</title>
+			</titleStmt>
+			<pubStmt />
+			<notesStmt>
+				<annot>Beam should have a regular slope one identical motifs with different pitches</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application isodate="2020-03-24T02:43:30" version="2.7.0" label="1">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv xml:id="mdiv-0000001469826880">
+				<score xml:id="score-0000002019668391">
+					<scoreDef xml:id="scoredef-0000000438845605">
+						<staffGrp xml:id="staffgrp-0000002133001406">
+							<staffDef xml:id="staffdef-0000000254906411" n="1" lines="5">
+								<clef xml:id="clef-0000000272449445" shape="G" line="2" />
+							</staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section xml:id="section-L1F1">
+						<measure xml:id="measure-L1" n="1">
+							<staff xml:id="staff-0000001310876474" n="1">
+								<layer xml:id="layer-L1F1N1" n="1">
+									<beam xml:id="beam-L3F1-L5F1">
+										<note xml:id="note-L3F1" dur="8" oct="4" pname="b" accid.ges="n" />
+										<note xml:id="note-L4F1" dur="8" oct="4" pname="a" accid.ges="n" />
+										<note xml:id="note-L5F1" dur="8" oct="4" pname="g" accid.ges="n" />
+									</beam>
+									<beam xml:id="beam-L6F1-L8F1">
+										<note xml:id="note-L6F1" dur="8" oct="4" pname="a" accid.ges="n" />
+										<note xml:id="note-L7F1" dur="8" oct="4" pname="g" accid.ges="n" />
+										<note xml:id="note-L8F1" dur="8" oct="4" pname="f" accid.ges="n" />
+									</beam>
+									<beam xml:id="beam-L9F1-L11F1">
+										<note xml:id="note-L9F1" dur="8" oct="4" pname="g" accid.ges="n" />
+										<note xml:id="note-L10F1" dur="8" oct="4" pname="f" accid.ges="n" />
+										<note xml:id="note-L11F1" dur="8" oct="4" pname="e" accid.ges="n" />
+									</beam>
+								</layer>
+							</staff>
+						</measure>
+						<measure xml:id="measure-L12" right="end">
+							<staff xml:id="staff-L12F1N1" n="1">
+								<layer xml:id="layer-L12F1N1" n="1">
+									<beam xml:id="beam-L13F1-L14F1">
+										<note xml:id="note-L13F1" dur="8" oct="4" pname="b" accid.ges="n" />
+										<note xml:id="note-L14F1" dur="8" oct="4" pname="a" accid.ges="n" />
+									</beam>
+									<beam xml:id="beam-L15F1-L16F1">
+										<note xml:id="note-L15F1" dur="8" oct="4" pname="a" accid.ges="n" />
+										<note xml:id="note-L16F1" dur="8" oct="4" pname="g" accid.ges="n" />
+									</beam>
+									<beam xml:id="beam-L17F1-L18F1">
+										<note xml:id="note-L17F1" dur="8" oct="4" pname="g" accid.ges="n" />
+										<note xml:id="note-L18F1" dur="8" oct="4" pname="f" accid.ges="n" />
+									</beam>
+									<beam xml:id="beam-L19F1-L20F1">
+										<note xml:id="note-L19F1" dur="8" oct="4" pname="f" accid.ges="n" />
+										<note xml:id="note-L20F1" dur="8" oct="4" pname="e" accid.ges="n" />
+									</beam>
+								</layer>
+							</staff>
+						</measure>
+						
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>
