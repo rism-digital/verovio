@@ -1169,7 +1169,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                         continue;
                     }
                     else {
-                        horizontalMargin *= -1.5;
+                        horizontalMargin *= -1;
                     }
                 }
             }

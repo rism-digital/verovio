@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Improved spacing with crossing voices (@rettinghaus)
 * Complete beam refactoring
 * Support for mSpace elements (@rettinghaus)
 * Improved header in MusicXML import (@rettinghaus)
