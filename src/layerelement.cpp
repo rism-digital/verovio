@@ -1160,26 +1160,48 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
                     horizontalMargin = 0;
                 }
+                else if (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir()) {
+                    if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == - 1) {
+                        horizontalMargin *= -5;
+                    }
+                    else if ((params->m_currentNote->GetDrawingDur() == DUR_1)
+                             && (previousNote->GetDrawingDur() == DUR_1)) {
+                        continue;
+                    }
+                    else {
+                        horizontalMargin *= -1.5;
+                    }
+                }
             }
 
             if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
                 continue;
             }
+            
+            if (!(horizontalMargin < 0)) {
+                
+                // Nothing to do if we have no vertical overlap
+                if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
 
-            // Nothing to do if we have no vertical overlap
-            if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
+                // Nothing to do either if we have no horizontal overlap
+                if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
-            // Nothing to do either if we have no horizontal overlap
-            if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
+                int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
 
-            int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
-
-            // Move the appropriate parent to the left
-            if (xRelShift > 0) {
+                // Move the appropriate parent to the left
+                if (xRelShift > 0) {
+                    if (params->m_currentChord)
+                        params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
+                    else if (params->m_currentNote)
+                        params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+                }
+            }
+            else {
+                // Move the appropriate parent to the right
                 if (params->m_currentChord)
-                    params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
+                    params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + horizontalMargin);
                 else if (params->m_currentNote)
-                    params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+                    params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + horizontalMargin);
             }
         }
     }
