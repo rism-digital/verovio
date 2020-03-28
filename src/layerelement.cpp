@@ -1161,12 +1161,12 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                     horizontalMargin = 0;
                 }
                 else if (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir()) {
-                    if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == - 1) {
+                    if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
                         horizontalMargin *= -5;
                         if (params->m_currentNote->GetDrawingDur() <= DUR_1) horizontalMargin *= 1.5;
                     }
                     else if ((params->m_currentNote->GetDrawingDur() <= DUR_1)
-                             && (previousNote->GetDrawingDur() <= DUR_1)) {
+                        && (previousNote->GetDrawingDur() <= DUR_1)) {
                         continue;
                     }
                     else {
@@ -1178,9 +1178,9 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
                 continue;
             }
-            
+
             if (!(horizontalMargin < 0)) {
-                
+
                 // Nothing to do if we have no vertical overlap
                 if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
 

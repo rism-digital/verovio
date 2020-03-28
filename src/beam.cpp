@@ -329,7 +329,7 @@ bool BeamSegment::CalcBeamSlope(
 
     m_beamSlope = 0.0;
     shorten = false;
-    
+
     if (m_nbNotesOrChords < 2) {
         return false;
     }
@@ -677,7 +677,7 @@ void BeamSegment::CalcAdjustSlope(
                 }
             }
         }
-        
+
         // If we can, shorten by two units
         if (shorten) {
             int shortening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? 2 * unit : -2 * unit;

@@ -3144,22 +3144,23 @@ bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
     return true;
 }
 
-void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node) {
-  assert(fermata);
+void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
+{
+    assert(fermata);
 
-  // color
-  fermata->SetColor(node.attribute("color").as_string());
-  // shape
-  fermata->SetShape(ConvertFermataShape(node.text().as_string()));
-  // form and place
-  if (HasAttributeWithValue(node, "type", "inverted")) {
-      fermata->SetForm(fermataVis_FORM_inv);
-      fermata->SetPlace(STAFFREL_below);
-  }
-  else if (HasAttributeWithValue(node, "type", "upright")) {
-      fermata->SetForm(fermataVis_FORM_norm);
-      fermata->SetPlace(STAFFREL_above);
-  }
+    // color
+    fermata->SetColor(node.attribute("color").as_string());
+    // shape
+    fermata->SetShape(ConvertFermataShape(node.text().as_string()));
+    // form and place
+    if (HasAttributeWithValue(node, "type", "inverted")) {
+        fermata->SetForm(fermataVis_FORM_inv);
+        fermata->SetPlace(STAFFREL_below);
+    }
+    else if (HasAttributeWithValue(node, "type", "upright")) {
+        fermata->SetForm(fermataVis_FORM_norm);
+        fermata->SetPlace(STAFFREL_above);
+    }
 }
 
 } // namespace vrv
