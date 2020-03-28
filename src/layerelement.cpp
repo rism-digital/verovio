@@ -1157,11 +1157,13 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() > 1) {
                     continue;
                 }
-                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1
+                    && !params->m_currentChord) {
                     horizontalMargin = 0;
                 }
                 else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() < 0)
-                    && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())) {
+                    && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())
+                    && !params->m_currentChord) {
                     if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
                         horizontalMargin *= -5;
                         if (params->m_currentNote->GetDrawingDur() <= DUR_1) horizontalMargin *= 1.5;
@@ -1180,7 +1182,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 continue;
             }
 
-            if (!(horizontalMargin < 0)) {
+            if (!(horizontalMargin < 0) || params->m_currentChord) {
 
                 // Nothing to do if we have no vertical overlap
                 if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
