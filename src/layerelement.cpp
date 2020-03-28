@@ -1157,8 +1157,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() > 1) {
                     continue;
                 }
-                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1
-                    && !params->m_currentChord) {
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
                     horizontalMargin = 0;
                 }
                 else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() < 0)
