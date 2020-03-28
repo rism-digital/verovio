@@ -1163,9 +1163,10 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 else if (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir()) {
                     if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == - 1) {
                         horizontalMargin *= -5;
+                        if (params->m_currentNote->GetDrawingDur() <= DUR_1) horizontalMargin *= 1.5;
                     }
-                    else if ((params->m_currentNote->GetDrawingDur() == DUR_1)
-                             && (previousNote->GetDrawingDur() == DUR_1)) {
+                    else if ((params->m_currentNote->GetDrawingDur() <= DUR_1)
+                             && (previousNote->GetDrawingDur() <= DUR_1)) {
                         continue;
                     }
                     else {
