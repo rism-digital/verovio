@@ -1160,7 +1160,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
                     horizontalMargin = 0;
                 }
-                else if (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir()) {
+                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() < 0)
+                    && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())) {
                     if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
                         horizontalMargin *= -5;
                         if (params->m_currentNote->GetDrawingDur() <= DUR_1) horizontalMargin *= 1.5;
@@ -1200,7 +1201,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             else {
                 // Move the appropriate parent to the right
                 if (params->m_currentChord)
-                    params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + horizontalMargin);
+                    continue;
                 else if (params->m_currentNote)
                     params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + horizontalMargin);
             }
