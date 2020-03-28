@@ -1164,8 +1164,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                     && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())
                     && !params->m_currentChord) {
                     if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
-                        horizontalMargin *= -5;
-                        if (params->m_currentNote->GetDrawingDur() <= DUR_1) horizontalMargin *= 1.5;
+                        horizontalMargin *= -1;
                     }
                     else if ((params->m_currentNote->GetDrawingDur() <= DUR_1)
                         && (previousNote->GetDrawingDur() <= DUR_1)) {
@@ -1173,6 +1172,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                     }
                     else {
                         horizontalMargin *= -1;
+                        verticalMargin = horizontalMargin;
                     }
                 }
             }
@@ -1201,10 +1201,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             }
             else {
                 // Move the appropriate parent to the right
-                if (params->m_currentChord)
-                    continue;
-                else if (params->m_currentNote)
-                    params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + horizontalMargin);
+                int xRelShift = this->HorizontalRightOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+                params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
             }
         }
     }
