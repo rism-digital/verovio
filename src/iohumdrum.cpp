@@ -14829,28 +14829,30 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
-    if (octaveupQ) {
-        // @oct required even if @oct.ges given.
-        note->SetOctGes(octave);
-        note->SetOct(octave - 1);
-    }
-    else if (octavedownQ) {
-        // @oct required even if @oct.ges given.
-        note->SetOctGes(octave);
-        note->SetOct(octave + 1);
-    }
-    else if (octave2upQ) {
-        // @oct required even if @oct.ges given.
-        note->SetOctGes(octave);
-        note->SetOct(octave - 2);
-    }
-    else if (octave2downQ) {
-        // @oct required even if @oct.ges given.
-        note->SetOctGes(octave);
-        note->SetOct(octave + 2);
-    }
-    else {
-        note->SetOct(octave);
+    if (!unpitchedQ) {
+        if (octaveupQ) {
+            // @oct required even if @oct.ges given.
+            note->SetOctGes(octave);
+            note->SetOct(octave - 1);
+        }
+        else if (octavedownQ) {
+            // @oct required even if @oct.ges given.
+            note->SetOctGes(octave);
+            note->SetOct(octave + 1);
+        }
+        else if (octave2upQ) {
+            // @oct required even if @oct.ges given.
+            note->SetOctGes(octave);
+            note->SetOct(octave - 2);
+        }
+        else if (octave2downQ) {
+            // @oct required even if @oct.ges given.
+            note->SetOctGes(octave);
+            note->SetOct(octave + 2);
+        }
+        else {
+            note->SetOct(octave);
+        }
     }
 
     switch (diatonic % 7) {
@@ -14993,7 +14995,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
     }
-    else if (!mensit) {
+    else if (!mensit && (!unpitchedQ)) {
         Accid *accid = new Accid;
         appendElement(note, accid);
         setLocationId(accid, token, subtoken);
