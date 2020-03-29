@@ -14679,6 +14679,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     bool chordQ = token->isChord();
+    bool unpitchedQ = token->isUnpitched();
 
     if (!chordQ) {
         setStemLength(note, token);
@@ -14860,6 +14861,13 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         case 4: note->SetPname(PITCHNAME_g); break;
         case 5: note->SetPname(PITCHNAME_a); break;
         case 6: note->SetPname(PITCHNAME_b); break;
+    }
+
+    if (unpitchedQ) {
+        int loc = hum::Convert::kernToStaffLocation(token, "*clefX");
+        note->SetLoc(loc);
+        // suppress note@pname (see issue https://github.com/rism-ch/verovio/issues/1385)
+        // suppress note@oct as well
     }
 
     bool cautionaryQ = false;
