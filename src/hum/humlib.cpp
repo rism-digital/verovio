@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Mar 21 18:41:21 PDT 2020
+// Last Modified: Sun Mar 29 12:31:54 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2891,6 +2891,64 @@ int Convert::base7ToBase40(int base7) {
 	}
 	return octave * 40 + 2 + b40pc;
 }
+
+
+
+//////////////////////////////
+//
+// Convert::kernToStaffLocation -- 0 = bottom line of staff, 1 = next space higher,
+//     2 = second line of staff, etc.  -1 = space below bottom line.
+//
+
+int Convert::kernToStaffLocation(HTp token, HTp clef) {
+	if (clef == NULL) {
+		return Convert::kernToStaffLocation(*token, "");
+	} else {
+		return Convert::kernToStaffLocation(*token, *clef);
+	}
+}
+
+
+int Convert::kernToStaffLocation(HTp token, const string& clef) {
+	return Convert::kernToStaffLocation(*token, clef);
+}
+
+
+int Convert::kernToStaffLocation(const string& token, const string& clef) {
+	int offset = 0;
+	HumRegex hre;
+	if (hre.search(clef, "clef([GFC])([v^]*)(\\d+)")) {
+		string letter = hre.getMatch(1);
+		string vcaret = hre.getMatch(2);
+		int line = hre.getMatchInt(3);
+		int octadj = 0;
+		if (!vcaret.empty()) {
+			for (int i=0; i<(int)vcaret.size(); i++) {
+				if (vcaret[i] == '^') {
+					octadj--;
+				} else if (vcaret[i] == 'v') {
+					octadj++;
+				}
+			}
+		}
+		if (letter == "F") {
+			offset = 14 + 4;
+		} else if (letter == "C") {
+			offset = 28;
+		} else {
+			offset = 28 + 4;
+		}
+		offset += (line - 1)  * 2;
+		offset += octadj * 7;
+	} else {
+		// pretend clefG2:
+		offset = 28 + 2;
+	}
+
+	int diatonic = Convert::kernToBase7(token);
+	return diatonic - offset;
+}
+
 
 
 
@@ -5904,10 +5962,17 @@ void GridMeasure::addInterpretationAfter(GridSlice* slice, int partindex,
 	auto previous = iter;
 	// auto last = previous;
 	previous++;
-	HumNum ptime = (*previous)->getTimestamp();
-	HumNum newtargettime = ptime;
+	HumNum ptime;
+	HumNum newtargettime;
+	if (previous != this->rend()) {
+		ptime = (*previous)->getTimestamp();
+		newtargettime = ptime;
+	} else {
+		ptime = targettime;
+		newtargettime = targettime;
+	}
 
-	if (ptime < targettime) {
+	if (ptime <= targettime) {
 		// Insert slice at end of measure.
 		GridSlice* newslice = new GridSlice(this, timestamp, SliceType::_Interpretation);
 		newslice->initializeBySlice(slice);
@@ -27937,6 +28002,46 @@ bool HumdrumToken::isNote(void) {
 	}
 	return false;
 }
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isPitched -- True if not a rest or an unpitched note.
+//
+
+bool HumdrumToken::isPitched(void) { 
+	if (this->isKern()) {
+		for (int i=0; i<(int)this->size(); i++) {
+			if ((this->at(i) == 'r') || (this->at(i) == 'R')) {
+				return false;
+			}
+		}
+		return true;
+	}
+	// Don't know data type so return false for now:
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isPitched -- True if has an unpitched marker (could be a rest)
+//
+
+bool HumdrumToken::isUnpitched(void) {
+	if (this->isKern()) {
+		if (this->find('R') != string::npos) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	// Don't know data type so return false for now:
+	return false;
+}
+
 
 
 
