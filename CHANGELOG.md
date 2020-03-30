@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `note@head.visible` (@rettinghaus)
 * Improved spacing with crossing voices (@rettinghaus)
 * Complete beam refactoring
 * Support for mSpace elements (@rettinghaus)
