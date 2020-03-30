@@ -1264,19 +1264,23 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         // Whole notes
         else if (drawingDur == DUR_1) {
-            if (note->GetColored() == BOOLEAN_true)
+            if (note->GetColored() == BOOLEAN_true) {
                 fontNo = SMUFL_E0FA_noteheadWholeFilled;
-            else
+            }
+            else {
                 fontNo = SMUFL_E0A2_noteheadWhole;
+            }
 
             DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
         }
         // Other values
         else {
-            if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2)
+            if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
                 fontNo = SMUFL_E0A3_noteheadHalf;
-            else
+            }
+            else {
                 fontNo = SMUFL_E0A4_noteheadBlack;
+            }
 
             DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
         }
