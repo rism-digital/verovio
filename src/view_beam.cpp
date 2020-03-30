@@ -238,7 +238,6 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
     // temporary variables
     int shiftY;
     int polygonHeight;
-    double dy1, dy2;
 
     // loops
     int i;
@@ -263,9 +262,6 @@ void View::DrawBeamSegment(DeviceContext *dc, BeamSegment *beamSegment, BeamDraw
 
     x1 = beamElementCoords->at(0)->m_x;
     x2 = beamElementCoords->at(last)->m_x;
-
-    dy1 = shiftY;
-    dy2 = shiftY;
 
     // For acc and rit beam (see AttBeamingVis set
     // s_y = 0 and s_y2 = 0 respectively
