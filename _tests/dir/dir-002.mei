@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
 	<meiHead>
 		<fileDesc>
@@ -12,6 +12,7 @@
 			</pubStmt>
 			<notesStmt>
 				<annot>Verovio appropriately places multiple directives, spacing them as desired.</annot>
+				<annot type="warning">This isn't working as supposed in Safari due to <ref target="https://bugs.webkit.org/show_bug.cgi?id=112032">this bug</ref>.</annot>
 			</notesStmt>
 		</fileDesc>
 		<encodingDesc>
@@ -40,7 +41,7 @@
 									</note>
 								</layer>
 							</staff>
-							<dir place="above" staff="1" tstamp="1.000000">Allegro <rend>molto</rend></dir>
+							<dir place="above" staff="1" tstamp="1">Allegro <rend>molto</rend></dir>
 						</measure>
 						<measure n="2">
 							<staff n="1">
@@ -50,7 +51,7 @@
 									</note>
 								</layer>
 							</staff>
-							<dir place="above" staff="1" tstamp="1.000000"><rend xml:space="preserve">   a         b       c    </rend></dir>
+							<dir place="above" staff="1" tstamp="1"><rend xml:space="preserve">   a         b       c    </rend></dir>
 						</measure>
 						<measure n="3">
 							<staff n="1">
@@ -60,7 +61,7 @@
 									</note>
 								</layer>
 							</staff>
-							<dir place="above" staff="1" tstamp="1.000000"><rend xml:space="default"> a b c </rend></dir>
+							<dir place="above" staff="1" tstamp="1"><rend xml:space="default"> a b c </rend></dir>
 						</measure>
 					</section>
 				</score>
