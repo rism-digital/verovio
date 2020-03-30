@@ -892,7 +892,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         assert(note);
         Chord *chord = note->IsChordTone();
         int loc = 0;
-        if (note->HasPname()) {
+        if (note->HasPname() || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
