@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Changing the stem position</title>
+			</titleStmt>
+			<pubStmt />
+			<notesStmt>
+				<annot>The note@stem.pos parameter can be used to change the side of the note the stem is attached, such as in measure 2 of this example</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application isodate="2020-03-24T21:50:47" version="2.7.0" label="2">
+					<name>Verovio</name>
+					<p>Transcoded from Humdrum</p>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<workList>
+			<work>
+				<title />
+			</work>
+		</workList>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv xml:id="mdiv-0000001244977722">
+				<score xml:id="score-0000001753406272">
+					<scoreDef xml:id="scoredef-0000001027826020">
+						<staffGrp xml:id="staffgrp-0000000195083349">
+							<staffDef xml:id="staffdef-0000000044079545" n="1" lines="5">
+								<clef xml:id="clef-0000000001828467" shape="G" line="2" />
+								<meterSig xml:id="metersig-L2F1" count="4" unit="4" />
+							</staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section xml:id="section-L1F1">
+						<measure xml:id="measure-L1" n="1">
+							<staff xml:id="staff-0000001752597584" n="1">
+								<layer xml:id="layer-L1F1N1" n="1">
+									<note xml:id="note-L4F1" dur="2" oct="5" pname="g" accid.ges="n" />
+									<note xml:id="note-L5F1" dur="4" oct="5" pname="f" accid.ges="n" />
+									<note xml:id="note-L6F1" dur="4" oct="5" pname="g" accid.ges="n" />
+								</layer>
+							</staff>
+						</measure>
+						<measure xml:id="measure-L7" right="end">
+							<staff xml:id="staff-L7F1N1" n="1">
+								<layer xml:id="layer-L7F1N1" n="1">
+									<note xml:id="note-L9F1" dur="2" oct="5" pname="g" stem.pos="right" accid.ges="n" />
+									<note xml:id="note-L10F1" dur="4" oct="5" pname="f" stem.pos="right" accid.ges="n" />
+									<note xml:id="note-L11F1" dur="4" oct="5" pname="g" stem.pos="right" accid.ges="n" />
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

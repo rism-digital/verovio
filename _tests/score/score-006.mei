@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Single line staves and staffGrp</title>
+			</titleStmt>
+			<pubStmt>
+				<date>2017-05-15</date>
+			</pubStmt>
+			<notesStmt>
+				<annot>Grouping symbols respect single line staves.</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="2.0.0" label="1">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef system.leftline="true">
+						<staffGrp bar.thru="false" symbol="bracket">
+							<staffDef n="1" lines="1" clef.shape="perc" clef.line="1">
+								<meterSig count="4" unit="4"/>
+							</staffDef>
+							<staffDef n="2" lines="1" clef.shape="perc" clef.line="1">
+								<meterSig count="4" unit="4"/>
+							</staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<measure n="1">
+							<staff n="1">
+								<layer>
+									<mRest/>
+								</layer>
+							</staff>
+							<staff n="2">
+								<layer>
+									<mRest/>
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

@@ -132,7 +132,7 @@
     function loadCustomFile() {
         console.log(vrvVersion);
         options = window["defaultOptions_" + vrvVersion];
-        options.pageWidth = ($("#00").width()) * 100 / options.scale ;
+        options.pageWidth = ($("#localStorageFile").width()) * 100 / options.scale ;
         
         if (localStorage['testOptions']) {
             testOptions = JSON.parse(localStorage['testOptions']);
@@ -149,7 +149,7 @@
         
         // load function for the current version
         loadFunction = window["loadExample_" + vrvVersion]; 
-        loadFunction(customExample, "#00", options, page );
+        loadFunction(customExample, "#localStorageFile", options, page );
     }
     
     function onVerovioLoaded() {
@@ -212,7 +212,7 @@
                 
                 <div id="{{ id }}-meiDiv" style="display: none;">
                     <p>
-                        <a data-toggle="collapse" data-target="#{{ id }}-meiCode" aria-expanded="false" aria-controls="{{ id }}-meiCode">Show MEI</a> | 
+                        <a data-toggle="collapse" data-target="#{{ id }}-meiCode" aria-expanded="false" aria-controls="{{ id }}-meiCode" style="cursor: pointer;">Show MEI</a> | 
                         <a href="{{ site.tests-edit-path }}/{{ f.path }}" target="_blank">Edit MEI</a>
                     </p>
                 </div>
@@ -290,6 +290,8 @@
     </div>
         {% endunless %}
     {% endfor %}
+
+    <div id="localStorageFile"></div>
     
 </div>
 
@@ -320,8 +322,8 @@
         if ((iframe != null) && localStorage['testData']) {
             customExample = localStorage['testData'];
             // Swap display
-            $(".test-group").hide();
-            $(".test-group").last().show();
+            // $(".test-group").hide();
+            // $(".test-group").last().show();
             // Empty the list of examples to load
             examples = [];
         }
