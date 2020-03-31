@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Mar 30 11:58:56 PDT 2020
+// Last Modified: Tue 31 Mar 2020 06:13:36 AM UTC
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -18754,7 +18754,7 @@ HLp HumdrumFileBase::insertNullDataLine(HumNum timestamp) {
 	HumNum beforet(-1);
 	HumNum aftert(-1);
 	int beforei = -1;
-	int afteri = -1;
+	// int afteri = -1;
 	HumNum current;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isData()) {
@@ -18768,7 +18768,7 @@ HLp HumdrumFileBase::insertNullDataLine(HumNum timestamp) {
 			beforei = i;
 		} else if (current > timestamp) {
 			aftert = current;
-			afteri = i;
+			// afteri = i;
 			break;
 		}
 	}
@@ -18822,7 +18822,7 @@ HLp HumdrumFileBase::insertNullInterpretationLine(HumNum timestamp) {
 	HumNum beforet(-1);
 	HumNum aftert(-1);
 	int beforei = -1;
-	int afteri = -1;
+	// int afteri = -1;
 	HumNum current;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].isData()) {
@@ -18837,7 +18837,7 @@ HLp HumdrumFileBase::insertNullInterpretationLine(HumNum timestamp) {
 			beforei = i;
 		} else if (current > timestamp) {
 			aftert = current;
-			afteri = i;
+			// afteri = i;
 			break;
 		}
 	}
@@ -18900,7 +18900,7 @@ HLp HumdrumFileBase::insertNullInterpretationLineAbove(HumNum timestamp) {
 	HumNum beforet(-1);
 	HumNum aftert(-1);
 	int beforei = -1;
-	int afteri = -1;
+	// int afteri = -1;
 	HumNum current;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		current = infile[i].getDurationFromStart();
@@ -18912,7 +18912,7 @@ HLp HumdrumFileBase::insertNullInterpretationLineAbove(HumNum timestamp) {
 			beforei = i;
 		} else if (current > timestamp) {
 			aftert = current;
-			afteri = i;
+			// afteri = i;
 			break;
 		}
 	}
@@ -23155,10 +23155,10 @@ bool HumdrumFileStructure::analyzeStructure(void) {
 bool HumdrumFileStructure::analyzeStrophes(void) {
 	vector<HTp> strands;
 	int scount = (int)m_strand1d.size();
-	bool dataQ;
+	// bool dataQ;
 	vector<HTp> strophestarts;
 	for (int i=0; i<scount; i++) {
-		dataQ = false;
+		// dataQ = false;
 		HTp current = m_strand1d.at(i).first;
 		HTp send = m_strand1d.at(i).last;
 		if (!send) {
@@ -28732,10 +28732,11 @@ bool HumdrumToken::isSplitInterpretation(void) const {
 //
 
 bool HumdrumToken::isMergeInterpretation(void) const {
-	if ((void*)this == NULL) {
-		// This was added perhaps due to a new bug [20100125] that is checking a null pointer
-		return false;
-	}
+	// [20200331] GCC 6+ will print a compiler warning when checking this against NULL.
+	//if ((void*)this == NULL) {
+	//	// This was added perhaps due to a new bug [20100125] that is checking a null pointer
+	//	return false;
+	//}
 	return ((string)(*this)) == MERGE_TOKEN;
 }
 
@@ -71700,7 +71701,7 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 	}
 
 	string sign;
-	int line = -1000;
+	int line = 0;
 	int octadjust = 0;
 
 	xml_node child = clef.first_child();
@@ -71730,9 +71731,7 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 			ss << "^";
 		}
 	}
-	if (line > 0) {
-		ss << line;
-	}
+	ss << line;
 	token = new HumdrumToken(ss.str());
 
 	clef = clef.next_sibling();
