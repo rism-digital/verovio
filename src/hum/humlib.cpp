@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Mar 29 12:31:54 PDT 2020
+// Last Modified: Mon Mar 30 11:58:56 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -39517,6 +39517,7 @@ string MxmlEvent::getKernPitch(void) {
 	bool explicitQ    = false;
 	bool naturalQ     = false;
 	bool editorialQ   = false;
+	bool unpitchedQ   = false;
 	// bool sharpQ       = false;
 	// bool flatQ        = false;
 	// bool doubleflatQ  = false;
@@ -39531,6 +39532,7 @@ string MxmlEvent::getKernPitch(void) {
 				rest = true;
 				break;
 			}
+
 			if (nodeType(child, "pitch")) {
 				xml_node grandchild = child.first_child();
 				while (grandchild) {
@@ -39539,6 +39541,19 @@ string MxmlEvent::getKernPitch(void) {
 					} else if (nodeType(grandchild, "alter")) {
 						alter = atoi(grandchild.child_value());
 					} else if (nodeType(grandchild, "octave")) {
+						octave = atoi(grandchild.child_value());
+					}
+					grandchild = grandchild.next_sibling();
+				}
+			} else if (nodeType(child, "unpitched")) {
+				unpitchedQ = true;
+				xml_node grandchild = child.first_child();
+				while (grandchild) {
+					if (nodeType(grandchild, "display-step")) {
+						step = grandchild.child_value();
+					} else if (nodeType(grandchild, "alter")) {
+						alter = atoi(grandchild.child_value());
+					} else if (nodeType(grandchild, "display-octave")) {
 						octave = atoi(grandchild.child_value());
 					}
 					grandchild = grandchild.next_sibling();
@@ -39594,6 +39609,9 @@ string MxmlEvent::getKernPitch(void) {
 		count = 4 - octave;
 	}
 	string output;
+	if (unpitchedQ) {
+		output += "R";
+	}
 	for (int i=0; i<count; i++) {
 		output += pc;
 	}
@@ -39676,6 +39694,9 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
 	int tiestart     = 0;
 	int tiestop      = 0;
 
+	bool unpitchedQ  = false;
+	bool stemsQ      = m_stems;
+
 	// bool rest = false;
 	xml_node child = m_node.first_child();
 	xml_node notations;
@@ -39696,8 +39717,10 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
 			} else if (strcmp(beaminfo, "backward hook") == 0) {
 				hookbacks++;
 			}
+		} else if (nodeType(child, "unpitched")) {
+			unpitchedQ = true;
 		} else if (nodeType(child, "stem")) {
-			if (m_stems || (getVoiceIndex() >= 2) || (getDuration() == 0)) {
+			if (unpitchedQ || stemsQ || (getVoiceIndex() >= 2) || (getDuration() == 0)) {
 				const char* stemdir = child.child_value();
 				if (strcmp(stemdir, "up") == 0) {
 					stem = 1;
@@ -70501,6 +70524,7 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 	bool hastransposition  = false;
 	bool hastimesig        = false;
 	bool hasottava         = false;
+	bool hasstafflines     = false;
 
 	vector<vector<xml_node>> clefs(partdata.size());
 	vector<vector<xml_node>> keysigs(partdata.size());
@@ -70508,6 +70532,7 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 	vector<vector<xml_node>> timesigs(partdata.size());
 	vector<vector<vector<xml_node>>> ottavas(partdata.size());
 	vector<vector<xml_node>> hairpins(partdata.size());
+	vector<vector<xml_node>> stafflines(partdata.size());
 
 	vector<vector<vector<vector<MxmlEvent*>>>> gracebefore(partdata.size());
 	vector<vector<vector<vector<MxmlEvent*>>>> graceafter(partdata.size());
@@ -70543,6 +70568,21 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 					}
 
 					if (nodeType(child, "transpose")) {
+						transpositions[pindex].push_back(child);
+						hastransposition = true;
+						foundnongrace = true;
+					}
+
+					if (nodeType(child, "staff-details")) {
+						grandchild = child.first_child();
+						while (grandchild) {
+							if (nodeType(grandchild, "staff-lines")) {
+								stafflines[pindex].push_back(grandchild);
+								hasstafflines = true;
+							}
+							grandchild = grandchild.next_sibling();
+						}
+
 						transpositions[pindex].push_back(child);
 						hastransposition = true;
 						foundnongrace = true;
@@ -70590,6 +70630,10 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 	}
 
 	addGraceLines(outdata, gracebefore, partdata, nowtime);
+
+	if (hasstafflines) {
+		addStriaLine(outdata, stafflines, partdata, nowtime);
+	}
 
 	if (hasclef) {
 		addClefLine(outdata, clefs, partdata, nowtime);
@@ -70803,6 +70847,33 @@ void Tool_musicxml2hum::addClefLine(GridMeasure* outdata,
 
 //////////////////////////////
 //
+// Tool_musicxml2hum::addStriaLine --
+//
+
+void Tool_musicxml2hum::addStriaLine(GridMeasure* outdata,
+		vector<vector<xml_node> >& stafflines, vector<MxmlPart>& partdata,
+		HumNum nowtime) {
+
+	GridSlice* slice = new GridSlice(outdata, nowtime,
+		SliceType::Stria);
+	outdata->push_back(slice);
+	slice->initializePartStaves(partdata);
+
+	for (int i=0; i<(int)partdata.size(); i++) {
+		for (int j=0; j<(int)stafflines[i].size(); j++) {
+			if (stafflines[i][j]) {
+				string lines = stafflines[i][j].child_value();
+				int linecount = stoi(lines);
+				insertPartStria(linecount, *slice->at(i));
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_musicxml2hum::addTimeSigLine --
 //
 
@@ -70972,6 +71043,23 @@ void Tool_musicxml2hum::insertPartClefs(xml_node clef, GridPart& part) {
 		clef = convertClefToHumdrum(clef, token, staffnum);
 		part[staffnum]->setTokenLayer(0, token, 0);
 	}
+
+	// go back and fill in all NULL pointers with null interpretations
+	fillEmpties(&part, "*");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::insertPartStria --
+//
+
+void Tool_musicxml2hum::insertPartStria(int lines, GridPart& part) {
+	HTp token = new HumdrumToken;
+	string value = "*stria" + to_string(lines);
+	token->setText(value);
+	part[0]->setTokenLayer(0, token, 0);
 
 	// go back and fill in all NULL pointers with null interpretations
 	fillEmpties(&part, "*");
@@ -71612,7 +71700,7 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 	}
 
 	string sign;
-	int line = 0;
+	int line = -1000;
 	int octadjust = 0;
 
 	xml_node child = clef.first_child();
@@ -71642,7 +71730,9 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 			ss << "^";
 		}
 	}
-	ss << line;
+	if (line > 0) {
+		ss << line;
+	}
 	token = new HumdrumToken(ss.str());
 
 	clef = clef.next_sibling();

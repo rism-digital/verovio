@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Mar 29 12:31:54 PDT 2020
+// Last Modified: Mon Mar 30 11:58:56 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1103,7 +1103,7 @@ class HumdrumLine : public std::string, public HumHash {
 		void     setDurationFromBarline (HumNum dur);
 		void     setDurationToBarline   (HumNum dur);
 
-		void     copyStructure          (HLp line, const string& empty);
+		void     copyStructure          (HLp line, const std::string& empty);
 
 	protected:
 		bool     analyzeTracks          (std::string& err);
@@ -3434,8 +3434,8 @@ class Convert {
 				{ return kernToAccidentalCount((std::string)*token); }
 
       static int     kernToStaffLocation  (HTp token, HTp clef = NULL);
-      static int     kernToStaffLocation  (HTp token, const string& clef);
-      static int     kernToStaffLocation  (const string& token, const string& clef = "");
+      static int     kernToStaffLocation  (HTp token, const std::string& clef);
+      static int     kernToStaffLocation  (const std::string& token, const std::string& clef = "");
 
 		static int     kernToDiatonicPC     (const std::string& kerndata);
 		static int     kernToDiatonicPC     (HTp token)
@@ -3622,6 +3622,7 @@ enum class SliceType {
 		_Data,
 			Measures,
 		_Measure,
+				Stria,
 				Clefs,
 				Transpositions,
 				KeyDesignations,
@@ -6680,6 +6681,10 @@ class Tool_musicxml2hum : public HumTool {
 		void insertOffsetHarmonyIntoMeasure(GridMeasure* gm);
 		void insertOffsetFiguredBassIntoMeasure(GridMeasure* gm);
 
+		void addStriaLine      (GridMeasure* outdata,
+		                        std::vector<std::vector<xml_node> >& stafflines,
+		                        std::vector<MxmlPart>& partdata,
+                              HumNum nowtime);
 		void addClefLine       (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node>>& clefs,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
 		void addOttavaLine     (GridMeasure* outdata, std::vector<std::vector<std::vector<pugi::xml_node>>>& ottavas,
@@ -6687,6 +6692,7 @@ class Tool_musicxml2hum : public HumTool {
 		void storeOttava       (int pindex, xml_node octaveShift, xml_node direction,
 		                        std::vector<std::vector<std::vector<xml_node>>>& ottavas);
 		void insertPartClefs   (pugi::xml_node clef, GridPart& part);
+		void insertPartStria   (int lines, GridPart& part);
 		void insertPartOttavas (pugi::xml_node ottava, GridPart& part, int partindex, int partstaffindex, int staffcount);
 		pugi::xml_node convertClefToHumdrum(pugi::xml_node clef, HTp& token, int& staffindex);
 		pugi::xml_node convertOttavaToHumdrum(pugi::xml_node ottava, HTp& token, int& staffindex,
@@ -7583,7 +7589,7 @@ class Tool_transpose : public HumTool {
 
 		bool     run             (HumdrumFileSet& infiles);
 		bool     run             (HumdrumFile& infile);
-		bool     run             (const string& indata, ostream& out);
+		bool     run             (const std::string& indata, ostream& out);
 		bool     run             (HumdrumFile& infile, ostream& out);
 
 	protected:
@@ -7597,10 +7603,10 @@ class Tool_transpose : public HumTool {
 		                                 vector<int>& tvals);
 		void     convertToWrittenPitches(HumdrumFile& infile, int line,
 		                                 vector<int>& tvals);
-		void     printNewKeySignature   (const string& keysig, int trans);
+		void     printNewKeySignature   (const std::string& keysig, int trans);
 		void     processInterpretationLine(HumdrumFile& infile, int line,
 		                                 vector<int>& tvals, int style);
-		int      isKeyMarker            (const string& str);
+		int      isKeyMarker            (const std::string& str);
 		void     printNewKeyInterpretation(HumdrumLine& aRecord,
 		                                 int index, int transval);
 		int      hasTrMarkers           (HumdrumFile& infile, int line);
@@ -7609,9 +7615,9 @@ class Tool_transpose : public HumTool {
 		void     printHumdrumMxhmToken(HumdrumLine& record, int index,
 		                                 int transval);
 		int      checkForDeletedLine    (HumdrumFile& infile, int line);
-		int      getBase40ValueFromInterval(const string& string);
+		int      getBase40ValueFromInterval(const std::string& string);
 		void     example                (void);
-		void     usage                  (const string& command);
+		void     usage                  (const std::string& command);
 		void     printHumdrumDataRecord (HumdrumLine& record,
 		                                 vector<bool>& spineprocess);
 
@@ -7663,7 +7669,7 @@ class Tool_transpose : public HumTool {
 		                                 vector<bool>& spineprocess,
 		                                 int line, int transval);
 		int      getTransposeInfo       (HumdrumFile& infile, int row, int col);
-		void     printNewKernString     (const string& string, int transval);
+		void     printNewKernString     (const std::string& string, int transval);
 
 	private:
 		int      transval     = 0;   // used with -b option
