@@ -184,13 +184,6 @@ public:
 
     /**
      * Get the MEI as a string.
-     * Get all the pages unless a page number (1-based) is specified.
-     * Deprecated: use the version options passed as a string
-     */
-    std::string GetMEI(int pageNo = 0, bool scoreBased = true);
-
-    /**
-     * Get the MEI as a string.
      * Options (JSON) can be:
      * pageNo: integer; (1-based), all pages if none (or 0) specified
      * scoreBased: true|false; true by default

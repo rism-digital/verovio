@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Support for `note@head.visible` (@rettinghaus)
+* Improved spacing with crossing voices (@rettinghaus)
 * Complete beam refactoring
 * Support for mSpace elements (@rettinghaus)
 * Improved header in MusicXML import (@rettinghaus)
@@ -10,6 +12,7 @@
 ## [2.6.0] - 2020-03-11
 * Support for Plaine and Easie output (limited features)
 * Support for lyrics on chords (@rettinghaus)
+* Support for `scoreDef@system.leftline` (@rettinghaus)
 * Support for reh elements (@rettinghaus)
 * Improved extender lines in MusicXML import (@rettinghaus)
 * Improved backup handling in MusicXML import (@wergo)

@@ -372,7 +372,7 @@ void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel l
         case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
         default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
     }
-    
+
     if (checkDuplicate && LogBufferContains(message)) return;
     logBuffer.push_back(message);
 }

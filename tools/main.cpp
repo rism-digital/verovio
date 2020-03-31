@@ -378,14 +378,7 @@ int main(int argc, char **argv)
 
             case '?':
                 display_usage();
-                // Unless the found option is "help", we're here because the
-                // option was not recognized. Exit with error in that case.
-                if (!strcmp(long_options[option_index].name, "help")) {
-                    exit(0);
-                }
-                else {
-                    exit(1);
-                }
+                exit(0);
                 break;
 
             default: break;
@@ -589,7 +582,7 @@ int main(int argc, char **argv)
         }
         else {
             if (std_output) {
-                std::cout << toolkit.GetMEI(page);
+                std::cout << toolkit.GetMEI(vrv::StringFormat("{'pageNo': %d}", page));
             }
             else {
                 std::cerr << "MEI output of one page is available only to standard output." << std::endl;
