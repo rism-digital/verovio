@@ -99,12 +99,11 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 {
     std::string value;
     switch (data) {
+        case BEATRPT_REND_1: value = "1"; break;
+        case BEATRPT_REND_2: value = "2"; break;
+        case BEATRPT_REND_3: value = "3"; break;
         case BEATRPT_REND_4: value = "4"; break;
-        case BEATRPT_REND_8: value = "8"; break;
-        case BEATRPT_REND_16: value = "16"; break;
-        case BEATRPT_REND_32: value = "32"; break;
-        case BEATRPT_REND_64: value = "64"; break;
-        case BEATRPT_REND_128: value = "128"; break;
+        case BEATRPT_REND_5: value = "5"; break;
         case BEATRPT_REND_mixed: value = "mixed"; break;
         default:
             LogWarning("Unknown beatrpt rend '%d'", data);
@@ -116,12 +115,11 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 
 data_BEATRPT_REND Att::StrToBeatrptRend(std::string value, bool logWarning) const
 {
+    if (value == "1") return BEATRPT_REND_1;
+    if (value == "2") return BEATRPT_REND_2;
+    if (value == "3") return BEATRPT_REND_3;
     if (value == "4") return BEATRPT_REND_4;
-    if (value == "8") return BEATRPT_REND_8;
-    if (value == "16") return BEATRPT_REND_16;
-    if (value == "32") return BEATRPT_REND_32;
-    if (value == "64") return BEATRPT_REND_64;
-    if (value == "128") return BEATRPT_REND_128;
+    if (value == "5") return BEATRPT_REND_5;
     if (value == "mixed") return BEATRPT_REND_mixed;
     if (logWarning && !value.empty()) LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
     return BEATRPT_REND_NONE;
@@ -150,6 +148,8 @@ std::string Att::DurationToStr(data_DURATION data) const
         case DURATION_64: value = "64"; break;
         case DURATION_128: value = "128"; break;
         case DURATION_256: value = "256"; break;
+        case DURATION_512: value = "512"; break;
+        case DURATION_1024: value = "1024"; break;
         default:
             LogWarning("Unknown dur '%d'", data);
             value = "4";
@@ -179,6 +179,8 @@ data_DURATION Att::StrToDuration(std::string value, bool logWarning) const
     if (value == "64") return DURATION_64;
     if (value == "128") return DURATION_128;
     if (value == "256") return DURATION_256;
+    if (value == "512") return DURATION_512;
+    if (value == "1024") return DURATION_1024;
     if ((value.length() > 0) && (value[value.length() - 1] == 'p')) {
         // if (logWarning)
         // LogWarning("PPQ duration dur_s are not supported"); // remove it for now
@@ -219,54 +221,6 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
     else if (logWarning && !value.empty())
         LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
     return 0;
-}
-
-std::string Att::CompassdirectionToStr(data_COMPASSDIRECTION data) const
-{
-    std::string value;
-    if (data.GetType() == COMPASSDIRECTION_basic)
-        value = CompassdirectionBasicToStr(data.GetBasic());
-    else if (data.GetType() == COMPASSDIRECTION_extended)
-        value = CompassdirectionExtendedToStr(data.GetExtended());
-
-    return value;
-}
-
-data_COMPASSDIRECTION Att::StrToCompassdirection(std::string value, bool logWarning) const
-{
-    data_COMPASSDIRECTION data;
-    data.SetBasic(StrToCompassdirectionBasic(value, false));
-    if (data.HasValue()) return data;
-    data.SetExtended(StrToCompassdirectionExtended(value, false));
-    if (data.HasValue()) return data;
-
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.COMPASSDIRECTION '%s'", value.c_str());
-
-    return data;
-}
-
-std::string Att::EventrelToStr(data_EVENTREL data) const
-{
-    std::string value;
-    if (data.GetType() == EVENTREL_basic)
-        value = EventrelBasicToStr(data.GetBasic());
-    else if (data.GetType() == EVENTREL_extended)
-        value = EventrelExtendedToStr(data.GetExtended());
-
-    return value;
-}
-
-data_EVENTREL Att::StrToEventrel(std::string value, bool logWarning) const
-{
-    data_EVENTREL data;
-    data.SetBasic(StrToEventrelBasic(value, false));
-    if (data.HasValue()) return data;
-    data.SetExtended(StrToEventrelExtended(value, false));
-    if (data.HasValue()) return data;
-
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.EVENTREL '%s'", value.c_str());
-
-    return data;
 }
 
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
@@ -339,51 +293,43 @@ data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarnin
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
 {
     std::string value;
-    switch (data) {
-        case KEYSIGNATURE_7f: value = "7f"; break;
-        case KEYSIGNATURE_6f: value = "6f"; break;
-        case KEYSIGNATURE_5f: value = "5f"; break;
-        case KEYSIGNATURE_4f: value = "4f"; break;
-        case KEYSIGNATURE_3f: value = "3f"; break;
-        case KEYSIGNATURE_2f: value = "2f"; break;
-        case KEYSIGNATURE_1f: value = "1f"; break;
-        case KEYSIGNATURE_0: value = "0"; break;
-        case KEYSIGNATURE_1s: value = "1s"; break;
-        case KEYSIGNATURE_2s: value = "2s"; break;
-        case KEYSIGNATURE_3s: value = "3s"; break;
-        case KEYSIGNATURE_4s: value = "4s"; break;
-        case KEYSIGNATURE_5s: value = "5s"; break;
-        case KEYSIGNATURE_6s: value = "6s"; break;
-        case KEYSIGNATURE_7s: value = "7s"; break;
-        case KEYSIGNATURE_mixed: value = "mixed"; break;
-        default:
-            LogWarning("Unknown key signature '%d'", data);
-            value = "";
-            break;
+
+    if (data.first == VRV_UNSET) {
+        value = "mixed";
     }
+    else if (data.first == 0) {
+        value = "0";
+    }
+    else if (data.first != -1) {
+        value = StringFormat("%d%s", data.first, AccidentalWrittenToStr(data.second).c_str());
+    }
+
     return value;
 }
 
 data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) const
 {
-    if (value == "7f") return KEYSIGNATURE_7f;
-    if (value == "6f") return KEYSIGNATURE_6f;
-    if (value == "5f") return KEYSIGNATURE_5f;
-    if (value == "4f") return KEYSIGNATURE_4f;
-    if (value == "3f") return KEYSIGNATURE_3f;
-    if (value == "2f") return KEYSIGNATURE_2f;
-    if (value == "1f") return KEYSIGNATURE_1f;
-    if (value == "0") return KEYSIGNATURE_0;
-    if (value == "1s") return KEYSIGNATURE_1s;
-    if (value == "2s") return KEYSIGNATURE_2s;
-    if (value == "3s") return KEYSIGNATURE_3s;
-    if (value == "4s") return KEYSIGNATURE_4s;
-    if (value == "5s") return KEYSIGNATURE_5s;
-    if (value == "6s") return KEYSIGNATURE_6s;
-    if (value == "7s") return KEYSIGNATURE_7s;
-    if (value == "mixed") return KEYSIGNATURE_mixed;
-    if (logWarning && !value.empty()) LogWarning("Unsupported key signature '%s'", value.c_str());
-    return KEYSIGNATURE_NONE;
+    int alterationNumber = 0;
+    data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
+
+    std::regex test("mixed|0|[1-7][s|f]");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.KEYSIGNATURE '%s'", value.c_str());
+        return std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
+    }
+
+    if (value == "mixed") {
+        return std::make_pair(VRV_UNSET, ACCIDENTAL_WRITTEN_NONE);
+    }
+    else if (value != "0") {
+        alterationNumber = atoi(value.substr(0, 1).c_str());
+        alterationType = (value.at(1) == 's') ? ACCIDENTAL_WRITTEN_s : ACCIDENTAL_WRITTEN_f;
+    }
+    else {
+        alterationType = ACCIDENTAL_WRITTEN_n;
+    }
+
+    return std::make_pair(alterationNumber, alterationType);
 }
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
@@ -634,7 +580,7 @@ std::string Att::PlacementToStr(data_PLACEMENT data) const
 {
     std::string value;
     if (data.GetType() == PLACEMENT_staffRel)
-        value = StaffrelToStr(*data.GetStaffRelAtlernate());
+        value = StaffrelToStr(data.GetStaffRel());
     else if (data.GetType() == PLACEMENT_nonStaffPlace)
         value = NonstaffplaceToStr(data.GetNonStaffPlace());
     else if (data.GetType() == PLACEMENT_nmtoken)
@@ -679,68 +625,6 @@ data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
     if (value == "3") return PROLATIO_3;
     if (logWarning && !value.empty()) LogWarning("Unsupported prolatio '%s'", value.c_str());
     return PROLATIO_NONE;
-}
-
-std::string Att::StaffitemToStr(data_STAFFITEM data) const
-{
-    std::string value;
-    LogWarning("Writing data.STAFFITEM is not implemented");
-
-    return value;
-}
-
-data_STAFFITEM Att::StrToStaffitem(std::string value, bool logWarning) const
-{
-    data_STAFFITEM data;
-    LogWarning("Reading data.STAFFITEM is not implemented");
-
-    return data;
-}
-
-std::string Att::StaffrelToStr(data_STAFFREL data) const
-{
-    std::string value;
-    if (data.GetType() == STAFFREL_basic)
-        value = StaffrelBasicToStr(data.GetBasic());
-    else if (data.GetType() == STAFFREL_extended)
-        value = StaffrelExtendedToStr(data.GetExtended());
-
-    return value;
-}
-
-data_STAFFREL Att::StrToStaffrel(std::string value, bool logWarning) const
-{
-    data_STAFFREL data;
-    data.SetBasic(StrToStaffrelBasic(value, false));
-    if (data.HasValue()) return data;
-    data.SetExtended(StrToStaffrelExtended(value, false));
-    if (data.HasValue()) return data;
-
-    if (logWarning && !value.empty()) LogWarning("Unsupported data.STAFFREL '%s'", value.c_str());
-
-    return data;
-}
-
-std::string Att::StemdirectionToStr(data_STEMDIRECTION data) const
-{
-    std::string value;
-    switch (data) {
-        case STEMDIRECTION_up: value = "up"; break;
-        case STEMDIRECTION_down: value = "down"; break;
-        default:
-            LogWarning("Unknown stem direction '%d'", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_STEMDIRECTION Att::StrToStemdirection(std::string value, bool logWarning) const
-{
-    if (value == "up") return STEMDIRECTION_up;
-    if (value == "down") return STEMDIRECTION_down;
-    if (logWarning && !value.empty()) LogWarning("Unsupported stem direction '%s'", value.c_str());
-    return STEMDIRECTION_NONE;
 }
 
 std::string Att::TempusToStr(data_TEMPUS data) const
@@ -829,6 +713,89 @@ xsdPositiveInteger_List Att::StrToXsdPositiveIntegerList(std::string value) cons
         list.push_back(atoi(token.c_str()));
     }
     return list;
+}
+
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+
+data_ACCIDENTAL_WRITTEN Att::AccidentalGesturalToWritten(data_ACCIDENTAL_GESTURAL accidGes)
+{
+    data_ACCIDENTAL_WRITTEN accid;
+    switch (accidGes) {
+        case ACCIDENTAL_GESTURAL_s: accid = ACCIDENTAL_WRITTEN_s; break;
+        case ACCIDENTAL_GESTURAL_f: accid = ACCIDENTAL_WRITTEN_f; break;
+        case ACCIDENTAL_GESTURAL_ss: accid = ACCIDENTAL_WRITTEN_ss; break;
+        case ACCIDENTAL_GESTURAL_ff: accid = ACCIDENTAL_WRITTEN_ff; break;
+        case ACCIDENTAL_GESTURAL_n: accid = ACCIDENTAL_WRITTEN_n; break;
+        case ACCIDENTAL_GESTURAL_su: accid = ACCIDENTAL_WRITTEN_su; break;
+        case ACCIDENTAL_GESTURAL_sd: accid = ACCIDENTAL_WRITTEN_sd; break;
+        case ACCIDENTAL_GESTURAL_fu: accid = ACCIDENTAL_WRITTEN_fu; break;
+        case ACCIDENTAL_GESTURAL_fd: accid = ACCIDENTAL_WRITTEN_fd; break;
+        default: accid = ACCIDENTAL_WRITTEN_NONE; break;
+    }
+    return accid;
+}
+
+data_ACCIDENTAL_GESTURAL Att::AccidentalWrittenToGestural(data_ACCIDENTAL_WRITTEN accid)
+{
+    data_ACCIDENTAL_GESTURAL accidGes;
+    switch (accid) {
+        case ACCIDENTAL_WRITTEN_s: accidGes = ACCIDENTAL_GESTURAL_s; break;
+        case ACCIDENTAL_WRITTEN_f: accidGes = ACCIDENTAL_GESTURAL_f; break;
+        case ACCIDENTAL_WRITTEN_ss:
+        case ACCIDENTAL_WRITTEN_x: accidGes = ACCIDENTAL_GESTURAL_ss; break;
+        case ACCIDENTAL_WRITTEN_ff: accidGes = ACCIDENTAL_GESTURAL_ff; break;
+        /* To verified - triple sharp missing in gestural ? */
+        case ACCIDENTAL_WRITTEN_xs:
+        case ACCIDENTAL_WRITTEN_sx:
+        case ACCIDENTAL_WRITTEN_ts: accidGes = ACCIDENTAL_GESTURAL_ss; break;
+        /* To be verified - triple flat missing in gestural ? */
+        case ACCIDENTAL_WRITTEN_tf: accidGes = ACCIDENTAL_GESTURAL_ff; break;
+        case ACCIDENTAL_WRITTEN_n: accidGes = ACCIDENTAL_GESTURAL_n; break;
+        case ACCIDENTAL_WRITTEN_nf: accidGes = ACCIDENTAL_GESTURAL_f; break;
+        case ACCIDENTAL_WRITTEN_ns: accidGes = ACCIDENTAL_GESTURAL_s; break;
+        case ACCIDENTAL_WRITTEN_su: accidGes = ACCIDENTAL_GESTURAL_su; break;
+        case ACCIDENTAL_WRITTEN_sd: accidGes = ACCIDENTAL_GESTURAL_sd; break;
+        case ACCIDENTAL_WRITTEN_fu: accidGes = ACCIDENTAL_GESTURAL_fu; break;
+        case ACCIDENTAL_WRITTEN_fd: accidGes = ACCIDENTAL_GESTURAL_fd; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_nu: accidGes = ACCIDENTAL_GESTURAL_n; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_nd: accidGes = ACCIDENTAL_GESTURAL_n; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_1qf: accidGes = ACCIDENTAL_GESTURAL_fu; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_3qf: accidGes = ACCIDENTAL_GESTURAL_fd; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_1qs: accidGes = ACCIDENTAL_GESTURAL_su; break;
+        /* To verified */
+        case ACCIDENTAL_WRITTEN_3qs: accidGes = ACCIDENTAL_GESTURAL_sd; break;
+        default: accidGes = ACCIDENTAL_GESTURAL_NONE; break;
+    }
+    return accidGes;
+}
+
+data_STAFFREL Att::StaffrelBasicToStaffrel(data_STAFFREL_basic staffrelBasic)
+{
+    data_STAFFREL staffrel;
+    switch (staffrelBasic) {
+        case STAFFREL_basic_above: staffrel = STAFFREL_above; break;
+        case STAFFREL_basic_below: staffrel = STAFFREL_below; break;
+        default: staffrel = STAFFREL_NONE; break;
+    }
+    return staffrel;
+}
+
+data_STAFFREL_basic Att::StaffrelToStaffrelBasic(data_STAFFREL staffrel)
+{
+    data_STAFFREL_basic staffrelBasic;
+    switch (staffrel) {
+        case STAFFREL_above: staffrelBasic = STAFFREL_basic_above; break;
+        case STAFFREL_below: staffrelBasic = STAFFREL_basic_below; break;
+        default: staffrelBasic = STAFFREL_basic_NONE; break;
+    }
+    return staffrelBasic;
 }
 
 } // namespace vrv

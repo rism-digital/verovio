@@ -43,7 +43,9 @@ class OptionGrp;
 #define TEMP_LYRIC_LINE_SPACE 5.0
 
 // the key signature spacing factor
-#define TEMP_KEYSIG_STEP 1.3
+#define TEMP_KEYSIG_STEP 0.4
+// the key signature spacing factor for natural (usually slighly larger)
+#define TEMP_KEYSIG_NATURAL_STEP 0.6
 
 /* Options parameters for mensural notation */
 // Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
@@ -63,7 +65,13 @@ class OptionGrp;
 
 enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_encoded };
 
+enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded };
+
+enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
+
 enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
+
+enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDIVIDER_left_right };
 
 //----------------------------------------------------------------------------
 // Option
@@ -79,17 +87,17 @@ public:
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
 
-    void SetKey(std::string key) { m_key = key; }
+    void SetKey(const std::string &key) { m_key = key; }
     std::string GetKey() const { return m_key; }
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValueArray(const std::vector<std::string> &values);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
-    void SetInfo(std::string title, std::string description);
+    void SetInfo(const std::string &title, const std::string &description);
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
 
@@ -98,7 +106,10 @@ public:
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */
     static std::map<int, std::string> s_breaks;
+    static std::map<int, std::string> s_footer;
+    static std::map<int, std::string> s_header;
     static std::map<int, std::string> s_measureNumber;
+    static std::map<int, std::string> s_systemDivider;
 
 protected:
     std::string m_title;
@@ -125,7 +136,7 @@ public:
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -158,7 +169,7 @@ public:
     void Init(double defaultValue, double minValue, double maxValue);
 
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -195,7 +206,7 @@ public:
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
 
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -231,9 +242,9 @@ public:
     OptionString() {}
     virtual ~OptionString() {}
     virtual void CopyTo(Option *option);
-    void Init(std::string defaultValue);
+    void Init(const std::string &defaultValue);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const { return m_value; }
     virtual std::string GetDefaultStrValue() const { return m_defaultValue; }
 
@@ -265,7 +276,7 @@ public:
     void Init();
 
     virtual bool SetValueArray(const std::vector<std::string> &values);
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -297,7 +308,7 @@ public:
     virtual void CopyTo(Option *option);
     void Init(int defaultValue, std::map<int, std::string> *values);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -334,7 +345,7 @@ public:
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -367,7 +378,7 @@ public:
     virtual void CopyTo(Option *option);
     void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
 
-    virtual bool SetValue(std::string value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -438,7 +449,7 @@ public:
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
 
 private:
-    void Register(Option *option, std::string key, OptionGrp *grp);
+    void Register(Option *option, const std::string &key, OptionGrp *grp);
 
 public:
     /**
@@ -451,25 +462,37 @@ public:
     OptionGrp m_general;
 
     OptionBool m_adjustPageHeight;
+    OptionBool m_adjustPageWidth;
     OptionIntMap m_breaks;
+    OptionBool m_condenseEncoded;
+    OptionBool m_condenseFirstPage;
+    OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
+    OptionBool m_justifyIncludeLastPage;
+    OptionBool m_justifySystemsOnly;
+    OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
     OptionDbl m_midiTempoAdjustment;
+    OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
-    OptionBool m_noFooter;
-    OptionBool m_noHeader;
+    OptionIntMap m_footer;
+    OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
+    OptionBool m_outputSmuflXmlEntities;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;
     OptionInt m_pageMarginLeft;
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionString m_expand;
+    OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionInt m_unit;
+    OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
 
@@ -486,7 +509,6 @@ public:
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
-    OptionDbl m_leftPosition;
     OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricHyphenWidth;
     OptionBool m_lyricNoStartHyphen;
@@ -509,6 +531,7 @@ public:
     OptionInt m_spacingSystem;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
+    OptionIntMap m_systemDivider;
     OptionDbl m_tieThickness;
 
     /**
@@ -520,6 +543,8 @@ public:
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
+    OptionString m_transpose;
+    OptionBool m_transposeSelectedOnly;
 
     /**
      * Element margins

@@ -44,20 +44,16 @@ public:
     ///@{
     Layer(int n = 1);
     virtual ~Layer();
+    virtual Object *Clone() const { return new Layer(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Layer"; }
     virtual ClassId GetClassId() const { return LAYER; }
     ///@}
 
     /**
-     * Do not copy children for layers
+     * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual bool CopyChildren() const { return false; }
-
-    /**
-     * Overriding CopyReset() method to be called after copy / assignment calls.
-     */
-    virtual void CopyReset();
+    virtual void CloneReset();
 
     /**
      * @name Methods for adding allowed content
@@ -83,6 +79,13 @@ public:
      * to know the clef in order to get the pitch.
      */
     Clef *GetClef(LayerElement *test);
+
+    /**
+     * Get the current clef based on facsimile for the test element.
+     * This goes back by facsimile position until a clef is found.
+     * Returns NULL if a clef cannot be found via this method.
+     */
+    Clef *GetClefFacs(LayerElement *test);
 
     /**
      * Return the clef offset for the position x.
@@ -199,6 +202,18 @@ public:
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::GenerateTimemap
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int GenerateTimemap(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     * To be added once Layer implements LinkingInterface
+     */
+    // virtual int ResetDrawing(FunctorParams *);
 
 private:
     //

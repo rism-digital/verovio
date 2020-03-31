@@ -18,6 +18,7 @@
 #include "layerelement.h"
 #include "measure.h"
 #include "staff.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -82,7 +83,7 @@ void TimePointInterface::SetUuidStr()
 Measure *TimePointInterface::GetStartMeasure()
 {
     if (!m_start) return NULL;
-    return dynamic_cast<Measure *>(this->m_start->GetFirstParent(MEASURE));
+    return dynamic_cast<Measure *>(this->m_start->GetFirstAncestor(MEASURE));
 }
 
 bool TimePointInterface::IsOnStaff(int n)
@@ -96,7 +97,7 @@ bool TimePointInterface::IsOnStaff(int n)
         return false;
     }
     else if (m_start) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
         if (staff && (staff->GetN() == n)) return true;
     }
     return false;
@@ -111,7 +112,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         staffList = this->GetStaff();
     }
     else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
+        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
         if (staff) staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
@@ -120,7 +121,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
     }
     for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison comparison(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByComparison(&comparison, 1));
+        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
             continue;
@@ -186,13 +187,73 @@ bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 Measure *TimeSpanningInterface::GetEndMeasure()
 {
     if (!m_end) return NULL;
-    return dynamic_cast<Measure *>(this->m_end->GetFirstParent(MEASURE));
+    return dynamic_cast<Measure *>(this->m_end->GetFirstAncestor(MEASURE));
 }
 
 bool TimeSpanningInterface::IsSpanningMeasures()
 {
     if (!this->HasStartAndEnd()) return false;
     return (this->GetStartMeasure() != this->GetEndMeasure());
+}
+
+void TimeSpanningInterface::GetCrossStaffOverflows(
+    StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow)
+{
+    assert(alignment);
+
+    if (!this->GetStart() || !this->GetEnd() || !alignment->GetStaff()) return;
+
+    Layer *layer = NULL;
+
+    // If the starting point is a chord we need to select the appropriate extreme staff
+    Staff *startStaff = NULL;
+    if (this->GetStart()->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord *>(this->GetStart());
+        assert(chord);
+        Staff *staffAbove = NULL;
+        Staff *staffBelow = NULL;
+        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+        startStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+    }
+    else
+        startStaff = this->GetStart()->GetCrossStaff(layer);
+
+    // Same for the end point
+    Staff *endStaff = NULL;
+    if (this->GetEnd()->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord *>(this->GetEnd());
+        assert(chord);
+        Staff *staffAbove = NULL;
+        Staff *staffBelow = NULL;
+        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+        endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+    }
+    else {
+        endStaff = this->GetEnd()->GetCrossStaff(layer);
+    }
+
+    // No cross-staff endpoints, check if the slur itself crosses staves
+    if (!startStaff) {
+        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+    }
+    if (!endStaff) {
+        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
+    }
+
+    // This happens with slurs starting or ending with a timestamp
+    if (!endStaff) {
+        endStaff = startStaff;
+    }
+    else if (!startStaff) {
+        startStaff = endStaff;
+    }
+    assert(startStaff && endStaff);
+
+    if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
+    if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
+
+    if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
+    if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
 }
 
 //----------------------------------------------------------------------------

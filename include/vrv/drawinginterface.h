@@ -52,7 +52,7 @@ public:
      * Return the drawing list.
      * This is used when actually drawing the list (see View::DrawLayerList)
      */
-    ListOfObjects *GetDrawingList();
+    ArrayOfObjects *GetDrawingList();
 
     /**
      * Reset the drawing list.
@@ -66,7 +66,70 @@ public:
     //
 private:
     /** The list of object for which drawing is postponed */
-    ListOfObjects m_drawingList;
+    ArrayOfObjects m_drawingList;
+};
+
+//----------------------------------------------------------------------------
+// BeamDrawingInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for MEI beam elements (beam, beamSpan).
+ * It stores stem drawing values.
+ */
+class BeamDrawingInterface {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    BeamDrawingInterface();
+    virtual ~BeamDrawingInterface();
+    virtual void Reset();
+    ///@}
+
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by Beam::FilterList
+     */
+    void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
+
+    bool IsHorizontal();
+
+    bool IsRepeatedPattern();
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoords();
+
+protected:
+    //
+public:
+    // values to be set before calling CalcBeam
+    bool m_changingDur;
+    bool m_beamHasChord;
+    bool m_hasMultipleStemDir;
+    bool m_cueSize;
+    bool m_isCrossStaff;
+    int m_shortestDur;
+    data_STEMDIRECTION m_notesStemDir;
+    data_BEAMPLACE m_drawingPlace;
+    Staff *m_beamStaff;
+
+    // values set by CalcBeam
+    int m_beamWidth;
+    int m_beamWidthBlack;
+    int m_beamWidthWhite;
+
+    // position x for the stem (normal and cue-sized)
+    int m_stemXAbove[2];
+    int m_stemXBelow[2];
+
+    /**
+     * An array of coordinates for each element
+     **/
+    ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 //----------------------------------------------------------------------------
@@ -98,19 +161,13 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); }
+    bool DrawClef() { return (m_drawClef && m_currentClef.HasShape()); }
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
-    bool DrawKeySig() const
-    {
-        return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_WRITTEN_NONE));
-    }
+    bool DrawKeySig() { return (m_drawKeySig); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() { return (m_drawMensur && m_currentMensur.HasSign()); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
-    bool DrawMeterSig() const
-    {
-        return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym()));
-    }
+    bool DrawMeterSig() { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
     ///@}
 
@@ -118,10 +175,10 @@ public:
      * @name Set the current clef, keySig, mensur and meterSig.
      */
     ///@{
-    void SetCurrentClef(Clef *clef);
-    void SetCurrentKeySig(KeySig *keySig);
-    void SetCurrentMensur(Mensur *mensur);
-    void SetCurrentMeterSig(MeterSig *meterSig);
+    void SetCurrentClef(Clef const *clef);
+    void SetCurrentKeySig(KeySig const *keySig);
+    void SetCurrentMensur(Mensur const *mensur);
+    void SetCurrentMeterSig(MeterSig const *meterSig);
     ///@}
 
     /**
@@ -198,6 +255,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;
+    virtual int CalcStemLenInThirdUnits(Staff *staff) = 0;
     ///@}
 
 protected:

@@ -19,7 +19,7 @@ class Accid;
 class Arpeg;
 class BarLine;
 class Beam;
-class BeamDrawingParams;
+class BeamSegment;
 class BracketSpan;
 class Breath;
 class ControlElement;
@@ -55,6 +55,7 @@ class PgFoot;
 class PgFoot;
 class PgHead;
 class PgHead2;
+class Reh;
 class Rend;
 class RunningElement;
 class Slur;
@@ -191,6 +192,7 @@ protected:
     void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
         bool abbreviations, int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
+    void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
     void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, bool eraseIntersections = false);
@@ -286,6 +288,7 @@ protected:
     void DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawGraceGrp(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -293,6 +296,7 @@ protected:
     void DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -370,8 +374,7 @@ protected:
      */
     ///@{
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
-        wchar_t fontNo = SMUFL_E990_chantPunctum, int xOffset = 0, int yOffset = 0);
+    void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
     /**
@@ -391,6 +394,7 @@ protected:
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
     void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
+    void DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);
@@ -481,14 +485,17 @@ protected:
     void DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength = 0);
     void DrawSmuflCode(
         DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
-    void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
+    void DrawThickBezierCurve(
+        DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0, int penStyle = AxSOLID);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
-    void DrawHarmString(DeviceContext *dc, TextDrawingParams &params, std::wstring s);
+    void DrawTextString(DeviceContext *dc, std::wstring str, TextDrawingParams &params);
+    void DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParams &params, Rend *rend);
+    void DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams &params);
     void DrawSmuflLine(DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill,
         wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100,
         bool dimin = false, bool setBBGlyph = false);
-    void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
+    void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
@@ -519,10 +526,17 @@ private:
     /**
      * @name Internal methods used for calculating slurs
      */
+    ///@{
     void DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, int x2, Staff *staff, char spanningType);
     float CalcInitialSlur(FloatingCurvePositioner *curve, Slur *slur, Staff *staff, int layerN,
         curvature_CURVEDIR curveDir, Point points[4]);
     ///@}
+
+    /**
+     * Internal method for drawing a BeamSegment
+     */
+    void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,
+        Staff *staff, Measure *measure);
 
     /**
      * Used for calculating clustered information/dot position
@@ -532,7 +546,7 @@ private:
     /**
      * Find the nearest unit position in the direction indicated by place.
      */
-    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL_basic place);
+    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
 
 public:
     /** Document */
@@ -554,7 +568,7 @@ public:
     Staff *m_currentStaff;
     System *m_currentSystem;
     Page *m_currentPage;
-    ///@}m
+    ///@}
 
 protected:
     /**

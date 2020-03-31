@@ -21,6 +21,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "tie.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -286,7 +287,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
     ArrayOfFloatingPositioners::const_iterator iter;
     for (auto &grp : grpIdYRel) {
         // Check if the next group it not already higher or lower.
-        if (params->m_place == STAFFREL_basic_above) {
+        if (params->m_place == STAFFREL_above) {
             yRel = (nextYRel < grp.second) ? nextYRel : grp.second;
         }
         else {
@@ -300,10 +301,10 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
             // Set its position
             (*iter)->SetDrawingYRel(yRel);
             // Then find the highest / lowest position for the next group
-            if (params->m_place == STAFFREL_basic_above) {
+            if (params->m_place == STAFFREL_above) {
                 int iterY = yRel - (*iter)->GetContentY2()
                     - (params->m_doc->GetTopMargin((*iter)->GetObject()->GetClassId())
-                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                        * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel > iterY) {
                     nextYRel = iterY;
                 }
@@ -311,7 +312,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
             else {
                 int iterY = yRel + (*iter)->GetContentY2()
                     + (params->m_doc->GetBottomMargin((*iter)->GetObject()->GetClassId())
-                          * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
+                        * params->m_doc->GetDrawingUnit(this->GetStaffSize()));
                 if (nextYRel < iterY) {
                     nextYRel = iterY;
                 }
@@ -371,6 +372,11 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
                 assert(slur);
                 slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
+            else if ((*iter)->GetObject()->Is(TIE)) {
+                Tie *tie = dynamic_cast<Tie *>((*iter)->GetObject());
+                assert(tie);
+                tie->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
+            }
 
             int overflowAbove = 0;
             if (!skipAbove) overflowAbove = this->CalcOverflowAbove((*iter));
@@ -395,8 +401,8 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
         // above?
-        data_STAFFREL_basic place = (*iter)->GetDrawingPlace();
-        if (place == STAFFREL_basic_above) {
+        data_STAFFREL place = (*iter)->GetDrawingPlace();
+        if (place == STAFFREL_above) {
             overflowBoxes = &m_overflowAboveBBoxes;
         }
         auto i = overflowBoxes->begin();
@@ -412,7 +418,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         }
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
         //  overflowing elements
-        if (place == STAFFREL_basic_above) {
+        if (place == STAFFREL_above) {
             int overflowAbove = this->CalcOverflowAbove((*iter));
             overflowBoxes->push_back((*iter));
             this->SetOverflowAbove(overflowAbove);
@@ -464,7 +470,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
         }
         // else, adjust the min or max YRel of the pair if necessary
         else {
-            if (params->m_place == STAFFREL_basic_above) {
+            if (params->m_place == STAFFREL_above) {
                 if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
             }
             else {
@@ -492,7 +498,7 @@ int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 
     //  Now update the staffAlignment max overflow (above or below)
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
-        if (params->m_place == STAFFREL_basic_above) {
+        if (params->m_place == STAFFREL_above) {
             int overflowAbove = this->CalcOverflowAbove((*iter));
             this->SetOverflowAbove(overflowAbove);
         }
@@ -632,6 +638,22 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 
     params->m_previousOverflowBelow = m_overflowBelow;
     params->m_previousVerseCount = this->GetVerseCount();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int StaffAlignment::JustifyY(FunctorParams *functorParams)
+{
+    JustifyYParams *params = dynamic_cast<JustifyYParams *>(functorParams);
+    assert(params);
+
+    // Skip bottom aligner
+    if (!this->m_staff) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    this->SetYRel(this->GetYRel() - params->m_stepSize * params->m_stepCountStaff);
+    params->m_stepCountStaff++;
 
     return FUNCTOR_CONTINUE;
 }

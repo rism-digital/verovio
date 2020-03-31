@@ -92,17 +92,23 @@ class MidiMessage : public std::vector<uchar> {
 
 		// message-type convenience functions:
 		bool           isMetaMessage        (void) const;
-		bool           isMeta               (void) const;
-		bool           isNoteOff            (void) const;
-		bool           isNoteOn             (void) const;
+		bool             isMeta             (void) const;
 		bool           isNote               (void) const;
+		bool             isNoteOff          (void) const;
+		bool             isNoteOn           (void) const;
 		bool           isAftertouch         (void) const;
 		bool           isController         (void) const;
-		bool           isTimbre             (void) const;
+		bool             isSustain          (void) const;  // controller 64
+		bool             isSustainOn        (void) const;
+		bool             isSustainOff       (void) const;
+		bool             isSoft             (void) const;  // controller 67
+		bool             isSoftOn           (void) const;
+		bool             isSoftOff          (void) const;
 		bool           isPatchChange        (void) const;
+		bool             isTimbre           (void) const;
 		bool           isPressure           (void) const;
 		bool           isPitchbend          (void) const;
-		bool           isEmpty              (void) const;
+		bool           isEmpty              (void) const;  // see MidiFile::removeEmpties()
 
 		// helper functions to create various MidiMessages:
 		void           makeNoteOn           (int channel, int key, int velocity);

@@ -23,11 +23,12 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
-Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCurvature()
+Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
 
     Reset();
 }
@@ -40,6 +41,7 @@ void Tie::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetCurvature();
+    ResetCurveRend();
 }
 
 //----------------------------------------------------------------------------
@@ -112,9 +114,9 @@ int Tie::FindSpannedLayerElements(FunctorParams *functorParams)
     else if (this->GetDrawingX() > params->m_maxPos) {
         return FUNCTOR_STOP;
     }
-    */
 
     return FUNCTOR_CONTINUE;
+    */
 }
 
 } // namespace vrv

@@ -14,7 +14,7 @@ using namespace vrv;
 extern "C" {
 
 #include "c_wrapper.h"
-    
+
 /****************************************************************
  * Methods exported to use the Toolkit class
  ****************************************************************/
@@ -37,6 +37,7 @@ void *vrvToolkit_constructorResourcePath(const char* resourcePath)
 
 void vrvToolkit_destructor(Toolkit *tk)
 {
+    LogMessage("Deleting toolkit");
     delete tk;
 }
 
@@ -47,6 +48,12 @@ bool vrvToolkit_edit(Toolkit *tk, const char *editorAction)
         return false;
     }
     return true;
+}
+
+const char *vrvToolkit_editInfo(Toolkit *tk)
+{
+    tk->SetCString(tk->EditInfo());
+    return tk->GetCString();
 }
 
 const char *vrvToolkit_getAvailableOptions(Toolkit *tk)
@@ -67,6 +74,12 @@ const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getExpansionIdsForElement(Toolkit *tk, const char *xmlId)
+{
+    tk->SetCString(tk->GetExpansionIdsForElement(xmlId));
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_getHumdrum(Toolkit *tk)
 {
     const char *buffer = tk->GetHumdrumBuffer();
@@ -79,15 +92,21 @@ const char *vrvToolkit_getLog(Toolkit *tk)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
+const char *vrvToolkit_getMEI(Toolkit *tk, const char *options)
 {
-    tk->SetCString(tk->GetMEI(page_no, score_based));
+    tk->SetCString(tk->GetMEI(options));
     return tk->GetCString();
 }
 
 const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId)
 {
     tk->SetCString(tk->GetMIDIValuesForElement(xmlId));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_getNotatedIdForElement(Toolkit *tk, const char *xmlId)
+{
+    tk->SetCString(tk->GetNotatedIdForElement(xmlId));
     return tk->GetCString();
 }
 

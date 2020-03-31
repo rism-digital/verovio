@@ -27,8 +27,9 @@ class Dir : public ControlElement,
             public TextListInterface,
             public TextDirInterface,
             public TimeSpanningInterface,
-            public AttLang,
             public AttExtender,
+            public AttLang,
+            public AttLineRendBase,
             public AttVerticalGroup {
 public:
     /**
@@ -38,6 +39,7 @@ public:
     ///@{
     Dir();
     virtual ~Dir();
+    virtual Object *Clone() const { return new Dir(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dir"; }
     virtual ClassId GetClassId() const { return DIR; }
@@ -53,7 +55,7 @@ public:
     ///@}
 
     /**
-     * Add an element (text, rend. etc.) to a dynam.
+     * Add an element (text, rend. etc.) to a dir.
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);

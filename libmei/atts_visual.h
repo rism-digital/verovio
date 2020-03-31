@@ -387,8 +387,6 @@ public:
     void SetPlace(data_EVENTREL place_) { m_place = place_; }
     data_EVENTREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:
@@ -628,14 +626,10 @@ public:
     void SetPlace(data_EVENTREL place_) { m_place = place_; }
     data_EVENTREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
     //
     void SetTilt(data_COMPASSDIRECTION tilt_) { m_tilt = tilt_; }
     data_COMPASSDIRECTION GetTilt() const { return m_tilt; }
     bool HasTilt() const;
-    /** Getter for reference (for alternate type only) */
-    data_COMPASSDIRECTION *GetTiltAlternate() { return &m_tilt; }
     ///@}
 
 private:
@@ -966,14 +960,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(meterSigVis_FORM form_) { m_form = form_; }
-    meterSigVis_FORM GetForm() const { return m_form; }
+    void SetForm(data_METERFORM form_) { m_form = form_; }
+    data_METERFORM GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
-    meterSigVis_FORM m_form;
+    data_METERFORM m_form;
 
     /* include <attform> */
 };
@@ -1002,8 +996,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterForm(meterSigDefaultVis_METERFORM meterForm_) { m_meterForm = meterForm_; }
-    meterSigDefaultVis_METERFORM GetMeterForm() const { return m_meterForm; }
+    void SetMeterForm(data_METERFORM meterForm_) { m_meterForm = meterForm_; }
+    data_METERFORM GetMeterForm() const { return m_meterForm; }
     bool HasMeterForm() const;
     //
     void SetMeterShowchange(data_BOOLEAN meterShowchange_) { m_meterShowchange = meterShowchange_; }
@@ -1013,7 +1007,7 @@ public:
 
 private:
     /** Contains an indication of how the meter signature should be rendered. **/
-    meterSigDefaultVis_METERFORM m_meterForm;
+    data_METERFORM m_meterForm;
     /**
      * Determines whether the old meter signature should be displayed when the meter
      * signature changes.
@@ -1313,8 +1307,6 @@ public:
     void SetPlace(data_EVENTREL place_) { m_place = place_; }
     data_EVENTREL GetPlace() const { return m_place; }
     bool HasPlace() const;
-    /** Getter for reference (for alternate type only) */
-    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:

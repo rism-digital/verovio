@@ -48,6 +48,7 @@ public:
     ///@{
     Chord();
     virtual ~Chord();
+    virtual Object *Clone() const { return new Chord(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Chord"; }
     virtual ClassId GetClassId() const { return CHORD; }
@@ -131,6 +132,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
+    virtual int CalcStemLenInThirdUnits(Staff *staff);
     ///@}
 
     /**
@@ -176,7 +178,7 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDIEnd
+     * See Object::CalcOnsetOffsetEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
 
@@ -194,7 +196,7 @@ protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ListOfObjects *childlist);
+    virtual void FilterList(ArrayOfObjects *childlist);
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

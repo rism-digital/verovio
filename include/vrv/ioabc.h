@@ -21,6 +21,7 @@ namespace vrv {
 
 class BarLine;
 class Beam;
+class Clef;
 class ControlElement;
 class Harm;
 class KeySig;
@@ -36,17 +37,16 @@ class Staff;
 class Tie;
 
 //----------------------------------------------------------------------------
-// AbcInput
+// ABCInput
 //----------------------------------------------------------------------------
 
-class AbcInput : public FileInputStream {
+class ABCInput : public Input {
 public:
     // constructors and destructors
-    AbcInput(Doc *doc, std::string filename);
-    virtual ~AbcInput();
+    ABCInput(Doc *doc);
+    virtual ~ABCInput();
 
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &abc);
+    virtual bool Import(const std::string &abc);
 
 #ifndef NO_ABC_SUPPORT
 
@@ -96,10 +96,12 @@ public:
 private:
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
+    Clef *m_clef = NULL;
+    KeySig *m_key = NULL;
     MeterSig *m_meter = NULL;
     Layer *m_layer = NULL;
 
-    data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
+    data_DURATION m_durDefault; // todo: switch to MEI
     std::string m_ID;
     int m_unitDur;
     std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines
@@ -137,7 +139,7 @@ private:
     std::vector<data_ARTICULATION> m_artic;
     std::vector<std::string> m_dynam;
     std::string m_ornam;
-    data_STAFFREL_basic m_fermata = STAFFREL_basic_NONE;
+    data_STAFFREL m_fermata = STAFFREL_NONE;
     /*
      * The stack of control elements to be added at the end of each measure
      */

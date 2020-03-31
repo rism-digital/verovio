@@ -78,8 +78,10 @@ void Layer::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
-void Layer::CopyReset()
+void Layer::CloneReset()
 {
+    Object::CloneReset();
+
     m_drawKeySigCancellation = false;
     m_staffDefClef = NULL;
     m_staffDefKeySig = NULL;
@@ -199,8 +201,26 @@ Clef *Layer::GetClef(LayerElement *test)
         assert(clef);
         return clef;
     }
-
+    Clef *facsClef = this->GetClefFacs(test);
+    if (facsClef != NULL) {
+        return facsClef;
+    }
     return GetCurrentClef();
+}
+
+Clef *Layer::GetClefFacs(LayerElement *test)
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    if (doc->GetType() == Facs) {
+        ArrayOfObjects clefs;
+        ClassIdComparison ac(CLEF);
+        doc->FindAllDescendantBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
+        if (clefs.size() > 0) {
+            return dynamic_cast<Clef *>(*clefs.rbegin());
+        }
+    }
+    return NULL;
 }
 
 int Layer::GetClefLocOffset(LayerElement *test)
@@ -234,7 +254,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
         return m_drawingStemDir;
     }
 
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
     Alignment *alignmentFirst = first->GetAlignment();
@@ -243,7 +263,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     assert(alignmentLast);
 
     // We are ignoring cross-staff situation here because this should not be called if we have one
-    Staff *staff = dynamic_cast<Staff *>(first->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(first->GetFirstAncestor(STAFF));
     assert(staff);
 
     double time = alignmentFirst->GetTime();
@@ -262,7 +282,7 @@ int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
 {
     assert(element);
 
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
     Alignment *alignment = element->GetAlignment();
@@ -271,7 +291,7 @@ int Layer::GetLayerCountForTimeSpanOf(LayerElement *element)
     Layer *layer = NULL;
     Staff *staff = element->GetCrossStaff(layer);
     if (!staff) {
-        staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+        staff = dynamic_cast<Staff *>(element->GetFirstAncestor(STAFF));
     }
     // At this stage we have the parent or the cross-staff
     assert(staff);
@@ -300,28 +320,28 @@ int Layer::GetLayerCountInTimeSpan(double time, double duration, Measure *measur
 
 Clef *Layer::GetCurrentClef() const
 {
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetCurrentClef());
     return staff->m_drawingStaffDef->GetCurrentClef();
 }
 
 KeySig *Layer::GetCurrentKeySig() const
 {
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentKeySig();
 }
 
 Mensur *Layer::GetCurrentMensur() const
 {
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentMensur();
 }
 
 MeterSig *Layer::GetCurrentMeterSig() const
 {
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentMeterSig();
 }
@@ -404,7 +424,8 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
     params->m_contentLayer = this;
 
     params->m_targetLayer = new Layer(*this);
-    params->m_targetLayer->CopyReset();
+    params->m_targetLayer->ClearChildren();
+    params->m_targetLayer->CloneReset();
     // Keep the xml:id of the layer in the first segment
     params->m_targetLayer->SwapUuid(this);
     assert(params->m_targetStaff);
@@ -527,7 +548,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
 
     params->m_scoreDefRole = SCOREDEF_NONE;
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
 
@@ -551,7 +572,7 @@ int Layer::PrepareProcessingLists(FunctorParams *functorParams)
     // Alternate solution with StaffN_LayerN_VerseN_t
     // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
     params->m_layerTree.child[staff->GetN()].child[this->GetN()];
 
@@ -564,7 +585,7 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     assert(params);
 
     // If we have encountered a mRpt before and there is none is this layer, reset it to NULL
-    if (params->m_currentMRpt && !this->FindChildByType(MRPT)) {
+    if (params->m_currentMRpt && !this->FindDescendantByType(MRPT)) {
         params->m_currentMRpt = NULL;
     }
     return FUNCTOR_CONTINUE;
@@ -583,5 +604,33 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+
+/*
+int Layer::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    if (this->HasSameasLink()) {
+        assert(this->GetSameasLink());
+        this->GetSameasLink()->Process(params->m_functor, functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+ }
+ */
 
 } // namespace vrv

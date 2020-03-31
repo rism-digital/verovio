@@ -29,11 +29,12 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature()
+Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
 
     Reset();
 }
@@ -46,68 +47,9 @@ void Slur::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetCurvature();
+    ResetCurveRend();
 
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
-}
-
-void Slur::GetCrossStaffOverflows(
-    StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow)
-{
-    assert(alignment);
-
-    if (!this->GetStart() || !this->GetEnd() || !alignment->GetStaff()) return;
-
-    Layer *layer = NULL;
-
-    // If the starting point is a chord we need to select the appropriate extreme staff
-    Staff *startStaff = NULL;
-    if (this->GetStart()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetStart());
-        assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        startStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
-    }
-    else
-        startStaff = this->GetStart()->GetCrossStaff(layer);
-
-    // Same for the end point
-    Staff *endStaff = NULL;
-    if (this->GetEnd()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetEnd());
-        assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
-    }
-    else {
-        endStaff = this->GetEnd()->GetCrossStaff(layer);
-    }
-
-    // No cross-staff endpoints, check if the slur itself crosses staves
-    if (!startStaff) {
-        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstParent(STAFF));
-    }
-    if (!endStaff) {
-        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstParent(STAFF));
-    }
-
-    // This happens with slurs starting or ending with a timestamp
-    if (!endStaff) {
-        endStaff = startStaff;
-    }
-    else if (!startStaff) {
-        startStaff = endStaff;
-    }
-    assert(startStaff && endStaff);
-
-    if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
-    if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
-
-    if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
-    if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
 }
 
 bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
@@ -120,7 +62,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     curvature_CURVEDIR curveDir = curve->GetDir();
     Point points[4];
     curve->GetPoints(points);
-    ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
     Point p1 = points[0];
     Point rotatedC1 = BoundingBox::CalcPositionAfterRotation(points[1], -slurAngle, p1);
@@ -188,7 +130,7 @@ bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
     return adjusted;
 }
 
-int Slur::AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
+int Slur::AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
     Point &c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio)
 {
     Point bezier[4];
@@ -205,8 +147,8 @@ int Slur::AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist
         / (maxHeightFactor
-              * (doc->GetOptions()->m_slurCurveFactor.GetValue()
-                    + 5)); // 5 is the minimum - can be increased for limiting curvature
+            * (doc->GetOptions()->m_slurCurveFactor.GetValue()
+                + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
     maxHeight = std::min(maxHeight, doc->GetDrawingOctaveSize(staffSize));
@@ -313,8 +255,9 @@ int Slur::AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements
     return 0;
 }
 
-void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfCurveSpannedElements *spannedElements,
-    Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, float &angle, bool forceBothSides)
+void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
+    const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
+    curvature_CURVEDIR curveDir, float &angle, bool forceBothSides)
 {
     Point bezier[4];
     bezier[0] = p1;
@@ -461,12 +404,12 @@ void Slur::GetControlPoints(
     }
 }
 
-void Slur::GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
+void Slur::GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
     curvature_CURVEDIR curveDir, int staffSize)
 {
+    /*
     for (auto &spannedElement : *spannedElements) {
         int margin = 1;
-        /*
         // Not sure if it is better to add the margin before or after the rotation...
         // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
@@ -478,8 +421,8 @@ void Slur::GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spann
         else {
             itPoint->second.second.y -= doc->GetDrawingUnit(staffSize) * margin;
         }
-        */
     }
+    */
 }
 
 //----------------------------------------------------------------------------

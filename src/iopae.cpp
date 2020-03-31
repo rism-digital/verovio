@@ -9,13 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#ifndef NO_PAE_SUPPORT
-
 #include <assert.h>
-#include <regex>
+#include <cctype>
+#include <fstream>
 #include <sstream>
 #include <string>
 
+#ifndef NO_PAE_SUPPORT
+#include <regex>
 #endif /* NO_PAE_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -23,9 +24,12 @@
 #include "beam.h"
 #include "chord.h"
 #include "clef.h"
+#include "comparison.h"
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
+#include "gracegrp.h"
+#include "keyaccid.h"
 #include "keysig.h"
 #include "layer.h"
 #include "mdiv.h"
@@ -38,6 +42,7 @@
 #include "score.h"
 #include "scoredef.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
@@ -49,6 +54,534 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
+
+//----------------------------------------------------------------------------
+// PAEOutput
+//----------------------------------------------------------------------------
+
+PAEOutput::PAEOutput(Doc *doc) : Output(doc) {}
+
+PAEOutput::~PAEOutput() {}
+
+bool PAEOutput::Export(std::string &output)
+{
+    m_docScoreDef = true;
+    m_mensural = false;
+    m_skip = false;
+    m_layerN = -1;
+    m_staffN = -1;
+    m_currentOct = -1;
+    m_currentDur = -1;
+    m_currentDots = -1;
+    m_grace = false;
+
+    m_doc->m_scoreDef.Save(this);
+
+    m_docScoreDef = false;
+
+    m_doc->Save(this);
+
+    output = m_streamStringOutput.str();
+
+    return true;
+}
+
+bool PAEOutput::WriteObject(Object *object)
+{
+    if (object->Is(SCOREDEF)) {
+        WriteScoreDef(dynamic_cast<ScoreDef *>(object));
+    }
+    else if (object->Is(STAFFDEF)) {
+        WriteStaffDef(dynamic_cast<StaffDef *>(object));
+    }
+    else if (object->Is(MEASURE)) {
+        WriteMeasure(dynamic_cast<Measure *>(object));
+    }
+    else if (object->Is(STAFF)) {
+        WriteStaff(dynamic_cast<Staff *>(object));
+    }
+    else if (object->Is(LAYER)) {
+        WriteLayer(dynamic_cast<Layer *>(object));
+    }
+
+    // Measure elements
+
+    // Layer elements
+    else if (object->Is(BARLINE)) {
+        WriteBarLine(dynamic_cast<BarLine *>(object));
+    }
+    else if (object->Is(BEAM)) {
+        WriteBeam(dynamic_cast<Beam *>(object));
+    }
+    else if (object->Is(CHORD)) {
+        WriteChord(dynamic_cast<Chord *>(object));
+    }
+    else if (object->Is(CLEF)) {
+        WriteClef(dynamic_cast<Clef *>(object));
+    }
+    else if (object->Is(GRACEGRP)) {
+        WriteGraceGrp(dynamic_cast<GraceGrp *>(object));
+    }
+    else if (object->Is(KEYACCID)) {
+        WriteKeyAccid(dynamic_cast<KeyAccid *>(object));
+    }
+    else if (object->Is(KEYSIG)) {
+        WriteKeySig(dynamic_cast<KeySig *>(object));
+    }
+    else if (object->Is(MENSUR)) {
+        WriteMensur(dynamic_cast<Mensur *>(object));
+    }
+    else if (object->Is(METERSIG)) {
+        WriteMeterSig(dynamic_cast<MeterSig *>(object));
+    }
+    else if (object->Is(MREST)) {
+        WriteMRest(dynamic_cast<MRest *>(object));
+    }
+    else if (object->Is(MULTIREST)) {
+        WriteMultiRest(dynamic_cast<MultiRest *>(object));
+    }
+    else if (object->Is(NOTE)) {
+        WriteNote(dynamic_cast<Note *>(object));
+    }
+    else if (object->Is(REST)) {
+        WriteRest(dynamic_cast<Rest *>(object));
+    }
+    else if (object->Is(SPACE)) {
+        WriteSpace(dynamic_cast<Space *>(object));
+    }
+    else if (object->Is(TUPLET)) {
+        WriteTuplet(dynamic_cast<Tuplet *>(object));
+    }
+
+    // Text elements
+
+    // Editorial markup
+
+    // BoundaryEnd - nothing to add - only
+
+    else {
+        // Log something?
+    }
+
+    return true;
+}
+
+bool PAEOutput::WriteObjectEnd(Object *object)
+{
+    if (object->Is(MEASURE)) {
+        WriteMeasureEnd(dynamic_cast<Measure *>(object));
+    }
+    else if (object->Is(BEAM)) {
+        WriteBeamEnd(dynamic_cast<Beam *>(object));
+    }
+    else if (object->Is(TUPLET)) {
+        WriteTupletEnd(dynamic_cast<Tuplet *>(object));
+    }
+
+    return true;
+}
+
+void PAEOutput::WriteScoreDef(ScoreDef *scoreDef) {}
+
+void PAEOutput::WriteStaffDef(StaffDef *staffDef)
+{
+    assert(staffDef);
+
+    if (m_staffN != -1) return;
+
+    m_staffN = staffDef->GetN();
+
+    if (staffDef->HasNotationtype() && staffDef->GetNotationtype() == NOTATIONTYPE_mensural) {
+        m_mensural = true;
+    }
+}
+
+void PAEOutput::WriteMeasure(Measure *measure)
+{
+    assert(measure);
+
+    m_currentMeasure = measure;
+}
+
+void PAEOutput::WriteMeasureEnd(Measure *measure)
+{
+    assert(measure);
+
+    std::string barLine;
+    switch (measure->GetRight()) {
+        case (BARRENDITION_rptend): barLine = "://"; break;
+        case (BARRENDITION_rptboth): barLine = "://:"; break;
+        case (BARRENDITION_rptstart): barLine = "//:"; break;
+        case (BARRENDITION_dbl): barLine = "//"; break;
+        case (BARRENDITION_invis): barLine = ""; break;
+        default: barLine = "/";
+    }
+
+    m_streamStringOutput << barLine;
+}
+
+void PAEOutput::WriteStaff(Staff *staff)
+{
+    assert(staff);
+
+    if (m_staffN == staff->GetN()) {
+        m_skip = false;
+        return;
+    }
+
+    m_skip = true;
+}
+
+void PAEOutput::WriteLayer(Layer *layer)
+{
+    assert(layer);
+
+    if (m_layerN == -1) {
+        m_layerN = layer->GetN();
+        m_streamStringOutput << "@data:";
+        m_skip = false;
+        return;
+    }
+
+    // second layer in the staff
+    if (!m_skip && (m_layerN != layer->GetN())) {
+        m_skip = true;
+        return;
+    }
+}
+
+void PAEOutput::WriteBarLine(BarLine *barLine)
+{
+    assert(barLine);
+
+    if (m_skip) return;
+
+    // We should look more precisely at its apperance...
+    m_streamStringOutput << "/";
+}
+
+void PAEOutput::WriteBeam(Beam *beam)
+{
+    assert(beam);
+
+    if (m_skip) return;
+
+    m_grace = false;
+
+    ClassIdsComparison matchType({ NOTE, CHORD });
+    ArrayOfObjects children;
+    LayerElement *child = dynamic_cast<LayerElement *>(beam->FindDescendantByComparison(&matchType));
+    if (child && child->IsGraceNote()) {
+        m_streamStringOutput << "qq";
+        m_grace = true;
+    }
+
+    m_streamStringOutput << "{";
+}
+
+void PAEOutput::WriteBeamEnd(Beam *beam)
+{
+    assert(beam);
+
+    if (m_skip) return;
+
+    m_streamStringOutput << "}";
+
+    if (m_grace) {
+        m_streamStringOutput << "r";
+        m_grace = false;
+    }
+}
+
+void PAEOutput::WriteChord(Chord *chord)
+{
+    assert(chord);
+
+    if (m_skip) return;
+
+    std::string oct;
+
+    WriteDur(chord);
+    WriteGrace(chord);
+}
+
+void PAEOutput::WriteClef(Clef *clef)
+{
+    assert(clef);
+
+    if (m_skip) return;
+
+    std::string outStart = (m_docScoreDef) ? "@clef:" : " %";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+
+    std::string shape;
+    if ((clef->GetShape() == CLEFSHAPE_G) && (clef->GetDis() == OCTAVE_DIS_8)) {
+        shape = "g";
+    }
+    else {
+        switch (clef->GetShape()) {
+            case (CLEFSHAPE_C): shape = "C"; break;
+            case (CLEFSHAPE_F): shape = "F"; break;
+            case (CLEFSHAPE_G): shape = "G"; break;
+            default: shape = "G";
+        }
+    }
+    std::string sign = (m_mensural) ? "+" : "-";
+    std::string line = StringFormat("%d", clef->GetLine());
+
+    m_streamStringOutput << outStart << shape << sign << line << outEnd;
+}
+
+void PAEOutput::WriteGraceGrp(GraceGrp *graceGrp) {}
+
+void PAEOutput::WriteKeyAccid(KeyAccid *keyAccid)
+{
+    // To do for cases when key signature have []
+}
+
+void PAEOutput::WriteKeySig(KeySig *keySig)
+{
+    assert(keySig);
+
+    if (m_skip) return;
+
+    std::string outStart = (m_docScoreDef) ? "@keysig:" : " $";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+
+    data_ACCIDENTAL_WRITTEN accidType = keySig->GetSig().second;
+    std::string sig;
+    sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
+    for (int i = 0; i < keySig->GetSig().first; ++i) {
+        data_PITCHNAME pname = KeySig::GetAccidPnameAt(accidType, i);
+        std::string pnameStr = keySig->AttTyped::PitchnameToStr(pname);
+        sig.push_back(std::toupper(pnameStr.at(0)));
+    }
+
+    m_streamStringOutput << outStart << sig << outEnd;
+}
+
+void PAEOutput::WriteMensur(Mensur *mensur)
+{
+    assert(mensur);
+
+    if (m_skip) return;
+
+    std::string outStart = (m_docScoreDef) ? "@timesig:" : " @";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+
+    m_streamStringOutput << outStart << outEnd;
+}
+
+void PAEOutput::WriteMeterSig(MeterSig *meterSig)
+{
+    assert(meterSig);
+
+    if (m_skip) return;
+
+    std::string outStart = (m_docScoreDef) ? "@timesig:" : " @";
+    std::string outEnd = (m_docScoreDef) ? "\n" : " ";
+
+    std::string sig;
+    if (meterSig->HasSym()) {
+        sig = (meterSig->GetSym() == METERSIGN_common) ? "c" : "c/";
+    }
+    else if (meterSig->GetForm() == METERFORM_num) {
+        sig = StringFormat("%d", meterSig->GetCount());
+    }
+    else if (meterSig->HasCount() && meterSig->GetUnit()) {
+        sig = StringFormat("%d/%d", meterSig->GetCount(), meterSig->GetUnit());
+    }
+
+    m_streamStringOutput << outStart << sig << outEnd;
+}
+
+void PAEOutput::WriteMRest(MRest *mRest)
+{
+    assert(mRest);
+
+    if (m_skip) return;
+
+    m_streamStringOutput << "=";
+}
+
+void PAEOutput::WriteMultiRest(MultiRest *multiRest)
+{
+    assert(multiRest);
+
+    if (m_skip) return;
+
+    m_streamStringOutput << "=" << multiRest->GetNum();
+}
+
+void PAEOutput::WriteNote(Note *note)
+{
+    assert(note);
+    assert(m_currentMeasure);
+
+    if (m_skip) return;
+
+    std::string oct;
+
+    // For chords, only output the top note
+    Chord *chord = note->IsChordTone();
+    if (chord) {
+        if (note != chord->GetTopNote()) return;
+    }
+    else {
+        WriteDur(note);
+        WriteGrace(note);
+    }
+
+    if (note->GetOct() != m_currentOct) {
+        m_currentOct = note->GetOct();
+        char octSign = (m_currentOct > 3) ? '\'' : ',';
+        int signCount = (m_currentOct > 3) ? (m_currentOct - 3) : (4 - m_currentOct);
+        m_streamStringOutput << std::string(signCount, octSign);
+    }
+
+    Accid *noteAccid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
+    if (noteAccid) {
+        std::string accid;
+        switch (noteAccid->GetAccid()) {
+            case (ACCIDENTAL_WRITTEN_s): accid = "x"; break;
+            case (ACCIDENTAL_WRITTEN_f): accid = "b"; break;
+            case (ACCIDENTAL_WRITTEN_ss): accid = "xx"; break;
+            case (ACCIDENTAL_WRITTEN_x): accid = "xx"; break;
+            case (ACCIDENTAL_WRITTEN_ff): accid = "bb"; break;
+            case (ACCIDENTAL_WRITTEN_n): accid = "n"; break;
+            default: accid = "";
+        }
+        m_streamStringOutput << accid;
+    }
+
+    PointingToComparison pointingToComparisonFermata(FERMATA, note);
+    Fermata *fermata
+        = dynamic_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+    if (fermata) m_streamStringOutput << "(";
+
+    std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
+    std::transform(pname.begin(), pname.end(), pname.begin(), ::toupper);
+    m_streamStringOutput << pname;
+
+    if (fermata) m_streamStringOutput << ")";
+
+    PointingToComparison pointingToComparisonTrill(TRILL, note);
+    Trill *trill = dynamic_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
+    if (trill) m_streamStringOutput << "t";
+
+    PointingToComparison pointingToComparisonTie(TIE, note);
+    Tie *tie = dynamic_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
+    if (tie) m_streamStringOutput << "+";
+}
+
+void PAEOutput::WriteRest(Rest *rest)
+{
+    assert(rest);
+
+    if (m_skip) return;
+
+    WriteDur(rest);
+    m_streamStringOutput << "-";
+}
+
+void PAEOutput::WriteSpace(Space *space)
+{
+    assert(space);
+
+    if (m_skip) return;
+
+    WriteDur(space);
+    // Simply make it a rest - no other option in PAE
+    m_streamStringOutput << "-";
+}
+
+void PAEOutput::WriteTuplet(Tuplet *tuplet)
+{
+    assert(tuplet);
+
+    Staff *staff = dynamic_cast<Staff *>(tuplet->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
+    // content = DUR_MAX / 2^(dur - 2)
+    int tupletDur = (content != 0.0) ? log2(DUR_MAX / content) + 2 : 4;
+    // We should be looking for dotted values
+
+    std::string dur;
+    switch (tupletDur) {
+        case (DUR_LG): dur = "0"; break;
+        case (DUR_BR): dur = "9"; break;
+        case (DUR_1): dur = "1"; break;
+        case (DUR_2): dur = "2"; break;
+        case (DUR_4): dur = "4"; break;
+        case (DUR_8): dur = "8"; break;
+        case (DUR_16): dur = "6"; break;
+        case (DUR_32): dur = "3"; break;
+        case (DUR_64): dur = "5"; break;
+        case (DUR_128): dur = "7"; break;
+        default: LogWarning("Unsupported tuplet duration"); dur = "4";
+    }
+
+    // For duration to be written within the tuplet
+    m_currentDur = -1;
+    m_streamStringOutput << dur << "(";
+}
+
+void PAEOutput::WriteTupletEnd(Tuplet *tuplet)
+{
+    assert(tuplet);
+
+    m_streamStringOutput << ";" << tuplet->GetNum() << ")";
+}
+
+void PAEOutput::WriteDur(DurationInterface *interface)
+{
+    assert(interface);
+
+    if ((interface->GetDur() != m_currentDur) || (interface->GetDots() != m_currentDots)) {
+        m_currentDur = interface->GetDur();
+        m_currentDots = (interface->HasDots()) ? interface->GetDots() : 0;
+        std::string dur;
+        switch (m_currentDur) {
+            case (DURATION_long): dur = "0"; break;
+            case (DURATION_breve): dur = "9"; break;
+            case (DURATION_1): dur = "1"; break;
+            case (DURATION_2): dur = "2"; break;
+            case (DURATION_4): dur = "4"; break;
+            case (DURATION_8): dur = "8"; break;
+            case (DURATION_16): dur = "6"; break;
+            case (DURATION_32): dur = "3"; break;
+            case (DURATION_64): dur = "5"; break;
+            case (DURATION_128): dur = "7"; break;
+            case (DURATION_maxima): dur = "0"; break;
+            case (DURATION_longa): dur = "0"; break;
+            case (DURATION_brevis): dur = "9"; break;
+            case (DURATION_semibrevis): dur = "1"; break;
+            case (DURATION_minima): dur = "2"; break;
+            case (DURATION_semiminima): dur = "4"; break;
+            case (DURATION_fusa): dur = "8"; break;
+            case (DURATION_semifusa): dur = "6"; break;
+            default: LogWarning("Unsupported duration"); dur = "4";
+        }
+        m_streamStringOutput << dur;
+        m_streamStringOutput << std::string(m_currentDots, '.');
+    }
+}
+
+void PAEOutput::WriteGrace(AttGraced *attGraced)
+{
+    assert(attGraced);
+
+    // We are in a beam of grace notes;
+    if (m_grace) return;
+
+    if (attGraced->GetGrace() == GRACE_unacc) {
+        m_streamStringOutput << "g";
+    }
+    else if (attGraced->HasGrace()) {
+        m_streamStringOutput << "q";
+    }
+}
 
 #ifndef NO_PAE_SUPPORT
 
@@ -72,36 +605,35 @@ char data_line[10001] = { 0 };
 char data_key[MAX_DATA_LEN];
 char data_value[MAX_DATA_LEN]; // ditto as above
 
+#endif /* NO_PAE_SUPPORT */
+
 //----------------------------------------------------------------------------
-// PaeInput
+// PAEInput
 //----------------------------------------------------------------------------
 
-PaeInput::PaeInput(Doc *doc, std::string filename)
+PAEInput::PAEInput(Doc *doc)
     : // This is pretty bad. We open a bad fileoinputstream as we don't use it
-    FileInputStream(doc)
+    Input(doc)
 {
-    m_filename = filename;
     m_staff = NULL;
     m_measure = NULL;
     m_layer = NULL;
     m_tie = NULL;
     m_is_in_chord = false;
     m_is_mensural = false;
+
+    m_currentKeySig = NULL;
+    m_tieAccid.first = PITCHNAME_NONE;
+    m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
 }
 
-PaeInput::~PaeInput() {}
+PAEInput::~PAEInput() {}
+
+#ifndef NO_PAE_SUPPORT
 
 //////////////////////////////////////////////////////////////////////////
 
-bool PaeInput::ImportFile()
-{
-    std::ifstream infile;
-    infile.open(m_filename.c_str());
-    parsePlainAndEasy(infile);
-    return true;
-}
-
-bool PaeInput::ImportString(std::string const &pae)
+bool PAEInput::Import(const std::string &pae)
 {
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);
@@ -113,7 +645,7 @@ bool PaeInput::ImportString(std::string const &pae)
 // parsePlainAndEasy --
 //
 
-void PaeInput::parsePlainAndEasy(std::istream &infile)
+void PAEInput::parsePlainAndEasy(std::istream &infile)
 {
     // buffers
     char c_clef[1024] = { 0 };
@@ -133,6 +665,26 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
+
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
+    // add minimal scoreDef
+    StaffGrp *staffGrp = new StaffGrp();
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(5);
+    staffGrp->AddChild(staffDef);
 
     // read values
     while (!infile.eof()) {
@@ -176,6 +728,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
     if (strlen(c_keysig)) {
         KeySig *k = new KeySig();
+        // Make it an attribute for now
+        k->IsAttribute(true);
         getKeyInfo(c_keysig, k);
         if (!scoreDefKeySig) {
             scoreDefKeySig = k;
@@ -319,6 +873,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
             current_measure.abbreviation_offset = 0; // just in case...
             staff.push_back(current_measure);
             current_measure.reset();
+            if (m_currentKeySig) m_currentKeySig->FillMap(m_currentAccids);
         }
 
         // clef change
@@ -376,16 +931,16 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
         // key signature change
         else if ((incipit[i] == '$') && (i + 1 < length)) {
-            KeySig *k = new KeySig;
+            KeySig *k = new KeySig();
+            // Make it an attribute for now
+            k->IsAttribute(true);
             i += getKeyInfo(incipit, k, i + 1);
             if (current_measure.notes.size() == 0) {
                 if (current_measure.key) delete current_measure.key;
-
                 current_measure.key = k;
             }
             else {
                 if (current_note.key) delete current_note.key;
-
                 current_note.key = k;
             }
         }
@@ -399,19 +954,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         staff.push_back(current_measure);
         current_measure.notes.clear();
     }
-
-    m_doc->Reset();
-    m_doc->SetType(Raw);
-    // The mdiv
-    Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
-    m_doc->AddChild(mdiv);
-    // The score
-    Score *score = new Score();
-    mdiv->AddChild(score);
-    // the section
-    Section *section = new Section();
-    score->AddChild(section);
 
     int measure_count = 1;
 
@@ -432,15 +974,12 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         if (obj.key || obj.meter) {
             ScoreDef *scoreDef = new ScoreDef();
             if (obj.key) {
-                scoreDef->SetKeySig(obj.key->ConvertToKeySigLog());
-                delete obj.key;
+                scoreDef->AddChild(obj.key);
                 obj.key = NULL;
             }
             if (obj.meter) {
-                scoreDef->SetMeterCount(obj.meter->GetCount());
-                scoreDef->SetMeterUnit(obj.meter->GetUnit());
-                scoreDef->SetMeterSym(obj.meter->GetSym());
-                delete obj.meter;
+                obj.meter->IsAttribute(true);
+                scoreDef->AddChild(obj.meter);
                 obj.meter = NULL;
             }
             section->AddChild(scoreDef);
@@ -452,45 +991,34 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         measure_count++;
     }
 
-    // add minimal scoreDef
-    StaffGrp *staffGrp = new StaffGrp();
-    StaffDef *staffDef = new StaffDef();
-    staffDef->SetN(1);
-    staffDef->SetLines(5);
     if (m_is_mensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
     }
     if (staffDefClef) {
-        staffDef->SetClefShape(staffDefClef->GetShape());
-        staffDef->SetClefLine(staffDefClef->GetLine());
-        staffDef->SetClefDis(staffDefClef->GetDis());
-        staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
-        delete staffDefClef;
+        // Make it an attribute for now
+        staffDefClef->IsAttribute(true);
+        staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->m_scoreDef.SetKeySig(scoreDefKeySig->ConvertToKeySigLog());
-        delete scoreDefKeySig;
+        m_doc->m_scoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
-        m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
-        m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
-        m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
-        delete scoreDefMeterSig;
+        // Make it an attribute for now
+        scoreDefMeterSig->IsAttribute(true);
+        m_doc->m_scoreDef.AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
-        m_doc->m_scoreDef.SetMensurDot(scoreDefMensur->GetDot());
-        m_doc->m_scoreDef.SetMensurSign(scoreDefMensur->GetSign());
-        m_doc->m_scoreDef.SetMensurSlash(scoreDefMensur->GetSlash());
-        m_doc->m_scoreDef.SetProportNum(scoreDefMensur->GetNum());
-        m_doc->m_scoreDef.SetProportNumbase(scoreDefMensur->GetNumbase());
-        delete scoreDefMensur;
+        // Make it an attribute for now
+        scoreDefMensur->IsAttribute(true);
+        m_doc->m_scoreDef.AddChild(scoreDefMensur);
     }
+
+    m_doc->m_scoreDef.AddChild(staffGrp);
+
     if (m_tie != NULL) {
         delete m_tie;
         m_tie = NULL;
     }
-    staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 }
@@ -500,7 +1028,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 // getOctave --
 //
 #define BASE_OCT 4
-int PaeInput::getOctave(const char *incipit, char *octave, int index)
+int PAEInput::getOctave(const char *incipit, char *octave, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -528,7 +1056,7 @@ int PaeInput::getOctave(const char *incipit, char *octave, int index)
 // getDuration --
 //
 
-int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot, int index)
+int PAEInput::getDuration(const char *incipit, data_DURATION *duration, int *dot, int index)
 {
 
     int i = index;
@@ -589,7 +1117,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
 // getDurations --
 //
 
-int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index)
+int PAEInput::getDurations(const char *incipit, pae::Measure *measure, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -623,7 +1151,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
 // getAccidental --
 //
 
-int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index)
+int PAEInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -653,7 +1181,7 @@ int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accide
 // getTupletOrFermata --
 //
 
-int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
+int PAEInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -668,34 +1196,33 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
     if (is_tuplet) {
         int t = i;
-        int t2 = 0;
         int tuplet_val = 3; // triplets are default
+        int tuplet_notes = 0;
         char *buf;
 
-        // Triplets are in the form (4ABC)
-        // index points to the '(', so we look back
-        // if the result is a number or dot, it means we have the long format
-        // i.e. 4(6ABC;5) or 4.(6ABC;5)
-        if ((index != 0) && (isdigit(incipit[index - 1]) || incipit[index - 1] == '.')) {
+        // create the buffer so we can convert the tuplet nr to int
+        buf = (char *)malloc(length + 1); // allocate it with space for 0x00
+        memset(buf, 0x00, length + 1); // wipe it up
 
-            // create the buffer so we can convert the tuplet nr to int
-            buf = (char *)malloc(length + 1); // allocate it with space for 0x00
-            memset(buf, 0x00, length + 1); // wipe it up
+        // move until we find the ;
+        while ((t < length) && (incipit[t] != ';')) {
 
-            // move until we find the ;
-            while ((t < length) && (incipit[t] != ';')) {
-
-                // we should not find any close paren before the ';' !
-                // FIXME find a graceful way to exit signaling this to user
-                if (incipit[t] == ')') {
-                    LogDebug("Plaine & Easie import: You have a ')' before the ';' in a tuplet!");
-                    free(buf);
-                    return i - index;
-                }
-
-                t++;
+            // Triplets are sometimes codes without ';' values
+            if (incipit[t] == ')') {
+                break;
             }
 
+            // count the notes
+            if ((incipit[t] - 'A' >= 0) && (incipit[t] - 'A' < 7)) {
+                tuplet_notes++;
+            }
+
+            t++;
+        }
+
+        // We detected a ';', get the value of the tuplet (otherwise 3 by default)
+        if ((t < length) && incipit[t] != ')') {
+            int t2 = 0;
             // t + 1 should point to the number
             t++; // move one char to the number
             while (((t + t2) < length) && (incipit[t + t2] != ')')) {
@@ -713,13 +1240,15 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
             }
 
             tuplet_val = atoi(buf);
-            free(buf); // dispose of the buffer
         }
 
         // this is the first note, the total number of notes = tuplet_val
-        note->tuplet_notes = tuplet_val;
+        note->tuplet_notes = tuplet_notes;
         // but also the note counter
-        note->tuplet_note = tuplet_val;
+        note->tuplet_note = tuplet_notes;
+        // the tuplet val (3 or after ;)
+        note->tuplet_val = tuplet_val;
+        free(buf); // dispose of the buffer
     }
     else {
         if (note->tuplet_notes > 0) {
@@ -736,13 +1265,15 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 // getTupletFermataEnd --
 //
 // this can be deleted in the future?
-int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int index)
+int PAEInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     // int length = strlen(incipit);
 
     // TODO: fermatas inside tuplets won't be currently handled correctly
-    note->fermata = false;
+    if (note->tuplet_notes != 1) {
+        note->fermata = false;
+    }
 
     return i - index;
 }
@@ -752,7 +1283,7 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
 // getGraceNote --
 //
 
-int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
+int PAEInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -784,7 +1315,7 @@ int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 // getPitch --
 //
 
-data_PITCHNAME PaeInput::getPitch(char c_note)
+data_PITCHNAME PAEInput::getPitch(char c_note)
 {
     data_PITCHNAME pitch = PITCHNAME_c;
 
@@ -807,7 +1338,7 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 // getTimeInfo -- read the time signature.
 //
 
-int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index)
+int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -849,6 +1380,8 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
         }
         else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
             meter->SetCount(std::stoi(timesig_str));
+            meter->SetUnit(1);
+            meter->SetForm(METERFORM_num);
         }
         else if (strcmp(timesig_str, "c") == 0) {
             // C
@@ -920,7 +1453,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
 // getClefInfo -- read the clef.
 //
 
-int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
+int PAEInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 {
     // a clef is maximum 3 character length
     // go through the 3 character and retrieve the letter (clef) and the line
@@ -974,7 +1507,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 // getWholeRest -- read the getWholeRest.
 //
 
-int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
+int PAEInput::getWholeRest(const char *incipit, int *wholerest, int index)
 {
     int length = (int)strlen(incipit);
     int i = index;
@@ -1003,7 +1536,7 @@ int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
  BARRENDITION_dbl        //
  */
 
-int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
+int PAEInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
 {
 
     bool is_barline_rptboth = false;
@@ -1056,11 +1589,10 @@ int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int ind
 // getAbbreviation -- read abbreviation
 //
 
-int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
+int PAEInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
 {
     int length = (int)strlen(incipit);
     int i = index;
-    int j;
 
     if (measure->abbreviation_offset == -1) { // start
         measure->abbreviation_offset = (int)measure->notes.size();
@@ -1069,7 +1601,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
         int abbreviation_stop = (int)measure->notes.size();
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
             i++;
-            for (j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
+            for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
             }
         }
@@ -1084,21 +1616,42 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 // getKeyInfo -- read the key signature.
 //
 
-int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
+int PAEInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
+    key->Reset();
+
     int alt_nr = 0;
-    m_keySigString = "";
+    std::string m_keySigString = "";
 
     // at the key information line, extract data
     int length = (int)strlen(incipit);
     int i = index;
     bool end_of_keysig = false;
+    bool enclosed = false;
+    bool has_enclosed = false;
+    std::vector<bool> enclosedAccids;
+    enclosedAccids.resize(7);
+    bool cancel = false;
+    data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': key->SetAlterationType(ACCIDENTAL_WRITTEN_f); break;
-            case 'x': key->SetAlterationType(ACCIDENTAL_WRITTEN_s); break;
-            case 'n': key->SetAlterationType(ACCIDENTAL_WRITTEN_n); break;
-            case '[': break;
+            case 'b':
+                alt_nr = 0;
+                alterationType = ACCIDENTAL_WRITTEN_f;
+                break;
+            case 'x':
+                alt_nr = 0;
+                alterationType = ACCIDENTAL_WRITTEN_s;
+                break;
+            case 'n':
+                alt_nr = 0;
+                cancel = true;
+                break;
+            case '[':
+                enclosed = true;
+                has_enclosed = true;
+                break;
+            case ']': enclosed = false; break;
             case 'F':
             case 'C':
             case 'G':
@@ -1109,16 +1662,44 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             default: end_of_keysig = true; break;
         }
         if (!end_of_keysig) {
-            m_keySigString.push_back(incipit[i]);
+            if (alt_nr < 7) {
+                enclosedAccids.at(alt_nr) = enclosed;
+            }
             i++;
         }
     }
 
-    if (key->GetAlterationType() != ACCIDENTAL_WRITTEN_n) {
-        key->SetAlterationNumber(alt_nr);
+    // Just in case
+    alt_nr = std::min(6, alt_nr);
+
+    if (alterationType != ACCIDENTAL_WRITTEN_NONE) {
+        if (has_enclosed == true) {
+            key->IsAttribute(false);
+            for (int i = 0; i < alt_nr; ++i) {
+                KeyAccid *keyAccid = new KeyAccid();
+                data_PITCHNAME pname = (alterationType == ACCIDENTAL_WRITTEN_f) ? KeySig::s_pnameForFlats[i]
+                                                                                : KeySig::s_pnameForSharps[i];
+                keyAccid->SetPname(pname);
+                keyAccid->SetAccid(alterationType);
+                key->AddChild(keyAccid);
+                if (enclosedAccids.at(i)) {
+                    keyAccid->SetEnclose(ENCLOSURE_brack);
+                }
+            }
+        }
+        else {
+            key->SetSig(std::make_pair(alt_nr, alterationType));
+        }
+        if (cancel) {
+            key->SetSigShowchange(BOOLEAN_true);
+        }
+    }
+    else {
+        key->SetSig(std::make_pair(0, ACCIDENTAL_WRITTEN_n));
     }
 
-    key->ConvertToMei();
+    m_currentKeySig = key;
+    key->FillMap(m_currentAccids);
 
     return i - index;
 }
@@ -1128,7 +1709,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 // getNote --
 //
 
-int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
+int PAEInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
 {
     int oct;
     int i = index;
@@ -1153,11 +1734,35 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     }
     note->pitch = getPitch(incipit[i]);
 
-    if (m_keySigString.find(incipit[i]) != std::string::npos) {
-        if (m_keySigString[0] == 'x')
-            note->accidGes = ACCIDENTAL_GESTURAL_s;
-        else if (m_keySigString[0] == 'b')
-            note->accidGes = ACCIDENTAL_GESTURAL_f;
+    // If necessary pass the accid from the tied note (could be from the previous measure)
+    if (m_tieAccid.first != PITCHNAME_NONE) {
+        if (m_tieAccid.second == ACCIDENTAL_WRITTEN_n) {
+            if (m_currentAccids.count(m_tieAccid.first) != 0) {
+                m_currentAccids.erase(m_tieAccid.first);
+            }
+        }
+        else if (m_tieAccid.second != ACCIDENTAL_WRITTEN_NONE) {
+            m_currentAccids[m_tieAccid.first] = m_tieAccid.second;
+        }
+    }
+    m_tieAccid.first = PITCHNAME_NONE;
+    m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
+
+    // Natural in front of the note, remove it from the current list
+    if (note->accidental == ACCIDENTAL_WRITTEN_n) {
+        if (m_currentAccids.count(note->pitch) != 0) {
+            m_currentAccids.erase(note->pitch);
+        }
+    }
+    // Not a natural in front of the note, add it to the current list
+    else if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
+        m_currentAccids[note->pitch] = note->accidental;
+    }
+
+    // Nothing in front of the note, but something in the list - make it an accid.ges
+    if ((note->accidental == ACCIDENTAL_WRITTEN_NONE) && (m_currentAccids.count(note->pitch) != 0)) {
+        note->accidental = m_currentAccids.at(note->pitch);
+        note->accidGes = true;
     }
 
     // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
@@ -1174,6 +1779,14 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     // tie
     if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
         note->tie = true;
+        if (note->accidental) {
+            m_tieAccid.first = note->pitch;
+            m_tieAccid.second = note->accidental;
+        }
+    }
+    else {
+        m_tieAccid.first = PITCHNAME_NONE;
+        m_tieAccid.second = ACCIDENTAL_WRITTEN_NONE;
     }
 
     // trills
@@ -1224,7 +1837,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
 // convertMeasure --
 //
 
-void PaeInput::convertMeasure(pae::Measure *measure)
+void PAEInput::convertMeasure(pae::Measure *measure)
 {
     if (measure->clef != NULL) {
         m_layer->AddChild(measure->clef);
@@ -1253,7 +1866,7 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     m_measure->SetRight(measure->barLine);
 }
 
-void PaeInput::parseNote(pae::Note *note)
+void PAEInput::parseNote(pae::Note *note)
 {
 
     LayerElement *element;
@@ -1269,7 +1882,7 @@ void PaeInput::parseNote(pae::Note *note)
 
         if (note->fermata) {
             Fermata *fermata = new Fermata();
-            fermata->SetStartid(rest->GetUuid());
+            fermata->SetStartid("#" + rest->GetUuid());
             m_measure->AddChild(fermata);
         }
 
@@ -1282,14 +1895,13 @@ void PaeInput::parseNote(pae::Note *note)
         mnote->SetOct(note->octave);
         if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
             Accid *accid = new Accid();
-            accid->SetAccid(note->accidental);
+            if (note->accidGes) {
+                accid->SetAccidGes(Att::AccidentalWrittenToGestural(note->accidental));
+            }
+            else {
+                accid->SetAccid(note->accidental);
+            }
             mnote->AddChild(accid);
-        }
-        if (!mnote->FindChildByType(ACCID)) {
-            Accid *accid = new Accid();
-            mnote->AddChild(accid);
-            accid->IsAttribute(true);
-            accid->SetAccidGes(note->accidGes);
         }
 
         mnote->SetDur(note->duration);
@@ -1308,25 +1920,25 @@ void PaeInput::parseNote(pae::Note *note)
 
         if (note->fermata) {
             Fermata *fermata = new Fermata();
-            fermata->SetStartid(mnote->GetUuid());
+            fermata->SetStartid("#" + mnote->GetUuid());
             m_measure->AddChild(fermata);
         }
 
         if (note->trill) {
             Trill *trill = new Trill();
-            trill->SetStartid(mnote->GetUuid());
+            trill->SetStartid("#" + mnote->GetUuid());
             m_measure->AddChild(trill);
         }
 
         if (m_tie != NULL) {
-            m_tie->SetEndid(mnote->GetUuid());
-            m_measure->AddChild(m_tie);
+            m_tie->SetEndid("#" + mnote->GetUuid());
             m_tie = NULL;
         }
 
         if (note->tie) {
             m_tie = new Tie();
-            m_tie->SetStartid(mnote->GetUuid());
+            m_tie->SetStartid("#" + mnote->GetUuid());
+            m_measure->AddChild(m_tie);
         }
 
         element = mnote;
@@ -1377,7 +1989,7 @@ void PaeInput::parseNote(pae::Note *note)
     // which means we are counting a tuplet
     if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
         Tuplet *newTuplet = new Tuplet();
-        newTuplet->SetNum(note->tuplet_notes);
+        newTuplet->SetNum(note->tuplet_val);
         newTuplet->SetNumbase(2);
         pushContainer(newTuplet);
     }
@@ -1433,13 +2045,13 @@ void PaeInput::parseNote(pae::Note *note)
     }
 }
 
-void PaeInput::pushContainer(LayerElement *container)
+void PAEInput::pushContainer(LayerElement *container)
 {
     addLayerElement(container);
     m_nested_objects.push_back(container);
 }
 
-void PaeInput::popContainer()
+void PAEInput::popContainer()
 {
     // assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
@@ -1451,7 +2063,7 @@ void PaeInput::popContainer()
     }
 }
 
-void PaeInput::addLayerElement(LayerElement *element)
+void PAEInput::addLayerElement(LayerElement *element)
 {
     if (m_nested_objects.size() > 0) {
         m_nested_objects.back()->AddChild(element);
@@ -1472,7 +2084,7 @@ void PaeInput::addLayerElement(LayerElement *element)
 //   only one per line
 //
 
-void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
+void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 {
 
 #define SKIPSPACE                                                                                                      \

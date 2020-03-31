@@ -30,6 +30,7 @@ public:
     ///@{
     Pb();
     virtual ~Pb();
+    virtual Object *Clone() const { return new Pb(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Pb"; }
     virtual ClassId GetClassId() const { return PB; }

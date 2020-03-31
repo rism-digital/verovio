@@ -60,7 +60,15 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else
         dc->StartGraphic(slur, "spanning-slur", "");
 
-    DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle());
+    int penStyle = AxSOLID;
+    switch (slur->GetLform()) {
+        case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
+        case LINEFORM_dotted: penStyle = AxDOT; break;
+        case LINEFORM_wavy:
+        // TODO: Implement wavy slur.
+        default: break;
+    }
+    DrawThickBezierCurve(dc, points, curve->GetThickness(), staff->m_drawingStaffSize, curve->GetAngle(), penStyle);
 
     /*
     int i;
@@ -140,17 +148,17 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     LayerElement *layerElement = NULL;
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
     if (!start->Is(TIMESTAMP_ATTR)) {
-        layer = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+        layer = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
         layerElement = start;
     }
     else {
-        layer = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+        layer = dynamic_cast<Layer *>(end->GetFirstAncestor(LAYER));
         layerElement = end;
     }
     assert(layer);
 
     if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
-        System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
+        System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
         assert(system);
         // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
         // situations
@@ -424,19 +432,17 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        start->FindAllChildByComparison(&artics, &matchType);
+        start->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
-                    && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(curve, true);
                 }
-                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(curve, true);
                 }
             }
@@ -444,19 +450,17 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     }
     // normal case or end
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        end->FindAllChildByComparison(&artics, &matchType);
+        end->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
-                    && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(curve, false);
                 }
-                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
-                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(curve, false);
                 }
             }
@@ -493,7 +497,7 @@ float View::CalcInitialSlur(
 
     /************** content **************/
 
-    System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
+    System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
     assert(system);
     FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur, slur);
     findSpannedLayerElementsParams.m_minPos = p1.x;
@@ -511,12 +515,8 @@ float View::CalcInitialSlur(
     Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
     system->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams, NULL, &filters);
 
-    ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    spannedElements->clear();
+    curve->ClearSpannedElements();
     for (auto &element : findSpannedLayerElementsParams.m_elements) {
-
-        CurveSpannedElement *spannedElement = new CurveSpannedElement;
-        spannedElement->m_boundingBox = element;
 
         Point pRotated;
         Point pLeft;
@@ -532,18 +532,21 @@ float View::CalcInitialSlur(
         //    spannedElements->push_back(spannedElement);
         //}
         if (((pLeft.x > p1.x) && (pLeft.x < p2.x)) || ((pRight.x > p1.x) && (pRight.x < p2.x))) {
-            spannedElements->push_back(spannedElement);
+            CurveSpannedElement *spannedElement = new CurveSpannedElement;
+            spannedElement->m_boundingBox = element;
+            curve->AddSpannedElement(spannedElement);
         }
     }
 
     for (auto &positioner : findSpannedLayerElementsParams.m_ties) {
         CurveSpannedElement *spannedElement = new CurveSpannedElement;
         spannedElement->m_boundingBox = positioner;
-        spannedElements->push_back(spannedElement);
+        curve->AddSpannedElement(spannedElement);
     }
 
     /************** angle **************/
 
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
     float slurAngle = slur->GetAdjustedSlurAngle(m_doc, p1, p2, curveDir, (spannedElements->size() > 0));
     Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(p2, -slurAngle, p1);
 

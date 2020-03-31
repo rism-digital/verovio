@@ -31,6 +31,7 @@ public:
     ///@{
     MRpt();
     virtual ~MRpt();
+    virtual Object *Clone() const { return new MRpt(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "MRpt"; }
     virtual ClassId GetClassId() const { return MRPT; }

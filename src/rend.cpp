@@ -26,11 +26,19 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend() : TextElement("rend-"), AreaPosInterface(), AttColor(), AttLang(), AttTypography(), AttWhitespace()
+Rend::Rend()
+    : TextElement("rend-")
+    , AreaPosInterface()
+    , AttColor()
+    , AttLang()
+    , AttTextRendition()
+    , AttTypography()
+    , AttWhitespace()
 {
     RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
+    RegisterAttClass(ATT_TEXTRENDITION);
     RegisterAttClass(ATT_TYPOGRAPHY);
     RegisterAttClass(ATT_WHITESPACE);
 
@@ -45,6 +53,7 @@ void Rend::Reset()
     AreaPosInterface::Reset();
     ResetColor();
     ResetLang();
+    ResetTextRendition();
     ResetTypography();
     ResetWhitespace();
 }

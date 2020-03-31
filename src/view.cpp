@@ -30,7 +30,7 @@ View::View()
     m_options = NULL;
     m_pageIdx = 0;
 
-    m_currentColour = AxBLACK;
+    m_currentColour = AxNONE;
     m_currentElement = NULL;
     m_currentLayer = NULL;
     m_currentMeasure = NULL;
@@ -73,7 +73,7 @@ void View::SetPage(int pageIdx, bool doLayout)
         m_doc->SetCurrentScoreDefDoc();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
-        if (m_doc->GetType() == Transcription)
+        if (m_doc->GetType() == Transcription || m_doc->GetType() == Facs)
             m_currentPage->LayOutTranscription();
         else
             m_currentPage->LayOut();

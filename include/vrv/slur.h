@@ -17,7 +17,11 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature {
+class Slur : public ControlElement,
+             public TimeSpanningInterface,
+             public AttColor,
+             public AttCurvature,
+             public AttCurveRend {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -26,6 +30,7 @@ public:
     ///@{
     Slur();
     virtual ~Slur();
+    virtual Object *Clone() const { return new Slur(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Slur"; }
     virtual ClassId GetClassId() const { return SLUR; }
@@ -48,24 +53,18 @@ public:
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
 
-    /**
-     * Check if the slur needs to be taken into account as overflow above or below in case of cross-staff end points.
-     * This methods assumes staff@n to be greater for the staff below.
-     */
-    void GetCrossStaffOverflows(
-        StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
-
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
-    int AdjustSlurCurve(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
+    int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,
         Point &c2, curvature_CURVEDIR curveDir, float angle, int staffSize, bool posRatio = true);
-    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve, ArrayOfCurveSpannedElements *spannedElements,
-        Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, float &angle, bool forceBothSides);
+    void AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
+        const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1, Point &c2,
+        curvature_CURVEDIR curveDir, float &angle, bool forceBothSides);
 
     float GetAdjustedSlurAngle(Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir, bool withPoints);
     void GetControlPoints(
         Doc *doc, Point &p1, Point &p2, Point &c1, Point &c2, curvature_CURVEDIR curveDir, int height, int staffSize);
-    void GetSpannedPointPositions(Doc *doc, ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
+    void GetSpannedPointPositions(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point p1, float angle,
         curvature_CURVEDIR curveDir, int staffSize);
 
     //----------//

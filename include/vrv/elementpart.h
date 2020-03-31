@@ -344,6 +344,14 @@ public:
     void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
     ///@}
 
+    /**
+     * @name Setter and getter of the virtual flag
+     */
+    ///@{
+    bool IsVirtual() const { return m_isVirtual; }
+    void IsVirtual(bool isVirtual) { m_isVirtual = isVirtual; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -372,13 +380,19 @@ public:
     //
 private:
     /**
-     *
+     * The drawing direction of the stem
      */
     data_STEMDIRECTION m_drawingStemDir;
     /**
-     *
+     * The drawing length of stem
      */
     int m_drawingStemLen;
+    /**
+     * A flag indicating if a stem if virtual and should never be rendered.
+     * Virtual stems are added to whole notes (and longer) for position calculation and
+     * for supporting MEI @stem.mod
+     */
+    bool m_isVirtual;
 };
 
 } // namespace vrv

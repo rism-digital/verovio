@@ -39,6 +39,7 @@
 #include "octave.h"
 #include "options.h"
 #include "pedal.h"
+#include "reh.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -116,6 +117,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         assert(pedal);
         DrawPedal(dc, pedal, measure, system);
     }
+    else if (element->Is(REH)) {
+        Reh *reh = dynamic_cast<Reh *>(element);
+        assert(reh);
+        DrawReh(dc, reh, measure, system);
+    }
     else if (element->Is(TEMPO)) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);
         assert(tempo);
@@ -171,8 +177,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     if (!start || !end) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstParent(SYSTEM));
+    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstAncestor(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstAncestor(SYSTEM));
 
     int x1, x2;
     Object *objectX = NULL;
@@ -193,7 +199,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // Only the first parent is the same, this means that the element is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = start->GetDrawingX();
         objectX = start;
@@ -204,7 +210,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // We are in the system of the last note - draw the element from the beginning of the system
     else if (system == parentSystem2) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
@@ -216,13 +222,13 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // throughout the system
     else {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
-        Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        Measure *last = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;
         x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
@@ -421,7 +427,7 @@ void View::DrawBracketSpan(
             dc->ResetBrush();
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
-            dc->SetPen(m_currentColour, lineWidth, AxSOLID, lineWidth);
+            dc->SetPen(m_currentColour, lineWidth, AxDOT, lineWidth, 1);
             dc->SetBrush(m_currentColour, AxSOLID);
             // Adjust the start and end because the horizontal line of the was drawn in that case
             int x1Dotted
@@ -429,8 +435,8 @@ void View::DrawBracketSpan(
             int x2Dotted
                 = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
             int yDotted = y + lineWidth / 2;
-            dc->DrawLine(ToDeviceContextX(x1Dotted), ToDeviceContextY(yDotted), ToDeviceContextX(x2Dotted),
-                ToDeviceContextY(yDotted));
+            dc->DrawLine(ToDeviceContextX(x1Dotted + 1.5 * lineWidth), ToDeviceContextY(yDotted),
+                ToDeviceContextX(x2Dotted), ToDeviceContextY(yDotted));
             dc->ResetPen();
             dc->ResetBrush();
         }
@@ -488,7 +494,6 @@ void View::DrawHairpin(
         hairpin->SetDrawingLength(x2 - x1);
     }
 
-    data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
     int startY = 0;
@@ -710,7 +715,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     Layer *layer1 = NULL;
     if (note1) {
         durElement = note1;
-        layer1 = dynamic_cast<Layer *>(note1->GetFirstParent(LAYER));
+        layer1 = dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
         parentChord1 = note1->IsChordTone();
     }
     if (parentChord1) {
@@ -887,11 +892,18 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     assert(curve);
     curve->UpdateCurveParams(bezier, 0.0, thickness, drawingCurveDir);
 
+    int penStyle = AxSOLID;
+    switch (tie->GetLform()) {
+        case LINEFORM_dashed: penStyle = AxSHORT_DASH; break;
+        case LINEFORM_dotted: penStyle = AxDOT; break;
+        default: break;
+    }
+
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "spanning-tie", "");
-    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize);
+    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize, 0, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -904,8 +916,6 @@ void View::DrawTrillExtension(
     assert(dc);
     assert(trill);
     assert(staff);
-
-    data_STAFFREL place = trill->GetPlace();
 
     int y = trill->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
 
@@ -1120,11 +1130,11 @@ void View::DrawSylConnector(
         // If we do not want to show hyphens at start of a syatem and the the end is at time 0.0
         if (m_options->m_lyricNoStartHyphen.GetValue() && (syl->GetEnd()->GetAlignment()->GetTime() == 0.0)) {
             // Return but only if the end is in the first measure of the system...
-            Measure *measure = dynamic_cast<Measure *>(syl->GetEnd()->GetFirstParent(MEASURE));
+            Measure *measure = dynamic_cast<Measure *>(syl->GetEnd()->GetFirstAncestor(MEASURE));
             assert(measure);
-            System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+            System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
             assert(system);
-            if (measure == dynamic_cast<Measure *>(system->FindChildByType(MEASURE))) {
+            if (measure == dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE))) {
                 return;
             }
         }
@@ -1191,9 +1201,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         // no dash if the distance is smaller than a dash length
         if (dist < dashLength) {
             LogDebug("Hyphen space under the limit");
+            nbDashes = 0;
         }
-
-        if (nbDashes < 2) {
+        else if (nbDashes < 2) {
             nbDashes = 1;
         }
         else {
@@ -1236,7 +1246,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int bottom = bottomNote->GetDrawingY();
 
     // We arbitrarily look at the top note
-    Staff *staff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(topNote->GetFirstAncestor(STAFF));
     assert(staff);
     bool drawingCueSize = topNote->GetDrawingCueSize();
 
@@ -1505,22 +1515,20 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
         if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
         if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;
     }
     else if (fermata->GetForm() == fermataVis_FORM_inv
-        || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
         code = SMUFL_E4C1_fermataBelow;
 
     std::wstring str;
@@ -1770,6 +1778,58 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     dc->EndGraphic(pedal, this);
 }
 
+void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(reh);
+
+    // Reh should be drawn at measure start
+    if (!reh->GetStart()) return;
+
+    dc->StartGraphic(reh, "", reh->GetUuid());
+
+    FontInfo rehTxt;
+    if (!dc->UseGlobalStyling()) {
+        rehTxt.SetFaceName("Times");
+        rehTxt.SetWeight(FONTWEIGHT_bold);
+    }
+
+    TextDrawingParams params;
+
+    params.m_x = reh->GetStart()->GetDrawingX();
+
+    data_HORIZONTALALIGNMENT alignment = reh->GetChildRendAlignment();
+    // Rehearsal marks are center aligned by default;
+    if (alignment == 0) alignment = HORIZONTALALIGNMENT_center;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = reh->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), reh, reh->GetStart(), *staffIter)) {
+            continue;
+        }
+
+        params.m_y = reh->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+
+        rehTxt.SetPointSize(params.m_pointSize);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&rehTxt);
+
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, reh, params);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(reh, this);
+}
+
 void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system)
 {
     assert(dc);
@@ -1790,20 +1850,16 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     TextDrawingParams params;
 
-    // If we have not timestamp
-    params.m_x = measure->GetDrawingX();
-    // First try to see if we have a meter sig attribute for this measure
+    // see if we have a meter signature for this measure
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
-    if (!pos) {
-        // if not, try to get the first beat element
-        alignmentComparison.SetType(ALIGNMENT_DEFAULT);
-        pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
-    }
-    // if we found one, use it
-    if (pos) {
-        params.m_x += pos->GetXRel();
+        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
+    params.m_x = tempo->GetStart()->GetDrawingX();
+    if (!tempo->HasStartid()) {
+        if ((tempo->GetTstamp() <= 1) && pos)
+            params.m_x = measure->GetDrawingX() + pos->GetXRel();
+        else
+            params.m_x -= 2 * tempo->GetStart()->GetDrawingRadius(m_doc);
     }
 
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
@@ -1912,11 +1968,11 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     dc->StartGraphic(turn, "", turn->GetUuid());
 
     int x = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
-    if (turn->GetDelayed() == BOOLEAN_true) LogWarning("delayed turns not supported");
+    if (turn->GetDelayed() == BOOLEAN_true && !turn->HasTstamp()) LogWarning("delayed turns not supported");
 
     // set norm as default
     int code = SMUFL_E567_ornamentTurn;
-    if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
+    if (turn->GetForm() == turnLog_FORM_lower) code = SMUFL_E568_ornamentTurnInverted;
 
     bool centered = true;
     // center the turn only with @startid
@@ -2026,8 +2082,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     if (!ending->GetMeasure() || !endingEndBoundary->GetMeasure()) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(ending->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(endingEndBoundary->GetFirstParent(SYSTEM));
+    System *parentSystem1 = dynamic_cast<System *>(ending->GetFirstAncestor(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(endingEndBoundary->GetFirstAncestor(SYSTEM));
 
     assert(parentSystem1 && parentSystem2);
     // in non debug mode
@@ -2050,7 +2106,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = ending->GetMeasure()->GetDrawingX();
         objectX = measure;
@@ -2062,7 +2118,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // We are in the system where the ending ends - draw it from the beginning of the system
     else if (system == parentSystem2) {
         // We need the last measure of the system for x2
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
@@ -2073,12 +2129,12 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // throughout the system
     else {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
@@ -2095,7 +2151,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     assert(measure);
     // By default, endings are drawn on top of each group (@ending.rend="gouped") unless "top" is specified)
     if (system->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
-        Staff *staff = dynamic_cast<Staff *>(system->FindChildByType(STAFF, 2, FORWARD));
+        Staff *staff = dynamic_cast<Staff *>(system->FindDescendantByType(STAFF, 2, FORWARD));
         if (!Check(staff)) return;
         staffList.push_back(staff);
     }

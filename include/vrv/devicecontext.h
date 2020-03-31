@@ -25,6 +25,7 @@ namespace vrv {
 class Glyph;
 class Object;
 class View;
+class Zone;
 
 extern "C" {
 static inline double DegToRad(double deg)
@@ -96,7 +97,7 @@ public:
      */
     ///@{
     void SetBrush(int colour, int opacity);
-    void SetPen(int colour, int width, int opacity, int dashLength = 0);
+    void SetPen(int colour, int width, int opacity, int dashLength = 0, int lineCap = 0);
     void SetFont(FontInfo *font);
     void ResetBrush();
     void ResetPen();
@@ -135,6 +136,7 @@ public:
      * @name Drawing methods
      */
     ///@{
+    virtual void DrawSimpleBezierPath(Point bezier[4]) = 0;
     virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]) = 0;
     virtual void DrawCircle(int x, int y, int radius) = 0;
     virtual void DrawEllipse(int x, int y, int width, int height) = 0;
@@ -169,10 +171,13 @@ public:
     virtual void EndText() = 0;
 
     /**
-     * Move a text to the specified position, for example when starting a new line.
-     * This method should be called only between a StartText and EndText call.
+     * @name Move a text to the specified position, for example when starting a new line.
+     * These methods should be called only between a StartText and EndText call.
      */
+    ///@{
     virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) = 0;
+    virtual void MoveTextVerticallyTo(int y) = 0;
+    ///@}
 
     /**
      * @name Temporarily deactivate a graphic
@@ -194,7 +199,7 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartGraphic(Object *object, std::string gClass, std::string gId) = 0;
+    virtual void StartGraphic(Object *object, std::string gClass, std::string gId, bool preprend = false) = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}
 
@@ -274,6 +279,8 @@ protected:
     /** flag for indicating if the graphic is deactivated */
     bool m_isDeactivatedX;
     bool m_isDeactivatedY;
+
+    Zone *m_facsimile = NULL;
 
 private:
     /** stores the width and height of the device context */

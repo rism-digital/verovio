@@ -40,8 +40,8 @@ void DisableLog();
 /**
  * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
  */
-#ifdef EMSCRIPTEN
-enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR };
+#ifdef __EMSCRIPTEN__
+enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR, CONSOLE_DEBUG };
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);
 void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level);
@@ -60,12 +60,12 @@ std::string ExtractUuidFragment(std::string refUuid);
 /**
  * Utility for converting UTF16 (std::wstring) to UTF-8
  */
-std::string UTF16to8(const std::wstring in);
+std::string UTF16to8(const std::wstring &in);
 
 /**
  * Utility for converting UTF-8 to UTF16 (std::wstring)
  */
-std::wstring UTF8to16(const std::string in);
+std::wstring UTF8to16(const std::string &in);
 
 /**
  * Format a string using vsnprintf.
@@ -138,7 +138,7 @@ public:
     /** Init the SMufL music and text fonts */
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */
-    static bool InitTextFont();
+    static bool InitTextFont(std::string fontName);
     /** Select a particular font */
     static bool SetFont(std::string fontName);
     /** Returns the glyph (if exists) for the current SMuFL font */

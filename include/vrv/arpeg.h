@@ -37,6 +37,7 @@ public:
     ///@{
     Arpeg();
     virtual ~Arpeg();
+    virtual Object *Clone() const { return new Arpeg(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Arpeg"; }
     virtual ClassId GetClassId() const { return ARPEG; }
@@ -91,6 +92,11 @@ public:
     ///@{
     virtual int AdjustArpeg(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     //

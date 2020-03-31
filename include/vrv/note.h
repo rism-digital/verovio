@@ -14,12 +14,14 @@
 
 #include "accid.h"
 #include "atts_mensural.h"
+#include "atts_midi.h"
 #include "atts_shared.h"
 #include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
+#include "transposition.h"
 
 namespace vrv {
 
@@ -27,6 +29,7 @@ class Accid;
 class Chord;
 class Slur;
 class Tie;
+class TransPitch;
 class Verse;
 class Note;
 typedef std::vector<Note *> ChordCluster;
@@ -47,7 +50,9 @@ class Note : public LayerElement,
              public AttColoration,
              public AttCue,
              public AttGraced,
+             public AttMidiVelocity,
              public AttNoteAnlMensural,
+             public AttNoteHeads,
              public AttStems,
              public AttStemsCmn,
              public AttTiePresent,
@@ -60,6 +65,7 @@ public:
     ///@{
     Note();
     virtual ~Note();
+    virtual Object *Clone() const { return new Note(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Note"; }
     virtual ClassId GetClassId() const { return NOTE; }
@@ -106,6 +112,14 @@ public:
     ///@}
 
     /**
+     * Check if the note has leger lines.
+     * If staff is passed, use it for getting the staff line number.
+     * Otherwise, it will look for the Staff ancestor.
+     * Set the value of ledger lines above or below.
+     */
+    bool HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff = NULL);
+
+    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
@@ -148,6 +162,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
+    virtual int CalcStemLenInThirdUnits(Staff *staff);
     ///@}
 
     /**
@@ -171,14 +186,15 @@ public:
     void SetScoreTimeTiedDuration(double timeInSeconds);
     void SetMIDIPitch(char pitch);
     double GetScoreTimeOnset();
-    int GetRealTimeOnsetMilliseconds();
+    double GetRealTimeOnsetMilliseconds();
     double GetScoreTimeOffset();
     double GetScoreTimeTiedDuration();
-    int GetRealTimeOffsetMilliseconds();
+    double GetRealTimeOffsetMilliseconds();
     double GetScoreTimeDuration();
     char GetMIDIPitch();
     ///@}
 
+public:
     //----------//
     // Functors //
     //----------//
@@ -243,8 +259,21 @@ public:
      */
     virtual int GenerateTimemap(FunctorParams *functorParams);
 
+    /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *);
+
 private:
-    //
+    /**
+     * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
+     */
+    int GetChromaticAlteration();
+
+    TransPitch GetTransPitch();
+
+    void UpdateFromTransPitch(const TransPitch &tp);
+
 public:
     //
 private:
@@ -287,14 +316,14 @@ private:
     /**
      * The time in milliseconds since the start of the measure element that contains the note.
      */
-    int m_realTimeOnsetMilliseconds;
+    double m_realTimeOnsetMilliseconds;
 
     /**
      * The time in milliseconds since the start of the measure element to end of printed note.
      * The real-time duration of a tied group is not currently tracked (this gets complicated
      * if there is a tempo change during a note sustain, which is currently not supported).
      */
-    int m_realTimeOffsetMilliseconds;
+    double m_realTimeOffsetMilliseconds;
 
     /**
      * If the note is the first in a tied group, then m_scoreTimeTiedDuration contains the

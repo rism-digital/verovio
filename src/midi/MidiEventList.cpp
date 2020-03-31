@@ -2,7 +2,7 @@
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Feb 14 21:55:38 PST 2015
 // Last Modified: Sat Apr 21 10:52:19 PDT 2018 Removed using namespace std;
-// Filename:      midifile/src-library/MidiEventList.cpp
+// Filename:      midifile/src/MidiEventList.cpp
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
 // vim:           ts=3 noexpandtab
@@ -18,7 +18,7 @@
 #include <iterator>
 #include <utility>
 
-#include <stdlib.h>
+#include "stdlib.h"
 
 namespace smf {
 
@@ -97,11 +97,21 @@ MidiEvent& MidiEventList::back(void) {
 	return *list.back();
 }
 
+
+const MidiEvent& MidiEventList::back(void) const {
+	return *list.back();
+}
+
 //
 // MidiEventList::last -- Alias for MidiEventList::back().
 //
 
 MidiEvent& MidiEventList::last(void) {
+	return back();
+}
+
+
+const MidiEvent& MidiEventList::last(void) const {
 	return back();
 }
 
@@ -114,6 +124,11 @@ MidiEvent& MidiEventList::last(void) {
 //
 
 MidiEvent& MidiEventList::getEvent(int index) {
+   return *list[index];
+}
+
+
+const MidiEvent& MidiEventList::getEvent(int index) const {
    return *list[index];
 }
 

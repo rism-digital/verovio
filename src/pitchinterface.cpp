@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "custos.h"
 #include "layer.h"
 #include "note.h"
 #include "rest.h"
@@ -112,7 +113,8 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
 // Static methods
 //----------------------------------------------------------------------------
 
-int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, bool topChordNote)
+int PitchInterface::CalcLoc(
+    LayerElement *layerElement, Layer *layer, LayerElement *crossStaffElement, bool topChordNote)
 {
     assert(layerElement);
 
@@ -120,7 +122,7 @@ int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, bool topCh
         Chord *chord = dynamic_cast<Chord *>(layerElement);
         assert(chord);
         Note *note = (topChordNote) ? chord->GetTopNote() : chord->GetBottomNote();
-        return CalcLoc(note, layer);
+        return CalcLoc(note, layer, crossStaffElement);
     }
     else if (layerElement->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(layerElement);
@@ -128,7 +130,16 @@ int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, bool topCh
         if (note->HasLoc()) {
             return note->GetLoc();
         }
-        return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(layerElement));
+        return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(crossStaffElement));
+    }
+    else if (layerElement->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(layerElement);
+        assert(custos);
+        if (custos->HasLoc()) {
+            return custos->GetLoc();
+        }
+        return PitchInterface::CalcLoc(
+            custos->GetPname(), custos->GetOct(), layer->GetClefLocOffset(crossStaffElement));
     }
     else {
         assert(false);

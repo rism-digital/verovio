@@ -13,8 +13,12 @@ if [ ! -e tmp ]; then
 fi
 
 if ! command -v saxon9ee >/dev/null 2>&1 ; then
-	echo >&2 "Saxon9ee is required.  Aborting.";
-	exit 1;
+	if command -v saxonb-xslt >/dev/null 2>&1 ; then
+		alias saxon9ee='saxonb-xslt -ext:on'
+	else
+		echo >&2 "Saxon9ee or saxonb-xslt is required.  Aborting.";
+		exit 1;
+	fi
 fi
 
 if ! command -v phantomjs >/dev/null 2>&1 ; then

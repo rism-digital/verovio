@@ -29,6 +29,7 @@ public:
     ///@{
     Space();
     virtual ~Space();
+    virtual Object *Clone() const { return new Space(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Space"; }
     virtual ClassId GetClassId() const { return SPACE; }

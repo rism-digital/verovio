@@ -26,7 +26,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Nc::Nc()
-    : LayerElement("nc-"), DurationInterface(), PitchInterface(), PositionInterface(), AttColor(), AttIntervalMelodic()
+    : LayerElement("nc-")
+    , DurationInterface()
+    , PitchInterface()
+    , PositionInterface()
+    , AttColor()
+    , AttIntervalMelodic()
+    , AttNcForm()
 
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
@@ -34,6 +40,7 @@ Nc::Nc()
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_INTERVALMELODIC);
+    RegisterAttClass(ATT_NCFORM);
 
     Reset();
 }
@@ -48,6 +55,7 @@ void Nc::Reset()
     PositionInterface::Reset();
     ResetColor();
     ResetIntervalMelodic();
+    ResetNcForm();
 }
 
 } // namespace vrv
