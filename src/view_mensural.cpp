@@ -370,7 +370,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     }
 
     if (!fillNotehead) {
-        //	double the bases of rectangles
+        // double the bases of rectangles
         DrawObliquePolygon(dc, xLeft, yTop, xRight, yTop, -height);
         DrawObliquePolygon(dc, xLeft, yBottom, xRight, yBottom, height);
     }
@@ -471,7 +471,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
 
     if (!fillNotehead) {
-        //    double the bases of rectangles
+        // double the bases of rectangles
         DrawObliquePolygon(dc, xLeft, yTop, xRight, yTop, -height);
         DrawObliquePolygon(dc, xLeft, yBottom, xRight, yBottom, height);
     }

@@ -52,6 +52,7 @@ class Note : public LayerElement,
              public AttGraced,
              public AttMidiVelocity,
              public AttNoteAnlMensural,
+             public AttNoteHeads,
              public AttStems,
              public AttStemsCmn,
              public AttTiePresent,
@@ -161,7 +162,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
-    virtual int CalcStemLenInHalfUnits(Staff *staff);
+    virtual int CalcStemLenInThirdUnits(Staff *staff);
     ///@}
 
     /**

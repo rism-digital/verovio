@@ -329,7 +329,7 @@ bool BeamSegment::CalcBeamSlope(
 
     m_beamSlope = 0.0;
     shorten = false;
-    
+
     if (m_nbNotesOrChords < 2) {
         return false;
     }
@@ -677,7 +677,7 @@ void BeamSegment::CalcAdjustSlope(
                 }
             }
         }
-        
+
         // If we can, shorten by two units
         if (shorten) {
             int shortening = (beamInterface->m_drawingPlace == BEAMPLACE_below) ? 2 * unit : -2 * unit;
@@ -1033,8 +1033,8 @@ void BeamElementCoord::SetDrawingStemDir(
     bool extend = onStaffLine;
     const int standardStemLen = STANDARD_STEMLENGTH * 2;
     // Check if the stem has to be shortened because outside the staff
-    // In this case, Note::CalcStemLenInHalfUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
-    int stemLenInHalfUnits = m_closestNote->CalcStemLenInHalfUnits(staff);
+    // In this case, Note::CalcStemLenInThirdUnits will return a value shorter than 2 * STANDARD_STEMLENGTH
+    int stemLenInHalfUnits = m_closestNote->CalcStemLenInThirdUnits(staff) * 2 / 3;
     // Do not extend when not on the staff line
     if (stemLenInHalfUnits != standardStemLen) {
         this->m_shortened = true;
