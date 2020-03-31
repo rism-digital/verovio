@@ -3556,7 +3556,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HTp abbrtok = NULL;
 
     std::string stria; // number of staff lines
-    // hum::HTp striatok = NULL;
+    hum::HTp striatok = NULL;
     std::string clef;
     hum::HTp cleftok = NULL;
     hum::HTp keytok = NULL;
@@ -3581,6 +3581,11 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
                 clef = *part;
                 cleftok = part;
             }
+            else if (part->find("clefX") != std::string::npos) {
+                // allow percussion clef to not have a line number since it is unpitched.
+                clef = *part;
+                cleftok = part;
+            }
         }
         else if (part->compare(0, 6, "*oclef") == 0) {
             if (hre.search(part, 6, "\\d")) {
@@ -3589,7 +3594,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 6, "*stria") == 0) {
             stria = *part;
-            // striatok = part;
+            striatok = part;
         }
         else if (part->compare(0, 5, "*omet") == 0) {
             m_omet.emplace_back(partnumber, part);
@@ -3742,12 +3747,12 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (clef.size() > 0) {
-        setClef(m_staffdef.back(), clef, cleftok);
+        setClef(m_staffdef.back(), clef, cleftok, striatok);
         ss.at(partnumber - 1).last_clef = clef;
     }
     else {
         std::string autoclef = getAutoClef(partstart, partnumber);
-        setClef(m_staffdef.back(), autoclef);
+        setClef(m_staffdef.back(), autoclef, NULL);
         ss.at(partnumber - 1).last_clef = clef;
     }
 
@@ -4629,7 +4634,7 @@ void HumdrumInput::setDynamicTransposition(int staffindex, StaffDef *staff, cons
 // HumdrumInput::setClef -- Convert a Humdrum clef to an MEI clef.
 //
 
-void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok)
+void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok, hum::HTp striatok)
 {
     // Search for a Clef child in StaffDef and add one if it does not exist.
     Clef *vrvclef = getClef(staff);
@@ -4654,8 +4659,32 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
     }
     if (clef.find("clefX") != string::npos) {
         vrvclef->SetShape(CLEFSHAPE_perc);
-        // by default place on 3rd line (unless another numbe is given):
-        vrvclef->SetLine(3);
+        hum::HumRegex hre;
+        int line = -100;
+        if (hre.search(clef, "clefX(\\d)")) {
+            line = hre.getMatchInt(1);
+        }
+        else {
+            // Automatically center percussion clef in middle of staff.
+            int lines = 5;
+            if (striatok) {
+                if (hre.search(striatok, "stria(\\d+)")) {
+                    lines = hre.getMatchInt(1);
+                }
+            }
+
+            if (lines % 2) {
+                // Odd number of lines, so center on line in middle of staff:
+                line = (lines + 1) / 2;
+            }
+            else {
+                // Even number of lines. Can't position on a space, so put on next lower line:
+                line = lines / 2;
+            }
+        }
+        if (line > 0) {
+            vrvclef->SetLine(line);
+        }
     }
 
     if (clef.find("2") != string::npos) {

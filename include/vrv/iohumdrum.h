@@ -354,7 +354,7 @@ protected:
     void setSystemMeasureStyle(int startline, int endline);
     std::vector<int> getStaffLayerCounts();
     void prepareStaffGroups();
-    void setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok = NULL);
+    void setClef(StaffDef *staff, const std::string &clef, hum::HTp cleftok = NULL, hum::HTp striatok = NULL);
     void setDynamicTransposition(int staffindex, StaffDef *staff, const std::string &itranspose);
     void setTransposition(StaffDef *staffDef, const std::string &transpose);
     void setTimeSig(StaffDef *part, const std::string &timesig, const std::string &metersig = "",
