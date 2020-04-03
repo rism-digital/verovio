@@ -163,8 +163,8 @@ int TupletBracket::GetDrawingYLeft()
     if (beam) {
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
-        return beam->m_drawingParams.m_startingY
-            + beam->m_drawingParams.m_beamSlope * (xLeft - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
+        return beam->m_beamSegment.m_startingY
+            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.m_startingX) + this->GetDrawingYRel();
     }
     else {
         return this->GetDrawingY();
@@ -180,8 +180,8 @@ int TupletBracket::GetDrawingYRight()
     if (beam) {
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
-        return beam->m_drawingParams.m_startingY
-            + beam->m_drawingParams.m_beamSlope * (xRight - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
+        return beam->m_beamSegment.m_startingY
+            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.m_startingX) + this->GetDrawingYRel();
     }
     else {
         return this->GetDrawingY();
@@ -240,10 +240,9 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         }
         if (tuplet->GetNumAlignedBeam()) {
             Beam *beam = tuplet->GetNumAlignedBeam();
-            data_STEMDIRECTION beamPos = beam->m_drawingParams.m_stemDir;
-            switch (beamPos) {
-                case STEMDIRECTION_up: xLeft += (tuplet->GetDrawingLeft()->GetDrawingRadius(doc)); break;
-                case STEMDIRECTION_down: xRight -= (tuplet->GetDrawingRight()->GetDrawingRadius(doc)); break;
+            switch (beam->m_drawingPlace) {
+                case BEAMPLACE_above: xLeft += (tuplet->GetDrawingLeft()->GetDrawingRadius(doc)); break;
+                case BEAMPLACE_below: xRight -= (tuplet->GetDrawingRight()->GetDrawingRadius(doc)); break;
                 default: break;
             }
         }
@@ -391,7 +390,8 @@ int Stem::CalcStem(FunctorParams *functorParams)
         baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
     }
     else {
-        baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
+        int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
+        baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)

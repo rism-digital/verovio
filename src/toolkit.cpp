@@ -49,6 +49,10 @@ namespace vrv {
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 
+std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
+    = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
+          { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -122,6 +126,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "timemap") {
         m_outputTo = TIMEMAP;
     }
+    else if (outputTo == "pae") {
+        m_outputTo = PAE;
+    }
     else if (outputTo != "svg") {
         LogError("Output format can only be: mei, humdrum, midi, timemap or svg");
         return false;
@@ -185,7 +192,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     FileFormat musicxmlDefault = MUSICXML;
 #endif
 
-    if (data.size() == 0) {
+    if (data.empty()) {
         return UNKNOWN;
     }
     if (data[0] == 0) {
@@ -351,10 +358,37 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     return LoadData(utf8line);
 }
 
+void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
+{
+    // one we use magic_enum.hpp we can do :
+    /*
+    for (auto str : classStrings) {
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+        auto classId = magic_enum::enum_cast<ClassId>(str);
+        if (classId.has_value()) {
+            classIds.push_back(classId.value());
+          // color.value() -> Color::GREEN
+        }
+        else {
+            LogError("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+    */
+    // For now, map a few by hand... - there must be a better way to do this
+    for (auto str : classStrings) {
+        if (Toolkit::s_MEItoClassIdMap.count(str) > 0) {
+            classIds.push_back(Toolkit::s_MEItoClassIdMap.at(str));
+        }
+        else {
+            LogDebug("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+}
+
 bool Toolkit::LoadData(const std::string &data)
 {
     std::string newData;
-    FileInputStream *input = NULL;
+    Input *input = NULL;
 
     auto inputFormat = m_inputFrom;
     if (inputFormat == AUTO) {
@@ -362,7 +396,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     if (inputFormat == ABC) {
 #ifndef NO_ABC_SUPPORT
-        input = new AbcInput(&m_doc, "");
+        input = new ABCInput(&m_doc);
 #else
         LogError("ABC import is not supported in this build.");
         return false;
@@ -370,7 +404,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     else if (inputFormat == PAE) {
 #ifndef NO_PAE_SUPPORT
-        input = new PaeInput(&m_doc, "");
+        input = new PAEInput(&m_doc);
 #else
         LogError("Plaine & Easie import is not supported in this build.");
         return false;
@@ -378,7 +412,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     else if (inputFormat == DARMS) {
 #ifndef NO_DARMS_SUPPORT
-        input = new DarmsInput(&m_doc, "");
+        input = new DarmsInput(&m_doc);
 #else
         LogError("DARMS import is not supported in this build.");
         return false;
@@ -390,12 +424,12 @@ bool Toolkit::LoadData(const std::string &data)
 
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
+        HumdrumInput *tempinput = new HumdrumInput(&tempdoc);
         if (GetOutputTo() == HUMDRUM) {
             tempinput->SetOutputFormat("humdrum");
         }
 
-        if (!tempinput->ImportString(data)) {
+        if (!tempinput->Import(data)) {
             LogError("Error importing Humdrum data (1)");
             delete tempinput;
             return false;
@@ -407,7 +441,7 @@ bool Toolkit::LoadData(const std::string &data)
             return true;
         }
 
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
 
@@ -415,15 +449,15 @@ bool Toolkit::LoadData(const std::string &data)
         tempinput->parseEmbeddedOptions(m_doc);
         delete tempinput;
 
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 #endif
     else if (inputFormat == MEI) {
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
     else if (inputFormat == MUSICXML) {
         // This is the direct converter from MusicXML to MEI using iomusicxml:
-        input = new MusicXmlInput(&m_doc, "");
+        input = new MusicXmlInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == MUSICXMLHUM) {
@@ -443,17 +477,17 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        if (!tempinput->ImportString(conversion.str())) {
+        Input *tempinput = new HumdrumInput(&tempdoc);
+        if (!tempinput->Import(conversion.str())) {
             LogError("Error importing Humdrum data (2)");
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 
     else if (inputFormat == MEIHUM) {
@@ -473,17 +507,17 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        if (!tempinput->ImportString(conversion.str())) {
+        Input *tempinput = new HumdrumInput(&tempdoc);
+        if (!tempinput->Import(conversion.str())) {
             LogError("Error importing Humdrum data (3)");
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 
     else if (inputFormat == MUSEDATAHUM) {
@@ -501,17 +535,17 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        if (!tempinput->ImportString(conversion.str())) {
+        Input *tempinput = new HumdrumInput(&tempdoc);
+        if (!tempinput->Import(conversion.str())) {
             LogError("Error importing Humdrum data (4)");
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 
     else if (inputFormat == ESAC) {
@@ -529,17 +563,17 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        if (!tempinput->ImportString(conversion.str())) {
+        Input *tempinput = new HumdrumInput(&tempdoc);
+        if (!tempinput->Import(conversion.str())) {
             LogError("Error importing Humdrum data (5)");
             delete tempinput;
             return false;
         }
-        MeiOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-        input = new MeiInput(&m_doc, "");
+        input = new MEIInput(&m_doc);
     }
 #endif
     else {
@@ -554,7 +588,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // load the file
-    if (!input->ImportString(newData.size() ? newData : data)) {
+    if (!input->Import(newData.size() ? newData : data)) {
         LogError("Error importing data");
         delete input;
         return false;
@@ -626,8 +660,22 @@ bool Toolkit::LoadData(const std::string &data)
     return true;
 }
 
-std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
+std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
+    bool scoreBased = true;
+    int pageNo = 0;
+
+    jsonxx::Object json;
+
+    // Read JSON options
+    if (!json.parse(jsonOptions)) {
+        LogWarning("Can not parse JSON std::string. Using default options.");
+    }
+    else {
+        if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+        if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+    }
+
     if (GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
@@ -637,7 +685,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
-    MeiOutput meioutput(&m_doc, "");
+    MEIOutput meioutput(&m_doc, "");
     meioutput.SetScoreBasedMEI(scoreBased);
     std::string output = meioutput.GetOutput(pageNo);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
@@ -646,9 +694,9 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
 
 bool Toolkit::SaveFile(const std::string &filename)
 {
-    MeiOutput meioutput(&m_doc, filename.c_str());
+    MEIOutput meioutput(&m_doc, filename.c_str());
     meioutput.SetScoreBasedMEI(m_scoreBasedMei);
-    if (!meioutput.ExportFile()) {
+    if (!meioutput.Export()) {
         LogError("Unknown error");
         return false;
     }
@@ -797,12 +845,12 @@ std::string Toolkit::GetAvailableOptions() const
     return o.json();
 }
 
-bool Toolkit::SetOptions(const std::string &json_options)
+bool Toolkit::SetOptions(const std::string &jsonOptions)
 {
     jsonxx::Object json;
 
     // Read JSON options
-    if (!json.parse(json_options)) {
+    if (!json.parse(jsonOptions)) {
         LogError("Can not parse JSON std::string.");
         return false;
     }
@@ -1140,10 +1188,12 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     // Adjusting page width and height according to the options
     int width = m_options->m_pageWidth.GetUnfactoredValue();
     int height = m_options->m_pageHeight.GetUnfactoredValue();
+    int breaks = m_options->m_breaks.GetValue();
+    bool adjustHeight = m_options->m_adjustPageHeight.GetValue();
+    bool adjustWidth = m_options->m_adjustPageWidth.GetValue();
 
-    if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
-    if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
-        height = m_doc.GetAdjustedDrawingPageHeight();
+    if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
     if (m_doc.GetType() == Transcription) {
         width = m_doc.GetAdjustedDrawingPageWidth();
@@ -1254,6 +1304,34 @@ std::string Toolkit::RenderToMIDI()
         reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
 
     return outputstr;
+}
+
+std::string Toolkit::RenderToPAE()
+{
+    if (GetPageCount() == 0) {
+        LogWarning("No data loaded");
+        return "";
+    }
+
+    PAEOutput paeOutput(&m_doc);
+    std::string output;
+    if (!paeOutput.Export(output)) {
+        LogError("Export to PAE failed");
+    }
+    return output;
+}
+
+bool Toolkit::RenderToPAEFile(const std::string &filename)
+{
+    std::string outputString = this->RenderToPAE();
+
+    std::ofstream output(filename.c_str());
+    if (!output.is_open()) {
+        return false;
+    }
+    output << outputString;
+
+    return true;
 }
 
 std::string Toolkit::RenderToTimemap()

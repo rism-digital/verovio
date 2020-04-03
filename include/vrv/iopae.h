@@ -8,25 +8,37 @@
 #ifndef __VRV_IOPAE_H__
 #define __VRV_IOPAE_H__
 
+#include <sstream>
 #include <string>
 #include <vector>
 
 //----------------------------------------------------------------------------
 
+#include "atts_cmn.h"
 #include "io.h"
 #include "vrvdef.h"
 
 namespace vrv {
 
 class Beam;
+class Chord;
 class Clef;
+class DurationInterface;
+class GraceGrp;
+class KeyAccid;
 class Layer;
 class LayerElement;
 class Measure;
 class MeterSig;
 class Mensur;
+class MRest;
+class MultiRest;
 class Note;
+class Rest;
+class ScoreDef;
+class Space;
 class Staff;
+class StaffDef;
 class Tie;
 class Tuplet;
 class KeySig;
@@ -37,6 +49,8 @@ class BarLine;
 //----------------------------------------------------------------------------
 
 namespace pae {
+
+    // static char keySigFlats[7];
 
     class Note {
 
@@ -233,19 +247,141 @@ namespace pae {
 } // namespace pae
 
 //----------------------------------------------------------------------------
-// PaeInput
+// PAEOutput
 //----------------------------------------------------------------------------
 
-class PaeInput : public FileInputStream {
+/**
+ * This class is a file output stream for writing PAE files.
+ */
+class PAEOutput : public Output {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    PAEOutput(Doc *doc);
+    virtual ~PAEOutput();
+    ///@}
+
+    /**
+     * The main method for exporting to PAE.
+     */
+    bool Export(std::string &output);
+
+    /**
+     * The main method for write objects.
+     */
+    virtual bool WriteObject(Object *object);
+
+    /**
+     * Writing object method that must be overridden in the child class.
+     */
+    virtual bool WriteObjectEnd(Object *object);
+
+private:
+    bool WriteDoc(Doc *doc);
+
+    /**
+     * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
+     */
+    ///@{
+    void WriteScoreDef(ScoreDef *scoreDef);
+    void WriteStaffDef(StaffDef *staffDef);
+    void WriteMeasure(Measure *measure);
+    void WriteMeasureEnd(Measure *measure);
+    void WriteStaff(Staff *staff);
+    void WriteLayer(Layer *layer);
+    ///@}
+
+    /**
+     * @name Methods for writing LayerElement children.
+     * Called from WriteLayerElement.
+     */
+    ///@{
+    void WriteBarLine(BarLine *barLine);
+    void WriteBeam(Beam *beam);
+    void WriteBeamEnd(Beam *beam);
+    void WriteChord(Chord *chord);
+    void WriteClef(Clef *clef);
+    void WriteGraceGrp(GraceGrp *graceGrp);
+    void WriteKeyAccid(KeyAccid *keyAccid);
+    void WriteKeySig(KeySig *keySig);
+    void WriteMensur(Mensur *mensur);
+    void WriteMeterSig(MeterSig *meterSig);
+    void WriteMRest(MRest *mRest);
+    void WriteMultiRest(MultiRest *multiRest);
+    void WriteNote(Note *note);
+    void WriteRest(Rest *rest);
+    void WriteSpace(Space *space);
+    void WriteTuplet(Tuplet *tuplet);
+    void WriteTupletEnd(Tuplet *tuplet);
+    ///@}
+
+    /**
+     * @name Methods for writing ControlElement
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing text and figure elements
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing editorial markup
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing other mei elements
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Methods for writing LayerElement, EditorialElement and interfaces.
+     * Call WriteDurationInferface from WriteNote, for example.
+     */
+    ///@{
+    ///@}
+
+    /**
+     * @name Other private methods
+     */
+    ///@{
+    void WriteDur(DurationInterface *interface);
+    void WriteGrace(AttGraced *attGraced);
+    ///@}
+
+public:
+    //
+private:
+    std::ostringstream m_streamStringOutput;
+    bool m_docScoreDef; // Indicates that we are writing the document scoreDef
+    bool m_mensural; // Indicates that the incipit is mensural (initial staffDef)
+    bool m_skip; // Processing a staff or a layer to skip
+    int m_layerN; // The @n of the first layer within the first staff
+    int m_staffN; // The @n of the first staff (initial staffDef)
+    int m_currentOct; // The current octave
+    int m_currentDur; // The current duration
+    int m_currentDots;
+    bool m_grace;
+    Measure *m_currentMeasure;
+};
+
+//----------------------------------------------------------------------------
+// PAEInput
+//----------------------------------------------------------------------------
+
+class PAEInput : public Input {
 public:
     // constructors and destructors
-    PaeInput(Doc *doc, std::string filename);
-    virtual ~PaeInput();
-
-    virtual bool ImportFile();
-    virtual bool ImportString(const std::string &pae);
+    PAEInput(Doc *doc);
+    virtual ~PAEInput();
 
 #ifndef NO_PAE_SUPPORT
+    virtual bool Import(const std::string &pae);
 
 private:
     // function declarations:
@@ -285,7 +421,6 @@ private:
 public:
     //
 private:
-    std::string m_filename;
     Staff *m_staff;
     Measure *m_measure;
     Layer *m_layer;

@@ -326,24 +326,23 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     m_numAlignedBeam = m_bracketAlignedBeam;
 
     // Cancel alignment of the bracket with the beam if position and stemdirection are not concordant
-    if (m_bracketAlignedBeam && (m_bracketAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_up)
+    if (m_bracketAlignedBeam && (m_bracketAlignedBeam->m_drawingPlace == BEAMPLACE_above)
         && (m_drawingBracketPos == STAFFREL_basic_below)) {
         m_bracketAlignedBeam = NULL;
     }
     else if (m_bracketAlignedBeam
-        && ((m_bracketAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
+        && ((m_bracketAlignedBeam->m_drawingPlace == BEAMPLACE_below)
             && (m_drawingBracketPos == STAFFREL_basic_above))) {
         m_bracketAlignedBeam = NULL;
     }
 
     // Cancel alignment of the num with the beam if position and stemdirection are not concordant
-    if (m_numAlignedBeam && (m_numAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_up)
+    if (m_numAlignedBeam && (m_numAlignedBeam->m_drawingPlace == BEAMPLACE_above)
         && (m_drawingNumPos == STAFFREL_basic_below)) {
         m_numAlignedBeam = NULL;
     }
     else if (m_numAlignedBeam
-        && ((m_numAlignedBeam->m_drawingParams.m_stemDir == STEMDIRECTION_down)
-            && (m_drawingNumPos == STAFFREL_basic_above))) {
+        && ((m_numAlignedBeam->m_drawingPlace == BEAMPLACE_below) && (m_drawingNumPos == STAFFREL_basic_above))) {
         m_numAlignedBeam = NULL;
     }
 
@@ -414,18 +413,18 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
                 if (m_drawingBracketPos == STAFFREL_basic_above) {
                     // Left point when slope is going up and right when going down
                     int relevantX
-                        = (beam->m_drawingParams.m_beamSlope > 0) ? artic->GetSelfLeft() : artic->GetSelfRight();
-                    int currentYRel = beam->m_drawingParams.m_startingY
-                        + beam->m_drawingParams.m_beamSlope * (relevantX - beam->m_drawingParams.m_startingX);
+                        = (beam->m_beamSegment.m_beamSlope > 0) ? artic->GetSelfLeft() : artic->GetSelfRight();
+                    int currentYRel = beam->m_beamSegment.m_startingY
+                        + beam->m_beamSegment.m_beamSlope * (relevantX - beam->m_beamSegment.m_startingX);
                     int articYRel = artic->GetSelfTop();
                     articPadding = std::min(currentYRel - articYRel, articPadding);
                 }
                 else {
                     // Right point when slope is going up and left when going down
                     int relevantX
-                        = (beam->m_drawingParams.m_beamSlope > 0) ? artic->GetSelfRight() : artic->GetSelfLeft();
-                    int currentYRel = beam->m_drawingParams.m_startingY
-                        + beam->m_drawingParams.m_beamSlope * (relevantX - beam->m_drawingParams.m_startingX);
+                        = (beam->m_beamSegment.m_beamSlope > 0) ? artic->GetSelfRight() : artic->GetSelfLeft();
+                    int currentYRel = beam->m_beamSegment.m_startingY
+                        + beam->m_beamSegment.m_beamSlope * (relevantX - beam->m_beamSegment.m_startingX);
                     int articYRel = artic->GetSelfBottom();
                     articPadding = std::max(currentYRel - articYRel, articPadding);
                 }
@@ -484,8 +483,8 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             // If we have a beam first move it to the appropriate postion
             if (beam) {
                 int xMid = tupletNum->GetDrawingXMid(params->m_doc);
-                int yMid = beam->m_drawingParams.m_startingY
-                    + beam->m_drawingParams.m_beamSlope * (xMid - beam->m_drawingParams.m_startingX);
+                int yMid = beam->m_beamSegment.m_startingY
+                    + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.m_startingX);
                 int yMidRel = yMid - yReference;
 
                 tupletNum->SetDrawingYRel(tupletNum->GetDrawingYRel() + yMidRel);

@@ -4,13 +4,12 @@
 setup.py file for Verovio
 """
 
-
-from setuptools import setup, Extension
 from glob import glob
+import os
 import platform
+from setuptools import setup, Extension
 
 # generate the git commit include file
-import os
 os.system("../../tools/get_git_commit.sh")
 
 
@@ -62,7 +61,7 @@ verovio_module = Extension('_verovio',
                            )
 
 setup(name='verovio',
-      version='2.6.0-dev',
+      version='2.7.0-dev',
       url="www.verovio.org",
       description="""A library and toolkit for engraving MEI music notation into SVG""",
       ext_modules=[verovio_module],

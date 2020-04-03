@@ -426,8 +426,8 @@ int main(int argc, char **argv)
     }
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
-        && (outformat != "humdrum") && (outformat != "hum")) {
-        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', or 'humdrum'." << std::endl;
+        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae")) {
+        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
         exit(1);
     }
 
@@ -550,6 +550,20 @@ int main(int argc, char **argv)
             }
         }
     }
+    else if (outformat == "pae") {
+        outfile += ".pae";
+        if (std_output) {
+            std::string output;
+            std::cout << toolkit.RenderToPAE();
+        }
+        else if (!toolkit.RenderToPAEFile(outfile)) {
+            std::cerr << "Unable to write PAE to " << outfile << "." << std::endl;
+            exit(1);
+        }
+        else {
+            std::cerr << "Output written to " << outfile << "." << std::endl;
+        }
+    }
     else {
         if (all_pages) {
             toolkit.SetScoreBasedMei(true);
@@ -568,7 +582,7 @@ int main(int argc, char **argv)
         }
         else {
             if (std_output) {
-                std::cout << toolkit.GetMEI(page);
+                std::cout << toolkit.GetMEI(vrv::StringFormat("{'pageNo': %d}", page));
             }
             else {
                 std::cerr << "MEI output of one page is available only to standard output." << std::endl;

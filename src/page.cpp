@@ -476,6 +476,9 @@ void Page::JustifyHorizontally()
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
+    if ((doc->GetOptions()->m_adjustPageWidth.GetValue()))
+        doc->m_drawingPageWidth = GetContentWidth() + doc->m_drawingPageMarginLeft + doc->m_drawingPageMarginRight;
+
     // Justify X position
     Functor justifyX(&Object::JustifyX);
     JustifyXParams justifyXParams(&justifyX, doc);
@@ -587,14 +590,19 @@ int Page::GetContentWidth() const
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    System *first = dynamic_cast<System *>(m_children.front());
-    assert(first);
-
+    int maxWidth = 0;
+    for (auto &child : m_children) {
+        System *system = dynamic_cast<System *>(child);
+        if (system) {
+            // we include the left margin and the right margin
+            int systemWidth = system->m_drawingTotalWidth + system->m_systemLeftMar + system->m_systemRightMar;
+            maxWidth = std::max(systemWidth, maxWidth);
+        }
+    }
     // For avoiding unused variable warning in non debug mode
     doc = NULL;
 
-    // we include the left margin and the right margin
-    return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
+    return maxWidth;
 }
 
 int Page::CalcJustificationStepSize(bool systemsOnly) const

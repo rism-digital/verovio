@@ -9,6 +9,8 @@
 
 //----------------------------------------------------------------------------
 
+#include <fstream>
+
 //----------------------------------------------------------------------------
 
 #ifndef NO_DARMS_SUPPORT
@@ -98,13 +100,11 @@ pitchmap DarmsInput::PitchMap[] = {
     { 8, PITCHNAME_b },
 };
 
-DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
+DarmsInput::DarmsInput(Doc *doc) : Input(doc)
 {
     m_layer = NULL;
     m_measure = NULL;
     m_staff = NULL;
-
-    m_filename = filename;
 }
 
 DarmsInput::~DarmsInput() {}
@@ -385,10 +385,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         case 'Y': duration = DURATION_128; break;
         case 'Z': duration = DURATION_256; break;
 
-        default:
-            LogWarning("DARMS import: Unknown note duration: %c", data[pos]);
-            return 0;
-            break;
+        default: LogWarning("DARMS import: Unknown note duration: %c", data[pos]); return 0;
     }
 
     if (data[pos + 1] == '.') {
@@ -454,26 +451,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
     return pos;
 }
 
-bool DarmsInput::ImportFile()
-{
-    char data[10000];
-
-    std::ifstream infile;
-
-    infile.open(m_filename.c_str());
-
-    if (infile.eof()) {
-        infile.close();
-        return false;
-    }
-
-    infile.getline(data, sizeof(data), '\n');
-    infile.close();
-
-    return ImportString(data);
-}
-
-bool DarmsInput::ImportString(const std::string &data_str)
+bool DarmsInput::Import(const std::string &data_str)
 {
     int len;
     int res;
