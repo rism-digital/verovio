@@ -8,7 +8,6 @@
 #ifndef __VRV_MSPACE_H__
 #define __VRV_MSPACE_H__
 
-#include "durationinterface.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -20,7 +19,7 @@ namespace vrv {
 /**
  * This class models the MEI <space> element.
  */
-class MSpace : public LayerElement, public DurationInterface {
+class MSpace : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -33,13 +32,6 @@ public:
     virtual void Reset();
     virtual std::string GetClassName() const { return "MSpace"; }
     virtual ClassId GetClassId() const { return MSPACE; }
-    ///@}
-
-    /**
-     * @name Getter to interfaces
-     */
-    ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     ///@}
 
     //----------//

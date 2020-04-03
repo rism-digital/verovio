@@ -9,13 +9,10 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
-#include "horizontalaligner.h"
-#include "vrv.h"
 
 namespace vrv {
 
@@ -23,10 +20,8 @@ namespace vrv {
 // MSpace
 //----------------------------------------------------------------------------
 
-MSpace::MSpace() : LayerElement("mSpace-"), DurationInterface()
+MSpace::MSpace() : LayerElement("mSpace-")
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-
     Reset();
 }
 
@@ -35,7 +30,6 @@ MSpace::~MSpace() {}
 void MSpace::Reset()
 {
     LayerElement::Reset();
-    DurationInterface::Reset();
 }
 
 //----------------------------------------------------------------------------
