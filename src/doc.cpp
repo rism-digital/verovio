@@ -811,7 +811,7 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     Page *currentPage = new Page();
 
     if(useSectionBreaks && !usePageBreaks) {
-        CastOffEncodingParams castOffEncodingParams(this, currentPage, currentSystem, contentSystem, false);
+        CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
         contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
