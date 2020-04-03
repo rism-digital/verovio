@@ -1994,7 +1994,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     hre.replaceDestructive(d, "", "g\\d+", "g");
 
     // Remove any invalid characters:
-    hre.replaceDestructive(d, "", "[^0-9s(){}*\\][]", "g");
+    hre.replaceDestructive(d, "", "[^0-9s()<>{}*\\][]", "g");
 
     // Expand * to mean all staves present in score.
     bool hasstar = false;
@@ -2033,11 +2033,12 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
     // Remove any empty groups:
     hre.replaceDestructive(d, "", "\\(\\)", "g");
     hre.replaceDestructive(d, "", "\\{\\}", "g");
-    hre.replaceDestructive(d, "", "\\[\\]}", "g");
+    hre.replaceDestructive(d, "", "\\[\\]", "g");
+    hre.replaceDestructive(d, "", "<>", "g");
     // Do it again to be safe (for one recursion):
     hre.replaceDestructive(d, "", "\\(\\)", "g");
     hre.replaceDestructive(d, "", "\\{\\}", "g");
-    hre.replaceDestructive(d, "", "\\[\\]}", "g");
+    hre.replaceDestructive(d, "", "<>", "g");
 
     int scount = 0;
     for (int i = 0; i < (int)d.size(); i++) {
@@ -2056,7 +2057,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         hre.replaceDestructive(d, "", "[^ts\\d]", "g");
     }
 
-    // Now pair (), {}, and [] parentheses in the d string.
+    // Now pair (), <> {}, and [] parentheses in the d string.
     vector<pair<int, char> > stack;
     pair<int, char> item;
     vector<int> pairing(d.size(), -1);
@@ -2072,6 +2073,11 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             stack.push_back(item);
         }
         else if (d[i] == '[') {
+            item.first = i;
+            item.second = d[i];
+            stack.push_back(item);
+        }
+        else if (d[i] == '<') {
             item.first = i;
             item.second = d[i];
             stack.push_back(item);
@@ -2108,6 +2114,19 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                 break;
             }
             if (stack.back().second != '[') {
+                validQ = false;
+                break;
+            }
+            pairing.at(stack.back().first) = i;
+            pairing.at(i) = stack.back().first;
+            stack.resize((int)stack.size() - 1);
+        }
+        else if (d[i] == '>') {
+            if (stack.empty()) {
+                validQ = false;
+                break;
+            }
+            if (stack.back().second != '<') {
                 validQ = false;
                 break;
             }
@@ -2218,6 +2237,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             grouper = true;
             glevel++;
         }
+
         else if (d[i] == '{') {
             if (!grouper) {
                 if (bargroups.back().empty()) {
@@ -2238,6 +2258,28 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             grouper = true;
             glevel++;
         }
+
+        else if (d[i] == '<') {
+            if (!grouper) {
+                if (bargroups.back().empty()) {
+                    groupstyle.back() = "<";
+                }
+                else {
+                    groupstyle.push_back("<");
+                    bargroups.resize(bargroups.size() + 1);
+                }
+            }
+            groupstyle.back() = "<";
+            if (i < (int)d.size() - 1) {
+                if (d[i + 1] == '(') {
+                    groupstyle.back() += "(";
+                    i++;
+                }
+            }
+            grouper = true;
+            glevel++;
+        }
+
         else if (d[i] == '}') {
             groupstyle.push_back(" ");
             bargroups.resize(bargroups.size() + 1);
@@ -2246,6 +2288,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                 grouper = false;
             }
         }
+
         else if (d[i] == ']') {
             groupstyle.push_back(" ");
             bargroups.resize(bargroups.size() + 1);
@@ -2254,6 +2297,16 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                 grouper = false;
             }
         }
+
+        else if (d[i] == '>') {
+            groupstyle.push_back(" ");
+            bargroups.resize(bargroups.size() + 1);
+            glevel--;
+            if (glevel == 0) {
+                grouper = false;
+            }
+        }
+
         else if (d[i] == 's') {
             staffQ = true;
             trackQ = false;
@@ -2432,6 +2485,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                 sg->SetBarThru(BOOLEAN_false);
             }
         }
+
         else if ((!newstyles.at(0).empty()) && (newstyles.at(0).at(0) == '{')) {
             if (newgroups.at(0).size() > 1) {
                 sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
@@ -2443,6 +2497,19 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                 sg->SetBarThru(BOOLEAN_false);
             }
         }
+
+        else if ((!newstyles.at(0).empty()) && (newstyles.at(0).at(0) == '<')) {
+            if (newgroups.at(0).size() > 1) {
+                // sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+            }
+            if (newstyles.at(0).find('(') != std::string::npos) {
+                sg->SetBarThru(BOOLEAN_true);
+            }
+            else {
+                sg->SetBarThru(BOOLEAN_false);
+            }
+        }
+
         else if ((!newstyles.at(0).empty()) && (newstyles.at(0).at(0) == '(')) {
             sg->SetBarThru(BOOLEAN_true);
         }
@@ -2499,6 +2566,9 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             }
             else if (newstyles.at(i).at(0) == '{') {
                 sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+            }
+            else if (newstyles.at(i).at(0) == '<') {
+                // sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
             }
             for (int j = 0; j < (int)newgroups[i].size(); ++j) {
                 sg->AddChild(m_staffdef[newgroups[i][j]]);
