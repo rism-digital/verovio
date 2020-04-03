@@ -808,7 +808,6 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
 
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
-    Page *currentPage = new Page();
 
     if(useSectionBreaks && !usePageBreaks) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
@@ -844,6 +843,7 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     assert(contentPage && !contentPage->GetParent());
     this->ResetDrawingPage();
 
+    Page *currentPage = new Page();
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
     castOffPagesParams.m_pageHeight = this->m_drawingPageHeight - this->m_drawingPageMarginBot;
