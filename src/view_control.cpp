@@ -932,7 +932,7 @@ void View::DrawTrillExtension(
     }
 
     // Adjust the x2 for endid
-    if (!trill->GetEnd()->Is(TIMESTAMP_ATTR)) x2 += trill->GetStart()->GetDrawingRadius(m_doc);
+    if (!trill->GetEnd()->Is(TIMESTAMP_ATTR)) x2 -= trill->GetEnd()->GetDrawingRadius(m_doc);
 
     int length = x2 - x1;
     Point orig(x1, y);
