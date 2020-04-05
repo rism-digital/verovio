@@ -624,19 +624,21 @@ bool Toolkit::LoadData(const std::string &data)
     // Regardless, we won't do layout if the --breaks none option was set.
     int option = m_options->m_breaks.GetValue();
     if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs) && (option != BREAKS_none)) {
-        if (input->HasLayoutInformation() &&
-            (option == BREAKS_encoded || option == BREAKS_line)) {
+        if (input->HasLayoutInformation() && (option == BREAKS_encoded || option == BREAKS_line)) {
             if (option == BREAKS_encoded) {
                 // LogElapsedTimeStart();
                 m_doc.CastOffEncodingDoc();
                 // LogElapsedTimeEnd("layout");
-            } else if (option == BREAKS_line) {
+            }
+            else if (option == BREAKS_line) {
                 m_doc.CastOffLineDoc();
             }
-        } else {
+        }
+        else {
             if (option == BREAKS_encoded) {
                 LogWarning("Requesting layout with encoded breaks but nothing provided in the data");
-            } else if (option == BREAKS_line) {
+            }
+            else if (option == BREAKS_line) {
                 LogWarning("Requesting layout with line breaks but nothing provided in the data");
             }
             // LogElapsedTimeStart();

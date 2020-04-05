@@ -809,12 +809,13 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if(useSectionBreaks && !usePageBreaks) {
+    if (useSectionBreaks && !usePageBreaks) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
         contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
-    } else {
+    }
+    else {
         CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
         castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
             - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;

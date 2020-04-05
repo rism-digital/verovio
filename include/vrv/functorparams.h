@@ -784,7 +784,8 @@ public:
 
 class CastOffEncodingParams : public FunctorParams {
 public:
-    CastOffEncodingParams(Doc *doc, Page *currentPage, System *currentSystem, System *contentSystem, bool usePages = true)
+    CastOffEncodingParams(
+        Doc *doc, Page *currentPage, System *currentSystem, System *contentSystem, bool usePages = true)
     {
         m_doc = doc;
         m_currentPage = currentPage;
