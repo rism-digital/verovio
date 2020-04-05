@@ -939,7 +939,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         mRest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
-
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
@@ -1202,7 +1201,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             else {
                 // Move the appropriate parent to the right
                 int xRelShift = this->HorizontalRightOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
-                params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
+                params->m_currentNote->SetDrawingXRel(
+                    params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
             }
         }
     }
@@ -1548,7 +1548,8 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
+    if (!this->GetDurationInterface() || this->Is(MSPACE) || this->Is(SPACE) || this->HasSameasLink())
+        return FUNCTOR_CONTINUE;
 
     double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
     double time = m_alignment->GetTime();
