@@ -917,22 +917,22 @@ void View::DrawTrillExtension(
     assert(trill);
     assert(staff);
 
-    int y = trill->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    int y
+        = trill->GetDrawingY() + m_doc->GetGlyphHeight(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false) / 3;
 
     // Adjust the x1 for the tr symbol
-    if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
-        x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
+    if (trill->GetLstartsym() == LINESTARTENDSYMBOL_none) {
+        x1 -= trill->GetStart()->GetDrawingRadius(m_doc);
+        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+    else if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
+        int offsetFactor = 2;
+        if (trill->GetStart()->Is(TIMESTAMP_ATTR)) offsetFactor = 1;
+        x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false) / offsetFactor;
     }
 
-    // Adjust the x2 for extensions with @endid
-    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
-        LayerElement *end = trill->GetEnd();
-        assert(end);
-        if (!end->Is(TIMESTAMP_ATTR)) {
-            x2 = end->GetContentLeft()
-                - m_doc->GetGlyphWidth(SMUFL_E59D_ornamentZigZagLineNoRightEnd, staff->m_drawingStaffSize, false) / 2;
-        }
-    }
+    // Adjust the x2 for endid
+    if (!trill->GetEnd()->Is(TIMESTAMP_ATTR)) x2 += trill->GetStart()->GetDrawingRadius(m_doc);
 
     int length = x2 - x1;
     Point orig(x1, y);
@@ -1904,19 +1904,24 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
 
     dc->StartGraphic(trill, "", trill->GetUuid());
 
-    int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
+    int x = trill->GetStart()->GetDrawingX();
 
     bool centered = true;
     // center the trill only with @startid
     if (trill->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
+    else {
+        x += trill->GetStart()->GetDrawingRadius(m_doc);
+    }
 
     // for a start always put trill up
     int code = SMUFL_E566_ornamentTrill;
-
     std::wstring str;
-    str.push_back(code);
+
+    if (trill->GetLstartsym() != LINESTARTENDSYMBOL_none) {
+        str.push_back(code);
+    }
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
