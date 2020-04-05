@@ -82,7 +82,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 6: return SMUFL_E24A_flag256thUp;
             case 7: return SMUFL_E24C_flag512thUp;
             case 8: return SMUFL_E24E_flag1024thUp;
-            default: return 0; break;
+            default: return 0;
         }
     }
     else {
@@ -95,7 +95,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 6: return SMUFL_E24B_flag256thDown;
             case 7: return SMUFL_E24D_flag512thDown;
             case 8: return SMUFL_E24F_flag1024thDown;
-            default: return 0; break;
+            default: return 0;
         }
     }
 }
