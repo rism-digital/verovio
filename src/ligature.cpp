@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
 #include "note.h"
 #include "vrv.h"
 
@@ -128,6 +129,16 @@ Note *Ligature::GetLastNote()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
+{
+    CalcLigatureNotePosParams *params = dynamic_cast<CalcLigatureNotePosParams *>(functorParams);
+    assert(params);
+    
+    params->m_previousNote = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Ligature::ResetDrawing(FunctorParams *functorParams)
 {

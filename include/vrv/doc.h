@@ -423,7 +423,10 @@ public:
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
 
-    /** Record notation type for document */
+    /**
+     * Record notation type for document.
+     * (This should be improved by storing a vector of all notation types of the document for cases mixing notations)
+     */
     data_NOTATIONTYPE m_notationType;
 
     /** An expansion map that contains  */

@@ -65,6 +65,11 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::CalcLigatureNotePos
+     */
+    virtual int CalcLigatureNotePos(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing

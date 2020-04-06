@@ -28,6 +28,7 @@
 #include "horizontalaligner.h"
 #include "keysig.h"
 #include "layer.h"
+#include "ligature.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -459,7 +460,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
-        if (note->IsMensural()) {
+        if (note->IsMensuralDur()) {
             code = note->GetMensuralSmuflNoteHead();
         }
     }
@@ -519,7 +520,7 @@ double LayerElement::GetAlignmentDuration(
         }
         DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
-        if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
+        if (duration->IsMensuralDur() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
@@ -659,8 +660,11 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignmentType type = ALIGNMENT_DEFAULT;
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    Ligature *ligatureParent = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = dynamic_cast<Rest *>(this->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
+    
+    double duration = 0.0;
 
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
@@ -673,6 +677,16 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is({ DOTS, FLAG, STEM })) {
         assert(false);
+    }
+    else if (ligatureParent && this->Is(NOTE)) {
+        // Ligature notes are all aligned with the first note
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+        if (ligatureParent->GetFirstNote() != note) {
+            m_alignment = ligatureParent->GetFirstNote()->GetAlignment();
+            duration = this->GetAlignmentDuration(
+                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        }
     }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
@@ -782,23 +796,24 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_GRACENOTE;
     }
 
-    double duration = 0.0;
     // We have already an alignment with grace note children - skip this
     if (!m_alignment) {
         // get the duration of the event
         duration = this->GetAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
 
-        // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
-        // So use it as current time - we can do this because the timestamp loop is redirected from the measure
-        // The time will be reset to 0.0 when starting a new layer anyway
-        if (this->Is(TIMESTAMP_ATTR))
-            params->m_time = duration;
-        else
-            params->m_measureAligner->SetMaxTime(params->m_time + duration);
-
         m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
         assert(m_alignment);
+    }
+    
+    // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
+    // So use it as current time - we can do this because the timestamp loop is redirected from the measure
+    // The time will be reset to 0.0 when starting a new layer anyway
+    if (this->Is(TIMESTAMP_ATTR)) {
+        params->m_time = duration;
+    }
+    else {
+        params->m_measureAligner->SetMaxTime(params->m_time + duration);
     }
 
     if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {

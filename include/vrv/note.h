@@ -223,6 +223,11 @@ public:
      * See Object::CalcLedgerLines
      */
     virtual int CalcLedgerLines(FunctorParams *functorParams);
+        
+    /**
+     * See Object::CalcLigatureNotePos
+     */
+    virtual int CalcLigatureNotePos(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareLayerElementParts

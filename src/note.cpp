@@ -257,7 +257,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
         p.y = doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
@@ -296,7 +296,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
         p.y = -doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
@@ -359,7 +359,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff)
 
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
-    assert(this->IsMensural());
+    assert(this->IsMensuralDur());
 
     int drawingDur = this->GetDrawingDur();
 
@@ -607,7 +607,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     }
 
     // We currently have no stem object with mensural notes
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -725,7 +725,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     assert(params);
 
     // We currently have no dots object with mensural notes
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
     if (!this->IsVisible()) {
@@ -851,6 +851,29 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Note::CalcLigatureNotePos(FunctorParams *functorParams)
+{
+    CalcLigatureNotePosParams *params = dynamic_cast<CalcLigatureNotePosParams *>(functorParams);
+    assert(params);
+    
+    Ligature *ligature = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE));
+    
+    if (!ligature) return FUNCTOR_SIBLINGS;
+    
+    if (params->m_previousNote == NULL) {
+        params->m_previousNote = this;
+        return FUNCTOR_SIBLINGS;
+    }
+    
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    
+    int xRel = (2 * params->m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * ligature->PositionInLigature(this));
+    this->SetDrawingXRel(xRel);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
@@ -858,7 +881,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
 
-    if (!this->IsChordTone() && !this->IsMensural()) {
+    if (!this->IsChordTone() && !this->IsMensuralDur()) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
@@ -880,7 +903,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem() && !this->IsChordTone()
-        && !this->IsMensural()) {
+        && !this->IsMensuralDur()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

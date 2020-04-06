@@ -450,8 +450,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
 
     // Calculate size of the rectangle
-    xLeft = firstNote->GetDrawingX();
-    xLeft += (2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * ligature->PositionInLigature(note));
+    xLeft = note->GetDrawingX();
+    //xLeft += (2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * ligature->PositionInLigature(note));
 
     xRight = xLeft + 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     if (note->GetActualDur() == DUR_MX) {

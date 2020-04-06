@@ -276,6 +276,12 @@ void Page::LayOutHorizontally()
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    
+    if (Att::IsMensuralType(doc->m_notationType)) {
+        CalcLigatureNotePosParams calcLigatureNotePosParams(doc);
+        Functor calcLigatureNotePos(&Object::CalcLigatureNotePos);
+        this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);
+    }
 
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);
