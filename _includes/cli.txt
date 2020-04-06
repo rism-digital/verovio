@@ -1,4 +1,4 @@
-Verovio 2.7.0-dev-2c09d61
+Verovio 2.7.0-dev-be05e49
 
 Example usage:
 
@@ -20,7 +20,7 @@ Options (marked as * are repeatable)
 Input and page layout options
  --adjust-page-height              Adjust the page height to the height of the content
  --adjust-page-width               Adjust the page width to the width of the content
- --breaks <s>                      Define page and system breaks layout (default: "auto"; other values: "none", "encoded")
+ --breaks <s>                      Define page and system breaks layout (default: "auto"; other values: "none", "line", "encoded")
  --condense-encoded                Condense encoded layout rendering
  --condense-first-page             When condensing a score also condense the first page
  --condense-tempo-pages            When condensing a score also condense pages with a tempo change

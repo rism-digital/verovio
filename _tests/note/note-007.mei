@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Unpitched notes</title>
+			</titleStmt>
+			<pubStmt>
+				<date>2020-03-30</date>
+			</pubStmt>
+			<notesStmt>
+				<annot>Notes can be placed on specific lines/spaces on a staff without pitch information.</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="2.0.0" label="2">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef n="1" lines="3">
+								<clef shape="perc" line="2" />
+								<meterSig count="4" unit="4" />
+							</staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<measure n="1">
+							<staff n="1">
+								<layer n="1">
+									<note dur="4" pname="e" loc="0" stem.dir="down" />
+									<beam>
+										<note dur="8" pname="g" loc="2" />
+										<note dur="8" pname="a" loc="3" />
+									</beam>
+									<rest dur="4" />
+									<note dur="4" pname="b" loc="4" stem.dir="up" />
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>
