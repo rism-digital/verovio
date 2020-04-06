@@ -1262,7 +1262,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
-    pedal->WriteVerticalGroup(currentNode);
+    // pedal->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
@@ -1335,6 +1335,7 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
     trill->WriteExtender(currentNode);
+    trill->WriteLineRend(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
 }
@@ -4098,6 +4099,7 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadExtender(trill);
+    vrvTrill->ReadLineRend(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
 
