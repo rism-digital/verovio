@@ -241,6 +241,19 @@ public:
     void CastOffDoc();
 
     /**
+     * Casts off the entire document, using the document's line breaks,
+     * but adding its own page breaks.
+     */
+    void CastOffLineDoc();
+
+    /**
+     * Casts off the entire document, with options for obeying breaks.
+     * @param useSectionBreaks - true to use the section breaks from the document.
+     * @param usePageBreaks - true to use the page breaks from the document.
+     */
+    void CastOffDocBase(bool useSectionBreaks, bool usePageBreaks);
+
+    /**
      * Casts off the running elements (headers and footer)
      * Called from Doc::CastOffDoc
      * The doc needs to be empty, the methods adds two empty pages to calculate the

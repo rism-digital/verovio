@@ -776,25 +776,28 @@ public:
 
 /**
  * member 0: a pointer the document we are adding pages to
- * member 2: a pointer to the current page
- * member 4: a pointer to the current system
+ * member 1: a pointer to the current page
+ * member 2: a pointer to the current system
  * member 3: a pointer to the system we are taking the content from
- * member 5: a flag indicating if we have processed the first pb
+ * member 4: a flag if we want to use the pageBreaks from the document
  **/
 
 class CastOffEncodingParams : public FunctorParams {
 public:
-    CastOffEncodingParams(Doc *doc, Page *currentPage, System *currentSystem, System *contentSystem)
+    CastOffEncodingParams(
+        Doc *doc, Page *currentPage, System *currentSystem, System *contentSystem, bool usePages = true)
     {
         m_doc = doc;
         m_currentPage = currentPage;
         m_currentSystem = currentSystem;
         m_contentSystem = contentSystem;
+        m_usePages = usePages;
     }
     Doc *m_doc;
     Page *m_currentPage;
     System *m_contentSystem;
     System *m_currentSystem;
+    bool m_usePages;
 };
 
 //----------------------------------------------------------------------------
