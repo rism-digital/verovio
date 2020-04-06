@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei meiversion="4.0.0" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Trill without a 'tr' symbol</title>
+			</titleStmt>
+			<pubStmt>
+				<date>2017-05-17</date>
+			</pubStmt>
+			<notesStmt>
+				<annot>Trills with @lstartsym="none" display no 'tr' symbol.</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="unknown">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music xml:id="m-22">
+		<body xml:id="m-23">
+			<mdiv xml:id="m-24">
+				<score xml:id="m-25">
+					<scoreDef xml:id="m-26" meter.count="2" meter.unit="4" ppq="256">
+						<staffGrp xml:id="m-27">
+							<staffGrp xml:id="m-34" n="1">
+								<staffDef xml:id="m-28" clef.line="2" clef.shape="G" label="" lines="5" n="1"> </staffDef>
+							</staffGrp>
+						</staffGrp>
+					</scoreDef>
+					<section xml:id="m-35">
+						<measure>
+							<staff n="1">
+								<layer>
+									<note dur="1" pname="c" oct="5" xml:id="three" />
+								</layer>
+							</staff>
+							<trill startid="#three" endid="#four" lstartsym="none" />
+						</measure>
+						<measure>
+							<staff n="1">
+								<layer>
+									<note dur="1" pname="c" oct="5" xml:id="four" />
+								</layer>
+							</staff>
+						</measure>
+						<measure>
+							<staff n="1">
+								<layer>
+									<note dur="1" pname="c" oct="5" />
+								</layer>
+							</staff>
+							<trill tstamp="1" tstamp2="1m+1" lstartsym="none" />
+						</measure>
+						<measure>
+							<staff n="1">
+								<layer>
+									<note dur="1" pname="c" oct="5" />
+								</layer>
+							</staff>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>
