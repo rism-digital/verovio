@@ -65,7 +65,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::CalcLigatureNotePos
      */

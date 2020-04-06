@@ -223,7 +223,7 @@ public:
      * See Object::CalcLedgerLines
      */
     virtual int CalcLedgerLines(FunctorParams *functorParams);
-        
+
     /**
      * See Object::CalcLigatureNotePos
      */

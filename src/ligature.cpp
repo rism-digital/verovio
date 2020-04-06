@@ -134,7 +134,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
     CalcLigatureNotePosParams *params = dynamic_cast<CalcLigatureNotePosParams *>(functorParams);
     assert(params);
-    
+
     params->m_previousNote = NULL;
 
     return FUNCTOR_CONTINUE;

@@ -663,7 +663,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     Ligature *ligatureParent = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = dynamic_cast<Rest *>(this->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
-    
+
     double duration = 0.0;
 
     if (chordParent) {
@@ -805,7 +805,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
         assert(m_alignment);
     }
-    
+
     // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
     // So use it as current time - we can do this because the timestamp loop is redirected from the measure
     // The time will be reset to 0.0 when starting a new layer anyway
@@ -1217,7 +1217,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             else {
                 // Move the appropriate parent to the right
                 int xRelShift = this->HorizontalRightOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
-                params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
+                params->m_currentNote->SetDrawingXRel(
+                    params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
             }
         }
     }

@@ -855,20 +855,21 @@ int Note::CalcLigatureNotePos(FunctorParams *functorParams)
 {
     CalcLigatureNotePosParams *params = dynamic_cast<CalcLigatureNotePosParams *>(functorParams);
     assert(params);
-    
+
     Ligature *ligature = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE));
-    
+
     if (!ligature) return FUNCTOR_SIBLINGS;
-    
+
     if (params->m_previousNote == NULL) {
         params->m_previousNote = this;
         return FUNCTOR_SIBLINGS;
     }
-    
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
     assert(staff);
-    
-    int xRel = (2 * params->m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * ligature->PositionInLigature(this));
+
+    int xRel
+        = (2 * params->m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * ligature->PositionInLigature(this));
     this->SetDrawingXRel(xRel);
 
     return FUNCTOR_SIBLINGS;

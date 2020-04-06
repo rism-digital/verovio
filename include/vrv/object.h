@@ -754,7 +754,7 @@ public:
      * Set the note position for each note in ligature
      */
     virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * Set the note head flipped positions and calc the ledger lines
      */

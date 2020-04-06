@@ -98,7 +98,7 @@ public:
 
     static data_STAFFREL StaffrelBasicToStaffrel(data_STAFFREL_basic staffrelBasic);
     static data_STAFFREL_basic StaffrelToStaffrelBasic(data_STAFFREL staffrel);
-    
+
     static bool IsMensuralType(data_NOTATIONTYPE notationType);
     static bool IsNeumeType(data_NOTATIONTYPE notationType);
     static bool IsTabType(data_NOTATIONTYPE notationType);

@@ -800,9 +800,8 @@ data_STAFFREL_basic Att::StaffrelToStaffrelBasic(data_STAFFREL staffrel)
 
 bool Att::IsMensuralType(data_NOTATIONTYPE notationType)
 {
-    return (notationType == NOTATIONTYPE_mensural
-    || notationType == NOTATIONTYPE_mensural_white
-    || notationType == NOTATIONTYPE_mensural_black);
+    return (notationType == NOTATIONTYPE_mensural || notationType == NOTATIONTYPE_mensural_white
+        || notationType == NOTATIONTYPE_mensural_black);
 }
 
 bool Att::IsNeumeType(data_NOTATIONTYPE notationType)
@@ -816,6 +815,5 @@ bool Att::IsTabType(data_NOTATIONTYPE notationType)
     // Next version of MEI will have other tab types
     return (notationType == NOTATIONTYPE_tab);
 }
-
 
 } // namespace vrv
