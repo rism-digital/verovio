@@ -352,6 +352,10 @@ void View::DrawStaffGrp(
     // for the bottom position we need to take into account the number of lines and the staff size
     int yBottom
         = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    // adjust to single line staves
+    if (firstDef->GetLines() <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    if (lastDef->GetLines() <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+
     int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
 
     // adjust the top and bottom according to staffline width
@@ -687,8 +691,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     yTop = yBottom + (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
                 }
                 // Make sure barlines are visible with a single line
-                if (childStaffDef->GetLines() == 1) {
-                    yTop += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                if (childStaffDef->GetLines() <= 1) {
+                    yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                     yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 }
                 DrawBarLine(dc, yTop, yBottom, barLine);

@@ -1303,7 +1303,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
-    pedal->WriteVerticalGroup(currentNode);
+    // pedal->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection)
@@ -1383,6 +1383,8 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     WriteControlElement(currentNode, trill);
     WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
+    trill->WriteExtender(currentNode);
+    trill->WriteLineRend(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
 }
@@ -1775,6 +1777,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteMidiVelocity(currentNode);
     note->WriteNoteAnlMensural(currentNode);
     note->WriteNoteGesTab(currentNode);
+    note->WriteNoteHeads(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiePresent(currentNode);
@@ -4248,6 +4251,8 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
 
     ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
+    vrvTrill->ReadExtender(trill);
+    vrvTrill->ReadLineRend(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
 
@@ -4959,6 +4964,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadMidiVelocity(note);
     vrvNote->ReadNoteAnlMensural(note);
     vrvNote->ReadNoteGesTab(note);
+    vrvNote->ReadNoteHeads(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiePresent(note);

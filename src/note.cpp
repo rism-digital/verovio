@@ -57,6 +57,7 @@ Note::Note()
     , AttMidiVelocity()
     , AttNoteAnlMensural()
     , AttNoteGesTab()
+    , AttNoteHeads()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -71,6 +72,7 @@ Note::Note()
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_NOTEGESTAB);
+    RegisterAttClass(ATT_NOTEHEADS);
     RegisterAttClass(ATT_MIDIVELOCITY);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
@@ -95,6 +97,7 @@ void Note::Reset()
     ResetGraced();
     ResetNoteAnlMensural();
     ResetNoteGesTab();
+    ResetNoteHeads();
     ResetMidiVelocity();
     ResetStems();
     ResetStemsCmn();
@@ -180,6 +183,22 @@ Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
     return accid;
+}
+
+bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+{
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+    }
+
+    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+    linesBelow = -(this->GetDrawingLoc()) / 2;
+
+    linesAbove = std::max(linesAbove, 0);
+    linesBelow = std::max(linesBelow, 0);
+
+    return ((linesAbove > 0) || (linesBelow > 0));
 }
 
 Chord *Note::IsChordTone() const
@@ -334,6 +353,43 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     }
 
     return p;
+}
+
+int Note::CalcStemLenInThirdUnits(Staff *staff)
+{
+    assert(staff);
+
+    int baseStem = STANDARD_STEMLENGTH * 3;
+
+    int shortening = 0;
+
+    int unitToLine = (this->GetDrawingStemDir() == STEMDIRECTION_up)
+        ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
+        : this->GetDrawingLoc();
+    if (unitToLine < 5) {
+        switch (unitToLine) {
+            case 4: shortening = 1; break;
+            case 3: shortening = 2; break;
+            case 2: shortening = 3; break;
+            case 1: shortening = 4; break;
+            case 0: shortening = 5; break;
+            default: shortening = 6;
+        }
+    }
+
+    // Limit shortening with duration shorter than quarter not when not in a beam
+    if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            shortening = std::min(4, shortening);
+        }
+        else {
+            shortening = std::min(3, shortening);
+        }
+    }
+
+    baseStem -= shortening;
+
+    return baseStem;
 }
 
 wchar_t Note::GetMensuralSmuflNoteHead()
@@ -796,10 +852,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     /************** Ledger lines: **************/
 
-    int linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    int linesBelow = -(this->GetDrawingLoc()) / 2;
+    int linesAbove = 0;
+    int linesBelow = 0;
 
-    if ((linesAbove <= 0) && (linesBelow <= 0)) return FUNCTOR_CONTINUE;
+    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
 
     // HARDCODED
     int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);

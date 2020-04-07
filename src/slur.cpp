@@ -52,66 +52,6 @@ void Slur::Reset()
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 }
 
-void Slur::GetCrossStaffOverflows(
-    StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow)
-{
-    assert(alignment);
-
-    if (!this->GetStart() || !this->GetEnd() || !alignment->GetStaff()) return;
-
-    Layer *layer = NULL;
-
-    // If the starting point is a chord we need to select the appropriate extreme staff
-    Staff *startStaff = NULL;
-    if (this->GetStart()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetStart());
-        assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        startStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
-    }
-    else
-        startStaff = this->GetStart()->GetCrossStaff(layer);
-
-    // Same for the end point
-    Staff *endStaff = NULL;
-    if (this->GetEnd()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetEnd());
-        assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
-    }
-    else {
-        endStaff = this->GetEnd()->GetCrossStaff(layer);
-    }
-
-    // No cross-staff endpoints, check if the slur itself crosses staves
-    if (!startStaff) {
-        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
-    }
-    if (!endStaff) {
-        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
-    }
-
-    // This happens with slurs starting or ending with a timestamp
-    if (!endStaff) {
-        endStaff = startStaff;
-    }
-    else if (!startStaff) {
-        startStaff = endStaff;
-    }
-    assert(startStaff && endStaff);
-
-    if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
-    if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
-
-    if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
-    if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
-}
-
 bool Slur::AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff)
 {
     assert(doc);

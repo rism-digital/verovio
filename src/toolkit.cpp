@@ -49,6 +49,10 @@ namespace vrv {
 const char *UTF_16_BE_BOM = "\xFE\xFF";
 const char *UTF_16_LE_BOM = "\xFF\xFE";
 
+std::map<std::string, ClassId> Toolkit::s_MEItoClassIdMap
+    = { { "chord", CHORD }, { "rest", REST }, { "mRest", MREST }, { "mRpt", MRPT }, { "mRpt2", MRPT2 },
+          { "multiRest", MULTIREST }, { "mulitRpt", MULTIRPT }, { "note", NOTE }, { "space", SPACE } };
+
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -188,7 +192,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     FileFormat musicxmlDefault = MUSICXML;
 #endif
 
-    if (data.size() == 0) {
+    if (data.empty()) {
         return UNKNOWN;
     }
     if (data[0] == 0) {
@@ -352,6 +356,33 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
 
     return LoadData(utf8line);
+}
+
+void Toolkit::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
+{
+    // one we use magic_enum.hpp we can do :
+    /*
+    for (auto str : classStrings) {
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+        auto classId = magic_enum::enum_cast<ClassId>(str);
+        if (classId.has_value()) {
+            classIds.push_back(classId.value());
+          // color.value() -> Color::GREEN
+        }
+        else {
+            LogError("Class name '%s' could not be matched", str.c_str());
+        }
+    }
+    */
+    // For now, map a few by hand... - there must be a better way to do this
+    for (auto str : classStrings) {
+        if (Toolkit::s_MEItoClassIdMap.count(str) > 0) {
+            classIds.push_back(Toolkit::s_MEItoClassIdMap.at(str));
+        }
+        else {
+            LogDebug("Class name '%s' could not be matched", str.c_str());
+        }
+    }
 }
 
 bool Toolkit::LoadData(const std::string &data)
@@ -591,16 +622,24 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs)
-        && (m_options->m_breaks.GetValue() != BREAKS_none)) {
-        if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
-            // LogElapsedTimeStart();
-            m_doc.CastOffEncodingDoc();
-            // LogElapsedTimeEnd("layout");
+    int option = m_options->m_breaks.GetValue();
+    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs) && (option != BREAKS_none)) {
+        if (input->HasLayoutInformation() && (option == BREAKS_encoded || option == BREAKS_line)) {
+            if (option == BREAKS_encoded) {
+                // LogElapsedTimeStart();
+                m_doc.CastOffEncodingDoc();
+                // LogElapsedTimeEnd("layout");
+            }
+            else if (option == BREAKS_line) {
+                m_doc.CastOffLineDoc();
+            }
         }
         else {
-            if (m_options->m_breaks.GetValue() == BREAKS_encoded) {
+            if (option == BREAKS_encoded) {
                 LogWarning("Requesting layout with encoded breaks but nothing provided in the data");
+            }
+            else if (option == BREAKS_line) {
+                LogWarning("Requesting layout with line breaks but nothing provided in the data");
             }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();
@@ -629,8 +668,22 @@ bool Toolkit::LoadData(const std::string &data)
     return true;
 }
 
-std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
+std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
+    bool scoreBased = true;
+    int pageNo = 0;
+
+    jsonxx::Object json;
+
+    // Read JSON options
+    if (!json.parse(jsonOptions)) {
+        LogWarning("Can not parse JSON std::string. Using default options.");
+    }
+    else {
+        if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
+        if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+    }
+
     if (GetPageCount() == 0) {
         LogWarning("No data loaded");
         return "";
@@ -800,12 +853,12 @@ std::string Toolkit::GetAvailableOptions() const
     return o.json();
 }
 
-bool Toolkit::SetOptions(const std::string &json_options)
+bool Toolkit::SetOptions(const std::string &jsonOptions)
 {
     jsonxx::Object json;
 
     // Read JSON options
-    if (!json.parse(json_options)) {
+    if (!json.parse(jsonOptions)) {
         LogError("Can not parse JSON std::string.");
         return false;
     }

@@ -352,6 +352,22 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
+int Chord::CalcStemLenInThirdUnits(Staff *staff)
+{
+    assert(staff);
+
+    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+        Note *topNote = this->GetTopNote();
+        assert(topNote);
+        return topNote->CalcStemLenInThirdUnits(staff);
+    }
+    else {
+        Note *bottomNote = this->GetBottomNote();
+        assert(bottomNote);
+        return bottomNote->CalcStemLenInThirdUnits(staff);
+    }
+}
+
 bool Chord::IsVisible()
 {
     if (this->HasVisible()) {

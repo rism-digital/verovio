@@ -28,7 +28,7 @@ namespace vrv {
 // FTrem
 //----------------------------------------------------------------------------
 
-FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttFTremVis(), AttTremMeasured()
+FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), BeamDrawingInterface(), AttFTremVis(), AttTremMeasured()
 {
     RegisterAttClass(ATT_FTREMVIS);
     RegisterAttClass(ATT_TREMMEASURED);
@@ -36,14 +36,12 @@ FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttFTremVis(), A
     Reset();
 }
 
-FTrem::~FTrem()
-{
-    ClearCoords();
-}
+FTrem::~FTrem() {}
 
 void FTrem::Reset()
 {
     LayerElement::Reset();
+    BeamDrawingInterface::Reset();
     ResetFTremVis();
     ResetTremMeasured();
 }
@@ -72,6 +70,15 @@ void FTrem::AddChild(Object *child)
     Modify();
 }
 
+const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
+{
+    this->GetList(this);
+
+    this->m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
+
+    return &m_beamElementCoords;
+}
+
 void FTrem::FilterList(ArrayOfObjects *childList)
 {
     ArrayOfObjects::iterator iter = childList->begin();
@@ -94,9 +101,13 @@ void FTrem::FilterList(ArrayOfObjects *childList)
         ++iter;
     }
 
-    InitCoords(childList);
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+
+    InitCoords(childList, staff, BEAMPLACE_NONE);
 }
 
+/*
 void FTrem::InitCoords(ArrayOfObjects *childList)
 {
     ClearCoords();
@@ -124,37 +135,29 @@ void FTrem::InitCoords(ArrayOfObjects *childList)
         return;
     }
 
-    this->m_drawingParams.m_changingDur = false;
-    this->m_drawingParams.m_beamHasChord = false;
-    this->m_drawingParams.m_hasMultipleStemDir = false;
-    this->m_drawingParams.m_cueSize = false;
+    this->m_changingDur = false;
+    this->m_beamHasChord = false;
+    this->m_hasMultipleStemDir = false;
+    this->m_cueSize = false;
     // adjust beam->m_drawingParams.m_shortestDur depending on the number of slashes
-    this->m_drawingParams.m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
-    this->m_drawingParams.m_stemDir = STEMDIRECTION_NONE;
+    this->m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
+    this->m_stemDir = STEMDIRECTION_NONE;
 
     if (firstElement->m_element->Is(CHORD)) {
-        this->m_drawingParams.m_beamHasChord = true;
+        this->m_beamHasChord = true;
     }
     if (secondElement->m_element->Is(CHORD)) {
-        this->m_drawingParams.m_beamHasChord = true;
+        this->m_beamHasChord = true;
     }
 
     // For now look at the stemDir only on the first note
     assert(dynamic_cast<AttStems *>(firstElement->m_element));
-    this->m_drawingParams.m_stemDir = (dynamic_cast<AttStems *>(firstElement->m_element))->GetStemDir();
+    this->m_stemDir = (dynamic_cast<AttStems *>(firstElement->m_element))->GetStemDir();
 
     // We look only at the first note for checking if cue-sized. Somehow arbitrarily
-    this->m_drawingParams.m_cueSize = firstElement->m_element->GetDrawingCueSize();
-}
-
-void FTrem::ClearCoords()
-{
-    ArrayOfBeamElementCoords::iterator iter;
-    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter) {
-        delete *iter;
-    }
-    m_beamElementCoords.clear();
-}
+    this->m_cueSize = firstElement->m_element->GetDrawingCueSize();
+ }
+ */
 
 //----------------------------------------------------------------------------
 // Functors methods
@@ -171,18 +174,17 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     if (fTremChildren->empty()) {
         return FUNCTOR_CONTINUE;
     }
-    const ArrayOfBeamElementCoords *beamElementCoords = this->GetElementCoords();
 
-    assert(beamElementCoords->size() == 2);
+    assert(this->GetElementCoords()->size() == 2);
 
-    int elementCount = 2;
+    this->m_beamSegment.InitCoordRefs(this->GetElementCoords());
 
     Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
     assert(layer);
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
-    this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
+    this->m_beamSegment.CalcBeam(layer, staff, params->m_doc, this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -192,7 +194,7 @@ int FTrem::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
 
-    this->m_drawingParams.Reset();
+    this->m_beamSegment.Reset();
 
     // We want the list of the ObjectListInterface to be re-generated
     this->Modify();

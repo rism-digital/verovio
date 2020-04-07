@@ -138,7 +138,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // case ARTICULATION_lhpizz;
             // case ARTICULATION_dot;
             // case ARTICULATION_stroke;
-            default: return 0; break;
+            default: return 0;
         }
     }
     else if (place == STAFFREL_below) {
@@ -159,7 +159,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // Removed in MEI 4.0
             // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
-            default: return 0; break;
+            default: return 0;
         }
     }
     else

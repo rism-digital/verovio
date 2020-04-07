@@ -99,19 +99,12 @@ void LayerElement::Reset()
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
-    m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
 }
 
-LayerElement::~LayerElement()
-{
-    // set the pointer of the m_beamElementCoord to NULL;
-    if (m_beamElementCoord) {
-        m_beamElementCoord->m_element = NULL;
-    }
-}
+LayerElement::~LayerElement() {}
 
 void LayerElement::CloneReset()
 {
@@ -121,7 +114,6 @@ void LayerElement::CloneReset()
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
-    m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
@@ -912,7 +904,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staffY->m_drawingTuning->CalcPitchPos(
                 note->GetTabCourse(), staffY->m_drawingNotationType, staffY->m_drawingLines);
         }
-        else if (note->HasPname()) {
+        else if (note->HasPname() || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
@@ -959,7 +951,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         mRest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
-
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
@@ -1180,26 +1171,50 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
                     horizontalMargin = 0;
                 }
+                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() < 0)
+                    && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())
+                    && !params->m_currentChord) {
+                    if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
+                        horizontalMargin *= -1;
+                    }
+                    else if ((params->m_currentNote->GetDrawingDur() <= DUR_1)
+                        && (previousNote->GetDrawingDur() <= DUR_1)) {
+                        continue;
+                    }
+                    else {
+                        horizontalMargin *= -1;
+                        verticalMargin = horizontalMargin;
+                    }
+                }
             }
 
             if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
                 continue;
             }
 
-            // Nothing to do if we have no vertical overlap
-            if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
+            if (!(horizontalMargin < 0) || params->m_currentChord) {
 
-            // Nothing to do either if we have no horizontal overlap
-            if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
+                // Nothing to do if we have no vertical overlap
+                if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
 
-            int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+                // Nothing to do either if we have no horizontal overlap
+                if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
-            // Move the appropriate parent to the left
-            if (xRelShift > 0) {
-                if (params->m_currentChord)
-                    params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
-                else if (params->m_currentNote)
-                    params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+                int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+
+                // Move the appropriate parent to the left
+                if (xRelShift > 0) {
+                    if (params->m_currentChord)
+                        params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
+                    else if (params->m_currentNote)
+                        params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+                }
+            }
+            else {
+                // Move the appropriate parent to the right
+                int xRelShift = this->HorizontalRightOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+                params->m_currentNote->SetDrawingXRel(
+                    params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
             }
         }
     }
@@ -1555,7 +1570,8 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
+    if (!this->GetDurationInterface() || this->Is(MSPACE) || this->Is(SPACE) || this->HasSameasLink())
+        return FUNCTOR_CONTINUE;
 
     double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
     double time = m_alignment->GetTime();

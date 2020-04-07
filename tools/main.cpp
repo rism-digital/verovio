@@ -582,7 +582,7 @@ int main(int argc, char **argv)
         }
         else {
             if (std_output) {
-                std::cout << toolkit.GetMEI(page);
+                std::cout << toolkit.GetMEI(vrv::StringFormat("{'pageNo': %d}", page));
             }
             else {
                 std::cerr << "MEI output of one page is available only to standard output." << std::endl;

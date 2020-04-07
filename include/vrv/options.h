@@ -63,7 +63,7 @@ class OptionGrp;
 // Option defines
 //----------------------------------------------------------------------------
 
-enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_encoded };
+enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_encoded };
 
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded };
 

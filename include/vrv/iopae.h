@@ -380,7 +380,6 @@ public:
     PAEInput(Doc *doc);
     virtual ~PAEInput();
 
-
 #ifndef NO_PAE_SUPPORT
     virtual bool Import(const std::string &pae);
 

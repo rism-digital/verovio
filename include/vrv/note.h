@@ -54,6 +54,7 @@ class Note : public LayerElement,
              public AttMidiVelocity,
              public AttNoteAnlMensural,
              public AttNoteGesTab,
+             public AttNoteHeads,
              public AttStems,
              public AttStemsCmn,
              public AttTiePresent,
@@ -113,6 +114,14 @@ public:
     ///@}
 
     /**
+     * Check if the note has leger lines.
+     * If staff is passed, use it for getting the staff line number.
+     * Otherwise, it will look for the Staff ancestor.
+     * Set the value of ledger lines above or below.
+     */
+    bool HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff = NULL);
+
+    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
@@ -168,6 +177,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
+    virtual int CalcStemLenInThirdUnits(Staff *staff);
     ///@}
 
     /**

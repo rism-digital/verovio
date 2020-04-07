@@ -1123,8 +1123,8 @@ void View::DrawMSpace(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    MSpace *mSpace = dynamic_cast<MSpace *>(element);
-    assert(mSpace);
+    // MSpace *mSpace = dynamic_cast<MSpace *>(element);
+    // assert(mSpace);
 
     dc->StartGraphic(element, "", element->GetUuid());
     // nothing to draw here
@@ -1264,28 +1264,34 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
-    /************** Noteheads: **************/
+    if (!(note->GetHeadVisible() == BOOLEAN_false)) {
+        /************** Noteheads: **************/
 
-    if (drawingDur < DUR_1) {
-        DrawMaximaToBrevis(dc, noteY, element, layer, staff);
-    }
-    // Whole notes
-    else if (drawingDur == DUR_1) {
-        if (note->GetColored() == BOOLEAN_true)
-            fontNo = SMUFL_E0FA_noteheadWholeFilled;
-        else
-            fontNo = SMUFL_E0A2_noteheadWhole;
+        if (drawingDur < DUR_1) {
+            DrawMaximaToBrevis(dc, noteY, element, layer, staff);
+        }
+        // Whole notes
+        else if (drawingDur == DUR_1) {
+            if (note->GetColored() == BOOLEAN_true) {
+                fontNo = SMUFL_E0FA_noteheadWholeFilled;
+            }
+            else {
+                fontNo = SMUFL_E0A2_noteheadWhole;
+            }
 
-        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
-    }
-    // Other values
-    else {
-        if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2)
-            fontNo = SMUFL_E0A3_noteheadHalf;
-        else
-            fontNo = SMUFL_E0A4_noteheadBlack;
+            DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        }
+        // Other values
+        else {
+            if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
+                fontNo = SMUFL_E0A3_noteheadHalf;
+            }
+            else {
+                fontNo = SMUFL_E0A4_noteheadBlack;
+            }
 
-        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+            DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        }
     }
 
     /************ Draw children (accidentals, etc) ************/

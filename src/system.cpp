@@ -250,7 +250,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
     else if (object->Is(TRILL)) {
         Trill *trill = dynamic_cast<Trill *>(object);
         assert(trill);
-        if (trill->GetEnd()) {
+        if (trill->GetEnd() && (trill->GetExtender() != BOOLEAN_false)) {
             this->AddToDrawingList(trill);
         }
     }
