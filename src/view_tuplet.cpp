@@ -151,7 +151,7 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletNum->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
-    if ((tuplet->GetNum() == 0) || (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    if (!tuplet->HasNum() || (tuplet->GetNumVisible() == BOOLEAN_false)) {
         tupletNum->SetEmptyBB();
         return;
     }
