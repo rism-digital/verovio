@@ -8,6 +8,7 @@ webrick:
     Access-Control-Allow-Origin: "*"
 
 tests-edit-path: "https://github.com/rism-ch/verovio/edit/gh-pages"
+tests-verovio-edit-path: "https://editor.verovio.org/?file=https://raw.githubusercontent.com/rism-ch/verovio/gh-pages"
 
 collections:
     tests:
