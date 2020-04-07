@@ -262,7 +262,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
-    if (!this->HasNumVisible() || (this->GetNumVisible() == BOOLEAN_true)) {
+    if (this->HasNum() && (!this->HasNumVisible() || (this->GetNumVisible() == BOOLEAN_true))) {
         if (!currentNum) {
             currentNum = new TupletNum();
             this->AddChild(currentNum);
