@@ -789,7 +789,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         auto filterPredicate = [filters] (Object *iter) -> bool {
             if (filters && !filters->empty()) {
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
-                auto classId = iter->GetClassId();
+                ClassId classId = iter->GetClassId();
                 ArrayOfComparisons::iterator comparisonIter = std::find_if (filters->begin(), filters->end(), [classId] (Comparison* iter)->bool {
                     ClassIdComparison* attComparison = dynamic_cast<ClassIdComparison*>(iter);
                     assert(attComparison);
