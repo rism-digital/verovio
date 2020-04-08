@@ -859,19 +859,14 @@ int Note::CalcLigatureNotePos(FunctorParams *functorParams)
     Ligature *ligature = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE));
 
     if (!ligature) return FUNCTOR_SIBLINGS;
+    
+    int width = this->GetDrawingRadius(params->m_doc) * 2;
 
-    if (params->m_previousNote == NULL) {
-        params->m_previousNote = this;
-        return FUNCTOR_SIBLINGS;
-    }
+    this->SetDrawingXRel(params->m_previousRight);
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    int xRel
-        = (2 * params->m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * ligature->PositionInLigature(this));
-    this->SetDrawingXRel(xRel);
-
+    params->m_previousNote = this;
+    params->m_previousRight += width;
+        
     return FUNCTOR_SIBLINGS;
 }
 

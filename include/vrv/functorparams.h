@@ -685,9 +685,11 @@ public:
     CalcLigatureNotePosParams(Doc *doc)
     {
         m_previousNote = NULL;
+        m_previousRight = 0;
         m_doc = doc;
     }
     Note *m_previousNote;
+    int m_previousRight;
     Doc *m_doc;
 };
 

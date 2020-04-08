@@ -136,6 +136,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     assert(params);
 
     params->m_previousNote = NULL;
+    params->m_previousRight = 0;
 
     return FUNCTOR_CONTINUE;
 }
