@@ -477,11 +477,12 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
     }
     else if (dur <= DUR_BR) {
+        int widthFactor = (dur == DUR_MX) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
-            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.8;
+            return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.8;
         }
         else {
-            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+            return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
         }
     }
     else if (dur == DUR_1) {
@@ -682,8 +683,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // Ligature notes are all aligned with the first note
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
-        if (ligatureParent->GetFirstNote() != note) {
-            m_alignment = ligatureParent->GetFirstNote()->GetAlignment();
+        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetList(ligatureParent)->front());
+        if (firstNote && (firstNote != note)) {
+            m_alignment = firstNote->GetAlignment();
             duration = this->GetAlignmentDuration(
                 params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         }

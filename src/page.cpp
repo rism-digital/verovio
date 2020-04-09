@@ -278,7 +278,7 @@ void Page::LayOutHorizontally()
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
     if (Att::IsMensuralType(doc->m_notationType)) {
-        CalcLigatureNotePosParams calcLigatureNotePosParams(doc);
+        FunctorDocParams calcLigatureNotePosParams(doc);
         Functor calcLigatureNotePos(&Object::CalcLigatureNotePos);
         this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);
     }

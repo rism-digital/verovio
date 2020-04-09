@@ -121,7 +121,9 @@ bool Note::HasToBeAligned() const
     Note *note = const_cast<Note *>(this);
     Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
     assert(ligature);
-    return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
+    Note *firstNote = dynamic_cast<Note *>(ligature->GetList(ligature)->front());
+    Note *lastNote = dynamic_cast<Note *>(ligature->GetList(ligature)->back());
+    return ((note == firstNote) || (note == lastNote));
 }
 
 void Note::AddChild(Object *child)
@@ -849,25 +851,6 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-}
-
-int Note::CalcLigatureNotePos(FunctorParams *functorParams)
-{
-    CalcLigatureNotePosParams *params = dynamic_cast<CalcLigatureNotePosParams *>(functorParams);
-    assert(params);
-
-    Ligature *ligature = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE));
-
-    if (!ligature) return FUNCTOR_SIBLINGS;
-    
-    int width = this->GetDrawingRadius(params->m_doc) * 2;
-
-    this->SetDrawingXRel(params->m_previousRight);
-
-    params->m_previousNote = this;
-    params->m_previousRight += width;
-        
-    return FUNCTOR_SIBLINGS;
 }
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)

@@ -533,6 +533,12 @@ private:
     ///@}
 
     /**
+     * @name Internal methods for calcultating brevis / longa
+     */
+    void CalcBrevisPoints(
+        Note *note, Staff *staff, Point &topLeft, Point &bottomRight, int sides[4], int shape, bool isMensuralBlack);
+
+    /**
      * Internal method for drawing a BeamSegment
      */
     void DrawBeamSegment(DeviceContext *dc, BeamSegment *segment, BeamDrawingInterface *beamInterface, Layer *layer,

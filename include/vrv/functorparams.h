@@ -675,23 +675,7 @@ public:
 // CalcLigatureNotePosParams
 //----------------------------------------------------------------------------
 
-/**
- * member 0: the previous note (NULL if first one)
- * member 1: the doc
- **/
-
-class CalcLigatureNotePosParams : public FunctorParams {
-public:
-    CalcLigatureNotePosParams(Doc *doc)
-    {
-        m_previousNote = NULL;
-        m_previousRight = 0;
-        m_doc = doc;
-    }
-    Note *m_previousNote;
-    int m_previousRight;
-    Doc *m_doc;
-};
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
