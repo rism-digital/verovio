@@ -39,7 +39,7 @@ RunningElement::RunningElement() : Object("re"), ObjectListInterface(), AttHoriz
     Reset();
 }
 
-RunningElement::RunningElement(std::string classid) : Object(classid), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement(const std::string& classid) : Object(classid), AttHorizontalAlign(), AttTyped()
 {
     RegisterAttClass(ATT_HORIZONTALALIGN);
     RegisterAttClass(ATT_TYPED);

@@ -29,7 +29,7 @@ SystemElement::SystemElement() : FloatingObject("se"), AttTyped()
     Reset();
 }
 
-SystemElement::SystemElement(std::string classid) : FloatingObject(classid), AttTyped()
+SystemElement::SystemElement(const std::string& classid) : FloatingObject(classid), AttTyped()
 {
     RegisterAttClass(ATT_TYPED);
 

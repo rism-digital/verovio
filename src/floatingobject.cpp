@@ -53,7 +53,7 @@ FloatingObject::FloatingObject() : Object("fe")
     Reset();
 }
 
-FloatingObject::FloatingObject(std::string classid) : Object(classid)
+FloatingObject::FloatingObject(const std::string& classid) : Object(classid)
 {
     Reset();
 
