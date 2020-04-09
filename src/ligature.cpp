@@ -179,8 +179,12 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             }
             else {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
+                m_drawingShapes.at(n2) = LIGATURE_OBLIQUE_END;
                 // make sure we previous one is not oblique
-                if (n1 > 0) m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
+                if (n1 > 0) {
+                    m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
+                    m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE_UP;
+                }
             }
         }
         // B - B
@@ -190,9 +194,11 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             }
             else {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
+                m_drawingShapes.at(n2) = LIGATURE_OBLIQUE_END;
                 // make sure we previous one is not oblique
                 if (n1 > 0) {
                     m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
+                    m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE_UP;
                 }
                 else {
                     m_drawingShapes.at(n1) |= LIGATURE_STEM_LEFT_DOWN;

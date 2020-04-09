@@ -425,37 +425,70 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     /** code duplicated from View::DrawMaximaToBrevis */
     bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (isMensuralBlack || note->GetColored()) && !(isMensuralBlack && note->GetColored());
+    bool oblique = ((shape & LIGATURE_OBLIQUE) || (prevShape & LIGATURE_OBLIQUE));
 
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     int strokeWidth = 2.7 * stemWidth;
+    /** end code duplicated */
 
     Point topLeft, bottomRight;
     int sides[4];
     this->CalcBrevisPoints(note, staff, topLeft, bottomRight, sides, shape, isMensuralBlack);
 
+    Point topRight = topLeft;
+    topRight.x = bottomRight.x;
+    Point bottomLeft = bottomRight;
+    bottomLeft.x = topLeft.x;
+    
+    if (oblique) {
+        Point ligTopLeft = topLeft;
+        Point ligBottomRight = bottomRight;
+        int ligSlides[4];
+        memcpy(ligSlides, sides, 4 * sizeof(int));
+        // First half of the oblique - checking the nextNote is there just in case, but is should
+        if ((shape & LIGATURE_OBLIQUE) && nextNote) {
+            CalcBrevisPoints(nextNote, staff, ligTopLeft, ligBottomRight, ligSlides, 0, isMensuralBlack);
+            int diff = topLeft.y - ligTopLeft.y;
+            topRight.y = topRight.y - (diff / 2);
+            bottomRight.y = bottomRight.y - (diff / 2);
+            topRight.x -= stemWidth / 2;
+            bottomRight.x -= stemWidth / 2;
+        }
+        // Second half of the oblique - checking the prevNote is there just in case, but is should
+        else if ((prevShape & LIGATURE_OBLIQUE) && prevNote) {
+            CalcBrevisPoints(prevNote, staff, ligTopLeft, ligBottomRight, ligSlides, 0, isMensuralBlack);
+            int diff = topLeft.y - ligTopLeft.y;
+            topLeft.y = topLeft.y - (diff / 2);
+            bottomLeft.y = bottomLeft.y - (diff / 2);
+            topLeft.x += stemWidth / 2;
+            bottomLeft.x += stemWidth / 2;
+        }
+    }
+    
     if (!fillNotehead) {
         // double the bases of rectangles
-        DrawObliquePolygon(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, topLeft.y, -strokeWidth);
-        DrawObliquePolygon(
-            dc, topLeft.x + stemWidth, bottomRight.y, bottomRight.x - stemWidth, bottomRight.y, strokeWidth);
+        DrawObliquePolygon(dc, topLeft.x, topLeft.y, topRight.x, topRight.y, -strokeWidth);
+        DrawObliquePolygon(dc, bottomLeft.x, bottomLeft.y, bottomRight.x, bottomRight.y, strokeWidth);
     }
     else {
-        DrawFilledRectangle(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, bottomRight.y);
+        DrawObliquePolygon(dc, topLeft.x, topLeft.y, topRight.x, topRight.y, -2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     }
-
-    int sideTop = sides[0];
-    int sideBottom = sides[1];
-    if (prevNote) {
-        Point prevTopLeft = topLeft;
-        Point prevBottomRight = bottomRight;
-        int prevSides[4];
-        memcpy(prevSides, sides, 4 * sizeof(int));
-        if (prevNote)
-            CalcBrevisPoints(prevNote, staff, prevTopLeft, prevBottomRight, prevSides, prevShape, isMensuralBlack);
-        sideTop = std::max(sides[0], prevSides[2]);
-        sideBottom = std::min(sides[1], prevSides[3]);
+    
+    if ((prevShape & LIGATURE_OBLIQUE) == 0) {
+        int sideTop = sides[0];
+        int sideBottom = sides[1];
+        if (prevNote) {
+            Point prevTopLeft = topLeft;
+            Point prevBottomRight = bottomRight;
+            int prevSides[4];
+            memcpy(prevSides, sides, 4 * sizeof(int));
+            if (prevNote)
+                CalcBrevisPoints(prevNote, staff, prevTopLeft, prevBottomRight, prevSides, prevShape, isMensuralBlack);
+            sideTop = std::max(sides[0], prevSides[2]);
+            sideBottom = std::min(sides[1], prevSides[3]);
+        }
+        DrawFilledRectangle(dc, topLeft.x, sideTop, topLeft.x + stemWidth, sideBottom);
     }
-    DrawFilledRectangle(dc, topLeft.x, sideTop, topLeft.x + stemWidth, sideBottom);
 
     if (!nextNote) {
         DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
@@ -544,6 +577,7 @@ void View::CalcBrevisPoints(
     assert(staff);
 
     int y = note->GetDrawingY();
+    int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
     // Calculate size of the rectangle
     topLeft.x = note->GetDrawingX();
@@ -552,6 +586,22 @@ void View::CalcBrevisPoints(
 
     topLeft.y = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     bottomRight.y = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    
+    /*
+    if (!isMensuralBlack && ((shape & LIGATURE_OBLIQUE) || (shape & LIGATURE_OBLIQUE_END))) {
+        int adjustment = stemWidth;
+        if (shape & LIGATURE_OBLIQUE_UP) adjustment = -adjustment;
+        if (shape & LIGATURE_OBLIQUE) {
+            topLeft.y += adjustment;
+            bottomRight.y -= adjustment;
+            
+        }
+        if (shape & LIGATURE_OBLIQUE_END) {
+            topLeft.y += adjustment;
+            bottomRight.y -= adjustment;
+        }
+    }
+    */
 
     sides[0] = topLeft.y;
     sides[1] = bottomRight.y;
@@ -560,6 +610,10 @@ void View::CalcBrevisPoints(
         // add sherif
         sides[0] += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         sides[1] -= (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    }
+    else {
+        sides[0] -= (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        sides[1] += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
 
     sides[2] = sides[0];
