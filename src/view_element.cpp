@@ -514,13 +514,14 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if (stemDir == STEMDIRECTION_up) {
         if (drawingDur > DUR_1) {
             // Since we are adding the slashing on the stem, ignore artic
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false)
+                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             x = stemPoint.x;
         }
         else {
             // Take into account artic (not likely, though)
             y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
-                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 + (stemMod - 2) * step;
             x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
         }
         step = -step;
@@ -528,12 +529,13 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     else {
         if (drawingDur > DUR_1) {
             // Idem as above
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false)
+                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
         }
         else {
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
-                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
+                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 - (stemMod - 2) * step;
             x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
         }
     }
