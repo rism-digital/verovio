@@ -508,19 +508,19 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
     int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
     int width = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
-    int height = beamWidthBlack * 7 / 10;
-    int step = height + beamWidthWhite;
+    int height = beamWidthBlack * 2 / 3;
+    int step = beamWidthBlack + beamWidthWhite;
 
     if (stemDir == STEMDIRECTION_up) {
         if (drawingDur > DUR_1) {
             // Since we are adding the slashing on the stem, ignore artic
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - 3 * height;
+            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             x = stemPoint.x;
         }
         else {
             // Take into account artic (not likely, though)
             y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
-                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
+                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
         }
         step = -step;
@@ -528,8 +528,8 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     else {
         if (drawingDur > DUR_1) {
             // Idem as above
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) + 1 * height;
-            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
         }
         else {
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
@@ -548,7 +548,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // by default draw 3 slashes (e.g., for a temolo on a whole note)
     if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
     for (s = 1; s < stemMod; ++s) {
-        DrawObliquePolygon(dc, x - width / 2, y, x + width / 2, y + height, height);
+        DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
         y += step;
     }
 
