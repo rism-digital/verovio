@@ -398,8 +398,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
     if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
-        baseStem += params->m_chordStemLength;
-
         Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetStemPos() == STEMPOSITION_left) {
@@ -408,8 +406,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
             else {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
             }
-            baseStem += p.y;
-            this->SetDrawingStemLen(baseStem);
+            this->SetDrawingStemLen(baseStem + params->m_chordStemLength + p.y);
         }
         else {
             if (this->GetStemPos() == STEMPOSITION_right) {
@@ -418,8 +415,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
             else {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
             }
-            baseStem -= p.y;
-            this->SetDrawingStemLen(-baseStem);
+            this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - p.y));
         }
         this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
         this->SetDrawingXRel(p.x);
@@ -480,6 +476,18 @@ int Stem::CalcStem(FunctorParams *functorParams)
     if (adjust) {
         this->SetDrawingStemLen(this->GetDrawingStemLen() + (endY - params->m_verticalCenter));
         if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
+    }
+
+    // Adjust basic stem length to number of slashes
+    int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
+        + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
+    if (abs(baseStem) < ((this->GetStemMod()) * tremStep)) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - (this->GetStemMod() - 4) * tremStep);
+        }
+        else {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + (this->GetStemMod() - 4) * tremStep);
+        }
     }
 
     return FUNCTOR_CONTINUE;
