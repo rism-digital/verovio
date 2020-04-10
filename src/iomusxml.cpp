@@ -1871,7 +1871,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             else if (m_prevLayer) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
-                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN() + staffOffset)));
+                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
