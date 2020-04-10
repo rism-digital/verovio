@@ -443,6 +443,10 @@ int Stem::CalcStem(FunctorParams *functorParams)
         if ((this->GetStemLen() == 0) && flag) flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
+    if ((this->GetStemVisible() == BOOLEAN_false) && flag) {
+        flag->m_drawingNbFlags = 0;
+        return FUNCTOR_CONTINUE;
+    }
 
     // Do not adjust the length of grace notes - this is debatable and should probably become as styling option
     if (params->m_isGraceNote) return FUNCTOR_CONTINUE;
