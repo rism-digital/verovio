@@ -491,14 +491,16 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
 
-    if (bTrem->HasUnitdur()) {
-        switch (bTrem->GetUnitdur()) {
-            case (DUR_8): stemMod = STEMMODIFIER_1slash; break;
-            case (DUR_16): stemMod = STEMMODIFIER_2slash; break;
-            case (DUR_32): stemMod = STEMMODIFIER_3slash; break;
-            case (DUR_64): stemMod = STEMMODIFIER_4slash; break;
-            case (DUR_128): stemMod = STEMMODIFIER_5slash; break;
-            case (DUR_256): stemMod = STEMMODIFIER_6slash; break;
+    if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
+        int slashDur = bTrem->GetUnitdur() - drawingDur;
+        switch (slashDur) {
+            case (0): stemMod = STEMMODIFIER_NONE; break;
+            case (1): stemMod = STEMMODIFIER_1slash; break;
+            case (2): stemMod = STEMMODIFIER_2slash; break;
+            case (3): stemMod = STEMMODIFIER_3slash; break;
+            case (4): stemMod = STEMMODIFIER_4slash; break;
+            case (5): stemMod = STEMMODIFIER_5slash; break;
+            case (6): stemMod = STEMMODIFIER_6slash; break;
             default: break;
         }
     }
@@ -544,7 +546,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     int s;
     // by default draw 3 slashes (e.g., for a temolo on a whole note)
-    if (stemMod == STEMMODIFIER_NONE) stemMod = STEMMODIFIER_3slash;
+    if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
     for (s = 1; s < stemMod; ++s) {
         DrawObliquePolygon(dc, x - width / 2, y, x + width / 2, y + height, height);
         y += step;
