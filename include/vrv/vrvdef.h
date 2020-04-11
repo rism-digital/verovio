@@ -512,6 +512,20 @@ enum {
 };
 
 //----------------------------------------------------------------------------
+// Ligature shape bitfields
+//----------------------------------------------------------------------------
+
+enum {
+    LIGATURE_DEFAULT = 0,
+    LIGATURE_STEM_LEFT_UP = 1,
+    LIGATURE_STEM_LEFT_DOWN = 2,
+    LIGATURE_STEM_RIGHT_UP = 4,
+    LIGATURE_STEM_RIGHT_DOWN = 8,
+    LIGATURE_OBLIQUE = 16,
+    LIGATURE_STACKED = 32
+};
+
+//----------------------------------------------------------------------------
 // Bounding box access
 //----------------------------------------------------------------------------
 

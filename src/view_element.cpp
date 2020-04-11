@@ -593,9 +593,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         x = element->GetDrawingX();
     }
     int sym = 0;
-    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    bool isMensural = Att::IsMensuralType(staff->m_drawingNotationType);
     bool isNeume = staff->m_drawingNotationType == NOTATIONTYPE_neume;
 
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
@@ -1240,7 +1238,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    if (note->IsMensural()) {
+    if (note->IsMensuralDur()) {
         DrawMensuralNote(dc, element, layer, staff, measure);
         return;
     }
@@ -1302,7 +1300,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
-    if (rest->IsMensural()) {
+    if (rest->IsMensuralDur()) {
         DrawMensuralRest(dc, element, layer, staff, measure);
         return;
     }

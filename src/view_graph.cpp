@@ -95,12 +95,22 @@ void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2
 {
     assert(dc);
 
+    this->DrawFilledRoundedRectangle(dc, x1, y1, x2, y2, 0.0);
+
+    return;
+}
+
+void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, double radius)
+{
+    assert(dc);
+
     BoundingBox::Swap(y1, y2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
+    dc->DrawRoundedRectangle(
+        ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
 
     dc->ResetPen();
     dc->ResetBrush();
