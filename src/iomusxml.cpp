@@ -2561,7 +2561,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         trill->SetColor(xmlTrill.node().attribute("color").as_string());
         // place
         trill->SetPlace(trill->AttPlacement::StrToStaffrel(xmlTrill.node().attribute("placement").as_string()));
-        if (notations.node().select_node("ornaments/wavy-line")) {
+        if (std::strncmp(xmlTrill.node().next_sibling().name(), "wavy-line", 9) == 0) {
             trill->SetTstamp2(
                 std::pair<int, double>(0, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.99));
         }
