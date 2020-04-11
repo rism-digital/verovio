@@ -1550,7 +1550,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     pugi::xpath_node type = node.select_node("direction-type");
-    pugi::xpath_node extender = type.node().next_sibling("direction-type").first_child();
+    pugi::xpath_node extender;
+    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket") ||  !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
+        extender = type.node().next_sibling("direction-type").first_child();
+    }
     std::string placeStr = node.attribute("placement").as_string();
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
