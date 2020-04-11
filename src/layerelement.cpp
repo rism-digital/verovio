@@ -447,7 +447,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
     return this->GetDrawingY();
 }
 
-int LayerElement::GetDrawingRadius(Doc *doc)
+int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
 {
     assert(doc);
 
@@ -460,7 +460,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
-        if (note->IsMensuralDur()) {
+        if (note->IsMensuralDur() && !isInLigature) {
             code = note->GetMensuralSmuflNoteHead();
         }
     }
@@ -476,7 +476,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
     if (code) {
         return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
     }
-    else if (dur <= DUR_BR) {
+    else if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
         int widthFactor = (dur == DUR_MX) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.8;

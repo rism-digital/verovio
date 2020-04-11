@@ -578,7 +578,7 @@ void View::CalcBrevisPoints(
 
     // Calculate size of the rectangle
     topLeft->x = note->GetDrawingX();
-    int width = 2 * note->GetDrawingRadius(m_doc);
+    int width = 2 * note->GetDrawingRadius(m_doc, true);
     bottomRight->x = topLeft->x + width;
 
     topLeft->y = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);

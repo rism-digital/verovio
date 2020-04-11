@@ -139,7 +139,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(iter);
         assert(note);
 
-        int width = (note->GetDrawingRadius(params->m_doc) * 2)
+        int width = (note->GetDrawingRadius(params->m_doc, true) * 2)
             - params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         note->SetDrawingXRel(previousRight);
         previousRight += width;
