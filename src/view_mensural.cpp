@@ -431,37 +431,27 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     int strokeWidth = 2.7 * stemWidth;
     /** end code duplicated */
 
-    Point topLeft, bottomRight;
+    Point topLeft, bottomLeft, topRight, bottomRight;
     int sides[4];
-    this->CalcBrevisPoints(note, staff, topLeft, bottomRight, sides, shape, isMensuralBlack);
-
-    Point topRight = topLeft;
-    topRight.x = bottomRight.x;
-    Point bottomLeft = bottomRight;
-    bottomLeft.x = topLeft.x;
-    
-    if (oblique) {
-        Point ligTopLeft = topLeft;
-        Point ligBottomRight = bottomRight;
-        int ligSlides[4];
-        memcpy(ligSlides, sides, 4 * sizeof(int));
+    if (!oblique) {
+        this->CalcBrevisPoints(note, staff, topLeft, bottomRight, sides, shape, isMensuralBlack);
+        topRight = topLeft;
+        topRight.x = bottomRight.x;
+        bottomLeft = bottomRight;
+        bottomLeft.x = topLeft.x;
+    }
+    else {
         // First half of the oblique - checking the nextNote is there just in case, but is should
         if ((shape & LIGATURE_OBLIQUE) && nextNote) {
-            CalcBrevisPoints(nextNote, staff, ligTopLeft, ligBottomRight, ligSlides, 0, isMensuralBlack);
-            int diff = topLeft.y - ligTopLeft.y;
-            topRight.y = topRight.y - (diff / 2);
-            bottomRight.y = bottomRight.y - (diff / 2);
-            topRight.x -= stemWidth / 2;
-            bottomRight.x -= stemWidth / 2;
+            return;
+            CalcObliquePoints(note, nextNote, staff, topLeft, bottomLeft, topRight, bottomRight, sides, shape, isMensuralBlack);
         }
         // Second half of the oblique - checking the prevNote is there just in case, but is should
         else if ((prevShape & LIGATURE_OBLIQUE) && prevNote) {
-            CalcBrevisPoints(prevNote, staff, ligTopLeft, ligBottomRight, ligSlides, 0, isMensuralBlack);
-            int diff = topLeft.y - ligTopLeft.y;
-            topLeft.y = topLeft.y - (diff / 2);
-            bottomLeft.y = bottomLeft.y - (diff / 2);
-            topLeft.x += stemWidth / 2;
-            bottomLeft.x += stemWidth / 2;
+            CalcObliquePoints(prevNote, note, staff, topLeft, bottomLeft, topRight, bottomRight, sides, prevShape, isMensuralBlack);
+        }
+        else {
+            assert(false);
         }
     }
     
@@ -625,6 +615,58 @@ void View::CalcBrevisPoints(
     if (shape & LIGATURE_STEM_LEFT_DOWN) sides[1] = y - stem;
     if (shape & LIGATURE_STEM_RIGHT_UP) sides[2] = y + stem;
     if (shape & LIGATURE_STEM_RIGHT_DOWN) sides[3] = y - stem;
+}
+
+void View::CalcObliquePoints(
+    Note *note1, Note *note2, Staff *staff, Point &topLeft, Point &bottomLeft, Point &topRight, Point &bottomRight, int sides[4], int shape, bool isMensuralBlack)
+{
+    assert(note1);
+    assert(note2);
+    assert(staff);
+    
+    int sides1[4];
+    CalcBrevisPoints(note1, staff, topLeft, bottomLeft, sides1, shape, isMensuralBlack);
+    // Correct the x of bottomLeft
+    bottomLeft.x = topLeft.x;
+    // Copy the left sides
+    sides[0] = sides1[0];
+    sides[1] = sides1[1];
+    
+    int sides2[4];
+    CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, 0, isMensuralBlack);
+    // Correct the x of topRight;
+    topRight.x = bottomRight.x;
+    // Copy the right sides
+    sides[2] = sides2[2];
+    sides[3] = sides2[3];
+    
+    /*
+    if (oblique) {
+        Point ligTopLeft = topLeft;
+        Point ligBottomRight = bottomRight;
+        int ligSlides[4];
+        memcpy(ligSlides, sides, 4 * sizeof(int));
+        // First half of the oblique - checking the nextNote is there just in case, but is should
+        if ((shape & LIGATURE_OBLIQUE) && nextNote) {
+            CalcBrevisPoints(nextNote, staff, ligTopLeft, ligBottomRight, ligSlides, 0, isMensuralBlack);
+            int diff = topLeft.y - ligTopLeft.y;
+            topRight.y = topRight.y - (diff / 2);
+            bottomRight.y = bottomRight.y - (diff / 2);
+            topRight.x -= stemWidth / 2;
+            bottomRight.x -= stemWidth / 2;
+        }
+        // Second half of the oblique - checking the prevNote is there just in case, but is should
+        else if ((prevShape & LIGATURE_OBLIQUE) && prevNote) {
+            CalcBrevisPoints(prevNote, staff, ligTopLeft, ligBottomRight, ligSlides, 0, isMensuralBlack);
+            int diff = topLeft.y - ligTopLeft.y;
+            topLeft.y = topLeft.y - (diff / 2);
+            bottomLeft.y = bottomLeft.y - (diff / 2);
+            topLeft.x += stemWidth / 2;
+            bottomLeft.x += stemWidth / 2;
+        }
+    }
+    */
+    
 }
 
 } // namespace vrv

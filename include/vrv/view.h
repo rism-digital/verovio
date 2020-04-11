@@ -537,6 +537,8 @@ private:
      */
     void CalcBrevisPoints(
         Note *note, Staff *staff, Point &topLeft, Point &bottomRight, int sides[4], int shape, bool isMensuralBlack);
+    void CalcObliquePoints(
+        Note *note1, Note *note2, Staff *staff, Point &topLeft, Point &bottomLeft, Point &topRight, Point &bottomRight, int sides[4], int shape, bool isMensuralBlack);
 
     /**
      * Internal method for drawing a BeamSegment
