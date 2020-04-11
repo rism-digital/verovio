@@ -521,8 +521,13 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         else {
             // Take into account artic (not likely, though)
             y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
-                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 + (stemMod - 2) * step;
+                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + (stemMod - 2) * step;
             x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
+        }
+        if (drawingDur > DUR_4) {
+            Flag *flag = NULL;
+            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
+            if (flag) y -= (drawingDur > DUR_8) ? 2 * step : step;
         }
         step = -step;
     }
@@ -537,6 +542,11 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
                 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 - (stemMod - 2) * step;
             x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
+        }
+        if (drawingDur > DUR_4) {
+            Flag *flag = NULL;
+            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
+            if (flag) y += (drawingDur > DUR_8) ? 2 * step : step;
         }
     }
 
