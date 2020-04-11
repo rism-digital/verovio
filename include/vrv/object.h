@@ -58,7 +58,7 @@ public:
      */
     ///@{
     Object();
-    Object(std::string classid);
+    Object(const std::string& classid);
     virtual ~Object();
     virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
@@ -1137,7 +1137,7 @@ private:
     /**
      * Initialisation method taking a uuid prefix argument.
      */
-    void Init(std::string);
+    void Init(const std::string&);
 
 public:
     /**
