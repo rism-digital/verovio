@@ -522,9 +522,7 @@ enum {
     LIGATURE_STEM_RIGHT_UP = 4,
     LIGATURE_STEM_RIGHT_DOWN = 8,
     LIGATURE_OBLIQUE = 16,
-    LIGATURE_OBLIQUE_END = 32,
-    LIGATURE_OBLIQUE_UP = 64,
-    LIGATURE_STACKED = 128
+    LIGATURE_STACKED = 32
 };
 
 //----------------------------------------------------------------------------

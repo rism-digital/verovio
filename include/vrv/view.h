@@ -497,6 +497,7 @@ protected:
         bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
+    void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, double radius);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
     void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
@@ -536,9 +537,9 @@ private:
      * @name Internal methods for calcultating brevis / longa
      */
     void CalcBrevisPoints(
-        Note *note, Staff *staff, Point &topLeft, Point &bottomRight, int sides[4], int shape, bool isMensuralBlack);
-    void CalcObliquePoints(
-        Note *note1, Note *note2, Staff *staff, Point &topLeft, Point &bottomLeft, Point &topRight, Point &bottomRight, int sides[4], int shape, bool isMensuralBlack);
+        Note *note, Staff *staff, Point *topLeft, Point *bottomRight, int sides[4], int shape, bool isMensuralBlack);
+    void CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point points[4], int sides[4], int shape,
+        bool isMensuralBlack, bool firstHalf);
 
     /**
      * Internal method for drawing a BeamSegment

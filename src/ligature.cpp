@@ -157,10 +157,12 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
         bool up = (diatonicStep > 0);
         bool isLastNote = (note == lastNote);
 
+        /*
         if (dur1 == DUR_LG) previousNote->SetColor("red");
         if (dur1 == DUR_BR) previousNote->SetColor("green");
         if (dur2 == DUR_LG) note->SetColor("red");
         if (dur2 == DUR_BR) note->SetColor("green");
+        */
 
         // L - L
         if ((dur1 == DUR_LG) && (dur2 == DUR_LG)) {
@@ -179,11 +181,9 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             }
             else {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
-                m_drawingShapes.at(n2) = LIGATURE_OBLIQUE_END;
                 // make sure we previous one is not oblique
                 if (n1 > 0) {
                     m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
-                    m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE_UP;
                 }
             }
         }
@@ -194,11 +194,9 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             }
             else {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
-                m_drawingShapes.at(n2) = LIGATURE_OBLIQUE_END;
                 // make sure we previous one is not oblique
                 if (n1 > 0) {
                     m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
-                    m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE_UP;
                 }
                 else {
                     m_drawingShapes.at(n1) |= LIGATURE_STEM_LEFT_DOWN;
