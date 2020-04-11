@@ -38,7 +38,19 @@
 								<ligature>
 									<note dur="longa" pname="c" oct="4"/>
 									<note dur="longa" pname="a" oct="3"/>
-                                </ligature>						
+								</ligature>
+								<ligature>
+									<note dur="longa" pname="c" oct="4"/>
+									<note dur="longa" pname="b" oct="3"/>
+								</ligature>
+								<ligature>
+									<note dur="longa" pname="b" oct="3"/>
+									<note dur="longa" pname="a" oct="3"/>
+								</ligature>
+								<ligature>
+									<note dur="longa" pname="c" oct="4"/>
+									<note dur="longa" pname="g" oct="3"/>
+								</ligature>
 							</layer>
 						</staff>
 						<staff n="2">
@@ -47,12 +59,23 @@
 									<note dur="longa" pname="c" oct="4"/>
 									<note dur="longa" pname="a" oct="3"/>
 								</ligature>
+								<ligature>
+									<note dur="longa" pname="c" oct="4"/>
+									<note dur="longa" pname="b" oct="3"/>
+								</ligature>
+								<ligature>
+									<note dur="longa" pname="b" oct="3"/>
+									<note dur="longa" pname="a" oct="3"/>
+								</ligature>
+								<ligature>
+									<note dur="longa" pname="c" oct="4"/>
+									<note dur="longa" pname="g" oct="3"/>
+								</ligature>
 							</layer>
 						</staff>
 					</section>
-                </score>
+				</score>
 			</mdiv>
 		</body>
 	</music>
 </mei>
-

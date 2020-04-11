@@ -38,7 +38,19 @@
 								<ligature>
 									<note dur="brevis" pname="c" oct="4"/>
 									<note dur="brevis" pname="e" oct="4"/>
-                                </ligature>						
+								</ligature>
+								<ligature>
+									<note dur="brevis" pname="c" oct="4"/>
+									<note dur="brevis" pname="d" oct="4"/>
+								</ligature>
+								<ligature>
+									<note dur="brevis" pname="d" oct="4"/>
+									<note dur="brevis" pname="e" oct="4"/>
+								</ligature>
+								<ligature>
+									<note dur="brevis" pname="c" oct="4"/>
+									<note dur="brevis" pname="f" oct="4"/>
+								</ligature>
 							</layer>
 						</staff>
 						<staff n="2">
@@ -47,12 +59,23 @@
 									<note dur="brevis" pname="c" oct="4"/>
 									<note dur="brevis" pname="e" oct="4"/>
 								</ligature>
+								<ligature>
+									<note dur="brevis" pname="c" oct="4"/>
+									<note dur="brevis" pname="d" oct="4"/>
+								</ligature>
+								<ligature>
+									<note dur="brevis" pname="d" oct="4"/>
+									<note dur="brevis" pname="e" oct="4"/>
+								</ligature>
+								<ligature>
+									<note dur="brevis" pname="c" oct="4"/>
+									<note dur="brevis" pname="f" oct="4"/>
+								</ligature>
 							</layer>
 						</staff>
 					</section>
-                </score>
+				</score>
 			</mdiv>
 		</body>
 	</music>
 </mei>
-
