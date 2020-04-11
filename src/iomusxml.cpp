@@ -600,6 +600,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 else if (groupGymbol == "square") {
                     staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
                 }
+                std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
+                staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
