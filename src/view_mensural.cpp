@@ -311,31 +311,6 @@ void View::DrawMensuralStem(
     note->SetDrawingStemDir(dir);
 }
 
-void View::CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff)
-{
-    /*
-     if (element == NULL)
-     {
-     return;
-     }
-     LayerElement *previous = layer->GetPrevious(element);
-     if (previous == NULL || !previous->IsNote())
-     {
-     return;
-     }
-     Note *previousNote = dynamic_cast<Note*>(previous);
-     if (previousNote->m_lig==LIG_TERMINAL)
-     {
-     return;
-     }
-     if (previousNote->m_lig && previousNote->m_dur <= DUR_1)
-     {
-     element->SetDrawingX(previous->GetDrawingX() + m_doc->m_drawingBrevisWidth[staff->m_drawingStaffSize] * 2);
-     }
-     */
-    return;
-}
-
 void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff)
 {
     assert(dc);
@@ -465,8 +440,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawObliquePolygon(dc, bottomLeft->x, bottomLeft->y, bottomRight->x, bottomRight->y, strokeWidth);
     }
     else {
-        DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y,
-            -2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
     }
 
     if ((prevShape & LIGATURE_OBLIQUE) == 0) {
@@ -581,8 +555,9 @@ void View::CalcBrevisPoints(
     int width = 2 * note->GetDrawingRadius(m_doc, true);
     bottomRight->x = topLeft->x + width;
 
-    topLeft->y = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    bottomRight->y = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    double heightFactor = (isMensuralBlack) ? 0.8 : 1.0;
+    topLeft->y = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * heightFactor;
+    bottomRight->y = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * heightFactor;
 
     sides[0] = topLeft->y;
     sides[1] = bottomRight->y;
@@ -592,7 +567,7 @@ void View::CalcBrevisPoints(
         sides[0] += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
         sides[1] -= (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 3;
     }
-    else {
+    else if (shape & LIGATURE_OBLIQUE) {
         // shorten the sides to make sure they are note visible with oblique ligatures
         sides[0] -= (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         sides[1] += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
@@ -632,7 +607,8 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
     sides[1] = sides1[1];
 
     int sides2[4];
-    CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, 0, isMensuralBlack);
+    // add OBLIQUE shape to make sure sides are shortened in mensural black
+    CalcBrevisPoints(note2, staff, topRight, bottomRight, sides2, LIGATURE_OBLIQUE, isMensuralBlack);
     // Correct the x of topRight;
     topRight->x = bottomRight->x;
     // Copy the right sides

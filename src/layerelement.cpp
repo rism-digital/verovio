@@ -479,7 +479,7 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
     else if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
         int widthFactor = (dur == DUR_MX) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
-            return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.8;
+            return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.7;
         }
         else {
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
