@@ -600,6 +600,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 else if (groupGymbol == "square") {
                     staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
                 }
+                std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
+                staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
@@ -1548,7 +1550,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     pugi::xpath_node type = node.select_node("direction-type");
-    pugi::xpath_node extender = type.node().next_sibling("direction-type").first_child();
+    pugi::xpath_node extender;
+    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket") ||  !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
+        extender = type.node().next_sibling("direction-type").first_child();
+    }
     std::string placeStr = node.attribute("placement").as_string();
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
@@ -2120,6 +2125,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
+    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
 
     bool cue = false;
     if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
@@ -2130,14 +2136,13 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart) {
+    if (beamStart && !(tremolo.node(), "type", "start")) {
         Beam *beam = new Beam();
         AddLayerElement(layer, beam);
         m_elementStackMap.at(layer).push_back(beam);
     }
 
     // tremolos
-    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = 0;
     if (tremolo) {
         if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
