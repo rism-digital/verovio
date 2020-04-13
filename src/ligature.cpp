@@ -178,7 +178,8 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             if (up) {
                 m_drawingShapes.at(n1) = LIGATURE_STEM_RIGHT_DOWN;
             }
-            else {
+            // automatically set oblique on B only at the beginning and end
+            else if ((n1 == 0) || (isLastNote)) {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
                 // make sure we previous one is not oblique
                 if (n1 > 0) {
@@ -191,7 +192,8 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             if (up) {
                 // nothing to change
             }
-            else {
+            // automatically set oblique on B only at the beginning and end
+            else if ((n1 == 0) || (isLastNote)) {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
                 // make sure we previous one is not oblique
                 if (n1 > 0) {
@@ -234,7 +236,8 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             if (up) {
                 // nothing to change
             }
-            else {
+            // only set the oblique with the SB if the following B is not the start of an oblique
+            else if (note->GetLig() != noteAnlMensural_LIG_obliqua) {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
                 if (n1 > 0) {
                     m_drawingShapes.at(n1 - 1) &= ~LIGATURE_OBLIQUE;
