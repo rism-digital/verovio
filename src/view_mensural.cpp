@@ -325,7 +325,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     bool fillNotehead = (isMensuralBlack || note->GetColored()) && !(isMensuralBlack && note->GetColored());
 
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    int strokeWidth = 2.7 * stemWidth;
+    int strokeWidth = 2.8 * stemWidth;
 
     int shape = LIGATURE_DEFAULT;
     if (note->GetActualDur() != DUR_BR) {
@@ -403,7 +403,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     bool oblique = ((shape & LIGATURE_OBLIQUE) || (prevShape & LIGATURE_OBLIQUE));
 
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    int strokeWidth = 2.7 * stemWidth;
+    int strokeWidth = 2.8 * stemWidth;
     /** end code duplicated */
 
     Point points[4];
@@ -576,7 +576,8 @@ void View::CalcBrevisPoints(
     sides[2] = sides[0];
     sides[3] = sides[1];
 
-    int stem = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7;
+    int stem = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    stem *= (!isMensuralBlack) ? 7 : 5;
 
     if (shape & LIGATURE_STEM_LEFT_UP) sides[0] = y + stem;
     if (shape & LIGATURE_STEM_LEFT_DOWN) sides[1] = y - stem;
