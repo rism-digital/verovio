@@ -51,6 +51,22 @@
 									<note dur="semibrevis" pname="c" oct="4"/>
 									<note dur="semibrevis" pname="g" oct="3"/>
 								</ligature>
+								<ligature form="obliqua">
+									<note dur="semibrevis" pname="c" oct="4"/>
+									<note dur="semibrevis" pname="a" oct="3"/>
+								</ligature>
+								<ligature form="obliqua">
+									<note dur="semibrevis" pname="c" oct="4"/>
+									<note dur="semibrevis" pname="b" oct="3"/>
+								</ligature>
+								<ligature form="obliqua">
+									<note dur="semibrevis" pname="b" oct="3"/>
+									<note dur="semibrevis" pname="a" oct="3"/>
+								</ligature>
+								<ligature form="obliqua">
+									<note dur="semibrevis" pname="c" oct="4"/>
+									<note dur="semibrevis" pname="g" oct="3"/>
+								</ligature>
 							</layer>
 						</staff>
 						<staff n="2">
@@ -68,6 +84,22 @@
 									<note dur="semibrevis" pname="a" oct="3"/>
 								</ligature>
 								<ligature>
+									<note dur="semibrevis" pname="c" oct="4"/>
+									<note dur="semibrevis" pname="g" oct="3"/>
+								</ligature>
+								<ligature form="obliqua">
+									<note dur="semibrevis" pname="c" oct="4"/>
+									<note dur="semibrevis" pname="a" oct="3"/>
+								</ligature>
+								<ligature form="obliqua">
+									<note dur="semibrevis" pname="c" oct="4"/>
+									<note dur="semibrevis" pname="b" oct="3"/>
+								</ligature>
+								<ligature form="obliqua">
+									<note dur="semibrevis" pname="b" oct="3"/>
+									<note dur="semibrevis" pname="a" oct="3"/>
+								</ligature>
+								<ligature form="obliqua">
 									<note dur="semibrevis" pname="c" oct="4"/>
 									<note dur="semibrevis" pname="g" oct="3"/>
 								</ligature>

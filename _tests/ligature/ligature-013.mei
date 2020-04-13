@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Ligatures</title>
+			</titleStmt>
+			<pubStmt>
+				<date>2020-04-09</date>
+			</pubStmt>
+			<notesStmt>
+				<annot>Ligature example. SB-SB+B</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="unknown">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef n="1" notationtype="mensural.white" lines="5" clef.shape="C" clef.line="1"/>
+							<staffDef n="2" notationtype="mensural.black" lines="5" clef.shape="C" clef.line="1"/>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<staff n="1">
+							<layer n="1">
+								<ligature>
+									<note dur="semibrevis" pname="f" oct="4" lig="obliqua"/>
+									<note dur="semibrevis" pname="d" oct="4"/>
+									<note dur="brevis" pname="f" oct="4"/>
+								</ligature>
+							</layer>
+						</staff>
+						<staff n="2">
+							<layer n="1">
+								<ligature>
+									<note dur="semibrevis" pname="f" oct="4" lig="obliqua"/>
+									<note dur="semibrevis" pname="d" oct="4"/>
+									<note dur="brevis" pname="f" oct="4"/>
+								</ligature>
+							</layer>
+						</staff>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>
