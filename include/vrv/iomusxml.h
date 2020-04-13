@@ -341,7 +341,7 @@ private:
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
     /* To remember layer of last element (note) to handle chords */
-    Layer *m_prevLayer;
+    Layer *m_prevLayer = NULL;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */

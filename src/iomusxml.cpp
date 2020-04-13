@@ -1296,6 +1296,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // clear arpeggio stack so no other notes may be added.
     if (!m_ArpeggioStack.empty()) m_ArpeggioStack.clear();
 
+    // clear prevLayer
+    m_prevLayer = NULL;
+
     return true;
 }
 
@@ -1616,6 +1619,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
             }
+            else if (m_prevLayer) {
+                dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+            }
+
             TextRendition(words, dir);
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             dir->SetVgrp(defaultY);
@@ -1656,6 +1664,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
             dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
                 std::to_string(staffNode.node().text().as_int() + staffOffset)));
         }
+        else if (m_prevLayer) {
+            dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
+                std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+        }
+
         if (defaultY == 0) defaultY = dynamics.node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
         defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1780,6 +1793,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
             }
+            else if (m_prevLayer) {
+                hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+            }
             int defaultY = wedge.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align hairpins
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1790,10 +1807,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
                     int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
                     hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
-                    Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByType(STAFF));
-                    assert(staff);
                     hairpin->SetStaff(
-                        staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(std::get<0>(*iter))));
+                        hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(std::get<0>(*iter))));
                     m_controlElements.push_back(std::make_pair(measureNum, hairpin));
                     m_hairpinStopStack.erase(iter);
                     return;
@@ -1858,6 +1873,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
+            else if (m_prevLayer) {
+                pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
@@ -2039,7 +2058,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(measure);
 
     Layer *layer;
-    if (!node.select_node("voice")) { // if no layer info, stay at previous layer
+    if (!node.select_node("voice") && m_prevLayer) { // if no layer info, stay at previous layer
         layer = m_prevLayer;
     }
     else {
