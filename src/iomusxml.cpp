@@ -2566,9 +2566,10 @@ void MusicXmlInput::ReadMusicXmlNote(
         trill->SetColor(xmlTrill.node().attribute("color").as_string());
         // place
         trill->SetPlace(trill->AttPlacement::StrToStaffrel(xmlTrill.node().attribute("placement").as_string()));
-        if (notations.node().select_node("ornaments/wavy-line")) {
-            trill->SetTstamp2(
-                std::pair<int, double>(0, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.99));
+        if (notations.node().select_node("ornaments/wavy-line[@type='stop']")) {
+            double duration = atoi(GetContentOfChild(node, "duration").c_str()) + 0.9999;
+            trill->SetExtender(BOOLEAN_true);
+            trill->SetTstamp2(std::pair<int, double>(0, duration));
         }
     }
 
