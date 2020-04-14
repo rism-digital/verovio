@@ -75,6 +75,11 @@ int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    // Right aligned cannot overflow
+    if (this->GetChildRendAlignment() == HORIZONTALALIGNMENT_right) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     assert(params->m_currentSystem);
 
     // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
