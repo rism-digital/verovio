@@ -129,10 +129,14 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
     const ArrayOfObjects *notes = this->GetList(this);
     assert(notes);
+    if (notes->size() < 2) return FUNCTOR_SIBLINGS;
+
     Note *previousNote = NULL;
+    bool previousUp = false;
     int n1 = 0;
     int n2 = 1;
 
+    bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool oblique = false;
     if ((notes->size() == 2) && this->GetForm() == LIGATUREFORM_obliqua) oblique = true;
 
@@ -258,16 +262,21 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             }
         }
 
-        /*
-        if (isLastNote && up && (diatonicStep > 2)) {
-            note->SetDrawingXRel(previousRight - 2 * width);
-            //note->SetColor("red");
-            return FUNCTOR_SIBLINGS;
+        // With mensural back notation, stack longa going up
+        if (isLastNote && isMensuralBlack && (dur2 == DUR_LG) && up) {
+            // Stack only if a least a third
+            int stackThreshold = 1;
+            // If the previous was going down, adjust the threshold
+            if ((n1 > 0) && !previousUp) {
+                // For oblique, stack but only from a fourth, for recta, never stack them
+                stackThreshold = (m_drawingShapes.at(n1 - 1) & LIGATURE_OBLIQUE) ? 2 : -VRV_UNSET;
+            }
+            if (diatonicStep > stackThreshold) m_drawingShapes.at(n2) = LIGATURE_STACKED;
         }
-        */
 
         oblique = false;
         previousNote = note;
+        previousUp = up;
         n1++;
         n2++;
     }
@@ -286,6 +295,8 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
         // previousRight is 0 for the first note
         int width = (note->GetDrawingRadius(params->m_doc, true) * 2)
             - params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        // With stacked notes, back-track the position
+        if (m_drawingShapes.at(n1 + 1) & LIGATURE_STACKED) previousRight -= width;
         note->SetDrawingXRel(previousRight);
         previousRight += width;
 
