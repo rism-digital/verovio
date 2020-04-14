@@ -600,6 +600,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 else if (groupGymbol == "square") {
                     staffGrp->SetSymbol(staffGroupingSym_SYMBOL_bracketsq);
                 }
+                std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
+                staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
@@ -1294,6 +1296,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     // clear arpeggio stack so no other notes may be added.
     if (!m_ArpeggioStack.empty()) m_ArpeggioStack.clear();
 
+    // clear prevLayer
+    m_prevLayer = NULL;
+
     return true;
 }
 
@@ -1548,7 +1553,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     pugi::xpath_node type = node.select_node("direction-type");
-    pugi::xpath_node extender = type.node().next_sibling("direction-type").first_child();
+    pugi::xpath_node extender;
+    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket") ||  !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
+        extender = type.node().next_sibling("direction-type").first_child();
+    }
     std::string placeStr = node.attribute("placement").as_string();
     int offset = node.select_node("offset").node().text().as_int();
     double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
@@ -1611,6 +1619,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
             }
+            else if (m_prevLayer) {
+                dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+            }
+
             TextRendition(words, dir);
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             dir->SetVgrp(defaultY);
@@ -1651,6 +1664,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
             dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
                 std::to_string(staffNode.node().text().as_int() + staffOffset)));
         }
+        else if (m_prevLayer) {
+            dynam->SetStaff(dynam->AttStaffIdent::StrToXsdPositiveIntegerList(
+                std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+        }
+
         if (defaultY == 0) defaultY = dynamics.node().attribute("default-y").as_int();
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
         defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1775,6 +1793,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
             }
+            else if (m_prevLayer) {
+                hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
+            }
             int defaultY = wedge.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align hairpins
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
@@ -1785,10 +1807,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 if (std::get<2>(*iter).m_dirN == hairpinNumber) {
                     int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
                     hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
-                    Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByType(STAFF));
-                    assert(staff);
                     hairpin->SetStaff(
-                        staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(std::get<0>(*iter))));
+                        hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(std::get<0>(*iter))));
                     m_controlElements.push_back(std::make_pair(measureNum, hairpin));
                     m_hairpinStopStack.erase(iter);
                     return;
@@ -1853,6 +1873,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(staffNode.node().text().as_int() + staffOffset)));
+            }
+            else if (m_prevLayer) {
+                pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
+                    std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
@@ -2034,7 +2058,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(measure);
 
     Layer *layer;
-    if (!node.select_node("voice")) { // if no layer info, stay at previous layer
+    if (!node.select_node("voice") && m_prevLayer) { // if no layer info, stay at previous layer
         layer = m_prevLayer;
     }
     else {
@@ -2120,6 +2144,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
+    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
 
     bool cue = false;
     if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
@@ -2130,14 +2155,13 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart) {
+    if (beamStart && !(tremolo.node(), "type", "start")) {
         Beam *beam = new Beam();
         AddLayerElement(layer, beam);
         m_elementStackMap.at(layer).push_back(beam);
     }
 
     // tremolos
-    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = 0;
     if (tremolo) {
         if (HasAttributeWithValue(tremolo.node(), "type", "single")) {

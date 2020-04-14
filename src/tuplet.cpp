@@ -262,7 +262,7 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
-    if (!this->HasNumVisible() || (this->GetNumVisible() == BOOLEAN_true)) {
+    if (this->HasNum() && (!this->HasNumVisible() || (this->GetNumVisible() == BOOLEAN_true))) {
         if (!currentNum) {
             currentNum = new TupletNum();
             this->AddChild(currentNum);
@@ -296,6 +296,11 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
+
+    // Nothing to do if there is no number
+    if (!this->HasNum()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     // Nothing to do if the bracket and the num are not visible
     if ((this->GetBracketVisible() == BOOLEAN_false) && (this->GetNumVisible() == BOOLEAN_false)) {
@@ -374,6 +379,11 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
+
+    // Nothing to do if there is no number
+    if (!this->HasNum()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     // Nothing to do if the bracket and the num are not visible
     if ((this->GetBracketVisible() == BOOLEAN_false) && (this->GetNumVisible() == BOOLEAN_false)) {

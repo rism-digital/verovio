@@ -327,8 +327,9 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
         m_textX -= extend.m_width;
     }
     else if (m_textAlignment == HORIZONTALALIGNMENT_center) {
-        m_textX -= (extend.m_width / 2);
+        m_textX -= extend.m_width / 2;
     }
+
     UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
 }
 

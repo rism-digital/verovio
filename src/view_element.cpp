@@ -1244,7 +1244,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    if (note->IsMensural()) {
+    if (note->IsMensuralDur()) {
         DrawMensuralNote(dc, element, layer, staff, measure);
         return;
     }
@@ -1310,7 +1310,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
-    if (rest->IsMensural()) {
+    if (rest->IsMensuralDur()) {
         DrawMensuralRest(dc, element, layer, staff, measure);
         return;
     }

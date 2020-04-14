@@ -293,7 +293,7 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
-typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
+typedef std::multimap<std::string, LinkingInterface *> ArrayOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 
@@ -517,6 +517,20 @@ enum {
     POSITION_TOP = 0,
     POSITION_MIDDLE = 3,
     POSITION_BOTTOM = 6,
+};
+
+//----------------------------------------------------------------------------
+// Ligature shape bitfields
+//----------------------------------------------------------------------------
+
+enum {
+    LIGATURE_DEFAULT = 0,
+    LIGATURE_STEM_LEFT_UP = 1,
+    LIGATURE_STEM_LEFT_DOWN = 2,
+    LIGATURE_STEM_RIGHT_UP = 4,
+    LIGATURE_STEM_RIGHT_DOWN = 8,
+    LIGATURE_OBLIQUE = 16,
+    LIGATURE_STACKED = 32
 };
 
 //----------------------------------------------------------------------------

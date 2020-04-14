@@ -161,7 +161,7 @@ public:
     /**
      * Return the drawing radius for notes and chords
      */
-    int GetDrawingRadius(Doc *doc);
+    int GetDrawingRadius(Doc *doc, bool isInLigature = false);
 
     /**
      * Alignment getter
