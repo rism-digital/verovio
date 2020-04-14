@@ -95,12 +95,12 @@ void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2
 {
     assert(dc);
 
-    this->DrawFilledRoundedRectangle(dc, x1, y1, x2, y2, 0.0);
+    this->DrawFilledRoundedRectangle(dc, x1, y1, x2, y2, 0);
 
     return;
 }
 
-void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, double radius)
+void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius)
 {
     assert(dc);
 

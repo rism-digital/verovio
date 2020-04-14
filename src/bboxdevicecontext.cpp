@@ -213,7 +213,7 @@ void BBoxDeviceContext::DrawRectangle(int x, int y, int width, int height)
     DrawRoundedRectangle(x, y, width, height, 0);
 }
 
-void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, double radius)
+void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
     // avoid negative heights or widths
     if (height < 0) {

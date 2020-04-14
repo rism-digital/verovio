@@ -665,7 +665,7 @@ void SvgDeviceContext::DrawRectangle(int x, int y, int width, int height)
     DrawRoundedRectangle(x, y, width, height, 0);
 }
 
-void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, double radius)
+void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
     std::string s;
 

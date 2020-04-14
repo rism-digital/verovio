@@ -81,7 +81,7 @@ public:
     virtual void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
-    virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
+    virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius);
     virtual void DrawText(
         const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET);
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);

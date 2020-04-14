@@ -496,7 +496,7 @@ protected:
         bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
-    void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, double radius);
+    void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
     void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
