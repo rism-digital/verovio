@@ -401,6 +401,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (isMensuralBlack || note->GetColored()) && !(isMensuralBlack && note->GetColored());
     bool oblique = ((shape & LIGATURE_OBLIQUE) || (prevShape & LIGATURE_OBLIQUE));
+    bool obliqueEnd = (prevShape & LIGATURE_OBLIQUE);
+    bool stackedEnd = (shape & LIGATURE_STACKED);
 
     int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     int strokeWidth = 2.8 * stemWidth;
@@ -443,7 +445,8 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawObliquePolygon(dc, topLeft->x, topLeft->y, topRight->x, topRight->y, bottomLeft->y - topLeft->y);
     }
 
-    if ((prevShape & LIGATURE_OBLIQUE) == 0) {
+    // Do not draw a left connector with obliques
+    if (!obliqueEnd) {
         int sideTop = sides[0];
         int sideBottom = sides[1];
         if (prevNote) {
@@ -451,11 +454,15 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
             Point prevBottomRight = *bottomRight;
             int prevSides[4];
             memcpy(prevSides, sides, 4 * sizeof(int));
-            if (prevNote)
-                CalcBrevisPoints(
-                    prevNote, staff, &prevTopLeft, &prevBottomRight, prevSides, prevShape, isMensuralBlack);
-            sideTop = std::max(sides[0], prevSides[2]);
-            sideBottom = std::min(sides[1], prevSides[3]);
+            CalcBrevisPoints(prevNote, staff, &prevTopLeft, &prevBottomRight, prevSides, prevShape, isMensuralBlack);
+            if (!stackedEnd) {
+                sideTop = std::max(sides[0], prevSides[2]);
+                sideBottom = std::min(sides[1], prevSides[3]);
+            }
+            else {
+                // Stacked end - simply use the bottom right [3] note since the interval is going up anyway
+                sides[3] = prevSides[3];
+            }
         }
         DrawFilledRoundedRectangle(dc, topLeft->x, sideTop, topLeft->x + stemWidth, sideBottom, 6.0);
     }
