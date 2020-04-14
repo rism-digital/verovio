@@ -155,8 +155,13 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
         if (previousNote->GetLig() == noteAnlMensural_LIG_obliqua) oblique = true;
         int dur1 = previousNote->GetActualDur();
         int dur2 = note->GetActualDur();
-        // Same treatment for maximas and longa execpt for positionning, which is done above
-        if (dur1 == DUR_MX) dur1 = DUR_LG;
+        // Same treatment for Mx and LG execpt for positionning, which is done above
+        // We still need to avoid oblique, so keep a flag.
+        bool isMaxima = false;
+        if (dur1 == DUR_MX) {
+            dur1 = DUR_LG;
+            isMaxima = true;
+        }
         if (dur2 == DUR_MX) dur2 = DUR_LG;
 
         int diatonicStep = note->GetDiatonicPitch() - previousNote->GetDiatonicPitch();
@@ -178,8 +183,8 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
             if (up) {
                 m_drawingShapes.at(n1) = LIGATURE_STEM_RIGHT_DOWN;
             }
-            // automatically set oblique on B only at the beginning and end
-            else if ((n1 == 0) || (isLastNote)) {
+            // automatically set oblique on B, but not with Mx and only at the beginning and end
+            else if (!isMaxima && ((n1 == 0) || (isLastNote))) {
                 m_drawingShapes.at(n1) = LIGATURE_OBLIQUE;
                 // make sure we previous one is not oblique
                 if (n1 > 0) {
