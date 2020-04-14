@@ -1167,7 +1167,12 @@ void Toolkit::RedoLayout()
     }
 
     m_doc.UnCastOffDoc();
-    m_doc.CastOffDoc();
+    if (m_options->m_breaks.GetValue() == BREAKS_line) {
+        m_doc.CastOffLineDoc();
+    }
+    else {
+        m_doc.CastOffDoc();
+    }
 }
 
 void Toolkit::RedoPagePitchPosLayout()
