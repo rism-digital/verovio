@@ -622,23 +622,25 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    int option = m_options->m_breaks.GetValue();
-    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs) && (option != BREAKS_none)) {
-        if (input->HasLayoutInformation() && (option == BREAKS_encoded || option == BREAKS_line)) {
-            if (option == BREAKS_encoded) {
+    int breaks = m_options->m_breaks.GetValue();
+    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI to be converted
+    if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
+    if (breaks != BREAKS_none) {
+        if (input->HasLayoutInformation() && (breaks == BREAKS_encoded || breaks == BREAKS_line)) {
+            if (breaks == BREAKS_encoded) {
                 // LogElapsedTimeStart();
                 m_doc.CastOffEncodingDoc();
                 // LogElapsedTimeEnd("layout");
             }
-            else if (option == BREAKS_line) {
+            else if (breaks == BREAKS_line) {
                 m_doc.CastOffLineDoc();
             }
         }
         else {
-            if (option == BREAKS_encoded) {
+            if (breaks == BREAKS_encoded) {
                 LogWarning("Requesting layout with encoded breaks but nothing provided in the data");
             }
-            else if (option == BREAKS_line) {
+            else if (breaks == BREAKS_line) {
                 LogWarning("Requesting layout with line breaks but nothing provided in the data");
             }
             // LogElapsedTimeStart();
