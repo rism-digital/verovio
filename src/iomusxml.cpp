@@ -2014,7 +2014,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
-    harmText += ConvertAlterToSymbol(GetContent(alter.node()));
+    if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xpath_node kind = node.select_node("kind");
     if (kind) {
         if (HasAttributeWithValue(kind.node(), "use-symbols", "yes")) {
@@ -2155,7 +2155,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart && !(tremolo.node(), "type", "start")) {
+    if (beamStart && !(tremolo.node().select_node("@type[text()='start']"))) {
         Beam *beam = new Beam();
         AddLayerElement(layer, beam);
         m_elementStackMap.at(layer).push_back(beam);
@@ -2585,9 +2585,10 @@ void MusicXmlInput::ReadMusicXmlNote(
         trill->SetColor(xmlTrill.node().attribute("color").as_string());
         // place
         trill->SetPlace(trill->AttPlacement::StrToStaffrel(xmlTrill.node().attribute("placement").as_string()));
-        if (notations.node().select_node("ornaments/wavy-line")) {
-            trill->SetTstamp2(
-                std::pair<int, double>(0, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.99));
+        if (notations.node().select_node("ornaments/wavy-line[@type='stop']")) {
+            double duration = atoi(GetContentOfChild(node, "duration").c_str()) + 0.9999;
+            trill->SetExtender(BOOLEAN_true);
+            trill->SetTstamp2(std::pair<int, double>(0, duration));
         }
     }
 
