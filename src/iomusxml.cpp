@@ -1554,7 +1554,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     pugi::xpath_node type = node.select_node("direction-type");
     pugi::xpath_node extender;
-    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket") ||  !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
+    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket")
+        || !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
         extender = type.node().next_sibling("direction-type").first_child();
     }
     std::string placeStr = node.attribute("placement").as_string();

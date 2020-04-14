@@ -804,7 +804,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // get the duration of the event
         duration = this->GetAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        
+
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
         // The time will be reset to 0.0 when starting a new layer anyway
@@ -818,8 +818,6 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
         assert(m_alignment);
     }
-
-
 
     if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {
         if (m_alignment->AddLayerElementRef(this)) params->m_hasMultipleLayer = true;
