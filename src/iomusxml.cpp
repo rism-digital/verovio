@@ -2136,7 +2136,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart && !(tremolo.node(), "type", "start")) {
+    if (beamStart && !(tremolo.node().select_node("@type[text()='start']"))) {
         Beam *beam = new Beam();
         AddLayerElement(layer, beam);
         m_elementStackMap.at(layer).push_back(beam);
