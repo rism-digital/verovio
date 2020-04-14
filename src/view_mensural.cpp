@@ -464,11 +464,11 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
                 sides[3] = prevSides[3];
             }
         }
-        DrawFilledRoundedRectangle(dc, topLeft->x, sideTop, topLeft->x + stemWidth, sideBottom, 6.0);
+        DrawFilledRoundedRectangle(dc, topLeft->x, sideTop, topLeft->x + stemWidth, sideBottom, stemWidth / 3);
     }
 
     if (!nextNote) {
-        DrawFilledRoundedRectangle(dc, bottomRight->x - stemWidth, sides[2], bottomRight->x, sides[3], 6.0);
+        DrawFilledRoundedRectangle(dc, bottomRight->x - stemWidth, sides[2], bottomRight->x, sides[3], stemWidth / 3);
     }
 
     return;
