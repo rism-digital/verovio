@@ -27,6 +27,7 @@ Trill::Trill()
     , AttColor()
     , AttExtender()
     , AttLineRend()
+    , AttNNumberLike()
     , AttOrnamentAccid()
     , AttPlacement()
 {
@@ -34,6 +35,7 @@ Trill::Trill()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_EXTENDER);
     RegisterAttClass(ATT_LINEREND);
+    RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
 
@@ -49,6 +51,7 @@ void Trill::Reset()
     ResetColor();
     ResetExtender();
     ResetLineRend();
+    ResetNNumberLike();
     ResetOrnamentAccid();
     ResetPlacement();
 }

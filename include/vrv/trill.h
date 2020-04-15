@@ -27,6 +27,7 @@ class Trill : public ControlElement,
               public AttColor,
               public AttExtender,
               public AttLineRend,
+              public AttNNumberLike,
               public AttOrnamentAccid,
               public AttPlacement {
 public:
