@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Right alignment of text</title>
+			</titleStmt>
+			<pubStmt>
+				<date>2020-04-15</date>
+			</pubStmt>
+			<notesStmt>
+				<annot>Right-justified text at end of system should not add space after barline</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="2.7.0" label="2">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<extMeta><![CDATA[ { "breaks": "encoded" }]]></extMeta>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef midi.bpm="400">
+						<staffGrp>
+							<staffDef clef.shape="G" clef.line="2" n="1" lines="5">
+								<label/>
+							</staffDef>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<pb/>
+						<measure n="0">
+							<staff n="1">
+								<layer n="1">
+									<note dur="1" oct="4" pname="c" accid.ges="n"/>
+								</layer>
+							</staff>
+						</measure>
+						<measure n="2">
+							<staff n="1">
+								<layer n="1">
+									<note dur="1" oct="4" pname="d" accid.ges="n"/>
+								</layer>
+							</staff>
+						</measure>
+						<measure n="3">
+							<staff n="1">
+								<layer n="1">
+									<note dur="1" oct="4" pname="f" accid.ges="n"/>
+								</layer>
+							</staff>
+							<dir place="above" staff="1" tstamp="5.000000">
+								<rend halign="right" fontstyle="normal">some text</rend>
+							</dir>
+						</measure>
+						<sb type="original"/>
+						<measure n="4">
+							<staff n="1">
+								<layer n="1">
+									<note dur="1" oct="4" pname="c" accid.ges="n"/>
+								</layer>
+							</staff>
+						</measure>
+						<measure n="5">
+							<staff n="1">
+								<layer n="1">
+									<note dur="1" oct="4" pname="d" accid.ges="n"/>
+								</layer>
+							</staff>
+						</measure>
+						<measure right="end" n="6">
+							<staff n="1">
+								<layer n="1">
+									<note dur="1" oct="4" pname="e" accid.ges="n"/>
+								</layer>
+							</staff>
+							<dir place="below" staff="1" tstamp="5.000000">
+								<rend halign="right">fine</rend>
+							</dir>
+						</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>
