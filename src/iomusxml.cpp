@@ -2125,7 +2125,6 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
-    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
 
     bool cue = false;
     if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
@@ -2136,13 +2135,14 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart && !(tremolo.node().select_node("@type[text()='start']"))) {
+    if (beamStart && !(notations.node().select_node("ornaments/tremolo[@type='start']"))) {
         Beam *beam = new Beam();
         AddLayerElement(layer, beam);
         m_elementStackMap.at(layer).push_back(beam);
     }
 
     // tremolos
+    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = 0;
     if (tremolo) {
         if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
@@ -2155,7 +2155,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             FTrem *fTrem = new FTrem();
             AddLayerElement(layer, fTrem);
             m_elementStackMap.at(layer).push_back(fTrem);
-            fTrem->SetBeams(tremolo.node().text().as_int());
+            int beams = tremolo.node().text().as_int();
+            beams += beamStart ? 1 : 0;
+            fTrem->SetBeams(beams);
         }
     }
 
