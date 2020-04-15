@@ -78,6 +78,10 @@
     loadExample_1_1 = loadExample_1_0;
     
     function loadExample_2_0(data, div, options, page = 1) {
+        // Reset default options
+        defaultOptions = vrvToolkit.getOptions(true);
+        vrvToolkit.setOptions( defaultOptions );
+        // Set the passed options
         vrvToolkit.setOptions( options );
         try {
             vrvToolkit.loadData(data);
@@ -101,17 +105,22 @@
     loadExample_2_6 = loadExample_2_5;
 
     function loadExample_2_7(data, div, options, page = 1) {
-        vrvToolkit.setOptions( options );
+        let svg = '';
         try {
+            // Reset default options
+            defaultOptions = vrvToolkit.getOptions(true);
+            vrvToolkit.setOptions( defaultOptions );
+            // Set the passed options
+            vrvToolkit.setOptions( options );
             vrvToolkit.loadData(data);
             $(div + '-meiCode pre').text(vrvToolkit.getMEI( ));
             $(div + '-meiDiv').show();
+            svg = vrvToolkit.renderToSVG(page, {});
         }
         catch(err) {
             $(div + '-errLog pre').html(err);
             $(div + '-errDiv').show();
         }
-        svg = vrvToolkit.renderToSVG(page, {});
         $(div).html(svg);
     }
     
@@ -273,9 +282,16 @@
                                         default: $('#label-{{ id }}').addClass("label-default");
                                     }
 
-                                    // default options for the current version
-                                    options = window["defaultOptions_" + vrvVersion];
+                                    // Get the version from the /appInfo/application@version
+                                    var extMetaOptions = xml.evaluate("//mei:meiHead/mei:extMeta/text()", xml, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                                    fileOptions = "{}";
+                                    if (extMetaOptions.singleNodeValue) fileOptions = extMetaOptions.singleNodeValue.data;
+
+                                    // default options for the current version - make a copy
+                                    var options = Object.assign({}, window["defaultOptions_" + vrvVersion]);
                                     options.pageWidth = ($("#{{ id }}").width()) * 100 / options.scale ;
+                                    // set the file options (if any);
+                                    options = Object.assign(options, JSON.parse(fileOptions));
                                     // load function for the current version
                                     loadFunction = window["loadExample_" + vrvVersion];
                                     loadFunction(data, "#{{ id }}", options );
