@@ -1113,27 +1113,27 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     if (!m_ClefChangeStack.empty()) {
         for (musicxml::ClefChange iter : m_ClefChangeStack) {
             if (iter.isFirst)
-                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted.",
+                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
                     iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
         }
         m_ClefChangeStack.clear();
     }
     if (!m_tieStack.empty()) {
-        LogWarning("MusicXML import: There are %d ties left open.", m_tieStack.size());
+        LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
         m_tieStack.clear();
     }
     if (!m_slurStack.empty()) { // There are slurs left open
         std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
         for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: Slur element '%s' could not be ended.", iter->first->GetUuid().c_str());
+            LogWarning("MusicXML import: slur '%s' could not be ended", iter->first->GetUuid().c_str());
         }
         m_slurStack.clear();
     }
     if (!m_slurStopStack.empty()) { // There are slurs ends without opening
         std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
         for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
-            LogWarning("MusicXML import: Slur ending for element '%s' could not be "
-                       "matched to a start element.",
+            LogWarning("MusicXML import: slur ending for element '%s' could not be "
+                       "matched to a start element",
                 iter->first->GetUuid().c_str());
         }
         m_slurStopStack.clear();
@@ -1142,14 +1142,21 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
         for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
             LogWarning(
-                "MusicXML import: Dashes/extender lines for '%s' could not be closed.", iter->first->GetUuid().c_str());
+                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetUuid().c_str());
         }
         m_openDashesStack.clear();
     }
     if (!m_bracketStack.empty()) { // open brackets without ending
         std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            LogWarning("MusicXML import: BracketSpan for '%s' could not be closed.", iter->first->GetUuid().c_str());
+            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
+        }
+        m_bracketStack.clear();
+    }
+    if (!m_trillStack.empty()) { // open trills without ending
+        std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
+            LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter->first->GetUuid().c_str());
         }
         m_bracketStack.clear();
     }
@@ -1551,7 +1558,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     pugi::xpath_node type = node.select_node("direction-type");
     pugi::xpath_node extender;
-    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket") ||  !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
+    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket")
+        || !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
         extender = type.node().next_sibling("direction-type").first_child();
     }
     std::string placeStr = node.attribute("placement").as_string();
@@ -1848,8 +1856,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (xmlPedal) {
         std::string pedalType = xmlPedal.node().attribute("type").as_string();
         std::string pedalLine = xmlPedal.node().attribute("line").as_string();
-        // do not import pedal start lines until engraving supported, but import stops anyway
-        if (pedalLine != "yes" || pedalType == "stop") {
+        // do not import pedal start lines until engraving supported
+        if (pedalLine != "yes") {
             Pedal *pedal = new Pedal();
             pedal->SetTstamp(timeStamp);
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
@@ -1866,7 +1874,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
-        else {
+        else if (pedalType == "start") {
             LogWarning("MusicXML import: pedal lines are not supported");
         }
     }
@@ -2559,7 +2567,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // trill
     pugi::xpath_node xmlTrill = notations.node().select_node("ornaments/trill-mark");
-    if (xmlTrill) {
+    pugi::xpath_node xmlTrillLine = notations.node().select_node("ornaments/wavy-line[@type='start']");
+    if (xmlTrill || xmlTrillLine) {
         Trill *trill = new Trill();
         m_controlElements.push_back(std::make_pair(measureNum, trill));
         trill->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
@@ -2568,10 +2577,29 @@ void MusicXmlInput::ReadMusicXmlNote(
         trill->SetColor(xmlTrill.node().attribute("color").as_string());
         // place
         trill->SetPlace(trill->AttPlacement::StrToStaffrel(xmlTrill.node().attribute("placement").as_string()));
-        if (notations.node().select_node("ornaments/wavy-line[@type='stop']")) {
-            double duration = atoi(GetContentOfChild(node, "duration").c_str()) + 0.9999;
+        if (xmlTrillLine) {
             trill->SetExtender(BOOLEAN_true);
-            trill->SetTstamp2(std::pair<int, double>(0, duration));
+            trill->SetN(xmlTrillLine.node().attribute("number").as_string());
+            if (!xmlTrill) {
+                trill->SetLstartsym(LINESTARTENDSYMBOL_none);
+                trill->SetColor(xmlTrillLine.node().attribute("color").as_string());
+                trill->SetPlace(
+                    trill->AttPlacement::StrToStaffrel(xmlTrillLine.node().attribute("placement").as_string()));
+            }
+            musicxml::OpenSpanner openTrill(1, m_measureCounts.at(measure));
+            m_trillStack.push_back(std::make_pair(trill, openTrill));
+        }
+    }
+    if (!m_trillStack.empty() && notations.node().select_node("ornaments/wavy-line[@type='stop']")) {
+        int extNumber
+            = notations.node().select_node("ornaments/wavy-line[@type='stop']").node().attribute("number").as_int();
+        std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
+            int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
+            if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
+                (iter->first)->SetTstamp2(std::pair<int, double>(measureDifference, m_durTotal + 0.9999));
+                m_trillStack.erase(iter--);
+            }
         }
     }
 
