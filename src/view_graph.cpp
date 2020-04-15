@@ -243,8 +243,8 @@ void View::DrawSmuflLine(
     dc->ResetBrush();
 }
 
-void View::DrawSmuflString(
-    DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize, bool dimin, bool setBBGlyph)
+void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data_HORIZONTALALIGNMENT alignment,
+    int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
 
@@ -253,10 +253,15 @@ void View::DrawSmuflString(
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
-    if (center) {
+    if (alignment == HORIZONTALALIGNMENT_center) {
         TextExtend extend;
         dc->GetSmuflTextExtent(s, &extend);
         xDC -= extend.m_width / 2;
+    }
+    else if (alignment == HORIZONTALALIGNMENT_right) {
+        TextExtend extend;
+        dc->GetSmuflTextExtent(s, &extend);
+        xDC -= extend.m_width;
     }
 
     dc->DrawMusicText(s, xDC, ToDeviceContextY(y), setBBGlyph);

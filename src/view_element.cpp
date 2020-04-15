@@ -267,7 +267,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    DrawSmuflString(dc, x, y, accidStr, true, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+    DrawSmuflString(
+        dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
     dc->EndGraphic(element, this);
 }
@@ -974,7 +975,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-        DrawSmuflString(dc, x, y, accidStr, false, staff->m_drawingStaffSize, false);
+        DrawSmuflString(dc, x, y, accidStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
         TextExtend extend;
         dc->GetSmuflTextExtent(accidStr, &extend);
         x += extend.m_width + step;
@@ -1199,7 +1200,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     start_offset = (x2 - x1 - extend.m_width) / 2; // calculate offset to center text
     int y = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                                         : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    DrawSmuflString(dc, x1 + start_offset, y, wtext, false);
+    DrawSmuflString(dc, x1 + start_offset, y, wtext, HORIZONTALALIGNMENT_left);
     dc->ResetFont();
 
     dc->EndGraphic(element, this);
@@ -1527,13 +1528,13 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den
     x += (extend.m_width / 2);
 
     if (den) {
-        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator, true,
-            staff->m_drawingStaffSize);
-        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator, true,
-            staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator,
+            HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator,
+            HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
     }
     else
-        DrawSmuflString(dc, x, y, timeSigCombNumerator, true, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
 
     dc->ResetFont();
 }

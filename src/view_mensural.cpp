@@ -497,11 +497,11 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     dc->SetFont(m_doc->GetDrawingSmuflFont(textSize, false));
 
     wtext = IntToTimeSigFigures(num);
-    DrawSmuflString(dc, x, ynum, wtext, true, textSize); // true = center
+    DrawSmuflString(dc, x, ynum, wtext, HORIZONTALALIGNMENT_center, textSize); // true = center
 
     if (numBase) {
         wtext = IntToTimeSigFigures(numBase);
-        DrawSmuflString(dc, x, yden, wtext, true, textSize); // true = center
+        DrawSmuflString(dc, x, yden, wtext, HORIZONTALALIGNMENT_center, textSize); // true = center
     }
 
     dc->ResetFont();
