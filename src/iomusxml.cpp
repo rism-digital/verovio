@@ -1876,7 +1876,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
             Pedal *pedal = new Pedal();
             pedal->SetTstamp(timeStamp);
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
-            if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            if (pedalType == "sostenuto") pedal->SetFunc("sostenuto");
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -3049,6 +3050,10 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
         return pedalLog_DIR_down;
     else if (value == "stop")
         return pedalLog_DIR_up;
+    else if (value == "sostenuto")
+        return pedalLog_DIR_down;
+    else if (value == "change")
+        return pedalLog_DIR_bounce;
     else {
         LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
         return pedalLog_DIR_NONE;
