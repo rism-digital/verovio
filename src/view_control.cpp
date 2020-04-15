@@ -923,7 +923,7 @@ void View::DrawTrillExtension(
     // Adjust the x1 for the tr symbol
     if (trill->GetLstartsym() == LINESTARTENDSYMBOL_none) {
         x1 -= trill->GetStart()->GetDrawingRadius(m_doc);
-        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
     else if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         int offsetFactor = 2;
