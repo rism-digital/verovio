@@ -2,47 +2,46 @@
 <?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
-	<meiHead>
-		<fileDesc>
-			<titleStmt>
-				<title />
-			</titleStmt>
-			<pubStmt>
-				<date>2016-07-31 11:16:50</date>
-			</pubStmt>
-		</fileDesc>
-		<encodingDesc>
-			<projectDesc>
-				<p>Transcoded from Humdrum with Verovio version 0.9.12-dev-a018b75-dirty</p>
-			</projectDesc>
-		</encodingDesc>
-	</meiHead>
-	<music>
-		<body>
-			<mdiv>
-				<score>
-					<scoreDef xml:id="scoredef-000000189826729">
-						<staffGrp xml:id="m-000000118962902" barthru="true">
-							<staffDef xml:id="staffdef-000000102225279" clef.shape="G" clef.line="2" key.sig="3f" meter.count="4" meter.unit="4" n="1" lines="5" />
-							
-						</staffGrp>
-					</scoreDef>
-					<section>
-						<measure xml:id="measure-000000031403486" n="1">
-							<staff xml:id="staff-000000002130464" n="1">
-								<layer xml:id="layer-000000160833120" n="1">
-									<note dur="4" oct="4" pname="f" />
-									<note dur="4" oct="4" pname="f" />
-									<note dur="4" oct="4" pname="f" />
-								</layer>
-							</staff>
-							<dynam staff="1" tstamp="1.0">ff e senza sordini mon non sfz</dynam>
-							<dynam staff="1" tstamp="2.0"><rend fontfam="Times">sempre pp e senza sordini</rend></dynam>
-							<dynam staff="1" tstamp="3.0">sempre fff rfz e poi<lb/>poco <rend fontstyle="normal" fontweight="bold">a</rend> poco crescendo ma non ffff<lb/>troppo</dynam>
-						</measure>
-					</section>
-				</score>
-			</mdiv>
-		</body>
-	</music>
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title />
+            </titleStmt>
+            <pubStmt>
+                <date>2016-07-31 11:16:50</date>
+            </pubStmt>
+        </fileDesc>
+        <encodingDesc>
+            <projectDesc>
+                <p>Transcoded from Humdrum with Verovio version 0.9.12-dev-a018b75-dirty</p>
+            </projectDesc>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000189826729">
+                        <staffGrp xml:id="m-000000118962902" bar.thru="true">
+                            <staffDef xml:id="staffdef-000000102225279" clef.shape="G" clef.line="2" key.sig="3f" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000031403486" n="1">
+                            <staff xml:id="staff-000000002130464" n="1">
+                                <layer xml:id="layer-000000160833120" n="1">
+                                    <note dur="4" oct="4" pname="f" />
+                                    <note dur="4" oct="4" pname="f" />
+                                    <note dur="4" oct="4" pname="f" />
+                                </layer>
+                            </staff>
+                            <dynam staff="1" tstamp="1.0">ff e senza sordini mon non sfz</dynam>
+                            <dynam staff="1" tstamp="2.0"><rend fontfam="Times">sempre pp e senza sordini</rend></dynam>
+                            <dynam staff="1" tstamp="3.0">sempre fff rfz e poi<lb/>poco <rend fontstyle="normal" fontweight="bold">a</rend> poco crescendo ma non ffff<lb/>troppo</dynam>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
 </mei>
