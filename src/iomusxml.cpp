@@ -2182,9 +2182,15 @@ void MusicXmlInput::ReadMusicXmlNote(
             FTrem *fTrem = new FTrem();
             AddLayerElement(layer, fTrem);
             m_elementStackMap.at(layer).push_back(fTrem);
-            int beams = tremolo.node().text().as_int();
-            beams += beamStart ? 1 : 0;
-            fTrem->SetBeams(beams);
+            int beamFloatNum = tremolo.node().text().as_int(); // number of floating beams
+            int beamAttachedNum = 0; // number of attached beams
+            while (beamStart && beamAttachedNum < 8) { // count number of (attached) beams, max 8
+                std::ostringstream o;
+                o << "beam[@number='" << ++beamAttachedNum + 1 << "'][text()='begin']";
+                beamStart = node.select_node(o.str().c_str());
+            }
+            fTrem->SetBeams(beamFloatNum + beamAttachedNum);
+            fTrem->SetBeamsFloat(beamFloatNum);
         }
     }
 
