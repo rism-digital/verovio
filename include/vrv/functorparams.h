@@ -1554,7 +1554,7 @@ public:
 class PrepareTimePointingParams : public FunctorParams {
 public:
     PrepareTimePointingParams() {}
-    ArrayOfPointingInterClassIdPairs m_timePointingInterfaces;
+    ListOfPointingInterClassIdPairs m_timePointingInterfaces;
 };
 
 //----------------------------------------------------------------------------
@@ -1569,7 +1569,7 @@ public:
 class PrepareTimeSpanningParams : public FunctorParams {
 public:
     PrepareTimeSpanningParams() { m_fillList = true; }
-    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
     bool m_fillList;
 };
 
@@ -1579,14 +1579,14 @@ public:
 
 /**
  * member 0: std::vector< Object*>* that holds the current elements to match
- * member 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+ * member 1:  ListOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
  **/
 
 class PrepareTimestampsParams : public FunctorParams {
 public:
     PrepareTimestampsParams() {}
-    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
-    ArrayOfObjectBeatPairs m_tstamps;
+    ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    ListOfObjectBeatPairs m_tstamps;
 };
 
 //----------------------------------------------------------------------------
