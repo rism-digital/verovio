@@ -2625,7 +2625,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
             int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
             if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
-                (iter->first)->SetTstamp2(std::pair<int, double>(measureDifference, m_durTotal + 0.9999));
+                (iter->first)->SetTstamp2(std::pair<int, double>(measureDifference, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1));
                 m_trillStack.erase(iter--);
             }
         }
