@@ -1876,7 +1876,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
             Pedal *pedal = new Pedal();
             pedal->SetTstamp(timeStamp);
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
-            if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            if (pedalType == "sostenuto") pedal->SetFunc("sostenuto");
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -2172,13 +2173,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = 0;
     if (tremolo) {
-        if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
-            BTrem *bTrem = new BTrem();
-            AddLayerElement(layer, bTrem);
-            m_elementStackMap.at(layer).push_back(bTrem);
-            tremSlashNum = tremolo.node().text().as_int();
-        }
-        else if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
+        if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
             FTrem *fTrem = new FTrem();
             AddLayerElement(layer, fTrem);
             m_elementStackMap.at(layer).push_back(fTrem);
@@ -2191,6 +2186,14 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
             fTrem->SetBeams(beamFloatNum + beamAttachedNum);
             fTrem->SetBeamsFloat(beamFloatNum);
+        }
+        else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
+            // this is default tremolo type in MusicXML
+            BTrem *bTrem = new BTrem();
+            AddLayerElement(layer, bTrem);
+            m_elementStackMap.at(layer).push_back(bTrem);
+            tremSlashNum = tremolo.node().text().as_int();
+            // if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) bTrem->SetForm(bTremLog_FORM_unmeas);
         }
     }
 
@@ -2622,7 +2625,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
             int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
             if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
-                (iter->first)->SetTstamp2(std::pair<int, double>(measureDifference, m_durTotal + 0.9999));
+                (iter->first)->SetTstamp2(std::pair<int, double>(measureDifference, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1));
                 m_trillStack.erase(iter--);
             }
         }
@@ -3049,6 +3052,10 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
         return pedalLog_DIR_down;
     else if (value == "stop")
         return pedalLog_DIR_up;
+    else if (value == "sostenuto")
+        return pedalLog_DIR_down;
+    else if (value == "change")
+        return pedalLog_DIR_bounce;
     else {
         LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
         return pedalLog_DIR_NONE;
