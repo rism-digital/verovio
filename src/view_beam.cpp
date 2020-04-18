@@ -168,13 +168,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         fullBars = allBars;
         floatingBars = 0;
     }
-    else if (dur == DUR_4) {
-        x1 += space;
-        y1 += space * fTrem->m_beamSegment.m_beamSlope;
-        x2 -= space;
-        y2 -= space * fTrem->m_beamSegment.m_beamSlope;
-    }
-    else if ((dur > DUR_4) && !floatingBars) {
+    else if ((dur > DUR_2) && !floatingBars) {
         fullBars = dur - 4;
         floatingBars = allBars - fullBars;
     }
