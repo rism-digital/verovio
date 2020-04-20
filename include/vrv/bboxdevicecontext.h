@@ -113,7 +113,8 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend = false);
+    virtual void StartGraphic(
+        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false);
     virtual void EndGraphic(Object *object, View *view);
     ///@}
 

@@ -199,7 +199,9 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartGraphic(Object *object, std::string gClass, std::string gId, bool preprend = false) = 0;
+    virtual void StartGraphic(
+        Object *object, std::string gClass, std::string gId, bool primary = true, bool preprend = false)
+        = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}
 

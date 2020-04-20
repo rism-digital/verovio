@@ -109,7 +109,8 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend = false);
+    virtual void StartGraphic(
+        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false);
     virtual void EndGraphic(Object *object, View *view);
     ///@}
 
@@ -160,6 +161,11 @@ public:
     ///@}
 
     /**
+     * Add id, data-id and class attributes
+     */
+    void AppendIdAndClass(std::string gId, std::string baseClass, std::string addedClasses, bool primary = true);
+
+    /**
      * In SVG use global styling but not with mm output (for pdf generation)
      */
     virtual bool UseGlobalStyling() { return !m_mmOutput; }
@@ -181,6 +187,11 @@ public:
      * Setting m_svgViewBox flag (false by default)
      */
     void SetSvgViewBox(bool svgViewBox) { m_svgViewBox = svgViewBox; }
+
+    /**
+     * Setting m_html5 flag (false by default)
+     */
+    void SetHtml5(bool html5) { m_html5 = html5; }
 
 private:
     /**
@@ -253,6 +264,8 @@ private:
     bool m_svgBoundingBoxes;
     // use viewbox on svg root element
     bool m_svgViewBox;
+    // output HTML5 data-* attributes
+    bool m_html5;
 };
 
 } // namespace vrv
