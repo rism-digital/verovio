@@ -32,6 +32,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "ftrem.h"
+#include "gliss.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "instrdef.h"
@@ -2547,7 +2548,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     }
 
-    // Dynamics
+    // dynamics
     pugi::xpath_node xmlDynam = notations.node().select_node("dynamics");
     if (xmlDynam) {
         Dynam *dynam = new Dynam();
@@ -2571,6 +2572,31 @@ void MusicXmlInput::ReadMusicXmlNote(
         fermata->SetStartid(m_ID);
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         ShapeFermata(fermata, xmlFermata.node());
+    }
+
+    // glissando and slide
+    pugi::xpath_node_set glissandi = notations.node().select_nodes("glissando|slide");
+    for (pugi::xpath_node_set::const_iterator it = glissandi.begin(); it != glissandi.end(); ++it) {
+        pugi::xml_node xmlGlissando = it->node();
+        if (HasAttributeWithValue(xmlGlissando, "type", "start")) {
+            Gliss *gliss = new Gliss();
+            m_controlElements.push_back(std::make_pair(measureNum, gliss));
+            gliss->SetLform(gliss->AttLineRendBase::StrToLineform(xmlGlissando.attribute("line-type").as_string()));
+            gliss->SetN(xmlGlissando.attribute("number").as_string());
+            gliss->SetStartid(m_ID);
+            gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            m_glissStack.push_back(gliss);
+        }
+        else if (!m_glissStack.empty()) {
+            int extNumber = xmlGlissando.attribute("number").as_int();
+            std::vector<Gliss *>::iterator iter;
+            for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
+                if (atoi(((*iter)->GetN()).c_str()) == extNumber) {
+                    (*iter)->SetEndid(m_ID);
+                    m_glissStack.erase(iter--);
+                }
+            }
+        }
     }
 
     // mordents
@@ -2625,7 +2651,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
             int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
             if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
-                (iter->first)->SetTstamp2(std::pair<int, double>(measureDifference, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1));
+                (iter->first)
+                    ->SetTstamp2(std::pair<int, double>(
+                        measureDifference, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1));
                 m_trillStack.erase(iter--);
             }
         }

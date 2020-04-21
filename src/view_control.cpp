@@ -1562,7 +1562,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
     assert(dc);
     assert(gliss);
     assert(staff);
-    
+
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
 
