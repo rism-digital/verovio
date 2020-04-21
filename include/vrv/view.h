@@ -36,6 +36,7 @@ class Fb;
 class Fig;
 class FloatingCurvePositioner;
 class Fermata;
+class Gliss;
 class Hairpin;
 class Harm;
 class Layer;
@@ -411,6 +412,8 @@ protected:
         Object *graphic = NULL);
     void DrawFConnector(
         DeviceContext *dc, F *f, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *staff, char spanningType,
+        Object *graphic = NULL);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(

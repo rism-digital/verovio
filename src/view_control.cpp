@@ -29,6 +29,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "functorparams.h"
+#include "gliss.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
@@ -69,7 +70,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -150,7 +151,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ SLUR, BRACKETSPAN, HAIRPIN, OCTAVE, TIE })) return;
+            if (element->Is({ SLUR, BRACKETSPAN, GLISS, HAIRPIN, OCTAVE, TIE })) return;
         }
     }
 
@@ -284,12 +285,18 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(FIGURE)) {
-            // cast to Dynam check in DrawFConnector
+            // cast to F check in DrawFConnector
             DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(BRACKETSPAN)) {
             // cast to BracketSpan check in DrawBracketSpan
             DrawBracketSpan(dc, dynamic_cast<BracketSpan *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(GLISS)) {
+            // For gliss we limit support to one value in @staff
+            if (staffIter != staffList.begin()) continue;
+            // cast to Gliss check in DrawGliss
+            DrawGliss(dc, dynamic_cast<Gliss *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -325,6 +332,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 void View::DrawBracketSpan(
     DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
+    assert(dc);
     assert(bracketSpan);
     assert(staff);
 
@@ -1547,6 +1555,98 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     }
 
     dc->EndGraphic(fermata, this);
+}
+
+void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(gliss);
+    assert(staff);
+    
+    int y1 = staff->GetDrawingY();
+    int y2 = staff->GetDrawingY();
+
+    /************** parent layers **************/
+
+    Note *note1 = dynamic_cast<Note *>(gliss->GetStart());
+    Note *note2 = dynamic_cast<Note *>(gliss->GetEnd());
+
+    if (!note1 && !note2) {
+        // no note, obviously nothing to do...
+        // this also means that notes with tstamp events are not supported
+        return;
+    }
+
+    LayerElement *durElement = NULL;
+    Chord *parentChord1 = NULL;
+    Layer *layer1 = NULL;
+    if (note1) {
+        durElement = note1;
+        layer1 = dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
+        parentChord1 = note1->IsChordTone();
+    }
+    if (parentChord1) {
+        durElement = parentChord1;
+    }
+
+    /************** x positions **************/
+
+    bool isShortTie = false;
+    // shortTie correction cannot be applied for chords
+    if (!parentChord1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
+        isShortTie = true;
+    }
+
+    // the normal case
+    if (spanningType == SPANNING_START_END) {
+        if (note1) {
+            y1 = note1->GetDrawingY();
+        }
+        if (note2) {
+            y2 = note2->GetDrawingY();
+        }
+        // isShort is never true with tstamp1
+        if (!isShortTie) {
+            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+            x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+            if (note1 && note1->GetDots() > 0) {
+                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
+            }
+            else if (parentChord1 && (parentChord1->GetDots() > 0)) {
+                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
+            }
+        }
+    }
+    else {
+        LogDebug("Gliss across an entire system is not supported");
+        return;
+    }
+
+    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+    wchar_t endGlyph = (gliss->GetLendsym() == LINESTARTENDSYMBOL_arrow) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
+
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else {
+        dc->StartGraphic(gliss, "", gliss->GetUuid(), false);
+    }
+
+    if (gliss->GetLform() == LINEFORM_wavy) {
+        // Smufl glyphs are horizontal - Rotate them counter clockwise
+        // dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
+        DrawSmuflLine(dc, Point(x1, y1), x2 - x1, staff->m_drawingStaffSize, false, fillGlyph, 0, endGlyph);
+    }
+    else {
+        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 2);
+    }
+
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(gliss, this);
+    }
 }
 
 void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system)
