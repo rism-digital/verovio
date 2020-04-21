@@ -72,7 +72,7 @@ bool AttAlignment::HasWhen() const
 
 /* include <attwhen> */
 
-bool Att::SetPerformance(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetPerformance(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ALIGNMENT)) {
         AttAlignment *att = dynamic_cast<AttAlignment *>(element);
