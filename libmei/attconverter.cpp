@@ -873,7 +873,7 @@ std::string AttConverter::CoursetuningToStr(data_COURSETUNING data) const
     return value;
 }
 
-data_COURSETUNING AttConverter::StrToCoursetuning(std::string value, bool logWarning) const
+data_COURSETUNING AttConverter::StrToCoursetuning(const std::string &value, bool logWarning) const
 {
     if (value == "guitar-drop-D") return COURSETUNING_guitar_drop_D;
     if (value == "lute-renaissance-6") return COURSETUNING_lute_renaissance_6;

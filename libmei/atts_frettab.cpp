@@ -133,7 +133,7 @@ bool AttNoteGesTab::HasTabFret() const
 
 /* include <atttab.fret> */
 
-bool Att::SetFrettab(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetFrettab(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_COURSELOG)) {
         AttCourseLog *att = dynamic_cast<AttCourseLog *>(element);
