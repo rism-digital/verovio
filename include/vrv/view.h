@@ -483,6 +483,7 @@ protected:
     ///@{
     void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength = 0);
     void DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength = 0);
+    void DrawRoundedLine(DeviceContext *dc, int x1, int y1, int x2, int y2, int width);
     void DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength = 0);
     void DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength = 0);
     void DrawSmuflCode(

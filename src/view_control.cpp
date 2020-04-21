@@ -1638,7 +1638,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         DrawSmuflLine(dc, Point(x1, y1), x2 - x1, staff->m_drawingStaffSize, false, fillGlyph, 0, endGlyph);
     }
     else {
-        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 2);
+        DrawRoundedLine(dc, x1, y1, x2, y2, lineWidth);
     }
 
     if (graphic) {
