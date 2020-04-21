@@ -2581,6 +2581,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (HasAttributeWithValue(xmlGlissando, "type", "start")) {
             Gliss *gliss = new Gliss();
             m_controlElements.push_back(std::make_pair(measureNum, gliss));
+            gliss->SetColor(xmlGlissando.attribute("color").as_string());
             gliss->SetLform(gliss->AttLineRendBase::StrToLineform(xmlGlissando.attribute("line-type").as_string()));
             gliss->SetN(xmlGlissando.attribute("number").as_string());
             gliss->SetStartid(m_ID);
