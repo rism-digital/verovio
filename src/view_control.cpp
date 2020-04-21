@@ -1622,6 +1622,27 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         return;
     }
 
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2;
+    if (gliss->HasLwidth()) {
+        if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
+            if (gliss->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
+                lineWidth *= LINEWIDTHTERM_factor_narrow;
+            }
+            else if (gliss->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
+                lineWidth *= LINEWIDTHTERM_factor_medium;
+            }
+            else if (gliss->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
+                lineWidth *= LINEWIDTHTERM_factor_wide;
+            }
+        }
+        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
+            if (gliss->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
+                lineWidth
+                    = gliss->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize * 2);
+            }
+        }
+    }
+
     wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
     wchar_t endGlyph = (gliss->GetLendsym() == LINESTARTENDSYMBOL_arrow) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
