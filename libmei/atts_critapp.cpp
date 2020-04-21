@@ -72,7 +72,7 @@ bool AttCrit::HasCause() const
 
 /* include <attcause> */
 
-bool Att::SetCritapp(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetCritapp(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_CRIT)) {
         AttCrit *att = dynamic_cast<AttCrit *>(element);

@@ -270,7 +270,7 @@ bool AttRegularMethod::HasMethod() const
 
 /* include <attmethod> */
 
-bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetHeader(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_BIFOLIUMSURFACES)) {
         AttBifoliumSurfaces *att = dynamic_cast<AttBifoliumSurfaces *>(element);
