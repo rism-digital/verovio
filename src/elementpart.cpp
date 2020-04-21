@@ -424,7 +424,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
     int slashFactor = this->GetStemMod() - 4;
-    
+
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
         flag = dynamic_cast<Flag *>(this->FindDescendantByType(FLAG));
