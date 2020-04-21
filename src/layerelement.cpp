@@ -72,7 +72,7 @@ LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInter
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid)
+LayerElement::LayerElement(const std::string &classid)
     : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
@@ -810,7 +810,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // get the duration of the event
         duration = this->GetAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        
+
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
         // The time will be reset to 0.0 when starting a new layer anyway
@@ -824,8 +824,6 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
         assert(m_alignment);
     }
-
-
 
     if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {
         if (m_alignment->AddLayerElementRef(this)) params->m_hasMultipleLayer = true;
@@ -1535,7 +1533,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
-    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
     while (iter != params->m_timePointingInterfaces.end()) {
         if (iter->first->SetStartOnly(this)) {
             // We have both the start and the end that are matched
@@ -1559,7 +1557,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
-    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         if (iter->first->SetStartAndEnd(this)) {
             // We have both the start and the end that are matched

@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Improved bTrem handling (@rettinghaus)
 * Improved trill support (@rettinghaus)
 * Option for using encoded line breaks, but automatic page breaks (--breaks=line) (@earboxer)
 * Support for `trill@extender` (@rettinghaus)

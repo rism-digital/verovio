@@ -273,7 +273,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    DrawSmuflString(dc, x, y, accidStr, true, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
+    DrawSmuflString(
+        dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
     dc->EndGraphic(element, this);
 }
@@ -497,14 +498,16 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
 
-    if (bTrem->HasUnitdur()) {
-        switch (bTrem->GetUnitdur()) {
-            case (DUR_8): stemMod = STEMMODIFIER_1slash; break;
-            case (DUR_16): stemMod = STEMMODIFIER_2slash; break;
-            case (DUR_32): stemMod = STEMMODIFIER_3slash; break;
-            case (DUR_64): stemMod = STEMMODIFIER_4slash; break;
-            case (DUR_128): stemMod = STEMMODIFIER_5slash; break;
-            case (DUR_256): stemMod = STEMMODIFIER_6slash; break;
+    if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
+        int slashDur = bTrem->GetUnitdur() - drawingDur;
+        switch (slashDur) {
+            case (0): stemMod = STEMMODIFIER_NONE; break;
+            case (1): stemMod = STEMMODIFIER_1slash; break;
+            case (2): stemMod = STEMMODIFIER_2slash; break;
+            case (3): stemMod = STEMMODIFIER_3slash; break;
+            case (4): stemMod = STEMMODIFIER_4slash; break;
+            case (5): stemMod = STEMMODIFIER_5slash; break;
+            case (6): stemMod = STEMMODIFIER_6slash; break;
             default: break;
         }
     }
@@ -512,33 +515,45 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
     int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
     int width = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
-    int height = beamWidthBlack * 7 / 10;
-    int step = height + beamWidthWhite;
+    int height = beamWidthBlack * 2 / 3;
+    int step = beamWidthBlack + beamWidthWhite;
 
     if (stemDir == STEMDIRECTION_up) {
         if (drawingDur > DUR_1) {
             // Since we are adding the slashing on the stem, ignore artic
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - 3 * height;
+            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false)
+                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             x = stemPoint.x;
         }
         else {
             // Take into account artic (not likely, though)
             y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
-                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
+                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + (stemMod - 2) * step;
             x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
+        }
+        if (drawingDur > DUR_4) {
+            Flag *flag = NULL;
+            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
+            if (flag) y -= (drawingDur > DUR_8) ? 2 * step : step;
         }
         step = -step;
     }
     else {
         if (drawingDur > DUR_1) {
             // Idem as above
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) + 1 * height;
-            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false)
+                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
         }
         else {
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
-                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
+                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 - (stemMod - 2) * step;
             x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
+        }
+        if (drawingDur > DUR_4) {
+            Flag *flag = NULL;
+            flag = dynamic_cast<Flag *>(childElement->FindDescendantByType(FLAG));
+            if (flag) y += (drawingDur > DUR_8) ? 2 * step : step;
         }
     }
 
@@ -550,9 +565,9 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     int s;
     // by default draw 3 slashes (e.g., for a temolo on a whole note)
-    if (stemMod == STEMMODIFIER_NONE) stemMod = STEMMODIFIER_3slash;
+    if ((stemMod == STEMMODIFIER_NONE) && (drawingDur < DUR_2)) stemMod = STEMMODIFIER_3slash;
     for (s = 1; s < stemMod; ++s) {
-        DrawObliquePolygon(dc, x - width / 2, y, x + width / 2, y + height, height);
+        DrawObliquePolygon(dc, x - width / 2, y - height / 2, x + width / 2, y + height / 2, beamWidthBlack);
         y += step;
     }
 
@@ -980,7 +995,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         loc = PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-        DrawSmuflString(dc, x, y, accidStr, false, staff->m_drawingStaffSize, false);
+        DrawSmuflString(dc, x, y, accidStr, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, false);
         TextExtend extend;
         dc->GetSmuflTextExtent(accidStr, &extend);
         x += extend.m_width + step;
@@ -1205,7 +1220,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     start_offset = (x2 - x1 - extend.m_width) / 2; // calculate offset to center text
     int y = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                                         : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    DrawSmuflString(dc, x1 + start_offset, y, wtext, false);
+    DrawSmuflString(dc, x1 + start_offset, y, wtext, HORIZONTALALIGNMENT_left);
     dc->ResetFont();
 
     dc->EndGraphic(element, this);
@@ -1537,13 +1552,13 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den
     x += (extend.m_width / 2);
 
     if (den) {
-        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator, true,
-            staff->m_drawingStaffSize);
-        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator, true,
-            staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator,
+            HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator,
+            HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
     }
     else
-        DrawSmuflString(dc, x, y, timeSigCombNumerator, true, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, timeSigCombNumerator, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
 
     dc->ResetFont();
 }

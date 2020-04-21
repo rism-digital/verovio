@@ -33,7 +33,7 @@ public:
      */
     ///@{
     RunningElement();
-    RunningElement(std::string classid);
+    RunningElement(const std::string& classid);
     virtual ~RunningElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return RUNNING_ELEMENT; }

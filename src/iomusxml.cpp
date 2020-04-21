@@ -1113,27 +1113,27 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     if (!m_ClefChangeStack.empty()) {
         for (musicxml::ClefChange iter : m_ClefChangeStack) {
             if (iter.isFirst)
-                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted.",
+                LogWarning("MusicXML import: Clef change at measure %s, staff %d, time %d not inserted",
                     iter.m_measureNum.c_str(), iter.m_staff->GetN(), iter.m_scoreOnset);
         }
         m_ClefChangeStack.clear();
     }
     if (!m_tieStack.empty()) {
-        LogWarning("MusicXML import: There are %d ties left open.", m_tieStack.size());
+        LogWarning("MusicXML import: There are %d ties left open", m_tieStack.size());
         m_tieStack.clear();
     }
     if (!m_slurStack.empty()) { // There are slurs left open
         std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
         for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-            LogWarning("MusicXML import: Slur element '%s' could not be ended.", iter->first->GetUuid().c_str());
+            LogWarning("MusicXML import: slur '%s' could not be ended", iter->first->GetUuid().c_str());
         }
         m_slurStack.clear();
     }
     if (!m_slurStopStack.empty()) { // There are slurs ends without opening
         std::vector<std::pair<LayerElement *, musicxml::CloseSlur> >::iterator iter;
         for (iter = m_slurStopStack.begin(); iter != m_slurStopStack.end(); ++iter) {
-            LogWarning("MusicXML import: Slur ending for element '%s' could not be "
-                       "matched to a start element.",
+            LogWarning("MusicXML import: slur ending for element '%s' could not be "
+                       "matched to a start element",
                 iter->first->GetUuid().c_str());
         }
         m_slurStopStack.clear();
@@ -1142,14 +1142,21 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         std::vector<std::pair<ControlElement *, musicxml::OpenDashes> >::iterator iter;
         for (iter = m_openDashesStack.begin(); iter != m_openDashesStack.end(); ++iter) {
             LogWarning(
-                "MusicXML import: Dashes/extender lines for '%s' could not be closed.", iter->first->GetUuid().c_str());
+                "MusicXML import: dashes/extender lines for '%s' could not be closed", iter->first->GetUuid().c_str());
         }
         m_openDashesStack.clear();
     }
     if (!m_bracketStack.empty()) { // open brackets without ending
         std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_bracketStack.begin(); iter != m_bracketStack.end(); ++iter) {
-            LogWarning("MusicXML import: BracketSpan for '%s' could not be closed.", iter->first->GetUuid().c_str());
+            LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
+        }
+        m_bracketStack.clear();
+    }
+    if (!m_trillStack.empty()) { // open trills without ending
+        std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
+            LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter->first->GetUuid().c_str());
         }
         m_bracketStack.clear();
     }
@@ -1554,7 +1561,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     pugi::xpath_node type = node.select_node("direction-type");
     pugi::xpath_node extender;
-    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket") ||  !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
+    if (!strcmp(type.node().next_sibling("direction-type").first_child().name(), "bracket")
+        || !strcmp(type.node().next_sibling("direction-type").first_child().name(), "dashes")) {
         extender = type.node().next_sibling("direction-type").first_child();
     }
     std::string placeStr = node.attribute("placement").as_string();
@@ -1863,12 +1871,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (xmlPedal) {
         std::string pedalType = xmlPedal.node().attribute("type").as_string();
         std::string pedalLine = xmlPedal.node().attribute("line").as_string();
-        // do not import pedal start lines until engraving supported, but import stops anyway
-        if (pedalLine != "yes" || pedalType == "stop") {
+        // do not import pedal start lines until engraving supported
+        if (pedalLine != "yes") {
             Pedal *pedal = new Pedal();
             pedal->SetTstamp(timeStamp);
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
-            if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            if (pedalType == "sostenuto") pedal->SetFunc("sostenuto");
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -1885,7 +1894,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
         }
-        else {
+        else if (pedalType == "start") {
             LogWarning("MusicXML import: pedal lines are not supported");
         }
     }
@@ -2014,7 +2023,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
-    harmText += ConvertAlterToSymbol(GetContent(alter.node()));
+    if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xpath_node kind = node.select_node("kind");
     if (kind) {
         if (HasAttributeWithValue(kind.node(), "use-symbols", "yes")) {
@@ -2144,7 +2153,6 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
-    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
 
     bool cue = false;
     if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
@@ -2155,26 +2163,37 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam start
     bool beamStart = node.select_node("beam[@number='1'][text()='begin']");
-    if (beamStart && !(tremolo.node(), "type", "start")) {
+    if (beamStart && !(notations.node().select_node("ornaments/tremolo[@type='start']"))) {
         Beam *beam = new Beam();
         AddLayerElement(layer, beam);
         m_elementStackMap.at(layer).push_back(beam);
     }
 
     // tremolos
+    pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = 0;
     if (tremolo) {
-        if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
+        if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
+            FTrem *fTrem = new FTrem();
+            AddLayerElement(layer, fTrem);
+            m_elementStackMap.at(layer).push_back(fTrem);
+            int beamFloatNum = tremolo.node().text().as_int(); // number of floating beams
+            int beamAttachedNum = 0; // number of attached beams
+            while (beamStart && beamAttachedNum < 8) { // count number of (attached) beams, max 8
+                std::ostringstream o;
+                o << "beam[@number='" << ++beamAttachedNum + 1 << "'][text()='begin']";
+                beamStart = node.select_node(o.str().c_str());
+            }
+            fTrem->SetBeams(beamFloatNum + beamAttachedNum);
+            fTrem->SetBeamsFloat(beamFloatNum);
+        }
+        else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
+            // this is default tremolo type in MusicXML
             BTrem *bTrem = new BTrem();
             AddLayerElement(layer, bTrem);
             m_elementStackMap.at(layer).push_back(bTrem);
             tremSlashNum = tremolo.node().text().as_int();
-        }
-        else if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
-            FTrem *fTrem = new FTrem();
-            AddLayerElement(layer, fTrem);
-            m_elementStackMap.at(layer).push_back(fTrem);
-            fTrem->SetBeams(tremolo.node().text().as_int());
+            // if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) bTrem->SetForm(bTremLog_FORM_unmeas);
         }
     }
 
@@ -2576,7 +2595,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // trill
     pugi::xpath_node xmlTrill = notations.node().select_node("ornaments/trill-mark");
-    if (xmlTrill) {
+    pugi::xpath_node xmlTrillLine = notations.node().select_node("ornaments/wavy-line[@type='start']");
+    if (xmlTrill || xmlTrillLine) {
         Trill *trill = new Trill();
         m_controlElements.push_back(std::make_pair(measureNum, trill));
         trill->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
@@ -2585,9 +2605,29 @@ void MusicXmlInput::ReadMusicXmlNote(
         trill->SetColor(xmlTrill.node().attribute("color").as_string());
         // place
         trill->SetPlace(trill->AttPlacement::StrToStaffrel(xmlTrill.node().attribute("placement").as_string()));
-        if (notations.node().select_node("ornaments/wavy-line")) {
-            trill->SetTstamp2(
-                std::pair<int, double>(0, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.99));
+        if (xmlTrillLine) {
+            trill->SetExtender(BOOLEAN_true);
+            trill->SetN(xmlTrillLine.node().attribute("number").as_string());
+            if (!xmlTrill) {
+                trill->SetLstartsym(LINESTARTENDSYMBOL_none);
+                trill->SetColor(xmlTrillLine.node().attribute("color").as_string());
+                trill->SetPlace(
+                    trill->AttPlacement::StrToStaffrel(xmlTrillLine.node().attribute("placement").as_string()));
+            }
+            musicxml::OpenSpanner openTrill(1, m_measureCounts.at(measure));
+            m_trillStack.push_back(std::make_pair(trill, openTrill));
+        }
+    }
+    if (!m_trillStack.empty() && notations.node().select_node("ornaments/wavy-line[@type='stop']")) {
+        int extNumber
+            = notations.node().select_node("ornaments/wavy-line[@type='stop']").node().attribute("number").as_int();
+        std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
+        for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
+            int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
+            if (atoi(((iter->first)->GetN()).c_str()) == extNumber) {
+                (iter->first)->SetTstamp2(std::pair<int, double>(measureDifference, (double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1));
+                m_trillStack.erase(iter--);
+            }
         }
     }
 
@@ -3012,6 +3052,10 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
         return pedalLog_DIR_down;
     else if (value == "stop")
         return pedalLog_DIR_up;
+    else if (value == "sostenuto")
+        return pedalLog_DIR_down;
+    else if (value == "change")
+        return pedalLog_DIR_bounce;
     else {
         LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
         return pedalLog_DIR_NONE;

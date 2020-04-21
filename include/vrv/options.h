@@ -491,6 +491,7 @@ public:
     OptionString m_expand;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
+    OptionBool m_svgHtml5;
     OptionInt m_unit;
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;

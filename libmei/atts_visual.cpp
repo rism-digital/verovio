@@ -2130,7 +2130,7 @@ bool AttTupletVis::HasNumFormat() const
 
 /* include <attnum.format> */
 
-bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetVisual(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ANNOTVIS)) {
         AttAnnotVis *att = dynamic_cast<AttAnnotVis *>(element);

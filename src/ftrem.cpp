@@ -74,8 +74,6 @@ const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
 {
     this->GetList(this);
 
-    this->m_shortestDur = std::max(DUR_8, DUR_1 + this->GetBeams());
-
     return &m_beamElementCoords;
 }
 

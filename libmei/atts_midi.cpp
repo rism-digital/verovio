@@ -575,7 +575,7 @@ bool AttTimeBase::HasPpq() const
 
 /* include <attppq> */
 
-bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetMidi(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_CHANNELIZED)) {
         AttChannelized *att = dynamic_cast<AttChannelized *>(element);

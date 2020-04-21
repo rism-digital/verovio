@@ -623,7 +623,8 @@ bool Toolkit::LoadData(const std::string &data)
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
     int breaks = m_options->m_breaks.GetValue();
-    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI to be converted
+    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI to
+    // be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
     if (breaks != BREAKS_none) {
         if (input->HasLayoutInformation() && (breaks == BREAKS_encoded || breaks == BREAKS_line)) {
@@ -1167,7 +1168,12 @@ void Toolkit::RedoLayout()
     }
 
     m_doc.UnCastOffDoc();
-    m_doc.CastOffDoc();
+    if (m_options->m_breaks.GetValue() == BREAKS_line) {
+        m_doc.CastOffLineDoc();
+    }
+    else {
+        m_doc.CastOffDoc();
+    }
 }
 
 void Toolkit::RedoPagePitchPosLayout()
@@ -1250,6 +1256,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     if (m_options->m_svgViewBox.GetValue()) {
         svg.SetSvgViewBox(true);
     }
+
+    svg.SetHtml5(m_options->m_svgHtml5.GetValue());
 
     // render the page
     RenderToDeviceContext(pageNo, &svg);
