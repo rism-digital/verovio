@@ -1336,6 +1336,7 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     trill->WriteColor(currentNode);
     trill->WriteExtender(currentNode);
     trill->WriteLineRend(currentNode);
+    trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
 }
@@ -4100,6 +4101,7 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadExtender(trill);
     vrvTrill->ReadLineRend(trill);
+    vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
 

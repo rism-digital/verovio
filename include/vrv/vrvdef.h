@@ -294,11 +294,11 @@ typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInter
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
-typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
+typedef std::list<std::pair<Object *, data_MEASUREBEAT> > ListOfObjectBeatPairs;
 
-typedef std::vector<std::pair<TimePointInterface *, ClassId> > ArrayOfPointingInterClassIdPairs;
+typedef std::list<std::pair<TimePointInterface *, ClassId> > ListOfPointingInterClassIdPairs;
 
-typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpanningInterClassIdPairs;
+typedef std::list<std::pair<TimeSpanningInterface *, ClassId> > ListOfSpanningInterClassIdPairs;
 
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 

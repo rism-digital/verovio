@@ -106,7 +106,7 @@ void display_usage()
     std::cout << "Options (marked as * are repeatable)" << std::endl;
 
     std::cout << " -                     Use \"-\" as input file for reading from the standard input" << std::endl;
-    std::cout << " -?, --help            Display this message" << std::endl;
+    std::cout << " -h, --help            Display this message" << std::endl;
     std::cout << " -a, --all-pages       Output all pages" << std::endl;
     std::cout << " -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)" << std::endl;
     std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
     static struct option base_options[]
         = { { "all-pages", no_argument, 0, 'a' },
             { "from", required_argument, 0, 'f' },
-            { "help", no_argument, 0, '?' },
+            { "help", no_argument, 0, 'h' },
             { "outfile", required_argument, 0, 'o' },
             { "page", required_argument, 0, 'p' },
             { "resources", required_argument, 0, 'r' },
@@ -228,8 +228,6 @@ int main(int argc, char **argv)
             { "no-footer", no_argument, 0, 'd' },
             { "no-header", no_argument, 0, 'd' },
             { "no-layout", no_argument, 0, 'd' },
-            { "page-height-deprecated", required_argument, 0, 'h' },
-            { "page-width-deprecated", required_argument, 0, 'w' },
             { "type", required_argument, 0, 'd' },
             { 0, 0, 0, 0 }
         };
@@ -276,7 +274,7 @@ int main(int argc, char **argv)
     int option_index = 0;
     vrv::Option *opt = NULL;
     vrv::OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "ab:f:hino:p:r:s:t:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
@@ -345,11 +343,6 @@ int main(int argc, char **argv)
                 };
                 break;
 
-            case 'h':
-                vrv::LogWarning("Option -h is deprecated; use --page-height instead");
-                options->m_pageHeight.SetValue(optarg);
-                break;
-
             case 'o': outfile = std::string(optarg); break;
 
             case 'p': page = atoi(optarg); break;
@@ -369,17 +362,11 @@ int main(int argc, char **argv)
 
             case 'v': show_version = 1; break;
 
-            case 'w':
-                vrv::LogWarning("Option -w is deprecated; use --page-width instead");
-                options->m_pageWidth.SetValue(optarg);
-                break;
-
             case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
 
-            case '?':
-                display_usage();
-                exit(0);
-                break;
+            case 'h': display_usage(); exit(0); break;
+
+            case '?': display_usage(); exit(1); break;
 
             default: break;
         }

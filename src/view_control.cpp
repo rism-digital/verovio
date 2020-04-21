@@ -369,7 +369,7 @@ void View::DrawBracketSpan(
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else {
-        dc->StartGraphic(bracketSpan, "spanning-bracketspan", "");
+        dc->StartGraphic(bracketSpan, "", bracketSpan->GetUuid(), false);
     }
 
     int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -557,7 +557,7 @@ void View::DrawHairpin(
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
-        dc->StartGraphic(hairpin, "spanning-hairpin", "");
+        dc->StartGraphic(hairpin, "", hairpin->GetUuid(), false);
     // dc->DeactivateGraphic();
 
     DrawObliquePolygon(
@@ -607,7 +607,7 @@ void View::DrawOctave(
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
-        dc->StartGraphic(octave, "spanning-octave", "");
+        dc->StartGraphic(octave, "", octave->GetUuid(), false);
 
     int code = SMUFL_E511_ottavaAlta;
     if (disPlace == STAFFREL_basic_above) {
@@ -902,7 +902,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
-        dc->StartGraphic(tie, "spanning-tie", "");
+        dc->StartGraphic(tie, "", tie->GetUuid(), false);
     DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize, 0, penStyle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
@@ -923,7 +923,7 @@ void View::DrawTrillExtension(
     // Adjust the x1 for the tr symbol
     if (trill->GetLstartsym() == LINESTARTENDSYMBOL_none) {
         x1 -= trill->GetStart()->GetDrawingRadius(m_doc);
-        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
     else if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         int offsetFactor = 2;
@@ -942,7 +942,7 @@ void View::DrawTrillExtension(
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
-        dc->StartGraphic(trill, "spanning-trill", "");
+        dc->StartGraphic(trill, "", trill->GetUuid(), false);
 
     DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
         SMUFL_E59E_ornamentZigZagLineWithRightEnd);
@@ -1013,7 +1013,7 @@ void View::DrawControlElementConnector(
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else {
-        dc->StartGraphic(element, "spanning-element", "");
+        dc->StartGraphic(element, "", element->GetUuid(), false);
     }
 
     bool deactivate = true;
@@ -1081,7 +1081,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else
-        dc->StartGraphic(&fConnector, "spanning-connector", "");
+        dc->StartGraphic(&fConnector, "", f->GetUuid(), false);
 
     dc->DeactivateGraphic();
 
@@ -1158,7 +1158,7 @@ void View::DrawSylConnector(
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else
-        dc->StartGraphic(&sylConnector, "spanning-connector", "");
+        dc->StartGraphic(&sylConnector, "", syl->GetUuid(), false);
 
     dc->DeactivateGraphic();
 
@@ -2159,7 +2159,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
         dc->ResumeGraphic(ending, ending->GetUuid());
     else
-        dc->StartGraphic(ending, "spanning-ending", "");
+        dc->StartGraphic(ending, "", ending->GetUuid(), false);
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList;
