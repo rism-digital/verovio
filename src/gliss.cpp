@@ -24,12 +24,14 @@ namespace vrv {
 // Gliss
 //----------------------------------------------------------------------------
 
-Gliss::Gliss() : ControlElement("gliss-"), TimeSpanningInterface(), AttColor(), AttLineRend(), AttLineRendBase()
+Gliss::Gliss()
+    : ControlElement("gliss-"), TimeSpanningInterface(), AttColor(), AttLineRend(), AttLineRendBase(), AttNNumberLike()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_LINERENDBASE);
+    RegisterAttClass(ATT_NNUMBERLIKE);
 
     Reset();
 }
@@ -43,6 +45,7 @@ void Gliss::Reset()
     ResetColor();
     ResetLineRend();
     ResetLineRendBase();
+    ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------

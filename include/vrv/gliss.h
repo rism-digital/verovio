@@ -25,7 +25,8 @@ class Gliss : public ControlElement,
                     public TimeSpanningInterface,
                     public AttColor,
                     public AttLineRend,
-                    public AttLineRendBase {
+                    public AttLineRendBase,
+                    public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

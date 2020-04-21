@@ -1207,6 +1207,7 @@ void MEIOutput::WriteGliss(pugi::xml_node currentNode, Gliss *gliss)
     gliss->WriteColor(currentNode);
     gliss->WriteLineRend(currentNode);
     gliss->WriteLineRendBase(currentNode);
+    gliss->WriteNNumberLike(currentNode);
 }
 
 void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
@@ -3959,6 +3960,7 @@ bool MEIInput::ReadGliss(Object *parent, pugi::xml_node gliss)
     vrvGliss->ReadColor(gliss);
     vrvGliss->ReadLineRend(gliss);
     vrvGliss->ReadLineRendBase(gliss);
+    vrvGliss->ReadNNumberLike(gliss);
 
     parent->AddChild(vrvGliss);
     ReadUnsupportedAttr(gliss, vrvGliss);
