@@ -151,7 +151,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ SLUR, BRACKETSPAN, GLISS, HAIRPIN, OCTAVE, TIE })) return;
+            if (element->Is({ SLUR, BRACKETSPAN, HAIRPIN, OCTAVE, TIE })) return;
         }
     }
 
@@ -1607,8 +1607,8 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         }
         // isShort is never true with tstamp1
         if (!isShortTie) {
-            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-            x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+            x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             if (note1 && note1->GetDots() > 0) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             }
@@ -1622,7 +1622,11 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         return;
     }
 
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2;
+    if (note2->GetDrawingAccid()) {
+        x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    }
+    
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.5;
     if (gliss->HasLwidth()) {
         if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
             if (gliss->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
@@ -1643,8 +1647,8 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         }
     }
 
-    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    wchar_t endGlyph = (gliss->GetLendsym() == LINESTARTENDSYMBOL_arrow) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
+    // wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+    // wchar_t endGlyph = (gliss->GetLendsym() == LINESTARTENDSYMBOL_arrow) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
 
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
@@ -1653,14 +1657,8 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         dc->StartGraphic(gliss, "", gliss->GetUuid(), false);
     }
 
-    if (gliss->GetLform() == LINEFORM_wavy) {
-        // Smufl glyphs are horizontal - Rotate them counter clockwise
-        // dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
-        DrawSmuflLine(dc, Point(x1, y1), x2 - x1, staff->m_drawingStaffSize, false, fillGlyph, 0, endGlyph);
-    }
-    else {
-        DrawRoundedLine(dc, x1, y1, x2, y2, lineWidth);
-    }
+    // only solid lines for now
+    DrawRoundedLine(dc, x1, y1, x2, y2, lineWidth);
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
