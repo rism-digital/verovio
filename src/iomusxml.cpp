@@ -1154,6 +1154,13 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         }
         m_bracketStack.clear();
     }
+    if (!m_glissStack.empty()) {
+        std::vector<Gliss *>::iterator iter;
+        for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
+            LogWarning("MusicXML import: gliss for '%s' could not be closed", (*iter)->GetUuid().c_str());
+        }
+        m_glissStack.clear();
+    }
     if (!m_trillStack.empty()) { // open trills without ending
         std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
         for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
