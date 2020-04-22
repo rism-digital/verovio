@@ -136,10 +136,9 @@ public:
     TabGrp *IsTabGrpNote() const;
 
     /**
-     * @name Return the smufl code or string to use for a note give the notation type
+     * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    wchar_t GetTabFretSmuflCode(data_NOTATIONTYPE notationType);
     std::wstring GetTabFretString(data_NOTATIONTYPE notationType);
     ///@}
 

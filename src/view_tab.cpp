@@ -104,12 +104,15 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        wchar_t code = note->GetTabFretSmuflCode(staff->m_drawingNotationType);
-        int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false) / 2;
+        std::wstring fret = note->GetTabFretString(staff->m_drawingNotationType);
+        wchar_t code = SMUFL_EBE0_luteItalianFret0;
+        int radius = m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, glyphSize, false);
         y -= (m_doc->GetGlyphHeight(code, glyphSize, drawingCueSize) / 2);
         x += radius - (m_doc->GetGlyphWidth(code, glyphSize, drawingCueSize) / 2);
 
-        DrawSmuflCode(dc, x, y, code, glyphSize, drawingCueSize);
+        dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
+        DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
+        dc->ResetFont();
     }
 
     // Draw children (nothing yet)
