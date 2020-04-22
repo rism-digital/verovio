@@ -54,7 +54,7 @@ public:
     static bool SetFacsimile(Object *element, const std::string &attrType, const std::string &attrValue);
     // static bool SetFigtable(Object *element, const std::string &attrType, const std::string &attrValue);
     // static bool SetFingering(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetFrettab(Object *element, const std::string &attrType, constr std::string &attrValue);
+    static bool SetFrettab(Object *element, const std::string &attrType, const std::string &attrValue);
     static bool SetGestural(Object *element, const std::string &attrType, const std::string &attrValue);
     // static bool SetHarmony(Object *element, const std::string &attrType, const std::string &attrValue);
     // static bool SetHeader(Object *element, const std::string &attrType, const std::string &attrValue);
