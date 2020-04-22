@@ -590,7 +590,7 @@ AttFTremVis::~AttFTremVis()
 void AttFTremVis::ResetFTremVis()
 {
     m_beams = 0;
-    m_beamsFloat = 0;
+    m_beamsFloat = -1;
     m_floatGap = VRV_UNSET;
 }
 
@@ -640,7 +640,7 @@ bool AttFTremVis::HasBeams() const
 
 bool AttFTremVis::HasBeamsFloat() const
 {
-    return (m_beamsFloat != 0);
+    return (m_beamsFloat != -1);
 }
 
 bool AttFTremVis::HasFloatGap() const
