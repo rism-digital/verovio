@@ -1658,9 +1658,6 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         }
     }
 
-    // wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
-    // wchar_t endGlyph = (gliss->GetLendsym() == LINESTARTENDSYMBOL_arrow) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
-
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
