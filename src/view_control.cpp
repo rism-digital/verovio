@@ -1565,6 +1565,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
+    double slope = 0.0;
 
     /************** parent layers **************/
 
@@ -1589,43 +1590,53 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         durElement = parentChord1;
     }
 
-    /************** x positions **************/
-
-    bool isShortTie = false;
-    // shortTie correction cannot be applied for chords
-    if (!parentChord1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
-        isShortTie = true;
+    if (note1 || note2) {
+        int firstLoc = note1->GetDrawingLoc();
+        int secondLoc = note2->GetDrawingLoc();
+        if (x1 != x2)
+            slope = (secondLoc - firstLoc) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / (double)(x2 - x1);
     }
+    // only half at system breaks
+    if (spanningType != SPANNING_START_END) slope = slope / 2;
 
     // the normal case
-    if (spanningType == SPANNING_START_END) {
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
         if (note1) {
-            y1 = note1->GetDrawingY();
+            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
         }
-        if (note2) {
-            y2 = note2->GetDrawingY();
+        if (note1 && note1->GetDots() > 0) {
+            x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
+            y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots() * slope;
         }
-        // isShort is never true with tstamp1
-        if (!isShortTie) {
-            x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            if (note1 && note1->GetDots() > 0) {
-                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
-            }
-            else if (parentChord1 && (parentChord1->GetDots() > 0)) {
-                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
-            }
+        else if (parentChord1 && (parentChord1->GetDots() > 0)) {
+            x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
+            y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots() * slope;
+        }
+        else {
+            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
         }
     }
     else {
-        LogDebug("Gliss across an entire system is not supported");
-        return;
+        y1 = note2->GetDrawingY() - (x2 - x1) * slope;
+    }
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
+        if (note2) {
+            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y2 = note2->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
+        }
+        if (note2 && note2->GetDrawingAccid()) {
+            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
+        }
+    }
+    else {
+        // shorten it
+        x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 = y1 + (x2 - x1) * slope;
     }
 
-    if (note2->GetDrawingAccid()) {
-        x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    }
-    
     int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.5;
     if (gliss->HasLwidth()) {
         if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
