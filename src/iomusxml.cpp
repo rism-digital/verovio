@@ -2586,13 +2586,14 @@ void MusicXmlInput::ReadMusicXmlNote(
             gliss->SetN(xmlGlissando.attribute("number").as_string());
             gliss->SetStartid(m_ID);
             gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            gliss->SetType(xmlGlissando.name());
             m_glissStack.push_back(gliss);
         }
         else if (!m_glissStack.empty()) {
             int extNumber = xmlGlissando.attribute("number").as_int();
             std::vector<Gliss *>::iterator iter;
             for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
-                if (atoi(((*iter)->GetN()).c_str()) == extNumber) {
+                if ((atoi(((*iter)->GetN()).c_str()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
                     (*iter)->SetEndid(m_ID);
                     m_glissStack.erase(iter--);
                 }
