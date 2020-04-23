@@ -334,6 +334,10 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         if (note->GetStemDir() != STEMDIRECTION_NONE) {
             up = (note->GetStemDir() == STEMDIRECTION_up);
         }
+        else if (staff->m_drawingNotationType == NOTATIONTYPE_NONE
+            || staff->m_drawingNotationType == NOTATIONTYPE_cmn) {
+            up = (note->GetDrawingStemDir() == STEMDIRECTION_up);
+        }
         shape = (up) ? LIGATURE_STEM_RIGHT_UP : LIGATURE_STEM_RIGHT_DOWN;
     }
 

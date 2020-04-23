@@ -45,7 +45,7 @@ public:
      * @name Constructors, destructors, and other standard methods.
      */
     ///@{
-    ScoreDefElement(const std::string& classid);
+    ScoreDefElement(const std::string &classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return SCOREDEF_ELEMENT; }

@@ -357,7 +357,7 @@ private:
      * measureCount) */
     std::vector<std::tuple<int, double, musicxml::OpenSpanner> > m_hairpinStopStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> > m_bracketStack;
-    std::vector<std::pair<Trill*, musicxml::OpenSpanner> > m_trillStack;
+    std::vector<std::pair<Trill *, musicxml::OpenSpanner> > m_trillStack;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */

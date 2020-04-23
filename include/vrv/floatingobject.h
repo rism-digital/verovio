@@ -33,7 +33,7 @@ public:
      */
     ///@{
     FloatingObject();
-    FloatingObject(const std::string& classid);
+    FloatingObject(const std::string &classid);
     virtual ~FloatingObject();
     virtual void Reset();
     virtual ClassId GetClassId() const { return FLOATING_OBJECT; }

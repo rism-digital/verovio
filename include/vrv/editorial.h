@@ -43,7 +43,7 @@ public:
      */
     ///@{
     EditorialElement();
-    EditorialElement(const std::string& classid);
+    EditorialElement(const std::string &classid);
     virtual ~EditorialElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return EDITORIAL_ELEMENT; }

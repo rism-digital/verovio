@@ -119,17 +119,6 @@ void Note::Reset()
     m_MIDIPitch = -1;
 }
 
-bool Note::HasToBeAligned() const
-{
-    if (!this->IsInLigature()) return true;
-    Note *note = const_cast<Note *>(this);
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
-    assert(ligature);
-    Note *firstNote = dynamic_cast<Note *>(ligature->GetList(ligature)->front());
-    Note *lastNote = dynamic_cast<Note *>(ligature->GetList(ligature)->back());
-    return ((note == firstNote) || (note == lastNote));
-}
-
 void Note::AddChild(Object *child)
 {
     // additional verification for accid and artic - this will no be raised with editorial markup, though
