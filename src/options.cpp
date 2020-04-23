@@ -617,7 +617,8 @@ Options::Options()
     m_svgViewBox.Init(false);
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
 
-    m_svgHtml5.SetInfo("Output SVG for HTML5 embedding", "Write data-id and data-class attributes for JS usage and id clash avoidance.");
+    m_svgHtml5.SetInfo("Output SVG for HTML5 embedding",
+        "Write data-id and data-class attributes for JS usage and id clash avoidance.");
     m_svgHtml5.Init(false);
     this->Register(&m_svgHtml5, "svgHtml5", &m_general);
 
