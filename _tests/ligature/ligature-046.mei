@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+	<meiHead>
+		<fileDesc>
+			<titleStmt>
+				<title>Ligature alignment</title>
+			</titleStmt>
+			<pubStmt>
+				<date>2020-04-23</date>
+			</pubStmt>
+			<notesStmt>
+				<annot>Ligature can be aligned globally with non-ligature notation</annot>
+			</notesStmt>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="unknown">
+					<name>Verovio</name>
+				</application>
+			</appInfo>
+		</encodingDesc>
+	</meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef n="1" notationtype="mensural.white" lines="5" clef.shape="C" clef.line="1"/>
+							<staffDef n="2" notationtype="mensural.white" lines="5" clef.shape="C" clef.line="1"/>
+						</staffGrp>
+					</scoreDef>
+					<section>
+						<staff n="1">
+							<layer n="1">
+								<note dur="brevis" pname="f" oct="4"/>
+								<ligature>
+									<note dur="semibrevis" pname="c" oct="5" lig="obliqua"/>
+									<note dur="semibrevis" pname="a" oct="4"/>
+									<note dur="brevis" pname="c" oct="5"/>
+									<note dur="brevis" pname="a" oct="4"/>
+									<note dur="brevis" pname="f" oct="4"/>
+									<note dur="brevis" pname="d" oct="4"/>
+								</ligature>
+								<note dur="brevis" pname="d" oct="4"/>
+							</layer>
+						</staff>
+						<staff n="2">
+							<layer n="1">
+								<note dur="brevis" pname="f" oct="4"/>
+								<note dur="semibrevis" pname="c" oct="5"/>
+								<note dur="semibrevis" pname="a" oct="4"/>
+								<note dur="brevis" pname="c" oct="5"/>
+								<note dur="brevis" pname="a" oct="4"/>
+								<note dur="brevis" pname="f" oct="4"/>
+								<note dur="brevis" pname="d" oct="4"/>
+								<note dur="brevis" pname="d" oct="4"/>
+							</layer>
+						</staff>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>
