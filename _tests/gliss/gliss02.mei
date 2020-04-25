@@ -17,6 +17,13 @@
                 <annot>Glissandi may connect chords in notes.</annot>
             </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="2.7.0" label="2">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
