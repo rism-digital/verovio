@@ -1572,22 +1572,10 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
     Note *note1 = dynamic_cast<Note *>(gliss->GetStart());
     Note *note2 = dynamic_cast<Note *>(gliss->GetEnd());
 
-    if (!note1 && !note2) {
+    if (!note1 || !note2) {
         // no note, obviously nothing to do...
         // this also means that notes with tstamp events are not supported
         return;
-    }
-
-    LayerElement *durElement = NULL;
-    Chord *parentChord1 = NULL;
-    Layer *layer1 = NULL;
-    if (note1) {
-        durElement = note1;
-        layer1 = dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
-        parentChord1 = note1->IsChordTone();
-    }
-    if (parentChord1) {
-        durElement = parentChord1;
     }
 
     if (note1 || note2) {
@@ -1608,10 +1596,6 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
         if (note1 && note1->GetDots() > 0) {
             x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots() * slope;
-        }
-        else if (parentChord1 && (parentChord1->GetDots() > 0)) {
-            x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
-            y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots() * slope;
         }
         else {
             x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
