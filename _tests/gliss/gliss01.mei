@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Glissandi</title>
+                <respStmt>
+                    <persName role="editor">Klaus Rettinghaus</persName>
+                </respStmt>
+            </titleStmt>
+			<pubStmt>
+				<date>2020-04-25</date>
+			</pubStmt>
+			<notesStmt>
+                <annot>Verovio supports glissandi.</annot>
+			</notesStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" lines="5" ppq="2" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4">
+                                <label>Guitar</label>
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-0000001191906675" n="1">
+                            <staff xml:id="staff-0000000225663200" n="1">
+                                <layer xml:id="layer-0000001853348377" n="1">
+                                    <note xml:id="note-0000001664638115" dur="2" oct="5" pname="f" />
+                                    <note xml:id="note-0000001076743506" dur="2" oct="4" pname="e" />
+                                </layer>
+                            </staff>
+                            <gliss xml:id="gliss-0000001975395078" staff="1" startid="#note-0000001664638115" endid="#note-0000001076743506" />
+                        </measure>
+                        <measure xml:id="measure-0000000140302158" n="2">
+                            <staff xml:id="staff-0000001516045685" n="1">
+                                <layer xml:id="layer-0000000603616540" n="1">
+                                    <note xml:id="note-0000001999368153" dur="2" oct="4" pname="f">
+                                        <accid xml:id="accid-0000000769832585" accid="s" accid.ges="s" />
+                                    </note>
+                                    <note xml:id="note-0000001881924406" dur="2" oct="5" pname="e">
+                                        <accid xml:id="accid-0000001886977379" accid="f" accid.ges="f" />
+                                    </note>
+                                </layer>
+                            </staff>
+                            <gliss xml:id="gliss-0000001207219199" staff="1" startid="#note-0000001999368153" endid="#note-0000001881924406" />
+                        </measure>
+                        <measure xml:id="measure-0000000925950823" right="end" n="3">
+                            <staff xml:id="staff-0000000185195412" n="1">
+                                <layer xml:id="layer-0000001848632400" n="1">
+                                    <note xml:id="note-0000001815811722" dots="1" dur="4" oct="4" pname="g" />
+                                    <note xml:id="note-0000001676543830" dots="1" dur="4" oct="5" pname="d" />
+                                    <note xml:id="note-0000001990135686" dur="4" oct="4" pname="b" />
+                                </layer>
+                            </staff>
+                            <gliss xml:id="gliss-0000001849833528" staff="1" startid="#note-0000001815811722" endid="#note-0000001676543830" />
+                            <gliss xml:id="gliss-0000000745071580" staff="1" startid="#note-0000001676543830" endid="#note-0000001990135686" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

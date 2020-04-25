@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0" ?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron" ?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Glissandi in chords</title>
+                <respStmt>
+                    <persName role="editor">Klaus Rettinghaus</persName>
+                </respStmt>
+            </titleStmt>
+            <pubStmt>
+                <date>2020-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Glissandi may connect chords in notes.</annot>
+            </notesStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" lines="5" clef.shape="C" clef.line="1" key.sig="4s">
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-0000001813443590" n="1">
+                            <staff xml:id="staff-0000000834314464" n="1">
+                                <layer xml:id="layer-0000002027457579" n="1">
+                                    <chord xml:id="chord-0000000368568485" dur="2">
+                                        <note xml:id="note-0000000387804174" oct="4" pname="e" />
+                                        <note xml:id="note-0000000821839605" oct="4" pname="b" />
+                                        <note xml:id="note-0000000774533766" oct="5" pname="f" />
+                                    </chord>
+                                    <chord xml:id="chord-0000001506379163" dur="2">
+                                        <note xml:id="note-0000001641057499" oct="4" pname="d" />
+                                        <note xml:id="note-0000001592091470" oct="4" pname="a" />
+                                        <note xml:id="note-0000000184866789" oct="5" pname="e" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <gliss xml:id="gliss-0000001413415076" startid="#note-0000000387804174" endid="#note-0000001641057499" color="purple" />
+                            <gliss xml:id="gliss-0000000425899365" startid="#note-0000000821839605" endid="#note-0000001592091470" color="orange" />
+                            <gliss xml:id="gliss-0000001614343336" startid="#note-0000000774533766" endid="#note-0000000184866789" color="blue" />
+                            <gliss xml:id="gliss-0000000621122200" startid="#note-0000001641057499" endid="#note-0000000115699169" color="cyan" />
+                            <gliss xml:id="gliss-0000001782818402" startid="#note-0000001592091470" endid="#note-0000001606207059" color="darkgreen" />
+                            <gliss xml:id="gliss-0000000266564486" startid="#note-0000000184866789" endid="#note-0000000115699169" color="violet" />
+                        </measure>
+                        <measure xml:id="measure-0000000693899311" right="end" n="2">
+                            <staff xml:id="staff-0000000030368869" n="1">
+                                <layer xml:id="layer-0000001822484239" n="1">
+                                    <chord xml:id="chord-0000001175588554" dur="2">
+                                        <note xml:id="note-0000000993369007" oct="4" pname="e" />
+                                        <note xml:id="note-0000001606207059" oct="4" pname="g" />
+                                        <note xml:id="note-0000000115699169" oct="4" pname="b" />
+                                    </chord>
+                                    <chord xml:id="chord-0000001529114245" dur="2">
+                                        <note xml:id="note-0000000230987856" oct="3" pname="g" />
+                                        <note xml:id="note-0000000668367190" oct="4" pname="a" />
+                                        <note xml:id="note-0000000656887221" oct="5" pname="a" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <gliss xml:id="gliss-0000000235725238" startid="#note-0000000993369007" endid="#note-0000000230987856" color="chartreuse" />
+                            <gliss xml:id="gliss-0000002009903018" startid="#note-0000001606207059" endid="#note-0000000656887221" color="goldenrod" />
+                            <gliss xml:id="gliss-0000001994011233" startid="#note-0000000115699169" endid="#note-0000000656887221" color="hotpink" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
