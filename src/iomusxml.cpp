@@ -2584,6 +2584,9 @@ void MusicXmlInput::ReadMusicXmlNote(
     // glissando and slide
     pugi::xpath_node_set glissandi = notations.node().select_nodes("glissando|slide");
     for (pugi::xpath_node_set::const_iterator it = glissandi.begin(); it != glissandi.end(); ++it) {
+        std::string noteID = m_ID;
+        // prevent from using chords
+        if (element->Is(CHORD)) noteID = "#" + element->GetChild(0)->GetUuid();
         pugi::xml_node xmlGlissando = it->node();
         if (HasAttributeWithValue(xmlGlissando, "type", "start")) {
             Gliss *gliss = new Gliss();
@@ -2591,7 +2594,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             gliss->SetColor(xmlGlissando.attribute("color").as_string());
             gliss->SetLform(gliss->AttLineRendBase::StrToLineform(xmlGlissando.attribute("line-type").as_string()));
             gliss->SetN(xmlGlissando.attribute("number").as_string());
-            gliss->SetStartid(m_ID);
+            gliss->SetStartid(noteID);
             gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             gliss->SetType(xmlGlissando.name());
             m_glissStack.push_back(gliss);
@@ -2601,7 +2604,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             std::vector<Gliss *>::iterator iter;
             for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
                 if ((atoi(((*iter)->GetN()).c_str()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
-                    (*iter)->SetEndid(m_ID);
+                    (*iter)->SetEndid(noteID);
                     m_glissStack.erase(iter--);
                 }
             }
