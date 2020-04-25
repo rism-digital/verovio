@@ -29,6 +29,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "functorparams.h"
+#include "gliss.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
@@ -69,7 +70,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, TIE })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -284,12 +285,18 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(FIGURE)) {
-            // cast to Dynam check in DrawFConnector
+            // cast to F check in DrawFConnector
             DrawFConnector(dc, dynamic_cast<F *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(BRACKETSPAN)) {
             // cast to BracketSpan check in DrawBracketSpan
             DrawBracketSpan(dc, dynamic_cast<BracketSpan *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(GLISS)) {
+            // For gliss we limit support to one value in @staff
+            if (staffIter != staffList.begin()) continue;
+            // cast to Gliss check in DrawGliss
+            DrawGliss(dc, dynamic_cast<Gliss *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -325,6 +332,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 void View::DrawBracketSpan(
     DeviceContext *dc, BracketSpan *bracketSpan, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
+    assert(dc);
     assert(bracketSpan);
     assert(staff);
 
@@ -1547,6 +1555,109 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     }
 
     dc->EndGraphic(fermata, this);
+}
+
+void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(gliss);
+    assert(staff);
+
+    int y1 = staff->GetDrawingY();
+    int y2 = staff->GetDrawingY();
+    double slope = 0.0;
+
+    /************** parent layers **************/
+
+    Note *note1 = dynamic_cast<Note *>(gliss->GetStart());
+    Note *note2 = dynamic_cast<Note *>(gliss->GetEnd());
+
+    if (!note1 || !note2) {
+        // no note, obviously nothing to do...
+        // this also means that notes with tstamp events are not supported
+        return;
+    }
+
+    if (note1 || note2) {
+        int firstLoc = note1->GetDrawingLoc();
+        int secondLoc = note2->GetDrawingLoc();
+        if (x1 != x2)
+            slope = (secondLoc - firstLoc) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / (double)(x2 - x1);
+    }
+    // only half at system breaks
+    if (spanningType != SPANNING_START_END) slope = slope / 2;
+
+    // the normal case
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
+        if (note1) {
+            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
+        }
+        if (note1 && (note1->GetDots() > 0) && (abs(slope) < 1.0)) {
+            x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
+            y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots() * slope;
+        }
+        else {
+            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
+        }
+    }
+    else {
+        y1 = note2->GetDrawingY() - (x2 - x1) * slope;
+    }
+    if (spanningType == SPANNING_START_END || spanningType == SPANNING_END) {
+        if (note2) {
+            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y2 = note2->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
+        }
+        if (note2 && note2->GetDrawingAccid()) {
+            x2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * slope;
+        }
+    }
+    else {
+        // shorten it
+        x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 = y1 + (x2 - x1) * slope;
+    }
+
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.5;
+    if (gliss->HasLwidth()) {
+        if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
+            if (gliss->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
+                lineWidth *= LINEWIDTHTERM_factor_narrow;
+            }
+            else if (gliss->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
+                lineWidth *= LINEWIDTHTERM_factor_medium;
+            }
+            else if (gliss->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
+                lineWidth *= LINEWIDTHTERM_factor_wide;
+            }
+        }
+        else if (gliss->GetLwidth().GetType() == LINEWIDTHTYPE_measurementAbs) {
+            if (gliss->GetLwidth().GetMeasurementAbs() != VRV_UNSET) {
+                lineWidth
+                    = gliss->GetLwidth().GetMeasurementAbs() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize * 2);
+            }
+        }
+    }
+
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else {
+        dc->StartGraphic(gliss, "", gliss->GetUuid(), false);
+    }
+
+    // only solid lines for now
+    DrawRoundedLine(dc, x1, y1, x2, y2, lineWidth);
+
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(gliss, this);
+    }
 }
 
 void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system)
