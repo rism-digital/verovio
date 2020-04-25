@@ -1593,7 +1593,7 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             y1 = note1->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slope;
         }
-        if (note1 && note1->GetDots() > 0) {
+        if (note1 && (note1->GetDots() > 0) && (abs(slope) < 1.0)) {
             x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots() * slope;
         }
