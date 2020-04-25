@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0" ?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron" ?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Crossing Glissandi</title>
+                <respStmt>
+                    <persName role="editor">Klaus Rettinghaus</persName>
+                </respStmt>
+            </titleStmt>
+            <pubStmt>
+                <date>2020-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Glissandi may cross each other.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="2.7.0" label="2">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-0000001437389882" n="1">
+                            <staff xml:id="staff-0000001073616694" n="1">
+                                <layer xml:id="layer-0000001165897773" n="1">
+                                    <note xml:id="note-0000001078833811" dur="2" oct="5" pname="f" stem.dir="down" />
+                                    <note xml:id="note-0000001003005317" dur="2" oct="4" pname="e" stem.dir="up" />
+                                </layer>
+                            </staff>
+                            <gliss xml:id="gliss-0000001661708833" staff="1" startid="#note-0000001078833811" endid="#note-0000001090412844" />
+                            <gliss xml:id="gliss-0000001147076990" staff="1" startid="#note-0000001003005317" endid="#note-0000001694321560" />
+                        </measure>
+                        <measure xml:id="measure-0000000076219326" right="end" n="2">
+                            <staff xml:id="staff-0000002110262862" n="1">
+                                <layer xml:id="layer-0000000172086315" n="1">
+                                    <note xml:id="note-0000001694321560" dur="2" oct="5" pname="e" stem.dir="down" />
+                                    <note xml:id="note-0000001090412844" dur="2" oct="4" pname="f" stem.dir="up" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
