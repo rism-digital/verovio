@@ -588,6 +588,7 @@ protected:
     void setRepeatSlashes(BeatRpt *repeat, std::vector<hum::HTp> &tokens, int index);
     std::string getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose);
     void checkForRehearsal(int line);
+    bool isBlackNotation(hum::HTp starting);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

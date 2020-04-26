@@ -3891,8 +3891,32 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     addInstrumentDefinition(m_staffdef.back(), partstart);
 
     if (partstart->isMens()) {
-        m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_white);
+        if (isBlackNotation(partstart)) {
+            m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_black);
+        }
+        else {
+            m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_white);
+        }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isBlackNotation --
+//
+
+bool HumdrumInput::isBlackNotation(hum::HTp starting)
+{
+    hum::HTp current = starting;
+    while (current && !current->isData()) {
+        if (current->isInterpretation()) {
+            if (*current == "*black") {
+                return true;
+            }
+        }
+        current = current->getNextToken();
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -9465,8 +9489,8 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         dir->SetTstamp(tstamp.getFloat());
     }
 
-    bool problemQ = false;
-    bool sicQ = false;
+    // bool problemQ = false;
+    // bool sicQ = false;
 
     std::string problem = token->getLayoutParameter("TX", "problem");
     if (problem == "true") {
@@ -9480,7 +9504,8 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         dir->SetType("sic");
     }
 
-    std::string typevalue = token->getLayoutParameter("TX", "type");
+    // std::string typevalue = token->getLayoutParameter("TX", "type");
+    typevalue = token->getLayoutParameter("TX", "type");
     if (!typevalue.empty()) {
         dir->SetType(typevalue);
     }
@@ -10208,7 +10233,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 endtok = getCrescendoEnd(line->token(i));
             }
-
             belowadj = 0;
             bool aboveQ = hasAboveParameter(line->token(i), "HP");
             bool belowQ = hasBelowParameter(line->token(i), "HP", belowadj);
@@ -10255,7 +10279,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
 
                 m_measure->AddChild(hairpin);
-
                 if (aboveQ) {
                     setPlace(hairpin, "above");
                 }
@@ -10284,6 +10307,18 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     fontstyle = m_signifiers.crescfontstyle;
                 }
                 addTextElement(dir, content, fontstyle);
+                if (aboveQ) {
+                    setPlace(dir, "above");
+                }
+                else if (belowQ) {
+                    setPlace(dir, "below");
+                }
+                else if (forceAboveQ) {
+                    setPlace(dir, "above");
+                }
+                else if (forceBelowQ) {
+                    setPlace(dir, "below");
+                }
             }
         }
         else if (hairpins.find(">") != string::npos) {
@@ -10351,6 +10386,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 else if (forceAboveQ) {
                     setPlace(hairpin, "above");
                 }
+                else if (forceBelowQ) {
+                    setPlace(hairpin, "below");
+                }
             }
             else {
                 // no endpoint so print as the word "decresc."
@@ -10371,6 +10409,18 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     fontstyle = m_signifiers.decrescfontstyle;
                 }
                 addTextElement(dir, content, fontstyle);
+                if (aboveQ) {
+                    setPlace(dir, "above");
+                }
+                else if (belowQ) {
+                    setPlace(dir, "below");
+                }
+                else if (forceAboveQ) {
+                    setPlace(dir, "above");
+                }
+                else if (forceBelowQ) {
+                    setPlace(dir, "below");
+                }
             }
         }
     }
