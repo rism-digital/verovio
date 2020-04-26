@@ -85,7 +85,9 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     // Semibrevis and shorter
     else {
         wchar_t code = note->GetMensuralSmuflNoteHead();
+        dc->StartCustomGraphic("notehead");
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
+        dc->EndCustomGraphic();
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
         if (((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE))
             && note->GetStemVisible() != BOOLEAN_false) {
@@ -345,6 +347,8 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     int sides[4];
     this->CalcBrevisPoints(note, staff, &topLeft, &bottomRight, sides, shape, isMensuralBlack);
 
+    dc->StartCustomGraphic("notehead");
+
     if (!fillNotehead) {
         // double the bases of rectangles
         DrawObliquePolygon(dc, topLeft.x + stemWidth, topLeft.y, bottomRight.x - stemWidth, topLeft.y, -strokeWidth);
@@ -357,7 +361,19 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     // serifs and / or stem
     DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[1]);
-    DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
+
+    if (note->GetActualDur() != DUR_BR) {
+        // Right side is a stem - end the notehead first
+        dc->EndCustomGraphic();
+        dc->StartCustomGraphic("stem");
+        DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
+        dc->EndCustomGraphic();
+    }
+    else {
+        // Right side is a serif
+        DrawFilledRectangle(dc, bottomRight.x - stemWidth, sides[2], bottomRight.x, sides[3]);
+        dc->EndCustomGraphic();
+    }
 
     return;
 }
