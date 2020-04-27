@@ -313,6 +313,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(SYL)) {
+            // prolong to the end of the notehead
+            x2 += endRadius;
             // cast to Syl check in DrawSylConnector
             DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
@@ -1150,7 +1152,7 @@ void View::DrawSylConnector(
         if (syl->m_nextWordSyl) {
             x2 = syl->m_nextWordSyl->GetContentLeft();
         }
-        x1 -= (dashLength / 2);
+        x1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
