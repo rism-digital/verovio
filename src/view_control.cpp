@@ -992,7 +992,7 @@ void View::DrawControlElementConnector(
         }
     }
 
-    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // the length of the dash and the space between them - can be made a parameter
     int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
@@ -1093,7 +1093,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
 
     dc->DeactivateGraphic();
 
-    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
     DrawFilledRectangle(dc, x1, y, x2, y + width);
@@ -1135,7 +1135,7 @@ void View::DrawSylConnector(
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
-        // If we do not want to show hyphens at start of a syatem and the the end is at time 0.0
+        // If we do not want to show hyphens at the start of a system and the end is at time 0.0
         if (m_options->m_lyricNoStartHyphen.GetValue() && (syl->GetEnd()->GetAlignment()->GetTime() == 0.0)) {
             // Return but only if the end is in the first measure of the system...
             Measure *measure = dynamic_cast<Measure *>(syl->GetEnd()->GetFirstAncestor(MEASURE));
@@ -1187,9 +1187,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         return;
     }
 
-    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int thickness = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
-    width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+    thickness *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
 
     if (syl->GetCon() == sylLog_CON_d) {
 
@@ -1223,14 +1223,14 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
-            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + thickness);
         }
         // DrawFilledRectangle(dc, x1, y, x2, y + width);
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         if (x2 > x1) {
-            DrawFilledRectangle(dc, x1, y, x2, y + width);
+            DrawFilledRectangle(dc, x1, y, x2, y + thickness);
         }
     }
 }
