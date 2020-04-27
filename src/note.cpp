@@ -115,15 +115,6 @@ void Note::Reset()
     m_MIDIPitch = -1;
 }
 
-bool Note::HasToBeAligned() const
-{
-    if (!this->IsInLigature()) return true;
-    Note *note = const_cast<Note *>(this);
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
-    assert(ligature);
-    return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
-}
-
 void Note::AddChild(Object *child)
 {
     // additional verification for accid and artic - this will no be raised with editorial markup, though
@@ -257,7 +248,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
         p.y = doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
@@ -296,7 +287,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
         p.y = -doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
@@ -359,7 +350,7 @@ int Note::CalcStemLenInThirdUnits(Staff *staff)
 
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
-    assert(this->IsMensural());
+    assert(this->IsMensuralDur());
 
     int drawingDur = this->GetDrawingDur();
 
@@ -607,7 +598,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     }
 
     // We currently have no stem object with mensural notes
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -725,7 +716,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     assert(params);
 
     // We currently have no dots object with mensural notes
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
     if (!this->IsVisible()) {
@@ -858,7 +849,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
 
-    if (!this->IsChordTone() && !this->IsMensural()) {
+    if (!this->IsChordTone() && !this->IsMensuralDur()) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
@@ -880,7 +871,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem() && !this->IsChordTone()
-        && !this->IsMensural()) {
+        && !this->IsMensuralDur()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

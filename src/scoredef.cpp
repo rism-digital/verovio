@@ -35,7 +35,7 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement(const std::string &classid) : Object(classid), ScoreDefInterface(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     RegisterAttClass(ATT_TYPED);

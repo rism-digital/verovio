@@ -82,7 +82,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 6: return SMUFL_E24A_flag256thUp;
             case 7: return SMUFL_E24C_flag512thUp;
             case 8: return SMUFL_E24E_flag1024thUp;
-            default: return 0; break;
+            default: return 0;
         }
     }
     else {
@@ -95,7 +95,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 6: return SMUFL_E24B_flag256thDown;
             case 7: return SMUFL_E24D_flag512thDown;
             case 8: return SMUFL_E24F_flag1024thDown;
-            default: return 0; break;
+            default: return 0;
         }
     }
 }
@@ -398,8 +398,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
     if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
-        baseStem += params->m_chordStemLength;
-
         Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetStemPos() == STEMPOSITION_left) {
@@ -408,8 +406,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
             else {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
             }
-            baseStem += p.y;
-            this->SetDrawingStemLen(baseStem);
+            this->SetDrawingStemLen(baseStem + params->m_chordStemLength + p.y);
         }
         else {
             if (this->GetStemPos() == STEMPOSITION_right) {
@@ -418,22 +415,38 @@ int Stem::CalcStem(FunctorParams *functorParams)
             else {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
             }
-            baseStem -= p.y;
-            this->SetDrawingStemLen(-baseStem);
+            this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - p.y));
         }
         this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
         this->SetDrawingXRel(p.x);
     }
 
-    /************ Set the flag (if necessary) and adjust the length ************/
+    /************ Set flag and slashes (if necessary) and adjust the length ************/
+
+    int slashFactor = this->GetStemMod() - 4;
 
     Flag *flag = NULL;
-
-    // SMUFL flags cover some additional stem length from the 32th only
     if (params->m_dur > DUR_4) {
         flag = dynamic_cast<Flag *>(this->FindDescendantByType(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
+        slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+    }
+
+    // Adjust basic stem length to number of slashes
+    int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
+        + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
+    if (abs(baseStem) < ((slashFactor + 4) * tremStep)) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - slashFactor * tremStep);
+        }
+        else {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + slashFactor * tremStep);
+        }
+    }
+
+    // SMUFL flags cover some additional stem length from the 32th only
+    if (flag) {
         flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
 
@@ -441,6 +454,10 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // extension from 32th - this can be improved
     if (this->HasStemLen()) {
         if ((this->GetStemLen() == 0) && flag) flag->m_drawingNbFlags = 0;
+        return FUNCTOR_CONTINUE;
+    }
+    if ((this->GetStemVisible() == BOOLEAN_false) && flag) {
+        flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
 

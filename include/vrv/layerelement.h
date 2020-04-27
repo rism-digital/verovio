@@ -43,7 +43,7 @@ public:
      */
     ///@{
     LayerElement();
-    LayerElement(std::string classid);
+    LayerElement(const std::string &classid);
     virtual ~LayerElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return LAYER_ELEMENT; }
@@ -161,7 +161,7 @@ public:
     /**
      * Return the drawing radius for notes and chords
      */
-    int GetDrawingRadius(Doc *doc);
+    int GetDrawingRadius(Doc *doc, bool isInLigature = false);
 
     /**
      * Alignment getter

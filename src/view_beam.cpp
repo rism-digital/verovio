@@ -108,8 +108,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     assert(beamElementCoords->size() == 2);
 
-    int elementCount = 2;
-
     BeamElementCoord *firstElement = beamElementCoords->at(0);
     BeamElementCoord *secondElement = beamElementCoords->at(1);
 
@@ -136,25 +134,15 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int dur = (dynamic_cast<AttDurationLogical *>(firstElement->m_element))->GetDur();
 
     if (dur > DUR_1) {
-        for (int i = 0; i < elementCount; ++i) {
-            LayerElement *el = beamElementCoords->at(i)->m_element;
-            if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
-                StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
-                assert(interface);
-                DrawVerticalLine(dc, interface->GetDrawingStemStart(el).y, interface->GetDrawingStemEnd(el).y,
-                    interface->GetDrawingStemStart(el).x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
-            }
-        }
+        // Adjust the x position of the first and last element for taking into account the stem width
+        firstElement->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        secondElement->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     }
 
     // Number of bars to draw
     int allBars = fTrem->GetBeams();
     int floatingBars = fTrem->GetBeamsFloat();
     int fullBars = allBars - floatingBars;
-
-    // Adjust the x position of the first and last element for taking into account the stem width
-    firstElement->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    secondElement->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
 
     // Shift direction
     shiftY = (fTrem->m_drawingPlace == BEAMPLACE_below) ? 1.0 : -1.0;
@@ -180,13 +168,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         fullBars = allBars;
         floatingBars = 0;
     }
-    else if (dur == DUR_4) {
-        x1 += space;
-        y1 += space * fTrem->m_beamSegment.m_beamSlope;
-        x2 -= space;
-        y2 -= space * fTrem->m_beamSegment.m_beamSlope;
-    }
-    else if ((dur > DUR_4) && !floatingBars) {
+    else if ((dur > DUR_2) && !floatingBars) {
         fullBars = dur - 4;
         floatingBars = allBars - fullBars;
     }

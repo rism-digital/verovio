@@ -40,7 +40,7 @@ EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), 
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid)
+EditorialElement::EditorialElement(const std::string &classid)
     : Object(classid), BoundaryStartInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);

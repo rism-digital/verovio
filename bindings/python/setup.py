@@ -10,7 +10,7 @@ import platform
 from setuptools import setup, Extension
 
 # generate the git commit include file
-os.system("../../tools/get_git_commit.sh")
+os.system("cd ..;../tools/get_git_commit.sh")
 
 
 EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']

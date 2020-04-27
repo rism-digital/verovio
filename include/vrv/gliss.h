@@ -1,47 +1,44 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        trill.h
+// Name:        gliss.h
 // Author:      Klaus Rettinghaus
-// Created:     2017
+// Created:     2020
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_TRILL_H__
-#define __VRV_TRILL_H__
+#ifndef __VRV_GLISS_H__
+#define __VRV_GLISS_H__
 
 #include "atts_cmn.h"
-#include "atts_cmnornaments.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Trill
+// Gliss
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <trill> element.
+ * This class models the MEI <gliss> element.
  */
-class Trill : public ControlElement,
-              public TimeSpanningInterface,
-              public AttColor,
-              public AttExtender,
-              public AttLineRend,
-              public AttNNumberLike,
-              public AttOrnamentAccid,
-              public AttPlacement {
+class Gliss : public ControlElement,
+                    public TimeSpanningInterface,
+                    public AttColor,
+                    public AttLineRend,
+                    public AttLineRendBase,
+                    public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Trill();
-    virtual ~Trill();
-    virtual Object *Clone() const { return new Trill(*this); }
+    Gliss();
+    virtual ~Gliss();
+    virtual Object *Clone() const { return new Gliss(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Trill"; }
-    virtual ClassId GetClassId() const { return TRILL; }
+    virtual std::string GetClassName() const { return "Gliss"; }
+    virtual ClassId GetClassId() const { return GLISS; }
     ///@}
 
     /**
@@ -63,7 +60,6 @@ private:
 public:
     //
 private:
-    //
 };
 
 } // namespace vrv

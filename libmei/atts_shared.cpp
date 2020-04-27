@@ -7932,7 +7932,7 @@ bool AttXy2::HasY2() const
 
 /* include <atty2> */
 
-bool Att::SetShared(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetShared(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ACCIDLOG)) {
         AttAccidLog *att = dynamic_cast<AttAccidLog *>(element);

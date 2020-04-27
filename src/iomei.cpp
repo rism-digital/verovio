@@ -49,6 +49,7 @@
 #include "fig.h"
 #include "ftrem.h"
 #include "functorparams.h"
+#include "gliss.h"
 #include "gracegrp.h"
 #include "hairpin.h"
 #include "halfmrpt.h"
@@ -492,6 +493,10 @@ bool MEIOutput::WriteObject(Object *object)
     else if (object->Is(FTREM)) {
         m_currentNode = m_currentNode.append_child("fTrem");
         WriteFTrem(m_currentNode, dynamic_cast<FTrem *>(object));
+    }
+    else if (object->Is(GLISS)) {
+        m_currentNode = m_currentNode.append_child("gliss");
+        WriteGliss(m_currentNode, dynamic_cast<Gliss *>(object));
     }
     else if (object->Is(GRACEGRP)) {
         m_currentNode = m_currentNode.append_child("graceGrp");
@@ -1193,6 +1198,18 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WritePlacement(currentNode);
 }
 
+void MEIOutput::WriteGliss(pugi::xml_node currentNode, Gliss *gliss)
+{
+    assert(gliss);
+
+    WriteControlElement(currentNode, gliss);
+    WriteTimeSpanningInterface(currentNode, gliss);
+    gliss->WriteColor(currentNode);
+    gliss->WriteLineRend(currentNode);
+    gliss->WriteLineRendBase(currentNode);
+    gliss->WriteNNumberLike(currentNode);
+}
+
 void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
     assert(hairpin);
@@ -1262,7 +1279,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
-    pedal->WriteVerticalGroup(currentNode);
+    // pedal->WriteVerticalGroup(currentNode);
 }
 
 void MEIOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
@@ -1334,6 +1351,9 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     WriteControlElement(currentNode, trill);
     WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
+    trill->WriteExtender(currentNode);
+    trill->WriteLineRend(currentNode);
+    trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
 }
@@ -3761,6 +3781,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "fermata") {
             success = ReadFermata(parent, current);
         }
+        else if (std::string(current.name()) == "gliss") {
+            success = ReadGliss(parent, current);
+        }
         else if (std::string(current.name()) == "hairpin") {
             success = ReadHairpin(parent, current);
         }
@@ -3925,6 +3948,22 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
 
     parent->AddChild(vrvFermata);
     ReadUnsupportedAttr(fermata, vrvFermata);
+    return true;
+}
+
+bool MEIInput::ReadGliss(Object *parent, pugi::xml_node gliss)
+{
+    Gliss *vrvGliss = new Gliss();
+    ReadControlElement(gliss, vrvGliss);
+
+    ReadTimeSpanningInterface(gliss, vrvGliss);
+    vrvGliss->ReadColor(gliss);
+    vrvGliss->ReadLineRend(gliss);
+    vrvGliss->ReadLineRendBase(gliss);
+    vrvGliss->ReadNNumberLike(gliss);
+
+    parent->AddChild(vrvGliss);
+    ReadUnsupportedAttr(gliss, vrvGliss);
     return true;
 }
 
@@ -4096,6 +4135,9 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
 
     ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
+    vrvTrill->ReadExtender(trill);
+    vrvTrill->ReadLineRend(trill);
+    vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
 
