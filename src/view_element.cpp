@@ -399,7 +399,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     dc->StartGraphic(element, "", element->GetUuid());
 
     int y = staff->GetDrawingY();
-    DrawBarLine(dc, y, y - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), barLine);
+    DrawBarLine(dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), barLine);
 
     dc->EndGraphic(element, this);
 }
@@ -1285,27 +1285,29 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (drawingDur < DUR_1) {
             DrawMaximaToBrevis(dc, noteY, element, layer, staff);
         }
-        // Whole notes
-        else if (drawingDur == DUR_1) {
-            if (note->GetColored() == BOOLEAN_true) {
-                fontNo = SMUFL_E0FA_noteheadWholeFilled;
-            }
-            else {
-                fontNo = SMUFL_E0A2_noteheadWhole;
-            }
-
-            DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
-        }
-        // Other values
         else {
-            if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
-                fontNo = SMUFL_E0A3_noteheadHalf;
+            // Whole notes
+            if (drawingDur == DUR_1) {
+                if (note->GetColored() == BOOLEAN_true) {
+                    fontNo = SMUFL_E0FA_noteheadWholeFilled;
+                }
+                else {
+                    fontNo = SMUFL_E0A2_noteheadWhole;
+                }
             }
+            // Other values
             else {
-                fontNo = SMUFL_E0A4_noteheadBlack;
+                if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
+                    fontNo = SMUFL_E0A3_noteheadHalf;
+                }
+                else {
+                    fontNo = SMUFL_E0A4_noteheadBlack;
+                }
             }
 
+            dc->StartCustomGraphic("notehead");
             DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+            dc->EndCustomGraphic();
         }
     }
 

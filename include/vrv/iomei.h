@@ -59,6 +59,7 @@ class Fig;
 class Fermata;
 class FloatingElement;
 class FTrem;
+class Gliss;
 class GraceGrp;
 class Hairpin;
 class HalfmRpt;
@@ -295,6 +296,7 @@ private:
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
+    void WriteGliss(pugi::xml_node currentNode, Gliss *gliss);
     void WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteHarm(pugi::xml_node currentNode, Harm *harm);
     void WriteMNum(pugi::xml_node currentNode, MNum *mnum);
@@ -542,7 +544,7 @@ private:
     ///@}
 
     /**
-     * @name Methods for reading MEI floating elements
+     * @name Methods for reading MEI control elements
      */
     ///@{
     bool ReadAnchoredText(Object *parent, pugi::xml_node anchoredText);
@@ -552,6 +554,7 @@ private:
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
+    bool ReadGliss(Object *parent, pugi::xml_node gliss);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
     bool ReadMNum(Object *parent, pugi::xml_node mnum);

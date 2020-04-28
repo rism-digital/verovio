@@ -32,6 +32,7 @@ class Dynam;
 class F;
 class Fermata;
 class Fb;
+class Gliss;
 class Hairpin;
 class Harm;
 class Layer;
@@ -365,6 +366,7 @@ private:
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
+    std::vector<Gliss *> m_glissStack;
     std::vector<Harm *> m_harmStack;
     std::vector<Octave *> m_octaveStack;
     std::vector<Pedal *> m_pedalStack;

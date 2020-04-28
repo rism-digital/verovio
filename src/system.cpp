@@ -230,7 +230,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
 
-    if (object->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, PITCHINFLECTION, SLUR, SYL, TIE })) {
+    if (object->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, PITCHINFLECTION, SLUR, SYL, TIE })) {
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {
@@ -653,6 +653,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
     Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
+
+    params->m_classId = GLISS;
+    m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);

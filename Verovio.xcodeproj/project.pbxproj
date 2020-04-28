@@ -20,6 +20,12 @@
 		402492BE232E6FCB0017BB75 /* gracegrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 400FEDD1206FA742000D3233 /* gracegrp.h */; };
 		402492BF232E70000017BB75 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
 		4026FBE4203C827E0076535E /* mnum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4026FBE3203C827D0076535E /* mnum.cpp */; };
+		403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0510244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0511244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0512244F3E2900EE4F71 /* gliss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403B050E244F3E2800EE4F71 /* gliss.cpp */; };
+		403B0514244F3E4D00EE4F71 /* gliss.h in Headers */ = {isa = PBXBuildFile; fileRef = 403B0513244F3E4C00EE4F71 /* gliss.h */; };
+		403B0515244F3E4D00EE4F71 /* gliss.h in Headers */ = {isa = PBXBuildFile; fileRef = 403B0513244F3E4C00EE4F71 /* gliss.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		403BEFED206C00B500D022D5 /* beatrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFE7206C00B400D022D5 /* beatrpt.cpp */; };
 		403BEFEE206C00B500D022D5 /* mrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEA206C00B400D022D5 /* mrpt.cpp */; };
 		403BEFEF206C00B500D022D5 /* mrpt2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEB206C00B400D022D5 /* mrpt2.cpp */; };
@@ -1216,6 +1222,8 @@
 		402197931F2E09DA00182DF1 /* ioabc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ioabc.cpp; path = src/ioabc.cpp; sourceTree = "<group>"; };
 		4026FBE2203C827D0076535E /* mnum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mnum.h; path = include/vrv/mnum.h; sourceTree = "<group>"; };
 		4026FBE3203C827D0076535E /* mnum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mnum.cpp; path = src/mnum.cpp; sourceTree = "<group>"; };
+		403B050E244F3E2800EE4F71 /* gliss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gliss.cpp; path = src/gliss.cpp; sourceTree = "<group>"; };
+		403B0513244F3E4C00EE4F71 /* gliss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gliss.h; path = include/vrv/gliss.h; sourceTree = "<group>"; };
 		403BEFE5206C00B300D022D5 /* mrpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mrpt.h; path = include/vrv/mrpt.h; sourceTree = "<group>"; };
 		403BEFE6206C00B300D022D5 /* multirpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multirpt.h; path = include/vrv/multirpt.h; sourceTree = "<group>"; };
 		403BEFE7206C00B400D022D5 /* beatrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beatrpt.cpp; path = src/beatrpt.cpp; sourceTree = "<group>"; };
@@ -1954,6 +1962,8 @@
 				4DDBBB561C7AE43E00054AFF /* dynam.h */,
 				4067E4C71DDDAF0000C6E059 /* fermata.cpp */,
 				4067E4C91DDDAF6400C6E059 /* fermata.h */,
+				403B050E244F3E2800EE4F71 /* gliss.cpp */,
+				403B0513244F3E4C00EE4F71 /* gliss.h */,
 				4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */,
 				4DDBBB551C7AE43E00054AFF /* hairpin.h */,
 				4D796B5D1D78641900A15238 /* harm.cpp */,
@@ -2328,6 +2338,7 @@
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
+				403B0514244F3E4D00EE4F71 /* gliss.h in Headers */,
 				4DEF8A6221B7AACC0093A76B /* f.h in Headers */,
 				4DB3D8B71F83D0A300B5FC2B /* label.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
@@ -2554,6 +2565,7 @@
 				BB4C4B2E22A932CF001F6AF0 /* octave.h in Headers */,
 				BB4C4AC022A932B6001F6AF0 /* labelabbr.h in Headers */,
 				BB4C4ABE22A932B6001F6AF0 /* label.h in Headers */,
+				403B0515244F3E4D00EE4F71 /* gliss.h in Headers */,
 				BB4C4B0A22A932C3001F6AF0 /* pghead.h in Headers */,
 				4DFB3E8B23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
 				BB4C4B8A22A932DF001F6AF0 /* mnum.h in Headers */,
@@ -2918,6 +2930,7 @@
 				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
 				4DC12A791F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4D1694231E3A44F300569BF4 /* pitchinterface.cpp in Sources */,
+				403B0510244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				40C2E4222052A6F60003625F /* pb.cpp in Sources */,
 				4DA0EAF322BB77C300A7EBEB /* facsimileinterface.cpp in Sources */,
 				4D1694241E3A44F300569BF4 /* positioninterface.cpp in Sources */,
@@ -3039,6 +3052,7 @@
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
 				40E1CEDE205060E20007C8AF /* labelabbr.cpp in Sources */,
+				403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				4D766EFD20ACAD63006875D8 /* neume.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
@@ -3239,6 +3253,7 @@
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D4C26EF1EF7E75400681770 /* label.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
+				403B0511244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				4D6122C01F77E1E000FC90A0 /* rend.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
@@ -3440,6 +3455,7 @@
 				BB4C4BB522A932EB001F6AF0 /* view_tuplet.cpp in Sources */,
 				BB4C4B2122A932CF001F6AF0 /* dir.cpp in Sources */,
 				BB4C4BAF22A932EB001F6AF0 /* view_mensural.cpp in Sources */,
+				403B0512244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				BB4C4B5D22A932D7001F6AF0 /* metersig.cpp in Sources */,
 				BB4C4BB622A932F6001F6AF0 /* jsonxx.cc in Sources */,
 				BB4C4A7622A9321F001F6AF0 /* atts_gestural.cpp in Sources */,

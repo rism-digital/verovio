@@ -32,6 +32,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "ftrem.h"
+#include "gliss.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "instrdef.h"
@@ -1152,6 +1153,13 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
             LogWarning("MusicXML import: bracketSpan for '%s' could not be closed", iter->first->GetUuid().c_str());
         }
         m_bracketStack.clear();
+    }
+    if (!m_glissStack.empty()) {
+        std::vector<Gliss *>::iterator iter;
+        for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
+            LogWarning("MusicXML import: gliss for '%s' could not be closed", (*iter)->GetUuid().c_str());
+        }
+        m_glissStack.clear();
     }
     if (!m_trillStack.empty()) { // open trills without ending
         std::vector<std::pair<Trill *, musicxml::OpenSpanner> >::iterator iter;
@@ -2547,7 +2555,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
     }
 
-    // Dynamics
+    // dynamics
     pugi::xpath_node xmlDynam = notations.node().select_node("dynamics");
     if (xmlDynam) {
         Dynam *dynam = new Dynam();
@@ -2571,6 +2579,36 @@ void MusicXmlInput::ReadMusicXmlNote(
         fermata->SetStartid(m_ID);
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         ShapeFermata(fermata, xmlFermata.node());
+    }
+
+    // glissando and slide
+    pugi::xpath_node_set glissandi = notations.node().select_nodes("glissando|slide");
+    for (pugi::xpath_node_set::const_iterator it = glissandi.begin(); it != glissandi.end(); ++it) {
+        std::string noteID = m_ID;
+        // prevent from using chords
+        if (element->Is(CHORD)) noteID = "#" + element->GetChild(0)->GetUuid();
+        pugi::xml_node xmlGlissando = it->node();
+        if (HasAttributeWithValue(xmlGlissando, "type", "start")) {
+            Gliss *gliss = new Gliss();
+            m_controlElements.push_back(std::make_pair(measureNum, gliss));
+            gliss->SetColor(xmlGlissando.attribute("color").as_string());
+            gliss->SetLform(gliss->AttLineRendBase::StrToLineform(xmlGlissando.attribute("line-type").as_string()));
+            gliss->SetN(xmlGlissando.attribute("number").as_string());
+            gliss->SetStartid(noteID);
+            gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+            gliss->SetType(xmlGlissando.name());
+            m_glissStack.push_back(gliss);
+        }
+        else if (!m_glissStack.empty()) {
+            int extNumber = xmlGlissando.attribute("number").as_int();
+            std::vector<Gliss *>::iterator iter;
+            for (iter = m_glissStack.begin(); iter != m_glissStack.end(); ++iter) {
+                if ((atoi(((*iter)->GetN()).c_str()) == extNumber) && ((*iter)->GetType() == xmlGlissando.name())) {
+                    (*iter)->SetEndid(noteID);
+                    m_glissStack.erase(iter--);
+                }
+            }
+        }
     }
 
     // mordents
