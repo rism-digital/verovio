@@ -16,7 +16,7 @@
 		</fileDesc>
 		<encodingDesc>
 			<appInfo>
-				<application version="unknown">
+				<application version="1.0.0" label="2">
 					<name>Verovio</name>
 				</application>
 			</appInfo>
@@ -29,9 +29,8 @@
 					<scoreDef xml:id="m-26" meter.count="2" meter.unit="4" ppq="256">
 						<staffGrp xml:id="m-27">
 							<staffGrp xml:id="m-34" n="1" symbol="brace">
-								<staffDef xml:id="m-28" clef.line="2" clef.shape="G" key.mode="major" key.sig="2f" label="" lines="5" n="1"> </staffDef>
-								<staffDef xml:id="m-31" clef.line="4" clef.shape="F" key.mode="major" key.sig="2f" label="" lines="5" n="2"
-								> </staffDef>
+								<staffDef xml:id="m-28" clef.line="2" clef.shape="G" key.mode="major" key.sig="2f" label="" lines="5" n="1"></staffDef>
+								<staffDef xml:id="m-31" clef.line="4" clef.shape="F" key.mode="major" key.sig="2f" label="" lines="5" n="2"></staffDef>
 							</staffGrp>
 						</staffGrp>
 					</scoreDef>

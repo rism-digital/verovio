@@ -1,4 +1,4 @@
-Verovio 2.7.0-dev-d5911c2
+Verovio 2.7.0-dev-093d856-dirty
 
 Example usage:
 
@@ -47,6 +47,7 @@ Input and page layout options
  --expand <s>                      Expand all referenced elements in the expansion <xml:id> (default: "")
  --svg-bounding-boxes              Include bounding boxes in SVG output
  --svg-view-box                    Use viewBox on svg root element for easy scaling of document
+ --svg-html5                       Write data-id and data-class attributes for JS usage and id clash avoidance.
  --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
  --use-facsimile                   Use information in the <facsimile> element to control the layout
  --use-pg-footer-for-all           Use the pgFooter for all pages
