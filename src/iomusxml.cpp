@@ -2309,11 +2309,11 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // stem direction - taken into account below for the chord or the note
         data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-        std::string stemDirStr = GetContentOfChild(node, "stem");
-        if (stemDirStr == "down") {
+        std::string stemText = GetContentOfChild(node, "stem");
+        if (stemText == "down") {
             stemDir = STEMDIRECTION_down;
         }
-        else if (stemDirStr == "up") {
+        else if (stemText == "up") {
             stemDir = STEMDIRECTION_up;
         }
 
@@ -2363,6 +2363,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 chord->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
+                if (stemText == "none") chord->SetStemVisible(BOOLEAN_false);
                 if (tremSlashNum != 0)
                     chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
                 AddLayerElement(layer, chord, duration);
@@ -2410,6 +2411,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
+            if (stemText == "none") note->SetStemVisible(BOOLEAN_false);
             if (tremSlashNum != 0)
                 note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
         }
