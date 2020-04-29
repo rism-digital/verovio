@@ -1278,6 +1278,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     WriteTimePointInterface(currentNode, pedal);
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
+    pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     // pedal->WriteVerticalGroup(currentNode);
 }
@@ -4058,6 +4059,7 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     ReadTimePointInterface(pedal, vrvPedal);
     vrvPedal->ReadColor(pedal);
     vrvPedal->ReadPedalLog(pedal);
+    vrvPedal->ReadPedalVis(pedal);
     vrvPedal->ReadPlacement(pedal);
     vrvPedal->ReadVerticalGroup(pedal);
 
