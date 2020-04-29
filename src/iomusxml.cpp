@@ -2347,7 +2347,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // notehead
         pugi::xpath_node notehead = node.select_node("notehead");
         if (notehead) {
-            // if (HasAttributeWithValue(notehead.node(), "parentheses", "yes")) note->SetEnclose(ENCLOSURE_paren);
+            note->SetHeadColor(notehead.node().attribute("color").as_string());
+            //if (notehead.node().attribute("parentheses").as_bool()) note->SetEnclose(ENCLOSURE_paren);
         }
 
         // look at the next note to see if we are starting or ending a chord
