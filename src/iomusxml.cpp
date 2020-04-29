@@ -1181,8 +1181,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     std::string measureNum = node.attribute("number").as_string();
     if (measure != NULL) measure->SetN(measureNum);
 
-    std::string implicit = node.attribute("implicit").as_string();
-    if (implicit == "yes") {
+    bool implicit = node.attribute("implicit").as_bool();
+    if (implicit) {
         MNum *mNum = new MNum();
         // An empty mNum means that we like to render this measure number as blank.
         measure->AddChild(mNum);
