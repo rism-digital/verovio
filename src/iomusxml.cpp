@@ -1878,13 +1878,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
     pugi::xpath_node xmlPedal = type.node().select_node("pedal");
     if (xmlPedal) {
         std::string pedalType = xmlPedal.node().attribute("type").as_string();
-        std::string pedalLine = xmlPedal.node().attribute("line").as_string();
-        // do not import pedal start lines until engraving supported
-        if (pedalLine != "yes") {
+        bool pedalLine = xmlPedal.node().attribute("line").as_bool();
+        if (pedalType != "continue") {
             Pedal *pedal = new Pedal();
-            pedal->SetTstamp(timeStamp);
+            pedal->SetColor(xmlPedal.node().attribute("color").as_string());
+            // pedal->SetN(xmlPedal.node().attribute("number").as_string());
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
             if (pedalType == "sostenuto") pedal->SetFunc("sostenuto");
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
@@ -1895,15 +1896,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
+            pedal->SetTstamp(timeStamp);
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             pedal->SetVgrp(defaultY);
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
-        }
-        else if (pedalType == "start") {
-            LogWarning("MusicXML import: pedal lines are not supported");
         }
     }
 
