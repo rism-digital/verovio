@@ -1024,7 +1024,9 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    DrawStaffLines(dc, staff, measure, system);
+    if (staffDef->GetLinesVisible() != BOOLEAN_false) {
+        DrawStaffLines(dc, staff, measure, system);
+    }
 
     DrawStaffDef(dc, staff, measure);
 
