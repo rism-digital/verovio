@@ -37,23 +37,23 @@ tests:
           - name: "02a-Rests-Durations.xml"
             description: "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half, etc. until a 128th-rest; Then the same with dotted durations"
             comment: "Multi-measure rests need to be fixed."
-            mei: 1
+            mei: 2
             verovio: 2
           - name: "02b-Rests-PitchedRests.xml"
             description: "Rests can have explicit pitches, where they are displayed. The first rest uses no explicit position and should use the default position, all others are explicitly positioned somewhere else."
             mei: 2
-            verovio: 1
+            verovio: 2
           - name: "02c-Rests-MultiMeasureRests.xml"
             description: "Four multi-measure rests: 3 measures, 15 measures, 1 measure, and 12 measures."
-            mei: 0
-            verovio: 0
+            mei: 2
+            verovio: 2
           - name: "02d-Rests-Multimeasure-TimeSignatures.xml"
-            description: "Four multi-measure rests: 3 measures, 15 measures, 1 measure, and 12 measures."
-            mei: 0
-            verovio: 0
+            description: "Multi-Measure rests should always be converted into durations that are a multiple of the time signature."
+            mei: 1
+            verovio: 1
           - name: "02e-Rests-NoType.xml"
             description: "In some cases, a rest might not have its type attribute set (this happens, for example, with voices in Finale, where you don’t manually insert a rest)."
-            mei: 2
+            mei: 1
             verovio: 2
 
     - id: "03"
@@ -85,8 +85,8 @@ tests:
       files:
           - name: "11a-TimeSignatures.xml"
             description: "Various time signatures: 2/2 (alla breve), 4/4 (C), 2/2, 3/2, 2/4, 3/4, 4/4, 5/4, 3/8, 6/8, 12/8"
-            mei: 0
-            verovio: 0
+            mei: 2
+            verovio: 2
           - name: "11b-TimeSignatures-NoTime.xml"
             description: "A score without a time signature (but with a key and clefs)"
             mei: 2
@@ -145,12 +145,12 @@ tests:
             verovio: 2
           - name: "13c-KeySignatures-NonTraditional.xml"
             description: "Non-traditional key signatures, where each alteration is separately given. Here we have (f sharp, a flat, b flat) and (c flatflat, g sharp sharp, d flat, b sharp, f natural), where in the second case an explicit octave is given for each alteration."
-            mei: 0
-            verovio: 0
+            mei: 1
+            verovio: 1
           - name: "13d-KeySignatures-Microtones.xml"
             description: "Non-traditional key signatures with microtone alterations: (g flat-and-a-half, a flat, b half-flat, c natural, d half-sharp, e sharp, f sharp-and-a-half)."
-            mei: 0
-            verovio: 0
+            mei: 1
+            verovio: 1
     - id: "14"
       name: "Staff attributes"
       files:
