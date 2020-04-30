@@ -324,16 +324,16 @@ tests:
             verovio: 2
           - name: "33f-Trill-EndingOnGraceNote.xml"
             description: "A trill spanner that spans a grace note and ends on an after-grace note at the end of the measure."
-            mei: 0
-            verovio: 0
+            mei: 1
+            verovio: 1
           - name: "33g-Slur-ChordedNotes.xml"
             description: "Slurs on chorded notes: Only the first note of the chord should get the slur notation. Some applications print out the slur for all notes – these should be ignored."
             mei: 2
             verovio: 2
           - name: "33h-Spanners-Glissando.xml"
             description: "All different types of glissando defined in MusicXML"
-            mei: 0
-            verovio: 0
+            mei: 1
+            verovio: 1
           - name: "33i-Ties-NotEnded.xml"
             description: "Several ties that have their end tag missing."
             mei: 2
