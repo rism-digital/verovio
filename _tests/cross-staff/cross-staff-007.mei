@@ -1,81 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
 	<meiHead>
 		<fileDesc>
 			<titleStmt>
 				<title>Spacing of staves in cross-staff</title>
+				<respStmt>
+					<persName role="editor">Klaus Rettinghaus</persName>
+				</respStmt>
 			</titleStmt>
-			<pubStmt />
+			<pubStmt>
+				<date>2020-04-30</date>
+			</pubStmt>
 			<notesStmt>
 				<annot>Spacing of staves should not be affected by cross-staff notes within beams</annot>
 			</notesStmt>
 		</fileDesc>
 		<encodingDesc>
 			<appInfo>
-				<application isodate="2019-11-12T15:47:44" version="2.7.0" label="2">
+				<application version="unknown" label="1">
 					<name>Verovio</name>
-					<p>Transcoded from Humdrum</p>
 				</application>
 			</appInfo>
 		</encodingDesc>
-		<extMeta>
-			<frames xmlns="http://www.humdrum.org/ns/humxml">
-				<metaFrame n="13" token="!!!RDF**kern: > = above" xml:id="L14">
-					<frameInfo>
-						<startTime float="4" />
-						<frameType>reference</frameType>
-						<referenceKey>RDF**kern</referenceKey>
-						<referenceValue>&gt; = above</referenceValue>
-					</frameInfo>
-				</metaFrame>
-			</frames>
-		</extMeta>
 	</meiHead>
 	<music>
 		<body>
-			<mdiv xml:id="mdiv-0000000679526149">
-				<score xml:id="score-0000001052510580">
-					<scoreDef xml:id="scoredef-0000000882915273">
-						<staffGrp xml:id="staffgrp-0000000338249361" symbol="brace" bar.thru="true">
-							<labelAbbr xml:id="labelAbbr-0000000843989372" />
-							<staffDef xml:id="staffdef-0000001129485935" n="1" lines="5">
-								<clef xml:id="clef-L3F2" shape="G" line="2" />
-								<meterSig xml:id="metersig-L2F2" count="4" unit="4" />
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp symbol="brace" bar.thru="true">
+							<staffDef n="1" lines="5">
+								<clef shape="G" line="2"/>
+								<meterSig count="6" unit="8"/>
 							</staffDef>
-							<staffDef xml:id="staffdef-0000001619978311" n="2" lines="5">
-								<clef xml:id="clef-L3F1" shape="F" line="4" />
-								<meterSig xml:id="metersig-L2F1" count="4" unit="4" />
+							<staffDef n="2" lines="5">
+								<clef shape="F" line="4"/>
+								<meterSig count="6" unit="8"/>
 							</staffDef>
 						</staffGrp>
 					</scoreDef>
-					<section xml:id="section-L1F1">
-						<measure xml:id="measure-L1" right="end" n="0">
-							<staff xml:id="staff-0000000530978708" n="1">
-								<layer xml:id="layer-L1F2N1" n="1">
-									<chord xml:id="chord-L5F2" dur="4">
-										<note xml:id="note-L5F2S1" oct="5" pname="c" accid.ges="n" />
-										<note xml:id="note-L5F2S2" oct="5" pname="e" accid.ges="n" />
-										<note xml:id="note-L5F2S3" oct="5" pname="g" accid.ges="n" />
-									</chord>
-									<rest xml:id="rest-L6F2" dots="1" dur="2" />
+					<section>
+						<measure>
+							<staff n="1">
+								<layer>
+									<mRest/>
 								</layer>
 							</staff>
-							<staff xml:id="staff-0000001194715467" n="2">
-								<layer xml:id="layer-L1F1N1" n="1">
-									<chord xml:id="chord-L5F1" dur="4">
-										<note xml:id="note-L5F1S1" oct="3" pname="a" accid.ges="n" />
-										<note xml:id="note-L5F1S2" oct="4" pname="c" accid.ges="n" />
-										<note xml:id="note-L5F1S3" oct="4" pname="e" accid.ges="n" />
-									</chord>
-									<beam xml:id="beam-L6F1-L11F1">
-										<note xml:id="note-L6F1" dur="8" oct="3" pname="a" accid.ges="n" />
-										<note xml:id="note-L7F1" dur="8" oct="3" pname="b" accid.ges="n" />
-										<note xml:id="note-L8F1" dur="8" oct="4" pname="c" accid.ges="n" />
-										<note xml:id="note-L9F1" dur="8" staff="1" oct="4" pname="d" stem.dir="down" accid.ges="n" />
-										<note xml:id="note-L10F1" dur="8" oct="4" pname="c" accid.ges="n" />
-										<note xml:id="note-L11F1" dur="8" oct="3" pname="b" accid.ges="n" />
+							<staff n="2">
+								<layer>
+									<beam>
+										<note dur="8" oct="3" pname="a" accid.ges="n"/>
+										<note dur="8" oct="3" pname="b" accid.ges="n"/>
+										<note dur="8" oct="4" pname="c" accid.ges="n"/>
+										<note dur="8" staff="1" oct="4" pname="d" accid.ges="n"/>
+										<note dur="8" oct="4" pname="c" accid.ges="n"/>
+										<note dur="8" oct="3" pname="b" accid.ges="n"/>
+									</beam>
+								</layer>
+							</staff>
+						</measure>
+						<measure>
+							<staff n="1">
+								<layer>
+									<mRest/>
+								</layer>
+							</staff>
+							<staff n="2">
+								<layer>
+									<beam>
+										<note dur="8" oct="2" pname="a" accid.ges="n"/>
+										<note dur="8" oct="2" pname="b" accid.ges="n"/>
+										<note dur="8" oct="3" pname="c" accid.ges="n"/>
+										<note dur="8" staff="1" oct="5" pname="d" accid.ges="n"/>
+										<note dur="8" oct="3" pname="c" accid.ges="n"/>
+										<note dur="8" oct="2" pname="b" accid.ges="n"/>
 									</beam>
 								</layer>
 							</staff>
