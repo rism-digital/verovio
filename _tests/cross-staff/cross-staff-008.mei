@@ -68,24 +68,6 @@
                 </layer>
               </staff>
             </measure>
-            <measure>
-              <staff n="1">
-                <layer n="1">
-                  <beam beam.with="below">
-                    <note dots="1" dur="8" oct="5" pname="c"/>
-                    <space dur="16"/>
-                  </beam>
-                </layer>
-              </staff>
-              <staff n="2">
-                <layer n="1">
-                  <beam beam.with="above">
-                    <space dots="1" dur="8"/>
-                    <note dur="16" oct="3" pname="c"/>
-                  </beam>
-                </layer>
-              </staff>
-            </measure>
           </section>
         </score>
       </mdiv>
