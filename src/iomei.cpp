@@ -539,7 +539,7 @@ bool MEIOutput::WriteObject(Object *object)
         WriteMRpt2(m_currentNode, dynamic_cast<MRpt2 *>(object));
     }
     else if (object->Is(MSPACE)) {
-        m_currentNode = m_currentNode.append_child("mspace");
+        m_currentNode = m_currentNode.append_child("mSpace");
         WriteMSpace(m_currentNode, dynamic_cast<MSpace *>(object));
     }
     else if (object->Is(MULTIREST)) {
