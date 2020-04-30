@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Mixed cross-staff beams</title>
+        <respStmt>
+          <persName role="editor">Klaus Rettinghaus</persName>
+        </respStmt>
+      </titleStmt>
+      <pubStmt>
+        <date>2020-04-30</date>
+      </pubStmt>
+      <notesStmt>
+        <annot>Cross-staff beams can be positioned between noteheads by setting stem direction or beam placement.</annot>
+      </notesStmt>
+    </fileDesc>
+    <encodingDesc>
+      <appInfo>
+        <application version="unknown" label="1">
+          <name>Verovio</name>
+        </application>
+      </appInfo>
+    </encodingDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffGrp symbol="brace" bar.thru="true">
+                <staffDef n="1" lines="5" clef.shape="G" clef.line="2" meter.count="1" meter.unit="4"/>
+                <staffDef n="2" lines="5" clef.shape="F" clef.line="4" meter.count="1" meter.unit="4"/>
+              </staffGrp>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure>
+              <staff n="1">
+                <layer n="1">
+                  <beam>
+                    <note dots="1" dur="8" oct="5" pname="c" stem.dir="down"/>
+                    <note dur="16" staff="2" oct="3" pname="c" stem.dir="up"/>
+                  </beam>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <mSpace/>
+                </layer>
+              </staff>
+            </measure>
+            <measure>
+              <staff n="1">
+                <layer n="1">
+                  <beam place="mixed">
+                    <note dots="1" dur="8" oct="5" pname="c"/>
+                    <note dur="16" staff="2" oct="3" pname="c"/>
+                  </beam>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <mSpace/>
+                </layer>
+              </staff>
+            </measure>
+            <measure>
+              <staff n="1">
+                <layer n="1">
+                  <beam beam.with="below">
+                    <note dots="1" dur="8" oct="5" pname="c"/>
+                    <space dur="16"/>
+                  </beam>
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <beam beam.with="above">
+                    <space dots="1" dur="8"/>
+                    <note dur="16" oct="3" pname="c"/>
+                  </beam>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>
