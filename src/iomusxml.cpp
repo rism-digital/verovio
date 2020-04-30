@@ -2309,7 +2309,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // stem direction - taken into account below for the chord or the note
         data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-        std::string stemText = GetContentOfChild(node, "stem");
+        pugi::xpath_node stem = node.select_node("stem");
+        std::string stemText = stem.node().text().as_string();
         if (stemText == "down") {
             stemDir = STEMDIRECTION_down;
         }
@@ -2411,6 +2412,10 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
+            if (node.attribute("default-y") && stem.node().attribute("default-y")) {
+              float stemLen = abs (node.attribute("default-y").as_float() - stem.node().attribute("default-y").as_float()) / 5;
+              note->SetStemLen(stemLen);
+            }
             if (stemText == "none") note->SetStemVisible(BOOLEAN_false);
             if (tremSlashNum != 0)
                 note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
