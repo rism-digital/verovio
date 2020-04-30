@@ -539,7 +539,7 @@ bool MEIOutput::WriteObject(Object *object)
         WriteMRpt2(m_currentNode, dynamic_cast<MRpt2 *>(object));
     }
     else if (object->Is(MSPACE)) {
-        m_currentNode = m_currentNode.append_child("mspace");
+        m_currentNode = m_currentNode.append_child("mSpace");
         WriteMSpace(m_currentNode, dynamic_cast<MSpace *>(object));
     }
     else if (object->Is(MULTIREST)) {
@@ -1278,6 +1278,7 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     WriteTimePointInterface(currentNode, pedal);
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
+    pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     // pedal->WriteVerticalGroup(currentNode);
 }
@@ -4058,6 +4059,7 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     ReadTimePointInterface(pedal, vrvPedal);
     vrvPedal->ReadColor(pedal);
     vrvPedal->ReadPedalLog(pedal);
+    vrvPedal->ReadPedalVis(pedal);
     vrvPedal->ReadPlacement(pedal);
     vrvPedal->ReadVerticalGroup(pedal);
 

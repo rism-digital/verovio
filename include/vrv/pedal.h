@@ -9,6 +9,7 @@
 #define __VRV_PEDAL_H__
 
 #include "atts_cmn.h"
+#include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -25,6 +26,7 @@ class Pedal : public ControlElement,
               public TimePointInterface,
               public AttColor,
               public AttPedalLog,
+              public AttPedalVis,
               public AttPlacement,
               public AttVerticalGroup {
 public:

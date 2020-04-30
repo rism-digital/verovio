@@ -1181,8 +1181,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     std::string measureNum = node.attribute("number").as_string();
     if (measure != NULL) measure->SetN(measureNum);
 
-    std::string implicit = node.attribute("implicit").as_string();
-    if (implicit == "yes") {
+    bool implicit = node.attribute("implicit").as_bool();
+    if (implicit) {
         MNum *mNum = new MNum();
         // An empty mNum means that we like to render this measure number as blank.
         measure->AddChild(mNum);
@@ -1878,13 +1878,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
     pugi::xpath_node xmlPedal = type.node().select_node("pedal");
     if (xmlPedal) {
         std::string pedalType = xmlPedal.node().attribute("type").as_string();
-        std::string pedalLine = xmlPedal.node().attribute("line").as_string();
-        // do not import pedal start lines until engraving supported
-        if (pedalLine != "yes") {
+        bool pedalLine = xmlPedal.node().attribute("line").as_bool();
+        if (pedalType != "continue") {
             Pedal *pedal = new Pedal();
-            pedal->SetTstamp(timeStamp);
+            pedal->SetColor(xmlPedal.node().attribute("color").as_string());
+            // pedal->SetN(xmlPedal.node().attribute("number").as_string());
             if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+            if (pedalLine) pedal->SetForm(pedalVis_FORM_line);
             if (pedalType == "sostenuto") pedal->SetFunc("sostenuto");
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
@@ -1895,15 +1896,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 pedal->SetStaff(pedal->AttStaffIdent::StrToXsdPositiveIntegerList(
                     std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
+            pedal->SetTstamp(timeStamp);
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
             pedal->SetVgrp(defaultY);
             m_controlElements.push_back(std::make_pair(measureNum, pedal));
             m_pedalStack.push_back(pedal);
-        }
-        else if (pedalType == "start") {
-            LogWarning("MusicXML import: pedal lines are not supported");
         }
     }
 
@@ -2310,11 +2309,11 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // stem direction - taken into account below for the chord or the note
         data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-        std::string stemDirStr = GetContentOfChild(node, "stem");
-        if (stemDirStr == "down") {
+        std::string stemText = GetContentOfChild(node, "stem");
+        if (stemText == "down") {
             stemDir = STEMDIRECTION_down;
         }
-        else if (stemDirStr == "up") {
+        else if (stemText == "up") {
             stemDir = STEMDIRECTION_up;
         }
 
@@ -2348,7 +2347,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // notehead
         pugi::xpath_node notehead = node.select_node("notehead");
         if (notehead) {
-            // if (HasAttributeWithValue(notehead.node(), "parentheses", "yes")) note->SetEnclose(ENCLOSURE_paren);
+            note->SetHeadColor(notehead.node().attribute("color").as_string());
+            //if (notehead.node().attribute("parentheses").as_bool()) note->SetEnclose(ENCLOSURE_paren);
         }
 
         // look at the next note to see if we are starting or ending a chord
@@ -2363,6 +2363,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 chord->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
+                if (stemText == "none") chord->SetStemVisible(BOOLEAN_false);
                 if (tremSlashNum != 0)
                     chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
                 AddLayerElement(layer, chord, duration);
@@ -2410,6 +2411,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
+            if (stemText == "none") note->SetStemVisible(BOOLEAN_false);
             if (tremSlashNum != 0)
                 note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
         }
