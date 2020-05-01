@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `staffDef@lines.visible` (@rettinghaus)
 * Support for gliss (@rettinghaus)
 * Improved bTrem handling (@rettinghaus)
 * Improved trill support (@rettinghaus)
