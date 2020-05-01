@@ -2214,12 +2214,14 @@ void MusicXmlInput::ReadMusicXmlNote(
         Tuplet *tuplet = new Tuplet();
         AddLayerElement(layer, tuplet);
         m_elementStackMap.at(layer).push_back(tuplet);
-        pugi::xpath_node actualNotes = node.select_node("time-modification/actual-notes");
-        pugi::xpath_node normalNotes = node.select_node("time-modification/normal-notes");
-        if (actualNotes && normalNotes) {
-            tuplet->SetNum(actualNotes.node().text().as_int());
-            tuplet->SetNumbase(normalNotes.node().text().as_int());
+        int num = node.select_node("time-modification/actual-notes").node().text().as_int();
+        int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
+        if (tupletStart.node().first_child()) {
+            num = tupletStart.node().select_node("tuplet-actual/tuplet-number").node().text().as_int();
+            numbase = tupletStart.node().select_node("tuplet-normal/tuplet-number").node().text().as_int();
         }
+        if (num) tuplet->SetNum(num);
+        if (numbase) tuplet->SetNumbase(numbase);
         tuplet->SetNumPlace(
             tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
         tuplet->SetBracketPlace(
@@ -2348,7 +2350,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xpath_node notehead = node.select_node("notehead");
         if (notehead) {
             note->SetHeadColor(notehead.node().attribute("color").as_string());
-            //if (notehead.node().attribute("parentheses").as_bool()) note->SetEnclose(ENCLOSURE_paren);
+            // if (notehead.node().attribute("parentheses").as_bool()) note->SetEnclose(ENCLOSURE_paren);
         }
 
         // look at the next note to see if we are starting or ending a chord
