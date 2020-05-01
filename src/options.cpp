@@ -680,9 +680,9 @@ Options::Options()
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
 
-    m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");
-    m_lyricHyphenWidth.Init(0.20, 0.10, 0.50);
-    this->Register(&m_lyricHyphenWidth, "lyricHyphenWidth", &m_generalLayout);
+    m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
+    m_lyricLineThickness.Init(0.25, 0.10, 0.50);
+    this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
 
     m_lyricNoStartHyphen.SetInfo("Lyric no start hyphen", "Do not show hyphens at the beginning of a system");
     m_lyricNoStartHyphen.Init(false);
