@@ -2161,8 +2161,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-    bool cue = false;
-    if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
+    bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']"))? true : false;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -2383,9 +2382,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             // Mark a chord as cue=true if and only if all its child notes are cue.
             // (This causes it to have a smaller stem).
             if (!cue) {
-                chord->SetCue(BOOLEAN_false);
+                chord->SetCue(BOOLEAN_NONE);
             }
-            else if (chord->GetCue() != BOOLEAN_false) {
+            else if (chord->GetCue() != BOOLEAN_NONE) {
                 chord->SetCue(BOOLEAN_true);
             }
         }
