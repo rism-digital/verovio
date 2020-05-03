@@ -2777,9 +2777,22 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // beam end
-    bool beamEnd = node.select_node("beam[@number='1'][text()='end']");
+    bool beamEnd = node.select_node("beam[text()='end']");
     if (beamEnd) {
-        RemoveLastFromStack(BEAM, layer);
+        int breakSec = (int)node.select_nodes("beam[text()='continue']").size();
+        if (breakSec) {
+            if (element->Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(element);
+                note->SetBreaksec(breakSec);
+            }
+            else if (element->Is(CHORD)) {
+                Chord *chord = dynamic_cast<Chord *>(element);
+                chord->SetBreaksec(breakSec);
+            }
+        }
+        else {
+            RemoveLastFromStack(BEAM, layer);
+        }
     }
 
     // add StartIDs to dir, dynam, and pedal
