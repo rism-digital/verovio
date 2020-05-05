@@ -2161,8 +2161,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-    bool cue = false;
-    if (node.select_node("cue") || node.select_node("type[@size='cue']")) cue = true;
+    bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']"))? true : false;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -2383,9 +2382,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             // Mark a chord as cue=true if and only if all its child notes are cue.
             // (This causes it to have a smaller stem).
             if (!cue) {
-                chord->SetCue(BOOLEAN_false);
+                chord->SetCue(BOOLEAN_NONE);
             }
-            else if (chord->GetCue() != BOOLEAN_false) {
+            else if (chord->GetCue() != BOOLEAN_NONE) {
                 chord->SetCue(BOOLEAN_true);
             }
         }
@@ -2778,9 +2777,22 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // beam end
-    bool beamEnd = node.select_node("beam[@number='1'][text()='end']");
+    bool beamEnd = node.select_node("beam[text()='end']");
     if (beamEnd) {
-        RemoveLastFromStack(BEAM, layer);
+        int breakSec = (int)node.select_nodes("beam[text()='continue']").size();
+        if (breakSec) {
+            if (element->Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(element);
+                note->SetBreaksec(breakSec);
+            }
+            else if (element->Is(CHORD)) {
+                Chord *chord = dynamic_cast<Chord *>(element);
+                chord->SetBreaksec(breakSec);
+            }
+        }
+        else {
+            RemoveLastFromStack(BEAM, layer);
+        }
     }
 
     // add StartIDs to dir, dynam, and pedal
