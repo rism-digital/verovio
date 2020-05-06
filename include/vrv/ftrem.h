@@ -66,6 +66,11 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
     //
 protected:
