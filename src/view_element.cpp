@@ -493,8 +493,8 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
-        int slashDur = 0;
-        if (bTrem->GetUnitdur() > drawingDur) slashDur = bTrem->GetUnitdur() - DUR_4;
+        int slashDur = bTrem->GetUnitdur() - drawingDur;
+        if (drawingDur < DUR_4) slashDur = bTrem->GetUnitdur() - DUR_4;
         switch (slashDur) {
             case (0): stemMod = STEMMODIFIER_NONE; break;
             case (1): stemMod = STEMMODIFIER_1slash; break;
