@@ -393,7 +393,8 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     dc->StartGraphic(element, "", element->GetUuid());
 
     int y = staff->GetDrawingY();
-    DrawBarLine(dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), barLine);
+    DrawBarLine(
+        dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), barLine);
 
     dc->EndGraphic(element, this);
 }
