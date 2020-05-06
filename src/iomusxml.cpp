@@ -403,16 +403,15 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         std::string textFont = textNode.attribute("font-family").as_string();
         std::string textStyle = textNode.attribute("font-style").as_string();
         std::string textWeight = textNode.attribute("font-weight").as_string();
-        std::string lang = textNode.attribute("xml:lang").as_string();
         Object *textParent = element;
-        if (!textColor.empty() || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
+        if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
+            || textNode.attribute("halign") || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
             Rend *rend = new Rend();
-            if (words.size() > 1 && !lang.empty()) {
-                rend->SetLang(lang.c_str());
-            }
+            rend->SetLang(textNode.attribute("xml:lang").as_string());
             rend->SetColor(textNode.attribute("color").as_string());
-            if (!textAlign.empty())
-                rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(textAlign.c_str()));
+            rend->SetHalign(
+                rend->AttHorizontalAlign::StrToHorizontalalignment(textNode.attribute("halign").as_string()));
+            rend->SetSpace(textNode.attribute("xml:space").as_string());
             if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
             if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
             if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
@@ -2161,7 +2160,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     pugi::xpath_node notations = node.select_node("notations[not(@print-object='no')]");
 
-    bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']"))? true : false;
+    bool cue = (node.select_node("cue") || node.select_node("type[@size='cue']")) ? true : false;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");

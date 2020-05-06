@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `@xml:space` in MusicXML import (@rettinghaus)
 * Support for `staffDef@lines.visible` (@rettinghaus)
 * Support for gliss (@rettinghaus)
 * Improved bTrem handling (@rettinghaus)
