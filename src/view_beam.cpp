@@ -141,7 +141,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // Number of bars to draw
     int allBars = fTrem->GetBeams();
-    int floatingBars = fTrem->GetBeamsFloat();
+    int floatingBars = fTrem->HasBeamsFloat()? fTrem->GetBeamsFloat() : 0;
     int fullBars = allBars - floatingBars;
 
     // Shift direction
