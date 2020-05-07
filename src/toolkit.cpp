@@ -1489,9 +1489,11 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
         int timeofElement = this->GetTimeForElement(xmlId);
         int pitchofElement = note->GetMIDIPitch();
         int durationofElement = note->GetScoreTimeDuration();
+        int tieddurationofElement = note->GetScoreTimeTiedDuration();
         o << "time" << timeofElement;
         o << "pitch" << pitchofElement;
         o << "duration" << durationofElement;
+        o << "tiedduration" << tieddurationofElement;
     }
     return o.json();
 }
