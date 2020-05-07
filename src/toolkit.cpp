@@ -1486,12 +1486,12 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
-        int timeofElement = this->GetTimeForElement(xmlId);
-        int pitchofElement = note->GetMIDIPitch();
-        int durationofElement = note->GetScoreTimeDuration();
-        o << "time" << timeofElement;
-        o << "pitch" << pitchofElement;
-        o << "duration" << durationofElement;
+        int timeOfElement = this->GetTimeForElement(xmlId);
+        int pitchOfElement = note->GetMIDIPitch();
+        int durationOfElement = note->GetRealTimeOffsetMilliseconds() - note->GetRealTimeOnsetMilliseconds();
+        o << "time" << timeOfElement;
+        o << "pitch" << pitchOfElement;
+        o << "duration" << durationOfElement;
     }
     return o.json();
 }
