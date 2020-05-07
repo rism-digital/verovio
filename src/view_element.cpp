@@ -393,7 +393,8 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     dc->StartGraphic(element, "", element->GetUuid());
 
     int y = staff->GetDrawingY();
-    DrawBarLine(dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), barLine);
+    DrawBarLine(
+        dc, y, y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), barLine);
 
     dc->EndGraphic(element, this);
 }
@@ -494,6 +495,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
         int slashDur = bTrem->GetUnitdur() - drawingDur;
+        if (drawingDur < DUR_4) slashDur = bTrem->GetUnitdur() - DUR_4;
         switch (slashDur) {
             case (0): stemMod = STEMMODIFIER_NONE; break;
             case (1): stemMod = STEMMODIFIER_1slash; break;
