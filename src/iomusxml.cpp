@@ -901,11 +901,22 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             xpath = StringFormat("clef[@number='%d']/line", i + 1);
             clefLine = it->select_node(xpath.c_str());
             if (!clefLine) {
-                clefLine = it->select_node("clef/line");
+                clefLine = it->select_node("clef/line[not(@number)]");
             }
             if (clefLine.node().text()) {
                 if (!clef) clef = new Clef();
-                clef->SetLine(clef->AttLineLoc::StrToInt(clefLine.node().text().as_string()));
+                if (clef->GetShape() != CLEFSHAPE_perc) {
+                    clef->SetLine(clefLine.node().text().as_int());
+                }
+            }
+            else if (clef) {
+                switch (clef->GetShape()) {
+                    case CLEFSHAPE_C: clef->SetLine(3); break;
+                    case CLEFSHAPE_F: clef->SetLine(4); break;
+                    case CLEFSHAPE_G: clef->SetLine(2); break;
+                    case CLEFSHAPE_TAB: clef->SetLine(5); break;
+                    default: break;
+                }
             }
             // clef octave change
             pugi::xpath_node clefOctaveChange;
