@@ -901,11 +901,22 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             xpath = StringFormat("clef[@number='%d']/line", i + 1);
             clefLine = it->select_node(xpath.c_str());
             if (!clefLine) {
-                clefLine = it->select_node("clef/line");
+                clefLine = it->select_node("clef/line[not(@number)]");
             }
             if (clefLine.node().text()) {
                 if (!clef) clef = new Clef();
-                clef->SetLine(clef->AttLineLoc::StrToInt(clefLine.node().text().as_string()));
+                if (clef->GetShape() != CLEFSHAPE_perc) {
+                    clef->SetLine(clefLine.node().text().as_int());
+                }
+            }
+            else if (clef) {
+                switch (clef->GetShape()) {
+                    case CLEFSHAPE_C: clef->SetLine(3); break;
+                    case CLEFSHAPE_F: clef->SetLine(4); break;
+                    case CLEFSHAPE_G: clef->SetLine(2); break;
+                    case CLEFSHAPE_TAB: clef->SetLine(5); break;
+                    default: break;
+                }
             }
             // clef octave change
             pugi::xpath_node clefOctaveChange;
@@ -1859,9 +1870,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
             octave->SetColor(xmlShift.node().attribute("color").as_string());
             octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
             octave->SetStaff(octave->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffN)));
-            octave->SetDis(
-                octave->AttOctaveDisplacement::StrToOctaveDis(xmlShift.node().attribute("size").as_string()));
-            m_octDis[staffN] = (xmlShift.node().attribute("size").as_int() + 2) / 8;
+            int octDisNum = xmlShift.node().attribute("size") ? xmlShift.node().attribute("size").as_int() : 8;
+            octave->SetDis(octave->AttOctaveDisplacement::StrToOctaveDis(std::to_string(octDisNum)));
+            m_octDis[staffN] = (octDisNum + 2) / 8;
             if (HasAttributeWithValue(xmlShift.node(), "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
                 m_octDis[staffN] = -1 * m_octDis[staffN];
@@ -2085,7 +2096,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstAncestor(STAFF));
     assert(staff);
 
-    pugi::xpath_node isChord = node.select_node("chord");
+    bool isChord = node.select_node("chord");
 
     // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
@@ -2229,7 +2240,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
     }
 
-    int duration = atoi(GetContentOfChild(node, "duration").c_str());
+    std::string noteID = node.attribute("id").as_string();
+    int duration = node.select_node("duration").node().text().as_int();
     pugi::xpath_node rest = node.select_node("rest");
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
@@ -2241,11 +2253,17 @@ void MusicXmlInput::ReadMusicXmlNote(
                 space->SetDur(ConvertTypeToDur(typeStr));
                 space->SetDurPpq(duration);
                 if (dots > 0) space->SetDots(dots);
+                if (!noteID.empty()) {
+                    space->SetUuid(noteID);
+                }
                 AddLayerElement(layer, space, duration);
             }
             else {
-                MSpace *mspace = new MSpace();
-                AddLayerElement(layer, mspace);
+                MSpace *mSpace = new MSpace();
+                if (!noteID.empty()) {
+                    mSpace->SetUuid(noteID);
+                }
+                AddLayerElement(layer, mSpace);
             }
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
@@ -2264,6 +2282,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                 if (cue) mRest->SetCue(BOOLEAN_true);
                 if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
                 if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+                if (!noteID.empty()) {
+                    mRest->SetUuid(noteID);
+                }
                 AddLayerElement(layer, mRest, duration);
             }
         }
@@ -2276,6 +2297,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (cue) rest->SetCue(BOOLEAN_true);
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
+            if (!noteID.empty()) {
+                rest->SetUuid(noteID);
+            }
             AddLayerElement(layer, rest, duration);
         }
     }
@@ -2284,8 +2308,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         element = note;
         note->SetVisible(ConvertWordToBool(node.append_attribute("print-object").as_string()));
         note->SetColor(node.attribute("color").as_string());
-        if (node.attribute("xml:id")) {
-            note->SetUuid(node.attribute("xml:id").as_string());
+        if (!noteID.empty()) {
+            note->SetUuid(noteID);
         }
         note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
         int noteStaffNum = atoi(GetContentOfChild(node, "staff").c_str());
@@ -2309,7 +2333,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // stem direction - taken into account below for the chord or the note
         data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-        std::string stemText = GetContentOfChild(node, "stem");
+        pugi::xpath_node stem = node.select_node("stem");
+        std::string stemText = stem.node().text().as_string();
         if (stemText == "down") {
             stemDir = STEMDIRECTION_down;
         }
@@ -2411,6 +2436,11 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetDurPpq(atoi(GetContentOfChild(node, "duration").c_str()));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
+            if (node.attribute("default-y") && stem.node().attribute("default-y")) {
+                float stemLen
+                    = abs(node.attribute("default-y").as_float() - stem.node().attribute("default-y").as_float()) / 5;
+                note->SetStemLen(stemLen);
+            }
             if (stemText == "none") note->SetStemVisible(BOOLEAN_false);
             if (tremSlashNum != 0)
                 note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));

@@ -613,44 +613,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     bool isMensural = Att::IsMensuralType(staff->m_drawingNotationType);
     bool isNeume = staff->m_drawingNotationType == NOTATIONTYPE_neume;
 
-    int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
-
-    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-        sym = SMUFL_E050_gClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-        sym = SMUFL_E052_gClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
-        sym = SMUFL_E051_gClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
-        sym = SMUFL_E053_gClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
-        sym = SMUFL_E054_gClef15ma;
-    // C-clef
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-        sym = SMUFL_E05C_cClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-        sym = SMUFL_E05D_cClef8vb;
-    else if (clef->GetShape() == CLEFSHAPE_C)
-        sym = SMUFL_E05C_cClef;
-
-    // F-clef
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-        sym = SMUFL_E062_fClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-        sym = SMUFL_E064_fClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
-        sym = SMUFL_E063_fClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
-        sym = SMUFL_E065_fClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
-        sym = SMUFL_E066_fClef15ma;
-    else if (clef->GetShape() == CLEFSHAPE_F)
-        sym = SMUFL_E062_fClef;
-
-    // Perc
-    else if (clef->GetShape() == CLEFSHAPE_perc)
-        sym = SMUFL_E069_unpitchedPercussionClef1;
-
     // mensural clefs
     if (isMensural) {
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
@@ -671,19 +633,67 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 sym = SMUFL_E904_mensuralFclefPetrucci;
         }
     }
-
-    if (isNeume) {
+    // neume clefs
+    else if (isNeume) {
         if (clef->GetShape() == CLEFSHAPE_C)
             sym = SMUFL_E906_chantCclef;
         else if (clef->GetShape() == CLEFSHAPE_F)
             sym = SMUFL_E902_chantFclef;
+    }
+    // cmn clefs
+    else {
+        int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
+        // G clef
+        if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+            sym = SMUFL_E050_gClef;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+            sym = SMUFL_E052_gClef8vb;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
+            sym = SMUFL_E051_gClef15mb;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
+            sym = SMUFL_E053_gClef8va;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
+            sym = SMUFL_E054_gClef15ma;
+        // C clef
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+            sym = SMUFL_E05C_cClef;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+            sym = SMUFL_E05D_cClef8vb;
+        else if (clef->GetShape() == CLEFSHAPE_C)
+            sym = SMUFL_E05C_cClef;
+        // F clef
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+            sym = SMUFL_E062_fClef;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+            sym = SMUFL_E064_fClef8vb;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
+            sym = SMUFL_E063_fClef15mb;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
+            sym = SMUFL_E065_fClef8va;
+        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
+            sym = SMUFL_E066_fClef15ma;
+        else if (clef->GetShape() == CLEFSHAPE_F)
+            sym = SMUFL_E062_fClef;
+        // Perc clef
+        else if (clef->GetShape() == CLEFSHAPE_perc)
+            sym = SMUFL_E069_unpitchedPercussionClef1;
     }
 
     if (sym == 0) {
         clef->SetEmptyBB();
         return;
     }
-    y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
+
+    if (clef->HasLine()) {
+        y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
+    }
+    else if (clef->GetShape() == CLEFSHAPE_perc) {
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
+    }
+    else {
+        // we have no information where to put it
+        return;
+    }
 
     bool cueSize = false;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
