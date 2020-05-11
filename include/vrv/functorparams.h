@@ -41,6 +41,7 @@ class MeterSig;
 class MRpt;
 class Object;
 class Page;
+class Pedal;
 class ScoreDef;
 class Slur;
 class Staff;
@@ -1467,6 +1468,24 @@ public:
     ArrayOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
 };
+
+//----------------------------------------------------------------------------
+// PreparePedalLine
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current Pedal
+ **/
+
+class PreparePedalLine : public FunctorParams {
+public:
+    PreparePedalLine()
+    {
+        m_pedalLine = NULL;
+    }
+    Pedal *m_pedalLine;
+};
+
 
 //----------------------------------------------------------------------------
 // PreparePlistParams

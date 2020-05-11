@@ -99,4 +99,21 @@ int Pedal::PrepareFloatingGrps(FunctorParams *)
     return FUNCTOR_CONTINUE;
 }
 
+int Pedal::PreparePedalLine(FunctorParams *functorParams)
+{
+    class PreparePedalLine *params = dynamic_cast<class PreparePedalLine *>(functorParams);
+    assert(params);
+    
+    if (this->HasStart()) {
+        if (this->GetDir() == pedalLog_DIR_down && this->GetForm() == pedalVis_FORM_line) params->m_pedalLine = this;
+    }
+
+    // At this stage m_pedal is actually a started pedal line
+    if (params->m_pedalLine && this->GetDir() == pedalLog_DIR_up) {
+        params->m_pedalLine->SetEnd(this->GetStart());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
