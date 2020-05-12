@@ -58,6 +58,8 @@ void Pedal::Reset()
     ResetPedalVis();
     ResetPlacement();
     ResetVerticalGroup();
+
+    m_endsWithBounce = false;
 }
 
 //----------------------------------------------------------------------------
@@ -99,11 +101,17 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
         this->SetDrawingGrpId(-this->GetVgrp());
     }
 
-    if (params->m_pedalLine && this->GetDir() == pedalLog_DIR_up) {
+    if (!this->HasDir()) return FUNCTOR_CONTINUE;
+
+    if (params->m_pedalLine && (this->GetDir() != pedalLog_DIR_down)) {
         params->m_pedalLine->SetEnd(this->GetStart());
+        if (this->GetDir() == pedalLog_DIR_bounce) {
+            params->m_pedalLine->EndsWithBounce(true);
+        }
+        params->m_pedalLine = NULL;
     }
 
-    if (this->GetDir() == pedalLog_DIR_down && this->GetForm() == pedalVis_FORM_line) {
+    if ((this->GetDir() != pedalLog_DIR_up) && (this->GetForm() == pedalVis_FORM_line)) {
         params->m_pedalLine = this;
     }
 
