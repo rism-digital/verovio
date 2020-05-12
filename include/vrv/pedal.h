@@ -65,11 +65,6 @@ public:
      */
     virtual int GenerateMIDI(FunctorParams *functorParams);
 
-    /**
-     * See Object::PreparePedalLine
-     */
-    virtual int PreparePedalLine(FunctorParams *functorParams);
-
 protected:
     //
 private:

@@ -1402,8 +1402,13 @@ public:
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
+    PrepareFloatingGrpsParams()
+    {
+        m_previousEnding = NULL;
+        m_pedalLine = NULL;
+    }
     Ending *m_previousEnding;
+    Pedal *m_pedalLine;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
     std::map<std::string, Harm *> m_harms;
@@ -1468,24 +1473,6 @@ public:
     ArrayOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
 };
-
-//----------------------------------------------------------------------------
-// PreparePedalLine
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current Pedal
- **/
-
-class PreparePedalLine : public FunctorParams {
-public:
-    PreparePedalLine()
-    {
-        m_pedalLine = NULL;
-    }
-    Pedal *m_pedalLine;
-};
-
 
 //----------------------------------------------------------------------------
 // PreparePlistParams

@@ -90,27 +90,21 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Pedal::PrepareFloatingGrps(FunctorParams *)
+int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
 {
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
     if (this->HasVgrp()) {
         this->SetDrawingGrpId(-this->GetVgrp());
     }
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Pedal::PreparePedalLine(FunctorParams *functorParams)
-{
-    class PreparePedalLine *params = dynamic_cast<class PreparePedalLine *>(functorParams);
-    assert(params);
-    
-    if (this->HasStart()) {
-        if (this->GetDir() == pedalLog_DIR_down && this->GetForm() == pedalVis_FORM_line) params->m_pedalLine = this;
-    }
-
-    // At this stage m_pedal is actually a started pedal line
     if (params->m_pedalLine && this->GetDir() == pedalLog_DIR_up) {
         params->m_pedalLine->SetEnd(this->GetStart());
+    }
+
+    if (this->GetDir() == pedalLog_DIR_down && this->GetForm() == pedalVis_FORM_line) {
+        params->m_pedalLine = this;
     }
 
     return FUNCTOR_CONTINUE;
