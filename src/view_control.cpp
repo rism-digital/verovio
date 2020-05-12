@@ -949,7 +949,7 @@ void View::DrawPedalLine(
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
         x1 -= startRadius;
-        x2 += endRadius;
+        x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
@@ -957,7 +957,7 @@ void View::DrawPedalLine(
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
-        x2 += endRadius;
+        x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     }
     else {
         // nothing to adjust
@@ -975,18 +975,15 @@ void View::DrawPedalLine(
 
     // Opening bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
-        // (Do draw the horizontal line for doted lines at it looks better)
-        DrawFilledRectangle(dc, x1, y, x1 + bracketSize, y + lineWidth);
+        DrawFilledRectangle(dc, x1, y, x1 + bracketSize / 2, y + lineWidth);
         DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y + bracketSize);
     }
     // Closing bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        // Ditto
-        DrawFilledRectangle(dc, x2 - bracketSize, y, x2, y + lineWidth);
+        DrawFilledRectangle(dc, x2 - bracketSize / 2, y, x2, y + lineWidth);
         DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
     }
-    DrawFilledRectangle(dc, x1, y, x2, y + lineWidth);
+    DrawFilledRectangle(dc, x1 + bracketSize / 2, y, x2 - bracketSize / 2, y + lineWidth);
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -1918,11 +1915,6 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     // just as without a dir attribute
     if (!pedal->HasDir()) return;
 
-    // Don't draw a symbol, if it's a line
-    if (pedal->HasForm() == pianoPedals_PEDALSTYLE_line) return;
-
-    dc->StartGraphic(pedal, "", pedal->GetUuid());
-
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
@@ -1956,16 +1948,21 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     }
     str.push_back(code);
 
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
-        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
-            continue;
-        }
-        // Basic method that use bounding box
-        int y = pedal->GetDrawingY();
+    dc->StartGraphic(pedal, "", pedal->GetUuid());
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
-        dc->ResetFont();
+    // Don't draw a symbol, if it's a line
+    if (pedal->GetForm() != pedalVis_FORM_line) {
+        for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
+            if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
+                continue;
+            }
+            // Basic method that use bounding box
+            int y = pedal->GetDrawingY();
+
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
     }
 
     dc->EndGraphic(pedal, this);
