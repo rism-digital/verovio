@@ -25,6 +25,7 @@
 #include "measure.h"
 #include "page.h"
 #include "pages.h"
+#include "pedal.h"
 #include "section.h"
 #include "staff.h"
 #include "syl.h"
@@ -245,6 +246,13 @@ void System::AddToDrawingListIfNeccessary(Object *object)
         assert(dynam);
         if (dynam->GetEnd() || (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true))) {
             this->AddToDrawingList(dynam);
+        }
+    }
+    else if (object->Is(PEDAL)) {
+        Pedal *pedal = dynamic_cast<Pedal *>(object);
+        assert(pedal);
+        if (pedal->GetEnd()) {
+            this->AddToDrawingList(pedal);
         }
     }
     else if (object->Is(TRILL)) {

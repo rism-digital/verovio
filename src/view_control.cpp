@@ -117,6 +117,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Pedal *pedal = dynamic_cast<Pedal *>(element);
         assert(pedal);
         DrawPedal(dc, pedal, measure, system);
+        system->AddToDrawingListIfNeccessary(pedal);
     }
     else if (element->Is(REH)) {
         Reh *reh = dynamic_cast<Reh *>(element);
@@ -305,6 +306,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         else if (element->Is(OCTAVE)) {
             // cast to Slur check in DrawOctave
             DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(PEDAL)) {
+            DrawPedalLine(dc, dynamic_cast<Pedal *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(SLUR)) {
             // For slurs we limit support to one value in @staff
@@ -918,6 +922,78 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(tie, this);
+}
+
+void View::DrawPedalLine(
+    DeviceContext *dc, Pedal *pedal, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(pedal);
+    assert(staff);
+
+    assert(pedal->GetStart());
+    assert(pedal->GetEnd());
+
+    int y = pedal->GetDrawingY();
+
+    int startRadius = 0;
+    if (!pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
+        startRadius = pedal->GetStart()->GetDrawingRadius(m_doc);
+    }
+
+    int endRadius = 0;
+    if (!pedal->GetEnd()->Is(TIMESTAMP_ATTR)) {
+        endRadius = pedal->GetEnd()->GetDrawingRadius(m_doc);
+    }
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (spanningType == SPANNING_START_END) {
+        x1 -= startRadius;
+        x2 += endRadius;
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if (spanningType == SPANNING_START) {
+        x1 -= startRadius;
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if (spanningType == SPANNING_END) {
+        x2 += endRadius;
+    }
+    else {
+        // nothing to adjust
+    }
+
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else {
+        dc->StartGraphic(pedal, "", pedal->GetUuid(), false);
+    }
+
+    int bracketSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+    // Opening bracket
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
+        // (Do draw the horizontal line for doted lines at it looks better)
+        DrawFilledRectangle(dc, x1, y, x1 + bracketSize, y + lineWidth);
+        DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y + bracketSize);
+    }
+    // Closing bracket
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        // Ditto
+        DrawFilledRectangle(dc, x2 - bracketSize, y, x2, y + lineWidth);
+        DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
+    }
+    DrawFilledRectangle(dc, x1, y, x2, y + lineWidth);
+
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(pedal, this);
+    }
 }
 
 void View::DrawTrillExtension(
@@ -1841,6 +1917,9 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     // just as without a dir attribute
     if (!pedal->HasDir()) return;
+
+    // Don't draw a symbol, if it's a line
+    if (pedal->HasForm() == pianoPedals_PEDALSTYLE_line) return;
 
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
