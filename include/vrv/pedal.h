@@ -51,6 +51,14 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ////@}
 
+    /**
+     * @name Setter and getter of the bounce flag
+     */
+    ///@{
+    bool EndsWithBounce() const { return m_endsWithBounce; }
+    void EndsWithBounce(bool endsWithBounce) { m_endsWithBounce = endsWithBounce; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -65,14 +73,11 @@ public:
      */
     virtual int GenerateMIDI(FunctorParams *functorParams);
 
-protected:
-    //
 private:
-    //
-public:
-    //
-private:
-    //
+    /**
+     * Flag indicating whether or not the element was generated
+     */
+    bool m_endsWithBounce;
 };
 
 } // namespace vrv
