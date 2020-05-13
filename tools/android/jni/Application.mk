@@ -2,5 +2,5 @@
 APP_ABI := armeabi-v7a
 APP_CPPFLAGS += -fexceptions -frtti -std=c++11
 APP_OPTIM := release
-APP_STL := gnustl_shared
+APP_STL := c++_shared
 APP_MODULES := verovio-android

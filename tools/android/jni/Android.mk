@@ -13,6 +13,7 @@ LOCAL_SRC_FILES := \
 	$(VEROVIO_SRC:$(VEROVIO_SRC)/%=%) \
 	$(MIDI_SRC:$(MIDI_SRC)/%=%) \
 	$(ROOT_PATH)/src/pugi/pugixml.cpp \
+	$(ROOT_PATH)/src/json/jsonxx.cc \
 	$(ROOT_PATH)/libmei/attconverter.cpp \
 	$(ROOT_PATH)/libmei/atts_analytical.cpp \
 	$(ROOT_PATH)/libmei/atts_cmn.cpp \
@@ -34,6 +35,7 @@ LOCAL_C_INCLUDES := \
 	$(ROOT_PATH)/include/utf8 \
 	$(ROOT_PATH)/include/pugi \
 	$(ROOT_PATH)/include/hum \
-	$(ROOT_PATH)/include/midi
+	$(ROOT_PATH)/include/midi \
+	$(ROOT_PATH)/include/json
 
 include $(BUILD_SHARED_LIBRARY)
