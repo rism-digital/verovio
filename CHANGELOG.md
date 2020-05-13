@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [2.7.0] - 2020-05-13
 * Support for `@pname.ges` and `@pnum` in MIDI output (@rettinghaus)
 * Support for `@xml:space` in MusicXML import (@rettinghaus)
 * Support for `staffDef@lines.visible` (@rettinghaus)
