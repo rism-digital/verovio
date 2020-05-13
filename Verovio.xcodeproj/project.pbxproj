@@ -221,6 +221,8 @@
 		4D22C41918890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41A18890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41C18890E9900D0831F /* mrest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C41B18890E9900D0831F /* mrest.h */; };
+		4D2461DB246BD325002BBCCD /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
+		4D2461DC246BD326002BBCCD /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		4D308101203DB69D00BC44F6 /* ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D308100203DB69C00BC44F6 /* ref.h */; };
 		4D308104203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
 		4D308105203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
@@ -3300,6 +3302,7 @@
 				4DF440781D39575500152B7E /* ending.cpp in Sources */,
 				4DEC4D9021C81DEE00D1D273 /* damage.cpp in Sources */,
 				4D6DF9F820E1074200C12BBD /* subst.cpp in Sources */,
+				4D2461DC246BD326002BBCCD /* expansionmap.cpp in Sources */,
 				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */,
 				4D1BE7701C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
@@ -3494,6 +3497,7 @@
 				BB4C4A8622A9321F001F6AF0 /* atts_visual.cpp in Sources */,
 				BB4C4B8922A932DF001F6AF0 /* mnum.cpp in Sources */,
 				BB4C4B2722A932CF001F6AF0 /* hairpin.cpp in Sources */,
+				4D2461DB246BD325002BBCCD /* expansionmap.cpp in Sources */,
 				BB4C4B3F22A932D7001F6AF0 /* barline.cpp in Sources */,
 				BB4C4AAF22A932A6001F6AF0 /* ioabc.cpp in Sources */,
 				BB4C4B4D22A932D7001F6AF0 /* dot.cpp in Sources */,
