@@ -563,12 +563,12 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         }
     }
     else if (beam) {
-        if ((int)beam->GetElementCoords()->size() == 2) {
+        if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
             bool insertBefore = true;
-            LayerElement *otherElement = beam->GetElementCoords()->back()->m_element;
+            LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
             if (note == otherElement) {
                 insertBefore = false;
-                otherElement = beam->GetElementCoords()->front()->m_element;
+                otherElement = beam->m_beamSegment.GetElementCoordRefs()->front()->m_element;
             }
             assert(otherElement && (otherElement != note));
             Rest *rest = new Rest();
@@ -626,7 +626,6 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         this->m_chainedId = rest->GetUuid();
         return true;
     }
-    return false;
 }
 
 } // namespace vrv

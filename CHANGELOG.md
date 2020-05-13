@@ -1,8 +1,26 @@
 # Changelog
 
+## [unreleased]
+* Support for `@pname.ges` and `@pnum` in MIDI output (@rettinghaus)
+* Support for `@xml:space` in MusicXML import (@rettinghaus)
+* Support for `staffDef@lines.visible` (@rettinghaus)
+* Support for gliss (@rettinghaus)
+* Improved bTrem handling (@rettinghaus)
+* Improved trill support (@rettinghaus)
+* Option for using encoded line breaks, but automatic page breaks (--breaks=line) (@earboxer)
+* Support for `trill@extender` (@rettinghaus)
+* Support for `note@head.visible` (@rettinghaus)
+* Improved spacing with crossing voices (@rettinghaus)
+* Complete beam refactoring
+* Support for mSpace elements (@rettinghaus)
+* Improved header in MusicXML import (@rettinghaus)
+* Improved header generation with additional names (@earboxer)
+* Fix tremolo beaming (@rettinghaus)
+
 ## [2.6.0] - 2020-03-11
 * Support for Plaine and Easie output (limited features)
 * Support for lyrics on chords (@rettinghaus)
+* Support for `scoreDef@system.leftline` (@rettinghaus)
 * Support for reh elements (@rettinghaus)
 * Improved extender lines in MusicXML import (@rettinghaus)
 * Improved backup handling in MusicXML import (@wergo)
@@ -14,6 +32,7 @@
 
 ## [2.5.0] - 2020-02-03
 * Support for expansion implementation with --expand option (@wergo)
+* Adjust stem length with double-stemmed writing
 * Option for forcing first page to be condensed (--condense-first-page)
 * Option for forcing pages qwith tempo to be condensed (--condense-tempo-pages)
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)

@@ -162,7 +162,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     assert(params);
 
     // We currently have no dots object with mensural rests
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -192,7 +192,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     switch (this->GetActualDur()) {
-        case DUR_1: loc -= 2; break;
+        case DUR_1: loc += 0; break;
         case DUR_2: loc += 0; break;
         case DUR_4: loc += 2; break;
         case DUR_8: loc += 2; break;

@@ -30,7 +30,7 @@ public:
      */
     ///@{
     SystemElement();
-    SystemElement(std::string classid);
+    SystemElement(const std::string &classid);
     virtual ~SystemElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return SYSTEM_ELEMENT; }

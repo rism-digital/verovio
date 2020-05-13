@@ -1077,7 +1077,7 @@ int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
             params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
     }
 
-    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
     while (iter != params->m_timePointingInterfaces.end()) {
         iter = params->m_timePointingInterfaces.erase(iter);
     }
@@ -1090,7 +1090,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
@@ -1111,7 +1111,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
-    ArrayOfObjectBeatPairs::iterator iter = params->m_tstamps.begin();
+    ListOfObjectBeatPairs::iterator iter = params->m_tstamps.begin();
     // Loop throught the object/beat pairs and create the TimestampAttr when necessary
     while (iter != params->m_tstamps.end()) {
         // -1 means that we have a @tstamp (start) to add to the current measure

@@ -45,7 +45,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
 
 BBoxDeviceContext::~BBoxDeviceContext() {}
 
-void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend)
+void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool primary, bool prepend)
 {
     // add the object object
     object->BoundingBox::ResetBoundingBox();
@@ -213,7 +213,7 @@ void BBoxDeviceContext::DrawRectangle(int x, int y, int width, int height)
     DrawRoundedRectangle(x, y, width, height, 0);
 }
 
-void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, double radius)
+void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
     // avoid negative heights or widths
     if (height < 0) {
@@ -300,8 +300,9 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
         m_textX -= extend.m_width;
     }
     else if (m_textAlignment == HORIZONTALALIGNMENT_center) {
-        m_textX -= (extend.m_width / 2);
+        m_textX -= extend.m_width / 2;
     }
+
     UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
 }
 

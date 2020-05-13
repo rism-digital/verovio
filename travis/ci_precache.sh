@@ -29,6 +29,7 @@ git clone $EMSCRIPTEN_REPOSITORY $EMSCRIPTEN_DIRECTORY
 echo "Installing emscripten"
 cd $EMSCRIPTEN_DIRECTORY
 ./emsdk install latest
+./emsdk activate latest
 
 # Return to the root
 cd ..
@@ -59,11 +60,11 @@ cd ..
 #############
 cd ./tools
 
-cmake .
-make -j3
+cmake ../cmake
+make -j 8
 
 echo "Update the documentation of the option list"
-./verovio -? > $OUTPUT_DIRECTORY/_includes/cli.txt
+./verovio -h > $OUTPUT_DIRECTORY/_includes/cli.txt
 
 # Return to the root
 cd ..

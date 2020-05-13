@@ -92,9 +92,9 @@ const char *vrvToolkit_getLog(Toolkit *tk)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
+const char *vrvToolkit_getMEI(Toolkit *tk, const char *options)
 {
-    tk->SetCString(tk->GetMEI(page_no, score_based));
+    tk->SetCString(tk->GetMEI(options));
     return tk->GetCString();
 }
 

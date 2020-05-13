@@ -241,6 +241,19 @@ public:
     void CastOffDoc();
 
     /**
+     * Casts off the entire document, using the document's line breaks,
+     * but adding its own page breaks.
+     */
+    void CastOffLineDoc();
+
+    /**
+     * Casts off the entire document, with options for obeying breaks.
+     * @param useSectionBreaks - true to use the section breaks from the document.
+     * @param usePageBreaks - true to use the page breaks from the document.
+     */
+    void CastOffDocBase(bool useSectionBreaks, bool usePageBreaks);
+
+    /**
      * Casts off the running elements (headers and footer)
      * Called from Doc::CastOffDoc
      * The doc needs to be empty, the methods adds two empty pages to calculate the
@@ -423,7 +436,10 @@ public:
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
 
-    /** Record notation type for document */
+    /**
+     * Record notation type for document.
+     * (This should be improved by storing a vector of all notation types of the document for cases mixing notations)
+     */
     data_NOTATIONTYPE m_notationType;
 
     /** An expansion map that contains  */

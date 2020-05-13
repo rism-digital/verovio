@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        trill.cpp
+// Name:        gliss.cpp
 // Author:      Klaus Rettinghaus
-// Created:     2017
+// Created:     2020
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "trill.h"
+#include "gliss.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,51 +13,43 @@
 
 //----------------------------------------------------------------------------
 
-#include "verticalaligner.h"
+#include "devicecontext.h"
+#include "doc.h"
+#include "functorparams.h"
+#include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Trill
+// Gliss
 //----------------------------------------------------------------------------
 
-Trill::Trill()
-    : ControlElement("trill-")
-    , TimeSpanningInterface()
-    , AttColor()
-    , AttExtender()
-    , AttLineRend()
-    , AttNNumberLike()
-    , AttOrnamentAccid()
-    , AttPlacement()
+Gliss::Gliss()
+    : ControlElement("gliss-"), TimeSpanningInterface(), AttColor(), AttLineRend(), AttLineRendBase(), AttNNumberLike()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_EXTENDER);
     RegisterAttClass(ATT_LINEREND);
+    RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_ORNAMENTACCID);
-    RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
 }
 
-Trill::~Trill() {}
+Gliss::~Gliss() {}
 
-void Trill::Reset()
+void Gliss::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
     ResetColor();
-    ResetExtender();
     ResetLineRend();
+    ResetLineRendBase();
     ResetNNumberLike();
-    ResetOrnamentAccid();
-    ResetPlacement();
 }
 
 //----------------------------------------------------------------------------
-// Trill functor methods
+// Gliss functor methods
 //----------------------------------------------------------------------------
 
 } // namespace vrv

@@ -798,4 +798,22 @@ data_STAFFREL_basic Att::StaffrelToStaffrelBasic(data_STAFFREL staffrel)
     return staffrelBasic;
 }
 
+bool Att::IsMensuralType(data_NOTATIONTYPE notationType)
+{
+    return (notationType == NOTATIONTYPE_mensural || notationType == NOTATIONTYPE_mensural_white
+        || notationType == NOTATIONTYPE_mensural_black);
+}
+
+bool Att::IsNeumeType(data_NOTATIONTYPE notationType)
+{
+    // Maybe one day we will have other neume types too
+    return (notationType == NOTATIONTYPE_neume);
+}
+
+bool Att::IsTabType(data_NOTATIONTYPE notationType)
+{
+    // Next version of MEI will have other tab types
+    return (notationType == NOTATIONTYPE_tab);
+}
+
 } // namespace vrv

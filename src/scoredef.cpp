@@ -35,7 +35,7 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface(), AttTyped()
+ScoreDefElement::ScoreDefElement(const std::string &classid) : Object(classid), ScoreDefInterface(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
     RegisterAttClass(ATT_TYPED);
@@ -277,8 +277,6 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
         }
         // copy other attributes if present
         if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
-        // FIXME MEI 4.0.0
-        // if (newStaffDef->HasLabelAbbr()) staffDef->SetLabelAbbr(newStaffDef->GetLabelAbbr());
     }
     else {
         LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetUuid().c_str());
