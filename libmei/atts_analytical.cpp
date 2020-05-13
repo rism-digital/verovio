@@ -470,7 +470,7 @@ bool AttSolfa::HasPsolfa() const
 
 /* include <attpsolfa> */
 
-bool Att::SetAnalytical(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetAnalytical(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_HARMANL)) {
         AttHarmAnl *att = dynamic_cast<AttHarmAnl *>(element);

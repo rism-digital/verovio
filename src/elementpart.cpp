@@ -82,7 +82,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 6: return SMUFL_E24A_flag256thUp;
             case 7: return SMUFL_E24C_flag512thUp;
             case 8: return SMUFL_E24E_flag1024thUp;
-            default: return 0; break;
+            default: return 0;
         }
     }
     else {
@@ -95,7 +95,7 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
             case 6: return SMUFL_E24B_flag256thDown;
             case 7: return SMUFL_E24D_flag512thDown;
             case 8: return SMUFL_E24F_flag1024thDown;
-            default: return 0; break;
+            default: return 0;
         }
     }
 }
@@ -163,8 +163,8 @@ int TupletBracket::GetDrawingYLeft()
     if (beam) {
         // Calculate the y point aligning with the beam
         int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + m_drawingXRelLeft;
-        return beam->m_drawingParams.m_startingY
-            + beam->m_drawingParams.m_beamSlope * (xLeft - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
+        return beam->m_beamSegment.m_startingY
+            + beam->m_beamSegment.m_beamSlope * (xLeft - beam->m_beamSegment.m_startingX) + this->GetDrawingYRel();
     }
     else {
         return this->GetDrawingY();
@@ -180,8 +180,8 @@ int TupletBracket::GetDrawingYRight()
     if (beam) {
         // Calculate the y point aligning with the beam
         int xRight = tuplet->GetDrawingRight()->GetDrawingX() + m_drawingXRelRight;
-        return beam->m_drawingParams.m_startingY
-            + beam->m_drawingParams.m_beamSlope * (xRight - beam->m_drawingParams.m_startingX) + this->GetDrawingYRel();
+        return beam->m_beamSegment.m_startingY
+            + beam->m_beamSegment.m_beamSlope * (xRight - beam->m_beamSegment.m_startingX) + this->GetDrawingYRel();
     }
     else {
         return this->GetDrawingY();
@@ -240,10 +240,9 @@ int TupletNum::GetDrawingXMid(Doc *doc)
         }
         if (tuplet->GetNumAlignedBeam()) {
             Beam *beam = tuplet->GetNumAlignedBeam();
-            data_STEMDIRECTION beamPos = beam->m_drawingParams.m_stemDir;
-            switch (beamPos) {
-                case STEMDIRECTION_up: xLeft += (tuplet->GetDrawingLeft()->GetDrawingRadius(doc)); break;
-                case STEMDIRECTION_down: xRight -= (tuplet->GetDrawingRight()->GetDrawingRadius(doc)); break;
+            switch (beam->m_drawingPlace) {
+                case BEAMPLACE_above: xLeft += (tuplet->GetDrawingLeft()->GetDrawingRadius(doc)); break;
+                case BEAMPLACE_below: xRight -= (tuplet->GetDrawingRight()->GetDrawingRadius(doc)); break;
                 default: break;
             }
         }
@@ -391,15 +390,14 @@ int Stem::CalcStem(FunctorParams *functorParams)
         baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
     }
     else {
-        baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
+        int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
+        baseStem = -(params->m_interface->CalcStemLenInThirdUnits(params->m_staff) * thirdUnit);
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
     // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
     if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
-        baseStem += params->m_chordStemLength;
-
         Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetStemPos() == STEMPOSITION_left) {
@@ -408,8 +406,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
             else {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
             }
-            baseStem += p.y;
-            this->SetDrawingStemLen(baseStem);
+            this->SetDrawingStemLen(baseStem + params->m_chordStemLength + p.y);
         }
         else {
             if (this->GetStemPos() == STEMPOSITION_right) {
@@ -418,22 +415,38 @@ int Stem::CalcStem(FunctorParams *functorParams)
             else {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
             }
-            baseStem -= p.y;
-            this->SetDrawingStemLen(-baseStem);
+            this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - p.y));
         }
         this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
         this->SetDrawingXRel(p.x);
     }
 
-    /************ Set the flag (if necessary) and adjust the length ************/
+    /************ Set flag and slashes (if necessary) and adjust the length ************/
+
+    int slashFactor = this->GetStemMod() - 4;
 
     Flag *flag = NULL;
-
-    // SMUFL flags cover some additional stem length from the 32th only
     if (params->m_dur > DUR_4) {
         flag = dynamic_cast<Flag *>(this->FindDescendantByType(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
+        slashFactor += (params->m_dur > DUR_8) ? 2 : 1;
+    }
+
+    // Adjust basic stem length to number of slashes
+    int tremStep = (params->m_doc->GetDrawingBeamWidth(staffSize, drawingCueSize)
+        + params->m_doc->GetDrawingBeamWhiteWidth(staffSize, drawingCueSize));
+    if (abs(baseStem) < ((slashFactor + 4) * tremStep)) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() - slashFactor * tremStep);
+        }
+        else {
+            this->SetDrawingStemLen(this->GetDrawingStemLen() + slashFactor * tremStep);
+        }
+    }
+
+    // SMUFL flags cover some additional stem length from the 32th only
+    if (flag) {
         flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
 
@@ -441,6 +454,10 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // extension from 32th - this can be improved
     if (this->HasStemLen()) {
         if ((this->GetStemLen() == 0) && flag) flag->m_drawingNbFlags = 0;
+        return FUNCTOR_CONTINUE;
+    }
+    if ((this->GetStemVisible() == BOOLEAN_false) && flag) {
+        flag->m_drawingNbFlags = 0;
         return FUNCTOR_CONTINUE;
     }
 

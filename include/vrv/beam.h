@@ -14,51 +14,87 @@
 
 namespace vrv {
 
+class BeamElementCoord;
+
 // the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
 
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
 
 //----------------------------------------------------------------------------
-// BeamDrawingParams
+// BeamSegment
 //----------------------------------------------------------------------------
 
 /**
  * Class for storing drawing parameters when calculating beams.
  * See View::DrawBeam and View::CalcBeam
- * This could be turned into a BeamDrawingInterface
  */
 
-class BeamDrawingParams {
+class BeamSegment {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamDrawingParams();
-    virtual ~BeamDrawingParams() {}
+    BeamSegment();
+    virtual ~BeamSegment();
 
     void Reset();
 
-    void CalcBeam(
-        Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount);
+    void CalcBeam(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface,
+        data_BEAMPLACE place = BEAMPLACE_NONE, bool init = true);
 
-    // values to be set before calling CalcBeam
-    bool m_changingDur;
-    bool m_beamHasChord;
-    bool m_hasMultipleStemDir;
-    bool m_cueSize;
-    bool m_crossStaff;
-    int m_shortestDur;
-    data_STEMDIRECTION m_stemDir;
+    /**
+     *
+     */
+    const ArrayOfBeamElementCoords *GetElementCoordRefs();
 
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by Beam::FilterList
+     */
+    void InitCoordRefs(const ArrayOfBeamElementCoords *beamElementCoords);
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoordRefs();
+
+private:
+    void CalcBeamInit(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+
+    bool CalcBeamSlope(
+        Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool &shorten, int &step);
+
+    void CalcAdjustSlope(
+        Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface, bool shorten, int &step, const int &elementCount);
+
+    void CalcStemLenInHalfUnitsgth(Layer *layer, Staff *staff, Doc *doc, BeamDrawingInterface *beamInterface);
+
+    void CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterface, data_BEAMPLACE place);
+
+    // Helper to simply set the values of each BeamElementCoord according the the first position and the slope
+    void CalcSetValues(const int &elementCount);
+
+public:
     // values set by CalcBeam
-    int m_beamWidth;
-    int m_beamWidthBlack;
-    int m_beamWidthWhite;
     int m_startingX; // the initial X position of the beam
     int m_startingY; // the initial Y position of the beam
+    int m_nbNotesOrChords;
+    bool m_extendedToCenter; // the stem where extended to touch the center staff line
     double m_beamSlope; // the slope of the beam
+    int m_verticalCenter;
+    int m_avgY;
+    int m_ledgerLinesAbove;
+    int m_ledgerLinesBelow;
+
+    BeamElementCoord *m_firstNoteOrChord;
+    BeamElementCoord *m_lastNoteOrChord;
+
+    /**
+     * An array of coordinates for each element
+     **/
+    ArrayOfBeamElementCoords m_beamElementCoordRefs;
 };
 
 //----------------------------------------------------------------------------
@@ -67,7 +103,7 @@ public:
 
 class Beam : public LayerElement,
              public ObjectListInterface,
-             public DrawingListInterface,
+             public BeamDrawingInterface,
              public AttColor,
              public AttBeamedWith,
              public AttBeamRend {
@@ -127,11 +163,6 @@ protected:
      * This also initializes the m_beamElementCoords vector
      */
     virtual void FilterList(ArrayOfObjects *childList);
-    /**
-     * Initializes the m_beamElementCoords vector objects.
-     * This is called by Beam::FilterList
-     */
-    void InitCoords(ArrayOfObjects *childList);
 
     /**
      * Return the position of the element in the beam.
@@ -139,22 +170,11 @@ protected:
      */
     int GetPosition(LayerElement *element);
 
-    /**
-     * Clear the m_beamElementCoords vector and delete all the objects.
-     */
-    void ClearCoords();
-
 private:
     //
 public:
     /** */
-    BeamDrawingParams m_drawingParams;
-
-private:
-    /**
-     * An array of coordinates for each element
-     **/
-    mutable ArrayOfBeamElementCoords m_beamElementCoords;
+    BeamSegment m_beamSegment;
 };
 
 //----------------------------------------------------------------------------
@@ -167,18 +187,34 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamElementCoord() { m_element = NULL; }
+    BeamElementCoord()
+    {
+        m_element = NULL;
+        m_closestNote = NULL;
+        m_stem = NULL;
+    }
     virtual ~BeamElementCoord();
 
+    /**
+     * Return the encoded stem direction.
+     * Access the value in the Stem element if already set.
+     */
+    data_STEMDIRECTION GetStemDir();
+
+    void SetDrawingStemDir(
+        data_STEMDIRECTION stemDir, Staff *staff, Doc *doc, BeamSegment *segment, BeamDrawingInterface *interface);
+
     int m_x;
-    int m_y; // represents the point farthest from the beam
-    int m_yTop; // y value of topmost note
-    int m_yBottom; // y value of bottom-most note
     int m_yBeam; // y value of stem top position
     int m_dur; // drawing duration
     int m_breaksec;
+    bool m_centered; // beam is centered on the line
+    bool m_shortened; // stem is shortened because pointing oustide the staff
     char m_partialFlags[MAX_DURATION_PARTIALS];
+    data_BEAMPLACE m_partialFlagPlace;
     LayerElement *m_element;
+    Note *m_closestNote;
+    Stem *m_stem; // a pointer to the stem in order to avoid to have to re-cast it
 };
 
 } // namespace vrv

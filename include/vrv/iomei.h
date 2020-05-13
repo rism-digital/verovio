@@ -58,6 +58,7 @@ class Fig;
 class Fermata;
 class FloatingElement;
 class FTrem;
+class Gliss;
 class GraceGrp;
 class Hairpin;
 class HalfmRpt;
@@ -82,6 +83,7 @@ class Mordent;
 class MRest;
 class MRpt;
 class MRpt2;
+class MSpace;
 class MultiRest;
 class MultiRpt;
 class Nc;
@@ -261,6 +263,7 @@ private:
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
     void WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt);
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
+    void WriteMSpace(pugi::xml_node currentNode, MSpace *mSpace);
     void WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
     void WriteNc(pugi::xml_node currentNode, Nc *nc);
@@ -284,6 +287,7 @@ private:
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
+    void WriteGliss(pugi::xml_node currentNode, Gliss *gliss);
     void WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteHarm(pugi::xml_node currentNode, Harm *harm);
     void WriteMNum(pugi::xml_node currentNode, MNum *mnum);
@@ -509,6 +513,7 @@ private:
     bool ReadMRest(Object *parent, pugi::xml_node mRest);
     bool ReadMRpt(Object *parent, pugi::xml_node mRpt);
     bool ReadMRpt2(Object *parent, pugi::xml_node mRpt2);
+    bool ReadMSpace(Object *parent, pugi::xml_node mSpace);
     bool ReadMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMultiRpt(Object *parent, pugi::xml_node multiRpt);
     bool ReadNc(Object *parent, pugi::xml_node nc);
@@ -524,7 +529,7 @@ private:
     ///@}
 
     /**
-     * @name Methods for reading MEI floating elements
+     * @name Methods for reading MEI control elements
      */
     ///@{
     bool ReadAnchoredText(Object *parent, pugi::xml_node anchoredText);
@@ -534,6 +539,7 @@ private:
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
+    bool ReadGliss(Object *parent, pugi::xml_node gliss);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
     bool ReadMNum(Object *parent, pugi::xml_node mnum);

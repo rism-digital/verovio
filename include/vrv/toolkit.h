@@ -86,7 +86,7 @@ public:
     ///@{
     std::string GetOptions(bool defaultValues) const;
     std::string GetAvailableOptions() const;
-    bool SetOptions(const std::string &json_options);
+    bool SetOptions(const std::string &jsonOptions);
     ///@}
 
     /**
@@ -184,9 +184,12 @@ public:
 
     /**
      * Get the MEI as a string.
-     * Get all the pages unless a page number (1-based) is specified
+     * Options (JSON) can be:
+     * pageNo: integer; (1-based), all pages if none (or 0) specified
+     * scoreBased: true|false; true by default
+     * (noXmlIds: true|false; false by default - remove all @xml:id not used in the data - not implemented)
      */
-    std::string GetMEI(int pageNo = 0, bool scoreBased = true);
+    std::string GetMEI(const std::string &jsonOptions);
 
     /**
      * Return element attributes as a JSON string
@@ -299,9 +302,11 @@ public:
 private:
     bool IsUTF16(const std::string &filename);
     bool LoadUTF16File(const std::string &filename);
+    void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    //
+    static std::map<std::string, ClassId> s_MEItoClassIdMap;
+
 private:
     Doc m_doc;
     View m_view;

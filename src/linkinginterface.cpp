@@ -87,10 +87,10 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
     this->SetUuidStr();
 
     if (!m_nextUuid.empty()) {
-        params->m_nextUuidPairs.insert({m_nextUuid, this});
+        params->m_nextUuidPairs.insert({ m_nextUuid, this });
     }
     if (!m_sameasUuid.empty()) {
-        params->m_sameasUuidPairs.insert({m_sameasUuid, this});
+        params->m_sameasUuidPairs.insert({ m_sameasUuid, this });
     }
 
     return FUNCTOR_CONTINUE;

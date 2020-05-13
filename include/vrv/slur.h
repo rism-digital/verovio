@@ -53,13 +53,6 @@ public:
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
 
-    /**
-     * Check if the slur needs to be taken into account as overflow above or below in case of cross-staff end points.
-     * This methods assumes staff@n to be greater for the staff below.
-     */
-    void GetCrossStaffOverflows(
-        StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
-
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 
     int AdjustSlurCurve(Doc *doc, const ArrayOfCurveSpannedElements *spannedElements, Point &p1, Point &p2, Point &c1,

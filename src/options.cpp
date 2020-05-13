@@ -20,7 +20,7 @@
 namespace vrv {
 
 std::map<int, std::string> Option::s_breaks
-    = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_encoded, "encoded" } };
+    = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_line, "line" }, { BREAKS_encoded, "encoded" } };
 
 std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" } };
@@ -617,6 +617,11 @@ Options::Options()
     m_svgViewBox.Init(false);
     this->Register(&m_svgViewBox, "svgViewBox", &m_general);
 
+    m_svgHtml5.SetInfo("Output SVG for HTML5 embedding",
+        "Write data-id and data-class attributes for JS usage and id clash avoidance.");
+    m_svgHtml5.Init(false);
+    this->Register(&m_svgHtml5, "svgHtml5", &m_general);
+
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
@@ -675,9 +680,9 @@ Options::Options()
     m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
 
-    m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");
-    m_lyricHyphenWidth.Init(0.20, 0.10, 0.50);
-    this->Register(&m_lyricHyphenWidth, "lyricHyphenWidth", &m_generalLayout);
+    m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
+    m_lyricLineThickness.Init(0.25, 0.10, 0.50);
+    this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
 
     m_lyricNoStartHyphen.SetInfo("Lyric no start hyphen", "Do not show hyphens at the beginning of a system");
     m_lyricNoStartHyphen.Init(false);

@@ -385,10 +385,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         case 'Y': duration = DURATION_128; break;
         case 'Z': duration = DURATION_256; break;
 
-        default:
-            LogWarning("DARMS import: Unknown note duration: %c", data[pos]);
-            return 0;
-            break;
+        default: LogWarning("DARMS import: Unknown note duration: %c", data[pos]); return 0;
     }
 
     if (data[pos + 1] == '.') {

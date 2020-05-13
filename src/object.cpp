@@ -61,7 +61,7 @@ Object::Object() : BoundingBox()
     }
 }
 
-Object::Object(const std::string& classid) : BoundingBox()
+Object::Object(const std::string &classid) : BoundingBox()
 {
     Init(classid);
     if (s_objectCounter++ == 0) {
@@ -161,7 +161,7 @@ Object::~Object()
     ClearChildren();
 }
 
-void Object::Init(const std::string& classid)
+void Object::Init(const std::string &classid)
 {
     m_classid = classid;
     m_parent = NULL;
@@ -786,15 +786,16 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     deepness--;
 
     if (processChildren) {
-        auto filterPredicate = [filters] (Object *iter) -> bool {
+        auto filterPredicate = [filters](Object *iter) -> bool {
             if (filters && !filters->empty()) {
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
-                auto classId = iter->GetClassId();
-                ArrayOfComparisons::iterator comparisonIter = std::find_if (filters->begin(), filters->end(), [classId] (Comparison* iter)->bool {
-                    ClassIdComparison* attComparison = dynamic_cast<ClassIdComparison*>(iter);
-                    assert(attComparison);
-                    return classId == attComparison->GetType();
-                });
+                ClassId classId = iter->GetClassId();
+                ArrayOfComparisons::iterator comparisonIter
+                    = std::find_if(filters->begin(), filters->end(), [classId](Comparison *iter) -> bool {
+                          ClassIdComparison *attComparison = dynamic_cast<ClassIdComparison *>(iter);
+                          assert(attComparison);
+                          return classId == attComparison->GetType();
+                      });
 
                 if (comparisonIter != filters->end()) {
                     // use the operator of the Comparison object to evaluate the attribute
@@ -810,14 +811,15 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         // We need a pointer to the array for the option to work on a reversed copy
         ArrayOfObjects *children = &this->m_children;
         if (direction == BACKWARD) {
-            for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter!=children->rend(); ++iter) {
+            for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
                 if (filterPredicate(*iter)) {
                     (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
                 }
             }
-        } else {
-            for (ArrayOfObjects::iterator iter = children->begin(); iter!=children->end(); ++iter) {
+        }
+        else {
+            for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
                 if (filterPredicate(*iter)) {
                     (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
@@ -1183,7 +1185,7 @@ int Object::PrepareLinking(FunctorParams *functorParams)
     // @sameas
     auto r2 = params->m_sameasUuidPairs.equal_range(uuid);
     if (r2.first != params->m_sameasUuidPairs.end()) {
-        for (auto j = r2.first; j != r2.second;  ++j) {
+        for (auto j = r2.first; j != r2.second; ++j) {
             j->second->SetSameasLink(this);
         }
         params->m_sameasUuidPairs.erase(r2.first, r2.second);
@@ -1449,6 +1451,18 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     if (!this->IsLayerElement()) {
         return FUNCTOR_CONTINUE;
+    }
+
+    // Ignore beam in cross-staff situation
+    if (this->Is(BEAM)) {
+        Beam *beam = dynamic_cast<Beam *>(this);
+        if (beam && beam->m_isCrossStaff) return FUNCTOR_CONTINUE;
+    }
+
+    // Ignore stem for notes in cross-staff situation and in beams
+    if (this->Is(STEM)) {
+        Note *note = dynamic_cast<Note *>(this->GetParent());
+        if (note && note->m_crossStaff && note->IsInBeam()) return FUNCTOR_CONTINUE;
     }
 
     if (this->Is(FB) || this->Is(FIGURE)) {

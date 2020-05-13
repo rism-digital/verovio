@@ -30,7 +30,9 @@ class ControlElement;
 class Dir;
 class Dynam;
 class F;
+class Fermata;
 class Fb;
+class Gliss;
 class Hairpin;
 class Harm;
 class Layer;
@@ -43,6 +45,7 @@ class Slur;
 class StaffGrp;
 class Tempo;
 class Tie;
+class Trill;
 
 //----------------------------------------------------------------------------
 // namespace for local MusicXml classes
@@ -290,6 +293,13 @@ private:
     void GenerateUuid(pugi::xml_node node);
 
     /*
+     * @name Helper method for styling fermatas
+     */
+    ///@{
+    ///@}
+    void ShapeFermata(Fermata *fermata, pugi::xml_node node);
+
+    /*
      * @name Methods for converting MusicXML string values to MEI attributes.
      */
     ///@{
@@ -301,7 +311,7 @@ private:
     data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
     std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
-    curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
+    curvature_CURVEDIR InferCurvedir(pugi::xml_node slurOrTie);
     fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
@@ -333,7 +343,7 @@ private:
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
     /* To remember layer of last element (note) to handle chords */
-    Layer *m_prevLayer;
+    Layer *m_prevLayer = NULL;
     /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */
@@ -348,6 +358,7 @@ private:
      * measureCount) */
     std::vector<std::tuple<int, double, musicxml::OpenSpanner> > m_hairpinStopStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> > m_bracketStack;
+    std::vector<std::pair<Trill *, musicxml::OpenSpanner> > m_trillStack;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */
@@ -355,6 +366,7 @@ private:
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
+    std::vector<Gliss *> m_glissStack;
     std::vector<Harm *> m_harmStack;
     std::vector<Octave *> m_octaveStack;
     std::vector<Pedal *> m_pedalStack;

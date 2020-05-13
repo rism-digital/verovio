@@ -31,7 +31,7 @@ public:
      */
     ///@{
     ControlElement();
-    ControlElement(std::string classid);
+    ControlElement(const std::string &classid);
     virtual ~ControlElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return CONTROL_ELEMENT; }

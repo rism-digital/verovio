@@ -70,6 +70,69 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// BeamDrawingInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for MEI beam elements (beam, beamSpan).
+ * It stores stem drawing values.
+ */
+class BeamDrawingInterface {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    BeamDrawingInterface();
+    virtual ~BeamDrawingInterface();
+    virtual void Reset();
+    ///@}
+
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by Beam::FilterList
+     */
+    void InitCoords(ArrayOfObjects *childList, Staff *staff, data_BEAMPLACE place);
+
+    bool IsHorizontal();
+
+    bool IsRepeatedPattern();
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoords();
+
+protected:
+    //
+public:
+    // values to be set before calling CalcBeam
+    bool m_changingDur;
+    bool m_beamHasChord;
+    bool m_hasMultipleStemDir;
+    bool m_cueSize;
+    bool m_isCrossStaff;
+    int m_shortestDur;
+    data_STEMDIRECTION m_notesStemDir;
+    data_BEAMPLACE m_drawingPlace;
+    Staff *m_beamStaff;
+
+    // values set by CalcBeam
+    int m_beamWidth;
+    int m_beamWidthBlack;
+    int m_beamWidthWhite;
+
+    // position x for the stem (normal and cue-sized)
+    int m_stemXAbove[2];
+    int m_stemXBelow[2];
+
+    /**
+     * An array of coordinates for each element
+     **/
+    ArrayOfBeamElementCoords m_beamElementCoords;
+};
+
+//----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
 
@@ -192,6 +255,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;
+    virtual int CalcStemLenInThirdUnits(Staff *staff) = 0;
     ///@}
 
 protected:

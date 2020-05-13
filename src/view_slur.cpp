@@ -58,7 +58,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
-        dc->StartGraphic(slur, "spanning-slur", "");
+        dc->StartGraphic(slur, "", slur->GetUuid(), false);
 
     int penStyle = AxSOLID;
     switch (slur->GetLform()) {
@@ -503,7 +503,7 @@ float View::CalcInitialSlur(
     findSpannedLayerElementsParams.m_minPos = p1.x;
     findSpannedLayerElementsParams.m_maxPos = p2.x;
     findSpannedLayerElementsParams.m_classIds
-        = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
+        = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)

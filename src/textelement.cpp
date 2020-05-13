@@ -27,7 +27,7 @@ TextElement::TextElement() : Object("te-"), AttLabelled(), AttTyped()
     Reset();
 }
 
-TextElement::TextElement(std::string classid) : Object(classid), AttLabelled(), AttTyped()
+TextElement::TextElement(const std::string &classid) : Object(classid), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);

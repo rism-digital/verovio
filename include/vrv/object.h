@@ -58,7 +58,7 @@ public:
      */
     ///@{
     Object();
-    Object(const std::string& classid);
+    Object(const std::string &classid);
     virtual ~Object();
     virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
@@ -751,6 +751,11 @@ public:
     ///@}
 
     /**
+     * Set the note position for each note in ligature
+     */
+    virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Set the note head flipped positions and calc the ledger lines
      */
     virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1132,7 +1137,7 @@ private:
     /**
      * Initialisation method taking a uuid prefix argument.
      */
-    void Init(const std::string&);
+    void Init(const std::string &);
 
 public:
     /**

@@ -226,7 +226,7 @@ std::vector<std::string> ExpansionMap::GetExpansionIdsForElement(const std::stri
     try {
         return m_map.at(xmlId);
     }
-    catch (std::out_of_range e) {
+    catch (std::out_of_range &e) {
         std::vector<std::string> ids;
         ids.push_back(xmlId.c_str());
         return ids;
