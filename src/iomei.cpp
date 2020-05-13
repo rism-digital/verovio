@@ -3397,7 +3397,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     cleffingLog.ReadCleffingLog(element);
     AttCleffingVis cleffingVis;
     cleffingVis.ReadCleffingVis(element);
-    if (cleffingLog.HasClefLine() && cleffingLog.HasClefShape()) {
+    if (cleffingLog.HasClefShape()) {
         Clef *vrvClef = new Clef();
         vrvClef->IsAttribute(true);
         vrvClef->SetShape(cleffingLog.GetClefShape());

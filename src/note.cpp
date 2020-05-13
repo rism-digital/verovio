@@ -1019,29 +1019,37 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Create midi this
-    int midiBase = 0;
-    data_PITCHNAME pname = note->GetPname();
-    switch (pname) {
-        case PITCHNAME_c: midiBase = 0; break;
-        case PITCHNAME_d: midiBase = 2; break;
-        case PITCHNAME_e: midiBase = 4; break;
-        case PITCHNAME_f: midiBase = 5; break;
-        case PITCHNAME_g: midiBase = 7; break;
-        case PITCHNAME_a: midiBase = 9; break;
-        case PITCHNAME_b: midiBase = 11; break;
-        case PITCHNAME_NONE: break;
+    int pitch = 0;
+    if (note->HasPnum()) {
+        pitch = note->GetPnum();
     }
-    // Check for accidentals
-    midiBase += note->GetChromaticAlteration();
+    else {
+        // calc pitch
+        int midiBase = 0;
+        data_PITCHNAME pname = note->GetPname();
+        if (note->HasPnameGes()) pname = note->GetPnameGes();
+        switch (pname) {
+            case PITCHNAME_c: midiBase = 0; break;
+            case PITCHNAME_d: midiBase = 2; break;
+            case PITCHNAME_e: midiBase = 4; break;
+            case PITCHNAME_f: midiBase = 5; break;
+            case PITCHNAME_g: midiBase = 7; break;
+            case PITCHNAME_a: midiBase = 9; break;
+            case PITCHNAME_b: midiBase = 11; break;
+            case PITCHNAME_NONE: break;
+        }
+        int oct = note->GetOct();
+        if (note->HasOctGes()) oct = note->GetOctGes();
 
-    // Adjustment for transposition intruments
-    midiBase += params->m_transSemi;
+        // Check for accidentals
+        midiBase += note->GetChromaticAlteration();
 
-    int oct = note->GetOct();
-    if (note->HasOctGes()) oct = note->GetOctGes();
+        // Adjustment for transposition intruments
+        midiBase += params->m_transSemi;
 
-    int pitch = midiBase + (oct + 1) * 12;
+        pitch = midiBase + (oct + 1) * 12;
+    }
+
     // We do store the MIDIPitch in the note even with a sameas
     this->SetMIDIPitch(pitch);
     int channel = params->m_midiChannel;

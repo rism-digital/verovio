@@ -244,6 +244,8 @@
 		4D22C41918890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41A18890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41C18890E9900D0831F /* mrest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C41B18890E9900D0831F /* mrest.h */; };
+		4D2461DD246BE2E8002BBCCD /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
+		4D2461DE246BE2E9002BBCCD /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		4D2E758822BC2B20004C51F0 /* atts_frettab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20740122A46BA900E0765F /* atts_frettab.cpp */; };
 		4D2E758922BC2B25004C51F0 /* atts_frettab.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D20740222A46BA900E0765F /* atts_frettab.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D2E758A22BC2B34004C51F0 /* view_tab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20741122A708C600E0765F /* view_tab.cpp */; };
@@ -3380,6 +3382,7 @@
 				4DA0EAEC22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
 				4DB3D8F31F83D1C600B5FC2B /* scoredefinterface.cpp in Sources */,
+				4D2461DD246BE2E8002BBCCD /* expansionmap.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
 				4DC12A7E1F740FB9000440E9 /* view_running.cpp in Sources */,
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
@@ -3581,6 +3584,7 @@
 				BB4C4B3722A932CF001F6AF0 /* trill.cpp in Sources */,
 				BB4C4B1F22A932CF001F6AF0 /* breath.cpp in Sources */,
 				BB4C4AC522A932B6001F6AF0 /* measure.cpp in Sources */,
+				4D2461DE246BE2E9002BBCCD /* expansionmap.cpp in Sources */,
 				BB4C4BA722A932EB001F6AF0 /* glyph.cpp in Sources */,
 				BB4C4AB922A932A6001F6AF0 /* iopae.cpp in Sources */,
 				BB4C4ABB22A932B6001F6AF0 /* instrdef.cpp in Sources */,
