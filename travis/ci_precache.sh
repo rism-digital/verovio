@@ -34,14 +34,14 @@ cd $EMSCRIPTEN_DIRECTORY
 # Return to the root
 cd ..
 
-#############################################
-# copy gh-pages branch of verovio repository
-#############################################
+################################################
+# copy gh-pages branch of verovio.org repository
+################################################
 echo "Remove empty ${GH_PAGES_DIRECTORY} folder created by travis cache before"
 rm -rf $GH_PAGES_DIRECTORY
 
-echo "Cloning branch ${GH_PAGES_BRANCH} of ${VEROVIO_REPOSITORY} into ${OUTPUT_DIRECTORY}"
-git clone --single-branch --branch ${GH_PAGES_BRANCH} ${VEROVIO_REPOSITORY} ${OUTPUT_DIRECTORY}
+echo "Cloning branch ${GH_PAGES_BRANCH} of ${VEROVIO_ORG_REPOSITORY} into ${OUTPUT_DIRECTORY}"
+git clone --single-branch --branch ${GH_PAGES_BRANCH} ${VEROVIO_ORG_REPOSITORY} ${OUTPUT_DIRECTORY}
 
 # checkout new branch for toolkit updates
 cd ${OUTPUT_DIRECTORY}

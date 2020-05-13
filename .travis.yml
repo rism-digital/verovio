@@ -18,6 +18,7 @@ env:
     # repos
     - EMSCRIPTEN_REPOSITORY: "https://github.com/emscripten-core/emsdk.git"
     - VEROVIO_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio"
+    - VEROVIO_ORG_REPOSITORY: "https://${GH_TOKEN}@github.com/rism-ch/verovio.org"
     # branches
     - BUILD_BRANCH: develop
     - GH_PAGES_BRANCH: gh-pages
