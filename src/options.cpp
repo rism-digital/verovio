@@ -634,6 +634,10 @@ Options::Options()
     m_usePgHeaderForAll.Init(false);
     this->Register(&m_usePgHeaderForAll, "usePgHeaderForAll", &m_general);
 
+    m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");
+    m_useBraceGlyph.Init(false);
+    this->Register(&m_useBraceGlyph, "useBraceGlyph", &m_general);
+
     /********* General layout *********/
 
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");

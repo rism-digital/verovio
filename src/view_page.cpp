@@ -48,6 +48,8 @@
 #include "text.h"
 #include "tuplet.h"
 #include "vrv.h"
+#include "glyph.h"
+#include "doc.h"
 
 namespace vrv {
 
@@ -530,7 +532,27 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
-
+    if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
+        Glyph *glyph = Resources::GetGlyph(SMUFL_E000_brace);
+        if (glyph) {
+            FontInfo* font = m_doc->GetDrawingSmuflFont(staffSize, false);
+            int dummy, g_w, g_h;
+            glyph->GetBoundingBox(dummy, dummy, g_w, g_h);
+            float ratio = static_cast<float>(glyph->GetUnitsPerEm()) / font->GetPointSize();
+            float scale = ratio * (y1 - y2) / g_h;
+            staffSize *= scale;
+            int braceWidth = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
+            x -= braceWidth;
+            float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
+            float heightAspect = static_cast<float>(font->GetPointSize()) / glyph->GetUnitsPerEm();
+            font->SetWidthToHeightRatio(static_cast<float>(m_doc->GetDrawingDoubleUnit(staffSize)) / braceWidth / scale);
+            DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize, false);
+            font->SetWidthToHeightRatio(currentWidthToHeightRatio);
+            return;
+        } else {
+            LogError("Cant find brace glyph(SMUFL_E000_brace). Use the standart brace pattern.");
+        }
+    }
     // int new_coords[2][6];
     Point points[4];
     Point bez1[4];
