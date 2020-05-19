@@ -54,7 +54,7 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    /*
+    /**
      * Clear the content of the document.
      */
     virtual void Reset();

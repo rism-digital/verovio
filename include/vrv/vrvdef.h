@@ -33,8 +33,8 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 2
-#define VERSION_MINOR 7
+#define VERSION_MAJOR 3
+#define VERSION_MINOR 0
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -289,7 +289,7 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
-typedef std::multimap<std::string, LinkingInterface *> ArrayOfLinkingInterfaceUuidPairs;
+typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 

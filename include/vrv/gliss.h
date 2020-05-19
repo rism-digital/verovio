@@ -22,11 +22,11 @@ namespace vrv {
  * This class models the MEI <gliss> element.
  */
 class Gliss : public ControlElement,
-                    public TimeSpanningInterface,
-                    public AttColor,
-                    public AttLineRend,
-                    public AttLineRendBase,
-                    public AttNNumberLike {
+              public TimeSpanningInterface,
+              public AttColor,
+              public AttLineRend,
+              public AttLineRendBase,
+              public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

@@ -32,6 +32,8 @@ tools/libverovio.so
 # emscripten build
 emscripten/data/
 emscripten/build/
+emscripten/CMakeFiles/
+emscripten/CMakeCache.txt
 
 # python build
 bindings/python/verovio_wrap.cpp
@@ -71,3 +73,4 @@ verovio.wasm
 Makefile
 libverovio.bc
 cmake_install.cmake
+libverovio.a
