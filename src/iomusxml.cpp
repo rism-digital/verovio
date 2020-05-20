@@ -2975,6 +2975,59 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(float value)
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
+data_ARTICULATION MusicXmlInput::ConvertArticulations(std::string value)
+{
+    // articulations
+    if (value == "accent")
+        return ARTICULATION_acc;
+    else if (value == "detached-legato")
+        return ARTICULATION_NONE;
+    else if (value == "doit")
+        return ARTICULATION_doit;
+    else if (value == "falloff")
+        return ARTICULATION_fall;
+    else if (value == "plop")
+        return ARTICULATION_plop;
+    else if (value == "scoop")
+        return ARTICULATION_scoop;
+    else if (value == "spiccato")
+        return ARTICULATION_spicc;
+    else if (value == "staccatissimo")
+        return ARTICULATION_stacciss;
+    else if (value == "staccato")
+        return ARTICULATION_stacc;
+    else if (value == "strong-accent")
+        return ARTICULATION_marc;
+    else if (value == "tenuto")
+        return ARTICULATION_ten;
+    // technical
+    else if (value == "bend")
+        return ARTICULATION_bend;
+    else if (value == "double-tongue")
+        return ARTICULATION_dbltongue;
+    else if (value == "down-bow")
+        return ARTICULATION_dnbow;
+    else if (value == "fingernails")
+        return ARTICULATION_fingernail;
+    else if (value == "harmonic")
+        return ARTICULATION_harm;
+    else if (value == "heel")
+        return ARTICULATION_heel;
+    else if (value == "open-string")
+        return ARTICULATION_open;
+    else if (value == "snap-pizzicato")
+        return ARTICULATION_snap;
+    else if (value == "stopped")
+        return ARTICULATION_stop;
+    else if (value == "toe")
+        return ARTICULATION_toe;
+    else if (value == "triple-tongue")
+        return ARTICULATION_trpltongue;
+    else if (value == "up-bow")
+        return ARTICULATION_upbow;
+    return ARTICULATION_NONE;
+}
+
 data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repeat)
 {
     if (value == "dashed") return BARRENDITION_dashed;
