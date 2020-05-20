@@ -2627,6 +2627,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             gliss->SetStartid(noteID);
             gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             gliss->SetType(xmlGlissando.name());
+            gliss->SetUuid(xmlGlissando.attribute("id").as_string());
             m_glissStack.push_back(gliss);
         }
         else if (!m_glissStack.empty()) {
@@ -2778,6 +2779,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(InferCurvedir(slur));
+            meiSlur->SetUuid(slur.attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(measure, slurNumber, meiSlur);
