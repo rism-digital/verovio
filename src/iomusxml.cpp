@@ -966,8 +966,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 else if (key.node().child("key-step")) {
                     keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature("mixed"));
-                    for (pugi::xml_node keyStep = key.node().child("key-step"); keyStep;
-                         keyStep = keyStep.next_sibling("key-step")) {
+                    for (pugi::xml_node keyStep : key.node().children("key-step")) {
                         KeyAccid *keyAccid = new KeyAccid();
                         keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
                         if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
@@ -2008,7 +2007,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         // std::string textColor = node.attribute("color").as_string();
         // std::string textStyle = node.attribute("font-style").as_string();
         // std::string textWeight = node.attribute("font-weight").as_string();
-        for (pugi::xml_node figure = node.child("figure"); figure; figure = figure.next_sibling("figure")) {
+        for (pugi::xml_node figure : node.child("figure")) {
             std::string textStr = GetContent(figure.select_node("figure-number").node());
             F *f = new F();
             Text *text = new Text();
@@ -2457,7 +2456,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             // verse->SetPlace(verse->AttPlacement::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
-            for (pugi::xml_node textNode = lyric.child("text"); textNode; textNode = textNode.next_sibling("text")) {
+            for (pugi::xml_node textNode : lyric.children("text")) {
                 if (!HasAttributeWithValue(lyric, "print-object", "no")) {
                     // std::string textColor = textNode.attribute("color").as_string();
                     std::string textStyle = textNode.attribute("font-style").as_string();
@@ -2533,8 +2532,8 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // articulation
         std::vector<data_ARTICULATION> artics;
-        for (pugi::xml_node articulations = notations.node().child("articulations"); articulations;
-             articulations = articulations.next_sibling("articulations")) {
+        for (pugi::xml_node articulations : notations.node().children("articulations")) {
+
             Artic *artic = new Artic();
             if (articulations.select_node("accent")) artics.push_back(ARTICULATION_acc);
             if (articulations.select_node("spiccato")) artics.push_back(ARTICULATION_spicc);
@@ -2546,8 +2545,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             element->AddChild(artic);
             artics.clear();
         }
-        for (pugi::xml_node technical = notations.node().child("technical"); technical;
-             technical = technical.next_sibling("technical")) {
+        for (pugi::xml_node technical : notations.node().children("technical")) {
             Artic *artic = new Artic();
             if (technical.select_node("down-bow")) artics.push_back(ARTICULATION_dnbow);
             if (technical.select_node("harmonic")) artics.push_back(ARTICULATION_harm);
