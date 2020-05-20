@@ -2533,29 +2533,61 @@ void MusicXmlInput::ReadMusicXmlNote(
         // articulation
         std::vector<data_ARTICULATION> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
-
-            Artic *artic = new Artic();
-            if (articulations.select_node("accent")) artics.push_back(ARTICULATION_acc);
-            if (articulations.select_node("spiccato")) artics.push_back(ARTICULATION_spicc);
-            if (articulations.select_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
-            if (articulations.select_node("staccato")) artics.push_back(ARTICULATION_stacc);
-            if (articulations.select_node("strong-accent")) artics.push_back(ARTICULATION_marc);
-            if (articulations.select_node("tenuto")) artics.push_back(ARTICULATION_ten);
-            artic->SetArtic(artics);
-            element->AddChild(artic);
-            artics.clear();
+            if (notations.node().select_node("articulations/*[not(@placement)]")) {
+                Artic *artic = new Artic();
+                for (pugi::xml_node articulation : articulations.children()) {
+                    artics.push_back(ConvertArticulations(articulation.name()));
+                    if (!std::strcmp(articulation.name(), "detached-legato")) {
+                        artics.push_back(ARTICULATION_stacc);
+                        artics.push_back(ARTICULATION_ten);
+                    }
+                }
+                artic->SetArtic(artics);
+                element->AddChild(artic);
+                artics.clear();
+            }
+            else {
+                std::vector<data_ARTICULATION> articsAbove;
+                std::vector<data_ARTICULATION> articsBelow;
+                for (pugi::xml_node articulation : articulations.children()) {
+                    if (HasAttributeWithValue(articulation, "placement", "above")) {
+                        articsAbove.push_back(ConvertArticulations(articulation.name()));
+                        if (!std::strcmp(articulation.name(), "detached-legato")) {
+                            articsAbove.push_back(ARTICULATION_stacc);
+                            articsAbove.push_back(ARTICULATION_ten);
+                        }
+                    }
+                    else {
+                        articsBelow.push_back(ConvertArticulations(articulation.name()));
+                        if (!std::strcmp(articulation.name(), "detached-legato")) {
+                            articsBelow.push_back(ARTICULATION_stacc);
+                            articsBelow.push_back(ARTICULATION_ten);
+                        }
+                    }
+                }
+                if (!articsAbove.empty()) {
+                    Artic *artic = new Artic();
+                    artic->SetArtic(articsAbove);
+                    artic->SetPlace(STAFFREL_above);
+                    element->AddChild(artic);
+                }
+                if (!articsBelow.empty()) {
+                    Artic *artic = new Artic();
+                    artic->SetArtic(articsBelow);
+                    artic->SetPlace(STAFFREL_below);
+                    element->AddChild(artic);
+                }
+            }
         }
         for (pugi::xml_node technical : notations.node().children("technical")) {
             Artic *artic = new Artic();
-            if (technical.select_node("down-bow")) artics.push_back(ARTICULATION_dnbow);
-            if (technical.select_node("harmonic")) artics.push_back(ARTICULATION_harm);
-            if (technical.select_node("open-string")) artics.push_back(ARTICULATION_open);
-            if (technical.select_node("snap-pizzicato")) artics.push_back(ARTICULATION_snap);
-            if (technical.select_node("stopped")) artics.push_back(ARTICULATION_stop);
-            if (technical.select_node("up-bow")) artics.push_back(ARTICULATION_upbow);
+            for (pugi::xml_node articulation : technical.children()) {
+                artics.push_back(ConvertArticulations(articulation.name()));
+            }
             artic->SetArtic(artics);
             artic->SetType("technical");
             element->AddChild(artic);
+            artics.clear();
         }
 
         // add the note to the layer or to the current container
