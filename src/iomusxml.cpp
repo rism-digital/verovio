@@ -2267,8 +2267,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         // we assume /note without /type or with duration of an entire bar to be mRest
-        else if (typeStr.empty() || duration == (m_ppq * 4 * m_meterCount / m_meterUnit)
-            || HasAttributeWithValue(rest.node(), "measure", "yes")) {
+        else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
             if (m_slash) {
                 for (int i = m_meterCount; i > 0; --i) {
                     BeatRpt *slash = new BeatRpt;
