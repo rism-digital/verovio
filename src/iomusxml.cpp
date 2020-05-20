@@ -2290,6 +2290,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         else {
             Rest *rest = new Rest();
             element = rest;
+            rest->SetColor(node.attribute("color").as_string());
             rest->SetDur(ConvertTypeToDur(typeStr));
             rest->SetDurPpq(duration);
             if (dots > 0) rest->SetDots(dots);
