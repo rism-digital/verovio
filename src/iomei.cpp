@@ -3803,6 +3803,11 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "pedal") {
             success = ReadPedal(parent, current);
         }
+        else if (std::string(current.name()) == "phrase") {
+            if (ReadPhraseAsSlur(dynamic_cast<Measure *>(parent), current)) {
+                LogWarning("<phrase> converted to <slur>");
+            }
+        }
         else if (std::string(current.name()) == "reh") {
             success = ReadReh(parent, current);
         }
@@ -5791,6 +5796,52 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     else {
         return false;
     }
+}
+
+bool MEIInput::ReadPhraseAsSlur(Measure *measure, pugi::xml_node phrase)
+{
+    Slur *slur = new Slur();
+    SetMeiUuid(phrase, slur);
+
+    AttConverter converter;
+
+    // att.color
+    if (phrase.attribute("color")) {
+        slur->SetColor(phrase.attribute("color").value());
+    }
+
+    // att.curvature
+    if (phrase.attribute("bulge")) {
+        slur->SetBulge(phrase.attribute("bulge").as_double());
+    }
+    if (phrase.attribute("curvedir")) {
+        slur->SetCurvedir(converter.StrToCurvatureCurvedir(phrase.attribute("curvedir").value()));
+    }
+
+    // att.curveRend
+    if (phrase.attribute("lform")) {
+        slur->SetLform(converter.StrToLineform(phrase.attribute("lform").value()));
+    }
+
+    // att.labelled
+    if (phrase.attribute("label")) {
+        slur->SetLabel(phrase.attribute("label").value());
+    }
+
+    // att.startEndId
+    if (phrase.attribute("endid")) {
+        slur->SetEndid(phrase.attribute("endid").value());
+    }
+    if (phrase.attribute("startid")) {
+        slur->SetStartid(phrase.attribute("startid").value());
+    }
+
+    // add type
+    slur->SetType("phrase");
+
+    measure->AddChild(slur);
+
+    return true;
 }
 
 bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)

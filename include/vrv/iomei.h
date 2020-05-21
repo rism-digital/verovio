@@ -627,6 +627,7 @@ private:
      */
     ///@{
     bool ReadFacsimile(Doc *doc, pugi::xml_node facsimile);
+    bool ReadPhraseAsSlur(Measure *measure, pugi::xml_node phrase);
     bool ReadSurface(Facsimile *parent, pugi::xml_node surface);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     bool ReadZone(Surface *parent, pugi::xml_node zone);
