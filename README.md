@@ -43,7 +43,7 @@ Example output
 
 This page was generated with version 2.4.0-dev-2748fed
 
-![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-2.4.0-dev.png)
+![Example page](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)
 
 Used libraries
 --------------

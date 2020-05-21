@@ -305,6 +305,7 @@ private:
     ///@{
     data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(std::string value);
     data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(float value);
+    data_ARTICULATION ConvertArticulations(std::string value);
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
