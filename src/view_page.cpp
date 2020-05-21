@@ -373,8 +373,8 @@ void View::DrawStaffGrp(
     // draw the system start bar line
     if (topStaffGrp
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
-                && (m_doc->m_scoreDef.GetSystemLeftline() != BOOLEAN_false))
-            || (m_doc->m_scoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+                && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
+            || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
     // actually draw the line, the brace or the bracket

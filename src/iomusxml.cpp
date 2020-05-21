@@ -565,20 +565,20 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 head->AddChild(rend);
             }
         }
-        m_doc->m_scoreDef.AddChild(head);
-        m_doc->m_scoreDef.AddChild(foot);
+        m_doc->m_mdivScoreDef.AddChild(head);
+        m_doc->m_mdivScoreDef.AddChild(foot);
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
-    m_doc->m_scoreDef.AddChild(staffGrp);
+    m_doc->m_mdivScoreDef.AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
     int staffOffset = 0;
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
-    if (scoreMidiBpm) m_doc->m_scoreDef.SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_int());
+    if (scoreMidiBpm) m_doc->m_mdivScoreDef.SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_int());
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
