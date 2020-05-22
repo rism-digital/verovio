@@ -1399,6 +1399,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
     }
 
+    dc->GetFont()->SetStyle(syl->HasFontstyle() ? syl->GetFontstyle() : data_FONTSTYLE::FONTSTYLE_normal);
+    dc->GetFont()->SetWeight(syl->HasFontweight() ? syl->GetFontweight() : data_FONTWEIGHT::FONTWEIGHT_normal);
+
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();

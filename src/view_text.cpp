@@ -356,6 +356,10 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     dc->StartTextGraphic(text, "", text->GetUuid());
 
+    if(dc->GetFont()->GetWeight() != FONTWEIGHT_NONE && dc->GetFont()->GetStyle() != FONTSTYLE_NONE) {
+        Resources::SelectTextFont(dc->GetFont()->GetWeight(), dc->GetFont()->GetStyle());
+    }
+
     if (params.m_newLine) {
         dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
         params.m_newLine = false;
