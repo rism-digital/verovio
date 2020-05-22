@@ -2,6 +2,9 @@
 
 ## [unreleased]
 
+## [2.7.1] - 2020-05-22
+* Fix bug with mensural clefs not displaying
+
 ## [2.7.0] - 2020-05-13
 * Support for `@pname.ges` and `@pnum` in MIDI output (@rettinghaus)
 * Support for `@xml:space` in MusicXML import (@rettinghaus)
