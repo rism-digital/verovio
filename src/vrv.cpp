@@ -61,8 +61,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 std::string Resources::m_path = "/usr/local/share/verovio";
-std::map<wchar_t, Glyph> Resources::m_font;
-std::map<wchar_t, Glyph> Resources::m_textFont;
+Resources::GlyphTextMap Resources::m_textFont;
+Resources::GlyphMap Resources::m_font;
+Resources::StyleAttributes Resources::m_currentStyle;
+const Resources::StyleAttributes Resources::k_defaultStyle{data_FONTWEIGHT::FONTWEIGHT_normal, data_FONTSTYLE::FONTSTYLE_normal};
 
 //----------------------------------------------------------------------------
 // Font related methods
@@ -81,15 +83,33 @@ bool Resources::InitFonts()
         return false;
     }
 
-    if (!InitTextFont("Times") || !InitTextFont("VerovioText-1.0")) {
-        LogError("Text font could not be initialized.");
-        return false;
+    struct TextFontInfo_type {
+        const StyleAttributes m_style;
+        const std::string m_fileName;
+        bool m_isMandatory;
+    };
+
+    static const TextFontInfo_type textFontInfos[] = {
+        {k_defaultStyle, "Times", true},
+        {k_defaultStyle, "VerovioText-1.0", true},
+        {{FONTWEIGHT_bold, FONTSTYLE_normal}, "Times-bold", false},
+        {{FONTWEIGHT_bold, FONTSTYLE_italic}, "Times-bold-italic", false},
+        {{FONTWEIGHT_normal, FONTSTYLE_italic}, "Times-italic", false},
+    };
+
+    for (const auto &textFontInfo : textFontInfos) {
+        if (!InitTextFont(textFontInfo.m_fileName, textFontInfo.m_style) && textFontInfo.m_isMandatory) {
+            LogError("Text font could not be initialized.");
+            return false;
+        }
     }
+
+    m_currentStyle = k_defaultStyle;
 
     return true;
 }
 
-bool Resources::SetFont(std::string fontName)
+bool Resources::SetFont(const std::string &fontName)
 {
     return LoadFont(fontName);
 }
@@ -100,13 +120,26 @@ Glyph *Resources::GetGlyph(wchar_t smuflCode)
     return &m_font[smuflCode];
 }
 
-Glyph *Resources::GetTextGlyph(wchar_t code)
+void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
 {
-    if (!m_textFont.count(code)) return NULL;
-    return &m_textFont[code];
+    m_currentStyle = std::make_pair(fontWeight, fontStyle);
+    if (m_textFont.count(m_currentStyle) == 0) {
+        LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
+        m_currentStyle = k_defaultStyle;
+    }
 }
 
-bool Resources::LoadFont(std::string fontName)
+Glyph *Resources::GetTextGlyph(wchar_t code)
+{
+    GlyphMap *currentMap = &m_textFont[m_textFont.count(m_currentStyle) != 0 ? m_currentStyle : k_defaultStyle];
+
+    if (currentMap->count(code) == 0)
+            return NULL;
+
+    return &currentMap->at(code);
+}
+
+bool Resources::LoadFont(const std::string &fontName)
 {
     ::DIR *dir;
     dirent *pdir;
@@ -194,7 +227,7 @@ bool Resources::LoadFont(std::string fontName)
     return true;
 }
 
-bool Resources::InitTextFont(std::string fontName)
+bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes &style)
 {
     // For the text font, we load the bounding boxes only
     pugi::xml_document doc;
@@ -214,6 +247,10 @@ bool Resources::InitTextFont(std::string fontName)
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
+    if (m_textFont.count(style) == 0) {
+        m_textFont[style] = GlyphMap{};
+    }
+    GlyphMap &currentMap = m_textFont.at(style);
     for (current = root.child("g"); current; current = current.next_sibling("g")) {
         if (current.attribute("c")) {
             wchar_t code = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
@@ -228,10 +265,10 @@ bool Resources::InitTextFont(std::string fontName)
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph.SetBoundingBox(x, y, width, height);
             if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
-            if (m_textFont.count(code) > 0) {
+            if (currentMap.count(code) > 0) {
                 LogDebug("Redefining %d with %s", code, fontName.c_str());
             }
-            m_textFont[code] = glyph;
+            currentMap[code] = glyph;
         }
     }
     return true;

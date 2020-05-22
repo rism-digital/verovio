@@ -102,8 +102,8 @@ public:
     {
         m_pointSize = 0;
         m_family = 0; // was wxFONTFAMILY_DEFAULT;
-        m_style = FONTSTYLE_NONE;
-        m_weight = FONTWEIGHT_NONE;
+        m_style = FONTSTYLE_normal;
+        m_weight = FONTWEIGHT_normal;
         m_underlined = false;
         m_supSubScript = false;
         m_faceName.clear();
@@ -113,8 +113,8 @@ public:
 
     // accessors and modifiers for the font elements
     int GetPointSize() { return m_pointSize; }
-    int GetStyle() { return m_style; }
-    int GetWeight() { return m_weight; }
+    data_FONTSTYLE GetStyle() { return m_style; }
+    data_FONTWEIGHT GetWeight() { return m_weight; }
     bool GetUnderlined() { return m_underlined; }
     bool GetSupSubScript() { return m_supSubScript; }
     std::string GetFaceName() { return m_faceName; }
