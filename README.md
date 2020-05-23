@@ -6,7 +6,7 @@ Verovio is a fast, portable and lightweight library for engraving [Music Encodin
 
 See the JavaScript toolkit running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) and check out the [app](http://www.verovio.org/app.html) or the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
 
-![Choice interaction](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/movies/reflow.gif)
+![Choice interaction](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/movies/reflow.gif)
 
 Verovio can also render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code) and imports MusicXML, Humdrum data, and ABC notation. It is designed as a tool usable as a one-step conversion tool and it is written in pure standard C++.
 

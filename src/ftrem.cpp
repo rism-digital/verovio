@@ -205,16 +205,18 @@ int FTrem::ResetDrawing(FunctorParams *functorParams)
 
 int FTrem::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
+    // GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    // assert(params);
 
     FTrem *fTrem = dynamic_cast<FTrem *>(this);
     assert(fTrem);
 
-    if (!fTrem->HasUnitdur())
+    if (!fTrem->HasUnitdur()) {
         return FUNCTOR_CONTINUE;
-    else
+    }
+    else {
         LogWarning("FTrem produces incorrect MIDI output");
+    }
 
     return FUNCTOR_CONTINUE;
 }

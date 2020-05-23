@@ -417,7 +417,7 @@ public:
      * Holds the top scoreDef.
      * In a standard MEI file, this is the <scoreDef> encoded before the first <section>.
      */
-    ScoreDef m_scoreDef;
+    ScoreDef m_mdivScoreDef;
 
     /** The current page height */
     int m_drawingPageHeight;

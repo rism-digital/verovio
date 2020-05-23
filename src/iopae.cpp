@@ -75,7 +75,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->m_scoreDef.Save(this);
+    m_doc->m_mdivScoreDef.Save(this);
 
     m_docScoreDef = false;
 
@@ -1000,20 +1000,20 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->m_scoreDef.AddChild(scoreDefKeySig);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         // Make it an attribute for now
         scoreDefMeterSig->IsAttribute(true);
-        m_doc->m_scoreDef.AddChild(scoreDefMeterSig);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now
         scoreDefMensur->IsAttribute(true);
-        m_doc->m_scoreDef.AddChild(scoreDefMensur);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefMensur);
     }
 
-    m_doc->m_scoreDef.AddChild(staffGrp);
+    m_doc->m_mdivScoreDef.AddChild(staffGrp);
 
     if (m_tie != NULL) {
         delete m_tie;

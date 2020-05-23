@@ -89,10 +89,10 @@ RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return doc->m_scoreDef.GetPgHead();
+        return doc->m_mdivScoreDef.GetPgHead();
     }
     else {
-        return doc->m_scoreDef.GetPgHead2();
+        return doc->m_mdivScoreDef.GetPgHead2();
     }
 }
 
@@ -108,10 +108,10 @@ RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return doc->m_scoreDef.GetPgFoot();
+        return doc->m_mdivScoreDef.GetPgFoot();
     }
     else {
-        return doc->m_scoreDef.GetPgFoot2();
+        return doc->m_mdivScoreDef.GetPgFoot2();
     }
 }
 
@@ -306,7 +306,7 @@ void Page::LayOutHorizontally()
     // Adjust the x position of the LayerElement where multiple layer collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustLayers(&Object::AdjustLayers);
-    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_scoreDef.GetStaffNs());
+    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustLayers, &adjustLayersParams);
 
     // Adjust the X position of the accidentals, including in chords
@@ -318,7 +318,7 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustXPos(&Object::AdjustXPos);
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
@@ -326,7 +326,7 @@ void Page::LayOutHorizontally()
     Functor adjustGraceXPos(&Object::AdjustGraceXPos);
     Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
     AdjustGraceXPosParams adjustGraceXPosParams(
-        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_scoreDef.GetStaffNs());
+        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
