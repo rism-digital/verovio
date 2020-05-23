@@ -1175,7 +1175,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         for (iter = m_trillStack.begin(); iter != m_trillStack.end(); ++iter) {
             LogWarning("MusicXML import: trill extender for '%s' could not be ended", iter->first->GetUuid().c_str());
         }
-        m_bracketStack.clear();
+        m_trillStack.clear();
     }
 
     return false;
@@ -2524,7 +2524,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             // placement and orientation
             tie->SetCurvedir(InferCurvedir(startTie.node()));
             tie->SetLform(tie->AttCurveRend::StrToLineform(startTie.node().attribute("line-type").as_string()));
-
+            if (startTie.node().attribute("id")) tie->SetUuid(startTie.node().attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(note, tie);
@@ -2626,6 +2626,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         dynam->SetStartid(m_ID);
         std::string dynamStr = GetContentOfChild(xmlDynam.node(), "other-dynamics");
         if (dynamStr.empty()) dynamStr = xmlDynam.node().first_child().name();
+        if (xmlDynam.node().attribute("id")) dynam->SetUuid(xmlDynam.node().attribute("id").as_string());
         // place
         dynam->SetPlace(dynam->AttPlacement::StrToStaffrel(xmlDynam.node().attribute("placement").as_string()));
         Text *text = new Text();
@@ -2640,6 +2641,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
         fermata->SetStartid(m_ID);
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        if (xmlFermata.node().attribute("id")) fermata->SetUuid(xmlFermata.node().attribute("id").as_string());
         ShapeFermata(fermata, xmlFermata.node());
     }
 
@@ -2659,7 +2661,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             gliss->SetStartid(noteID);
             gliss->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             gliss->SetType(xmlGlissando.name());
-            gliss->SetUuid(xmlGlissando.attribute("id").as_string());
+            if (xmlGlissando.attribute("id")) gliss->SetUuid(xmlGlissando.attribute("id").as_string());
             m_glissStack.push_back(gliss);
         }
         else if (!m_glissStack.empty()) {
@@ -2811,7 +2813,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(InferCurvedir(slur));
-            meiSlur->SetUuid(slur.attribute("id").as_string());
+            if (slur.attribute("id")) meiSlur->SetUuid(slur.attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(measure, slurNumber, meiSlur);
@@ -2925,7 +2927,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (std::get<0>(*iter) == 0) std::get<0>(*iter) = staff->GetN();
         }
     }
-}
+} // namespace vrv
 
 void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 {

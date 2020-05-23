@@ -408,7 +408,7 @@ void View::DrawBracketSpan(
     // Opening bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
-        // (Do draw the horizontal line for doted lines at it looks better)
+        // (Do draw the horizontal line for dotted lines as it looks better)
         if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
             DrawFilledRectangle(dc, x1, y, x1 + bracketSize, y + lineWidth);
         }
