@@ -1116,7 +1116,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
+    int y = staff->GetDrawingY() + GetSylYRel(syl->m_drawingVerse, staff);
     TextExtend extend;
 
     // the length of the dash and the space between them

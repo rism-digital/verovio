@@ -1412,7 +1412,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    syl->SetDrawingYRel(GetSylYRel(syl, staff));
+    syl->SetDrawingYRel(GetSylYRel(syl->m_drawingVerse, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
     dc->DeactivateGraphicY();
@@ -1687,9 +1687,9 @@ int View::GetFYRel(F *f, Staff *staff)
     return y;
 }
 
-int View::GetSylYRel(Syl *syl, Staff *staff)
+int View::GetSylYRel(int verseN, Staff *staff)
 {
-    assert(syl && staff);
+    assert(staff);
 
     int y = 0;
     StaffAlignment *alignment = staff->GetAlignment();
@@ -1700,7 +1700,7 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+            + (alignment->GetVerseCount() - verseN) * (height + descender + margin) + (descender);
     }
     return y;
 }

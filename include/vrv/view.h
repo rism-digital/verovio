@@ -523,7 +523,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(Syl *syl, Staff *staff);
+    int GetSylYRel(int verseN, Staff *staff);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 
