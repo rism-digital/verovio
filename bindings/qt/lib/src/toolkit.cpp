@@ -229,10 +229,25 @@ void Toolkit::setResourcesDataPath(QString resourcesDataPath)
                 qWarning() << "tmp directory for resources data is invalid";
                 return;
             }
-            copyDirRecursive(resourcesDataPath, m_resourcesDataTmpDir.path());
-            resourcesDataPath = m_resourcesDataTmpDir.path();
+            if (true) {
+
+                QDir testDir;
+                testDir.mkdir("temptemptemp");
+                testDir.cd("temptemptemp");
+                copyDirRecursive(resourcesDataPath, testDir.absolutePath());
+                resourcesDataPath = testDir.absolutePath();
+            }
+            else {
+                qWarning() << __FUNCTION__ << __LINE__;
+                copyDirRecursive(resourcesDataPath, m_resourcesDataTmpDir.path());
+                qWarning() << __FUNCTION__ << __LINE__;
+                resourcesDataPath = m_resourcesDataTmpDir.path();
+                qWarning() << __FUNCTION__ << __LINE__;
+            }
         }
 #endif
+
+        qWarning() << __FUNCTION__ << __LINE__;
 
         m_resourcesDataPath = resourcesDataPath;
         bool success = m_verovioToolkit.SetResourcePath(resourcesDataPath.toStdString());
@@ -245,6 +260,7 @@ void Toolkit::setResourcesDataPath(QString resourcesDataPath)
         m_resourcesDataInitialized = true;
         requestReloadData();
     }
+    qWarning() << __FUNCTION__ << __LINE__;
 }
 
 void Toolkit::setSpacingStaff(int spacingStaff)

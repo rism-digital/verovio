@@ -21,13 +21,15 @@ LOCAL_SRC_FILES := \
 	$(ROOT_PATH)/libmei/atts_critapp.cpp \
 	$(ROOT_PATH)/libmei/atts_gestural.cpp \
 	$(ROOT_PATH)/libmei/atts_externalsymbols.cpp \
+	$(ROOT_PATH)/libmei/atts_facsimile.cpp \
 	$(ROOT_PATH)/libmei/atts_mei.cpp \
 	$(ROOT_PATH)/libmei/atts_mensural.cpp \
 	$(ROOT_PATH)/libmei/atts_midi.cpp \
+	$(ROOT_PATH)/libmei/atts_neumes.cpp \
 	$(ROOT_PATH)/libmei/atts_pagebased.cpp \
 	$(ROOT_PATH)/libmei/atts_shared.cpp \
 	$(ROOT_PATH)/libmei/atts_visual.cpp
-
+	
 LOCAL_C_INCLUDES := \
 	$(ROOT_PATH)/include \
 	$(ROOT_PATH)/include/vrv \
