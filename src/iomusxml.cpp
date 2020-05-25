@@ -1906,6 +1906,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     std::to_string(dynamic_cast<Staff *>(m_prevLayer->GetParent())->GetN())));
             }
             pedal->SetTstamp(timeStamp);
+            if (pedalLine && (pedalType == "stop")) pedal->SetTstamp(timeStamp - 0.1);
             int defaultY = xmlPedal.node().attribute("default-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
             defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
