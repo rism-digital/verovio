@@ -1600,8 +1600,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             else {
                 int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
                 m_bracketStack.front().first->SetLendsym(
-                    m_bracketStack.front().first->AttLineRend::StrToLinestartendsymbol(
-                        bracket.node().attribute("line-end").as_string()));
+                    ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
                 m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                 m_bracketStack.erase(m_bracketStack.begin());
             }
@@ -1614,8 +1613,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 bracketSpan->AttLineRendBase::StrToLineform(bracket.node().attribute("line-type").as_string()));
             // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
             bracketSpan->SetFunc("unclear");
-            bracketSpan->SetLstartsym(
-                bracketSpan->AttLineRend::StrToLinestartendsymbol(bracket.node().attribute("line-end").as_string()));
+            bracketSpan->SetLstartsym(ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
             m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
@@ -3157,7 +3155,11 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
 
 data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(std::string value)
 {
-    if (value == "arrow")
+    if (value == "up")
+        return LINESTARTENDSYMBOL_angleup;
+    else if (value == "down")
+        return LINESTARTENDSYMBOL_angledown;
+    else if (value == "arrow")
         return LINESTARTENDSYMBOL_arrow;
     else if (value == "Hauptstimme")
         return LINESTARTENDSYMBOL_H;
