@@ -1915,43 +1915,47 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     // just as without a dir attribute
     if (!pedal->HasDir()) return;
 
-    int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
-
-    data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
-    // center the pedal only with @startid
-    if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
-        alignment = HORIZONTALALIGNMENT_left;
-    }
-
-    std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
-
-    int code = SMUFL_E655_keyboardPedalUp;
-    std::wstring str;
-    if (pedal->GetDir() == pedalLog_DIR_bounce && pedal->GetForm() != pedalVis_FORM_altpedstar) {
-        str.push_back(code);
-        // Get the staff size of the first staff
-        int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
-        TextExtend bounceOffset;
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
-        dc->GetSmuflTextExtent(str, &bounceOffset);
-        dc->ResetFont();
-        x -= bounceOffset.m_width;
-    }
-    if (pedal->GetDir() != pedalLog_DIR_up) {
-        if (pedal->GetFunc() == "sostenuto") {
-            code = SMUFL_E659_keyboardPedalSost;
-        }
-        else {
-            code = SMUFL_E650_keyboardPedalPed;
-        }
-    }
-    str.push_back(code);
-
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
-    // Don't draw a symbol, if it's a line
+    // Draw a symbol, if it's not a line
     if (pedal->GetForm() != pedalVis_FORM_line) {
+
+        bool bounceStar = true;
+        if (pedal->GetForm() == pedalVis_FORM_altpedstar) bounceStar = false;
+
+        int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
+
+        data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
+        // center the pedal only with @startid
+        if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
+            alignment = HORIZONTALALIGNMENT_left;
+        }
+
+        std::vector<Staff *>::iterator staffIter;
+        std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
+
+        int code = SMUFL_E655_keyboardPedalUp;
+        std::wstring str;
+        if (bounceStar && (pedal->GetDir() == pedalLog_DIR_bounce)) {
+            str.push_back(code);
+            // Get the staff size of the first staff
+            int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
+            TextExtend bounceOffset;
+            dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
+            dc->GetSmuflTextExtent(str, &bounceOffset);
+            dc->ResetFont();
+            x -= bounceOffset.m_width;
+        }
+        if (pedal->GetDir() != pedalLog_DIR_up) {
+            if (pedal->GetFunc() == "sostenuto") {
+                code = SMUFL_E659_keyboardPedalSost;
+            }
+            else {
+                code = SMUFL_E650_keyboardPedalPed;
+            }
+        }
+        str.push_back(code);
+
         for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
             if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
                 continue;
