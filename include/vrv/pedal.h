@@ -75,7 +75,7 @@ public:
 
 private:
     /**
-     * Flag indicating whether or not the element was generated
+     * Flag indicating if following pedal mark is a bounce
      */
     bool m_endsWithBounce;
 };
