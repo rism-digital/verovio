@@ -86,6 +86,10 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
         case pedalLog_DIR_up:
             params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
             break;
+        case pedalLog_DIR_bounce:
+            params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
+            params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq) + 0.1, params->m_midiChannel);
+            break;
         default: return FUNCTOR_CONTINUE;
     }
 
