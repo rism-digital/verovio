@@ -74,3 +74,5 @@ Makefile
 libverovio.bc
 cmake_install.cmake
 libverovio.a
+tools/.cmake
+tools/compile_commands.json
