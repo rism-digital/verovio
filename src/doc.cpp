@@ -793,7 +793,8 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     // By default, optimize scores
     bool optimize = (m_mdivScoreDef.GetOptimize() != BOOLEAN_false);
     // However, if nothing specified, do not if there is only one staffGrp
-    if ((m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE) && (m_mdivScoreDef.GetChildCount(STAFFGRP, UNLIMITED_DEPTH) < 2)) {
+    if ((m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE)
+        && (m_mdivScoreDef.GetChildCount(STAFFGRP, UNLIMITED_DEPTH) < 2)) {
         optimize = false;
     }
 
@@ -1565,14 +1566,28 @@ double Doc::GetRightMargin(const ClassId classId) const
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
-    if (classId == HARM) return m_options->m_bottomMarginHarm.GetValue();
-    return m_options->m_defaultBottomMargin.GetValue();
+    int margin = m_options->m_defaultBottomMargin.GetValue();
+    if (classId == DYNAM) {
+        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
+    }
+    else if (classId == HARM) {
+        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
+                                                    : m_options->m_bottomMarginHarm.GetValue();
+    }
+    return margin;
 }
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
-    if (classId == HARM) return m_options->m_topMarginHarm.GetValue();
-    return m_options->m_defaultTopMargin.GetValue();
+    int margin = m_options->m_defaultTopMargin.GetValue();
+    if (classId == DYNAM) {
+        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
+    }
+    else if (classId == HARM) {
+        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
+                                                    : m_options->m_topMarginHarm.GetValue();
+    }
+    return margin;
 }
 
 Page *Doc::SetDrawingPage(int pageIdx)
