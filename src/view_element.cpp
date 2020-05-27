@@ -33,6 +33,8 @@
 #include "functorparams.h"
 #include "halfmrpt.h"
 #include "keysig.h"
+#include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
@@ -1479,6 +1481,50 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     Verse *verse = dynamic_cast<Verse *>(element);
     assert(verse);
+
+    Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
+    LabelAbbr *labelAbbr = verse->m_drawingLabelAbbr;
+    
+    if (label || labelAbbr) {
+        
+        std::wstring labelStr;
+        Object *graphic = NULL;
+        
+        if (label) {
+            graphic = label;
+            labelStr = label->GetText(label);
+            
+        }
+        else {
+            graphic = labelAbbr;
+            labelStr = labelAbbr->GetText(labelAbbr);
+        }
+
+        FontInfo labelTxt;
+        if (!dc->UseGlobalStyling()) {
+            labelTxt.SetFaceName("Times");
+        }
+        labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+
+        TextDrawingParams params;
+        params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
+        params.m_pointSize = labelTxt.GetPointSize();
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&labelTxt);
+
+        dc->StartGraphic(graphic, "", graphic->GetUuid());
+
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
+        DrawTextChildren(dc, graphic, params);
+        dc->EndText();
+
+        dc->EndGraphic(graphic, this);
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
 
     dc->StartGraphic(verse, "", verse->GetUuid());
 
