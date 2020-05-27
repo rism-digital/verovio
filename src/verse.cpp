@@ -17,6 +17,8 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
@@ -52,7 +54,13 @@ void Verse::Reset()
 
 void Verse::AddChild(Object *child)
 {
-    if (child->Is(SYL)) {
+    if (child->Is(LABEL)) {
+        assert(dynamic_cast<Label *>(child));
+    }
+    else if (child->Is(LABELABBR)) {
+        assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
     }
     else if (child->IsEditorialElement()) {
