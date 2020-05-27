@@ -32,6 +32,7 @@ class Functor;
 class Hairpin;
 class Harm;
 class KeySig;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
@@ -376,6 +377,7 @@ public:
         m_previousVerse = NULL;
         m_lastSyl = NULL;
         m_previousMeasure = NULL;
+        m_currentLabelAbbr = NULL;
         m_freeSpace = 0;
         m_staffSize = 100;
         m_doc = doc;
@@ -384,6 +386,7 @@ public:
     Verse *m_previousVerse;
     Syl *m_lastSyl;
     Measure *m_previousMeasure;
+    LabelAbbr *m_currentLabelAbbr;
     int m_freeSpace;
     int m_staffSize;
     Doc *m_doc;

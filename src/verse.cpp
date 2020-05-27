@@ -129,6 +129,25 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
+
+    /****** find label / labelAbbr */
+
+    // If we have a <label>, reset the previous abbreviation
+    if (this->FindDescendantByType(LABEL)) {
+        params->m_currentLabelAbbr = NULL;
+    }
+
+    bool newLabelAbbr = false;
+    this->m_drawingLabelAbbr = NULL;
+    // Find the labelAbbr (if none previously given)
+    if (params->m_currentLabelAbbr == NULL) {
+        params->m_currentLabelAbbr = dynamic_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR));
+        // Keep indication that this is a new abbreviation and that is should not be displayed on this verse
+        newLabelAbbr = true;
+    }
+
+    /*******/
+
     ArrayOfObjects syls;
     ClassIdComparison matchTypeSyl(SYL);
     this->FindAllDescendantByComparison(&syls, &matchTypeSyl);
@@ -169,6 +188,11 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     if (params->m_previousVerse == NULL) {
         params->m_previousVerse = this;
         params->m_lastSyl = lastSyl;
+
+        if (!newLabelAbbr && params->m_currentLabelAbbr) {
+            this->m_drawingLabelAbbr = params->m_currentLabelAbbr;
+        }
+
         // No free space because we never move the first one back
         params->m_freeSpace = 0;
         params->m_previousMeasure = NULL;
