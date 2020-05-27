@@ -144,8 +144,10 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
 // ScoreDef
 //----------------------------------------------------------------------------
 
-ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttEndings(), AttOptimization()
+ScoreDef::ScoreDef()
+    : ScoreDefElement("scoredef-"), ObjectListInterface(), AttDistances(), AttEndings(), AttOptimization()
 {
+    RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_ENDINGS);
     RegisterAttClass(ATT_OPTIMIZATION);
 
@@ -157,6 +159,7 @@ ScoreDef::~ScoreDef() {}
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
+    ResetDistances();
     ResetEndings();
     ResetOptimization();
 

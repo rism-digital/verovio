@@ -835,7 +835,7 @@ Options::Options()
     /// custom bottom
 
     m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
-    m_bottomMarginHarm.Init(0.5, 0.0, 10.0);
+    m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
 
     /// custom left
@@ -973,7 +973,7 @@ Options::Options()
     /// custom top
 
     m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
-    m_topMarginHarm.Init(0.5, 0.0, 10.0);
+    m_topMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
 
     /*
