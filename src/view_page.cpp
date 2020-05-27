@@ -1401,7 +1401,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
             // cast to EditorialElement check in DrawLayerEditorialElement
             DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement *>(current), layer, staff, measure);
         }
-        else {
+        else if (!current->Is({LABEL, LABELABBR})) {
             assert(false);
         }
     }
