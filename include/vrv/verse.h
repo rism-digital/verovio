@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class LabelAbbr;
 class Syl;
 
 //----------------------------------------------------------------------------
@@ -66,10 +67,19 @@ public:
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 public:
-    //
+    /**
+     *  A pointer to the labelAbbr 
+     */
+    LabelAbbr *m_drawingLabelAbbr;
+
 private:
 };
 

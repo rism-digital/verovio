@@ -50,6 +50,8 @@ void Verse::Reset()
     ResetLang();
     ResetNInteger();
     ResetTypography();
+
+    m_drawingLabelAbbr = NULL;
 }
 
 void Verse::AddChild(Object *child)
@@ -226,6 +228,17 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
     //(*tree)[ staff->GetN() ][ layer->GetN() ][ this->GetN() ] = true;
 
     return FUNCTOR_SIBLINGS;
+}
+
+
+int Verse::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    m_drawingLabelAbbr = NULL;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
