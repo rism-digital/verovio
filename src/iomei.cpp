@@ -2645,7 +2645,13 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for verse
     else if (filterParent->Is(VERSE)) {
-        if (element == "syl") {
+        if (element == "label") {
+            return true;
+        }
+        else if (element == "labelAbbr") {
+            return true;
+        }
+        else if (element == "syl") {
             return true;
         }
         else {
@@ -4336,6 +4342,11 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "keySig") {
             success = ReadKeySig(parent, xmlElement);
+        }
+        else if (elementName == "label") {
+            success = ReadLabel(parent, xmlElement);
+        }        else if (elementName == "labelAbbr") {
+            success = ReadLabelAbbr(parent, xmlElement);
         }
         else if (elementName == "ligature") {
             success = ReadLigature(parent, xmlElement);
