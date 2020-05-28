@@ -991,6 +991,7 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
 
     WriteScoreDefElement(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
+    scoreDef->WriteDistances(currentNode);
     scoreDef->WriteEndings(currentNode);
     scoreDef->WriteOptimization(currentNode);
 }
@@ -2645,7 +2646,13 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for verse
     else if (filterParent->Is(VERSE)) {
-        if (element == "syl") {
+        if (element == "label") {
+            return true;
+        }
+        else if (element == "labelAbbr") {
+            return true;
+        }
+        else if (element == "syl") {
             return true;
         }
         else {
@@ -3407,6 +3414,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     }
 
     ReadScoreDefInterface(scoreDef, vrvScoreDef);
+    vrvScoreDef->ReadDistances(scoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
     vrvScoreDef->ReadOptimization(scoreDef);
 
@@ -4336,6 +4344,11 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "keySig") {
             success = ReadKeySig(parent, xmlElement);
+        }
+        else if (elementName == "label") {
+            success = ReadLabel(parent, xmlElement);
+        }        else if (elementName == "labelAbbr") {
+            success = ReadLabelAbbr(parent, xmlElement);
         }
         else if (elementName == "ligature") {
             success = ReadLigature(parent, xmlElement);
