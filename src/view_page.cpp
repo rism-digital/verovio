@@ -538,15 +538,14 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
             FontInfo* font = m_doc->GetDrawingSmuflFont(staffSize, false);
             int dummy, g_w, g_h;
             glyph->GetBoundingBox(dummy, dummy, g_w, g_h);
-            float ratio = static_cast<float>(glyph->GetUnitsPerEm()) / font->GetPointSize();
-            float scale = ratio * (y1 - y2) / g_h;
-            staffSize *= scale;
-            int braceWidth = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
-            x -= braceWidth;
-            float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
-            float heightAspect = static_cast<float>(font->GetPointSize()) / glyph->GetUnitsPerEm();
-            font->SetWidthToHeightRatio(static_cast<float>(m_doc->GetDrawingDoubleUnit(staffSize)) / braceWidth / scale);
-            DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize, false);
+            const float ratio = static_cast<float>(glyph->GetUnitsPerEm()) / font->GetPointSize();
+            const float scale = static_cast<float>(y1 - y2) / g_h;
+            int braceWidth =  m_doc->GetDrawingDoubleUnit(staffSize);
+            x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2;
+            const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
+            const float widthAfterScalling = g_w * scale;
+            font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
+            DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * ratio * scale, false);
             font->SetWidthToHeightRatio(currentWidthToHeightRatio);
             return;
         } else {
