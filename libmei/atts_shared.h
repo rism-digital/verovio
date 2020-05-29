@@ -914,8 +914,8 @@ public:
     std::string GetBezier() const { return m_bezier; }
     bool HasBezier() const;
     //
-    void SetBulge(double bulge_) { m_bulge = bulge_; }
-    double GetBulge() const { return m_bulge; }
+    void SetBulge(std::string bulge_) { m_bulge = bulge_; }
+    std::string GetBulge() const { return m_bulge; }
     bool HasBulge() const;
     //
     void SetCurvedir(curvature_CURVEDIR curvedir_) { m_curvedir = curvedir_; }
@@ -938,7 +938,7 @@ private:
      * line's length. N.B. An MEI virtual unit (VU) is half the distance between
      * adjacent staff lines.
      **/
-    double m_bulge;
+    std::string m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
     curvature_CURVEDIR m_curvedir;
 

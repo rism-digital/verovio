@@ -481,16 +481,11 @@ float View::CalcInitialSlur(
 
     // the 'height' of the bezier
     int height;
-    if (slur->HasBulge()) {
-        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slur->GetBulge();
-    }
-    else {
-        int dist = abs(p2.x - p1.x);
-        height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
-            dist / m_options->m_slurHeightFactor.GetValue());
-        height = std::min(
-            int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
-    }
+    int dist = abs(p2.x - p1.x);
+    height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+        dist / m_options->m_slurHeightFactor.GetValue());
+    height = std::min(
+        int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
 
     // the height of the control points
     height = height * 4 / 3;
