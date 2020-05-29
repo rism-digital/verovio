@@ -4347,7 +4347,8 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "label") {
             success = ReadLabel(parent, xmlElement);
-        }        else if (elementName == "labelAbbr") {
+        }
+        else if (elementName == "labelAbbr") {
             success = ReadLabelAbbr(parent, xmlElement);
         }
         else if (elementName == "ligature") {

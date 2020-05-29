@@ -1484,16 +1484,15 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
     LabelAbbr *labelAbbr = verse->m_drawingLabelAbbr;
-    
+
     if (label || labelAbbr) {
-        
+
         std::wstring labelStr;
         Object *graphic = NULL;
-        
+
         if (label) {
             graphic = label;
             labelStr = label->GetText(label);
-            
         }
         else {
             graphic = labelAbbr;
