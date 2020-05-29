@@ -129,7 +129,6 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
-
     /****** find label / labelAbbr */
 
     // If we have a <label>, reset the previous abbreviation
@@ -253,7 +252,6 @@ int Verse::PrepareProcessingLists(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
-
 
 int Verse::ResetDrawing(FunctorParams *functorParams)
 {

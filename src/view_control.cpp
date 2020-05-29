@@ -862,16 +862,10 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     /************** bezier points **************/
 
     // the 'height' of the bezier
-    int height;
-    if (tie->HasBulge()) {
-        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * tie->GetBulge();
-    }
-    else {
-        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // if the space between the to points is more than two staff height, increase the height
-        if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
-            height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        }
+    int height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // if the space between the to points is more than two staff height, increase the height
+    if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
+        height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieThickness.GetValue();
 

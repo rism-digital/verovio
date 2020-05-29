@@ -76,7 +76,7 @@ private:
     //
 public:
     /**
-     *  A pointer to the labelAbbr 
+     *  A pointer to the labelAbbr
      */
     LabelAbbr *m_drawingLabelAbbr;
 
