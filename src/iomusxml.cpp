@@ -398,23 +398,19 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
         std::string textStr = textNode.text().as_string();
-        std::string textAlign = textNode.attribute("halign").as_string();
         std::string textColor = textNode.attribute("color").as_string();
-        std::string textFont = textNode.attribute("font-family").as_string();
-        std::string textStyle = textNode.attribute("font-style").as_string();
-        std::string textWeight = textNode.attribute("font-weight").as_string();
         Object *textParent = element;
         if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
-            || textNode.attribute("halign") || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
+            || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style") || textNode.attribute("font-weight")) {
             Rend *rend = new Rend();
             rend->SetLang(textNode.attribute("xml:lang").as_string());
             rend->SetColor(textNode.attribute("color").as_string());
             rend->SetHalign(
                 rend->AttHorizontalAlign::StrToHorizontalalignment(textNode.attribute("halign").as_string()));
             rend->SetSpace(textNode.attribute("xml:space").as_string());
-            if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
-            if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
-            if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
+            rend->SetFontfam(textNode.attribute("font-family").as_string());
+            rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textNode.attribute("font-style").as_string()));
+            rend->SetFontweight(rend->AttTypography::StrToFontweight(textNode.attribute("font-weight").as_string()));
             element->AddChild(rend);
             textParent = rend;
         }
