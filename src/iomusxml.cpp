@@ -1951,9 +1951,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
         staffNum = (staffNum < 1) ? 1 : staffNum;
         reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
+        Rend *rend = new Rend();
+        rend->SetRend(TEXTRENDITION_box);
+        rend->SetHalign(
+        rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
-        reh->AddChild(text);
+        rend->AddChild(text);
+        reh->AddChild(rend);
         m_controlElements.push_back(std::make_pair(measureNum, reh));
     }
 
@@ -2005,6 +2010,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         for (pugi::xml_node figure : node.children("figure")) {
             std::string textStr = figure.select_node("figure-number").node().text().as_string();
             F *f = new F();
+            if (figure.select_node("extend[@type='start']")) f->SetExtender(BOOLEAN_true);
             Text *text = new Text();
             text->SetText(UTF8to16(textStr));
             f->AddChild(text);

@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <f> element.
  */
-class F : public TextElement, public TimeSpanningInterface {
+class F : public TextElement, public TimeSpanningInterface, public AttExtender {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
