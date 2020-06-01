@@ -2002,8 +2002,8 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         // std::string textColor = node.attribute("color").as_string();
         // std::string textStyle = node.attribute("font-style").as_string();
         // std::string textWeight = node.attribute("font-weight").as_string();
-        for (pugi::xml_node figure : node.child("figure")) {
-            std::string textStr = GetContent(figure.select_node("figure-number").node());
+        for (pugi::xml_node figure : node.children("figure")) {
+            std::string textStr = figure.select_node("figure-number").node().text().as_string();
             F *f = new F();
             Text *text = new Text();
             text->SetText(UTF8to16(textStr));
