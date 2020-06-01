@@ -1953,8 +1953,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
         reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
         Rend *rend = new Rend();
-        rend->SetRend(TEXTRENDITION_box);
+        rend->SetFontweight(
+            rend->AttTypography::StrToFontweight(rehearsal.node().attribute("font-weight").as_string()));
         rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
+        rend->SetRend(ConvertEnclosure(rehearsal.node().attribute("enclosure").as_string()));
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         rend->AddChild(text);
@@ -3130,6 +3132,26 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
         LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
         return DURATION_NONE;
     }
+}
+
+data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(std::string value)
+{
+    if (value == "rectangle")
+        return TEXTRENDITION_box;
+    else if (value == "square")
+        return TEXTRENDITION_box;
+    else if (value == "oval")
+        return TEXTRENDITION_circle;
+    else if (value == "circle")
+        return TEXTRENDITION_circle;
+    else if (value == "triangle")
+        return TEXTRENDITION_tbox;
+    else if (value == "diamond")
+        return TEXTRENDITION_dbox;
+    else if (value == "none")
+        return TEXTRENDITION_none;
+
+    return TEXTRENDITION_box;
 }
 
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
