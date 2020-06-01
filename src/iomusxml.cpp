@@ -401,7 +401,8 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         std::string textColor = textNode.attribute("color").as_string();
         Object *textParent = element;
         if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
-            || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style") || textNode.attribute("font-weight")) {
+            || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style")
+            || textNode.attribute("font-weight")) {
             Rend *rend = new Rend();
             rend->SetLang(textNode.attribute("xml:lang").as_string());
             rend->SetColor(textNode.attribute("color").as_string());
@@ -1953,8 +1954,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         reh->SetLang(lang);
         Rend *rend = new Rend();
         rend->SetRend(TEXTRENDITION_box);
-        rend->SetHalign(
-        rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
+        rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         rend->AddChild(text);
@@ -2002,13 +2002,18 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        int durOffset = 0;
+        bool paren = node.attribute("parentheses").as_bool();
 
         // std::string textColor = node.attribute("color").as_string();
         // std::string textStyle = node.attribute("font-style").as_string();
         // std::string textWeight = node.attribute("font-weight").as_string();
         for (pugi::xml_node figure : node.children("figure")) {
-            std::string textStr = figure.select_node("figure-number").node().text().as_string();
+            std::string textStr;
+            if (paren) textStr.append("(");
+            textStr.append(ConvertFigureGlyph(figure.select_node("prefix").node().text().as_string()));
+            textStr.append(figure.select_node("figure-number").node().text().as_string());
+            textStr.append(ConvertFigureGlyph(figure.select_node("suffix").node().text().as_string()));
+            if (paren) textStr.append(")");
             F *f = new F();
             if (figure.select_node("extend[@type='start']")) f->SetExtender(BOOLEAN_true);
             Text *text = new Text();
@@ -2017,7 +2022,8 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
             fb->AddChild(f);
         }
         harm->AddChild(fb);
-        harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        m_durFb += node.select_node("duration").node().text().as_int();
         m_controlElements.push_back(std::make_pair(measureNum, harm));
         m_harmStack.push_back(harm);
     }
@@ -2097,6 +2103,9 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(staff);
 
     bool isChord = node.select_node("chord");
+
+    // reset figured bass offset
+    m_durFb = 0;
 
     // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
@@ -3379,6 +3388,30 @@ std::string MusicXmlInput::ConvertKindToText(std::string value)
     else if (value == "power")
         return "5";
     // Skipping Tristan
+    else
+        return "";
+}
+
+std::string MusicXmlInput::ConvertFigureGlyph(std::string value)
+{
+    if (value == "sharp")
+        return "♯";
+    else if (value == "flat")
+        return "♭";
+    else if (value == "natural")
+        return "♮";
+    else if (value == "double-sharp")
+        return "𝄪";
+    else if (value == "flat-flat")
+        return "𝄫";
+    else if (value == "sharp-sharp")
+        return "♯♯";
+    else if (value == "backslash")
+        return "\u20E5";
+    else if (value == "slash")
+        return "\u0338";
+    else if (value == "cross")
+        return "+";
     else
         return "";
 }

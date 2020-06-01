@@ -319,6 +319,7 @@ private:
     std::string ConvertAlterToSymbol(std::string value);
     std::string ConvertKindToSymbol(std::string value);
     std::string ConvertKindToText(std::string value);
+    std::string ConvertFigureGlyph(std::string value);
     ///@}
 
 private:
@@ -334,6 +335,8 @@ private:
     int m_ppq;
     /* measure time */
     int m_durTotal = 0;
+    /* measure time */
+    int m_durFb = 0;
     /* meter signature */
     int m_meterCount = 4;
     int m_meterUnit = 4;
