@@ -1880,6 +1880,7 @@ void MEIOutput::WriteF(pugi::xml_node currentNode, F *f)
 
     WriteTextElement(currentNode, f);
     WriteTimeSpanningInterface(currentNode, f);
+    f->WriteExtender(currentNode);
 }
 
 void MEIOutput::WriteFig(pugi::xml_node currentNode, Fig *fig)
@@ -5075,6 +5076,7 @@ bool MEIInput::ReadF(Object *parent, pugi::xml_node f)
     ReadTextElement(f, vrvF);
 
     ReadTimeSpanningInterface(f, vrvF);
+    vrvF->ReadExtender(f);
 
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);

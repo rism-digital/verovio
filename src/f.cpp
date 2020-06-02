@@ -23,9 +23,10 @@ namespace vrv {
 // F (Figure)
 //----------------------------------------------------------------------------
 
-F::F() : TextElement("f-"), TimeSpanningInterface()
+F::F() : TextElement("f-"), TimeSpanningInterface(), AttExtender()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_EXTENDER);
 
     Reset();
 }
@@ -36,6 +37,7 @@ void F::Reset()
 {
     TextElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetExtender();
 }
 
 void F::AddChild(Object *child)

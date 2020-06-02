@@ -398,23 +398,20 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
         std::string textStr = textNode.text().as_string();
-        std::string textAlign = textNode.attribute("halign").as_string();
         std::string textColor = textNode.attribute("color").as_string();
-        std::string textFont = textNode.attribute("font-family").as_string();
-        std::string textStyle = textNode.attribute("font-style").as_string();
-        std::string textWeight = textNode.attribute("font-weight").as_string();
         Object *textParent = element;
         if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
-            || textNode.attribute("halign") || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
+            || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style")
+            || textNode.attribute("font-weight")) {
             Rend *rend = new Rend();
             rend->SetLang(textNode.attribute("xml:lang").as_string());
             rend->SetColor(textNode.attribute("color").as_string());
             rend->SetHalign(
                 rend->AttHorizontalAlign::StrToHorizontalalignment(textNode.attribute("halign").as_string()));
             rend->SetSpace(textNode.attribute("xml:space").as_string());
-            if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
-            if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
-            if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
+            rend->SetFontfam(textNode.attribute("font-family").as_string());
+            rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textNode.attribute("font-style").as_string()));
+            rend->SetFontweight(rend->AttTypography::StrToFontweight(textNode.attribute("font-weight").as_string()));
             element->AddChild(rend);
             textParent = rend;
         }
@@ -1345,7 +1342,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         pugi::xpath_node clefLine = clef.node().select_node("line");
         if (clefSign && clefLine) {
             Clef *meiClef = new Clef();
-            meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(clefSign.node().text().as_string()));
+            meiClef->SetShape(meiClef->AttClefShape::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
             meiClef->SetLine(meiClef->AttClefShape::StrToInt(clefLine.node().text().as_string()));
             // clef octave change
             pugi::xpath_node clefOctaveChange = clef.node().select_node("clef-octave-change");
@@ -1600,8 +1597,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             else {
                 int measureDifference = m_measureCounts.at(measure) - m_bracketStack.front().second.m_lastMeasureCount;
                 m_bracketStack.front().first->SetLendsym(
-                    m_bracketStack.front().first->AttLineRend::StrToLinestartendsymbol(
-                        bracket.node().attribute("line-end").as_string()));
+                    ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
                 m_bracketStack.front().first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                 m_bracketStack.erase(m_bracketStack.begin());
             }
@@ -1614,8 +1610,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 bracketSpan->AttLineRendBase::StrToLineform(bracket.node().attribute("line-type").as_string()));
             // bracketSpan->SetPlace(bracketSpan->AttPlacement::StrToStaffrel(placeStr.c_str()));
             bracketSpan->SetFunc("unclear");
-            bracketSpan->SetLstartsym(
-                bracketSpan->AttLineRend::StrToLinestartendsymbol(bracket.node().attribute("line-end").as_string()));
+            bracketSpan->SetLstartsym(ConvertLineEndSymbol(bracket.node().attribute("line-end").as_string()));
             bracketSpan->SetTstamp(timeStamp);
             m_controlElements.push_back(std::make_pair(measureNum, bracketSpan));
             m_bracketStack.push_back(std::make_pair(bracketSpan, openBracket));
@@ -1957,9 +1952,15 @@ void MusicXmlInput::ReadMusicXmlDirection(
         staffNum = (staffNum < 1) ? 1 : staffNum;
         reh->SetStaff(reh->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffNum)));
         reh->SetLang(lang);
+        Rend *rend = new Rend();
+        rend->SetFontweight(
+            rend->AttTypography::StrToFontweight(rehearsal.node().attribute("font-weight").as_string()));
+        rend->SetHalign(rend->AttHorizontalAlign::StrToHorizontalalignment(halign));
+        rend->SetRend(ConvertEnclosure(rehearsal.node().attribute("enclosure").as_string()));
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
-        reh->AddChild(text);
+        rend->AddChild(text);
+        reh->AddChild(rend);
         m_controlElements.push_back(std::make_pair(measureNum, reh));
     }
 
@@ -2003,21 +2004,28 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        int durOffset = 0;
+        bool paren = node.attribute("parentheses").as_bool();
 
         // std::string textColor = node.attribute("color").as_string();
         // std::string textStyle = node.attribute("font-style").as_string();
         // std::string textWeight = node.attribute("font-weight").as_string();
-        for (pugi::xml_node figure : node.child("figure")) {
-            std::string textStr = GetContent(figure.select_node("figure-number").node());
+        for (pugi::xml_node figure : node.children("figure")) {
+            std::string textStr;
+            if (paren) textStr.append("(");
+            textStr.append(ConvertFigureGlyph(figure.select_node("prefix").node().text().as_string()));
+            textStr.append(figure.select_node("figure-number").node().text().as_string());
+            textStr.append(ConvertFigureGlyph(figure.select_node("suffix").node().text().as_string()));
+            if (paren) textStr.append(")");
             F *f = new F();
+            if (figure.select_node("extend[@type='start']")) f->SetExtender(BOOLEAN_true);
             Text *text = new Text();
             text->SetText(UTF8to16(textStr));
             f->AddChild(text);
             fb->AddChild(f);
         }
         harm->AddChild(fb);
-        harm->SetTstamp((double)(m_durTotal + durOffset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        harm->SetTstamp((double)(m_durTotal + m_durFb) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        m_durFb += node.select_node("duration").node().text().as_int();
         m_controlElements.push_back(std::make_pair(measureNum, harm));
         m_harmStack.push_back(harm);
     }
@@ -2097,6 +2105,9 @@ void MusicXmlInput::ReadMusicXmlNote(
     assert(staff);
 
     bool isChord = node.select_node("chord");
+
+    // reset figured bass offset
+    m_durFb = 0;
 
     // add clef changes to all layers of a given measure, staff, and time stamp
     if (!m_ClefChangeStack.empty()) {
@@ -3123,6 +3134,26 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
     }
 }
 
+data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(std::string value)
+{
+    if (value == "rectangle")
+        return TEXTRENDITION_box;
+    else if (value == "square")
+        return TEXTRENDITION_box;
+    else if (value == "oval")
+        return TEXTRENDITION_circle;
+    else if (value == "circle")
+        return TEXTRENDITION_circle;
+    else if (value == "triangle")
+        return TEXTRENDITION_tbox;
+    else if (value == "diamond")
+        return TEXTRENDITION_dbox;
+    else if (value == "none")
+        return TEXTRENDITION_none;
+
+    return TEXTRENDITION_box;
+}
+
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
 {
     if (value == "breve")
@@ -3157,7 +3188,11 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
 
 data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(std::string value)
 {
-    if (value == "arrow")
+    if (value == "up")
+        return LINESTARTENDSYMBOL_angleup;
+    else if (value == "down")
+        return LINESTARTENDSYMBOL_angledown;
+    else if (value == "arrow")
         return LINESTARTENDSYMBOL_arrow;
     else if (value == "Hauptstimme")
         return LINESTARTENDSYMBOL_H;
@@ -3375,6 +3410,30 @@ std::string MusicXmlInput::ConvertKindToText(std::string value)
     else if (value == "power")
         return "5";
     // Skipping Tristan
+    else
+        return "";
+}
+
+std::string MusicXmlInput::ConvertFigureGlyph(std::string value)
+{
+    if (value == "sharp")
+        return "♯";
+    else if (value == "flat")
+        return "♭";
+    else if (value == "natural")
+        return "♮";
+    else if (value == "double-sharp")
+        return "𝄪";
+    else if (value == "flat-flat")
+        return "𝄫";
+    else if (value == "sharp-sharp")
+        return "♯♯";
+    else if (value == "backslash")
+        return "\u20E5";
+    else if (value == "slash")
+        return "\u0338";
+    else if (value == "cross")
+        return "+";
     else
         return "";
 }

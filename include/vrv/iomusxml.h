@@ -310,6 +310,7 @@ private:
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
     data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
+    data_TEXTRENDITION ConvertEnclosure(std::string value);
     std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     curvature_CURVEDIR InferCurvedir(pugi::xml_node slurOrTie);
@@ -319,6 +320,7 @@ private:
     std::string ConvertAlterToSymbol(std::string value);
     std::string ConvertKindToSymbol(std::string value);
     std::string ConvertKindToText(std::string value);
+    std::string ConvertFigureGlyph(std::string value);
     ///@}
 
 private:
@@ -334,6 +336,8 @@ private:
     int m_ppq;
     /* measure time */
     int m_durTotal = 0;
+    /* measure time */
+    int m_durFb = 0;
     /* meter signature */
     int m_meterCount = 4;
     int m_meterUnit = 4;
