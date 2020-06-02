@@ -309,14 +309,15 @@ private:
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
+    data_HEADSHAPE ConvertNotehead(std::string value);
     data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
-    data_TEXTRENDITION ConvertEnclosure(std::string value);
-    std::wstring ConvertTypeToVerovioText(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
+    data_TEXTRENDITION ConvertEnclosure(std::string value);
     curvature_CURVEDIR InferCurvedir(pugi::xml_node slurOrTie);
     fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
+    std::wstring ConvertTypeToVerovioText(std::string value);
     std::string ConvertAlterToSymbol(std::string value);
     std::string ConvertKindToSymbol(std::string value);
     std::string ConvertKindToText(std::string value);
