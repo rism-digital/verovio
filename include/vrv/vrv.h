@@ -138,8 +138,8 @@ public:
      */
     ///@{
     /** Resource path */
-    static std::string GetPath() { return m_path; }
-    static void SetPath(const std::string &path) { m_path = path; }
+    static std::string GetPath() { return s_path; }
+    static void SetPath(const std::string &path) { s_path = path; }
     /** Init the SMufL music and text fonts */
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */
@@ -159,12 +159,12 @@ private:
 
 private:
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
-    static std::string m_path;
+    static std::string s_path;
     /** The loaded SMuFL font */
-    static GlyphMap m_font;
+    static GlyphMap s_font;
     /** A text font used for bounding box calculations */
-    static GlyphTextMap m_textFont;
-    static StyleAttributes m_currentStyle;
+    static GlyphTextMap s_textFont;
+    static StyleAttributes s_currentStyle;
     static const StyleAttributes k_defaultStyle;
 };
 
