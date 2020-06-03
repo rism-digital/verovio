@@ -60,10 +60,10 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-std::string Resources::m_path = "/usr/local/share/verovio";
-Resources::GlyphTextMap Resources::m_textFont;
-Resources::GlyphMap Resources::m_font;
-Resources::StyleAttributes Resources::m_currentStyle;
+std::string Resources::s_path = "/usr/local/share/verovio";
+Resources::GlyphTextMap Resources::s_textFont;
+Resources::GlyphMap Resources::s_font;
+Resources::StyleAttributes Resources::s_currentStyle;
 const Resources::StyleAttributes Resources::k_defaultStyle{data_FONTWEIGHT::FONTWEIGHT_normal, data_FONTSTYLE::FONTSTYLE_normal};
 
 //----------------------------------------------------------------------------
@@ -78,8 +78,8 @@ bool Resources::InitFonts()
     // The Leipzig as the default font
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
 
-    if (m_font.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMUFL glyphs but could load only %d.", SMUFL_COUNT, m_font.size());
+    if (s_font.size() < SMUFL_COUNT) {
+        LogError("Expected %d default SMUFL glyphs but could load only %d.", SMUFL_COUNT, s_font.size());
         return false;
     }
 
@@ -104,7 +104,7 @@ bool Resources::InitFonts()
         }
     }
 
-    m_currentStyle = k_defaultStyle;
+    s_currentStyle = k_defaultStyle;
 
     return true;
 }
@@ -116,8 +116,8 @@ bool Resources::SetFont(const std::string &fontName)
 
 Glyph *Resources::GetGlyph(wchar_t smuflCode)
 {
-    if (!m_font.count(smuflCode)) return NULL;
-    return &m_font[smuflCode];
+    if (!s_font.count(smuflCode)) return NULL;
+    return &s_font[smuflCode];
 }
 
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
@@ -130,19 +130,20 @@ void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontSt
         fontStyle = FONTSTYLE_normal;
     }
 
-    m_currentStyle = std::make_pair(fontWeight, fontStyle);
-    if (m_textFont.count(m_currentStyle) == 0) {
+    s_currentStyle = std::make_pair(fontWeight, fontStyle);
+    if (s_textFont.count(s_currentStyle) == 0) {
         LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
-        m_currentStyle = k_defaultStyle;
+        s_currentStyle = k_defaultStyle;
     }
 }
 
 Glyph *Resources::GetTextGlyph(wchar_t code)
 {
-    GlyphMap *currentMap = &m_textFont[m_textFont.count(m_currentStyle) != 0 ? m_currentStyle : k_defaultStyle];
+    GlyphMap *currentMap = &s_textFont[s_textFont.count(s_currentStyle) != 0 ? s_currentStyle : k_defaultStyle];
 
-    if (currentMap->count(code) == 0)
-            return NULL;
+    if (currentMap->count(code) == 0) {
+        return NULL;
+    }
 
     return &currentMap->at(code);
 }
@@ -173,7 +174,7 @@ bool Resources::LoadFont(const std::string &fontName)
             std::string codeStr = pdir->d_name;
             codeStr = codeStr.substr(0, 4);
             Glyph glyph(Resources::GetPath() + "/" + fontName + "/" + pdir->d_name, codeStr);
-            m_font[smuflCode] = glyph;
+            s_font[smuflCode] = glyph;
         }
     }
 
@@ -199,11 +200,11 @@ bool Resources::LoadFont(const std::string &fontName)
         Glyph *glyph = NULL;
         if (current.attribute("c")) {
             wchar_t smuflCode = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
-            if (!m_font.count(smuflCode)) {
+            if (!s_font.count(smuflCode)) {
                 LogWarning("Glyph with code '%d' not found.", smuflCode);
                 continue;
             }
-            glyph = &m_font[smuflCode];
+            glyph = &s_font[smuflCode];
             if (glyph->GetUnitsPerEm() != unitsPerEm * 10) {
                 LogWarning("Glyph and bounding box units-per-em for code '%d' miss-match (bounding box: %d)", smuflCode,
                     unitsPerEm);
@@ -255,10 +256,10 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
-    if (m_textFont.count(style) == 0) {
-        m_textFont[style] = GlyphMap{};
+    if (s_textFont.count(style) == 0) {
+        s_textFont[style] = GlyphMap{};
     }
-    GlyphMap &currentMap = m_textFont.at(style);
+    GlyphMap &currentMap = s_textFont.at(style);
     for (current = root.child("g"); current; current = current.next_sibling("g")) {
         if (current.attribute("c")) {
             wchar_t code = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
