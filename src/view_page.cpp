@@ -541,10 +541,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
             const float ratio = static_cast<float>(glyph->GetUnitsPerEm()) / font->GetPointSize();
             const float scale = static_cast<float>(y1 - y2) / g_h;
             int braceWidth =  m_doc->GetDrawingDoubleUnit(staffSize);
-            // This constant defines the field between the brace and the vertical line.
-            // field_size = brace_width * BRACE_MARGIN_RATIO
-            static constexpr auto BRACE_MARGIN_RATIO = 0.2f;
-            x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + BRACE_MARGIN_RATIO * braceWidth;
+            x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + m_doc->GetDrawingUnit(staffSize);
             const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
             const float widthAfterScalling = g_w * scale;
             font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
