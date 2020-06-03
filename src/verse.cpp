@@ -138,7 +138,6 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
             Syl *syl = dynamic_cast<Syl *>(*iter);
             assert(syl);
             syl->SetDrawingXRel(previousSylShift);
-            auto t = syl->GetUuid();
             previousSylShift += syl->GetContentX2() + syl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
             ++iter;
         }
@@ -177,10 +176,6 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     // Use the syl because the content bounding box of the verse might be invalid at this stage
     int overlap = params->m_lastSyl->GetContentRight() - (firstSyl->GetContentLeft() + xShift);
     overlap += params->m_lastSyl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
-
-    if (params->m_lastSyl->GetUuid() == "syl-0000001599481773") {
-        int d = params->m_doc->GetDrawingUnit(params->m_staffSize);
-    }
 
     int nextFreeSpace = params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
