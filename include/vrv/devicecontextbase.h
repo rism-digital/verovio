@@ -102,8 +102,8 @@ public:
     {
         m_pointSize = 0;
         m_family = 0; // was wxFONTFAMILY_DEFAULT;
-        m_style = FONTSTYLE_normal;
-        m_weight = FONTWEIGHT_normal;
+        m_style = FONTSTYLE_NONE;
+        m_weight = FONTWEIGHT_NONE;
         m_underlined = false;
         m_supSubScript = false;
         m_faceName.clear();

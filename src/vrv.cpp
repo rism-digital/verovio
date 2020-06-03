@@ -122,6 +122,14 @@ Glyph *Resources::GetGlyph(wchar_t smuflCode)
 
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
 {
+    if(fontWeight == FONTWEIGHT_NONE) {
+        fontWeight = FONTWEIGHT_normal;
+    }
+
+    if (fontStyle == FONTSTYLE_NONE) {
+        fontStyle = FONTSTYLE_normal;
+    }
+
     m_currentStyle = std::make_pair(fontWeight, fontStyle);
     if (m_textFont.count(m_currentStyle) == 0) {
         LogWarning("Text font for style (%d, %d) is not loaded. Use default", fontWeight, fontStyle);
