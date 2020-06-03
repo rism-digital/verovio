@@ -208,7 +208,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     // Use the syl because the content bounding box of the verse might be invalid at this stage
     int overlap = params->m_lastSyl->GetContentRight() - (firstSyl->GetContentLeft() + xShift);
-    overlap += lastSyl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
+    overlap += params->m_lastSyl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
 
     int nextFreeSpace = params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
 
