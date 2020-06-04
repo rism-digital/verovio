@@ -113,7 +113,7 @@ void display_usage()
     std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
     std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
     std::cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << std::endl;
-    std::cout << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << std::endl;
+    std::cout << " -t, --to <s>          Select output format: mei, pb-mei, svg, or midi (default is svg)" << std::endl;
     std::cout << " -v, --version         Display the version number" << std::endl;
     std::cout << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << std::endl;
 
@@ -413,8 +413,8 @@ int main(int argc, char **argv)
     }
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
-        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae")) {
-        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
+        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae") && (outformat != "pb-mei")) {
+        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
         exit(1);
     }
 
@@ -552,14 +552,15 @@ int main(int argc, char **argv)
         }
     }
     else {
+        const char *scoreBased = (outformat == "mei") ? "true" : "false";
+        outfile += ".mei";
         if (all_pages) {
-            toolkit.SetScoreBasedMei(true);
-            outfile += ".mei";
+            std::string params = vrv::StringFormat("{'scoreBased': %s}", scoreBased);
             if (std_output) {
-                std::cerr << "MEI output of all pages to standard output is not possible." << std::endl;
-                exit(1);
+                std::string output;
+                std::cout << toolkit.GetMEI(params);
             }
-            else if (!toolkit.SaveFile(outfile)) {
+            else if (!toolkit.SaveFile(outfile, params)) {
                 std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
                 exit(1);
             }
@@ -568,12 +569,16 @@ int main(int argc, char **argv)
             }
         }
         else {
+            std::string params = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d}", scoreBased, page);
             if (std_output) {
-                std::cout << toolkit.GetMEI(vrv::StringFormat("{'pageNo': %d}", page));
+                std::cout << toolkit.GetMEI(params);
+            }
+            else if (!toolkit.SaveFile(outfile, params)) {
+                std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
+                exit(1);
             }
             else {
-                std::cerr << "MEI output of one page is available only to standard output." << std::endl;
-                exit(1);
+                std::cerr << "Output written to " << outfile << "." << std::endl;
             }
         }
     }

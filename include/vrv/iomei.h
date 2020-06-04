@@ -157,7 +157,7 @@ class MEIOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
-    MEIOutput(Doc *doc, std::string filename);
+    MEIOutput(Doc *doc);
     virtual ~MEIOutput();
     ///@}
 
@@ -398,9 +398,7 @@ private:
 public:
     //
 private:
-    std::string m_filename;
     std::ostringstream m_streamStringOutput;
-    bool m_writeToStreamString;
     int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;

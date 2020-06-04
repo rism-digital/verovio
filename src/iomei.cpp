@@ -133,10 +133,8 @@ std::vector<std::string> MEIInput::s_editorialElementNames = { "abbr", "add", "a
 // MEIOutput
 //----------------------------------------------------------------------------
 
-MEIOutput::MEIOutput(Doc *doc, std::string filename) : Output(doc)
+MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 {
-    m_filename = filename;
-    m_writeToStreamString = false;
     m_page = -1;
     m_scoreBasedMEI = false;
 }
@@ -212,12 +210,7 @@ bool MEIOutput::Export()
             output_flags |= pugi::format_no_escapes;
         }
 
-        if (m_writeToStreamString) {
-            meiDoc.save(m_streamStringOutput, "    ", output_flags);
-        }
-        else {
-            meiDoc.save_file(m_filename.c_str(), "    ", output_flags);
-        }
+        meiDoc.save(m_streamStringOutput, "    ", output_flags);
     }
     catch (char *str) {
         LogError("%s", str);
@@ -229,10 +222,8 @@ bool MEIOutput::Export()
 
 std::string MEIOutput::GetOutput(int page)
 {
-    m_writeToStreamString = true;
     m_page = page;
     this->Export();
-    m_writeToStreamString = false;
     m_page = -1;
 
     return m_streamStringOutput.str();
