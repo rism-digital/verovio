@@ -62,6 +62,11 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
     //
 public:
