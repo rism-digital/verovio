@@ -1345,64 +1345,56 @@ int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
     return y;
 }
 
-int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphHeight(wchar_t code, const FontInfo &font, bool graceSize) const
 {
-    assert(font);
-
     int x, y, w, h;
     Glyph *glyph = Resources::GetTextGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
-    h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
+    h = h * font.GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) h = h * this->m_options->m_graceFactor.GetValue();
     return h;
 }
 
-int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphWidth(wchar_t code, const FontInfo &font, bool graceSize) const
 {
-    assert(font);
-
     int x, y, w, h;
     Glyph *glyph = Resources::GetTextGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
-    w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
+    w = w * font.GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) w = w * this->m_options->m_graceFactor.GetValue();
     return w;
 }
 
-int Doc::GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphAdvX(wchar_t code, const FontInfo &font, bool graceSize) const
 {
-    assert(font);
-
     Glyph *glyph = Resources::GetTextGlyph(code);
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
-    advX = advX * font->GetPointSize() / glyph->GetUnitsPerEm();
+    advX = advX * font.GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) advX = advX * this->m_options->m_graceFactor.GetValue();
     return advX;
 }
 
-int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const
+int Doc::GetTextGlyphDescender(wchar_t code, const FontInfo &font, bool graceSize) const
 {
-    assert(font);
-
     int x, y, w, h;
     Glyph *glyph = Resources::GetTextGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
-    y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
+    y = y * font.GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) y = y * this->m_options->m_graceFactor.GetValue();
     return y;
 }
 
-int Doc::GetTextLineHeight(FontInfo *font, bool graceSize) const
+int Doc::GetTextLineHeight(const FontInfo &font, bool graceSize) const
 {
     int descender = -this->GetTextGlyphDescender(L'q', font, graceSize);
     int height = this->GetTextGlyphHeight(L'I', font, graceSize);
 
     int lineHeight = ((descender + height) * 1.1);
-    if (font->GetSupSubScript()) lineHeight /= SUPER_SCRIPT_FACTOR;
+    if (font.GetSupSubScript()) lineHeight /= SUPER_SCRIPT_FACTOR;
 
     return lineHeight;
 }
@@ -1489,19 +1481,19 @@ int Doc::GetCueSize(int value) const
     return value * this->m_options->m_graceFactor.GetValue();
 }
 
-FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
+FontInfo &Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
 {
     m_drawingSmuflFont.SetFaceName(m_options->m_font.GetValue().c_str());
     int value = m_drawingSmuflFontSize * staffSize / 100;
     if (graceSize) value = value * this->m_options->m_graceFactor.GetValue();
     m_drawingSmuflFont.SetPointSize(value);
-    return &m_drawingSmuflFont;
+    return m_drawingSmuflFont;
 }
 
-FontInfo *Doc::GetDrawingLyricFont(int staffSize)
+FontInfo &Doc::GetDrawingLyricFont(int staffSize)
 {
     m_drawingLyricFont.SetPointSize(m_drawingLyricFontSize * staffSize / 100);
-    return &m_drawingLyricFont;
+    return m_drawingLyricFont;
 }
 
 double Doc::GetLeftMargin(const ClassId classId) const

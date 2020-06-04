@@ -88,7 +88,7 @@ void View::DrawDynamString(DeviceContext *dc, std::wstring str, TextDrawingParam
                 FontInfo vrvTxt;
                 vrvTxt.SetFaceName("VerovioText");
                 vrvTxt.SetStyle(FONTSTYLE_normal);
-                dc->SetFont(&vrvTxt);
+                dc->SetFont(vrvTxt);
                 DrawTextString(dc, smuflStr, params);
                 dc->ResetFont();
             }
@@ -140,7 +140,7 @@ void View::DrawHarmString(DeviceContext *dc, std::wstring str, TextDrawingParams
 
             FontInfo vrvTxt;
             vrvTxt.SetFaceName("VerovioText");
-            dc->SetFont(&vrvTxt);
+            dc->SetFont(vrvTxt);
             // Once we have rendered the some text to not pass x / y anymore
             dc->DrawText(UTF16to8(smuflAccid), smuflAccid, toDcX, toDcY);
             dc->ResetFont();
@@ -209,7 +209,7 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize)
 
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
-        dc->SetFont(&vrvTxt);
+        dc->SetFont(vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
         dc->DrawText(UTF16to8(str), str);
@@ -224,7 +224,7 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 
     dc->StartTextGraphic(lb, "", lb->GetUuid());
 
-    FontInfo *currentFont = dc->GetFont();
+    const FontInfo &currentFont = dc->GetFont();
 
     params.m_y -= m_doc->GetTextLineHeight(currentFont, false);
     params.m_newLine = true;
@@ -316,11 +316,10 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }
 
-    if (customFont) dc->SetFont(&rendFont);
+    if (customFont) dc->SetFont(rendFont);
 
     int yShift = 0;
     if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
-        assert(dc->GetFont());
         int MHeight = m_doc->GetTextGlyphHeight('M', dc->GetFont(), false);
         if (rend->GetRend() == TEXTRENDITION_sup) {
             yShift = m_doc->GetTextGlyphHeight('o', dc->GetFont(), false);
@@ -331,8 +330,8 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         }
         params.m_y += yShift;
         params.m_verticalShift = true;
-        dc->GetFont()->SetSupSubScript(true);
-        dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() * SUPER_SCRIPT_FACTOR);
+        dc->GetFont().SetSupSubScript(true);
+        dc->GetFont().SetPointSize(dc->GetFont().GetPointSize() * SUPER_SCRIPT_FACTOR);
     }
 
     DrawTextChildren(dc, rend, params);
@@ -340,8 +339,8 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
     if ((rend->GetRend() == TEXTRENDITION_sup) || (rend->GetRend() == TEXTRENDITION_sub)) {
         params.m_y -= yShift;
         params.m_verticalShift = true;
-        dc->GetFont()->SetSupSubScript(false);
-        dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
+        dc->GetFont().SetSupSubScript(false);
+        dc->GetFont().SetPointSize(dc->GetFont().GetPointSize() / SUPER_SCRIPT_FACTOR);
     }
 
     if (customFont) dc->ResetFont();
@@ -356,7 +355,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     dc->StartTextGraphic(text, "", text->GetUuid());
 
-    Resources::SelectTextFont(dc->GetFont()->GetWeight(), dc->GetFont()->GetStyle());
+    Resources::SelectTextFont(dc->GetFont().GetWeight(), dc->GetFont().GetStyle());
 
     if (params.m_newLine) {
         dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);

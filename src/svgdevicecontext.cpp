@@ -713,22 +713,22 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
     // is not added between tspan elements
     m_currentNode.append_attribute("font-size") = "0px";
     //
-    if (!m_fontStack.top()->GetFaceName().empty()) {
-        m_currentNode.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
+    if (!m_fontStack.top().GetFaceName().empty()) {
+        m_currentNode.append_attribute("font-family") = m_fontStack.top().GetFaceName().c_str();
     }
-    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
+    if (m_fontStack.top().GetStyle() != FONTSTYLE_NONE) {
+        if (m_fontStack.top().GetStyle() == FONTSTYLE_italic) {
             m_currentNode.append_attribute("font-style") = "italic";
         }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+        else if (m_fontStack.top().GetStyle() == FONTSTYLE_normal) {
             m_currentNode.append_attribute("font-style") = "normal";
         }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
+        else if (m_fontStack.top().GetStyle() == FONTSTYLE_oblique) {
             m_currentNode.append_attribute("font-style") = "oblique";
         }
     }
-    if (m_fontStack.top()->GetWeight() != FONTWEIGHT_NONE) {
-        if (m_fontStack.top()->GetWeight() == FONTWEIGHT_bold) {
+    if (m_fontStack.top().GetWeight() != FONTWEIGHT_NONE) {
+        if (m_fontStack.top().GetWeight() == FONTWEIGHT_bold) {
             m_currentNode.append_attribute("font-weight") = "bold";
         }
     }
@@ -763,8 +763,6 @@ void SvgDeviceContext::EndText()
 
 void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
 {
-    assert(m_fontStack.top());
-
     std::string svgText = text;
     // Because IE does not support xml:space="preserve", we need to replace the initial
     // space with a non breakable space
@@ -777,28 +775,28 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
 
     std::string currentFaceName
         = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
-    std::string fontFaceName = m_fontStack.top()->GetFaceName();
+    const std::string &fontFaceName = m_fontStack.top().GetFaceName();
 
     pugi::xml_node textChild = AppendChild("tspan");
     // We still add @xml::space (No: this seems to create problems with Safari)
     // textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
-        textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
+        textChild.append_attribute("font-family") = m_fontStack.top().GetFaceName().c_str();
         // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
         if (fontFaceName == "VerovioText") this->VrvTextFont();
     }
-    if (m_fontStack.top()->GetPointSize() != 0) {
-        textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+    if (m_fontStack.top().GetPointSize() != 0) {
+        textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top().GetPointSize()).c_str();
     }
-    if (m_fontStack.top()->GetStyle() != FONTSIZE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
+    if (m_fontStack.top().GetStyle() != FONTSIZE_NONE) {
+        if (m_fontStack.top().GetStyle() == FONTSTYLE_italic) {
             textChild.append_attribute("font-style") = "italic";
         }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+        else if (m_fontStack.top().GetStyle() == FONTSTYLE_normal) {
             textChild.append_attribute("font-style") = "normal";
         }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
+        else if (m_fontStack.top().GetStyle() == FONTSTYLE_oblique) {
             textChild.append_attribute("font-style") = "oblique";
         }
     }
@@ -818,8 +816,6 @@ void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, do
 
 void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
-    assert(m_fontStack.top());
-
     int w, h, gx, gy;
 
     // print chars one by one
@@ -844,15 +840,15 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         useChild.append_attribute("href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
-        useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-        useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top().GetPointSize()).c_str();
+        useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top().GetPointSize()).c_str();
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)
-            x += glyph->GetHorizAdvX() * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+            x += glyph->GetHorizAdvX() * m_fontStack.top().GetPointSize() / glyph->GetUnitsPerEm();
         else {
             glyph->GetBoundingBox(gx, gy, w, h);
-            x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+            x += w * m_fontStack.top().GetPointSize() / glyph->GetUnitsPerEm();
         }
     }
 }

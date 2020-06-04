@@ -1390,20 +1390,19 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    FontInfo currentFont;
-    if (staff->m_drawingStaffDef) {
-        currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        dc->SetFont(&currentFont);
+    FontInfo currentFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+    if (syl->HasFontweight()) {
+        currentFont.SetWeight(syl->GetFontweight());
     }
-    else {
-        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
+    if (syl->HasFontstyle()) {
+        currentFont.SetStyle(syl->GetFontstyle());
     }
+    dc->SetFont(currentFont);
 
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
-    assert(dc->GetFont());
-    params.m_pointSize = dc->GetFont()->GetPointSize();
+    params.m_pointSize = dc->GetFont().GetPointSize();
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
     DrawTextChildren(dc, syl, params);
@@ -1413,7 +1412,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->DeactivateGraphic();
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
-        dc->SetFont(&vrvTxt);
+        dc->SetFont(vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
         dc->DrawText(UTF16to8(str), str);
@@ -1650,7 +1649,7 @@ int View::GetFYRel(F *f, Staff *staff)
     int line = fb->GetDescendantIndex(f, FIGURE, UNLIMITED_DEPTH);
 
     if (line > 0) {
-        FontInfo *fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        const FontInfo &fFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int lineHeight = m_doc->GetTextLineHeight(fFont, false);
         y -= (line * lineHeight);
     }
@@ -1665,7 +1664,7 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
     int y = 0;
     StaffAlignment *alignment = staff->GetAlignment();
     if (alignment) {
-        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        const FontInfo &lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);

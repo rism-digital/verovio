@@ -333,7 +333,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     if (params->m_classId == SYL) {
         if (this->GetVerseCount() > 0) {
-            FontInfo *lyricFont = params->m_doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
+            const FontInfo &lyricFont = params->m_doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
             int descender = params->m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
             int height = params->m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
             int margin = params->m_doc->GetBottomMargin(SYL) * params->m_doc->GetDrawingUnit(staffSize);

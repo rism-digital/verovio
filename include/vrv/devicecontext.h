@@ -98,7 +98,7 @@ public:
     ///@{
     void SetBrush(int colour, int opacity);
     void SetPen(int colour, int width, int opacity, int dashLength = 0, int lineCap = 0);
-    void SetFont(FontInfo *font);
+    void SetFont(FontInfo &font);
     void ResetBrush();
     void ResetPen();
     void ResetFont();
@@ -114,7 +114,7 @@ public:
      * @name Getters
      */
     ///@{
-    FontInfo *GetFont();
+    FontInfo &GetFont();
     ///@}
 
     /**
@@ -274,7 +274,7 @@ public:
 protected:
     std::stack<Pen> m_penStack;
     std::stack<Brush> m_brushStack;
-    std::stack<FontInfo *> m_fontStack;
+    std::stack<FontInfo> m_fontStack;
 
     /** flag for indicating if the graphic is deactivated */
     bool m_isDeactivatedX;

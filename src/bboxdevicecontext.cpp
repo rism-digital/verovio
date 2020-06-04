@@ -278,8 +278,6 @@ void BBoxDeviceContext::MoveTextVerticallyTo(int y)
 
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
 {
-    assert(m_fontStack.top());
-
     if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
         m_textX = x;
         m_textY = y;
@@ -312,8 +310,6 @@ void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, d
 
 void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
-    assert(m_fontStack.top());
-
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
 
@@ -329,15 +325,15 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
         glyph->GetBoundingBox(g_x, g_y, g_w, g_h);
         int advX = glyph->GetHorizAdvX();
 
-        int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        int x_off = x + g_x * m_fontStack.top().GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position is already flipped
-        int y_off = y - g_y * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        int y_off = y - g_y * m_fontStack.top().GetPointSize() / glyph->GetUnitsPerEm();
 
-        UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
+        UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top().GetPointSize() / glyph->GetUnitsPerEm(),
             // idem, y position is flipped
-            y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(), smuflGlyph);
+            y_off - g_h * m_fontStack.top().GetPointSize() / glyph->GetUnitsPerEm(), smuflGlyph);
 
-        lastCharWidth = advX * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        lastCharWidth = advX * m_fontStack.top().GetPointSize() / glyph->GetUnitsPerEm();
         x += lastCharWidth; // move x to next char
     }
 }
@@ -371,11 +367,11 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
     // object)
     if (!m_isDeactivatedX) {
         (m_objects.back())->UpdateSelfBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
-        if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top()->GetPointSize());
+        if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top().GetPointSize());
     }
     if (!m_isDeactivatedY) {
         (m_objects.back())->UpdateSelfBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
-        if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top()->GetPointSize());
+        if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top().GetPointSize());
     }
 
     int i;

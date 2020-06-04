@@ -464,11 +464,11 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     if (!dc->UseGlobalStyling()) {
         labelTxt.SetFaceName("Times");
     }
-    labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staffSize)->GetPointSize());
+    labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staffSize).GetPointSize());
 
     int lineCount = graphic->GetChildCount(LB) + 1;
     if (lineCount > 1) {
-        y += (m_doc->GetTextLineHeight(&labelTxt, false) * (lineCount - 1) / 2);
+        y += (m_doc->GetTextLineHeight(labelTxt, false) * (lineCount - 1) / 2);
     }
 
     TextDrawingParams params;
@@ -477,7 +477,7 @@ void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Objec
     params.m_pointSize = labelTxt.GetPointSize();
 
     dc->SetBrush(m_currentColour, AxSOLID);
-    dc->SetFont(&labelTxt);
+    dc->SetFont(labelTxt);
 
     dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -941,12 +941,12 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = staff->GetDrawingX();
         params.m_y = staff->GetDrawingY() + 1.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize() * 4 / 5;
+        params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize).GetPointSize() * 4 / 5;
 
         mnumTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&mnumTxt);
+        dc->SetFont(mnumTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
         DrawTextChildren(dc, mnum, params);

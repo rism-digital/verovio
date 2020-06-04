@@ -158,11 +158,11 @@ public:
      * The staff size must already be taken into account in the FontInfo
      */
     ///@{
-    int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextGlyphAdvX(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
-    int GetTextLineHeight(FontInfo *font, bool graceSize) const;
+    int GetTextGlyphHeight(wchar_t code, const FontInfo &font, bool graceSize) const;
+    int GetTextGlyphWidth(wchar_t code, const FontInfo &font, bool graceSize) const;
+    int GetTextGlyphAdvX(wchar_t code, const FontInfo &font, bool graceSize) const;
+    int GetTextGlyphDescender(wchar_t code, const FontInfo &font, bool graceSize) const;
+    int GetTextLineHeight(const FontInfo &font, bool graceSize) const;
     ///@}
 
     /**
@@ -170,8 +170,8 @@ public:
      * (no const because the size of the member font is changed)
      */
     ///@{
-    FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
-    FontInfo *GetDrawingLyricFont(int staffSize);
+    FontInfo &GetDrawingSmuflFont(int staffSize, bool graceSize);
+    FontInfo &GetDrawingLyricFont(int staffSize);
     ///@}
 
     /**

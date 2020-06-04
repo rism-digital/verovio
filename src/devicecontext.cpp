@@ -69,19 +69,18 @@ void DeviceContext::SetBrush(int colour, int opacity)
     m_brushStack.push(Brush(colour, opacityValue));
 }
 
-void DeviceContext::SetFont(FontInfo *font)
+void DeviceContext::SetFont(FontInfo &font)
 {
     // If we have a previous font on the stack and the new font has not size,
     // pass it because we need a font size in all cases
-    if ((m_fontStack.size() > 0) && (font->GetPointSize() == 0)) {
-        font->SetPointSize(m_fontStack.top()->GetPointSize());
+    if ((m_fontStack.size() > 0) && (font.GetPointSize() == 0)) {
+        font.SetPointSize(m_fontStack.top().GetPointSize());
     }
     m_fontStack.push(font);
 }
 
-FontInfo *DeviceContext::GetFont()
+FontInfo &DeviceContext::GetFont()
 {
-    assert(m_fontStack.top());
     return m_fontStack.top();
 }
 
@@ -134,7 +133,6 @@ void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend,
 
 void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend, bool typeSize)
 {
-    assert(m_fontStack.top());
     assert(extend);
 
     extend->m_width = 0;
@@ -163,7 +161,6 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
 
 void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *extend)
 {
-    assert(m_fontStack.top());
     assert(extend);
 
     extend->m_width = 0;
@@ -189,17 +186,17 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
 
     glyph->GetBoundingBox(x, y, partialWidth, partialHeight);
 
-    tmp = partialWidth * m_fontStack.top()->GetPointSize();
+    tmp = partialWidth * m_fontStack.top().GetPointSize();
     partialWidth = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    tmp = partialHeight * m_fontStack.top()->GetPointSize();
+    tmp = partialHeight * m_fontStack.top().GetPointSize();
     partialHeight = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    tmp = y * m_fontStack.top()->GetPointSize();
+    tmp = y * m_fontStack.top().GetPointSize();
     y = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    tmp = x * m_fontStack.top()->GetPointSize();
+    tmp = x * m_fontStack.top().GetPointSize();
     x = ceil(tmp / (double)glyph->GetUnitsPerEm());
 
     advX = glyph->GetHorizAdvX();
-    tmp = advX * m_fontStack.top()->GetPointSize();
+    tmp = advX * m_fontStack.top().GetPointSize();
     advX = ceil(tmp / (double)glyph->GetUnitsPerEm());
 
     extend->m_width += std::max(partialWidth + x, advX);

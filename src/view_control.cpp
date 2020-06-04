@@ -1359,12 +1359,12 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         }
 
         params.m_y = dir->GetDrawingY();
-        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize).GetPointSize();
 
         dirTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&dirTxt);
+        dc->SetFont(dirTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
         DrawTextChildren(dc, dir, params);
@@ -1421,7 +1421,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         }
 
         params.m_y = dynam->GetDrawingY();
-        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize).GetPointSize();
 
         dynamTxt.SetPointSize(params.m_pointSize);
 
@@ -1435,7 +1435,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         }
         else {
             dc->SetBrush(m_currentColour, AxSOLID);
-            dc->SetFont(&dynamTxt);
+            dc->SetFont(dynamTxt);
 
             dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
             DrawTextChildren(dc, dynam, params);
@@ -1456,11 +1456,11 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &pa
 
     dc->StartGraphic(fb, "", fb->GetUuid());
 
-    FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+    FontInfo &fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     int lineHeight = m_doc->GetTextLineHeight(fontDim, false);
     int startX = params.m_x;
 
-    fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
+    fontDim.SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize).GetPointSize());
 
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(fontDim);
@@ -1586,12 +1586,12 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), params);
         }
         else {
-            params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+            params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize).GetPointSize();
 
             harmTxt.SetPointSize(params.m_pointSize);
 
             dc->SetBrush(m_currentColour, AxSOLID);
-            dc->SetFont(&harmTxt);
+            dc->SetFont(harmTxt);
 
             dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
             DrawTextChildren(dc, harm, params);
@@ -1816,12 +1816,12 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         }
 
         params.m_y = tempo->GetDrawingY();
-        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize).GetPointSize();
 
         tempoTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&tempoTxt);
+        dc->SetFont(tempoTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
         DrawTextChildren(dc, tempo, params);
@@ -2108,10 +2108,10 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         int y1 = ending->GetDrawingY();
 
-        FontInfo currentFont = *m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize);
+        FontInfo &currentFont = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize);
         // currentFont.SetWeight(FONTWEIGHT_bold);
         // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
-        dc->SetFont(&currentFont);
+        dc->SetFont(currentFont);
 
         TextExtend extend;
         dc->GetTextExtent("M", &extend, false);

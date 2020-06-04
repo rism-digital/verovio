@@ -92,7 +92,7 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     }
     // Elision
     else if (con == sylLog_CON_b) {
-        FontInfo *fFont = doc->GetDrawingLyricFont(staffSize);
+        const FontInfo &fFont = doc->GetDrawingLyricFont(staffSize);
         int elisionSpace = doc->GetTextGlyphAdvX(VRV_TEXT_E551, fFont, false);
         // Adjust it proportionally to the lyric size
         elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
