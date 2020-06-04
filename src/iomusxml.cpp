@@ -1808,6 +1808,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
             else if (HasAttributeWithValue(wedge.node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
             }
+            if (wedge.node().attribute("niente")) {
+                hairpin->SetNiente(ConvertWordToBool(wedge.node().attribute("niente").as_string()));
+            }
             hairpin->SetColor(wedge.node().attribute("color").as_string());
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
             hairpin->SetTstamp(timeStamp);
