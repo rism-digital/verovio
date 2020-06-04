@@ -1788,6 +1788,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 if (iter->second.m_dirN == hairpinNumber) {
                     int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
                     iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    if (wedge.node().attribute("spread")) {
+                        iter->first->SetOpening(wedge.node().attribute("spread").as_double() / 5);
+                    }
                     m_hairpinStack.erase(iter);
                     return;
                 }

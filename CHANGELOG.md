@@ -1,6 +1,9 @@
 # Changelog
 
 ## [unreleased]
+* Support for `hairpin@opening` (@rettinghaus)
+* Support for `@dynam.dist` and `@harm.dist` (@rettinghaus)
+* Support for pedal lines (@rettinghaus)
 
 ## [2.7.1] - 2020-05-22
 * Fix bug with mensural clefs not displaying
