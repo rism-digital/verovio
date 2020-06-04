@@ -64,7 +64,8 @@ std::string Resources::s_path = "/usr/local/share/verovio";
 Resources::GlyphTextMap Resources::s_textFont;
 Resources::GlyphMap Resources::s_font;
 Resources::StyleAttributes Resources::s_currentStyle;
-const Resources::StyleAttributes Resources::k_defaultStyle{data_FONTWEIGHT::FONTWEIGHT_normal, data_FONTSTYLE::FONTSTYLE_normal};
+const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
+    data_FONTSTYLE::FONTSTYLE_normal };
 
 //----------------------------------------------------------------------------
 // Font related methods
@@ -90,11 +91,11 @@ bool Resources::InitFonts()
     };
 
     static const TextFontInfo_type textFontInfos[] = {
-        {k_defaultStyle, "Times", true},
-        {k_defaultStyle, "VerovioText-1.0", true},
-        {{FONTWEIGHT_bold, FONTSTYLE_normal}, "Times-bold", false},
-        {{FONTWEIGHT_bold, FONTSTYLE_italic}, "Times-bold-italic", false},
-        {{FONTWEIGHT_normal, FONTSTYLE_italic}, "Times-italic", false},
+        { k_defaultStyle, "Times", true },
+        { k_defaultStyle, "VerovioText-1.0", true },
+        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
+        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
+        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false },
     };
 
     for (const auto &textFontInfo : textFontInfos) {
@@ -122,7 +123,7 @@ Glyph *Resources::GetGlyph(wchar_t smuflCode)
 
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
 {
-    if(fontWeight == FONTWEIGHT_NONE) {
+    if (fontWeight == FONTWEIGHT_NONE) {
         fontWeight = FONTWEIGHT_normal;
     }
 
