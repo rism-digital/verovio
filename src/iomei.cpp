@@ -1219,6 +1219,7 @@ void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     WriteTimeSpanningInterface(currentNode, hairpin);
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
+    hairpin->WriteHairpinVis(currentNode);
     hairpin->WritePlacement(currentNode);
     hairpin->WriteVerticalGroup(currentNode);
 }
@@ -3985,6 +3986,7 @@ bool MEIInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     ReadTimeSpanningInterface(hairpin, vrvHairpin);
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
+    vrvHairpin->ReadHairpinVis(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
     vrvHairpin->ReadVerticalGroup(hairpin);
 

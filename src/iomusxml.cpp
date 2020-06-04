@@ -1788,6 +1788,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 if (iter->second.m_dirN == hairpinNumber) {
                     int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
                     iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
+                    if (wedge.node().attribute("spread")) {
+                        iter->first->SetOpening(wedge.node().attribute("spread").as_double() / 5);
+                    }
                     m_hairpinStack.erase(iter);
                     return;
                 }
@@ -1804,6 +1807,10 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             else if (HasAttributeWithValue(wedge.node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
+            }
+            // hairpin->SetLform(hairpin->AttLineRendBase::StrToLineform(wedge.node().attribute("line-type").as_string()));
+            if (wedge.node().attribute("niente")) {
+                hairpin->SetNiente(ConvertWordToBool(wedge.node().attribute("niente").as_string()));
             }
             hairpin->SetColor(wedge.node().attribute("color").as_string());
             hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
@@ -2384,7 +2391,9 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xpath_node notehead = node.select_node("notehead");
         if (notehead) {
             note->SetHeadColor(notehead.node().attribute("color").as_string());
-            // if (notehead.node().attribute("parentheses").as_bool()) note->SetEnclose(ENCLOSURE_paren);
+            note->SetHeadShape(ConvertNotehead(notehead.node().text().as_string()));
+            if (notehead.node().attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
+            if (!std::strncmp(notehead.node().text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
         }
 
         // look at the next note to see if we are starting or ending a chord
@@ -3184,6 +3193,34 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(std::string value)
         LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
         return L"";
     }
+}
+
+data_HEADSHAPE MusicXmlInput::ConvertNotehead(std::string value)
+{
+    if (value == "slash")
+        return HEADSHAPE_slash;
+    else if (value == "triangle")
+        return HEADSHAPE_rtriangle;
+    else if (value == "diamond")
+        return HEADSHAPE_diamond;
+    else if (value == "square")
+        return HEADSHAPE_square;
+    else if (value == "cross")
+        return HEADSHAPE_plus;
+    else if (value == "x")
+        return HEADSHAPE_slash;
+    else if (value == "circle-x")
+        return HEADSHAPE_slash;
+    else if (value == "inverted triangle")
+        return HEADSHAPE_slash;
+    else if (value == "arrow down")
+        return HEADSHAPE_slash;
+    else if (value == "arrow up")
+        return HEADSHAPE_slash;
+    else if (value == "circle dot")
+        return HEADSHAPE_circle;
+    else
+        return HEADSHAPE_NONE;
 }
 
 data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(std::string value)
