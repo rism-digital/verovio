@@ -51,6 +51,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_svgViewBox = false;
     m_html5 = false;
     m_facsimile = false;
+    m_indent = 2;
 
     // create the initial SVG element
     // width and height need to be set later; these are taken care of in "commit"
@@ -147,7 +148,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         .set_value(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
 
     // save the glyph data to m_outdata
-    m_svgDoc.save(m_outdata, "\t", output_flags);
+    std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
+    m_svgDoc.save(m_outdata, indent.c_str(), output_flags);
 
     m_committed = true;
 }

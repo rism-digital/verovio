@@ -698,6 +698,10 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
+
+    int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
+    meioutput.SetIndent(indent);
+
     std::string output = meioutput.GetOutput(pageNo);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
@@ -1245,6 +1249,9 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
+
+    int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
+    svg.SetIndent(indent);
 
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);

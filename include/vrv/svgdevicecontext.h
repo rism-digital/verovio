@@ -193,6 +193,11 @@ public:
      */
     void SetHtml5(bool html5) { m_html5 = html5; }
 
+    /**
+     * Setter for indent of the SVG (default is 3, -1 for tabs)
+     */
+    void SetIndent(int indent) { m_indent = indent; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -266,6 +271,8 @@ private:
     bool m_svgViewBox;
     // output HTML5 data-* attributes
     bool m_html5;
+    // indentation value (-1 for tabs)
+    int m_indent;
 };
 
 } // namespace vrv

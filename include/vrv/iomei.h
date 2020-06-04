@@ -182,9 +182,14 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Setter for score-based MEI output (not implemented)
+     * Setter for score-based MEI output
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+
+    /**
+     * Setter for indent for the MEI output (default is 3, -1 for tabs)
+     */
+    void SetIndent(int indent) { m_indent = indent; }
 
 private:
     bool WriteDoc(Doc *doc);
@@ -399,6 +404,7 @@ public:
     //
 private:
     std::ostringstream m_streamStringOutput;
+    int m_indent;
     int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;

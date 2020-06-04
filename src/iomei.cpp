@@ -136,6 +136,7 @@ std::vector<std::string> MEIInput::s_editorialElementNames = { "abbr", "add", "a
 MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 {
     m_page = -1;
+    m_indent = 5;
     m_scoreBasedMEI = false;
 }
 
@@ -210,7 +211,8 @@ bool MEIOutput::Export()
             output_flags |= pugi::format_no_escapes;
         }
 
-        meiDoc.save(m_streamStringOutput, "    ", output_flags);
+        std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
+        meiDoc.save(m_streamStringOutput, indent.c_str(), output_flags);
     }
     catch (char *str) {
         LogError("%s", str);
