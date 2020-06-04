@@ -191,6 +191,11 @@ public:
      */
     void SetIndent(int indent) { m_indent = indent; }
 
+    /**
+     * Setter for remove Ids flag for the MEI output (default is false)
+     */
+    void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
+
 private:
     bool WriteDoc(Doc *doc);
 
@@ -411,6 +416,8 @@ private:
     /** @name Current element */
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_nodeStack;
+    bool m_removeIds;
+    ListOfObjects m_referredObjects;
 };
 
 //----------------------------------------------------------------------------

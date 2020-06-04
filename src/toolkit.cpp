@@ -675,6 +675,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
     int pageNo = 0;
+    bool removeIds = false;
 
     jsonxx::Object json;
 
@@ -685,6 +686,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     else {
         if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
         if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+        if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
     }
 
     if (GetPageCount() == 0) {
@@ -701,6 +703,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 
     int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
     meioutput.SetIndent(indent);
+    meioutput.SetRemoveIds(removeIds);
 
     std::string output = meioutput.GetOutput(pageNo);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);

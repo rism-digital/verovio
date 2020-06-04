@@ -540,6 +540,11 @@ public:
     virtual int FindAllBetween(FunctorParams *functorParams);
 
     /**
+     * Find a all Object to which another object points to in the data.
+     */
+    virtual int FindAllReferencedObjects(FunctorParams *functorParams);
+
+    /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
      */
     virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }

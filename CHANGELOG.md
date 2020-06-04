@@ -5,6 +5,7 @@
 * Support for `@dynam.dist` and `@harm.dist` (@rettinghaus)
 * Support for pedal lines (@rettinghaus)
 * Options for controlling output tabs (--output-indent and --output-indent-tab)
+* Option to remove ids in the MEI output (--remove-ids) to be passed to GetMEI with the JS toolkit
 
 ## [2.7.1] - 2020-05-22
 * Fix bug with mensural clefs not displaying

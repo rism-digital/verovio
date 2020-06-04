@@ -157,7 +157,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y = staff->GetDrawingY()
             - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
     }
-    
+
     if (mensur->GetSign() == MENSURATIONSIGN_O) {
         code = SMUFL_E911_mensuralProlation2;
     }

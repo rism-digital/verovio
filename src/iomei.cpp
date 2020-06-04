@@ -138,12 +138,21 @@ MEIOutput::MEIOutput(Doc *doc) : Output(doc)
     m_page = -1;
     m_indent = 5;
     m_scoreBasedMEI = false;
+    m_removeIds = false;
 }
 
 MEIOutput::~MEIOutput() {}
 
 bool MEIOutput::Export()
 {
+
+    if (m_removeIds) {
+        FindAllReferencedObjectsParams findAllReferencedObjectsParams(&m_referredObjects);
+        Functor findAllReferencedObjects(&Object::FindAllReferencedObjects);
+        m_doc->Process(&findAllReferencedObjects, &findAllReferencedObjectsParams);
+        m_referredObjects.unique();
+    }
+
     try {
         pugi::xml_document meiDoc;
 
@@ -760,6 +769,11 @@ std::string MEIOutput::UuidToMeiStr(Object *element)
 
 void MEIOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
 {
+    if (m_removeIds) {
+        ListOfObjects::iterator it = std::find(m_referredObjects.begin(), m_referredObjects.end(), object);
+        if (it == m_referredObjects.end()) return;
+        m_referredObjects.erase(it);
+    }
     currentNode.append_attribute("xml:id") = UuidToMeiStr(object).c_str();
 }
 

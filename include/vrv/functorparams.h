@@ -1049,6 +1049,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindAllReferencedObjectsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: an array of all matching objects
+ **/
+
+class FindAllReferencedObjectsParams : public FunctorParams {
+public:
+    FindAllReferencedObjectsParams(ListOfObjects *elements) { m_elements = elements; }
+    ListOfObjects *m_elements;
+};
+
+//----------------------------------------------------------------------------
 // FindAllByComparisonParams
 //----------------------------------------------------------------------------
 
