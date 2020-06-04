@@ -92,7 +92,7 @@ bool Neume::IsLastInNeume(LayerElement *element)
 
 NeumeGroup Neume::GetNeumeGroup()
 {
-    ArrayOfObjects children;
+    ListOfObjects children;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&children, &ac);
 
@@ -125,7 +125,7 @@ NeumeGroup Neume::GetNeumeGroup()
 std::vector<int> Neume::GetPitchDifferences()
 {
     std::vector<int> pitchDifferences;
-    ArrayOfObjects ncChildren;
+    ListOfObjects ncChildren;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&ncChildren, &ac);
 
@@ -148,7 +148,7 @@ std::vector<int> Neume::GetPitchDifferences()
 
 bool Neume::GenerateChildMelodic()
 {
-    ArrayOfObjects children;
+    ListOfObjects children;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&children, &ac);
 
@@ -184,7 +184,7 @@ bool Neume::GenerateChildMelodic()
 
 PitchInterface *Neume::GetHighestPitch()
 {
-    ArrayOfObjects pitchChildren;
+    ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
     this->FindAllDescendantByComparison(&pitchChildren, &ic);
 
@@ -203,7 +203,7 @@ PitchInterface *Neume::GetHighestPitch()
 
 PitchInterface *Neume::GetLowestPitch()
 {
-    ArrayOfObjects pitchChildren;
+    ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
     this->FindAllDescendantByComparison(&pitchChildren, &ic);
 

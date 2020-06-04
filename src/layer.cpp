@@ -213,7 +213,7 @@ Clef *Layer::GetClefFacs(LayerElement *test)
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     if (doc->GetType() == Facs) {
-        ArrayOfObjects clefs;
+        ListOfObjects clefs;
         ClassIdComparison ac(CLEF);
         doc->FindAllDescendantBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
         if (clefs.size() > 0) {

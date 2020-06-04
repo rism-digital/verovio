@@ -455,7 +455,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
             return false;
         }
 
-        ArrayOfObjects lyric;
+        ListOfObjects lyric;
         ClassIdsComparison lyricsComparison({ VERSE, SYL });
         currentNote->FindAllDescendantByComparison(&lyric, &lyricsComparison);
         if (!lyric.empty()) {
@@ -481,7 +481,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         Note *note = new Note();
         chord->AddChild(note);
 
-        ArrayOfObjects artics;
+        ListOfObjects artics;
         ClassIdComparison articComparison(ARTIC);
         currentNote->FindAllDescendantByComparison(&artics, &articComparison);
         for (auto &artic : artics) {
@@ -536,7 +536,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             chord->DetachChild(otherNote->GetIdx());
             parent->ReplaceChild(chord, otherNote);
 
-            ArrayOfObjects artics;
+            ListOfObjects artics;
             ClassIdComparison articComparison(ARTIC);
             chord->FindAllDescendantByComparison(&artics, &articComparison, 1);
             for (auto &artic : artics) {

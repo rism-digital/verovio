@@ -427,15 +427,14 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     // First get all artic children
     ClassIdComparison matchType(ARTIC);
-    ArrayOfObjects artics;
-    ArrayOfObjects::iterator articIter;
+    ListOfObjects artics;
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         start->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
-        for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
-            Artic *artic = dynamic_cast<Artic *>(*articIter);
+        for (auto &object : artics) {
+            Artic *artic = dynamic_cast<Artic *>(object);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
@@ -452,8 +451,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         end->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
-        for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
-            Artic *artic = dynamic_cast<Artic *>(*articIter);
+        for (auto &object : artics) {
+            Artic *artic = dynamic_cast<Artic *>(object);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {

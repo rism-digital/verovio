@@ -1399,12 +1399,12 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     if (page) pageNo = page->GetIdx() + 1;
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
-    ArrayOfObjects notes;
+    ListOfObjects notes;
 
     measure->FindAllDescendantByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
-    ArrayOfObjects::iterator iter;
+    ListOfObjects::iterator iter;
     for (iter = notes.begin(); iter != notes.end(); ++iter) {
         a << (*iter)->GetUuid();
     }

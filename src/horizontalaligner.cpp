@@ -347,17 +347,16 @@ void GraceAligner::AlignStack()
         element->SetGraceAlignment(alignment);
 
         ClassIdsComparison matchType({ ACCID, FLAG, NOTE, STEM });
-        ArrayOfObjects children;
-        ArrayOfObjects::iterator childrenIter;
+        ListOfObjects children;
         element->FindAllDescendantByComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignmnet to all children
-        for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
+        for (auto &child : children) {
             // Trick : FindAllDescendantByComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
-            if (*childrenIter == element) continue;
-            LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
+            if (child == element) continue;
+            LayerElement *childElement = dynamic_cast<LayerElement *>(child);
             assert(childElement);
             childElement->SetGraceAlignment(alignment);
             alignment->AddLayerElementRef(childElement);

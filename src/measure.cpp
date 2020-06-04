@@ -346,13 +346,12 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
     // First get all the staffGrps
     ClassIdComparison matchType(STAFFGRP);
-    ArrayOfObjects staffGrps;
-    ArrayOfObjects::iterator staffGrpIter;
+    ListOfObjects staffGrps;
     scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
-    for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); ++staffGrpIter) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>((*staffGrpIter)->GetFirst(STAFFDEF));
+    for (auto &staffGrp : staffGrps) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>((staffGrp)->GetFirst(STAFFDEF));
         if (staffDef) staffList.push_back(staffDef->GetN());
     }
 
@@ -373,7 +372,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 Staff *Measure::GetTopVisibleStaff()
 {
     Staff *staff = NULL;
-    ArrayOfObjects staves;
+    ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
     this->FindAllDescendantByComparison(&staves, &matchType, 1);
     for (auto &child : staves) {

@@ -143,7 +143,7 @@ bool Doc::GenerateDocumentScoreDef()
         return false;
     }
 
-    ArrayOfObjects staves;
+    ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
     measure->FindAllDescendantByComparison(&staves, &matchType);
 
@@ -154,9 +154,8 @@ bool Doc::GenerateDocumentScoreDef()
 
     m_mdivScoreDef.Reset();
     StaffGrp *staffGrp = new StaffGrp();
-    ArrayOfObjects::iterator iter;
-    for (iter = staves.begin(); iter != staves.end(); ++iter) {
-        Staff *staff = dynamic_cast<Staff *>(*iter);
+    for (auto &object : staves) {
+        Staff *staff = dynamic_cast<Staff *>(object);
         assert(staff);
         StaffDef *staffDef = new StaffDef();
         staffDef->SetN(staff->GetN());
@@ -216,13 +215,12 @@ bool Doc::GenerateHeader()
 bool Doc::GenerateMeasureNumbers()
 {
     ClassIdComparison matchType(MEASURE);
-    ArrayOfObjects measures;
-    ArrayOfObjects::iterator measureIter;
+    ListOfObjects measures;
     this->FindAllDescendantByComparison(&measures, &matchType);
 
     // run through all measures and generate missing mNum from attribute
-    for (measureIter = measures.begin(); measureIter != measures.end(); ++measureIter) {
-        Measure *measure = dynamic_cast<Measure *>(*measureIter);
+    for (auto &object : measures) {
+        Measure *measure = dynamic_cast<Measure *>(object);
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
             Text *text = new Text;

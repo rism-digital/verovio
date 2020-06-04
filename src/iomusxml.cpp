@@ -2125,11 +2125,11 @@ void MusicXmlInput::ReadMusicXmlNote(
                 if (iter->isFirst) { // add clef when first in staff
                     // if afterBarline is false at beginning of measure, move before barline
                     if (!iter->m_afterBarline && m_durTotal == 0) {
-                        ArrayOfObjects objects;
+                        ListOfObjects objects;
                         ClassIdComparison matchClassId(LAYER);
                         section->FindAllDescendantByComparison(&objects, &matchClassId);
                         Layer *prevLayer = NULL;
-                        ArrayOfObjects::reverse_iterator rit = objects.rbegin();
+                        ListOfObjects::reverse_iterator rit = objects.rbegin();
                         for (; rit != objects.rend(); ++rit) {
                             prevLayer = dynamic_cast<Layer *>(*rit);
                             if (prevLayer->GetN() == layer->GetN()) break;
@@ -2148,7 +2148,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
                 else { // add clef with @sameas attribute, if no other sameas clef or original clef in that layer
                     bool addSameas = true;
-                    ArrayOfObjects objects;
+                    ListOfObjects objects;
                     ClassIdComparison matchClassId(CLEF);
                     layer->FindAllDescendantByComparison(&objects, &matchClassId);
                     for (auto o : objects) {

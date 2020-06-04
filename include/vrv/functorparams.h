@@ -1035,7 +1035,7 @@ public:
 
 class FindAllBetweenParams : public FunctorParams {
 public:
-    FindAllBetweenParams(Comparison *comparison, ArrayOfObjects *elements, Object *start, Object *end)
+    FindAllBetweenParams(Comparison *comparison, ListOfObjects *elements, Object *start, Object *end)
     {
         m_comparison = comparison;
         m_elements = elements;
@@ -1043,7 +1043,7 @@ public:
         m_end = end;
     }
     Comparison *m_comparison;
-    ArrayOfObjects *m_elements;
+    ListOfObjects *m_elements;
     Object *m_start;
     Object *m_end;
 };
@@ -1059,13 +1059,13 @@ public:
 
 class FindAllByComparisonParams : public FunctorParams {
 public:
-    FindAllByComparisonParams(Comparison *comparison, ArrayOfObjects *elements)
+    FindAllByComparisonParams(Comparison *comparison, ListOfObjects *elements)
     {
         m_comparison = comparison;
         m_elements = elements;
     }
     Comparison *m_comparison;
-    ArrayOfObjects *m_elements;
+    ListOfObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------

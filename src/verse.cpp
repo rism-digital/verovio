@@ -147,7 +147,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     /*******/
 
-    ArrayOfObjects syls;
+    ListOfObjects syls;
     ClassIdComparison matchTypeSyl(SYL);
     this->FindAllDescendantByComparison(&syls, &matchTypeSyl);
 
@@ -160,7 +160,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
 
     this->SetDrawingXRel(-1 * shift);
 
-    ArrayOfObjects::iterator iter = syls.begin();
+    ListOfObjects::iterator iter = syls.begin();
     while (iter != syls.end()) {
         if ((*iter)->HasContentHorizontalBB()) {
             Syl *syl = dynamic_cast<Syl *>(*iter);

@@ -185,8 +185,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 {
     ClassIdsComparison matchType({ CHORD, NOTE });
-    ArrayOfObjects children;
-    ArrayOfObjects::iterator childrenIter;
+    ListOfObjects children;
     this->FindAllDescendantBetween(&children, &matchType, start, end);
 
     Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
@@ -196,10 +195,10 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
-        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstAncestor(LAYER));
+    for (auto &child : children) {
+        Layer *layer = dynamic_cast<Layer *>((child)->GetFirstAncestor(LAYER));
         assert(layer);
-        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstAncestor(STAFF));
+        Staff *staff = dynamic_cast<Staff *>((child)->GetFirstAncestor(STAFF));
         assert(staff);
 
         // If the slur is spanning over several measure, the the children list will include note and chords
@@ -210,7 +209,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
             continue;
         }
 
-        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(*childrenIter);
+        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(child);
         assert(interface);
 
         // First pass

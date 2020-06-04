@@ -413,7 +413,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
         Beam *beam = this->GetBracketAlignedBeam();
         if (beam) {
             // Check for possible articulations
-            ArrayOfObjects artics;
+            ListOfObjects artics;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART });
             this->FindAllDescendantByComparison(&artics, &comparison);
 
@@ -449,7 +449,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
 
             // Check for overlap with content
             // Possible issue with beam above the tuplet - not sure this will be noticable
-            ArrayOfObjects descendants;
+            ListOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 
@@ -509,7 +509,7 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
             int yRel = tupletNum->GetDrawingY();
 
             // Check for overlap with content - beam is not taken into account
-            ArrayOfObjects descendants;
+            ListOfObjects descendants;
             ClassIdsComparison comparison({ ARTIC, ARTIC_PART, ACCID, DOT, FLAG, NOTE, REST, STEM });
             this->FindAllDescendantByComparison(&descendants, &comparison);
 

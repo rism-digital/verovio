@@ -49,7 +49,7 @@ Zone *Facsimile::FindZoneByUuid(std::string zoneId)
 int Facsimile::GetMaxX()
 {
     ClassIdComparison ac(SURFACE);
-    ArrayOfObjects surfaces;
+    ListOfObjects surfaces;
     this->FindAllDescendantByComparison(&surfaces, &ac);
 
     int max = 0;
@@ -64,7 +64,7 @@ int Facsimile::GetMaxX()
 int Facsimile::GetMaxY()
 {
     ClassIdComparison ac(SURFACE);
-    ArrayOfObjects surfaces;
+    ListOfObjects surfaces;
     this->FindAllDescendantByComparison(&surfaces, &ac);
 
     int max = 0;
