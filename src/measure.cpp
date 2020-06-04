@@ -864,6 +864,31 @@ int Measure::AdjustXOverflow(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::AdjustXOverflowEnd(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+
+    if (!params->m_currentWidest) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    int measureRightX = GetDrawingX() + GetRightBarLineLeft() - params->m_margin;
+    if (measureRightX < params->m_currentWidest->GetContentRight()) {
+        LayerElement *objectX = dynamic_cast<LayerElement *>(params->m_currentWidest->GetObjectX());
+        if (!objectX) {
+            return FUNCTOR_CONTINUE;
+        }
+        Alignment *left = objectX->GetAlignment();
+        ArrayOfAdjustmentTuples boundaries{
+            std::make_tuple(left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(),
+                            params->m_currentWidest->GetContentRight() - measureRightX) 
+        };
+        m_measureAligner.AdjustProportionally(boundaries);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
