@@ -297,6 +297,7 @@ public:
      * See Object::AdjustXOverflow
      */
     virtual int AdjustXOverflow(FunctorParams *functorParams);
+    virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustXPos
