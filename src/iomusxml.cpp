@@ -1808,6 +1808,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             else if (HasAttributeWithValue(wedge.node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
             }
+            // hairpin->SetLform(hairpin->AttLineRendBase::StrToLineform(wedge.node().attribute("line-type").as_string()));
             if (wedge.node().attribute("niente")) {
                 hairpin->SetNiente(ConvertWordToBool(wedge.node().attribute("niente").as_string()));
             }
@@ -2393,7 +2394,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetHeadShape(ConvertNotehead(notehead.node().text().as_string()));
             if (notehead.node().attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
             if (!std::strncmp(notehead.node().text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
-            // if (notehead.node().attribute("parentheses").as_bool()) note->SetEnclose(ENCLOSURE_paren);
         }
 
         // look at the next note to see if we are starting or ending a chord
