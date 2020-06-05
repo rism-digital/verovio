@@ -115,7 +115,7 @@ void Note::Reset()
     m_MIDIPitch = -1;
 }
 
-void Note::AddChild(Object *child)
+bool Note::CanHaveChild(Object *child)
 {
     // additional verification for accid and artic - this will no be raised with editorial markup, though
     if (child->Is(ACCID)) {

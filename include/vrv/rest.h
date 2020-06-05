@@ -46,7 +46,7 @@ public:
      * Add an element to a rest.
      * Only Dots elements will be actually added to the rest.
      */
-    virtual void AddChild(Object *object);
+    virtual bool CanHaveChild(Object *object);
 
     /**
      * @name Getter to interfaces

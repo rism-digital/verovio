@@ -41,7 +41,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    virtual void AddChild(Object *object);
+    virtual bool CanHaveChild(Object *object);
 
 protected:
     /** We store the level of the <subst> for integrity check */

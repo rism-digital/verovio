@@ -42,7 +42,7 @@ void Mdiv::Reset()
     m_visibility = Hidden;
 }
 
-void Mdiv::AddChild(Object *child)
+bool Mdiv::CanHaveChild(Object *child)
 {
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));

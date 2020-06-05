@@ -61,7 +61,7 @@ void EditorialElement::Reset()
 
 EditorialElement::~EditorialElement() {}
 
-void EditorialElement::AddChild(Object *child)
+bool EditorialElement::CanHaveChild(Object *child)
 {
     if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

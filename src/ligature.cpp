@@ -49,7 +49,7 @@ void Ligature::Reset()
 
 void Ligature::ClearClusters() {}
 
-void Ligature::AddChild(Object *child)
+bool Ligature::CanHaveChild(Object *child)
 {
     if (child->Is(NOTE)) {
         assert(dynamic_cast<LayerElement *>(child));

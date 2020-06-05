@@ -51,7 +51,7 @@ void Rest::Reset()
     ResetRestVisMensural();
 }
 
-void Rest::AddChild(Object *child)
+bool Rest::CanHaveChild(Object *child)
 {
     if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));

@@ -66,7 +66,7 @@ void RunningElement::Reset()
     }
 }
 
-void RunningElement::AddChild(Object *child)
+bool RunningElement::CanHaveChild(Object *child)
 {
     if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));

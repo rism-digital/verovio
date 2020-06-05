@@ -53,7 +53,7 @@ void Artic::Reset()
     ResetPlacement();
 }
 
-void Artic::AddChild(Object *child)
+bool Artic::CanHaveChild(Object *child)
 {
     if (child->Is(ARTIC_PART)) {
         assert(dynamic_cast<ArticPart *>(child));

@@ -95,7 +95,7 @@ void Chord::ClearClusters() const
     m_clusters.clear();
 }
 
-void Chord::AddChild(Object *child)
+bool Chord::CanHaveChild(Object *child)
 {
     if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));

@@ -65,7 +65,7 @@ void Tuplet::Reset()
     m_numAlignedBeam = NULL;
 }
 
-void Tuplet::AddChild(Object *child)
+bool Tuplet::CanHaveChild(Object *child)
 {
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));

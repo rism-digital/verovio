@@ -38,7 +38,7 @@ void F::Reset()
     TimeSpanningInterface::Reset();
 }
 
-void F::AddChild(Object *child)
+bool F::CanHaveChild(Object *child)
 {
     if (child->Is(TEXT)) {
         assert(dynamic_cast<Text *>(child));

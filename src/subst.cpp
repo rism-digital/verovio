@@ -44,7 +44,7 @@ void Subst::Reset()
 
 Subst::~Subst() {}
 
-void Subst::AddChild(Object *child)
+bool Subst::CanHaveChild(Object *child)
 {
     if (child->Is(ADD)) {
         assert(dynamic_cast<Add *>(child));

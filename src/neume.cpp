@@ -56,7 +56,7 @@ void Neume::Reset()
     ResetColor();
 }
 
-void Neume::AddChild(Object *child)
+bool Neume::CanHaveChild(Object *child)
 {
     if (child->Is(NC)) {
         assert(dynamic_cast<Nc *>(child));

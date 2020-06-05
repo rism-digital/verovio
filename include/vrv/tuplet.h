@@ -45,7 +45,7 @@ public:
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual void AddChild(Object *object);
+    virtual bool CanHaveChild(Object *object);
 
     /**
      * @name Setter and getter for darwing elements and position

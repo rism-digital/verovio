@@ -58,7 +58,7 @@ void Harm::Reset()
     ResetNNumberLike();
 }
 
-void Harm::AddChild(Object *child)
+bool Harm::CanHaveChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

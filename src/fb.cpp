@@ -36,7 +36,7 @@ void Fb::Reset()
     Object::Reset();
 }
 
-void Fb::AddChild(Object *child)
+bool Fb::CanHaveChild(Object *child)
 {
     if (child->Is(FIGURE)) {
         assert(dynamic_cast<F *>(child));

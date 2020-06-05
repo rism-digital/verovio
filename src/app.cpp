@@ -44,7 +44,7 @@ void App::Reset()
 
 App::~App() {}
 
-void App::AddChild(Object *child)
+bool App::CanHaveChild(Object *child)
 {
     if (child->Is(LEM)) {
         assert(dynamic_cast<Lem *>(child));

@@ -38,7 +38,7 @@ void Fig::Reset()
     AreaPosInterface::Reset();
 }
 
-void Fig::AddChild(Object *child)
+bool Fig::CanHaveChild(Object *child)
 {
     if (child->Is(SVG)) {
         assert(dynamic_cast<Svg *>(child));

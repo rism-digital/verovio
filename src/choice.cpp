@@ -49,7 +49,7 @@ void Choice::Reset()
 
 Choice::~Choice() {}
 
-void Choice::AddChild(Object *child)
+bool Choice::CanHaveChild(Object *child)
 {
     if (child->Is(ABBR)) {
         assert(dynamic_cast<Abbr *>(child));

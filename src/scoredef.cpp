@@ -168,7 +168,7 @@ void ScoreDef::Reset()
     m_setAsDrawing = false;
 }
 
-void ScoreDef::AddChild(Object *child)
+bool ScoreDef::CanHaveChild(Object *child)
 {
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));

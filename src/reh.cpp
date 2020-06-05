@@ -47,7 +47,7 @@ void Reh::Reset()
     ResetVerticalGroup();
 }
 
-void Reh::AddChild(Object *child)
+bool Reh::CanHaveChild(Object *child)
 {
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

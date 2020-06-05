@@ -135,7 +135,7 @@ void Layer::ResetStaffDefObjects()
     }
 }
 
-void Layer::AddChild(Object *child)
+bool Layer::CanHaveChild(Object *child)
 {
     if (child->IsLayerElement()) {
         assert(dynamic_cast<LayerElement *>(child));

@@ -53,7 +53,7 @@ public:
      * @name Add children to an editorial element.
      */
     ///@{
-    virtual void AddChild(Object *object);
+    virtual bool CanHaveChild(Object *object);
     ///@}
 
     //----------//

@@ -82,7 +82,7 @@ void System::Reset()
     m_drawingIsOptimized = false;
 }
 
-void System::AddChild(Object *child)
+bool System::CanHaveChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));

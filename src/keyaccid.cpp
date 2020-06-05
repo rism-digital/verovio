@@ -50,7 +50,7 @@ void KeyAccid::Reset()
     ResetEnclosingChars();
 }
 
-void KeySig::AddChild(Object *child)
+bool KeySig::CanHaveChild(Object *child)
 {
     if (this->IsAttribute()) {
         LogError("Adding a child to an attribute is not allowed");

@@ -46,7 +46,7 @@ void GraceGrp::Reset()
     ResetGraceGrpLog();
 }
 
-void GraceGrp::AddChild(Object *child)
+bool GraceGrp::CanHaveChild(Object *child)
 {
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));

@@ -116,7 +116,7 @@ void Staff::ClearLedgerLines()
     }
 }
 
-void Staff::AddChild(Object *child)
+bool Staff::CanHaveChild(Object *child)
 {
     if (child->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(child);

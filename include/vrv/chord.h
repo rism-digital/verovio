@@ -71,7 +71,7 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
-    virtual void AddChild(Object *object);
+    virtual bool CanHaveChild(Object *object);
 
     /**
      * Return the maximum and minimum Y positions of the notes in the chord

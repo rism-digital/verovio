@@ -50,7 +50,7 @@ void Verse::Reset()
     ResetTypography();
 }
 
-void Verse::AddChild(Object *child)
+bool Verse::CanHaveChild(Object *child)
 {
     if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));

@@ -59,7 +59,7 @@ void StaffGrp::Reset()
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
-void StaffGrp::AddChild(Object *child)
+bool StaffGrp::CanHaveChild(Object *child)
 {
     if (child->Is(INSTRDEF)) {
         assert(dynamic_cast<InstrDef *>(child));

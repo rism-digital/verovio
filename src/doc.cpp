@@ -115,7 +115,7 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-void Doc::AddChild(Object *child)
+bool Doc::CanHaveChild(Object *child)
 {
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));

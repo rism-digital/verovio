@@ -604,6 +604,13 @@ void Object::SetParent(Object *parent)
     m_parent = parent;
 }
 
+bool Object::CanHaveChild(Object *child)
+{
+    // This should never happen because the method should be overridden
+    LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
+    assert(false);
+}
+
 void Object::AddChild(Object *child)
 {
     // This should never happen because the method should be overridden

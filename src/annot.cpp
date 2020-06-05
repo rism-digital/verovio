@@ -39,7 +39,7 @@ void Annot::Reset()
     ResetSource();
 }
 
-void Annot::AddChild(Object *child)
+bool Annot::CanHaveChild(Object *child)
 {
     if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));

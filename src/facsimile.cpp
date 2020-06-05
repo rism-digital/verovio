@@ -28,7 +28,7 @@ Facsimile::Facsimile() : Object("facsimile-") {}
 Facsimile::~Facsimile() {}
 void Facsimile::Reset() {}
 
-void Facsimile::AddChild(Object *object)
+bool Facsimile::CanHaveChild(Object *object)
 {
     if (object->Is(SURFACE)) {
         object->SetParent(this);

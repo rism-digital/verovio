@@ -43,7 +43,7 @@ public:
     /**
      * Method for adding allowed content
      */
-    virtual void AddChild(Object *object);
+    virtual bool CanHaveChild(Object *object);
 
     //----------//
     // Functors //

@@ -41,7 +41,7 @@ void BTrem::Reset()
     ResetTremMeasured();
 }
 
-void BTrem::AddChild(Object *child)
+bool BTrem::CanHaveChild(Object *child)
 {
     if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));

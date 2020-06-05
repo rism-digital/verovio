@@ -308,8 +308,14 @@ public:
     void ResetParent() { m_parent = NULL; }
 
     /**
-     * Base method for adding children.
+     * Base method for checking if a child can be added.
      * The method has to be overridden.
+     */
+    virtual bool CanHaveChild(Object *object);
+
+    /**
+     * Base method for adding children.
+     * The method can be overridden.
      */
     virtual void AddChild(Object *object);
 

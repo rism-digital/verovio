@@ -461,7 +461,7 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-void Alignment::AddChild(Object *child)
+bool Alignment::CanHaveChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
 
@@ -636,7 +636,7 @@ void AlignmentReference::Reset()
     m_layerCount = 0;
 }
 
-void AlignmentReference::AddChild(Object *child)
+bool AlignmentReference::CanHaveChild(Object *child)
 {
     LayerElement *childElement = dynamic_cast<LayerElement *>(child);
     assert(childElement);

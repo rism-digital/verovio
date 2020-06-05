@@ -36,7 +36,7 @@ void Num::Reset()
     m_currentText.SetText(L"");
 }
 
-void Num::AddChild(Object *child)
+bool Num::CanHaveChild(Object *child)
 {
     if (child->Is(TEXT)) {
         assert(dynamic_cast<Text *>(child));

@@ -48,7 +48,7 @@ void Tempo::Reset()
     ResetMmTempo();
 }
 
-void Tempo::AddChild(Object *child)
+bool Tempo::CanHaveChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

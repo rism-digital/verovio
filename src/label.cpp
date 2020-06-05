@@ -35,7 +35,7 @@ void Label::Reset()
     Object::Reset();
 }
 
-void Label::AddChild(Object *child)
+bool Label::CanHaveChild(Object *child)
 {
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

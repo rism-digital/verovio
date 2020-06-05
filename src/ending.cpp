@@ -45,7 +45,7 @@ void Ending::Reset()
     ResetNNumberLike();
 }
 
-void Ending::AddChild(Object *child)
+bool Ending::CanHaveChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
