@@ -635,6 +635,12 @@ void AlignmentReference::Reset()
 
 bool AlignmentReference::IsSupportedChild(Object *child)
 {
+    assert(dynamic_cast<LayerElement *>(child));
+    return true;
+}
+
+void AlignmentReference::AddChild(Object *child)
+{
     LayerElement *childElement = dynamic_cast<LayerElement *>(child);
     assert(childElement);
 

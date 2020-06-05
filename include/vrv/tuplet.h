@@ -48,6 +48,11 @@ public:
     virtual bool IsSupportedChild(Object *object);
 
     /**
+     * Overwritten method for tuplet
+     */
+    virtual void AddChild(Object *object);
+
+    /**
      * @name Setter and getter for darwing elements and position
      */
     ///@{

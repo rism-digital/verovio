@@ -49,6 +49,11 @@ public:
     virtual bool IsSupportedChild(Object *object);
 
     /**
+     * Overwritten method for rest
+     */
+    virtual void AddChild(Object *object);
+
+    /**
      * @name Getter to interfaces
      */
     ///@{

@@ -287,6 +287,11 @@ public:
     virtual bool IsSupportedChild(Object *object);
 
     /**
+     * Overwritten method for AlignmentReference children
+     */
+    virtual void AddChild(Object *object);
+
+    /**
      * Add an accidental to the accidSpace of the AlignmentReference.
      */
     void AddToAccidSpace(Accid *accid);

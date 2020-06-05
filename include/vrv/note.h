@@ -96,6 +96,11 @@ public:
     virtual bool IsSupportedChild(Object *object);
 
     /**
+     * Overwritten method for note
+     */
+    virtual void AddChild(Object *object);
+
+    /**
      * @name Setter and getter for tie attribute and other pointers
      */
     ///@{

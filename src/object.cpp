@@ -609,11 +609,15 @@ bool Object::IsSupportedChild(Object *child)
     // This should never happen because the method should be overridden
     LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
     assert(false);
+    return false;
 }
 
 void Object::AddChild(Object *child)
 {
-    if (!this->IsSupportedChild(child)) return;
+    if (!this->IsSupportedChild(child)) {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        return;
+    }
 
     child->SetParent(this);
     m_children.push_back(child);

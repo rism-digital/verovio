@@ -74,6 +74,11 @@ public:
     virtual bool IsSupportedChild(Object *object);
 
     /**
+     * Overwritten method for chord
+     */
+    virtual void AddChild(Object *object);
+
+    /**
      * Return the maximum and minimum Y positions of the notes in the chord
      */
     void GetYExtremes(int &yMax, int &yMin);

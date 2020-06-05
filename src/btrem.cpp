@@ -56,7 +56,6 @@ bool BTrem::IsSupportedChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         return false;
     }
     return true;
