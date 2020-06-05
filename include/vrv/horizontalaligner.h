@@ -87,7 +87,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * @name Set and get the xRel value of the alignment
@@ -284,7 +284,7 @@ public:
     /**
      * Override the method of adding AlignmentReference children
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Add an accidental to the accidSpace of the AlignmentReference.

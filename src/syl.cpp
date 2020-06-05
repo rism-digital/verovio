@@ -53,7 +53,7 @@ void Syl::Reset()
     m_nextWordSyl = NULL;
 }
 
-bool Syl::CanHaveChild(Object *child)
+bool Syl::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

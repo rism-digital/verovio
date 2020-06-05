@@ -66,7 +66,7 @@ void RunningElement::Reset()
     }
 }
 
-bool RunningElement::CanHaveChild(Object *child)
+bool RunningElement::IsSupportedChild(Object *child)
 {
     if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));

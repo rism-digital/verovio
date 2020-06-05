@@ -36,7 +36,7 @@ void Fb::Reset()
     Object::Reset();
 }
 
-bool Fb::CanHaveChild(Object *child)
+bool Fb::IsSupportedChild(Object *child)
 {
     if (child->Is(FIGURE)) {
         assert(dynamic_cast<F *>(child));

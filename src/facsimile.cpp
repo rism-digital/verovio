@@ -28,7 +28,7 @@ Facsimile::Facsimile() : Object("facsimile-") {}
 Facsimile::~Facsimile() {}
 void Facsimile::Reset() {}
 
-bool Facsimile::CanHaveChild(Object *object)
+bool Facsimile::IsSupportedChild(Object *object)
 {
     if (object->Is(SURFACE)) {
         assert(dynamic_cast<Surface *>(object));

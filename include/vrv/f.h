@@ -48,7 +48,7 @@ public:
      * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     //----------//
     // Functors //

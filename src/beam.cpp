@@ -783,7 +783,7 @@ void Beam::Reset()
     ResetBeamRend();
 }
 
-bool Beam::CanHaveChild(Object *child)
+bool Beam::IsSupportedChild(Object *child)
 {
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));

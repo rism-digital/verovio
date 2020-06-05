@@ -46,7 +46,7 @@ public:
     /**
      * Add children (notes or editorial markup)
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * @name Return shape information about the note ligature

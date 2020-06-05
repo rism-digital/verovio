@@ -70,7 +70,7 @@ void StaffDef::Reset()
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
-bool StaffDef::CanHaveChild(Object *child)
+bool StaffDef::IsSupportedChild(Object *child)
 {
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));

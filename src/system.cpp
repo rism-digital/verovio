@@ -82,7 +82,7 @@ void System::Reset()
     m_drawingIsOptimized = false;
 }
 
-bool System::CanHaveChild(Object *child)
+bool System::IsSupportedChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));

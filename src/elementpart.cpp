@@ -284,7 +284,7 @@ void Stem::Reset()
     m_isVirtual = false;
 }
 
-bool Stem::CanHaveChild(Object *child)
+bool Stem::IsSupportedChild(Object *child)
 {
     if (child->Is(FLAG)) {
         assert(dynamic_cast<Flag *>(child));

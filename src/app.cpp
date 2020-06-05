@@ -44,7 +44,7 @@ void App::Reset()
 
 App::~App() {}
 
-bool App::CanHaveChild(Object *child)
+bool App::IsSupportedChild(Object *child)
 {
     if (child->Is(LEM)) {
         assert(dynamic_cast<Lem *>(child));

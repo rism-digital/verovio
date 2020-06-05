@@ -57,7 +57,7 @@ void Dir::Reset()
     ResetVerticalGroup();
 }
 
-bool Dir::CanHaveChild(Object *child)
+bool Dir::IsSupportedChild(Object *child)
 {
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

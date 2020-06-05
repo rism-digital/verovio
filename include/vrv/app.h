@@ -38,7 +38,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
 protected:
     /** We store the level of the <app> for integrity check */

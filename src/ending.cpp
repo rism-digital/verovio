@@ -45,7 +45,7 @@ void Ending::Reset()
     ResetNNumberLike();
 }
 
-bool Ending::CanHaveChild(Object *child)
+bool Ending::IsSupportedChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));

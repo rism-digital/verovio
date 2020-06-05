@@ -46,7 +46,7 @@ void Section::Reset()
     ResetNNumberLike();
 }
 
-bool Section::CanHaveChild(Object *child)
+bool Section::IsSupportedChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));

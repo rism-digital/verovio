@@ -37,7 +37,7 @@ void Surface::Reset()
     ResetCoordinated();
 }
 
-bool Surface::CanHaveChild(Object *object)
+bool Surface::IsSupportedChild(Object *object)
 {
     // TODO Add support for graphic tag
     if (object->Is(ZONE)) {

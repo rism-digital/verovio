@@ -38,7 +38,7 @@ void Fig::Reset()
     AreaPosInterface::Reset();
 }
 
-bool Fig::CanHaveChild(Object *child)
+bool Fig::IsSupportedChild(Object *child)
 {
     if (child->Is(SVG)) {
         assert(dynamic_cast<Svg *>(child));

@@ -50,7 +50,7 @@ void FTrem::Reset()
     ResetTremMeasured();
 }
 
-bool FTrem::CanHaveChild(Object *child)
+bool FTrem::IsSupportedChild(Object *child)
 {
     if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));

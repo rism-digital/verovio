@@ -42,7 +42,7 @@ void Score::Reset()
     ResetNNumberLike();
 }
 
-bool Score::CanHaveChild(Object *child)
+bool Score::IsSupportedChild(Object *child)
 {
     if (child->Is(SCOREDEF)) {
         assert(dynamic_cast<ScoreDef *>(child));

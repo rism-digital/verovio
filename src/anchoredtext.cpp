@@ -39,7 +39,7 @@ void AnchoredText::Reset()
     TextDirInterface::Reset();
 }
 
-bool AnchoredText::CanHaveChild(Object *child)
+bool AnchoredText::IsSupportedChild(Object *child)
 {
     if (child->Is(TEXT)) {
         assert(dynamic_cast<TextElement *>(child));

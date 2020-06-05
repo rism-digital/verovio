@@ -604,7 +604,7 @@ void Object::SetParent(Object *parent)
     m_parent = parent;
 }
 
-bool Object::CanHaveChild(Object *child)
+bool Object::IsSupportedChild(Object *child)
 {
     // This should never happen because the method should be overridden
     LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
@@ -613,7 +613,7 @@ bool Object::CanHaveChild(Object *child)
 
 void Object::AddChild(Object *child)
 {
-    if (!this->CanHaveChild(child)) return;
+    if (!this->IsSupportedChild(child)) return;
 
     child->SetParent(this);
     m_children.push_back(child);

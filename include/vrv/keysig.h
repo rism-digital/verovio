@@ -56,7 +56,7 @@ public:
     /**
      * Add an element (a keyAccid) to a keySig.
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /** Accid number getter */
     int GetAccidCount();

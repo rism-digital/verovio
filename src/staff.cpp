@@ -116,7 +116,7 @@ void Staff::ClearLedgerLines()
     }
 }
 
-bool Staff::CanHaveChild(Object *child)
+bool Staff::IsSupportedChild(Object *child)
 {
     if (child->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(child);

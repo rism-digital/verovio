@@ -35,7 +35,7 @@ public:
     /**
      * Add childElement to a element.
      */
-    virtual bool CanHaveChild(Object *childElement);
+    virtual bool IsSupportedChild(Object *childElement);
 
 protected:
     //

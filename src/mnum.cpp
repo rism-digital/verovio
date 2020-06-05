@@ -56,7 +56,7 @@ void MNum::Reset()
     m_isGenerated = false;
 }
 
-bool MNum::CanHaveChild(Object *child)
+bool MNum::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

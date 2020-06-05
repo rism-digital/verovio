@@ -35,7 +35,7 @@ void LabelAbbr::Reset()
     Object::Reset();
 }
 
-bool LabelAbbr::CanHaveChild(Object *child)
+bool LabelAbbr::IsSupportedChild(Object *child)
 {
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

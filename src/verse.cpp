@@ -50,7 +50,7 @@ void Verse::Reset()
     ResetTypography();
 }
 
-bool Verse::CanHaveChild(Object *child)
+bool Verse::IsSupportedChild(Object *child)
 {
     if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));

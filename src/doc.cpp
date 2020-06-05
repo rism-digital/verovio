@@ -115,7 +115,7 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-bool Doc::CanHaveChild(Object *child)
+bool Doc::IsSupportedChild(Object *child)
 {
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));

@@ -64,7 +64,7 @@ public:
      * Add an element (text, rend. etc.) to a syl.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Calculate the spacing needed depending on the @worpos and @con

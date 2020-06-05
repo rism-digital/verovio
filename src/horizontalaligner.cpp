@@ -461,7 +461,7 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-bool Alignment::CanHaveChild(Object *child)
+bool Alignment::IsSupportedChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
     return true;
@@ -633,7 +633,7 @@ void AlignmentReference::Reset()
     m_layerCount = 0;
 }
 
-bool AlignmentReference::CanHaveChild(Object *child)
+bool AlignmentReference::IsSupportedChild(Object *child)
 {
     LayerElement *childElement = dynamic_cast<LayerElement *>(child);
     assert(childElement);

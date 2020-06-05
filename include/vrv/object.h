@@ -311,7 +311,7 @@ public:
      * Base method for checking if a child can be added.
      * The method has to be overridden.
      */
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Base method for adding children.

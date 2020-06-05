@@ -62,7 +62,7 @@ void Dynam::Reset()
     ResetVerticalGroup();
 }
 
-bool Dynam::CanHaveChild(Object *child)
+bool Dynam::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, LB, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

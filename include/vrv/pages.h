@@ -41,7 +41,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
     ///@}
 
     /**

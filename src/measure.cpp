@@ -137,7 +137,7 @@ void Measure::Reset()
     m_currentTempo = 120;
 }
 
-bool Measure::CanHaveChild(Object *child)
+bool Measure::IsSupportedChild(Object *child)
 {
     if (child->IsControlElement()) {
         assert(dynamic_cast<ControlElement *>(child));

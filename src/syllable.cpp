@@ -38,7 +38,7 @@ void Syllable::Init()
     Reset();
 }
 
-bool Syllable::CanHaveChild(Object *child)
+bool Syllable::IsSupportedChild(Object *child)
 {
     if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));

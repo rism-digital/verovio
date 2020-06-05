@@ -40,7 +40,7 @@ void Pages::Reset()
     ResetNNumberLike();
 }
 
-bool Pages::CanHaveChild(Object *child)
+bool Pages::IsSupportedChild(Object *child)
 {
     if (child->Is(PAGE)) {
         assert(dynamic_cast<Page *>(child));

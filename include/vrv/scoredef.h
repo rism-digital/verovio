@@ -126,7 +126,7 @@ public:
     virtual ClassId GetClassId() const { return SCOREDEF; }
     ///@}
 
-    virtual bool CanHaveChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.

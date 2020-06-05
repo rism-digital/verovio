@@ -44,7 +44,7 @@ void Subst::Reset()
 
 Subst::~Subst() {}
 
-bool Subst::CanHaveChild(Object *child)
+bool Subst::IsSupportedChild(Object *child)
 {
     if (child->Is(ADD)) {
         assert(dynamic_cast<Add *>(child));

@@ -56,7 +56,7 @@ void Neume::Reset()
     ResetColor();
 }
 
-bool Neume::CanHaveChild(Object *child)
+bool Neume::IsSupportedChild(Object *child)
 {
     if (child->Is(NC)) {
         assert(dynamic_cast<Nc *>(child));

@@ -58,7 +58,7 @@ void Rend::Reset()
     ResetWhitespace();
 }
 
-bool Rend::CanHaveChild(Object *child)
+bool Rend::IsSupportedChild(Object *child)
 {
     if (child->Is(LB)) {
         assert(dynamic_cast<Lb *>(child));

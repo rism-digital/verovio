@@ -62,7 +62,7 @@ void Page::Reset()
     m_drawingJustifiableStaves = 0;
 }
 
-bool Page::CanHaveChild(Object *child)
+bool Page::IsSupportedChild(Object *child)
 {
     if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));

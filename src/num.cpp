@@ -36,7 +36,7 @@ void Num::Reset()
     m_currentText.SetText(L"");
 }
 
-bool Num::CanHaveChild(Object *child)
+bool Num::IsSupportedChild(Object *child)
 {
     if (child->Is(TEXT)) {
         assert(dynamic_cast<Text *>(child));
