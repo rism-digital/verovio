@@ -49,7 +49,7 @@ void Choice::Reset()
 
 Choice::~Choice() {}
 
-void Choice::AddChild(Object *child)
+bool Choice::IsSupportedChild(Object *child)
 {
     if (child->Is(ABBR)) {
         assert(dynamic_cast<Abbr *>(child));
@@ -76,13 +76,9 @@ void Choice::AddChild(Object *child)
         assert(dynamic_cast<Unclear *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------

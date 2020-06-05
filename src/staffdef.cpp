@@ -70,7 +70,7 @@ void StaffDef::Reset()
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
-void StaffDef::AddChild(Object *child)
+bool StaffDef::IsSupportedChild(Object *child)
 {
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
@@ -94,13 +94,9 @@ void StaffDef::AddChild(Object *child)
         assert(dynamic_cast<MeterSig *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 bool StaffDef::IsInBraceAndBracket()

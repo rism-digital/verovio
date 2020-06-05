@@ -93,6 +93,11 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Overwritten method for note
+     */
     virtual void AddChild(Object *object);
 
     /**

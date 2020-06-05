@@ -52,7 +52,7 @@ public:
     /**
      * Add a page to the document
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Clear the content of the document.

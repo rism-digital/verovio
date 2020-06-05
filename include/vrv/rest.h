@@ -46,6 +46,11 @@ public:
      * Add an element to a rest.
      * Only Dots elements will be actually added to the rest.
      */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Overwritten method for rest
+     */
     virtual void AddChild(Object *object);
 
     /**

@@ -53,7 +53,7 @@ void Syl::Reset()
     m_nextWordSyl = NULL;
 }
 
-void Syl::AddChild(Object *child)
+bool Syl::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -65,13 +65,9 @@ void Syl::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)

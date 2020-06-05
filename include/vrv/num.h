@@ -39,7 +39,7 @@ public:
     /**
      * Add an element (text) to a num.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Return a pointer to the current text object.

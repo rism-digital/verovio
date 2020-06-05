@@ -783,7 +783,7 @@ void Beam::Reset()
     ResetBeamRend();
 }
 
-void Beam::AddChild(Object *child)
+bool Beam::IsSupportedChild(Object *child)
 {
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
@@ -816,13 +816,9 @@ void Beam::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Beam::FilterList(ArrayOfObjects *childList)

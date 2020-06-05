@@ -40,7 +40,7 @@ void Pages::Reset()
     ResetNNumberLike();
 }
 
-void Pages::AddChild(Object *child)
+bool Pages::IsSupportedChild(Object *child)
 {
     if (child->Is(PAGE)) {
         assert(dynamic_cast<Page *>(child));
@@ -49,13 +49,9 @@ void Pages::AddChild(Object *child)
         assert(dynamic_cast<ScoreDef *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Pages::ConvertFrom(Score *score)

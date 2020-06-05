@@ -115,19 +115,15 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-void Doc::AddChild(Object *child)
+bool Doc::IsSupportedChild(Object *child)
 {
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Doc::Refresh()

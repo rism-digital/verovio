@@ -39,7 +39,7 @@ public:
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Calculate the adjustment according to the overlap and the free space available before.

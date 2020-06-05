@@ -62,19 +62,15 @@ void Page::Reset()
     m_drawingJustifiableStaves = 0;
 }
 
-void Page::AddChild(Object *child)
+bool Page::IsSupportedChild(Object *child)
 {
     if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 RunningElement *Page::GetHeader() const

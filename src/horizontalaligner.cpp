@@ -460,13 +460,10 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-void Alignment::AddChild(Object *child)
+bool Alignment::IsSupportedChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 bool Alignment::HasAlignmentReference(int staffN)
@@ -633,6 +630,12 @@ void AlignmentReference::Reset()
 
     m_accidSpace.clear();
     m_layerCount = 0;
+}
+
+bool AlignmentReference::IsSupportedChild(Object *child)
+{
+    assert(dynamic_cast<LayerElement *>(child));
+    return true;
 }
 
 void AlignmentReference::AddChild(Object *child)
