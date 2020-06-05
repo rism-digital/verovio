@@ -113,8 +113,8 @@ public:
 
     // accessors and modifiers for the font elements
     int GetPointSize() { return m_pointSize; }
-    int GetStyle() { return m_style; }
-    int GetWeight() { return m_weight; }
+    data_FONTSTYLE GetStyle() { return m_style; }
+    data_FONTWEIGHT GetWeight() { return m_weight; }
     bool GetUnderlined() { return m_underlined; }
     bool GetSupSubScript() { return m_supSubScript; }
     std::string GetFaceName() { return m_faceName; }

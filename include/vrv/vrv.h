@@ -21,6 +21,8 @@
 #include <time.h>
 #endif
 
+#include "atttypes.h"
+
 namespace vrv {
 
 class Glyph;
@@ -128,35 +130,42 @@ bool Check(Object *object);
 
 class Resources {
 public:
+    using StyleAttributes = std::pair<data_FONTWEIGHT, data_FONTSTYLE>;
+    using GlyphMap = std::map<wchar_t, Glyph>;
+    using GlyphTextMap = std::map<StyleAttributes, GlyphMap>;
     /**
      * @name Setters and getters for static environment variables
      */
     ///@{
     /** Resource path */
-    static std::string GetPath() { return m_path; }
-    static void SetPath(std::string path) { m_path = path; }
+    static std::string GetPath() { return s_path; }
+    static void SetPath(const std::string &path) { s_path = path; }
     /** Init the SMufL music and text fonts */
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */
-    static bool InitTextFont(std::string fontName);
+    static bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
     /** Select a particular font */
-    static bool SetFont(std::string fontName);
+    static bool SetFont(const std::string &fontName);
     /** Returns the glyph (if exists) for the current SMuFL font */
     static Glyph *GetGlyph(wchar_t smuflCode);
+    /** Set current text style*/
+    static void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle);
     /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
     static Glyph *GetTextGlyph(wchar_t code);
     ///@}
 
 private:
-    static bool LoadFont(std::string fontName);
+    static bool LoadFont(const std::string &fontName);
 
 private:
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
-    static std::string m_path;
+    static std::string s_path;
     /** The loaded SMuFL font */
-    static std::map<wchar_t, Glyph> m_font;
+    static GlyphMap s_font;
     /** A text font used for bounding box calculations */
-    static std::map<wchar_t, Glyph> m_textFont;
+    static GlyphTextMap s_textFont;
+    static StyleAttributes s_currentStyle;
+    static const StyleAttributes k_defaultStyle;
 };
 
 //----------------------------------------------------------------------------

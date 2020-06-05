@@ -71,6 +71,11 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Overwritten method for chord
+     */
     virtual void AddChild(Object *object);
 
     /**

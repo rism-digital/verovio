@@ -146,7 +146,7 @@ void ABCInput::parseABC(std::istream &infile)
         // create score
         assert(m_mdiv != NULL);
         Score *score = new Score();
-        if (!m_doc->m_scoreDef.GetFirst(STAFFGRP)) {
+        if (!m_doc->m_mdivScoreDef.GetFirst(STAFFGRP)) {
             m_mdiv->AddChild(score);
 
             // create page head
@@ -162,13 +162,13 @@ void ABCInput::parseABC(std::istream &infile)
                 m_clef = NULL;
             }
             staffGrp->AddChild(staffDef);
-            m_doc->m_scoreDef.AddChild(staffGrp);
+            m_doc->m_mdivScoreDef.AddChild(staffGrp);
             if (m_key) {
-                m_doc->m_scoreDef.AddChild(m_key);
+                m_doc->m_mdivScoreDef.AddChild(m_key);
                 m_key = NULL;
             }
             if (m_meter) {
-                m_doc->m_scoreDef.AddChild(m_meter);
+                m_doc->m_mdivScoreDef.AddChild(m_meter);
                 m_meter = NULL;
             }
         }
@@ -291,7 +291,7 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
 
 void ABCInput::CalcUnitNoteLength()
 {
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_scoreDef.FindDescendantByType(METERSIG));
+    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->m_mdivScoreDef.FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
@@ -846,7 +846,7 @@ void ABCInput::PrintInformationFields()
         originRend->AddChild(origin);
         pgHead->AddChild(originRend);
     }
-    m_doc->m_scoreDef.AddChild(pgHead);
+    m_doc->m_mdivScoreDef.AddChild(pgHead);
 }
 
 void ABCInput::CreateHeader()

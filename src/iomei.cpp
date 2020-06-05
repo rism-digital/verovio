@@ -138,18 +138,26 @@ std::vector<std::string> MEIInput::s_editorialElementNames = { "abbr", "add", "a
 // MEIOutput
 //----------------------------------------------------------------------------
 
-MEIOutput::MEIOutput(Doc *doc, std::string filename) : Output(doc)
+MEIOutput::MEIOutput(Doc *doc) : Output(doc)
 {
-    m_filename = filename;
-    m_writeToStreamString = false;
     m_page = -1;
+    m_indent = 5;
     m_scoreBasedMEI = false;
+    m_removeIds = false;
 }
 
 MEIOutput::~MEIOutput() {}
 
 bool MEIOutput::Export()
 {
+
+    if (m_removeIds) {
+        FindAllReferencedObjectsParams findAllReferencedObjectsParams(&m_referredObjects);
+        Functor findAllReferencedObjects(&Object::FindAllReferencedObjects);
+        m_doc->Process(&findAllReferencedObjects, &findAllReferencedObjectsParams);
+        m_referredObjects.unique();
+    }
+
     try {
         pugi::xml_document meiDoc;
 
@@ -203,7 +211,7 @@ bool MEIOutput::Export()
                 m_currentNode = m_currentNode.append_child("section");
                 m_nodeStack.push_back(m_currentNode);
                 // First save the main scoreDef
-                m_doc->m_scoreDef.Save(this);
+                m_doc->m_mdivScoreDef.Save(this);
             }
             else {
                 m_currentNode = meiDoc.append_child("pages");
@@ -217,12 +225,8 @@ bool MEIOutput::Export()
             output_flags |= pugi::format_no_escapes;
         }
 
-        if (m_writeToStreamString) {
-            meiDoc.save(m_streamStringOutput, "    ", output_flags);
-        }
-        else {
-            meiDoc.save_file(m_filename.c_str(), "    ", output_flags);
-        }
+        std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
+        meiDoc.save(m_streamStringOutput, indent.c_str(), output_flags);
     }
     catch (char *str) {
         LogError("%s", str);
@@ -234,10 +238,8 @@ bool MEIOutput::Export()
 
 std::string MEIOutput::GetOutput(int page)
 {
-    m_writeToStreamString = true;
     m_page = page;
     this->Export();
-    m_writeToStreamString = false;
     m_page = -1;
 
     return m_streamStringOutput.str();
@@ -750,11 +752,11 @@ bool MEIOutput::WriteObject(Object *object)
 
     if (object->Is(PAGES) && (dynamic_cast<Pages *>(object) == m_doc->GetPages())) {
         // First save the main scoreDef
-        m_doc->m_scoreDef.Save(this);
+        m_doc->m_mdivScoreDef.Save(this);
     }
     else if (object->Is(SCORE) && (dynamic_cast<Score *>(object) == m_doc->GetScore())) {
         // First save the main scoreDef
-        m_doc->m_scoreDef.Save(this);
+        m_doc->m_mdivScoreDef.Save(this);
     }
 
     WriteUnsupportedAttr(m_currentNode, object);
@@ -792,6 +794,11 @@ std::string MEIOutput::UuidToMeiStr(Object *element)
 
 void MEIOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
 {
+    if (m_removeIds) {
+        ListOfObjects::iterator it = std::find(m_referredObjects.begin(), m_referredObjects.end(), object);
+        if (it == m_referredObjects.end()) return;
+        m_referredObjects.erase(it);
+    }
     currentNode.append_attribute("xml:id") = UuidToMeiStr(object).c_str();
 }
 
@@ -1016,6 +1023,7 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
 
     WriteScoreDefElement(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
+    scoreDef->WriteDistances(currentNode);
     scoreDef->WriteEndings(currentNode);
     scoreDef->WriteOptimization(currentNode);
 }
@@ -1259,6 +1267,7 @@ void MEIOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     WriteTimeSpanningInterface(currentNode, hairpin);
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
+    hairpin->WriteHairpinVis(currentNode);
     hairpin->WritePlacement(currentNode);
     hairpin->WriteVerticalGroup(currentNode);
 }
@@ -1945,6 +1954,7 @@ void MEIOutput::WriteF(pugi::xml_node currentNode, F *f)
 
     WriteTextElement(currentNode, f);
     WriteTimeSpanningInterface(currentNode, f);
+    f->WriteExtender(currentNode);
 }
 
 void MEIOutput::WriteFig(pugi::xml_node currentNode, Fig *fig)
@@ -2732,7 +2742,13 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for verse
     else if (filterParent->Is(VERSE)) {
-        if (element == "syl") {
+        if (element == "label") {
+            return true;
+        }
+        else if (element == "labelAbbr") {
+            return true;
+        }
+        else if (element == "syl") {
             return true;
         }
         else {
@@ -3482,7 +3498,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     ScoreDef *vrvScoreDef;
     // We have not reached the first scoreDef and we have to use if for the doc
     if (!m_hasScoreDef && m_useScoreDefForDoc) {
-        vrvScoreDef = &m_doc->m_scoreDef;
+        vrvScoreDef = &m_doc->m_mdivScoreDef;
     }
     else {
         vrvScoreDef = new ScoreDef();
@@ -3494,6 +3510,7 @@ bool MEIInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     }
 
     ReadScoreDefInterface(scoreDef, vrvScoreDef);
+    vrvScoreDef->ReadDistances(scoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
     vrvScoreDef->ReadOptimization(scoreDef);
 
@@ -4117,6 +4134,7 @@ bool MEIInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     ReadTimeSpanningInterface(hairpin, vrvHairpin);
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
+    vrvHairpin->ReadHairpinVis(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
     vrvHairpin->ReadVerticalGroup(hairpin);
 
@@ -4489,6 +4507,12 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "keySig") {
             success = ReadKeySig(parent, xmlElement);
+        }
+        else if (elementName == "label") {
+            success = ReadLabel(parent, xmlElement);
+        }
+        else if (elementName == "labelAbbr") {
+            success = ReadLabelAbbr(parent, xmlElement);
         }
         else if (elementName == "ligature") {
             success = ReadLigature(parent, xmlElement);
@@ -5245,6 +5269,7 @@ bool MEIInput::ReadF(Object *parent, pugi::xml_node f)
     ReadTextElement(f, vrvF);
 
     ReadTimeSpanningInterface(f, vrvF);
+    vrvF->ReadExtender(f);
 
     parent->AddChild(vrvF);
     ReadUnsupportedAttr(f, vrvF);

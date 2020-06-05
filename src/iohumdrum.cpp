@@ -1573,7 +1573,7 @@ void HumdrumInput::prepareStaffGroups()
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     if (staffstarts.size() > 0) {
-        addMidiTempo(m_doc->m_scoreDef, staffstarts[0]);
+        addMidiTempo(m_doc->m_mdivScoreDef, staffstarts[0]);
     }
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
@@ -1600,7 +1600,7 @@ void HumdrumInput::prepareStaffGroups()
         // If there is one staff, then no extra decoration.
         else if (staffstarts.size() == 1) {
             StaffGrp *sg = new StaffGrp();
-            m_doc->m_scoreDef.AddChild(sg);
+            m_doc->m_mdivScoreDef.AddChild(sg);
             sg->AddChild(m_staffdef[0]);
         }
         // do something if there is no staff in the score?
@@ -1609,7 +1609,7 @@ void HumdrumInput::prepareStaffGroups()
         bool status = processStaffDecoration(decoration);
         if (!status) {
             StaffGrp *sg = new StaffGrp();
-            m_doc->m_scoreDef.AddChild(sg);
+            m_doc->m_mdivScoreDef.AddChild(sg);
             sg->SetBarThru(BOOLEAN_false);
             // sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
             for (int i = 0; i < (int)m_staffdef.size(); ++i) {
@@ -1636,7 +1636,7 @@ void HumdrumInput::prepareStaffGroups()
 
 void HumdrumInput::promoteInstrumentNamesToGroup()
 {
-    ScoreDef &sdf = m_doc->m_scoreDef;
+    ScoreDef &sdf = m_doc->m_mdivScoreDef;
     int count = sdf.GetChildCount();
     for (int i = 0; i < count; i++) {
         Object *obj = sdf.GetChild(i);
@@ -1710,7 +1710,7 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
 
 void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 {
-    ScoreDef &sdf = m_doc->m_scoreDef;
+    ScoreDef &sdf = m_doc->m_mdivScoreDef;
     int count = sdf.GetChildCount();
 
     for (int i = 0; i < count; i++) {
@@ -2143,14 +2143,14 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         // There is no barline across the staves in this case.
         root = new StaffGrp();
         root->SetBarThru(BOOLEAN_false);
-        m_doc->m_scoreDef.AddChild(root);
+        m_doc->m_mdivScoreDef.AddChild(root);
     }
     else if (d[0] == '(') {
         // The outer group is not bracketed, but bar goes all of
         // the way through system.
         root = new StaffGrp();
         root->SetBarThru(BOOLEAN_true);
-        m_doc->m_scoreDef.AddChild(root);
+        m_doc->m_mdivScoreDef.AddChild(root);
     }
     else if (pairing.back() == 0) {
         skipfirst = true;
@@ -2166,7 +2166,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         else if (d[0] == '[') {
             root->SetSymbol(staffGroupingSym_SYMBOL_bracket);
         }
-        m_doc->m_scoreDef.AddChild(root);
+        m_doc->m_mdivScoreDef.AddChild(root);
     }
 
     vector<int> spine; // kernstart index
@@ -2373,7 +2373,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
             root->AddChild(sg);
         }
         else {
-            m_doc->m_scoreDef.AddChild(sg);
+            m_doc->m_mdivScoreDef.AddChild(sg);
         }
         for (int i = 0; i < (int)m_staffdef.size(); ++i) {
             sg->AddChild(m_staffdef[i]);
@@ -2396,7 +2396,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
                 root->AddChild(sg);
             }
             else {
-                m_doc->m_scoreDef.AddChild(sg);
+                m_doc->m_mdivScoreDef.AddChild(sg);
             }
         }
 
@@ -2459,7 +2459,7 @@ bool HumdrumInput::processStaffDecoration(const string &decoration)
         }
         else {
             root_sg = new StaffGrp();
-            m_doc->m_scoreDef.AddChild(root_sg);
+            m_doc->m_mdivScoreDef.AddChild(root_sg);
             root_sg->SetBarThru(BOOLEAN_false);
         }
         for (int i = 0; i < (int)newgroups.size(); ++i) {
@@ -2899,12 +2899,12 @@ bool HumdrumInput::prepareFooter(
         return false;
     }
 
-    // MEIOutput meioutput(&tempdoc, "");
+    // MEIOutput meioutput(&tempdoc);
     // meioutput.SetScoreBasedMEI(true);
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pgfoot = tempdoc.m_scoreDef.FindDescendantByType(ClassId::PGFOOT);
+    Object *pgfoot = tempdoc.m_mdivScoreDef.FindDescendantByType(ClassId::PGFOOT);
     if (pgfoot == NULL) {
         return false;
     }
@@ -2922,9 +2922,9 @@ bool HumdrumInput::prepareFooter(
         return false;
     }
 
-    m_doc->m_scoreDef.AddChild(pgfoot);
+    m_doc->m_mdivScoreDef.AddChild(pgfoot);
 
-    Object *pgfoot2 = tempdoc.m_scoreDef.FindDescendantByType(ClassId::PGFOOT2);
+    Object *pgfoot2 = tempdoc.m_mdivScoreDef.FindDescendantByType(ClassId::PGFOOT2);
     if (pgfoot2 == NULL) {
         return true;
     }
@@ -2942,7 +2942,7 @@ bool HumdrumInput::prepareFooter(
         return true;
     }
 
-    m_doc->m_scoreDef.AddChild(pgfoot2);
+    m_doc->m_mdivScoreDef.AddChild(pgfoot2);
 
     return true;
 }
@@ -3073,12 +3073,12 @@ bool HumdrumInput::prepareHeader(
         return false;
     }
 
-    // MEIOutput meioutput(&tempdoc, "");
+    // MEIOutput meioutput(&tempdoc);
     // meioutput.SetScoreBasedMEI(true);
     // string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pghead = tempdoc.m_scoreDef.FindDescendantByType(ClassId::PGHEAD);
+    Object *pghead = tempdoc.m_mdivScoreDef.FindDescendantByType(ClassId::PGHEAD);
     if (pghead == NULL) {
         return false;
     }
@@ -3096,7 +3096,7 @@ bool HumdrumInput::prepareHeader(
         return false;
     }
 
-    m_doc->m_scoreDef.AddChild(pghead);
+    m_doc->m_mdivScoreDef.AddChild(pghead);
 
     return true;
 }
@@ -18128,7 +18128,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
 
 std::string HumdrumInput::GetMeiString()
 {
-    MEIOutput meioutput(m_doc, "");
+    MEIOutput meioutput(m_doc);
     meioutput.SetScoreBasedMEI(true);
     return meioutput.GetOutput();
 }

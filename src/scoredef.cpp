@@ -144,8 +144,10 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
 // ScoreDef
 //----------------------------------------------------------------------------
 
-ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttEndings(), AttOptimization()
+ScoreDef::ScoreDef()
+    : ScoreDefElement("scoredef-"), ObjectListInterface(), AttDistances(), AttEndings(), AttOptimization()
 {
+    RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_ENDINGS);
     RegisterAttClass(ATT_OPTIMIZATION);
 
@@ -157,6 +159,7 @@ ScoreDef::~ScoreDef() {}
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
+    ResetDistances();
     ResetEndings();
     ResetOptimization();
 
@@ -165,7 +168,7 @@ void ScoreDef::Reset()
     m_setAsDrawing = false;
 }
 
-void ScoreDef::AddChild(Object *child)
+bool ScoreDef::IsSupportedChild(Object *child)
 {
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
@@ -189,13 +192,9 @@ void ScoreDef::AddChild(Object *child)
         assert(dynamic_cast<RunningElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)

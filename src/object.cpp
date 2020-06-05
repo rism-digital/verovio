@@ -326,7 +326,7 @@ int Object::GetChildCount(const ClassId classId) const
 
 int Object::GetChildCount(const ClassId classId, int deepth)
 {
-    ArrayOfObjects objects;
+    ListOfObjects objects;
     ClassIdComparison matchClassId(classId);
     this->FindAllDescendantByComparison(&objects, &matchClassId);
     return (int)objects.size();
@@ -516,7 +516,7 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 }
 
 void Object::FindAllDescendantByComparison(
-    ArrayOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
+    ListOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
     if (clear) objects->clear();
@@ -527,7 +527,7 @@ void Object::FindAllDescendantByComparison(
 }
 
 void Object::FindAllDescendantBetween(
-    ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
+    ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
 {
     assert(objects);
     if (clear) objects->clear();
@@ -547,13 +547,15 @@ Object *Object::GetChild(int idx) const
 
 Object *Object::GetChild(int idx, const ClassId classId)
 {
-    ArrayOfObjects objects;
+    ListOfObjects objects;
     ClassIdComparison matchClassId(classId);
     this->FindAllDescendantByComparison(&objects, &matchClassId, 1);
     if ((idx < 0) || (idx >= (int)objects.size())) {
         return NULL;
     }
-    return objects.at(idx);
+    ListOfObjects::iterator it = objects.begin();
+    std::advance(it, idx);
+    return *it;
 }
 
 bool Object::DeleteChild(Object *child)
@@ -605,11 +607,24 @@ void Object::SetParent(Object *parent)
     m_parent = parent;
 }
 
-void Object::AddChild(Object *child)
+bool Object::IsSupportedChild(Object *child)
 {
     // This should never happen because the method should be overridden
     LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
     assert(false);
+    return false;
+}
+
+void Object::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        return;
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 int Object::GetDrawingX() const
@@ -658,15 +673,13 @@ int Object::GetChildIndex(const Object *child)
 
 int Object::GetDescendantIndex(const Object *child, const ClassId classId, int deepth)
 {
-    ArrayOfObjects objects;
+    ListOfObjects objects;
     ClassIdComparison matchClassId(classId);
     this->FindAllDescendantByComparison(&objects, &matchClassId);
-    ArrayOfObjects::iterator iter;
-    int i;
-    for (iter = objects.begin(), i = 0; iter != objects.end(); ++iter, ++i) {
-        if (child == *iter) {
-            return i;
-        }
+    int i = 0;
+    for (auto &object : objects) {
+        if (child == object) return i;
+        i++;
     }
     return -1;
 }
@@ -731,7 +744,7 @@ Object *Object::GetLastAncestorNot(const ClassId classId, int maxDepth)
 
 bool Object::HasEditorialContent()
 {
-    ArrayOfObjects editorial;
+    ListOfObjects editorial;
     IsEditorialElementComparison editorialComparison;
     this->FindAllDescendantByComparison(&editorial, &editorialComparison);
     return (!editorial.empty());
@@ -1139,6 +1152,41 @@ int Object::FindAllBetween(FunctorParams *functorParams)
     // We have reached the end of the range
     if (params->m_end == this) {
         return FUNCTOR_STOP;
+    }
+
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindAllReferencedObjects(FunctorParams *functorParams)
+{
+    FindAllReferencedObjectsParams *params = dynamic_cast<FindAllReferencedObjectsParams *>(functorParams);
+    assert(params);
+
+    if (this->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = this->GetLinkingInterface();
+        assert(interface);
+        if (interface->GetNextLink()) params->m_elements->push_back(interface->GetNextLink());
+        if (interface->GetSameasLink()) params->m_elements->push_back(interface->GetSameasLink());
+    }
+    if (this->HasInterface(INTERFACE_PLIST)) {
+        PlistInterface *interface = this->GetPlistInterface();
+        assert(interface);
+        for (auto &object : *interface->GetRefs()) {
+            params->m_elements->push_back(object);
+        }
+    }
+    if (this->HasInterface(INTERFACE_TIME_POINT) || this->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimePointInterface *interface = this->GetTimePointInterface();
+        assert(interface);
+        if (interface->GetStart() && !interface->GetStart()->Is(TIMESTAMP_ATTR))
+            params->m_elements->push_back(interface->GetStart());
+    }
+    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
+        assert(interface);
+        if (interface->GetEnd() && !interface->GetEnd()->Is(TIMESTAMP_ATTR))
+            params->m_elements->push_back(interface->GetEnd());
     }
 
     // continue until the end
@@ -1579,7 +1627,7 @@ bool Object::sortByUlx(Object *a, Object *b)
     if (a->GetFacsimileInterface())
         fa = a->GetFacsimileInterface();
     else {
-        ArrayOfObjects children;
+        ListOfObjects children;
         a->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
@@ -1592,7 +1640,7 @@ bool Object::sortByUlx(Object *a, Object *b)
     if (b->GetFacsimileInterface())
         fb = b->GetFacsimileInterface();
     else {
-        ArrayOfObjects children;
+        ListOfObjects children;
         b->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);

@@ -282,6 +282,8 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
+typedef std::list<Object *> ListOfObjects;
+
 typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
@@ -294,7 +296,7 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<int, int> > ArrayOfIntPairs;
 
-typedef std::multimap<std::string, LinkingInterface *> ArrayOfLinkingInterfaceUuidPairs;
+typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceUuidPairs;
 
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 

@@ -64,9 +64,6 @@ Toolkit::Toolkit(bool initFont)
     m_scale = DEFAULT_SCALE;
     m_inputFrom = AUTO;
 
-    // default page size
-    m_scoreBasedMei = false;
-
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
@@ -120,6 +117,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "mei") {
         m_outputTo = MEI;
     }
+    else if (outputTo == "pb-mei") {
+        m_outputTo = MEI;
+    }
     else if (outputTo == "midi") {
         m_outputTo = MIDI;
     }
@@ -130,7 +130,7 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
         m_outputTo = PAE;
     }
     else if (outputTo != "svg") {
-        LogError("Output format can only be: mei, humdrum, midi, timemap or svg");
+        LogError("Output format can only be: mei, pb-mei, humdrum, midi, timemap or svg");
         return false;
     }
     return true;
@@ -441,7 +441,7 @@ bool Toolkit::LoadData(const std::string &data)
             return true;
         }
 
-        MEIOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
 
@@ -483,7 +483,7 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MEIOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
@@ -513,7 +513,7 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MEIOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
@@ -541,7 +541,7 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MEIOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
@@ -569,7 +569,7 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-        MEIOutput meioutput(&tempdoc, "");
+        MEIOutput meioutput(&tempdoc);
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
@@ -675,6 +675,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
 {
     bool scoreBased = true;
     int pageNo = 0;
+    bool removeIds = false;
 
     jsonxx::Object json;
 
@@ -685,6 +686,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     else {
         if (json.has<jsonxx::Boolean>("scoreBased")) scoreBased = json.get<jsonxx::Boolean>("scoreBased");
         if (json.has<jsonxx::Number>("pageNo")) pageNo = json.get<jsonxx::Number>("pageNo");
+        if (json.has<jsonxx::Boolean>("removeIds")) removeIds = json.get<jsonxx::Boolean>("removeIds");
     }
 
     if (GetPageCount() == 0) {
@@ -696,21 +698,32 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
-    MEIOutput meioutput(&m_doc, "");
+    MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
+
+    int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
+    meioutput.SetIndent(indent);
+    meioutput.SetRemoveIds(removeIds);
+
     std::string output = meioutput.GetOutput(pageNo);
     if (initialPageNo >= 0) m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
 
-bool Toolkit::SaveFile(const std::string &filename)
+bool Toolkit::SaveFile(const std::string &filename, const std::string &jsonOptions)
 {
-    MEIOutput meioutput(&m_doc, filename.c_str());
-    meioutput.SetScoreBasedMEI(m_scoreBasedMei);
-    if (!meioutput.Export()) {
-        LogError("Unknown error");
+    std::string output = GetMEI(jsonOptions);
+
+    std::ofstream outfile;
+    outfile.open(filename.c_str());
+
+    if (!outfile.is_open()) {
+        // add message?
         return false;
     }
+
+    outfile << output;
+    outfile.close();
     return true;
 }
 
@@ -1240,6 +1253,9 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
 
+    int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
+    svg.SetIndent(indent);
+
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
     }
@@ -1386,12 +1402,12 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     if (page) pageNo = page->GetIdx() + 1;
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
-    ArrayOfObjects notes;
+    ListOfObjects notes;
 
     measure->FindAllDescendantByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
-    ArrayOfObjects::iterator iter;
+    ListOfObjects::iterator iter;
     for (iter = notes.begin(); iter != notes.end(); ++iter) {
         a << (*iter)->GetUuid();
     }

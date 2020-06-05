@@ -56,19 +56,15 @@ void Neume::Reset()
     ResetColor();
 }
 
-void Neume::AddChild(Object *child)
+bool Neume::IsSupportedChild(Object *child)
 {
     if (child->Is(NC)) {
         assert(dynamic_cast<Nc *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Neume::GetPosition(LayerElement *element)
@@ -92,7 +88,7 @@ bool Neume::IsLastInNeume(LayerElement *element)
 
 NeumeGroup Neume::GetNeumeGroup()
 {
-    ArrayOfObjects children;
+    ListOfObjects children;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&children, &ac);
 
@@ -125,7 +121,7 @@ NeumeGroup Neume::GetNeumeGroup()
 std::vector<int> Neume::GetPitchDifferences()
 {
     std::vector<int> pitchDifferences;
-    ArrayOfObjects ncChildren;
+    ListOfObjects ncChildren;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&ncChildren, &ac);
 
@@ -148,7 +144,7 @@ std::vector<int> Neume::GetPitchDifferences()
 
 bool Neume::GenerateChildMelodic()
 {
-    ArrayOfObjects children;
+    ListOfObjects children;
     ClassIdComparison ac(NC);
     this->FindAllDescendantByComparison(&children, &ac);
 
@@ -184,7 +180,7 @@ bool Neume::GenerateChildMelodic()
 
 PitchInterface *Neume::GetHighestPitch()
 {
-    ArrayOfObjects pitchChildren;
+    ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
     this->FindAllDescendantByComparison(&pitchChildren, &ic);
 
@@ -203,7 +199,7 @@ PitchInterface *Neume::GetHighestPitch()
 
 PitchInterface *Neume::GetLowestPitch()
 {
-    ArrayOfObjects pitchChildren;
+    ListOfObjects pitchChildren;
     InterfaceComparison ic(INTERFACE_PITCH);
     this->FindAllDescendantByComparison(&pitchChildren, &ic);
 

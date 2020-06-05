@@ -162,7 +162,7 @@ class MEIOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
-    MEIOutput(Doc *doc, std::string filename);
+    MEIOutput(Doc *doc);
     virtual ~MEIOutput();
     ///@}
 
@@ -187,9 +187,19 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Setter for score-based MEI output (not implemented)
+     * Setter for score-based MEI output
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+
+    /**
+     * Setter for indent for the MEI output (default is 3, -1 for tabs)
+     */
+    void SetIndent(int indent) { m_indent = indent; }
+
+    /**
+     * Setter for remove Ids flag for the MEI output (default is false)
+     */
+    void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
 private:
     bool WriteDoc(Doc *doc);
@@ -408,15 +418,16 @@ private:
 public:
     //
 private:
-    std::string m_filename;
     std::ostringstream m_streamStringOutput;
-    bool m_writeToStreamString;
+    int m_indent;
     int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
     /** @name Current element */
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_nodeStack;
+    bool m_removeIds;
+    ListOfObjects m_referredObjects;
 };
 
 //----------------------------------------------------------------------------

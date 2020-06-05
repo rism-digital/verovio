@@ -39,7 +39,7 @@ public:
     virtual void Reset();
     ClassId GetClassId() const { return SURFACE; }
     ///@}
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     int GetMaxX();
     int GetMaxY();

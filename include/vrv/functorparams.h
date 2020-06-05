@@ -32,6 +32,7 @@ class Functor;
 class Hairpin;
 class Harm;
 class KeySig;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
@@ -41,6 +42,7 @@ class MeterSig;
 class MRpt;
 class Object;
 class Page;
+class Pedal;
 class ScoreDef;
 class Slur;
 class Staff;
@@ -375,6 +377,7 @@ public:
         m_previousVerse = NULL;
         m_lastSyl = NULL;
         m_previousMeasure = NULL;
+        m_currentLabelAbbr = NULL;
         m_freeSpace = 0;
         m_staffSize = 100;
         m_doc = doc;
@@ -383,6 +386,7 @@ public:
     Verse *m_previousVerse;
     Syl *m_lastSyl;
     Measure *m_previousMeasure;
+    LabelAbbr *m_currentLabelAbbr;
     int m_freeSpace;
     int m_staffSize;
     Doc *m_doc;
@@ -1033,7 +1037,7 @@ public:
 
 class FindAllBetweenParams : public FunctorParams {
 public:
-    FindAllBetweenParams(Comparison *comparison, ArrayOfObjects *elements, Object *start, Object *end)
+    FindAllBetweenParams(Comparison *comparison, ListOfObjects *elements, Object *start, Object *end)
     {
         m_comparison = comparison;
         m_elements = elements;
@@ -1041,9 +1045,23 @@ public:
         m_end = end;
     }
     Comparison *m_comparison;
-    ArrayOfObjects *m_elements;
+    ListOfObjects *m_elements;
     Object *m_start;
     Object *m_end;
+};
+
+//----------------------------------------------------------------------------
+// FindAllReferencedObjectsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: an array of all matching objects
+ **/
+
+class FindAllReferencedObjectsParams : public FunctorParams {
+public:
+    FindAllReferencedObjectsParams(ListOfObjects *elements) { m_elements = elements; }
+    ListOfObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------
@@ -1057,13 +1075,13 @@ public:
 
 class FindAllByComparisonParams : public FunctorParams {
 public:
-    FindAllByComparisonParams(Comparison *comparison, ArrayOfObjects *elements)
+    FindAllByComparisonParams(Comparison *comparison, ListOfObjects *elements)
     {
         m_comparison = comparison;
         m_elements = elements;
     }
     Comparison *m_comparison;
-    ArrayOfObjects *m_elements;
+    ListOfObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------
@@ -1403,8 +1421,13 @@ public:
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
+    PrepareFloatingGrpsParams()
+    {
+        m_previousEnding = NULL;
+        m_pedalLine = NULL;
+    }
     Ending *m_previousEnding;
+    Pedal *m_pedalLine;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
     std::map<std::string, Harm *> m_harms;
@@ -1465,8 +1488,8 @@ public:
 class PrepareLinkingParams : public FunctorParams {
 public:
     PrepareLinkingParams() { m_fillList = true; }
-    ArrayOfLinkingInterfaceUuidPairs m_nextUuidPairs;
-    ArrayOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
+    MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
+    MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
 };
 

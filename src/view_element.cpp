@@ -33,6 +33,8 @@
 #include "functorparams.h"
 #include "halfmrpt.h"
 #include "keysig.h"
+#include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
@@ -619,6 +621,43 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     bool isMensural = staff->IsMensural();
     bool isNeume = staff->IsNeume();
 
+    // cmn clefs
+    int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
+    // G clef
+    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+        sym = SMUFL_E050_gClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+        sym = SMUFL_E052_gClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
+        sym = SMUFL_E051_gClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
+        sym = SMUFL_E053_gClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
+        sym = SMUFL_E054_gClef15ma;
+    // C clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+        sym = SMUFL_E05C_cClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+        sym = SMUFL_E05D_cClef8vb;
+    else if (clef->GetShape() == CLEFSHAPE_C)
+        sym = SMUFL_E05C_cClef;
+    // F clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
+        sym = SMUFL_E062_fClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
+        sym = SMUFL_E064_fClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
+        sym = SMUFL_E063_fClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
+        sym = SMUFL_E065_fClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
+        sym = SMUFL_E066_fClef15ma;
+    else if (clef->GetShape() == CLEFSHAPE_F)
+        sym = SMUFL_E062_fClef;
+    // Perc clef
+    else if (clef->GetShape() == CLEFSHAPE_perc)
+        sym = SMUFL_E069_unpitchedPercussionClef1;
+
     // mensural clefs
     if (isMensural) {
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
@@ -645,44 +684,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             sym = SMUFL_E906_chantCclef;
         else if (clef->GetShape() == CLEFSHAPE_F)
             sym = SMUFL_E902_chantFclef;
-    }
-    // cmn clefs
-    else {
-        int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
-        // G clef
-        if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-            sym = SMUFL_E050_gClef;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-            sym = SMUFL_E052_gClef8vb;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
-            sym = SMUFL_E051_gClef15mb;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
-            sym = SMUFL_E053_gClef8va;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
-            sym = SMUFL_E054_gClef15ma;
-        // C clef
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-            sym = SMUFL_E05C_cClef;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-            sym = SMUFL_E05D_cClef8vb;
-        else if (clef->GetShape() == CLEFSHAPE_C)
-            sym = SMUFL_E05C_cClef;
-        // F clef
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
-            sym = SMUFL_E062_fClef;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
-            sym = SMUFL_E064_fClef8vb;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
-            sym = SMUFL_E063_fClef15mb;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
-            sym = SMUFL_E065_fClef8va;
-        else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
-            sym = SMUFL_E066_fClef15ma;
-        else if (clef->GetShape() == CLEFSHAPE_F)
-            sym = SMUFL_E062_fClef;
-        // Perc clef
-        else if (clef->GetShape() == CLEFSHAPE_perc)
-            sym = SMUFL_E069_unpitchedPercussionClef1;
     }
 
     if (sym == 0) {
@@ -1423,7 +1424,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    syl->SetDrawingYRel(GetSylYRel(syl, staff));
+    syl->SetDrawingYRel(GetSylYRel(syl->m_drawingVerse, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
     dc->DeactivateGraphicY();
@@ -1491,6 +1492,49 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Verse *verse = dynamic_cast<Verse *>(element);
     assert(verse);
 
+    Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
+    LabelAbbr *labelAbbr = verse->m_drawingLabelAbbr;
+
+    if (label || labelAbbr) {
+
+        std::wstring labelStr;
+        Object *graphic = NULL;
+
+        if (label) {
+            graphic = label;
+            labelStr = label->GetText(label);
+        }
+        else {
+            graphic = labelAbbr;
+            labelStr = labelAbbr->GetText(labelAbbr);
+        }
+
+        FontInfo labelTxt;
+        if (!dc->UseGlobalStyling()) {
+            labelTxt.SetFaceName("Times");
+        }
+        labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+
+        TextDrawingParams params;
+        params.m_x = verse->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
+        params.m_pointSize = labelTxt.GetPointSize();
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&labelTxt);
+
+        dc->StartGraphic(graphic, "", graphic->GetUuid());
+
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
+        DrawTextChildren(dc, graphic, params);
+        dc->EndText();
+
+        dc->EndGraphic(graphic, this);
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
     dc->StartGraphic(verse, "", verse->GetUuid());
 
     DrawLayerChildren(dc, verse, layer, staff, measure);
@@ -1508,26 +1552,24 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
     assert(stem);
     assert(staff);
 
-    dc->SetPen(AxNONE, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    dc->SetPen(AxNONE, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 1.2, AxSOLID);
     dc->SetBrush(AxNONE, AxSOLID);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-    int positionShiftX1 = positionShift * 3 / 2;
-    int positionShiftY1 = positionShift * -5;
-    int positionShiftX2 = positionShift * 3;
+    int positionShiftX1 = positionShift;
+    int positionShiftY1 = positionShift * -4;
+    int positionShiftX2 = positionShift * 2;
     int positionShiftY2 = positionShift * -1;
     Point startPoint(stem->GetDrawingX(), stem->GetDrawingY() - stem->GetDrawingStemLen());
 
-    int startPointY = startPoint.y;
-
     // HARDCODED
     if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY + positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY + positionShiftY2));
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y + positionShiftY1),
+            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y + positionShiftY2));
     }
     else {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY - positionShiftY2),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY - positionShiftY1));
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y - positionShiftY1),
+            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y - positionShiftY2));
     }
 
     dc->ResetPen();
@@ -1698,9 +1740,9 @@ int View::GetFYRel(F *f, Staff *staff)
     return y;
 }
 
-int View::GetSylYRel(Syl *syl, Staff *staff)
+int View::GetSylYRel(int verseN, Staff *staff)
 {
-    assert(syl && staff);
+    assert(staff);
 
     int y = 0;
     StaffAlignment *alignment = staff->GetAlignment();
@@ -1711,7 +1753,7 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+            + (alignment->GetVerseCount() - verseN) * (height + descender + margin) + (descender);
     }
     return y;
 }

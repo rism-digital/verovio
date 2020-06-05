@@ -36,14 +36,9 @@ void TabRhythm::Reset()
     ResetNNumberLike();
 }
 
-void TabRhythm::AddChild(Object *child)
+bool TabRhythm::IsSupportedChild(Object *child)
 {
-    // Nothing of now
-    assert(false);
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return false;
 }
 
 } // namespace vrv

@@ -308,8 +308,14 @@ public:
     void ResetParent() { m_parent = NULL; }
 
     /**
-     * Base method for adding children.
+     * Base method for checking if a child can be added.
      * The method has to be overridden.
+     */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Base method for adding children.
+     * The method can be overridden.
      */
     virtual void AddChild(Object *object);
 
@@ -392,7 +398,7 @@ public:
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllDescendantByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
@@ -400,7 +406,7 @@ public:
      * The start and end objects are included in the result set.
      */
     void FindAllDescendantBetween(
-        ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
+        ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -538,6 +544,11 @@ public:
      * Find a all Object between a start and end Object and with an Comparison functor.
      */
     virtual int FindAllBetween(FunctorParams *functorParams);
+
+    /**
+     * Find a all Object to which another object points to in the data.
+     */
+    virtual int FindAllReferencedObjects(FunctorParams *functorParams);
 
     /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references

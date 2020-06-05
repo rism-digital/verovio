@@ -34,14 +34,10 @@ void Course::Reset()
     ResetNNumberLike();
 }
 
-void Course::AddChild(Object *child)
+bool Course::IsSupportedChild(Object *child)
 {
     // Nothing for now
-    assert(false);
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return false;
 }
 
 } // namespace vrv

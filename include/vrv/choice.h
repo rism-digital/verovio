@@ -39,7 +39,7 @@ public:
     /**
      * Add children to a apparatus.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
 protected:
     /** We store the level of the <choice> for integrity check */

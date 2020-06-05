@@ -52,9 +52,9 @@ public:
     /**
      * Add a page to the document
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
-    /*
+    /**
      * Clear the content of the document.
      */
     virtual void Reset();
@@ -417,7 +417,7 @@ public:
      * Holds the top scoreDef.
      * In a standard MEI file, this is the <scoreDef> encoded before the first <section>.
      */
-    ScoreDef m_scoreDef;
+    ScoreDef m_mdivScoreDef;
 
     /** The current page height */
     int m_drawingPageHeight;

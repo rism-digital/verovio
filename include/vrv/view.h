@@ -404,7 +404,7 @@ protected:
 
     /**
      * @name Methods for drawing time spanning elements, connectors or extensions
-     * Called fomr DrawTimeSpanningElement
+     * Called from DrawTimeSpanningElement
      */
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff,
@@ -419,6 +419,8 @@ protected:
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawPedalLine(
+        DeviceContext *dc, Pedal *pedal, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawPitchInflection(DeviceContext *dc, PitchInflection *pitchInflection, int x1, int x2, Staff *staff,
         char spanningType, Object *graphic = NULL);
     void DrawSlur(
@@ -540,7 +542,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(Syl *syl, Staff *staff);
+    int GetSylYRel(int verseN, Staff *staff);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 

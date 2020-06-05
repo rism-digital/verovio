@@ -203,6 +203,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, TRILL);
     DrawSystemList(dc, system, FIGURE);
     DrawSystemList(dc, system, OCTAVE);
+    DrawSystemList(dc, system, PEDAL);
     DrawSystemList(dc, system, PITCHINFLECTION);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
@@ -239,6 +240,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == OCTAVE)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == PEDAL)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == PITCHINFLECTION)) {
@@ -377,8 +381,8 @@ void View::DrawStaffGrp(
     // draw the system start bar line
     if (topStaffGrp
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
-                && (m_doc->m_scoreDef.GetSystemLeftline() != BOOLEAN_false))
-            || (m_doc->m_scoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+                && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
+            || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
     // actually draw the line, the brace or the bracket
@@ -1092,7 +1096,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
             fullLine.UpdateContentBBoxY(y + (lineWidth / 2), y - (lineWidth / 2));
             fullLine.UpdateContentBBoxX(x1, x2);
             int margin = m_doc->GetDrawingUnit(100) / 2;
-            ArrayOfObjects notes;
+            ListOfObjects notes;
             ClassIdComparison matchClassId(NOTE);
             staff->FindAllDescendantByComparison(&notes, &matchClassId);
             for (auto &note : notes) {
@@ -1418,7 +1422,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
             // cast to EditorialElement check in DrawLayerEditorialElement
             DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement *>(current), layer, staff, measure);
         }
-        else {
+        else if (!current->Is({ LABEL, LABELABBR })) {
             assert(false);
         }
     }

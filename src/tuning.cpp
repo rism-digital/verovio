@@ -37,7 +37,7 @@ void Tuning::Reset()
     ResetCourseLog();
 }
 
-void Tuning::AddChild(Object *child)
+bool Tuning::IsSupportedChild(Object *child)
 {
     if (child->Is(COURSE)) {
         assert(dynamic_cast<Course *>(child));
@@ -46,13 +46,9 @@ void Tuning::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines)

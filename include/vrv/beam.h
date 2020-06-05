@@ -127,7 +127,7 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Return information about the position in the beam.

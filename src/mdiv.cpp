@@ -42,7 +42,7 @@ void Mdiv::Reset()
     m_visibility = Hidden;
 }
 
-void Mdiv::AddChild(Object *child)
+bool Mdiv::IsSupportedChild(Object *child)
 {
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));
@@ -54,13 +54,9 @@ void Mdiv::AddChild(Object *child)
         assert(dynamic_cast<Score *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Mdiv::MakeVisible()

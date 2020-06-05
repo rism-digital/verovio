@@ -49,7 +49,7 @@ void Ligature::Reset()
 
 void Ligature::ClearClusters() {}
 
-void Ligature::AddChild(Object *child)
+bool Ligature::IsSupportedChild(Object *child)
 {
     if (child->Is(NOTE)) {
         assert(dynamic_cast<LayerElement *>(child));
@@ -57,15 +57,10 @@ void Ligature::AddChild(Object *child)
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
-
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Ligature::FilterList(ArrayOfObjects *childList)

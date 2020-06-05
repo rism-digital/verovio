@@ -38,7 +38,7 @@ public:
     /**
      * Add an element to a element.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
 protected:
     //

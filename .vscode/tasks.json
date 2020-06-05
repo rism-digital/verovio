@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "cmake",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceRoot}/tools"
+			},
+			"command": "cmake",
+			"args": [
+				"${workspaceRoot}/cmake",
+				"-DNO_HUMDRUM_SUPPORT=ON"
+			]
+		},
+		{
+			"label": "make",
+			"type": "shell",
+			"command": "make",
+			"options": {
+				"cwd": "${workspaceRoot}/tools"
+			},
+			"dependsOn": [
+				"cmake"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+	}
