@@ -1564,7 +1564,7 @@ double Doc::GetRightMargin(const ClassId classId) const
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
-    int margin = m_options->m_defaultBottomMargin.GetValue();
+    double margin = m_options->m_defaultBottomMargin.GetValue();
     if (classId == DYNAM) {
         margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
     }
@@ -1577,7 +1577,7 @@ double Doc::GetBottomMargin(const ClassId classId) const
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
-    int margin = m_options->m_defaultTopMargin.GetValue();
+    double margin = m_options->m_defaultTopMargin.GetValue();
     if (classId == DYNAM) {
         margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
     }
