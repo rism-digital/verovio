@@ -1162,7 +1162,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
             params->m_elements->push_back(object);
         }
     }
-    if (this->HasInterface(INTERFACE_TIME_POINT)) {
+    if (this->HasInterface(INTERFACE_TIME_POINT) || this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimePointInterface *interface = this->GetTimePointInterface();
         assert(interface);
         if (interface->GetStart() && !interface->GetStart()->Is(TIMESTAMP_ATTR))
