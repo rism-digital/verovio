@@ -464,10 +464,7 @@ void Alignment::ClearGraceAligners()
 bool Alignment::CanHaveChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 bool Alignment::HasAlignmentReference(int staffN)

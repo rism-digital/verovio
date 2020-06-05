@@ -31,14 +31,13 @@ void Facsimile::Reset() {}
 bool Facsimile::CanHaveChild(Object *object)
 {
     if (object->Is(SURFACE)) {
-        object->SetParent(this);
-        this->m_children.push_back(object);
-        Modify();
+        assert(dynamic_cast<Surface *>(object));
     }
     else {
         LogError("Unsupported child '%s' of facsimile", object->GetClassName().c_str());
-        assert(false);
+        return false;
     }
+    return true;
 }
 
 Zone *Facsimile::FindZoneByUuid(std::string zoneId)

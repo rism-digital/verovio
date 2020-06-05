@@ -41,17 +41,13 @@ bool Surface::CanHaveChild(Object *object)
 {
     // TODO Add support for graphic tag
     if (object->Is(ZONE)) {
-        object->SetParent(this);
-        this->m_children.push_back(object);
-        Modify();
-    }
-    else if (object->GetClassName() == "graphic") {
-        LogWarning("The graphic element is currently not supported.");
+        assert(dynamic_cast<Zone *>(object));
     }
     else {
         LogError("Unsupported child '%s' of surface", object->GetClassName().c_str());
-        assert(false);
+        return false;
     }
+    return true;
 }
 
 int Surface::GetMaxX()

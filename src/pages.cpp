@@ -50,12 +50,9 @@ bool Pages::CanHaveChild(Object *child)
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Pages::ConvertFrom(Score *score)

@@ -613,9 +613,11 @@ bool Object::CanHaveChild(Object *child)
 
 void Object::AddChild(Object *child)
 {
-    // This should never happen because the method should be overridden
-    LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
-    assert(false);
+    if (!this->CanHaveChild(child)) return;
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 int Object::GetDrawingX() const
