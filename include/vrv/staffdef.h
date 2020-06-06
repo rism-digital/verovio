@@ -62,7 +62,7 @@ public:
     ///@}
 
     /**
-     * Return true if the staffDef in in a braced staffGrp within a bracket staffGrp.
+     * Return true if the staffDef is in a braced staffGrp within a bracket staffGrp.
      * Used for increasing the spacing in View::DrawStaffDefLabels.
      */
     bool IsInBraceAndBracket();
