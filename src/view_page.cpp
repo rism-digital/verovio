@@ -358,16 +358,13 @@ void View::DrawStaffGrp(
     if (firstDef->GetLines() <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     if (lastDef->GetLines() <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
 
-    int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-
-    // adjust the top and bottom according to staffline width
-    x += barLineWidth / 2;
-
     // draw the system start bar line
     if (topStaffGrp
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+        int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+        x += barLineWidth / 2;
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
     // actually draw the line, the brace or the bracket
