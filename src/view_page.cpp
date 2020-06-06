@@ -401,7 +401,7 @@ void View::DrawStaffGrp(
 
     // DrawStaffGrpLabel
     System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
-    int space = 3 * m_doc->GetDrawingBeamWidth(staffGrp->GetMaxStaffSize(), false);
+    int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
     this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
