@@ -404,7 +404,7 @@ void View::DrawStaffGrp(
     int space = 3 * m_doc->GetDrawingBeamWidth(staffGrp->GetMaxStaffSize(), false);
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-    this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, -space);
+    this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
 }
 
 void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations)
@@ -448,17 +448,16 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
-        this->DrawLabels(dc, measure, system, staffDef, x, y, abbreviations, staff->m_drawingStaffSize, space);
+        this->DrawLabels(dc, system, staffDef, x, y, abbreviations, staff->m_drawingStaffSize, space);
 
         ++iter;
     }
 }
 
-void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
+void View::DrawLabels(DeviceContext *dc, System *system, Object *object, int x, int y,
     bool abbreviations, int staffSize, int space)
 {
     assert(dc);
-    assert(measure);
     assert(system);
     assert(object->Is({ STAFFDEF, STAFFGRP }));
 
