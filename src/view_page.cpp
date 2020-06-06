@@ -279,10 +279,6 @@ void View::DrawScoreDef(
     if (barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
         DrawStaffGrp(dc, measure, staffGrp, x, true, !scoreDef->DrawLabels());
-
-        DrawStaffDefLabels(dc, measure, scoreDef, !scoreDef->DrawLabels());
-        // if this was true (non-abbreviated labels), set it to false for next one
-        // scoreDef->SetDrawLabels(false);
     }
     else {
         dc->StartGraphic(barLine, "", barLine->GetUuid());
@@ -387,9 +383,8 @@ void View::DrawStaffGrp(
     }
 
     // recursively draw the children
-    int i;
     StaffGrp *childStaffGrp = NULL;
-    for (i = 0; i < staffGrp->GetChildCount(); ++i) {
+    for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
         childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
         if (childStaffGrp) {
             DrawStaffGrp(dc, measure, childStaffGrp, x, false, abbreviations);
@@ -402,22 +397,21 @@ void View::DrawStaffGrp(
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
     this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
+    
+    DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
 }
 
-void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations)
+void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations)
 {
     assert(dc);
     assert(measure);
-    assert(scoreDef);
+    assert(staffGrp);
 
-    const ArrayOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
-    ArrayOfObjects::const_iterator iter = scoreDefChildren->begin();
-    while (iter != scoreDefChildren->end()) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+    StaffDef *staffDef = NULL;
+    for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
+        staffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
 
         if (!staffDef) {
-            LogDebug("Should be staffDef in View::DrawStaffDefLabels");
-            ++iter;
             continue;
         }
 
@@ -427,27 +421,19 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
-            ++iter;
             continue;
         }
 
         if (!staff->DrawingIsVisible()) {
-            ++iter;
             continue;
         }
 
         // HARDCODED
-        int space = 3 * m_doc->GetDrawingBeamWidth(scoreDef->GetMaxStaffSize(), false);
-        if (staffDef->IsInBraceAndBracket()) {
-            space *= 2;
-        }
-        int x = system->GetDrawingX() - space;
+        int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
-        this->DrawLabels(dc, system, staffDef, x, y, abbreviations, staff->m_drawingStaffSize, space);
-
-        ++iter;
+        this->DrawLabels(dc, system, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, space);
     }
 }
 
