@@ -754,6 +754,11 @@ bool MEIOutput::WriteObjectEnd(Object *object)
     else if (m_scoreBasedMEI && (object->Is(PAGE))) {
         return true;
     }
+
+    if (object->HasClosingComment()) {
+        m_currentNode.append_child(pugi::node_comment).set_value(object->GetClosingComment().c_str());
+    }
+
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
 
@@ -2294,7 +2299,7 @@ bool MEIInput::Import(const std::string &mei)
         m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document doc;
-        doc.load_string(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
+        doc.load_string(mei.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
         return ReadDoc(root);
     }
@@ -2306,7 +2311,7 @@ bool MEIInput::Import(const std::string &mei)
 
 bool MEIInput::IsAllowed(std::string element, Object *filterParent)
 {
-    if (!filterParent) {
+    if (!filterParent || (element == "")) {
         return true;
     }
 
@@ -2869,6 +2874,10 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
             }
             break;
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
         }
@@ -2923,6 +2932,10 @@ bool MEIInput::ReadPages(Object *parent, pugi::xml_node pages)
             // Skipping scoreDefs, only the first one is possible
             continue;
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <pages>", current.name());
         }
@@ -2972,6 +2985,10 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
         else if (elementName == "section") {
             success = ReadSection(vrvScore, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
         }
@@ -2990,10 +3007,12 @@ bool MEIInput::ReadSection(Object *parent, pugi::xml_node section)
 
     parent->AddChild(vrvSection);
     ReadUnsupportedAttr(section, vrvSection);
-    if (m_readingScoreBased)
+    if (m_readingScoreBased) {
         return ReadSectionChildren(vrvSection, section);
-    else
+    }
+    else {
         return ReadSystemChildren(vrvSection, section);
+    }
 }
 
 bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
@@ -3055,6 +3074,10 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             //}
             success = ReadMeasure(parent, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <section>", current.name());
         }
@@ -3080,10 +3103,10 @@ bool MEIInput::ReadEnding(Object *parent, pugi::xml_node ending)
 
     parent->AddChild(vrvEnding);
     ReadUnsupportedAttr(ending, vrvEnding);
-    if (m_readingScoreBased)
+    if (m_readingScoreBased) {
         return ReadSectionChildren(vrvEnding, ending);
-    else
-        return true;
+    }
+    return true;
 }
 
 bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
@@ -3094,10 +3117,10 @@ bool MEIInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
 
     parent->AddChild(vrvExpansion);
     ReadUnsupportedAttr(expansion, vrvExpansion);
-    if (m_readingScoreBased)
+    if (m_readingScoreBased) {
         return ReadSectionChildren(vrvExpansion, expansion);
-    else
-        return true;
+    }
+    return true;
 }
 
 bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
@@ -3202,6 +3225,10 @@ bool MEIInput::ReadPageChildren(Object *parent, pugi::xml_node parentNode)
          ReadApp(vrvPage, current, EDITORIAL_PAGE);
          }
          */
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <page>", current.name());
         }
@@ -3285,6 +3312,10 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
             // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             success = ReadMeasure(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <system>", current.name());
@@ -3479,6 +3510,10 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "staffGrp") {
             success = ReadStaffGrp(parent, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <scoreDef>", current.name());
         }
@@ -3535,6 +3570,10 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "staffDef") {
             success = ReadStaffDef(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
@@ -3621,6 +3660,10 @@ bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Ob
         else if (elementName == "rend") {
             success = ReadRend(parent, xmlElement);
         }
+        // xml comment
+        else if (elementName == "") {
+            success = ReadXMLComment(parent, xmlElement);
+        }
         // unknown
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
@@ -3695,6 +3738,10 @@ bool MEIInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "labelAbbr") {
             success = ReadLabelAbbr(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <staffDef>", current.name());
@@ -3845,6 +3892,10 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
                 LogWarning("<tupletSpan> is not readable as <tuplet> and will be ignored");
             }
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <measure>", current.name());
@@ -4212,6 +4263,10 @@ bool MEIInput::ReadFbChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "f") {
             success = ReadF(parent, current);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <staff>", current.name());
         }
@@ -4258,6 +4313,10 @@ bool MEIInput::ReadStaffChildren(Object *parent, pugi::xml_node parentNode)
         // content
         else if (std::string(current.name()) == "layer") {
             success = ReadLayer(parent, current);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <staff>", current.name());
@@ -4417,6 +4476,10 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "verse") {
             success = ReadVerse(parent, xmlElement);
+        }
+        // xml comment
+        else if (elementName == "") {
+            success = ReadXMLComment(parent, xmlElement);
         }
         // unknown
         else {
@@ -5061,6 +5124,10 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         else if (elementName == "fb") {
             success = ReadFb(parent, xmlElement);
         }
+        // xml comment
+        else if (elementName == "") {
+            success = ReadXMLComment(parent, xmlElement);
+        }
         // unknown
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
@@ -5426,6 +5493,10 @@ bool MEIInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
         else if (std::string(current.name()) == "rdg") {
             success = ReadRdg(parent, current, level, filter);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <app>", current.name());
         }
@@ -5513,6 +5584,10 @@ bool MEIInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
         }
         else if (std::string(current.name()) == "unclear") {
             success = ReadUnclear(parent, current, level, filter);
+        }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <choice>", current.name());
@@ -5725,6 +5800,10 @@ bool MEIInput::ReadSubstChildren(Object *parent, pugi::xml_node parentNode, Edit
         else if (std::string(current.name()) == "subst") {
             success = ReadSubst(parent, current, level, filter);
         }
+        // xml comment
+        else if (std::string(current.name()) == "") {
+            success = ReadXMLComment(parent, current);
+        }
         else {
             LogWarning("Unsupported '<%s>' within <subst>", current.name());
         }
@@ -5906,6 +5985,11 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
 void MEIInput::SetMeiUuid(pugi::xml_node element, Object *object)
 {
+    if (!m_comment.empty()) {
+        object->SetComment(m_comment);
+        m_comment.clear();
+    }
+
     if (!element.attribute("xml:id")) {
         return;
     }
@@ -5938,6 +6022,19 @@ std::wstring MEIInput::RightTrim(std::wstring str)
     while (pos > 0 && iswspace(str[pos - 1])) pos--;
     str.erase(pos);
     return str;
+}
+
+bool MEIInput::ReadXMLComment(Object *object, pugi::xml_node element)
+{
+    assert(object);
+
+    if (element.next_sibling()) {
+        m_comment = element.value();
+    }
+    else {
+        object->SetClosingComment(element.value());
+    }
+    return true;
 }
 
 bool MEIInput::IsEditorialElementName(std::string elementName)

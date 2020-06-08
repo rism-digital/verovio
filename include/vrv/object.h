@@ -227,9 +227,15 @@ public:
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
+    /**
+     * Methods for setting / getting comments
+     */
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
     bool HasComment() { return !m_comment.empty(); }
+    std::string GetClosingComment() const { return m_closingComment; }
+    void SetClosingComment(std::string endComment) { m_closingComment = endComment; }
+    bool HasClosingComment() { return !m_closingComment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.
@@ -1213,10 +1219,13 @@ private:
     std::vector<InterfaceId> m_interfaces;
 
     /**
-     * A string for storing a comment to be printed immediately before
-     * the object when printing an MEI element.
+     * String for storing a comments attached to the object when printing an MEI element.
+     * m_comment is to be printed immediately before the element
+     * m_closingComment is to be printed before the closing tag of the element
      */
     std::string m_comment;
+    std::string m_closingComment;
+    ///@}
 
     /**
      * A flag indicating if the Object represents an attribute in the original MEI.

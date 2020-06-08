@@ -668,6 +668,7 @@ private:
     DocType StrToDocType(std::string type);
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
+    bool ReadXMLComment(Object *object, pugi::xml_node element);
     ///@}
 
     /**
@@ -731,6 +732,11 @@ private:
      * This is not the case when selecting a mDiv that is not the first one with a score in the tree.
      */
     bool m_useScoreDefForDoc;
+
+    /**
+     * The comment to be attached to the next Object
+     */
+    std::string m_comment;
 };
 
 } // namespace vrv

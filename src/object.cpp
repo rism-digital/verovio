@@ -169,6 +169,9 @@ void Object::Init(const std::string &classid)
     m_isAttribute = false;
     m_isModified = true;
     m_isReferenceObject = false;
+    // Comments
+    m_comment = "";
+    m_closingComment = "";
 
     this->GenerateUuid();
 

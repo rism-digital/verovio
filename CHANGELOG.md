@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support (limited) for preserving XML comments in the MEI output
 * Support for `hairpin@opening` (@rettinghaus)
 * Support for `@dynam.dist` and `@harm.dist` (@rettinghaus)
 * Support for pedal lines (@rettinghaus)
