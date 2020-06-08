@@ -671,9 +671,15 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
             childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
             if (childStaffGrp) {
+                if (childStaffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+                    continue;
+                }
                 DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure);
             }
             else if (childStaffDef) {
+                if (childStaffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+                    continue;
+                }
                 AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
                 Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
                 if (!staff) {
