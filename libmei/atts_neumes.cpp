@@ -238,7 +238,7 @@ bool AttNcForm::HasTilt() const
 
 /* include <atttilt> */
 
-bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetNeumes(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_NCLOG)) {
         AttNcLog *att = dynamic_cast<AttNcLog *>(element);

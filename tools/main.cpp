@@ -106,16 +106,19 @@ void display_usage()
     std::cout << "Options (marked as * are repeatable)" << std::endl;
 
     std::cout << " -                     Use \"-\" as input file for reading from the standard input" << std::endl;
-    std::cout << " -?, --help            Display this message" << std::endl;
+    std::cout << " -h, --help            Display this message" << std::endl;
     std::cout << " -a, --all-pages       Output all pages" << std::endl;
     std::cout << " -f, --format <s>      Select input format: abc, darms, mei, pae, xml (default is mei)" << std::endl;
     std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
     std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
     std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
     std::cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << std::endl;
-    std::cout << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << std::endl;
+    std::cout << " -t, --to <s>          Select output format: mei, pb-mei, svg, or midi (default is svg)" << std::endl;
     std::cout << " -v, --version         Display the version number" << std::endl;
     std::cout << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << std::endl;
+    
+    std::cout << std::endl << "Additional long options" << std::endl;
+    std::cout << "--remove-ids           Remove in the MEI output XML IDs that are not referenced " << std::endl;
 
     vrv::Options options;
     std::vector<vrv::OptionGrp *> *grp = options.GetGrps();
@@ -193,6 +196,7 @@ int main(int argc, char **argv)
     std::string outfile;
     std::string outformat = "svg";
     bool std_output = false;
+    bool remove_ids = false;
 
     int all_pages = 0;
     int page = 1;
@@ -213,7 +217,7 @@ int main(int argc, char **argv)
     static struct option base_options[]
         = { { "all-pages", no_argument, 0, 'a' },
             { "from", required_argument, 0, 'f' },
-            { "help", no_argument, 0, '?' },
+            { "help", no_argument, 0, 'h' },
             { "outfile", required_argument, 0, 'o' },
             { "page", required_argument, 0, 'p' },
             { "resources", required_argument, 0, 'r' },
@@ -221,16 +225,8 @@ int main(int argc, char **argv)
             { "to", required_argument, 0, 't' },
             { "version", no_argument, 0, 'v' },
             { "xml-id-seed", required_argument, 0, 'x' },
-            // deprecated - some use undocumented short options to catch them as such
-            { "border", required_argument, 0, 'b' },
-            { "format", required_argument, 0, 'd' },
-            { "ignore-layout", no_argument, 0, 'd' },
-            { "no-footer", no_argument, 0, 'd' },
-            { "no-header", no_argument, 0, 'd' },
-            { "no-layout", no_argument, 0, 'd' },
-            { "page-height-deprecated", required_argument, 0, 'h' },
-            { "page-width-deprecated", required_argument, 0, 'w' },
-            { "type", required_argument, 0, 'd' },
+            // mei output - long options only
+            { "remove-ids", no_argument, 0, 'm' },
             { 0, 0, 0, 0 }
         };
 
@@ -276,7 +272,7 @@ int main(int argc, char **argv)
     int option_index = 0;
     vrv::Option *opt = NULL;
     vrv::OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "ab:f:hmo:p:r:s:t:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
@@ -309,45 +305,16 @@ int main(int argc, char **argv)
                 options->m_pageMarginTop.SetValue(optarg);
                 break;
 
-            case 'd':
-                if (!strcmp(long_options[option_index].name, "format")) {
-                    vrv::LogWarning("Option --format is deprecated; use --from");
-                    if (!toolkit.SetInputFrom(std::string(optarg))) {
-                        exit(1);
-                    };
-                }
-                else if (!strcmp(long_options[option_index].name, "ignore-layout")) {
-                    vrv::LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
-                    options->m_breaks.SetValue(vrv::BREAKS_auto);
-                }
-                else if (!strcmp(long_options[option_index].name, "no-footer")) {
-                    vrv::LogWarning("Option --no-footer is deprecated; use --footer none");
-                    options->m_footer.SetValue(vrv::FOOTER_none);
-                }
-                else if (!strcmp(long_options[option_index].name, "no-header")) {
-                    vrv::LogWarning("Option --no-header is deprecated; use --header none");
-                    options->m_header.SetValue(vrv::HEADER_none);
-                }
-                else if (!strcmp(long_options[option_index].name, "no-layout")) {
-                    vrv::LogWarning("Option --no-layout is deprecated; use --breaks none");
-                    options->m_breaks.SetValue(vrv::BREAKS_none);
-                }
-                else if (!strcmp(long_options[option_index].name, "type")) {
-                    vrv::LogWarning("Option --type is deprecated; use --to");
-                    outformat = std::string(optarg);
-                    toolkit.SetOutputTo(std::string(optarg));
-                }
-                break;
-
             case 'f':
                 if (!toolkit.SetInputFrom(std::string(optarg))) {
                     exit(1);
                 };
                 break;
-
-            case 'h':
-                vrv::LogWarning("Option -h is deprecated; use --page-height instead");
-                options->m_pageHeight.SetValue(optarg);
+                
+            case 'm':
+                if (!strcmp(long_options[option_index].name, "remove-ids")) {
+                    remove_ids = true;
+                }
                 break;
 
             case 'o': outfile = std::string(optarg); break;
@@ -369,17 +336,11 @@ int main(int argc, char **argv)
 
             case 'v': show_version = 1; break;
 
-            case 'w':
-                vrv::LogWarning("Option -w is deprecated; use --page-width instead");
-                options->m_pageWidth.SetValue(optarg);
-                break;
-
             case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
 
-            case '?':
-                display_usage();
-                exit(0);
-                break;
+            case 'h': display_usage(); exit(0); break;
+
+            case '?': display_usage(); exit(1); break;
 
             default: break;
         }
@@ -426,8 +387,8 @@ int main(int argc, char **argv)
     }
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
-        && (outformat != "humdrum") && (outformat != "hum")) {
-        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', or 'humdrum'." << std::endl;
+        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae") && (outformat != "pb-mei")) {
+        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'pb-mei', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
         exit(1);
     }
 
@@ -550,15 +511,31 @@ int main(int argc, char **argv)
             }
         }
     }
+    else if (outformat == "pae") {
+        outfile += ".pae";
+        if (std_output) {
+            std::string output;
+            std::cout << toolkit.RenderToPAE();
+        }
+        else if (!toolkit.RenderToPAEFile(outfile)) {
+            std::cerr << "Unable to write PAE to " << outfile << "." << std::endl;
+            exit(1);
+        }
+        else {
+            std::cerr << "Output written to " << outfile << "." << std::endl;
+        }
+    }
     else {
+        const char *scoreBased = (outformat == "mei") ? "true" : "false";
+        const char *removeIds = (remove_ids) ? "true" : "false";
+        outfile += ".mei";
         if (all_pages) {
-            toolkit.SetScoreBasedMei(true);
-            outfile += ".mei";
+            std::string params = vrv::StringFormat("{'scoreBased': %s, 'removeIds': %s}", scoreBased, removeIds);
             if (std_output) {
-                std::cerr << "MEI output of all pages to standard output is not possible." << std::endl;
-                exit(1);
+                std::string output;
+                std::cout << toolkit.GetMEI(params);
             }
-            else if (!toolkit.SaveFile(outfile)) {
+            else if (!toolkit.SaveFile(outfile, params)) {
                 std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
                 exit(1);
             }
@@ -567,12 +544,16 @@ int main(int argc, char **argv)
             }
         }
         else {
+            std::string params = vrv::StringFormat("{'scoreBased': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, page, removeIds);
             if (std_output) {
-                std::cout << toolkit.GetMEI(page);
+                std::cout << toolkit.GetMEI(params);
+            }
+            else if (!toolkit.SaveFile(outfile, params)) {
+                std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
+                exit(1);
             }
             else {
-                std::cerr << "MEI output of one page is available only to standard output." << std::endl;
-                exit(1);
+                std::cerr << "Output written to " << outfile << "." << std::endl;
             }
         }
     }

@@ -1143,7 +1143,7 @@ AttCurvature::~AttCurvature()
 void AttCurvature::ResetCurvature()
 {
     m_bezier = "";
-    m_bulge = 0.0;
+    m_bulge = "";
     m_curvedir = curvature_CURVEDIR_NONE;
 }
 
@@ -1156,7 +1156,7 @@ bool AttCurvature::ReadCurvature(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("bulge")) {
-        this->SetBulge(StrToDbl(element.attribute("bulge").value()));
+        this->SetBulge(StrToStr(element.attribute("bulge").value()));
         element.remove_attribute("bulge");
         hasAttribute = true;
     }
@@ -1176,7 +1176,7 @@ bool AttCurvature::WriteCurvature(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasBulge()) {
-        element.append_attribute("bulge") = DblToStr(this->GetBulge()).c_str();
+        element.append_attribute("bulge") = StrToStr(this->GetBulge()).c_str();
         wroteAttribute = true;
     }
     if (this->HasCurvedir()) {
@@ -1193,7 +1193,7 @@ bool AttCurvature::HasBezier() const
 
 bool AttCurvature::HasBulge() const
 {
-    return (m_bulge != 0.0);
+    return (m_bulge != "");
 }
 
 bool AttCurvature::HasCurvedir() const
@@ -7932,7 +7932,7 @@ bool AttXy2::HasY2() const
 
 /* include <atty2> */
 
-bool Att::SetShared(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetShared(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ACCIDLOG)) {
         AttAccidLog *att = dynamic_cast<AttAccidLog *>(element);
@@ -8146,7 +8146,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "bulge") {
-            att->SetBulge(att->StrToDbl(attrValue));
+            att->SetBulge(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "curvedir") {
@@ -9649,7 +9649,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("bezier", att->StrToStr(att->GetBezier())));
         }
         if (att->HasBulge()) {
-            attributes->push_back(std::make_pair("bulge", att->DblToStr(att->GetBulge())));
+            attributes->push_back(std::make_pair("bulge", att->StrToStr(att->GetBulge())));
         }
         if (att->HasCurvedir()) {
             attributes->push_back(std::make_pair("curvedir", att->CurvatureCurvedirToStr(att->GetCurvedir())));

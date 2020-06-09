@@ -19,7 +19,7 @@ const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec);
 const char *vrvToolkit_getExpansionIdsForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getHumdrum(Toolkit *tk);
 const char *vrvToolkit_getLog(Toolkit *tk);
-const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based);
+const char *vrvToolkit_getMEI(Toolkit *tk, const char *options);
 const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getNotatedIdForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getOptions(Toolkit *tk, bool default_values);

@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
-#include <QFileInfo>
 #include <QFontDatabase>
 #include <QUrl>
 
@@ -167,6 +167,15 @@ void Toolkit::setBreaks(QString breaks)
     }
 }
 
+void Toolkit::setTranspose(QString transpose)
+{
+    if (getTranspose() != transpose) {
+        m_verovioToolkit.SetOption("transpose", transpose.toStdString());
+        // "transpose" is used in LoadData
+        requestReloadData();
+    }
+}
+
 void Toolkit::setFileContent(QString fileContent)
 {
     if (m_fileContent != fileContent) {
@@ -230,6 +239,11 @@ int Toolkit::getSpacingStaff() const
 QString Toolkit::getBreaks() const
 {
     return QString::fromStdString(m_verovioToolkit.GetOption("spacingStaff"));
+}
+
+QString Toolkit::getTranspose() const
+{
+    return QString::fromStdString(m_verovioToolkit.GetOption("transpose"));
 }
 
 bool Toolkit::addFont(QString fontFilePath)

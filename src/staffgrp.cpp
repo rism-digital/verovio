@@ -59,7 +59,7 @@ void StaffGrp::Reset()
     m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
-void StaffGrp::AddChild(Object *child)
+bool StaffGrp::IsSupportedChild(Object *child)
 {
     if (child->Is(INSTRDEF)) {
         assert(dynamic_cast<InstrDef *>(child));
@@ -80,13 +80,9 @@ void StaffGrp::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void StaffGrp::FilterList(ArrayOfObjects *childList)
@@ -117,12 +113,13 @@ int StaffGrp::GetMaxStaffSize()
     for (auto &child : *childList) {
         staffDef = dynamic_cast<StaffDef *>(child);
         assert(staffDef);
-        if (staffDef->GetScale() > max) {
+        if (staffDef->HasScale() && staffDef->GetScale() >= max) {
             max = staffDef->GetScale();
         }
+        else {
+            max = 100;
+        }
     }
-
-    if (max == 0) return 100;
 
     return max;
 }

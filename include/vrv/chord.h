@@ -71,6 +71,11 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Overwritten method for chord
+     */
     virtual void AddChild(Object *object);
 
     /**
@@ -132,6 +137,7 @@ public:
     ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
+    virtual int CalcStemLenInThirdUnits(Staff *staff);
     ///@}
 
     /**

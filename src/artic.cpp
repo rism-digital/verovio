@@ -53,19 +53,15 @@ void Artic::Reset()
     ResetPlacement();
 }
 
-void Artic::AddChild(Object *child)
+bool Artic::IsSupportedChild(Object *child)
 {
     if (child->Is(ARTIC_PART)) {
         assert(dynamic_cast<ArticPart *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)
@@ -138,7 +134,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // case ARTICULATION_lhpizz;
             // case ARTICULATION_dot;
             // case ARTICULATION_stroke;
-            default: return 0; break;
+            default: return 0;
         }
     }
     else if (place == STAFFREL_below) {
@@ -159,7 +155,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             // Removed in MEI 4.0
             // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
-            default: return 0; break;
+            default: return 0;
         }
     }
     else

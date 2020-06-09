@@ -276,7 +276,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
 
         // Get components of neume
         ClassIdComparison ac(NC);
-        ArrayOfObjects objects;
+        ListOfObjects objects;
         neume->FindAllDescendantByComparison(&objects, &ac);
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Nc *nc = dynamic_cast<Nc *>(*it);
@@ -315,13 +315,13 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
 
         // Get components of syllable
         ClassIdComparison ac(NEUME);
-        ArrayOfObjects neumes;
+        ListOfObjects neumes;
         syllable->FindAllDescendantByComparison(&neumes, &ac);
         for (auto it = neumes.begin(); it != neumes.end(); ++it) {
             Neume *neume = dynamic_cast<Neume *>(*it);
             assert(neume);
             ClassIdComparison ac(NC);
-            ArrayOfObjects ncs;
+            ListOfObjects ncs;
             neume->FindAllDescendantByComparison(&ncs, &ac);
             for (auto it = ncs.begin(); it != ncs.end(); ++it) {
                 Nc *nc = dynamic_cast<Nc *>(*it);
@@ -363,7 +363,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
 
         if (initialClefLine != clefLine) { // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;
-            ArrayOfObjects objects;
+            ListOfObjects objects;
             InterfaceComparison ic(INTERFACE_PITCH);
 
             Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
@@ -394,7 +394,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y, bool isChain)
         }
 
         // Move staff and all staff children with facsimiles
-        ArrayOfObjects children;
+        ListOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
         staff->FindAllDescendantByComparison(&children, &ic);
         std::set<Zone *> zones;
@@ -440,16 +440,17 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
     // Find closest valid staff
     if (staffId == "auto") {
-        ArrayOfObjects staves;
+        ListOfObjects staves;
         ClassIdComparison ac(STAFF);
         m_doc->FindAllDescendantByComparison(&staves, &ac);
+        ArrayOfObjects stavesVector(staves.begin(), staves.end());
 
         ClosestBB comp;
         comp.x = ulx;
         comp.y = uly;
 
-        std::sort(staves.begin(), staves.end(), comp);
-        staff = dynamic_cast<Staff *>(staves.at(0));
+        std::sort(stavesVector.begin(), stavesVector.end(), comp);
+        staff = dynamic_cast<Staff *>(stavesVector.front());
     }
     else {
         staff = dynamic_cast<Staff *>(m_doc->FindDescendantByUuid(staffId));
@@ -483,14 +484,15 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         newStaff->AddChild(newLayer);
 
         // Find index to insert new staff
-        ArrayOfObjects staves;
+        ListOfObjects staves;
         ClassIdComparison ac(STAFF);
         parent->FindAllDescendantByComparison(&staves, &ac);
-        staves.push_back(newStaff);
+        ArrayOfObjects stavesVector(staves.begin(), staves.end());
+        stavesVector.push_back(newStaff);
         StaffSort staffSort;
-        std::stable_sort(staves.begin(), staves.end(), staffSort);
+        std::stable_sort(stavesVector.begin(), stavesVector.end(), staffSort);
         for (int i = 0; i < (int)staves.size(); i++) {
-            if (staves.at(i) == newStaff) {
+            if (stavesVector.at(i) == newStaff) {
                 newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
                 parent->Modify();
@@ -668,14 +670,14 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         layer->ReorderByXPos();
 
         // Ensure children of this clef keep their position if it is NOT the first clef in the file.
-        ArrayOfObjects clefs;
+        ListOfObjects clefs;
         ClassIdComparison ac(CLEF);
         m_doc->GetDrawingPage()->FindAllDescendantByComparison(&clefs, &ac);
         if (clefs.size() == 0) {
             LogError("Something went wrong. Clef does not appear to be inserted.");
         }
         else if (clefs.size() > 1) {
-            Clef *previousClef = dynamic_cast<Clef *>(clefs.at(0));
+            Clef *previousClef = dynamic_cast<Clef *>(clefs.front());
             Clef *temp = NULL;
             for (auto it = clefs.begin(); it != clefs.end(); ++it) {
                 temp = dynamic_cast<Clef *>(*it);
@@ -687,7 +689,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     previousClef = temp;
                 }
                 else {
-                    temp = dynamic_cast<Clef *>(*(it + 1));
+                    ListOfObjects::iterator next = it;
+                    next++;
+                    temp = dynamic_cast<Clef *>(*(next));
                     break;
                 }
             }
@@ -707,7 +711,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
 
                 // Adjust elements with a relative position to clef by pitch
-                ArrayOfObjects elements;
+                ListOfObjects elements;
                 InterfaceComparison ic(INTERFACE_PITCH);
                 m_doc->GetDrawingPage()->FindAllDescendantBetween(
                     &elements, &ic, clef, (temp != clefs.back()) ? temp : m_doc->GetDrawingPage()->GetLast());
@@ -943,7 +947,7 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
         LogError("Could not get the drawing page.");
         return false;
     }
-    ArrayOfObjects objects;
+    ListOfObjects objects;
     bool success = false;
     data_CLEFSHAPE clefShape = CLEFSHAPE_NONE;
     int shift = 0;
@@ -1035,7 +1039,7 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(child);
         if (fi == NULL || !fi->HasFacs()) {
             fi = NULL;
-            ArrayOfObjects facsimileInterfaces;
+            ListOfObjects facsimileInterfaces;
             InterfaceComparison ic(INTERFACE_FACSIMILE);
             child->FindAllDescendantByComparison(&facsimileInterfaces, &ic);
 
@@ -1075,7 +1079,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     m_editInfo = elementId;
     // Remove Zone for element (if any)
     InterfaceComparison ic(INTERFACE_FACSIMILE);
-    ArrayOfObjects fiChildren;
+    ListOfObjects fiChildren;
     obj->FindAllDescendantByComparison(&fiChildren, &ic);
     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(obj);
     if (fi != NULL && fi->HasFacs()) {
@@ -1521,7 +1525,7 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
 
     // Get children of neume. Keep the first child and delete the others.
     ClassIdComparison ac(NC);
-    ArrayOfObjects children;
+    ListOfObjects children;
     el->FindAllDescendantByComparison(&children, &ac);
     for (auto it = children.begin(); it != children.end(); ++it) {
         if (children.begin() == it) {
