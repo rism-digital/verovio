@@ -598,11 +598,11 @@ public:
 
     /**
      * Convert analytical markup (@fermata, @tie) to elements.
-     * See Doc::ConvertAnalyticalMarkupDoc
+     * See Doc::ConvertMarkupAnalyticalDoc
      */
     ///@{
-    virtual int ConvertAnalyticalMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupAnalytical(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

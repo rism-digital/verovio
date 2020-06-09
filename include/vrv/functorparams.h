@@ -885,7 +885,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ConvertAnalyticalMarkupParams
+// ConvertMarkupAnalyticalParams
 //----------------------------------------------------------------------------
 
 /**
@@ -895,9 +895,9 @@ public:
  * member 3: a flag indicating whereas the conversion is permanent of not
  **/
 
-class ConvertAnalyticalMarkupParams : public FunctorParams {
+class ConvertMarkupAnalyticalParams : public FunctorParams {
 public:
-    ConvertAnalyticalMarkupParams(bool permanent)
+    ConvertMarkupAnalyticalParams(bool permanent)
     {
         m_currentChord = NULL;
         m_permanent = permanent;

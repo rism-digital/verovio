@@ -2811,7 +2811,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
 
     if (success && m_readingScoreBased) {
         m_doc->ConvertToPageBasedDoc();
-        m_doc->ConvertAnalyticalMarkupDoc();
+        m_doc->ConvertMarkupDoc();
     }
 
     if (success && !m_hasScoreDef) {
@@ -4644,7 +4644,7 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     }
 
     if (vrvChord->HasTie()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_TIE);
     }
 
     parent->AddChild(vrvChord);
@@ -4825,7 +4825,7 @@ bool MEIInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     vrvMRest->ReadVisibility(mRest);
 
     if (vrvMRest->HasFermata()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_FERMATA);
     }
 
     parent->AddChild(vrvMRest);
@@ -4959,7 +4959,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     }
 
     if (vrvNote->HasTie()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_TIE);
     }
 
     parent->AddChild(vrvNote);
@@ -5266,7 +5266,7 @@ bool MEIInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     interface->ReadStaffIdent(element);
 
     if (interface->HasFermata()) {
-        m_doc->SetAnalyticalMarkup(true);
+        m_doc->SetMarkup(MARKUP_ANALYTICAL_FERMATA);
     }
 
     return true;

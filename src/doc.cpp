@@ -97,7 +97,7 @@ void Doc::Reset()
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_MIDITimemapTempo = 0.0;
-    m_hasAnalyticalMarkup = false;
+    m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
 
     m_mdivScoreDef.Reset();
@@ -1116,53 +1116,59 @@ void Doc::ConvertScoreDefMarkupDoc(bool permanent)
     this->Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
 }
 
-void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
+void Doc::ConvertMarkupDoc(bool permanent)
 {
-    if (!m_hasAnalyticalMarkup) return;
+    if (m_markup == MARKUP_DEFAULT) return;
 
     LogMessage("Converting analytical markup...");
 
-    /************ Prepare processing by staff/layer/verse ************/
+    if (m_markup & MARKUP_GRACE_ATTRIBUTE) {
+    }
 
-    // We need to populate processing lists for processing the document by Layer (for matching @tie) and
-    // by Verse (for matching syllable connectors)
-    PrepareProcessingListsParams prepareProcessingListsParams;
+    if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
 
-    // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+        /************ Prepare processing by staff/layer/verse ************/
 
-    IntTree_t::iterator staves;
-    IntTree_t::iterator layers;
+        // We need to populate processing lists for processing the document by Layer (for matching @tie) and
+        // by Verse (for matching syllable connectors)
+        PrepareProcessingListsParams prepareProcessingListsParams;
 
-    /************ Resolve ties ************/
+        // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
+        Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+        this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
-    // Process by layer for matching @tie attribute - we process notes and chords, looking at
-    // GetTie values and pitch and oct for matching notes
-    ArrayOfComparisons filters;
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            filters.clear();
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
-            filters.push_back(&matchStaff);
-            filters.push_back(&matchLayer);
+        IntTree_t::iterator staves;
+        IntTree_t::iterator layers;
 
-            ConvertAnalyticalMarkupParams convertAnalyticalMarkupParams(permanent);
-            Functor convertAnalyticalMarkup(&Object::ConvertAnalyticalMarkup);
-            Functor convertAnalyticalMarkupEnd(&Object::ConvertAnalyticalMarkupEnd);
-            this->Process(
-                &convertAnalyticalMarkup, &convertAnalyticalMarkupParams, &convertAnalyticalMarkupEnd, &filters);
+        /************ Resolve ties ************/
 
-            // After having processed one layer, we check if we have open ties - if yes, we
-            // must reset them and they will be ignored.
-            if (!convertAnalyticalMarkupParams.m_currentNotes.empty()) {
-                std::vector<Note *>::iterator iter;
-                for (iter = convertAnalyticalMarkupParams.m_currentNotes.begin();
-                     iter != convertAnalyticalMarkupParams.m_currentNotes.end(); ++iter) {
-                    LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+        // Process by layer for matching @tie attribute - we process notes and chords, looking at
+        // GetTie values and pitch and oct for matching notes
+        ArrayOfComparisons filters;
+        for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+             staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+            for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+                filters.clear();
+                // Create ad comparison object for each type / @n
+                AttNIntegerComparison matchStaff(STAFF, staves->first);
+                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                filters.push_back(&matchStaff);
+                filters.push_back(&matchLayer);
+
+                ConvertMarkupAnalyticalParams convertMarkupAnalyticalParams(permanent);
+                Functor convertMarkupAnalytical(&Object::ConvertMarkupAnalytical);
+                Functor convertMarkupAnalyticalEnd(&Object::ConvertMarkupAnalyticalEnd);
+                this->Process(
+                    &convertMarkupAnalytical, &convertMarkupAnalyticalParams, &convertMarkupAnalyticalEnd, &filters);
+
+                // After having processed one layer, we check if we have open ties - if yes, we
+                // must reset them and they will be ignored.
+                if (!convertMarkupAnalyticalParams.m_currentNotes.empty()) {
+                    std::vector<Note *>::iterator iter;
+                    for (iter = convertMarkupAnalyticalParams.m_currentNotes.begin();
+                         iter != convertMarkupAnalyticalParams.m_currentNotes.end(); ++iter) {
+                        LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+                    }
                 }
             }
         }

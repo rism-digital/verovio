@@ -444,9 +444,9 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     ArrayOfObjects::iterator iter;

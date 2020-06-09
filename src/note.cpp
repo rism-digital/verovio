@@ -536,9 +536,9 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     /****** ties ******/

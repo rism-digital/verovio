@@ -438,9 +438,9 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     assert(!params->m_currentChord);
@@ -456,9 +456,9 @@ int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (params->m_permanent) {

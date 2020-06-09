@@ -304,7 +304,7 @@ public:
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
-    void ConvertAnalyticalMarkupDoc(bool permanent = false);
+    void ConvertMarkupDoc(bool permanent = false);
 
     /**
      * Transpose the content of the doc.
@@ -356,9 +356,11 @@ public:
     int GetAdjustedDrawingPageHeight() const;
 
     /**
-     * Setter for analytical markup flag
+     * Setter for markup flag. See corresponding enum in vrvdef.h
+     * Set when reading the file to indicate what markup conversion needs to be applied.
+     * See Doc::ConvertMarkupDoc
      */
-    void SetAnalyticalMarkup(bool hasAnalyticalMarkup) { m_hasAnalyticalMarkup = hasAnalyticalMarkup; }
+    void SetMarkup(int markup) { m_markup |= markup; }
 
     /**
      * @name Setter for and getter for mensural only flag
@@ -513,7 +515,7 @@ private:
      * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
      * is converted during the import in MEIInput.
      */
-    bool m_hasAnalyticalMarkup;
+    int m_markup;
 
     /**
      * A flag to indicate whereas to document contains only mensural music.

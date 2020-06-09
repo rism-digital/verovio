@@ -212,9 +212,9 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertAnalyticalMarkup
+     * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToPageBased
