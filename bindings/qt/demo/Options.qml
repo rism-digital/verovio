@@ -16,7 +16,7 @@ Item {
 
     width: layout.width
 
-    property string fileName: ":/mei/test.mei"
+    property string fileUrl: ":/mei/test.mei"
     property string musicFontName: "Leipzig"
 
     Column {
@@ -37,7 +37,7 @@ Item {
             Row {
                 spacing: 5
                 TextField {
-                    text: root.fileName
+                    text: root.fileUrl
                     Layout.fillWidth: true
                     Layout.minimumWidth: grid.minimumInputSize
                     Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
@@ -54,7 +54,7 @@ Item {
                     title: "Please choose a file"
                     folder: shortcuts.home
                     onAccepted: {
-                        root.fileName = fileDialog.fileUrl
+                        root.fileUrl = fileDialog.fileUrl
                     }
                 }
             }
@@ -79,7 +79,7 @@ Item {
     }
 
     Settings {
-        property alias fileName: root.fileName
+        property alias fileUrl: root.fileUrl
         property alias musicFontName: root.musicFontName
     }
 }
