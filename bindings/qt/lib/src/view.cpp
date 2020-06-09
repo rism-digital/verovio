@@ -21,6 +21,7 @@ namespace vrvQt {
 View::View()
 {
     setFlag(ItemHasContents, true);
+    connect(this, &View::requestNewHeight, this, &View::setHeight, Qt::QueuedConnection);
 }
 
 View::~View()
@@ -67,7 +68,7 @@ QSGNode *View::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 
         node->removeAllChildNodes();
         for (auto child : childItems()) {
-            delete child;
+            child->deleteLater();
         }
         m_qtDeviceContext->Clear();
 
@@ -75,7 +76,10 @@ QSGNode *View::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         m_verovioRenderingDirty = false;
 
         m_toolkit->setAdjustedDisplayHeightForPage(m_pageNumber, m_qtDeviceContext->GetScaledHeight());
-        setHeight(m_toolkit->adjustedDisplayHeightForPage(m_pageNumber));
+        auto newHeight = m_toolkit->adjustedDisplayHeightForPage(m_pageNumber);
+        if (height() != newHeight) {
+            emit requestNewHeight(newHeight);
+        }
     }
 
     return node;

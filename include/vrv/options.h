@@ -63,7 +63,7 @@ class OptionGrp;
 // Option defines
 //----------------------------------------------------------------------------
 
-enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_encoded };
+enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_line, BREAKS_encoded };
 
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded };
 
@@ -93,7 +93,7 @@ public:
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValueArray(const std::vector<std::string> &values);
-    virtual bool SetValue(const std::string& value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -136,7 +136,7 @@ public:
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
-    virtual bool SetValue(const std::string& value);
+    virtual bool SetValue(const std::string &value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
 
@@ -481,6 +481,8 @@ public:
     OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
+    OptionInt m_outputIndent;
+    OptionBool m_outputIndentTab;
     OptionBool m_outputSmuflXmlEntities;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;
@@ -491,6 +493,7 @@ public:
     OptionString m_expand;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
+    OptionBool m_svgHtml5;
     OptionInt m_unit;
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
@@ -511,7 +514,7 @@ public:
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
     OptionDbl m_lyricHyphenLength;
-    OptionDbl m_lyricHyphenWidth;
+    OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
     OptionDbl m_lyricTopMinMargin;

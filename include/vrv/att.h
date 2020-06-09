@@ -45,27 +45,27 @@ public:
      * Files to be uncommented according to the inclusion of the corresponding LibMEI files
      */
     ///@{
-    static bool SetAnalytical(Object *element, std::string attrType, std::string attrValue);
-    static bool SetCmn(Object *element, std::string attrType, std::string attrValue);
-    static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
-    static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
-    static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
-    static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetFingering(Object *element, std::string attrType, std::string attrValue);
-    static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetHeader(Object *element, std::string attrType, std::string attrValue);
-    static bool SetMei(Object *element, std::string attrType, std::string attrValue);
-    static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
-    static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
-    static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
-    static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
-    static bool SetShared(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetUsersymbols(Object *element, std::string attrType, std::string attrValue);
-    static bool SetVisual(Object *element, std::string attrType, std::string attrValue);
+    static bool SetAnalytical(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetCmn(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetCmnornaments(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetCritapp(Object *element, const std::string &attrType, const std::string &attrValue);
+    // static bool SetEdittrans(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetExternalsymbols(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetFacsimile(Object *element, const std::string &attrType, const std::string &attrValue);
+    // static bool SetFigtable(Object *element, const std::string &attrType, const std::string &attrValue);
+    // static bool SetFingering(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetGestural(Object *element, const std::string &attrType, const std::string &attrValue);
+    // static bool SetHarmony(Object *element, const std::string &attrType, const std::string &attrValue);
+    // static bool SetHeader(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetMei(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetMensural(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetMidi(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetNeumes(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetPagebased(Object *element, const std::string &attrType, const std::string &attrValue);
+    // static bool SetPerformance(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetShared(Object *element, const std::string &attrType, const std::string &attrValue);
+    // static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
+    static bool SetVisual(Object *element, const std::string &attrType, const std::string &attrValue);
 
     /**
      * Idem for getting attributes as strings
@@ -98,6 +98,10 @@ public:
 
     static data_STAFFREL StaffrelBasicToStaffrel(data_STAFFREL_basic staffrelBasic);
     static data_STAFFREL_basic StaffrelToStaffrelBasic(data_STAFFREL staffrel);
+
+    static bool IsMensuralType(data_NOTATIONTYPE notationType);
+    static bool IsNeumeType(data_NOTATIONTYPE notationType);
+    static bool IsTabType(data_NOTATIONTYPE notationType);
 
 public:
     /** Dummy string converter */

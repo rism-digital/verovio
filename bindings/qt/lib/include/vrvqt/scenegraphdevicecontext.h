@@ -38,7 +38,7 @@ public:
      */
     ///@{
     SceneGraphDeviceContext(QQuickItem *quickItem, QSGNode *node);
-    virtual ~SceneGraphDeviceContext() = default;
+    ~SceneGraphDeviceContext() override = default;
     vrv::ClassId GetClassId() const override { return vrv::CUSTOM_DEVICE_CONTEXT; }
     void Clear();
     ///@}
@@ -57,6 +57,7 @@ public:
     ///@{
     QList<QSGGeometryNode *> GetGeometryNodesForId(QString id);
     QList<TextQuickItem *> GetQuickItemsForId(QString id);
+    QList<TextQuickItem *> FindQuickItemsByType(QString type);
     QStringList GetIdsForQuickItem(QQuickItem *item);
     ///@}
 
@@ -85,6 +86,7 @@ public:
      * @name Drawing methods
      */
     ///@{
+    void DrawSimpleBezierPath(vrv::Point bezier[4]) override;
     void DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4]) override;
     void DrawCircle(int x, int y, int radius) override;
     void DrawEllipse(int x, int y, int width, int height) override;
@@ -94,7 +96,7 @@ public:
         int n, vrv::Point points[], int xoffset, int yoffset, int fill_style = vrv::AxODDEVEN_RULE) override;
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
-    void DrawRoundedRectangle(int x, int y, int width, int height, double radius) override;
+    void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
     void DrawText(
         const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET) override;
     void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph) override;
@@ -110,13 +112,14 @@ public:
     void StartText(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment = vrv::HORIZONTALALIGNMENT_left) override;
     void EndText() override;
     void MoveTextTo(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment) override;
+    void MoveTextVerticallyTo(int y) override;
     ///@}
 
     /**
      * @name Method for starting, restarting and ending a graphic
      */
     ///@{
-    void StartGraphic(vrv::Object *object, std::string gClass, std::string gId) override;
+    void StartGraphic(vrv::Object *object, std::string gClass, std::string gId, bool primary, bool prepend) override;
     void EndGraphic(vrv::Object *object, vrv::View *view) override;
     void ResumeGraphic(vrv::Object *object, std::string gId) override;
     void EndResumedGraphic(vrv::Object *object, vrv::View *view) override;
@@ -160,15 +163,16 @@ private:
      * @name Functions used to translate from the logical to device coordinates.
      */
     ///@{
-    template <class T> float translate(T x)
+    float translate(float x)
     {
         // User-scale: Everything has to be scaled, thus it is not possible to differentiate between UserScaleX and
         // UserScaleY. If there is no requirement in other DeviceContexts to have different user-scales it makes sense
         // to merge the two values to a single user-scale.
-        return x / DEFINITION_FACTOR * GetUserScaleX();
+        float userScale = static_cast<float>(GetUserScaleX());
+        return x * userScale / DEFINITION_FACTOR;
     }
-    template <class T> float translateX(T x) { return translate(x + m_logicalOrigin.x); }
-    template <class T> float translateY(T y) { return translate(y + m_logicalOrigin.y); }
+    float translateX(float x) { return translate(x + m_logicalOrigin.x); }
+    float translateY(float y) { return translate(y + m_logicalOrigin.y); }
     ///@}
 
 private:

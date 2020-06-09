@@ -22,7 +22,11 @@ namespace vrv {
 /**
  * This class models the MEI <fTrem> element.
  */
-class FTrem : public LayerElement, public ObjectListInterface, public AttFTremVis, public AttTremMeasured {
+class FTrem : public LayerElement,
+              public ObjectListInterface,
+              public BeamDrawingInterface,
+              public AttFTremVis,
+              public AttTremMeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -41,23 +45,12 @@ public:
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    virtual void AddChild(Object *object);
-
-    /**
-     * Initializes the m_beamElementCoords vector objects.
-     * This is called by FTrem::FilterList
-     */
-    void InitCoords(ArrayOfObjects *childList);
-
-    /**
-     * Clear the m_beamElementCoords vector and delete all the objects.
-     */
-    void ClearCoords();
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+    const ArrayOfBeamElementCoords *GetElementCoords();
 
     //----------//
     // Functors //
@@ -73,6 +66,11 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
     //
 protected:
@@ -83,13 +81,9 @@ protected:
 
 public:
     /** */
-    BeamDrawingParams m_drawingParams;
+    BeamSegment m_beamSegment;
 
 private:
-    /**
-     * An array of coordinates for each element
-     **/
-    mutable ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 } // namespace vrv

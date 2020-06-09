@@ -69,32 +69,26 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
         this->AddChild(titleRend);
     }
 
-    // composer
-    node = header.select_node("//fileDesc/titleStmt/respStmt/persName[@role=\"composer\"]");
-    if (node) {
-        Rend *composerRend = new Rend();
-        composerRend->SetHalign(HORIZONTALALIGNMENT_right);
-        composerRend->SetValign(VERTICALALIGNMENT_bottom);
-        composerRend->SetLabel("composer");
-        Text *composerText = new Text();
-        composerText->SetText(UTF8to16(node.node().text().as_string()));
-        composerRend->SetLang(node.node().attribute("xml:lang").as_string());
-        composerRend->AddChild(composerText);
-        this->AddChild(composerRend);
-    }
-
-    // lyricist
-    node = header.select_node("//fileDesc/titleStmt/respStmt/persName[@role=\"lyricist\"]");
-    if (node) {
-        Rend *lyricistRend = new Rend();
-        lyricistRend->SetHalign(HORIZONTALALIGNMENT_left);
-        lyricistRend->SetValign(VERTICALALIGNMENT_bottom);
-        lyricistRend->SetLabel("lyricist");
-        Text *lyricistText = new Text();
-        lyricistText->SetText(UTF8to16(node.node().text().as_string()));
-        lyricistRend->SetLang(node.node().attribute("xml:lang").as_string());
-        lyricistRend->AddChild(lyricistText);
-        this->AddChild(lyricistRend);
+    nodeSet = header.select_nodes(
+        "//fileDesc/titleStmt/respStmt/persName[contains('lyricist translator composer harmonizer arranger', @role)]");
+    for (pugi::xpath_node_set::const_iterator it = nodeSet.begin(); it != nodeSet.end(); ++it) {
+        node = *it;
+        Rend *personRend = new Rend();
+        std::string role = node.node().attribute("role").as_string();
+        if (role == "lyricist" || role == "translator") {
+            personRend->SetHalign(HORIZONTALALIGNMENT_left);
+        }
+        else {
+            // composer, harmonizer, and arranger get placed on the right side.
+            personRend->SetHalign(HORIZONTALALIGNMENT_right);
+        }
+        personRend->SetValign(VERTICALALIGNMENT_bottom);
+        personRend->SetLabel(role);
+        Text *personText = new Text();
+        personText->SetText(UTF8to16(node.node().text().as_string()));
+        personRend->SetLang(node.node().attribute("xml:lang").as_string());
+        personRend->AddChild(personText);
+        this->AddChild(personRend);
     }
 
     return true;

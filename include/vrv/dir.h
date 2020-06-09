@@ -55,10 +55,10 @@ public:
     ///@}
 
     /**
-     * Add an element (text, rend. etc.) to a dynam.
+     * Add an element (text, rend. etc.) to a dir.
      * Only supported elements will be actually added to the child list.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     //----------//
     // Functors //

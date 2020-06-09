@@ -64,7 +64,8 @@ std::string Resources::s_path = "/usr/local/share/verovio";
 Resources::GlyphTextMap Resources::s_textFont;
 Resources::GlyphMap Resources::s_font;
 Resources::StyleAttributes Resources::s_currentStyle;
-const Resources::StyleAttributes Resources::k_defaultStyle{data_FONTWEIGHT::FONTWEIGHT_normal, data_FONTSTYLE::FONTSTYLE_normal};
+const Resources::StyleAttributes Resources::k_defaultStyle{ data_FONTWEIGHT::FONTWEIGHT_normal,
+    data_FONTSTYLE::FONTSTYLE_normal };
 
 //----------------------------------------------------------------------------
 // Font related methods
@@ -90,11 +91,11 @@ bool Resources::InitFonts()
     };
 
     static const TextFontInfo_type textFontInfos[] = {
-        {k_defaultStyle, "Times", true},
-        {k_defaultStyle, "VerovioText-1.0", true},
-        {{FONTWEIGHT_bold, FONTSTYLE_normal}, "Times-bold", false},
-        {{FONTWEIGHT_bold, FONTSTYLE_italic}, "Times-bold-italic", false},
-        {{FONTWEIGHT_normal, FONTSTYLE_italic}, "Times-italic", false},
+        { k_defaultStyle, "Times", true },
+        { k_defaultStyle, "VerovioText-1.0", true },
+        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
+        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
+        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false },
     };
 
     for (const auto &textFontInfo : textFontInfos) {
@@ -122,7 +123,7 @@ Glyph *Resources::GetGlyph(wchar_t smuflCode)
 
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle)
 {
-    if(fontWeight == FONTWEIGHT_NONE) {
+    if (fontWeight == FONTWEIGHT_NONE) {
         fontWeight = FONTWEIGHT_normal;
     }
 
@@ -320,7 +321,7 @@ void LogDebug(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s, CONSOLE_LOG);
+    AppendLogBuffer(true, s, CONSOLE_DEBUG);
     va_end(args);
 #else
     va_list args;
@@ -411,15 +412,16 @@ bool LogBufferContains(const std::string &s)
 
 void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level)
 {
-    if (checkDuplicate && LogBufferContains(message)) return;
-    logBuffer.push_back(message);
-
     switch (level) {
+        case CONSOLE_DEBUG: EM_ASM_ARGS({ console.debug(UTF8ToString($0)); }, message.c_str()); break;
         case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(UTF8ToString($0)); }, message.c_str()); break;
         case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(UTF8ToString($0)); }, message.c_str()); break;
         case CONSOLE_INFO: EM_ASM_ARGS({ console.info(UTF8ToString($0)); }, message.c_str()); break;
         default: EM_ASM_ARGS({ console.log(UTF8ToString($0)); }, message.c_str()); break;
     }
+
+    if (checkDuplicate && LogBufferContains(message)) return;
+    logBuffer.push_back(message);
 }
 
 #endif
