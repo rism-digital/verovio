@@ -2601,6 +2601,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         for (pugi::xml_node technical : notations.node().children("technical")) {
+            if (technical.child("fingering")) continue;
             Artic *artic = new Artic();
             for (pugi::xml_node articulation : technical.children()) {
                 artics.push_back(ConvertArticulations(articulation.name()));
