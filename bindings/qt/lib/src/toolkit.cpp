@@ -326,15 +326,36 @@ void Toolkit::reloadData()
 
     if (!m_resourcesDataInitialized) return;
 
+    if (!prepareLayout()) {
+        return;
+    }
+
     bool success = m_verovioToolkit.LoadData(m_fileContent.toStdString());
+
     setHasValidData(success);
 
     if (success) {
-        requestDocumentRelayout();
+        setPageCount(m_verovioToolkit.GetPageCount());
+        emit documentLayoutChanged();
     }
     else {
         setPageCount(0);
     }
+}
+
+bool Toolkit::prepareLayout()
+{
+    if (!initFont()) {
+        qWarning() << "Could not layout document because fonts are not correctly initialized";
+        return false;
+    }
+
+    m_verovioToolkit.SetOption(
+        "pageWidth", std::to_string(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale())));
+    m_verovioToolkit.SetOption(
+        "pageHeight", std::to_string(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale())));
+
+    return true;
 }
 
 void Toolkit::documentRelayout()
@@ -345,20 +366,13 @@ void Toolkit::documentRelayout()
         return;
     }
 
-    if (!initFont()) {
-        qWarning() << "Could not layout document because fonts are not correctly initialized";
+    if (!prepareLayout()) {
         return;
     }
-
-    m_verovioToolkit.SetOption(
-        "pageWidth", std::to_string(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale())));
-    m_verovioToolkit.SetOption(
-        "pageHeight", std::to_string(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale())));
 
     m_verovioToolkit.RedoLayout();
 
     setPageCount(m_verovioToolkit.GetPageCount());
-
     emit documentLayoutChanged();
 }
 
