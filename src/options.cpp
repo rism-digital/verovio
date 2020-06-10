@@ -634,6 +634,10 @@ Options::Options()
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
 
+    m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");
+    m_useBraceGlyph.Init(false);
+    this->Register(&m_useBraceGlyph, "useBraceGlyph", &m_general);
+
     m_useFacsimile.SetInfo(
         "Use facsimile for layout", "Use information in the <facsimile> element to control the layout");
     m_useFacsimile.Init(false);
