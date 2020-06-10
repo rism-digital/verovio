@@ -186,6 +186,11 @@ private:
      */
     void setHasValidData(bool hasValidData);
 
+    /**
+     * @name Other internal helper functions.
+     */
+    bool prepareLayout();
+
 private:
     // Stores the dimensions to which the score should be rendered. This takes into account the current scale and thus
     // differs to the Verovio pageWidth and pageHeight.
