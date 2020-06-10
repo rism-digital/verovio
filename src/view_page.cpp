@@ -553,19 +553,17 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
     if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
-        Glyph *glyph = Resources::GetGlyph(SMUFL_E000_brace);
-        assert(glyph);
         FontInfo* font = m_doc->GetDrawingSmuflFont(staffSize, false);
-        int dummy, g_w, g_h;
-        glyph->GetBoundingBox(dummy, dummy, g_w, g_h);
-        const float ratio = static_cast<float>(glyph->GetUnitsPerEm()) / font->GetPointSize();
-        const float scale = static_cast<float>(y1 - y2) / g_h;
+        int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
+        int height = 8 * m_doc->GetDrawingUnit(staffSize);
+        const float scale = static_cast<float>(y1 - y2) / height;
+        // We want the brace width always to be 2 units
         int braceWidth =  m_doc->GetDrawingDoubleUnit(staffSize);
         x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + m_doc->GetDrawingUnit(staffSize);
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
-        const float widthAfterScalling = g_w * scale;
+        const float widthAfterScalling = width * scale ;
         font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
-        DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * ratio * scale, false);
+        DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
         font->SetWidthToHeightRatio(currentWidthToHeightRatio);
         return;
     }
