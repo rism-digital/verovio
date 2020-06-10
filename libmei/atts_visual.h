@@ -860,6 +860,14 @@ public:
     void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; }
     data_ORIENTATION GetOrient() const { return m_orient; }
     bool HasOrient() const;
+    //
+    void SetDot(data_BOOLEAN dot_) { m_dot = dot_; }
+    data_BOOLEAN GetDot() const { return m_dot; }
+    bool HasDot() const;
+    //
+    void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; }
+    data_MENSURATIONSIGN GetSign() const { return m_sign; }
+    bool HasSign() const;
     ///@}
 
 private:
@@ -867,73 +875,12 @@ private:
     mensurVis_FORM m_form;
     /** Describes the rotation or reflection of the base symbol. **/
     data_ORIENTATION m_orient;
+    /** Specifies whether a dot is to be added to the base symbol. **/
+    data_BOOLEAN m_dot;
+    /** The base symbol in the mensuration sign/time signature of mensural notation. **/
+    data_MENSURATIONSIGN m_sign;
 
-    /* include <attorient> */
-};
-
-//----------------------------------------------------------------------------
-// AttMensuralVis
-//----------------------------------------------------------------------------
-
-class AttMensuralVis : public Att {
-public:
-    AttMensuralVis();
-    virtual ~AttMensuralVis();
-
-    /** Reset the default values for the attribute class **/
-    void ResetMensuralVis();
-
-    /** Read the values for the attribute class **/
-    bool ReadMensuralVis(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteMensuralVis(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetMensurColor(std::string mensurColor_) { m_mensurColor = mensurColor_; }
-    std::string GetMensurColor() const { return m_mensurColor; }
-    bool HasMensurColor() const;
-    //
-    void SetMensurForm(mensuralVis_MENSURFORM mensurForm_) { m_mensurForm = mensurForm_; }
-    mensuralVis_MENSURFORM GetMensurForm() const { return m_mensurForm; }
-    bool HasMensurForm() const;
-    //
-    void SetMensurLoc(int mensurLoc_) { m_mensurLoc = mensurLoc_; }
-    int GetMensurLoc() const { return m_mensurLoc; }
-    bool HasMensurLoc() const;
-    //
-    void SetMensurOrient(data_ORIENTATION mensurOrient_) { m_mensurOrient = mensurOrient_; }
-    data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; }
-    bool HasMensurOrient() const;
-    //
-    void SetMensurSize(data_FONTSIZE mensurSize_) { m_mensurSize = mensurSize_; }
-    data_FONTSIZE GetMensurSize() const { return m_mensurSize; }
-    bool HasMensurSize() const;
-    /** Getter for reference (for alternate type only) */
-    data_FONTSIZE *GetMensurSizeAlternate() { return &m_mensurSize; }
-    ///@}
-
-private:
-    /**
-     * Records the color of the mensuration sign.
-     * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
-     **/
-    std::string m_mensurColor;
-    /** Indicates whether the base symbol is written vertically or horizontally. **/
-    mensuralVis_MENSURFORM m_mensurForm;
-    /** Holds the staff location of the mensuration sign. **/
-    int m_mensurLoc;
-    /** Describes the rotation or reflection of the base symbol. **/
-    data_ORIENTATION m_mensurOrient;
-    /** Describes the relative size of the mensuration sign. **/
-    data_FONTSIZE m_mensurSize;
-
-    /* include <attmensur.size> */
+    /* include <attsign> */
 };
 
 //----------------------------------------------------------------------------

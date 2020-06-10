@@ -1216,6 +1216,8 @@ void AttMensurVis::ResetMensurVis()
 {
     m_form = mensurVis_FORM_NONE;
     m_orient = ORIENTATION_NONE;
+    m_dot = BOOLEAN_NONE;
+    m_sign = MENSURATIONSIGN_NONE;
 }
 
 bool AttMensurVis::ReadMensurVis(pugi::xml_node element)
@@ -1229,6 +1231,16 @@ bool AttMensurVis::ReadMensurVis(pugi::xml_node element)
     if (element.attribute("orient")) {
         this->SetOrient(StrToOrientation(element.attribute("orient").value()));
         element.remove_attribute("orient");
+        hasAttribute = true;
+    }
+    if (element.attribute("dot")) {
+        this->SetDot(StrToBoolean(element.attribute("dot").value()));
+        element.remove_attribute("dot");
+        hasAttribute = true;
+    }
+    if (element.attribute("sign")) {
+        this->SetSign(StrToMensurationsign(element.attribute("sign").value()));
+        element.remove_attribute("sign");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1245,6 +1257,14 @@ bool AttMensurVis::WriteMensurVis(pugi::xml_node element)
         element.append_attribute("orient") = OrientationToStr(this->GetOrient()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasDot()) {
+        element.append_attribute("dot") = BooleanToStr(this->GetDot()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSign()) {
+        element.append_attribute("sign") = MensurationsignToStr(this->GetSign()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
@@ -1258,113 +1278,17 @@ bool AttMensurVis::HasOrient() const
     return (m_orient != ORIENTATION_NONE);
 }
 
-/* include <attorient> */
-
-//----------------------------------------------------------------------------
-// AttMensuralVis
-//----------------------------------------------------------------------------
-
-AttMensuralVis::AttMensuralVis() : Att()
+bool AttMensurVis::HasDot() const
 {
-    ResetMensuralVis();
+    return (m_dot != BOOLEAN_NONE);
 }
 
-AttMensuralVis::~AttMensuralVis()
+bool AttMensurVis::HasSign() const
 {
+    return (m_sign != MENSURATIONSIGN_NONE);
 }
 
-void AttMensuralVis::ResetMensuralVis()
-{
-    m_mensurColor = "";
-    m_mensurForm = mensuralVis_MENSURFORM_NONE;
-    m_mensurLoc = 0;
-    m_mensurOrient = ORIENTATION_NONE;
-    m_mensurSize = data_FONTSIZE();
-}
-
-bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("mensur.color")) {
-        this->SetMensurColor(StrToStr(element.attribute("mensur.color").value()));
-        element.remove_attribute("mensur.color");
-        hasAttribute = true;
-    }
-    if (element.attribute("mensur.form")) {
-        this->SetMensurForm(StrToMensuralVisMensurform(element.attribute("mensur.form").value()));
-        element.remove_attribute("mensur.form");
-        hasAttribute = true;
-    }
-    if (element.attribute("mensur.loc")) {
-        this->SetMensurLoc(StrToInt(element.attribute("mensur.loc").value()));
-        element.remove_attribute("mensur.loc");
-        hasAttribute = true;
-    }
-    if (element.attribute("mensur.orient")) {
-        this->SetMensurOrient(StrToOrientation(element.attribute("mensur.orient").value()));
-        element.remove_attribute("mensur.orient");
-        hasAttribute = true;
-    }
-    if (element.attribute("mensur.size")) {
-        this->SetMensurSize(StrToFontsize(element.attribute("mensur.size").value()));
-        element.remove_attribute("mensur.size");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttMensuralVis::WriteMensuralVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasMensurColor()) {
-        element.append_attribute("mensur.color") = StrToStr(this->GetMensurColor()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMensurForm()) {
-        element.append_attribute("mensur.form") = MensuralVisMensurformToStr(this->GetMensurForm()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMensurLoc()) {
-        element.append_attribute("mensur.loc") = IntToStr(this->GetMensurLoc()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMensurOrient()) {
-        element.append_attribute("mensur.orient") = OrientationToStr(this->GetMensurOrient()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMensurSize()) {
-        element.append_attribute("mensur.size") = FontsizeToStr(this->GetMensurSize()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttMensuralVis::HasMensurColor() const
-{
-    return (m_mensurColor != "");
-}
-
-bool AttMensuralVis::HasMensurForm() const
-{
-    return (m_mensurForm != mensuralVis_MENSURFORM_NONE);
-}
-
-bool AttMensuralVis::HasMensurLoc() const
-{
-    return (m_mensurLoc != 0);
-}
-
-bool AttMensuralVis::HasMensurOrient() const
-{
-    return (m_mensurOrient != ORIENTATION_NONE);
-}
-
-bool AttMensuralVis::HasMensurSize() const
-{
-    return (m_mensurSize.HasValue());
-}
-
-/* include <attmensur.size> */
+/* include <attsign> */
 
 //----------------------------------------------------------------------------
 // AttMeterSigVis
@@ -2379,28 +2303,12 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
             att->SetOrient(att->StrToOrientation(attrValue));
             return true;
         }
-    }
-    if (element->HasAttClass(ATT_MENSURALVIS)) {
-        AttMensuralVis *att = dynamic_cast<AttMensuralVis *>(element);
-        assert(att);
-        if (attrType == "mensur.color") {
-            att->SetMensurColor(att->StrToStr(attrValue));
+        if (attrType == "dot") {
+            att->SetDot(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "mensur.form") {
-            att->SetMensurForm(att->StrToMensuralVisMensurform(attrValue));
-            return true;
-        }
-        if (attrType == "mensur.loc") {
-            att->SetMensurLoc(att->StrToInt(attrValue));
-            return true;
-        }
-        if (attrType == "mensur.orient") {
-            att->SetMensurOrient(att->StrToOrientation(attrValue));
-            return true;
-        }
-        if (attrType == "mensur.size") {
-            att->SetMensurSize(att->StrToFontsize(attrValue));
+        if (attrType == "sign") {
+            att->SetSign(att->StrToMensurationsign(attrValue));
             return true;
         }
     }
@@ -2758,24 +2666,11 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasOrient()) {
             attributes->push_back(std::make_pair("orient", att->OrientationToStr(att->GetOrient())));
         }
-    }
-    if (element->HasAttClass(ATT_MENSURALVIS)) {
-        const AttMensuralVis *att = dynamic_cast<const AttMensuralVis *>(element);
-        assert(att);
-        if (att->HasMensurColor()) {
-            attributes->push_back(std::make_pair("mensur.color", att->StrToStr(att->GetMensurColor())));
+        if (att->HasDot()) {
+            attributes->push_back(std::make_pair("dot", att->BooleanToStr(att->GetDot())));
         }
-        if (att->HasMensurForm()) {
-            attributes->push_back(std::make_pair("mensur.form", att->MensuralVisMensurformToStr(att->GetMensurForm())));
-        }
-        if (att->HasMensurLoc()) {
-            attributes->push_back(std::make_pair("mensur.loc", att->IntToStr(att->GetMensurLoc())));
-        }
-        if (att->HasMensurOrient()) {
-            attributes->push_back(std::make_pair("mensur.orient", att->OrientationToStr(att->GetMensurOrient())));
-        }
-        if (att->HasMensurSize()) {
-            attributes->push_back(std::make_pair("mensur.size", att->FontsizeToStr(att->GetMensurSize())));
+        if (att->HasSign()) {
+            attributes->push_back(std::make_pair("sign", att->MensurationsignToStr(att->GetSign())));
         }
     }
     if (element->HasAttClass(ATT_METERSIGVIS)) {

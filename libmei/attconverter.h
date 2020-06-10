@@ -74,6 +74,18 @@ public:
     std::string CompassdirectionExtendedToStr(data_COMPASSDIRECTION_extended data) const;
     data_COMPASSDIRECTION_extended StrToCompassdirectionExtended(const std::string &value, bool logWarning = true) const;
 
+    std::string DivisioToStr(data_DIVISIO data) const;
+    data_DIVISIO StrToDivisio(const std::string &value, bool logWarning = true) const;
+
+    std::string DurationrestsToStr(data_DURATIONRESTS data) const;
+    data_DURATIONRESTS StrToDurationrests(const std::string &value, bool logWarning = true) const;
+
+    std::string DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const;
+    data_DURATIONRESTS_mensural StrToDurationrestsMensural(const std::string &value, bool logWarning = true) const;
+
+    std::string DurqualityMensuralToStr(data_DURQUALITY_mensural data) const;
+    data_DURQUALITY_mensural StrToDurqualityMensural(const std::string &value, bool logWarning = true) const;
+
     std::string EnclosureToStr(data_ENCLOSURE data) const;
     data_ENCLOSURE StrToEnclosure(const std::string &value, bool logWarning = true) const;
 
@@ -88,6 +100,12 @@ public:
 
     std::string FillToStr(data_FILL data) const;
     data_FILL StrToFill(const std::string &value, bool logWarning = true) const;
+
+    std::string FlagformMensuralToStr(data_FLAGFORM_mensural data) const;
+    data_FLAGFORM_mensural StrToFlagformMensural(const std::string &value, bool logWarning = true) const;
+
+    std::string FlagposMensuralToStr(data_FLAGPOS_mensural data) const;
+    data_FLAGPOS_mensural StrToFlagposMensural(const std::string &value, bool logWarning = true) const;
 
     std::string FontsizetermToStr(data_FONTSIZETERM data) const;
     data_FONTSIZETERM StrToFontsizeterm(const std::string &value, bool logWarning = true) const;
@@ -152,6 +170,9 @@ public:
     std::string ModsrelationshipToStr(data_MODSRELATIONSHIP data) const;
     data_MODSRELATIONSHIP StrToModsrelationship(const std::string &value, bool logWarning = true) const;
 
+    std::string MultibreverestsMensuralToStr(data_MULTIBREVERESTS_mensural data) const;
+    data_MULTIBREVERESTS_mensural StrToMultibreverestsMensural(const std::string &value, bool logWarning = true) const;
+
     std::string NonstaffplaceToStr(data_NONSTAFFPLACE data) const;
     data_NONSTAFFPLACE StrToNonstaffplace(const std::string &value, bool logWarning = true) const;
 
@@ -205,6 +226,9 @@ public:
 
     std::string StemdirectionExtendedToStr(data_STEMDIRECTION_extended data) const;
     data_STEMDIRECTION_extended StrToStemdirectionExtended(const std::string &value, bool logWarning = true) const;
+
+    std::string StemformMensuralToStr(data_STEMFORM_mensural data) const;
+    data_STEMFORM_mensural StrToStemformMensural(const std::string &value, bool logWarning = true) const;
 
     std::string StemmodifierToStr(data_STEMMODIFIER data) const;
     data_STEMMODIFIER StrToStemmodifier(const std::string &value, bool logWarning = true) const;
@@ -334,9 +358,6 @@ public:
 
     std::string MensurVisFormToStr(mensurVis_FORM data) const;
     mensurVis_FORM StrToMensurVisForm(const std::string &value, bool logWarning = true) const;
-
-    std::string MensuralVisMensurformToStr(mensuralVis_MENSURFORM data) const;
-    mensuralVis_MENSURFORM StrToMensuralVisMensurform(const std::string &value, bool logWarning = true) const;
 
     std::string MeterConformanceMetconToStr(meterConformance_METCON data) const;
     meterConformance_METCON StrToMeterConformanceMetcon(const std::string &value, bool logWarning = true) const;
