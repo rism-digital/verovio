@@ -243,29 +243,13 @@ void Toolkit::setResourcesDataPath(QString resourcesDataPath)
 
 #ifdef Q_OS_ANDROID
         if (resourcesDataPath.startsWith("assets:/")) {
-            if (!m_resourcesDataTmpDir.isValid()) {
-                qWarning() << "tmp directory for resources data is invalid";
-                return;
-            }
-            if (true) {
-
-                QDir testDir;
-                testDir.mkdir("temptemptemp");
-                testDir.cd("temptemptemp");
-                copyDirRecursive(resourcesDataPath, testDir.absolutePath());
-                resourcesDataPath = testDir.absolutePath();
-            }
-            else {
-                qWarning() << __FUNCTION__ << __LINE__;
-                copyDirRecursive(resourcesDataPath, m_resourcesDataTmpDir.path());
-                qWarning() << __FUNCTION__ << __LINE__;
-                resourcesDataPath = m_resourcesDataTmpDir.path();
-                qWarning() << __FUNCTION__ << __LINE__;
-            }
+            QDir localAssetDir;
+            localAssetDir.mkdir("assetDir");
+            localAssetDir.cd("assetDir");
+            copyDirRecursive(resourcesDataPath, localAssetDir.absolutePath());
+            resourcesDataPath = localAssetDir.absolutePath();
         }
 #endif
-
-        qWarning() << __FUNCTION__ << __LINE__;
 
         m_resourcesDataPath = resourcesDataPath;
         bool success = m_verovioToolkit.SetResourcePath(resourcesDataPath.toStdString());
@@ -278,7 +262,6 @@ void Toolkit::setResourcesDataPath(QString resourcesDataPath)
         m_resourcesDataInitialized = true;
         requestReloadData();
     }
-    qWarning() << __FUNCTION__ << __LINE__;
 }
 
 void Toolkit::setSpacingStaff(int spacingStaff)

@@ -47,7 +47,7 @@ android {
 else {
     message("* Using settings for Other (Linux, Mac, Windows, ...).")
 
-    LIBS += -L../../../tools -lverovio
+    LIBS += -L../../../tools/build-library -lverovio
 }
 
 unix {
