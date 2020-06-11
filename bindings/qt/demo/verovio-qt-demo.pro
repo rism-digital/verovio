@@ -20,6 +20,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+GIT_BASE_PATH = $$shell_path($$_PRO_FILE_PWD_)/../../..
+
 {
     INCLUDEPATH += ../../../include/
     INCLUDEPATH += ../../../include/vrv
@@ -32,11 +34,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 android {
     message("* Using settings for Android.")
 
-    LIBS += -L../../../tools/android/libs/armeabi-v7a -lverovio-android
-    LIBS += -L../build-android -lverovio-qt
+    LIBS += -L../../../bindings/android/libs/armeabi-v7a -lverovio-android
+    LIBS += -L../build-android -lverovio-qt_armeabi-v7a
 
-    ANDROID_EXTRA_LIBS += "../../../tools/android/libs/armeabi-v7a/libverovio-android.so"
-    ANDROID_EXTRA_LIBS += "../build-android/libverovio-qt.so"
+    ANDROID_EXTRA_LIBS += "$${GIT_BASE_PATH}/bindings/android/libs/armeabi-v7a/libverovio-android.so"
+    ANDROID_EXTRA_LIBS += "$${GIT_BASE_PATH}/bindings/qt/build-android/libverovio-qt_armeabi-v7a.so"
 
     # The 'data' directory with the font resources is put into the assets of the Android APK
     resources_data.path = /assets/data

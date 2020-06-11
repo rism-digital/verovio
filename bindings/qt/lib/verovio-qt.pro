@@ -42,7 +42,7 @@ INCLUDEPATH += include
 android {
     message("* Using settings for Android.")
 
-    LIBS += -L../../../tools/android/libs/armeabi-v7a -lverovio-android
+    LIBS += -L../../android/libs/armeabi-v7a -lverovio-android
 }
 else {
     message("* Using settings for Other (Linux, Mac, Windows, ...).")
