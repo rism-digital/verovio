@@ -276,7 +276,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             }
         }
         else {
-            ArrayOfObjects facsChildren;
+            ListOfObjects facsChildren;
             element->FindAllDescendantByComparison(&facsChildren, &facsIC);
             for (auto it = facsChildren.begin(); it != facsChildren.end(); ++it) {
                 // dont change the text bbox position
@@ -337,7 +337,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // after this clef before the drag action), and nextClefAfter. And of course clef just refers to
         // this clef, the clef being dragged.
         //
-        // There are also ArrayOfObjects which refer to which elements
+        // There are also ListOfObjects which refer to which elements
         // were associated to different clefs at different times. with{ClefName} just refers to the pitched
         // elements that were associated to that clef at that time. For example withThisClefBefore refers
         // to the elements that were associated with this clef before the drag action took place.
@@ -382,8 +382,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         int lineDiff = clefLine - initialClefLine;
 
-        ArrayOfObjects withThisClefBefore;
-        ArrayOfObjects withPrecedingClefBefore;
+        ListOfObjects withThisClefBefore;
+        ListOfObjects withPrecedingClefBefore;
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison ic(INTERFACE_PITCH);
@@ -410,15 +410,15 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         // case 1
         if (precedingClefAfter == precedingClefBefore && nextClefAfter == nextClefBefore) {
-            ArrayOfObjects withThisClefAfter;
-            ArrayOfObjects withPrecedingClefAfter;
+            ListOfObjects withThisClefAfter;
+            ListOfObjects withPrecedingClefAfter;
 
             m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefAfter, &ic, clef,
                 (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
             m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
 
             if (withPrecedingClefBefore.size() > withPrecedingClefAfter.size()) {
-                ArrayOfObjects newlyWithThisClef;
+                ListOfObjects newlyWithThisClef;
 
                 clef->SetLine(clefLine);
 
@@ -438,7 +438,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
                 }
             }
             else if (withPrecedingClefBefore.size() < withPrecedingClefAfter.size()) {
-                ArrayOfObjects noLongerWithThisClef;
+                ListOfObjects noLongerWithThisClef;
 
                 std::set_difference(withPrecedingClefAfter.begin(), withPrecedingClefAfter.end(),
                     withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
@@ -467,11 +467,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
         // case 2
         else {
-            ArrayOfObjects withOldPrecedingClefAfter;
-            ArrayOfObjects withNewPrecedingClefBefore;
-            ArrayOfObjects withNewPrecedingClefAfter;
-            ArrayOfObjects noLongerWithThisClef;
-            ArrayOfObjects newlyWithThisClef;
+            ListOfObjects withOldPrecedingClefAfter;
+            ListOfObjects withNewPrecedingClefBefore;
+            ListOfObjects withNewPrecedingClefAfter;
+            ListOfObjects noLongerWithThisClef;
+            ListOfObjects newlyWithThisClef;
 
             m_doc->GetDrawingPage()->FindAllDescendantBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
                 (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
@@ -585,15 +585,15 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         ListOfObjects staves;
         ClassIdComparison ac(STAFF);
         m_doc->FindAllDescendantByComparison(&staves, &ac);
-        ArrayOfObjects stavesVector(staves.begin(), staves.end());
+        std::vector<Object *> stavesVector(staves.begin(), staves.end());
 
         ClosestBB comp;
         comp.x = ulx;
         comp.y = uly;
 
         if (staves.size() > 0) {
-            std::sort(staves.begin(), staves.end(), comp);
-            staff = dynamic_cast<Staff *>(staves.at(0));
+            std::sort(stavesVector.begin(), stavesVector.end(), comp);
+            staff = dynamic_cast<Staff *>(stavesVector.at(0));
         }
         else {
             staff = NULL;
@@ -623,7 +623,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             parent = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
             assert(parent);
             newStaff = new Staff(1);
-            newStaff->m_drawingStaffDef = dynamic_cast<StaffDef *>(m_doc->m_scoreDef.FindDescendantByType(STAFFDEF));
+            newStaff->m_drawingStaffDef = dynamic_cast<StaffDef *>(m_doc->m_mdivScoreDef.FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -643,7 +643,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         ListOfObjects staves;
         ClassIdComparison ac(STAFF);
         parent->FindAllDescendantByComparison(&staves, &ac);
-        ArrayOfObjects stavesVector(staves.begin(), staves.end());
+        std::vector<Object *> stavesVector(staves.begin(), staves.end());
         stavesVector.push_back(newStaff);
         StaffSort staffSort;
         std::stable_sort(stavesVector.begin(), stavesVector.end(), staffSort);
@@ -871,7 +871,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
 
         // adjust pitched elements whose clef is changing
-        ArrayOfObjects elements;
+        ListOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
         m_doc->GetDrawingPage()->FindAllDescendantBetween(&elements, &ic, clef,
@@ -927,7 +927,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
     m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
-    ArrayOfObjects staves;
+    ListOfObjects staves;
 
     // Get the staves by element ID and fail if a staff does not exist.
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
@@ -1344,7 +1344,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             previousClef = layer->GetCurrentClef();
         }
 
-        ArrayOfObjects elements;
+        ListOfObjects elements;
         InterfaceComparison ic(INTERFACE_PITCH);
 
         m_doc->GetDrawingPage()->FindAllDescendantBetween(&elements, &ic, clef,
@@ -1502,7 +1502,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     Object *parent = NULL, *doubleParent = NULL;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
-    ArrayOfObjects sortedElements;
+    std::vector<Object *> sortedElements;
     std::vector<Object *> fullParents;
     std::map<Syllable *, Clef *> clefsBefore;
 
@@ -1594,9 +1594,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     std::copy(elements.begin(), elements.end(), std::back_inserter(sortedElements));
     std::stable_sort(sortedElements.begin(), sortedElements.end(), Object::sortByUlx);
 
-    ArrayOfObjects clefs;
+    ListOfObjects clefs;
     std::set<Object *> syllables;
-    ArrayOfObjects sortedSyllables;
+    ListOfObjects sortedSyllables;
     ClassIdComparison clefComp(CLEF);
     InterfaceComparison pitchComp(INTERFACE_PITCH);
     Clef *newClef;
@@ -1682,7 +1682,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     }
                     // otherwise get a boundingbox that comprises all the neumes in the syllable
                     else {
-                        ArrayOfObjects children;
+                        ListOfObjects children;
                         InterfaceComparison comp(INTERFACE_FACSIMILE);
                         syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantByComparison(&children, &comp);
                         for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
@@ -1847,7 +1847,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     }
 
     // change the pitch of any pitched elements whose clef may have changed
-    ArrayOfObjects pitchedChildren;
+    ListOfObjects pitchedChildren;
     // LogMessage("%d", sortedSyllables.size());
     if (sortedSyllables.size()) {
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
@@ -1904,7 +1904,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     bool firstIsSyl = false;
     Clef *oldClef;
     ClassIdComparison ac(CLEF);
-    ArrayOfObjects syllables;
+    ListOfObjects syllables;
 
     jsonxx::Array uuidArray;
 
@@ -2061,7 +2061,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     }
                     // otherwise get a boundingbox that comprises all the neumes in the syllable
                     else {
-                        ArrayOfObjects children;
+                        ListOfObjects children;
                         InterfaceComparison comp(INTERFACE_FACSIMILE);
                         syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantByComparison(&children, &comp);
                         for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
@@ -2117,10 +2117,11 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     }
     if (syllables.size() != 0) {
         Clef *currentClef;
-        ArrayOfObjects pitchedChildren;
+        ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
-        std::stable_sort(syllables.begin(), syllables.end(), Object::sortByUlx);
-        for (auto it = syllables.begin(); it != syllables.end(); ++it) {
+        std::vector<Object *> syllablesVector(syllables.begin(), syllables.end());
+        std::stable_sort(syllablesVector.begin(), syllablesVector.end(), Object::sortByUlx);
+        for (auto it = syllablesVector.begin(); it != syllablesVector.end(); ++it) {
             currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
             if (currentClef == NULL) {
                     currentClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
@@ -2365,9 +2366,11 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    ArrayOfObjects staves;
+    ListOfObjects stavesList;
     ClassIdComparison ac(STAFF);
-    m_doc->FindAllDescendantByComparison(&staves, &ac);
+    m_doc->FindAllDescendantByComparison(&stavesList, &ac);
+
+    std::vector<Object *> staves(stavesList.begin(), stavesList.end());
 
     ClosestBB comp;
 
@@ -2399,7 +2402,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
     if (staves.size() > 0) {
         std::sort(staves.begin(), staves.end(), comp);
-        staff = dynamic_cast<Staff *>(staves.at(0));
+        staff = dynamic_cast<Staff *>(staves.front());
     }
     else {
         LogError("Could not find any staves. This should not happen");
@@ -2442,7 +2445,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
         Clef *previousClefBefore;
         Clef *nextClefBefore;
-        ArrayOfObjects oldPitchChildren;
+        ListOfObjects oldPitchChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
         ClassIdComparison cic(CLEF);
 
@@ -2479,7 +2482,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         }
 
         // apply pitch interface changes to any elements whose clef may have changed
-        ArrayOfObjects newPitchChildren;
+        ListOfObjects newPitchChildren;
         Clef *previousClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cic, element));
         if (previousClefAfter == NULL) {
             previousClefAfter = layer->GetCurrentClef();
@@ -2833,7 +2836,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         Staff *staff = dynamic_cast<Staff *>(syl->GetFirstAncestor(STAFF));
         assert(staff);
 
-        ArrayOfObjects pitchedChildren;
+        ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
         syl->FindAllDescendantByComparison(&pitchedChildren, &ic);
 

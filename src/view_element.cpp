@@ -753,6 +753,11 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
             break;
     }
 
+    Clef *clef = layer->GetClef(element);
+    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int staffLineNumber = staff->m_drawingLines;
+    int clefLine = clef->GetLine();
+
     int x, y;
     if (custos->HasFacs() && m_doc->GetType() == Facs) {
         x = custos->GetDrawingX();

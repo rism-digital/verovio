@@ -1719,7 +1719,7 @@ bool Object::GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry)
     *uly = INT_MAX;
     *lrx = INT_MIN;
     *lry = INT_MIN;
-    ArrayOfObjects childrenWithFacsimileInterface;
+    ListOfObjects childrenWithFacsimileInterface;
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     this->FindAllDescendantByComparison(&childrenWithFacsimileInterface, &ic);
     bool result = false;
