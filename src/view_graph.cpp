@@ -49,6 +49,20 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int wid
     return;
 }
 
+void View::DrawRoundedLine(DeviceContext *dc, int x1, int y1, int x2, int y2, int width)
+{
+    assert(dc);
+
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, 0, 1);
+    dc->SetBrush(m_currentColour, AxSOLID);
+
+    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+
+    dc->ResetPen();
+    dc->ResetBrush();
+    return;
+}
+
 void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength)
 {
     int i, start, end;
@@ -95,12 +109,22 @@ void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2
 {
     assert(dc);
 
+    this->DrawFilledRoundedRectangle(dc, x1, y1, x2, y2, 0);
+
+    return;
+}
+
+void View::DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius)
+{
+    assert(dc);
+
     BoundingBox::Swap(y1, y2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
+    dc->DrawRoundedRectangle(
+        ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2), radius);
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -233,8 +257,8 @@ void View::DrawSmuflLine(
     dc->ResetBrush();
 }
 
-void View::DrawSmuflString(
-    DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize, bool dimin, bool setBBGlyph)
+void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data_HORIZONTALALIGNMENT alignment,
+    int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
 
@@ -243,10 +267,15 @@ void View::DrawSmuflString(
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
-    if (center) {
+    if (alignment == HORIZONTALALIGNMENT_center) {
         TextExtend extend;
         dc->GetSmuflTextExtent(s, &extend);
         xDC -= extend.m_width / 2;
+    }
+    else if (alignment == HORIZONTALALIGNMENT_right) {
+        TextExtend extend;
+        dc->GetSmuflTextExtent(s, &extend);
+        xDC -= extend.m_width;
     }
 
     dc->DrawMusicText(s, xDC, ToDeviceContextY(y), setBBGlyph);

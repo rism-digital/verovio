@@ -39,7 +39,7 @@ void AnchoredText::Reset()
     TextDirInterface::Reset();
 }
 
-void AnchoredText::AddChild(Object *child)
+bool AnchoredText::IsSupportedChild(Object *child)
 {
     if (child->Is(TEXT)) {
         assert(dynamic_cast<TextElement *>(child));
@@ -48,13 +48,9 @@ void AnchoredText::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 } // namespace vrv

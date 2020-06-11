@@ -108,6 +108,7 @@ public:
         m_supSubScript = false;
         m_faceName.clear();
         m_encoding = 0; // was wxFONTENCODING_DEFAULT;
+        m_widthToHeightRatio = 1.0;
     }
     virtual ~FontInfo(){};
 
@@ -129,6 +130,7 @@ public:
     void SetFaceName(const char *faceName) { m_faceName = faceName; }
     void SetFamily(int family) { m_family = family; }
     void SetEncoding(int encoding) { m_encoding = encoding; }
+    void SetWidthToHeightRatio(float ratio) { m_widthToHeightRatio = ratio; }
 
 private:
     int m_pointSize;
@@ -139,6 +141,7 @@ private:
     bool m_supSubScript;
     std::string m_faceName;
     int m_encoding;
+    float m_widthToHeightRatio;
 };
 
 // ---------------------------------------------------------------------------

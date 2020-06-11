@@ -40,7 +40,7 @@ EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), 
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid)
+EditorialElement::EditorialElement(const std::string &classid)
     : Object(classid), BoundaryStartInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
@@ -61,7 +61,7 @@ void EditorialElement::Reset()
 
 EditorialElement::~EditorialElement() {}
 
-void EditorialElement::AddChild(Object *child)
+bool EditorialElement::IsSupportedChild(Object *child)
 {
     if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -97,13 +97,9 @@ void EditorialElement::AddChild(Object *child)
         assert(dynamic_cast<Staff *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------

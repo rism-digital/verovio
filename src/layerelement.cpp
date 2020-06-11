@@ -28,6 +28,7 @@
 #include "horizontalaligner.h"
 #include "keysig.h"
 #include "layer.h"
+#include "ligature.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -69,7 +70,7 @@ LayerElement::LayerElement() : Object("le-"), FacsimileInterface(), LinkingInter
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid)
+LayerElement::LayerElement(const std::string &classid)
     : Object(classid), FacsimileInterface(), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
@@ -97,19 +98,12 @@ void LayerElement::Reset()
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
-    m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
 }
 
-LayerElement::~LayerElement()
-{
-    // set the pointer of the m_beamElementCoord to NULL;
-    if (m_beamElementCoord) {
-        m_beamElementCoord->m_element = NULL;
-    }
-}
+LayerElement::~LayerElement() {}
 
 void LayerElement::CloneReset()
 {
@@ -119,7 +113,6 @@ void LayerElement::CloneReset()
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
-    m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
     m_crossLayer = NULL;
@@ -454,7 +447,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
     return this->GetDrawingY();
 }
 
-int LayerElement::GetDrawingRadius(Doc *doc)
+int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
 {
     assert(doc);
 
@@ -467,7 +460,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
-        if (note->IsMensural()) {
+        if (note->IsMensuralDur() && !isInLigature) {
             code = note->GetMensuralSmuflNoteHead();
         }
     }
@@ -483,12 +476,13 @@ int LayerElement::GetDrawingRadius(Doc *doc)
     if (code) {
         return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
     }
-    else if (dur <= DUR_BR) {
+    else if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
+        int widthFactor = (dur == DUR_MX) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
-            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.8;
+            return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.7;
         }
         else {
-            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+            return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
         }
     }
     else if (dur == DUR_1) {
@@ -527,7 +521,7 @@ double LayerElement::GetAlignmentDuration(
         }
         DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
-        if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
+        if (duration->IsMensuralDur() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
@@ -580,19 +574,29 @@ double LayerElement::GetAlignmentDuration(
     }
 }
 
-double LayerElement::GetContentAlignmentDuration(
+double LayerElement::GetSameAsContentAlignmentDuration(
     Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
     }
 
-    double duration = 0.0;
-
     LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
     assert(sameas);
 
-    for (auto child : *sameas->GetChildren()) {
+    return sameas->GetContentAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+}
+
+double LayerElement::GetContentAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+{
+    if (!this->Is({ BEAM, FTREM, TUPLET })) {
+        return 0.0;
+    }
+
+    double duration = 0.0;
+
+    for (auto child : *this->GetChildren()) {
         // Skip everything that does not have a duration interface and notes in chords
         if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH) != NULL)) {
             continue;
@@ -657,6 +661,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignmentType type = ALIGNMENT_DEFAULT;
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    Ligature *ligatureParent = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
     Note *noteParent = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
     Rest *restParent = dynamic_cast<Rest *>(this->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
 
@@ -672,9 +677,23 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is({ DOTS, FLAG, STEM })) {
         assert(false);
     }
+    else if (ligatureParent && this->Is(NOTE)) {
+        // Ligature notes are all aligned with the first note
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetList(ligatureParent)->front());
+        if (firstNote && (firstNote != note)) {
+            m_alignment = firstNote->GetAlignment();
+            m_alignment->AddLayerElementRef(this);
+            double duration = this->GetAlignmentDuration(
+                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+            params->m_time += duration;
+            return FUNCTOR_CONTINUE;
+        }
+    }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
-        double duration = this->GetContentAlignmentDuration(
+        double duration = this->GetSameAsContentAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         params->m_time += duration;
         return FUNCTOR_CONTINUE;
@@ -790,10 +809,12 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
         // The time will be reset to 0.0 when starting a new layer anyway
-        if (this->Is(TIMESTAMP_ATTR))
+        if (this->Is(TIMESTAMP_ATTR)) {
             params->m_time = duration;
-        else
+        }
+        else {
             params->m_measureAligner->SetMaxTime(params->m_time + duration);
+        }
 
         m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
         assert(m_alignment);
@@ -869,17 +890,28 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         int loc = PitchInterface::CalcLoc(this, layerY, layerElementY, true);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
-    else if (this->Is({ CUSTOS, DOT })) {
+    else if (this->Is(DOT)) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, interface->CalcDrawingLoc(layerY, layerElementY)));
+    }
+    else if (this->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(this);
+        assert(custos);
+        int loc = 0;
+        if (custos->HasPname()) {
+            loc = PitchInterface::CalcLoc(custos, layerY, layerElementY);
+        }
+        int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
+        custos->SetDrawingLoc(loc);
+        this->SetDrawingYRel(yRel);
     }
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
         int loc = 0;
-        if (note->HasPname()) {
+        if (note->HasPname() || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
@@ -926,7 +958,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         mRest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
-
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
@@ -1141,28 +1172,56 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                         && (previousNote->GetDrawingDur() == DUR_1))
                         horizontalMargin = 0;
                 }
-                else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() > 1) {
                     continue;
+                }
+                else if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == 1) {
+                    horizontalMargin = 0;
+                }
+                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() < 0)
+                    && (previousNote->GetDrawingStemDir() != params->m_currentNote->GetDrawingStemDir())
+                    && !params->m_currentChord) {
+                    if (previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc() == -1) {
+                        horizontalMargin *= -1;
+                    }
+                    else if ((params->m_currentNote->GetDrawingDur() <= DUR_1)
+                        && (previousNote->GetDrawingDur() <= DUR_1)) {
+                        continue;
+                    }
+                    else {
+                        horizontalMargin *= -1;
+                        verticalMargin = horizontalMargin;
+                    }
+                }
             }
 
             if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
                 continue;
             }
 
-            // Nothing to do if we have no vertical overlap
-            if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
+            if (!(horizontalMargin < 0) || params->m_currentChord) {
 
-            // Nothing to do either if we have no horizontal overlap
-            if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
+                // Nothing to do if we have no vertical overlap
+                if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
 
-            int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+                // Nothing to do either if we have no horizontal overlap
+                if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
-            // Move the appropriate parent to the left
-            if (xRelShift > 0) {
-                if (params->m_currentChord)
-                    params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
-                else if (params->m_currentNote)
-                    params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+                int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+
+                // Move the appropriate parent to the left
+                if (xRelShift > 0) {
+                    if (params->m_currentChord)
+                        params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
+                    else if (params->m_currentNote)
+                        params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+                }
+            }
+            else {
+                // Move the appropriate parent to the right
+                int xRelShift = this->HorizontalRightOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+                params->m_currentNote->SetDrawingXRel(
+                    params->m_currentNote->GetDrawingXRel() - xRelShift + horizontalMargin);
             }
         }
     }
@@ -1453,7 +1512,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
-    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
     while (iter != params->m_timePointingInterfaces.end()) {
         if (iter->first->SetStartOnly(this)) {
             // We have both the start and the end that are matched
@@ -1477,7 +1536,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
     // Do not look for tstamp pointing to these
     if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
-    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         if (iter->first->SetStartAndEnd(this)) {
             // We have both the start and the end that are matched
@@ -1508,7 +1567,8 @@ int LayerElement::LayerCountInTimeSpan(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (!this->GetDurationInterface() || this->Is(SPACE) || this->HasSameasLink()) return FUNCTOR_CONTINUE;
+    if (!this->GetDurationInterface() || this->Is(MSPACE) || this->Is(SPACE) || this->HasSameasLink())
+        return FUNCTOR_CONTINUE;
 
     double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
     double time = m_alignment->GetTime();
@@ -1640,7 +1700,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && this->HasSameasLink()) {
-        incrementScoreTime = this->GetContentAlignmentDuration(
+        incrementScoreTime = this->GetSameAsContentAlignmentDuration(
             params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
@@ -1687,7 +1747,7 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 int LayerElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_drawingCueSize = false;
-    
+
     // Pass it to the pseudo functor of the interface
     LinkingInterface *interface = this->GetLinkingInterface();
     assert(interface);

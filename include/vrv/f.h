@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <f> element.
  */
-class F : public TextElement, public TimeSpanningInterface {
+class F : public TextElement, public TimeSpanningInterface, public AttExtender {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -48,7 +48,7 @@ public:
      * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     //----------//
     // Functors //

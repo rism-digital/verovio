@@ -72,7 +72,7 @@ bool AttHarmLog::HasChordref() const
 
 /* include <attchordref> */
 
-bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetHarmony(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_HARMLOG)) {
         AttHarmLog *att = dynamic_cast<AttHarmLog *>(element);

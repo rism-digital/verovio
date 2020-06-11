@@ -25,7 +25,7 @@ namespace vrv {
 class Doc;
 class DurationInterface;
 class EditorialElement;
-class FileOutputStream;
+class Output;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
@@ -58,7 +58,7 @@ public:
      */
     ///@{
     Object();
-    Object(std::string classid);
+    Object(const std::string &classid);
     virtual ~Object();
     virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
@@ -227,9 +227,15 @@ public:
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
+    /**
+     * Methods for setting / getting comments
+     */
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
     bool HasComment() { return !m_comment.empty(); }
+    std::string GetClosingComment() const { return m_closingComment; }
+    void SetClosingComment(std::string endComment) { m_closingComment = endComment; }
+    bool HasClosingComment() { return !m_closingComment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.
@@ -308,8 +314,14 @@ public:
     void ResetParent() { m_parent = NULL; }
 
     /**
-     * Base method for adding children.
+     * Base method for checking if a child can be added.
      * The method has to be overridden.
+     */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Base method for adding children.
+     * The method can be overridden.
      */
     virtual void AddChild(Object *object);
 
@@ -392,7 +404,7 @@ public:
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllDescendantByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+    void FindAllDescendantByComparison(ListOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
         bool direction = FORWARD, bool clear = true);
 
     /**
@@ -400,7 +412,7 @@ public:
      * The start and end objects are included in the result set.
      */
     void FindAllDescendantBetween(
-        ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
+        ListOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -485,7 +497,7 @@ public:
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
-    virtual int Save(FileOutputStream *output);
+    virtual int Save(Output *output);
 
     virtual void ReorderByXPos();
     /**
@@ -540,6 +552,11 @@ public:
     virtual int FindAllBetween(FunctorParams *functorParams);
 
     /**
+     * Find a all Object to which another object points to in the data.
+     */
+    virtual int FindAllReferencedObjects(FunctorParams *functorParams);
+
+    /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
      */
     virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -581,11 +598,11 @@ public:
 
     /**
      * Convert analytical markup (@fermata, @tie) to elements.
-     * See Doc::ConvertAnalyticalMarkupDoc
+     * See Doc::ConvertMarkupAnalyticalDoc
      */
     ///@{
-    virtual int ConvertAnalyticalMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupAnalytical(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -749,6 +766,11 @@ public:
     virtual int AlignVertically(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int AlignVerticallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
+
+    /**
+     * Set the note position for each note in ligature
+     */
+    virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set the note head flipped positions and calc the ledger lines
@@ -1132,7 +1154,7 @@ private:
     /**
      * Initialisation method taking a uuid prefix argument.
      */
-    void Init(std::string);
+    void Init(const std::string &);
 
 public:
     /**
@@ -1197,10 +1219,13 @@ private:
     std::vector<InterfaceId> m_interfaces;
 
     /**
-     * A string for storing a comment to be printed immediately before
-     * the object when printing an MEI element.
+     * String for storing a comments attached to the object when printing an MEI element.
+     * m_comment is to be printed immediately before the element
+     * m_closingComment is to be printed before the closing tag of the element
      */
     std::string m_comment;
+    std::string m_closingComment;
+    ///@}
 
     /**
      * A flag indicating if the Object represents an attribute in the original MEI.

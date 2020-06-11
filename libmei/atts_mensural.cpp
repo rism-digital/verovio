@@ -361,7 +361,7 @@ bool AttRestVisMensural::HasSpaces() const
 
 /* include <attspaces> */
 
-bool Att::SetMensural(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetMensural(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_LIGATURELOG)) {
         AttLigatureLog *att = dynamic_cast<AttLigatureLog *>(element);

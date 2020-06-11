@@ -25,7 +25,7 @@ public:
      */
     ///@{
     TextElement();
-    TextElement(std::string classid);
+    TextElement(const std::string &classid);
     virtual ~TextElement();
     virtual void Reset();
     virtual std::string GetClassName() const { return "TextElement"; }
