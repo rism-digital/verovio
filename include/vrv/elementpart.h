@@ -332,7 +332,7 @@ public:
     /**
      * Add an element (only flag supported) to a stem.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * @name Setter and getter for darwing stem direction and length

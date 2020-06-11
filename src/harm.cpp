@@ -58,7 +58,7 @@ void Harm::Reset()
     ResetNNumberLike();
 }
 
-void Harm::AddChild(Object *child)
+bool Harm::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -70,13 +70,9 @@ void Harm::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos)

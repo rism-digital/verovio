@@ -35,7 +35,7 @@ void LabelAbbr::Reset()
     Object::Reset();
 }
 
-void LabelAbbr::AddChild(Object *child)
+bool LabelAbbr::IsSupportedChild(Object *child)
 {
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -44,13 +44,9 @@ void LabelAbbr::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------

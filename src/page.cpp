@@ -62,19 +62,15 @@ void Page::Reset()
     m_drawingJustifiableStaves = 0;
 }
 
-void Page::AddChild(Object *child)
+bool Page::IsSupportedChild(Object *child)
 {
     if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 RunningElement *Page::GetHeader() const
@@ -89,10 +85,10 @@ RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return doc->m_scoreDef.GetPgHead();
+        return doc->m_mdivScoreDef.GetPgHead();
     }
     else {
-        return doc->m_scoreDef.GetPgHead2();
+        return doc->m_mdivScoreDef.GetPgHead2();
     }
 }
 
@@ -108,10 +104,10 @@ RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return doc->m_scoreDef.GetPgFoot();
+        return doc->m_mdivScoreDef.GetPgFoot();
     }
     else {
-        return doc->m_scoreDef.GetPgFoot2();
+        return doc->m_mdivScoreDef.GetPgFoot2();
     }
 }
 
@@ -277,6 +273,12 @@ void Page::LayOutHorizontally()
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
+    if (Att::IsMensuralType(doc->m_notationType)) {
+        FunctorDocParams calcLigatureNotePosParams(doc);
+        Functor calcLigatureNotePos(&Object::CalcLigatureNotePos);
+        this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);
+    }
+
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);
     this->Process(&calcStem, &calcStemParams);
@@ -300,7 +302,7 @@ void Page::LayOutHorizontally()
     // Adjust the x position of the LayerElement where multiple layer collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustLayers(&Object::AdjustLayers);
-    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_scoreDef.GetStaffNs());
+    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustLayers, &adjustLayersParams);
 
     // Adjust the X position of the accidentals, including in chords
@@ -312,7 +314,7 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustXPos(&Object::AdjustXPos);
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
@@ -320,7 +322,7 @@ void Page::LayOutHorizontally()
     Functor adjustGraceXPos(&Object::AdjustGraceXPos);
     Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
     AdjustGraceXPosParams adjustGraceXPosParams(
-        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_scoreDef.GetStaffNs());
+        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_mdivScoreDef.GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -477,9 +479,7 @@ void Page::JustifyHorizontally()
     assert(this == doc->GetDrawingPage());
 
     if ((doc->GetOptions()->m_adjustPageWidth.GetValue()))
-        doc->m_drawingPageWidth = GetContentWidth()
-            + doc->m_drawingPageMarginLeft
-            + doc->m_drawingPageMarginRight;
+        doc->m_drawingPageWidth = GetContentWidth() + doc->m_drawingPageMarginLeft + doc->m_drawingPageMarginRight;
 
     // Justify X position
     Functor justifyX(&Object::JustifyX);
@@ -592,14 +592,19 @@ int Page::GetContentWidth() const
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    System *first = dynamic_cast<System *>(m_children.front());
-    assert(first);
-
+    int maxWidth = 0;
+    for (auto &child : m_children) {
+        System *system = dynamic_cast<System *>(child);
+        if (system) {
+            // we include the left margin and the right margin
+            int systemWidth = system->m_drawingTotalWidth + system->m_systemLeftMar + system->m_systemRightMar;
+            maxWidth = std::max(systemWidth, maxWidth);
+        }
+    }
     // For avoiding unused variable warning in non debug mode
     doc = NULL;
 
-    // we include the left margin and the right margin
-    return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
+    return maxWidth;
 }
 
 int Page::CalcJustificationStepSize(bool systemsOnly) const

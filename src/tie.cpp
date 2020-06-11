@@ -114,9 +114,9 @@ int Tie::FindSpannedLayerElements(FunctorParams *functorParams)
     else if (this->GetDrawingX() > params->m_maxPos) {
         return FUNCTOR_STOP;
     }
-    */
 
     return FUNCTOR_CONTINUE;
+    */
 }
 
 } // namespace vrv

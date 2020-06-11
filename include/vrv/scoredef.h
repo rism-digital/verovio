@@ -45,7 +45,7 @@ public:
      * @name Constructors, destructors, and other standard methods.
      */
     ///@{
-    ScoreDefElement(std::string classid);
+    ScoreDefElement(const std::string &classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return SCOREDEF_ELEMENT; }
@@ -107,7 +107,11 @@ private:
  * This class represents a MEI scoreDef.
  * It contains StaffGrp objects.
  */
-class ScoreDef : public ScoreDefElement, public ObjectListInterface, public AttEndings, public AttOptimization {
+class ScoreDef : public ScoreDefElement,
+                 public ObjectListInterface,
+                 public AttDistances,
+                 public AttEndings,
+                 public AttOptimization {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -122,7 +126,7 @@ public:
     virtual ClassId GetClassId() const { return SCOREDEF; }
     ///@}
 
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.

@@ -30,6 +30,7 @@ Dir::Dir()
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()
+    , AttExtender()
     , AttLang()
     , AttLineRendBase()
     , AttVerticalGroup()
@@ -57,7 +58,7 @@ void Dir::Reset()
     ResetVerticalGroup();
 }
 
-void Dir::AddChild(Object *child)
+bool Dir::IsSupportedChild(Object *child)
 {
     if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -66,13 +67,9 @@ void Dir::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------

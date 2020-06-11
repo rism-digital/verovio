@@ -46,25 +46,24 @@ public:
     /**
      * Add children (notes or editorial markup)
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
-     * Return information about the note's position in the ligature
-     * Assume that the note is in the ligature and does not check for that.
-     */
-    int PositionInLigature(Note *note);
-
-    /**
-     * @name Return the first and last note in the ligature (NULL if empty)
+     * @name Return shape information about the note ligature
      */
     ///@{
-    Note *GetFirstNote();
-    Note *GetLastNote();
+    int GetDrawingNoteShape(Note *note);
+    int GetDrawingPreviousNoteShape(Note *note);
     ///@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::CalcLigatureNotePos
+     */
+    virtual int CalcLigatureNotePos(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -83,6 +82,10 @@ protected:
     virtual void FilterList(ArrayOfObjects *childlist);
 
 public:
+    /**
+     *
+     */
+    std::vector<int> m_drawingShapes;
 };
 
 } // namespace vrv

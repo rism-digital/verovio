@@ -53,7 +53,7 @@ void Syl::Reset()
     m_nextWordSyl = NULL;
 }
 
-void Syl::AddChild(Object *child)
+bool Syl::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -65,13 +65,9 @@ void Syl::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
@@ -124,6 +120,10 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
     }
 
     this->SetStart(dynamic_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
+    // If there isn't an ancestor note, it should be a chord
+    if (!this->GetStart()) {
+        this->SetStart(dynamic_cast<LayerElement *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
+    }
 
     // At this stage currentSyl is actually the previous one that is ending here
     if (params->m_currentSyl) {

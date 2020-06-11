@@ -87,7 +87,7 @@ bool AttNotationType::HasNotationsubtype() const
 
 /* include <attnotationsubtype> */
 
-bool Att::SetMei(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetMei(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
         AttNotationType *att = dynamic_cast<AttNotationType *>(element);

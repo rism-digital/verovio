@@ -757,7 +757,7 @@ bool AttTimestamp2Gestural::HasTstamp2Real() const
 
 /* include <atttstamp2.real> */
 
-bool Att::SetGestural(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetGestural(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ACCIDENTALGESTURAL)) {
         AttAccidentalGestural *att = dynamic_cast<AttAccidentalGestural *>(element);

@@ -38,7 +38,7 @@ void Syllable::Init()
     Reset();
 }
 
-void Syllable::AddChild(Object *child)
+bool Syllable::IsSupportedChild(Object *child)
 {
     if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
@@ -47,13 +47,9 @@ void Syllable::AddChild(Object *child)
         assert(dynamic_cast<Neume *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 Syllable::~Syllable() {}

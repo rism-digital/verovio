@@ -8,7 +8,7 @@ Building the demo for Qt involves following steps:
 ```
 mkdir VEROVIO_ROOT/tools/build-library
 cd VEROVIO_ROOT/tools/build-library
-cmake -DBUILD_AS_LIBRARY=ON ..
+cmake -DBUILD_AS_LIBRARY=ON ../../cmake
 make -j8
 ln -s $(pwd)/libverovio.so ..
 ```

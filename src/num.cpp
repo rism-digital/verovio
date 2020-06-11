@@ -36,19 +36,15 @@ void Num::Reset()
     m_currentText.SetText(L"");
 }
 
-void Num::AddChild(Object *child)
+bool Num::IsSupportedChild(Object *child)
 {
     if (child->Is(TEXT)) {
         assert(dynamic_cast<Text *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 } // namespace vrv
