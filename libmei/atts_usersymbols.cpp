@@ -210,7 +210,7 @@ bool AttLineLog::HasFunc() const
 
 /* include <attfunc> */
 
-bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
         AttAltSym *att = dynamic_cast<AttAltSym *>(element);

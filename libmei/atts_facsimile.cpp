@@ -72,7 +72,7 @@ bool AttFacsimile::HasFacs() const
 
 /* include <attfacs> */
 
-bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetFacsimile(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_FACSIMILE)) {
         AttFacsimile *att = dynamic_cast<AttFacsimile *>(element);

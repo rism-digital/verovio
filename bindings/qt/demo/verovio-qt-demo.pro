@@ -26,10 +26,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
     INCLUDEPATH += ../../../include/pugi
     INCLUDEPATH += ../../../include/utf8
     INCLUDEPATH += ../../../libmei
+    INCLUDEPATH += ../lib/include
+
+    LIBS += -L../build-library -lverovio-qt
     LIBS += -L../../../tools -lverovio
 }
 
-{
-    INCLUDEPATH += ../../qt/lib/include
-    LIBS += -L../../qt/build-library -lverovio-qt
-}

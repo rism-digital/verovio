@@ -51,7 +51,7 @@ Item {
 
         resourcesDataPath: "../../../data"
 
-        fileName: options.fileName
+        fileName: options.fileUrl
         musicFontName: options.musicFontName
         musicFontPath: {
             if (options.musicFontName == "Bravura")
@@ -118,7 +118,7 @@ Item {
         keys: ["text/plain"]
         onDropped: {
             if (drop.hasText) {
-                options.fileName = drop.text.trim()
+                options.fileUrl = drop.text.trim()
             }
         }
     }

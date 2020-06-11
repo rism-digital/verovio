@@ -37,7 +37,7 @@ echo "Squash merge commits from ${TEMPORARY_OUTPUT_BRANCH} into ${GH_PAGES_BRANC
 git merge --squash ${TEMPORARY_OUTPUT_BRANCH}
 
 echo "Running git commit"
-git commit -m "Auto-commit of toolkit build for rism-ch/verovio@${SHA}" # TODO: include build-branch in commit message?
+git commit -m "Auto-commit of toolkit build for rism-ch/verovio.org@${SHA}" # TODO: include build-branch in commit message?
 
 echo "Running git status"
 git status

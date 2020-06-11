@@ -54,7 +54,7 @@ public:
      * Add an element (text, rend. etc.) to a dynam.
      * Only supported elements will be actually added to the child list.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     /**
      * Return true if the dynam text is only composed of f, p, r, z, etc. letters (e.g. sfz)

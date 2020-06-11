@@ -118,7 +118,7 @@ bool AttReasonIdent::HasReason() const
 
 /* include <attreason> */
 
-bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetEdittrans(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_AGENTIDENT)) {
         AttAgentIdent *att = dynamic_cast<AttAgentIdent *>(element);

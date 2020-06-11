@@ -56,8 +56,8 @@ public:
     void setColor(QColor color);
 
     /**
-      * Returns if the text item is empty, i.e. it has no text elements.
-      */
+     * Returns if the text item is empty, i.e. it has no text elements.
+     */
     bool isEmpty();
 
     /**

@@ -151,7 +151,7 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
     Tuplet *tuplet = dynamic_cast<Tuplet *>(tupletNum->GetFirstAncestor(TUPLET));
     assert(tuplet);
 
-    if ((tuplet->GetNum() == 0) || (tuplet->GetNumVisible() == BOOLEAN_false)) {
+    if (!tuplet->HasNum() || (tuplet->GetNumVisible() == BOOLEAN_false)) {
         tupletNum->SetEmptyBB();
         return;
     }
@@ -183,7 +183,7 @@ void View::DrawTupletNum(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->ResumeGraphic(tupletNum, tupletNum->GetUuid());
 
-    DrawSmuflString(dc, x, y, notes, false, staff->m_drawingStaffSize);
+    DrawSmuflString(dc, x, y, notes, HORIZONTALALIGNMENT_left, staff->m_drawingStaffSize, drawingCueSize);
 
     dc->EndResumedGraphic(tupletNum, this);
 

@@ -46,6 +46,11 @@ public:
      * Add an element to a rest.
      * Only Dots elements will be actually added to the rest.
      */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Overwritten method for rest
+     */
     virtual void AddChild(Object *object);
 
     /**
@@ -75,9 +80,9 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertAnalyticalMarkup
+     * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
 
     /**
      * See Object::CalcDots

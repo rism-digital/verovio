@@ -33,7 +33,7 @@ public:
      */
     ///@{
     RunningElement();
-    RunningElement(std::string classid);
+    RunningElement(const std::string &classid);
     virtual ~RunningElement();
     virtual void Reset();
     virtual ClassId GetClassId() const { return RUNNING_ELEMENT; }
@@ -49,7 +49,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
     ///@}
 
     /**
