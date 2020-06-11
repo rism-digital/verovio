@@ -167,6 +167,24 @@ void Toolkit::setBreaks(QString breaks)
     }
 }
 
+void Toolkit::setHeader(QString header)
+{
+    if (getHeader() != header) {
+        m_verovioToolkit.SetOption("header", header.toStdString());
+        // "header" is used in LoadData
+        requestReloadData();
+    }
+}
+
+void Toolkit::setFooter(QString footer)
+{
+    if (getFooter() != footer) {
+        m_verovioToolkit.SetOption("footer", footer.toStdString());
+        // "footer" is used in LoadData
+        requestReloadData();
+    }
+}
+
 void Toolkit::setTranspose(QString transpose)
 {
     if (getTranspose() != transpose) {
@@ -307,6 +325,16 @@ QString Toolkit::getBreaks() const
 QString Toolkit::getTranspose() const
 {
     return QString::fromStdString(m_verovioToolkit.GetOption("transpose"));
+}
+
+QString Toolkit::getHeader() const
+{
+    return QString::fromStdString(m_verovioToolkit.GetOption("header"));
+}
+
+QString Toolkit::getFooter() const
+{
+    return QString::fromStdString(m_verovioToolkit.GetOption("footer"));
 }
 
 bool Toolkit::addFont(QString fontFilePath)

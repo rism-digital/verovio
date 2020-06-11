@@ -48,6 +48,8 @@ Item {
         displayHeight: 100
         scale: 50
         adjustPageHeight: true
+        header: "none"
+        footer: "none"
 
         resourcesDataPath: Qt.platform.os == "android" ? "assets:/data" : "../../../data"
 
