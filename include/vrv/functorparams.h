@@ -32,6 +32,7 @@ class Functor;
 class Hairpin;
 class Harm;
 class KeySig;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
@@ -41,6 +42,7 @@ class MeterSig;
 class MRpt;
 class Object;
 class Page;
+class Pedal;
 class ScoreDef;
 class Slur;
 class Staff;
@@ -375,6 +377,7 @@ public:
         m_previousVerse = NULL;
         m_lastSyl = NULL;
         m_previousMeasure = NULL;
+        m_currentLabelAbbr = NULL;
         m_freeSpace = 0;
         m_staffSize = 100;
         m_doc = doc;
@@ -383,6 +386,7 @@ public:
     Verse *m_previousVerse;
     Syl *m_lastSyl;
     Measure *m_previousMeasure;
+    LabelAbbr *m_currentLabelAbbr;
     int m_freeSpace;
     int m_staffSize;
     Doc *m_doc;
@@ -672,6 +676,12 @@ public:
 // Use FunctorDocParams
 
 //----------------------------------------------------------------------------
+// CalcLigatureNotePosParams
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 
@@ -776,25 +786,28 @@ public:
 
 /**
  * member 0: a pointer the document we are adding pages to
- * member 2: a pointer to the current page
- * member 4: a pointer to the current system
+ * member 1: a pointer to the current page
+ * member 2: a pointer to the current system
  * member 3: a pointer to the system we are taking the content from
- * member 5: a flag indicating if we have processed the first pb
+ * member 4: a flag if we want to use the pageBreaks from the document
  **/
 
 class CastOffEncodingParams : public FunctorParams {
 public:
-    CastOffEncodingParams(Doc *doc, Page *currentPage, System *currentSystem, System *contentSystem)
+    CastOffEncodingParams(
+        Doc *doc, Page *currentPage, System *currentSystem, System *contentSystem, bool usePages = true)
     {
         m_doc = doc;
         m_currentPage = currentPage;
         m_currentSystem = currentSystem;
         m_contentSystem = contentSystem;
+        m_usePages = usePages;
     }
     Doc *m_doc;
     Page *m_currentPage;
     System *m_contentSystem;
     System *m_currentSystem;
+    bool m_usePages;
 };
 
 //----------------------------------------------------------------------------
@@ -872,7 +885,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ConvertAnalyticalMarkupParams
+// ConvertMarkupAnalyticalParams
 //----------------------------------------------------------------------------
 
 /**
@@ -882,9 +895,9 @@ public:
  * member 3: a flag indicating whereas the conversion is permanent of not
  **/
 
-class ConvertAnalyticalMarkupParams : public FunctorParams {
+class ConvertMarkupAnalyticalParams : public FunctorParams {
 public:
-    ConvertAnalyticalMarkupParams(bool permanent)
+    ConvertMarkupAnalyticalParams(bool permanent)
     {
         m_currentChord = NULL;
         m_permanent = permanent;
@@ -1022,7 +1035,7 @@ public:
 
 class FindAllBetweenParams : public FunctorParams {
 public:
-    FindAllBetweenParams(Comparison *comparison, ArrayOfObjects *elements, Object *start, Object *end)
+    FindAllBetweenParams(Comparison *comparison, ListOfObjects *elements, Object *start, Object *end)
     {
         m_comparison = comparison;
         m_elements = elements;
@@ -1030,9 +1043,23 @@ public:
         m_end = end;
     }
     Comparison *m_comparison;
-    ArrayOfObjects *m_elements;
+    ListOfObjects *m_elements;
     Object *m_start;
     Object *m_end;
+};
+
+//----------------------------------------------------------------------------
+// FindAllReferencedObjectsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: an array of all matching objects
+ **/
+
+class FindAllReferencedObjectsParams : public FunctorParams {
+public:
+    FindAllReferencedObjectsParams(ListOfObjects *elements) { m_elements = elements; }
+    ListOfObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------
@@ -1046,13 +1073,13 @@ public:
 
 class FindAllByComparisonParams : public FunctorParams {
 public:
-    FindAllByComparisonParams(Comparison *comparison, ArrayOfObjects *elements)
+    FindAllByComparisonParams(Comparison *comparison, ListOfObjects *elements)
     {
         m_comparison = comparison;
         m_elements = elements;
     }
     Comparison *m_comparison;
-    ArrayOfObjects *m_elements;
+    ListOfObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------
@@ -1392,8 +1419,13 @@ public:
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
+    PrepareFloatingGrpsParams()
+    {
+        m_previousEnding = NULL;
+        m_pedalLine = NULL;
+    }
     Ending *m_previousEnding;
+    Pedal *m_pedalLine;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
     std::map<std::string, Harm *> m_harms;
@@ -1454,8 +1486,8 @@ public:
 class PrepareLinkingParams : public FunctorParams {
 public:
     PrepareLinkingParams() { m_fillList = true; }
-    ArrayOfLinkingInterfaceUuidPairs m_nextUuidPairs;
-    ArrayOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
+    MapOfLinkingInterfaceUuidPairs m_nextUuidPairs;
+    MapOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
 };
 
@@ -1545,7 +1577,7 @@ public:
 class PrepareTimePointingParams : public FunctorParams {
 public:
     PrepareTimePointingParams() {}
-    ArrayOfPointingInterClassIdPairs m_timePointingInterfaces;
+    ListOfPointingInterClassIdPairs m_timePointingInterfaces;
 };
 
 //----------------------------------------------------------------------------
@@ -1560,7 +1592,7 @@ public:
 class PrepareTimeSpanningParams : public FunctorParams {
 public:
     PrepareTimeSpanningParams() { m_fillList = true; }
-    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
     bool m_fillList;
 };
 
@@ -1570,14 +1602,14 @@ public:
 
 /**
  * member 0: std::vector< Object*>* that holds the current elements to match
- * member 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+ * member 1:  ListOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
  **/
 
 class PrepareTimestampsParams : public FunctorParams {
 public:
     PrepareTimestampsParams() {}
-    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
-    ArrayOfObjectBeatPairs m_tstamps;
+    ListOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    ListOfObjectBeatPairs m_tstamps;
 };
 
 //----------------------------------------------------------------------------

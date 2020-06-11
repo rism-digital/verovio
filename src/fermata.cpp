@@ -44,7 +44,7 @@ void Fermata::Reset()
 }
 
 void Fermata::ConvertFromAnalyticalMarkup(
-    AttFermataPresent *fermataPresent, const std::string &uuid, ConvertAnalyticalMarkupParams *params)
+    AttFermataPresent *fermataPresent, const std::string &uuid, ConvertMarkupAnalyticalParams *params)
 {
     this->SetPlace(Att::StaffrelBasicToStaffrel(fermataPresent->GetFermata()));
     if (params->m_permanent) {

@@ -83,7 +83,7 @@ $FLAGS .= " -DNDEBUG";
 $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++$cpp";
 $FLAGS .= " -s ASM_JS=1";
-$FLAGS .= " -s TOTAL_MEMORY=256MB";
+$FLAGS .= " -s INITIAL_MEMORY=256MB";
 $FLAGS .= " -s TOTAL_STACK=128MB";
 $FLAGS .= " -s WASM=0";
 
@@ -102,7 +102,7 @@ if ($wasmQ) {
 	# $FLAGS = " -g4 -O0 --emit-symbol-map";
     # For now, trapping them (followign option does not work with Safari)
 	#$FLAGS .= " -mnontrapping-fptoint";
-	$FLAGS .= " -s TOTAL_MEMORY=512MB";
+	$FLAGS .= " -s INITIAL_MEMORY=512MB";
 	$FLAGS .= " -s TOTAL_STACK=256MB";
     $FLAGS .= " -s SINGLE_FILE=1";
 	$FLAGS_NAME = "-wasm";
@@ -148,7 +148,7 @@ print "Creating commit version header file...\n";
 
 my $defines = "-DUSE_EMSCRIPTEN";
 
-my $cmake = "-DBUILD_AS_WASM=ON -DEMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES=ON";
+my $cmake = "-DBUILD_AS_WASM=ON";
 $cmake .= " -DNO_PAE_SUPPORT=ON" if ($nopae);
 $cmake .= " -DNO_DARMS_SUPPORT=ON" if ($nodarms);
 $cmake .= " -DNO_HUMDRUM_SUPPORT=ON" if ($nohumdrum);
@@ -202,7 +202,7 @@ my $makeCmd = "$EMMAKE make -j 8";
 system($makeCmd);
 
 print "*************\nLinking...\n";
-my $ccCmd = "$EMCC $CHATTY libverovio.bc $FLAGS $embed $exports $extra_exports $output";
+my $ccCmd = "$EMCC $CHATTY libverovio.a $FLAGS $embed $exports $extra_exports $output";
 print "$ccCmd\n" if $CHATTY;
 
 system($ccCmd);

@@ -44,7 +44,7 @@ void Subst::Reset()
 
 Subst::~Subst() {}
 
-void Subst::AddChild(Object *child)
+bool Subst::IsSupportedChild(Object *child)
 {
     if (child->Is(ADD)) {
         assert(dynamic_cast<Add *>(child));
@@ -56,13 +56,9 @@ void Subst::AddChild(Object *child)
         assert(dynamic_cast<Subst *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------

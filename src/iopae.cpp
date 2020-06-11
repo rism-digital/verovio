@@ -75,7 +75,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->m_scoreDef.Save(this);
+    m_doc->m_mdivScoreDef.Save(this);
 
     m_docScoreDef = false;
 
@@ -265,9 +265,9 @@ void PAEOutput::WriteBeam(Beam *beam)
     assert(beam);
 
     if (m_skip) return;
-    
+
     m_grace = false;
-    
+
     ClassIdsComparison matchType({ NOTE, CHORD });
     ArrayOfObjects children;
     LayerElement *child = dynamic_cast<LayerElement *>(beam->FindDescendantByComparison(&matchType));
@@ -275,7 +275,6 @@ void PAEOutput::WriteBeam(Beam *beam)
         m_streamStringOutput << "qq";
         m_grace = true;
     }
-
 
     m_streamStringOutput << "{";
 }
@@ -287,7 +286,7 @@ void PAEOutput::WriteBeamEnd(Beam *beam)
     if (m_skip) return;
 
     m_streamStringOutput << "}";
-    
+
     if (m_grace) {
         m_streamStringOutput << "r";
         m_grace = false;
@@ -572,10 +571,10 @@ void PAEOutput::WriteDur(DurationInterface *interface)
 void PAEOutput::WriteGrace(AttGraced *attGraced)
 {
     assert(attGraced);
-    
+
     // We are in a beam of grace notes;
     if (m_grace) return;
-    
+
     if (attGraced->GetGrace() == GRACE_unacc) {
         m_streamStringOutput << "g";
     }
@@ -1001,20 +1000,20 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->m_scoreDef.AddChild(scoreDefKeySig);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         // Make it an attribute for now
         scoreDefMeterSig->IsAttribute(true);
-        m_doc->m_scoreDef.AddChild(scoreDefMeterSig);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now
         scoreDefMensur->IsAttribute(true);
-        m_doc->m_scoreDef.AddChild(scoreDefMensur);
+        m_doc->m_mdivScoreDef.AddChild(scoreDefMensur);
     }
 
-    m_doc->m_scoreDef.AddChild(staffGrp);
+    m_doc->m_mdivScoreDef.AddChild(staffGrp);
 
     if (m_tie != NULL) {
         delete m_tie;

@@ -31,12 +31,14 @@ Hairpin::Hairpin()
     , TimeSpanningInterface()
     , AttColor()
     , AttHairpinLog()
+    , AttHairpinVis()
     , AttPlacement()
     , AttVerticalGroup()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_HAIRPINLOG);
+    RegisterAttClass(ATT_HAIRPINVIS);
     RegisterAttClass(ATT_PLACEMENT);
     RegisterAttClass(ATT_VERTICALGROUP);
 
@@ -51,6 +53,7 @@ void Hairpin::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetHairpinLog();
+    ResetHairpinVis();
     ResetPlacement();
     ResetVerticalGroup();
 
@@ -65,6 +68,10 @@ int Hairpin::CalcHeight(
     assert(doc);
 
     int endY = doc->GetDrawingHairpinSize(staffSize, false);
+
+    if (this->HasOpening()) {
+        endY = this->GetOpening() * doc->GetDrawingUnit(staffSize);
+    }
 
     // Something is probably wrong before...
     if (!this->GetDrawingLength()) return endY;

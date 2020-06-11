@@ -590,8 +590,8 @@ AttFTremVis::~AttFTremVis()
 void AttFTremVis::ResetFTremVis()
 {
     m_beams = 0;
-    m_beamsFloat = 0;
-    m_floatGap = "";
+    m_beamsFloat = -1;
+    m_floatGap = VRV_UNSET;
 }
 
 bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
@@ -640,7 +640,7 @@ bool AttFTremVis::HasBeams() const
 
 bool AttFTremVis::HasBeamsFloat() const
 {
-    return (m_beamsFloat != 0);
+    return (m_beamsFloat != -1);
 }
 
 bool AttFTremVis::HasFloatGap() const
@@ -2130,7 +2130,7 @@ bool AttTupletVis::HasNumFormat() const
 
 /* include <attnum.format> */
 
-bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetVisual(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ANNOTVIS)) {
         AttAnnotVis *att = dynamic_cast<AttAnnotVis *>(element);

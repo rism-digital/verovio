@@ -49,7 +49,9 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_mmOutput = false;
     m_svgBoundingBoxes = false;
     m_svgViewBox = false;
+    m_html5 = false;
     m_facsimile = false;
+    m_indent = 2;
 
     // create the initial SVG element
     // width and height need to be set later; these are taken care of in "commit"
@@ -118,7 +120,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        std::vector<std::string>::const_iterator it;
+        std::set<std::string>::const_iterator it;
         for (it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
             // load the XML file that contains it as a pugi::xml_document
             std::ifstream source((*it).c_str());
@@ -147,24 +149,19 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         .set_value(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
 
     // save the glyph data to m_outdata
-    m_svgDoc.save(m_outdata, "\t", output_flags);
+    std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
+    m_svgDoc.save(m_outdata, indent.c_str(), output_flags);
 
     m_committed = true;
 }
 
-void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend)
+void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool primary, bool prepend)
 {
-    std::string baseClass = object->GetClassName();
-    std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
-    if (gClass.length() > 0) {
-        baseClass.append(" " + gClass);
-    }
-
     if (object->HasAttClass(ATT_TYPED)) {
         AttTyped *att = dynamic_cast<AttTyped *>(object);
         assert(att);
         if (att->HasType()) {
-            baseClass.append(" " + att->GetType());
+            gClass.append((gClass.empty() ? "" : " ") + att->GetType());
         }
     }
 
@@ -175,10 +172,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         m_currentNode = m_currentNode.append_child("g");
     }
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("class") = baseClass.c_str();
-    if (gId.length() > 0) {
-        m_currentNode.append_attribute("id") = gId.c_str();
-    }
+    AppendIdAndClass(gId, object->GetClassName(), gClass, primary);
 
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
@@ -278,30 +272,16 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
 
 void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, std::string gId)
 {
-    if (gClass.length() > 0) {
-        name.append(" " + gClass);
-    }
-
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("class") = name.c_str();
-    if (gId.length() > 0) {
-        m_currentNode.append_attribute("id") = gId.c_str();
-    }
+    AppendIdAndClass(gId, name, gClass);
 }
 
 void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
 {
-    std::string baseClass = object->GetClassName();
-    std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
-    if (gClass.length() > 0) {
-        baseClass.append(" " + gClass);
-    }
-
     m_currentNode = AppendChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("class") = baseClass.c_str();
-    m_currentNode.append_attribute("id") = gId.c_str();
+    AppendIdAndClass(gId, object->GetClassName(), gClass);
 
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
@@ -351,7 +331,8 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
 
 void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
-    std::string xpath = "//g[@id=\"" + gId + "\"]";
+    std::string xpathPrefix = m_html5 ? "//g[@data-id=\"" : "//g[@id=\"";
+    std::string xpath = xpathPrefix + gId + "\"]";
     pugi::xpath_node selection = m_currentNode.select_node(xpath.c_str());
     if (selection) {
         m_currentNode = selection.node();
@@ -677,7 +658,7 @@ void SvgDeviceContext::DrawRectangle(int x, int y, int width, int height)
     DrawRoundedRectangle(x, y, width, height, 0);
 }
 
-void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, double radius)
+void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
     std::string s;
 
@@ -806,7 +787,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
-    if (m_fontStack.top()->GetStyle() != FONTSIZE_NONE) {
+    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
         if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
             textChild.append_attribute("font-style") = "italic";
         }
@@ -859,19 +840,19 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         std::string path = glyph->GetPath();
 
         // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_smuflGlyphs.begin(), m_smuflGlyphs.end(), path);
-        if (it == m_smuflGlyphs.end()) {
-            m_smuflGlyphs.push_back(path);
-        }
+        m_smuflGlyphs.insert(path);
 
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
         useChild.append_attribute("xlink:href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
-        useChild.append_attribute("href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
+            useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)", m_fontStack.top()->GetWidthToHeightRatio(),
+                                                                  x * (1. - m_fontStack.top()->GetWidthToHeightRatio())).c_str();
+        }
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)
@@ -901,6 +882,34 @@ void SvgDeviceContext::AddDescription(const std::string &text)
 {
     pugi::xml_node desc = m_currentNode.append_child("desc");
     desc.append_child(pugi::node_pcdata).set_value(text.c_str());
+}
+
+void SvgDeviceContext::AppendIdAndClass(std::string gId, std::string baseClass, std::string addedClasses, bool primary)
+{
+    std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
+
+    if (gId.length() > 0) {
+        if (m_html5) {
+            m_currentNode.append_attribute("data-id") = gId.c_str();
+        }
+        else if (primary) {
+            // Don't write ids for HTML5 to avoid id clashes when embedding into
+            // an HTML document.
+            m_currentNode.append_attribute("id") = gId.c_str();
+        }
+    }
+
+    if (m_html5) {
+        m_currentNode.append_attribute("data-class") = baseClass.c_str();
+    }
+
+    if (!primary) {
+        baseClass.append(" spanning id-" + gId);
+    }
+    if (!addedClasses.empty()) {
+        baseClass.append(" " + addedClasses);
+    }
+    m_currentNode.append_attribute("class") = baseClass.c_str();
 }
 
 std::string SvgDeviceContext::GetColour(int colour)
@@ -981,7 +990,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             m_currentNode = m_pageNode;
         }
 
-        StartGraphic(object, "bounding-box", "bbox-" + object->GetUuid(), true);
+        StartGraphic(object, "bounding-box", "bbox-" + object->GetUuid(), true, true);
 
         if (box->HasSelfBB()) {
             this->DrawSvgBoundingBoxRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
@@ -1032,7 +1041,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
         if (drawContentBB) {
             if (object->HasContentBB()) {
-                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid(), true);
+                StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid(), true, true);
                 if (object->HasContentBB()) {
                     this->DrawSvgBoundingBoxRectangle(
                         view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),

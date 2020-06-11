@@ -87,7 +87,7 @@ bool AttTabular::HasRowspan() const
 
 /* include <attrowspan> */
 
-bool Att::SetFigtable(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetFigtable(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
         AttTabular *att = dynamic_cast<AttTabular *>(element);

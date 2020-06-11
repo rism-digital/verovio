@@ -45,6 +45,11 @@ public:
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Overwritten method for tuplet
+     */
     virtual void AddChild(Object *object);
 
     /**

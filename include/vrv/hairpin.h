@@ -9,6 +9,7 @@
 #define __VRV_HAIRPIN_H__
 
 #include "atts_cmn.h"
+#include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -25,6 +26,7 @@ class Hairpin : public ControlElement,
                 public TimeSpanningInterface,
                 public AttColor,
                 public AttHairpinLog,
+                public AttHairpinVis,
                 public AttPlacement,
                 public AttVerticalGroup {
 public:

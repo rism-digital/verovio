@@ -58,7 +58,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
-        dc->StartGraphic(slur, "spanning-slur", "");
+        dc->StartGraphic(slur, "", slur->GetUuid(), false);
 
     int penStyle = AxSOLID;
     switch (slur->GetLform()) {
@@ -427,15 +427,14 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
 
     // First get all artic children
     ClassIdComparison matchType(ARTIC);
-    ArrayOfObjects artics;
-    ArrayOfObjects::iterator articIter;
+    ListOfObjects artics;
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         start->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
-        for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
-            Artic *artic = dynamic_cast<Artic *>(*articIter);
+        for (auto &object : artics) {
+            Artic *artic = dynamic_cast<Artic *>(object);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
@@ -452,8 +451,8 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         end->FindAllDescendantByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
-        for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
-            Artic *artic = dynamic_cast<Artic *>(*articIter);
+        for (auto &object : artics) {
+            Artic *artic = dynamic_cast<Artic *>(object);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
@@ -481,16 +480,11 @@ float View::CalcInitialSlur(
 
     // the 'height' of the bezier
     int height;
-    if (slur->HasBulge()) {
-        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slur->GetBulge();
-    }
-    else {
-        int dist = abs(p2.x - p1.x);
-        height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
-            dist / m_options->m_slurHeightFactor.GetValue());
-        height = std::min(
-            int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
-    }
+    int dist = abs(p2.x - p1.x);
+    height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+        dist / m_options->m_slurHeightFactor.GetValue());
+    height = std::min(
+        int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
 
     // the height of the control points
     height = height * 4 / 3;
@@ -503,7 +497,7 @@ float View::CalcInitialSlur(
     findSpannedLayerElementsParams.m_minPos = p1.x;
     findSpannedLayerElementsParams.m_maxPos = p2.x;
     findSpannedLayerElementsParams.m_classIds
-        = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
+        = { ACCID, ARTIC_PART, ARTIC, CHORD, FLAG, GLISS, NOTE, STEM, TIE, TUPLET_BRACKET, TUPLET_NUM };
     ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)

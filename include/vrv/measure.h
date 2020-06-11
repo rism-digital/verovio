@@ -65,12 +65,14 @@ public:
     bool IsMeasuredMusic() const { return m_measuredMusic; }
 
     /**
-     * @name Methods for adding allowed content
+     * Methods for adding allowed content
      */
-    ///@{
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Specific method for measures
+     */
     void AddChildBack(Object *object);
-    ///@}
 
     /**
      * Add a TimestampAttr to the measure.
@@ -210,9 +212,9 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertAnalyticalMarkup
+     * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToPageBased

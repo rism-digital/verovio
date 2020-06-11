@@ -1707,7 +1707,7 @@ bool AttTremMeasured::HasUnitdur() const
 
 /* include <attunitdur> */
 
-bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetCmn(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ARPEGLOG)) {
         AttArpegLog *att = dynamic_cast<AttArpegLog *>(element);

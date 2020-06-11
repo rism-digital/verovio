@@ -29,6 +29,7 @@
 #include "fb.h"
 #include "fig.h"
 #include "functorparams.h"
+#include "glyph.h"
 #include "keysig.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -199,10 +200,12 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, BRACKETSPAN);
     DrawSystemList(dc, system, DYNAM);
     DrawSystemList(dc, system, DIR);
+    DrawSystemList(dc, system, GLISS);
     DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TRILL);
     DrawSystemList(dc, system, FIGURE);
     DrawSystemList(dc, system, OCTAVE);
+    DrawSystemList(dc, system, PEDAL);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
     DrawSystemList(dc, system, ENDING);
@@ -231,10 +234,16 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         if ((*iter)->Is(classId) && (classId == FIGURE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
+        if ((*iter)->Is(classId) && (classId == GLISS)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
         if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == OCTAVE)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == PEDAL)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == SYL)) {
@@ -272,10 +281,6 @@ void View::DrawScoreDef(
     if (barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
         DrawStaffGrp(dc, measure, staffGrp, x, true, !scoreDef->DrawLabels());
-
-        DrawStaffDefLabels(dc, measure, scoreDef, !scoreDef->DrawLabels());
-        // if this was true (non-abbreviated labels), set it to false for next one
-        // scoreDef->SetDrawLabels(false);
     }
     else {
         dc->StartGraphic(barLine, "", barLine->GetUuid());
@@ -296,8 +301,6 @@ void View::DrawStaffGrp(
     if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
         return;
     }
-
-    TextExtend extend;
 
     const ArrayOfObjects *staffDefs = staffGrp->GetList(staffGrp);
     if (staffDefs->empty()) {
@@ -349,31 +352,23 @@ void View::DrawStaffGrp(
     // for the bottom position we need to take into account the number of lines and the staff size
     int yBottom
         = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
-    int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-
-    // adjust the top and bottom according to staffline width
-    x += barLineWidth / 2;
-
-    // HARDCODED
-    int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
-    int xLabel = x - space;
-    int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
-
-    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
-
-    this->DrawLabels(dc, measure, system, staffGrp, xLabel, yLabel, abbreviations, 100, space);
+    // adjust to single line staves
+    if (firstDef->GetLines() <= 1) yTop += m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    if (lastDef->GetLines() <= 1) yBottom -= m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
 
     // draw the system start bar line
     if (topStaffGrp
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
-                && (m_doc->m_scoreDef.GetSystemLeftline() != BOOLEAN_false))
-            || (m_doc->m_scoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+                && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
+            || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
+        int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+        x += barLineWidth / 2;
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * m_doc->GetDrawingBeamWidth(staffSize, false),
-            m_doc->GetDrawingBeamWidth(staffSize, false));
+                         m_doc->GetDrawingBeamWidth(staffSize, false));
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
@@ -390,30 +385,35 @@ void View::DrawStaffGrp(
     }
 
     // recursively draw the children
-    int i;
     StaffGrp *childStaffGrp = NULL;
-    for (i = 0; i < staffGrp->GetChildCount(); ++i) {
+    for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
         childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
         if (childStaffGrp) {
             DrawStaffGrp(dc, measure, childStaffGrp, x, false, abbreviations);
         }
     }
+
+    // DrawStaffGrpLabel
+    System *system = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+    int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
+    int xLabel = x - space;
+    int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+    this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space);
+    
+    DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
 }
 
-void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations)
+void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations)
 {
     assert(dc);
     assert(measure);
-    assert(scoreDef);
+    assert(staffGrp);
 
-    const ArrayOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
-    ArrayOfObjects::const_iterator iter = scoreDefChildren->begin();
-    while (iter != scoreDefChildren->end()) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+    StaffDef *staffDef = NULL;
+    for (int i = 0; i < staffGrp->GetChildCount(); ++i) {
+        staffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
 
         if (!staffDef) {
-            LogDebug("Should be staffDef in View::DrawStaffDefLabels");
-            ++iter;
             continue;
         }
 
@@ -423,35 +423,26 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
-            ++iter;
             continue;
         }
 
         if (!staff->DrawingIsVisible()) {
-            ++iter;
             continue;
         }
 
         // HARDCODED
-        int space = 3 * m_doc->GetDrawingBeamWidth(scoreDef->GetMaxStaffSize(), false);
-        if (staffDef->IsInBraceAndBracket()) {
-            space *= 2;
-        }
-        int x = system->GetDrawingX() - space;
+        int space = m_doc->GetDrawingDoubleUnit(staffGrp->GetMaxStaffSize());
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
-        this->DrawLabels(dc, measure, system, staffDef, x, y, abbreviations, staff->m_drawingStaffSize, space);
-
-        ++iter;
+        this->DrawLabels(dc, system, staffDef, x - space, y, abbreviations, staff->m_drawingStaffSize, 2 * space);
     }
 }
 
-void View::DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
+void View::DrawLabels(DeviceContext *dc, System *system, Object *object, int x, int y,
     bool abbreviations, int staffSize, int space)
 {
     assert(dc);
-    assert(measure);
     assert(system);
     assert(object->Is({ STAFFDEF, STAFFGRP }));
 
@@ -562,7 +553,21 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
-
+    if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
+        FontInfo* font = m_doc->GetDrawingSmuflFont(staffSize, false);
+        int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
+        int height = 8 * m_doc->GetDrawingUnit(staffSize);
+        const float scale = static_cast<float>(y1 - y2) / height;
+        // We want the brace width always to be 2 units
+        int braceWidth =  m_doc->GetDrawingDoubleUnit(staffSize);
+        x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + m_doc->GetDrawingUnit(staffSize);
+        const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
+        const float widthAfterScalling = width * scale ;
+        font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
+        DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
+        font->SetWidthToHeightRatio(currentWidthToHeightRatio);
+        return;
+    }
     // int new_coords[2][6];
     Point points[4];
     Point bez1[4];
@@ -660,9 +665,15 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
             childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
             if (childStaffGrp) {
+                if (childStaffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+                    continue;
+                }
                 DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure);
             }
             else if (childStaffDef) {
+                if (childStaffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+                    continue;
+                }
                 AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
                 Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
                 if (!staff) {
@@ -684,8 +695,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     yTop = yBottom + (measure->GetBarLen() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
                 }
                 // Make sure barlines are visible with a single line
-                if (childStaffDef->GetLines() == 1) {
-                    yTop += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                if (childStaffDef->GetLines() <= 1) {
+                    yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                     yBottom -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 }
                 DrawBarLine(dc, yTop, yBottom, barLine);
@@ -1017,7 +1028,9 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    DrawStaffLines(dc, staff, measure, system);
+    if (staffDef->GetLinesVisible() != BOOLEAN_false) {
+        DrawStaffLines(dc, staff, measure, system);
+    }
 
     DrawStaffDef(dc, staff, measure);
 
@@ -1394,7 +1407,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
             // cast to EditorialElement check in DrawLayerEditorialElement
             DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement *>(current), layer, staff, measure);
         }
-        else {
+        else if (!current->Is({ LABEL, LABELABBR })) {
             assert(false);
         }
     }

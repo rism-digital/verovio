@@ -25,6 +25,7 @@
 #include "measure.h"
 #include "page.h"
 #include "pages.h"
+#include "pedal.h"
 #include "section.h"
 #include "staff.h"
 #include "syl.h"
@@ -81,7 +82,7 @@ void System::Reset()
     m_drawingIsOptimized = false;
 }
 
-void System::AddChild(Object *child)
+bool System::IsSupportedChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
@@ -96,13 +97,9 @@ void System::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int System::GetDrawingX() const
@@ -184,8 +181,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 {
     ClassIdsComparison matchType({ CHORD, NOTE });
-    ArrayOfObjects children;
-    ArrayOfObjects::iterator childrenIter;
+    ListOfObjects children;
     this->FindAllDescendantBetween(&children, &matchType, start, end);
 
     Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstAncestor(LAYER));
@@ -195,10 +191,10 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
-        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstAncestor(LAYER));
+    for (auto &child : children) {
+        Layer *layer = dynamic_cast<Layer *>((child)->GetFirstAncestor(LAYER));
         assert(layer);
-        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstAncestor(STAFF));
+        Staff *staff = dynamic_cast<Staff *>((child)->GetFirstAncestor(STAFF));
         assert(staff);
 
         // If the slur is spanning over several measure, the the children list will include note and chords
@@ -209,7 +205,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
             continue;
         }
 
-        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(*childrenIter);
+        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(child);
         assert(interface);
 
         // First pass
@@ -230,7 +226,7 @@ void System::AddToDrawingListIfNeccessary(Object *object)
 
     if (!object->HasInterface(INTERFACE_TIME_SPANNING)) return;
 
-    if (object->Is({ BRACKETSPAN, FIGURE, HAIRPIN, OCTAVE, SLUR, SYL, TIE })) {
+    if (object->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, SLUR, SYL, TIE })) {
         this->AddToDrawingList(object);
     }
     else if (object->Is(DIR)) {
@@ -247,10 +243,17 @@ void System::AddToDrawingListIfNeccessary(Object *object)
             this->AddToDrawingList(dynam);
         }
     }
+    else if (object->Is(PEDAL)) {
+        Pedal *pedal = dynamic_cast<Pedal *>(object);
+        assert(pedal);
+        if (pedal->GetEnd()) {
+            this->AddToDrawingList(pedal);
+        }
+    }
     else if (object->Is(TRILL)) {
         Trill *trill = dynamic_cast<Trill *>(object);
         assert(trill);
-        if (trill->GetEnd()) {
+        if (trill->GetEnd() && (trill->GetExtender() != BOOLEAN_false)) {
             this->AddToDrawingList(trill);
         }
     }
@@ -653,6 +656,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
     Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
+
+    params->m_classId = GLISS;
+    m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);

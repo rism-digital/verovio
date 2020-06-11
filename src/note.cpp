@@ -55,6 +55,7 @@ Note::Note()
     , AttGraced()
     , AttMidiVelocity()
     , AttNoteAnlMensural()
+    , AttNoteHeads()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -68,6 +69,7 @@ Note::Note()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTEANLMENSURAL);
+    RegisterAttClass(ATT_NOTEHEADS);
     RegisterAttClass(ATT_MIDIVELOCITY);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
@@ -91,6 +93,7 @@ void Note::Reset()
     ResetCue();
     ResetGraced();
     ResetNoteAnlMensural();
+    ResetNoteHeads();
     ResetMidiVelocity();
     ResetStems();
     ResetStemsCmn();
@@ -112,16 +115,7 @@ void Note::Reset()
     m_MIDIPitch = -1;
 }
 
-bool Note::HasToBeAligned() const
-{
-    if (!this->IsInLigature()) return true;
-    Note *note = const_cast<Note *>(this);
-    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstAncestor(LIGATURE));
-    assert(ligature);
-    return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
-}
-
-void Note::AddChild(Object *child)
+bool Note::IsSupportedChild(Object *child)
 {
     // additional verification for accid and artic - this will no be raised with editorial markup, though
     if (child->Is(ACCID)) {
@@ -157,18 +151,28 @@ void Note::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
+        return false;
+    }
+    return true;
+}
+
+void Note::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return;
     }
 
     child->SetParent(this);
 
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ DOTS, STEM }))
+    if (child->Is({ DOTS, STEM })) {
         m_children.insert(m_children.begin(), child);
-    else
+    }
+    else {
         m_children.push_back(child);
+    }
     Modify();
 }
 
@@ -176,6 +180,22 @@ Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
     return accid;
+}
+
+bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+{
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+        assert(staff);
+    }
+
+    linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+    linesBelow = -(this->GetDrawingLoc()) / 2;
+
+    linesAbove = std::max(linesAbove, 0);
+    linesBelow = std::max(linesBelow, 0);
+
+    return ((linesAbove > 0) || (linesBelow > 0));
 }
 
 Chord *Note::IsChordTone() const
@@ -238,7 +258,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
         p.y = doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
@@ -277,7 +297,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
         p.y = -doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
@@ -301,9 +321,46 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return p;
 }
 
+int Note::CalcStemLenInThirdUnits(Staff *staff)
+{
+    assert(staff);
+
+    int baseStem = STANDARD_STEMLENGTH * 3;
+
+    int shortening = 0;
+
+    int unitToLine = (this->GetDrawingStemDir() == STEMDIRECTION_up)
+        ? -this->GetDrawingLoc() + (staff->m_drawingLines - 1) * 2
+        : this->GetDrawingLoc();
+    if (unitToLine < 5) {
+        switch (unitToLine) {
+            case 4: shortening = 1; break;
+            case 3: shortening = 2; break;
+            case 2: shortening = 3; break;
+            case 1: shortening = 4; break;
+            case 0: shortening = 5; break;
+            default: shortening = 6;
+        }
+    }
+
+    // Limit shortening with duration shorter than quarter not when not in a beam
+    if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            shortening = std::min(4, shortening);
+        }
+        else {
+            shortening = std::min(3, shortening);
+        }
+    }
+
+    baseStem -= shortening;
+
+    return baseStem;
+}
+
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
-    assert(this->IsMensural());
+    assert(this->IsMensuralDur());
 
     int drawingDur = this->GetDrawingDur();
 
@@ -479,9 +536,9 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     /****** ties ******/
@@ -551,7 +608,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     }
 
     // We currently have no stem object with mensural notes
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -669,7 +726,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     assert(params);
 
     // We currently have no dots object with mensural notes
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
     if (!this->IsVisible()) {
@@ -761,10 +818,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     /************** Ledger lines: **************/
 
-    int linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
-    int linesBelow = -(this->GetDrawingLoc()) / 2;
+    int linesAbove = 0;
+    int linesBelow = 0;
 
-    if ((linesAbove <= 0) && (linesBelow <= 0)) return FUNCTOR_CONTINUE;
+    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
 
     // HARDCODED
     int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
@@ -802,7 +859,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
 
-    if (!this->IsChordTone() && !this->IsMensural()) {
+    if (!this->IsChordTone() && !this->IsMensuralDur()) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
@@ -824,7 +881,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem() && !this->IsChordTone()
-        && !this->IsMensural()) {
+        && !this->IsMensuralDur()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
@@ -935,29 +992,37 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    // Create midi this
-    int midiBase = 0;
-    data_PITCHNAME pname = note->GetPname();
-    switch (pname) {
-        case PITCHNAME_c: midiBase = 0; break;
-        case PITCHNAME_d: midiBase = 2; break;
-        case PITCHNAME_e: midiBase = 4; break;
-        case PITCHNAME_f: midiBase = 5; break;
-        case PITCHNAME_g: midiBase = 7; break;
-        case PITCHNAME_a: midiBase = 9; break;
-        case PITCHNAME_b: midiBase = 11; break;
-        case PITCHNAME_NONE: break;
+    int pitch = 0;
+    if (note->HasPnum()) {
+        pitch = note->GetPnum();
     }
-    // Check for accidentals
-    midiBase += note->GetChromaticAlteration();
+    else {
+        // calc pitch
+        int midiBase = 0;
+        data_PITCHNAME pname = note->GetPname();
+        if (note->HasPnameGes()) pname = note->GetPnameGes();
+        switch (pname) {
+            case PITCHNAME_c: midiBase = 0; break;
+            case PITCHNAME_d: midiBase = 2; break;
+            case PITCHNAME_e: midiBase = 4; break;
+            case PITCHNAME_f: midiBase = 5; break;
+            case PITCHNAME_g: midiBase = 7; break;
+            case PITCHNAME_a: midiBase = 9; break;
+            case PITCHNAME_b: midiBase = 11; break;
+            case PITCHNAME_NONE: break;
+        }
+        int oct = note->GetOct();
+        if (note->HasOctGes()) oct = note->GetOctGes();
 
-    // Adjustment for transposition intruments
-    midiBase += params->m_transSemi;
+        // Check for accidentals
+        midiBase += note->GetChromaticAlteration();
 
-    int oct = note->GetOct();
-    if (note->HasOctGes()) oct = note->GetOctGes();
+        // Adjustment for transposition intruments
+        midiBase += params->m_transSemi;
 
-    int pitch = midiBase + (oct + 1) * 12;
+        pitch = midiBase + (oct + 1) * 12;
+    }
+
     // We do store the MIDIPitch in the note even with a sameas
     this->SetMIDIPitch(pitch);
     int channel = params->m_midiChannel;

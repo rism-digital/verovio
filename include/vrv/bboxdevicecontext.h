@@ -79,7 +79,7 @@ public:
     virtual void DrawPolygon(int n, Point points[], int xOffset, int yOffset, int fillStyle = AxODDEVEN_RULE);
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
-    virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
+    virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius);
     virtual void DrawText(
         const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, 
         int y = VRV_UNSET,  int width = VRV_UNSET, int heigh = VRV_UNSET);
@@ -114,7 +114,8 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend = false);
+    virtual void StartGraphic(
+        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false);
     virtual void EndGraphic(Object *object, View *view);
     ///@}
 

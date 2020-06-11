@@ -46,7 +46,7 @@ public:
      * Add an element (svg) to an fig.
      * Only supported elements will be actually added to the child list.
      */
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     //----------//
     // Functors //
