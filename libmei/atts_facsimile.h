@@ -59,7 +59,7 @@ private:
      * Permits the current element to reference a facsimile image or image zone which
      * corresponds to it.
      **/
-     std::string m_facs;
+    std::string m_facs;
 
     /* include <attfacs> */
 };
