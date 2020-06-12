@@ -37,6 +37,16 @@ INCLUDEPATH += include
     INCLUDEPATH += ../../../include/pugi
     INCLUDEPATH += ../../../include/utf8
     INCLUDEPATH += ../../../libmei
+}
+
+android {
+    message("* Using settings for Android.")
+
+    LIBS += -L../../android/libs/armeabi-v7a -lverovio-android
+}
+else {
+    message("* Using settings for Other (Linux, Mac, Windows, ...).")
+
     LIBS += -L../../../tools/build-library -lverovio
 }
 
