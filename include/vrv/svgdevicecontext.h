@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -253,7 +254,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::vector<std::string> m_smuflGlyphs;
+    std::set<std::string> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;

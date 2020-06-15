@@ -36,6 +36,8 @@ class Toolkit : public QObject {
     Q_PROPERTY(QString musicFontPath MEMBER m_musicFontPath WRITE setMusicFontPath)
     Q_PROPERTY(QString verovioTextFontPath MEMBER m_verovioTextFontPath WRITE setVerovioTextFontPath)
     Q_PROPERTY(QString breaks WRITE setBreaks READ getBreaks)
+    Q_PROPERTY(QString header WRITE setHeader READ getHeader)
+    Q_PROPERTY(QString footer WRITE setFooter READ getFooter)
     Q_PROPERTY(QString transpose WRITE setTranspose READ getTranspose)
     Q_PROPERTY(int pageCount MEMBER m_pageCount READ pageCount NOTIFY pageCountChanged)
     Q_PROPERTY(int displayWidth MEMBER m_displayWidth WRITE setDisplayWidth)
@@ -88,6 +90,8 @@ public:
     int getSpacingSystem() const;
     int getSpacingStaff() const;
     QString getBreaks() const;
+    QString getHeader() const;
+    QString getFooter() const;
     QString getTranspose() const;
     ///@}
 
@@ -103,6 +107,8 @@ public slots:
     void setMusicFontPath(QString musicFontPath);
     void setVerovioTextFontPath(QString verovioTextFontPath);
     void setBreaks(QString breaks);
+    void setHeader(QString header);
+    void setFooter(QString footer);
     void setTranspose(QString transpose);
     void setDisplayWidth(int displayWidth);
     void setDisplayHeight(int displayHeight);
@@ -185,6 +191,11 @@ private:
      * @name Setter for hasValidData.
      */
     void setHasValidData(bool hasValidData);
+
+    /**
+     * @name Other internal helper functions.
+     */
+    bool prepareLayout();
 
 private:
     // Stores the dimensions to which the score should be rendered. This takes into account the current scale and thus

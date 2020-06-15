@@ -119,7 +119,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        std::vector<std::string>::const_iterator it;
+        std::set<std::string>::const_iterator it;
         for (it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
             // load the XML file that contains it as a pugi::xml_document
             std::ifstream source((*it).c_str());
@@ -814,10 +814,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         std::string path = glyph->GetPath();
 
         // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_smuflGlyphs.begin(), m_smuflGlyphs.end(), path);
-        if (it == m_smuflGlyphs.end()) {
-            m_smuflGlyphs.push_back(path);
-        }
+        m_smuflGlyphs.insert(path);
 
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
@@ -826,6 +823,11 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
+            useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)",
+                m_fontStack.top()->GetWidthToHeightRatio(), x * (1. - m_fontStack.top()->GetWidthToHeightRatio()))
+                                                         .c_str();
+        }
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)

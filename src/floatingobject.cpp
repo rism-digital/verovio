@@ -331,7 +331,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
         if (this->m_place == STAFFREL_above) {
-            if (curve && curve->m_object->Is({ SLUR, TIE })) {
+            if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
                 int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -351,7 +351,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             }
         }
         else {
-            if (curve && curve->m_object->Is({ SLUR, TIE })) {
+            if (curve && curve->m_object->Is({ PHRASE, SLUR, TIE })) {
                 int shift = this->Intersects(curve, CONTENT, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -439,7 +439,7 @@ void FloatingCurvePositioner::UpdateCurveParams(
 int FloatingCurvePositioner::CalcMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
-    assert(this->GetObject()->Is({ SLUR, TIE }));
+    assert(this->GetObject()->Is({ PHRASE, SLUR, TIE }));
     assert(m_dir != curvature_CURVEDIR_NONE);
 
     if (m_cachedMinMaxY != VRV_UNSET) return m_cachedMinMaxY;
