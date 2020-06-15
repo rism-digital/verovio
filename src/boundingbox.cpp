@@ -515,7 +515,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
 {
     assert(curve);
     assert(curve->GetObject());
-    assert(curve->GetObject()->Is({ SLUR, TIE }));
+    assert(curve->GetObject()->Is({ PHRASE, SLUR, TIE }));
 
     // for lisability
     Point points[4];

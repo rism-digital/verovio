@@ -203,6 +203,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TRILL);
     DrawSystemList(dc, system, FIGURE);
+    DrawSystemList(dc, system, PHRASE);
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, PEDAL);
     DrawSystemList(dc, system, TIE);
@@ -237,6 +238,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == PHRASE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == OCTAVE)) {
@@ -367,7 +371,7 @@ void View::DrawStaffGrp(
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * m_doc->GetDrawingBeamWidth(staffSize, false),
-                         m_doc->GetDrawingBeamWidth(staffSize, false));
+            m_doc->GetDrawingBeamWidth(staffSize, false));
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
@@ -398,7 +402,7 @@ void View::DrawStaffGrp(
     int xLabel = x - space;
     int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
     this->DrawLabels(dc, system, staffGrp, xLabel, yLabel, abbreviations, 100, 2 * space);
-    
+
     DrawStaffDefLabels(dc, measure, staffGrp, x, abbreviations);
 }
 
@@ -438,8 +442,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
     }
 }
 
-void View::DrawLabels(DeviceContext *dc, System *system, Object *object, int x, int y,
-    bool abbreviations, int staffSize, int space)
+void View::DrawLabels(
+    DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space)
 {
     assert(dc);
     assert(system);
@@ -553,15 +557,15 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
     if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
-        FontInfo* font = m_doc->GetDrawingSmuflFont(staffSize, false);
+        FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
         int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
         int height = 8 * m_doc->GetDrawingUnit(staffSize);
         const float scale = static_cast<float>(y1 - y2) / height;
         // We want the brace width always to be 2 units
-        int braceWidth =  m_doc->GetDrawingDoubleUnit(staffSize);
+        int braceWidth = m_doc->GetDrawingDoubleUnit(staffSize);
         x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + m_doc->GetDrawingUnit(staffSize);
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
-        const float widthAfterScalling = width * scale ;
+        const float widthAfterScalling = width * scale;
         font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
         DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
         font->SetWidthToHeightRatio(currentWidthToHeightRatio);

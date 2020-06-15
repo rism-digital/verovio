@@ -29,6 +29,7 @@ public:
      */
     ///@{
     Slur();
+    Slur(const std::string &classid);
     virtual ~Slur();
     virtual Object *Clone() const { return new Slur(*this); }
     virtual void Reset();
