@@ -850,8 +850,9 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
-            useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)", m_fontStack.top()->GetWidthToHeightRatio(),
-                                                                  x * (1. - m_fontStack.top()->GetWidthToHeightRatio())).c_str();
+            useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)",
+                m_fontStack.top()->GetWidthToHeightRatio(), x * (1. - m_fontStack.top()->GetWidthToHeightRatio()))
+                                                         .c_str();
         }
 
         // Get the bounds of the char

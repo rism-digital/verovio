@@ -151,6 +151,7 @@ enum ClassId {
     MNUM,
     OCTAVE,
     PEDAL,
+    PHRASE,
     REH,
     SLUR,
     TEMPO,
