@@ -70,7 +70,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, SLUR, TIE })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, PHRASE, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -151,7 +151,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ SLUR, BRACKETSPAN, HAIRPIN, OCTAVE, TIE })) return;
+            if (element->Is({ BRACKETSPAN, HAIRPIN, PHRASE, OCTAVE, SLUR, TIE })) return;
         }
     }
 
@@ -302,6 +302,13 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
+        else if (element->Is(PHRASE)) {
+            // For phrases (slurs) we limit support to one value in @staff
+            if (staffIter != staffList.begin()) continue;
+            // cast to Slur check in DrawSlur
+            DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+
         else if (element->Is(OCTAVE)) {
             // cast to Slur check in DrawOctave
             DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, *staffIter, spanningType, graphic);

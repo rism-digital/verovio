@@ -89,6 +89,7 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "phrase.h"
 #include "proport.h"
 #include "rdg.h"
 #include "ref.h"
@@ -420,6 +421,11 @@ bool MEIOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("pedal");
         WritePedal(m_currentNode, dynamic_cast<Pedal *>(object));
     }
+    else if (object->Is(PHRASE)) {
+        m_currentNode = m_currentNode.append_child("phrase");
+        WritePhrase(m_currentNode, dynamic_cast<Phrase *>(object));
+    }
+
     else if (object->Is(REH)) {
         m_currentNode = m_currentNode.append_child("reh");
         WriteReh(m_currentNode, dynamic_cast<Reh *>(object));
@@ -1281,6 +1287,13 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacement(currentNode);
     // pedal->WriteVerticalGroup(currentNode);
+}
+
+void MEIOutput::WritePhrase(pugi::xml_node currentNode, Phrase *phrase)
+{
+    assert(phrase);
+
+    WriteSlur(currentNode, phrase);
 }
 
 void MEIOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
@@ -3803,6 +3816,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "pedal") {
             success = ReadPedal(parent, current);
         }
+        else if (std::string(current.name()) == "phrase") {
+            success = ReadPhrase(parent, current);
+        }
         else if (std::string(current.name()) == "reh") {
             success = ReadReh(parent, current);
         }
@@ -4065,6 +4081,21 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
 
     parent->AddChild(vrvPedal);
     ReadUnsupportedAttr(pedal, vrvPedal);
+    return true;
+}
+
+bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
+{
+    Phrase *vrvPhrase = new Phrase();
+    ReadControlElement(phrase, vrvPhrase);
+
+    ReadTimeSpanningInterface(phrase, vrvPhrase);
+    vrvPhrase->ReadColor(phrase);
+    vrvPhrase->ReadCurvature(phrase);
+    vrvPhrase->ReadCurveRend(phrase);
+
+    parent->AddChild(vrvPhrase);
+    ReadUnsupportedAttr(phrase, vrvPhrase);
     return true;
 }
 

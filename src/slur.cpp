@@ -39,6 +39,16 @@ Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), Att
     Reset();
 }
 
+Slur::Slur(const std::string &classid) : ControlElement(classid), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+{
+    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CURVATURE);
+    RegisterAttClass(ATT_CURVEREND);
+
+    Reset();
+}
+
 Slur::~Slur() {}
 
 void Slur::Reset()

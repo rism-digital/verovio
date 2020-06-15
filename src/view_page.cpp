@@ -202,6 +202,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TRILL);
     DrawSystemList(dc, system, FIGURE);
+    DrawSystemList(dc, system, PHRASE);
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
@@ -235,6 +236,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == PHRASE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == OCTAVE)) {
