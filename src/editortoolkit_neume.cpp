@@ -1623,7 +1623,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     ListOfObjects sortedSyllables;
     ClassIdComparison clefComp(CLEF);
     InterfaceComparison pitchComp(INTERFACE_PITCH);
-    Clef *newClef;
+    Clef *newClef = NULL;
 
     m_doc->GetDrawingPage()->FindAllDescendantBetween(&clefs, &clefComp,
         sortedElements.front()->GetFirstAncestor(SYLLABLE), sortedElements.back()->GetFirstAncestor(SYLLABLE));
@@ -1878,6 +1878,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     }
 
     // change the pitch of any pitched elements whose clef may have changed
+    assert(newClef);
     ListOfObjects pitchedChildren;
     if (sortedSyllables.size()) {
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
@@ -1932,7 +1933,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     bool success1, success2;
     int ligCount = 0;
     bool firstIsSyl = false;
-    Clef *oldClef;
+    Clef *oldClef = NULL;
     ClassIdComparison ac(CLEF);
     ListOfObjects syllables;
 
@@ -1952,6 +1953,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         // only if the ligature is the entire selection
         if (groupType == "nc" && elementIds.size() == 2) {
             Nc *nc = dynamic_cast<Nc *>(el);
+            assert(nc);
             if (nc->HasLigated() && nc->GetLigated() == BOOLEAN_true) {
                 nc->SetLigated(BOOLEAN_false);
                 ligCount++;
