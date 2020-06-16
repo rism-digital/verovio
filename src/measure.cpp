@@ -137,7 +137,7 @@ void Measure::Reset()
     m_currentTempo = 120;
 }
 
-void Measure::AddChild(Object *child)
+bool Measure::IsSupportedChild(Object *child)
 {
     if (child->IsControlElement()) {
         assert(dynamic_cast<ControlElement *>(child));
@@ -155,35 +155,16 @@ void Measure::AddChild(Object *child)
         }
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Measure::AddChildBack(Object *child)
 {
-    if (child->IsControlElement()) {
-        assert(dynamic_cast<ControlElement *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else if (child->Is(STAFF)) {
-        Staff *staff = dynamic_cast<Staff *>(child);
-        assert(staff);
-        if (staff && (staff->GetN() < 1)) {
-            // This is not 100% safe if we have a <app> and <rdg> with more than
-            // one staff as a previous child.
-            staff->SetN(this->GetChildCount());
-        }
-    }
-    else {
+    if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return;
     }
 
     child->SetParent(this);
@@ -346,13 +327,12 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
     // First get all the staffGrps
     ClassIdComparison matchType(STAFFGRP);
-    ArrayOfObjects staffGrps;
-    ArrayOfObjects::iterator staffGrpIter;
+    ListOfObjects staffGrps;
     scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
-    for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); ++staffGrpIter) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>((*staffGrpIter)->GetFirst(STAFFDEF));
+    for (auto &staffGrp : staffGrps) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>((staffGrp)->GetFirst(STAFFDEF));
         if (staffDef) staffList.push_back(staffDef->GetN());
     }
 
@@ -373,7 +353,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 Staff *Measure::GetTopVisibleStaff()
 {
     Staff *staff = NULL;
-    ArrayOfObjects staves;
+    ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
     this->FindAllDescendantByComparison(&staves, &matchType, 1);
     for (auto &child : staves) {
@@ -464,9 +444,9 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     ArrayOfObjects::iterator iter;
@@ -1077,7 +1057,7 @@ int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
             params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
     }
 
-    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
     while (iter != params->m_timePointingInterfaces.end()) {
         iter = params->m_timePointingInterfaces.erase(iter);
     }
@@ -1090,7 +1070,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
@@ -1111,7 +1091,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
     assert(params);
 
-    ArrayOfObjectBeatPairs::iterator iter = params->m_tstamps.begin();
+    ListOfObjectBeatPairs::iterator iter = params->m_tstamps.begin();
     // Loop throught the object/beat pairs and create the TimestampAttr when necessary
     while (iter != params->m_tstamps.end()) {
         // -1 means that we have a @tstamp (start) to add to the current measure

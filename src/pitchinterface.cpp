@@ -14,11 +14,12 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "clef.h"
+#include "custos.h"
 #include "layer.h"
 #include "note.h"
 #include "rest.h"
 #include "vrv.h"
-#include "clef.h"
 
 namespace vrv {
 
@@ -141,6 +142,15 @@ int PitchInterface::CalcLoc(
             return note->GetLoc();
         }
         return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(crossStaffElement));
+    }
+    else if (layerElement->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(layerElement);
+        assert(custos);
+        if (custos->HasLoc()) {
+            return custos->GetLoc();
+        }
+        return PitchInterface::CalcLoc(
+            custos->GetPname(), custos->GetOct(), layer->GetClefLocOffset(crossStaffElement));
     }
     else {
         assert(false);

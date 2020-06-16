@@ -116,7 +116,7 @@ void Staff::ClearLedgerLines()
     }
 }
 
-void Staff::AddChild(Object *child)
+bool Staff::IsSupportedChild(Object *child)
 {
     if (child->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(child);
@@ -131,13 +131,9 @@ void Staff::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 int Staff::GetDrawingX() const
@@ -195,10 +191,9 @@ void Staff::AdjustDrawingStaffSize()
         if (doc->GetType() == Facs) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
-            int yDiff = zone->GetLry() - zone->GetUly() -
-                (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
-            this->m_drawingStaffSize = 100 * yDiff /
-                (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+            int yDiff
+                = zone->GetLry() - zone->GetUly() - (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
+            this->m_drawingStaffSize = 100 * yDiff / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
         }
     }
 }
@@ -260,7 +255,7 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
 
 void Staff::SetFromFacsimile(Doc *doc)
 {
-    if(!this->HasFacs()) return;
+    if (!this->HasFacs()) return;
     if (this->GetZone() == NULL) {
         assert(doc);
         Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
@@ -368,11 +363,11 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
     staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
 
     // Ignore layers that are empty (or with @sameas)
-    ArrayOfObjects layers;
+    ListOfObjects layers;
     IsEmptyComparison matchTypeLayer(LAYER, true);
     this->FindAllDescendantByComparison(&layers, &matchTypeLayer);
 
-    ArrayOfObjects mRests;
+    ListOfObjects mRests;
     ClassIdComparison matchTypeMRest(MREST);
     this->FindAllDescendantByComparison(&mRests, &matchTypeMRest);
 
@@ -524,7 +519,7 @@ int Staff::CalcOnsetOffset(FunctorParams *functorParams)
 int Staff::CalcStem(FunctorParams *)
 {
     ClassIdComparison isLayer(LAYER);
-    ArrayOfObjects layers;
+    ListOfObjects layers;
     this->FindAllDescendantByComparison(&layers, &isLayer);
 
     // Not more than one layer - drawing stem dir remains unset
@@ -534,7 +529,7 @@ int Staff::CalcStem(FunctorParams *)
 
     // Detecting empty layers (empty layers can also have @sameas) which have to be ignored for stem direction
     IsEmptyComparison isEmptyElement(LAYER);
-    ArrayOfObjects emptyLayers;
+    ListOfObjects emptyLayers;
     this->FindAllDescendantByComparison(&emptyLayers, &isEmptyElement);
 
     // We have only one layer (or less) with content - drawing stem dir remains unset
@@ -543,7 +538,7 @@ int Staff::CalcStem(FunctorParams *)
     }
 
     if (!emptyLayers.empty()) {
-        ArrayOfObjects nonEmptyLayers;
+        ListOfObjects nonEmptyLayers;
         // not need to sort since it already sorted
         std::set_difference(layers.begin(), layers.end(), emptyLayers.begin(), emptyLayers.end(),
             std::inserter(nonEmptyLayers, nonEmptyLayers.begin()));

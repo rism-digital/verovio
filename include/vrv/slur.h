@@ -29,6 +29,7 @@ public:
      */
     ///@{
     Slur();
+    Slur(const std::string &classid);
     virtual ~Slur();
     virtual Object *Clone() const { return new Slur(*this); }
     virtual void Reset();
@@ -52,13 +53,6 @@ public:
     void SetDrawingCurvedir(curvature_CURVEDIR curvedir) { m_drawingCurvedir = curvedir; }
     bool HasDrawingCurvedir() const { return (m_drawingCurvedir != curvature_CURVEDIR_NONE); }
     ///@}
-
-    /**
-     * Check if the slur needs to be taken into account as overflow above or below in case of cross-staff end points.
-     * This methods assumes staff@n to be greater for the staff below.
-     */
-    void GetCrossStaffOverflows(
-        StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
 
     bool AdjustSlur(Doc *doc, FloatingCurvePositioner *curve, Staff *staff);
 

@@ -167,7 +167,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     if (staff->GetDrawingRotate() != 0) {
         double deg = staff->GetDrawingRotate();
         int xDiff = noteX - staff->GetDrawingX();
-        rotateOffset =  int(xDiff * tan(deg * M_PI / 180.0));
+        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
     }
     else {
         rotateOffset = 0;

@@ -21,6 +21,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "tie.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -220,7 +221,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        if (object->Is({ SLUR, TIE })) {
+        if (object->Is({ PHRASE, SLUR, TIE })) {
             positioner = new FloatingCurvePositioner(object, this, spanningType);
             m_floatingPositioners.push_back(positioner);
         }
@@ -357,7 +358,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         if (!(*iter)->HasContentBB()) continue;
 
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
-        if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
+        if ((params->m_classId == PHRASE) || (params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
             assert((*iter)->Is(FLOATING_CURVE_POSITIONER));
             FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(*iter);
@@ -366,10 +367,15 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             bool skipAbove = false;
             bool skipBelow = false;
 
-            if ((*iter)->GetObject()->Is(SLUR)) {
+            if ((*iter)->GetObject()->Is({ PHRASE, SLUR })) {
                 Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
                 slur->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
+            }
+            else if ((*iter)->GetObject()->Is(TIE)) {
+                Tie *tie = dynamic_cast<Tie *>((*iter)->GetObject());
+                assert(tie);
+                tie->GetCrossStaffOverflows(this, curve->GetDir(), skipAbove, skipBelow);
             }
 
             int overflowAbove = 0;
@@ -513,7 +519,7 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         assert((*iter)->GetObject());
-        if (!(*iter)->GetObject()->Is(SLUR)) continue;
+        if (!(*iter)->GetObject()->Is({ PHRASE, SLUR })) continue;
         Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
         assert(slur);
 

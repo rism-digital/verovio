@@ -93,7 +93,7 @@ void AttArpegVis::ResetArpegVis()
     m_arrowColor = "";
     m_arrowFillcolor = "";
     m_lineForm = LINEFORM_NONE;
-    m_lineWidth = "";
+    m_lineWidth = data_LINEWIDTH();
 }
 
 bool AttArpegVis::ReadArpegVis(pugi::xml_node element)
@@ -130,7 +130,7 @@ bool AttArpegVis::ReadArpegVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("line.width")) {
-        this->SetLineWidth(StrToStr(element.attribute("line.width").value()));
+        this->SetLineWidth(StrToLinewidth(element.attribute("line.width").value()));
         element.remove_attribute("line.width");
         hasAttribute = true;
     }
@@ -165,7 +165,7 @@ bool AttArpegVis::WriteArpegVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasLineWidth()) {
-        element.append_attribute("line.width") = StrToStr(this->GetLineWidth()).c_str();
+        element.append_attribute("line.width") = LinewidthToStr(this->GetLineWidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -203,7 +203,7 @@ bool AttArpegVis::HasLineForm() const
 
 bool AttArpegVis::HasLineWidth() const
 {
-    return (m_lineWidth != "");
+    return (m_lineWidth.HasValue());
 }
 
 /* include <attline.width> */
@@ -590,8 +590,8 @@ AttFTremVis::~AttFTremVis()
 void AttFTremVis::ResetFTremVis()
 {
     m_beams = 0;
-    m_beamsFloat = 0;
-    m_floatGap = "";
+    m_beamsFloat = -1;
+    m_floatGap = VRV_UNSET;
 }
 
 bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
@@ -608,7 +608,7 @@ bool AttFTremVis::ReadFTremVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("float.gap")) {
-        this->SetFloatGap(StrToStr(element.attribute("float.gap").value()));
+        this->SetFloatGap(StrToMeasurementabs(element.attribute("float.gap").value()));
         element.remove_attribute("float.gap");
         hasAttribute = true;
     }
@@ -627,7 +627,7 @@ bool AttFTremVis::WriteFTremVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasFloatGap()) {
-        element.append_attribute("float.gap") = StrToStr(this->GetFloatGap()).c_str();
+        element.append_attribute("float.gap") = MeasurementabsToStr(this->GetFloatGap()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -640,12 +640,12 @@ bool AttFTremVis::HasBeams() const
 
 bool AttFTremVis::HasBeamsFloat() const
 {
-    return (m_beamsFloat != 0);
+    return (m_beamsFloat != -1);
 }
 
 bool AttFTremVis::HasFloatGap() const
 {
-    return (m_floatGap != "");
+    return (m_floatGap != VRV_UNSET);
 }
 
 /* include <attfloat.gap> */
@@ -772,14 +772,14 @@ AttHairpinVis::~AttHairpinVis()
 
 void AttHairpinVis::ResetHairpinVis()
 {
-    m_opening = "";
+    m_opening = VRV_UNSET;
 }
 
 bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("opening")) {
-        this->SetOpening(StrToStr(element.attribute("opening").value()));
+        this->SetOpening(StrToMeasurementabs(element.attribute("opening").value()));
         element.remove_attribute("opening");
         hasAttribute = true;
     }
@@ -790,7 +790,7 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOpening()) {
-        element.append_attribute("opening") = StrToStr(this->GetOpening()).c_str();
+        element.append_attribute("opening") = MeasurementabsToStr(this->GetOpening()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -798,7 +798,7 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
 
 bool AttHairpinVis::HasOpening() const
 {
-    return (m_opening != "");
+    return (m_opening != VRV_UNSET);
 }
 
 /* include <attopening> */
@@ -1033,7 +1033,7 @@ AttLineVis::~AttLineVis()
 void AttLineVis::ResetLineVis()
 {
     m_form = LINEFORM_NONE;
-    m_width = "";
+    m_width = data_LINEWIDTH();
     m_endsym = LINESTARTENDSYMBOL_NONE;
     m_endsymSize = 0;
     m_startsym = LINESTARTENDSYMBOL_NONE;
@@ -1049,7 +1049,7 @@ bool AttLineVis::ReadLineVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("width")) {
-        this->SetWidth(StrToStr(element.attribute("width").value()));
+        this->SetWidth(StrToLinewidth(element.attribute("width").value()));
         element.remove_attribute("width");
         hasAttribute = true;
     }
@@ -1084,7 +1084,7 @@ bool AttLineVis::WriteLineVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasWidth()) {
-        element.append_attribute("width") = StrToStr(this->GetWidth()).c_str();
+        element.append_attribute("width") = LinewidthToStr(this->GetWidth()).c_str();
         wroteAttribute = true;
     }
     if (this->HasEndsym()) {
@@ -1113,7 +1113,7 @@ bool AttLineVis::HasForm() const
 
 bool AttLineVis::HasWidth() const
 {
-    return (m_width != "");
+    return (m_width.HasValue());
 }
 
 bool AttLineVis::HasEndsym() const
@@ -2130,7 +2130,7 @@ bool AttTupletVis::HasNumFormat() const
 
 /* include <attnum.format> */
 
-bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetVisual(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ANNOTVIS)) {
         AttAnnotVis *att = dynamic_cast<AttAnnotVis *>(element);
@@ -2168,7 +2168,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "line.width") {
-            att->SetLineWidth(att->StrToStr(attrValue));
+            att->SetLineWidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -2256,7 +2256,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "float.gap") {
-            att->SetFloatGap(att->StrToStr(attrValue));
+            att->SetFloatGap(att->StrToMeasurementabs(attrValue));
             return true;
         }
     }
@@ -2284,7 +2284,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
         assert(att);
         if (attrType == "opening") {
-            att->SetOpening(att->StrToStr(attrValue));
+            att->SetOpening(att->StrToMeasurementabs(attrValue));
             return true;
         }
     }
@@ -2336,7 +2336,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "width") {
-            att->SetWidth(att->StrToStr(attrValue));
+            att->SetWidth(att->StrToLinewidth(attrValue));
             return true;
         }
         if (attrType == "endsym") {
@@ -2583,7 +2583,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("line.form", att->LineformToStr(att->GetLineForm())));
         }
         if (att->HasLineWidth()) {
-            attributes->push_back(std::make_pair("line.width", att->StrToStr(att->GetLineWidth())));
+            attributes->push_back(std::make_pair("line.width", att->LinewidthToStr(att->GetLineWidth())));
         }
     }
     if (element->HasAttClass(ATT_BARLINEVIS)) {
@@ -2656,7 +2656,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("beams.float", att->IntToStr(att->GetBeamsFloat())));
         }
         if (att->HasFloatGap()) {
-            attributes->push_back(std::make_pair("float.gap", att->StrToStr(att->GetFloatGap())));
+            attributes->push_back(std::make_pair("float.gap", att->MeasurementabsToStr(att->GetFloatGap())));
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
@@ -2680,7 +2680,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
         assert(att);
         if (att->HasOpening()) {
-            attributes->push_back(std::make_pair("opening", att->StrToStr(att->GetOpening())));
+            attributes->push_back(std::make_pair("opening", att->MeasurementabsToStr(att->GetOpening())));
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
@@ -2724,7 +2724,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("form", att->LineformToStr(att->GetForm())));
         }
         if (att->HasWidth()) {
-            attributes->push_back(std::make_pair("width", att->StrToStr(att->GetWidth())));
+            attributes->push_back(std::make_pair("width", att->LinewidthToStr(att->GetWidth())));
         }
         if (att->HasEndsym()) {
             attributes->push_back(std::make_pair("endsym", att->LinestartendsymbolToStr(att->GetEndsym())));

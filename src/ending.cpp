@@ -45,7 +45,7 @@ void Ending::Reset()
     ResetNNumberLike();
 }
 
-void Ending::AddChild(Object *child)
+bool Ending::IsSupportedChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
@@ -55,23 +55,18 @@ void Ending::AddChild(Object *child)
     }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
-        // here we are actually allowing ending withing ending, which is wrong
+        // here we are actually allowing ending within ending, which is wrong
         if (child->Is(ENDING)) {
-            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-            assert(false);
+            return false;
         }
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------

@@ -255,7 +255,7 @@ bool AttTurnLog::HasForm() const
 
 /* include <attform> */
 
-bool Att::SetCmnornaments(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetCmnornaments(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_MORDENTLOG)) {
         AttMordentLog *att = dynamic_cast<AttMordentLog *>(element);

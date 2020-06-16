@@ -111,9 +111,11 @@ public:
     data_LINEFORM GetLineForm() const { return m_lineForm; }
     bool HasLineForm() const;
     //
-    void SetLineWidth(std::string lineWidth_) { m_lineWidth = lineWidth_; }
-    std::string GetLineWidth() const { return m_lineWidth; }
+    void SetLineWidth(data_LINEWIDTH lineWidth_) { m_lineWidth = lineWidth_; }
+    data_LINEWIDTH GetLineWidth() const { return m_lineWidth; }
     bool HasLineWidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetLineWidthAlternate() { return &m_lineWidth; }
     ///@}
 
 private:
@@ -130,7 +132,7 @@ private:
     /** Visual form of the line. **/
     data_LINEFORM m_lineForm;
     /** Width of the line. **/
-    std::string m_lineWidth;
+    data_LINEWIDTH m_lineWidth;
 
     /* include <attline.width> */
 };
@@ -428,8 +430,8 @@ public:
     int GetBeamsFloat() const { return m_beamsFloat; }
     bool HasBeamsFloat() const;
     //
-    void SetFloatGap(std::string floatGap_) { m_floatGap = floatGap_; }
-    std::string GetFloatGap() const { return m_floatGap; }
+    void SetFloatGap(data_MEASUREMENTABS floatGap_) { m_floatGap = floatGap_; }
+    data_MEASUREMENTABS GetFloatGap() const { return m_floatGap; }
     bool HasFloatGap() const;
     ///@}
 
@@ -439,7 +441,7 @@ private:
     /** Captures the number of "floating" beams, i.e., those not attached to stems. **/
     int m_beamsFloat;
     /** Records the amount of separation between floating beams and stems. **/
-    std::string m_floatGap;
+    data_MEASUREMENTABS m_floatGap;
 
     /* include <attfloat.gap> */
 };
@@ -546,8 +548,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOpening(std::string opening_) { m_opening = opening_; }
-    std::string GetOpening() const { return m_opening; }
+    void SetOpening(data_MEASUREMENTABS opening_) { m_opening = opening_; }
+    data_MEASUREMENTABS GetOpening() const { return m_opening; }
     bool HasOpening() const;
     ///@}
 
@@ -556,7 +558,7 @@ private:
      * Specifies the distance between the lines at the open end of a hairpin dynamic
      * mark.
      **/
-    std::string m_opening;
+    data_MEASUREMENTABS m_opening;
 
     /* include <attopening> */
 };
@@ -745,9 +747,11 @@ public:
     data_LINEFORM GetForm() const { return m_form; }
     bool HasForm() const;
     //
-    void SetWidth(std::string width_) { m_width = width_; }
-    std::string GetWidth() const { return m_width; }
+    void SetWidth(data_LINEWIDTH width_) { m_width = width_; }
+    data_LINEWIDTH GetWidth() const { return m_width; }
     bool HasWidth() const;
+    /** Getter for reference (for alternate type only) */
+    data_LINEWIDTH *GetWidthAlternate() { return &m_width; }
     //
     void SetEndsym(data_LINESTARTENDSYMBOL endsym_) { m_endsym = endsym_; }
     data_LINESTARTENDSYMBOL GetEndsym() const { return m_endsym; }
@@ -770,7 +774,7 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_LINEFORM m_form;
     /** Measurement of the horizontal dimension of an entity. **/
-    std::string m_width;
+    data_LINEWIDTH m_width;
     /** Symbol rendered at end of line. **/
     data_LINESTARTENDSYMBOL m_endsym;
     /** Holds the relative size of the line-end symbol. **/

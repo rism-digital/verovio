@@ -51,7 +51,7 @@ void Rest::Reset()
     ResetRestVisMensural();
 }
 
-void Rest::AddChild(Object *child)
+bool Rest::IsSupportedChild(Object *child)
 {
     if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
@@ -60,18 +60,28 @@ void Rest::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
+        return false;
+    }
+    return true;
+}
+
+void Rest::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return;
     }
 
     child->SetParent(this);
 
     // Dots are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is(DOTS))
+    if (child->Is(DOTS)) {
         m_children.insert(m_children.begin(), child);
-    else
+    }
+    else {
         m_children.push_back(child);
+    }
     Modify();
 }
 
@@ -117,9 +127,9 @@ int Rest::GetRestLocOffset(int loc)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Rest::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (this->HasFermata()) {
@@ -162,7 +172,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     assert(params);
 
     // We currently have no dots object with mensural rests
-    if (this->IsMensural()) {
+    if (this->IsMensuralDur()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -192,7 +202,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     switch (this->GetActualDur()) {
-        case DUR_1: loc -= 2; break;
+        case DUR_1: loc += 0; break;
         case DUR_2: loc += 0; break;
         case DUR_4: loc += 2; break;
         case DUR_8: loc += 2; break;

@@ -117,7 +117,7 @@ bool AttExtSym::HasGlyphUri() const
 
 /* include <attglyph.uri> */
 
-bool Att::SetExternalsymbols(Object *element, std::string attrType, std::string attrValue)
+bool Att::SetExternalsymbols(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_EXTSYM)) {
         AttExtSym *att = dynamic_cast<AttExtSym *>(element);

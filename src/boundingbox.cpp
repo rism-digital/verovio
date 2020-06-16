@@ -515,7 +515,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
 {
     assert(curve);
     assert(curve->GetObject());
-    assert(curve->GetObject()->Is({ SLUR, TIE }));
+    assert(curve->GetObject()->Is({ PHRASE, SLUR, TIE }));
 
     // for lisability
     Point points[4];
@@ -696,6 +696,13 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     point.x = xnew + center.x;
     point.y = ynew + center.y;
     return point;
+}
+
+double BoundingBox::CalcSlope(Point const &p1, Point const &p2)
+{
+    if ((p1.y == p2.y) || (p1.x == p2.x)) return 0.0;
+
+    return (double)(p2.y - p1.y) / (double)(p2.x - p1.x);
 }
 
 /*

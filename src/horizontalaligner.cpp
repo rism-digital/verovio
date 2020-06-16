@@ -347,17 +347,16 @@ void GraceAligner::AlignStack()
         element->SetGraceAlignment(alignment);
 
         ClassIdsComparison matchType({ ACCID, FLAG, NOTE, STEM });
-        ArrayOfObjects children;
-        ArrayOfObjects::iterator childrenIter;
+        ListOfObjects children;
         element->FindAllDescendantByComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignmnet to all children
-        for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
+        for (auto &child : children) {
             // Trick : FindAllDescendantByComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
-            if (*childrenIter == element) continue;
-            LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
+            if (child == element) continue;
+            LayerElement *childElement = dynamic_cast<LayerElement *>(child);
             assert(childElement);
             childElement->SetGraceAlignment(alignment);
             alignment->AddLayerElementRef(childElement);
@@ -461,13 +460,10 @@ void Alignment::ClearGraceAligners()
     m_graceAligners.clear();
 }
 
-void Alignment::AddChild(Object *child)
+bool Alignment::IsSupportedChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 bool Alignment::HasAlignmentReference(int staffN)
@@ -634,6 +630,12 @@ void AlignmentReference::Reset()
 
     m_accidSpace.clear();
     m_layerCount = 0;
+}
+
+bool AlignmentReference::IsSupportedChild(Object *child)
+{
+    assert(dynamic_cast<LayerElement *>(child));
+    return true;
 }
 
 void AlignmentReference::AddChild(Object *child)
@@ -1072,7 +1074,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     if (m_accidSpace.empty()) return FUNCTOR_SIBLINGS;
 
     assert(params->m_doc);
-    StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN());
+    StaffDef *staffDef = params->m_doc->m_mdivScoreDef.GetStaffDef(this->GetN());
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 
     std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());

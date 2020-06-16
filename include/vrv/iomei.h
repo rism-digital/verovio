@@ -58,6 +58,7 @@ class Fig;
 class Fermata;
 class FloatingElement;
 class FTrem;
+class Gliss;
 class GraceGrp;
 class Hairpin;
 class HalfmRpt;
@@ -82,6 +83,7 @@ class Mordent;
 class MRest;
 class MRpt;
 class MRpt2;
+class MSpace;
 class MultiRest;
 class MultiRpt;
 class Nc;
@@ -98,6 +100,7 @@ class PgFoot;
 class PgFoot2;
 class PgHead;
 class PgHead2;
+class Phrase;
 class PitchInterface;
 class PlistInterface;
 class PositionInterface;
@@ -155,7 +158,7 @@ class MEIOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
-    MEIOutput(Doc *doc, std::string filename);
+    MEIOutput(Doc *doc);
     virtual ~MEIOutput();
     ///@}
 
@@ -180,9 +183,19 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Setter for score-based MEI output (not implemented)
+     * Setter for score-based MEI output
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+
+    /**
+     * Setter for indent for the MEI output (default is 3, -1 for tabs)
+     */
+    void SetIndent(int indent) { m_indent = indent; }
+
+    /**
+     * Setter for remove Ids flag for the MEI output (default is false)
+     */
+    void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
 private:
     bool WriteDoc(Doc *doc);
@@ -261,6 +274,7 @@ private:
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
     void WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt);
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
+    void WriteMSpace(pugi::xml_node currentNode, MSpace *mSpace);
     void WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
     void WriteNc(pugi::xml_node currentNode, Nc *nc);
@@ -284,12 +298,14 @@ private:
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
+    void WriteGliss(pugi::xml_node currentNode, Gliss *gliss);
     void WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteHarm(pugi::xml_node currentNode, Harm *harm);
     void WriteMNum(pugi::xml_node currentNode, MNum *mnum);
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
+    void WritePhrase(pugi::xml_node currentNode, Phrase *phrase);
     void WriteReh(pugi::xml_node currentNode, Reh *reh);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteTempo(pugi::xml_node currentNode, Tempo *tempo);
@@ -394,15 +410,16 @@ private:
 public:
     //
 private:
-    std::string m_filename;
     std::ostringstream m_streamStringOutput;
-    bool m_writeToStreamString;
+    int m_indent;
     int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
     /** @name Current element */
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_nodeStack;
+    bool m_removeIds;
+    ListOfObjects m_referredObjects;
 };
 
 //----------------------------------------------------------------------------
@@ -509,6 +526,7 @@ private:
     bool ReadMRest(Object *parent, pugi::xml_node mRest);
     bool ReadMRpt(Object *parent, pugi::xml_node mRpt);
     bool ReadMRpt2(Object *parent, pugi::xml_node mRpt2);
+    bool ReadMSpace(Object *parent, pugi::xml_node mSpace);
     bool ReadMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMultiRpt(Object *parent, pugi::xml_node multiRpt);
     bool ReadNc(Object *parent, pugi::xml_node nc);
@@ -524,7 +542,7 @@ private:
     ///@}
 
     /**
-     * @name Methods for reading MEI floating elements
+     * @name Methods for reading MEI control elements
      */
     ///@{
     bool ReadAnchoredText(Object *parent, pugi::xml_node anchoredText);
@@ -534,12 +552,14 @@ private:
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
+    bool ReadGliss(Object *parent, pugi::xml_node gliss);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
     bool ReadMNum(Object *parent, pugi::xml_node mnum);
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
+    bool ReadPhrase(Object *parent, pugi::xml_node phrase);
     bool ReadReh(Object *parent, pugi::xml_node reh);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
     bool ReadTempo(Object *parent, pugi::xml_node tempo);
@@ -651,6 +671,7 @@ private:
     DocType StrToDocType(std::string type);
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
+    bool ReadXMLComment(Object *object, pugi::xml_node element);
     ///@}
 
     /**
@@ -714,6 +735,11 @@ private:
      * This is not the case when selecting a mDiv that is not the first one with a score in the tree.
      */
     bool m_useScoreDefForDoc;
+
+    /**
+     * The comment to be attached to the next Object
+     */
+    std::string m_comment;
 };
 
 } // namespace vrv

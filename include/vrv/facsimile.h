@@ -42,7 +42,7 @@ public:
     virtual ClassId GetClassId() const { return FACSIMILE; }
     virtual std::string GetClassName() const { return "facsimile"; }
     ///@}
-    virtual void AddChild(Object *object);
+    virtual bool IsSupportedChild(Object *object);
 
     Zone *FindZoneByUuid(std::string zoneId);
     int GetMaxY();

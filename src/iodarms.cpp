@@ -385,10 +385,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         case 'Y': duration = DURATION_128; break;
         case 'Z': duration = DURATION_256; break;
 
-        default:
-            LogWarning("DARMS import: Unknown note duration: %c", data[pos]);
-            return 0;
-            break;
+        default: LogWarning("DARMS import: Unknown note duration: %c", data[pos]); return 0;
     }
 
     if (data[pos + 1] == '.') {
@@ -524,7 +521,7 @@ bool DarmsInput::Import(const std::string &data_str)
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
+    m_doc->m_mdivScoreDef.AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 

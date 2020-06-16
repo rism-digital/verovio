@@ -16,6 +16,7 @@
 #include <QSGGeometryNode>
 #include <QSGSimpleRectNode>
 #include <QScreen>
+#include <QThread>
 #include <cmath>
 
 //----------------------------------------------------------------------------
@@ -64,6 +65,10 @@ void SceneGraphDeviceContext::AddGeometryNode(QSGGeometryNode *node)
 
 void SceneGraphDeviceContext::AddQuickItem(TextQuickItem *item)
 {
+    // The scene graph rendering may be done on a separate thread (i.e. not the GUI thread), thus we have to ensure that
+    // the new item is on the same thread as the m_quickItem.
+    item->moveToThread(m_quickItem->thread());
+
     item->setParentItem(m_quickItem); // visual parent
     item->setParent(m_quickItem); // object parent (for proper cleanup)
 
@@ -80,6 +85,17 @@ QList<QSGGeometryNode *> SceneGraphDeviceContext::GetGeometryNodesForId(QString 
 QList<TextQuickItem *> SceneGraphDeviceContext::GetQuickItemsForId(QString id)
 {
     return m_id2QuickItemMapping[id];
+}
+
+QList<TextQuickItem *> SceneGraphDeviceContext::FindQuickItemsByType(QString type)
+{
+    QList<TextQuickItem *> quickItems;
+    for (auto iter = m_id2QuickItemMapping.begin(); iter != m_id2QuickItemMapping.end(); ++iter) {
+        if (iter.key().startsWith(type)) {
+            quickItems << iter.value();
+        }
+    }
+    return quickItems;
 }
 
 QStringList SceneGraphDeviceContext::GetIdsForQuickItem(QQuickItem *item)
@@ -130,6 +146,21 @@ vrv::Point SceneGraphDeviceContext::GetLogicalOrigin()
     return m_logicalOrigin;
 }
 
+void SceneGraphDeviceContext::DrawSimpleBezierPath(vrv::Point bezier[])
+{
+    qWarning() << "Warning:" << __FUNCTION__ << "not supported";
+}
+
+QRgb GetRgbFromPen(const vrv::Pen &pen)
+{
+    if (pen.GetColour() == AxNONE) {
+        return static_cast<QRgb>(AxBLACK);
+    }
+    else {
+        return static_cast<QRgb>(pen.GetColour());
+    }
+}
+
 void SceneGraphDeviceContext::DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4])
 {
     // Note: No support for vertex antialiasing. Use a top-level QQuickView with multisample antialiasing.
@@ -149,7 +180,7 @@ void SceneGraphDeviceContext::DrawComplexBezierPath(vrv::Point bezier1[4], vrv::
     node->setFlag(QSGNode::OwnsGeometry);
 
     QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
-    material->setColor(static_cast<QRgb>(currentPen.GetColour()));
+    material->setColor(GetRgbFromPen(currentPen));
     node->setMaterial(material);
     node->setFlag(QSGNode::OwnsMaterial);
 
@@ -203,7 +234,7 @@ void SceneGraphDeviceContext::DrawCircle(int x, int y, int radius)
     node->setFlag(QSGNode::OwnsGeometry);
 
     QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
-    material->setColor(static_cast<QRgb>(currentPen.GetColour()));
+    material->setColor(GetRgbFromPen(currentPen));
     node->setMaterial(material);
     node->setFlag(QSGNode::OwnsMaterial);
 
@@ -236,6 +267,29 @@ void SceneGraphDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     vrv::Pen currentPen = m_penStack.top();
 
+    // Some OpenGL devices (e.g. on Android) do not allow to use GL_LINES with a line-width > 1. DrawLine with
+    // line-width > 1 is called e.g. for measure break or staff lines. For vertical and horizontal lines the DrawLine
+    // call can be easily translated into a DrawRectangle call. Diagonal lines could be implemented by using DrawPolygon
+    // but have not yet been observed.
+    if (translate(currentPen.GetWidth()) > 1) {
+        int x = std::min(x1, x2);
+        int y = std::min(y1, y2);
+        auto width = std::abs(x2 - x1);
+        auto height = std::abs(y2 - y1);
+
+        if (width == 0) {
+            DrawRectangle(x - (currentPen.GetWidth() / 2), y, width + currentPen.GetWidth(), height);
+            return;
+        }
+        else if (height == 0) {
+            DrawRectangle(x, y - (currentPen.GetWidth() / 2), width, height + currentPen.GetWidth());
+            return;
+        }
+        else {
+            qWarning() << "Warning: Calling DrawLine for a diagonal line with line-width > 1";
+        }
+    }
+
     QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 2);
     geometry->setDrawingMode(GL_LINES);
     geometry->setLineWidth(translate(currentPen.GetWidth()));
@@ -243,7 +297,7 @@ void SceneGraphDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     geometry->vertexDataAsPoint2D()[1].set(translateX(x2), translateY(y2));
 
     QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
-    material->setColor(static_cast<QRgb>(currentPen.GetColour()));
+    material->setColor(GetRgbFromPen(currentPen));
 
     QSGGeometryNode *node = new QSGGeometryNode;
     node->setGeometry(geometry);
@@ -272,7 +326,7 @@ void SceneGraphDeviceContext::DrawPolygon(int n, vrv::Point points[], int xoffse
     geometry->setDrawingMode(QSGGeometry::DrawTriangleStrip);
 
     QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
-    material->setColor(static_cast<QRgb>(currentPen.GetColour()));
+    material->setColor(GetRgbFromPen(currentPen));
 
     // Reorder points so that they can be drawn with DrawTriangleStrip.
     int counter1 = 0;
@@ -302,9 +356,8 @@ void SceneGraphDeviceContext::DrawPolygon(int n, vrv::Point points[], int xoffse
 void SceneGraphDeviceContext::DrawRectangle(int x, int y, int width, int height)
 {
     vrv::Pen currentPen = m_penStack.top();
-
     QSGSimpleRectNode *node = new QSGSimpleRectNode;
-    node->setColor(static_cast<QRgb>(currentPen.GetColour()));
+    node->setColor(GetRgbFromPen(currentPen));
     qreal rectX = static_cast<qreal>(translateX(x));
     qreal rectY = static_cast<qreal>(translateY(y));
     qreal rectWidth = static_cast<qreal>(translate(width));
@@ -318,9 +371,9 @@ void SceneGraphDeviceContext::DrawRotatedText(const std::string &, int, int, dou
     // This function is also not implemented for SvgDeviceContext
 }
 
-void SceneGraphDeviceContext::DrawRoundedRectangle(int, int, int, int, double)
+void SceneGraphDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
-    qWarning() << "Warning:" << __FUNCTION__ << "not supported";
+    DrawRectangle(x, y, width, height);
 }
 
 void SceneGraphDeviceContext::StartText(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment)
@@ -341,7 +394,14 @@ void SceneGraphDeviceContext::DrawText(const std::string &text, const std::wstri
         qWarning() << "Warning:" << __FUNCTION__ << "does not yet support specifying x and y";
     }
 
-    QFont font(QString::fromStdString(m_fontStack.top()->GetFaceName()));
+    // Verovio uses "Times" for layout calculation, thus we use it as our default. Note: Some texts (e.g. lyrics) don't
+    // have a face-name.
+    QString fontName = QString::fromStdString(m_fontStack.top()->GetFaceName());
+    if (fontName.isEmpty()) {
+        fontName = "Times";
+    }
+
+    QFont font(fontName);
 
     // Note: Verovio calls it point size but it is actually pixel size. Qt can only handle pixel size in int, thus it
     // would be better to use point size.
@@ -402,6 +462,11 @@ void SceneGraphDeviceContext::MoveTextTo(int x, int y, vrv::data_HORIZONTALALIGN
     }
 }
 
+void SceneGraphDeviceContext::MoveTextVerticallyTo(int y)
+{
+    MoveTextTo(0, y, vrv::HORIZONTALALIGNMENT_NONE);
+}
+
 void SceneGraphDeviceContext::SetTextPositionAndAlignment(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment)
 {
     m_currentTextQuickItem->setX(static_cast<double>(translateX(x)));
@@ -454,8 +519,13 @@ void SceneGraphDeviceContext::DrawBackgroundImage(int, int)
     // This function is also not implemented for SvgDeviceContext
 }
 
-void SceneGraphDeviceContext::StartGraphic(vrv::Object *object, std::string, std::string gId)
+void SceneGraphDeviceContext::StartGraphic(
+    vrv::Object *object, std::string gClass, std::string gId, bool primary, bool prepend)
 {
+    if (prepend) {
+        qWarning() << "Warning:" << __FUNCTION__ << " with parameter prepend = true not supported";
+    }
+
     m_activeGraphicObjectsStack.push(ActiveGraphic(QString::fromStdString(gId), object));
 }
 

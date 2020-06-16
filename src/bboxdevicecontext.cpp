@@ -45,7 +45,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
 
 BBoxDeviceContext::~BBoxDeviceContext() {}
 
-void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool prepend)
+void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId, bool primary, bool prepend)
 {
     // add the object object
     object->BoundingBox::ResetBoundingBox();
@@ -213,7 +213,7 @@ void BBoxDeviceContext::DrawRectangle(int x, int y, int width, int height)
     DrawRoundedRectangle(x, y, width, height, 0);
 }
 
-void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, double radius)
+void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
     // avoid negative heights or widths
     if (height < 0) {
@@ -280,8 +280,8 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
 {
     assert(m_fontStack.top());
 
-    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET)
-        && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
+    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
+        && (width != VRV_UNSET) && (height != VRV_UNSET)) {
         m_textX = x;
         m_textY = y;
         m_textWidth = width;
@@ -316,7 +316,6 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
         }
         UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
     }
-
 }
 
 void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)

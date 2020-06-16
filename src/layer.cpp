@@ -135,7 +135,7 @@ void Layer::ResetStaffDefObjects()
     }
 }
 
-void Layer::AddChild(Object *child)
+bool Layer::IsSupportedChild(Object *child)
 {
     if (child->IsLayerElement()) {
         assert(dynamic_cast<LayerElement *>(child));
@@ -144,13 +144,9 @@ void Layer::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 LayerElement *Layer::GetPrevious(LayerElement *element)
@@ -213,7 +209,7 @@ Clef *Layer::GetClefFacs(LayerElement *test)
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
     if (doc->GetType() == Facs) {
-        ArrayOfObjects clefs;
+        ListOfObjects clefs;
         ClassIdComparison ac(CLEF);
         doc->FindAllDescendantBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
         if (clefs.size() > 0) {

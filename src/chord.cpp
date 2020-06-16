@@ -95,7 +95,7 @@ void Chord::ClearClusters() const
     m_clusters.clear();
 }
 
-void Chord::AddChild(Object *child)
+bool Chord::IsSupportedChild(Object *child)
 {
     if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
@@ -116,17 +116,27 @@ void Chord::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
+        return false;
+    }
+    return true;
+}
+
+void Chord::AddChild(Object *child)
+{
+    if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return;
     }
 
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ DOTS, STEM }))
+    if (child->Is({ DOTS, STEM })) {
         m_children.insert(m_children.begin(), child);
-    else
+    }
+    else {
         m_children.push_back(child);
+    }
     Modify();
 }
 
@@ -352,6 +362,22 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
+int Chord::CalcStemLenInThirdUnits(Staff *staff)
+{
+    assert(staff);
+
+    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+        Note *topNote = this->GetTopNote();
+        assert(topNote);
+        return topNote->CalcStemLenInThirdUnits(staff);
+    }
+    else {
+        Note *bottomNote = this->GetBottomNote();
+        assert(bottomNote);
+        return bottomNote->CalcStemLenInThirdUnits(staff);
+    }
+}
+
 bool Chord::IsVisible()
 {
     if (this->HasVisible()) {
@@ -412,9 +438,9 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     assert(!params->m_currentChord);
@@ -430,9 +456,9 @@ int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (params->m_permanent) {
