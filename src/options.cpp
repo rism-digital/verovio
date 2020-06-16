@@ -643,16 +643,18 @@ Options::Options()
     m_useFacsimile.Init(false);
     this->Register(&m_useFacsimile, "useFacsimile", &m_general);
 
-    m_createDefaultSyl.SetInfo("Add default syls to syllables", "Add empty syl elements to syllables if it doesn't have one");
+    m_createDefaultSyl.SetInfo(
+        "Add default syls to syllables", "Add empty syl elements to syllables if it doesn't have one");
     m_createDefaultSyl.Init(false);
     this->Register(&m_createDefaultSyl, "createDefaultSyl", &m_general);
 
     m_createDefaultSylBBox.SetInfo("Make default syl bounding boxes",
-        "When no facsimile data is provided for a syl, make a default element with coordinates similar to that of its syllable");
+        "When no facsimile data is provided for a syl, make a default element with coordinates similar to that of its "
+        "syllable");
     m_createDefaultSylBBox.Init(false);
     this->Register(&m_createDefaultSylBBox, "createDefaultSylBBox", &m_general);
 
-    m_useRotate.SetInfo("Whether to consider rotate values in facsimile mode", 
+    m_useRotate.SetInfo("Whether to consider rotate values in facsimile mode",
         "When zones in the MEI facsimile have a rotate value, take those values into account when rendering");
     m_useRotate.Init(false);
     this->Register(&m_useRotate, "useRotate", &m_general);

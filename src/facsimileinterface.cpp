@@ -49,9 +49,7 @@ int FacsimileInterface::GetDrawingY() const
         y = m_zone->GetLogicalUly();
     }
     else {
-        y = m_zone->GetLogicalUly() -
-            (m_zone->GetLrx() - m_zone->GetUlx()) *
-            tan(m_zone->GetRotate() * M_PI / 180.0);
+        y = m_zone->GetLogicalUly() - (m_zone->GetLrx() - m_zone->GetUlx()) * tan(m_zone->GetRotate() * M_PI / 180.0);
     }
     return y;
 }

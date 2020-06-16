@@ -11,8 +11,8 @@
 #include "devicecontextbase.h"
 #include "scoredef.h"
 #include "smufl.h"
-#include "vrvdef.h"
 #include "textelement.h"
+#include "vrvdef.h"
 
 namespace vrv {
 

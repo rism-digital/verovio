@@ -1819,7 +1819,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             // find the new boundingbox comprising all of the text
             int ulx = -1, uly = -1, lrx = -1, lry = -1;
-            int counter = 0;
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Object *par = dynamic_cast<Object *>(*it);
                 assert(par);

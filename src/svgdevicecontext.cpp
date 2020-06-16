@@ -754,8 +754,8 @@ void SvgDeviceContext::EndText()
     m_currentNode = m_svgNodeStack.back();
 }
 
-//draw text element with optional parameters to specify the bounding box of the text
-//if the bounding box is specified then append a rect child
+// draw text element with optional parameters to specify the bounding box of the text
+// if the bounding box is specified then append a rect child
 void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y, int width, int height)
 {
     assert(m_fontStack.top());
@@ -815,7 +815,6 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         textChild.append_attribute("x") = StringFormat("%d", x).c_str();
         textChild.append_attribute("y") = StringFormat("%d", y).c_str();
     }
-
 }
 
 void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)

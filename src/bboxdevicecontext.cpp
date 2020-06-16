@@ -280,8 +280,8 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
 {
     assert(m_fontStack.top());
 
-    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET)
-        && (width != 0) && (height != 0) && (width != VRV_UNSET) && (height != VRV_UNSET)) {
+    if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
+        && (width != VRV_UNSET) && (height != VRV_UNSET)) {
         m_textX = x;
         m_textY = y;
         m_textWidth = width;
@@ -316,7 +316,6 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
         }
         UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
     }
-
 }
 
 void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)

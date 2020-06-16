@@ -890,8 +890,6 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
     return params.m_element;
 }
 
-
-
 //----------------------------------------------------------------------------
 // ObjectListInterface
 //----------------------------------------------------------------------------
@@ -1649,7 +1647,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         ListOfObjects children;
         a->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
-            if((*it)->Is(SYL)) continue;
+            if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
             if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
@@ -1663,7 +1661,7 @@ bool Object::sortByUlx(Object *a, Object *b)
         ListOfObjects children;
         b->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
-            if((*it)->Is(SYL)) continue;
+            if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
@@ -1774,7 +1772,8 @@ int Object::SetChildZones(FunctorParams *functorParams)
                 zone->SetUly(tempZone->GetUly() + offsetUly);
                 zone->SetLrx(tempZone->GetLrx() + offsetLrx);
                 zone->SetLry(tempZone->GetLry() + offsetLry);
-                Surface *surface = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
+                Surface *surface
+                    = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                 assert(surface);
                 surface->AddChild(zone);
                 fi->SetZone(zone);
@@ -1796,13 +1795,15 @@ int Object::SetChildZones(FunctorParams *functorParams)
                     zone->SetUly(uly + offsetUly);
                     zone->SetLrx(lrx + offsetLrx);
                     zone->SetLry(lry + offsetLry);
-                    Surface *surface = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
+                    Surface *surface
+                        = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                     assert(surface);
                     surface->AddChild(zone);
                     fi->SetZone(zone);
                 }
                 else {
-                    LogWarning("Failed to create zone for %s of type %s", this->GetUuid().c_str(), this->GetClassName().c_str());
+                    LogWarning("Failed to create zone for %s of type %s", this->GetUuid().c_str(),
+                        this->GetClassName().c_str());
                 }
             }
         }
@@ -1823,7 +1824,7 @@ int Object::FindNextChildByComparison(FunctorParams *functorparams)
     }
 
     else if (params->m_start) {
-        //we're not yet in the range
+        // we're not yet in the range
         return FUNCTOR_CONTINUE;
     }
 

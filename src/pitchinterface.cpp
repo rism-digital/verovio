@@ -14,12 +14,12 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "clef.h"
 #include "custos.h"
 #include "layer.h"
 #include "note.h"
 #include "rest.h"
 #include "vrv.h"
-#include "clef.h"
 
 namespace vrv {
 

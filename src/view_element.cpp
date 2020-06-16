@@ -778,7 +778,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (staff->GetDrawingRotate() != 0) {
         double deg = staff->GetDrawingRotate();
         int xDiff = x - staff->GetDrawingX();
-        rotateOffset =  int(xDiff * tan(deg * M_PI / 180.0));
+        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
     }
     else {
         rotateOffset = 0;

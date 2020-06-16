@@ -502,8 +502,10 @@ public:
     /**
      * Sort the child elements using std::stable_sort
      */
-    template <class Compare>
-    void StableSort(Compare comp) { std::stable_sort(m_children.begin(), m_children.end(), comp); }
+    template <class Compare> void StableSort(Compare comp)
+    {
+        std::stable_sort(m_children.begin(), m_children.end(), comp);
+    }
 
     virtual void ReorderByXPos();
 

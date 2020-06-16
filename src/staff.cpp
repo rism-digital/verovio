@@ -191,10 +191,9 @@ void Staff::AdjustDrawingStaffSize()
         if (doc->GetType() == Facs) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
-            int yDiff = zone->GetLry() - zone->GetUly() -
-                (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
-            this->m_drawingStaffSize = 100 * yDiff /
-                (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+            int yDiff
+                = zone->GetLry() - zone->GetUly() - (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
+            this->m_drawingStaffSize = 100 * yDiff / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
         }
     }
 }
@@ -256,7 +255,7 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
 
 void Staff::SetFromFacsimile(Doc *doc)
 {
-    if(!this->HasFacs()) return;
+    if (!this->HasFacs()) return;
     if (this->GetZone() == NULL) {
         assert(doc);
         Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
