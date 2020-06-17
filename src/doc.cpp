@@ -86,12 +86,21 @@ void Doc::Reset()
 
     m_type = Raw;
     m_notationType = NOTATIONTYPE_NONE;
-    m_pageWidth = -1;
     m_pageHeight = -1;
+    m_pageWidth = -1;
     m_pageMarginBottom = 0;
     m_pageMarginRight = 0;
     m_pageMarginLeft = 0;
     m_pageMarginTop = 0;
+
+    m_drawingPageHeight = -1;
+    m_drawingPageWidth = -1;
+    m_drawingPageContentHeight = -1;
+    m_drawingPageContentWidth = -1;
+    m_drawingPageMarginBottom = 0;
+    m_drawingPageMarginRight = 0;
+    m_drawingPageMarginLeft = 0;
+    m_drawingPageMarginTop = 0;
 
     m_drawingPage = NULL;
     m_currentScoreDefDone = false;
@@ -812,8 +821,8 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     }
     else {
         CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
-        castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
-            - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+        castOffSystemsParams.m_systemWidth
+            = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
         castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
         castOffSystemsParams.m_currentScoreDefWidth
             = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
@@ -842,7 +851,7 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     Page *currentPage = new Page();
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
-    castOffPagesParams.m_pageHeight = this->m_drawingPageHeight - this->m_drawingPageMarginBot;
+    castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
     Functor castOffPages(&Object::CastOffPages);
     pages->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);
@@ -1611,7 +1620,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     if (m_drawingPage->m_pageHeight != -1) {
         m_drawingPageHeight = m_drawingPage->m_pageHeight;
         m_drawingPageWidth = m_drawingPage->m_pageWidth;
-        m_drawingPageMarginBot = m_drawingPage->m_pageMarginBottom;
+        m_drawingPageMarginBottom = m_drawingPage->m_pageMarginBottom;
         m_drawingPageMarginLeft = m_drawingPage->m_pageMarginLeft;
         m_drawingPageMarginRight = m_drawingPage->m_pageMarginRight;
         m_drawingPageMarginTop = m_drawingPage->m_pageMarginTop;
@@ -1619,7 +1628,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     else if (this->m_pageHeight != -1) {
         m_drawingPageHeight = this->m_pageHeight;
         m_drawingPageWidth = this->m_pageWidth;
-        m_drawingPageMarginBot = this->m_pageMarginBottom;
+        m_drawingPageMarginBottom = this->m_pageMarginBottom;
         m_drawingPageMarginLeft = this->m_pageMarginLeft;
         m_drawingPageMarginRight = this->m_pageMarginRight;
         m_drawingPageMarginTop = this->m_pageMarginTop;
@@ -1627,7 +1636,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     else {
         m_drawingPageHeight = m_options->m_pageHeight.GetValue();
         m_drawingPageWidth = m_options->m_pageWidth.GetValue();
-        m_drawingPageMarginBot = m_options->m_pageMarginBottom.GetValue();
+        m_drawingPageMarginBottom = m_options->m_pageMarginBottom.GetValue();
         m_drawingPageMarginLeft = m_options->m_pageMarginLeft.GetValue();
         m_drawingPageMarginRight = m_options->m_pageMarginRight.GetValue();
         m_drawingPageMarginTop = m_options->m_pageMarginTop.GetValue();
@@ -1641,6 +1650,9 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageMarginLeft = m_drawingPageMarginRight;
         m_drawingPageMarginRight = pageMarginRight;
     }
+
+    m_drawingPageContentHeight = m_drawingPageHeight - m_drawingPageMarginTop - m_drawingPageMarginBottom;
+    m_drawingPageContentWidth = m_drawingPageWidth - m_drawingPageMarginLeft - m_drawingPageMarginRight;
 
     // From here we could check if values have changed
     // Since  m_options->m_interlDefin stays the same, it's useless to do it
@@ -1678,19 +1690,21 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
         return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+    }
 
     int contentHeight = m_drawingPage->GetContentHeight();
-    return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
+    return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBottom) / DEFINITION_FACTOR;
 }
 
 int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
         return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+    }
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;

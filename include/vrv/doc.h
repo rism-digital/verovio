@@ -425,8 +425,12 @@ public:
     int m_drawingPageHeight;
     /** The current page width */
     int m_drawingPageWidth;
+    /** The current page content height (without margings) */
+    int m_drawingPageContentHeight;
+    /** The current page content width (without margins) */
+    int m_drawingPageContentWidth;
     /** The current page bottom margin */
-    int m_drawingPageMarginBot;
+    int m_drawingPageMarginBottom;
     /** The current page left margin */
     int m_drawingPageMarginLeft;
     /** The current page right margin */
