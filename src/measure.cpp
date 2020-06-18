@@ -205,10 +205,15 @@ int Measure::GetDrawingX() const
     return m_cachedDrawingX;
 }
 
+void Measure::ResetCachedDrawingX() const
+{
+    Object::ResetCachedDrawingX();
+    m_timestampAligner.ResetCachedDrawingX();
+}
+
 void Measure::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
-    m_timestampAligner.ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 

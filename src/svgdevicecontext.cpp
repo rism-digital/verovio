@@ -374,7 +374,7 @@ void SvgDeviceContext::StartPage()
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.append_child(pugi::node_pcdata)
             .set_value("g.page-margin{font-family:Times;} "
-                       "g.page-margin{background: pink;} "
+                       //"g.page-margin{background: pink;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
                        "g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
@@ -402,10 +402,11 @@ void SvgDeviceContext::StartPage()
     m_currentNode.append_attribute("transform")
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
 
-    pugi::xml_node rect = m_currentNode.append_child("rect");
-    rect.append_attribute("fill") = "pink";
-    rect.append_attribute("height") = StringFormat("%d", GetHeight() * DEFINITION_FACTOR - 2 * m_originY).c_str();
-    rect.append_attribute("width") = StringFormat("%d", GetWidth() * DEFINITION_FACTOR - 2 * m_originX).c_str();
+    // margin rectangle for debugging
+    //pugi::xml_node rect = m_currentNode.append_child("rect");
+    //rect.append_attribute("fill") = "pink";
+    //rect.append_attribute("height") = StringFormat("%d", GetHeight() * DEFINITION_FACTOR - 2 * m_originY).c_str();
+    //rect.append_attribute("width") = StringFormat("%d", GetWidth() * DEFINITION_FACTOR - 2 * m_originX).c_str();
 
     m_pageNode = m_currentNode;
 }

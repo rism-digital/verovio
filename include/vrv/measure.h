@@ -86,6 +86,11 @@ public:
     virtual int GetDrawingX() const;
 
     /**
+     * Reset the cached values of the drawingX values.
+     */
+    virtual void ResetCachedDrawingX() const;
+
+    /**
      * @name Get and set the X drawing relative positions
      */
     ///@{
