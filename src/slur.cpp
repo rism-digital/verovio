@@ -278,7 +278,6 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
 
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
-    int leftShift, rightShift;
 
     int dist = abs(p2.x - p1.x);
     float posXRatio = 1.0;
@@ -319,8 +318,8 @@ void Slur::AdjustSlurPosition(Doc *doc, FloatingCurvePositioner *curve,
 
         // intersection += doc->GetDrawingUnit(100);
         if (intersection > 0) {
-            leftShift = (forceBothSides || leftPoint) ? intersection : intersection * posXRatio;
-            rightShift = (forceBothSides || !leftPoint) ? intersection : intersection * posXRatio;
+            int leftShift = (forceBothSides || leftPoint) ? intersection : intersection * posXRatio;
+            int rightShift = (forceBothSides || !leftPoint) ? intersection : intersection * posXRatio;
             // Keep the maximum shift on the left and right
             maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
             maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
