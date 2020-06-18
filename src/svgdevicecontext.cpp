@@ -403,10 +403,10 @@ void SvgDeviceContext::StartPage()
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
 
     // margin rectangle for debugging
-    //pugi::xml_node rect = m_currentNode.append_child("rect");
-    //rect.append_attribute("fill") = "pink";
-    //rect.append_attribute("height") = StringFormat("%d", GetHeight() * DEFINITION_FACTOR - 2 * m_originY).c_str();
-    //rect.append_attribute("width") = StringFormat("%d", GetWidth() * DEFINITION_FACTOR - 2 * m_originX).c_str();
+    // pugi::xml_node rect = m_currentNode.append_child("rect");
+    // rect.append_attribute("fill") = "pink";
+    // rect.append_attribute("height") = StringFormat("%d", GetHeight() * DEFINITION_FACTOR - 2 * m_originY).c_str();
+    // rect.append_attribute("width") = StringFormat("%d", GetWidth() * DEFINITION_FACTOR - 2 * m_originX).c_str();
 
     m_pageNode = m_currentNode;
 }

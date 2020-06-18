@@ -1988,6 +1988,7 @@ void MEIOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface
     interface->WriteBeamSecondary(element);
     interface->WriteDurationGestural(element);
     interface->WriteDurationLogical(element);
+    interface->WriteDurationQuality(element);
     interface->WriteDurationRatio(element);
     interface->WriteFermataPresent(element);
     interface->WriteStaffIdent(element);
@@ -5290,6 +5291,7 @@ bool MEIInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     interface->ReadBeamSecondary(element);
     interface->ReadDurationGestural(element);
     interface->ReadDurationLogical(element);
+    interface->ReadDurationQuality(element);
     interface->ReadDurationRatio(element);
     interface->ReadFermataPresent(element);
     interface->ReadStaffIdent(element);
