@@ -248,10 +248,10 @@ public:
 
     /**
      * Casts off the entire document, with options for obeying breaks.
-     * @param useSectionBreaks - true to use the section breaks from the document.
+     * @param useSystemBreaks - true to use the system breaks from the document.
      * @param usePageBreaks - true to use the page breaks from the document.
      */
-    void CastOffDocBase(bool useSectionBreaks, bool usePageBreaks);
+    void CastOffDocBase(bool useSystemBreaks, bool usePageBreaks);
 
     /**
      * Casts off the running elements (headers and footer)
