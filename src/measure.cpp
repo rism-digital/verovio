@@ -274,9 +274,9 @@ int Measure::GetWidth() const
     if (!this->IsMeasuredMusic()) {
         System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
-        Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
-        assert(page);
         if (system->m_yAbs != VRV_UNSET) {
+            Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
+            assert(page);
             // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
             return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
         }
