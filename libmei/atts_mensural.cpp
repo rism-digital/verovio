@@ -240,6 +240,112 @@ bool AttLigatureLog::HasForm() const
 /* include <attform> */
 
 //----------------------------------------------------------------------------
+// AttMensuralLog
+//----------------------------------------------------------------------------
+
+AttMensuralLog::AttMensuralLog() : Att()
+{
+    ResetMensuralLog();
+}
+
+AttMensuralLog::~AttMensuralLog()
+{
+}
+
+void AttMensuralLog::ResetMensuralLog()
+{
+    m_mensurDot = BOOLEAN_NONE;
+    m_mensurSign = MENSURATIONSIGN_NONE;
+    m_mensurSlash = 0;
+    m_proportNum = -1;
+    m_proportNumbase = -1;
+}
+
+bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("mensur.dot")) {
+        this->SetMensurDot(StrToBoolean(element.attribute("mensur.dot").value()));
+        element.remove_attribute("mensur.dot");
+        hasAttribute = true;
+    }
+    if (element.attribute("mensur.sign")) {
+        this->SetMensurSign(StrToMensurationsign(element.attribute("mensur.sign").value()));
+        element.remove_attribute("mensur.sign");
+        hasAttribute = true;
+    }
+    if (element.attribute("mensur.slash")) {
+        this->SetMensurSlash(StrToInt(element.attribute("mensur.slash").value()));
+        element.remove_attribute("mensur.slash");
+        hasAttribute = true;
+    }
+    if (element.attribute("proport.num")) {
+        this->SetProportNum(StrToInt(element.attribute("proport.num").value()));
+        element.remove_attribute("proport.num");
+        hasAttribute = true;
+    }
+    if (element.attribute("proport.numbase")) {
+        this->SetProportNumbase(StrToInt(element.attribute("proport.numbase").value()));
+        element.remove_attribute("proport.numbase");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMensuralLog::WriteMensuralLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasMensurDot()) {
+        element.append_attribute("mensur.dot") = BooleanToStr(this->GetMensurDot()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMensurSign()) {
+        element.append_attribute("mensur.sign") = MensurationsignToStr(this->GetMensurSign()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMensurSlash()) {
+        element.append_attribute("mensur.slash") = IntToStr(this->GetMensurSlash()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasProportNum()) {
+        element.append_attribute("proport.num") = IntToStr(this->GetProportNum()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasProportNumbase()) {
+        element.append_attribute("proport.numbase") = IntToStr(this->GetProportNumbase()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMensuralLog::HasMensurDot() const
+{
+    return (m_mensurDot != BOOLEAN_NONE);
+}
+
+bool AttMensuralLog::HasMensurSign() const
+{
+    return (m_mensurSign != MENSURATIONSIGN_NONE);
+}
+
+bool AttMensuralLog::HasMensurSlash() const
+{
+    return (m_mensurSlash != 0);
+}
+
+bool AttMensuralLog::HasProportNum() const
+{
+    return (m_proportNum != -1);
+}
+
+bool AttMensuralLog::HasProportNumbase() const
+{
+    return (m_proportNumbase != -1);
+}
+
+/* include <attproport.numbase> */
+
+//----------------------------------------------------------------------------
 // AttMensuralShared
 //----------------------------------------------------------------------------
 
@@ -529,6 +635,30 @@ bool Att::SetMensural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
+    if (element->HasAttClass(ATT_MENSURALLOG)) {
+        AttMensuralLog *att = dynamic_cast<AttMensuralLog *>(element);
+        assert(att);
+        if (attrType == "mensur.dot") {
+            att->SetMensurDot(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "mensur.sign") {
+            att->SetMensurSign(att->StrToMensurationsign(attrValue));
+            return true;
+        }
+        if (attrType == "mensur.slash") {
+            att->SetMensurSlash(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "proport.num") {
+            att->SetProportNum(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "proport.numbase") {
+            att->SetProportNumbase(att->StrToInt(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_MENSURALSHARED)) {
         AttMensuralShared *att = dynamic_cast<AttMensuralShared *>(element);
         assert(att);
@@ -617,6 +747,25 @@ void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->LigatureformToStr(att->GetForm())));
+        }
+    }
+    if (element->HasAttClass(ATT_MENSURALLOG)) {
+        const AttMensuralLog *att = dynamic_cast<const AttMensuralLog *>(element);
+        assert(att);
+        if (att->HasMensurDot()) {
+            attributes->push_back(std::make_pair("mensur.dot", att->BooleanToStr(att->GetMensurDot())));
+        }
+        if (att->HasMensurSign()) {
+            attributes->push_back(std::make_pair("mensur.sign", att->MensurationsignToStr(att->GetMensurSign())));
+        }
+        if (att->HasMensurSlash()) {
+            attributes->push_back(std::make_pair("mensur.slash", att->IntToStr(att->GetMensurSlash())));
+        }
+        if (att->HasProportNum()) {
+            attributes->push_back(std::make_pair("proport.num", att->IntToStr(att->GetProportNum())));
+        }
+        if (att->HasProportNumbase()) {
+            attributes->push_back(std::make_pair("proport.numbase", att->IntToStr(att->GetProportNumbase())));
         }
     }
     if (element->HasAttClass(ATT_MENSURALSHARED)) {

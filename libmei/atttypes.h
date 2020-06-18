@@ -1979,6 +1979,16 @@ enum mensurVis_FORM {
 };
 
 /**
+ * MEI att.mensural.vis@mensur.form
+ */
+enum mensuralVis_MENSURFORM {
+    mensuralVis_MENSURFORM_NONE = 0,
+    mensuralVis_MENSURFORM_horizontal,
+    mensuralVis_MENSURFORM_vertical,
+    mensuralVis_MENSURFORM_MAX
+};
+
+/**
  * MEI att.meterConformance@metcon
  */
 enum meterConformance_METCON {

@@ -1635,7 +1635,6 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     assert(mensur);
 
     if (mensur->IsAttribute()) {
-        /** Temporarily disabling attributes - discussion is still open
         AttMensuralLog mensuralLog;
         mensuralLog.SetMensurDot(mensur->GetDot());
         mensuralLog.SetProportNum(mensur->GetNum());
@@ -1643,19 +1642,16 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
         mensuralLog.SetMensurSign(mensur->GetSign());
         mensuralLog.SetMensurSlash(mensur->GetSlash());
         mensuralLog.WriteMensuralLog(currentNode);
-        */
         AttMensuralShared mensuralShared;
         mensuralShared.SetModusmaior(mensur->GetModusmaior());
         mensuralShared.SetModusminor(mensur->GetModusminor());
         mensuralShared.SetProlatio(mensur->GetProlatio());
         mensuralShared.SetTempus(mensur->GetTempus());
         mensuralShared.WriteMensuralShared(currentNode);
-        /** Temporarily disabling attributes - discussion is still open
         AttMensuralVis mensuralVis;
         mensuralVis.SetMensurColor(mensur->GetColor());
         mensuralVis.SetMensurOrient(mensur->GetOrient());
         mensuralVis.WriteMensuralVis(currentNode);
-        */
         return;
     }
 
@@ -3404,7 +3400,6 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         object->AddChild(vrvKeySig);
     }
 
-    /**  Temporarily disabling attributes - discussion is still open
     AttMensuralLog mensuralLog;
     mensuralLog.ReadMensuralLog(element);
     AttMensuralShared mensuralShared;
@@ -3431,7 +3426,6 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
         object->AddChild(vrvMensur);
     }
-    */
 
     AttMeterSigDefaultLog meterSigDefaultLog;
     meterSigDefaultLog.ReadMeterSigDefaultLog(element);

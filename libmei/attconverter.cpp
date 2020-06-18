@@ -4276,6 +4276,29 @@ mensurVis_FORM AttConverter::StrToMensurVisForm(const std::string &value, bool l
     return mensurVis_FORM_NONE;
 }
 
+std::string AttConverter::MensuralVisMensurformToStr(mensuralVis_MENSURFORM data) const
+{
+    std::string value;
+    switch (data) {
+        case mensuralVis_MENSURFORM_horizontal: value = "horizontal"; break;
+        case mensuralVis_MENSURFORM_vertical: value = "vertical"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.mensural.vis@mensur.form", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+mensuralVis_MENSURFORM AttConverter::StrToMensuralVisMensurform(const std::string &value, bool logWarning) const
+{
+    if (value == "horizontal") return mensuralVis_MENSURFORM_horizontal;
+    if (value == "vertical") return mensuralVis_MENSURFORM_vertical;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.mensural.vis@mensur.form", value.c_str());
+    return mensuralVis_MENSURFORM_NONE;
+}
+
 std::string AttConverter::MeterConformanceMetconToStr(meterConformance_METCON data) const
 {
     std::string value;

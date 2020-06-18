@@ -359,6 +359,9 @@ public:
     std::string MensurVisFormToStr(mensurVis_FORM data) const;
     mensurVis_FORM StrToMensurVisForm(const std::string &value, bool logWarning = true) const;
 
+    std::string MensuralVisMensurformToStr(mensuralVis_MENSURFORM data) const;
+    mensuralVis_MENSURFORM StrToMensuralVisMensurform(const std::string &value, bool logWarning = true) const;
+
     std::string MeterConformanceMetconToStr(meterConformance_METCON data) const;
     meterConformance_METCON StrToMeterConformanceMetcon(const std::string &value, bool logWarning = true) const;
 

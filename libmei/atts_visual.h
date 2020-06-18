@@ -884,6 +884,71 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttMensuralVis
+//----------------------------------------------------------------------------
+
+class AttMensuralVis : public Att {
+public:
+    AttMensuralVis();
+    virtual ~AttMensuralVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMensuralVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadMensuralVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMensuralVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMensurColor(std::string mensurColor_) { m_mensurColor = mensurColor_; }
+    std::string GetMensurColor() const { return m_mensurColor; }
+    bool HasMensurColor() const;
+    //
+    void SetMensurForm(mensuralVis_MENSURFORM mensurForm_) { m_mensurForm = mensurForm_; }
+    mensuralVis_MENSURFORM GetMensurForm() const { return m_mensurForm; }
+    bool HasMensurForm() const;
+    //
+    void SetMensurLoc(int mensurLoc_) { m_mensurLoc = mensurLoc_; }
+    int GetMensurLoc() const { return m_mensurLoc; }
+    bool HasMensurLoc() const;
+    //
+    void SetMensurOrient(data_ORIENTATION mensurOrient_) { m_mensurOrient = mensurOrient_; }
+    data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; }
+    bool HasMensurOrient() const;
+    //
+    void SetMensurSize(data_FONTSIZE mensurSize_) { m_mensurSize = mensurSize_; }
+    data_FONTSIZE GetMensurSize() const { return m_mensurSize; }
+    bool HasMensurSize() const;
+    /** Getter for reference (for alternate type only) */
+    data_FONTSIZE *GetMensurSizeAlternate() { return &m_mensurSize; }
+    ///@}
+
+private:
+    /**
+     * Records the color of the mensuration sign.
+     * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
+     **/
+    std::string m_mensurColor;
+    /** Indicates whether the base symbol is written vertically or horizontally. **/
+    mensuralVis_MENSURFORM m_mensurForm;
+    /** Holds the staff location of the mensuration sign. **/
+    int m_mensurLoc;
+    /** Describes the rotation or reflection of the base symbol. **/
+    data_ORIENTATION m_mensurOrient;
+    /** Describes the relative size of the mensuration sign. **/
+    data_FONTSIZE m_mensurSize;
+
+    /* include <attmensur.size> */
+};
+
+//----------------------------------------------------------------------------
 // AttMeterSigVis
 //----------------------------------------------------------------------------
 

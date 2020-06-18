@@ -174,6 +174,77 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttMensuralLog
+//----------------------------------------------------------------------------
+
+class AttMensuralLog : public Att {
+public:
+    AttMensuralLog();
+    virtual ~AttMensuralLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMensuralLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadMensuralLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMensuralLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMensurDot(data_BOOLEAN mensurDot_) { m_mensurDot = mensurDot_; }
+    data_BOOLEAN GetMensurDot() const { return m_mensurDot; }
+    bool HasMensurDot() const;
+    //
+    void SetMensurSign(data_MENSURATIONSIGN mensurSign_) { m_mensurSign = mensurSign_; }
+    data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; }
+    bool HasMensurSign() const;
+    //
+    void SetMensurSlash(int mensurSlash_) { m_mensurSlash = mensurSlash_; }
+    int GetMensurSlash() const { return m_mensurSlash; }
+    bool HasMensurSlash() const;
+    //
+    void SetProportNum(int proportNum_) { m_proportNum = proportNum_; }
+    int GetProportNum() const { return m_proportNum; }
+    bool HasProportNum() const;
+    //
+    void SetProportNumbase(int proportNumbase_) { m_proportNumbase = proportNumbase_; }
+    int GetProportNumbase() const { return m_proportNumbase; }
+    bool HasProportNumbase() const;
+    ///@}
+
+private:
+    /** Determines if a dot is to be added to the base symbol. **/
+    data_BOOLEAN m_mensurDot;
+    /** The base symbol in the mensuration sign/time signature of mensural notation. **/
+    data_MENSURATIONSIGN m_mensurSign;
+    /**
+     * Indicates the number lines added to the mensuration sign.
+     * For example, one slash is added for what we now call 'alla breve'.
+     **/
+    int m_mensurSlash;
+    /**
+     * Together, proport.num and proport.numbase specify a proportional change as a
+     * ratio, e.g., 1:3.
+     * Proport.num is for the first value in the ratio.
+     **/
+    int m_proportNum;
+    /**
+     * Together, proport.num and proport.numbase specify a proportional change as a
+     * ratio, e.g., 1:3.
+     * Proport.numbase is for the second value in the ratio.
+     **/
+    int m_proportNumbase;
+
+    /* include <attproport.numbase> */
+};
+
+//----------------------------------------------------------------------------
 // AttMensuralShared
 //----------------------------------------------------------------------------
 
