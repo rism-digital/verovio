@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue 31 Mar 2020 06:13:36 AM UTC
+// Last Modified: Fri 19 Jun 2020 01:07:24 PM PDT
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -362,6 +362,223 @@ std::ostream& operator<<(std::ostream& out, const HumNum& number);
 
 template <typename A>
 std::ostream& operator<<(std::ostream& out, const std::vector<A>& v);
+
+
+
+#define INVALID_INTERVAL_CLASS -123456789
+
+// Diatonic pitch class integers:
+// These could be converted into an enum provided
+// that the same value are assigned to each class.
+#define dpc_rest -1 /* Any negative value should be treated as a rest */
+#define dpc_C 0 /* Integer for Diatonic pitch class for C */
+#define dpc_D 1
+#define dpc_E 2
+#define dpc_F 3
+#define dpc_G 4
+#define dpc_A 5
+#define dpc_B 6
+
+
+////////////////////////////////////////////////////////////////////////////
+//
+// The HumPitch class is an interface for storing information about notes that will
+// be used in the HumTransposer class.  The diatonic pitch class, chromatic alteration
+// of the diatonic pitch and the octave are store in the class.  Names given to the
+// parameters are analogous to MEI note attributes.  Note that note@accid can be also
+// note/accid in MEI data, and other complications that need to be resolved into
+// storing the correct pitch information in HumPitch.
+//
+
+class HumPitch {
+
+	public:
+
+		            HumPitch              (void)   {};
+		            HumPitch              (int aDiatonic, int anAccid, int anOct);
+		            HumPitch              (const HumPitch &pitch);
+		            HumPitch &operator=   (const HumPitch &pitch);
+		bool        isValid               (int maxAccid);
+		void        setPitch              (int aDiatonic, int anAccid, int anOct);
+
+		bool        isRest                (void) const;
+		void        makeRest              (void);
+
+		int         getOctave             (void) const;
+		int         getAccid              (void) const;
+		int         getDiatonicPitchClass (void) const;
+		int         getDiatonicPC         (void) const;
+
+		void        setOctave             (int anOct);
+		void        setAccid              (int anAccid);
+		void        makeSharp             (void);
+		void        makeFlat              (void);
+		void        makeNatural           (void);
+		void        setDiatonicPitchClass (int aDiatonicPC);
+		void        setDiatonicPC         (int aDiatonicPC);
+
+
+		// conversions in/out of various representations:
+		std::string getKernPitch          (void) const;
+		bool        setKernPitch          (const std::string& kern);
+		std::string getScientificPitch    (void) const;
+		bool        setScientificPitch    (const std::string& pitch);
+
+	protected:
+
+		// diatonic pitch class name of pitch: C = 0, D = 1, ... B = 6.
+		int m_diatonicpc;
+
+		// chromatic alteration of pitch: 0 = natural, 1 = sharp, -2 = flat, +2 = double sharp
+		int m_accid;
+
+		// octave number of pitch: 4 = middle-C octave
+		int m_oct;
+
+		// used to convert to other formats:
+		static const std::vector<char> m_diatonicPC2letterLC;
+		static const std::vector<char> m_diatonicPC2letterUC;
+
+};
+
+std::ostream &operator<<(std::ostream &out, const HumPitch &pitch);
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+//
+// The HumTransposer class is an interface for transposing notes represented in the
+// HumPitch class format.
+//
+
+class HumTransposer {
+
+	public:
+		             HumTransposer       (void);
+		            ~HumTransposer       (void);
+
+		// Set the interval class for an octave (default is 40, +/- two sharps/flats).
+		void         setMaxAccid         (int maxAccid);
+		int          getMaxAccid         (void);
+		void         setBase40           (void);
+		void         setBase600          (void);
+		int          getBase             (void);
+
+		// Set the transposition amount for use with Transpose(void) functions.  These functions
+		// need to be rerun after SetMaxAccid(void) or SetBase*(void) are called; otherwise, the
+		// transposition will be 0/P1/unison.
+		bool         setTransposition    (int transVal);
+		bool         setTransposition    (const std::string &transString);
+		bool         setTransposition    (const HumPitch &fromPitch, const std::string &toString);
+		bool         setTransposition    (int keyFifths, int semitones);
+		bool         setTransposition    (int keyFifths, const std::string &semitones);
+		bool         setTranspositionDC  (int diatonic, int chromatic);
+
+		// Accessor functions for retrieving stored transposition interval.
+		int         getTranspositionIntervalClass  (void);
+		std::string getTranspositionIntervalName   (void);
+
+		// Transpostion based on stored transposition interval.
+		void        transpose            (HumPitch &pitch);
+		int         transpose            (int iPitch);
+
+		// Transpose based on second input parameter (not with stored transposition interval).
+		void        transpose            (HumPitch &pitch, int transVal);
+		void        transpose            (HumPitch &pitch, const std::string &transString);
+
+		// Convert between integer intervals and interval name strings:
+		std::string getIntervalName      (const HumPitch &p1, const HumPitch &p2);
+		std::string getIntervalName      (int intervalClass);
+		int         getInterval          (const std::string &intervalName);
+
+		// Convert between HumPitch class and integer pitch and interval representations.
+		int humHumPitchToIntegerPitch    (const HumPitch &pitch);
+		HumPitch integerPitchToHumPitch  (int ipitch);
+		int         getInterval          (const HumPitch &p1, const HumPitch &p2);
+
+		// Convert between Semitones and integer interval representation.
+		std::string semitonesToIntervalName  (int keyFifths, int semitones);
+		int         semitonesToIntervalClass (int keyFifths, int semitones);
+		int         intervalToSemitones      (int intervalClass);
+		int         intervalToSemitones      (const std::string &intervalName);
+
+		// Circle-of-fifths related functions.
+		int         intervalToCircleOfFifths      (const std::string &transString);
+		int         intervalToCircleOfFifths      (int transval);
+		std::string circleOfFifthsToIntervalName  (int fifths);
+		int         circleOfFifthsToIntervalClass (int fifths);
+
+		// Key-signature related functions.
+		bool       getKeyTonic                     (const std::string &keyTonic,
+		                                            HumPitch &tonic);
+		HumPitch   circleOfFifthsToMajorTonic      (int fifths);
+		HumPitch   circleOfFifthsToMinorTonic      (int fifths);
+		HumPitch   circleOfFifthsToDorianTonic     (int fifths);
+		HumPitch   circleOfFifthsToPhrygianTonic   (int fifths);
+		HumPitch   circleOfFifthsToLydianTonic     (int fifths);
+		HumPitch   circleOfFifthsToMixolydianTonic (int fifths);
+		HumPitch   circleOfFifthsToLocrianTonic    (int fifths);
+
+		// Conversions between diatonic/chromatic system and integer system of intervals.
+		std::string diatonicChromaticToIntervalName(int diatonic, int chromatic);
+		int  diatonicChromaticToIntervalClass (int diatonic, int chromatic);
+		void intervalToDiatonicChromatic      (int &diatonic, int &chromatic, int intervalClass);
+		void intervalToDiatonicChromatic      (int &diatonic, int &chromatic,
+		                                       const std::string &intervalName);
+
+		// Convenience functions for calculating common interval classes.  Augmented classes
+		// can be calculated by adding 1 to perfect/major classes, and diminished classes can be
+		// calcualted by subtracting 1 from perfect/minor classes.
+		int    perfectUnisonClass   (void);
+		int    minorSecondClass     (void);
+		int    majorSecondClass     (void);
+		int    minorThirdClass      (void);
+		int    majorThirdClass      (void);
+		int    perfectFourthClass   (void);
+		int    perfectFifthClass    (void);
+		int    minorSixthClass      (void);
+		int    majorSixthClass      (void);
+		int    minorSeventhClass    (void);
+		int    majorSeventhClass    (void);
+		int    perfectOctaveClass   (void);
+
+		// Convenience functions for acessing m_diatonicMapping.
+		int getCPitchClass(void) { return m_diatonicMapping[0]; }
+		int getDPitchClass(void) { return m_diatonicMapping[1]; }
+		int getEPitchClass(void) { return m_diatonicMapping[2]; }
+		int getFPitchClass(void) { return m_diatonicMapping[3]; }
+		int getGPitchClass(void) { return m_diatonicMapping[4]; }
+		int getAPitchClass(void) { return m_diatonicMapping[5]; }
+		int getBPitchClass(void) { return m_diatonicMapping[6]; }
+
+		// Input string validity helper functions.
+		static bool isValidIntervalName (const std::string &name);
+		static bool isValidKeyTonic     (const std::string &name);
+		static bool isValidSemitones    (const std::string &name);
+
+	protected:
+		// integer representation for perfect octave:
+		int m_base;
+
+		// maximum allowable sharp/flats for transposing:
+		int m_maxAccid;
+
+		// integer interval class for transposing:
+		int m_transpose;
+
+		// pitch integers for each natural diatonic pitch class:
+		std::vector<int> m_diatonicMapping;
+
+		// used to calculate semitones between diatonic pitch classes:
+		static const std::vector<int> m_diatonic2semitone;
+
+	private:
+		void calculateDiatonicMapping(void);
+};
+
 
 
 
@@ -1275,6 +1492,9 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isInstrumentName          (void);
 		bool     isInstrumentAbbreviation  (void);
 
+		std::string getInstrumentName        (void);
+		std::string getInstrumentAbbreviation(void);
+
 		bool     hasSlurStart              (void);
 		bool     hasSlurEnd                (void);
 		int      hasVisibleAccidental      (int subtokenIndex) const;
@@ -1630,6 +1850,7 @@ class HumdrumFileBase : public HumHash {
 		std::string   getXmlIdPrefix           (void);
 		void          setFilename              (const std::string& filename);
 		std::string   getFilename              (void);
+		std::string   getFilenameBase          (void);
 
 		void          setSegmentLevel          (int level = 0);
 		int           getSegmentLevel          (void);
@@ -3465,6 +3686,8 @@ class Convert {
 		static int     kernToBase7          (const std::string& kerndata);
 		static int     kernToBase7          (HTp token)
 				{ return kernToBase7          ((std::string)*token); }
+		static std::string  kernToRecip     (const std::string& kerndata);
+		static std::string  kernToRecip     (HTp token);
 		static int     kernToMidiNoteNumber (const std::string& kerndata);
 		static int     kernToMidiNoteNumber(HTp token)
 				{ return kernToMidiNoteNumber((std::string)*token); }
@@ -5035,6 +5258,41 @@ class Tool_binroll : public HumTool {
 
 	private:
 		HumNum    m_duration;
+
+};
+
+
+class Tool_chantize : public HumTool {
+	public:
+		         Tool_chantize      (void);
+		        ~Tool_chantize      () {};
+
+		bool     run                (HumdrumFileSet& infiles);
+		bool     run                (HumdrumFile& infile);
+		bool     run                (const string& indata, ostream& out);
+		bool     run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize         (HumdrumFile& infile);
+		void     processFile        (HumdrumFile& infile);
+		void     outputFile         (HumdrumFile& infile);
+		void     updateKeySignatures(HumdrumFile& infile, int lineindex);
+		void     checkDataLine      (HumdrumFile& infile, int lineindex);
+		void     clearStates        (void);
+		void     addBibliographicRecords(HumdrumFile& infile);
+		void     deleteBreaks       (HumdrumFile& infile);
+		void     fixEditorialAccidentals(HumdrumFile& infile);
+		void     fixInstrumentAbbreviations(HumdrumFile& infile);
+		void     deleteDummyTranspositions(HumdrumFile& infile);
+		string   getDate            (void);
+		vector<bool> getTerminalRestStates(HumdrumFile& infile);
+		bool     hasDiamondNotes    (HumdrumFile& infile);
+
+	private:
+		vector<vector<int>> m_pstates;
+		vector<vector<int>> m_kstates;
+		vector<vector<bool>> m_estates;
+		bool m_diamondQ = false;
 
 };
 
@@ -7258,6 +7516,37 @@ class Tool_satb2gs : public HumTool {
 		void    printHeaderLine    (HumdrumFile& infile, int line,
 		                            std::vector<std::vector<int>>& tracks);
 		bool    validateHeader     (HumdrumFile& infile);
+
+};
+
+
+class Tool_scordatura : public HumTool {
+	public:
+		         Tool_scordatura   (void);
+		        ~Tool_scordatura   () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		void     getScordaturaRdfs (vector<HTp>& rdfs, HumdrumFile& infile);
+		void     processScordatura (HumdrumFile& infile, HTp reference);
+		void     processScordaturas(HumdrumFile& infile, vector<HTp>& rdfs);
+		void     flipScordaturaInfo(HTp reference, int diatonic, int chromatic);
+		void     transposeStrand   (HTp sstart, HTp sstop, const string& marker);
+		void     transposeChord    (HTp token, const string& marker);
+		std::string transposeNote     (const string& note);
+		void     transposeMarker   (HumdrumFile& infile, const string& marker, int diatonic, int chromatic);
+
+	private:
+		bool          m_writtenQ    = false;
+		bool          m_soundingQ   = false;
+		bool          m_modifiedQ   = false;
+		HumTransposer m_transposer;
 
 };
 

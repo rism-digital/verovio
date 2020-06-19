@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue 31 Mar 2020 06:13:36 AM UTC
+// Last Modified: Fri 19 Jun 2020 01:07:24 PM PDT
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -786,6 +786,47 @@ char Convert::hasKernStemDirection(const string& kerndata) {
 	}
 	return '\0';
 }
+
+
+
+//////////////////////////////
+//
+// Convert::kernToRecip -- Extract only the **recip data from **kern data.
+//
+
+string Convert::kernToRecip(const std::string& kerndata) {
+	string output;
+	output.reserve(kerndata.size());
+	for (int i=0; i<(int)kerndata.size(); i++) {
+		if (kerndata.at(i) == ' ') {
+			// only process the first subtoken
+			break;
+		}
+		switch (kerndata.at(i)) {
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+			case '.':   // augmentation dot
+			case '%':   // rational rhythms
+			case 'q':   // grace note (zero duration)
+				output += kerndata.at(i);
+		}
+	}
+	return output;
+}
+
+
+string Convert::kernToRecip(HTp token) {
+	return Convert::kernToRecip((string)*token);
+}
+
 
 
 
@@ -14611,6 +14652,389 @@ ostream& operator<<(ostream& out, HumParamSet& hps) {
 
 
 
+const std::vector<char> HumPitch::m_diatonicPC2letterLC({ 'c', 'd', 'e', 'f', 'g', 'a', 'b' });
+const std::vector<char> HumPitch::m_diatonicPC2letterUC({ 'C', 'D', 'E', 'F', 'G', 'A', 'B' });
+
+////////////////////////////////////////////////////////////////////////////
+//
+// The HumPitch class is an interface for storing information about notes which
+// will be used in the HumTransposer class.  The diatonic pitch class, chromatic alteration
+// of the diatonic pitch and the octave are store in the class.  Names given to the
+// parameters are analogous to MEI note attributes.  Note that note@accid can be also
+// note/accid in MEI data, and other complications that need to be resolved into
+// storing the correct pitch information in HumPitch.
+//
+
+
+//////////////////////////////
+//
+// HumPitch::HumPitch -- HumPitch constructor.
+//
+
+HumPitch::HumPitch(int aDiatonic, int anAccid, int anOct) {
+	setPitch(aDiatonic, anAccid, anOct);
+}
+
+
+HumPitch::HumPitch(const HumPitch &pitch) {
+	m_diatonicpc = pitch.m_diatonicpc;
+	m_accid = pitch.m_accid;
+	m_oct = pitch.m_oct;
+}
+
+
+
+//////////////////////////////
+//
+// operator= HumPitch -- copy operator for pitches.
+//
+
+HumPitch &HumPitch::operator=(const HumPitch &pitch) {
+	if (this != &pitch) {
+		m_diatonicpc = pitch.m_diatonicpc;
+		m_accid = pitch.m_accid;
+		m_oct = pitch.m_oct;
+	}
+	return *this;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::isValid -- returns true if the absolute value of the accidental
+//     is less than or equal to the max accidental value.
+
+bool HumPitch::isValid(int maxAccid) {
+	return abs(m_accid) <= abs(maxAccid);
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::setPitch -- Set the attributes for a pitch all at once.
+//
+
+void HumPitch::setPitch(int aDiatonic, int anAccid, int anOct) {
+	m_diatonicpc = aDiatonic;
+	m_accid = anAccid;
+	m_oct = anOct;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::isRest -- returns true if a rest, which means that m_diatonicpc is negative.
+//
+
+bool HumPitch::isRest(void) const {
+	return m_diatonicpc < 0 ? true : false;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::makeRest -- 
+//
+
+void HumPitch::makeRest(void) {
+	m_diatonicpc = -1;
+	m_accid = 0;
+	m_oct = 0;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::getOctave -- Middle C is the start of the 4th octave.
+//
+
+int HumPitch::getOctave(void) const {
+	return m_oct;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::getAccid -- +1=sharp, -1=flat, +2=double-sharp, etc.
+//   Maybe expand to a double later for quarter tones, etc.
+//
+
+int HumPitch::getAccid(void) const {
+	return m_accid;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::getDiatonicPitchClass --  Return the diatonic pitch class:
+//   0 = C, 1 = D, 2 = E, 3 = F, 4 = G, 5 = A, 6 = B, -1 = rest.
+//
+
+int HumPitch::getDiatonicPitchClass(void) const {
+	return m_diatonicpc;
+}
+
+
+int HumPitch::getDiatonicPC(void) const {
+	return getDiatonicPitchClass();
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::setOctave -- Set the octave number of the pitch, with 4 meaning
+//   the middle-C octave.
+//
+
+void HumPitch::setOctave(int anOct) {
+	m_oct = anOct;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::setAccid -- +1 = sharp, -1 = flat, +2 = double-sharp.
+//
+void HumPitch::setAccid(int anAccid) {
+	m_accid = anAccid;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::makeSharp -- Set the accidental to +1.
+//
+
+void HumPitch::makeSharp(void) {
+	m_accid = 1;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::makeFlat -- Set the accidental to -1.
+//
+
+void HumPitch::makeFlat(void) {
+	m_accid = -1;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::makeNatural -- Set the accidental to -1.
+//
+
+void HumPitch::makeNatural(void) {
+	m_accid = 0;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::setDiatonicPitchClass --
+//
+
+void HumPitch::setDiatonicPitchClass(int aDiatonicPC) {
+	if (aDiatonicPC < 0) {
+		m_diatonicpc = -1;
+	} else if (aDiatonicPC < 7) {
+		m_diatonicpc = aDiatonicPC;
+	} else if (aDiatonicPC >= 'A' && aDiatonicPC <= 'G') {
+		m_diatonicpc = (aDiatonicPC - 'A' + 5) % 7;
+	} else if (aDiatonicPC >= 'a' && aDiatonicPC <= 'g') {
+		m_diatonicpc = (aDiatonicPC - 'a' + 5) % 7;
+	} else {
+		m_diatonicpc = -1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::setDiatonicPC --
+//
+
+void HumPitch::setDiatonicPC(int aDiatonicPC) {
+	setDiatonicPitchClass(aDiatonicPC);
+}
+
+
+
+//////////////////////////////
+//
+// operator<< HumPitch -- Print pitch data as string for debugging.
+//
+
+ostream &operator<<(ostream &out, const HumPitch &pitch) {
+	switch (pitch.getDiatonicPC()) {
+		case dpc_C: out << "C"; break;
+		case dpc_D: out << "D"; break;
+		case dpc_E: out << "E"; break;
+		case dpc_F: out << "F"; break;
+		case dpc_G: out << "G"; break;
+		case dpc_A: out << "A"; break;
+		case dpc_B: out << "B"; break;
+		default: out << "R";
+	}
+	if (pitch.getAccid() > 0) {
+		for (int i = 0; i < pitch.getAccid(); i++) {
+			out << "#";
+		}
+	} else if (pitch.getAccid() < 0) {
+		for (int i = 0; i < abs(pitch.getAccid()); i++) {
+			out << "b";
+		}
+	}
+	out << pitch.getOctave();
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::getKernPitch -- Return the pitch as a **kern pitch name.
+//
+
+string HumPitch::getKernPitch(void) const {
+	if (m_diatonicpc < 0) {
+		return "r";
+	}
+
+	int count;
+	char diatonic;
+	if (m_oct < 4) {
+		diatonic = m_diatonicPC2letterUC.at(m_diatonicpc);
+		count = 4 - m_oct;
+	} else {
+		count = m_oct - 4 + 1;
+		diatonic = m_diatonicPC2letterLC.at(m_diatonicpc);
+	}
+	string output;
+	output = diatonic;
+	for (int i=1; i<count; i++) {
+		output += diatonic;
+	}
+	if (m_accid != 0) {
+		if (m_accid < 0) {
+			for (int i=0; i<-m_accid; i++) {
+				output += '-';
+			}
+		} else {
+			for (int i=0; i<m_accid; i++) {
+				output += '#';
+			}
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::setKernPitch -- Set the pitch from a **kern pitch name.
+//
+
+bool HumPitch::setKernPitch(const string& kern) {
+	makeRest();
+	HumRegex hre;
+	if (kern.find('r') != string::npos) {
+		// rests can have pitch information, but ignore.
+		return true;
+	}
+	if (!hre.search(kern, "(A+|B+|C+|D+|E+|F+|G+|a+|b+|c+|d+|e+|f+|g+)(-+|#+)?")) {
+		return false;
+	}
+	string letters = hre.getMatch(1);
+	string accidentals = hre.getMatch(2);
+
+	if (!accidentals.empty()) {
+		m_accid = (int)accidentals.size();
+		if (accidentals[0] == '-') {
+			m_accid = -m_accid;
+		}
+	}
+	int lcount = (int)letters.size();
+	m_oct = islower(letters[0]) ? 3 + lcount : 4 - lcount;
+	m_diatonicpc = (tolower(letters[0]) - 'a' + 5) % 7;
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::getScientificPitch -- Returns the **pitch representation of the pitch.
+//    Examples: Eb4, F#3, C-2.
+//    Format:    [A-G](b+|#+)?-?\d+
+//
+
+std::string HumPitch::getScientificPitch(void) const {
+	if (m_diatonicpc < 0) {
+		return "R";
+	}
+	string output;
+	output = m_diatonicPC2letterUC.at(m_diatonicpc);
+	if (m_accid < 0) {
+		for (int i=0; i<-m_accid; i++) {
+			output += 'b';
+		}
+	} else if (m_accid > 0) {
+		for (int i=0; i<m_accid; i++) {
+			output += '#';
+		}
+	}
+	output = to_string(m_oct);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumPitch::setScientificPitch --
+//
+
+bool HumPitch::setScientificPitch(const std::string& pitch) {
+	makeRest();
+
+	HumRegex hre;
+	if (!hre.search(pitch, "([A-Ga-g])(b+|#+)?(-?\\d+)")) {
+		return false;
+	}
+	string diatonic = hre.getMatch(1);
+	string accidental = hre.getMatch(2);
+	m_oct = hre.getMatchInt(3);
+	if (!accidental.empty()) {
+		m_accid = (int)accidental.size();
+		if (accidental[0] == 'f') {
+			m_accid = -m_accid;
+		}
+	}
+	m_diatonicpc = (toupper(diatonic[0]) - 'A' + 5) % 7;
+	return true;
+}
+
+
+
+
+
 //////////////////////////////
 //
 // HumRegex::HumRegex -- Constructor.
@@ -15792,6 +16216,1903 @@ void HumTool::setError(const string& message) {
 
 
 
+
+const std::vector<int> HumTransposer::m_diatonic2semitone({ 0, 2, 4, 5, 7, 9, 11 });
+
+
+//////////////////////////////
+//
+// HumTransposer::HumTransposer -- HumTransposer constructor.
+//
+
+HumTransposer::HumTransposer() {
+	// Initialize with base-600 system by default:
+	setMaxAccid(42);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::~HumTransposer -- HumTransposer deconstructor.
+//
+
+HumTransposer::~HumTransposer() {
+	// do nothing;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::setTransposition -- Set the transposition value which is an
+//   interval class in the current base system.  When HumTransposer::setMaxAccid()
+//   or HumTransposer::setBase*() are called, the transposition value will be set
+//   to 0 (a perfect unison).  The integer is a base-40 class of number.  If you
+//   want to transpose by semitone, do not use this option but rather the
+//   setHumTransposer(int keyFifths, string semitones) function or the
+//   setHumTransposer(int keyFifths, int semitones) function that are defined
+//   further below.
+//
+
+bool HumTransposer::setTransposition(int transVal) {
+	m_transpose = transVal;
+	return true;
+}
+
+// Use a string to set the interval class in the current base system.  For example,
+//  "+M2" means up a major second, which is the integer 6 in base-40.
+
+bool HumTransposer::setTransposition(const string &transString) {
+	m_transpose = getInterval(transString);
+	return m_transpose != INVALID_INTERVAL_CLASS;
+}
+
+// Set transposition interval based on two pitches that represent the source data
+// key tonic and the target key tonic.
+
+bool HumTransposer::setTransposition(const HumPitch &fromPitch, const string &toString) {
+	HumPitch toPitch;
+	if (getKeyTonic(toString, toPitch)) {
+		// Determine proper octave offset.
+		int numSigns = toPitch.getOctave();
+		m_transpose = getInterval(fromPitch, toPitch);
+		// A transposition with n plus or minus signs should never be more than n octaves away.
+		if (numSigns > 0 && m_transpose > perfectOctaveClass() * numSigns) {
+			m_transpose -= perfectOctaveClass();
+		}
+		else if (numSigns < 0 && m_transpose < perfectOctaveClass() * numSigns) {
+			m_transpose += perfectOctaveClass();
+		}
+		// A transposition with 0 plus or minus signs should never be more than 1/2 an octave away.
+		else if (numSigns == 0 && m_transpose > perfectOctaveClass() / 2) {
+			m_transpose -= perfectOctaveClass();
+		}
+		else if (numSigns == 0 && m_transpose < -1 * perfectOctaveClass() / 2) {
+			m_transpose += perfectOctaveClass();
+		}
+		return true;
+	}
+	return false;
+}
+
+// Set the transposition based on the key signature (or inferred key signature coming from
+// the keySig@diatonic/keySig@accid/keySig@mode information) and a string containing the
+// semitone transposition.
+
+bool HumTransposer::setTransposition(int keyFifths, const string &semitones) {
+	if (!isValidSemitones(semitones)) {
+		return false;
+	}
+	int semis = stoi(semitones);
+	return setTransposition(keyFifths, semis);
+}
+
+// Note the order of the variables (key signature information is first in all
+// cases where there are two input parametrs to setTransposition().
+
+bool HumTransposer::setTransposition(int keyFifths, int semitones) {
+	int intervalClass = semitonesToIntervalClass(keyFifths, semitones);
+	return setTransposition(intervalClass);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::setTranspositionDC --
+//
+
+bool HumTransposer::setTranspositionDC(int diatonic, int chromatic) {
+	int interval = HumTransposer::diatonicChromaticToIntervalClass(diatonic, chromatic);
+	return setTransposition(interval);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::semitonesToIntervalClass -- convert semitones plus key
+//     signature information into an integer interval class.
+//
+
+int HumTransposer::semitonesToIntervalClass(int keyFifths, int semitones) {
+	int sign = semitones < 0 ? -1 : +1;
+	semitones = semitones < 0 ? -semitones : semitones;
+	int octave = semitones / 12;
+	semitones = semitones - octave * 12;
+	int sum1, sum2;
+	string interval = "P1";
+	switch (semitones) {
+		case 0: interval = "P1"; break;
+
+		case 1:
+			sum1 = keyFifths - 5 * sign;
+			sum2 = keyFifths + 7 * sign;
+			interval = abs(sum1) < abs(sum2) ? "m2" : "A1";
+			break;
+
+		case 2:
+			sum1 = keyFifths + 2 * sign;
+			sum2 = keyFifths - 10 * sign;
+			interval = abs(sum1) < abs(sum2) ? "M2" : "d3";
+			break;
+
+		case 3:
+			sum1 = keyFifths - 3 * sign;
+			sum2 = keyFifths + 9 * sign;
+			interval = abs(sum1) < abs(sum2) ? "m3" : "A2";
+			break;
+
+		case 4:
+			sum1 = keyFifths + 4 * sign;
+			sum2 = keyFifths - 8 * sign;
+			interval = abs(sum1) < abs(sum2) ? "M3" : "d4";
+			break;
+
+		case 5:
+			sum1 = keyFifths - 1 * sign;
+			sum2 = keyFifths + 11 * sign;
+			interval = abs(sum1) < abs(sum2) ? "P4" : "A3";
+			break;
+
+		case 6:
+			sum1 = keyFifths + 6 * sign;
+			sum2 = keyFifths - 6 * sign;
+			interval = abs(sum1) < abs(sum2) ? "A4" : "d5";
+			break;
+
+		case 7:
+			sum1 = keyFifths + 1 * sign;
+			sum2 = keyFifths - 11 * sign;
+			interval = abs(sum1) < abs(sum2) ? "P5" : "d6";
+			break;
+
+		case 8:
+			sum1 = keyFifths - 4 * sign;
+			sum2 = keyFifths + 8 * sign;
+			interval = abs(sum1) < abs(sum2) ? "m6" : "A5";
+			break;
+
+		case 9:
+			sum1 = keyFifths + 3 * sign;
+			sum2 = keyFifths - 9 * sign;
+			interval = abs(sum1) < abs(sum2) ? "M6" : "d7";
+			break;
+
+		case 10:
+			sum1 = keyFifths - 2 * sign;
+			sum2 = keyFifths + 10 * sign;
+			interval = abs(sum1) < abs(sum2) ? "m7" : "A6";
+			break;
+
+		case 11:
+			sum1 = keyFifths + 5 * sign;
+			sum2 = keyFifths - 7 * sign;
+			interval = abs(sum1) < abs(sum2) ? "M7" : "d8";
+			break;
+	}
+
+	interval = sign < 0 ? "-" + interval : "+" + interval;
+	int intint = getInterval(interval);
+	intint += sign * octave * m_base;
+	return intint;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::semitonesToIntervalName -- convert semitones plus key
+//     signature information into an interval name string.
+//
+
+string HumTransposer::semitonesToIntervalName(int keyFifths, int semitones) {
+	int intervalClass = semitonesToIntervalClass(keyFifths, semitones);
+	return getIntervalName(intervalClass);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::intervalToSemitones --  Convert a base interval class into
+//   semitones.  Multiple enharmonic equivalent interval classes will collapse into
+//   a single semitone value, so the process is not completely reversable
+//   by calling HumTransposer::semitonesToIntervalClass(), but for simple
+//   intervals it will be reversable.
+//
+
+int HumTransposer::intervalToSemitones(int interval) {
+	int sign = interval < 0 ? -1 : +1;
+	interval = interval < 0 ? -interval : interval;
+	int octave = interval / m_base;
+	int intervalClass = interval - octave * m_base;
+	int diatonic = 0;
+	int chromatic = 0;
+	intervalToDiatonicChromatic(diatonic, chromatic, intervalClass);
+	if ((diatonic != INVALID_INTERVAL_CLASS) && (chromatic != INVALID_INTERVAL_CLASS)) {
+		return (m_diatonic2semitone.at(diatonic) + chromatic) * sign + 12 * octave;
+	}
+	else {
+		return INVALID_INTERVAL_CLASS;
+	}
+}
+
+//  Conversion from an interval name string into semitones:
+
+int HumTransposer::intervalToSemitones(const string &intervalName) {
+	int interval = getInterval(intervalName);
+	return intervalToSemitones(interval);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::getTranspositionIntervalClass -- return the interval class integer
+//   that was set for use with HumTransposer::HumTransposer.
+//
+
+int HumTransposer::getTranspositionIntervalClass() {
+	return m_transpose;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::getTranspositionIntervalClass -- return the interval integer
+//   as a string name that was set for use with HumTransposer::HumTransposer.
+//
+string HumTransposer::getTranspositionIntervalName() {
+	return getIntervalName(m_transpose);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::transpose -- Do a transposition at the stored transposition interval, or
+//   with a temporary provided integer interval class, or a temporary interval name.
+//
+
+void HumTransposer::transpose(HumPitch &pitch) {
+	int ipitch = humHumPitchToIntegerPitch(pitch);
+	ipitch += m_transpose;
+	pitch = integerPitchToHumPitch(ipitch);
+}
+
+int HumTransposer::transpose(int ipitch) {
+	return ipitch + m_transpose;
+}
+
+// Use a temporary transposition value in the following
+// two functions. To save for later use of HumTransposer::HumTransposer
+// without specifying the transposition interval, store
+// transposition value with HumTransposer::setTransposition() first.
+
+void HumTransposer::transpose(HumPitch &pitch, int transVal) {
+	int ipitch = humHumPitchToIntegerPitch(pitch);
+	ipitch += transVal;
+	pitch = integerPitchToHumPitch(ipitch);
+}
+
+void HumTransposer::transpose(HumPitch &pitch, const string &transString) {
+	int transVal = getInterval(transString);
+	int ipitch = humHumPitchToIntegerPitch(pitch);
+	ipitch += transVal;
+	pitch = integerPitchToHumPitch(ipitch);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::getBase -- Return the integer interval class representing an octave.
+//
+
+int HumTransposer::getBase() {
+	return m_base;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::getMaxAccid -- Return the maximum possible absolute accidental value
+//     that can be represented by the current transposition base.
+//
+
+int HumTransposer::getMaxAccid() {
+	return m_maxAccid;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::setMaxAccid -- Calculate variables related to a specific base system.
+//
+
+void HumTransposer::setMaxAccid(int maxAccid) {
+	m_maxAccid = abs(maxAccid);
+	m_base = 7 * (2 * m_maxAccid + 1) + 5;
+	calculateDiatonicMapping();
+	m_transpose = 0;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::calculateDiatonicMaping -- Calculate the integer values for the
+//    natural diatonic pitch classes: C, D, E, F, G, A, and B in the current
+//    base system.
+//
+
+void HumTransposer::calculateDiatonicMapping() {
+	int m2 = m_maxAccid * 2 + 1;
+	int M2 = m2 + 1;
+	m_diatonicMapping.resize(7);
+	m_diatonicMapping[dpc_C] = m_maxAccid;
+	m_diatonicMapping[dpc_D] = m_diatonicMapping[dpc_C] + M2;
+	m_diatonicMapping[dpc_E] = m_diatonicMapping[dpc_D] + M2;
+	m_diatonicMapping[dpc_F] = m_diatonicMapping[dpc_E] + m2;
+	m_diatonicMapping[dpc_G] = m_diatonicMapping[dpc_F] + M2;
+	m_diatonicMapping[dpc_A] = m_diatonicMapping[dpc_G] + M2;
+	m_diatonicMapping[dpc_B] = m_diatonicMapping[dpc_A] + M2;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::getKeyTonic -- Convert a key tonic string into a HumPitch
+//      where the octave is the direction it should go.
+//      Should conform to the following regular expression:
+//          ([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)
+
+bool HumTransposer::getKeyTonic(const string &keyTonic, HumPitch &tonic) {
+	int octave = 0;
+	int pitch = 0;
+	int accid = 0;
+	int state = 0;
+	for (unsigned int i = 0; i < (unsigned int)keyTonic.size(); i++) {
+		switch (state) {
+			case 0:
+				switch (keyTonic[i]) {
+					case '-': octave--; break;
+					case '+': octave++; break;
+					default:
+						state++;
+						i--;
+						break;
+				}
+				break;
+			case 1:
+				state++;
+				switch (keyTonic[i]) {
+					case 'C':
+					case 'c': pitch = 0; break;
+					case 'D':
+					case 'd': pitch = 1; break;
+					case 'E':
+					case 'e': pitch = 2; break;
+					case 'F':
+					case 'f': pitch = 3; break;
+					case 'G':
+					case 'g': pitch = 4; break;
+					case 'A':
+					case 'a': pitch = 5; break;
+					case 'B':
+					case 'b': pitch = 6; break;
+					default:
+						cerr << "Invalid keytonic pitch character: " << keyTonic[i] << endl;
+						return false;
+				}
+				break;
+			case 2:
+				switch (keyTonic[i]) {
+					case 'F':
+					case 'f':
+					case 'b': accid--; break;
+					case 'S':
+					case 's':
+					case '#': accid++; break;
+					default:
+						cerr << "Invalid keytonic accid character: " << keyTonic[i] << endl;
+						return false;
+				}
+				break;
+		}
+	}
+
+	tonic = HumPitch(pitch, accid, octave);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::getInterval -- Convert a diatonic interval with chromatic
+//     quality and direction into an integer interval class.   Input string
+//     is in the format: direction + quality + diatonic interval.
+//     Such as +M2 for up a major second, -P5 is down a perfect fifth.
+//     Regular expression that the string should conform to:
+//            (-|\+?)([Pp]|M|m|[aA]+|[dD]+)(\d+)
+//
+
+int HumTransposer::getInterval(const string &intervalName) {
+	string direction;
+	string quality;
+	string number;
+	int state = 0;
+
+	for (int i = 0; i < (int)intervalName.size(); i++) {
+		switch (state) {
+			case 0: // direction or quality expected
+				switch (intervalName[i]) {
+					case '-': // interval is down
+						direction = "-";
+						state++;
+						break;
+					case '+': // interval is up
+						direction += "";
+						state++;
+						break;
+					default: // interval is up by default
+						direction += "";
+						state++;
+						i--;
+						break;
+				}
+				break;
+
+			case 1: // quality expected
+				if (isdigit(intervalName[i])) {
+					state++;
+					i--;
+				}
+				else {
+					switch (intervalName[i]) {
+						case 'M': // major
+							quality = "M";
+							break;
+						case 'm': // minor
+							quality = "m";
+							break;
+						case 'P': // perfect
+						case 'p': quality = "P"; break;
+						case 'D': // diminished
+						case 'd': quality += "d"; break;
+						case 'A': // augmented
+						case 'a': quality += "A"; break;
+					}
+				}
+				break;
+
+			case 2: // digit expected
+				if (isdigit(intervalName[i])) {
+					number += intervalName[i];
+				}
+				break;
+		}
+	}
+
+	if (quality.empty()) {
+		cerr << "Interval name requires a chromatic quality: " << intervalName << endl;
+		return INVALID_INTERVAL_CLASS;
+	}
+
+	if (number.empty()) {
+		cerr << "Interval name requires a diatonic interval number: " << intervalName << endl;
+		return INVALID_INTERVAL_CLASS;
+	}
+
+	int dnum = stoi(number);
+	if (dnum == 0) {
+		cerr << "Integer interval number cannot be zero: " << intervalName << endl;
+		return INVALID_INTERVAL_CLASS;
+	}
+	dnum--;
+	int octave = dnum / 7;
+	dnum = dnum - octave * 7;
+
+	int base = 0;
+	int adjust = 0;
+
+	switch (dnum) {
+		case 0: // unison
+			base = perfectUnisonClass();
+			if (quality[0] == 'A') {
+				adjust = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				adjust = -(int)quality.size();
+			}
+			else if (quality != "P") {
+				cerr << "Error in interval quality: " << intervalName << endl;
+				return INVALID_INTERVAL_CLASS;
+			}
+			break;
+		case 1: // second
+			if (quality == "M") {
+				base = majorSecondClass();
+			}
+			else if (quality == "m") {
+				base = minorSecondClass();
+			}
+			else if (quality[0] == 'A') {
+				base = majorSecondClass();
+				adjust = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				base = minorSecondClass();
+				adjust = -(int)quality.size();
+			}
+			else {
+				cerr << "Error in interval quality: " << intervalName << endl;
+				return INVALID_INTERVAL_CLASS;
+			}
+			break;
+		case 2: // third
+			if (quality == "M") {
+				base = majorThirdClass();
+			}
+			else if (quality == "m") {
+				base = minorThirdClass();
+			}
+			else if (quality[0] == 'A') {
+				base = majorThirdClass();
+				adjust = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				base = minorThirdClass();
+				adjust = -(int)quality.size();
+			}
+			else {
+				cerr << "Error in interval quality: " << intervalName << endl;
+				return INVALID_INTERVAL_CLASS;
+			}
+			break;
+		case 3: // fourth
+			base = perfectFourthClass();
+			if (quality[0] == 'A') {
+				adjust = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				adjust = -(int)quality.size();
+			}
+			else if (quality != "P") {
+				cerr << "Error in interval quality: " << intervalName << endl;
+				return INVALID_INTERVAL_CLASS;
+			}
+			break;
+		case 4: // fifth
+			base = perfectFifthClass();
+			if (quality[0] == 'A') {
+				adjust = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				adjust = -(int)quality.size();
+			}
+			else if (quality != "P") {
+				cerr << "Error in interval quality: " << intervalName << endl;
+				return INVALID_INTERVAL_CLASS;
+			}
+			break;
+		case 5: // sixth
+			if (quality == "M") {
+				base = majorSixthClass();
+			}
+			else if (quality == "m") {
+				base = minorSixthClass();
+			}
+			else if (quality[0] == 'A') {
+				base = majorSixthClass();
+				adjust = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				base = minorSixthClass();
+				adjust = -(int)quality.size();
+			}
+			else {
+				cerr << "Error in interval quality: " << intervalName << endl;
+				return INVALID_INTERVAL_CLASS;
+			}
+			break;
+		case 6: // seventh
+			if (quality == "M") {
+				base = majorSeventhClass();
+			}
+			else if (quality == "m") {
+				base = minorSeventhClass();
+			}
+			else if (quality[0] == 'A') {
+				base = majorSeventhClass();
+				adjust = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				base = minorSeventhClass();
+				adjust = -(int)quality.size();
+			}
+			else {
+				cerr << "Error in interval quality: " << intervalName << endl;
+				return INVALID_INTERVAL_CLASS;
+			}
+			break;
+	}
+
+	if (direction == "-") {
+		return -((octave * m_base) + base + adjust);
+	}
+	else {
+		return (octave * m_base) + base + adjust;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::perfectUnisonClass -- Return the integer interval class
+//     representing a perfect unison.
+//
+
+int HumTransposer::perfectUnisonClass() {
+	return 0;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::minorSecondClass -- Return the integer interval class
+//     representing a minor second.
+//
+
+int HumTransposer::minorSecondClass() {
+	return m_diatonicMapping[3] - m_diatonicMapping[2]; // F - E
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::majorSecondClass -- Return the integer interval class
+//    representing a major second.
+//
+
+int HumTransposer::majorSecondClass() {
+	return m_diatonicMapping[1] - m_diatonicMapping[0]; // D - C
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::minorThirdClass -- Return the integer interval class
+//    representing a minor third.
+//
+
+int HumTransposer::minorThirdClass() {
+	return m_diatonicMapping[3] - m_diatonicMapping[1]; // F - D
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::majorThirdClass -- Return the integer interval class
+//    representing a major third.
+//
+
+int HumTransposer::majorThirdClass() {
+	return m_diatonicMapping[2] - m_diatonicMapping[0]; // E - C
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::perfectFourthClass -- Return the integer interval class
+//    representing a perfect fourth.
+//
+
+int HumTransposer::perfectFourthClass() {
+	return m_diatonicMapping[3] - m_diatonicMapping[0]; // F - C
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::perfectFifthClass -- Return the integer interval class
+//    representing a perfect fifth.
+//
+
+int HumTransposer::perfectFifthClass() {
+	return m_diatonicMapping[4] - m_diatonicMapping[0]; // G - C
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::minorSixthClass -- Return the integer interval class
+//    representing a minor sixth.
+//
+
+int HumTransposer::minorSixthClass() {
+	return m_diatonicMapping[5] - m_diatonicMapping[0] - 1; // A - C - 1;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::majorSixthClass -- Return the integer interval class
+//    representing a major sixth.
+//
+
+int HumTransposer::majorSixthClass() {
+	return m_diatonicMapping[5] - m_diatonicMapping[0]; // A - C
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::minorSeventhClass -- Return the integer interval class
+//    representing a minor sixth.
+//
+
+int HumTransposer::minorSeventhClass() {
+	return m_diatonicMapping[6] - m_diatonicMapping[0] - 1; // B - C - 1
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::majorSeventhClass -- Return the integer interval class
+//    representing a major sixth.
+//
+
+int HumTransposer::majorSeventhClass() {
+	return m_diatonicMapping[6] - m_diatonicMapping[0]; // B - C
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::octaveClass -- Return the integer interval class
+//    representing a major second.
+//
+
+int HumTransposer::perfectOctaveClass() {
+	return m_base;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::humHumPitchToIntegerPitch -- Convert a pitch (octave/diatonic pitch class/chromatic
+//     alteration) into an integer value according to the current base.
+//
+
+int HumTransposer::humHumPitchToIntegerPitch(const HumPitch &pitch) {
+	return pitch.getOctave() * m_base + m_diatonicMapping[pitch.getDiatonicPC()] + pitch.getAccid();
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::integerPitchToHumPitch -- Convert an integer within the current base
+//    into a pitch (octave/diatonic pitch class/chromatic alteration).  Pitches
+//    with negative octaves will have to be tested.
+//
+
+HumPitch HumTransposer::integerPitchToHumPitch(int ipitch) {
+	HumPitch pitch;
+	pitch.setOctave(ipitch / m_base);
+	int chroma = ipitch - pitch.getOctave() * m_base;
+	int mindiff = -1000;
+	int mini = -1;
+
+	int targetdiff = m_maxAccid;
+
+	if (chroma > m_base / 2) {
+		// search from B downwards
+		mindiff = chroma - m_diatonicMapping.back();
+		mini = (int)m_diatonicMapping.size() - 1;
+		for (int i = (int)m_diatonicMapping.size() - 2; i >= 0; i--) {
+			int diff = chroma - m_diatonicMapping[i];
+			if (abs(diff) < abs(mindiff)) {
+				mindiff = diff;
+				mini = i;
+			}
+			if (abs(mindiff) <= targetdiff) {
+				break;
+			}
+		}
+	}
+	else {
+		// search from C upwards
+		mindiff = chroma - m_diatonicMapping[0];
+		mini = 0;
+		for (int i = 1; i < (int)m_diatonicMapping.size(); i++) {
+			int diff = chroma - m_diatonicMapping[i];
+			if (abs(diff) < abs(mindiff)) {
+				mindiff = diff;
+				mini = i;
+			}
+			if (abs(mindiff) <= targetdiff) {
+				break;
+			}
+		}
+	}
+	pitch.setDiatonicPC(mini);
+	pitch.setAccid(mindiff);
+	return pitch;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::setBase40 -- Standard chromatic alteration mode, allowing up to double sharp/flats.
+//
+
+void HumTransposer::setBase40() {
+	setMaxAccid(2);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::setBase600 -- Extended chromatic alteration mode, allowing up to 42 sharp/flats.
+//
+
+void HumTransposer::setBase600() {
+	setMaxAccid(42);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::getInterval -- Return the interval between two pitches.
+//    If the second pitch is higher than the first, then the interval will be
+//    positive; otherwise, the interval will be negative.
+//
+
+int HumTransposer::getInterval(const HumPitch &p1, const HumPitch &p2) {
+	return humHumPitchToIntegerPitch(p2) - humHumPitchToIntegerPitch(p1);
+}
+
+// Similar function to getInterval, but the integer interval class is converted
+// into a string that is not dependent on a base:
+
+string HumTransposer::getIntervalName(const HumPitch &p1, const HumPitch &p2) {
+	int iclass = getInterval(p1, p2);
+	return getIntervalName(iclass);
+}
+
+string HumTransposer::getIntervalName(int intervalClass) {
+	string direction;
+	if (intervalClass < 0) {
+		direction = "-";
+		intervalClass = -intervalClass;
+	}
+
+	int octave = intervalClass / m_base;
+	int chroma = intervalClass - octave * m_base;
+
+	int mindiff = chroma;
+	int mini = 0;
+	for (int i = 1; i < (int)m_diatonicMapping.size(); i++) {
+		int diff = chroma - (m_diatonicMapping[i] - m_diatonicMapping[0]);
+		if (abs(diff) < abs(mindiff)) {
+			mindiff = diff;
+			mini = i;
+		}
+		if (abs(mindiff) <= m_maxAccid) {
+			break;
+		}
+	}
+
+	int number = INVALID_INTERVAL_CLASS;
+	int diminished = 0;
+	int augmented = 0;
+	string quality;
+
+	switch (mini) {
+		case 0: // unison
+			number = 1;
+			if (mindiff == 0) {
+				quality = "P";
+			}
+			else if (mindiff < 0) {
+				diminished = -mindiff;
+			}
+			else if (mindiff > 0) {
+				augmented = mindiff;
+			}
+			break;
+		case 1: // second
+			number = 2;
+			if (mindiff == 0) {
+				quality = "M";
+			}
+			else if (mindiff == -1) {
+				quality = "m";
+			}
+			else if (mindiff < 0) {
+				diminished = -mindiff - 1;
+			}
+			else if (mindiff > 0) {
+				augmented = mindiff;
+			}
+			break;
+		case 2: // third
+			number = 3;
+			if (mindiff == 0) {
+				quality = "M";
+			}
+			else if (mindiff == -1) {
+				quality = "m";
+			}
+			else if (mindiff < 0) {
+				diminished = -mindiff - 1;
+			}
+			else if (mindiff > 0) {
+				augmented = mindiff;
+			}
+			break;
+		case 3: // fourth
+			number = 4;
+			if (mindiff == 0) {
+				quality = "P";
+			}
+			else if (mindiff < 0) {
+				diminished = -mindiff;
+			}
+			else if (mindiff > 0) {
+				augmented = mindiff;
+			}
+			break;
+		case 4: // fifth
+			number = 5;
+			if (mindiff == 0) {
+				quality = "P";
+			}
+			else if (mindiff < 0) {
+				diminished = -mindiff;
+			}
+			else if (mindiff > 0) {
+				augmented = mindiff;
+			}
+			break;
+		case 5: // sixth
+			number = 6;
+			if (mindiff == 0) {
+				quality = "M";
+			}
+			else if (mindiff == -1) {
+				quality = "m";
+			}
+			else if (mindiff < 0) {
+				diminished = -mindiff - 1;
+			}
+			else if (mindiff > 0) {
+				augmented = mindiff;
+			}
+			break;
+		case 6: // seventh
+			number = 7;
+			if (mindiff == 0) {
+				quality = "M";
+			}
+			else if (mindiff == -1) {
+				quality = "m";
+			}
+			else if (mindiff < 0) {
+				diminished = -mindiff - 1;
+			}
+			else if (mindiff > 0) {
+				augmented = mindiff;
+			}
+			break;
+	}
+
+	if (quality.empty()) {
+		if (augmented) {
+			for (int i = 0; i < augmented; i++) {
+				quality += "A";
+			}
+		}
+		else if (diminished) {
+			for (int i = 0; i < diminished; i++) {
+				quality += "d";
+			}
+		}
+		else {
+			quality = "?";
+		}
+	}
+
+	number += octave * 7;
+
+	string output = direction;
+	output += quality;
+	output += to_string(number);
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::intervalToCircleOfFifths -- Returns the circle-of-fiths count
+//    that is represented by the given interval class or interval string.
+//    Examples:  "P5"  => +1      "-P5" => -1
+//               "P4"  => -1      "-P4" => +1
+//               "M2"  => +2      "m7"  => -2
+//               "M6"  => +3      "m3"  => -3
+//               "M3"  => +4      "m6"  => -4
+//               "M7"  => +5      "m2"  => -5
+//               "A4"  => +6      "d5"  => -6
+//               "A1"  => +7      "d1"  => -7
+//
+// If a key-signature plus the transposition interval in circle-of-fifths format
+// is greater than +/-7, Then the -/+ 7 should be added to the key signature to
+// avoid double sharp/flats in the key signature (and the transposition interval
+// should be adjusted accordingly).
+//
+
+int HumTransposer::intervalToCircleOfFifths(const string &transstring) {
+	int intervalClass = getInterval(transstring);
+	return intervalToCircleOfFifths(intervalClass);
+}
+
+int HumTransposer::intervalToCircleOfFifths(int transval) {
+	if (transval < 0) {
+		transval = (m_base * 100 + transval) % m_base;
+	}
+	else if (transval == 0) {
+		return 0;
+	}
+	else {
+		transval %= m_base;
+	}
+
+	int p5 = perfectFifthClass();
+	int p4 = perfectFourthClass();
+	for (int i = 1; i < m_base; i++) {
+		if ((p5 * i) % m_base == transval) {
+			return i;
+		}
+		if ((p4 * i) % m_base == transval) {
+			return -i;
+		}
+	}
+	return INVALID_INTERVAL_CLASS;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToIntervalClass -- Inputs a circle-of-fifths value and
+//   returns the interval class as an integer in the current base.
+//
+
+int HumTransposer::circleOfFifthsToIntervalClass(int fifths) {
+	if (fifths == 0) {
+		return 0;
+	}
+	else if (fifths > 0) {
+		return (perfectFifthClass() * fifths) % m_base;
+	}
+	else {
+		return (perfectFourthClass() * (-fifths)) % m_base;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToIntervalName -- Convert a circle-of-fifths position
+//    into an interval string.
+//
+
+string HumTransposer::circleOfFifthsToIntervalName(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return getIntervalName(intervalClass);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsTomajorTonic -- Return the tonic
+//    of the major key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+HumPitch HumTransposer::circleOfFifthsToMajorTonic(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return integerPitchToHumPitch((getCPitchClass() + intervalClass) % getBase());
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToMinorTonic -- Return the tonic
+//    of the minor key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+HumPitch HumTransposer::circleOfFifthsToMinorTonic(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return integerPitchToHumPitch((getAPitchClass() + intervalClass) % getBase());
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToDorianTonic -- Return the tonic
+//    of the dorian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+HumPitch HumTransposer::circleOfFifthsToDorianTonic(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return integerPitchToHumPitch((getDPitchClass() + intervalClass) % getBase());
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToPhrygianTonic -- Return the tonic
+//    of the phrygian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+HumPitch HumTransposer::circleOfFifthsToPhrygianTonic(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return integerPitchToHumPitch((getEPitchClass() + intervalClass) % getBase());
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToLydianTonic -- Return the tonic
+//    of the lydian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+HumPitch HumTransposer::circleOfFifthsToLydianTonic(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return integerPitchToHumPitch((getFPitchClass() + intervalClass) % getBase());
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToMixolydianTonic -- Return the tonic
+//    of the mixolydian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+HumPitch HumTransposer::circleOfFifthsToMixolydianTonic(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return integerPitchToHumPitch((getGPitchClass() + intervalClass) % getBase());
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::circleOfFifthsToLocrianTonic -- Return the tonic
+//    of the locrian key that has the given key signature.  Return
+//    value is in the 0th octave.
+//
+
+HumPitch HumTransposer::circleOfFifthsToLocrianTonic(int fifths) {
+	int intervalClass = circleOfFifthsToIntervalClass(fifths);
+	return integerPitchToHumPitch((getBPitchClass() + intervalClass) % getBase());
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::diatonicChromaticToIntervalClass -- Convert a diatonic/chromatic interval
+//    into a base-n interval class integer.
+//      +1D +1C = m2
+//      +1D +2C = M2
+//      +1D +3C = A2
+//      +2D +4C = M3
+//      +2D +3C = m3
+//      +2D +2C = m3
+//      +2D +1C = d3
+//      +3D +5C = P4
+//      +3D +6C = A4
+//      +3D +4C = d4
+//
+//
+
+string HumTransposer::diatonicChromaticToIntervalName(int diatonic, int chromatic) {
+	if (diatonic == 0) {
+		string output;
+		if (chromatic == 0) {
+			output += "P";
+		}
+		else if (chromatic > 0) {
+			for (int i = 0; i < chromatic; i++) {
+				output += "A";
+			}
+		}
+		else {
+			for (int i = 0; i < -chromatic; i++) {
+				output += "d";
+			}
+		}
+		output += "1";
+		return output;
+	}
+
+	int octave = 0;
+	string direction;
+	if (diatonic < 0) {
+		direction = "-";
+		octave = -diatonic / 7;
+		diatonic = (-diatonic - octave * 7);
+		chromatic = -chromatic;
+	}
+	else {
+		octave = diatonic / 7;
+		diatonic = diatonic - octave * 7;
+	}
+
+	int augmented = 0;
+	int diminished = 0;
+	string quality;
+
+	switch (abs(diatonic)) {
+		case 0: // unsion
+			if (chromatic == 0) {
+				quality = "P";
+			}
+			else if (chromatic > 0) {
+				augmented = chromatic;
+			}
+			else {
+				diminished = chromatic;
+			}
+			break;
+		case 1: // second
+			if (chromatic == 2) {
+				quality = "M";
+			}
+			else if (chromatic == 1) {
+				quality = "m";
+			}
+			else if (chromatic > 2) {
+				augmented = chromatic - 2;
+			}
+			else {
+				diminished = chromatic - 1;
+			}
+			break;
+		case 2: // third
+			if (chromatic == 4) {
+				quality = "M";
+			}
+			else if (chromatic == 3) {
+				quality = "m";
+			}
+			else if (chromatic > 4) {
+				augmented = chromatic - 4;
+			}
+			else {
+				diminished = chromatic - 3;
+			}
+			break;
+		case 3: // fourth
+			if (chromatic == 5) {
+				quality = "P";
+			}
+			else if (chromatic > 5) {
+				augmented = chromatic - 5;
+			}
+			else {
+				diminished = chromatic - 5;
+			}
+			break;
+		case 4: // fifth
+			if (chromatic == 7) {
+				quality = "P";
+			}
+			else if (chromatic > 7) {
+				augmented = chromatic - 7;
+			}
+			else {
+				diminished = chromatic - 7;
+			}
+			break;
+		case 5: // sixth
+			if (chromatic == 9) {
+				quality = "M";
+			}
+			else if (chromatic == 8) {
+				quality = "m";
+			}
+			else if (chromatic > 9) {
+				augmented = chromatic - 9;
+			}
+			else {
+				diminished = chromatic - 8;
+			}
+			break;
+		case 6: // seventh
+			if (chromatic == 11) {
+				quality = "M";
+			}
+			else if (chromatic == 10) {
+				quality = "m";
+			}
+			else if (chromatic > 11) {
+				augmented = chromatic - 11;
+			}
+			else {
+				diminished = chromatic - 10;
+			}
+			break;
+	}
+
+	augmented = abs(augmented);
+	diminished = abs(diminished);
+
+	if (quality.empty()) {
+		if (augmented) {
+			for (int i = 0; i < augmented; i++) {
+				quality += "A";
+			}
+		}
+		else if (diminished) {
+			for (int i = 0; i < diminished; i++) {
+				quality += "d";
+			}
+		}
+	}
+
+	return direction + quality + to_string(octave * 7 + diatonic + 1);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::diatonicChromaticToIntervalClass --
+//
+
+int HumTransposer::diatonicChromaticToIntervalClass(int diatonic, int chromatic) {
+	string intervalName = diatonicChromaticToIntervalName(diatonic, chromatic);
+	return getInterval(intervalName);
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::intervalToDiatonicChromatic --
+//
+
+void HumTransposer::intervalToDiatonicChromatic(int &diatonic, int &chromatic, int intervalClass) {
+	string intervalName = getIntervalName(intervalClass);
+	intervalToDiatonicChromatic(diatonic, chromatic, intervalName);
+}
+
+void HumTransposer::intervalToDiatonicChromatic(int &diatonic, int &chromatic, const string &intervalName) {
+	int direction = 1;
+	string quality;
+	string number;
+	int state = 0;
+
+	for (int i = 0; i < (int)intervalName.size(); i++) {
+		switch (state) {
+			case 0: // direction or quality expected
+				switch (intervalName[i]) {
+					case '-': // interval is down
+						direction = -1;
+						state++;
+						break;
+					case '+': // interval is up
+						direction = 1;
+						state++;
+						break;
+					default: // interval is up by default
+						direction = 1;
+						state++;
+						i--;
+						break;
+				}
+				break;
+
+			case 1: // quality expected
+				if (isdigit(intervalName[i])) {
+					state++;
+					i--;
+				}
+				else {
+					switch (intervalName[i]) {
+						case 'M': // major
+							quality = "M";
+							break;
+						case 'm': // minor
+							quality = "m";
+							break;
+						case 'P': // perfect
+						case 'p': quality = "P"; break;
+						case 'D': // diminished
+						case 'd': quality += "d"; break;
+						case 'A': // augmented
+						case 'a': quality += "A"; break;
+					}
+				}
+				break;
+
+			case 2: // digit expected
+				if (isdigit(intervalName[i])) {
+					number += intervalName[i];
+				}
+				break;
+		}
+	}
+
+	if (quality.empty()) {
+		cerr << "Interval requires a chromatic quality: " << intervalName << endl;
+		chromatic = INVALID_INTERVAL_CLASS;
+		diatonic = INVALID_INTERVAL_CLASS;
+		return;
+	}
+
+	if (number.empty()) {
+		cerr << "Interval requires a diatonic interval number: " << intervalName << endl;
+		chromatic = INVALID_INTERVAL_CLASS;
+		diatonic = INVALID_INTERVAL_CLASS;
+		return;
+	}
+
+	int dnum = stoi(number);
+	if (dnum == 0) {
+		cerr << "Integer interval number cannot be zero: " << intervalName << endl;
+		chromatic = INVALID_INTERVAL_CLASS;
+		diatonic = INVALID_INTERVAL_CLASS;
+		return;
+	}
+	dnum--;
+	int octave = dnum / 7;
+	dnum = dnum - octave * 7;
+
+	diatonic = direction * (octave * 7 + dnum);
+	chromatic = 0;
+
+	switch (dnum) {
+		case 0: // unison
+			if (quality[0] == 'A') {
+				chromatic = (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				chromatic = -(int)quality.size();
+			}
+			else if (quality == "P") {
+				chromatic = 0;
+			}
+			else {
+				cerr << "Error in Interval quality: " << intervalName << endl;
+				chromatic = INVALID_INTERVAL_CLASS;
+				diatonic = INVALID_INTERVAL_CLASS;
+				return;
+			}
+			break;
+		case 1: // second
+			if (quality == "M") {
+				chromatic = 2;
+			}
+			else if (quality == "m") {
+				chromatic = 1;
+			}
+			else if (quality[0] == 'A') {
+				chromatic = 2 + (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				chromatic = 1 - (int)quality.size();
+			}
+			else {
+				cerr << "Error in Interval quality: " << intervalName << endl;
+				chromatic = INVALID_INTERVAL_CLASS;
+				diatonic = INVALID_INTERVAL_CLASS;
+				return;
+			}
+			break;
+		case 2: // third
+			if (quality == "M") {
+				chromatic = 4;
+			}
+			else if (quality == "m") {
+				chromatic = 3;
+			}
+			else if (quality[0] == 'A') {
+				chromatic = 4 + (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				chromatic = 3 - (int)quality.size();
+			}
+			else {
+				cerr << "Error in Interval quality: " << intervalName << endl;
+				chromatic = INVALID_INTERVAL_CLASS;
+				diatonic = INVALID_INTERVAL_CLASS;
+				return;
+			}
+			break;
+		case 3: // fourth
+			if (quality[0] == 'A') {
+				chromatic = 5 + (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				chromatic = 5 - (int)quality.size();
+			}
+			else if (quality == "P") {
+				chromatic = 5;
+			}
+			else {
+				cerr << "Error in Interval quality: " << intervalName << endl;
+				chromatic = INVALID_INTERVAL_CLASS;
+				diatonic = INVALID_INTERVAL_CLASS;
+				return;
+			}
+			break;
+		case 4: // fifth
+			if (quality[0] == 'A') {
+				chromatic = 7 + (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				chromatic = 7 - (int)quality.size();
+			}
+			else if (quality == "P") {
+				chromatic = 7;
+			}
+			else {
+				cerr << "Error in Interval quality: " << intervalName << endl;
+				chromatic = INVALID_INTERVAL_CLASS;
+				diatonic = INVALID_INTERVAL_CLASS;
+				return;
+			}
+			break;
+		case 5: // sixth
+			if (quality == "M") {
+				chromatic = 9;
+			}
+			else if (quality == "m") {
+				chromatic = 8;
+			}
+			else if (quality[0] == 'A') {
+				chromatic = 9 + (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				chromatic = 8 - (int)quality.size();
+			}
+			else {
+				cerr << "Error in Interval quality: " << intervalName << endl;
+				chromatic = INVALID_INTERVAL_CLASS;
+				diatonic = INVALID_INTERVAL_CLASS;
+				return;
+			}
+			break;
+		case 6: // seventh
+			if (quality == "M") {
+				chromatic = 11;
+			}
+			else if (quality == "m") {
+				chromatic = 10;
+			}
+			else if (quality[0] == 'A') {
+				chromatic = 11 + (int)quality.size();
+			}
+			else if (quality[0] == 'd') {
+				chromatic = 10 - (int)quality.size();
+			}
+			else {
+				cerr << "Error in Interval quality: " << intervalName << endl;
+				chromatic = INVALID_INTERVAL_CLASS;
+				diatonic = INVALID_INTERVAL_CLASS;
+				return;
+			}
+			break;
+	}
+	chromatic *= direction;
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::isValidIntervalName -- Returns true if the input string
+//    is a valid chromatic interval string.  A valid interval name will match
+//    this regular expression:
+//          (-|\+?)([Pp]|M|m|[aA]+|[dD]+)([1-9][0-9]*)
+//
+//    Components of the regular expression:
+//
+//    1:  (-|\+?) == an optional direction for the interval.  When there
+//                   is no sign, a + sign is implied.  A sign on a unison (P1)
+//                   will be ignored.
+//    2:  ([Pp]|M|m|[aA]+|[dD]+) == The chromatic quality of the following
+//                   diatonic interval number.  Meanings of the letters:
+//                      P or p = perfect
+//                      M      = major
+//                      m      = minor
+//                      A or a = augmented
+//                      d or D = diminished
+//                   unisons (1), fourths, fifths and octaves (8) and octave multiples
+//                   of these intervals can be prefixed by P but not by M or m.  Seconds,
+//                   thirds, sixths, sevenths and octave transpositions of those intervals
+//                   can be prefixed by M and m but not by P.  All intervals can be prefixed
+//                   with A or d (or AA/dd for doubly augmented/diminished, etc.).  M and m
+//                   are case sensitive, but P, A, and d are case insensitive.  This function
+//                   does not check the correct pairing of M/m and P for the diatonic intervals
+//                   (such as the invalid interval construct P3 for a perfect third).
+//                   HumTransposer::getInterval(const string &intervalName) will do a
+//                   more thorough check for invalid pairings.  This function is used mainly to
+//                   determine whether an interval or a key tonic is being used in the --transpose
+//                   option for verovio.
+//     3: ([1-9][0-9]*) == a positive integer representing the diatonic interval.  1 = unison,
+//                   2 = second, 3 = third, and so on.  Compound intervals are allowed, such as
+//                   9 for a nineth (2nd plus a perfect octave), 15 for two perfect octaves.
+//
+//
+
+bool HumTransposer::isValidIntervalName(const string &name) {
+	string pattern = "(-|\\+?)([Pp]|M|m|[aA]+|[dD]+)([1-9][0-9]*)";
+	if (regex_search(name, regex(pattern))) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::isValidSemitones -- Returns true if the input string
+//    is a valid semitone interval string.  A valid interval name will match
+//    this regular expression:
+//          ^(-|\+?)(\d+)$
+//
+//    Components of the regular expression:
+//
+//    1:  (-|\+?) == an optional direction for the interval.  When there
+//                   is no sign, a + sign is implied.  A sign on 0
+//                   will be ignored.
+//    2:  (\d+)   == The number of semitones.  0 means transpose at the
+//                   unison (i.e., transpose to same pitch as input).
+//                   12 means an octave, 14 means a second plus an octave,
+//                   24 means two octaves.
+//
+
+bool HumTransposer::isValidSemitones(const string &name) {
+	string pattern = "^(-|\\+?)(\\d+)$";
+	if (regex_search(name, regex(pattern))) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumTransposer::isValidKeyTonicName -- Returns true if the input string
+//    is a valid key tonic which can be used to calculate a transposition
+//    interval based on the current key.  A valid key tonic will match
+//    this regular expression:
+//          ([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)
+//
+//    Components of the regular expression:
+//
+//    1: ([+]*|[-]*) == An optional sign for the direction of the
+//                      transposition.  If there is no sign, then
+//                      the closest tonic pitch class to the tonic
+//                      of the data will be selected.  When The
+//                      sign is double/tripled/etc., additional
+//                      octaves will be added to the transposition.
+//    2: ([A-Ga-g]) ==  The diatonic letter of the tonic key.  The letter
+//                      is case insensitive, so "g" and "G" have the
+//                      same meaning.
+//    3: ([Ss#]*|[Ffb]*) == An optional accidental alteration of the
+//                      diatonic letter, such as eF, ef, eb, EF, Ef, or Eb,
+//                      all meaning e-flat, and aS, as, a#, AS, As, or
+//                      A# all meaning a-sharp.
+//
+
+bool HumTransposer::isValidKeyTonic(const string &name) {
+	string pattern = "([+]*|[-]*)([A-Ga-g])([Ss#]*|[Ffb]*)";
+	if (regex_search(name, regex(pattern))) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+/*
+
+
+
+/////////////////////////////////////////////////////
+//
+// Test program for HumTransposer class:
+//
+
+int main(void) {
+	HumPitch pitch(dpc_C, 0, 4); // middle C
+
+	HumTransposer transpose;
+
+	// transpose.setBase40() is the default system.
+	transpose.setTransposition(transpose.perfectFifthClass());
+	cout << "Starting pitch:\t\t\t\t" << pitch << endl;
+	transpose.HumTransposer(pitch);
+	cout << "HumTransposerd up a perfect fifth:\t\t" << pitch << endl;
+
+	// testing use of a different base for transposition:
+	transpose.setBase600(); // allows up to 42 sharps or flats
+	// Note that transpose value is cleared when setAccid() or setBase*() is called.
+	transpose.setTransposition(-transpose.perfectFifthClass());
+	transpose.HumTransposer(pitch);
+	cout << "HumTransposerd back down a perfect fifth:\t" << pitch << endl;
+
+	// testing use of interval string
+	transpose.setTransposition("-m3");
+	transpose.HumTransposer(pitch);
+	cout << "HumTransposerd down a minor third:\t\t" << pitch << endl;
+
+	// testing validation system for under/overflows:
+	cout << endl;
+	pitch.setPitch(dpc_C, 2, 4); // C##4
+	cout << "Initial pitch:\t\t" << pitch << endl;
+	transpose.HumTransposer(pitch, "A4"); // now F###4
+	bool valid = pitch.isValid(2);
+	cout << "Up an aug. 4th:\t\t" << pitch;
+	if (!valid) {
+		cout << "\t(not valid in base-40 system)";
+	}
+	cout << endl;
+
+	// calculate interval between two pitches:
+	cout << endl;
+	cout << "TESTING INTERVAL NAMES IN BASE-40:" << endl;
+	transpose.setBase40();
+	HumPitch p1(dpc_C, 0, 4);
+	HumPitch p2(dpc_F, 2, 4);
+	cout << "\tInterval between " << p1 << " and " << p2;
+	cout << " is " << transpose.getIntervalName(p1, p2) << endl;
+	HumPitch p3(dpc_G, -2, 3);
+	cout << "\tInterval between " << p1 << " and " << p3;
+	cout << " is " << transpose.getIntervalName(p1, p3) << endl;
+
+	cout << "TESTING INTERVAL NAMES IN BASE-600:" << endl;
+	transpose.setBase600();
+	cout << "\tInterval between " << p1 << " and " << p2;
+	cout << " is " << transpose.getIntervalName(p1, p2) << endl;
+	cout << "\tInterval between " << p1 << " and " << p3;
+	cout << " is " << transpose.getIntervalName(p1, p3) << endl;
+	cout << endl;
+
+	cout << "TESTING INTERVAL NAME TO CIRCLE-OF-FIFTHS:" << endl;
+	cout << "\tM6 should be 3:  " << transpose.intervalTocircleOfFifths("M6") << endl;
+	cout << "\tm6 should be -4: " << transpose.intervalTocircleOfFifths("m6") << endl;
+
+	cout << "TESTING CIRCLE-OF-FIFTHS TO INTERVAL NAME:" << endl;
+	cout << "\t3 should be M6:  " << transpose.circleOfFifthsToIntervalName(3) << endl;
+	cout << "\t-4 should be m6: " << transpose.circleOfFifthsToIntervalName(-4) << endl;
+	cout << endl;
+
+	cout << "TESTING INTERVAL NAME TO DIATONIC/CHROMATIC:" << endl;
+	cout << "\tD-1,C-2 should be -M2:  " << transpose.diatonicChromaticToIntervalName(-1, -2) << endl;
+	cout << "\tD3,C6 should be A4:     " << transpose.diatonicChromaticToIntervalName(3, 6) << endl;
+
+	int chromatic;
+	int diatonic;
+
+	cout << "TESTING DIATONIC/CHROMATIC TO INTERVAL NAME:" << endl;
+	cout << "\t-M2 should be D-1,C-2:  ";
+	transpose.intervalToDiatonicChromatic(diatonic, chromatic, "-M2");
+	cout << "D" << diatonic << ",C" << chromatic << endl;
+	cout << "\tA4 should be D3,C6:     ";
+	transpose.intervalToDiatonicChromatic(diatonic, chromatic, "A4");
+	cout << "D" << diatonic << ",C" << chromatic << endl;
+
+	return 0;
+}
+
+*/
+
+/* Example output from test program:
+
+	Starting pitch:                        C4
+	Transposed up a perfect fifth:         G4
+	Transposed back down a perfect fifth:  C4
+	Transposed down a minor third:         A3
+
+	Initial pitch:   C##4
+	Up an aug. 4th:  F###4 (not valid in base-40 system)
+
+	TESTING INTERVAL NAMES IN BASE-40:
+		Interval between C4 and F##4 is AA4
+		Interval between C4 and Gbb3 is -AA4
+	TESTING INTERVAL NAMES IN BASE-600:
+		Interval between C4 and F##4 is AA4
+		Interval between C4 and Gbb3 is -AA4
+
+	TESTING INTERVAL NAME TO CIRCLE-OF-FIFTHS:
+		M6 should be 3:  3
+		m6 should be -4: -4
+	TESTING CIRCLE-OF-FIFTHS TO INTERVAL NAME:
+		3 should be M6:  M6
+		-4 should be m6: m6
+
+	TESTING INTERVAL NAME TO DIATONIC/CHROMATIC:
+		D-1,C-2 should be -M2:  -M2
+		D3,C6 should be A4:     A4
+	TESTING DIATONIC/CHROMATIC TO INTERVAL NAME:
+		-M2 should be D-1,C-2:  D-1,C-2
+		A4 should be D3,C6:     D3,C6
+
+ */
+
+
 //////////////////////////////
 //
 // HumdrumFile::HumdrumFile -- HumdrumFile constructor.
@@ -16491,6 +18812,7 @@ void HumdrumFileBase::clear(void) {
 	m_strand2d.clear();
 	m_filename.clear();
 	m_segmentlevel = 0;
+	m_strands_analyzed = false;
 	m_structure_analyzed = false;
 	m_rhythm_analyzed = false;
 	m_slurs_analyzed = false;
@@ -16859,6 +19181,29 @@ void HumdrumFileBase::setFilename(const string& filename) {
 
 string HumdrumFileBase::getFilename(void) {
 	return m_filename;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getFilenameBase -- Remove any path and any
+//    dot followed by non-dots.
+//
+
+string HumdrumFileBase::getFilenameBase(void) {
+	string output;
+	auto pos = m_filename.rfind('/');
+	if (pos != string::npos) {
+		output = m_filename.substr(pos+1);
+	} else {
+		output = m_filename;
+	}
+	pos = output.rfind('.');
+	if (pos != string::npos) {
+		output = output.substr(0,pos);
+	}
+	return output;
 }
 
 
@@ -27655,6 +30000,9 @@ HumNum HumdrumToken::getDuration(void) {
 
 
 HumNum HumdrumToken::getDuration(HumNum scale) {
+	if (!m_rhythm_analyzed) {
+		analyzeDuration();
+	}
 	return m_duration * scale;
 }
 
@@ -27668,6 +30016,9 @@ HumNum HumdrumToken::getDuration(HumNum scale) {
 //
 
 HumNum HumdrumToken::getTiedDuration(void) {
+	if (!m_rhythm_analyzed) {
+		analyzeDuration();
+	}
 	HumNum output = m_duration;
 	// start of a tied group so add the durations of the other notes.
 	int b40 = Convert::kernToBase40(this);
@@ -28065,7 +30416,8 @@ bool HumdrumToken::isSustainedNote(void) {
 //////////////////////////////
 //
 // HumdrumToken::isNoteAttack -- Returns true if the token represents
-//     the attack of a note.  Should only be applied to **kern data.
+//     the attack of a note.  Should only be applied to **kern data, but
+//     this function does not check for that for efficiency reasons.
 //
 
 bool HumdrumToken::isNoteAttack(void) {
@@ -28302,6 +30654,40 @@ bool HumdrumToken::isInstrumentAbbreviation(void) {
 		return false;
 	} else {
 		return true;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getInstrumentName --
+//
+
+string HumdrumToken::getInstrumentName(void) {
+	if (this->size() < 3) {
+		return "";
+	} else if (this->compare(0, 3, "*I\"") != 0) {
+		return "";
+	} else {
+		return this->substr(3);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getInstrumentAbbreviation --
+//
+
+string HumdrumToken::getInstrumentAbbreviation(void) {
+	if (this->size() < 3) {
+		return "";
+	} else if (this->compare(0, 3, "*I'") != 0) {
+		return "";
+	} else {
+		return this->substr(3);
 	}
 }
 
@@ -46891,6 +49277,879 @@ void Tool_binroll::processStrand(vector<vector<char>>& roll, HTp starting,
 
 /////////////////////////////////
 //
+// Tool_chantize::Tool_chantize -- Set the recognized options for the tool.
+//
+
+Tool_chantize::Tool_chantize(void) {
+	define("R|no-reference-records=b", "Do not add reference records");
+	define("r|only-add-reference-records=b", "Only add reference records");
+
+	define("B|do-not-delete-breaks=b", "Do not delete system/page break markers");
+	define("b|only-delete-breaks=b", "only delete breaks");
+
+	define("A|do-not-fix-instrument-abbreviations=b", "Do not fix instrument abbreviations");
+	define("a|only-fix-instrument-abbreviations=b", "Only fix instrument abbreviations");
+
+	define("E|do-not-fix-editorial-accidentals=b", "Do not fix instrument abbreviations");
+	define("e|only-fix-editorial-accidentals=b", "Only fix editorial accidentals");
+
+	define("N|do-not-remove-empty-transpositions=b", "Do not remove empty transposition instructions");
+	define ("n|only-remove-empty-transpositions=b", "Only remove empty transpositions");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_chantize::run -- Primary interfaces to the tool.
+//
+
+bool Tool_chantize::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_chantize::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_chantize::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+//
+// In-place processing of file:
+//
+
+bool Tool_chantize::run(HumdrumFile& infile) {
+	processFile(infile);
+
+	// Re-load the text for each line from their tokens.
+	infile.createLinesFromTokens();
+	outputFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chantize::outputFile -- 
+//    * remove time signature, 
+//    * remove barlines, except double barlines
+//    * convert rests to double barlines (except at the end of the
+//         music).
+//
+
+void Tool_chantize::outputFile(HumdrumFile& infile) {
+	vector<bool> terminalRest = getTerminalRestStates(infile);
+	HTp token;
+	bool restQ = false;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			token = infile.token(i, 0);
+			if (token->isTimeSignature()) {
+				// suppress time signatures
+				continue;
+			}
+		} else if (infile[i].isCommentGlobal()) {
+			// Convert line breaks into invisible barlines.
+			token = infile.token(i, 0);
+			if (token->find("original") != string::npos) {
+				int cols = 2;
+				for (int j=0; j<cols; j++) {
+					m_humdrum_text << "=-";
+					if (j < cols - 1) {
+						m_humdrum_text << "\t";
+					}
+				}
+				m_humdrum_text << "\n";
+				continue;
+			}
+		} else if (infile[i].isBarline()) {
+			// suppress barlines
+			token = infile.token(i, 0);
+			// but do not suppress double barlines
+			if (token->find("||") == string::npos) {
+				continue;
+			}
+		} else if (infile[i].isData()) {
+			token = infile.token(i, 0);
+			if (token->isRest()) {
+				if (terminalRest[i]) {
+					continue;
+				}
+				if (!restQ) {
+					restQ = true;
+					// convert rest into double barline
+					// but suppress rests at end of music
+					//or just suppress
+					// for (int j=0; j<infile[i].getFieldCount(); j++) {
+					// 	m_humdrum_text  << "=-";
+					// 	if (j < infile[i].getFieldCount() - 1) {
+					// 		m_humdrum_text << "\t";
+					// 	}
+					// }
+					// m_humdrum_text << "\n";
+				} 
+				continue;
+			} else {
+				restQ = false;
+			}
+		}
+		m_humdrum_text << infile[i] << "\n";
+	}
+	if (m_diamondQ) {
+		m_humdrum_text << "!!!RDF**kern: j = diamond note, color=blue\n";
+	}
+	m_humdrum_text << "!!!RDF**kern: {} = ligature\n";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chantize::processFile --
+//
+
+void Tool_chantize::processFile(HumdrumFile& infile) {
+
+	bool abbreviationsQ  = true;
+	bool accidentalsQ    = true;
+	bool referencesQ     = true;
+	// bool breaksQ         = true;
+	bool transpositionsQ = true;
+
+	if (getBoolean("no-reference-records")) { referencesQ = false; }
+	if (getBoolean("only-add-reference-records")) {
+		abbreviationsQ  = false;
+		accidentalsQ    = false;
+		referencesQ     = true;
+		// breaksQ         = false;
+		transpositionsQ = false;
+	}
+
+	if (getBoolean("do-not-delete-breaks")) { 
+		//	breaksQ = false; 
+	}
+	if (getBoolean("only-delete-breaks")) {
+		abbreviationsQ  = false;
+		accidentalsQ    = false;
+		referencesQ     = false;
+		// breaksQ         = true;
+		transpositionsQ = false;
+	}
+
+	if (getBoolean("do-not-fix-instrument-abbreviations")) { abbreviationsQ = false; }
+	if (getBoolean("only-fix-instrument-abbreviations")) {
+		abbreviationsQ  = true;
+		accidentalsQ    = false;
+		referencesQ     = false;
+		// breaksQ         = false;
+		transpositionsQ = false;
+	}
+
+	if (getBoolean("do-not-fix-editorial-accidentals")) { accidentalsQ = false; }
+	if (getBoolean("only-fix-editorial-accidentals")) {
+		abbreviationsQ  = false;
+		accidentalsQ    = true;
+		referencesQ     = false;
+		// breaksQ         = false;
+		transpositionsQ = false;
+	}
+
+	if (getBoolean("do-not-remove-empty-transpositions")) { transpositionsQ = false; }
+	if (getBoolean("only-remove-empty-transpositions")) {
+		abbreviationsQ  = false;
+		accidentalsQ    = false;
+		referencesQ     = false;
+		// breaksQ         = false;
+		transpositionsQ = true;
+	}
+
+	m_diamondQ = hasDiamondNotes(infile);
+
+	if (abbreviationsQ)  { fixInstrumentAbbreviations(infile); }
+	if (accidentalsQ)    { fixEditorialAccidentals(infile); }
+	if (referencesQ)     { addBibliographicRecords(infile); }
+//	if (breaksQ)         { deleteBreaks(infile); }
+	if (transpositionsQ) { deleteDummyTranspositions(infile); }
+
+	// Remove rhythms from notes
+	Tool_shed shed;
+	vector<string> argv;
+	argv.push_back("shed");
+	argv.push_back("-x");     // only apply to **text spines
+	argv.push_back("kern");
+	argv.push_back("-e");
+	// convert 8th notes into diamond notes
+	// remove rhythms and beams
+	argv.push_back("s/8/j/g; s/[0-9LJ]//g; s/\\(/{/g; s/\\)/}/g");
+	shed.process(argv);
+	shed.run(infile);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chantize::deleteDummyTranspositions -- Somehow empty
+//    transpositions that go to the same pitch can appear in the
+//    MusicXML data, so remove them here.  Example:
+// 		*Trd0c0
+//
+
+void Tool_chantize::deleteDummyTranspositions(HumdrumFile& infile) {
+	std::vector<int> ldel;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		bool empty = true;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (*token == "*") {
+				continue;
+			}
+			if (!token->isKern()) {
+				empty = false;
+				continue;
+			}
+			if (*token == "*Trd0c0") {
+				token->setText("*");
+			} else {
+				empty = false;
+			}
+		}
+		if (empty) {
+			ldel.push_back(i);
+		}
+	}
+
+	if (ldel.size() == 1) {
+		infile.deleteLine(ldel[0]);
+	} else if (ldel.size() > 1) {
+		cerr << "Warning: multiple transposition lines, not deleting them" << endl;
+	}
+
+}
+
+
+//////////////////////////////
+//
+// Tool_chantize::fixEditorialAccidentals -- checkDataLine() does
+//       all of the work for this function, which only manages
+//       key signature and barline processing.
+//    Rules for accidentals in Tasso in Music Project:
+//    (1) Only note accidentals printed in the source editions
+//        are displayed as regular accidentals.  These accidentals
+//        are postfixed with an "X" in the **kern data.
+//    (2) Editorial accidentals are given an "i" marker but not
+//        a "X" marker in the **kern data.  This editorial accidental
+//        is displayed above the note.
+//    This algorithm makes adjustments to the input data because
+//    Sibelius will drop editorial information after the frist
+//    editorial accidental on that pitch in the measure.
+//    (3) If a note is the same pitch as a previous note in the
+//        measure and the previous note has an editorial accidental,
+//        then make the note an editorial note.  However, if the
+//        accidental state of the note matches the key-signature,
+//        then do not add an editorial accidental, and there will be
+//        no accidental displayed on the note.  In that case, add a "y"
+//        after the accidental to indicate that it is interpreted
+//        and not visible in the original score.
+//
+
+void Tool_chantize::fixEditorialAccidentals(HumdrumFile& infile) {
+	m_pstates.resize(infile.getMaxTrack() + 1);
+	m_estates.resize(infile.getMaxTrack() + 1);
+	m_kstates.resize(infile.getMaxTrack() + 1);
+
+	for (int i=0; i<(int)m_pstates.size(); i++) {
+		m_pstates[i].resize(70);
+		fill(m_pstates[i].begin(), m_pstates[i].end(), 0);
+		m_kstates[i].resize(70);
+		fill(m_kstates[i].begin(), m_kstates[i].end(), 0);
+		m_estates[i].resize(70);
+		fill(m_estates[i].begin(), m_estates[i].end(), false);
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			updateKeySignatures(infile, i);
+			continue;
+		} else if (infile[i].isBarline()) {
+			clearStates();
+			continue;
+		} else if (infile[i].isData()) {
+			checkDataLine(infile, i);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chantize::fixInstrumentAbbreviations --
+//
+
+void Tool_chantize::fixInstrumentAbbreviations(HumdrumFile& infile) {
+	int iline = -1;
+	int aline = -1;
+
+	std::vector<HTp> kerns = infile.getKernSpineStartList();
+	if (kerns.empty()) {
+		return;
+	}
+
+	HTp cur = kerns[0];
+	while (cur) {
+		if (cur->isData()) {
+			break;
+		}
+		if (cur->compare(0, 3, "*I\"") == 0) {
+			iline = cur->getLineIndex();
+		} else if (cur->compare(0, 3, "*I'") == 0) {
+			aline = cur->getLineIndex();
+		}
+		cur = cur->getNextToken();
+	}
+
+	if (iline < 0) {
+		// no names to create abbreviations for
+		return;
+	}
+	if (aline < 0) {
+		// not creating a new abbreviation for now
+		// (could add later).
+		return;
+	}
+	if (infile[iline].getFieldCount() != infile[aline].getFieldCount()) {
+		// no spine splitting between the two lines.
+		return;
+	}
+	// Maybe also require them to be adjacent to each other.
+	HumRegex hre;
+	for (int j=0; j<(int)infile[iline].getFieldCount(); j++) {
+		if (!infile.token(iline, j)->isKern()) {
+			continue;
+		}
+		if (!hre.search(*infile.token(iline, j), "([A-Za-z][A-Za-z .0-9]+)")) {
+			continue;
+		}
+		string name = hre.getMatch(1);
+		string abbr = "*I'";
+		if (name == "Basso Continuo") {
+			abbr += "BC";
+		} else if (name == "Basso continuo") {
+			abbr += "BC";
+		} else if (name == "basso continuo") {
+			abbr += "BC";
+		} else {
+			abbr += toupper(name[0]);
+		}
+		// check for numbers after the end of the name and add to abbreviation
+		infile.token(aline, j)->setText(abbr);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chantize::deleteBreaks --
+//
+
+void Tool_chantize::deleteBreaks(HumdrumFile& infile) {
+	HumRegex hre;
+	for (int i=infile.getLineCount()-1; i>= 0; i--) {
+		if (!infile[i].isGlobalComment()) {
+			continue;
+		}
+		if (hre.search(*infile.token(i, 0), "linebreak\\s*:\\s*original")) {
+			infile.deleteLine(i);
+		}
+		else if (hre.search(*infile.token(i, 0), "pagebreak\\s*:\\s*original")) {
+			infile.deleteLine(i);
+		}
+	}
+}
+
+
+
+////////////////////////////////
+//
+// Tool_chantize::addBibliographicRecords --
+//
+// !!!folio:
+// !!!system:
+// !!!SMS:
+//
+// At end:
+// !!!SMS-url:
+// !!!AGN: Chant
+// !!!ENC: [Encoder's name]
+// !!!END: [Encoding date]
+// !!!EEV: $DATE
+//
+
+void Tool_chantize::addBibliographicRecords(HumdrumFile& infile) {
+	std::vector<HLp> refinfo = infile.getReferenceRecords();
+	std::map<string, HLp> refs;
+	for (int i=0; i<(int)refinfo.size(); i++) {
+		string key = refinfo[i]->getReferenceKey();
+		refs[key] = refinfo[i];
+	}
+
+	// header records
+
+	if (refs.find("system") == refs.end()) {
+		infile.insertLine(0, "!!!system:");
+	}
+
+	if (refs.find("folio") == refs.end()) {
+		infile.insertLine(0, "!!!folio:");
+	}
+
+	if (refs.find("SMS") == refs.end()) {
+		infile.insertLine(0, "!!!SMS:");
+	}
+
+	if (refs.find("OTL") == refs.end()) {
+		if (infile.token(0, 0)->find("!!!OTL") != std::string::npos) {
+			// do nothing
+		} else {
+			infile.insertLine(0, "!!!OTL:");
+		}
+	}
+
+	// trailer records
+
+	if (refs.find("SMS-url") == refs.end()) {
+		infile.appendLine("!!!SMS-url:");
+	}
+
+	if (refs.find("AGN") == refs.end()) {
+		infile.appendLine("!!!AGN: Chant");
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isReference()) {
+			continue;
+		}
+		if (infile.token(i, 0)->find("!!!RDF**kern:") == std::string::npos) {
+			continue;
+		}
+	}
+
+	if (refs.find("ENC") == refs.end()) {
+		infile.appendLine("!!!ENC: [Encoder's name]");
+	}
+	if (refs.find("END") == refs.end()) {
+		string date = getDate();
+		string line = "!!!EED: " + date;
+		infile.appendLine(line);
+	}
+	if (refs.find("EEV") == refs.end()) {
+		string date = getDate();
+		string line = "!!!EEV: " + date;
+		infile.appendLine(line);
+	}
+
+}
+
+
+
+////////////////////////////////
+//
+// Tool_chantize::checkDataLine --
+//
+
+void Tool_chantize::checkDataLine(HumdrumFile& infile, int lineindex) {
+	HumdrumLine& line = infile[lineindex];
+
+	HumRegex hre;
+	HTp token;
+	bool haseditQ;
+	int base7;
+	int accid;
+	int track;
+	bool removeQ;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		token = line.token(i);
+		track = token->getTrack();
+		if (!token->isKern()) {
+			continue;
+		}
+		if (token->isNull()) {
+			continue;
+		}
+		if (token->isRest()) {
+			continue;
+		}
+		if (token->isSecondaryTiedNote()) {
+			continue;
+		}
+
+		base7 = Convert::kernToBase7(token);
+		accid = Convert::kernToAccidentalCount(token);
+		haseditQ = false;
+		removeQ = false;
+
+		// Hard-wired to "i" as editorial accidental marker
+		if (token->find("ni") != string::npos) {
+			haseditQ = true;
+		} else if (token->find("-i") != string::npos) {
+			haseditQ = true;
+		} else if (token->find("#i") != string::npos) {
+			haseditQ = true;
+		} else if (token->find("nXi") != string::npos) {
+			haseditQ = true;
+			removeQ = true;
+		} else if (token->find("-Xi") != string::npos) {
+			haseditQ = true;
+			removeQ = true;
+		} else if (token->find("#Xi") != string::npos) {
+			haseditQ = true;
+			removeQ = true;
+		}
+
+		if (removeQ) {
+			string temp = *token;
+			hre.replaceDestructive(temp, "", "X");
+			token->setText(temp);
+		}
+
+		bool explicitQ = false;
+		if (token->find("#X") != string::npos) {
+			explicitQ = true;
+		} else if (token->find("-X") != string::npos) {
+			explicitQ = true;
+		} else if (token->find("nX") != string::npos) {
+			explicitQ = true;
+		} else if (token->find("n") != string::npos) {
+			// add an explicit accidental marker
+			explicitQ = true;
+			string text = *token;
+			hre.replaceDestructive(text, "nX", "n");
+			token->setText(text);
+		}
+
+		if (haseditQ) {
+			// Store new editorial pitch state.
+			m_estates.at(track).at(base7) = true;
+			m_pstates.at(track).at(base7) = accid;
+			continue;
+		}
+
+		if (explicitQ) {
+			// No need to make editorial since it is visible.
+			m_estates.at(track).at(base7) = false;
+			m_pstates.at(track).at(base7) = accid;
+			continue;
+		}
+
+		if (accid == m_kstates.at(track).at(base7)) {
+			// 	!m_estates.at(track).at(base7)) {
+			// add !m_estates.at(track).at(base) as a condition if
+			// you want editorial accidentals to be added to return the
+			// note to the accidental in the key.
+			//
+			// The accidental matches the key-signature state,
+			// so it should not be made editorial eventhough
+			// it is not visible.
+			m_pstates.at(track).at(base7) = accid;
+
+			// Add a "y" marker of there is an interpreted accidental
+			// state (flat or sharp) that is part of the key signature.
+			int hasaccid = false;
+			if (token->find("#") != std::string::npos) {
+				hasaccid = true;
+			} else if (token->find("-") != std::string::npos) {
+				hasaccid = true;
+			}
+			int hashide = false;
+			if (token->find("-y") != std::string::npos) {
+				hashide = true;
+			}
+			else if (token->find("#y") != std::string::npos) {
+				hashide = true;
+			}
+			if (hasaccid && !hashide) {
+				string text = *token;
+				hre.replaceDestructive(text, "#y", "#");
+				hre.replaceDestructive(text, "-y", "-");
+				token->setText(text);
+			}
+
+			continue;
+		}
+
+		// At this point the previous note with this pitch class
+		// had an editorial accidental, and this note also has the
+		// same accidental, or there was a previous visual accidental
+		// outside of the key signature that will cause this note to have
+		// an editorial accidental mark applied (Sibelius will drop
+		// secondary editorial accidentals in a measure when exporting,
+		// MusicXML, which is why this function is needed).
+
+		m_estates[track][base7] = true;
+		m_pstates[track][base7] = accid;
+
+		string text = token->getText();
+		string output = "";
+		bool foundQ = false;
+		for (int j=0; j<(int)text.size(); j++) {
+			if (text[j] == 'n') {
+				output += "ni";
+				foundQ = true;
+			} else if (text[j] == '#') {
+				output += "#i";
+				foundQ = true;
+			} else if (text[j] == '-') {
+				output += "-i";
+				foundQ = true;
+			} else {
+				output += text[j];
+			}
+		}
+
+		if (foundQ) {
+			token->setText(output);
+			continue;
+		}
+
+		// The note is natural, but has no natural sign.
+		// add the natural sign and editorial mark.
+		for (int j=(int)output.size()-1; j>=0; j--) {
+			if ((tolower(output[j]) >= 'a') && (tolower(output[j]) <= 'g')) {
+				output.insert(j+1, "ni");
+				break;
+			}
+		}
+		token->setText(output);
+	}
+}
+
+
+
+////////////////////////////////
+//
+// Tool_chantize::updateKeySignatures -- Fill in the accidental
+//    states for each diatonic pitch.
+//
+
+void Tool_chantize::updateKeySignatures(HumdrumFile& infile, int lineindex) {
+	HumdrumLine& line = infile[lineindex];
+	int track;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		if (!line.token(i)->isKeySignature()) {
+			continue;
+		}
+		HTp token = line.token(i);
+		track = token->getTrack();
+		string text = token->getText();
+		fill(m_kstates[track].begin(), m_kstates[track].end(), 0);
+		for (int j=3; j<(int)text.size()-1; j++) {
+			if (text[j] == ']') {
+				break;
+			}
+			switch (text[j]) {
+				case 'a': case 'A':
+					switch (text[j+1]) {
+						case '#': m_kstates[track][5] = +1;
+						break;
+						case '-': m_kstates[track][5] = -1;
+						break;
+					}
+					break;
+
+				case 'b': case 'B':
+					switch (text[j+1]) {
+						case '#': m_kstates[track][6] = +1;
+						break;
+						case '-': m_kstates[track][6] = -1;
+						break;
+					}
+					break;
+
+				case 'c': case 'C':
+					switch (text[j+1]) {
+						case '#': m_kstates[track][0] = +1;
+						break;
+						case '-': m_kstates[track][0] = -1;
+						break;
+					}
+					break;
+
+				case 'd': case 'D':
+					switch (text[j+1]) {
+						case '#': m_kstates[track][1] = +1;
+						break;
+						case '-': m_kstates[track][1] = -1;
+						break;
+					}
+					break;
+
+				case 'e': case 'E':
+					switch (text[j+1]) {
+						case '#': m_kstates[track][2] = +1;
+						break;
+						case '-': m_kstates[track][2] = -1;
+						break;
+					}
+					break;
+
+				case 'f': case 'F':
+					switch (text[j+1]) {
+						case '#': m_kstates[track][3] = +1;
+						break;
+						case '-': m_kstates[track][3] = -1;
+						break;
+					}
+					break;
+
+				case 'g': case 'G':
+					switch (text[j+1]) {
+						case '#': m_kstates[track][4] = +1;
+						break;
+						case '-': m_kstates[track][4] = -1;
+						break;
+					}
+					break;
+			}
+			for (int j=0; j<7; j++) {
+				if (m_kstates[track][j] == 0) {
+					continue;
+				}
+				for (int k=1; k<10; k++) {
+					m_kstates[track][j+k*7] = m_kstates[track][j];
+				}
+			}
+		}
+	}
+
+	// initialize m_pstates with contents of m_kstates
+	for (int i=0; i<(int)m_kstates.size(); i++) {
+		for (int j=0; j<(int)m_kstates[i].size(); j++) {
+			m_pstates[i][j] = m_kstates[i][j];
+		}
+	}
+
+}
+
+
+
+////////////////////////////////
+//
+// Tool_chantize::clearStates --
+//
+
+void Tool_chantize::clearStates(void) {
+	for (int i=0; i<(int)m_pstates.size(); i++) {
+		fill(m_pstates[i].begin(), m_pstates[i].end(), 0);
+	}
+	for (int i=0; i<(int)m_estates.size(); i++) {
+		fill(m_estates[i].begin(), m_estates[i].end(), false);
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_chantize::getDate --
+//
+
+string Tool_chantize::getDate(void) {
+	time_t t = time(NULL);
+	tm* timeptr = localtime(&t);
+	stringstream ss;
+	int year = timeptr->tm_year + 1900;
+	int month = timeptr->tm_mon + 1;
+	int day = timeptr->tm_mday;
+	ss << year << "/";
+	if (month < 10) {
+		ss << "0";
+	}
+	ss << month << "/";
+	if (day < 10) {
+		ss << "0";
+	}
+	ss << day;
+	return ss.str();
+}
+
+
+//////////////////////////////
+//
+// Tool_chantize::getTerminalRestStates -- return a vector of each line,
+//    setting true if the line is a data line containing a rest at the end of the 
+//    music after the last note.
+//
+
+vector<bool> Tool_chantize::getTerminalRestStates(HumdrumFile& infile) {
+	vector<bool> output(infile.getLineCount(), false);
+
+	for (int i=infile.getLineCount() - 1; i>=0; i--) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if (token->isRest()) {
+			output[i] = true;
+		} else {
+			break;
+		}
+	}
+
+	return output;
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chantize::hasDiamondNotes -- True if the duration of any line is less than a quarter note.
+//
+
+bool Tool_chantize::hasDiamondNotes(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		HumNum duration = infile[i].getDuration();
+		if (duration < 1) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+/////////////////////////////////
+//
 // Tool_chooser::Tool_chooser -- Set the recognized options for the tool.
 //
 
@@ -56866,6 +60125,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "satb2gsx") {
 			// humlib cli emulation
 			RUNTOOL(satb2gs, infile, commands[i].second, status);
+		} else if (commands[i].first == "scordatura") {
+			RUNTOOL(scordatura, infile, commands[i].second, status);
 		} else if (commands[i].first == "sic") {
 			RUNTOOL(sic, infile, commands[i].second, status);
 		} else if (commands[i].first == "simat") {
@@ -56886,6 +60147,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(tassoize, infile, commands[i].second, status);
 		} else if (commands[i].first == "tasso") {
 			RUNTOOL(tassoize, infile, commands[i].second, status);
+		} else if (commands[i].first == "chantize") {
+			RUNTOOL(chantize, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
 			RUNTOOL(transpose, infile, commands[i].second, status);
 		} else if (commands[i].first == "tremolo") {
@@ -71701,7 +74964,7 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 	}
 
 	string sign;
-	int line = 0;
+	int line = -1000;
 	int octadjust = 0;
 
 	xml_node child = clef.first_child();
@@ -71731,7 +74994,9 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 			ss << "^";
 		}
 	}
-	ss << line;
+	if (line > 0) {
+		ss << line;
+	}
 	token = new HumdrumToken(ss.str());
 
 	clef = clef.next_sibling();
@@ -77855,6 +81120,308 @@ bool Tool_satb2gs::validateHeader(HumdrumFile& infile) {
 	return true;
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_scordatura::Tool_scordatura -- Set the recognized options for the tool.
+//
+
+Tool_scordatura::Tool_scordatura(void) {
+	define("s|sounding=b", "generate sounding score");
+	define("w|written=b", "generate written score");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_scordatura::run -- Do the main work of the tool.
+//
+
+bool Tool_scordatura::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_scordatura::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_scordatura::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_scordatura::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_scordatura::initialize(void) {
+	m_writtenQ  = getBoolean("written");
+	m_soundingQ = getBoolean("sounding");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::processFile --
+//
+
+void Tool_scordatura::processFile(HumdrumFile& infile) {
+	m_modifiedQ = false;
+
+	vector<HTp> rdfs;
+	getScordaturaRdfs(rdfs, infile);
+	if (!rdfs.empty()) {
+		processScordaturas(infile, rdfs);
+	}
+	if (m_modifiedQ) {
+		infile.createLinesFromTokens();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::processScoredaturas --
+//
+
+void Tool_scordatura::processScordaturas(HumdrumFile& infile, vector<HTp>& rdfs) {
+	for (int i=0; i<(int)rdfs.size(); i++) {
+		processScordatura(infile, rdfs[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::processScordatura --
+//
+
+void Tool_scordatura::processScordatura(HumdrumFile& infile, HTp reference) {
+	HumRegex hre;
+
+	if (m_writtenQ) {
+		if (!hre.search(reference, "^!!!RDF\\*\\*kern\\s*:\\s*([^\\s]+)\\s*=.*\\bscordatura\\s*=\\s*[\"']?\\s*ITrd(-?\\d+)c(-?\\d+)\\b")) {
+			return;
+		}
+	} else if (m_soundingQ) {
+		if (!hre.search(reference, "^!!!RDF\\*\\*kern\\s*:\\s*([^\\s]+)\\s*=.*\\bscordatura\\s*=\\s*[\"']?\\s*Trd(-?\\d+)c(-?\\d+)\\b")) {
+			return;
+		}
+	}
+
+	string marker = hre.getMatch(1);
+	int diatonic = hre.getMatchInt(2);
+	int chromatic = hre.getMatchInt(3);
+
+	if (diatonic == 0 && chromatic == 0) {
+		// nothing to do
+		return;
+	}
+
+	flipScordaturaInfo(reference, diatonic, chromatic);
+	transposeMarker(infile, marker, diatonic, chromatic);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::transposeMarker --
+//
+
+
+void Tool_scordatura::transposeMarker(HumdrumFile& infile, const string& marker, int diatonic, int chromatic) {
+	m_transposer.setTranspositionDC(diatonic, chromatic);
+	for (int i=0; i<infile.getStrandCount(); i++) {
+		HTp sstart = infile.getStrandBegin(i);
+		if (!sstart->isKern()) {
+			continue;
+		}
+		HTp sstop = infile.getStrandEnd(i);
+		transposeStrand(sstart, sstop, marker);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::transposeStrand --
+//
+
+void Tool_scordatura::transposeStrand(HTp sstart, HTp sstop, const string& marker) {
+	HTp current = sstart;
+	while (current && current != sstop) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull() || current->isRest()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->find(marker) != string::npos) {
+			transposeChord(current, marker);
+		}
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::transposeChord --
+//
+
+void Tool_scordatura::transposeChord(HTp token, const string& marker) {
+	int scount = token->getSubtokenCount();
+	if (scount == 1) {
+		string inputnote = *token;
+		string newtoken;
+		newtoken = transposeNote(inputnote);
+		token->setText(newtoken);
+		return;
+	}
+	vector<string> subtokens;
+	subtokens = token->getSubtokens();
+	for (int i=0; i<(int)subtokens.size(); i++) {
+		if (subtokens[i].find(marker) == string::npos) {
+			continue;
+		}
+		string newtoken = transposeNote(subtokens[i]);
+		subtokens[i] = newtoken;
+	}
+	string newchord;
+	for (int i=0; i<(int)subtokens.size(); i++) {
+		newchord += subtokens[i];
+		if (i<(int)subtokens.size() - 1) {
+			newchord += ' ';
+		}
+	}
+	token->setText(newchord);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::transposeNote --
+//
+
+string Tool_scordatura::transposeNote(const string& note) {
+	HumRegex hre;
+	if (!hre.search(note, "(.*?)([A-Ga-g]+[-#]*)(.*)")) {
+		return note;
+	}
+	string pre = hre.getMatch(1);
+	string pitch = hre.getMatch(2);
+	string post = hre.getMatch(3);
+	HumPitch hpitch;
+	hpitch.setKernPitch(pitch);
+	m_transposer.transpose(hpitch);
+	string output;
+	output = pre;
+	output += hpitch.getKernPitch();
+	output += post;
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::flipScordaturaInfo --
+//
+
+void Tool_scordatura::flipScordaturaInfo(HTp reference, int diatonic, int chromatic) {
+	diatonic *= -1;
+	chromatic *= -1;
+	string output;
+	if (m_writtenQ) {
+		output = "Trd";
+		output += to_string(diatonic);
+		output += "c";
+		output += to_string(chromatic);
+	} else if (m_soundingQ) {
+		output = "ITrd";
+		output += to_string(diatonic);
+		output += "c";
+		output += to_string(chromatic);
+	} else {
+		return;
+	}
+	HumRegex hre;
+	string token = *reference;
+	hre.replaceDestructive(token, output, "I?Trd-?\\dc-?\\d");
+	if (token != *reference) {
+		m_modifiedQ = true;
+		reference->setText(token);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_scordatura::getScoredaturaRdfs --
+//
+
+void Tool_scordatura::getScordaturaRdfs(vector<HTp>& rdfs, HumdrumFile& infile) {
+	rdfs.clear();
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isReference()) {
+			continue;
+		}
+		HTp reference = infile.token(i, 0);
+		if (m_writtenQ) {
+			if (hre.search(reference, "^!!!RDF\\*\\*kern\\s*:\\s*[^\\s]+\\s*=.*\\bscordatura\\s*=\\s*[\"']?\\s*ITrd-?\\d+c-?\\d+\\b")) {
+				rdfs.push_back(reference);
+			}
+		} else if (m_soundingQ) {
+			if (hre.search(reference, "^!!!RDF\\*\\*kern\\s*:\\s*[^\\s]+\\s*=.*\\bscordatura\\s*=\\s*[\"']?\\s*Trd-?\\d+c-?\\d+\\b")) {
+				rdfs.push_back(reference);
+			}
+		}
+	}
+}
 
 
 
