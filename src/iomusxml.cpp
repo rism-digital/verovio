@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <codecvt>
 #include <regex>
 #include <sstream>
 
@@ -397,6 +398,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
 {
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
+        pugi::xml_node soundNode = textNode.parent().next_sibling("sound");
         std::string textStr = textNode.text().as_string();
         std::string textColor = textNode.attribute("color").as_string();
         Object *textParent = element;
@@ -412,6 +414,12 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             rend->SetFontfam(textNode.attribute("font-family").as_string());
             rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textNode.attribute("font-style").as_string()));
             rend->SetFontweight(rend->AttTypography::StrToFontweight(textNode.attribute("font-weight").as_string()));
+            element->AddChild(rend);
+            textParent = rend;
+        }
+        if (soundNode && !soundNode.attribute("@tempo")) {
+            Rend *rend = new Rend();
+            rend->SetHalign(HORIZONTALALIGNMENT_right);
             element->AddChild(rend);
             textParent = rend;
         }
@@ -1617,6 +1625,27 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
     }
 
+    // Coda
+    pugi::xpath_node coda = type.node().select_node("coda");
+    if (coda) {
+        Dir *dir = new Dir();
+        dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        dir->SetTstamp(timeStamp - 1.0);
+        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        Rend *rend = new Rend;
+        rend->SetFontname("VerovioText");
+        rend->SetFontstyle(FONTSTYLE_normal);
+        rend->SetHalign(HORIZONTALALIGNMENT_center);
+        Text *text = new Text();
+        std::wstring wtext;
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
+        wtext = conv.from_bytes("𝄌");
+        text->SetText(wtext);
+        rend->AddChild(text);
+        dir->AddChild(rend);
+        m_controlElements.push_back(std::make_pair(measureNum, dir));
+    }
+
     // Directive
     std::string dynamStr = ""; // string containing dynamics information
     int defaultY = 0; // y position attribute, only for directives and dynamics
@@ -1971,6 +2000,27 @@ void MusicXmlInput::ReadMusicXmlDirection(
         m_controlElements.push_back(std::make_pair(measureNum, reh));
     }
 
+    // Segno
+    pugi::xpath_node segno = type.node().select_node("segno");
+    if (segno) {
+        Dir *dir = new Dir();
+        dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        dir->SetTstamp(timeStamp - 1.0);
+        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        Rend *rend = new Rend;
+        rend->SetFontname("VerovioText");
+        rend->SetFontstyle(FONTSTYLE_normal);
+        rend->SetHalign(HORIZONTALALIGNMENT_center);
+        Text *text = new Text();
+        std::wstring wtext;
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
+        wtext = conv.from_bytes("𝄋");
+        text->SetText(wtext);
+        rend->AddChild(text);
+        dir->AddChild(rend);
+        m_controlElements.push_back(std::make_pair(measureNum, dir));
+    }
+
     // Tempo
     pugi::xpath_node metronome = type.node().select_node("metronome");
     if (node.select_node("sound[@tempo]") || metronome) {
@@ -1996,8 +2046,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !bracket && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes
-        && !rehearsal) {
+    if (words.size() == 0 && !coda && !dynamics && !bracket && !lead && !metronome && !segno && !xmlShift && !xmlPedal
+        && !wedge && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
