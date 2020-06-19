@@ -43,16 +43,21 @@ namespace vrv {
 bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 {
     jsonxx::Object json;
+    m_infoObject.reset();
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
         LogError("Can not parse JSON std::string.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Cannot parse JSON from std::string " + json_editorAction);
         return false;
     }
 
     if (!json.has<jsonxx::String>("action")
         || (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param"))) {
         LogWarning("Incorrectly formatted JSON action");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "JSON action misformatted.");
         return false;
     }
 
@@ -60,6 +65,8 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 
     if (action != "chain" && json.has<jsonxx::Array>("param")) {
         LogWarning("Only 'chain' uses 'param' as an array.");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "'param' can only be an array for a chain action.");
         return false;
     }
 
@@ -188,6 +195,8 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
     else {
         LogWarning("Unknown action type '%s'.", action.c_str());
     }
+    m_infoObject.import("status", "FAILURE");
+    m_infoObject.import("message", "Action " + action + " could not be parsed or is unknown.");
     return false;
 }
 
@@ -212,7 +221,6 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 
 bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 {
-    m_infoObject.reset();
     std::string status = "OK", message = "";
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page.");
@@ -565,7 +573,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
     std::vector<std::pair<std::string, std::string> > attributes)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -930,7 +937,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     ListOfObjects staves;
 
@@ -1022,7 +1028,6 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
 bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) return false;
     Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
     bool success = false;
@@ -1064,7 +1069,6 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
 // Update the text of a TextElement by its syl
 bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 {
-    m_infoObject.reset();
     std::string status = "OK", message = "";
     std::wstring wtext;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
@@ -1164,7 +1168,6 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
 
 bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");
@@ -1226,7 +1229,6 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
 
 bool EditorToolkitNeume::Split(std::string elementId, int x)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -1321,7 +1323,6 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
 
 bool EditorToolkitNeume::Remove(std::string elementId)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");
@@ -1446,7 +1447,6 @@ bool EditorToolkitNeume::Remove(std::string elementId)
 
 bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float rotate)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");
@@ -1521,7 +1521,6 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
 
 bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> elementIds)
 {
-    m_infoObject.reset();
     Object *parent = NULL, *doubleParent = NULL;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
@@ -1924,7 +1923,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
 bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
-    m_infoObject.reset();
     Object *fparent = NULL;
     Object *sparent = NULL;
     Object *currentParent = NULL;
@@ -2175,7 +2173,6 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
 bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
 {
-    m_infoObject.reset();
     // Check if you can get drawing page
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
@@ -2283,7 +2280,6 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
 bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
 {
     assert(elementIds.size() == 2);
-    m_infoObject.reset();
     bool success1 = false;
     bool success2 = false;
     Facsimile *facsimile = m_doc->GetFacsimile();
@@ -2366,7 +2362,6 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
 
 bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 {
-    m_infoObject.reset();
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page");
         m_infoObject.import("status", "FAILURE");
