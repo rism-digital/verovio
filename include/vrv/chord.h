@@ -71,6 +71,11 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
+    virtual bool IsSupportedChild(Object *object);
+
+    /**
+     * Overwritten method for chord
+     */
     virtual void AddChild(Object *object);
 
     /**
@@ -155,11 +160,11 @@ public:
     virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
 
     /**
-     * See Object::ConvertAnalyticalMarkup
+     * See Object::ConvertMarkupAnalytical
      */
     ///@{
-    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
-    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
+    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams);
     ///@}
 
     /**

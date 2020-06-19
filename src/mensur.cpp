@@ -5,7 +5,9 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "mensur.h" //----------------------------------------------------------------------------
+#include "mensur.h"
+
+//----------------------------------------------------------------------------
 
 #include <assert.h>
 #include <math.h>
@@ -31,7 +33,6 @@ Mensur::Mensur()
     , AttCue()
     , AttDurationRatio()
     , AttMensuralShared()
-    , AttMensurLog()
     , AttMensurVis()
     , AttSlashCount()
     , AttStaffLoc()
@@ -40,7 +41,6 @@ Mensur::Mensur()
     RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_MENSURALSHARED);
-    RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_MENSURVIS);
     RegisterAttClass(ATT_SLASHCOUNT);
     RegisterAttClass(ATT_STAFFLOC);
@@ -57,7 +57,6 @@ void Mensur::Reset()
     ResetCue();
     ResetDurationRatio();
     ResetMensuralShared();
-    ResetMensurLog();
     ResetMensurVis();
     ResetSlashCount();
     ResetStaffLoc();

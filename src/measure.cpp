@@ -137,7 +137,7 @@ void Measure::Reset()
     m_currentTempo = 120;
 }
 
-void Measure::AddChild(Object *child)
+bool Measure::IsSupportedChild(Object *child)
 {
     if (child->IsControlElement()) {
         assert(dynamic_cast<ControlElement *>(child));
@@ -155,35 +155,16 @@ void Measure::AddChild(Object *child)
         }
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Measure::AddChildBack(Object *child)
 {
-    if (child->IsControlElement()) {
-        assert(dynamic_cast<ControlElement *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else if (child->Is(STAFF)) {
-        Staff *staff = dynamic_cast<Staff *>(child);
-        assert(staff);
-        if (staff && (staff->GetN() < 1)) {
-            // This is not 100% safe if we have a <app> and <rdg> with more than
-            // one staff as a previous child.
-            staff->SetN(this->GetChildCount());
-        }
-    }
-    else {
+    if (!this->IsSupportedChild(child)) {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return;
     }
 
     child->SetParent(this);
@@ -224,10 +205,15 @@ int Measure::GetDrawingX() const
     return m_cachedDrawingX;
 }
 
+void Measure::ResetCachedDrawingX() const
+{
+    Object::ResetCachedDrawingX();
+    m_timestampAligner.ResetCachedDrawingX();
+}
+
 void Measure::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
-    m_timestampAligner.ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
@@ -288,9 +274,9 @@ int Measure::GetWidth() const
     if (!this->IsMeasuredMusic()) {
         System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
-        Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
-        assert(page);
         if (system->m_yAbs != VRV_UNSET) {
+            Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
+            assert(page);
             // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
             return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
         }
@@ -346,13 +332,12 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
     // First get all the staffGrps
     ClassIdComparison matchType(STAFFGRP);
-    ArrayOfObjects staffGrps;
-    ArrayOfObjects::iterator staffGrpIter;
+    ListOfObjects staffGrps;
     scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
-    for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); ++staffGrpIter) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>((*staffGrpIter)->GetFirst(STAFFDEF));
+    for (auto &staffGrp : staffGrps) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>((staffGrp)->GetFirst(STAFFDEF));
         if (staffDef) staffList.push_back(staffDef->GetN());
     }
 
@@ -373,7 +358,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 Staff *Measure::GetTopVisibleStaff()
 {
     Staff *staff = NULL;
-    ArrayOfObjects staves;
+    ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
     this->FindAllDescendantByComparison(&staves, &matchType, 1);
     for (auto &child : staves) {
@@ -464,9 +449,9 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     ArrayOfObjects::iterator iter;

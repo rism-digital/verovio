@@ -100,6 +100,7 @@ class PgFoot;
 class PgFoot2;
 class PgHead;
 class PgHead2;
+class Phrase;
 class PitchInterface;
 class PlistInterface;
 class PositionInterface;
@@ -157,7 +158,7 @@ class MEIOutput : public Output {
 public:
     /** @name Constructors and destructor */
     ///@{
-    MEIOutput(Doc *doc, std::string filename);
+    MEIOutput(Doc *doc);
     virtual ~MEIOutput();
     ///@}
 
@@ -182,9 +183,19 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Setter for score-based MEI output (not implemented)
+     * Setter for score-based MEI output
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+
+    /**
+     * Setter for indent for the MEI output (default is 3, -1 for tabs)
+     */
+    void SetIndent(int indent) { m_indent = indent; }
+
+    /**
+     * Setter for remove Ids flag for the MEI output (default is false)
+     */
+    void SetRemoveIds(bool removeIds) { m_removeIds = removeIds; }
 
 private:
     bool WriteDoc(Doc *doc);
@@ -294,6 +305,7 @@ private:
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
+    void WritePhrase(pugi::xml_node currentNode, Phrase *phrase);
     void WriteReh(pugi::xml_node currentNode, Reh *reh);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteTempo(pugi::xml_node currentNode, Tempo *tempo);
@@ -398,15 +410,16 @@ private:
 public:
     //
 private:
-    std::string m_filename;
     std::ostringstream m_streamStringOutput;
-    bool m_writeToStreamString;
+    int m_indent;
     int m_page;
     bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
     /** @name Current element */
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_nodeStack;
+    bool m_removeIds;
+    ListOfObjects m_referredObjects;
 };
 
 //----------------------------------------------------------------------------
@@ -546,6 +559,7 @@ private:
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
+    bool ReadPhrase(Object *parent, pugi::xml_node phrase);
     bool ReadReh(Object *parent, pugi::xml_node reh);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
     bool ReadTempo(Object *parent, pugi::xml_node tempo);
@@ -657,6 +671,7 @@ private:
     DocType StrToDocType(std::string type);
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
+    bool ReadXMLComment(Object *object, pugi::xml_node element);
     ///@}
 
     /**
@@ -666,6 +681,7 @@ private:
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
+    void UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
@@ -720,6 +736,11 @@ private:
      * This is not the case when selecting a mDiv that is not the first one with a score in the tree.
      */
     bool m_useScoreDefForDoc;
+
+    /**
+     * The comment to be attached to the next Object
+     */
+    std::string m_comment;
 };
 
 } // namespace vrv

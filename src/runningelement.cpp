@@ -66,7 +66,7 @@ void RunningElement::Reset()
     }
 }
 
-void RunningElement::AddChild(Object *child)
+bool RunningElement::IsSupportedChild(Object *child)
 {
     if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
@@ -75,13 +75,9 @@ void RunningElement::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void RunningElement::FilterList(ArrayOfObjects *childList)
@@ -161,7 +157,7 @@ int RunningElement::GetWidth() const
     Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstAncestor(DOC));
     if (!doc) return 0;
 
-    return (doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight);
+    return (doc->m_drawingPageContentWidth);
     // return m_drawingPage->GetContentWidth();
 }
 

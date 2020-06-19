@@ -70,7 +70,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, OCTAVE, SLUR, TIE })) {
+    if (element->Is({ BRACKETSPAN, FIGURE, GLISS, HAIRPIN, PHRASE, OCTAVE, SLUR, TIE })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -117,6 +117,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Pedal *pedal = dynamic_cast<Pedal *>(element);
         assert(pedal);
         DrawPedal(dc, pedal, measure, system);
+        system->AddToDrawingListIfNeccessary(pedal);
     }
     else if (element->Is(REH)) {
         Reh *reh = dynamic_cast<Reh *>(element);
@@ -151,7 +152,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if (element->Is({ SLUR, BRACKETSPAN, HAIRPIN, OCTAVE, TIE })) return;
+            if (element->Is({ BRACKETSPAN, HAIRPIN, PHRASE, OCTAVE, SLUR, TIE })) return;
         }
     }
 
@@ -302,9 +303,19 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
+        else if (element->Is(PHRASE)) {
+            // For phrases (slurs) we limit support to one value in @staff
+            if (staffIter != staffList.begin()) continue;
+            // cast to Slur check in DrawSlur
+            DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+
         else if (element->Is(OCTAVE)) {
             // cast to Slur check in DrawOctave
             DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(PEDAL)) {
+            DrawPedalLine(dc, dynamic_cast<Pedal *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(SLUR)) {
             // For slurs we limit support to one value in @staff
@@ -708,6 +719,8 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     int y1, y2;
+    int r1 = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int r2 = r1;
 
     /************** parent layers **************/
 
@@ -748,6 +761,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         if (note1) {
             y1 = note1->GetDrawingY();
             y2 = y1;
+            noteStemDir = note1->GetDrawingStemDir();
         }
         else if (note2) {
             y2 = note2->GetDrawingY();
@@ -755,17 +769,16 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         }
         // isShort is never true with tstamp1
         if (!isShortTie) {
-            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-            x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+            if (note1) r1 = note1->GetDrawingRadius(m_doc);
+            if (note2) r2 = note2->GetDrawingRadius(m_doc);
+            x1 += r1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+            x2 -= r2 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
             if (note1 && note1->GetDots() > 0) {
-                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
+                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * note1->GetDots() * 3 / 2;
             }
             else if (parentChord1 && (parentChord1->GetDots() > 0)) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
             }
-        }
-        if (note1) {
-            noteStemDir = note1->GetDrawingStemDir();
         }
     }
     // This is the case when the tie is split over two system of two pages.
@@ -774,12 +787,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         if (note1) {
             y1 = note1->GetDrawingY();
             y2 = y1;
+            r1 = note1->GetDrawingRadius(m_doc);
+            noteStemDir = note1->GetDrawingStemDir();
         }
         if (!isShortTie) {
-            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-        }
-        if (note1) {
-            noteStemDir = note1->GetDrawingStemDir();
+            x1 += r1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         }
     }
     // Now this is the case when the tie is split but we are drawing the end of it
@@ -787,12 +799,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         if (note2) {
             y2 = note2->GetDrawingY();
             y1 = y2;
+            r2 = note2->GetDrawingRadius(m_doc);
+            noteStemDir = note2->GetDrawingStemDir();
         }
         if (!isShortTie) {
-            x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-        }
-        if (note2) {
-            noteStemDir = note2->GetDrawingStemDir();
+            x2 -= r2 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         }
     }
     // Finally - this make no sense ?
@@ -858,16 +869,10 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     /************** bezier points **************/
 
     // the 'height' of the bezier
-    int height;
-    if (tie->HasBulge()) {
-        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * tie->GetBulge();
-    }
-    else {
-        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // if the space between the to points is more than two staff height, increase the height
-        if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
-            height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        }
+    int height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // if the space between the to points is more than two staff height, increase the height
+    if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
+        height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieThickness.GetValue();
 
@@ -918,6 +923,75 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(tie, this);
+}
+
+void View::DrawPedalLine(
+    DeviceContext *dc, Pedal *pedal, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(pedal);
+    assert(staff);
+
+    assert(pedal->GetStart());
+    assert(pedal->GetEnd());
+
+    int y = pedal->GetDrawingY();
+
+    int startRadius = 0;
+    if (!pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
+        startRadius = pedal->GetStart()->GetDrawingRadius(m_doc);
+    }
+
+    int endRadius = 0;
+    if (!pedal->GetEnd()->Is(TIMESTAMP_ATTR)) {
+        endRadius = pedal->GetEnd()->GetDrawingRadius(m_doc);
+    }
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (spanningType == SPANNING_START_END) {
+        x1 -= startRadius;
+        x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if (spanningType == SPANNING_START) {
+        x1 -= startRadius;
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if (spanningType == SPANNING_END) {
+        x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    }
+    else {
+        // nothing to adjust
+    }
+
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else {
+        dc->StartGraphic(pedal, "", pedal->GetUuid(), false);
+    }
+
+    int bracketSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+    // Opening bracket
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        DrawFilledRectangle(dc, x1, y, x1 + bracketSize / 2, y + lineWidth);
+        DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y + bracketSize);
+    }
+    // Closing bracket
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        DrawFilledRectangle(dc, x2 - bracketSize / 2, y, x2, y + lineWidth);
+        DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
+    }
+    DrawFilledRectangle(dc, x1 + bracketSize / 2, y, x2 - bracketSize / 2, y + lineWidth);
+
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else {
+        dc->EndGraphic(pedal, this);
+    }
 }
 
 void View::DrawTrillExtension(
@@ -1116,7 +1190,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
+    int y = staff->GetDrawingY() + GetSylYRel(syl->m_drawingVerse, staff);
     TextExtend extend;
 
     // the length of the dash and the space between them
@@ -1844,49 +1918,56 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
-    int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
+    // Draw a symbol, if it's not a line
+    if (pedal->GetForm() != pedalVis_FORM_line) {
 
-    data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
-    // center the pedal only with @startid
-    if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
-        alignment = HORIZONTALALIGNMENT_left;
-    }
+        bool bounceStar = true;
+        if (pedal->GetForm() == pedalVis_FORM_altpedstar) bounceStar = false;
 
-    std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
+        int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
-    int code = SMUFL_E655_keyboardPedalUp;
-    std::wstring str;
-    if (pedal->GetDir() == pedalLog_DIR_bounce) {
+        data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
+        // center the pedal only with @startid
+        if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
+            alignment = HORIZONTALALIGNMENT_left;
+        }
+
+        std::vector<Staff *>::iterator staffIter;
+        std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
+
+        int code = SMUFL_E655_keyboardPedalUp;
+        std::wstring str;
+        if (bounceStar && (pedal->GetDir() == pedalLog_DIR_bounce)) {
+            str.push_back(code);
+            // Get the staff size of the first staff
+            int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
+            TextExtend bounceOffset;
+            dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
+            dc->GetSmuflTextExtent(str, &bounceOffset);
+            dc->ResetFont();
+            x -= bounceOffset.m_width;
+        }
+        if (pedal->GetDir() != pedalLog_DIR_up) {
+            if (pedal->GetFunc() == "sostenuto") {
+                code = SMUFL_E659_keyboardPedalSost;
+            }
+            else {
+                code = SMUFL_E650_keyboardPedalPed;
+            }
+        }
         str.push_back(code);
-        // Get the staff size of the first staff
-        int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
-        TextExtend bounceOffset;
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
-        dc->GetSmuflTextExtent(str, &bounceOffset);
-        dc->ResetFont();
-        x -= bounceOffset.m_width;
-    }
-    if (pedal->GetDir() != pedalLog_DIR_up) {
-        if (pedal->GetFunc() == "sostenuto") {
-            code = SMUFL_E659_keyboardPedalSost;
-        }
-        else {
-            code = SMUFL_E650_keyboardPedalPed;
-        }
-    }
-    str.push_back(code);
 
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
-        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
-            continue;
-        }
-        // Basic method that use bounding box
-        int y = pedal->GetDrawingY();
+        for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
+            if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
+                continue;
+            }
+            // Basic method that use bounding box
+            int y = pedal->GetDrawingY();
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
-        dc->ResetFont();
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
     }
 
     dc->EndGraphic(pedal, this);

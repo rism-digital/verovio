@@ -413,6 +413,75 @@ enum data_COMPASSDIRECTION_extended {
 };
 
 /**
+ * MEI data.DIVISIO
+ */
+enum data_DIVISIO {
+    DIVISIO_NONE = 0,
+    DIVISIO_ternaria,
+    DIVISIO_quaternaria,
+    DIVISIO_senariaimperf,
+    DIVISIO_senariaperf,
+    DIVISIO_octonaria,
+    DIVISIO_novenaria,
+    DIVISIO_duodenaria,
+    DIVISIO_MAX
+};
+
+/**
+ * MEI data.DURATIONRESTS
+ */
+enum data_DURATIONRESTS {
+    DURATIONRESTS_NONE = 0,
+    DURATIONRESTS_long,
+    DURATIONRESTS_breve,
+    DURATIONRESTS_1,
+    DURATIONRESTS_2,
+    DURATIONRESTS_4,
+    DURATIONRESTS_8,
+    DURATIONRESTS_16,
+    DURATIONRESTS_32,
+    DURATIONRESTS_64,
+    DURATIONRESTS_128,
+    DURATIONRESTS_256,
+    DURATIONRESTS_512,
+    DURATIONRESTS_1024,
+    DURATIONRESTS_2048,
+    DURATIONRESTS_MAX
+};
+
+/**
+ * MEI data.DURATIONRESTS.mensural
+ */
+enum data_DURATIONRESTS_mensural {
+    DURATIONRESTS_mensural_NONE = 0,
+    DURATIONRESTS_mensural_2B,
+    DURATIONRESTS_mensural_3B,
+    DURATIONRESTS_mensural_maxima,
+    DURATIONRESTS_mensural_longa,
+    DURATIONRESTS_mensural_brevis,
+    DURATIONRESTS_mensural_semibrevis,
+    DURATIONRESTS_mensural_minima,
+    DURATIONRESTS_mensural_semiminima,
+    DURATIONRESTS_mensural_fusa,
+    DURATIONRESTS_mensural_semifusa,
+    DURATIONRESTS_mensural_MAX
+};
+
+/**
+ * MEI data.DURQUALITY.mensural
+ */
+enum data_DURQUALITY_mensural {
+    DURQUALITY_mensural_NONE = 0,
+    DURQUALITY_mensural_perfecta,
+    DURQUALITY_mensural_imperfecta,
+    DURQUALITY_mensural_altera,
+    DURQUALITY_mensural_minor,
+    DURQUALITY_mensural_maior,
+    DURQUALITY_mensural_duplex,
+    DURQUALITY_mensural_MAX
+};
+
+/**
  * MEI data.ENCLOSURE
  */
 enum data_ENCLOSURE {
@@ -474,6 +543,31 @@ enum data_FILL {
     FILL_left,
     FILL_right,
     FILL_MAX
+};
+
+/**
+ * MEI data.FLAGFORM.mensural
+ */
+enum data_FLAGFORM_mensural {
+    FLAGFORM_mensural_NONE = 0,
+    FLAGFORM_mensural_straight,
+    FLAGFORM_mensural_angled,
+    FLAGFORM_mensural_curled,
+    FLAGFORM_mensural_flared,
+    FLAGFORM_mensural_extended,
+    FLAGFORM_mensural_hooked,
+    FLAGFORM_mensural_MAX
+};
+
+/**
+ * MEI data.FLAGPOS.mensural
+ */
+enum data_FLAGPOS_mensural {
+    FLAGPOS_mensural_NONE = 0,
+    FLAGPOS_mensural_left,
+    FLAGPOS_mensural_right,
+    FLAGPOS_mensural_center,
+    FLAGPOS_mensural_MAX
 };
 
 /**
@@ -757,6 +851,19 @@ enum data_MENSURATIONSIGN {
     MENSURATIONSIGN_NONE = 0,
     MENSURATIONSIGN_C,
     MENSURATIONSIGN_O,
+    MENSURATIONSIGN_t,
+    MENSURATIONSIGN_q,
+    MENSURATIONSIGN_si,
+    MENSURATIONSIGN_i,
+    MENSURATIONSIGN_sg,
+    MENSURATIONSIGN_g,
+    MENSURATIONSIGN_sp,
+    MENSURATIONSIGN_p,
+    MENSURATIONSIGN_sy,
+    MENSURATIONSIGN_y,
+    MENSURATIONSIGN_n,
+    MENSURATIONSIGN_oc,
+    MENSURATIONSIGN_d,
     MENSURATIONSIGN_MAX
 };
 
@@ -996,6 +1103,16 @@ enum data_MODSRELATIONSHIP {
     MODSRELATIONSHIP_isReferencedBy,
     MODSRELATIONSHIP_references,
     MODSRELATIONSHIP_MAX
+};
+
+/**
+ * MEI data.MULTIBREVERESTS.mensural
+ */
+enum data_MULTIBREVERESTS_mensural {
+    MULTIBREVERESTS_mensural_NONE = 0,
+    MULTIBREVERESTS_mensural_2B,
+    MULTIBREVERESTS_mensural_3B,
+    MULTIBREVERESTS_mensural_MAX
 };
 
 /**
@@ -1322,6 +1439,18 @@ enum data_STEMDIRECTION_extended {
     STEMDIRECTION_extended_nw,
     STEMDIRECTION_extended_sw,
     STEMDIRECTION_extended_MAX
+};
+
+/**
+ * MEI data.STEMFORM.mensural
+ */
+enum data_STEMFORM_mensural {
+    STEMFORM_mensural_NONE = 0,
+    STEMFORM_mensural_circle,
+    STEMFORM_mensural_oblique,
+    STEMFORM_mensural_swallowtail,
+    STEMFORM_mensural_virgula,
+    STEMFORM_mensural_MAX
 };
 
 /**

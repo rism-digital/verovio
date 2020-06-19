@@ -189,9 +189,9 @@ protected:
         bool abbreviations = false);
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
     void DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure);
-    void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false);
-    void DrawLabels(DeviceContext *dc, Measure *measure, System *system, Object *object, int x, int y,
-        bool abbreviations, int staffSize, int space);
+    void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
+    void DrawLabels(
+        DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
@@ -403,7 +403,7 @@ protected:
 
     /**
      * @name Methods for drawing time spanning elements, connectors or extensions
-     * Called fomr DrawTimeSpanningElement
+     * Called from DrawTimeSpanningElement
      */
     ///@{
     void DrawControlElementConnector(DeviceContext *dc, ControlElement *element, int x1, int x2, Staff *staff,
@@ -418,6 +418,8 @@ protected:
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawPedalLine(
+        DeviceContext *dc, Pedal *pedal, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSlur(
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
@@ -523,7 +525,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
-    int GetSylYRel(Syl *syl, Staff *staff);
+    int GetSylYRel(int verseN, Staff *staff);
     int GetFYRel(F *f, Staff *staff);
     ///@}
 

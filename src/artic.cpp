@@ -53,19 +53,15 @@ void Artic::Reset()
     ResetPlacement();
 }
 
-void Artic::AddChild(Object *child)
+bool Artic::IsSupportedChild(Object *child)
 {
     if (child->Is(ARTIC_PART)) {
         assert(dynamic_cast<ArticPart *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)

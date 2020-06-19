@@ -51,6 +51,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     m_svgViewBox = false;
     m_html5 = false;
     m_facsimile = false;
+    m_indent = 2;
 
     // create the initial SVG element
     // width and height need to be set later; these are taken care of in "commit"
@@ -118,7 +119,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        std::vector<std::string>::const_iterator it;
+        std::set<std::string>::const_iterator it;
         for (it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
             // load the XML file that contains it as a pugi::xml_document
             std::ifstream source((*it).c_str());
@@ -147,7 +148,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         .set_value(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
 
     // save the glyph data to m_outdata
-    m_svgDoc.save(m_outdata, "\t", output_flags);
+    std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
+    m_svgDoc.save(m_outdata, indent.c_str(), output_flags);
 
     m_committed = true;
 }
@@ -372,6 +374,7 @@ void SvgDeviceContext::StartPage()
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.append_child(pugi::node_pcdata)
             .set_value("g.page-margin{font-family:Times;} "
+                       //"g.page-margin{background: pink;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
                        "g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
@@ -398,6 +401,12 @@ void SvgDeviceContext::StartPage()
     m_currentNode.append_attribute("class") = "page-margin";
     m_currentNode.append_attribute("transform")
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
+
+    // margin rectangle for debugging
+    // pugi::xml_node rect = m_currentNode.append_child("rect");
+    // rect.append_attribute("fill") = "pink";
+    // rect.append_attribute("height") = StringFormat("%d", GetHeight() * DEFINITION_FACTOR - 2 * m_originY).c_str();
+    // rect.append_attribute("width") = StringFormat("%d", GetWidth() * DEFINITION_FACTOR - 2 * m_originX).c_str();
 
     m_pageNode = m_currentNode;
 }
@@ -770,7 +779,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
-    if (m_fontStack.top()->GetStyle() != FONTSIZE_NONE) {
+    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
         if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
             textChild.append_attribute("font-style") = "italic";
         }
@@ -812,10 +821,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         std::string path = glyph->GetPath();
 
         // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_smuflGlyphs.begin(), m_smuflGlyphs.end(), path);
-        if (it == m_smuflGlyphs.end()) {
-            m_smuflGlyphs.push_back(path);
-        }
+        m_smuflGlyphs.insert(path);
 
         // Write the char in the SVG
         pugi::xml_node useChild = AppendChild("use");
@@ -824,6 +830,11 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
+            useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)",
+                m_fontStack.top()->GetWidthToHeightRatio(), x * (1. - m_fontStack.top()->GetWidthToHeightRatio()))
+                                                         .c_str();
+        }
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)

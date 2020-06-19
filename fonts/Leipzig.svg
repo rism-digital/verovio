@@ -42,14 +42,15 @@ Version 5.2.36 - adding 512th and 1024th rests
 Version 5.2.37 - adding some more tablature glyphs
 Version 5.2.38 - validating font
 Version 5.2.39 - adjusting some more tablature glyphs
+Version 5.2.40 - adding brace glyph
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20200314 at Wed Apr 22 13:02:30 2020
+Created by FontForge 20200314 at Wed Jun 10 16:47:26 2020
  By Laurent Pugin
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.39
+Version 5.2.40
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
@@ -64,7 +65,7 @@ Version 5.2.39
     bbox="-247 -1140 1833 1317"
     underline-thickness="50"
     underline-position="-50"
-    unicode-range="U+E003-EBE9"
+    unicode-range="U+E000-EBE9"
   />
     <missing-glyph />
     <glyph glyph-name="uniE0A3" unicode="&#xe0a3;" horiz-adv-x="314" 
@@ -1157,5 +1158,8 @@ l-43 -39c-25 -22 -49 -39 -70 -50l-8 87c-4 35 -9 64 -14 86c-91 -68 -158 -124 -200
     <glyph glyph-name="uniEBCC" unicode="&#xebcc;" horiz-adv-x="308" 
 d="M-108 133c11 12 32 32 64 58c32 28 54 46 64 57c4 -12 9 -33 13 -64c5 -33 10 -60 16 -81c15 16 43 41 83 73c44 36 73 61 88 75c5 -20 12 -50 18 -90c7 -44 11 -69 12 -73l27 16c11 6 18 9 22 9s6 -1 7 -3l-53 -54c-26 -27 -48 -46 -66 -56c-4 29 -8 56 -11 80
 c-5 34 -10 60 -15 79c-41 -30 -94 -83 -160 -159c-15 88 -22 143 -22 167c-4 0 -11 -4 -22 -12c-12 -9 -22 -17 -30 -26z" />
+    <glyph glyph-name="uniE000" unicode="&#xe000;" 
+d="M92 7c3 -5 -4 -8 -7 -4c-54 81 -70 151 -70 214c0 46 9 89 16 125c6 29 12 54 12 77c0 31 -10 56 -41 77c-2 2 -3 5 0 7c31 21 41 46 41 77c0 23 -6 49 -12 78c-7 36 -16 79 -16 125c0 63 16 133 70 214c3 4 10 1 7 -4c-38 -69 -50 -132 -50 -187c0 -46 9 -88 16 -126
+c6 -30 11 -58 11 -83c0 -39 -13 -72 -56 -97c43 -25 56 -58 56 -97c0 -25 -5 -53 -11 -83c-7 -38 -16 -80 -16 -126c0 -55 12 -118 50 -187z" />
   </font>
 </defs></svg>

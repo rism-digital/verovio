@@ -62,19 +62,15 @@ void Page::Reset()
     m_drawingJustifiableStaves = 0;
 }
 
-void Page::AddChild(Object *child)
+bool Page::IsSupportedChild(Object *child)
 {
     if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 RunningElement *Page::GetHeader() const
@@ -462,7 +458,7 @@ void Page::LayOutVertically()
 
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams(doc);
-    alignSystemsParams.m_shift = doc->m_drawingPageHeight;
+    alignSystemsParams.m_shift = doc->m_drawingPageContentHeight;
     alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     Functor alignSystemsEnd(&Object::AlignSystemsEnd);
@@ -482,15 +478,18 @@ void Page::JustifyHorizontally()
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    if ((doc->GetOptions()->m_adjustPageWidth.GetValue()))
-        doc->m_drawingPageWidth = GetContentWidth() + doc->m_drawingPageMarginLeft + doc->m_drawingPageMarginRight;
-
-    // Justify X position
-    Functor justifyX(&Object::JustifyX);
-    JustifyXParams justifyXParams(&justifyX, doc);
-    justifyXParams.m_systemFullWidth
-        = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
-    this->Process(&justifyX, &justifyXParams);
+    if ((doc->GetOptions()->m_adjustPageWidth.GetValue())) {
+        doc->m_drawingPageContentWidth = this->GetContentWidth();
+        doc->m_drawingPageWidth
+            = doc->m_drawingPageContentWidth + doc->m_drawingPageMarginLeft + doc->m_drawingPageMarginRight;
+    }
+    else {
+        // Justify X position
+        Functor justifyX(&Object::JustifyX);
+        JustifyXParams justifyXParams(&justifyX, doc);
+        justifyXParams.m_systemFullWidth = doc->m_drawingPageContentWidth;
+        this->Process(&justifyX, &justifyXParams);
+    }
 }
 
 void Page::JustifyVertically()
@@ -575,7 +574,7 @@ int Page::GetContentHeight() const
 
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
-    int height = doc->m_drawingPageHeight - doc->m_drawingPageMarginTop - last->GetDrawingYRel() + last->GetHeight();
+    int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
     // Not sure what to do with the footer when adjusted page height is requested...
     // if (this->GetFooter()) {
@@ -747,8 +746,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
     RunningElement *footer = this->GetFooter();
     if (footer) {
         // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(
-            footer->GetTotalHeight() + params->m_doc->m_drawingPageMarginTop + params->m_doc->m_drawingPageMarginBot);
+        footer->SetDrawingYRel(footer->GetTotalHeight());
     }
 
     return FUNCTOR_CONTINUE;
@@ -759,8 +757,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
-    this->m_drawingJustifiableHeight
-        = params->m_shift - params->m_doc->m_drawingPageMarginBot - params->m_doc->m_drawingPageMarginTop;
+    this->m_drawingJustifiableHeight = params->m_shift;
     this->m_drawingJustifiableSystems = params->m_justifiableSystems;
     this->m_drawingJustifiableStaves = params->m_justifiableStaves;
 

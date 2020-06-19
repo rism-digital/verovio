@@ -86,18 +86,27 @@ void Doc::Reset()
 
     m_type = Raw;
     m_notationType = NOTATIONTYPE_NONE;
-    m_pageWidth = -1;
     m_pageHeight = -1;
+    m_pageWidth = -1;
     m_pageMarginBottom = 0;
     m_pageMarginRight = 0;
     m_pageMarginLeft = 0;
     m_pageMarginTop = 0;
 
+    m_drawingPageHeight = -1;
+    m_drawingPageWidth = -1;
+    m_drawingPageContentHeight = -1;
+    m_drawingPageContentWidth = -1;
+    m_drawingPageMarginBottom = 0;
+    m_drawingPageMarginRight = 0;
+    m_drawingPageMarginLeft = 0;
+    m_drawingPageMarginTop = 0;
+
     m_drawingPage = NULL;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_MIDITimemapTempo = 0.0;
-    m_hasAnalyticalMarkup = false;
+    m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
 
     m_mdivScoreDef.Reset();
@@ -115,19 +124,15 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-void Doc::AddChild(Object *child)
+bool Doc::IsSupportedChild(Object *child)
 {
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 void Doc::Refresh()
@@ -143,7 +148,7 @@ bool Doc::GenerateDocumentScoreDef()
         return false;
     }
 
-    ArrayOfObjects staves;
+    ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
     measure->FindAllDescendantByComparison(&staves, &matchType);
 
@@ -154,9 +159,8 @@ bool Doc::GenerateDocumentScoreDef()
 
     m_mdivScoreDef.Reset();
     StaffGrp *staffGrp = new StaffGrp();
-    ArrayOfObjects::iterator iter;
-    for (iter = staves.begin(); iter != staves.end(); ++iter) {
-        Staff *staff = dynamic_cast<Staff *>(*iter);
+    for (auto &object : staves) {
+        Staff *staff = dynamic_cast<Staff *>(object);
         assert(staff);
         StaffDef *staffDef = new StaffDef();
         staffDef->SetN(staff->GetN());
@@ -216,13 +220,12 @@ bool Doc::GenerateHeader()
 bool Doc::GenerateMeasureNumbers()
 {
     ClassIdComparison matchType(MEASURE);
-    ArrayOfObjects measures;
-    ArrayOfObjects::iterator measureIter;
+    ListOfObjects measures;
     this->FindAllDescendantByComparison(&measures, &matchType);
 
     // run through all measures and generate missing mNum from attribute
-    for (measureIter = measures.begin(); measureIter != measures.end(); ++measureIter) {
-        Measure *measure = dynamic_cast<Measure *>(*measureIter);
+    for (auto &object : measures) {
+        Measure *measure = dynamic_cast<Measure *>(object);
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
             Text *text = new Text;
@@ -780,7 +783,7 @@ void Doc::CastOffLineDoc()
 {
     Doc::CastOffDocBase(true, false);
 }
-void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
+void Doc::CastOffDocBase(bool useSystemBreaks, bool usePageBreaks)
 {
     Pages *pages = this->GetPages();
     assert(pages);
@@ -793,7 +796,8 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     // By default, optimize scores
     bool optimize = (m_mdivScoreDef.GetOptimize() != BOOLEAN_false);
     // However, if nothing specified, do not if there is only one staffGrp
-    if ((m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE) && (m_mdivScoreDef.GetChildCount(STAFFGRP, UNLIMITED_DEPTH) < 2)) {
+    if ((m_mdivScoreDef.GetOptimize() == BOOLEAN_NONE)
+        && (m_mdivScoreDef.GetChildCount(STAFFGRP, UNLIMITED_DEPTH) < 2)) {
         optimize = false;
     }
 
@@ -809,7 +813,7 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if (useSectionBreaks && !usePageBreaks) {
+    if (useSystemBreaks && !usePageBreaks) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
@@ -817,8 +821,8 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     }
     else {
         CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
-        castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
-            - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+        castOffSystemsParams.m_systemWidth
+            = this->m_drawingPageContentWidth - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
         castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
         castOffSystemsParams.m_currentScoreDefWidth
             = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
@@ -837,6 +841,8 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
+    // Because of the new scoreDef, we need to reset cached drawingX
+    contentPage->ResetCachedDrawingX();
     contentPage->LayOutVertically();
 
     // Detach the contentPage
@@ -847,7 +853,7 @@ void Doc::CastOffDocBase(bool useSectionBreaks, bool usePageBreaks)
     Page *currentPage = new Page();
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
-    castOffPagesParams.m_pageHeight = this->m_drawingPageHeight - this->m_drawingPageMarginBot;
+    castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
     Functor castOffPages(&Object::CastOffPages);
     pages->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);
@@ -1121,53 +1127,59 @@ void Doc::ConvertScoreDefMarkupDoc(bool permanent)
     this->Process(&convertScoreDefMarkup, &convertScoreDefMarkupParams);
 }
 
-void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
+void Doc::ConvertMarkupDoc(bool permanent)
 {
-    if (!m_hasAnalyticalMarkup) return;
+    if (m_markup == MARKUP_DEFAULT) return;
 
     LogMessage("Converting analytical markup...");
 
-    /************ Prepare processing by staff/layer/verse ************/
+    if (m_markup & MARKUP_GRACE_ATTRIBUTE) {
+    }
 
-    // We need to populate processing lists for processing the document by Layer (for matching @tie) and
-    // by Verse (for matching syllable connectors)
-    PrepareProcessingListsParams prepareProcessingListsParams;
+    if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {
 
-    // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
-    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+        /************ Prepare processing by staff/layer/verse ************/
 
-    IntTree_t::iterator staves;
-    IntTree_t::iterator layers;
+        // We need to populate processing lists for processing the document by Layer (for matching @tie) and
+        // by Verse (for matching syllable connectors)
+        PrepareProcessingListsParams prepareProcessingListsParams;
 
-    /************ Resolve ties ************/
+        // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
+        Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+        this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
-    // Process by layer for matching @tie attribute - we process notes and chords, looking at
-    // GetTie values and pitch and oct for matching notes
-    ArrayOfComparisons filters;
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            filters.clear();
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
-            filters.push_back(&matchStaff);
-            filters.push_back(&matchLayer);
+        IntTree_t::iterator staves;
+        IntTree_t::iterator layers;
 
-            ConvertAnalyticalMarkupParams convertAnalyticalMarkupParams(permanent);
-            Functor convertAnalyticalMarkup(&Object::ConvertAnalyticalMarkup);
-            Functor convertAnalyticalMarkupEnd(&Object::ConvertAnalyticalMarkupEnd);
-            this->Process(
-                &convertAnalyticalMarkup, &convertAnalyticalMarkupParams, &convertAnalyticalMarkupEnd, &filters);
+        /************ Resolve ties ************/
 
-            // After having processed one layer, we check if we have open ties - if yes, we
-            // must reset them and they will be ignored.
-            if (!convertAnalyticalMarkupParams.m_currentNotes.empty()) {
-                std::vector<Note *>::iterator iter;
-                for (iter = convertAnalyticalMarkupParams.m_currentNotes.begin();
-                     iter != convertAnalyticalMarkupParams.m_currentNotes.end(); ++iter) {
-                    LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+        // Process by layer for matching @tie attribute - we process notes and chords, looking at
+        // GetTie values and pitch and oct for matching notes
+        ArrayOfComparisons filters;
+        for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+             staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+            for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+                filters.clear();
+                // Create ad comparison object for each type / @n
+                AttNIntegerComparison matchStaff(STAFF, staves->first);
+                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                filters.push_back(&matchStaff);
+                filters.push_back(&matchLayer);
+
+                ConvertMarkupAnalyticalParams convertMarkupAnalyticalParams(permanent);
+                Functor convertMarkupAnalytical(&Object::ConvertMarkupAnalytical);
+                Functor convertMarkupAnalyticalEnd(&Object::ConvertMarkupAnalyticalEnd);
+                this->Process(
+                    &convertMarkupAnalytical, &convertMarkupAnalyticalParams, &convertMarkupAnalyticalEnd, &filters);
+
+                // After having processed one layer, we check if we have open ties - if yes, we
+                // must reset them and they will be ignored.
+                if (!convertMarkupAnalyticalParams.m_currentNotes.empty()) {
+                    std::vector<Note *>::iterator iter;
+                    for (iter = convertMarkupAnalyticalParams.m_currentNotes.begin();
+                         iter != convertMarkupAnalyticalParams.m_currentNotes.end(); ++iter) {
+                        LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+                    }
                 }
             }
         }
@@ -1565,14 +1577,28 @@ double Doc::GetRightMargin(const ClassId classId) const
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
-    if (classId == HARM) return m_options->m_bottomMarginHarm.GetValue();
-    return m_options->m_defaultBottomMargin.GetValue();
+    double margin = m_options->m_defaultBottomMargin.GetValue();
+    if (classId == DYNAM) {
+        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
+    }
+    else if (classId == HARM) {
+        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
+                                                    : m_options->m_bottomMarginHarm.GetValue();
+    }
+    return margin;
 }
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
-    if (classId == HARM) return m_options->m_topMarginHarm.GetValue();
-    return m_options->m_defaultTopMargin.GetValue();
+    double margin = m_options->m_defaultTopMargin.GetValue();
+    if (classId == DYNAM) {
+        margin = this->m_mdivScoreDef.HasDynamDist() ? this->m_mdivScoreDef.GetDynamDist() : margin;
+    }
+    else if (classId == HARM) {
+        margin = this->m_mdivScoreDef.HasHarmDist() ? this->m_mdivScoreDef.GetHarmDist()
+                                                    : m_options->m_topMarginHarm.GetValue();
+    }
+    return margin;
 }
 
 Page *Doc::SetDrawingPage(int pageIdx)
@@ -1596,7 +1622,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     if (m_drawingPage->m_pageHeight != -1) {
         m_drawingPageHeight = m_drawingPage->m_pageHeight;
         m_drawingPageWidth = m_drawingPage->m_pageWidth;
-        m_drawingPageMarginBot = m_drawingPage->m_pageMarginBottom;
+        m_drawingPageMarginBottom = m_drawingPage->m_pageMarginBottom;
         m_drawingPageMarginLeft = m_drawingPage->m_pageMarginLeft;
         m_drawingPageMarginRight = m_drawingPage->m_pageMarginRight;
         m_drawingPageMarginTop = m_drawingPage->m_pageMarginTop;
@@ -1604,7 +1630,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     else if (this->m_pageHeight != -1) {
         m_drawingPageHeight = this->m_pageHeight;
         m_drawingPageWidth = this->m_pageWidth;
-        m_drawingPageMarginBot = this->m_pageMarginBottom;
+        m_drawingPageMarginBottom = this->m_pageMarginBottom;
         m_drawingPageMarginLeft = this->m_pageMarginLeft;
         m_drawingPageMarginRight = this->m_pageMarginRight;
         m_drawingPageMarginTop = this->m_pageMarginTop;
@@ -1612,7 +1638,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     else {
         m_drawingPageHeight = m_options->m_pageHeight.GetValue();
         m_drawingPageWidth = m_options->m_pageWidth.GetValue();
-        m_drawingPageMarginBot = m_options->m_pageMarginBottom.GetValue();
+        m_drawingPageMarginBottom = m_options->m_pageMarginBottom.GetValue();
         m_drawingPageMarginLeft = m_options->m_pageMarginLeft.GetValue();
         m_drawingPageMarginRight = m_options->m_pageMarginRight.GetValue();
         m_drawingPageMarginTop = m_options->m_pageMarginTop.GetValue();
@@ -1626,6 +1652,9 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageMarginLeft = m_drawingPageMarginRight;
         m_drawingPageMarginRight = pageMarginRight;
     }
+
+    m_drawingPageContentHeight = m_drawingPageHeight - m_drawingPageMarginTop - m_drawingPageMarginBottom;
+    m_drawingPageContentWidth = m_drawingPageWidth - m_drawingPageMarginLeft - m_drawingPageMarginRight;
 
     // From here we could check if values have changed
     // Since  m_options->m_interlDefin stays the same, it's useless to do it
@@ -1663,19 +1692,21 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
         return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+    }
 
     int contentHeight = m_drawingPage->GetContentHeight();
-    return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
+    return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBottom) / DEFINITION_FACTOR;
 }
 
 int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs))
+    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
         return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+    }
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;

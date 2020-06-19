@@ -1143,7 +1143,7 @@ AttCurvature::~AttCurvature()
 void AttCurvature::ResetCurvature()
 {
     m_bezier = "";
-    m_bulge = 0.0;
+    m_bulge = "";
     m_curvedir = curvature_CURVEDIR_NONE;
 }
 
@@ -1156,7 +1156,7 @@ bool AttCurvature::ReadCurvature(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("bulge")) {
-        this->SetBulge(StrToDbl(element.attribute("bulge").value()));
+        this->SetBulge(StrToStr(element.attribute("bulge").value()));
         element.remove_attribute("bulge");
         hasAttribute = true;
     }
@@ -1176,7 +1176,7 @@ bool AttCurvature::WriteCurvature(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasBulge()) {
-        element.append_attribute("bulge") = DblToStr(this->GetBulge()).c_str();
+        element.append_attribute("bulge") = StrToStr(this->GetBulge()).c_str();
         wroteAttribute = true;
     }
     if (this->HasCurvedir()) {
@@ -1193,7 +1193,7 @@ bool AttCurvature::HasBezier() const
 
 bool AttCurvature::HasBulge() const
 {
-    return (m_bulge != 0.0);
+    return (m_bulge != "");
 }
 
 bool AttCurvature::HasCurvedir() const
@@ -3463,67 +3463,6 @@ bool AttMeiVersion::HasMeiversion() const
 /* include <attmeiversion> */
 
 //----------------------------------------------------------------------------
-// AttMensurLog
-//----------------------------------------------------------------------------
-
-AttMensurLog::AttMensurLog() : Att()
-{
-    ResetMensurLog();
-}
-
-AttMensurLog::~AttMensurLog()
-{
-}
-
-void AttMensurLog::ResetMensurLog()
-{
-    m_dot = BOOLEAN_NONE;
-    m_sign = MENSURATIONSIGN_NONE;
-}
-
-bool AttMensurLog::ReadMensurLog(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("dot")) {
-        this->SetDot(StrToBoolean(element.attribute("dot").value()));
-        element.remove_attribute("dot");
-        hasAttribute = true;
-    }
-    if (element.attribute("sign")) {
-        this->SetSign(StrToMensurationsign(element.attribute("sign").value()));
-        element.remove_attribute("sign");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttMensurLog::WriteMensurLog(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasDot()) {
-        element.append_attribute("dot") = BooleanToStr(this->GetDot()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSign()) {
-        element.append_attribute("sign") = MensurationsignToStr(this->GetSign()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttMensurLog::HasDot() const
-{
-    return (m_dot != BOOLEAN_NONE);
-}
-
-bool AttMensurLog::HasSign() const
-{
-    return (m_sign != MENSURATIONSIGN_NONE);
-}
-
-/* include <attsign> */
-
-//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 
@@ -5442,6 +5381,52 @@ bool AttResponsibility::HasResp() const
 }
 
 /* include <attresp> */
+
+//----------------------------------------------------------------------------
+// AttRestdurationLogical
+//----------------------------------------------------------------------------
+
+AttRestdurationLogical::AttRestdurationLogical() : Att()
+{
+    ResetRestdurationLogical();
+}
+
+AttRestdurationLogical::~AttRestdurationLogical()
+{
+}
+
+void AttRestdurationLogical::ResetRestdurationLogical()
+{
+    m_dur = DURATIONRESTS_NONE;
+}
+
+bool AttRestdurationLogical::ReadRestdurationLogical(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("dur")) {
+        this->SetDur(StrToDurationrests(element.attribute("dur").value()));
+        element.remove_attribute("dur");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRestdurationLogical::WriteRestdurationLogical(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasDur()) {
+        element.append_attribute("dur") = DurationrestsToStr(this->GetDur()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttRestdurationLogical::HasDur() const
+{
+    return (m_dur != DURATIONRESTS_NONE);
+}
+
+/* include <attdur> */
 
 //----------------------------------------------------------------------------
 // AttScalable
@@ -8146,7 +8131,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
         if (attrType == "bulge") {
-            att->SetBulge(att->StrToDbl(attrValue));
+            att->SetBulge(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "curvedir") {
@@ -8590,18 +8575,6 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
             return true;
         }
     }
-    if (element->HasAttClass(ATT_MENSURLOG)) {
-        AttMensurLog *att = dynamic_cast<AttMensurLog *>(element);
-        assert(att);
-        if (attrType == "dot") {
-            att->SetDot(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "sign") {
-            att->SetSign(att->StrToMensurationsign(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_METADATAPOINTING)) {
         AttMetadataPointing *att = dynamic_cast<AttMetadataPointing *>(element);
         assert(att);
@@ -8983,6 +8956,14 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
         assert(att);
         if (attrType == "resp") {
             att->SetResp(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_RESTDURATIONLOGICAL)) {
+        AttRestdurationLogical *att = dynamic_cast<AttRestdurationLogical *>(element);
+        assert(att);
+        if (attrType == "dur") {
+            att->SetDur(att->StrToDurationrests(attrValue));
             return true;
         }
     }
@@ -9649,7 +9630,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("bezier", att->StrToStr(att->GetBezier())));
         }
         if (att->HasBulge()) {
-            attributes->push_back(std::make_pair("bulge", att->DblToStr(att->GetBulge())));
+            attributes->push_back(std::make_pair("bulge", att->StrToStr(att->GetBulge())));
         }
         if (att->HasCurvedir()) {
             attributes->push_back(std::make_pair("curvedir", att->CurvatureCurvedirToStr(att->GetCurvedir())));
@@ -10021,16 +10002,6 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("meiversion", att->MeiVersionMeiversionToStr(att->GetMeiversion())));
         }
     }
-    if (element->HasAttClass(ATT_MENSURLOG)) {
-        const AttMensurLog *att = dynamic_cast<const AttMensurLog *>(element);
-        assert(att);
-        if (att->HasDot()) {
-            attributes->push_back(std::make_pair("dot", att->BooleanToStr(att->GetDot())));
-        }
-        if (att->HasSign()) {
-            attributes->push_back(std::make_pair("sign", att->MensurationsignToStr(att->GetSign())));
-        }
-    }
     if (element->HasAttClass(ATT_METADATAPOINTING)) {
         const AttMetadataPointing *att = dynamic_cast<const AttMetadataPointing *>(element);
         assert(att);
@@ -10347,6 +10318,13 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasResp()) {
             attributes->push_back(std::make_pair("resp", att->StrToStr(att->GetResp())));
+        }
+    }
+    if (element->HasAttClass(ATT_RESTDURATIONLOGICAL)) {
+        const AttRestdurationLogical *att = dynamic_cast<const AttRestdurationLogical *>(element);
+        assert(att);
+        if (att->HasDur()) {
+            attributes->push_back(std::make_pair("dur", att->DurationrestsToStr(att->GetDur())));
         }
     }
     if (element->HasAttClass(ATT_SCALABLE)) {

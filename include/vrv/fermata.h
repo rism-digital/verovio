@@ -15,7 +15,7 @@
 
 namespace vrv {
 
-class ConvertAnalyticalMarkupParams;
+class ConvertMarkupAnalyticalParams;
 
 //----------------------------------------------------------------------------
 // Fermata
@@ -54,7 +54,7 @@ public:
      * Helpler for converting markup (from Note, Chord, Rest, MRest)
      */
     void ConvertFromAnalyticalMarkup(
-        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertAnalyticalMarkupParams *params);
+        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertMarkupAnalyticalParams *params);
 
     //----------//
     // Functors //

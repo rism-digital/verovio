@@ -126,7 +126,7 @@ int View::ToDeviceContextY(int i)
         return 0;
     }
 
-    return (m_doc->m_drawingPageHeight - i); // flipped
+    return (m_doc->m_drawingPageContentHeight - i); // flipped
 }
 
 /** y value in the Logical world  */
@@ -136,7 +136,7 @@ int View::ToLogicalY(int i)
         return 0;
     }
 
-    return m_doc->m_drawingPageHeight - i; // flipped
+    return m_doc->m_drawingPageContentHeight - i; // flipped
 }
 
 Point View::ToDeviceContext(Point p)

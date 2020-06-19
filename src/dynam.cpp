@@ -62,7 +62,7 @@ void Dynam::Reset()
     ResetVerticalGroup();
 }
 
-void Dynam::AddChild(Object *child)
+bool Dynam::IsSupportedChild(Object *child)
 {
     if (child->Is({ REND, LB, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -71,13 +71,9 @@ void Dynam::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 bool Dynam::IsSymbolOnly()

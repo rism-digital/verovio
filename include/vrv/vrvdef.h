@@ -39,7 +39,7 @@ namespace vrv {
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
 
-enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1 };
+enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0, MEI_4_0_1, MEI_5_0_0_dev };
 
 //----------------------------------------------------------------------------
 // Default midi values
@@ -151,6 +151,7 @@ enum ClassId {
     MNUM,
     OCTAVE,
     PEDAL,
+    PHRASE,
     REH,
     SLUR,
     TEMPO,
@@ -276,6 +277,8 @@ class TimePointInterface;
 class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
+
+typedef std::list<Object *> ListOfObjects;
 
 typedef std::vector<Comparison *> ArrayOfComparisons;
 
@@ -525,6 +528,12 @@ enum {
     LIGATURE_OBLIQUE = 16,
     LIGATURE_STACKED = 32
 };
+
+//----------------------------------------------------------------------------
+// Analytical markup bitfields
+//----------------------------------------------------------------------------
+
+enum { MARKUP_DEFAULT = 0, MARKUP_ANALYTICAL_TIE = 1, MARKUP_ANALYTICAL_FERMATA = 2, MARKUP_GRACE_ATTRIBUTE = 4 };
 
 //----------------------------------------------------------------------------
 // Bounding box access

@@ -27,6 +27,173 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttSTEMPROPERTIESMensural
+//----------------------------------------------------------------------------
+
+AttSTEMPROPERTIESMensural::AttSTEMPROPERTIESMensural() : Att()
+{
+    ResetSTEMPROPERTIESMensural();
+}
+
+AttSTEMPROPERTIESMensural::~AttSTEMPROPERTIESMensural()
+{
+}
+
+void AttSTEMPROPERTIESMensural::ResetSTEMPROPERTIESMensural()
+{
+    m_pos = STEMPOSITION_NONE;
+    m_length = VRV_UNSET;
+    m_form = STEMFORM_mensural_NONE;
+    m_dir = STEMDIRECTION_NONE;
+    m_flagPos = FLAGPOS_mensural_NONE;
+    m_flagForm = FLAGFORM_mensural_NONE;
+}
+
+bool AttSTEMPROPERTIESMensural::ReadSTEMPROPERTIESMensural(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("pos")) {
+        this->SetPos(StrToStemposition(element.attribute("pos").value()));
+        element.remove_attribute("pos");
+        hasAttribute = true;
+    }
+    if (element.attribute("length")) {
+        this->SetLength(StrToMeasurementabs(element.attribute("length").value()));
+        element.remove_attribute("length");
+        hasAttribute = true;
+    }
+    if (element.attribute("form")) {
+        this->SetForm(StrToStemformMensural(element.attribute("form").value()));
+        element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    if (element.attribute("dir")) {
+        this->SetDir(StrToStemdirection(element.attribute("dir").value()));
+        element.remove_attribute("dir");
+        hasAttribute = true;
+    }
+    if (element.attribute("flag.pos")) {
+        this->SetFlagPos(StrToFlagposMensural(element.attribute("flag.pos").value()));
+        element.remove_attribute("flag.pos");
+        hasAttribute = true;
+    }
+    if (element.attribute("flag.form")) {
+        this->SetFlagForm(StrToFlagformMensural(element.attribute("flag.form").value()));
+        element.remove_attribute("flag.form");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSTEMPROPERTIESMensural::WriteSTEMPROPERTIESMensural(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasPos()) {
+        element.append_attribute("pos") = StempositionToStr(this->GetPos()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLength()) {
+        element.append_attribute("length") = MeasurementabsToStr(this->GetLength()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasForm()) {
+        element.append_attribute("form") = StemformMensuralToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDir()) {
+        element.append_attribute("dir") = StemdirectionToStr(this->GetDir()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasFlagPos()) {
+        element.append_attribute("flag.pos") = FlagposMensuralToStr(this->GetFlagPos()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasFlagForm()) {
+        element.append_attribute("flag.form") = FlagformMensuralToStr(this->GetFlagForm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSTEMPROPERTIESMensural::HasPos() const
+{
+    return (m_pos != STEMPOSITION_NONE);
+}
+
+bool AttSTEMPROPERTIESMensural::HasLength() const
+{
+    return (m_length != VRV_UNSET);
+}
+
+bool AttSTEMPROPERTIESMensural::HasForm() const
+{
+    return (m_form != STEMFORM_mensural_NONE);
+}
+
+bool AttSTEMPROPERTIESMensural::HasDir() const
+{
+    return (m_dir != STEMDIRECTION_NONE);
+}
+
+bool AttSTEMPROPERTIESMensural::HasFlagPos() const
+{
+    return (m_flagPos != FLAGPOS_mensural_NONE);
+}
+
+bool AttSTEMPROPERTIESMensural::HasFlagForm() const
+{
+    return (m_flagForm != FLAGFORM_mensural_NONE);
+}
+
+/* include <attflag.form> */
+
+//----------------------------------------------------------------------------
+// AttDurationQuality
+//----------------------------------------------------------------------------
+
+AttDurationQuality::AttDurationQuality() : Att()
+{
+    ResetDurationQuality();
+}
+
+AttDurationQuality::~AttDurationQuality()
+{
+}
+
+void AttDurationQuality::ResetDurationQuality()
+{
+    m_durQuality = DURQUALITY_mensural_NONE;
+}
+
+bool AttDurationQuality::ReadDurationQuality(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("dur.quality")) {
+        this->SetDurQuality(StrToDurqualityMensural(element.attribute("dur.quality").value()));
+        element.remove_attribute("dur.quality");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttDurationQuality::WriteDurationQuality(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasDurQuality()) {
+        element.append_attribute("dur.quality") = DurqualityMensuralToStr(this->GetDurQuality()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttDurationQuality::HasDurQuality() const
+{
+    return (m_durQuality != DURQUALITY_mensural_NONE);
+}
+
+/* include <attdur.quality> */
+
+//----------------------------------------------------------------------------
 // AttLigatureLog
 //----------------------------------------------------------------------------
 
@@ -197,6 +364,7 @@ void AttMensuralShared::ResetMensuralShared()
     m_modusminor = MODUSMINOR_NONE;
     m_prolatio = PROLATIO_NONE;
     m_tempus = TEMPUS_NONE;
+    m_divisio = DIVISIO_NONE;
 }
 
 bool AttMensuralShared::ReadMensuralShared(pugi::xml_node element)
@@ -222,6 +390,11 @@ bool AttMensuralShared::ReadMensuralShared(pugi::xml_node element)
         element.remove_attribute("tempus");
         hasAttribute = true;
     }
+    if (element.attribute("divisio")) {
+        this->SetDivisio(StrToDivisio(element.attribute("divisio").value()));
+        element.remove_attribute("divisio");
+        hasAttribute = true;
+    }
     return hasAttribute;
 }
 
@@ -242,6 +415,10 @@ bool AttMensuralShared::WriteMensuralShared(pugi::xml_node element)
     }
     if (this->HasTempus()) {
         element.append_attribute("tempus") = TempusToStr(this->GetTempus()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDivisio()) {
+        element.append_attribute("divisio") = DivisioToStr(this->GetDivisio()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -267,7 +444,12 @@ bool AttMensuralShared::HasTempus() const
     return (m_tempus != TEMPUS_NONE);
 }
 
-/* include <atttempus> */
+bool AttMensuralShared::HasDivisio() const
+{
+    return (m_divisio != DIVISIO_NONE);
+}
+
+/* include <attdivisio> */
 
 //----------------------------------------------------------------------------
 // AttNoteAnlMensural
@@ -361,8 +543,90 @@ bool AttRestVisMensural::HasSpaces() const
 
 /* include <attspaces> */
 
+//----------------------------------------------------------------------------
+// AttStemsMensural
+//----------------------------------------------------------------------------
+
+AttStemsMensural::AttStemsMensural() : Att()
+{
+    ResetStemsMensural();
+}
+
+AttStemsMensural::~AttStemsMensural()
+{
+}
+
+void AttStemsMensural::ResetStemsMensural()
+{
+    m_stemForm = STEMFORM_mensural_NONE;
+}
+
+bool AttStemsMensural::ReadStemsMensural(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("stem.form")) {
+        this->SetStemForm(StrToStemformMensural(element.attribute("stem.form").value()));
+        element.remove_attribute("stem.form");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttStemsMensural::WriteStemsMensural(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasStemForm()) {
+        element.append_attribute("stem.form") = StemformMensuralToStr(this->GetStemForm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttStemsMensural::HasStemForm() const
+{
+    return (m_stemForm != STEMFORM_mensural_NONE);
+}
+
+/* include <attstem.form> */
+
 bool Att::SetMensural(Object *element, const std::string &attrType, const std::string &attrValue)
 {
+    if (element->HasAttClass(ATT_STEMPROPERTIESMENSURAL)) {
+        AttSTEMPROPERTIESMensural *att = dynamic_cast<AttSTEMPROPERTIESMensural *>(element);
+        assert(att);
+        if (attrType == "pos") {
+            att->SetPos(att->StrToStemposition(attrValue));
+            return true;
+        }
+        if (attrType == "length") {
+            att->SetLength(att->StrToMeasurementabs(attrValue));
+            return true;
+        }
+        if (attrType == "form") {
+            att->SetForm(att->StrToStemformMensural(attrValue));
+            return true;
+        }
+        if (attrType == "dir") {
+            att->SetDir(att->StrToStemdirection(attrValue));
+            return true;
+        }
+        if (attrType == "flag.pos") {
+            att->SetFlagPos(att->StrToFlagposMensural(attrValue));
+            return true;
+        }
+        if (attrType == "flag.form") {
+            att->SetFlagForm(att->StrToFlagformMensural(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_DURATIONQUALITY)) {
+        AttDurationQuality *att = dynamic_cast<AttDurationQuality *>(element);
+        assert(att);
+        if (attrType == "dur.quality") {
+            att->SetDurQuality(att->StrToDurqualityMensural(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_LIGATURELOG)) {
         AttLigatureLog *att = dynamic_cast<AttLigatureLog *>(element);
         assert(att);
@@ -414,6 +678,10 @@ bool Att::SetMensural(Object *element, const std::string &attrType, const std::s
             att->SetTempus(att->StrToTempus(attrValue));
             return true;
         }
+        if (attrType == "divisio") {
+            att->SetDivisio(att->StrToDivisio(attrValue));
+            return true;
+        }
     }
     if (element->HasAttClass(ATT_NOTEANLMENSURAL)) {
         AttNoteAnlMensural *att = dynamic_cast<AttNoteAnlMensural *>(element);
@@ -431,12 +699,49 @@ bool Att::SetMensural(Object *element, const std::string &attrType, const std::s
             return true;
         }
     }
+    if (element->HasAttClass(ATT_STEMSMENSURAL)) {
+        AttStemsMensural *att = dynamic_cast<AttStemsMensural *>(element);
+        assert(att);
+        if (attrType == "stem.form") {
+            att->SetStemForm(att->StrToStemformMensural(attrValue));
+            return true;
+        }
+    }
 
     return false;
 }
 
 void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_STEMPROPERTIESMENSURAL)) {
+        const AttSTEMPROPERTIESMensural *att = dynamic_cast<const AttSTEMPROPERTIESMensural *>(element);
+        assert(att);
+        if (att->HasPos()) {
+            attributes->push_back(std::make_pair("pos", att->StempositionToStr(att->GetPos())));
+        }
+        if (att->HasLength()) {
+            attributes->push_back(std::make_pair("length", att->MeasurementabsToStr(att->GetLength())));
+        }
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->StemformMensuralToStr(att->GetForm())));
+        }
+        if (att->HasDir()) {
+            attributes->push_back(std::make_pair("dir", att->StemdirectionToStr(att->GetDir())));
+        }
+        if (att->HasFlagPos()) {
+            attributes->push_back(std::make_pair("flag.pos", att->FlagposMensuralToStr(att->GetFlagPos())));
+        }
+        if (att->HasFlagForm()) {
+            attributes->push_back(std::make_pair("flag.form", att->FlagformMensuralToStr(att->GetFlagForm())));
+        }
+    }
+    if (element->HasAttClass(ATT_DURATIONQUALITY)) {
+        const AttDurationQuality *att = dynamic_cast<const AttDurationQuality *>(element);
+        assert(att);
+        if (att->HasDurQuality()) {
+            attributes->push_back(std::make_pair("dur.quality", att->DurqualityMensuralToStr(att->GetDurQuality())));
+        }
+    }
     if (element->HasAttClass(ATT_LIGATURELOG)) {
         const AttLigatureLog *att = dynamic_cast<const AttLigatureLog *>(element);
         assert(att);
@@ -478,6 +783,9 @@ void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasTempus()) {
             attributes->push_back(std::make_pair("tempus", att->TempusToStr(att->GetTempus())));
         }
+        if (att->HasDivisio()) {
+            attributes->push_back(std::make_pair("divisio", att->DivisioToStr(att->GetDivisio())));
+        }
     }
     if (element->HasAttClass(ATT_NOTEANLMENSURAL)) {
         const AttNoteAnlMensural *att = dynamic_cast<const AttNoteAnlMensural *>(element);
@@ -491,6 +799,13 @@ void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasSpaces()) {
             attributes->push_back(std::make_pair("spaces", att->IntToStr(att->GetSpaces())));
+        }
+    }
+    if (element->HasAttClass(ATT_STEMSMENSURAL)) {
+        const AttStemsMensural *att = dynamic_cast<const AttStemsMensural *>(element);
+        assert(att);
+        if (att->HasStemForm()) {
+            attributes->push_back(std::make_pair("stem.form", att->StemformMensuralToStr(att->GetStemForm())));
         }
     }
 }

@@ -50,7 +50,7 @@ void KeyAccid::Reset()
     ResetEnclosingChars();
 }
 
-void KeySig::AddChild(Object *child)
+bool KeySig::IsSupportedChild(Object *child)
 {
     if (this->IsAttribute()) {
         LogError("Adding a child to an attribute is not allowed");
@@ -63,13 +63,9 @@ void KeySig::AddChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 std::wstring KeyAccid::GetSymbolStr() const

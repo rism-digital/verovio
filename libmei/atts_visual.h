@@ -860,6 +860,14 @@ public:
     void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; }
     data_ORIENTATION GetOrient() const { return m_orient; }
     bool HasOrient() const;
+    //
+    void SetDot(data_BOOLEAN dot_) { m_dot = dot_; }
+    data_BOOLEAN GetDot() const { return m_dot; }
+    bool HasDot() const;
+    //
+    void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; }
+    data_MENSURATIONSIGN GetSign() const { return m_sign; }
+    bool HasSign() const;
     ///@}
 
 private:
@@ -867,8 +875,12 @@ private:
     mensurVis_FORM m_form;
     /** Describes the rotation or reflection of the base symbol. **/
     data_ORIENTATION m_orient;
+    /** Specifies whether a dot is to be added to the base symbol. **/
+    data_BOOLEAN m_dot;
+    /** The base symbol in the mensuration sign/time signature of mensural notation. **/
+    data_MENSURATIONSIGN m_sign;
 
-    /* include <attorient> */
+    /* include <attsign> */
 };
 
 //----------------------------------------------------------------------------

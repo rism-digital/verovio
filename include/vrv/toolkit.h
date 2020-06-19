@@ -78,7 +78,7 @@ public:
     /**
      * Save an MEI file.
      */
-    bool SaveFile(const std::string &filename);
+    bool SaveFile(const std::string &filename, const std::string &jsonOptions);
 
     /**
      * @name Getter and setter for options as JSON string
@@ -275,14 +275,6 @@ public:
     ///@}
 
     /**
-     * @name Set and get the xPath query for selecting <app> (if any)
-     */
-    ///@{
-    void SetScoreBasedMei(bool scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; }
-    bool GetScoreBasedMei() { return m_scoreBasedMei; }
-    ///@}
-
-    /**
      * @name Get the pages for a loaded file
      */
     ///@{
@@ -313,7 +305,6 @@ private:
     int m_scale;
     FileFormat m_inputFrom;
     FileFormat m_outputTo;
-    bool m_scoreBasedMei;
 
     static char *m_humdrumBuffer;
 

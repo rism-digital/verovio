@@ -284,19 +284,15 @@ void Stem::Reset()
     m_isVirtual = false;
 }
 
-void Stem::AddChild(Object *child)
+bool Stem::IsSupportedChild(Object *child)
 {
     if (child->Is(FLAG)) {
         assert(dynamic_cast<Flag *>(child));
     }
     else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
+        return false;
     }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    return true;
 }
 
 //----------------------------------------------------------------------------

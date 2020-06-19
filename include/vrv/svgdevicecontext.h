@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -193,6 +194,11 @@ public:
      */
     void SetHtml5(bool html5) { m_html5 = html5; }
 
+    /**
+     * Setter for indent of the SVG (default is 3, -1 for tabs)
+     */
+    void SetIndent(int indent) { m_indent = indent; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -248,7 +254,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::vector<std::string> m_smuflGlyphs;
+    std::set<std::string> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;
@@ -266,6 +272,8 @@ private:
     bool m_svgViewBox;
     // output HTML5 data-* attributes
     bool m_html5;
+    // indentation value (-1 for tabs)
+    int m_indent;
 };
 
 } // namespace vrv

@@ -481,6 +481,8 @@ public:
     OptionIntMap m_header;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
+    OptionInt m_outputIndent;
+    OptionBool m_outputIndentTab;
     OptionBool m_outputSmuflXmlEntities;
     OptionInt m_pageHeight;
     OptionInt m_pageMarginBottom;
@@ -496,6 +498,7 @@ public:
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
+    OptionBool m_useBraceGlyph;
 
     /**
      * General layout

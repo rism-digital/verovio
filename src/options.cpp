@@ -576,6 +576,14 @@ Options::Options()
     m_openControlEvents.Init(false);
     this->Register(&m_openControlEvents, "openControlEvents", &m_general);
 
+    m_outputIndent.SetInfo("Output indentation", "Output indentation value for MEI and SVG");
+    m_outputIndent.Init(3, 1, 10);
+    this->Register(&m_outputIndent, "outputIndent", &m_general);
+
+    m_outputIndentTab.SetInfo("Output indentation with tab", "Output indentation with tabulation for MEI and SVG");
+    m_outputIndentTab.Init(false);
+    this->Register(&m_outputIndentTab, "outputIndentTab", &m_general);
+
     m_outputSmuflXmlEntities.SetInfo(
         "Output SMuFL XML entities", "Output SMuFL charachters as XML entities instead of byte codes");
     m_outputSmuflXmlEntities.Init(false);
@@ -625,6 +633,10 @@ Options::Options()
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
+
+    m_useBraceGlyph.SetInfo("Use Brace Glyph", "Use brace glyph from current font");
+    m_useBraceGlyph.Init(false);
+    this->Register(&m_useBraceGlyph, "useBraceGlyph", &m_general);
 
     m_useFacsimile.SetInfo(
         "Use facsimile for layout", "Use information in the <facsimile> element to control the layout");
@@ -835,7 +847,7 @@ Options::Options()
     /// custom bottom
 
     m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
-    m_bottomMarginHarm.Init(0.5, 0.0, 10.0);
+    m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
 
     /// custom left
@@ -973,7 +985,7 @@ Options::Options()
     /// custom top
 
     m_topMarginHarm.SetInfo("Top margin harm", "The margin for harm in MEI units");
-    m_topMarginHarm.Init(0.5, 0.0, 10.0);
+    m_topMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_topMarginHarm, "topMarginHarm", &m_elementMargins);
 
     /*
