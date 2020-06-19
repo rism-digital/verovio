@@ -96,17 +96,18 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     }
     // perfecta in tempus imperfectum
     else if ((this->GetDurQuality() == DURQUALITY_mensural_perfecta) && (currentMensur->GetTempus() == TEMPUS_2)) {
-        num *= 3;
-        numBase *= 2;
-    }
-    // imperfecta in tempus perfectum (e.g. not imperfectum since perfectum is assumed by default)
-    else if ((this->GetDurQuality() == DURQUALITY_mensural_imperfecta) && (currentMensur->GetTempus() != TEMPUS_2)) {
         num *= 2;
         numBase *= 3;
     }
+    // imperfecta in tempus perfectum (e.g. not imperfectum since perfectum is assumed by default)
+    else if ((this->GetDurQuality() == DURQUALITY_mensural_imperfecta) && (currentMensur->GetTempus() != TEMPUS_2)) {
+        num *= 3;
+        numBase *= 2;
+    }
     // altera - that any other given value and not minor
     else if (this->HasDurQuality() && (this->GetDurQuality() != DURQUALITY_mensural_minor)) {
-        num *= 2;
+        num *= 1;
+        numBase *= 2;
     }
 
     if (currentMensur->HasNum()) num *= currentMensur->GetNum();

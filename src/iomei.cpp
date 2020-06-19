@@ -3427,11 +3427,11 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         //
         vrvMensur->SetColor(mensuralVis.GetMensurColor());
         vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
-        
+
         if (m_version < MEI_5_0_0_dev) {
             UpgradeMensurTo_5_0_0(element, vrvMensur);
         }
-        
+
         object->AddChild(vrvMensur);
     }
 
@@ -4832,7 +4832,7 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadMensurVis(mensur);
     vrvMensur->ReadSlashCount(mensur);
     vrvMensur->ReadStaffLoc(mensur);
-    
+
     if (m_version < MEI_5_0_0_dev) {
         UpgradeMensurTo_5_0_0(mensur, vrvMensur);
     }
