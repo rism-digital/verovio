@@ -417,7 +417,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             element->AddChild(rend);
             textParent = rend;
         }
-        if (soundNode && !soundNode.attribute("@tempo")) {
+        else if (soundNode && !soundNode.attribute("@tempo")) {
             Rend *rend = new Rend();
             rend->SetHalign(HORIZONTALALIGNMENT_right);
             element->AddChild(rend);
@@ -1637,10 +1637,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring wtext;
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
-        wtext = conv.from_bytes("𝄌");
-        text->SetText(wtext);
+        std::wstring codaSign = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> >{}.from_bytes("𝄌");
+        text->SetText(codaSign);
         rend->AddChild(text);
         dir->AddChild(rend);
         m_controlElements.push_back(std::make_pair(measureNum, dir));
@@ -2012,10 +2010,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring wtext;
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > conv;
-        wtext = conv.from_bytes("𝄋");
-        text->SetText(wtext);
+        std::wstring segnoSign = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> >{}.from_bytes("𝄋");
+        text->SetText(segnoSign);
         rend->AddChild(text);
         dir->AddChild(rend);
         m_controlElements.push_back(std::make_pair(measureNum, dir));
