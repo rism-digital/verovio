@@ -2639,6 +2639,7 @@ void HumdrumInput::prepareHeaderFooter()
     hum::HumdrumFile &infile = m_infiles[0];
     std::vector<std::pair<string, string> > biblist;
 
+    hum::HumRegex hre;
     std::vector<hum::HumdrumLine *> records = infile.getReferenceRecords();
     biblist.reserve(records.size());
     std::map<std::string, std::string> refmap;
@@ -14843,6 +14844,16 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         stindex = subtoken;
     }
 
+    std::string scordaturaGes;
+    if (!m_scordatura_marker.empty()) {
+        std::string vstring = checkForScordatura(tstring);
+        if (!vstring.empty()) {
+            hum::HumRegex hre;
+            scordaturaGes = tstring;
+            hre.replaceDestructive(tstring, vstring, "[A-Ga-g]+[-#n]*");
+        }
+    }
+
     bool chordQ = token->isChord();
     bool unpitchedQ = token->isUnpitched();
 
@@ -15097,6 +15108,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
+    Accid *accid = NULL;
+
     int accidCount = hum::Convert::base40ToAccidental(base40);
     if ((testaccid > 2) || (testaccid < -2)) {
         accidCount = testaccid;
@@ -15127,7 +15140,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     if (mensit && hasAccidental) {
-        Accid *accid = new Accid;
+        accid = new Accid;
         appendElement(note, accid);
         setLocationId(accid, token, subtoken);
 
@@ -15161,7 +15174,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
     else if (!mensit && (!unpitchedQ)) {
-        Accid *accid = new Accid;
+        accid = new Accid;
         appendElement(note, accid);
         setLocationId(accid, token, subtoken);
 
@@ -15409,6 +15422,63 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     else if (phraseStop) {
         note->SetType("phraseStop");
     }
+
+    if (!scordaturaGes.empty()) {
+        hum::HumPitch hpitch;
+        hpitch.setKernPitch(scordaturaGes);
+        int oct = hpitch.getOctave();
+        note->SetOctGes(oct);
+        switch (hpitch.getDiatonicPC()) {
+            case 0: note->SetPnameGes(PITCHNAME_c); break;
+            case 1: note->SetPnameGes(PITCHNAME_d); break;
+            case 2: note->SetPnameGes(PITCHNAME_e); break;
+            case 3: note->SetPnameGes(PITCHNAME_f); break;
+            case 4: note->SetPnameGes(PITCHNAME_g); break;
+            case 5: note->SetPnameGes(PITCHNAME_a); break;
+            case 6: note->SetPnameGes(PITCHNAME_b); break;
+        }
+        // note@accid.ges is likely to be overwritten, but this is needed for
+        // correct MIDI output.
+        if (accid) {
+            switch (hpitch.getAccid()) {
+                case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
+                case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
+                case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
+                case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
+                case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
+            }
+        }
+        std::string notetype = note->GetType();
+        if (!notetype.empty()) {
+            notetype += " ";
+        }
+        notetype += "scordatura";
+        note->SetType(notetype);
+        // ggg
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForScordatura -- Return the **kern written note if scordatura; otherwise, return empty string.
+//
+
+std::string HumdrumInput::checkForScordatura(const std::string &token)
+{
+    int index = -1;
+    for (int i = 0; i < (int)m_scordatura_marker.size(); i++) {
+        if (token.find(m_scordatura_marker[i]) != std::string::npos) {
+            index = i;
+            break;
+        }
+    }
+    if (index < 0) {
+        return "";
+    }
+    hum::HumPitch tpitch;
+    tpitch.setKernPitch(token);
+    m_scordatura_transposition[index]->transpose(tpitch);
+    return tpitch.getKernPitch();
 }
 
 //////////////////////////////
@@ -17926,6 +17996,11 @@ void HumdrumInput::clear()
     m_duradj.clear();
     m_nulls.clear();
     m_fbstates.clear();
+    for (int i = 0; i < (int)m_scordatura_transposition.size(); i++) {
+        delete m_scordatura_transposition[i];
+        m_scordatura_transposition[i] = NULL;
+    }
+    m_scordatura_transposition.clear();
 }
 
 //////////////////////////////
@@ -18861,6 +18936,27 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
             else {
                 m_signifiers.markdir.push_back("");
+            }
+        }
+
+        // scordatura markers
+        if (hre.search(value, "^\\s*([^\\s]+)\\s*=.*scordatura\\s*=\\s*[\"']?ITrd(-?\\d)c(-?\\d)")) {
+            std::string marker = hre.getMatch(1);
+            int diatonic = hre.getMatchInt(2);
+            int chromatic = hre.getMatchInt(3);
+            bool found = 0;
+            // don't allow redundant markers:
+            for (int j = 0; j < (int)m_scordatura_marker.size(); j++) {
+                if (marker == m_scordatura_marker[j]) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found) {
+                m_scordatura_marker.push_back(marker);
+                hum::HumTransposer *transposer = new hum::HumTransposer;
+                transposer->setTranspositionDC(diatonic, chromatic);
+                m_scordatura_transposition.push_back(transposer);
             }
         }
     }

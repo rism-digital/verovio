@@ -589,6 +589,7 @@ protected:
     std::string getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose);
     void checkForRehearsal(int line);
     bool isBlackNotation(hum::HTp starting);
+    std::string checkForScordatura(const std::string &token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -901,6 +902,12 @@ private:
 
     // m_group_abbr_tok == used to store group abbreviations, such as *I""trps.
     std::map<int, hum::HTp> m_group_abbr_tok;
+
+    // m_scordatura_marker == used to identify scordatura notes for transposition to written pitch.
+    std::vector<std::string> m_scordatura_marker;
+
+    // m_scordatura_transposition == used to transpose scordatura notes;
+    std::vector<hum::HumTransposer *> m_scordatura_transposition;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
