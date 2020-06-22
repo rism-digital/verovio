@@ -10,10 +10,10 @@
 
 #include "atts_gestural.h"
 #include "atts_shared.h"
-#include "clef.h"
 
 namespace vrv {
 
+class Clef;
 class Layer;
 
 //----------------------------------------------------------------------------
