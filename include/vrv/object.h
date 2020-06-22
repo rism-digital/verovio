@@ -1153,12 +1153,6 @@ public:
     virtual int FindPreviousChildByComparison(FunctorParams *);
 
     /**
-     * Get bounding box using child elements with facsimile interface
-     * Returns true if a bounding box could be constructed, false otherwise.
-     */
-    bool GenerateBoundingBox(int *ulx, int *uly, int *lrx, int *lry);
-
-    /**
      * Associate child objects with zones.
      */
     virtual int SetChildZones(FunctorParams *);

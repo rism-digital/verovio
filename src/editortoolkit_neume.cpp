@@ -1132,7 +1132,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, std::string text)
                 // Create a default bounding box
                 Zone *zone = new Zone();
                 int ulx, uly, lrx, lry;
-                if (syllable->GenerateBoundingBox(&ulx, &uly, &lrx, &lry)) {
+                if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
                     zone->SetUlx(ulx);
                     zone->SetUly(uly);
                     zone->SetLrx(lrx);
@@ -2410,7 +2410,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
     else if (element->Is(SYLLABLE)) {
         int ulx, uly, lrx, lry;
-        if (!element->GenerateBoundingBox(&ulx, &uly, &lrx, &lry)) {
+        LayerElement *layerElement = dynamic_cast<LayerElement *>(element);
+        if (!layerElement->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
             LogError("Couldn't generate bounding box for syllable.");
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Couldn't generate bounding box for syllable.");
@@ -2427,7 +2428,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    Staff *staff;
+    Staff *staff = NULL;
 
     if (staves.size() > 0) {
         std::sort(staves.begin(), staves.end(), comp);
