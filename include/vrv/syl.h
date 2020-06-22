@@ -71,8 +71,8 @@ public:
      */
     int CalcConnectorSpacing(Doc *doc, int staffSize);
 
-    virtual int GetDrawingWidth() const;
-    virtual int GetDrawingHeight() const;
+    int GetDrawingWidth() const;
+    int GetDrawingHeight() const;
 
     //----------//
     // Functors //
