@@ -199,6 +199,11 @@ public:
      */
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
+    /**
+     * See Object::SetChildZones
+     */
+    virtual int SetChildZones(FunctorParams *functorParms);
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.

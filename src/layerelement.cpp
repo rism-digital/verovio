@@ -611,6 +611,33 @@ double LayerElement::GetContentAlignmentDuration(
     return duration;
 }
 
+bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
+{
+    // Set integers to extremes
+    *ulx = INT_MAX;
+    *uly = INT_MAX;
+    *lrx = INT_MIN;
+    *lry = INT_MIN;
+    ListOfObjects childrenWithFacsimileInterface;
+    InterfaceComparison ic(INTERFACE_FACSIMILE);
+    this->FindAllDescendantByComparison(&childrenWithFacsimileInterface, &ic);
+    bool result = false;
+    for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
+        assert(fi);
+        if (!(*it)->Is(SYL) && fi->HasFacs()) {
+            Zone *zone = fi->GetZone();
+            assert(zone);
+            *ulx = std::min(*ulx, zone->GetUlx());
+            *uly = std::min(*uly, zone->GetUly());
+            *lrx = std::max(*lrx, zone->GetLrx());
+            *lry = std::max(*lry, zone->GetLry());
+            result |= true;
+        }
+    }
+    return result;
+}
+
 //----------------------------------------------------------------------------
 // LayerElement functors methods
 //----------------------------------------------------------------------------
@@ -1758,31 +1785,9 @@ int LayerElement::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry)
+int LayerElement::SetChildZones(FunctorParams *functorParams)
 {
-    // Set integers to extremes
-    *ulx = INT_MAX;
-    *uly = INT_MAX;
-    *lrx = INT_MIN;
-    *lry = INT_MIN;
-    ListOfObjects childrenWithFacsimileInterface;
-    InterfaceComparison ic(INTERFACE_FACSIMILE);
-    this->FindAllDescendantByComparison(&childrenWithFacsimileInterface, &ic);
-    bool result = false;
-    for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(*it);
-        assert(fi);
-        if (!(*it)->Is(SYL) && fi->HasFacs()) {
-            Zone *zone = fi->GetZone();
-            assert(zone);
-            *ulx = std::min(*ulx, zone->GetUlx());
-            *uly = std::min(*uly, zone->GetUly());
-            *lrx = std::max(*lrx, zone->GetLrx());
-            *lry = std::max(*lry, zone->GetLry());
-            result |= true;
-        }
-    }
-    return result;
+    return FacsimileInterface::InterfaceSetChildZones(functorParams, this);
 }
 
 } // namespace vrv

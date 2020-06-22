@@ -12,8 +12,9 @@
 #include "atts_shared.h"
 
 namespace vrv {
-class Zone;
+class FunctorParams;
 class View;
+class Zone;
 
 //----------------------------------------------------------------------------
 // FacsimileInterface
@@ -50,6 +51,11 @@ public:
 
     /** Get the zone */
     Zone *GetZone() { return m_zone; }
+
+    /**
+     * See Object::SetChildZones
+     */
+    virtual int InterfaceSetChildZones(FunctorParams *params, Object *object);
 
 private:
     Zone *m_zone = NULL;
