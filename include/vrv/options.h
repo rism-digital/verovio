@@ -532,6 +532,7 @@ public:
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
     OptionIntMap m_systemDivider;
+    OptionInt m_systemMaxPerPage;
     OptionDbl m_tieThickness;
 
     /**
