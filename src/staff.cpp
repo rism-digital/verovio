@@ -173,10 +173,10 @@ int Staff::GetDrawingY() const
 
 double Staff::GetDrawingRotate() const
 {
-    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstAncestor(DOC))->GetOptions()->m_useRotate.GetValue()) {
+    if (this->HasFacs()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetType() == Facs) {
+        if (doc->GetOptions()->m_useRotate.GetValue() && (doc->GetType() == Facs)) {
             return FacsimileInterface::GetDrawingRotate();
         }
     }
@@ -185,12 +185,13 @@ double Staff::GetDrawingRotate() const
 
 void Staff::AdjustDrawingStaffSize()
 {
-    if (this->HasFacs() && dynamic_cast<Doc *>(this->GetFirstAncestor(DOC))->GetOptions()->m_useRotate.GetValue()) {
+    if (this->HasFacs()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetType() == Facs) {
+        if (doc->GetOptions()->m_useRotate.GetValue() && (doc->GetType() == Facs)) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
+            assert(zone);
             int yDiff
                 = zone->GetLry() - zone->GetUly() - (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
             this->m_drawingStaffSize = 100 * yDiff / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
