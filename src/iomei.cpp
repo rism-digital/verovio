@@ -5288,13 +5288,7 @@ bool MEIInput::ReadLinkingInterface(pugi::xml_node element, LinkingInterface *in
 
 bool MEIInput::ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface)
 {
-    if (interface->ReadFacsimile(element)) {
-        std::string facsUuid = interface->GetFacs()[0] == '#' ? interface->GetFacs().substr(1) : interface->GetFacs();
-        Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(facsUuid);
-        if (zone != NULL) {
-            interface->SetZone(zone);
-        }
-    }
+    interface->ReadFacsimile(element);
     return true;
 }
 

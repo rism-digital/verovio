@@ -1233,6 +1233,26 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::PrepareFacsimile(FunctorParams *functorParams)
+{
+    PrepareFacsimileParams *params = dynamic_cast<PrepareFacsimileParams *>(functorParams);
+    assert(params);
+
+    if (this->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = this->GetFacsimileInterface();
+        assert(interface);
+        if (interface->HasFacs()) {
+            std::string facsUuid = (interface->GetFacs().compare(0, 1, "#") ? interface->GetFacs().substr(1) : interface->GetFacs());
+            Zone *zone = params->m_facsimile->FindZoneByUuid(facsUuid);
+            if (zone != NULL) {
+                interface->SetZone(zone);
+            }
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Object::PrepareLinking(FunctorParams *functorParams)
 {
     PrepareLinkingParams *params = dynamic_cast<PrepareLinkingParams *>(functorParams);

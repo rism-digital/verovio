@@ -943,6 +943,11 @@ public:
     ///@}
 
     /**
+     * Associate LayerElement with @facs to the appropriate zone
+     */
+    virtual int PrepareFacsimile(FunctorParams *functorParams);
+
+    /**
      * Match linking element (e.g, @next).
      */
     ///@{

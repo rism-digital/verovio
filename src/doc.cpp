@@ -727,6 +727,12 @@ void Doc::PrepareDrawing()
     }
     */
 
+    /************ Resolve @facs ************/
+
+    PrepareFacsimileParams prepareFacsimileParams(this->GetFacsimile());
+    Functor prepareFacsimile(&Object::PrepareFacsimile);
+    this->Process(&prepareFacsimile, &prepareFacsimileParams);
+
     // LogElapsedTimeEnd ("Preparing drawing");
 
     m_drawingPreparationDone = true;

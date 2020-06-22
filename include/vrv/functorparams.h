@@ -28,6 +28,7 @@ class Dots;
 class Dynam;
 class Ending;
 class Output;
+class Facsimile;
 class Functor;
 class Hairpin;
 class Harm;
@@ -1425,6 +1426,22 @@ public:
     Measure *m_lastMeasure;
     Ending *m_currentEnding;
     std::vector<BoundaryStartInterface *> m_startBoundaries;
+};
+
+//----------------------------------------------------------------------------
+// PrepareFacsimileParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ */
+
+class PrepareFacsimileParams : public FunctorParams {
+public:
+    PrepareFacsimileParams(Facsimile *facsimile) {
+        m_facsimile = facsimile;
+    }
+    Facsimile *m_facsimile;
 };
 
 //----------------------------------------------------------------------------
