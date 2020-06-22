@@ -503,7 +503,8 @@ protected:
         wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data_HORIZONTALALIGNMENT alignment,
         int staffSize = 100, bool dimin = false, bool setBBGlyph = false);
-    void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100, std::optional<TextDrawingParams> params = std::nullopt);
+    void DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize = 100,
+        std::optional<TextDrawingParams> params = std::nullopt);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawFilledRoundedRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int radius);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);

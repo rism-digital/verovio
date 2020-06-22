@@ -164,7 +164,8 @@ int FacsimileInterface::InterfaceSetChildZones(FunctorParams *functorParams, Obj
                 zone->SetUly(uly + offsetUly);
                 zone->SetLrx(lrx + offsetLrx);
                 zone->SetLry(lry + offsetLry);
-                Surface *surface = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
+                Surface *surface
+                    = dynamic_cast<Surface *>(params->m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                 assert(surface);
                 surface->AddChild(zone);
                 this->SetZone(zone);

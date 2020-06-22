@@ -1242,7 +1242,8 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
         FacsimileInterface *interface = this->GetFacsimileInterface();
         assert(interface);
         if (interface->HasFacs()) {
-            std::string facsUuid = (interface->GetFacs().compare(0, 1, "#") ? interface->GetFacs().substr(1) : interface->GetFacs());
+            std::string facsUuid
+                = (interface->GetFacs().compare(0, 1, "#") ? interface->GetFacs().substr(1) : interface->GetFacs());
             Zone *zone = params->m_facsimile->FindZoneByUuid(facsUuid);
             if (zone != NULL) {
                 interface->SetZone(zone);

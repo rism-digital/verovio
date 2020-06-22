@@ -1438,9 +1438,7 @@ public:
 
 class PrepareFacsimileParams : public FunctorParams {
 public:
-    PrepareFacsimileParams(Facsimile *facsimile) {
-        m_facsimile = facsimile;
-    }
+    PrepareFacsimileParams(Facsimile *facsimile) { m_facsimile = facsimile; }
     Facsimile *m_facsimile;
 };
 
