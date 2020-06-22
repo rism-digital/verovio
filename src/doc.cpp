@@ -783,7 +783,7 @@ void Doc::CastOffLineDoc()
 {
     Doc::CastOffDocBase(true, false);
 }
-void Doc::CastOffDocBase(bool useSystemBreaks, bool usePageBreaks)
+void Doc::CastOffDocBase(bool useSb, bool usePb)
 {
     Pages *pages = this->GetPages();
     assert(pages);
@@ -813,7 +813,7 @@ void Doc::CastOffDocBase(bool useSystemBreaks, bool usePageBreaks)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if (useSystemBreaks && !usePageBreaks) {
+    if (useSb && !usePb) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);
