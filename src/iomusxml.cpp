@@ -377,11 +377,11 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
 void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *element)
 {
     // try to match slur stop to open slurs by slur number
-    std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
-    for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-        if (iter->second.m_number == number) {
-            iter->first->SetEndid("#" + element->GetUuid());
-            m_slurStack.erase(iter);
+    std::vector<std::pair<Slur *, musicxml::OpenSlur> >::reverse_iterator riter;
+    for (riter = m_slurStack.rbegin(); riter != m_slurStack.rend(); ++riter) {
+        if (riter->second.m_number == number) {
+            riter->first->SetEndid("#" + element->GetUuid());
+            m_slurStack.erase(std::next(riter).base());
             return;
         }
     }
