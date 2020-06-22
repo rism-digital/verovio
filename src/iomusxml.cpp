@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <codecvt>
 #include <regex>
 #include <sstream>
 
@@ -1637,7 +1636,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring codaSign = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> >{}.from_bytes("𝄌");
+        std::wstring codaSign = UTF8to16("\xF0\x9D\x84\x8C");
         text->SetText(codaSign);
         rend->AddChild(text);
         dir->AddChild(rend);
@@ -2010,7 +2009,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
-        std::wstring segnoSign = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> >{}.from_bytes("𝄋");
+        std::wstring segnoSign = UTF8to16("\xF0\x9D\x84\x8B");
         text->SetText(segnoSign);
         rend->AddChild(text);
         dir->AddChild(rend);
