@@ -1119,6 +1119,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindChildByComparisonParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the comparison
+ * member 1: the start object
+ */
+
+class FindChildByComparisonParams : public FunctorParams {
+public:
+    FindChildByComparisonParams(Comparison *comparison, Object *start)
+    {
+        m_comparison = comparison;
+        m_element = NULL;
+        m_start = start;
+    }
+    Comparison *m_comparison;
+    Object *m_element;
+    Object *m_start;
+};
+
+//----------------------------------------------------------------------------
 // FindExtremeByComparisonParams
 //----------------------------------------------------------------------------
 
@@ -1717,6 +1739,19 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// SetChildZonesParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the Doc for the children operated on
+ */
+class SetChildZonesParams : public FunctorParams {
+public:
+    SetChildZonesParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // SetCurrentScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -1858,41 +1893,6 @@ class UnsetCurrentScoreDefParams : public FunctorParams {
 public:
     UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// SetChildZonesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the Doc for the children operated on
- */
-class SetChildZonesParams : public FunctorParams {
-public:
-    SetChildZonesParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// FindChildByComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the comparison
- * member 1: the start object
- */
-
-class FindChildByComparisonParams : public FunctorParams {
-public:
-    FindChildByComparisonParams(Comparison *comparison, Object *start)
-    {
-        m_comparison = comparison;
-        m_element = NULL;
-        m_start = start;
-    }
-    Comparison *m_comparison;
-    Object *m_element;
-    Object *m_start;
 };
 
 } // namespace vrv
