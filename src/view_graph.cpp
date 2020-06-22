@@ -284,32 +284,6 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, data
     dc->ResetBrush();
 }
 
-void View::DrawLyricString(DeviceContext *dc, TextDrawingParams &params, std::wstring s, int staffSize)
-{
-    assert(dc);
-
-    bool hasText = false;
-    std::wistringstream iss(s);
-    std::wstring token;
-    while (std::getline(iss, token, L'_')) {
-        hasText = true;
-        dc->DrawText(UTF16to8(token), token, params.m_x, params.m_y, params.m_width, params.m_height);
-        // no _
-        if (iss.eof()) break;
-        FontInfo vrvTxt;
-        vrvTxt.SetFaceName("VerovioText");
-        dc->SetFont(&vrvTxt);
-        std::wstring str;
-        str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str), str, params.m_x, params.m_y, params.m_width, params.m_height);
-        dc->ResetFont();
-    }
-
-    if (!hasText) {
-        dc->DrawText("", L"", params.m_x, params.m_y, params.m_width, params.m_height);
-    }
-}
-
 void View::DrawThickBezierCurve(
     DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle, int penStyle)
 {
