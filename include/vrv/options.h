@@ -467,8 +467,6 @@ public:
     OptionBool m_condenseEncoded;
     OptionBool m_condenseFirstPage;
     OptionBool m_condenseTempoPages;
-    OptionBool m_createDefaultSyl;
-    OptionBool m_createDefaultSylBBox;
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
     OptionBool m_justifyIncludeLastPage;

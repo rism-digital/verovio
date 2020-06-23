@@ -122,7 +122,7 @@ int FacsimileInterface::InterfaceSetChildZones(FunctorParams *functorParams, Obj
         }
         this->SetZone(zone);
     }
-    else if (!this->HasFacs() && object->Is(SYL) && params->m_doc->GetOptions()->m_createDefaultSylBBox.GetValue()) {
+    else if (!this->HasFacs() && object->Is(SYL) && (params->m_doc->GetType() == Facs)) {
         Zone *zone = new Zone();
         // if the syl's syllable parent has facs then use that as the bounding box
         FacsimileInterface *syllableFi = NULL;

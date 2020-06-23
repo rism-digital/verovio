@@ -5039,13 +5039,13 @@ bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     vrvSyllable->ReadSlashCount(syllable);
 
     parent->AddChild(vrvSyllable);
-
+    // return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
     // read all of the syllables elements
     // and add an empty <syl> if it doesn't have one
     if ((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
         Object *obj = vrvSyllable->FindDescendantByType(SYL);
         Syl *syl = dynamic_cast<Syl *>(obj);
-        if ((syl == NULL) && m_doc->GetOptions()->m_createDefaultSyl.GetValue() && !hasFollows) {
+        if ((syl == NULL) && (m_doc->GetType() == Facs) && !hasFollows) {
             syl = new Syl();
             Text *text = new Text();
             syl->AddChild(text);
