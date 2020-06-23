@@ -2833,12 +2833,6 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         success = m_doc->GenerateDocumentScoreDef();
     }
 
-    if (success && m_doc->GetType() == Facs) {
-        Functor setChildZones(&Object::SetChildZones);
-        SetChildZonesParams setChildZonesParams(m_doc);
-        m_doc->Process(&setChildZones, &setChildZonesParams);
-    }
-
     return success;
 }
 

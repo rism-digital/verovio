@@ -1153,11 +1153,6 @@ public:
     virtual int FindPreviousChildByComparison(FunctorParams *);
 
     /**
-     * Associate child objects with zones.
-     */
-    virtual int SetChildZones(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Transpose the content.
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }

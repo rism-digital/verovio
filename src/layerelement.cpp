@@ -1785,9 +1785,4 @@ int LayerElement::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::SetChildZones(FunctorParams *functorParams)
-{
-    return FacsimileInterface::InterfaceSetChildZones(functorParams, this);
-}
-
 } // namespace vrv

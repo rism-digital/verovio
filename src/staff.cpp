@@ -568,9 +568,4 @@ int Staff::AdjustSylSpacing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::SetChildZones(FunctorParams *functorParams)
-{
-    return FacsimileInterface::InterfaceSetChildZones(functorParams, this);
-}
-
 } // namespace vrv

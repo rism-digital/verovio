@@ -1754,19 +1754,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// SetChildZonesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the Doc for the children operated on
- */
-class SetChildZonesParams : public FunctorParams {
-public:
-    SetChildZonesParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // SetCurrentScoreDefParams
 //----------------------------------------------------------------------------
 

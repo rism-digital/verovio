@@ -58,6 +58,7 @@
 #include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 //----------------------------------------------------------------------------
 
@@ -737,8 +738,8 @@ void Doc::PrepareDrawing()
         ArrayOfStrAttr attributes;
         (*it)->GetAttributes(&attributes);
         bool noFollows = std::find_if(attributes.begin(), attributes.end(), [](auto att) -> bool {
-                return (std::string{ "follows" }.compare(att.first) == 0);
-            }) == attributes.end();
+            return (std::string{ "follows" }.compare(att.first) == 0);
+        }) == attributes.end();
         if (noFollows && (obj == NULL)) {
             Syl *syl = new Syl();
             Text *text = new Text();
@@ -748,10 +749,59 @@ void Doc::PrepareDrawing()
     }
 
     /************ Resolve @facs ************/
-    if (this->GetFacsimile() != NULL) {
+    if (this->GetType() == Facs) {
+        // Associate zones with elements
         PrepareFacsimileParams prepareFacsimileParams(this->GetFacsimile());
         Functor prepareFacsimile(&Object::PrepareFacsimile);
         this->Process(&prepareFacsimile, &prepareFacsimileParams);
+
+        // Add default syl zone if one is not present.
+        ListOfObjects syls;
+        ClassIdComparison comp(SYL);
+        this->FindAllDescendantByComparison(&syls, &comp);
+        for (auto it = syls.begin(); it != syls.end(); ++it) {
+            FacsimileInterface *fi = (*it)->GetFacsimileInterface();
+            assert(fi);
+            if (!fi->HasFacs()) {
+                Zone *zone = new Zone();
+                const int offsetUly = 100;
+                const int offsetLrx = 100;
+                const int offsetLry = 200;
+                LayerElement *syllable = dynamic_cast<LayerElement *>((*it)->GetFirstAncestor(SYLLABLE));
+                assert(syllable);
+                if (syllable->HasFacs()) {
+                    Zone *tempZone = syllable->GetZone();
+                    assert(tempZone);
+                    zone->SetUlx(tempZone->GetUlx());
+                    zone->SetUly(tempZone->GetUly() + offsetUly);
+                    zone->SetLrx(tempZone->GetLrx() + offsetLrx);
+                    zone->SetLry(tempZone->GetLry() + offsetLry);
+                }
+                else {
+                    int ulx, uly, lrx, lry;
+                    if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
+                        if (ulx == 0 || uly == 0 || lrx == 0 || lry == 0) {
+                            LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)",
+                                syllable->GetUuid().c_str(), ulx, uly, lrx, lry);
+                        }
+                        zone->SetUlx(ulx);
+                        zone->SetUly(uly + offsetUly);
+                        zone->SetLrx(lrx + offsetLrx);
+                        zone->SetLry(lry + offsetLry);
+                    }
+                    else {
+                        LogWarning("Failed to create zone for %s of type %s", (*it)->GetUuid().c_str(),
+                            (*it)->GetClassName().c_str());
+                        delete zone;
+                        continue;
+                    }
+                }
+                Object *surface = this->GetFacsimile()->FindDescendantByType(SURFACE);
+                assert(surface);
+                surface->AddChild(zone);
+                fi->SetZone(zone);
+            }
+        }
     }
 
     // LogElapsedTimeEnd ("Preparing drawing");
