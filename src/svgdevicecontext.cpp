@@ -810,6 +810,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         rectChild.append_attribute("y") = StringFormat("%d", y).c_str();
         rectChild.append_attribute("width") = StringFormat("%d", width).c_str();
         rectChild.append_attribute("height") = StringFormat("%d", height).c_str();
+        rectChild.append_attribute("opacity") = "0.0";
     }
     else if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET)) {
         textChild.append_attribute("x") = StringFormat("%d", x).c_str();
