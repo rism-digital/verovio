@@ -146,12 +146,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     int noteY, noteX;
     int yValue;
-    if (nc->HasFacs() && m_doc->GetType() == Facs) {
+    if (nc->HasFacs() && (m_doc->GetType() == Facs)) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = nc->GetDrawingX();
         params.at(0).xOffset = 0;
     }
-    else if (neume->HasFacs() && m_doc->GetType() == Facs) {
+    else if (neume->HasFacs() && (m_doc->GetType() == Facs)) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = neume->GetDrawingX() + position * noteWidth;
     }
@@ -164,7 +164,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int pitchOffset = 0;
     int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
     int rotateOffset;
-    if (staff->GetDrawingRotate() != 0) {
+    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = noteX - staff->GetDrawingX();
         rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
@@ -188,7 +188,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     // adjust facsimile values of element based on where it is rendered if necessary
-    if (element->HasFacs()) {
+    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
         FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
         fi->GetZone()->SetUlx(noteX);
         fi->GetZone()->SetUly(ToDeviceContextY(yValue));

@@ -688,7 +688,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (clef->HasLine()) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
-        if (staff->GetDrawingRotate() != 0) {
+        if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
             double deg = staff->GetDrawingRotate();
             int xDiff = x - staff->GetDrawingX();
             y -= int(xDiff * tan(deg * M_PI / 180.0));
@@ -715,7 +715,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
 
-    if (element->HasFacs()) {
+    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
@@ -775,7 +775,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int pitchOffset;
     int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
     int rotateOffset;
-    if (staff->GetDrawingRotate() != 0) {
+    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = x - staff->GetDrawingX();
         rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
@@ -802,7 +802,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
 
-    if (element->HasFacs()) {
+    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
@@ -1495,8 +1495,10 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
-    params.m_width = syl->GetDrawingWidth();
-    params.m_height = syl->GetDrawingHeight();
+    if (m_doc->GetType() == Facs) {
+        params.m_width = syl->GetDrawingWidth();
+        params.m_height = syl->GetDrawingHeight();
+    }
     assert(dc->GetFont());
     params.m_pointSize = dc->GetFont()->GetPointSize();
 
