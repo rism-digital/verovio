@@ -654,11 +654,6 @@ Options::Options()
     m_createDefaultSylBBox.Init(false);
     this->Register(&m_createDefaultSylBBox, "createDefaultSylBBox", &m_general);
 
-    m_useRotate.SetInfo("Whether to consider rotate values in facsimile mode",
-        "When zones in the MEI facsimile have a rotate value, take those values into account when rendering");
-    m_useRotate.Init(false);
-    this->Register(&m_useRotate, "useRotate", &m_general);
-
     m_usePgFooterForAll.SetInfo("Use PgFooter for all", "Use the pgFooter for all pages");
     m_usePgFooterForAll.Init(false);
     this->Register(&m_usePgFooterForAll, "usePgFooterForAll", &m_general);

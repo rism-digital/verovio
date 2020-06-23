@@ -500,7 +500,6 @@ public:
     OptionBool m_useFacsimile;
     OptionBool m_usePgFooterForAll;
     OptionBool m_usePgHeaderForAll;
-    OptionBool m_useRotate;
     OptionBool m_useBraceGlyph;
 
     /**

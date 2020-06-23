@@ -71,10 +71,6 @@ int FacsimileInterface::GetHeight() const
 
 double FacsimileInterface::GetDrawingRotate() const
 {
-    // this method should only be called in staff->GetDrawingRotate()
-    // since this method cannot validate the m_useRotate option
-    // while the staff->GetDrawingRotate() method can
-
     assert(m_zone);
     return m_zone->GetRotate();
 }

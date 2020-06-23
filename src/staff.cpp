@@ -176,7 +176,7 @@ double Staff::GetDrawingRotate() const
     if (this->HasFacs()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetOptions()->m_useRotate.GetValue() && (doc->GetType() == Facs)) {
+        if (doc->GetType() == Facs) {
             return FacsimileInterface::GetDrawingRotate();
         }
     }
@@ -188,7 +188,7 @@ void Staff::AdjustDrawingStaffSize()
     if (this->HasFacs()) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetOptions()->m_useRotate.GetValue() && (doc->GetType() == Facs)) {
+        if (doc->GetType() == Facs) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
             assert(zone);
