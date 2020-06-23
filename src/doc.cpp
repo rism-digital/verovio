@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <math.h>
 
@@ -727,11 +728,31 @@ void Doc::PrepareDrawing()
     }
     */
 
-    /************ Resolve @facs ************/
+    /************ Add default syl for syllables (if applicable) ************/
+    ListOfObjects syllables;
+    ClassIdComparison comp(SYLLABLE);
+    this->FindAllDescendantByComparison(&syllables, &comp);
+    for (auto it = syllables.begin(); it != syllables.end(); ++it) {
+        Object *obj = (*it)->FindDescendantByType(SYL);
+        ArrayOfStrAttr attributes;
+        (*it)->GetAttributes(&attributes);
+        bool noFollows = std::find_if(attributes.begin(), attributes.end(), [](auto att) -> bool {
+                return (std::string{ "follows" }.compare(att.first) == 0);
+            }) == attributes.end();
+        if (noFollows && (obj == NULL)) {
+            Syl *syl = new Syl();
+            Text *text = new Text();
+            syl->AddChild(text);
+            (*it)->AddChild(syl);
+        }
+    }
 
-    PrepareFacsimileParams prepareFacsimileParams(this->GetFacsimile());
-    Functor prepareFacsimile(&Object::PrepareFacsimile);
-    this->Process(&prepareFacsimile, &prepareFacsimileParams);
+    /************ Resolve @facs ************/
+    if (this->GetFacsimile() != NULL) {
+        PrepareFacsimileParams prepareFacsimileParams(this->GetFacsimile());
+        Functor prepareFacsimile(&Object::PrepareFacsimile);
+        this->Process(&prepareFacsimile, &prepareFacsimileParams);
+    }
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
