@@ -781,7 +781,10 @@ int System::CastOffPages(FunctorParams *functorParams)
         currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
     }
 
-    if ((params->m_currentPage->GetChildCount() > 0) && (this->m_drawingYRel - this->GetHeight() - currentShift < 0)) {
+    const int systemMaxPerPage = params->m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
+    const int childCount = params->m_currentPage->GetChildCount();
+    if ((systemMaxPerPage && systemMaxPerPage == childCount)
+        || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
         params->m_currentPage = new Page();
         // Use VRV_UNSET value as a flag
         params->m_pgHeadHeight = VRV_UNSET;
