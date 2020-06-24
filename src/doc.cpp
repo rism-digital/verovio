@@ -9,7 +9,6 @@
 
 //----------------------------------------------------------------------------
 
-#include <algorithm>
 #include <assert.h>
 #include <math.h>
 
@@ -52,6 +51,7 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "syl.h"
+#include "syllable.h"
 #include "system.h"
 #include "text.h"
 #include "timestamp.h"
@@ -734,18 +734,8 @@ void Doc::PrepareDrawing()
     ClassIdComparison comp(SYLLABLE);
     this->FindAllDescendantByComparison(&syllables, &comp);
     for (auto it = syllables.begin(); it != syllables.end(); ++it) {
-        Object *obj = (*it)->FindDescendantByType(SYL);
-        ArrayOfStrAttr attributes;
-        (*it)->GetAttributes(&attributes);
-        bool noFollows = std::find_if(attributes.begin(), attributes.end(), [](auto att) -> bool {
-            return (std::string{ "follows" }.compare(att.first) == 0);
-        }) == attributes.end();
-        if (noFollows && (obj == NULL)) {
-            Syl *syl = new Syl();
-            Text *text = new Text();
-            syl->AddChild(text);
-            (*it)->AddChild(syl);
-        }
+        Syllable *syllable = dynamic_cast<Syllable *>(*it);
+        syllable->MarkupAddSyl();
     }
 
     /************ Resolve @facs ************/

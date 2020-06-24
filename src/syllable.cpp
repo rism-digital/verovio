@@ -10,6 +10,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <iostream>
 
@@ -17,6 +18,7 @@
 
 #include "neume.h"
 #include "syl.h"
+#include "text.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -59,6 +61,29 @@ void Syllable::Reset()
     LayerElement::Reset();
     ResetColor();
     ResetSlashCount();
+}
+
+bool Syllable::MarkupAddSyl()
+{
+    // Check for a syl
+    Object *obj = this->FindDescendantByType(SYL);
+    if (obj != NULL) {  // A syl exists
+        return false;
+    }
+    // Check for follows attribute (extension of a syllable)
+    ArrayOfStrAttr attributes;
+    this->GetAttributes(&attributes);
+    bool hasFollows = std::find_if(attributes.begin(), attributes.end(), [](auto att) -> bool {
+        return std::string{ "follows" }.compare(att.first) == 0;
+    }) != attributes.end();
+    if (hasFollows) {
+        return false;
+    }
+    Syl *syl = new Syl();
+    Text *text = new Text();
+    syl->AddChild(text);
+    this->AddChild(text);
+    return true;
 }
 
 } // namespace vrv
