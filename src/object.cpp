@@ -1249,6 +1249,10 @@ int Object::PrepareFacsimile(FunctorParams *functorParams)
                 interface->SetZone(zone);
             }
         }
+        // Zoneless syl
+        else if (this->Is(SYL)) {
+            params->m_zonelessSyls.push_back(this);
+        }
     }
 
     return FUNCTOR_CONTINUE;
