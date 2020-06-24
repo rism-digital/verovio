@@ -93,6 +93,9 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /** Create a default zone for a syl based on syllable. */
+    bool CreateDefaultZone(Doc *doc);
+
 private:
     //
 public:
