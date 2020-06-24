@@ -215,8 +215,8 @@ bool Syl::CreateDefaultZone(Doc *doc)
         int ulx, uly, lrx, lry;
         if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
             if (ulx == 0 || uly == 0 || lrx == 0 || lry == 0) {
-                LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)",
-                    syllable->GetUuid().c_str(), ulx, uly, lrx, lry);
+                LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)", syllable->GetUuid().c_str(),
+                    ulx, uly, lrx, lry);
             }
             zone->SetUlx(ulx);
             zone->SetUly(uly + offsetUly);
@@ -224,8 +224,8 @@ bool Syl::CreateDefaultZone(Doc *doc)
             zone->SetLry(lry + offsetLry);
         }
         else {
-            LogWarning("Failed to create zone for %s of type %s", this->GetUuid().c_str(),
-                this->GetClassName().c_str());
+            LogWarning(
+                "Failed to create zone for %s of type %s", this->GetUuid().c_str(), this->GetClassName().c_str());
             delete zone;
             return false;
         }
