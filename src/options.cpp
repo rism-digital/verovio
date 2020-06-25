@@ -781,6 +781,10 @@ Options::Options()
     m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
+    m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
+    m_systemMaxPerPage.Init(0, 0, 24);
+    this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
+
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
