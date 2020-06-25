@@ -490,7 +490,7 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     assert(staff);
 
     int ynum = 0, yden = 0;
-    int textSize = PROPRT_SIZE_FACTOR * staff->m_drawingStaffSize;
+    int textSize = staff->m_drawingStaffSize;
     std::wstring wtext;
 
     if (numBase) {

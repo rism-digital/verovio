@@ -41,23 +41,10 @@ class OptionGrp;
 
 // the space between each lyric line in units
 #define TEMP_LYRIC_LINE_SPACE 5.0
-
 // the key signature spacing factor
 #define TEMP_KEYSIG_STEP 0.4
 // the key signature spacing factor for natural (usually slighly larger)
 #define TEMP_KEYSIG_NATURAL_STEP 0.6
-
-/* Options parameters for mensural notation */
-// Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
-#define TEMP_MNOTEHEAD_SIZE_FACTOR 1.0
-#define TEMP_MACCID_SIZE_FACTOR 1.0
-#define TEMP_MAUGDOT_SIZE_FACTOR 1.0
-// Width of the minima diamond relative to its height
-#define TEMP_MINIMA_WIDTH_FACTOR 1.0
-// Relative size of figures in proportions
-#define PROPRT_SIZE_FACTOR 1.0
-// Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
-#define MENSURAL_LINEWIDTH_FACTOR 1.0
 
 //----------------------------------------------------------------------------
 // Option defines
