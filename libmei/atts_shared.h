@@ -835,6 +835,10 @@ public:
     void SetLry(int lry_) { m_lry = lry_; }
     int GetLry() const { return m_lry; }
     bool HasLry() const;
+    //
+    void SetRotate(double rotate) { m_rotate = rotate; }
+    double GetRotate() const { return m_rotate; }
+    bool HasRotate() const;
     ///@}
 
 private:
@@ -846,6 +850,8 @@ private:
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
+    /** Indicates the rotate of the bounding box. **/
+    double m_rotate;
 
     /* include <attlry> */
 };

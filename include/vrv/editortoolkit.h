@@ -38,7 +38,7 @@ public:
     /**
      * In child classes, this parses the provided editor action and then performs the correct action.
      */
-    virtual bool ParseEditorAction(const std::string &json_editorAction, bool isChain = false) = 0;
+    virtual bool ParseEditorAction(const std::string &json_editorAction) = 0;
     /**
      * Get information on the last editor function used
      */

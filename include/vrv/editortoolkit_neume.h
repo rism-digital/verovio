@@ -30,14 +30,15 @@ namespace vrv {
 class EditorToolkitNeume : public EditorToolkit {
 public:
     EditorToolkitNeume(Doc *doc, View *view) : EditorToolkit(doc, view) {}
-    bool ParseEditorAction(const std::string &json_editorAction, bool isChain = false);
+    bool ParseEditorAction(const std::string &json_editorAction);
+    virtual std::string EditInfo() { return m_infoObject.json(); };
 
     /**
      * Experimental editor functions.
      */
     ///@{
     bool Chain(jsonxx::Array actions);
-    bool Drag(std::string elementId, int x, int y, bool isChain = false);
+    bool Drag(std::string elementId, int x, int y);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
         std::vector<std::pair<std::string, std::string> > attributes);
     bool Merge(std::vector<std::string> elementIds);
@@ -46,11 +47,12 @@ public:
     bool SetClef(std::string elementId, std::string shape);
     bool Split(std::string elementId, int x);
     bool Remove(std::string elementId);
-    bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry);
+    bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float resize = NAN);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds, std::string isLigature);
+    bool ChangeStaff(std::string elementId);
     ///@}
 protected:
     /**
@@ -68,11 +70,25 @@ protected:
     bool ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
     bool ParseResizeAction(jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry);
+    bool ParseResizeRotateAction(
+        jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry, float *rotate);
     bool ParseGroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
     bool ParseUngroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
     bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature);
+    bool ParseChangeStaffAction(jsonxx::Object param, std::string *elementId);
     ///@}
+
+    /**
+     * Helper functions for editor actions.
+     */
+    ///@{
+    bool AdjustPitchFromPosition(Object *obj, Clef *clef = NULL);
+    bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
+    ///@}
+
+private:
+    jsonxx::Object m_infoObject;
 };
 
 //--------------------------------------------------------------------------------
@@ -85,8 +101,11 @@ struct ClosestBB {
     int x;
     int y;
 
-    int distanceToBB(int ulx, int uly, int lrx, int lry)
+    int distanceToBB(int ulx, int uly, int lrx, int lry, double rotate = 0)
     {
+        int offset = (x - ulx) * tan(rotate * M_PI / 180.0);
+        uly = uly - offset;
+        lry = lry - offset;
         int xDiff = std::max((ulx > x ? ulx - x : 0), (x > lrx ? x - lrx : 0));
         int yDiff = std::max((uly > y ? uly - y : 0), (y > lry ? y - lry : 0));
 
@@ -99,8 +118,10 @@ struct ClosestBB {
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
-        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry());
-        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry());
+        int distA
+            = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry(), zoneA->GetRotate());
+        int distB
+            = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry(), zoneB->GetRotate());
         return (distA < distB);
     }
 };
@@ -116,10 +137,28 @@ struct StaffSort {
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFacsimileInterface()->GetZone();
 
+        int aLowest, bLowest, aHighest, bHighest;
+
+        aLowest = zoneA->GetRotate() < 0
+            ? zoneA->GetLry()
+            : zoneA->GetLry() + (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetRotate() * M_PI / 180.0);
+
+        aHighest = zoneA->GetRotate() < 0
+            ? zoneA->GetUly()
+            : zoneA->GetUly() - (zoneA->GetLrx() - zoneA->GetUlx()) * tan(zoneA->GetRotate() * M_PI / 180.0);
+
+        bLowest = zoneB->GetRotate() < 0
+            ? zoneB->GetLry()
+            : zoneB->GetLry() + (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetRotate() * M_PI / 180.0);
+
+        bHighest = zoneB->GetRotate() < 0
+            ? zoneB->GetUly()
+            : zoneB->GetUly() - (zoneB->GetLrx() - zoneB->GetUlx()) * tan(zoneB->GetRotate() * M_PI / 180.0);
+
         // Check for y intersection
-        if ((zoneA->GetUly() < zoneB->GetLry() && zoneA->GetLry() > zoneB->GetLry())
-            || (zoneA->GetUly() < zoneB->GetUly() && zoneA->GetLry() > zoneB->GetUly())) {
-            // y intersection, so sort by ulx
+        if ((aLowest <= bLowest && aLowest >= bHighest) || (aHighest <= bLowest && aHighest >= bHighest)
+            || (bLowest <= aLowest && bLowest >= aHighest) || (bHighest <= aLowest && bHighest >= aHighest)) {
+            // sort by x center
             return (zoneA->GetUlx() < zoneB->GetUlx());
         }
         else { // no intersection

@@ -171,6 +171,34 @@ int Staff::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
+double Staff::GetDrawingRotate() const
+{
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            return FacsimileInterface::GetDrawingRotate();
+        }
+    }
+    return 0;
+}
+
+void Staff::AdjustDrawingStaffSize()
+{
+    if (this->HasFacs()) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+        assert(doc);
+        if (doc->GetType() == Facs) {
+            double rotate = this->GetDrawingRotate();
+            Zone *zone = this->GetZone();
+            assert(zone);
+            int yDiff
+                = zone->GetLry() - zone->GetUly() - (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
+            this->m_drawingStaffSize = 100 * yDiff / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+        }
+    }
+}
+
 bool Staff::DrawingIsVisible()
 {
     System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
@@ -229,11 +257,13 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
 void Staff::SetFromFacsimile(Doc *doc)
 {
     if (!this->HasFacs()) return;
-    assert(doc);
-    Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
-    assert(zone);
-    m_drawingStaffSize
-        = 100 * (zone->GetLry() - zone->GetUly()) / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+    if (this->GetZone() == NULL) {
+        assert(doc);
+        Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
+        assert(zone);
+        this->SetZone(zone);
+    }
+    this->AdjustDrawingStaffSize();
 }
 
 //----------------------------------------------------------------------------

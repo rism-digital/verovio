@@ -22,6 +22,7 @@
 #include "textelement.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 namespace vrv {
 
@@ -105,6 +106,22 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     return spacing;
 }
 
+int Syl::GetDrawingWidth() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetWidth();
+    }
+    return 0;
+}
+
+int Syl::GetDrawingHeight() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetHeight();
+    }
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
@@ -174,6 +191,52 @@ int Syl::ResetDrawing(FunctorParams *functorParams)
 
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
+}
+
+bool Syl::CreateDefaultZone(Doc *doc)
+{
+    Zone *zone = new Zone();
+    const int offsetUly = 100;
+    const int offsetLrx = 100;
+    const int offsetLry = 200;
+
+    LayerElement *syllable = dynamic_cast<LayerElement *>(this->GetFirstAncestor(SYLLABLE));
+    if (syllable == NULL) { // Only do this for neume notation
+        return false;
+    }
+
+    if (syllable->HasFacs()) {
+        Zone *tempZone = syllable->GetZone();
+        assert(tempZone);
+        zone->SetUlx(tempZone->GetUlx());
+        zone->SetUly(tempZone->GetUly() + offsetUly);
+        zone->SetLrx(tempZone->GetLrx() + offsetLrx);
+        zone->SetLry(tempZone->GetLry() + offsetLry);
+    }
+    else {
+        int ulx, uly, lrx, lry;
+        if (syllable->GenerateZoneBounds(&ulx, &uly, &lrx, &lry)) {
+            if (ulx == 0 || uly == 0 || lrx == 0 || lry == 0) {
+                LogWarning("Zero value when generating bbox from %s: (%d, %d, %d, %d)", syllable->GetUuid().c_str(),
+                    ulx, uly, lrx, lry);
+            }
+            zone->SetUlx(ulx);
+            zone->SetUly(uly + offsetUly);
+            zone->SetLrx(lrx + offsetLrx);
+            zone->SetLry(lry + offsetLry);
+        }
+        else {
+            LogWarning(
+                "Failed to create zone for %s of type %s", this->GetUuid().c_str(), this->GetClassName().c_str());
+            delete zone;
+            return false;
+        }
+    }
+    Object *surface = doc->GetFacsimile()->FindDescendantByType(SURFACE);
+    assert(surface);
+    surface->AddChild(zone);
+    this->SetZone(zone);
+    return true;
 }
 
 } // namespace vrv

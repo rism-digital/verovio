@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "clef.h"
 #include "custos.h"
 #include "layer.h"
 #include "note.h"
@@ -107,6 +108,28 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
     pitchDifference += 7 * (this->GetOct() - pi->GetOct());
 
     return pitchDifference;
+}
+
+void PitchInterface::AdjustPitchForNewClef(Clef *oldClef, Clef *newClef)
+{
+    assert(oldClef);
+    assert(newClef);
+
+    int pitchDiff = -2 * (newClef->GetLine() - oldClef->GetLine());
+    if (oldClef->GetShape() == CLEFSHAPE_F) {
+        pitchDiff -= 3;
+    }
+    else if (oldClef->GetShape() == CLEFSHAPE_G) {
+        pitchDiff -= 4;
+    }
+    if (newClef->GetShape() == CLEFSHAPE_F) {
+        pitchDiff += 3;
+    }
+    else if (newClef->GetShape() == CLEFSHAPE_G) {
+        pitchDiff += 4;
+    }
+
+    this->AdjustPitchByOffset(pitchDiff);
 }
 
 //----------------------------------------------------------------------------

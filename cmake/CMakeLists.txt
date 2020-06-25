@@ -33,6 +33,7 @@ if(MSVC)
     add_definitions(/W2)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
+    add_definitions(/std:c++17)
     include_directories(../include/win32)
 else()
     # jsonxx raises -Wdollar-in-identifier-extension
