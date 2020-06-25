@@ -679,7 +679,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
-                partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                if (m_staffGrpStack.back()->GetSymbol() != staffGroupingSym_SYMBOL_brace) {
+                    partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                }
                 partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
@@ -2531,11 +2533,11 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::string textStr = textNode.text().as_string();
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
-                    if (lyric.select_node("extend")) {
-                        syl->SetCon(sylLog_CON_u);
-                    }
-                    else if (textNode.next_sibling("elision")) {
+                    if (textNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
+                    }
+                    else if (lyric.select_node("extend")) {
+                        syl->SetCon(sylLog_CON_u);
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "single") {
                         syl->SetCon(sylLog_CON_s);

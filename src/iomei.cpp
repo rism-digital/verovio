@@ -1833,6 +1833,7 @@ void MEIOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     WriteLayerElement(currentNode, syl);
+    WriteFacsimileInterface(currentNode, syl);
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
@@ -2832,12 +2833,6 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
     if (success && !m_hasScoreDef) {
         LogWarning("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
-    }
-
-    if (success && m_doc->GetType() == Facs) {
-        Functor setChildZones(&Object::SetChildZones);
-        SetChildZonesParams setChildZonesParams(m_doc);
-        m_doc->Process(&setChildZones, &setChildZonesParams);
     }
 
     return success;
@@ -4524,16 +4519,6 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
     }
-
-    // if the current parent is a syllable then we need to make sure that a syl got added
-    // if not then add a blank one
-    if (strcmp(parentNode.name(), "syllable") == 0) {
-        auto testSyl = parent->FindDescendantByType(SYL);
-        if (testSyl == NULL) {
-            Syl *syl = new Syl();
-            parent->AddChild(syl);
-        }
-    }
     return success;
 }
 
@@ -4542,25 +4527,7 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
-    } /*else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
-        Zone zone = this->m_doc->GetZone(element.attribute("facs").value());
-        AttCoordinated *att = dynamic_cast<AttCoordinated *>(object);
-        assert(att);
-        LogMessage("%d, %d, %d, %d", zone.ulx, zone.uly, zone.lrx, zone.lry);
-        if (zone.ulx > 0) {
-            att->SetUlx(zone.ulx);
-        }
-        if (zone.uly > 0) {
-            att->SetUly(zone.uly);
-        }
-        if (zone.lrx > 0) {
-            att->SetLrx(zone.lrx);
-        }
-        if (zone.lry > 0) {
-            att->SetLry(zone.lry);
-        }
-        LogMessage("Set att_coordinated based on zone %s", zone.xmlId.c_str());
-    }*/
+    }
 
     SetMeiUuid(element, object);
     ReadLinkingInterface(element, object);
@@ -5057,6 +5024,8 @@ bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
 
+    ReadFacsimileInterface(syl, vrvSyl);
+
     parent->AddChild(vrvSyl);
     ReadUnsupportedAttr(syl, vrvSyl);
     return ReadTextChildren(vrvSyl, syl, vrvSyl);
@@ -5064,7 +5033,6 @@ bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 
 bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 {
-    bool success;
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
 
@@ -5072,20 +5040,7 @@ bool MEIInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     vrvSyllable->ReadSlashCount(syllable);
 
     parent->AddChild(vrvSyllable);
-
-    // read all of the syllables elements
-    // and add an empty <syl> if it doesn't have one
-    if ((success = ReadLayerChildren(vrvSyllable, syllable, vrvSyllable))) {
-
-        Object *obj = vrvSyllable->FindDescendantByType(SYL);
-        Syl *syl = dynamic_cast<Syl *>(obj);
-
-        if (syl == NULL) {
-            syl = new Syl();
-            vrvSyllable->AddChild(syl);
-        }
-    }
-    return success;
+    return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
 
 bool MEIInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)

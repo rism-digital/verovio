@@ -47,6 +47,12 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
+    /**
+     * Add a default syl to this syllable if one does not exist.
+     * Returns true if a syl was added, false otherwise.
+     */
+    bool MarkupAddSyl();
+
 private:
     //
 public:

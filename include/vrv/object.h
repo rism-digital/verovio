@@ -499,7 +499,19 @@ public:
      */
     virtual int Save(Output *output);
 
+    /**
+     * Sort the child elements using std::stable_sort
+     */
+    template <class Compare> void StableSort(Compare comp)
+    {
+        std::stable_sort(m_children.begin(), m_children.end(), comp);
+    }
+
     virtual void ReorderByXPos();
+
+    Object *FindNextChild(Comparison *comp, Object *start);
+
+    Object *FindPreviousChild(Comparison *comp, Object *start);
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -931,6 +943,11 @@ public:
     ///@}
 
     /**
+     * Associate LayerElement with @facs to the appropriate zone
+     */
+    virtual int PrepareFacsimile(FunctorParams *functorParams);
+
+    /**
      * Match linking element (e.g, @next).
      */
     ///@{
@@ -1131,10 +1148,9 @@ public:
      */
     virtual int ReorderByXPos(FunctorParams *);
 
-    /**
-     * Associate child objects with zones.
-     */
-    virtual int SetChildZones(FunctorParams *);
+    virtual int FindNextChildByComparison(FunctorParams *);
+
+    virtual int FindPreviousChildByComparison(FunctorParams *);
 
     /**
      * Transpose the content.

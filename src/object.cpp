@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <climits>
 #include <iostream>
 #include <math.h>
 #include <sstream>
@@ -33,11 +34,15 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "nc.h"
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "surface.h"
+#include "syl.h"
+#include "syllable.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
@@ -869,6 +874,22 @@ void Object::ReorderByXPos()
     this->Process(&reorder, &params);
 }
 
+Object *Object::FindNextChild(Comparison *comp, Object *start)
+{
+    Functor findNextChildByComparison(&Object::FindNextChildByComparison);
+    FindChildByComparisonParams params(comp, start);
+    this->Process(&findNextChildByComparison, &params);
+    return params.m_element;
+}
+
+Object *Object::FindPreviousChild(Comparison *comp, Object *start)
+{
+    Functor findPreviousChildByComparison(&Object::FindPreviousChildByComparison);
+    FindChildByComparisonParams params(comp, start);
+    this->Process(&findPreviousChildByComparison, &params);
+    return params.m_element;
+}
+
 //----------------------------------------------------------------------------
 // ObjectListInterface
 //----------------------------------------------------------------------------
@@ -1207,6 +1228,31 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
         this->MoveItselfTo(params->m_targetLayer);
         // Do not precess children because we move the full sub-tree
         return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::PrepareFacsimile(FunctorParams *functorParams)
+{
+    PrepareFacsimileParams *params = dynamic_cast<PrepareFacsimileParams *>(functorParams);
+    assert(params);
+
+    if (this->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = this->GetFacsimileInterface();
+        assert(interface);
+        if (interface->HasFacs()) {
+            std::string facsUuid = (interface->GetFacs().compare(0, 1, "#") == 0 ? interface->GetFacs().substr(1)
+                                                                                 : interface->GetFacs());
+            Zone *zone = params->m_facsimile->FindZoneByUuid(facsUuid);
+            if (zone != NULL) {
+                interface->SetZone(zone);
+            }
+        }
+        // Zoneless syl
+        else if (this->Is(SYL)) {
+            params->m_zonelessSyls.push_back(this);
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -1620,12 +1666,13 @@ bool Object::sortByUlx(Object *a, Object *b)
 {
     FacsimileInterface *fa = NULL, *fb = NULL;
     InterfaceComparison comp(INTERFACE_FACSIMILE);
-    if (a->GetFacsimileInterface())
+    if (a->GetFacsimileInterface() && a->GetFacsimileInterface()->HasFacs())
         fa = a->GetFacsimileInterface();
     else {
         ListOfObjects children;
         a->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
+            if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
             if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
@@ -1633,12 +1680,13 @@ bool Object::sortByUlx(Object *a, Object *b)
             }
         }
     }
-    if (b->GetFacsimileInterface())
+    if (b->GetFacsimileInterface() && b->GetFacsimileInterface()->HasFacs())
         fb = b->GetFacsimileInterface();
     else {
         ListOfObjects children;
         b->FindAllDescendantByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
+            if ((*it)->Is(SYL)) continue;
             FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
@@ -1647,8 +1695,27 @@ bool Object::sortByUlx(Object *a, Object *b)
         }
     }
 
+    // Preserve ordering of neume components in ligature
+    if (a->Is(NC) && b->Is(NC)) {
+        Nc *nca = dynamic_cast<Nc *>(a);
+        Nc *ncb = dynamic_cast<Nc *>(b);
+        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+            Object *parent = a->GetParent();
+            assert(parent);
+            if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
+                // Return nc with higher pitch
+                return nca->PitchDifferenceTo(ncb) > 0; // If object a has the higher pitch
+            }
+        }
+    }
+
     if (fa == NULL || fb == NULL) {
-        LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
+        if (fa == NULL) {
+            LogMessage("No available facsimile interface for %s", a->GetUuid().c_str());
+        }
+        if (fb == NULL) {
+            LogMessage("No available facsimile interface for %s", b->GetUuid().c_str());
+        }
         return false;
     }
 
@@ -1668,24 +1735,46 @@ int Object::ReorderByXPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetChildZones(FunctorParams *functorParams)
+int Object::FindNextChildByComparison(FunctorParams *functorparams)
 {
-    SetChildZonesParams *params = dynamic_cast<SetChildZonesParams *>(functorParams);
+    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
     assert(params);
 
-    FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(this->GetFacsimileInterface());
-    if (fi != NULL) {
-        if (fi->HasFacs()) {
-            assert(params->m_doc);
-            assert(params->m_doc->GetFacsimile());
-            Zone *zone = params->m_doc->GetFacsimile()->FindZoneByUuid(fi->GetFacs());
-            if (zone == NULL) {
-                LogError("Could not find a zone of UUID %s", fi->GetFacs().c_str());
-                return FUNCTOR_STOP;
-            }
-            fi->SetZone(zone);
-        }
+    // we are reaching the start of the range
+    if (params->m_start == this) {
+        // setting m_start to be null tells us that we're in the range
+        params->m_start = NULL;
+        return FUNCTOR_CONTINUE;
     }
+
+    else if (params->m_start) {
+        // we're not yet in the range
+        return FUNCTOR_CONTINUE;
+    }
+
+    if ((*params->m_comparison)(this)) {
+        params->m_element = this;
+        return FUNCTOR_STOP;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindPreviousChildByComparison(FunctorParams *functorparams)
+{
+    FindChildByComparisonParams *params = dynamic_cast<FindChildByComparisonParams *>(functorparams);
+    assert(params);
+    // this guy works by going from the start and replacing the return element with every nearer element
+    // until you get to the 'start' element
+    if (params->m_start == this) {
+        // we've reached the end element, so stop
+        return FUNCTOR_STOP;
+    }
+
+    if ((*params->m_comparison)(this)) {
+        params->m_element = this;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
