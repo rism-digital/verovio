@@ -94,8 +94,11 @@ bool Resources::InitFonts()
         { k_defaultStyle, "Times", true },
         { k_defaultStyle, "VerovioText-1.0", true },
         { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
+        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "VerovioText-1.0", false },
         { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
+        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "VerovioText-1.0", false },
         { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false },
+        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "VerovioText-1.0", false }
     };
 
     for (const auto &textFontInfo : textFontInfos) {
