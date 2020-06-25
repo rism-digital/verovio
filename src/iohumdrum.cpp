@@ -10827,14 +10827,15 @@ hum::HumNum HumdrumInput::getMeasureEndTstamp(int staffindex)
 //
 
 template <class ELEMENT>
-void HumdrumInput::addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle)
+void HumdrumInput::addTextElement(
+    ELEMENT *element, const std::string &content, const std::string &fontstyle, bool addSpacer)
 {
     Text *text = new Text;
     std::string data = content;
     if (element->GetClassName() == "Syl") {
         // Approximate centering of single-letter text on noteheads.
         // currently the text is left justified to the left edge of the notehead.
-        if (content.size() == 1) {
+        if ((content.size() == 1) && addSpacer) {
             data = "&#160;" + data;
         }
     }
@@ -15727,94 +15728,148 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             }
             appendElement(element, verse);
             verse->SetN(versenum);
+
             Syl *syl = new Syl;
+            std::vector<Syl *> syls; // verse can have multiple syls if elision(s) present
+            syls.push_back(syl);
+            appendElement(verse, syls.back());
+
             string datatype = line.token(i)->getDataType();
 
             if (datatype.compare(0, 8, "**vdata-") == 0) {
                 string subdatatype = datatype.substr(8);
                 if (!subdatatype.empty()) {
-                    appendTypeTag(syl, subdatatype);
+                    appendTypeTag(syls.back(), subdatatype);
                 }
             }
             else if (datatype.compare(0, 9, "**vdata-") == 0) {
                 string subdatatype = datatype.substr(9);
                 if (!subdatatype.empty()) {
-                    appendTypeTag(syl, subdatatype);
+                    appendTypeTag(syls.back(), subdatatype);
                 }
             }
 
+            // add IDs for first syb-syllable:
             if (vvdataQ) {
-                setLocationId(syl, line.token(i), j + 1);
+                setLocationId(syls.back(), line.token(i), j + 1);
             }
             else {
-                setLocationId(syl, line.token(i), -1);
+                setLocationId(syls.back(), line.token(i), -1);
             }
 
-            appendElement(verse, syl);
-
             if (vdataQ || vvdataQ) {
-                addTextElement(syl, content);
+                // do not treat text content as lyrics
+                addTextElement(syls.back(), content);
                 continue;
             }
 
             colorVerse(verse, content);
 
-            bool dashbegin = false;
-            bool dashend = false;
+            bool dashonbegin = false;
+            bool dashonend = false;
             bool extender = false;
 
+            std::vector<string> contents(1);
+
+            // split syllable by elisions:
+            contents[0] += content[0];
             for (int z = 1; z < (int)content.size() - 1; ++z) {
-                // Use underscore for elision symbol
-                // (later use @con="b" when verovio allows it).
+                // Use underscore for elision symbol.
+                // Now using @con="b" when verovio allows it.
                 // Also possibly make elision symbols optional.
                 if ((content[z] == ' ') && (content[z + 1] != '\'')) {
                     // the later condition is to not to elide "ma 'l"
-                    content[z] = '_';
+                    // create an elision by separating into next piece of syllable
+                    contents.resize(contents.size() + 1);
+                    // content[z] = '_';
+                }
+                else {
+                    contents.back() += content[z];
                 }
             }
+            contents.back() += content.back();
 
-            if (content.back() == '-') {
-                dashend = true;
+            // add elements for sub-syllables due to elisions:
+            for (int k = 1; k < (int)contents.size(); k++) {
+                Syl *syl = new Syl;
+                syls.push_back(syl);
+                appendElement(verse, syl);
+            }
+            // Connect all sub-syllables except last as elisions.
+            // elision character styles:
+            // @con="t" : tilde
+            // @con="c" : circumflex
+            // @con="v" : caron
+            // @con="i" : inverted breve (curved line above)
+            // @con="b" : breve (curved line below)
+            // no space connector?
+            for (int k = 0; k < (int)contents.size() - 1; k++) {
+                syls[k]->SetCon(sylLog_CON_b);
+            }
+            // add sub-syllables to verse:
+
+            if (content.back() == '-') { // d connector
+                dashonend = true;
                 content.pop_back();
+                contents.back().pop_back();
             }
             if ((content.size() > 0) && (content[0] == '-')) {
-                dashbegin = true;
+                dashonbegin = true;
                 content.erase(0, 1);
+                contents[0].erase(0, 1);
             }
-            if (content.back() == '_') {
+            if (content.back() == '_') { // u connector
                 extender = true;
                 content.pop_back();
+                contents.back().pop_back();
             }
-            if (dashbegin && dashend) {
-                syl->SetWordpos(sylLog_WORDPOS_m);
-                syl->SetCon(sylLog_CON_d);
-                if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    appendTypeTag(syl, "m");
+
+            // @wordpos="i" : syllable at start of word (initial)
+            // @wordpos="m" : syllable in middle of word
+            // @wordpos="t" : syllable at end of word (terminal)
+            // nothing: syllable is a word
+
+            if (dashonbegin && dashonend) {
+                if (syls.size() > 1) {
+                    syls[0]->SetWordpos(sylLog_WORDPOS_t);
+                    syls.back()->SetWordpos(sylLog_WORDPOS_i);
+                    syls.back()->SetCon(sylLog_CON_d);
+                    if (m_doc->GetOptions()->m_humType.GetValue()) {
+                        appendTypeTag(syls[0], "t");
+                        appendTypeTag(syls.back(), "i");
+                    }
+                }
+                else {
+                    syls.back()->SetWordpos(sylLog_WORDPOS_m);
+                    syls.back()->SetCon(sylLog_CON_d);
+                    if (m_doc->GetOptions()->m_humType.GetValue()) {
+                        appendTypeTag(syls.back(), "m");
+                    }
                 }
             }
-            else if (dashbegin) {
-                syl->SetWordpos(sylLog_WORDPOS_t);
+            else if (dashonbegin) {
+                syls[0]->SetWordpos(sylLog_WORDPOS_t);
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    appendTypeTag(syl, "t");
+                    appendTypeTag(syls[0], "t");
                 }
             }
-            else if (dashend) {
-                syl->SetWordpos(sylLog_WORDPOS_i);
-                syl->SetCon(sylLog_CON_d);
+            else if (dashonend) {
+                syls.back()->SetWordpos(sylLog_WORDPOS_i);
+                syls.back()->SetCon(sylLog_CON_d);
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    appendTypeTag(syl, "i");
+                    appendTypeTag(syls.back(), "i");
                 }
             }
             else if (extender) {
-                syl->SetWordpos(sylLog_WORDPOS_t);
-                syl->SetCon(sylLog_CON_u);
+                syls.back()->SetWordpos(sylLog_WORDPOS_t);
+                syls.back()->SetCon(sylLog_CON_u);
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    appendTypeTag(syl, "t");
+                    appendTypeTag(syls.back(), "t");
                 }
             }
             else {
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    appendTypeTag(syl, "t");
+                    appendTypeTag(syls[0], "t");
                 }
             }
             // remove the last dash in a line (double dash which indicates
@@ -15822,33 +15877,49 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if ((!content.empty()) && content.back() == '-') {
                 content.resize(content.size() - 1);
             }
+            if (!contents.back().empty() && contents.back().back() == '-') {
+                contents.back().resize(contents.back().size() - 1);
+            }
 
             std::string inij = vtoken->getValue("auto", "ij");
             bool ij = !inij.empty();
-            if (ij) {
-                Rend *rend = new Rend;
-                rend->SetFontstyle(FONTSTYLE_italic);
-                addTextElement(rend, content);
-                syl->AddChild(rend);
-                std::string ijbegin = vtoken->getValue("auto", "ij-begin");
-                bool ijbeginQ = !ijbegin.empty();
-                std::string ijend = vtoken->getValue("auto", "ij-end");
-                bool ijendQ = !ijend.empty();
-                if (ijbeginQ && ijendQ) {
-                    syl->SetType("repetition repetition-begin repetition-end");
+
+            for (int m = 0; m < (int)contents.size(); m++) {
+                if (m > 0) {
+                    std::string id = syls[0]->GetUuid();
+                    id += "S" + to_string(m + 1);
+                    syls[m]->SetUuid(id);
                 }
-                else if (ijbeginQ) {
-                    syl->SetType("repetition repetition-begin");
+                bool spacer = false;
+                if ((contents.size() == 1) && (contents[0].size() == 1)) {
+                    spacer = true;
                 }
-                else if (ijendQ) {
-                    syl->SetType("repetition repetition-end");
+
+                if (ij) {
+                    Rend *rend = new Rend;
+                    rend->SetFontstyle(FONTSTYLE_italic);
+                    addTextElement(rend, contents[m], "", spacer);
+                    syls[m]->AddChild(rend);
+                    std::string ijbegin = vtoken->getValue("auto", "ij-begin");
+                    bool ijbeginQ = !ijbegin.empty();
+                    std::string ijend = vtoken->getValue("auto", "ij-end");
+                    bool ijendQ = !ijend.empty();
+                    if (ijbeginQ && ijendQ) {
+                        syls[m]->SetType("repetition repetition-begin repetition-end");
+                    }
+                    else if (ijbeginQ && (m == 0)) {
+                        syls[m]->SetType("repetition repetition-begin");
+                    }
+                    else if (ijendQ && (m == (int)contents.size() - 1)) {
+                        syls[m]->SetType("repetition repetition-end");
+                    }
+                    else {
+                        syls[m]->SetType("repetition");
+                    }
                 }
                 else {
-                    syl->SetType("repetition");
+                    addTextElement(syls[m], contents[m], "", spacer);
                 }
-            }
-            else {
-                addTextElement(syl, content);
             }
         }
     }

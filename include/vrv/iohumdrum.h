@@ -590,7 +590,7 @@ protected:
     void checkForRehearsal(int line);
     bool isBlackNotation(hum::HTp starting);
     std::string checkNoteForScordatura(const std::string &token);
-    bool checkForScordatura(hum::HumdrumFile& infile);
+    bool checkForScordatura(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -635,7 +635,8 @@ protected:
     void popElementStack(std::vector<std::string> &elements, std::vector<void *> &pointers);
 
     template <class ELEMENT>
-    void addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle = "");
+    void addTextElement(
+        ELEMENT *element, const std::string &content, const std::string &fontstyle = "", bool addSpacer = true);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
@@ -682,7 +683,7 @@ private:
 
     // m_comment == Display **kern data embedded in comments for each
     // staff layer.
-    int m_comment = 1;
+    int m_comment = 0;
 
     // m_doc is inherited root document object.
 
