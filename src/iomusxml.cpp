@@ -679,7 +679,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
-                partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                if (m_staffGrpStack.back()->GetSymbol() != staffGroupingSym_SYMBOL_brace) {
+                    partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                }
                 partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
