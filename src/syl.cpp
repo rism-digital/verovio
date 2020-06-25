@@ -201,7 +201,9 @@ bool Syl::CreateDefaultZone(Doc *doc)
     const int offsetLry = 200;
 
     LayerElement *syllable = dynamic_cast<LayerElement *>(this->GetFirstAncestor(SYLLABLE));
-    assert(syllable);
+    if (syllable == NULL) { // Only do this for neume notation
+        return false;
+    }
 
     if (syllable->HasFacs()) {
         Zone *tempZone = syllable->GetZone();
