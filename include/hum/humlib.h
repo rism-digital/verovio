@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri 19 Jun 2020 01:07:24 PM PDT
+// Last Modified: Tue Jun 23 23:31:13 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1909,17 +1909,13 @@ class HumdrumFileBase : public HumHash {
 		void          removeExtraTabs          (void);
 		void          addExtraTabs             (void);
 		std::vector<int> getTrackWidths        (void);
-		void          appendLine               (const char* line);
 		void          appendLine               (const std::string& line);
 		void          appendLine               (HLp line);
-		void          push_back                (const char* line)
-		                                                    { appendLine(line); }
 		void          push_back                (const std::string& line)
 		                                                    { appendLine(line); }
 		void          push_back                (HLp line)
 		                                                    { appendLine(line); }
 
-		void          insertLine               (int index, const char* line);
 		void          insertLine               (int index, const std::string& line);
 		void          insertLine               (int index, HLp line);
 
@@ -7541,12 +7537,28 @@ class Tool_scordatura : public HumTool {
 		void     transposeChord    (HTp token, const string& marker);
 		std::string transposeNote     (const string& note);
 		void     transposeMarker   (HumdrumFile& infile, const string& marker, int diatonic, int chromatic);
+		std::set<int> parsePitches(const string& input);
+		void     markPitches       (HumdrumFile& infile);
+		void     markPitches       (HTp sstart, HTp sstop);
+		void     markPitches       (HTp token);
+		void     addMarkerRdf      (HumdrumFile& infile);
+		void     prepareTranspositionInterval(void);
 
 	private:
-		bool          m_writtenQ    = false;
-		bool          m_soundingQ   = false;
-		bool          m_modifiedQ   = false;
-		HumTransposer m_transposer;
+		bool           m_writtenQ    = false;
+		bool           m_soundingQ   = false;
+		bool           m_modifiedQ   = false;
+		bool           m_IQ          = false;  // true: enbed marker in sounding score
+		std::string    m_transposition;
+		std::string    m_color;
+		std::string    m_marker;
+		std::set<int>  m_pitches;
+		HumTransposer  m_transposer;
+		int            m_diatonic;
+		int            m_chromatic;
+		std::string    m_interval;
+		bool           m_cd;
+		std::string    m_string;
 
 };
 

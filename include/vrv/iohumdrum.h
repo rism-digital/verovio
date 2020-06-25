@@ -589,7 +589,8 @@ protected:
     std::string getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose);
     void checkForRehearsal(int line);
     bool isBlackNotation(hum::HTp starting);
-    std::string checkForScordatura(const std::string &token);
+    std::string checkNoteForScordatura(const std::string &token);
+    bool checkForScordatura(hum::HumdrumFile& infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

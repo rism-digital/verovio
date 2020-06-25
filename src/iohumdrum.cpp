@@ -514,6 +514,16 @@ bool HumdrumInput::convertHumdrum()
 
     hum::HumdrumFile &infile = m_infiles[0];
 
+    bool hasScordatura = checkForScordatura(infile);
+    if (hasScordatura) {
+        hum::Tool_scordatura scordatura;
+        vector<string> argv;
+        argv.push_back("scordatura"); // name of program (placeholder)
+        argv.push_back("-w"); // transpose to written pitch
+        scordatura.process(argv);
+        scordatura.run(infile);
+    }
+
     m_multirest = analyzeMultiRest(infile);
     m_breaks = analyzeBreaks(infile);
 
@@ -679,6 +689,53 @@ bool HumdrumInput::convertHumdrum()
     // Pb pb = new Pb();
     // section->AddChild(pb);
 
+    return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForScordatura --
+//
+
+bool HumdrumInput::checkForScordatura(hum::HumdrumFile &infile)
+{
+    hum::HumRegex hre;
+    bool status = false;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        hum::HTp reference = infile[i].token(0);
+
+        // scordatura markers
+        if (hre.search(
+                reference, "^!!!RDF\\*\\*kern\\s*:\\s*([^\\s]+)\\s*=.*scordatura\\s*=\\s*[\"']?ITrd(-?\\d)c(-?\\d)")) {
+            std::string marker = hre.getMatch(1);
+            int diatonic = hre.getMatchInt(2);
+            int chromatic = hre.getMatchInt(3);
+            if (diatonic == 0 && chromatic == 0) {
+                // no transposition needed
+                continue;
+            }
+            bool found = 0;
+            // don't allow redundant markers:
+            for (int j = 0; j < (int)m_scordatura_marker.size(); j++) {
+                if (marker == m_scordatura_marker[j]) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found) {
+                m_scordatura_marker.push_back(marker);
+                hum::HumTransposer *transposer = new hum::HumTransposer;
+                // The score will be converted to written format, so need to reverse
+                // the transposition to get back to the sounding note:
+                transposer->setTranspositionDC(-diatonic, -chromatic);
+                m_scordatura_transposition.push_back(transposer);
+                status = true;
+            }
+        }
+    }
     return status;
 }
 
@@ -14846,12 +14903,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
     std::string scordaturaGes;
     if (!m_scordatura_marker.empty()) {
-        std::string vstring = checkForScordatura(tstring);
-        if (!vstring.empty()) {
-            hum::HumRegex hre;
-            scordaturaGes = tstring;
-            hre.replaceDestructive(tstring, vstring, "[A-Ga-g]+[-#n]*");
-        }
+        scordaturaGes = checkNoteForScordatura(tstring);
     }
 
     bool chordQ = token->isChord();
@@ -15460,10 +15512,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
 //////////////////////////////
 //
-// HumdrumInput::checkForScordatura -- Return the **kern written note if scordatura; otherwise, return empty string.
+// HumdrumInput::checkNoteForScordatura -- Return the **kern written note if scordatura; otherwise, return empty string.
 //
 
-std::string HumdrumInput::checkForScordatura(const std::string &token)
+std::string HumdrumInput::checkNoteForScordatura(const std::string &token)
 {
     int index = -1;
     for (int i = 0; i < (int)m_scordatura_marker.size(); i++) {
@@ -18936,27 +18988,6 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
             else {
                 m_signifiers.markdir.push_back("");
-            }
-        }
-
-        // scordatura markers
-        if (hre.search(value, "^\\s*([^\\s]+)\\s*=.*scordatura\\s*=\\s*[\"']?ITrd(-?\\d)c(-?\\d)")) {
-            std::string marker = hre.getMatch(1);
-            int diatonic = hre.getMatchInt(2);
-            int chromatic = hre.getMatchInt(3);
-            bool found = 0;
-            // don't allow redundant markers:
-            for (int j = 0; j < (int)m_scordatura_marker.size(); j++) {
-                if (marker == m_scordatura_marker[j]) {
-                    found = 1;
-                    break;
-                }
-            }
-            if (!found) {
-                m_scordatura_marker.push_back(marker);
-                hum::HumTransposer *transposer = new hum::HumTransposer;
-                transposer->setTranspositionDC(diatonic, chromatic);
-                m_scordatura_transposition.push_back(transposer);
             }
         }
     }
