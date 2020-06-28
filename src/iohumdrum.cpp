@@ -6940,7 +6940,7 @@ bool HumdrumInput::checkForTremolo(
         for (int i = 0; i < (int)groupings.size(); i++) {
             hum::HumNum tdur = duration * (int)groupings[i].size();
             std::string recip = hum::Convert::durationToRecip(tdur);
-            int slashcount = -(int)(log(duration.getFloat() / tdur.getFloat()) / log(2.0));
+            int slashcount = -(int)(log2(duration.getFloat() / tdur.getFloat()));
             groupings[i][0]->setValue("auto", "tremolo", "1");
             groupings[i][0]->setValue("auto", "slashes", slashcount);
             groupings[i][0]->setValue("auto", "recip", recip);
@@ -7486,8 +7486,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
                     BTrem *btrem = new BTrem;
                     setBeamLocationId(btrem, tgs, layerdata, i);
-                    int slashes = layerdata[i]->getValueInt("auto", "slashes");
-                    switch (slashes) {
+                    // int slashes = layerdata[i]->getValueInt("auto", "slashes"); // MEI 3 method
+                    int twodur = -(int)log2(hum::Convert::recipToDuration(layerdata[i]).getFloat());
+                    switch (twodur) {
                         case 1: btrem->SetUnitdur(DURATION_8); break;
                         case 2: btrem->SetUnitdur(DURATION_16); break;
                         case 3: btrem->SetUnitdur(DURATION_32); break;
@@ -7674,8 +7675,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
                 BTrem *btrem = new BTrem;
                 setBeamLocationId(btrem, tgs, layerdata, i);
-                int slashes = layerdata[i]->getValueInt("auto", "slashes");
-                switch (slashes) {
+                // int slashes = layerdata[i]->getValueInt("auto", "slashes"); // MEI 3 method
+                int twodur = -(int)log2(hum::Convert::recipToDuration(layerdata[i]).getFloat());
+                switch (twodur) {
                     case 1: btrem->SetUnitdur(DURATION_8); break;
                     case 2: btrem->SetUnitdur(DURATION_16); break;
                     case 3: btrem->SetUnitdur(DURATION_32); break;
