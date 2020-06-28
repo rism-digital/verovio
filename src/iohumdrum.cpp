@@ -3731,6 +3731,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             keysigtok = part;
             keysig = *keysigtok;
         }
+        else if (part->compare(0, 4, "*ok[") == 0) {
+            m_okey.emplace_back(partnumber, part);
+        }
         else if (hre.search(part, "^\\*[a-gA-G][#-]*:([a-z]{3})?$")) {
             keytok = part;
         }
@@ -4668,6 +4671,23 @@ void HumdrumInput::setKeySig(
             vrvkeysig->SetAccid(ACCIDENTAL_WRITTEN_s);
         }
     }
+}
+
+template <class ELEMENT> void HumdrumInput::setKeySig(ELEMENT *element, hum::HTp keysigtok)
+{
+    KeySig *vrvkeysig = getKeySig(element);
+    if (!vrvkeysig) {
+        return;
+    }
+    if (keysigtok) {
+        setLocationId(vrvkeysig, keysigtok);
+    }
+
+    std::string plainkey = *keysigtok;
+    hum::HumRegex hre;
+    hre.replaceDestructive(plainkey, "*k[", "^\\*ok\\[");
+    setKeySig(-1, element, plainkey, keysigtok, NULL, false);
+    // ggg ggg GGG GGG ggg
 }
 
 //////////////////////////////
@@ -17665,8 +17685,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 {
     hum::HumdrumFile &infile = m_infiles[0];
 
-    if (m_oclef.size() || m_omet.size()) {
-        storeOriginalClefMensurationApp();
+    if (m_oclef.size() || m_omet.size() || m_okey.size()) {
+        storeOriginalClefMensurationKeyApp();
     }
 
     if (infile[startline].getDurationFromStart() > 0) {
@@ -17858,7 +17878,7 @@ void HumdrumInput::addFTremSlurs()
 
 //////////////////////////////
 //
-// HumdrumInput::storeOriginalClefMensurationApp -- If there are any original
+// HumdrumInput::storeOriginalClefMensurationKeyApp -- If there are any original
 // clefs or mensuration signs, create an app for them.
 //
 // <app>
@@ -17873,9 +17893,9 @@ void HumdrumInput::addFTremSlurs()
 // </app>
 //
 
-void HumdrumInput::storeOriginalClefMensurationApp()
+void HumdrumInput::storeOriginalClefMensurationKeyApp()
 {
-    if (m_oclef.empty() && m_omet.empty()) {
+    if (m_oclef.empty() && m_omet.empty() && m_okey.empty()) {
         return;
     }
 
@@ -17922,15 +17942,38 @@ void HumdrumInput::storeOriginalClefMensurationApp()
                 }
                 setMeterSymbol(staffdef, *m_omet[j].second);
             }
+            for (int j = 0; j < (int)m_okey.size(); ++j) {
+                if (m_okey[j].first != m_oclef[i].first) {
+                    continue;
+                }
+                setKeySig(staffdef, m_okey[j].second);
+            }
         }
     }
+
     else if (m_omet.size() > 0) {
-        // No oclefs, just omets.
+        // No oclefs, just omets and maybe okeys.
         for (int i = 0; i < (int)m_oclef.size(); ++i) {
             StaffDef *staffdef = new StaffDef;
             staffgrp->AddChild(staffdef);
             setMeterSymbol(staffdef, *m_omet[i].second);
             staffdef->SetN(m_omet[i].first);
+            for (int j = 0; j < (int)m_okey.size(); ++j) {
+                if (m_okey[j].first != m_omet[i].first) {
+                    continue;
+                }
+                setKeySig(staffdef, m_okey[j].second);
+            }
+        }
+    }
+
+    else if (m_okey.size() > 0) {
+        // No oclefs or omets, just okeys.
+        for (int i = 0; i < (int)m_okey.size(); ++i) {
+            StaffDef *staffdef = new StaffDef;
+            staffgrp->AddChild(staffdef);
+            setKeySig(staffdef, m_okey[i].second);
+            staffdef->SetN(m_okey[i].first);
         }
     }
 

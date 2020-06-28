@@ -447,7 +447,7 @@ protected:
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
-    void storeOriginalClefMensurationApp();
+    void storeOriginalClefMensurationKeyApp();
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
@@ -607,6 +607,7 @@ protected:
     template <class ELEMENT>
     void setKeySig(
         int partindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary);
+    template <class ELEMENT> void setKeySig(ELEMENT *element, hum::HTp keysigtok);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
@@ -754,6 +755,9 @@ private:
 
     // m_omet == temporary variable for printing "original-mensuration" <app>
     std::vector<std::pair<int, hum::HTp> > m_omet;
+
+    // m_okey == temporary variable for printing "original-key" <app>
+    std::vector<std::pair<int, hum::HTp> > m_okey;
 
     // m_staffstates == state variables for each staff.
     std::vector<humaux::StaffStateVariables> m_staffstates;
