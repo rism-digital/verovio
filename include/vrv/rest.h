@@ -15,6 +15,8 @@
 
 namespace vrv {
 
+class TransPitch;
+
 //----------------------------------------------------------------------------
 // Rest
 //----------------------------------------------------------------------------
@@ -104,8 +106,17 @@ public:
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
+    /**
+     * See Object::Transpose
+     */
+    virtual int Transpose(FunctorParams *);
+
 private:
-    //
+
+    TransPitch GetTransPitch();
+
+    void UpdateFromTransPitch(const TransPitch &tp);
+
 public:
     //
 private:

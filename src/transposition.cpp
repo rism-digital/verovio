@@ -496,7 +496,7 @@ int Transposer::GetTranspositionIntervalClass()
 
 //////////////////////////////
 //
-// Transposer::GetTranspositionIntervalClass -- return the interval integer
+// Transposer::GetTranspositionIntervalName -- return the interval integer
 //   as a string name that was set for use with Transposer::Transpose.
 //
 std::string Transposer::GetTranspositionIntervalName()

@@ -20,6 +20,7 @@
 #include "functorparams.h"
 #include "smufl.h"
 #include "staff.h"
+#include "transposition.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -121,6 +122,24 @@ int Rest::GetRestLocOffset(int loc)
     }
 
     return loc;
+}
+
+TransPitch Rest::GetTransPitch()
+{
+    int ploc = this->GetPloc() - PITCHNAME_c;
+    LogWarning("pLoc=%d; oLoc=%d", this->GetPloc(), this->GetOloc());
+    return TransPitch(ploc, 0, this->GetOloc());
+}
+
+void Rest::UpdateFromTransPitch(const TransPitch &tp)
+{
+    if (this->HasOloc() && this->HasPloc()) {
+        this->SetPloc(tp.GetPitchName());
+
+        if (this->GetOloc() != tp.m_oct) {
+            this->SetOloc(tp.m_oct);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -242,6 +261,22 @@ int Rest::ResetHorizontalAlignment(FunctorParams *functorParams)
     PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     return FUNCTOR_CONTINUE;
+}
+
+int Rest::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasOloc() || !this->HasPloc()) return FUNCTOR_SIBLINGS;
+
+    LogDebug("relocating rest");
+
+    TransPitch pitch = this->GetTransPitch();
+    params->m_transposer->Transpose(pitch);
+    this->UpdateFromTransPitch(pitch);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
