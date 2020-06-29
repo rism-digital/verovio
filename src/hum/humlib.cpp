@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jun 23 23:31:13 PDT 2020
+// Last Modified: Sun Jun 28 16:57:13 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -86740,7 +86740,7 @@ void Tool_tremolo::expandTremolos(void) {
 
 //////////////////////////////
 //
-// Tool_tremolo::expandTremolos --
+// Tool_tremolo::expandTremolo --
 //
 
 void Tool_tremolo::expandTremolo(HTp token) {
@@ -86816,7 +86816,12 @@ void Tool_tremolo::expandTremolo(HTp token) {
 	int counter = 1;
 	while (current) {
 		if (!current->isData()) {
-			// Also check if line is non-zero duration (not a grace-note line).
+			current = current->getNextToken();
+			continue;
+		}
+		HumNum duration = current->getOwner()->getDuration();
+		if (duration == 0) {
+			// grace note line, so skip
 			current = current->getNextToken();
 			continue;
 		}
@@ -87063,7 +87068,7 @@ void Tool_tremolo::storeLastTremoloNoteInfo(HTp token) {
 		return;
 	}
 	HumNum timestamp = token->getDurationFromStart();
-	timestamp += token->getDuration();
+	timestamp += Convert::recipToDuration(token);
 	if (m_last_tremolo_time.at(track) < 0) {
 		m_last_tremolo_time.at(track) = timestamp;
 	} else if (timestamp > m_last_tremolo_time.at(track)) {
