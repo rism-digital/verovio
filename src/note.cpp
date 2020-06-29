@@ -1077,6 +1077,8 @@ int Note::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
     assert(params);
+    
+    if (!this->HasPname()) return FUNCTOR_SIBLINGS;
 
     LogDebug("Transposing note");
 
