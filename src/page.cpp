@@ -732,8 +732,11 @@ int Page::AlignSystems(FunctorParams *functorParams)
 
     RunningElement *header = this->GetHeader();
     if (header) {
+        const int bottomMarginPgHead
+            = params->m_doc->GetOptions()->m_bottomMarginPgHead.GetValue() * params->m_doc->GetDrawingUnit(100);
+
         header->SetDrawingYRel(params->m_shift);
-        params->m_shift -= header->GetTotalHeight();
+        params->m_shift -= header->GetTotalHeight() + bottomMarginPgHead;
     }
     RunningElement *footer = this->GetFooter();
     if (footer) {

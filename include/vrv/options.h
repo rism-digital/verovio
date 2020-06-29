@@ -557,6 +557,7 @@ public:
     OptionDbl m_defaultTopMargin;
     //
     OptionDbl m_bottomMarginHarm;
+    OptionDbl m_bottomMarginPgHead;
     //
     OptionDbl m_leftMarginAccid;
     OptionDbl m_leftMarginBarLine;

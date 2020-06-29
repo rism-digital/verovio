@@ -833,6 +833,10 @@ Options::Options()
     m_bottomMarginHarm.Init(0.5, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
 
+    m_bottomMarginPgHead.SetInfo("Bottom margin header", "The margin for header in MEI units");
+    m_bottomMarginPgHead.Init(8.0, 0.0, 24.0);
+    this->Register(&m_bottomMarginPgHead, "bottomMarginHeader", &m_elementMargins);
+
     /// custom left
 
     m_leftMarginAccid.SetInfo("Left margin accid", "The margin for accid in MEI units");
