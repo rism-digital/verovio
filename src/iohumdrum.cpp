@@ -4687,7 +4687,6 @@ template <class ELEMENT> void HumdrumInput::setKeySig(ELEMENT *element, hum::HTp
     hum::HumRegex hre;
     hre.replaceDestructive(plainkey, "*k[", "^\\*ok\\[");
     setKeySig(-1, element, plainkey, keysigtok, NULL, false);
-    // ggg ggg GGG GGG ggg
 }
 
 //////////////////////////////
@@ -7551,7 +7550,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                             Note *note2 = new Note;
                             setLocationId(note2, second);
                             appendElement(ftrem, note2);
-                            convertNote(note2, second, staffindex, 0);
+                            convertNote(note2, second, 0, staffindex);
                         }
                     }
                     appendElement(elements, pointers, ftrem);
@@ -7740,7 +7739,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         Note *note2 = new Note;
                         setLocationId(note2, second);
                         appendElement(ftrem, note2);
-                        convertNote(note2, second, staffindex, 0);
+                        convertNote(note2, second, 0, staffindex);
                     }
                 }
                 appendElement(elements, pointers, ftrem);
