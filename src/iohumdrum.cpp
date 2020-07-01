@@ -6812,12 +6812,22 @@ bool HumdrumInput::checkForTremolo(
     std::vector<std::vector<int> > pitches(notes.size());
     // std::vector<HumNum> durations(notes.size());
 
+    bool firstHasTie = false;
+    bool lastHasTie = false;
     for (int i = 0; i < (int)notes.size(); i++) {
         if ((notes[i]->find('_') != std::string::npos) || (notes[i]->find('[') != std::string::npos)
             || (notes[i]->find(']') != std::string::npos)) {
             // Note/chord involved a tie is present,
             // so disallow any tremolo on this beamed group.
-            return false;
+            if (i == 0) {
+                firstHasTie = true;
+            }
+            else if (i == (int)notes.size() - 1) {
+                lastHasTie = true;
+            }
+            else {
+                return false;
+            }
         }
 
         // durations.at(i) = notes[i]->getDuration();
@@ -6842,26 +6852,31 @@ bool HumdrumInput::checkForTremolo(
     // Check for <bTrem> case.
     std::vector<bool> nextsame(notes.size(), true);
     bool allpequal = true;
-    for (int i = 1; i < (int)pitches.size(); i++) {
-        if (pitches[i].size() != pitches[i - 1].size()) {
-            allpequal = false;
-            nextsame.at(i - 1) = false;
-            // break;
-        }
-        // Check if each note in the successive chords is the same.
-        // The ordering of notes in each chord is assumed to be the same
-        // (i.e., this function is not going to waste time sorting
-        // the pitches to check if the chords are equivalent).
-        for (int j = 0; j < (int)pitches[i].size(); j++) {
-            if (pitches[i][j] != pitches[i - 1][j]) {
+    if (firstHasTie || lastHasTie) {
+        allpequal = false;
+    }
+    else {
+        for (int i = 1; i < (int)pitches.size(); i++) {
+            if (pitches[i].size() != pitches[i - 1].size()) {
                 allpequal = false;
                 nextsame.at(i - 1) = false;
                 // break;
             }
+            // Check if each note in the successive chords is the same.
+            // The ordering of notes in each chord is assumed to be the same
+            // (i.e., this function is not going to waste time sorting
+            // the pitches to check if the chords are equivalent).
+            for (int j = 0; j < (int)pitches[i].size(); j++) {
+                if (pitches[i][j] != pitches[i - 1][j]) {
+                    allpequal = false;
+                    nextsame.at(i - 1) = false;
+                    // break;
+                }
+            }
+            // if (allpequal == false) {
+            //   break;
+            //}
         }
-        // if (allpequal == false) {
-        //   break;
-        //}
     }
 
     if (allpequal) {
@@ -7019,8 +7034,10 @@ bool HumdrumInput::checkForTremolo(
     notes[0]->setValue("auto", "recip", recip);
     notes[0]->setValue("auto", "unit", unitrecip); // problem if dotted...
     notes[0]->setValue("auto", "beams", beams);
-    notes[1]->setValue("auto", "tremoloAux", "1");
-    notes[1]->setValue("auto", "recip", recip);
+
+    int lasti = (int)notes.size() - 1;
+    notes[lasti]->setValue("auto", "tremoloAux", "1");
+    notes[lasti]->setValue("auto", "recip", recip);
 
     for (int i = 1; i < (int)notes.size(); i++) {
         notes[i]->setValue("auto", "suppress", "1");
