@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun 28 16:57:13 PDT 2020
+// Last Modified: Tue Jun 30 19:10:17 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4107,8 +4107,8 @@ class GridMeasure : public std::list<GridSlice*> {
 		                  { return m_style == MeasureStyle::RepeatForward; }
 		bool         isRepeatBoth(void)
 		                  { return m_style == MeasureStyle::RepeatBoth; }
-		void         addInterpretationBefore(GridSlice* slice, int partindex, const std::string& interpretation);
-		void         addInterpretationAfter(GridSlice* slice, int partindex, const std::string& interpretation, HumNum timestamp);
+		void         addInterpretationBefore(GridSlice* slice, int partindex, int staffindex, int voiceindex, const std::string& interpretation);
+		void         addInterpretationAfter(GridSlice* slice, int partindex, int staffindex, int voiceindex, const std::string& interpretation, HumNum timestamp);
 		void         addLayoutParameter(GridSlice* slice, int partindex, const std::string& locomment);
 		void         addLayoutParameter(HumNum timestamp, int partindex, int staffindex, const std::string& locomment);
 		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const std::string& locomment);
@@ -4162,9 +4162,9 @@ class GridSlice : public std::vector<GridPart*> {
 		bool isTimeSigSlice(void)       { return m_type == SliceType::TimeSigs;         }
 		bool isTempoSlice(void)         { return m_type == SliceType::Tempos;           }
 		bool isMeterSigSlice(void)      { return m_type == SliceType::MeterSigs;        }
-		bool isManipulatorSlice(void)   { return m_type==SliceType::Manipulators;       }
-		bool isLayoutSlice(void)        { return m_type ==  SliceType::Layouts;         }
-		bool isLocalLayoutSlice(void)   { return m_type ==  SliceType::Layouts;         }
+		bool isManipulatorSlice(void)   { return m_type == SliceType::Manipulators;     }
+		bool isLayoutSlice(void)        { return m_type == SliceType::Layouts;          }
+		bool isLocalLayoutSlice(void)   { return m_type == SliceType::Layouts;          }
 		bool isInvalidSlice(void)       { return m_type == SliceType::Invalid;          }
 		bool isGlobalComment(void)      { return m_type == SliceType::GlobalComments;   }
 		bool isGlobalLayout(void)       { return m_type == SliceType::GlobalLayouts;    }
@@ -4173,6 +4173,7 @@ class GridSlice : public std::vector<GridPart*> {
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		bool hasSpines(void);
+		std::string getNullTokenForSlice(void);
 		SliceType getType(void)    { return m_type; }
 
 		void transferTokens        (HumdrumFile& outfile, bool recip);
@@ -6988,7 +6989,7 @@ class Tool_musicxml2hum : public HumTool {
 		void addTexts          (GridSlice* slice, GridMeasure* measure, int partindex,
 		                        int staffindex, int voiceindex, MxmlEvent* event);
 		void addText           (GridSlice* slice, GridMeasure* measure, int partindex,
-		                        int staffindex, int voiceindex, pugi::xml_node node);
+		                        int staffindex, int voiceindex, pugi::xml_node node, bool force = false);
 		void addTempos         (GridSlice* slice, GridMeasure* measure, int partindex,
 		                        int staffindex, int voiceindex, MxmlEvent* event);
 		void addTempo          (GridSlice* slice, GridMeasure* measure, int partindex,
@@ -7058,6 +7059,14 @@ class Tool_musicxml2hum : public HumTool {
 
 		// m_hasTremoloQ is used to run the tremolo tool.
 		bool m_hasTremoloQ = false;
+
+		// m_post_note_text is used to store interpretations that occur
+		// before notes in the MusicXML data, but need to be moved after
+		// the note in the Humdrum data.  The text will be stored and then
+		// when note is processed, any text in this storage will be processed
+		// index is a string: "part staff voice" with a vector list of strings
+		// to process.
+		std::map<std::string, vector<pugi::xml_node>> m_post_note_text;
 
 };
 
