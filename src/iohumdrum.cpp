@@ -15809,7 +15809,9 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
                     contents.back() += content[z];
                 }
             }
-            contents.back() += content.back();
+            if (content.size() > 1) {
+                contents.back() += content.back();
+            }
 
             // add elements for sub-syllables due to elisions:
             for (int k = 1; k < (int)contents.size(); k++) {
