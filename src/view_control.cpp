@@ -28,6 +28,7 @@
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
+#include "fing.h"
 #include "functorparams.h"
 #include "gliss.h"
 #include "hairpin.h"
@@ -102,6 +103,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Fermata *fermata = dynamic_cast<Fermata *>(element);
         assert(fermata);
         DrawFermata(dc, fermata, measure, system);
+    }
+    else if (element->Is(FING)) {
+        Fing *fing = dynamic_cast<Fing *>(element);
+        assert(fing);
+        DrawFing(dc, fing, measure, system);
     }
     else if (element->Is(HARM)) {
         Harm *harm = dynamic_cast<Harm *>(element);
@@ -1631,6 +1637,11 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     }
 
     dc->EndGraphic(fermata, this);
+}
+
+void View::DrawFing(DeviceContext* dc, Fing* fing, Measure* measure, System* system)
+{
+    //TODO
 }
 
 void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
