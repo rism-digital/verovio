@@ -1224,7 +1224,7 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
 
 void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
 {
-    assert(fermata);
+    assert(fing);
 
     WriteControlElement(currentNode, fing);
     WriteTextDirInterface(currentNode, fing);
@@ -3875,6 +3875,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "fermata") {
             success = ReadFermata(parent, current);
+        }
+        else if (std::string(current.name()) == "fing") {
+            success = ReadFing(parent, current);
         }
         else if (std::string(current.name()) == "gliss") {
             success = ReadGliss(parent, current);
