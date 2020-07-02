@@ -1,0 +1,15 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        fing.h
+// Author:      Andriy Makarchuk
+// Created:     2020
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef __VRV_FING_H__
+#define __VRV_FING_H__
+
+namespace vrv {
+
+} // namespace vrv
+
+#endif // __VRV_FING_H__
