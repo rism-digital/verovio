@@ -1641,7 +1641,50 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
 
 void View::DrawFing(DeviceContext* dc, Fing* fing, Measure* measure, System* system)
 {
-    //TODO
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(fing);
+
+     // Cannot draw a fing that has no start position
+    if (!fing->GetStart()) return;
+
+    dc->StartGraphic(fing, "", fing->GetUuid());
+
+    FontInfo fingTxt;
+    if (!dc->UseGlobalStyling()) {
+        fingTxt.SetFaceName("Times");
+    }
+
+    TextDrawingParams params;
+    params.m_x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
+    // center fingering 
+    data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
+
+    auto staffList = fing->GetTstampStaves(measure);
+    for (auto staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fing, fing->GetStart(), *staffIter)) {
+            continue;
+        }
+
+        params.m_y = fing->GetDrawingY();
+
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+
+        fingTxt.SetPointSize(params.m_pointSize / 2);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&fingTxt);
+
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, fing, params);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(fing, this);
 }
 
 void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
