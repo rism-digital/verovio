@@ -47,6 +47,7 @@
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
+#include "fing.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "gliss.h"
@@ -398,6 +399,10 @@ bool MEIOutput::WriteObject(Object *object)
             m_currentNode = m_currentNode.append_child("fermata");
             WriteFermata(m_currentNode, dynamic_cast<Fermata *>(object));
         }
+    }
+    else if (object->Is(FING)) {
+        m_currentNode = m_currentNode.append_child("fing");
+        WriteFing(m_currentNode, dynamic_cast<Fing *>(object));
     }
     else if (object->Is(HAIRPIN)) {
         m_currentNode = m_currentNode.append_child("hairpin");
@@ -1215,6 +1220,16 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WriteColor(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacement(currentNode);
+}
+
+void MEIOutput::WriteFing(pugi::xml_node currentNode, Fing *fing)
+{
+    assert(fermata);
+
+    WriteControlElement(currentNode, fing);
+    WriteTextDirInterface(currentNode, fing);
+    WriteTimePointInterface(currentNode, fing);
+    fing->WriteNNumberLike(currentNode);
 }
 
 void MEIOutput::WriteGliss(pugi::xml_node currentNode, Gliss *gliss)
@@ -4036,6 +4051,20 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     parent->AddChild(vrvFermata);
     ReadUnsupportedAttr(fermata, vrvFermata);
     return true;
+}
+
+bool MEIInput::ReadFing(Object *parent, pugi::xml_node fing)
+{
+    Fing *vrvFing = new Fing();
+    ReadControlElement(fing, vrvFing);
+
+    ReadTextDirInterface(fing, vrvFing);
+    ReadTimePointInterface(fing, vrvFing);
+    vrvFing->ReadNNumberLike(fing);
+
+    parent->AddChild(vrvFing);
+    ReadUnsupportedAttr(fing, vrvFing);
+    return ReadTextChildren(vrvFing, fing, vrvFing);
 }
 
 bool MEIInput::ReadGliss(Object *parent, pugi::xml_node gliss)
