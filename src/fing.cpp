@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "text.h"
+
 namespace vrv {
 //----------------------------------------------------------------------------
 // Fing
@@ -36,4 +38,16 @@ void Fing::Reset()
     TextDirInterface::Reset();
     ResetNNumberLike();
 }
+
+bool Fing::IsSupportedChild(Object *child) 
+{
+    if (child->Is({ REND, TEXT })) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
 } // namespace vrv

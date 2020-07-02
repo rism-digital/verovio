@@ -45,6 +45,12 @@ public:
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
 
+    /**
+     * Add an element (text, rend. etc.) to a harm.
+     * Only supported elements will be actually added to the child list.
+     */
+    virtual bool IsSupportedChild(Object *object);
+
     //----------//
     // Functors //
     //----------//
