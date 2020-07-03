@@ -31,6 +31,7 @@
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
+#include "fing.h"
 #include "ftrem.h"
 #include "gliss.h"
 #include "hairpin.h"
@@ -2647,8 +2648,23 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
         }
+
+        // technical
         for (pugi::xml_node technical : notations.node().children("technical")) {
-            if (technical.child("fingering")) continue;
+            // fingering
+            auto xmlFing = technical.child("fingering");
+            if (xmlFing) {
+                std::string fingText = GetContent(xmlFing);
+                Fing *fing = new Fing();
+                Text *text = new Text();
+                text->SetText(UTF8to16(fingText));
+                m_controlElements.push_back(std::make_pair(measureNum, fing));
+                fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+                fing->SetPlace(fing->AttPlacement::StrToStaffrel(xmlFing.attribute("placement").as_string()));
+                fing->AddChild(text);
+                fing->SetTstamp((double)m_durTotal * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+            }
+
             Artic *artic = new Artic();
             for (pugi::xml_node articulation : technical.children()) {
                 artics.push_back(ConvertArticulations(articulation.name()));
