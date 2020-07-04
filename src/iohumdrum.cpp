@@ -7360,7 +7360,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handleStaffStateVariables(layerdata[i]);
             handleStaffDynamStateVariables(layerdata[i]);
             if (*layerdata[i] == "*rep") {
+                int oldi = i;
                 i = insertRepetitionElement(elements, pointers, layerdata, i);
+
+                // Now go back an insert dynamics for the removed notes:
+                for (int j = oldi; j <= i; j++) {
+                    if (!layerdata[j]->isData()) {
+                        continue;
+                    }
+                    processDynamics(layerdata[j], staffindex);
+                }
             }
             if (hre.search(layerdata[i], "^\\*color:(.*)")) {
                 int ctrack = layerdata[i]->getTrack();
@@ -7486,6 +7495,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (layerdata[i]->getValueInt("auto", "suppress")) {
             // This element is not supposed to be printed,
             // probably due to being in a tremolo.
+
+            // but first check for dynamics, which should not
+            // be suppressed:
+            processDynamics(layerdata[i], staffindex);
             continue;
         }
 
