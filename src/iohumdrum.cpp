@@ -10941,6 +10941,31 @@ std::string HumdrumInput::replaceMusicShapes(const std::string input)
     return output;
 }
 
+//////////////////////////////
+//
+// HumdrumInput::generateSlurId --
+//
+
+std::string HumdrumInput::generateSlurId(hum::HTp token, int count, int number)
+{
+    std::string id;
+    if (token->isChord()) {
+        id = "chord-L";
+    }
+    else {
+        id = "note-L";
+    }
+    id += to_string(token->getLineNumber());
+    id += "F";
+    id += to_string(token->getFieldNumber());
+    token->setValue("MEI", "xml:id", id);
+    if (count > 1) {
+        id += "N";
+        id += to_string(number);
+    }
+    return id;
+}
+
 /////////////////////////////
 //
 // HumdrumInput::processSlurs --
@@ -10948,237 +10973,131 @@ std::string HumdrumInput::replaceMusicShapes(const std::string input)
 
 void HumdrumInput::processSlurs(hum::HTp slurend)
 {
-    int startcount = slurend->getValueInt("auto", "slurStartCount");
-    if (startcount <= 0) {
+    int slurendcount = slurend->getValueInt("auto", "slurEndCount");
+    if (slurendcount <= 0) {
         return;
     }
 
-    // slurstarts contains a list of the correctly paired slurs
-    // attached to the note/chord.  Deal with unopened slurs
-    // here later (such as an excerpt of music where the opening
-    // of the slur is not present in the data).
-    std::vector<hum::HTp> slurstarts;
-    for (int i = 0; i < startcount; i++) {
-        hum::HTp tok;
-        tok = slurend->getSlurStartToken(i + 1);
-        if (tok) {
-            slurstarts.push_back(tok);
-        }
+    // slurstarts: indexed by slur end number (NB: 0 position not used).
+    // pair contains the slur start enumeration and the start token.
+    std::vector<pair<int, hum::HTp> > slurstartlist;
+    slurstartlist.resize(slurendcount + 1);
+    for (int i = 1; i <= slurendcount; i++) {
+        slurstartlist[i].first = slurend->getSlurStartNumber(i);
+        slurstartlist[i].second = slurend->getSlurStartToken(i);
     }
 
-    // slurindex contains a list of the indexes into slurstarts,
-    // with all identical slur starts placed on the first
-    // position that the note/chord is found in the slurstarts list.
-    std::vector<std::vector<int> > slurindex;
-    slurindex.resize(slurstarts.size());
-    for (int i = 0; i < (int)slurstarts.size(); i++) {
-        for (int j = 0; j <= i; j++) {
-            if (slurstarts[i] == slurstarts[j]) {
-                slurindex[j].push_back(i);
-                break;
-            }
+    for (int i = 1; i <= slurendcount; i++) {
+        hum::HTp slurstart = slurstartlist[i].second;
+        if (!slurstart) {
+            continue;
         }
-    }
+        int slurstartnumber = slurstartlist[i].first;
+        int slurendnumber = i;
+        int slurstartcount = slurstart->getValueInt("auto", "slurStartCount");
 
-    std::vector<bool> indexused(32, false);
-
-    std::vector<pair<int, bool> > slurendnoteinfo;
-    extractSlurNoteAttachmentInformation(slurendnoteinfo, slurend, ')');
-
-    int endsubtokcount = slurend->getSubtokenCount();
-    std::vector<int> endpitches;
-    for (int i = 0; i < endsubtokcount; i++) {
-        std::string subtok = slurend->getSubtoken(i);
-        if (subtok.find("r") != std::string::npos) {
-            endpitches.push_back(0);
+        int mindex;
+        std::string mindexstring = slurstart->getValue("MEI", "measureIndex");
+        if (mindexstring == "") {
+            // cross-layer sluring into later layer.  The beginning of the slur
+            // is in the same measure since it has not yet been processed.
+            mindex = slurend->getValueInt("MEI", "measureIndex");
         }
         else {
-            endpitches.push_back(hum::Convert::kernToBase7(subtok));
+            mindex = slurstart->getValueInt("MEI", "measureIndex");
         }
-    }
-    std::vector<pair<int, int> > endchordsorted;
-    endchordsorted.reserve(endsubtokcount);
-    pair<int, int> v;
-    for (int i = 0; i < endsubtokcount; i++) {
-        v.first = endpitches[i];
-        v.second = i;
-        endchordsorted.push_back(v);
-    }
-    std::sort(endchordsorted.begin(), endchordsorted.end());
 
-    int startsubtokcount;
-    std::vector<int> startpitches;
+        Measure *startmeasure = m_measures[mindex];
+        Slur *slur = new Slur;
+        addSlurLineStyle(slur, slurstart, slurstartnumber);
 
-    for (int i = 0; i < (int)slurindex.size(); i++) {
-        std::vector<pair<int, bool> > slurstartnoteinfo;
-        extractSlurNoteAttachmentInformation(slurstartnoteinfo, slurstarts.at(i), '(');
+        std::string startid = slurstart->getValue("MEI", "xml:id");
+        std::string endid = slurend->getValue("MEI", "xml:id");
 
-        startsubtokcount = slurstarts[i]->getSubtokenCount();
-        startpitches.clear();
-        for (int j = 0; j < startsubtokcount; j++) {
-            std::string subtok = slurstarts[i]->getSubtoken(j);
-            if (subtok.find("r") != std::string::npos) {
-                startpitches.push_back(0);
-            }
-            else {
-                startpitches.push_back(hum::Convert::kernToBase7(subtok));
-            }
+        // start ID can sometimes not be set yet due to cross layer slurs.
+        if (startid.empty()) {
+            startid = generateSlurId(slurstart, slurstartcount, slurstartnumber);
         }
-        std::vector<std::pair<int, int> > startchordsorted;
-        startchordsorted.reserve(startsubtokcount);
-
-        pair<int, int> v;
-        for (int i = 0; i < startsubtokcount; i++) {
-            v.first = startpitches[i];
-            v.second = i;
-            startchordsorted.push_back(v);
+        if (endid.empty()) {
+            endid = generateSlurId(slurend, slurendcount, slurendnumber);
         }
-        std::sort(startchordsorted.begin(), startchordsorted.end());
-        for (int j = 0; j < (int)slurindex[i].size(); j++) {
-            int ndex = -1;
-            if (slurindex.size() > 1) {
-                ndex = j;
+
+        slur->SetStartid("#" + startid);
+        slur->SetEndid("#" + endid);
+        setSlurLocationId(slur, slurstart, slurend, slurstartnumber);
+
+        startmeasure->AddChild(slur);
+        if (slurstart->getTrack() == slurend->getTrack()) {
+            // If the slur starts and ends on different staves,
+            // do not specify the staff attribute, but later
+            // add a list of the two staves involved.
+            setStaff(slur, m_currentstaff);
+        }
+
+        if (hasAboveParameter(slurstart, "S")) {
+            slur->SetCurvedir(curvature_CURVEDIR_above);
+        }
+        else if (hasBelowParameter(slurstart, "S")) {
+            slur->SetCurvedir(curvature_CURVEDIR_below);
+        }
+
+        if (slurendnumber < 0) {
+            continue;
+        }
+
+        // Calculate if the slur should be forced above or below
+        // this is the case for doubly slured chords.  Only the first
+        // two slurs between a pair of notes/chords will be oriented
+        // (other slurs will need to be manually adjusted and probably
+        // linked to individual notes to avoid overstriking the first
+        // two slurs.
+
+        if (slurendcount > 1) {
+            int found = -1;
+            for (int j = 1; j <= slurendcount; j++) {
+                if (i == j) {
+                    continue;
+                }
+                if (slurstartlist[i].second == slurstartlist[j].second) {
+                    found = j;
+                    break;
+                }
             }
-            hum::HTp slurstart = slurstarts[slurindex[i][j]];
-
-            std::vector<pair<int, bool> > slurstartnoteinfo;
-            extractSlurNoteAttachmentInformation(slurstartnoteinfo, slurstart, '(');
-            if (!slurstart) {
-                // should never occur...
-                return;
-            }
-
-            int mindex;
-            std::string mindexstring = slurstart->getValue("MEI", "measureIndex");
-            if (mindexstring == "") {
-                // cross-layer sluring into later layer.  The beginning of the slur
-                // is in the same measure since it has not yet been processed.
-                mindex = slurend->getValueInt("MEI", "measureIndex");
-            }
-            else {
-                mindex = slurstart->getValueInt("MEI", "measureIndex");
-            }
-
-            Measure *startmeasure = m_measures[mindex];
-            Slur *slur = new Slur;
-
-            addSlurLineStyle(slur, slurstart, ndex);
-
-            // start ID can sometimes not be set yet due to cross layer slurs.
-            std::string startid = slurstart->getValue("MEI", "xml:id");
-            std::string endid = slurend->getValue("MEI", "xml:id");
-
-            if (startid == "") {
-                if (slurstart->isChord()) {
-                    startid = "chord-L";
+            if (found > 0) {
+                if (found < i) {
+                    slur->SetCurvedir(curvature_CURVEDIR_above);
                 }
                 else {
-                    startid = "note-L";
-                }
-                startid += to_string(slurstart->getLineNumber());
-                startid += "F";
-                startid += to_string(slurstart->getFieldNumber());
-                slurstart->setValue("MEI", "xml:id", startid);
-                startid = slurstart->getValue("MEI", "xml:id");
-            }
-
-            if (slurindex[i].size() > 1) {
-                if (endpitches.size() > 1) {
-                    calculateNoteIdForSlur(endid, endchordsorted, j);
-                }
-                if (startpitches.size() > 1) {
-                    calculateNoteIdForSlur(startid, startchordsorted, j);
+                    slur->SetCurvedir(curvature_CURVEDIR_below);
                 }
             }
+        }
 
-            if (slurendnoteinfo.at(i).second) {
-                if (endid.find("chord") != std::string::npos) {
-                    hum::HumRegex hre;
-                    hre.replaceDestructive(endid, "note", "chord");
-                    endid += "S";
-                    endid += to_string(slurendnoteinfo[i].first + 1);
+        if (m_signifiers.above) {
+            int count = 0;
+            for (int k = 0; k < (int)slurstart->size() - 1; k++) {
+                if (slurstart->at(k) == '(') {
+                    count++;
                 }
-            }
-
-            if (slurstartnoteinfo.at(j).second) {
-                if (startid.find("chord") != std::string::npos) {
-                    hum::HumRegex hre;
-                    hre.replaceDestructive(startid, "note", "chord");
-                    startid += "S";
-                    startid += to_string(slurstartnoteinfo[i].first + 1);
-                }
-            }
-
-            slur->SetEndid("#" + endid);
-            slur->SetStartid("#" + startid);
-            setSlurLocationId(slur, slurstart, slurend, j);
-
-            startmeasure->AddChild(slur);
-            if (slurstart->getTrack() == slurend->getTrack()) {
-                // If the slur starts and ends on different staves,
-                // do not specify the staff attribute, but later
-                // add a list of the two staves involved.
-                setStaff(slur, m_currentstaff);
-            }
-
-            if (hasAboveParameter(slurstart, "S")) {
-                slur->SetCurvedir(curvature_CURVEDIR_above);
-            }
-            else if (hasBelowParameter(slurstart, "S")) {
-                slur->SetCurvedir(curvature_CURVEDIR_below);
-            }
-
-            std::string eid = slurend->getValue("auto", "id");
-            int sluridx = getSlurEndIndex(slurstart, eid, indexused);
-            if (sluridx < 0) {
-                continue;
-            }
-            indexused.at(sluridx) = true;
-
-            // Calculate if the slur should be forced above or below
-            // this is the case for doubly slured chords.  Only the first
-            // two slurs between a pair of notes/chords will be oriented
-            // (other slurs will need to be manually adjusted and probably
-            // linked to individual notes to avoid overstriking the first
-            // two slurs.
-            if (slurindex[i].size() >= 2) {
-                if (slurstarts[slurindex[i][0]] == slurstarts[slurindex[i][1]]) {
-                    if (j == 0) {
+                if (count == slurstartnumber) {
+                    if (slurstart->at(k + 1) == m_signifiers.above) {
                         slur->SetCurvedir(curvature_CURVEDIR_above);
                     }
-                    else {
+                    break;
+                }
+            }
+        }
+        if (m_signifiers.below) {
+            int count = 0;
+            for (int k = 0; k < (int)slurstart->size() - 1; k++) {
+                if (slurstart->at(k) == '(') {
+                    count++;
+                }
+                if (count == slurstartnumber) {
+                    if (slurstart->at(k + 1) == m_signifiers.below) {
                         slur->SetCurvedir(curvature_CURVEDIR_below);
                     }
-                }
-            }
-
-            if (m_signifiers.above) {
-                int count = -1;
-                for (int k = (int)slurstart->size() - 2; k >= 0; k--) {
-                    if (slurstart->at(k) == '(') {
-                        count++;
-                    }
-                    if (count == sluridx) {
-                        if (slurstart->at(k + 1) == m_signifiers.above) {
-                            slur->SetCurvedir(curvature_CURVEDIR_above);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            if (m_signifiers.below) {
-                int count = -1;
-                for (int k = (int)slurstart->size() - 2; k >= 0; k--) {
-                    if (slurstart->at(k) == '(') {
-                        count++;
-                    }
-                    if (count == sluridx) {
-                        if (slurstart->at(k + 1) == m_signifiers.below) {
-                            slur->SetCurvedir(curvature_CURVEDIR_below);
-                        }
-                        break;
-                    }
+                    break;
                 }
             }
         }
@@ -11509,7 +11428,8 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     phrase->SetEndid("#" + endid);
     phrase->SetStartid("#" + startid);
 
-    setSlurLocationId(phrase, phrasestart, phraseend, j, "phrase");
+    int slurstartnumber = 1; // hardwired to 1 for now.
+    setSlurLocationId(phrase, phrasestart, phraseend, slurstartnumber, "phrase");
 
     startmeasure->AddChild(phrase);
     if (phrasestart->getTrack() == phraseend->getTrack()) {
@@ -11527,7 +11447,8 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     // }
 
     std::string eid = phraseend->getValue("auto", "id");
-    int phraseidx = getSlurEndIndex(phrasestart, eid, indexused);
+    // int phraseidx = getSlurEndIndex(phrasestart, eid, indexused);
+    int phraseidx = 0;
     if (phraseidx < 0) {
         return;
     }
@@ -11549,50 +11470,20 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     //         }
     //     }
     // }
-
-    /*
-        if (m_signifiers.above) {
-            int count = -1;
-            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
-                if (phrasestart->at(k) == '(') {
-                    count++;
-                }
-                if (count == phraseidx) {
-                    if (phrasestart->at(k + 1) == m_signifiers.above) {
-                        slur->SetCurvedir(curvature_CURVEDIR_above);
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (m_signifiers.below) {
-            int count = -1;
-            for (int k = (int)phrasestart->size() - 2; k >= 0; k--) {
-                if (phrasestart->at(k) == '(') {
-                    count++;
-                }
-                if (count == phraseidx) {
-                    if (phrasestart->at(k + 1) == m_signifiers.below) {
-                        slur->SetCurvedir(curvature_CURVEDIR_below);
-                    }
-                    break;
-                }
-            }
-        }
-    */
 }
 
 //////////////////////////////
 //
 // HumdrumInput::addSlurLineStyle -- Add dotted or dashed line information to a
 //    slur from layout parameters.
-//        Default parameter: index = 0.
 //
 
-void HumdrumInput::addSlurLineStyle(Slur *element, hum::HTp token, int slurindex)
+void HumdrumInput::addSlurLineStyle(Slur *element, hum::HTp token, int slurnumber)
 {
-
+    if (slurnumber < 2) {
+        slurnumber = 1;
+    }
+    int slurindex = slurnumber - 1;
     string dashed = token->getLayoutParameter("S", "dash", slurindex);
     string dotted = token->getLayoutParameter("S", "dot", slurindex);
     if (!dotted.empty()) {
@@ -11798,32 +11689,22 @@ void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pai
 
 /////////////////////////////
 //
-// HumdrumInput::getSlurEndIndex --
+// HumdrumInput::getSlurEndNumber --
 //
 
-int HumdrumInput::getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused)
+int HumdrumInput::getSlurEndNumber(hum::HTp startslur, int slurstartnumber)
 {
-    int endcount = token->getValueInt("auto", "slurEndCount");
-    std::string parameter;
-    std::string endid;
-
-    int save = -1;
-    for (int i = 0; i < endcount; ++i) {
-        parameter = "slurEnd";
-        if (i > 0) {
-            parameter += to_string(i + 1);
-        }
-        endid = token->getValue("auto", parameter);
-        if (endid == targetid) {
-            if (indexused.at(i)) {
-                save = i;
-                continue;
-            }
-            return i;
-        }
+    if (slurstartnumber < 1) {
+        slurstartnumber = 1;
+    }
+    int startcount = startslur->getValueInt("auto", "slurStartCount");
+    std::string parameter = "slurEndNumber";
+    if (startcount > 1) {
+        parameter += to_string(slurstartnumber);
     }
 
-    return save;
+    int slurendnumber = startslur->getValueInt("auto", parameter);
+    return slurendnumber;
 }
 
 /////////////////////////////
@@ -18799,7 +18680,7 @@ void HumdrumInput::setTieLocationId(Object *object, hum::HTp tiestart, int sinde
 //
 
 void HumdrumInput::setSlurLocationId(
-    Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex, const string &prefix)
+    Object *object, hum::HTp slurstart, hum::HTp slurend, int slurstartnumber, const string &prefix)
 {
     int startline = slurstart->getLineNumber();
     int startfield = slurstart->getFieldNumber();
@@ -18813,59 +18694,18 @@ void HumdrumInput::setSlurLocationId(
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
-    int count1 = slurstart->getValueInt("auto", "slurEndCount");
-    int count2 = slurend->getValueInt("auto", "slurStartCount");
-    int num1 = 0;
-    int num2 = eindex + 1;
+    int startcount = slurstart->getValueInt("auto", "slurStartCount");
+    int endcount = slurend->getValueInt("auto", "slurEndCount");
 
-    if ((count1 > 1) || (count2 > 1)) {
-        // resolve which slur is being created.
-        std::string endid = slurend->getValue("auto", "id");
-        std::string startid = slurstart->getValue("auto", "id");
-        std::vector<int> index1(count1, 0);
-        std::vector<int> index2(count2, 0);
-        int counter;
-
-        if (count1 > 1) {
-            counter = 0;
-            for (int i = 0; i < count1; ++i) {
-                std::string param = "slurEnd";
-                if (i > 0) {
-                    param += to_string(i + 1);
-                }
-                std::string tid = slurstart->getValue("auto", param);
-                if (tid == endid) {
-                    index1[i] = ++counter;
-                }
-            }
-        }
-
-        if (count2 > 1) {
-            counter = 0;
-            for (int i = 0; i < count2; ++i) {
-                std::string param = "slurStart";
-                if (i > 0) {
-                    param += to_string(i + 1);
-                }
-                std::string tid = slurend->getValue("auto", param);
-                if (tid == startid) {
-                    index2[i] = ++counter;
-                }
-            }
-        }
-
-        int targetindex = index2[eindex];
-        auto location = std::find(index1.begin(), index1.end(), targetindex);
-        if (location != index1.end()) {
-            num1 = int(index1.end() - location);
-        }
+    std::string tag = "slurEndNumber";
+    if (slurstartnumber > 1) {
+        tag += to_string(slurstartnumber);
     }
+    int slurendnumber = slurstart->getValueInt("auto", tag);
 
-    if (count1 > 1) {
-        if (num1 > 0) {
-            id += "N";
-            id += to_string(num1);
-        }
+    if (startcount > 1) {
+        id += "N";
+        id += to_string(slurstartnumber);
     }
 
     int endline = slurend->getLineNumber();
@@ -18876,11 +18716,9 @@ void HumdrumInput::setSlurLocationId(
     id += "F";
     id += to_string(endfield);
 
-    if (count2 > 1) {
-        if (num2 > 0) {
-            id += "N";
-            id += to_string(num2);
-        }
+    if (endcount > 1) {
+        id += "N";
+        id += to_string(slurendnumber);
     }
 
     object->SetUuid(id);

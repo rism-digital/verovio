@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jun 30 19:10:17 PDT 2020
+// Last Modified: Sat Jul  4 00:11:53 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -13012,6 +13012,11 @@ ostream& operator<<(ostream& out, const HumHash& hash) {
 	return out;
 }
 
+ostream& operator<<(ostream& out, HumHash* hash) {
+	out << *hash;
+	return out;
+}
+
 
 
 typedef long TEMP64BITFIX;
@@ -23749,29 +23754,43 @@ bool HumdrumFileContent::isLinkedSlurBegin(HTp token, int index, const string& p
 
 void HumdrumFileContent::linkSlurEndpoints(HTp slurstart, HTp slurend) {
 	string durtag = "slurDuration";
-	string endtag = "slurEnd";
-	int slurEndCount = slurstart->getValueInt("auto", "slurEndCount");
-	slurEndCount++;
-	if (slurEndCount > 1) {
-		endtag += to_string(slurEndCount);
-		durtag += to_string(slurEndCount);
-	}
-	string starttag = "slurStart";
-	int slurStartCount = slurend->getValueInt("auto", "slurStartCount");
+	string endtag = "slurEndId";
+	string starttag = "slurStartId";
+	string slurstartnumbertag = "slurStartNumber";
+	string slurendnumbertag = "slurEndNumber";
+
+	int slurStartCount = slurstart->getValueInt("auto", "slurStartCount");
+	int opencount = (int)count(slurstart->begin(), slurstart->end(), '(');
 	slurStartCount++;
-	if (slurStartCount > 1) {
-		starttag += to_string(slurStartCount);
+	int openEnumeration = opencount - slurStartCount + 1;
+
+	if (openEnumeration > 1) {
+		endtag += to_string(openEnumeration);
+		durtag += to_string(openEnumeration);
+		slurendnumbertag += to_string(openEnumeration);
 	}
 
-	slurstart->setValue("auto", endtag, slurend);
-	slurstart->setValue("auto", "id", slurstart);
-	slurend->setValue("auto", starttag, slurstart);
-	slurend->setValue("auto", "id", slurend);
+	int slurEndNumber = slurend->getValueInt("auto", "slurEndCount");
+	slurEndNumber++;
+	int closeEnumeration = slurEndNumber;
+	if (closeEnumeration > 1) {
+		starttag += to_string(closeEnumeration);
+		slurstartnumbertag += to_string(closeEnumeration);
+	}
+
 	HumNum duration = slurend->getDurationFromStart()
 			- slurstart->getDurationFromStart();
-	slurstart->setValue("auto", durtag, duration);
-	slurstart->setValue("auto", "slurEndCount", to_string(slurEndCount));
-	slurend->setValue("auto", "slurStartCount", to_string(slurStartCount));
+
+	slurstart->setValue("auto", endtag,            slurend);
+	slurstart->setValue("auto", "id",              slurstart);
+	slurstart->setValue("auto", slurendnumbertag,  closeEnumeration);
+	slurstart->setValue("auto", durtag,            duration);
+	slurstart->setValue("auto", "slurStartCount",  slurStartCount);
+
+	slurend->setValue("auto", starttag, slurstart);
+	slurend->setValue("auto", "id", slurend);
+	slurend->setValue("auto", slurstartnumbertag, openEnumeration);
+	slurend->setValue("auto", "slurEndCount",  slurEndNumber);
 }
 
 
@@ -32460,11 +32479,28 @@ ostream& printSequence(vector<HTp>& sequence, ostream& out) {
 //
 
 HTp HumdrumToken::getSlurStartToken(int number) {
-	string tag = "slurStart";
+	string tag = "slurStartId";
 	if (number > 1) {
 		tag += to_string(number);
 	}
-	return getValueHTp("auto", tag);
+	HTp value = getValueHTp("auto", tag);
+	return value;
+}
+
+
+//////////////////////////////
+//
+// HumdrumToken::getSlurStartNumber -- Given a slur ending number, 
+//    return the slur start number that it pairs with.
+//
+
+int HumdrumToken::getSlurStartNumber(int endnumber) {
+	string tag = "slurStartNumber";
+	if (endnumber > 1) {
+		tag += to_string(endnumber);
+	}
+	int value = getValueInt("auto", tag);
+	return value;
 }
 
 

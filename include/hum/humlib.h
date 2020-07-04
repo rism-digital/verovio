@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jun 30 19:10:17 PDT 2020
+// Last Modified: Sat Jul  4 00:11:53 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -228,9 +228,9 @@ class HumHash {
 		                                    const std::string& ns2) const;
 		void           setPrefix           (const std::string& value);
 		std::string    getPrefix           (void) const;
-		std::ostream&       printXml            (std::ostream& out = std::cout, int level = 0,
+		std::ostream&  printXml            (std::ostream& out = std::cout, int level = 0,
 		                                    const std::string& indent = "\t");
-		std::ostream&       printXmlAsGlobal    (std::ostream& out = std::cout, int level = 0,
+		std::ostream&  printXmlAsGlobal    (std::ostream& out = std::cout, int level = 0,
 		                                    const std::string& indent = "\t");
 
 		void           setOrigin           (const std::string& key,
@@ -264,6 +264,7 @@ class HumHash {
 		std::string prefix;
 
 	friend std::ostream& operator<<(std::ostream& out, const HumHash& hash);
+	friend std::ostream& operator<<(std::ostream& out, HumHash* hash);
 };
 
 
@@ -1564,10 +1565,11 @@ class HumdrumToken : public std::string, public HumHash {
 		int      getPhraseStartElisionLevel(int index) const;
 		int      getSlurEndElisionLevel    (int index = 0) const;
 		int      getPhraseEndElisionLevel  (int index = 0) const;
-		HTp      getSlurStartToken         (int number = 0);
-		HTp      getSlurEndToken           (int number = 0);
-		HTp      getPhraseStartToken       (int number = 0);
-		HTp      getPhraseEndToken         (int number = 0);
+		HTp      getSlurStartToken         (int number = 1);
+		int      getSlurStartNumber        (int endnumber);
+		HTp      getSlurEndToken           (int number = 1);
+		HTp      getPhraseStartToken       (int number = 1);
+		HTp      getPhraseEndToken         (int number = 1);
 		void     storeParameterSet         (void);
 		bool     linkedParameterIsGlobal   (int index);
 		std::ostream& printCsv             (std::ostream& out = std::cout);

@@ -424,8 +424,9 @@ protected:
     void insertMeterSigElement(std::vector<std::string> &elements, std::vector<void *> &pointers,
         std::vector<hum::HTp> &layeritems, int index);
     void processSlurs(hum::HTp token);
+    std::string generateSlurId(hum::HTp token, int count, int number);
     void processPhrases(hum::HTp token);
-    int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
+    int getSlurEndNumber(hum::HTp startslur, int slurstartnumber);
     void addHarmFloatsForMeasure(int startine, int endline);
     void addFingeringsForMeasure(int startline, int endline);
     void insertFingerNumberInMeasure(
