@@ -7363,7 +7363,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 int oldi = i;
                 i = insertRepetitionElement(elements, pointers, layerdata, i);
 
-                // Now go back an insert dynamics for the removed notes:
+                // Now go back and insert dynamics for the removed notes:
                 for (int j = oldi; j <= i; j++) {
                     if (!layerdata[j]->isData()) {
                         continue;
@@ -7496,7 +7496,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // This element is not supposed to be printed,
             // probably due to being in a tremolo.
 
-            // but first check for dynamics, which should not
+            // But first check for dynamics, which should not
             // be suppressed:
             processDynamics(layerdata[i], staffindex);
             continue;
