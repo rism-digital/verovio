@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul  4 00:11:53 PDT 2020
+// Last Modified: Sun Jul  5 00:11:52 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -30314,6 +30314,12 @@ bool HumdrumToken::isRest(void) {
 //
 
 bool HumdrumToken::isNote(void) {
+	if (!isData()) {
+		return false;
+	}
+	if (isNull()) {
+		return false;
+	}
 	if (isKern()) {
 		if (Convert::isKernNote((string)(*this))) {
 			return true;
