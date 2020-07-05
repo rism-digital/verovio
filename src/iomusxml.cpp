@@ -607,6 +607,22 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
                 staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
+                std::string groupName = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
+                std::string groupAbbr = GetContentOfChild(xpathNode.node(), "group-abbreviation[not(@print-object='no')]");
+                if (!groupName.empty()) {
+                    Label *label = new Label();
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(groupName));
+                    label->AddChild(text);
+                    staffGrp->AddChild(label);
+                }
+                if (!groupAbbr.empty()) {
+                    LabelAbbr *labelAbbr = new LabelAbbr();
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(groupAbbr));
+                    labelAbbr->AddChild(text);
+                    staffGrp->AddChild(labelAbbr);
+                }
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
             }
