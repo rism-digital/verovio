@@ -276,6 +276,7 @@ private:
     ///@{
     ///@}
     void TextRendition(pugi::xpath_node_set words, ControlElement *element);
+    std::string StyleLabel(pugi::xml_node display);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
     /*

@@ -438,6 +438,22 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Style part and group names
+
+std::string MusicXmlInput::StyleLabel(pugi::xml_node display)
+{
+    std::string displayText;
+    for (pugi::xml_node child : display.children()) {
+        if (!std::strncmp(child.name(), "display", 7)) displayText += child.text().as_string();
+        if (!std::strncmp(child.name(), "accidental", 10)) displayText += ConvertFigureGlyph(child.text().as_string());
+    }
+    return displayText;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Print Metronome
+
 void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string rawText;
@@ -607,6 +623,40 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
                 staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
+                std::string groupName = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
+                std::string groupAbbr
+                    = GetContentOfChild(xpathNode.node(), "group-abbreviation[not(@print-object='no')]");
+                if (!groupName.empty()) {
+                    Label *label = new Label();
+                    if (xpathNode.node().select_node("group-name-display[not(@print-object='no')]")) {
+                        std::string name = StyleLabel(xpathNode.node().select_node("group-name-display").node());
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(name));
+                        label->AddChild(text);
+                    }
+                    else {
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(groupName));
+                        label->AddChild(text);
+                        staffGrp->AddChild(label);
+                    }
+                }
+                if (!groupAbbr.empty()) {
+                    LabelAbbr *labelAbbr = new LabelAbbr();
+                    if (xpathNode.node().select_node("group-abbreviation-display[not(@print-object='no')]")) {
+                        std::string name
+                            = StyleLabel(xpathNode.node().select_node("group-abbreviation-display").node());
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(name));
+                        labelAbbr->AddChild(text);
+                    }
+                    else {
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(groupAbbr));
+                        labelAbbr->AddChild(text);
+                        staffGrp->AddChild(labelAbbr);
+                    }
+                }
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
             }
@@ -641,24 +691,40 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             pugi::xpath_node midiVolume = midiInstrument.node().select_node("volume");
             if (!partName.empty()) {
                 label = new Label();
-                std::stringstream sstream(partName);
-                std::string line;
-                bool firstLine = true;
-                while (std::getline(sstream, line)) {
-                    if (!firstLine) {
-                        label->AddChild(new Lb());
-                    }
+                if (xpathNode.node().select_node("part-name-display[not(@print-object='no')]")) {
+                    std::string name = StyleLabel(xpathNode.node().select_node("part-name-display").node());
                     Text *text = new Text();
-                    text->SetText(UTF8to16(line));
+                    text->SetText(UTF8to16(name));
                     label->AddChild(text);
-                    firstLine = false;
+                }
+                else {
+                    std::stringstream sstream(partName);
+                    std::string line;
+                    bool firstLine = true;
+                    while (std::getline(sstream, line)) {
+                        if (!firstLine) {
+                            label->AddChild(new Lb());
+                        }
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(line));
+                        label->AddChild(text);
+                        firstLine = false;
+                    }
                 }
             }
             if (!partAbbr.empty()) {
                 labelAbbr = new LabelAbbr();
-                Text *text = new Text();
-                text->SetText(UTF8to16(partAbbr));
-                labelAbbr->AddChild(text);
+                if (xpathNode.node().select_node("part-abbreviation-display[not(@print-object='no')]")) {
+                    std::string name = StyleLabel(xpathNode.node().select_node("part-abbreviation-display").node());
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(name));
+                    labelAbbr->AddChild(text);
+                }
+                else {
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(partAbbr));
+                    labelAbbr->AddChild(text);
+                }
             }
             if (midiInstrument) {
                 instrdef = new InstrDef;
