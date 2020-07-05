@@ -2729,7 +2729,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_controlElements.push_back(std::make_pair(measureNum, fing));
         fing->SetStartid(m_ID);
         fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        fing->SetPlace(fing->AttPlacement::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
+        fing->SetPlace(fing->AttPlacement::StrToStaffrel(xmlFing.node().attribute("placement").as_string()));
         fing->AddChild(text);
     }
 
