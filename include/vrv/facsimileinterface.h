@@ -12,8 +12,9 @@
 #include "atts_shared.h"
 
 namespace vrv {
-class Zone;
+class FunctorParams;
 class View;
+class Zone;
 
 //----------------------------------------------------------------------------
 // FacsimileInterface
@@ -36,6 +37,9 @@ public:
     virtual int GetDrawingY() const;
 
     int GetWidth() const;
+    int GetHeight() const;
+
+    double GetDrawingRotate() const;
 
     /** Check if the object has a facsimile */
     bool HasFacsimile() { return this->HasFacs(); }

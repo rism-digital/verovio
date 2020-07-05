@@ -200,6 +200,12 @@ public:
     double GetContentAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
+    /**
+     * Get zone bounds using child elements with facsimile information.
+     * Returns true if bounds can be constructed, false otherwise.
+     */
+    bool GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry);
+
     //----------//
     // Functors //
     //----------//

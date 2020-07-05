@@ -51,12 +51,14 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "syl.h"
+#include "syllable.h"
 #include "system.h"
 #include "text.h"
 #include "timestamp.h"
 #include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
+#include "zone.h"
 
 //----------------------------------------------------------------------------
 
@@ -736,6 +738,30 @@ void Doc::PrepareDrawing()
     }
     */
 
+    /************ Add default syl for syllables (if applicable) ************/
+    ListOfObjects syllables;
+    ClassIdComparison comp(SYLLABLE);
+    this->FindAllDescendantByComparison(&syllables, &comp);
+    for (auto it = syllables.begin(); it != syllables.end(); ++it) {
+        Syllable *syllable = dynamic_cast<Syllable *>(*it);
+        syllable->MarkupAddSyl();
+    }
+
+    /************ Resolve @facs ************/
+    if (this->GetType() == Facs) {
+        // Associate zones with elements
+        PrepareFacsimileParams prepareFacsimileParams(this->GetFacsimile());
+        Functor prepareFacsimile(&Object::PrepareFacsimile);
+        this->Process(&prepareFacsimile, &prepareFacsimileParams);
+
+        // Add default syl zone if one is not present.
+        for (auto &it : prepareFacsimileParams.m_zonelessSyls) {
+            Syl *syl = dynamic_cast<Syl *>(it);
+            assert(syl);
+            syl->CreateDefaultZone(this);
+        }
+    }
+
     // LogElapsedTimeEnd ("Preparing drawing");
 
     m_drawingPreparationDone = true;
@@ -783,7 +809,7 @@ void Doc::CastOffLineDoc()
 {
     Doc::CastOffDocBase(true, false);
 }
-void Doc::CastOffDocBase(bool useSystemBreaks, bool usePageBreaks)
+void Doc::CastOffDocBase(bool useSb, bool usePb)
 {
     Pages *pages = this->GetPages();
     assert(pages);
@@ -813,7 +839,7 @@ void Doc::CastOffDocBase(bool useSystemBreaks, bool usePageBreaks)
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
 
-    if (useSystemBreaks && !usePageBreaks) {
+    if (useSb && !usePb) {
         CastOffEncodingParams castOffEncodingParams(this, contentPage, currentSystem, contentSystem, false);
 
         Functor castOffEncoding(&Object::CastOffEncoding);

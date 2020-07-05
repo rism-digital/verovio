@@ -781,6 +781,10 @@ Options::Options()
     m_systemDivider.Init(SYSTEMDIVIDER_left, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
+    m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
+    m_systemMaxPerPage.Init(0, 0, 24);
+    this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
+
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
@@ -849,6 +853,10 @@ Options::Options()
     m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
     m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
+
+    m_bottomMarginPgHead.SetInfo("Bottom margin header", "The margin for header in MEI units");
+    m_bottomMarginPgHead.Init(8.0, 0.0, 24.0);
+    this->Register(&m_bottomMarginPgHead, "bottomMarginHeader", &m_elementMargins);
 
     /// custom left
 

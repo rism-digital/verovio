@@ -196,14 +196,22 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
     }
 }
 
-void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize)
+void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize, std::optional<TextDrawingParams> params)
 {
     assert(dc);
 
+    bool wroteText = false;
     std::wistringstream iss(str);
     std::wstring token;
     while (std::getline(iss, token, L'_')) {
-        dc->DrawText(UTF16to8(token), token);
+        wroteText = true;
+        if (params) {
+            dc->DrawText(UTF16to8(token), token, params->m_x, params->m_y, params->m_width, params->m_height);
+        }
+        else {
+            dc->DrawText(UTF16to8(token), token);
+        }
+
         // no _
         if (iss.eof()) break;
 
@@ -212,8 +220,19 @@ void View::DrawLyricString(DeviceContext *dc, std::wstring str, int staffSize)
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str), str);
+        if (params) {
+            dc->DrawText(UTF16to8(str), str, params->m_x, params->m_y, params->m_width, params->m_height);
+        }
+        else {
+            dc->DrawText(UTF16to8(str), str);
+        }
         dc->ResetFont();
+    }
+
+    // This should only be called in facsimile mode where a zone is specified but there is
+    // no text. This draws the bounds of the zone but leaves the space blank.
+    if (!wroteText && params) {
+        dc->DrawText("", L"", params->m_x, params->m_y, params->m_width, params->m_height);
     }
 }
 
@@ -377,7 +396,12 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
     else if (text->GetFirstAncestor(SYL)) {
-        DrawLyricString(dc, text->GetText());
+        if (params.m_height != VRV_UNSET && params.m_height != 0) {
+            DrawLyricString(dc, text->GetText(), 100, params);
+        }
+        else {
+            DrawLyricString(dc, text->GetText());
+        }
     }
     else {
         DrawTextString(dc, text->GetText(), params);

@@ -81,3 +81,10 @@ cmake_install.cmake
 libverovio.a
 tools/.cmake
 tools/compile_commands.json
+
+# VS Studio files
+.vs/
+Debug/
+Release/
+*.vcxproj*
+*.sln

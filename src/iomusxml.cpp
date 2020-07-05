@@ -377,11 +377,11 @@ void MusicXmlInput::OpenSlur(Measure *measure, int number, Slur *slur)
 void MusicXmlInput::CloseSlur(Measure *measure, int number, LayerElement *element)
 {
     // try to match slur stop to open slurs by slur number
-    std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
-    for (iter = m_slurStack.begin(); iter != m_slurStack.end(); ++iter) {
-        if (iter->second.m_number == number) {
-            iter->first->SetEndid("#" + element->GetUuid());
-            m_slurStack.erase(iter);
+    std::vector<std::pair<Slur *, musicxml::OpenSlur> >::reverse_iterator riter;
+    for (riter = m_slurStack.rbegin(); riter != m_slurStack.rend(); ++riter) {
+        if (riter->second.m_number == number) {
+            riter->first->SetEndid("#" + element->GetUuid());
+            m_slurStack.erase(std::next(riter).base());
             return;
         }
     }
@@ -397,6 +397,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
 {
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
+        pugi::xml_node soundNode = textNode.parent().next_sibling("sound");
         std::string textStr = textNode.text().as_string();
         std::string textColor = textNode.attribute("color").as_string();
         Object *textParent = element;
@@ -415,6 +416,12 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             element->AddChild(rend);
             textParent = rend;
         }
+        else if (soundNode && !soundNode.attribute("@tempo")) {
+            Rend *rend = new Rend();
+            rend->SetHalign(HORIZONTALALIGNMENT_right);
+            element->AddChild(rend);
+            textParent = rend;
+        }
         // Whitespace line breaks are significant in MusicXML => split into lines
         std::stringstream sstream(textStr);
         std::string line;
@@ -430,6 +437,22 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         }
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// Style part and group names
+
+std::string MusicXmlInput::StyleLabel(pugi::xml_node display)
+{
+    std::string displayText;
+    for (pugi::xml_node child : display.children()) {
+        if (!std::strncmp(child.name(), "display", 7)) displayText += child.text().as_string();
+        if (!std::strncmp(child.name(), "accidental", 10)) displayText += ConvertFigureGlyph(child.text().as_string());
+    }
+    return displayText;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Print Metronome
 
 void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
@@ -600,6 +623,40 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 std::string groupBarline = GetContentOfChild(xpathNode.node(), "group-barline");
                 staffGrp->SetBarThru(ConvertWordToBool(groupBarline));
                 // now stack it
+                std::string groupName = GetContentOfChild(xpathNode.node(), "group-name[not(@print-object='no')]");
+                std::string groupAbbr
+                    = GetContentOfChild(xpathNode.node(), "group-abbreviation[not(@print-object='no')]");
+                if (!groupName.empty()) {
+                    Label *label = new Label();
+                    if (xpathNode.node().select_node("group-name-display[not(@print-object='no')]")) {
+                        std::string name = StyleLabel(xpathNode.node().select_node("group-name-display").node());
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(name));
+                        label->AddChild(text);
+                    }
+                    else {
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(groupName));
+                        label->AddChild(text);
+                        staffGrp->AddChild(label);
+                    }
+                }
+                if (!groupAbbr.empty()) {
+                    LabelAbbr *labelAbbr = new LabelAbbr();
+                    if (xpathNode.node().select_node("group-abbreviation-display[not(@print-object='no')]")) {
+                        std::string name
+                            = StyleLabel(xpathNode.node().select_node("group-abbreviation-display").node());
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(name));
+                        labelAbbr->AddChild(text);
+                    }
+                    else {
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(groupAbbr));
+                        labelAbbr->AddChild(text);
+                        staffGrp->AddChild(labelAbbr);
+                    }
+                }
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
             }
@@ -634,24 +691,40 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             pugi::xpath_node midiVolume = midiInstrument.node().select_node("volume");
             if (!partName.empty()) {
                 label = new Label();
-                std::stringstream sstream(partName);
-                std::string line;
-                bool firstLine = true;
-                while (std::getline(sstream, line)) {
-                    if (!firstLine) {
-                        label->AddChild(new Lb());
-                    }
+                if (xpathNode.node().select_node("part-name-display[not(@print-object='no')]")) {
+                    std::string name = StyleLabel(xpathNode.node().select_node("part-name-display").node());
                     Text *text = new Text();
-                    text->SetText(UTF8to16(line));
+                    text->SetText(UTF8to16(name));
                     label->AddChild(text);
-                    firstLine = false;
+                }
+                else {
+                    std::stringstream sstream(partName);
+                    std::string line;
+                    bool firstLine = true;
+                    while (std::getline(sstream, line)) {
+                        if (!firstLine) {
+                            label->AddChild(new Lb());
+                        }
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(line));
+                        label->AddChild(text);
+                        firstLine = false;
+                    }
                 }
             }
             if (!partAbbr.empty()) {
                 labelAbbr = new LabelAbbr();
-                Text *text = new Text();
-                text->SetText(UTF8to16(partAbbr));
-                labelAbbr->AddChild(text);
+                if (xpathNode.node().select_node("part-abbreviation-display[not(@print-object='no')]")) {
+                    std::string name = StyleLabel(xpathNode.node().select_node("part-abbreviation-display").node());
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(name));
+                    labelAbbr->AddChild(text);
+                }
+                else {
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(partAbbr));
+                    labelAbbr->AddChild(text);
+                }
             }
             if (midiInstrument) {
                 instrdef = new InstrDef;
@@ -672,7 +745,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
-                partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                if (m_staffGrpStack.back()->GetSymbol() != staffGroupingSym_SYMBOL_brace) {
+                    partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                }
                 partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
@@ -1617,6 +1692,25 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
     }
 
+    // Coda
+    pugi::xpath_node coda = type.node().select_node("coda");
+    if (coda) {
+        Dir *dir = new Dir();
+        dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        dir->SetTstamp(timeStamp - 1.0);
+        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        Rend *rend = new Rend;
+        rend->SetFontname("VerovioText");
+        rend->SetFontstyle(FONTSTYLE_normal);
+        rend->SetHalign(HORIZONTALALIGNMENT_center);
+        Text *text = new Text();
+        std::wstring codaSign = UTF8to16("\xF0\x9D\x84\x8C");
+        text->SetText(codaSign);
+        rend->AddChild(text);
+        dir->AddChild(rend);
+        m_controlElements.push_back(std::make_pair(measureNum, dir));
+    }
+
     // Directive
     std::string dynamStr = ""; // string containing dynamics information
     int defaultY = 0; // y position attribute, only for directives and dynamics
@@ -1971,6 +2065,25 @@ void MusicXmlInput::ReadMusicXmlDirection(
         m_controlElements.push_back(std::make_pair(measureNum, reh));
     }
 
+    // Segno
+    pugi::xpath_node segno = type.node().select_node("segno");
+    if (segno) {
+        Dir *dir = new Dir();
+        dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        dir->SetTstamp(timeStamp - 1.0);
+        dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
+        Rend *rend = new Rend;
+        rend->SetFontname("VerovioText");
+        rend->SetFontstyle(FONTSTYLE_normal);
+        rend->SetHalign(HORIZONTALALIGNMENT_center);
+        Text *text = new Text();
+        std::wstring segnoSign = UTF8to16("\xF0\x9D\x84\x8B");
+        text->SetText(segnoSign);
+        rend->AddChild(text);
+        dir->AddChild(rend);
+        m_controlElements.push_back(std::make_pair(measureNum, dir));
+    }
+
     // Tempo
     pugi::xpath_node metronome = type.node().select_node("metronome");
     if (node.select_node("sound[@tempo]") || metronome) {
@@ -1996,8 +2109,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (words.size() == 0 && !dynamics && !bracket && !lead && !metronome && !xmlShift && !xmlPedal && !wedge && !dashes
-        && !rehearsal) {
+    if (words.size() == 0 && !coda && !dynamics && !bracket && !lead && !metronome && !segno && !xmlShift && !xmlPedal
+        && !wedge && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
@@ -2486,11 +2599,11 @@ void MusicXmlInput::ReadMusicXmlNote(
                     std::string textStr = textNode.text().as_string();
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
-                    if (lyric.select_node("extend")) {
-                        syl->SetCon(sylLog_CON_u);
-                    }
-                    else if (textNode.next_sibling("elision")) {
+                    if (textNode.next_sibling("elision")) {
                         syl->SetCon(sylLog_CON_b);
+                    }
+                    else if (lyric.select_node("extend")) {
+                        syl->SetCon(sylLog_CON_u);
                     }
                     else if (GetContentOfChild(lyric, "syllabic") == "single") {
                         syl->SetCon(sylLog_CON_s);

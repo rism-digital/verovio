@@ -71,6 +71,9 @@ public:
      */
     int CalcConnectorSpacing(Doc *doc, int staffSize);
 
+    int GetDrawingWidth() const;
+    int GetDrawingHeight() const;
+
     //----------//
     // Functors //
     //----------//
@@ -89,6 +92,9 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /** Create a default zone for a syl based on syllable. */
+    bool CreateDefaultZone(Doc *doc);
 
 private:
     //

@@ -68,11 +68,19 @@ public:
     ///@}
 
     /**
-     * @name Get the X and Y drawing position
+     * @name Get the X, Y, and angle of drawing position
      */
     ///@{
     virtual int GetDrawingY() const;
     virtual int GetDrawingX() const;
+    virtual double GetDrawingRotate() const;
+    ///@}
+
+    /**
+     * Adjust drawingStaffSize based on rotate angle
+     */
+    void AdjustDrawingStaffSize();
+
     /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
