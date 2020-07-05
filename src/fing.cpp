@@ -41,12 +41,10 @@ void Fing::Reset()
 
 bool Fing::IsSupportedChild(Object *child) 
 {
-    if (child->Is({ REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
-    }
-    else {
+    if (!child->Is({ REND, TEXT })) {
         return false;
     }
+    assert(dynamic_cast<TextElement *>(child));
     return true;
 }
 

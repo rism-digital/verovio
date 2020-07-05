@@ -46,7 +46,7 @@ public:
     ///@}
 
     /**
-     * Add an element (text, rend. etc.) to a harm.
+     * Add an element (text, rend) to a fing.
      * Only supported elements will be actually added to the child list.
      */
     virtual bool IsSupportedChild(Object *object);
