@@ -7369,6 +7369,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         continue;
                     }
                     processDynamics(layerdata[j], staffindex);
+                    processDirections(layerdata[j], staffindex);
                 }
             }
             if (hre.search(layerdata[i], "^\\*color:(.*)")) {
@@ -7496,9 +7497,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // This element is not supposed to be printed,
             // probably due to being in a tremolo.
 
-            // But first check for dynamics, which should not
-            // be suppressed:
+            // But first check for dynamics and text, which
+            // should not be suppressed:
             processDynamics(layerdata[i], staffindex);
+            processDirections(layerdata[i], staffindex);
             continue;
         }
 
