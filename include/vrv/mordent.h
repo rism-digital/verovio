@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_cmnornaments.h"
+#include "atts_externalsymbols.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -27,7 +28,8 @@ class Mordent : public ControlElement,
                 public AttColor,
                 public AttOrnamentAccid,
                 public AttPlacement,
-                public AttMordentLog {
+                public AttMordentLog,
+                public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -48,6 +50,11 @@ public:
     ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
+
+     /**
+     * Get the SMuFL glyph for the mordent based on type, long attribute or glyph.name
+     */
+    wchar_t GetMordentGlyph() const;
 
     //----------//
     // Functors //

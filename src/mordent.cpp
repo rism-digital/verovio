@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "horizontalaligner.h"
+#include "smufl.h"
 
 namespace vrv {
 
@@ -29,6 +30,7 @@ Mordent::Mordent()
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
     RegisterAttClass(ATT_MORDENTLOG);
+    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -43,6 +45,21 @@ void Mordent::Reset()
     ResetOrnamentAccid();
     ResetPlacement();
     ResetMordentLog();
+    ResetExtSym();
+}
+
+wchar_t Mordent::GetMordentGlyph() const 
+{
+    if (!HasGlyphName()) {
+        if (GetLong() == BOOLEAN_true) {
+            // TODO: change FALSE condition glyph, it's supposed to be inverted long mordent/tremblement
+            return GetForm() == mordentLog_FORM_upper ? SMUFL_E56E_ornamentTremblement : SMUFL_E56E_ornamentTremblement;
+        }
+        return GetForm() == mordentLog_FORM_upper ? SMUFL_E56C_ornamentMordent : SMUFL_E56D_ornamentMordentInverted;
+    }
+
+    // TODO: handle glyph.name value and return glyphs based on it
+    return SMUFL_E56D_ornamentMordentInverted;
 }
 
 //----------------------------------------------------------------------------
