@@ -48,18 +48,26 @@ void Mordent::Reset()
     ResetExtSym();
 }
 
-wchar_t Mordent::GetMordentGlyph() const 
+wchar_t Mordent::GetMordentGlyph() const
 {
     if (!HasGlyphName()) {
-        if (GetLong() == BOOLEAN_true) {
-            // TODO: change FALSE condition glyph, it's supposed to be inverted long mordent/tremblement
-            return GetForm() == mordentLog_FORM_upper ? SMUFL_E56E_ornamentTremblement : SMUFL_E56E_ornamentTremblement;
-        }
-        return GetForm() == mordentLog_FORM_upper ? SMUFL_E56C_ornamentMordent : SMUFL_E56D_ornamentMordentInverted;
+        // TODO: change FALSE condition glyph, it's supposed to be inverted long mordent/tremblement
+        return GetMordentGlyph({ SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
+            SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted });
     }
 
     // TODO: handle glyph.name value and return glyphs based on it
     return SMUFL_E56D_ornamentMordentInverted;
+}
+
+wchar_t Mordent::GetMordentGlyph(std::vector<wchar_t> glyphs) const
+{
+    // order of glyphs in the vector is as following:
+    // [0] long, [1] long inverted, [2] short, [3] short inverted
+    if (GetLong() == BOOLEAN_true) {
+        return GetForm() == mordentLog_FORM_upper ? glyphs[0] : glyphs[1];
+    }
+    return GetForm() == mordentLog_FORM_upper ? glyphs[2] : glyphs[3];
 }
 
 //----------------------------------------------------------------------------
