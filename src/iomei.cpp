@@ -4160,6 +4160,7 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     vrvMordent->ReadOrnamentAccid(mordent);
     vrvMordent->ReadPlacement(mordent);
     vrvMordent->ReadMordentLog(mordent);
+    vrvMordent->ReadExtSym(mordent);
 
     parent->AddChild(vrvMordent);
     ReadUnsupportedAttr(mordent, vrvMordent);

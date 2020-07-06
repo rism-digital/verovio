@@ -56,7 +56,12 @@ wchar_t Mordent::GetMordentGlyph() const
             SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted });
     }
 
-    // TODO: handle glyph.name value and return glyphs based on it
+    // TODO: handle glyph.name value and return glyphs based on it. E.g.
+    /*if (GetGlyphName() == "approach_above") {
+        return GetMordentGlyph({ SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
+            SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted });
+    }*/
+    
     return SMUFL_E56D_ornamentMordentInverted;
 }
 
