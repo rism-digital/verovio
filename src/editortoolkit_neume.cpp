@@ -2047,7 +2047,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
-                if (nc->HasLigated()) continue;
+                if (nc->HasLigated() && (nc->GetLigated() == BOOLEAN_true)) nc->SetLigated(BOOLEAN_false);
             }
 
             // if the element is a syl then we want to keep it attached to the first node
