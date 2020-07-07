@@ -571,7 +571,17 @@ int System::AlignSystems(FunctorParams *functorParams)
 
     assert(m_systemAligner.GetBottomAlignment());
 
-    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel() - params->m_systemMargin;
+    int systemMargin = params->m_systemMargin;
+    if (params->m_doc->GetOptions()->m_justifyVertically.GetValue()) {
+        assert(GetParent());
+        // Check if we are on the last system: last system should stick to the footer.
+        // No margin required.
+        if (this->GetIdx() == GetParent()->GetChildCount() - 1) {
+            systemMargin = 0;
+        }
+    }
+
+    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel() - systemMargin;
     params->m_justifiableSystems++;
     // -1 because of the bottom aligner
     params->m_justifiableStaves += m_systemAligner.GetChildCount() - 1;
