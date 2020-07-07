@@ -55,7 +55,7 @@ wchar_t Mordent::GetMordentGlyph() const
         { "default",
             { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
               SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
-        { "appproach_above", 
+        { "approach_above", 
             { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
               SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
         { "approach_below",
