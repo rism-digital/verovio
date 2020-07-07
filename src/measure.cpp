@@ -935,6 +935,13 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
             params->m_shift = this->m_drawingXRel;
+            for (Object *oneOfPendingObjects : params->m_pendingObjects) {
+                if (oneOfPendingObjects->Is(MEASURE)) {
+                    Measure *firstPendingMesure = dynamic_cast<Measure *>(oneOfPendingObjects);
+                    assert(firstPendingMesure);
+                    params->m_shift = firstPendingMesure->m_drawingXRel;
+                }
+            }
         }
     }
 
