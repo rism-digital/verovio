@@ -64,7 +64,7 @@ protected:
     /**
     * Overload funciton to get correct glyph based on the combination of the attributes
     */
-    wchar_t GetMordentGlyph(std::vector<wchar_t> glyphs) const;
+    wchar_t GetMordentGlyph(std::vector<wchar_t>& glyphs) const;
     //
 private:
     //

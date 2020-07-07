@@ -50,22 +50,33 @@ void Mordent::Reset()
 
 wchar_t Mordent::GetMordentGlyph() const
 {
-    if (!HasGlyphName()) {
-        // TODO: change FALSE condition glyph, it's supposed to be inverted long mordent/tremblement
-        return GetMordentGlyph({ SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
-            SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted });
+    // order of glyphs in the map: [0] long, [1] long inverted, [2] short, [3] short inverted
+    static std::map<std::string, std::vector<wchar_t> > mordentGlyphs = { 
+        { "default",
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+        /*{ "appproach_above", 
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+        { "approach_below",
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+        { "depart_above",
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+        { "depart_below",
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } }*/
+        };
+    // If there's no glyph.name, get default category which encompases 4 simple glyphs:
+    //   mordent, inverted mordent and their long counterparts
+    std::string glyphName = HasGlyphName() ? GetGlyphName()  : "default";
+    if (mordentGlyphs.end() != mordentGlyphs.find(glyphName)) {
+        return GetMordentGlyph(mordentGlyphs[glyphName]);
     }
-
-    // TODO: handle glyph.name value and return glyphs based on it. E.g.
-    /*if (GetGlyphName() == "approach_above") {
-        return GetMordentGlyph({ SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
-            SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted });
-    }*/
-    
+    // If glyph.name is not in the map, then we can either process it further here or return default glyph
+    if (glyphName == "schleifer") {
+        return SMUFL_E56D_ornamentMordentInverted; // TODO: should be schleifer glyph here
+    }
     return SMUFL_E56D_ornamentMordentInverted;
 }
 
-wchar_t Mordent::GetMordentGlyph(std::vector<wchar_t> glyphs) const
+wchar_t Mordent::GetMordentGlyph(std::vector<wchar_t>& glyphs) const
 {
     // order of glyphs in the vector is as following:
     // [0] long, [1] long inverted, [2] short, [3] short inverted
