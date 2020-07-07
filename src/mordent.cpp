@@ -53,15 +53,20 @@ wchar_t Mordent::GetMordentGlyph() const
     // order of glyphs in the map: [0] long, [1] long inverted, [2] short, [3] short inverted
     static std::map<std::string, std::vector<wchar_t> > mordentGlyphs = { 
         { "default",
-            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
-        /*{ "appproach_above", 
-            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
+              SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+        { "appproach_above", 
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement,
+              SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
         { "approach_below",
-            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, 
+              SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
         { "depart_above",
-            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, 
+              SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } },
         { "depart_below",
-            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } }*/
+            { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, 
+              SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } }
         };
     // If there's no glyph.name, get default category which encompases 4 simple glyphs:
     //   mordent, inverted mordent and their long counterparts

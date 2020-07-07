@@ -2851,6 +2851,28 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!std::strncmp(xmlMordent.node().name(), "inverted", 7)) {
             mordent->SetForm(mordentLog_FORM_upper);
         }
+        if (xmlMordent.node().attribute("approach")) {
+            mordent->SetExternalsymbols(
+                mordent, "glyph.name", std::string("approach_") + xmlMordent.node().attribute("approach").as_string());
+        }
+        else if (xmlMordent.node().attribute("depart")) {
+            mordent->SetExternalsymbols(
+                mordent, "glyph.name", std::string("depart_") + xmlMordent.node().attribute("depart").as_string());
+        }
+    }
+
+    // schleifer (counts as mordent with different glyph)
+    pugi::xpath_node xmlSchleifer = notations.node().select_node("ornaments/*[contains(name(), 'schleifer')]");
+    if (xmlSchleifer) {
+        Mordent *mordent = new Mordent();
+        m_controlElements.push_back(std::make_pair(measureNum, mordent));
+        mordent->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        mordent->SetStartid(m_ID);
+        // color
+        mordent->SetColor(xmlSchleifer.node().attribute("color").as_string());
+        // place
+        mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlSchleifer.node().attribute("placement").as_string()));
+        mordent->SetExternalsymbols(mordent, "glyph.name", "schleifer");
     }
 
     // trill
