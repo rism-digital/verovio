@@ -940,6 +940,8 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
                     Measure *firstPendingMesure = dynamic_cast<Measure *>(oneOfPendingObjects);
                     assert(firstPendingMesure);
                     params->m_shift = firstPendingMesure->m_drawingXRel;
+                    // it has to be first measure
+                    break;
                 }
             }
         }
