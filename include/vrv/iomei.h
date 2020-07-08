@@ -554,7 +554,7 @@ private:
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
-    bool ReadFing(Object *parent, pugi::xml_node breath);
+    bool ReadFing(Object *parent, pugi::xml_node fing);
     bool ReadGliss(Object *parent, pugi::xml_node gliss);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
