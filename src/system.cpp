@@ -717,6 +717,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     params->m_classId = FERMATA;
     m_systemAligner.Process(params->m_functor, params);
 
+    params->m_classId = FING;
+    m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
 

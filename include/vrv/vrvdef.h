@@ -144,6 +144,7 @@ enum ClassId {
     DIR,
     DYNAM,
     FERMATA,
+    FING,
     GLISS,
     HAIRPIN,
     HARM,

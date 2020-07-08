@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "fermata.h"
+#include "fing.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "mordent.h"
@@ -181,6 +182,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(fermata);
         // fermata above by default
         m_place = (fermata->GetPlace() != STAFFREL_NONE) ? fermata->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(FING)) {
+        Fing *fing = dynamic_cast<Fing *>(object);
+        assert(fing);
+        // fing above by default
+        m_place = (fing->GetPlace() != STAFFREL_NONE) ? fing->GetPlace() : STAFFREL_above;
     }
     else if (object->Is(HAIRPIN)) {
         Hairpin *hairpin = dynamic_cast<Hairpin *>(object);

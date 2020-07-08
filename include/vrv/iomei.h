@@ -55,6 +55,7 @@ class Expansion;
 class F;
 class Fb;
 class Fig;
+class Fing;
 class Fermata;
 class FloatingElement;
 class FTrem;
@@ -298,6 +299,7 @@ private:
     void WriteDir(pugi::xml_node currentNode, Dir *dir);
     void WriteDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
+    void WriteFing(pugi::xml_node currentNode, Fing *fing);
     void WriteGliss(pugi::xml_node currentNode, Gliss *gliss);
     void WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteHarm(pugi::xml_node currentNode, Harm *harm);
@@ -552,6 +554,7 @@ private:
     bool ReadDir(Object *parent, pugi::xml_node dir);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
+    bool ReadFing(Object *parent, pugi::xml_node fing);
     bool ReadGliss(Object *parent, pugi::xml_node gliss);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
