@@ -2853,11 +2853,11 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
         if (xmlMordent.node().attribute("approach")) {
             mordent->SetExternalsymbols(
-                mordent, "glyph.name", std::string("approach_") + xmlMordent.node().attribute("approach").as_string());
+                mordent, "glyph.name", std::string("ornamentPrecomposedApproach_") + xmlMordent.node().attribute("approach").as_string());
         }
         else if (xmlMordent.node().attribute("depart")) {
             mordent->SetExternalsymbols(
-                mordent, "glyph.name", std::string("depart_") + xmlMordent.node().attribute("depart").as_string());
+                mordent, "glyph.name", std::string("ornamentPrecomposedDepart_") + xmlMordent.node().attribute("depart").as_string());
         }
     }
 
