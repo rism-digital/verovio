@@ -81,7 +81,7 @@ wchar_t Mordent::GetMordentGlyph() const
         return GetMordentGlyph(mordentGlyphs[glyphName]);
     }
     // If glyph.name is not in the map, then we can either process it further here or return default glyph
-    if (glyphName == "schleifer") {
+    if (glyphName == "ornamentPrecomposedSchleifer") {
         return SMUFL_E56D_ornamentMordentInverted; // TODO: should be schleifer glyph here
     }
     return SMUFL_E56D_ornamentMordentInverted;
