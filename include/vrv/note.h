@@ -176,6 +176,11 @@ public:
     wchar_t GetMensuralSmuflNoteHead();
 
     /**
+     * Return a SMuFL code for the notehead
+     */
+    wchar_t GetNoteheadGlyph() const;
+
+    /**
      * Check if a note or its parent chord are visible
      */
     bool IsVisible();

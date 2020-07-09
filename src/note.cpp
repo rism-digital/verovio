@@ -254,7 +254,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = SMUFL_E0A4_noteheadBlack;
+    wchar_t code = GetNoteheadGlyph();
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
@@ -293,7 +293,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     Point p(defaultXShift, -defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = SMUFL_E0A4_noteheadBlack;
+    wchar_t code = GetNoteheadGlyph();
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
@@ -396,6 +396,29 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         }
     }
     return code;
+}
+
+wchar_t Note::GetNoteheadGlyph() const 
+{
+    switch (GetHeadShape()) {
+        case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
+        case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
+        case HEADSHAPE_whole: return SMUFL_E0A2_noteheadWhole;
+        //case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
+        //case HEADSHAPE_circle: return SMUFL_noteheadCircle;
+        //case HEADSHAPE_plus: return SMUFL_noteheadPlus;
+        //case HEADSHAPE_diamond: return SMUFL_noteheadDiamond;
+        //case HEADSHAPE_isotriangle: return SMUFL_noteheadIsoTriangle;
+        //case HEADSHAPE_oval: return SMUFL_noteheadOval;
+        //case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedgel
+        //case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
+        //case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
+        //case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
+        //case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
+        //case HEADSHAPE_square: return SMUFL_noteheadSquare;
+        //case HEADSHAPE_x: return SMUFL_noteheadX;
+        default: return SMUFL_E0A4_noteheadBlack;
+    }
 }
 
 bool Note::IsVisible()

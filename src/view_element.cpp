@@ -1364,7 +1364,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                     fontNo = SMUFL_E0A3_noteheadHalf;
                 }
                 else {
-                    fontNo = SMUFL_E0A4_noteheadBlack;
+                    fontNo = note->GetNoteheadGlyph();
                 }
             }
 
