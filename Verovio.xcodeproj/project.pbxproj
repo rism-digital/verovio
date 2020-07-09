@@ -10,6 +10,11 @@
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
+		35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; };
+		35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */ = {isa = PBXBuildFile; fileRef = 35FDEBCD24B6DBC100AC1696 /* fing.h */; };
+		35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
+		35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
+		35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 35FDEBD024B6DC5B00AC1696 /* fing.cpp */; };
 		36E0442C2347A9150054F141 /* expansionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E0442B2347A9150054F141 /* expansionmap.cpp */; };
 		36E0442E2347A9290054F141 /* expansionmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E0442D2347A9290054F141 /* expansionmap.h */; };
 		400FEDD3206FA743000D3233 /* gracegrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400FEDD2206FA743000D3233 /* gracegrp.cpp */; };
@@ -1182,6 +1187,8 @@
 		1579B3421B15033100B16F5C /* proport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = proport.cpp; path = src/proport.cpp; sourceTree = "<group>"; };
 		2D2A79991A69812C000A441B /* chord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chord.cpp; path = src/chord.cpp; sourceTree = "<group>"; };
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
+		35FDEBCD24B6DBC100AC1696 /* fing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fing.h; path = include/vrv/fing.h; sourceTree = "<group>"; };
+		35FDEBD024B6DC5B00AC1696 /* fing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fing.cpp; path = src/fing.cpp; sourceTree = "<group>"; };
 		36E0442B2347A9150054F141 /* expansionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansionmap.cpp; path = src/expansionmap.cpp; sourceTree = "<group>"; };
 		36E0442D2347A9290054F141 /* expansionmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansionmap.h; path = include/vrv/expansionmap.h; sourceTree = "<group>"; };
 		400FEDD1206FA742000D3233 /* gracegrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gracegrp.h; path = include/vrv/gracegrp.h; sourceTree = "<group>"; };
@@ -1943,6 +1950,8 @@
 				40F910061E2799640081B7BB /* trill.h */,
 				40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */,
 				40D0D5E11E3BD7FE00E6BF5C /* turn.h */,
+				35FDEBCD24B6DBC100AC1696 /* fing.h */,
+				35FDEBD024B6DC5B00AC1696 /* fing.cpp */,
 			);
 			name = controlelements;
 			sourceTree = "<group>";
@@ -2274,6 +2283,7 @@
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
 				4D4335CF1ED421D2003BE1A9 /* atts_analytical.h in Headers */,
 				4DB3D8AA1F83D02A00B5FC2B /* atts_cmn.h in Headers */,
+				35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */,
 				4DEC4DDB21C8295700D1D273 /* sic.h in Headers */,
 				4DB3D8D41F83D12600B5FC2B /* pedal.h in Headers */,
 				4DB3D8BA1F83D0CA00B5FC2B /* boundary.h in Headers */,
@@ -2594,6 +2604,7 @@
 				BB4C4AAA22A932A0001F6AF0 /* devicecontextbase.h in Headers */,
 				BB4C4A9B22A9328F001F6AF0 /* object.h in Headers */,
 				BB4C4A9E22A9328F001F6AF0 /* smufl.h in Headers */,
+				35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */,
 				BB4C4A6722A9321F001F6AF0 /* atts_critapp.h in Headers */,
 				BB4C4B3E22A932D7001F6AF0 /* artic.h in Headers */,
 				4DA0EABE22BB772C00A7EBEB /* atts_neumes.h in Headers */,
@@ -2998,6 +3009,7 @@
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
+				35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
@@ -3177,6 +3189,7 @@
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D4C26EF1EF7E75400681770 /* label.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
+				35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */,
 				403B0511244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				4D6122C01F77E1E000FC90A0 /* rend.cpp in Sources */,
@@ -3373,6 +3386,7 @@
 				BB4C4BB522A932EB001F6AF0 /* view_tuplet.cpp in Sources */,
 				BB4C4B2122A932CF001F6AF0 /* dir.cpp in Sources */,
 				BB4C4BAF22A932EB001F6AF0 /* view_mensural.cpp in Sources */,
+				35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */,
 				403B0512244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				BB4C4B5D22A932D7001F6AF0 /* metersig.cpp in Sources */,
 				BB4C4BB622A932F6001F6AF0 /* jsonxx.cc in Sources */,
