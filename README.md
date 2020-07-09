@@ -38,7 +38,7 @@ Major releases of Verovio and MEI versions:
 * Verovio 2.x.x ⇔ MEI 4.0
 * Verovio 3.x.x ⇔ Development of MEI since 4.0
 
-From Version 2.x.x, the plan is to have even version numbers for Verovio releases using a stable version of MEI, and odd version numbers for releases using a development version of MEI. Which means that once MEI 5.0 is released, Verovio will move to version 4.x.x. Older version of MEI are still supported by newer version of Verovio. This means that MEI files are internally upgraded when loaded into Verovio. We will try to maintain this.
+From Verovio 2.x.x, the plan is to have even version numbers for Verovio releases using a stable version of MEI, and odd version numbers for releases using a development version of MEI. It means that once MEI 5.0 will be released, Verovio will move to version 4.x.x. Older versions of MEI are still supported by newer versions of Verovio. MEI files are internally upgraded when loaded into Verovio. This applies only to the features supported by Verovio. We will try to maintain this in the future.
 
 Contributing
 ------------
