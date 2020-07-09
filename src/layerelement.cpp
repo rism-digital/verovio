@@ -456,15 +456,18 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
     if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
     wchar_t code = 0;
-
     int dur = DUR_4;
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
     if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
         if (note->IsMensuralDur() && !isInLigature) {
-            code = note->GetMensuralSmuflNoteHead();
+            return doc->GetGlyphWidth(note->GetMensuralSmuflNoteHead(), 
+                staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
         }
+        code = note->GetNoteheadGlyph();
     }
     else if (this->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(this);
@@ -472,13 +475,8 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         dur = chord->GetActualDur();
     }
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
     // Mensural note shorter than DUR_BR
-    if (code) {
-        return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
-    }
-    else if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
+    if ((dur <= DUR_BR) || ((dur == DUR_1) && isInLigature)) {
         int widthFactor = (dur == DUR_MX) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.7;
@@ -487,15 +485,9 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
         }
     }
-    else if (dur == DUR_1) {
-        return doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
-    }
-    else if (dur == DUR_2) {
-        return doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
-    }
-    else {
-        return doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
-    }
+
+    if ((dur == DUR_1) || (dur == DUR_2)) code = (dur == DUR_1) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
+    return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
 double LayerElement::GetAlignmentDuration(

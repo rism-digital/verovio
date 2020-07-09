@@ -407,14 +407,15 @@ wchar_t Note::GetNoteheadGlyph() const
         //case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
         //case HEADSHAPE_circle: return SMUFL_noteheadCircle;
         //case HEADSHAPE_plus: return SMUFL_noteheadPlus;
-        //case HEADSHAPE_diamond: return SMUFL_noteheadDiamond;
+        //case HEADSHAPE_diamond: return GetHeadFill() == FILL_void ? SMUFL_noteheadDiamondEmpty 
+        //                                                          : SMUFL_noteheadDiamondFilled;
         //case HEADSHAPE_isotriangle: return SMUFL_noteheadIsoTriangle;
         //case HEADSHAPE_oval: return SMUFL_noteheadOval;
         //case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedgel
         //case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
         //case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         //case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
-        //case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
+        case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
         //case HEADSHAPE_square: return SMUFL_noteheadSquare;
         //case HEADSHAPE_x: return SMUFL_noteheadX;
         default: return SMUFL_E0A4_noteheadBlack;
