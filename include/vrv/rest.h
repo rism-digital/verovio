@@ -113,9 +113,9 @@ public:
 
 private:
 
-    TransPitch GetTransPitch();
+    TransPitch GetTransLoc();
 
-    void UpdateFromTransPitch(const TransPitch &tp);
+    void UpdateFromTransLoc(const TransPitch &tp);
 
 public:
     //

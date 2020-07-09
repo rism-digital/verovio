@@ -124,14 +124,13 @@ int Rest::GetRestLocOffset(int loc)
     return loc;
 }
 
-TransPitch Rest::GetTransPitch()
+TransPitch Rest::GetTransLoc()
 {
     int ploc = this->GetPloc() - PITCHNAME_c;
-    LogWarning("pLoc=%d; oLoc=%d", this->GetPloc(), this->GetOloc());
     return TransPitch(ploc, 0, this->GetOloc());
 }
 
-void Rest::UpdateFromTransPitch(const TransPitch &tp)
+void Rest::UpdateFromTransLoc(const TransPitch &tp)
 {
     if (this->HasOloc() && this->HasPloc()) {
         this->SetPloc(tp.GetPitchName());
@@ -268,13 +267,13 @@ int Rest::Transpose(FunctorParams *functorParams)
     TransposeParams *params = dynamic_cast<TransposeParams *>(functorParams);
     assert(params);
 
-    if (!this->HasOloc() || !this->HasPloc()) return FUNCTOR_SIBLINGS;
+    // if (!this->HasOloc() || !this->HasPloc()) return FUNCTOR_SIBLINGS;
 
     LogDebug("relocating rest");
 
-    TransPitch pitch = this->GetTransPitch();
-    params->m_transposer->Transpose(pitch);
-    this->UpdateFromTransPitch(pitch);
+    TransPitch restLoc = this->GetTransLoc();
+    params->m_transposer->Transpose(restLoc);
+    this->UpdateFromTransLoc(restLoc);
 
     return FUNCTOR_SIBLINGS;
 }
