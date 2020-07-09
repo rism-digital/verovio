@@ -68,6 +68,12 @@ wchar_t Mordent::GetMordentGlyph() const
             { SMUFL_E56E_ornamentTremblement, SMUFL_E56E_ornamentTremblement, 
               SMUFL_E56C_ornamentMordent, SMUFL_E56D_ornamentMordentInverted } }
         };
+    // If there is glyph.num, prioritize it, otherwise check glyph.name
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
     // If there's no glyph.name, get default category which encompases 4 simple glyphs:
     //   mordent, inverted mordent and their long counterparts
     std::string glyphName = HasGlyphName() ? GetGlyphName()  : "default";
