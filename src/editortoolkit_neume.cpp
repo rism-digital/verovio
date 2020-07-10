@@ -794,6 +794,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 else {
                     LogError("Unsupported character in contour.");
+                    delete newNc;
+                    delete newZone;
                     m_infoObject.import("status", "FAILURE");
                     m_infoObject.import("message", "Unsupported character in contour.");
                     return false;
@@ -2243,6 +2245,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         }
         else {
             LogError("Unsupported character in contour.");
+            delete newNc;
+            delete zone;
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Unsupported character in contour.");
             return false;
@@ -2336,6 +2340,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     }
     else {
         LogError("isLigature is invalid!");
+        delete zone;
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "isLigature value '" + isLigature + "' is invalid.");
         return false;
