@@ -1369,7 +1369,33 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             }
 
             dc->StartCustomGraphic("notehead");
+
             DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+
+            // handle notehead enclosure
+            if (note->HasHeadMod()) {
+                switch (note->GetHeadMod()) {
+                    case NOTEHEADMODIFIER_paren: {
+                        DrawSmuflCode(dc, noteX - note->GetDrawingRadius(m_doc), noteY, 
+                            SMUFL_E26A_accidentalParensLeft, staff->m_drawingStaffSize, drawingCueSize, true);
+                        DrawSmuflCode(dc, noteX + note->GetDrawingRadius(m_doc) * 2, noteY,
+                            SMUFL_E26B_accidentalParensRight, staff->m_drawingStaffSize, drawingCueSize, true);
+                        break;
+                    }
+                    case NOTEHEADMODIFIER_slash:
+                    case NOTEHEADMODIFIER_backslash:
+                    case NOTEHEADMODIFIER_vline: 
+                    case NOTEHEADMODIFIER_hline: {
+                        // TODO: Handle other headmodifiers whenever they become available
+                        //wchar_t glyphCode = note->GetNoteheadModifierGlyph();
+                        //int offset = (m_doc->GetGlyphWidth - note->GetDrawingRadius(m_doc) * 2) / 2;
+                        //DrawSmuflCode(dc, noteX - offset, noteY, glyphCode, staff->m_drawingStaffSize, drawingCueSize, true);
+                        break;
+                    }
+                    default: break;
+                }
+            }
+
             dc->EndCustomGraphic();
         }
     }
