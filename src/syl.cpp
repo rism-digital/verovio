@@ -195,7 +195,6 @@ int Syl::ResetDrawing(FunctorParams *functorParams)
 
 bool Syl::CreateDefaultZone(Doc *doc)
 {
-    Zone *zone = new Zone();
     const int offsetUly = 100;
     const int offsetLrx = 100;
     const int offsetLry = 200;
@@ -204,6 +203,8 @@ bool Syl::CreateDefaultZone(Doc *doc)
     if (syllable == NULL) { // Only do this for neume notation
         return false;
     }
+
+    Zone *zone = new Zone();
 
     if (syllable->HasFacs()) {
         Zone *tempZone = syllable->GetZone();
