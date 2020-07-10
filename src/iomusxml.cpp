@@ -2317,6 +2317,33 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_elementStackMap.at(layer).push_back(beam);
     }
 
+    // tuplet start
+    // For now tuplet with beam if starting at the same time. However, this will
+    // quite likely not work if we have a tuplet over serveral beams. We would need to check which
+    // one is ending first in order to determine which one is on top of the hierarchy.
+    // Also, it is not 100% sure that we can represent them as tuplet and beam elements.
+    pugi::xpath_node tupletStart = notations.node().select_node("tuplet[@type='start']");
+    if (tupletStart && !isChord) {
+        Tuplet *tuplet = new Tuplet();
+        AddLayerElement(layer, tuplet);
+        m_elementStackMap.at(layer).push_back(tuplet);
+        int num = node.select_node("time-modification/actual-notes").node().text().as_int();
+        int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
+        if (tupletStart.node().first_child()) {
+            num = tupletStart.node().select_node("tuplet-actual/tuplet-number").node().text().as_int();
+            numbase = tupletStart.node().select_node("tuplet-normal/tuplet-number").node().text().as_int();
+        }
+        if (num) tuplet->SetNum(num);
+        if (numbase) tuplet->SetNumbase(numbase);
+        tuplet->SetNumPlace(
+            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
+        tuplet->SetBracketPlace(
+            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
+        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
+        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
+        tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
+    }
+
     // tremolos
     pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = 0;
@@ -2343,33 +2370,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             tremSlashNum = tremolo.node().text().as_int();
             // if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) bTrem->SetForm(bTremLog_FORM_unmeas);
         }
-    }
-
-    // tuplet start
-    // For now tuplet with beam if starting at the same time. However, this will
-    // quite likely not work if we have a tuplet over serveral beams. We would need to check which
-    // one is ending first in order to determine which one is on top of the hierarchy.
-    // Also, it is not 100% sure that we can represent them as tuplet and beam elements.
-    pugi::xpath_node tupletStart = notations.node().select_node("tuplet[@type='start']");
-    if (tupletStart && !isChord) {
-        Tuplet *tuplet = new Tuplet();
-        AddLayerElement(layer, tuplet);
-        m_elementStackMap.at(layer).push_back(tuplet);
-        int num = node.select_node("time-modification/actual-notes").node().text().as_int();
-        int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
-        if (tupletStart.node().first_child()) {
-            num = tupletStart.node().select_node("tuplet-actual/tuplet-number").node().text().as_int();
-            numbase = tupletStart.node().select_node("tuplet-normal/tuplet-number").node().text().as_int();
-        }
-        if (num) tuplet->SetNum(num);
-        if (numbase) tuplet->SetNumbase(numbase);
-        tuplet->SetNumPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetBracketPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
-        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
-        tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
     }
 
     std::string noteID = node.attribute("id").as_string();
