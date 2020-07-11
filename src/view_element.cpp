@@ -1338,20 +1338,18 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     bool drawingCueSize = note->GetDrawingCueSize();
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
-    int drawingDur;
-    wchar_t fontNo;
-
-    drawingDur = note->GetDrawingDur();
-    drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
         /************** Noteheads: **************/
+        int drawingDur = note->GetDrawingDur();
+        drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
         if (drawingDur < DUR_1) {
             DrawMaximaToBrevis(dc, noteY, element, layer, staff);
         }
         else {
             // Whole notes
+            wchar_t fontNo;
             if (drawingDur == DUR_1) {
                 if (note->GetColored() == BOOLEAN_true) {
                     fontNo = SMUFL_E0FA_noteheadWholeFilled;
