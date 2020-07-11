@@ -5023,9 +5023,9 @@ void HumdrumInput::checkForOmd(int startline, int endline)
     if (m_omd > infile[startline].getDurationFromStart()) {
         return;
     }
-    if (m_omd < 0) {
-        startline = 0;
-    }
+    // if (m_omd < 0) {
+    //    startline = 0;
+    //}
 
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     if (staffstarts.size() == 0) {
@@ -5033,24 +5033,43 @@ void HumdrumInput::checkForOmd(int startline, int endline)
     }
     std::string key;
     std::string value;
+    int index = -1;
     for (int i = startline; i <= endline; ++i) {
         if (infile[i].isData()) {
             break;
+        }
+        if (infile[i].isBarline()) {
+            hum::HumRegex hre;
+            hum::HTp token = infile[i].token(0);
+            int number = -1;
+            if (hre.search(token, "=(\\d+)")) {
+                number = hre.getMatchInt(1);
+            }
+            if ((!value.empty()) && (number > 1)) {
+                // don't print initial OMD if a musical excerpt.
+                return;
+            }
         }
         if (!infile[i].isReference()) {
             continue;
         }
         key = infile[i].getReferenceKey();
         if (key == "OMD") {
+            index = i;
             value = infile[i].getReferenceValue();
-            Tempo *tempo = new Tempo;
-            setLocationId(tempo, infile.token(i, 0));
-            m_measure->AddChildBack(tempo);
-            setTempoContent(tempo, value);
-            tempo->SetTstamp(1.0);
-            setStaff(tempo, 1);
-            m_omd = infile[i].getDurationFromStart();
         }
+    }
+
+    if (!value.empty()) {
+        Tempo *tempo = new Tempo;
+        if (index >= 0) {
+            setLocationId(tempo, infile.token(index, 0));
+        }
+        m_measure->AddChildBack(tempo);
+        setTempoContent(tempo, value);
+        tempo->SetTstamp(1.0);
+        setStaff(tempo, 1);
+        m_omd = infile[index].getDurationFromStart();
     }
 }
 
