@@ -9761,6 +9761,7 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 {
     hum::HumRegex hre;
     if (!hre.search(text, "(.*)\\[([^=\\]]*)\\]\\s*=\\s*(\\d+.*)")) {
+        addTextElement(tempo, text);
         return false;
     }
     std::string first = hre.getMatch(1);
