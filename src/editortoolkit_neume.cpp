@@ -2151,7 +2151,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         std::stable_sort(syllablesVector.begin(), syllablesVector.end(), Object::sortByUlx);
         for (auto it = syllablesVector.begin(); it != syllablesVector.end(); ++it) {
             currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
-            if (currentClef == NULL) {
+            if (currentClef == NULL && sparent != NULL) {
                 currentClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
             }
             if (currentClef != oldClef) {
