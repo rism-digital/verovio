@@ -3861,6 +3861,11 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "arpeg") {
             success = ReadArpeg(parent, current);
         }
+        else if (std::string(current.name()) == "beamSpan") {
+            if (!ReadBeamSpanAsBeam(dynamic_cast<Measure *>(parent), current)) {
+                LogWarning("<beamSpan> is not readable as <beam> and will be ignored");
+            }
+        }
         else if (std::string(current.name()) == "bracketSpan") {
             success = ReadBracketSpan(parent, current);
         }
@@ -5926,6 +5931,83 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     }
 }
 
+bool MEIInput::ReadBeamSpanAsBeam(Measure *measure, pugi::xml_node beamSpan)
+{
+    if (!measure) {
+        LogWarning("Cannot read <beamSpan> within editorial markup");
+        return false;
+    }
+
+    Beam *beam = new Beam();
+    SetMeiUuid(beamSpan, beam);
+
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+
+    // att.labelled
+    if (beamSpan.attribute("label")) {
+        beam->SetLabel(beamSpan.attribute("label").value());
+    }
+
+    // att.typed
+    if (beamSpan.attribute("type")) {
+        beam->SetType(beamSpan.attribute("type").value());
+    }
+    else {
+        beam->SetType("beamSpan");
+    }
+
+    // att.beam.vis
+    if (beamSpan.attribute("color")) {
+        beam->SetColor(beamSpan.attribute("color").value());
+    }
+
+    // position (pitch)
+    if (beamSpan.attribute("startid")) {
+        std::string refId = ExtractUuidFragment(beamSpan.attribute("startid").value());
+        start = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
+        if (!start) {
+            LogWarning("Element with @startid '%s' not found when trying to read the <beamSpan>", refId.c_str());
+        }
+    }
+    if (beamSpan.attribute("endid")) {
+        std::string refId = ExtractUuidFragment(beamSpan.attribute("endid").value());
+        end = dynamic_cast<LayerElement *>(measure->FindDescendantByUuid(refId));
+        if (!end) {
+            LogWarning("Element with @endid '%s' not found when trying to read the <beamSpan>", refId.c_str());
+        }
+    }
+    if (!start || !end) {
+        delete beam;
+        return false;
+    }
+
+    LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastAncestorNot(LAYER));
+    LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastAncestorNot(LAYER));
+
+    if (!startChild || !endChild || (startChild->GetParent() != endChild->GetParent())) {
+        LogWarning("Start and end elements for <beamSpan> '%s' not in the same layer", beam->GetUuid().c_str());
+        delete beam;
+        return false;
+    }
+
+    Layer *parentLayer = dynamic_cast<Layer *>(startChild->GetParent());
+    assert(parentLayer);
+
+    int startIdx = startChild->GetIdx();
+    int endIdx = endChild->GetIdx();
+    // LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
+    int i;
+    for (i = endIdx; i >= startIdx; i--) {
+        LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
+        if (element) beam->AddChild(element);
+    }
+    beam->SetParent(parentLayer);
+    parentLayer->InsertChild(beam, startIdx);
+
+    return true;
+}
+
 bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)
 {
     if (!measure) {
@@ -5941,29 +6023,45 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     AttConverter converter;
 
-    // label
+    // att.labelled
     if (tupletSpan.attribute("label")) {
         tuplet->SetLabel(tupletSpan.attribute("label").value());
     }
 
-    // Read in the numerator and denominator properties
+    // att.typed
+    if (tupletSpan.attribute("type")) {
+        tuplet->SetType(tupletSpan.attribute("type").value());
+    }
+    else {
+        tuplet->SetType("tupletSpan");
+    }
+
+    // att.duration.ratio
     if (tupletSpan.attribute("num")) {
         tuplet->SetNum(atoi(tupletSpan.attribute("num").value()));
     }
     if (tupletSpan.attribute("numbase")) {
         tuplet->SetNumbase(atoi(tupletSpan.attribute("numbase").value()));
     }
-    if (tupletSpan.attribute("num.visible")) {
-        tuplet->SetNumVisible(converter.StrToBoolean(tupletSpan.attribute("num.visible").value()));
-    }
-    if (tupletSpan.attribute("num.place")) {
-        tuplet->SetNumPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("num.place").value()));
+
+    // att.tuplet.vis
+    if (tupletSpan.attribute("bracket.place")) {
+        tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
     }
     if (tupletSpan.attribute("bracket.visible")) {
         tuplet->SetBracketVisible(converter.StrToBoolean(tupletSpan.attribute("bracket.visible").value()));
     }
-    if (tupletSpan.attribute("bracket.place")) {
-        tuplet->SetBracketPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("bracket.place").value()));
+    if (tupletSpan.attribute("num.format")) {
+        tuplet->SetNumFormat(converter.StrToTupletVisNumformat(tupletSpan.attribute("num.format").value()));
+    }
+    if (tupletSpan.attribute("color")) {
+        tuplet->SetColor(tupletSpan.attribute("color").value());
+    }
+    if (tupletSpan.attribute("num.place")) {
+        tuplet->SetNumPlace(converter.StrToStaffrelBasic(tupletSpan.attribute("num.place").value()));
+    }
+    if (tupletSpan.attribute("num.visible")) {
+        tuplet->SetNumVisible(converter.StrToBoolean(tupletSpan.attribute("num.visible").value()));
     }
 
     // position (pitch)
