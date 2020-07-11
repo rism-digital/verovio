@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul  5 00:11:52 PDT 2020
+// Last Modified: Fri Jul 10 18:58:33 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -76074,6 +76074,8 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 		m_humdrum_text << '\n';
 	}
 
+	collapseSpines(infile, lasti);
+
 	if (debugQ) {
 		m_free_text << "PROCESSING ENDING" << endl;
 	}
@@ -76081,6 +76083,58 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 	if (lastline >= 0) {
 		//printEnding(infile, lastline);
 		printEnding(infile, outmeasures.back().stop, lasti);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::collapseSpines -- Shrink all sub-spines to single spine.
+//
+
+void Tool_myank::collapseSpines(HumdrumFile& infile, int line) {
+	if (line < 0) {
+		return;
+	}
+	vector<int> counts(infile.getMaxTrack() + 1, 0);
+	for (int i=0; i<infile[line].getFieldCount(); i++) {
+		int track = infile.token(line, i)->getTrack();
+		counts.at(track)++;
+	}
+	for (int i=1; i<(int)counts.size(); i++) {
+		if (counts[i] <= 1) {
+			continue;
+		}
+		bool started = false;
+		for (int j=1; j<(int)counts.size(); j++) {
+			if (j < i) {
+				if (started) {
+					m_humdrum_text << "\t";
+				}
+				m_humdrum_text << "*";
+				started = true;
+				continue;
+			} else if (j == i) {
+				for (int k=0; k<counts[j]; k++) {
+					if (started) {
+						m_humdrum_text << "\t";
+					}
+					m_humdrum_text << "*v";
+					started = true;
+				}
+			} else if (j > i) {
+				for (int k=0; k<counts[j]; k++) {
+					if (started) {
+						m_humdrum_text << "\t";
+					}
+					m_humdrum_text << "*";
+					started = true;
+				}
+			}
+		}
+		m_humdrum_text << "\n";
+		counts[i] = 1;
 	}
 }
 

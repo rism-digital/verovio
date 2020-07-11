@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul  5 00:11:52 PDT 2020
+// Last Modified: Fri Jul 10 18:58:33 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -7203,6 +7203,7 @@ class Tool_myank : public HumTool {
 		int       getSectionCount      (HumdrumFile& infile);
 		void      getSectionString     (string& sstring, HumdrumFile& infile,
 		                                int sec);
+		void      collapseSpines       (HumdrumFile& infile, int line);
 
 	private:
 		int    debugQ      = 0;             // used with --debug option
