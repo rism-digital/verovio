@@ -1071,10 +1071,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     assert(system);
 
     int j, x1, x2, y1, y2;
-    double d;
 
     if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
-        d = staff->GetDrawingRotate();
+        double d = staff->GetDrawingRotate();
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();
         y1 = ToLogicalY(staff->GetDrawingY());
