@@ -1199,11 +1199,6 @@ void View::DrawSylConnector(
     int y = staff->GetDrawingY() + GetSylYRel(syl->m_drawingVerse, staff);
     TextExtend extend;
 
-    // the length of the dash and the space between them
-    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
-    // Adjust it proportionally to the lyric size
-    dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
-
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
         x1 = syl->GetContentRight();
