@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul 10 18:58:33 PDT 2020
+// Last Modified: Sat Jul 11 21:48:27 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -18788,11 +18788,7 @@ void HumdrumFileBase::clear(void) {
 	m_strand2d.clear();
 	m_filename.clear();
 	m_segmentlevel = 0;
-	m_strands_analyzed = false;
-	m_structure_analyzed = false;
-	m_rhythm_analyzed = false;
-	m_slurs_analyzed = false;
-	m_nulls_analyzed = false;
+	m_analyses.clear();
 }
 
 
@@ -18803,7 +18799,7 @@ void HumdrumFileBase::clear(void) {
 //
 
 bool HumdrumFileBase::isStructureAnalyzed(void) {
-	return m_structure_analyzed;
+	return m_analyses.m_structure_analyzed;
 }
 
 
@@ -18814,7 +18810,7 @@ bool HumdrumFileBase::isStructureAnalyzed(void) {
 //
 
 bool HumdrumFileBase::isRhythmAnalyzed(void) {
-	return m_rhythm_analyzed;
+	return m_analyses.m_rhythm_analyzed;
 }
 
 
@@ -18825,7 +18821,7 @@ bool HumdrumFileBase::isRhythmAnalyzed(void) {
 //
 
 bool HumdrumFileBase::areStrandsAnalyzed(void) {
-	return m_strands_analyzed;
+	return m_analyses.m_strands_analyzed;
 }
 
 
@@ -21816,6 +21812,102 @@ void HumdrumFileContent::resetDiatonicStatesWithKeySignature(vector<int>&
 
 
 
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeBarlines -- 
+//
+
+void HumdrumFileContent::analyzeBarlines(void) {
+	if (m_analyses.m_barlines_analyzed) {
+		// Maybe allow forcing reanalysis.
+		return;
+	}
+	m_analyses.m_slurs_analyzed = true;
+	m_analyses.m_barlines_different = false;
+
+	string baseline;
+	string comparison;
+	bool baseQ;
+
+	HumdrumFileContent& infile = *this;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		bool allSame = true;
+		int fieldcount = infile[i].getFieldCount();
+		if (fieldcount <= 1) {
+			continue;
+		}
+		baseQ = false;
+		baseline = "";
+		comparison = "";
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile[i].token(j);
+			int subtrack = token->getSubtrack();
+			if (subtrack > 1) {
+				// ignore secondary barlines in subspines.
+				continue;
+			}
+			if (!token->isStaff()) {
+				// don't check non-staff barlines
+				continue;
+			}
+			if (!baseQ) {
+				baseline = "";
+				for (int k=0; k<(int)token->size(); k++) {
+					if (isdigit(token->at(k))) {
+						// ignore barnumbers
+						// maybe ignore fermatas
+						continue;
+					}
+					baseline += token->at(k);
+				}
+				baseQ = true;
+			} else {
+				comparison = "";
+				for (int k=0; k<(int)token->size(); k++) {
+					if (isdigit(token->at(k))) {
+						// ignore barnumbers;
+						// maybe ignore fermatas
+						continue;
+					}
+					comparison += token->at(k);
+				}
+				if (comparison != baseline) {
+					allSame = false;
+					break;
+				}
+			}
+		}
+
+		if (!allSame) {
+			infile[i].setValue("auto", "barlinesDifferent", 1);
+			m_analyses.m_barlines_different = true;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::hasDifferentBarlines --
+//
+
+bool HumdrumFileContent::hasDifferentBarlines(void) {
+	if (!m_analyses.m_barlines_analyzed) {
+		analyzeBarlines();
+	}
+	return m_analyses.m_barlines_different;
+}
+
+
+
+
+
 //////////////////////////////
 //
 // HumdrumFileStructure::getMetricLevels -- Each line in the output
@@ -22310,10 +22402,10 @@ void HumdrumFileContent::analyzeOttavas(void) {
 //
 
 bool HumdrumFileContent::analyzePhrasings(void) {
-	if (m_phrases_analyzed) {
+	if (m_analyses.m_phrases_analyzed) {
 		return false;
 	}
-	m_phrases_analyzed = true;
+	m_analyses.m_phrases_analyzed = true;
 	bool output = true;
 	output &= analyzeKernPhrasings();
 	return output;
@@ -23369,10 +23461,10 @@ int HumdrumFileContent::getRestPositionAboveNotes(HTp rest, vector<int>& vpos) {
 //
 
 bool HumdrumFileContent::analyzeSlurs(void) {
-	if (m_slurs_analyzed) {
+	if (m_analyses.m_slurs_analyzed) {
 		return false;
 	}
-	m_slurs_analyzed = true;
+	m_analyses.m_slurs_analyzed = true;
 	bool output = true;
 	output &= analyzeKernSlurs();
 	output &= analyzeMensSlurs();
@@ -25448,15 +25540,15 @@ bool HumdrumFileStructure::readStringCsv(const string& contents,
 //
 
 bool HumdrumFileStructure::analyzeStructure(void) {
-	m_structure_analyzed = false;
-	if (!m_strands_analyzed) {
+	m_analyses.m_structure_analyzed = false;
+	if (!m_analyses.m_strands_analyzed) {
 		if (!analyzeStrands()       ) { return isValid(); }
 	}
 	if (!analyzeGlobalParameters() ) { return isValid(); }
 	if (!analyzeLocalParameters()  ) { return isValid(); }
 	if (!analyzeTokenDurations()   ) { return isValid(); }
 	if (!analyzeTokenDurations()   ) { return isValid(); }
-	m_structure_analyzed = true;
+	m_analyses.m_structure_analyzed = true;
 	if (!analyzeRhythmStructure()  ) { return isValid(); }
 	analyzeSignifiers();
 	return isValid();
@@ -25534,8 +25626,8 @@ bool HumdrumFileStructure::analyzeStrophes(void) {
 //
 
 bool HumdrumFileStructure::analyzeStructureNoRhythm(void) {
-	m_structure_analyzed = true;
-	if (!m_strands_analyzed) {
+	m_analyses.m_structure_analyzed = true;
+	if (!m_analyses.m_strands_analyzed) {
 		if (!analyzeStrands()          ) { return isValid(); }
 	}
 	if (!analyzeGlobalParameters() ) { return isValid(); }
@@ -25553,7 +25645,7 @@ bool HumdrumFileStructure::analyzeStructureNoRhythm(void) {
 //
 
 bool HumdrumFileStructure::analyzeRhythmStructure(void) {
-	m_rhythm_analyzed = true;
+	m_analyses.m_rhythm_analyzed = true;
 	setLineRhythmAnalyzed();
 	if (!isStructureAnalyzed()) {
 		if (!analyzeStructureNoRhythm()) { return isValid(); }
@@ -26720,7 +26812,7 @@ void HumdrumFileStructure::checkForLocalParameters(HTp token,
 //
 
 bool HumdrumFileStructure::analyzeStrands(void) {
-	m_strands_analyzed = true;
+	m_analyses.m_strands_analyzed = true;
 	int spines = getSpineCount();
 	m_strand1d.clear();
 	m_strand2d.clear();
@@ -26758,10 +26850,10 @@ bool HumdrumFileStructure::analyzeStrands(void) {
 //
 
 void HumdrumFileStructure::resolveNullTokens(void) {
-	if (m_nulls_analyzed) {
+	if (m_analyses.m_nulls_analyzed) {
 		return;
 	}
-	m_nulls_analyzed = true;
+	m_analyses.m_nulls_analyzed = true;
 	if (!areStrandsAnalyzed()) {
 		analyzeStrands();
 	}
@@ -29157,6 +29249,19 @@ void HumdrumLine::copyStructure(HLp line, const string& empty) {
 
 
 
+/////////////////////////////
+//
+// HumdrumLine::allSameStyle -- return true if barlines through all 
+//     staves are the same. Requires HumdrumFile::analyzeBarlines() to be
+//     run first.
+//
+
+bool HumdrumLine::allSameBarlineStyle(void) {
+	return !this->getValueInt("auto", "barlinesDifferent");
+}
+
+
+
 //////////////////////////////
 //
 // operator<< -- Print a HumdrumLine. Needed to avoid interaction with
@@ -30285,6 +30390,24 @@ bool HumdrumToken::equalTo(const string& pattern) {
 
 //////////////////////////////
 //
+// HumdrumToken::isStaff -- Returns true if the spine type represents
+//   a notated staff.
+//
+
+bool HumdrumToken::isStaff(void) const {
+	if (isKern()) {
+		return true;
+	}
+	if (isMens()) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::isRest -- Returns true if the token is a (kern) rest.
 //
 
@@ -30823,6 +30946,22 @@ char HumdrumToken::hasStemDirection(void) {
 		return '\0';
 	}
 }
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::allSameBarlineStyle --
+//
+
+bool HumdrumToken::allSameBarlineStyle(void) {
+	HLp owner = getOwner();
+	if (!owner) {
+		return true;
+	}
+	return owner->allSameBarlineStyle();
+}
+
 
 
 //////////////////////////////

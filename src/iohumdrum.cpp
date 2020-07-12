@@ -44,6 +44,7 @@
 #include "arpeg.h"
 #include "artic.h"
 #include "att.h"
+#include "barline.h"
 #include "beam.h"
 #include "beatrpt.h"
 #include "bracketspan.h"
@@ -538,6 +539,10 @@ bool HumdrumInput::convertHumdrum()
     checkForColorSpine(infile);
     infile.analyzeRScale();
     infile.analyzeCrossStaffStemDirections();
+    infile.analyzeBarlines();
+    if (infile.hasDifferentBarlines()) {
+        adjustMeasureTimings(infile);
+    }
     m_spine_color.resize(infile.getMaxTrack() + 1);
     for (int i = 0; i < (int)m_spine_color.size(); i++) {
         // Hardwire max subtrack count to MAXCOLORSUBTRACK for each spine for now.
@@ -690,6 +695,31 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::adjustMeasureTimings --
+//
+
+void HumdrumInput::adjustMeasureTimings(hum::HumdrumFile &infile)
+{
+    hum::HumNum barstart;
+    hum::HumNum duration;
+    hum::HumNum difference;
+    barstart = 0;
+
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (infile[i].isBarline()) {
+            if (infile[i].allSameBarlineStyle()) {
+                barstart = infile[i].getDurationFromStart();
+            }
+        }
+        duration = infile[i].getDurationFromStart();
+        difference = duration - barstart;
+        infile[i].setDurationFromBarline(difference);
+    }
+    // could also adjust durationToBarline as well.
 }
 
 //////////////////////////////
@@ -5139,7 +5169,8 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
         }
         lasttrack = -1;
         for (j = 0; j < infile[i].getFieldCount(); ++j) {
-            track = infile[i].token(j)->getTrack();
+            hum::HTp token = infile[i].token(j);
+            track = token->getTrack();
             if (track < 1) {
                 continue;
             }
@@ -5154,14 +5185,14 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 layerindex++;
             }
             lasttrack = track;
-            if (infile[i].token(j)->isData() && infile[i].token(j)->isNull()) {
+            if (token->isData() && token->isNull()) {
                 // keeping null interpretations to search for clef
                 // in primary layer for secondary layer duplication.
-                if (infile[i].token(j)->getLinkedParameterSetCount() == 0) {
+                if (token->getLinkedParameterSetCount() == 0) {
                     continue;
                 }
             }
-            if (infile[i].token(j)->isCommentLocal() && infile[i].token(j)->isNull()) {
+            if (token->isCommentLocal() && token->isNull()) {
                 // don't store empty comments as well. (maybe ignore all
                 // comments anyway).
                 continue;
@@ -5170,12 +5201,19 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 lt[staffindex].resize(lt[staffindex].size() + 1);
                 lt[staffindex].back().clear(); // probably not necessary
             }
-            lt[staffindex][layerindex].push_back(infile[i].token(j));
-            if ((layerindex == 0) && (infile[i].token(j)->isClef())) {
+
+            if (token->isBarline() && !token->allSameBarlineStyle()) {
+                if (token->find('-') != std::string::npos) {
+                    // do not store partial invisible barlines
+                    continue;
+                }
+            }
+            lt[staffindex][layerindex].push_back(token);
+            if ((layerindex == 0) && (token->isClef())) {
                 // Duplicate clef in all layers (needed for cases when
                 // a secondary layer ends before the end of a measure.
                 for (int k = 1; k < (int)lt[staffindex].size(); k++) {
-                    lt[staffindex][k].push_back(infile[i].token(j));
+                    lt[staffindex][k].push_back(token);
                 }
             }
         }
@@ -7490,6 +7528,65 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 // middle of measures.
                 // insertMeterSigElement(elements, pointers, layerdata, i);
             }
+        }
+        if (layerdata[i]->isBarline() && (!layerdata[i]->allSameBarlineStyle())) {
+            // display a barline local to the staff
+            BarLine *barline = new BarLine;
+            setLocationId(barline, layerdata[i]);
+
+            if (layerdata[i]->compare(0, 2, "==") == 0) {
+                barline->SetForm(BARRENDITION_end);
+            }
+            else if (layerdata[i]->find(":|!|:") != string::npos) {
+                barline->SetForm(BARRENDITION_rptboth);
+            }
+            else if (layerdata[i]->find(":!!:") != string::npos) {
+                barline->SetForm(BARRENDITION_rptboth);
+            }
+            else if (layerdata[i]->find(":||:") != string::npos) {
+                barline->SetForm(BARRENDITION_rptboth);
+            }
+            else if (layerdata[i]->find(":!:") != string::npos) {
+                barline->SetForm(BARRENDITION_rptboth);
+            }
+            else if (layerdata[i]->find(":|:") != string::npos) {
+                barline->SetForm(BARRENDITION_rptboth);
+            }
+            else if (layerdata[i]->find(":|") != string::npos) {
+                barline->SetForm(BARRENDITION_rptend);
+            }
+            else if (layerdata[i]->find(":!") != string::npos) {
+                barline->SetForm(BARRENDITION_rptend);
+            }
+            else if (layerdata[i]->find("!:") != string::npos) {
+                barline->SetForm(BARRENDITION_rptstart);
+            }
+            else if (layerdata[i]->find("|:") != string::npos) {
+                barline->SetForm(BARRENDITION_rptstart);
+            }
+            else if (layerdata[i]->find("||") != string::npos) {
+                barline->SetForm(BARRENDITION_dbl);
+            }
+            else if (layerdata[i]->find("-") != string::npos) {
+                barline->SetForm(BARRENDITION_invis);
+            }
+            else if (layerdata[i]->find("..") != string::npos) {
+                barline->SetForm(BARRENDITION_dbldotted);
+            }
+            else if (layerdata[i]->find(".") != string::npos) {
+                barline->SetForm(BARRENDITION_dotted);
+            }
+            else if (layerdata[i]->find("::") != string::npos) {
+                barline->SetForm(BARRENDITION_dbldashed);
+            }
+            else if (layerdata[i]->find(":") != string::npos) {
+                barline->SetForm(BARRENDITION_dashed);
+            }
+            else {
+                barline->SetForm(BARRENDITION_single);
+            }
+
+            appendElement(elements, pointers, barline);
         }
         if (!layerdata[i]->isData()) {
             continue;
@@ -18016,8 +18113,12 @@ int HumdrumInput::getMeasureEndLine(int startline)
             foundDataQ = true;
         }
         else if (infile[i].isBarline()) {
-            endline = i;
-            break;
+            // If the barlines are not all of the same style, then
+            // treat the barline as <barLine> rather than create new <measure>:
+            if (infile[i].allSameBarlineStyle()) {
+                endline = i;
+                break;
+            }
         }
         endline = i;
         i++;

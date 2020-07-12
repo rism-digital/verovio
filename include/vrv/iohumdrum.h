@@ -592,6 +592,7 @@ protected:
     bool isBlackNotation(hum::HTp starting);
     std::string checkNoteForScordatura(const std::string &token);
     bool checkForScordatura(hum::HumdrumFile &infile);
+    void adjustMeasureTimings(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
