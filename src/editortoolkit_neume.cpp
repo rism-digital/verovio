@@ -1807,7 +1807,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::wstring fullString = L"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                if (fullSyl == NULL && syl != NULL) {
+                if (syl == NULL) continue;
+                if (fullSyl == NULL) {
                     fullSyl = syl;
                 }
                 Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
