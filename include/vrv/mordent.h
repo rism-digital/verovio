@@ -62,9 +62,9 @@ public:
 
 protected:
     /**
-    * Overload funciton to get correct glyph based on the combination of the attributes
+    * Helper funciton to get correct glyph based on the combination of the attributes
     */
-    wchar_t GetMordentGlyph(std::vector<wchar_t>& glyphs) const;
+    wchar_t GetOrnamentGlyphByName(const std::string& glyphName) const;
     //
 private:
     //
