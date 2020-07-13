@@ -2862,13 +2862,18 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!std::strncmp(xmlMordent.node().name(), "inverted", 7)) {
             mordent->SetForm(mordentLog_FORM_upper);
         }
-        if (xmlMordent.node().attribute("approach")) {
-            mordent->SetExternalsymbols(
-                mordent, "glyph.name", std::string("ornamentPrecomposedApproach_") + xmlMordent.node().attribute("approach").as_string());
-        }
-        else if (xmlMordent.node().attribute("depart")) {
-            mordent->SetExternalsymbols(
-                mordent, "glyph.name", std::string("ornamentPrecomposedDepart_") + xmlMordent.node().attribute("depart").as_string());
+        if (BOOLEAN_true == mordent->GetLong()) {
+            std::string mordent_attributes;
+            if (mordentLog_FORM_upper == mordent->GetForm()) {
+                mordent_attributes += "inverted_";
+            }
+            if (xmlMordent.node().attribute("approach")) {
+                mordent_attributes += std::string("approach_") + xmlMordent.node().attribute("approach").as_string();
+            }
+            else if (xmlMordent.node().attribute("departure")) {
+                mordent_attributes += std::string("departure_") + xmlMordent.node().attribute("departure").as_string();
+            }
+            mordent->SetExternalsymbols(mordent, "glyph.name", GetOrnamentPrecomposedName(mordent_attributes));
         }
     }
 
@@ -2883,7 +2888,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         mordent->SetColor(xmlSchleifer.node().attribute("color").as_string());
         // place
         mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlSchleifer.node().attribute("placement").as_string()));
-        mordent->SetExternalsymbols(mordent, "glyph.name", "ornamentPrecomposedSchleifer");
+        mordent->SetExternalsymbols(mordent, "glyph.name", "ornamentSchleifer");
     }
 
     // trill
@@ -3696,6 +3701,20 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
         fermata->SetForm(fermataVis_FORM_norm);
         fermata->SetPlace(STAFFREL_above);
     }
+}
+
+std::string MusicXmlInput::GetOrnamentPrecomposedName(const std::string& attributes) const
+{
+    static std::map<std::string, std::string> precomposedNames = {
+        { "inverted_approach_above", "ornamentPrecompAppoggTrill"},
+        { "inverted_approach_below", "ornamentPrecompDoubleCadenceUpperPrefix" },
+        { "approach_above", "ornamentPrecompPortDeVoixMordent" },
+        { "approach_below", "ornamentPrecompInvertedMordentUpperPrefix" }, 
+        { "inverted_departure_above", "ornamentPrecompTrillSuffixDandrieu" },
+        //{ "inverted_departure_below", "" }
+    };
+
+    return precomposedNames.end() != precomposedNames.find(attributes) ? precomposedNames[attributes] : "";
 }
 
 } // namespace vrv
