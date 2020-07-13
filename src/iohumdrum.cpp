@@ -3,7 +3,7 @@
 // Author:      Craig Stuart Sapp
 // Created:     06/06/2016
 // Copyright (c) Authors and others. All rights reserved.
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 //
 // References:
 //    http://humlib.humdrum.org
@@ -7785,18 +7785,31 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
             else {
-                Rest *rest = new Rest;
-                setLocationId(rest, layerdata[i]);
-                appendElement(elements, pointers, rest);
-                convertRest(rest, layerdata[i]);
+                int line = layerdata[i]->getLineIndex();
+                int field = layerdata[i]->getFieldIndex();
+
+                hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
+                if ((restDur == duration) && (restDur == timesigdurs[startline])) {
+                    // whole-measure rest with something else also in
+                    // measure (such as grace notes).
+                    MRest *mrest = new MRest;
+                    setLocationId(mrest, layerdata[i]);
+                    appendElement(elements, pointers, mrest);
+                    // colorRest(mrest, *layerdata[i], line, field);
+                    verticalRest(mrest, *layerdata[i]);
+                }
+                else {
+                    Rest *rest = new Rest;
+                    setLocationId(rest, layerdata[i]);
+                    appendElement(elements, pointers, rest);
+                    convertRest(rest, layerdata[i]);
+                    colorRest(rest, *layerdata[i], line, field);
+                    verticalRest(rest, *layerdata[i]);
+                }
                 processSlurs(layerdata[i]);
                 processPhrases(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 processDirections(layerdata[i], staffindex);
-                int line = layerdata[i]->getLineIndex();
-                int field = layerdata[i]->getFieldIndex();
-                colorRest(rest, *layerdata[i], line, field);
-                verticalRest(rest, *layerdata[i]);
             }
         }
         else if (!layerdata[i]->isNote()) {
