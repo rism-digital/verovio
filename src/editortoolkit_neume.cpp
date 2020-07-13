@@ -1928,7 +1928,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *currentParent = NULL;
     Nc *firstNc = NULL;
     Nc *secondNc = NULL;
-    bool success1, success2;
+    bool success1 = false, success2 = false;
     int ligCount = 0;
     bool firstIsSyl = false;
     Clef *oldClef = NULL;
