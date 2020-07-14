@@ -14273,6 +14273,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
     if (*token == "*ped") {
         // turn on pedal
         Pedal *pedal = new Pedal;
+        setLocationId(pedal, token);
         m_measure->AddChild(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         pedal->SetTstamp(tstamp.getFloat());
@@ -14285,6 +14286,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         // hum::HTp pdata = getPreviousDataToken(token);
         // if (pdata != NULL) {
         Pedal *pedal = new Pedal;
+        setLocationId(pedal, token);
         m_measure->AddChild(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
         pedal->SetTstamp(tstamp.getFloat());
