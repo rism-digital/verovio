@@ -14281,6 +14281,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         if (durtobar == 0) {
             tstamp -= barbuffer;
+            appendTypeTag(pedal, "endbar-25");
         }
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_down);
@@ -14297,6 +14298,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
         if (durtobar == 0) {
             tstamp -= barbuffer;
+            appendTypeTag(pedal, "endbar-25");
         }
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_up);
