@@ -532,6 +532,25 @@ void Note::UpdateFromTransPitch(const TransPitch &tp)
     }
 }
 
+bool Note::IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted)
+{
+    Object *stem = GetFirst(STEM);
+    if (!stem) return false;
+
+    Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
+    if (!flag) return false;
+
+    // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
+    const wchar_t flagGlyph
+        = (GetDur() >= DURATION_16) ? SMUFL_E242_flag16thUp : flag->GetSmuflCode(GetDrawingStemDir());
+    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, GetDrawingCueSize());
+
+    const int dotMargin = flag->GetDrawingY() - GetDrawingY() - flagHeight - GetDrawingRadius(doc) / 2
+        - (isDotShifted ? doc->GetDrawingUnit(staffSize) : 0);
+
+    return dotMargin < 0;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -770,19 +789,16 @@ int Note::CalcDots(FunctorParams *functorParams)
         std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
         int loc = this->GetDrawingLoc();
 
-        int threshold = loc + 4 - this->GetDur();
         // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-        if ((loc % 2) == 0) {
-            loc += 1;
-            threshold += 4;
-        }
-        threshold = (this->GetDur() > 4) ? threshold : 0;
+        const bool isDotShifted(loc % 2 == 0);
+        if (isDotShifted) ++loc;
         dotLocs->push_back(loc);
+
         // Stem up, shorter than 4th and not in beam
-        if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (threshold > 0) && !this->IsInBeam()) {
+        if ((GetDrawingStemDir() == STEMDIRECTION_up) && (!this->IsInBeam()) && (GetDrawingStemLen() < 3)
+            && (IsDotOverlappingWithFlag(params->m_doc, staffSize, isDotShifted))) {
             // HARDCODED
-            if (this->GetDrawingStemLen() < 3)
-                flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
         }
     }
     else {
