@@ -1643,9 +1643,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
-        Clef *tempClef;
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
-            tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
+            Clef *tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
             if (tempClef == NULL) {
                 Layer *layer = dynamic_cast<Layer *>((*it)->GetFirstAncestor(LAYER));
                 tempClef = layer->GetCurrentClef();
@@ -2145,13 +2144,12 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         }
     }
     if (syllables.size() != 0) {
-        Clef *currentClef;
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
         std::vector<Object *> syllablesVector(syllables.begin(), syllables.end());
         std::stable_sort(syllablesVector.begin(), syllablesVector.end(), Object::sortByUlx);
         for (auto it = syllablesVector.begin(); it != syllablesVector.end(); ++it) {
-            currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
+            Clef *currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
             if (currentClef == NULL && sparent != NULL) {
                 currentClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
             }
@@ -2898,17 +2896,14 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        PitchInterface *pi;
-        FacsimileInterface *fi;
-
         for (auto it = pitchedChildren.begin(); it != pitchedChildren.end(); ++it) {
-            fi = (*it)->GetFacsimileInterface();
+            FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             if (fi == NULL || !fi->HasFacs()) {
                 LogError("Could not adjust pitch: child %s does not have facsimile data", (*it)->GetUuid().c_str());
                 return false;
             }
 
-            pi = (*it)->GetPitchInterface();
+            PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
             pi->SetPname(pname);
             pi->SetOct(3);
