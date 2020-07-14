@@ -1807,7 +1807,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::wstring fullString = L"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                if (fullSyl == NULL && syl != NULL) {
+                if (syl == NULL) continue;
+                if (fullSyl == NULL) {
                     fullSyl = syl;
                 }
                 Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
@@ -1928,7 +1929,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *currentParent = NULL;
     Nc *firstNc = NULL;
     Nc *secondNc = NULL;
-    bool success1, success2;
+    bool success1 = false, success2 = false;
     int ligCount = 0;
     bool firstIsSyl = false;
     Clef *oldClef = NULL;
