@@ -14558,43 +14558,54 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
 void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
     hum::HumNum layerstarttime, hum::HumNum layerendtime)
 {
-    prespace.resize(layerdata.size());
-    if (prespace.size() > 0) {
-        prespace[0] = 0;
-    }
-    std::vector<hum::HumNum> startdur(layerdata.size());
-    std::vector<hum::HumNum> duration(layerdata.size());
-    hum::HumNum correction = 0;
-    for (int i = 0; i < (int)layerdata.size(); ++i) {
-        startdur[i] = layerdata[i]->getDurationFromStart();
-        if (!layerdata[i]->isData()) {
-            duration[i] = 0;
-        }
-        else if (layerdata[i]->isNull()) {
-            duration[i] = 0;
-        }
-        else {
-            duration[i] = layerdata[i]->getDuration();
+    prespace.resize(layerdata.size(), 0);
+
+    vector<int> dataindex;
+    dataindex.reserve(layerdata.size());
+    for (int i = 0; i < (int)layerdata.size(); i++) {
+        if (layerdata.at(i)->isData()) {
+            dataindex.push_back(i);
         }
     }
 
-    if (layerdata.size() > 0) {
-        prespace[0] = startdur[0] - layerstarttime;
-    }
-    for (int i = 1; i < (int)layerdata.size(); ++i) {
-        prespace[i] = startdur[i] - startdur[i - 1] - duration[i - 1];
-        prespace[i] -= m_duradj[layerdata[i]->getLineIndex()];
-        if (prespace[i] < 0) {
-            correction += prespace[i];
-            prespace[i] = 0;
+    std::vector<hum::HumNum> startdur(dataindex.size(), 0);
+    std::vector<hum::HumNum> duration(dataindex.size(), 0);
+
+    hum::HumNum correction = 0;
+    for (int i = 0; i < (int)dataindex.size(); ++i) {
+        int ii = dataindex.at(i);
+
+        startdur.at(i) = layerdata.at(ii)->getDurationFromStart();
+        if (!layerdata.at(ii)->isData()) {
+            duration.at(i) = 0;
         }
-        else if (prespace[i] > 0) {
-            prespace[i] += correction;
-            if (*layerdata[i] != "*") {
+        else if (layerdata.at(ii)->isNull()) {
+            duration.at(i) = 0;
+        }
+        else {
+            duration.at(i) = layerdata.at(ii)->getDuration();
+        }
+    }
+
+    if (dataindex.size() > 0) {
+        prespace.at(dataindex.at(0)) = startdur.at(0) - layerstarttime;
+    }
+    for (int i = 1; i < (int)dataindex.size(); ++i) {
+        int ii = dataindex.at(i);
+        prespace.at(ii) = startdur.at(i) - startdur.at(i - 1) - duration.at(i - 1);
+        prespace.at(ii) -= m_duradj[layerdata[ii]->getLineIndex()];
+        if (prespace.at(ii) < 0) {
+            correction += prespace.at(ii);
+            prespace.at(ii) = 0;
+        }
+        else if (prespace.at(ii) > 0) {
+            prespace.at(ii) += correction;
+            if (*layerdata.at(ii) != "*") {
                 correction = 0;
             }
         }
     }
+
     if (layerdata.size() > 0) {
         prespace.resize(prespace.size() + 1);
         prespace.back() = layerendtime - startdur.back() - duration.back();
@@ -14602,13 +14613,15 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
 
     // See https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/124
     // This solution may need to be changed for a more general solution.
-    for (int i = 0; i < (int)prespace.size() - 1; i++) {
-        if (prespace[i] == 0) {
+    for (int i = 0; i < (int)dataindex.size() - 1; i++) {
+        int ii = dataindex.at(i);
+        int iii = dataindex.at(i + 1);
+        if (prespace.at(ii) == 0) {
             continue;
         }
-        if ((prespace[i] + prespace[i + 1]) == 0) {
-            prespace[i] = 0;
-            prespace[i + 1] = 0;
+        if ((prespace.at(ii) + prespace.at(iii)) == 0) {
+            prespace.at(ii) = 0;
+            prespace.at(iii) = 0;
         }
     }
 }
