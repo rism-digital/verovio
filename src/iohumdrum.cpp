@@ -14270,12 +14270,18 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
 {
     int staffindex = m_currentstaff - 1;
 
+    hum::HumNum durtobar = token->getDurationToBarline();
+    hum::HumNum barbuffer(1, 4);
+
     if (*token == "*ped") {
         // turn on pedal
         Pedal *pedal = new Pedal;
         setLocationId(pedal, token);
         m_measure->AddChild(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+        if (durtobar == 0) {
+            tstamp -= barbuffer;
+        }
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_down);
         assignVerticalGroup(pedal, token);
@@ -14289,6 +14295,9 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         setLocationId(pedal, token);
         m_measure->AddChild(pedal);
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
+        if (durtobar == 0) {
+            tstamp -= barbuffer;
+        }
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_up);
         assignVerticalGroup(pedal, token);
