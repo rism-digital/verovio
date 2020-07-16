@@ -7219,6 +7219,23 @@ void HumdrumInput::handleGroupEnds(
 
 //////////////////////////////
 //
+// HumdrumInput::fillEmptyLayer --
+//
+
+void HumdrumInput::fillEmptyLayer(
+    int staffindex, int layerindex, std::vector<std::string> &elements, std::vector<void *> &pointers)
+{
+    std::vector<hum::HTp> &layerdata = m_layertokens[staffindex][layerindex];
+    if ((layerdata.size() >= 2) && layerdata[0]->isBarline() && layerdata.back()->isBarline()) {
+        hum::HumNum starttime = layerdata[0]->getDurationFromStart();
+        hum::HumNum endtime = layerdata.back()->getDurationFromStart();
+        hum::HumNum duration = endtime - starttime;
+        addSpace(elements, pointers, duration);
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::fillContentsOfLayer -- Fill the layer with musical data.
 //
 
@@ -7287,10 +7304,15 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return true;
     }
 
-    std::vector<string> elements;
+    std::vector<std::string> elements;
     std::vector<void *> pointers;
     elements.push_back("layer");
     pointers.push_back((void *)layer);
+
+    if ((layerdata.size() == 2) && layerdata[0]->isBarline() && layerdata[1]->isBarline()) {
+        fillEmptyLayer(staffindex, layerindex, elements, pointers);
+        return true;
+    }
 
     // If the layer contains only a single rest and the rest
     // is the same duration as the time signature, then

@@ -593,6 +593,8 @@ protected:
     std::string checkNoteForScordatura(const std::string &token);
     bool checkForScordatura(hum::HumdrumFile &infile);
     void adjustMeasureTimings(hum::HumdrumFile &infile);
+    void fillEmptyLayer(
+        int staffindex, int layerindex, std::vector<std::string> &elements, std::vector<void *> &pointers);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
