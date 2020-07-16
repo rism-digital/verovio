@@ -595,6 +595,7 @@ protected:
     void adjustMeasureTimings(hum::HumdrumFile &infile);
     void fillEmptyLayer(
         int staffindex, int layerindex, std::vector<std::string> &elements, std::vector<void *> &pointers);
+    bool processOverfillingNotes(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

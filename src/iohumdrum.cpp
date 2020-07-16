@@ -9238,6 +9238,35 @@ void HumdrumInput::processTerminalLong(hum::HTp token)
 
 //////////////////////////////
 //
+// HumdrumInput::processOverfillingNotes -- Shorten the gestural duration of notes
+//     that overfill the measure, but keep the visual display of the
+//     duration the same.  The chopped note durations in the succeeding
+//     measure(s) will be converted into spaces.  This will cause problems
+//     with the MIDI file rendering since the notes will be cut short.
+//     Ideally ties should be allowed to become invisible, and since notes
+//     are already allowed to become invisible, eventually convert the
+//     chopped off pieces of the overfilling note into a series of invisible
+//     tied notes.
+//
+// See issue https://github.com/music-encoding/music-encoding/issues/469
+//
+
+bool HumdrumInput::processOverfillingNotes(hum::HTp token)
+{
+    hum::HumNum duration = token->getDuration();
+    hum::HumNum barend = token->getDurationToBarline();
+    if (duration <= barend) {
+        return 0;
+    }
+    std::string logical_rhythm = hum::Convert::durationToRecip(barend);
+    std::string visual_rhythm = hum::Convert::kernToRecip(token);
+    token->setValue("auto", "N", "vis", visual_rhythm);
+    token->setValue("auto", "MEI", "dur.logical", logical_rhythm);
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput:: removeCharacter --
 //
 
@@ -15020,6 +15049,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     processTerminalLong(token); // do this before assigning rhythmic value.
+    processOverfillingNotes(token);
 
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
@@ -16263,13 +16293,22 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         tstring.erase(std::remove(tstring.begin(), tstring.end(), 'q'), tstring.end());
     }
 
+    bool overfillQ = false;
+    if (!grace) {
+        overfillQ = processOverfillingNotes(token);
+    }
+
     std::string vstring;
-    if (subtoken < 0) {
+    if (overfillQ) {
+        vstring = token->getValue("auto", "N", "vis");
+    }
+    else if (subtoken < 0) {
         vstring = token->getVisualDurationChord();
     }
     else {
         vstring = token->getVisualDuration(subtoken);
     }
+
     if (!vstring.empty()) {
         int visualdotcount = characterCountInSubtoken(vstring, '.');
         if (visualdotcount > 0) {
@@ -16294,22 +16333,36 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
     hum::HumNum dur;
     hum::HumNum durges;
 
-    if (vstring.empty()) {
+    if (overfillQ) {
+        std::string logicaldur = token->getValue("auto", "MEI", "dur.logical");
+        durges = hum::Convert::recipToDurationNoDots(logicaldur);
+        durges /= 4; // convert duration to whole-note units
+        std::string visualdur = token->getValue("auto", "N", "vis");
+        dur = hum::Convert::recipToDurationNoDots(visualdur);
+        dur /= 4; // convert duration to whole-note units
+        int logicaldurdots = std::count(logicaldur.begin(), logicaldur.end(), '.');
+        int visualdurdots = std::count(visualdur.begin(), visualdur.end(), '.');
+        if (visualdurdots != logicaldurdots) {
+            element->SetDotsGes(logicaldurdots);
+            element->SetType("overfill");
+        }
+    }
+    else if (vstring.empty()) {
         dur = hum::Convert::recipToDurationNoDots(tstring);
-        dur /= 4; // duration is now in whole note units;
+        dur /= 4; // convert duration to whole-note units
         if (!grace) {
             dur *= m_tupletscaling;
         }
     }
     else {
         dur = hum::Convert::recipToDurationNoDots(vstring);
-        dur /= 4; // duration is now in whole note units;
+        dur /= 4; // convert duration to whole-note units
         if (!grace) {
             dur *= m_tupletscaling;
         }
 
         durges = hum::Convert::recipToDurationNoDots(tstring);
-        durges /= 4; // duration is now in whole note units;
+        dur /= 4; // convert duration to whole-note units
         if (!grace) {
             durges *= m_tupletscaling;
         }
