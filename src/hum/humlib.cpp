@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jul 16 22:44:17 PDT 2020
+// Last Modified: Fri Jul 17 12:09:32 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -85199,6 +85199,7 @@ Tool_tie::Tool_tie(void) {
 	define("m|merge=b", "merge tied notes into a single note.");
 	define("p|printable=b", "merge tied notes only if single note is a printable note.");
 	define("M|mark=b", "Mark overfill notes.");
+	define("i|invisible=b", "Mark overfill barlines invisible.");
 }
 
 
@@ -85244,6 +85245,7 @@ bool Tool_tie::run(HumdrumFile& infile) {
 	initialize();
 	processFile(infile);
 	infile.createLinesFromTokens();
+	m_humdrum_text << infile;
 	return true;
 }
 
@@ -85255,10 +85257,11 @@ bool Tool_tie::run(HumdrumFile& infile) {
 //
 
 void Tool_tie::initialize(void) {
-	m_printQ = getBoolean("printable");
-	m_mergeQ = getBoolean("merge");
-	m_splitQ = getBoolean("split");
-	m_markQ  = getBoolean("mark");
+	m_printQ      = getBoolean("printable");
+	m_mergeQ      = getBoolean("merge");
+	m_splitQ      = getBoolean("split");
+	m_markQ       = getBoolean("mark");
+	m_invisibleQ  = getBoolean("invisible");
 }
 
 
@@ -85364,6 +85367,10 @@ void Tool_tie::mergeTie(HTp token) {
 
 	// cerr << "TOTAL DURATION OF " << token << " IS " << totaldur <<  " RECIP " << recip << endl;
 
+	bool makeinvis = false;
+	if (m_invisibleQ) {
+		makeinvis = checkForInvisible(token);
+	}
 	for (int i=0; i<(int)tiednotes.size(); i++) {
 		tiednotes[i]->setText(".");
 	}
@@ -85373,6 +85380,35 @@ void Tool_tie::mergeTie(HTp token) {
 	hre.replaceDestructive(text, recip, "\\d+(?:%\\d+)?\\.*", "g");
 	hre.replaceDestructive(text, "", "\\[", "g");
 	token->setText(text);
+	if (makeinvis) {
+		markNextBarlineInvisible(token);
+	}
+
+}
+
+
+//////////////////////////////
+//
+// Tool_tie::markNextBarlineInvisible --  Multiple layers are not dealt with yet.
+//
+
+void Tool_tie::markNextBarlineInvisible(HTp tok) {
+	HTp current = tok;
+	while (current) {
+		if (!current->isBarline()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->find('-') != string::npos) {
+			break;
+		}
+		string text = *current;
+		text += '-';
+		current->setText(text);
+		break;
+	}
+	
+
 }
 
 
@@ -85413,6 +85449,30 @@ int Tool_tie::markOverfills(HumdrumFile& infile) {
 		}
 	}
 	return counter;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tie::checkForInvisible --
+//
+
+bool Tool_tie::checkForInvisible(HTp tok) {
+	HumNum duration = tok->getDuration();
+	HumNum tobarline = tok->getDurationToBarline();
+	if (tok->find('[') != string::npos) {
+		if (duration >= tobarline) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	if (duration > tobarline) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 

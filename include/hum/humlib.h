@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jul 16 22:44:17 PDT 2020
+// Last Modified: Fri Jul 17 12:09:32 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -7935,28 +7935,31 @@ class Tool_tassoize : public HumTool {
 
 class Tool_tie : public HumTool {
 	public:
-		         Tool_tie          (void);
-		        ~Tool_tie          () {};
+		         Tool_tie                (void);
+		        ~Tool_tie                () {};
 
-		bool     run               (HumdrumFileSet& infiles);
-		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run                     (HumdrumFileSet& infiles);
+		bool     run                     (HumdrumFile& infile);
+		bool     run                     (const string& indata, std::ostream& out);
+		bool     run                     (HumdrumFile& infile, std::ostream& out);
 
 	protected:
-		void     processFile       (HumdrumFile& infile);
-		void     initialize        (void);
-		void     mergeTies         (HumdrumFile& infile);
-		void     mergeTie          (HTp token);
-		int      markOverfills     (HumdrumFile& infile);
-		bool     checkForOverfill  (HTp tok);
+		void     processFile             (HumdrumFile& infile);
+		void     initialize              (void);
+		void     mergeTies               (HumdrumFile& infile);
+		void     mergeTie                (HTp token);
+		int      markOverfills           (HumdrumFile& infile);
+		bool     checkForOverfill        (HTp tok);
+		bool     checkForInvisible       (HTp tok);
+		void     markNextBarlineInvisible(HTp tok);
 
 	private:
-		bool     m_printQ = false;
-		bool     m_mergeQ = false;
-		bool     m_splitQ = false;
-		bool     m_markQ  = false;
-		string   m_mark   = "@";
+		bool          m_printQ      = false;
+		bool          m_mergeQ      = false;
+		bool          m_splitQ      = false;
+		bool          m_markQ       = false;
+		bool          m_invisibleQ  = false;
+		std::string   m_mark        = "@";
 
 };
 
