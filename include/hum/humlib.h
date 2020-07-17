@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul 11 21:48:27 PDT 2020
+// Last Modified: Thu Jul 16 19:12:25 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1795,7 +1795,7 @@ class TokenPair {
 };
 
 
-// HumFileAalysis: class used to manage analysis states for a Humdrum file.
+// HumFileAnalysis: class used to manage analysis states for a Humdrum file.
 
 class HumFileAnalysis {
 	public:
@@ -7929,6 +7929,30 @@ class Tool_tassoize : public HumTool {
 		vector<vector<int>> m_pstates;
 		vector<vector<int>> m_kstates;
 		vector<vector<bool>> m_estates;
+
+};
+
+
+class Tool_tie : public HumTool {
+	public:
+		         Tool_tie          (void);
+		        ~Tool_tie          () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+		void     mergeTies         (HumdrumFile& infile);
+		void     mergeTie          (HTp token);
+
+	private:
+		bool     printQ = false;
+		bool     mergeQ = false;
+		bool     splitQ = false;
 
 };
 
