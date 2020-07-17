@@ -9256,12 +9256,55 @@ bool HumdrumInput::processOverfillingNotes(hum::HTp token)
     hum::HumNum duration = token->getDuration();
     hum::HumNum barend = token->getDurationToBarline();
     if (duration <= barend) {
-        return 0;
+        return false;
     }
+
+    bool nextbarignore = isNextBarIgnored(token);
+    if (nextbarignore) {
+        // Ignore invisible barlines that need to be skipped over since they
+        // will not be converted into MEI data.  Only the first barline
+        // will be considered, but all barlines through the end of the duration
+        // of the note should be checked in the general solution.
+        return false;
+    }
+
     std::string logical_rhythm = hum::Convert::durationToRecip(barend);
     std::string visual_rhythm = hum::Convert::kernToRecip(token);
     token->setValue("auto", "N", "vis", visual_rhythm);
     token->setValue("auto", "MEI", "dur.logical", logical_rhythm);
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isNextBarIgnored --
+//
+
+bool HumdrumInput::isNextBarIgnored(hum::HTp token)
+{
+    hum::HTp current = token->getNextToken();
+    while (current && !current->isBarline()) {
+        if (current->isNull()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->isData()) {
+            break;
+        }
+        current = current->getNextToken();
+    }
+    if (!current) {
+        return false;
+    }
+    if (!current->isBarline()) {
+        return false;
+    }
+    if (current->allSameBarlineStyle()) {
+        return false;
+    }
+    if (current->find('-') == std::string::npos) {
+        return false;
+    }
     return true;
 }
 

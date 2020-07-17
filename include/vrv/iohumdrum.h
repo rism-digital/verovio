@@ -596,6 +596,7 @@ protected:
     void fillEmptyLayer(
         int staffindex, int layerindex, std::vector<std::string> &elements, std::vector<void *> &pointers);
     bool processOverfillingNotes(hum::HTp token);
+    bool isNextBarIgnored(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
