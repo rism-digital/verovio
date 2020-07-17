@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jul 16 19:12:25 PDT 2020
+// Last Modified: Thu Jul 16 22:44:17 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -7948,11 +7948,15 @@ class Tool_tie : public HumTool {
 		void     initialize        (void);
 		void     mergeTies         (HumdrumFile& infile);
 		void     mergeTie          (HTp token);
+		int      markOverfills     (HumdrumFile& infile);
+		bool     checkForOverfill  (HTp tok);
 
 	private:
-		bool     printQ = false;
-		bool     mergeQ = false;
-		bool     splitQ = false;
+		bool     m_printQ = false;
+		bool     m_mergeQ = false;
+		bool     m_splitQ = false;
+		bool     m_markQ  = false;
+		string   m_mark   = "@";
 
 };
 
