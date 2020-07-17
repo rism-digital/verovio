@@ -1625,8 +1625,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     }
 
     // fermatas
-    pugi::xpath_node xmlFermata = node.select_node("fermata");
-    if (xmlFermata) {
+    for (pugi::xml_node xmlFermata : node.children("fermata")) {
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
         if (HasAttributeWithValue(node, "location", "left")) {
@@ -1636,10 +1635,10 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             LogWarning("MusicXML import: Unsupported barline location 'middle'");
         }
         else {
-            fermata->SetTstamp(m_durTotal + 1);
+            fermata->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
         }
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        ShapeFermata(fermata, xmlFermata.node());
+        ShapeFermata(fermata, xmlFermata);
     }
 }
 
