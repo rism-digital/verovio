@@ -16405,7 +16405,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         }
 
         durges = hum::Convert::recipToDurationNoDots(tstring);
-        dur /= 4; // convert duration to whole-note units
+        durges /= 4; // convert duration to whole-note units
         if (!grace) {
             durges *= m_tupletscaling;
         }
