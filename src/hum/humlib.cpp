@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul 17 17:55:32 PDT 2020
+// Last Modified: Sat Jul 18 14:28:54 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -85503,6 +85503,7 @@ void Tool_tie::mergeTies(HumdrumFile& infile) {
 }
 
 
+
 //////////////////////////////
 //
 // Tool_tie::mergeTie --
@@ -85512,6 +85513,7 @@ void Tool_tie::mergeTie(HTp token) {
 	if (token->find('[') == string::npos) {
 		return;
 	}
+
 	vector<HTp> tiednotes;
 
 	HumNum totaldur = token->getDuration();
@@ -85547,7 +85549,13 @@ void Tool_tie::mergeTie(HTp token) {
 	if (m_invisibleQ) {
 		makeinvis = checkForInvisible(token);
 	}
+
 	for (int i=0; i<(int)tiednotes.size(); i++) {
+		if (m_invisibleQ) {
+			if (checkForInvisible(tiednotes[i])) {
+				markNextBarlineInvisible(tiednotes[i]);
+			}
+		}
 		tiednotes[i]->setText(".");
 	}
 	// set initial tied notes with updated recip.
@@ -85636,7 +85644,8 @@ int Tool_tie::markOverfills(HumdrumFile& infile) {
 bool Tool_tie::checkForInvisible(HTp tok) {
 	HumNum duration = tok->getDuration();
 	HumNum tobarline = tok->getDurationToBarline();
-	if (tok->find('[') != string::npos) {
+	if ((tok->find('[') != string::npos) ||
+	   (tok->find('_') != string::npos)) {
 		if (duration >= tobarline) {
 			return true;
 		} else {
