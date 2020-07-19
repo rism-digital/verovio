@@ -9616,6 +9616,7 @@ bool HumdrumInput::isFirstTokenOnStaff(hum::HTp token)
 
 void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffindex)
 {
+
     bool globalQ = token->linkedParameterIsGlobal(index);
     bool firstQ = true;
     if (globalQ) {
@@ -9799,7 +9800,13 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 
     Dir *dir = new Dir;
     setStaff(dir, m_currentstaff);
-    setLocationId(dir, token);
+    hum::HTp dirtok = hps->getToken();
+    if (dirtok != NULL) {
+        setLocationId(dir, dirtok);
+    }
+    else {
+        cerr << "DIRTOK FOR " << token << " IS EMPTY " << endl;
+    }
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     if (token->isMens()) {
         // Attach to note, not with measure timestamp.
@@ -9814,20 +9821,14 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     // bool problemQ = false;
     // bool sicQ = false;
 
-    std::string problem = token->getLayoutParameter("TX", "problem");
-    if (problem == "true") {
-        problemQ = true;
+    if (problemQ) {
         dir->SetType("problem");
     }
 
-    std::string sic = token->getLayoutParameter("TX", "sic");
-    if (sic == "true") {
-        sicQ = true;
+    if (sicQ) {
         dir->SetType("sic");
     }
 
-    // std::string typevalue = token->getLayoutParameter("TX", "type");
-    typevalue = token->getLayoutParameter("TX", "type");
     if (!typevalue.empty()) {
         dir->SetType(typevalue);
     }

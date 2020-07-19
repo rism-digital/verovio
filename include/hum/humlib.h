@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul 18 14:28:54 PDT 2020
+// Last Modified: Sun Jul 19 16:10:19 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -897,6 +897,7 @@ class HumParamSet {
 		void          setNamespace2      (const std::string& name);
 		void          setNamespace       (const std::string& name);
 		void          setNamespace       (const std::string& name1, const std::string& name2);
+		HTp           getToken           (void) { return m_token; }
 
 		void          clear              (void);
 		int           getCount           (void);
@@ -905,10 +906,12 @@ class HumParamSet {
 		int           addParameter       (const std::string& name, const std::string& value);
 		int           setParameter       (const std::string& name, const std::string& value);
 		void          readString         (const std::string& text);
+		void          readString         (HTp token);
 		std::ostream& printXml           (std::ostream& out = std::cout, int level = 0,
 		                                  const std::string& indent = "\t");
 
 	private:
+		HTp         m_token = NULL;
 		std::string m_ns1;
 		std::string m_ns2;
 		std::vector<std::pair<std::string, std::string>> m_parameters;
