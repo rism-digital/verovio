@@ -372,6 +372,23 @@ Staff *Measure::GetTopVisibleStaff()
     return staff;
 }
 
+Staff *Measure::GetBottomVisibleStaff()
+{
+    Staff *bottomStaff = NULL;
+    ListOfObjects staves;
+    ClassIdComparison matchType(STAFF);
+    this->FindAllDescendantByComparison(&staves, &matchType, 1);
+    for (auto &child : staves) {
+        Staff* staff = dynamic_cast<Staff *>(child);
+        assert(staff);
+        if (!staff->DrawingIsVisible()) {
+            break;
+        }
+        bottomStaff = staff;
+    }
+    return bottomStaff;
+}
+
 int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;
