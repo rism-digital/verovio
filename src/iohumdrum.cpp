@@ -536,6 +536,9 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernAccidentals();
     infile.analyzeTextRepetition();
     parseSignifiers(infile);
+    if (m_signifiers.terminallong) {
+        hideTerminalBarlines(infile);
+    }
     checkForColorSpine(infile);
     infile.analyzeRScale();
     infile.analyzeCrossStaffStemDirections();
@@ -19656,6 +19659,79 @@ void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
     for (int i = 0; i < (int)labels.size(); i++) {
         string ref = "#label-" + labels[i];
         exp->AddRefAllowDuplicate(ref);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hideTerminalBarlines -- Barlines during a terminal long
+//    notes are made invisible.
+//
+
+void HumdrumInput::hideTerminalBarlines(hum::HumdrumFile &infile)
+{
+    for (int i = 0; i < infile.getStrandCount(); i++) {
+        hum::HTp stok = infile.getStrandStart(i);
+        if (!stok->isKern()) {
+            continue;
+        }
+        hum::HTp etok = infile.getStrandEnd(i);
+        hum::HTp tok = stok;
+        while (tok && (tok != etok)) {
+            if (!tok->isData()) {
+                tok = tok->getNextToken();
+                continue;
+            }
+            if (tok->isNull()) {
+                tok = tok->getNextToken();
+                continue;
+            }
+            if (tok->find('[') == string::npos) {
+                tok = tok->getNextToken();
+                continue;
+            }
+            if (tok->find(m_signifiers.terminallong) == string::npos) {
+                tok = tok->getNextToken();
+                continue;
+            }
+            hideBarlinesInTiedGroup(tok);
+            tok = tok->getNextToken();
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hideBarlinesInTiedGroup -- Barlines found between the starting
+//    note and the end of the tied group are made invisible.
+//
+
+void HumdrumInput::hideBarlinesInTiedGroup(hum::HTp startnote)
+{
+    hum::HTp current = startnote;
+    if (!startnote) {
+        return;
+    }
+    if (startnote->find('[') == std::string::npos) {
+        return;
+    }
+    while (current) {
+        if (current->isBarline()) {
+            std::string text = *current;
+            text += "-";
+            current->setText(text);
+        }
+        else if (current->isData() && (current->find(']') != std::string::npos)) {
+            if (current->find(';') != std::string::npos) {
+                if (startnote->find(';') == std::string::npos) {
+                    std::string text = *startnote;
+                    text += ';';
+                    startnote->setText(text);
+                }
+            }
+            break;
+        }
+        current = current->getNextToken();
     }
 }
 
