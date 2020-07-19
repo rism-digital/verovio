@@ -157,41 +157,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     Measure *firstMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1));
 
-    // Draw system divider (from the second one) if scoreDef is optimized
-    if (firstMeasure && (m_options->m_systemDivider.GetValue() != SYSTEMDIVIDER_none)) {
-        if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
-            int y = system->GetDrawingY();
-            Staff *staff = firstMeasure->GetTopVisibleStaff();
-            if (staff) {
-                // Place them just above the measure number - in very tight layout this can collision with
-                // the staff above. To be improved
-                y = staff->GetDrawingY() + 3.0 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            }
-            int x1 = system->GetDrawingX() - m_doc->GetDrawingUnit(100) * 3;
-            int x2 = system->GetDrawingX() + m_doc->GetDrawingUnit(100) * 3;
-            int y1 = y - m_doc->GetDrawingUnit(100) * 1;
-            int y2 = y + m_doc->GetDrawingUnit(100) * 3;
-            int y3 = y1 + m_doc->GetDrawingUnit(100) * 2;
-            int y4 = y2 + m_doc->GetDrawingUnit(100) * 2;
-            // left and left-right
-            dc->StartCustomGraphic("systemDivider");
-
-            DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
-            DrawObliquePolygon(dc, x1, y3, x2, y4, m_doc->GetDrawingUnit(100) * 1.5);
-            if (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_left_right) {
-                // Right divider is not taken into account in the layout calculation and can collision with the music
-                // content
-                Measure *lastMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
-                assert(lastMeasure);
-                int x4 = lastMeasure->GetDrawingX() + lastMeasure->GetRightBarLineRight();
-                int x3 = x4 - m_doc->GetDrawingUnit(100) * 6;
-                DrawObliquePolygon(dc, x3, y1, x4, y2, m_doc->GetDrawingUnit(100) * 1.5);
-                DrawObliquePolygon(dc, x3, y3, x4, y4, m_doc->GetDrawingUnit(100) * 1.5);
-            }
-
-            dc->EndCustomGraphic();
-        }
-    }
+    DrawSystemDivider(dc, system, firstMeasure);
 
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
@@ -1314,6 +1280,56 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
             DrawTupletNum(dc, dynamic_cast<LayerElement *>(*iter), layer, staff, measure);
         }
     }
+}
+
+void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMeasure)
+{
+    assert(dc);
+    assert(system);
+    assert(firstMeasure);
+
+    // Draw system divider (from the second one) if scoreDef is optimized
+    if (!firstMeasure || (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_none)) return;
+    // initialize to zero, first measure is not supposed to have system divider
+    static int previousSystemBottomMarginY = 0;
+    if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
+        int y = system->GetDrawingY();
+        Staff *staff = firstMeasure->GetTopVisibleStaff();
+        if (staff) {
+            // Place it in the middle of current and previous systems - in very tight layout this can collision with
+            // the staff above. To be improved
+            y = (staff->GetDrawingY() + previousSystemBottomMarginY) / 2;
+        }
+        int x1 = system->GetDrawingX() - m_doc->GetDrawingUnit(100) * 3;
+        int x2 = system->GetDrawingX() + m_doc->GetDrawingUnit(100) * 3;
+        int y1 = y - m_doc->GetDrawingUnit(100) * 1;
+        int y2 = y + m_doc->GetDrawingUnit(100) * 3;
+        int y3 = y1 + m_doc->GetDrawingUnit(100) * 2;
+        int y4 = y2 + m_doc->GetDrawingUnit(100) * 2;
+        // left and left-right
+        dc->StartCustomGraphic("systemDivider");
+
+        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+        DrawObliquePolygon(dc, x1, y3, x2, y4, m_doc->GetDrawingUnit(100) * 1.5);
+        if (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_left_right) {
+            // Right divider is not taken into account in the layout calculation and can collision with the music
+            // content
+            Measure *lastMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+            assert(lastMeasure);
+            int x4 = lastMeasure->GetDrawingX() + lastMeasure->GetRightBarLineRight();
+            int x3 = x4 - m_doc->GetDrawingUnit(100) * 6;
+            DrawObliquePolygon(dc, x3, y1, x4, y2, m_doc->GetDrawingUnit(100) * 1.5);
+            DrawObliquePolygon(dc, x3, y3, x4, y4, m_doc->GetDrawingUnit(100) * 1.5);
+        }
+
+        dc->EndCustomGraphic();
+    }
+    Staff *bottomStaff = firstMeasure->GetBottomVisibleStaff();
+    // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
+    // substract offset of the system divider symbol itself (added to y2 and y4)
+    previousSystemBottomMarginY = bottomStaff->GetDrawingY()
+        - (bottomStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
+        - m_doc->GetDrawingUnit(100) * 5;
 }
 
 //----------------------------------------------------------------------------
