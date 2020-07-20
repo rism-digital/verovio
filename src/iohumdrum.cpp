@@ -7282,7 +7282,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     if (emptyMeasures()) {
         if (timesigdurs[startline] == duration) {
-            MRest *mrest = new MRest();
+            MRest *mrest = new MRest;
             m_layer->AddChild(mrest);
             // Assign a Humdrum ID here.
             hum::HTp trest = NULL;
@@ -7325,6 +7325,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     // pedal mark in mrest meaures.
     if (hasFullMeasureRest(layerdata, timesigdurs[startline], duration)) {
         if (m_multirest[startline] > 1) {
+            int tempendline = getMultiEndline(startline);
             MultiRest *multirest = new MultiRest();
             multirest->SetNum(m_multirest[startline]);
             appendElement(layer, multirest);
@@ -7334,9 +7335,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 processDirections(layerdata[j], staffindex);
             }
+            setSystemMeasureStyle(startline, tempendline);
         }
         else {
-            MRest *mrest = new MRest();
+            MRest *mrest = new MRest;
             appendElement(layer, mrest);
             hum::HTp trest = NULL;
             for (int i = 0; i < (int)layerdata.size(); i++) {
@@ -7998,6 +8000,37 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMultiEndline -- Return the ending barline index of a multibar rest.
+//
+
+int HumdrumInput::getMultiEndline(int startindex)
+{
+    int found = -1;
+    int index = startindex;
+    for (int i = index; i < (int)m_multirest.size(); i++) {
+        if (m_multirest[i] == -1) {
+            found = i;
+            break;
+        }
+    }
+    if (found < 0) {
+        return startindex;
+    }
+    int found2 = -1;
+    for (int i = found; i < (int)m_multirest.size(); i++) {
+        if (m_multirest[i] != -1) {
+            found2 = i;
+            break;
+        }
+    }
+    if (found2 < 0) {
+        return found;
+    }
+    return found2;
 }
 
 //////////////////////////////
@@ -18213,6 +18246,7 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
 
     std::string endbar = infile[endline].getTokenString(0);
     std::string startbar = infile[startline].getTokenString(0);
+
     if (endbar.compare(0, 2, "==") == 0) {
         m_measure->SetRight(BARRENDITION_end);
     }

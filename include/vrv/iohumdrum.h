@@ -597,8 +597,9 @@ protected:
         int staffindex, int layerindex, std::vector<std::string> &elements, std::vector<void *> &pointers);
     bool processOverfillingNotes(hum::HTp token);
     bool isNextBarIgnored(hum::HTp token);
-    void hideTerminalBarlines(hum::HumdrumFile& infile);
+    void hideTerminalBarlines(hum::HumdrumFile &infile);
     void hideBarlinesInTiedGroup(hum::HTp startnote);
+    int getMultiEndline(int startindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
