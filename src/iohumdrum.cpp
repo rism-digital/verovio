@@ -11217,6 +11217,8 @@ std::string HumdrumInput::generateSlurId(hum::HTp token, int count, int number)
 
 void HumdrumInput::processSlurs(hum::HTp slurend)
 {
+    hum::HumRegex hre;
+
     int slurendcount = slurend->getValueInt("auto", "slurEndCount");
     if (slurendcount <= 0) {
         return;
@@ -11275,7 +11277,25 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             // If the slur starts and ends on different staves,
             // do not specify the staff attribute, but later
             // add a list of the two staves involved.
-            setStaff(slur, m_currentstaff);
+            int staff = m_currentstaff;
+            if (m_signifiers.above) {
+                std::string sabove = "[a-g]+[-n#]*[xy]*";
+                sabove += m_signifiers.above;
+                if (hre.search(slurstart, sabove)) {
+                    staff--;
+                    if (staff < 1) {
+                        staff = 1;
+                    }
+                }
+            }
+            if (m_signifiers.below) {
+                std::string sbelow = "[a-g]+[-n#]*[xy]*";
+                sbelow += m_signifiers.below;
+                if (hre.search(slurstart, sbelow)) {
+                    staff++;
+                }
+            }
+            setStaff(slur, staff);
         }
 
         if (hasAboveParameter(slurstart, "S")) {
