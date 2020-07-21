@@ -9,6 +9,7 @@
 #define __VRV_FERMATA_H__
 
 #include "atts_cmn.h"
+#include "atts_externalsymbols.h"
 #include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
@@ -28,7 +29,8 @@ class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
                 public AttFermataVis,
-                public AttPlacement {
+                public AttPlacement,
+                public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

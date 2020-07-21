@@ -22,12 +22,14 @@ namespace vrv {
 // Fermata
 //----------------------------------------------------------------------------
 
-Fermata::Fermata() : ControlElement("fermata-"), TimePointInterface(), AttColor(), AttFermataVis(), AttPlacement()
+Fermata::Fermata()
+    : ControlElement("fermata-"), TimePointInterface(), AttColor(), AttFermataVis(), AttPlacement(), AttExtSym()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_FERMATAVIS);
     RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -41,6 +43,7 @@ void Fermata::Reset()
     ResetColor();
     ResetFermataVis();
     ResetPlacement();
+    ResetExtSym();
 }
 
 void Fermata::ConvertFromAnalyticalMarkup(
