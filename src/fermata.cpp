@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "smufl.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -58,6 +59,33 @@ void Fermata::ConvertFromAnalyticalMarkup(
     }
     this->SetStartid("#" + uuid);
     params->m_controlEvents.push_back(this);
+}
+
+
+wchar_t Fermata::GetFermataGlyph() const
+{
+    // If there is glyph.num, prioritize it, otherwise check other attributes
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    // check for shape
+    if (GetShape() == fermataVis_SHAPE_angular) {
+        if (GetForm() == fermataVis_FORM_inv || (GetPlace() == STAFFREL_below && !(GetForm() == fermataVis_FORM_norm)))
+            return SMUFL_E4C5_fermataShortBelow;
+        return SMUFL_E4C4_fermataShortAbove;
+    }
+    else if (GetShape() == fermataVis_SHAPE_square) {
+        if (GetForm() == fermataVis_FORM_inv || (GetPlace() == STAFFREL_below && !(GetForm() == fermataVis_FORM_norm)))
+            return SMUFL_E4C7_fermataLongBelow;
+        return SMUFL_E4C6_fermataLongAbove;
+    }
+    else if (GetForm() == fermataVis_FORM_inv || (GetPlace() == STAFFREL_below && !(GetForm() == fermataVis_FORM_norm)))
+        return SMUFL_E4C1_fermataBelow;
+
+    // If no other attributes match, return default one (fermataAbove)
+    return SMUFL_E4C0_fermataAbove;
 }
 
 //----------------------------------------------------------------------------

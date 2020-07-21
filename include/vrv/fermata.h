@@ -58,6 +58,11 @@ public:
     void ConvertFromAnalyticalMarkup(
         AttFermataPresent *fermataPresent, const std::string &uuid, ConvertMarkupAnalyticalParams *params);
 
+    /**
+     * Get the SMuFL glyph for the fermata based on type, shape or glyph.num
+     */
+    wchar_t GetFermataGlyph() const;
+
     //----------//
     // Functors //
     //----------//
