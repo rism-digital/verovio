@@ -52,7 +52,7 @@ public:
     ///@}
 
      /**
-     * Get the SMuFL glyph for the mordent based on type, long attribute or glyph.name
+     * Get the SMuFL glyph for the mordent based on type, long attribute or glyph.num
      */
     wchar_t GetMordentGlyph() const;
 
@@ -61,10 +61,6 @@ public:
     //----------//
 
 protected:
-    /**
-    * Helper funciton to get correct glyph based on the combination of the attributes
-    */
-    wchar_t GetOrnamentGlyphByName(const std::string& glyphName) const;
     //
 private:
     //
