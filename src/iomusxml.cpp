@@ -2877,7 +2877,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         mordent->SetColor(xmlSchleifer.node().attribute("color").as_string());
         // place
         mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlSchleifer.node().attribute("placement").as_string()));
-        mordent->SetExternalsymbols(mordent, "glyph.name", "ornamentSchleifer");
+        mordent->SetExternalsymbols(mordent, "glyph.num", "U+E587");
     }
 
     // trill
