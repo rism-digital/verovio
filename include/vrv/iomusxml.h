@@ -305,11 +305,11 @@ private:
     void ShapeFermata(Fermata *fermata, pugi::xml_node node);
 
     /*
-     * @name Helper method for getting names for precomposed ornaments based on approach/depart attributes
+     * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
      */
     ///@{
     ///@}
-    std::string GetOrnamentPrecomposedName(const std::string& attributes) const;
+    std::string GetOrnamentGlyphNumber(const std::string &attributes) const;
 
     /*
      * @name Methods for converting MusicXML string values to MEI attributes.
