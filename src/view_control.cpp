@@ -2236,8 +2236,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     if (turn->GetDelayed() == BOOLEAN_true && !turn->HasTstamp()) LogWarning("delayed turns not supported");
 
     // set norm as default
-    int code = SMUFL_E567_ornamentTurn;
-    if (turn->GetForm() == turnLog_FORM_lower) code = SMUFL_E568_ornamentTurnInverted;
+    int code = turn->GetTurnGlyph();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the turn only with @startid

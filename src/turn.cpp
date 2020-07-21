@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "smufl.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -22,13 +23,20 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Turn::Turn()
-    : ControlElement("turn-"), TimePointInterface(), AttColor(), AttOrnamentAccid(), AttPlacement(), AttTurnLog()
+    : ControlElement("turn-")
+    , TimePointInterface()
+    , AttColor()
+    , AttOrnamentAccid()
+    , AttPlacement()
+    , AttTurnLog()
+    , AttExtSym()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
     RegisterAttClass(ATT_TURNLOG);
+    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -43,6 +51,18 @@ void Turn::Reset()
     ResetOrnamentAccid();
     ResetPlacement();
     ResetTurnLog();
+    ResetExtSym();
+}
+
+wchar_t Turn::GetTurnGlyph() const
+{
+    // If there is glyph.num, prioritize it, otherwise check other attributes
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
+    return (GetForm() == turnLog_FORM_lower)? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
 }
 
 //----------------------------------------------------------------------------
