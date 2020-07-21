@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_cmnornaments.h"
+#include "atts_externalsymbols.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -29,7 +30,8 @@ class Trill : public ControlElement,
               public AttLineRend,
               public AttNNumberLike,
               public AttOrnamentAccid,
-              public AttPlacement {
+              public AttPlacement,
+              public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

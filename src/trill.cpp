@@ -30,6 +30,7 @@ Trill::Trill()
     , AttNNumberLike()
     , AttOrnamentAccid()
     , AttPlacement()
+    , AttExtSym()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -38,6 +39,7 @@ Trill::Trill()
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_EXTSYM);
 
     Reset();
 }
@@ -54,6 +56,7 @@ void Trill::Reset()
     ResetNNumberLike();
     ResetOrnamentAccid();
     ResetPlacement();
+    ResetExtSym();
 }
 
 //----------------------------------------------------------------------------
