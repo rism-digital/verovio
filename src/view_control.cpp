@@ -1595,25 +1595,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
     // for a start always put fermatas up
-    int code = SMUFL_E4C0_fermataAbove;
-    // check for shape
-    if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-            code = SMUFL_E4C5_fermataShortBelow;
-        else
-            code = SMUFL_E4C4_fermataShortAbove;
-    }
-    else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-            code = SMUFL_E4C7_fermataLongBelow;
-        else
-            code = SMUFL_E4C6_fermataLongAbove;
-    }
-    else if (fermata->GetForm() == fermataVis_FORM_inv
-        || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
-        code = SMUFL_E4C1_fermataBelow;
+    int code = fermata->GetFermataGlyph();
 
     std::wstring str;
     str.push_back(code);
@@ -2158,7 +2140,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     }
 
     // for a start always put trill up
-    int code = SMUFL_E566_ornamentTrill;
+    int code = trill->GetTrillGlyph();
     std::wstring str;
 
     if (trill->GetLstartsym() != LINESTARTENDSYMBOL_none) {
