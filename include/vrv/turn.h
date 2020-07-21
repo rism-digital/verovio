@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_cmnornaments.h"
+#include "atts_externalsymbols.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -27,7 +28,8 @@ class Turn : public ControlElement,
              public AttColor,
              public AttOrnamentAccid,
              public AttPlacement,
-             public AttTurnLog {
+             public AttTurnLog,
+             public AttExtSym {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -48,6 +50,11 @@ public:
     ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
+
+    /**
+     * Get the SMuFL glyph for the trun based on form or glyph.num
+     */
+    wchar_t GetTurnGlyph() const;
 
     //----------//
     // Functors //

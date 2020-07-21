@@ -1413,6 +1413,7 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     turn->WriteOrnamentAccid(currentNode);
     turn->WritePlacement(currentNode);
     turn->WriteTurnLog(currentNode);
+    turn->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteLayer(pugi::xml_node currentNode, Layer *layer)
@@ -4312,6 +4313,7 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
     vrvTurn->ReadOrnamentAccid(turn);
     vrvTurn->ReadPlacement(turn);
     vrvTurn->ReadTurnLog(turn);
+    vrvTurn->ReadExtSym(turn);
 
     parent->AddChild(vrvTurn);
     ReadUnsupportedAttr(turn, vrvTurn);
