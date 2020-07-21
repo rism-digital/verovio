@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 19 16:10:19 PDT 2020
+// Last Modified: Mon Jul 20 22:36:44 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -42212,7 +42212,7 @@ string MxmlEvent::getPrefixNoteInfo(void) const {
 // MxmlEvent::getPostfixNoteInfo --
 //
 
-string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
+string MxmlEvent::getPostfixNoteInfo(bool primarynote, const string& recip) const {
 	int beamstarts   = 0;
 	int beamends     = 0;
 	int beamconts    = 0;
@@ -42272,7 +42272,7 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
 	}
 
 	stringstream ss;
-	addNotations(ss, notations, beamstarts);
+	addNotations(ss, notations, beamstarts, recip);
 
 	if (primarynote) {
 		// only add these signifiers if this is the first
@@ -42316,7 +42316,7 @@ string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
 //
 
 void MxmlEvent::addNotations(stringstream& ss, xml_node notations,
-		int beamstarts) const {
+		int beamstarts, const string& recip) const {
 	if (!notations) {
 		return;
 	}
@@ -42472,6 +42472,12 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations,
 			}
 			ss << "@@" << tvalue << "@@";
 		} else {
+			HumNum duration = Convert::recipToDurationNoDots(recip);
+			if (duration > 0) {
+				double dval = -log2(duration.getFloat());
+				int twopow = int(dval);
+				tvalue *= (1 << twopow);
+			}
 			ss << "@" << tvalue << "@";
 		}
 	}
@@ -72190,7 +72196,7 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		}
 		pitch     = event->getKernPitch();
 		prefix    = event->getPrefixNoteInfo();
-		postfix   = event->getPostfixNoteInfo(primarynote);
+		postfix   = event->getPostfixNoteInfo(primarynote, recip);
 		if (postfix.find("@") != string::npos) {
 			m_hasTremoloQ = true;
 		}
@@ -73917,8 +73923,8 @@ void Tool_musicxml2hum::addSecondaryChordNotes(ostream& output,
 	string pitch;
 	string prefix;
 	string postfix;
-	bool slurstarts = 0;
-	bool slurstops  = 0;
+	int slurstarts = 0;
+	int slurstops  = 0;
 	vector<int> slurdirs;
 
 	bool primarynote = false;
@@ -73926,7 +73932,7 @@ void Tool_musicxml2hum::addSecondaryChordNotes(ostream& output,
 		note       = links.at(i);
 		pitch      = note->getKernPitch();
 		prefix     = note->getPrefixNoteInfo();
-		postfix    = note->getPostfixNoteInfo(primarynote);
+		postfix    = note->getPostfixNoteInfo(primarynote, recip);
 		slurstarts = note->hasSlurStart(slurdirs);
 		slurstops  = note->hasSlurStop();
 
@@ -87532,6 +87538,11 @@ void Tool_tremolo::expandTremolo(HTp token) {
 	string markup = "@" + to_string(value) + "@";
 	string base = token->getText();
 	hre.replaceDestructive(base, "", markup, "g");
+
+	// complicated beamings are not allowed yet (no internal L/J markers in tremolo beam)
+	bool hasBeamStart = base.find('L') != string::npos;
+	bool hasBeamStop  = base.find('J') != string::npos;
+
 	// Currently not allowed to add tremolo to beamed notes, so remove all beaming:
 	hre.replaceDestructive(base, "", "[LJKk]+", "g");
 	string startbeam;
@@ -87544,13 +87555,19 @@ void Tool_tremolo::expandTremolo(HTp token) {
 	// Augmentation dot is expected adjacent to regular rhythm value.
 	// Maybe allow anywhere?
 	hre.replaceDestructive(base, to_string(value), "\\d+%?\\d*\\.*", "g");
-	string initial = base + startbeam;
+	string initial = base;
+	if (hasBeamStart) {
+		initial += startbeam;
+	}
+	string terminal = base;
+	if (hasBeamStop) {
+		terminal += endbeam;
+	}
 	// remove slur end from start of tremolo:
 	hre.replaceDestructive(initial, "", "[)]+[<>]?", "g");
 	if (m_keepQ) {
 		initial += markup;
 	}
-	string terminal = base + endbeam;
 	// remove slur start information from end of tremolo:
 	hre.replaceDestructive(terminal, "", "[(]+[<>]?", "g");
 

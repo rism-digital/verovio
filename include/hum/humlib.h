@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 19 16:10:19 PDT 2020
+// Last Modified: Mon Jul 20 22:36:44 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4505,14 +4505,15 @@ class MxmlEvent {
 		std::string        getRecip           (void) const;
 		std::string        getKernPitch       (void);
 		std::string        getPrefixNoteInfo  (void) const;
-		std::string        getPostfixNoteInfo (bool primarynote) const;
+		std::string        getPostfixNoteInfo (bool primarynote, const std::string& recip) const;
 		xml_node           getNode            (void);
 		xml_node           getHNode           (void);
 		HumNum             getTimeSigDur      (void);
 		std::string        getElementName     (void);
 		void               addNotations       (std::stringstream& ss,
 		                                       xml_node notations,
-		                                       int beamstarts) const;
+		                                       int beamstarts,
+		                                       const std::string& recip) const;
 		void               reportVerseCountToOwner    (int count);
 		void               reportVerseCountToOwner    (int staffnum, int count);
 		void               reportHarmonyCountToOwner  (int count);
