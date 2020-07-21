@@ -23,7 +23,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Mordent::Mordent()
-    : ControlElement("mordent-"), TimePointInterface(), AttColor(), AttOrnamentAccid(), AttPlacement(), AttMordentLog()
+    : ControlElement("mordent-")
+    , TimePointInterface()
+    , AttColor()
+    , AttOrnamentAccid()
+    , AttPlacement()
+    , AttMordentLog()
+    , AttExtSym()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -50,40 +56,18 @@ void Mordent::Reset()
 
 wchar_t Mordent::GetMordentGlyph() const
 {
-    // If there is glyph.num, prioritize it, otherwise check glyph.name
+    // If there is glyph.num, prioritize it, otherwise check other attributes
     if (HasGlyphNum()) {
         wchar_t code = GetGlyphNum();
         if (NULL != Resources::GetGlyph(code)) return code;
     }
 
-    // If there is no glyph.name, handle glyph based on other attributes
-    if (!HasGlyphName()) {
-        if (GetLong() == BOOLEAN_true) {
-            return GetForm() == mordentLog_FORM_upper ? SMUFL_E56E_ornamentTremblement : SMUFL_E56E_ornamentTremblement;
-        }
-        return GetForm() == mordentLog_FORM_upper ? SMUFL_E56C_ornamentMordent : SMUFL_E56D_ornamentMordentInverted;
+    // Handle glyph based on other attributes
+    if (GetLong() == BOOLEAN_true) {
+        // We need ornamentTremblementInverted, so for the time being return same result here
+        return GetForm() == mordentLog_FORM_upper ? SMUFL_E56E_ornamentTremblement : SMUFL_E56E_ornamentTremblement;
     }
-
-    // If there's glyph.name,
-    return GetOrnamentGlyphByName(GetGlyphName());
-}
-
-wchar_t Mordent::GetOrnamentGlyphByName(const std::string& glyphName) const {
-    static std::map<std::string, wchar_t> extendedOrnaments = { 
-        { "ornamentSchleifer", SMUFL_E56D_ornamentMordentInverted },
-        { "ornamentPrecompAppoggTrill", SMUFL_E56D_ornamentMordentInverted },
-        { "ornamentPrecompPortDeVoixMordent", SMUFL_E56D_ornamentMordentInverted },
-        { "ornamentPrecompInvertedMordentUpperPrefix", SMUFL_E56D_ornamentMordentInverted },
-        //{ "", SMUFL_E56D_ornamentMordentInverted }, #depart_below
-        { "ornamentPrecompTrillSuffixDandrieu", SMUFL_E56D_ornamentMordentInverted },
-        { "ornamentPrecompDoubleCadenceUpperPrefix", SMUFL_E56D_ornamentMordentInverted }
-    };
-
-    if (extendedOrnaments.end() != extendedOrnaments.find(glyphName)) {
-        return extendedOrnaments[glyphName];
-    }
-
-    return SMUFL_E56D_ornamentMordentInverted;
+    return GetForm() == mordentLog_FORM_upper ? SMUFL_E56C_ornamentMordent : SMUFL_E56D_ornamentMordentInverted;
 }
 
 //----------------------------------------------------------------------------
