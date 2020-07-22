@@ -531,7 +531,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeSlurs();
     infile.analyzePhrasings();
     infile.analyzeKernTies();
-    infile.analyzeKernStemLengths();
+    // infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
     infile.analyzeKernAccidentals();
     infile.analyzeTextRepetition();
@@ -9291,6 +9291,12 @@ bool HumdrumInput::processOverfillingNotes(hum::HTp token)
 {
     hum::HumNum duration = token->getDuration();
     hum::HumNum barend = token->getDurationToBarline();
+    if (barend == 0) {
+       // This can happen due to unterminated measure.
+       // In such a case, the note/rest cannot overfill the
+       // the measure since there is not measure end.
+       return false;
+    }
     if (duration <= barend) {
         return false;
     }
@@ -16468,7 +16474,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         }
     }
 
-    if ((!grace) && (dur == 0) && (element)) {
+    if ((!grace) && (dur == 0) && element) {
         return 0;
         // duration should be set to "1" to make it look like
         // a stemless note with a quarter note duration to make
