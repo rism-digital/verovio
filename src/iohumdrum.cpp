@@ -9292,10 +9292,10 @@ bool HumdrumInput::processOverfillingNotes(hum::HTp token)
     hum::HumNum duration = token->getDuration();
     hum::HumNum barend = token->getDurationToBarline();
     if (barend == 0) {
-       // This can happen due to unterminated measure.
-       // In such a case, the note/rest cannot overfill the
-       // the measure since there is not measure end.
-       return false;
+        // This can happen due to unterminated measure.
+        // In such a case, the note/rest cannot overfill the
+        // the measure since there is not measure end.
+        return false;
     }
     if (duration <= barend) {
         return false;
@@ -13531,6 +13531,10 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
         else {
             nextpowoftwo = nextLowerPowerOfTwo((double)tuptop[i] / tupbot[i]);
+        }
+        if (dotlessdur[i].getNumerator() == 3) {
+            // correction for duplets
+            nextpowoftwo /= 2;
         }
         hum::HumNum value = dotlessdur[i] / nextpowoftwo;
         tuptop[i] = value.getDenominator();
