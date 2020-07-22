@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 21 10:33:41 PDT 2020
+// Last Modified: Tue Jul 21 18:24:28 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -72612,6 +72612,12 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 		output = text;
 		globalQ = true;
 		specialQ = true;
+	} else if (hre.search(text, "\\s*problem\\s*:\\s*(.*)\\s*$")) {
+		specialQ = true;
+		output = "!LO:TX:t=P:problem:";
+		output += hre.getMatch(1);
+		hre.replaceDestructive(output, "\\n", "\n", "g");
+		hre.replaceDestructive(output, " ", "\t", "g");
 	}
 
 	if (!specialQ) {
