@@ -1117,40 +1117,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 }
             }
             else if (hasMultipleLayer) {
-                Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
-                assert(parentLayer);
-                int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
-                // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
-                if (layerCount == 2) {
-                    Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindDescendantByType(LAYER));
-                    assert(firstLayer);
-
-                    bool isTopLayer = (firstLayer->GetN() == layerY->GetN());
-                    // Get list of the layers in the current staff
-                    ListOfObjects layers;
-                    ClassIdComparison matchType(LAYER);
-                    staffY->FindAllDescendantByComparison(&layers, &matchType);
-
-                    // Get iterator to another layer. We're going to find coliding elements there
-                    auto layerIter = std::find_if(layers.begin(), layers.end(),
-                        [&](Object *layer) { return dynamic_cast<Layer *>(layer)->GetN() != layerY->GetN(); });
-                    auto collidingElementsList = dynamic_cast<Layer*>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
-
-                    int boundaryLoc = PitchInterface::CalcLoc(
-                        dynamic_cast<Note *>(*begin(collidingElementsList)), dynamic_cast<Layer *>(*layerIter), this); 
-                    for (auto iter = begin(collidingElementsList); iter != end(collidingElementsList); ++iter) {
-                        auto currentElementLoc
-                            = PitchInterface::CalcLoc(dynamic_cast<Note *>(*begin(collidingElementsList)),
-                                dynamic_cast<Layer *>(*layerIter), this);
-                        if ((isTopLayer && (boundaryLoc < currentElementLoc))
-                            || (!isTopLayer && (boundaryLoc > currentElementLoc))) {
-                            boundaryLoc = currentElementLoc;
-                        }
-                    }
-
-                    int offset = isTopLayer ? 6 : -6;
-                    loc = boundaryLoc + offset;
-                }
+                loc = rest->GetRestLayerLocation(staffY, layerY, loc);
             }
         }
         loc = rest->GetRestLocOffset(loc);
@@ -1649,37 +1616,24 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     LayerElementsInTimeSpanParams *params = dynamic_cast<LayerElementsInTimeSpanParams *>(functorParams);
     assert(params);
 
-    Layer *currentLayer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    if (!currentLayer || currentLayer != params->m_layer) return FUNCTOR_SIBLINGS;
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // For mRest we do not look at the time span
-    if (this->Is(MREST)) {
-        // Add the layerN to the list of layer element occuring in this time frame
-        params->m_elements.push_back(this);
+    Layer *currentLayer = dynamic_cast<Layer *>(GetFirstAncestor(LAYER));
+    if (!currentLayer || (currentLayer != params->m_layer) || IsScoreDefElement() || Is(MREST)) 
         return FUNCTOR_SIBLINGS;
-    }
-
-    if (!this->GetDurationInterface() || this->Is(MSPACE) || this->Is(SPACE) || this->HasSameasLink())
+    if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink())
         return FUNCTOR_CONTINUE;
 
-    double duration = this->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
-    double time = m_alignment->GetTime();
+    const double duration = GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+    const double time = m_alignment->GetTime();
 
     // The event is starting after the end of the element
-    if ((time + duration) <= params->m_time) {
-        return FUNCTOR_CONTINUE;
-    }
+    if ((time + duration) <= params->m_time) return FUNCTOR_CONTINUE;
     // The element is starting after the event end - we can stop here
-    else if (time >= (params->m_time + params->m_duration)) {
-        return FUNCTOR_STOP;
-    }
+    if (time >= (params->m_time + params->m_duration)) return FUNCTOR_STOP;
 
     params->m_elements.push_back(this);
 
-    // Not need to recurse for chords? Not quite sure about it.
-    return (this->Is(CHORD)) ? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
+    // Not need to recurse for chords
+    return Is(CHORD)? FUNCTOR_SIBLINGS : FUNCTOR_CONTINUE;
 }
 
 int LayerElement::FindSpannedLayerElements(FunctorParams *functorParams)

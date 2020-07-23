@@ -574,7 +574,7 @@ public:
     virtual int LayerCountInTimeSpan(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Look for all the layer elements that overlap with the time / duration passed as parameter
+     * Look for all the layer elements that overlap with the time / duration within certain layer passed as parameter
      */
     virtual int LayerElementsInTimeSpan(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 

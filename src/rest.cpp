@@ -13,11 +13,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
@@ -121,6 +123,50 @@ int Rest::GetRestLocOffset(int loc)
     }
 
     return loc;
+}
+
+int Rest::GetRestLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
+{
+    Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    assert(parentLayer);
+    const int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
+    // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
+    if (layerCount != 2) return defaultLocation;
+
+    ListOfObjects layers;
+    ClassIdComparison matchType(LAYER);
+    staff->FindAllDescendantByComparison(&layers, &matchType);
+    const bool isTopLayer(dynamic_cast<Layer *>(*begin(layers))->GetN() == layer->GetN());
+
+    // Get iterator to another layer. We're going to find coliding elements there
+    auto layerIter = std::find_if(begin(layers), end(layers),
+        [&](Object *foundLayer) { return dynamic_cast<Layer *>(foundLayer)->GetN() != layer->GetN(); });
+    if (layerIter == end(layers)) return defaultLocation;
+    auto collidingElementsList = dynamic_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
+
+    constexpr int undefinedLocation(0xFF);
+    int boundaryLoc = undefinedLocation;
+    // Go through each colliding element and figure out optimal location for the rest
+    for (Object *object : collidingElementsList) {
+        int currentElementLoc(0);
+        if (object->Is(NOTE)) {
+            currentElementLoc 
+                = PitchInterface::CalcLoc(dynamic_cast<Note *>(object), dynamic_cast<Layer *>(*layerIter), this);
+        }
+        else if (object->Is(CHORD)) {
+            currentElementLoc = PitchInterface::CalcLoc(
+                dynamic_cast<Chord *>(object), dynamic_cast<Layer *>(*layerIter), this, isTopLayer);
+        }
+        if ((undefinedLocation == boundaryLoc) ||
+            (isTopLayer && (boundaryLoc < currentElementLoc))
+            || (!isTopLayer && (boundaryLoc > currentElementLoc))) {
+            boundaryLoc = currentElementLoc;
+        }
+    }
+
+    int offset = isTopLayer ? 6 : -6;
+
+    return boundaryLoc + offset;
 }
 
 //----------------------------------------------------------------------------

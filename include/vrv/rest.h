@@ -75,6 +75,11 @@ public:
      */
     int GetRestLocOffset(int loc);
 
+    /**
+     * Get the vertical location for the rests that are located on other layers
+     */
+    int GetRestLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
+
     //----------//
     // Functors //
     //----------//
