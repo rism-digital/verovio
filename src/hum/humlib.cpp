@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 21 18:24:28 PDT 2020
+// Last Modified: Thu Jul 23 11:01:49 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -28088,6 +28088,22 @@ HTp HumdrumLine::getTrackStart(int track) const {
 		return NULL;
 	} else {
 		return ((HumdrumFile*)m_owner)->getTrackStart(track);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::getTrackEnd --  Returns the ending exclusive interpretation
+//    for the given spine/track.
+//
+
+HTp HumdrumLine::getTrackEnd(int track, int subspine) const {
+	if (!m_owner) {
+		return NULL;
+	} else {
+		return ((HumdrumFile*)m_owner)->getTrackEnd(track, subspine);
 	}
 }
 

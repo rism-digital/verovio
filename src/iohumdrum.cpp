@@ -156,6 +156,8 @@ namespace humaux {
         m_endmeasure = anothertie.m_endmeasure;
         m_pitch = anothertie.m_pitch;
         m_layer = anothertie.m_layer;
+        m_starttokenpointer = anothertie.m_starttokenpointer;
+        m_subindex = anothertie.m_subindex;
     }
 
     HumdrumTie::~HumdrumTie() { clear(); }
@@ -178,6 +180,8 @@ namespace humaux {
         m_endmeasure = anothertie.m_endmeasure;
         m_pitch = anothertie.m_pitch;
         m_layer = anothertie.m_layer;
+        m_starttokenpointer = anothertie.m_starttokenpointer;
+        m_subindex = anothertie.m_subindex;
         return *this;
     }
 
@@ -280,6 +284,8 @@ namespace humaux {
     int HumdrumTie::getLayer() { return m_layer; }
 
     hum::HumNum HumdrumTie::getStartTime() { return m_starttime; }
+
+    Measure *HumdrumTie::getStartMeasure() { return m_startmeasure; }
 
     hum::HumNum HumdrumTie::getEndTime() { return m_endtime; }
 
@@ -679,6 +685,7 @@ bool HumdrumInput::convertHumdrum()
             }
         }
     }
+    processHangingTieStarts();
 
     createHeader();
     // calculateLayout();
@@ -698,6 +705,64 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processHangingTieStarts -- Deal with tie starts that were
+//    never matched with tie ends.
+//
+
+void HumdrumInput::processHangingTieStarts()
+{
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    for (int i = 0; i < (int)ss.size(); i++) {
+        for (auto it : ss[i].ties) {
+            processHangingTieStart(it);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processHangingTieStart --
+//
+
+void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
+{
+    hum::HTp token = tieinfo.getStartTokenPointer();
+    int subindex = tieinfo.getStartSubindex();
+    Measure *measure = tieinfo.getStartMeasure();
+    if (measure == NULL) {
+        cerr << "Problem with start measure being NULL" << endl;
+        return;
+    }
+    hum::HumNum duration = token->getDuration();
+    hum::HumNum tobegin = token->getDurationFromStart();
+    hum::HumNum scordur = token->getOwner()->getOwner()->getScoreDuration();
+    if (scordur == tobegin + duration) {
+        // This is a hanging tie the goes off of the end of the music
+        Tie *tie = new Tie;
+        addTieLineStyle(tie, token, subindex);
+        measure->AddChild(tie);
+        hum::HTp trackend = token->getOwner()->getTrackEnd(token->getTrack());
+        setTieLocationId(tie, token, subindex, trackend, -1);
+        std::string startid = getLocationId("note", token);
+        if (token->isChord()) {
+            int startnumber = subindex + 1;
+            if (startnumber > 0) {
+                startid += "S" + to_string(startnumber);
+            }
+        }
+        hum::HumNum tobar = token->getDurationToBarline();
+        hum::HumNum frombar = token->getDurationFromBarline();
+        hum::HumNum mdur = tobar + frombar;
+        // Only works for */4 meters for now:
+        pair<int, double> ts2(0, mdur.getFloat() + 1);
+        tie->SetTstamp2(ts2); // attach start to beginning of measure
+        tie->SetStartid("#" + startid);
+        tie->SetType("hanging-terminal");
+    }
 }
 
 //////////////////////////////

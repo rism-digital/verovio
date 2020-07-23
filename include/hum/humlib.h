@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 21 18:24:28 PDT 2020
+// Last Modified: Thu Jul 23 11:01:49 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1298,6 +1298,7 @@ class HumdrumLine : public std::string, public HumHash {
 		HumNum   getBeat                (HumNum beatdur = 1);
 		HumNum   getBeatStr             (std::string beatrecip = "4");
 		HTp      getTrackStart          (int track) const;
+		HTp      getTrackEnd            (int track, int subtrack = 0) const;
 		void     setLineFromCsv         (const char* csv,
 		                                 const std::string& separator = ",");
 		void     setLineFromCsv         (const std::string& csv,
@@ -1964,7 +1965,7 @@ class HumdrumFileBase : public HumHash {
 		                    { return getSpineStartList(spinestarts, exinterps); }
 
 		int           getTrackEndCount         (int track) const;
-		HTp           getTrackEnd              (int track, int subtrack) const;
+		HTp           getTrackEnd              (int track, int subtrack = 0) const;
 		void          createLinesFromTokens    (void);
 		void          removeExtraTabs          (void);
 		void          addExtraTabs             (void);

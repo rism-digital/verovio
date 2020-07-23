@@ -91,6 +91,7 @@ namespace humaux {
         std::string getStartToken();
         hum::HTp getStartTokenPointer();
         std::string getEndToken();
+        Measure* getStartMeasure();
         int getStartSubindex();
         int getPitch();
         int getLayer();
@@ -601,6 +602,8 @@ protected:
     void hideBarlinesInTiedGroup(hum::HTp startnote);
     int getMultiEndline(int startindex);
     void processHangingTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
+    void processHangingTieStarts();
+    void processHangingTieStart(humaux::HumdrumTie& tieinfo);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
