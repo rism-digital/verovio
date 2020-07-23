@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.7.2] - 2020-07-23
+* Fix bug with memory in beams (@valeriyvan)
+
 ## [2.7.1] - 2020-05-22
 * Fix bug with mensural clefs not displaying
 
