@@ -296,6 +296,11 @@ public:
     virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
 
     /**
+     * See Object::LayerElementsInTimeSpan
+     */
+    virtual int LayerElementsInTimeSpan(FunctorParams *functorParams);
+
+    /**
      * See Object::CalcOnsetOffset
      */
     ///@{
