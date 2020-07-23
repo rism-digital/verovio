@@ -9,6 +9,9 @@
 * Options for controlling output tabs (--output-indent and --output-indent-tab)
 * Option to remove ids in the MEI output (--remove-ids) to be passed to GetMEI with the JS toolkit
 
+## [2.7.2] - 2020-07-23
+* Fix bug with memory in beams (@valeriyvan)
+
 ## [2.7.1] - 2020-05-22
 * Fix bug with mensural clefs not displaying
 
