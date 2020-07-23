@@ -17734,6 +17734,7 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
 
     if (found == ss[staffnum].ties.end()) {
         // can't find start of slur so give up.
+        processHangingTieEnd(note, token, tstring, subindex);
         return;
     }
 
@@ -17893,6 +17894,41 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
     // There will be an error in the data.
     cerr << "Unprintable rhythm: " << duration << endl;
     return duration;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processHangingTieEnd --
+//
+
+void HumdrumInput::processHangingTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
+{
+
+    hum::HumNum position = token->getDurationFromStart();
+    if (position == 0) {
+        // Hanging tie at start of music.
+        Tie *tie = new Tie;
+        addTieLineStyle(tie, token, subindex);
+        m_measure->AddChild(tie);
+        hum::HTp trackstart = token->getOwner()->getTrackStart(token->getTrack());
+        setTieLocationId(tie, trackstart, -1, token, subindex);
+        std::string endid = getLocationId("note", token);
+        if (token->isChord()) {
+            endid += "S" + to_string(subindex + 1);
+        }
+        if (token->isChord()) {
+            int endnumber = subindex + 1;
+            if (endnumber > 0) {
+                endid += "S" + to_string(endnumber);
+            }
+        }
+        tie->SetTstamp(0); // attach start to beginning of measure
+        tie->SetEndid("#" + endid);
+        tie->SetType("hanging-initial");
+    }
+    else {
+        cerr << "\tHANGING IN MIDDLE OF SCORE, CURRENTLY IGNORING " << endl;
+    }
 }
 
 //////////////////////////////
@@ -19012,10 +19048,19 @@ void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux:
 void HumdrumInput::setTieLocationId(Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex)
 {
 
-    int startline = tiestart->getLineNumber();
-    int startfield = tiestart->getFieldNumber();
-    int endline = tieend->getLineNumber();
-    int endfield = tieend->getFieldNumber();
+    int startline = 0;
+    int startfield = 0;
+    int endline = 0;
+    int endfield = 0;
+
+    if (tiestart) {
+        startline = tiestart->getLineNumber();
+        startfield = tiestart->getFieldNumber();
+    }
+    if (tieend) {
+        endline = tieend->getLineNumber();
+        endfield = tieend->getFieldNumber();
+    }
 
     std::string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);

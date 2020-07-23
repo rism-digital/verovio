@@ -600,6 +600,7 @@ protected:
     void hideTerminalBarlines(hum::HumdrumFile &infile);
     void hideBarlinesInTiedGroup(hum::HTp startnote);
     int getMultiEndline(int startindex);
+    void processHangingTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
