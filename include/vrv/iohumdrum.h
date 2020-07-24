@@ -616,7 +616,7 @@ protected:
     void processHangingTieStart(humaux::HumdrumTie &tieinfo);
     bool atEndingBoundaryStart(hum::HTp token);
     bool atEndingBoundaryEnd(hum::HTp token);
-    Tie* tieToStartOfMeasure(hum::HTp token, int subindex, hum::HumNum meterunit);
+    Tie* tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum meterunit);
     Tie* addHangingTieToNextItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure* measure);
     bool inDifferentEndings(hum::HTp token1, hum::HTp token2);
 

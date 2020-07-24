@@ -766,7 +766,11 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         tie->SetType("hanging-terminal-ending");
     }
     else {
-        cerr << "TIE START IN MIDDLE OF SCORE " << token << endl;
+        // This is a hanging tie for no apparent reason.  Display it, but make
+        // it red. L.v. will be handled differently as an ornament.
+        Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
+        tie->SetType("hanging");
+        tie->SetColor("red");
     }
 }
 
@@ -805,24 +809,24 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
         }
     }
 
-    hum::HumNum dur;
+    hum::HumNum tstamp;
     if (trackend->isData()) {
         hum::HumNum frombar = trackend->getDurationFromBarline();
-        dur = frombar;
-        dur *= meterunit;
-        dur /= 4;
-        dur += 1;
+        tstamp = frombar;
+        tstamp *= meterunit;
+        tstamp /= 4;
+        tstamp += 1;
     }
     else {
         hum::HumNum tobar = token->getDurationToBarline();
         hum::HumNum frombar = token->getDurationFromBarline();
-        dur = tobar + frombar;
-        dur *= meterunit;
-        dur /= 4;
-        dur += 1;
+        tstamp = tobar + frombar;
+        tstamp *= meterunit;
+        tstamp /= 4;
+        tstamp += 1;
     }
 
-    pair<int, double> ts2(0, dur.getFloat());
+    pair<int, double> ts2(0, tstamp.getFloat());
     tie->SetTstamp2(ts2); // attach start to beginning of measure
     tie->SetStartid("#" + startid);
 
@@ -840,7 +844,7 @@ void HumdrumInput::processHangingTieEnd(
     hum::HumNum position = token->getDurationFromStart();
     if (position == 0) {
         // Hanging tie at start of music.
-        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
+        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
         tie->SetType("hanging-initial");
     }
     else if (atEndingBoundaryStart(token)) {
@@ -849,11 +853,15 @@ void HumdrumInput::processHangingTieEnd(
         // measure before the first ending.  Also need to force
         // a tie split across ending boundaries (currently they will
         // automatically merge).
-        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
+        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
         tie->SetType("hanging-initial-ending");
     }
     else {
-        cerr << "\tHANGING TIE END IN MIDDLE OF SCORE, CURRENTLY IGNORING " << endl;
+        // This is a hanging tie for no apparent reason.  Display it, but make
+        // it red. L.v. will be handled differently as an ornament.
+        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
+        tie->SetType("hanging");
+        tie->SetColor("red");
     }
 }
 
@@ -18209,12 +18217,12 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
 
 //////////////////////////////
 //
-// HumdrumInput::tieToStartOfMeasure -- Tie a note to the start of
+// HumdrumInput::tieToPreviousItem -- Tie a note to the start of
 //    the measure (presumably the note is at the start of the measure
 //    as well).
 //
 
-Tie *HumdrumInput::tieToStartOfMeasure(hum::HTp token, int subindex, hum::HumNum meterunit)
+Tie *HumdrumInput::tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum meterunit)
 {
 
     Tie *tie = new Tie;
@@ -18232,12 +18240,18 @@ Tie *HumdrumInput::tieToStartOfMeasure(hum::HTp token, int subindex, hum::HumNum
                 break; // exclusive interpretation (start of spine)
             }
         }
+        if (current->isData() && !current->isNull()) {
+            // What about grace notes preceeding a tie end?
+            break;
+        }
         current = current->getPreviousToken();
     }
     if (current) {
         starttoken = current;
     }
+
     setTieLocationId(tie, starttoken, -1, token, subindex);
+
     std::string endid = getLocationId("note", token);
     if (token->isChord()) {
         endid += "S" + to_string(subindex + 1);
@@ -18252,11 +18266,24 @@ Tie *HumdrumInput::tieToStartOfMeasure(hum::HTp token, int subindex, hum::HumNum
     // Currently a bug in verovio for @tstamp=0, so
     // make an adjustment to compensate relative to meter.unit:
     // int tstamp = 0;
-    hum::HumNum tstamp = meterunit;
-    tstamp /= 4;
-    tstamp = -tstamp + 1;
-    if (tstamp < 0) {
-        tstamp = 0;
+    hum::HumNum tstamp;
+    if (current->isBarline() || current->isInterpretation()) {
+        hum::HumNum tstamp = meterunit;
+        tstamp /= 4;
+        tstamp = -tstamp + 1;
+        if (tstamp < 0) {
+            tstamp = 0;
+        }
+    }
+    else if (current->isData()) {
+        hum::HumNum frombar = starttoken->getDurationFromBarline();
+        tstamp = frombar;
+        tstamp *= meterunit;
+        tstamp /= 4;
+        tstamp += 1;
+    }
+    else {
+        cerr << "STRANGE CASE IN TIE INSERTION" << endl;
     }
 
     tie->SetTstamp(tstamp.getFloat()); // attach start to beginning of measure
