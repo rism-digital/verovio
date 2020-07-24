@@ -783,7 +783,7 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
     measure->AddChild(tie);
 
     hum::HTp trackend = token->getOwner()->getTrackEnd(token->getTrack());
-    hum::HTp current = token;
+    hum::HTp current = token->getNextToken();
     while (current) {
         if (current->isBarline()) {
             break;
@@ -814,8 +814,8 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
         dur += 1;
     }
     else {
-        hum::HumNum tobar = trackend->getDurationToBarline();
-        hum::HumNum frombar = trackend->getDurationFromBarline();
+        hum::HumNum tobar = token->getDurationToBarline();
+        hum::HumNum frombar = token->getDurationFromBarline();
         dur = tobar + frombar;
         dur *= meterunit;
         dur /= 4;
