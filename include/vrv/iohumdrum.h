@@ -82,7 +82,8 @@ namespace humaux {
         HumdrumTie &operator=(const HumdrumTie &anothertie);
         vrv::Tie *insertTieIntoDom();
         void setStart(const std::string &id, Measure *starting, int layer, const std::string &token, int pitch,
-            hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok);
+            hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop,
+            hum::HumNum meterbot);
         void setEnd(const std::string &id, Measure *ending, const std::string &token);
         vrv::Tie *setEndAndInsert(const std::string &id, Measure *ending, const std::string &token);
         hum::HumNum getEndTime();
@@ -91,7 +92,7 @@ namespace humaux {
         std::string getStartToken();
         hum::HTp getStartTokenPointer();
         std::string getEndToken();
-        Measure* getStartMeasure();
+        Measure *getStartMeasure();
         int getStartSubindex();
         int getPitch();
         int getLayer();
@@ -99,6 +100,10 @@ namespace humaux {
         void clear();
         void setTieAbove();
         void setTieBelow();
+        int getMeterTop();
+        hum::HumNum getMeterBottom();
+        void setMeterTop(int metertop);
+        void setMeterBottom(hum::HumNum meterbot);
 
     private:
         std::string m_starttoken;
@@ -116,6 +121,8 @@ namespace humaux {
         Measure *m_endmeasure;
         hum::HTp m_starttokenpointer = NULL;
         int m_subindex; // the subtoken index for the start of the tie
+        int m_meter_top;
+        hum::HumNum m_meter_bottom;
     };
 
     class HumdrumBeamAndTuplet {
@@ -256,8 +263,10 @@ namespace humaux {
         Measure *ottava2downmeasure;
 
         // meter_bottom == Used to keep track of bottom value of time signature.
-        // This is needed to calculate tstamps.
+        // This is needed to calculate tstamps (meter.unit).
         hum::HumNum meter_bottom;
+
+        // meter_top == the top number of the time signature (meter.count).
         int meter_top;
 
         // ties == keep track of ties for each staff/layer/pitch
@@ -601,9 +610,10 @@ protected:
     void hideTerminalBarlines(hum::HumdrumFile &infile);
     void hideBarlinesInTiedGroup(hum::HTp startnote);
     int getMultiEndline(int startindex);
-    void processHangingTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
+    void processHangingTieEnd(
+        Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit);
     void processHangingTieStarts();
-    void processHangingTieStart(humaux::HumdrumTie& tieinfo);
+    void processHangingTieStart(humaux::HumdrumTie &tieinfo);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

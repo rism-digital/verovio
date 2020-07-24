@@ -131,15 +131,7 @@ namespace humaux {
 
     /////////////////////////////////////////////////////////////////////
 
-    HumdrumTie::HumdrumTie()
-    {
-        m_endmeasure = m_startmeasure = NULL;
-        m_inserted = false;
-        m_above = false;
-        m_below = false;
-        m_pitch = 0;
-        m_layer = -1;
-    }
+    HumdrumTie::HumdrumTie() { clear(); }
 
     HumdrumTie::HumdrumTie(const HumdrumTie &anothertie)
     {
@@ -158,6 +150,8 @@ namespace humaux {
         m_layer = anothertie.m_layer;
         m_starttokenpointer = anothertie.m_starttokenpointer;
         m_subindex = anothertie.m_subindex;
+        m_meter_top = anothertie.m_meter_top;
+        m_meter_bottom = anothertie.m_meter_bottom;
     }
 
     HumdrumTie::~HumdrumTie() { clear(); }
@@ -182,6 +176,8 @@ namespace humaux {
         m_layer = anothertie.m_layer;
         m_starttokenpointer = anothertie.m_starttokenpointer;
         m_subindex = anothertie.m_subindex;
+        m_meter_top = anothertie.m_meter_top;
+        m_meter_bottom = anothertie.m_meter_bottom;
         return *this;
     }
 
@@ -191,9 +187,24 @@ namespace humaux {
         m_inserted = false;
         m_above = false;
         m_below = false;
+        m_pitch = 0;
+        m_layer = -1;
         m_startid.clear();
         m_endid.clear();
+        m_starttokenpointer = NULL;
+        m_starttoken = "";
+        m_subindex = -1;
+        m_meter_top = 4;
+        m_meter_bottom = 4;
     }
+
+    void HumdrumTie::setMeterTop(int metertop) { m_meter_top = metertop; }
+
+    void HumdrumTie::setMeterBottom(hum::HumNum meterbot) { m_meter_bottom = meterbot; }
+
+    int HumdrumTie::getMeterTop() { return m_meter_top; }
+
+    hum::HumNum HumdrumTie::getMeterBottom() { return m_meter_bottom; }
 
     void HumdrumTie::setTieAbove() { m_above = true; }
 
@@ -251,7 +262,7 @@ namespace humaux {
     }
 
     void HumdrumTie::setStart(const std::string &id, Measure *starting, int layer, const std::string &token, int pitch,
-        hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok)
+        hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok, int metertop, hum::HumNum meterbot)
     {
         m_starttoken = token;
         m_starttime = starttime;
@@ -262,6 +273,8 @@ namespace humaux {
         m_startid = id;
         m_subindex = subindex;
         m_starttokenpointer = starttok;
+        m_meter_top = metertop;
+        m_meter_bottom = meterbot;
     }
 
     void HumdrumTie::setEnd(const std::string &id, Measure *ending, const std::string &token)
@@ -737,6 +750,8 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         cerr << "Problem with start measure being NULL" << endl;
         return;
     }
+    // int metercount = tieinfo.getMeterTop();
+    hum::HumNum meterunit = tieinfo.getMeterBottom();
     hum::HumNum duration = token->getDuration();
     hum::HumNum tobegin = token->getDurationFromStart();
     hum::HumNum scordur = token->getOwner()->getOwner()->getScoreDuration();
@@ -757,6 +772,8 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         hum::HumNum tobar = token->getDurationToBarline();
         hum::HumNum frombar = token->getDurationFromBarline();
         hum::HumNum mdur = tobar + frombar;
+        mdur *= meterunit;
+        mdur /= 4;
         // Only works for */4 meters for now:
         pair<int, double> ts2(0, mdur.getFloat() + 1);
         tie->SetTstamp2(ts2); // attach start to beginning of measure
@@ -17702,8 +17719,12 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
     int cl = m_currentlayer;
     int pitch = hum::Convert::kernToMidiNoteNumber(tstring);
 
+    int metertop = ss[rtrack].meter_top;
+    hum::HumNum meterbot = ss[rtrack].meter_bottom;
+
     ss[rtrack].ties.emplace_back();
-    ss[rtrack].ties.back().setStart(noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime, subindex, token);
+    ss[rtrack].ties.back().setStart(
+        noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime, subindex, token, metertop, meterbot);
 
     if (m_signifiers.above) {
         std::string marker = "[";
@@ -17799,7 +17820,7 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
 
     if (found == ss[staffnum].ties.end()) {
         // can't find start of slur so give up.
-        processHangingTieEnd(note, token, tstring, subindex);
+        processHangingTieEnd(note, token, tstring, subindex, ss[staffnum].meter_bottom);
         return;
     }
 
@@ -17966,7 +17987,8 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
 // HumdrumInput::processHangingTieEnd --
 //
 
-void HumdrumInput::processHangingTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
+void HumdrumInput::processHangingTieEnd(
+    Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit)
 {
 
     hum::HumNum position = token->getDurationFromStart();
@@ -17987,7 +18009,18 @@ void HumdrumInput::processHangingTieEnd(Note *note, hum::HTp token, const std::s
                 endid += "S" + to_string(endnumber);
             }
         }
-        tie->SetTstamp(0); // attach start to beginning of measure
+
+        // Currently a bug in verovio for @tstamp=0, so
+        // make an adjustment to compensate relative to meter.unit:
+        // int tstamp = 0;
+        hum::HumNum tstamp = meterunit;
+        tstamp /= 4;
+        tstamp = -tstamp + 1;
+        if (tstamp < 0) {
+            tstamp = 0;
+        }
+
+        tie->SetTstamp(tstamp.getFloat()); // attach start to beginning of measure
         tie->SetEndid("#" + endid);
         tie->SetType("hanging-initial");
     }
