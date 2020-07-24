@@ -964,6 +964,47 @@ bool HumdrumInput::atEndingBoundaryEnd(hum::HTp token)
 
 //////////////////////////////
 //
+// HumdrumInput::inDifferentEndings --
+//
+
+bool HumdrumInput::inDifferentEndings(hum::HTp token1, hum::HTp token2)
+{
+    int line1 = token1->getLineIndex();
+    int line2 = token2->getLineIndex();
+    hum::HTp label1 = m_sectionlabels[line1];
+    hum::HTp label2 = m_sectionlabels[line2];
+    if (label1 == label2) {
+        return false;
+    }
+    if (label1 == NULL) {
+        return false;
+    }
+    if (label2 == NULL) {
+        return false;
+    }
+    hum::HumRegex hre;
+    int number1 = 0;
+    int number2 = 0;
+    if (hre.search(label1, "(\\d+)$")) {
+        number1 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (hre.search(label2, "(\\d+)$")) {
+        number2 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (number1 == number2) {
+        return false;
+    }
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::adjustMeasureTimings --
 //
 
@@ -18002,10 +18043,15 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
         processHangingTieEnd(note, token, tstring, subindex, ss[staffnum].meter_bottom);
         return;
     }
+    hum::HTp starttoken = found->getStartTokenPointer();
+    bool needToBreak = inDifferentEndings(starttoken, token);
+    if (needToBreak) {
+        processHangingTieEnd(note, token, tstring, subindex, ss[staffnum].meter_bottom);
+        return;
+    }
 
     Tie *tie = found->setEndAndInsert(noteuuid, m_measure, tstring);
 
-    hum::HTp starttoken = found->getStartTokenPointer();
     int startindex = found->getStartSubindex();
     if (starttoken) {
         addTieLineStyle(tie, starttoken, startindex);
