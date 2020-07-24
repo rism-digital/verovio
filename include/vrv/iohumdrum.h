@@ -614,8 +614,10 @@ protected:
         Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit);
     void processHangingTieStarts();
     void processHangingTieStart(humaux::HumdrumTie &tieinfo);
-    bool atEndingBoundary(hum::HTp token);
+    bool atEndingBoundaryStart(hum::HTp token);
+    bool atEndingBoundaryEnd(hum::HTp token);
     Tie* tieToStartOfMeasure(hum::HTp token, int subindex, hum::HumNum meterunit);
+    Tie* addHangingTieToNextItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure* measure);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

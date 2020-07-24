@@ -755,31 +755,211 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
     hum::HumNum duration = token->getDuration();
     hum::HumNum tobegin = token->getDurationFromStart();
     hum::HumNum scordur = token->getOwner()->getOwner()->getScoreDuration();
+
     if (scordur == tobegin + duration) {
         // This is a hanging tie the goes off of the end of the music
-        Tie *tie = new Tie;
-        addTieLineStyle(tie, token, subindex);
-        measure->AddChild(tie);
-        hum::HTp trackend = token->getOwner()->getTrackEnd(token->getTrack());
-        setTieLocationId(tie, token, subindex, trackend, -1);
-        std::string startid = getLocationId("note", token);
-        if (token->isChord()) {
-            int startnumber = subindex + 1;
-            if (startnumber > 0) {
-                startid += "S" + to_string(startnumber);
-            }
-        }
-        hum::HumNum tobar = token->getDurationToBarline();
-        hum::HumNum frombar = token->getDurationFromBarline();
-        hum::HumNum mdur = tobar + frombar;
-        mdur *= meterunit;
-        mdur /= 4;
-        // Only works for */4 meters for now:
-        pair<int, double> ts2(0, mdur.getFloat() + 1);
-        tie->SetTstamp2(ts2); // attach start to beginning of measure
-        tie->SetStartid("#" + startid);
+        Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
         tie->SetType("hanging-terminal");
     }
+    else if (atEndingBoundaryEnd(token)) {
+        Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
+        tie->SetType("hanging-terminal-ending");
+    }
+    else {
+        cerr << "TIE START IN MIDDLE OF SCORE " << token << endl;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addHangingTieToNextItem --
+//
+
+Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure *measure)
+{
+
+    Tie *tie = new Tie;
+    addTieLineStyle(tie, token, subindex);
+    measure->AddChild(tie);
+
+    hum::HTp trackend = token->getOwner()->getTrackEnd(token->getTrack());
+    hum::HTp current = token;
+    while (current) {
+        if (current->isBarline()) {
+            break;
+        }
+        if (current->isData() && !current->isNull()) {
+            break;
+        }
+        current = current->getNextToken();
+    }
+    if (current) {
+        trackend = current;
+    }
+    setTieLocationId(tie, token, subindex, trackend, -1);
+    std::string startid = getLocationId("note", token);
+    if (token->isChord()) {
+        int startnumber = subindex + 1;
+        if (startnumber > 0) {
+            startid += "S" + to_string(startnumber);
+        }
+    }
+
+    hum::HumNum dur;
+    if (trackend->isData()) {
+        hum::HumNum frombar = trackend->getDurationFromBarline();
+        dur = frombar;
+        dur *= meterunit;
+        dur /= 4;
+        dur += 1;
+    }
+    else {
+        hum::HumNum tobar = trackend->getDurationToBarline();
+        hum::HumNum frombar = trackend->getDurationFromBarline();
+        dur = tobar + frombar;
+        dur *= meterunit;
+        dur /= 4;
+        dur += 1;
+    }
+
+    pair<int, double> ts2(0, dur.getFloat());
+    tie->SetTstamp2(ts2); // attach start to beginning of measure
+    tie->SetStartid("#" + startid);
+
+    return tie;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processHangingTieEnd --
+//
+
+void HumdrumInput::processHangingTieEnd(
+    Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit)
+{
+    hum::HumNum position = token->getDurationFromStart();
+    if (position == 0) {
+        // Hanging tie at start of music.
+        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
+        tie->SetType("hanging-initial");
+    }
+    else if (atEndingBoundaryStart(token)) {
+        // The note is at the start of a secondary ending, and
+        // is not tied to the previous note, but a note in a previous
+        // measure before the first ending.  Also need to force
+        // a tie split across ending boundaries (currently they will
+        // automatically merge).
+        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
+        tie->SetType("hanging-initial-ending");
+    }
+    else {
+        cerr << "\tHANGING TIE END IN MIDDLE OF SCORE, CURRENTLY IGNORING " << endl;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::atEndingBoundaryStart -- Return true if a token is in a
+//   different ending section that the previous note. Split spines
+//   should mostly be accounted for, but maybe not corner cases.
+//
+
+bool HumdrumInput::atEndingBoundaryStart(hum::HTp token)
+{
+    hum::HTp current = token->getPreviousToken();
+    while (current) {
+        if (current->isData() && !current->isNull()) {
+            break;
+        }
+        current = current->getPreviousToken();
+    }
+    if (!current) {
+        return false;
+    }
+    int line1 = current->getLineIndex();
+    int line2 = token->getLineIndex();
+    hum::HTp label1 = m_sectionlabels[line1];
+    hum::HTp label2 = m_sectionlabels[line2];
+    if (label1 == label2) {
+        return false;
+    }
+    if (label1 == NULL) {
+        return false;
+    }
+    if (label2 == NULL) {
+        return false;
+    }
+    hum::HumRegex hre;
+    int number1 = 0;
+    int number2 = 0;
+    if (hre.search(label1, "(\\d+)$")) {
+        number1 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (hre.search(label2, "(\\d+)$")) {
+        number2 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (number1 == number2) {
+        return false;
+    }
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::atEndingBoundaryEnd -- Return true if a token is in a
+//   different ending section that the next note.
+//
+
+bool HumdrumInput::atEndingBoundaryEnd(hum::HTp token)
+{
+    hum::HTp current = token->getNextToken();
+    while (current) {
+        if (current->isData() && !current->isNull()) {
+            break;
+        }
+        current = current->getNextToken();
+    }
+    if (!current) {
+        return false;
+    }
+    int line1 = current->getLineIndex();
+    int line2 = token->getLineIndex();
+    hum::HTp label1 = m_sectionlabels[line1];
+    hum::HTp label2 = m_sectionlabels[line2];
+    if (label1 == label2) {
+        return false;
+    }
+    if (label1 == NULL) {
+        return false;
+    }
+    if (label2 == NULL) {
+        return false;
+    }
+    hum::HumRegex hre;
+    int number1 = 0;
+    int number2 = 0;
+    if (hre.search(label1, "(\\d+)$")) {
+        number1 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (hre.search(label2, "(\\d+)$")) {
+        number2 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (number1 == number2) {
+        return false;
+    }
+    return true;
 }
 
 //////////////////////////////
@@ -15826,7 +16006,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
         notetype += "scordatura";
         note->SetType(notetype);
-        // ggg
     }
 }
 
@@ -18038,87 +18217,6 @@ Tie *HumdrumInput::tieToStartOfMeasure(hum::HTp token, int subindex, hum::HumNum
     tie->SetEndid("#" + endid);
 
     return tie;
-}
-
-//////////////////////////////
-//
-// HumdrumInput::processHangingTieEnd --
-//
-
-void HumdrumInput::processHangingTieEnd(
-    Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit)
-{
-    hum::HumNum position = token->getDurationFromStart();
-    if (position == 0) {
-        // Hanging tie at start of music.
-        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
-        tie->SetType("hanging-initial");
-    }
-    else if (atEndingBoundary(token)) {
-        // The note is at the start of a secondary ending, and
-        // is not tied to the previous note, but a note in a previous
-        // measure before the first ending.  Also need to force
-        // a tie split across ending boundaries (currently they will
-        // automatically merge).
-        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
-        tie->SetType("hanging-initial-ending");
-    }
-    else {
-        cerr << "\tHANGING TIE END IN MIDDLE OF SCORE, CURRENTLY IGNORING " << endl;
-    }
-}
-
-//////////////////////////////
-//
-// HumdrumInput::atEndingBoundary -- Return true if a token is in a
-//   different ending section that the previous note. Split spines
-//   should mostly be accounted for, but maybe not corner cases.
-//
-
-bool HumdrumInput::atEndingBoundary(hum::HTp token)
-{
-    hum::HTp current = token->getPreviousToken();
-    while (current) {
-        if (current->isData() && !current->isNull()) {
-            break;
-        }
-        current = current->getPreviousToken();
-    }
-    if (!current) {
-        return false;
-    }
-    int line1 = current->getLineIndex();
-    int line2 = token->getLineIndex();
-    hum::HTp label1 = m_sectionlabels[line1];
-    hum::HTp label2 = m_sectionlabels[line2];
-    if (label1 == label2) {
-        return false;
-    }
-    if (label1 == NULL) {
-        return false;
-    }
-    if (label2 == NULL) {
-        return false;
-    }
-    hum::HumRegex hre;
-    int number1 = 0;
-    int number2 = 0;
-    if (hre.search(label1, "(\\d+)$")) {
-        number1 = hre.getMatchInt(1);
-    }
-    else {
-        return false;
-    }
-    if (hre.search(label2, "(\\d+)$")) {
-        number2 = hre.getMatchInt(1);
-    }
-    else {
-        return false;
-    }
-    if (number1 == number2) {
-        return false;
-    }
-    return true;
 }
 
 //////////////////////////////
