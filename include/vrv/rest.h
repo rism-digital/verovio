@@ -75,11 +75,6 @@ public:
      */
     int GetRestLocOffset(int loc);
 
-    /**
-     * Get the vertical location for the rests that are located on other layers
-     */
-    int GetRestLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
-
     //----------//
     // Functors //
     //----------//
@@ -109,8 +104,34 @@ public:
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
+    /**
+     * Get the vertical location for the rests that are located on other layers
+     */
+    int GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation);
+
 private:
     //
+
+    /**
+     * Get the rest vertical location relative to location of elements placed on other layers
+     */
+    int GetLocationRelativeToOtherLayers(const ListOfObjects &layersList, Layer *currentLayer);
+
+    /**
+     * Get the rest vertical location relative to location of elements placed on current layers
+     */
+    int GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentLayer, bool isTopLayer);
+
+    /**
+     * Get location of first/last element of the corresponding layer
+     */
+    int GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer);
+
+    /**
+     * Get location of the object on the layer if it's note or chord
+     */
+    int GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer);
+
 public:
     //
 private:

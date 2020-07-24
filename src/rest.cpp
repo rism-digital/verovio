@@ -125,10 +125,10 @@ int Rest::GetRestLocOffset(int loc)
     return loc;
 }
 
-int Rest::GetRestLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
+int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
 {
     Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(parentLayer);
+    if (!layer) return defaultLocation;
     const int layerCount = parentLayer->GetLayerCountForTimeSpanOf(this);
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (layerCount != 2) return defaultLocation;
@@ -138,35 +138,113 @@ int Rest::GetRestLayerLocation(Staff *staff, Layer *layer, int defaultLocation)
     staff->FindAllDescendantByComparison(&layers, &matchType);
     const bool isTopLayer(dynamic_cast<Layer *>(*begin(layers))->GetN() == layer->GetN());
 
-    // Get iterator to another layer. We're going to find coliding elements there
-    auto layerIter = std::find_if(begin(layers), end(layers),
-        [&](Object *foundLayer) { return dynamic_cast<Layer *>(foundLayer)->GetN() != layer->GetN(); });
-    if (layerIter == end(layers)) return defaultLocation;
-    auto collidingElementsList = dynamic_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
+    // find best rest location relative to elements on other layers
+    int otherLayerRelativeLocation = GetLocationRelativeToOtherLayers(layers, layer);
+    int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
 
-    constexpr int undefinedLocation(0xFF);
-    int boundaryLoc = undefinedLocation;
+    otherLayerRelativeLocation += isTopLayer ? 6 : -6;
+    if (currentLayerRelativeLocation == VRV_UNSET) {
+        currentLayerRelativeLocation = defaultLocation;
+    }
+    else {
+        currentLayerRelativeLocation += isTopLayer ? 0 : -0;
+    }
+
+    return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
+                      : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
+}
+
+int Rest::GetLocationRelativeToOtherLayers(const ListOfObjects& layersList, Layer* currentLayer)
+{
+    if (!currentLayer) return VRV_UNSET;
+    const bool isTopLayer(dynamic_cast<Layer *>(*begin(layersList))->GetN() == currentLayer->GetN());
+
+    // Get iterator to another layer. We're going to find coliding elements there
+    auto layerIter = std::find_if(begin(layersList), end(layersList),
+        [&](Object *foundLayer) { return dynamic_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
+    if (layerIter == end(layersList)) return VRV_UNSET;
+    auto collidingElementsList = dynamic_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
+    
+    int optimalLoc = VRV_UNSET;
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
-        int currentElementLoc(0);
-        if (object->Is(NOTE)) {
-            currentElementLoc 
-                = PitchInterface::CalcLoc(dynamic_cast<Note *>(object), dynamic_cast<Layer *>(*layerIter), this);
-        }
-        else if (object->Is(CHORD)) {
-            currentElementLoc = PitchInterface::CalcLoc(
-                dynamic_cast<Chord *>(object), dynamic_cast<Layer *>(*layerIter), this, isTopLayer);
-        }
-        if ((undefinedLocation == boundaryLoc) ||
-            (isTopLayer && (boundaryLoc < currentElementLoc))
-            || (!isTopLayer && (boundaryLoc > currentElementLoc))) {
-            boundaryLoc = currentElementLoc;
+        int currentElementLoc = GetNoteOrChordLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
+        if ((VRV_UNSET == optimalLoc) || (isTopLayer && (optimalLoc < currentElementLoc))
+            || (!isTopLayer && (optimalLoc > currentElementLoc))) {
+            optimalLoc = currentElementLoc;
         }
     }
 
-    int offset = isTopLayer ? 6 : -6;
+    return optimalLoc;
+}
 
-    return boundaryLoc + offset;
+int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentLayer, bool isTopLayer)
+{
+    if (!currentStaff || !currentLayer) return VRV_UNSET;
+        
+    //Get previous and next elements from the current layer
+    Object *previousElement = currentLayer->GetPrevious(this);
+    Object *nextElement = currentLayer->GetNext(this);
+
+    // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
+    // That way we'll get bottom chord note for top layer and top chord note for bottom layer
+    const int previousElementLoc = previousElement 
+        ? GetNoteOrChordLocation(previousElement, currentLayer, !isTopLayer)
+        : GetFirstRelativeElementLocation(currentStaff, currentLayer, true, !isTopLayer);
+    const int nextElementLoc = nextElement
+        ? GetNoteOrChordLocation(nextElement, currentLayer, !isTopLayer)
+        : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, !isTopLayer);
+
+    return isTopLayer ? std::min(previousElementLoc, nextElementLoc) : std::max(previousElementLoc, nextElementLoc);
+}
+
+int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer)
+{
+    // current doc
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+    // current measure
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstAncestor(MEASURE));
+    assert(measure);
+
+    ClassIdComparison ac(MEASURE);
+    Measure *relativeMeasure = dynamic_cast<Measure *>(
+        isPrevious ? doc->FindPreviousChild(&ac, measure) : doc->FindNextChild(&ac, measure));
+
+    if (!relativeMeasure) return VRV_UNSET;
+
+    // Find staff with the same N as current staff
+    AttNIntegerComparison snc(STAFF, currentStaff->GetN());
+    Staff *previousStaff = dynamic_cast<Staff *>(relativeMeasure->FindDescendantByComparison(&snc));
+    if (!previousStaff) return VRV_UNSET;
+
+    // Compare number of layers in the next/previous staff and if it's the same - find layer with same N
+    ListOfObjects layers;
+    ClassIdComparison matchType(LAYER);
+    previousStaff->FindAllDescendantByComparison(&layers, &matchType);
+    auto layerIter = std::find_if(begin(layers), end(layers), [&](Object *foundLayer) {
+        return dynamic_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
+    });
+    if ((layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == end(layers))) return VRV_UNSET;
+
+    // Get last element if it's previous layer, get first one otherwise
+    Object *lastLayerElement = isPrevious ? (*layerIter)->GetLast() : (*layerIter)->GetFirst();
+    if (lastLayerElement->Is({ NOTE, CHORD })) {
+        return GetNoteOrChordLocation(lastLayerElement, dynamic_cast<Layer *>(*layerIter), isTopLayer);
+    }
+
+    return VRV_UNSET;
+}
+
+int Rest::GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer)
+{
+    if (object->Is(NOTE)) {
+        return PitchInterface::CalcLoc(dynamic_cast<Note *>(object), dynamic_cast<Layer *>(layer), this);
+    }
+    if (object->Is(CHORD)) {
+        return PitchInterface::CalcLoc(dynamic_cast<Chord *>(object), dynamic_cast<Layer *>(layer), this, isTopLayer);
+    }
+    return VRV_UNSET;
 }
 
 //----------------------------------------------------------------------------

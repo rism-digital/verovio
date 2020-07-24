@@ -1117,7 +1117,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 }
             }
             else if (hasMultipleLayer) {
-                loc = rest->GetRestLayerLocation(staffY, layerY, loc);
+                loc = rest->GetOptimalLayerLocation(staffY, layerY, loc);
             }
         }
         loc = rest->GetRestLocOffset(loc);
