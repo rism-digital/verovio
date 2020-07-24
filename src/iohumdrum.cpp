@@ -17984,49 +17984,141 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
 
 //////////////////////////////
 //
+// HumdrumInput::tieToStartOfMeasure -- Tie a note to the start of
+//    the measure (presumably the note is at the start of the measure
+//    as well).
+//
+
+Tie *HumdrumInput::tieToStartOfMeasure(hum::HTp token, int subindex, hum::HumNum meterunit)
+{
+
+    Tie *tie = new Tie;
+    addTieLineStyle(tie, token, subindex);
+    m_measure->AddChild(tie);
+    hum::HTp starttoken = token->getOwner()->getTrackStart(token->getTrack());
+    hum::HTp current = token->getPreviousToken();
+    while (current) {
+        // match to previous barline if possible
+        if (current->isBarline()) {
+            break;
+        }
+        if (current->isInterpretation()) {
+            if (current->compare(0, 2, "**") == 0) {
+                break; // exclusive interpretation (start of spine)
+            }
+        }
+        current = current->getPreviousToken();
+    }
+    if (current) {
+        starttoken = current;
+    }
+    setTieLocationId(tie, starttoken, -1, token, subindex);
+    std::string endid = getLocationId("note", token);
+    if (token->isChord()) {
+        endid += "S" + to_string(subindex + 1);
+    }
+    if (token->isChord()) {
+        int endnumber = subindex + 1;
+        if (endnumber > 0) {
+            endid += "S" + to_string(endnumber);
+        }
+    }
+
+    // Currently a bug in verovio for @tstamp=0, so
+    // make an adjustment to compensate relative to meter.unit:
+    // int tstamp = 0;
+    hum::HumNum tstamp = meterunit;
+    tstamp /= 4;
+    tstamp = -tstamp + 1;
+    if (tstamp < 0) {
+        tstamp = 0;
+    }
+
+    tie->SetTstamp(tstamp.getFloat()); // attach start to beginning of measure
+    tie->SetEndid("#" + endid);
+
+    return tie;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::processHangingTieEnd --
 //
 
 void HumdrumInput::processHangingTieEnd(
     Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit)
 {
-
     hum::HumNum position = token->getDurationFromStart();
     if (position == 0) {
         // Hanging tie at start of music.
-        Tie *tie = new Tie;
-        addTieLineStyle(tie, token, subindex);
-        m_measure->AddChild(tie);
-        hum::HTp trackstart = token->getOwner()->getTrackStart(token->getTrack());
-        setTieLocationId(tie, trackstart, -1, token, subindex);
-        std::string endid = getLocationId("note", token);
-        if (token->isChord()) {
-            endid += "S" + to_string(subindex + 1);
-        }
-        if (token->isChord()) {
-            int endnumber = subindex + 1;
-            if (endnumber > 0) {
-                endid += "S" + to_string(endnumber);
-            }
-        }
-
-        // Currently a bug in verovio for @tstamp=0, so
-        // make an adjustment to compensate relative to meter.unit:
-        // int tstamp = 0;
-        hum::HumNum tstamp = meterunit;
-        tstamp /= 4;
-        tstamp = -tstamp + 1;
-        if (tstamp < 0) {
-            tstamp = 0;
-        }
-
-        tie->SetTstamp(tstamp.getFloat()); // attach start to beginning of measure
-        tie->SetEndid("#" + endid);
+        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
         tie->SetType("hanging-initial");
     }
-    else {
-        cerr << "\tHANGING IN MIDDLE OF SCORE, CURRENTLY IGNORING " << endl;
+    else if (atEndingBoundary(token)) {
+        // The note is at the start of a secondary ending, and
+        // is not tied to the previous note, but a note in a previous
+        // measure before the first ending.  Also need to force
+        // a tie split across ending boundaries (currently they will
+        // automatically merge).
+        Tie *tie = tieToStartOfMeasure(token, subindex, meterunit);
+        tie->SetType("hanging-initial-ending");
     }
+    else {
+        cerr << "\tHANGING TIE END IN MIDDLE OF SCORE, CURRENTLY IGNORING " << endl;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::atEndingBoundary -- Return true if a token is in a
+//   different ending section that the previous note. Split spines
+//   should mostly be accounted for, but maybe not corner cases.
+//
+
+bool HumdrumInput::atEndingBoundary(hum::HTp token)
+{
+    hum::HTp current = token->getPreviousToken();
+    while (current) {
+        if (current->isData() && !current->isNull()) {
+            break;
+        }
+        current = current->getPreviousToken();
+    }
+    if (!current) {
+        return false;
+    }
+    int line1 = current->getLineIndex();
+    int line2 = token->getLineIndex();
+    hum::HTp label1 = m_sectionlabels[line1];
+    hum::HTp label2 = m_sectionlabels[line2];
+    if (label1 == label2) {
+        return false;
+    }
+    if (label1 == NULL) {
+        return false;
+    }
+    if (label2 == NULL) {
+        return false;
+    }
+    hum::HumRegex hre;
+    int number1 = 0;
+    int number2 = 0;
+    if (hre.search(label1, "(\\d+)$")) {
+        number1 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (hre.search(label2, "(\\d+)$")) {
+        number2 = hre.getMatchInt(1);
+    }
+    else {
+        return false;
+    }
+    if (number1 == number2) {
+        return false;
+    }
+    return true;
 }
 
 //////////////////////////////
