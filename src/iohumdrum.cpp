@@ -11602,6 +11602,10 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
         else {
             mindex = slurstart->getValueInt("MEI", "measureIndex");
         }
+        bool isInvisible = checkIfSlurIsInvisible(slurstart, slurstartnumber);
+        if (isInvisible) {
+            continue;
+        }
 
         Measure *startmeasure = m_measures[mindex];
         Slur *slur = new Slur;
@@ -11716,6 +11720,31 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             }
         }
     }
+}
+
+/////////////////////////////
+//
+// HumdrumInput::checkIfSlurIsInvisible --
+//
+
+bool HumdrumInput::checkIfSlurIsInvisible(hum::HTp token, int number)
+{
+    int tsize = (int)token->size();
+    int counter = 0;
+    for (int i = 0; i < tsize - 1; i++) {
+        if (token->at(i) == '(') {
+            counter++;
+        }
+        if (counter == number) {
+            if (token->at(i + 1) == 'y') {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+    return false;
 }
 
 /////////////////////////////
