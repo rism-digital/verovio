@@ -1698,6 +1698,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
+        dir->SetType("coda");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
@@ -1728,6 +1729,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
+            dir->SetType(node.child("sound").first_attribute().name());
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -2071,6 +2073,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
+        dir->SetType("segno");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
