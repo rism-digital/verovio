@@ -154,25 +154,25 @@ namespace humaux {
     };
 
     // StaffStateVariables is a data structure used in the HumdrumInput
-    // class to store state variables for processing staves.  This structure
-    // is used to store all variables which are vectors
+    // class to store state variables for processing staves.
     class StaffStateVariables {
     public:
         StaffStateVariables();
         ~StaffStateVariables();
         void clear();
+        ostream &print(ostream &out = std::cout, const std::string &prefix = "SS> ");
 
         // verse == keeps track of whether or not staff contains associated
         // **text spines which will be converted into lyrics.
         bool verse;
 
-        // suppress_beam_tuplet == keeps track of whether or not beams should
+        // suppress_tuplet_number == keeps track of whether or not beams should
         // display beam tuplet numbers.
-        bool suppress_beam_tuplet;
+        bool suppress_tuplet_number;
 
-        // suppress_bracket_tuplet == keeps track of whether or not tuplet
+        // suppress_tuplet_bracket == keeps track of whether or not tuplet
         // brackets should be displayed.
-        bool suppress_bracket_tuplet;
+        bool suppress_tuplet_bracket;
 
         // Used for tremolo compression
         bool tremolo;
@@ -180,7 +180,7 @@ namespace humaux {
         // cue_size == keeps track of whether or not the notes in the current
         // staff/layer should be cue sized.  Index 0 is used to control all
         // layers.
-        vector<bool> cue_size;
+        std::vector<bool> cue_size;
 
         // stem_type == keeps track of what type of stem to automatically
         // add to a note/chord.  The states are:
@@ -188,7 +188,7 @@ namespace humaux {
         // '/' == up stem
         // 'x' == no stem
         // 'X' == no automatic assignments (assignment will be done automatically by verovio).
-        vector<char> stem_type;
+        std::vector<char> stem_type;
 
         // ligature_recta == true if in a recta ligature
         bool ligature_recta = false;
@@ -291,8 +291,8 @@ public:
     char nostem = '\0'; // !!!RDF**kern: N = no stem
     char cuesize = '\0'; // !!!RDF**kern: @ = cue size
     char terminallong = '\0'; // !!!RDF**kern: l = terminal long
-    vector<char> editacc; // !!!RDF**kern: i = editorial accidental
-    vector<std::string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+    std::vector<char> editacc; // !!!RDF**kern: i = editorial accidental
+    std::vector<std::string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
 
     // for **dynam:
     std::string cresctext; // !!!RDF**kern: > = "cresc."
@@ -407,7 +407,7 @@ protected:
     void printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
     void insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
-        bool suppress);
+        bool suppressTupletNumber, bool suppressBracketTuplet);
     vrv::Beam *insertBeam(
         std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     vrv::Beam *insertGBeam(
@@ -620,6 +620,9 @@ protected:
     Tie *addHangingTieToNextItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure *measure);
     bool inDifferentEndings(hum::HTp token1, hum::HTp token2);
     bool checkIfSlurIsInvisible(hum::HTp token, int number);
+    void checkForTupletMergesAndSplits(
+        std::vector<int> &tupletgroups, std::vector<hum::HTp> &duritems, std::vector<hum::HumNum> &durations);
+    bool hasLayoutParameter(hum::HTp token, const std::string &category, const std::string &param);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -867,7 +870,7 @@ private:
     std::vector<std::vector<std::string> > m_spine_color;
 
     // m_traspose == transposition to go from sounding to written pitch.
-    vector<int> m_transpose;
+    std::vector<int> m_transpose;
 
     //    *kcancel     = display cancellation key signatures
     //    *Xkcancel    = do not display cancellation key signatures (default)

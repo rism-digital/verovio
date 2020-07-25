@@ -320,12 +320,14 @@ namespace humaux {
         stem_type.resize(100);
         clear();
     }
+
     StaffStateVariables::~StaffStateVariables() { clear(); }
+
     void StaffStateVariables::clear()
     {
         verse = false;
-        suppress_beam_tuplet = false;
-        suppress_bracket_tuplet = false;
+        suppress_tuplet_number = false;
+        suppress_tuplet_bracket = false;
         tremolo = false;
         righthalfstem = false;
 
@@ -351,8 +353,47 @@ namespace humaux {
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
+
         std::fill(cue_size.begin(), cue_size.end(), false);
         std::fill(stem_type.begin(), stem_type.end(), 'X');
+    }
+
+    ostream &StaffStateVariables::print(ostream &out, const std::string &prefix)
+    {
+        out << prefix << "ADDRESS ==================  " << (long long)this << endl;
+        out << prefix << "verse                    =  " << verse << endl;
+        out << prefix << "suppress_tuplet_number   =  " << suppress_tuplet_number << endl;
+        out << prefix << "suppress_tuplet_bracket  =  " << suppress_tuplet_bracket << endl;
+        out << prefix << "tremolo                  =  " << tremolo << endl;
+        // vector<bool> cue_size;
+        // vector<char> stem_type;
+        out << prefix << "ligature_recta           =  " << ligature_recta << endl;
+        out << prefix << "ligature_obliqua         =  " << ligature_obliqua << endl;
+        out << prefix << "last_clef                =  " << last_clef << endl;
+        out << prefix << "acclev                   =  " << acclev << endl;
+        out << prefix << "righthalfstem            =  " << righthalfstem << endl;
+        // Note *ottavanotestart;
+        // Note *ottavanoteend;
+        out << prefix << "ottavaendtimestamp       =  " << ottavaendtimestamp << endl;
+        // Measure *ottavameasure;
+        // Note *ottavadownnotestart;
+        // Note *ottavadownnoteend;
+        out << prefix << "ottavadownendtimestamp   =  " << ottavadownendtimestamp << endl;
+        // Measure *ottavadownmeasure;
+        // Note *ottava2notestart;
+        // Note *ottava2noteend;
+        out << prefix << "ottava2endtimestamp      =  " << ottava2endtimestamp << endl;
+        // Measure *ottava2measure;
+        // Note *ottava2downnotestart;
+        // Note *ottava2downnoteend;
+        out << prefix << "ottava2downendtimestamp  =  " << ottava2downendtimestamp << endl;
+        // Measure *ottava2downmeasure;
+        out << prefix << "meter_top                =  " << meter_top << endl;
+        out << prefix << "meter_bottom             =  " << meter_bottom << endl;
+        // std::list<humaux::HumdrumTie> ties;
+        out << prefix << "m_dynampos               =  " << m_dynampos << endl;
+
+        return out;
     }
 
 } // end namespace humaux
@@ -7425,6 +7466,7 @@ bool HumdrumInput::checkForTremolo(
 void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
     std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int layerindex)
 {
+
     Beam *beam;
     const humaux::HumdrumBeamAndTuplet &tg = tgs.at(layerindex);
     hum::HTp token = layerdata[layerindex];
@@ -7469,7 +7511,8 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
 
     if (tg.beamstart && tg.tupletstart) {
         if (tg.priority == 'T') {
-            insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_beam_tuplet);
+            insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
+                ss[staffindex].suppress_tuplet_bracket);
             beam = insertBeam(elements, pointers, tg);
             checkBeamWith(beam, tgs, layerdata, layerindex);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
@@ -7478,7 +7521,8 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
             beam = insertBeam(elements, pointers, tg);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
             checkBeamWith(beam, tgs, layerdata, layerindex);
-            insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_beam_tuplet);
+            insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
+                ss[staffindex].suppress_tuplet_bracket);
         }
     }
     else if (tg.beamstart) {
@@ -7487,7 +7531,8 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
     else if (tg.tupletstart) {
-        insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_bracket_tuplet);
+        insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_tuplet_number,
+            ss[staffindex].suppress_tuplet_bracket);
     }
 
     if (tg.gbeamstart) {
@@ -11145,10 +11190,52 @@ hum::HumNum HumdrumInput::getLeftNoteDuration(hum::HTp token)
 
 //////////////////////////////
 //
+// HumdrumInput::hasLayoutParameter -- True if there is a layout parameter
+//   (regardless of whether or not it has a value).
+//
+
+bool HumdrumInput::hasLayoutParameter(hum::HTp token, const std::string &category, const std::string &param)
+{
+    int lcount = token->getLinkedParameterSetCount();
+    if (lcount == 0) {
+        return 0;
+    }
+
+    for (int p = 0; p < token->getLinkedParameterSetCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); ++q) {
+            string key = hps->getParameterName(q);
+            string value = hps->getParameterValue(q);
+            if (key != param) {
+                continue;
+            }
+            if (value == "0") {
+                return false;
+            }
+            if (value == "false") {
+                return false;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::hasAboveParameter -- true if has an "a" parameter or has a "Z" parameter set to anything.
 //
 
-bool HumdrumInput::hasAboveParameter(hum::HTp token, const string &category)
+bool HumdrumInput::hasAboveParameter(hum::HTp token, const std::string &category)
 {
     int lcount = token->getLinkedParameterSetCount();
     if (lcount == 0) {
@@ -13324,8 +13411,9 @@ bool HumdrumInput::shouldHideBeamBracket(
 
 void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
     const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
-    bool suppress)
+    bool suppressTupletNumber, bool suppressBracketTuplet)
 {
+
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     hum::HTp token = layerdata[layerindex];
@@ -13362,21 +13450,46 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
         // If the music contains lyrics, force the tuplet above the staff.
         tuplet->SetBracketPlace(STAFFREL_basic_above);
     }
+
     double scale = tg.numscale;
+
     if (scale == 0.0) {
         scale = 1.0;
     }
     if (scale < 0) {
         scale = -scale;
     }
+
+    std::string num = token->getLayoutParameter("TUP", "num");
+    int tnum = 1;
+    if (!num.empty()) {
+        tnum = stoi(num);
+        hum::HumNum factor = tnum;
+        factor /= tg.num;
+        if ((factor != 1) && factor.isInteger()) {
+            hum::HumNum factor2 = tg.numbase;
+            scale = factor.getNumerator();
+        }
+    }
     tuplet->SetNum(tg.num * scale);
     tuplet->SetNumbase(tg.numbase * scale);
-    if (suppress) {
+    if (suppressBracketTuplet) {
         tuplet->SetBracketVisible(BOOLEAN_false);
     }
     if (shouldHideBeamBracket(tgs, layerdata, layerindex)) {
         tuplet->SetBracketVisible(BOOLEAN_false);
     }
+
+    // local control of brackets
+    bool xbr = hasLayoutParameter(token, "TUP", "xbr");
+    bool br = hasLayoutParameter(token, "TUP", "br");
+    if (xbr) {
+        tuplet->SetBracketVisible(BOOLEAN_false);
+    }
+    if (br) {
+        tuplet->SetBracketVisible(BOOLEAN_true);
+    }
+
     // Brackets will be displayed automatically, so don't turn on:
     // else {
     //     if (tg.bracket) {
@@ -13386,7 +13499,7 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     //         tuplet->SetBracketVisible(BOOLEAN_false);
     //     }
     // }
-    if (suppress) {
+    if (suppressTupletNumber) {
         // Number is visible by default, so only hide
         // if explicitly requested:
         tuplet->SetNumVisible(BOOLEAN_false);
@@ -13640,8 +13753,8 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         return;
     }
 
-    // fulldur == full duration of the note/rest including augmentation dots.
-    std::vector<hum::HumNum> fulldur(duritems.size());
+    // durationswithdots == full duration of the note/rest including augmentation dots.
+    std::vector<hum::HumNum> durationwithdots(duritems.size());
 
     // dursum = a cumulative sum of the full durs, starting at 0 for
     // the first index.
@@ -13651,15 +13764,15 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<int> twocounttop(dotlessdur.size(), 0);
     std::vector<int> twocountbot(dotlessdur.size(), 0);
     for (int i = 0; i < (int)dotlessdur.size(); ++i) {
-        fulldur[i] = hum::Convert::recipToDuration(*duritems[i]);
+        durationwithdots[i] = hum::Convert::recipToDuration(*duritems[i]);
         dursum[i] = sum;
-        sum += fulldur[i];
+        sum += durationwithdots[i];
     }
 
     // beamdur = a list of the durations for each beam.
     std::vector<hum::HumNum> beamdur(beamstarts.size());
     for (int i = 0; i < (int)beamdur.size(); ++i) {
-        beamdur[i] = dursum[beamends[i]] - dursum[beamstarts[i]] + fulldur[beamends[i]];
+        beamdur[i] = dursum[beamends[i]] - dursum[beamstarts[i]] + durationwithdots[beamends[i]];
     }
 
     // beampowdot == the number of augmentation dots on a power of two for
@@ -13677,7 +13790,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
-    // Assume that tuplet beams which can fit into a power of two will form
+    // Assume that tuplet beams that can fit into a power of two will form
     // a tuplet group.  Perhaps bias towards beampowdot being 0, and try to
     // beam groups to include non-beamed tuplets into lower powdots.
     // Should check that the factors of notes in the beam group all match...
@@ -13703,7 +13816,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (beampowdot[i] >= 0) {
             for (int j = beamstarts[i]; j <= beamends[i]; ++j) {
 
-                // may have to deal with dotted triplets (which appear to be powers of two)
+                // may have to deal with dotted triplets (that appear to be powers of two)
                 if (poweroftwo[j]) {
                     if (ingroup) {
                         ingroup = false;
@@ -13716,9 +13829,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 tupletgroups.at(j) = tupletnum;
                 if (tupletcount == 0) {
                     samedurtup = true;
-                    tupletdur = fulldur[j];
+                    tupletdur = durationwithdots[j];
                 }
-                else if (tupletdur != fulldur[j]) {
+                else if (tupletdur != durationwithdots[j]) {
                     samedurtup = false;
                 }
                 tupletcount++;
@@ -13739,6 +13852,8 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             tupletcount = 0;
         }
     }
+
+    checkForTupletMergesAndSplits(tupletgroups, duritems, durationwithdots);
 
     int tcorrection = 0;
     for (int i = 0; i < (int)tupletgroups.size(); i++) {
@@ -13806,7 +13921,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 ending = j - 1;
                 break;
             }
-            groupdur = dursum[j] - dursum[i] + fulldur[j];
+            groupdur = dursum[j] - dursum[i] + durationwithdots[j];
             if (groupdur.isPowerOfTwo()) {
                 ending = j;
                 break;
@@ -14003,6 +14118,89 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     mergeTupletsCuttingBeam(tg);
     resolveTupletBeamTie(tg);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForTupletMergesAndSplits -- check to see if an automatically
+//    assigned tuplet group should be merged or split based on layout commands
+//    attached to tuplet notes.  Only the first note of a tuplet group will be checked.
+//    For tuplet splitting, set the duration of the first group to shorter than the
+//    automatic grouping, and then optionally set the duration of the secondary
+//    subgroup(s).
+//
+// Example:
+//    !LO:TUP:r=2
+//
+//  r=2 means that the tuplet starting on the next note should last for the duration
+//  of a half note (r means "rhythm" or specifically "**recip".
+//
+
+void HumdrumInput::checkForTupletMergesAndSplits(
+    std::vector<int> &tupletgroups, std::vector<hum::HTp> &duritems, std::vector<hum::HumNum> &durations)
+{
+
+    int counter = -1;
+    int lastgroup = 0;
+    hum::HumNum sum;
+    hum::HumNum targetsum;
+    for (int i = 0; i < (int)tupletgroups.size(); i++) {
+        if (tupletgroups[i] == 0) {
+            continue;
+        }
+        if (tupletgroups[i] == lastgroup) {
+            continue;
+        }
+        std::string rparam = duritems[i]->getLayoutParameter("TUP", "r");
+        if (rparam.empty()) {
+            lastgroup = tupletgroups[i];
+            continue;
+        }
+
+        targetsum = hum::Convert::recipToDuration(rparam);
+        sum = 0;
+        for (int j = i; j < (int)tupletgroups.size(); j++) {
+            if (tupletgroups[j] == 0) {
+                // do not allow tuplets outside on non-tuplet notes
+                break;
+            }
+            sum += durations[j];
+            if (sum <= targetsum) {
+                tupletgroups[j] = counter;
+            }
+            if (sum >= targetsum) {
+                break;
+            }
+        }
+        lastgroup = tupletgroups[i];
+        counter--;
+    }
+
+    if (counter == -1) {
+        // nothing was updated in tuplet groupings
+        return;
+    }
+
+    counter = 0;
+    lastgroup = 0;
+    for (int i = 0; i < (int)tupletgroups.size(); i++) {
+        if (tupletgroups[i] == 0) {
+            continue;
+        }
+        if (tupletgroups[i] != lastgroup) {
+            lastgroup = tupletgroups[i];
+            counter++;
+            for (int j = i; j < (int)tupletgroups.size(); j++) {
+                i = j;
+                if (tupletgroups[j] == lastgroup) {
+                    tupletgroups[j] = counter;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+    }
 }
 
 //////////////////////////////
@@ -14355,25 +14553,23 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     std::string value = *token;
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (value == "*Xbeamtup") {
-        ss[staffindex].suppress_beam_tuplet = true;
+        ss[staffindex].suppress_tuplet_number = true;
     }
     else if (value == "*beamtup") {
-        ss[staffindex].suppress_beam_tuplet = false;
+        ss[staffindex].suppress_tuplet_number = false;
     }
     if (value == "*Xbrackettup") {
-        ss[staffindex].suppress_bracket_tuplet = true;
+        ss[staffindex].suppress_tuplet_bracket = true;
     }
     else if (value == "*brackettup") {
-        ss[staffindex].suppress_bracket_tuplet = false;
+        ss[staffindex].suppress_tuplet_bracket = false;
     }
 
     if (value == "*Xtuplet") {
-        ss[staffindex].suppress_beam_tuplet = true;
-        ss[staffindex].suppress_bracket_tuplet = true;
+        ss[staffindex].suppress_tuplet_number = true;
     }
     else if (value.compare(0, 7, "*tuplet") == 0) {
-        ss[staffindex].suppress_beam_tuplet = false;
-        ss[staffindex].suppress_bracket_tuplet = false;
+        ss[staffindex].suppress_tuplet_number = false;
     }
 
     if (value == "*Xtremolo") {
