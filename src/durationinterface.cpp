@@ -104,11 +104,11 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
         num *= 3;
         numBase *= 2;
     }
-    // altera - that any other given value and not minor
-    else if (this->HasDurQuality() && (this->GetDurQuality() != DURQUALITY_mensural_minor)) {
+    // altera, maior, or duplex
+    else if (this->HasDurQuality() && (this->GetDurQuality() == DURQUALITY_mensural_altera || this->GetDurQuality() == DURQUALITY_mensural_maior || this->GetDurQuality() == DURQUALITY_mensural_duplex)) {
         num *= 1;
         numBase *= 2;
-    }
+    } // Any other case (minor, perfecta in tempus perfectum, and imperfecta in tempus imperfectum) follows the mensuration and has no @num and @numbase attributes
 
     if (currentMensur->HasNum()) num *= currentMensur->GetNum();
     if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
