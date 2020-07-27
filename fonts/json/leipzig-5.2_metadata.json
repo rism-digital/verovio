@@ -422,6 +422,86 @@
                 -0.532
             ]
         },
+        "uniE0A5": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE0A9": {
+            "bBoxNE": [
+                1.16,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
+        "uniE0AF": {
+            "bBoxNE": [
+                1.064,
+                0.532
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.532
+            ]
+        },
+        "uniE0D9": {
+            "bBoxNE": [
+                1.256,
+                0.64
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.64
+            ]
+        },
+        "uniE0DB": {
+            "bBoxNE": [
+                1.256,
+                0.64
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.64
+            ]
+        },
+        "uniE0DC": {
+            "bBoxNE": [
+                1.4,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
+        "uniE0DD": {
+            "bBoxNE": [
+                1.256,
+                0.64
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.64
+            ]
+        },
+        "uniE0DE": {
+            "bBoxNE": [
+                1.4,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
         "uniE0FA": {
             "bBoxNE": [
                 1.62,
@@ -3050,6 +3130,30 @@
         },
         "uniE0A4": {
             "codepoint": "0XE0A4"
+        },
+        "uniE0A5": {
+            "codepoint": "0XE0A5"
+        },
+        "uniE0A9": {
+            "codepoint": "0XE0A9"
+        },
+        "uniE0AF": {
+            "codepoint": "0XE0AF"
+        },
+        "uniE0D9": {
+            "codepoint": "0XE0D9"
+        },
+        "uniE0DB": {
+            "codepoint": "0XE0DB"
+        },
+        "uniE0DC": {
+            "codepoint": "0XE0DC"
+        },
+        "uniE0DD": {
+            "codepoint": "0XE0DD"
+        },
+        "uniE0DE": {
+            "codepoint": "0XE0DE"
         },
         "uniE0FA": {
             "codepoint": "0XE0FA"

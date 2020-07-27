@@ -175,17 +175,17 @@
             <glyph glyph-code="E0A2" smufl-name="noteheadWhole"/>
             <glyph glyph-code="E0A3" smufl-name="noteheadHalf"/>
             <glyph glyph-code="E0A4" smufl-name="noteheadBlack"/>
-            <!--<glyph glyph-code="E0A5" smufl-name="noteheadNull"/>-->
+            <glyph glyph-code="E0A5" smufl-name="noteheadNull"/>
             <!--<glyph glyph-code="E0A6" smufl-name="noteheadXDoubleWhole"/>-->
             <!--<glyph glyph-code="E0A7" smufl-name="noteheadXWhole"/>-->
             <!--<glyph glyph-code="E0A8" smufl-name="noteheadXHalf"/>-->
-            <!--<glyph glyph-code="E0A9" smufl-name="noteheadXBlack"/>-->
+            <glyph glyph-code="E0A9" smufl-name="noteheadXBlack"/>
             <!--<glyph glyph-code="E0AA" smufl-name="noteheadXOrnate"/>-->
             <!--<glyph glyph-code="E0AB" smufl-name="noteheadXOrnateEllipse"/>-->
             <!--<glyph glyph-code="E0AC" smufl-name="noteheadPlusDoubleWhole"/>-->
             <!--<glyph glyph-code="E0AD" smufl-name="noteheadPlusWhole"/>-->
             <!--<glyph glyph-code="E0AE" smufl-name="noteheadPlusHalf"/>-->
-            <!--<glyph glyph-code="E0AF" smufl-name="noteheadPlusBlack"/>-->
+            <glyph glyph-code="E0AF" smufl-name="noteheadPlusBlack"/>
             <!--<glyph glyph-code="E0B0" smufl-name="noteheadCircleXDoubleWhole"/>-->
             <!--<glyph glyph-code="E0B1" smufl-name="noteheadCircleXWhole"/>-->
             <!--<glyph glyph-code="E0B2" smufl-name="noteheadCircleXHalf"/>-->
@@ -227,12 +227,12 @@
             <!--<glyph glyph-code="E0D6" smufl-name="noteheadSlashedDoubleWhole2"/>-->
             <!--<glyph glyph-code="E0D7" smufl-name="noteheadDiamondDoubleWhole"/>-->
             <!--<glyph glyph-code="E0D8" smufl-name="noteheadDiamondWhole"/>-->
-            <!--<glyph glyph-code="E0D9" smufl-name="noteheadDiamondHalf"/>-->
+            <glyph glyph-code="E0D9" smufl-name="noteheadDiamondHalf"/>
             <!--<glyph glyph-code="E0DA" smufl-name="noteheadDiamondHalfWide"/>-->
-            <!--<glyph glyph-code="E0DB" smufl-name="noteheadDiamondBlack"/>-->
-            <!--<glyph glyph-code="E0DC" smufl-name="noteheadDiamondBlackWide"/>-->
-            <!--<glyph glyph-code="E0DD" smufl-name="noteheadDiamondWhite"/>-->
-            <!--<glyph glyph-code="E0DE" smufl-name="noteheadDiamondWhiteWide"/>-->
+            <glyph glyph-code="E0DB" smufl-name="noteheadDiamondBlack"/>
+            <glyph glyph-code="E0DC" smufl-name="noteheadDiamondBlackWide"/>
+            <glyph glyph-code="E0DD" smufl-name="noteheadDiamondWhite"/>
+            <glyph glyph-code="E0DE" smufl-name="noteheadDiamondWhiteWide"/>
             <!--<glyph glyph-code="E0DF" smufl-name="noteheadDiamondDoubleWholeOld"/>-->
             <!--<glyph glyph-code="E0E0" smufl-name="noteheadDiamondWholeOld"/>-->
             <!--<glyph glyph-code="E0E1" smufl-name="noteheadDiamondHalfOld"/>-->
@@ -1501,7 +1501,7 @@
             <!--<glyph glyph-code="E642" smufl-name="vocalMouthOpen"/>-->
             <!--<glyph glyph-code="E643" smufl-name="vocalMouthWideOpen"/>-->
             <!--<glyph glyph-code="E644" smufl-name="vocalMouthPursed"/>-->
-            <!--<glyph glyph-code="E645" smufl-name="vocalSprechgesang"/>-->
+            <glyph glyph-code="E645" smufl-name="vocalSprechgesang"/>
             <!--<glyph glyph-code="E646" smufl-name="vocalsSussurando"/>-->
             <range_end>U+E64F</range_end>
             <range_start>U+E640</range_start>
