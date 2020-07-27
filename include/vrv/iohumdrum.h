@@ -139,6 +139,10 @@ namespace humaux {
         int gbeamstart;
         int gbeamend;
         char priority;
+        bool force;
+        hum::HTp token;
+        hum::HumNum duration;
+
         HumdrumBeamAndTuplet() { clear(); }
         ~HumdrumBeamAndTuplet() { clear(); }
         void clear()
@@ -149,7 +153,9 @@ namespace humaux {
             tupletstart = tupletend = 0;
             beamstart = beamend = 0;
             gbeamstart = gbeamend = 0;
+            force = false;
             priority = ' ';
+            token = NULL;
         }
     };
 
@@ -403,8 +409,10 @@ protected:
     void handleLigature(hum::HTp token);
     void handleColoration(hum::HTp token);
     void prepareBeamAndTupletGroups(
-        const std::vector<hum::HTp> &layerdata, std::vector<humaux::HumdrumBeamAndTuplet> &hg);
-    void printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
+        std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
+    void assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAndTuplet *> &tggroup);
+
+    void printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
         bool suppressTupletNumber, bool suppressBracketTuplet);
@@ -620,9 +628,10 @@ protected:
     Tie *addHangingTieToNextItem(hum::HTp token, int subindex, hum::HumNum meterunit, Measure *measure);
     bool inDifferentEndings(hum::HTp token1, hum::HTp token2);
     bool checkIfSlurIsInvisible(hum::HTp token, int number);
-    void checkForTupletMergesAndSplits(
-        std::vector<int> &tupletgroups, std::vector<hum::HTp> &duritems, std::vector<hum::HumNum> &durations);
+    void checkForTupletMergesAndSplits(std::vector<int> &tupletgroups, std::vector<hum::HTp> &duritems,
+        std::vector<hum::HumNum> &durations, std::vector<bool> &durforce);
     bool hasLayoutParameter(hum::HTp token, const std::string &category, const std::string &param);
+    void assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
