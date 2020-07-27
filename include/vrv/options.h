@@ -478,6 +478,7 @@ public:
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionString m_expand;
+    OptionBool m_shrinkToFit;
     OptionBool m_svgBoundingBoxes;
     OptionBool m_svgViewBox;
     OptionBool m_svgHtml5;

@@ -404,7 +404,7 @@ void SvgDeviceContext::StartPage()
     }
     else {
         m_currentNode.append_attribute("viewBox")
-            = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetHeight() * DEFINITION_FACTOR).c_str();
+            = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetContentHeight() * DEFINITION_FACTOR).c_str();
     }
 
     // a graphic for the origin
