@@ -14132,7 +14132,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
         if (numvalue > 0) {
             hum::HumNum scale = num;
             scale /= tggroup[0]->num;
-            if (scale.isInteger() && scale > 1) {
+            if (scale.isInteger() && (scale >= 1)) {
                 for (int i = 0; i < (int)tggroup.size(); i++) {
                     tggroup[i]->numscale = scale.getNumerator();
                 }
