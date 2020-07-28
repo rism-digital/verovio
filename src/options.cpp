@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <fstream>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -33,6 +34,18 @@ std::map<int, std::string> Option::s_measureNumber
 
 std::map<int, std::string> Option::s_systemDivider
     = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
+
+// default offsets setting for rest location
+const char *defaultRestLayerOffsets
+    = "{'sameLayer':{'restOnTopLayer':{'line':{'long':2,'breve':0,'1':0,'2':6,'4':0,"
+      "'8':0,'16':0,'32':0,'64':0,'128':0,'256':0},'space':{'long':0,'breve':0,'1':0,'2':0,'4':0,'8':0,'16':0,'32':0,"
+      "'64':0,'128':0,'256':0}},'restOnBottomLayer':{'line':{'long':0,'breve':0,'1':0,'2':0,'4':0,'8':0,'16':0,'32':0,"
+      "'64':0,'128':0,'256':0},'space':{'long':0,'breve':0,'1':0,'2':0,'4':0,'8':0,'16':0,'32':0,'64':0,'128':0,'256'"
+      ":0}}},'otherLayer':{'restOnTopLayer':{'line':{'long':6,'breve':6,'1':6,'2':6,'4':6,'8':6,'16':8,'32':8,'64':8,"
+      "'128':10,'256':10},'space':{'long':6,'breve':6,'1':6,'2':6,'4':6,'8':6,'16':8,'32':8,'64':8,'128':10,'256':10}}"
+      ",'restOnBottomLayer':{'line':{'long':6,'breve':6,'1':-6,'2':-6,'4':-6,'8':-6,'16':-6,'32':-8,'64':-8,'128':-10,"
+      "'256':-10},'space':{'long':-6,'breve':-6,'1':-6,'2':-6,'4':-6,'8':-6,'16':-6,'32':-8,'64':-8,'128':-10,'256':-"
+      "10}}}}";
 
 //----------------------------------------------------------------------------
 // Option
@@ -484,6 +497,60 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 }
 
 //----------------------------------------------------------------------------
+// OptionJson
+//----------------------------------------------------------------------------
+
+void OptionJson::Init(const std::string& defaultValue)
+{
+    m_values.parse(defaultValue);
+}
+
+bool OptionJson::SetValue(const std::string &defaultValue)
+{
+    std::ifstream in(defaultValue.c_str());
+    if (!in.is_open()) {
+        return false;
+    }
+
+    in.seekg(0, std::ios::end);
+    std::streamsize fileSize = (std::streamsize)in.tellg();
+    in.clear();
+    in.seekg(0, std::ios::beg);
+
+    // read the file into the std::string:
+    std::string content(fileSize, 0);
+    in.read(&content[0], fileSize);
+
+    if (!m_values.parse(content)) {
+        LogError("Input file '%s' is not valid or contains errors", defaultValue.c_str());
+    }
+
+    in.close();
+}
+
+int OptionJson::GetIntValue(const std::vector<std::string> jsonNodePath) const 
+{
+    JsonMap map = m_values.kv_map();
+    for (auto iter = std::begin(jsonNodePath); iter != std::end(jsonNodePath); ++iter) {
+        auto elem = map.find(*iter);
+        if (elem == std::end(map)) break;
+        // at the end bottom of the value tree we always should have number values, so process them here
+        if (*iter == jsonNodePath.back()) {
+            if (elem->second->type_ != jsonxx::Value::NUMBER_) break; // path is invalid - last element should be number
+            return elem->second->number_value_;
+        }
+        // otherwise try to go deeper in the tree
+        else {
+            if (elem->second->type_ != jsonxx::Value::OBJECT_)
+                break; // path is invalid - intermediary elements should be of object type
+            map = elem->second->object_value_->kv_map();
+        }
+    }
+
+    return 0;
+}
+
+//----------------------------------------------------------------------------
 // Options
 //----------------------------------------------------------------------------
 
@@ -792,6 +859,11 @@ Options::Options()
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
+
+    m_restLayerOffsets.SetInfo("Rest layer offsets",
+        "Path to json file describing offsets for rest location in relation to elements on other/same layers");
+    m_restLayerOffsets.Init(defaultRestLayerOffsets);
+    this->Register(&m_restLayerOffsets, "restLayerOffsets", &m_generalLayout);
 
     /********* selectors *********/
 

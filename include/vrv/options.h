@@ -20,6 +20,7 @@
 
 #include "attalternates.h"
 #include "atttypes.h"
+#include "jsonxx.h"
 
 //----------------------------------------------------------------------------
 
@@ -383,6 +384,34 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// OptionJson
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for Json input params
+ */
+
+class OptionJson : public Option {
+    using JsonMap = std::map<std::string, jsonxx::Value*>;
+public:
+    //
+    OptionJson() = default;
+    virtual ~OptionJson() = default;
+    virtual void Init(const std::string &defaultValue);
+
+    virtual bool SetValue(const std::string &jsonFilePath);
+    //virtual std::string GetStrValue() const;
+
+    int GetIntValue(const std::vector<std::string> jsonNodePath) const;
+    //
+public:
+    //
+private:
+    jsonxx::Object m_values;
+};
+
+
+//----------------------------------------------------------------------------
 // OptionGrp
 //----------------------------------------------------------------------------
 
@@ -526,6 +555,7 @@ public:
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
     OptionDbl m_tieThickness;
+    OptionJson m_restLayerOffsets;
 
     /**
      * Selectors

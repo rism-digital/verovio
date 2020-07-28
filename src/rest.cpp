@@ -142,12 +142,14 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     int otherLayerRelativeLocation = GetLocationRelativeToOtherLayers(layers, layer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
 
-    otherLayerRelativeLocation += isTopLayer ? 6 : -6;
+    otherLayerRelativeLocation
+        += GetRestOffsetFromOptions("otherLayer", otherLayerRelativeLocation, isTopLayer); // isTopLayer ? 6 : -6;
     if (currentLayerRelativeLocation == VRV_UNSET) {
         currentLayerRelativeLocation = defaultLocation;
     }
     else {
-        currentLayerRelativeLocation += isTopLayer ? 0 : -0;
+        currentLayerRelativeLocation
+            += GetRestOffsetFromOptions("sameLayer", currentLayerRelativeLocation, isTopLayer);
     }
 
     return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
@@ -245,6 +247,16 @@ int Rest::GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer)
         return PitchInterface::CalcLoc(dynamic_cast<Chord *>(object), dynamic_cast<Layer *>(layer), this, isTopLayer);
     }
     return VRV_UNSET;
+}
+
+int Rest::GetRestOffsetFromOptions(const std::string& layer, int location, bool isTopLayer) const
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
+    assert(doc);
+
+    return doc->GetOptions()->m_restLayerOffsets.GetIntValue({ layer,
+        isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location % 2 ? "line" : "space",
+        Att::DurationToStr(data_DURATION(GetActualDur())) });
 }
 
 //----------------------------------------------------------------------------

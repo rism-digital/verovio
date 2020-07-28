@@ -132,6 +132,11 @@ private:
      */
     int GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer);
 
+    /**
+     * Get correct offset for the rest from the options based on layer and location
+     */
+    int GetRestOffsetFromOptions(const std::string &layer, int location, bool isTopLayer) const;
+
 public:
     //
 private:
