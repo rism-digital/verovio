@@ -139,45 +139,45 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     const bool isTopLayer(dynamic_cast<Layer *>(*begin(layers))->GetN() == layer->GetN());
 
     // find best rest location relative to elements on other layers
-    int otherLayerRelativeLocation = GetLocationRelativeToOtherLayers(layers, layer);
+    const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
     int currentLayerRelativeLocation = GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
-
-    otherLayerRelativeLocation
-        += GetRestOffsetFromOptions("otherLayer", otherLayerRelativeLocation, isTopLayer); // isTopLayer ? 6 : -6;
+    int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
+        + GetRestOffsetFromOptions("otherLayer", otherLayerRelativeLocationInfo, isTopLayer);
     if (currentLayerRelativeLocation == VRV_UNSET) {
         currentLayerRelativeLocation = defaultLocation;
     }
     else {
+        std::pair<int, std::string> currentLayerRelativeLocationInfo(currentLayerRelativeLocation, "noAccidental");
         currentLayerRelativeLocation
-            += GetRestOffsetFromOptions("sameLayer", currentLayerRelativeLocation, isTopLayer);
+            += GetRestOffsetFromOptions("sameLayer", currentLayerRelativeLocationInfo, isTopLayer);
     }
 
     return isTopLayer ? std::max({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation })
                       : std::min({ otherLayerRelativeLocation, currentLayerRelativeLocation, defaultLocation });
 }
 
-int Rest::GetLocationRelativeToOtherLayers(const ListOfObjects& layersList, Layer* currentLayer)
+std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfObjects &layersList, Layer *currentLayer)
 {
-    if (!currentLayer) return VRV_UNSET;
+    if (!currentLayer) return { VRV_UNSET, "noAccidental" };
     const bool isTopLayer(dynamic_cast<Layer *>(*begin(layersList))->GetN() == currentLayer->GetN());
 
     // Get iterator to another layer. We're going to find coliding elements there
     auto layerIter = std::find_if(begin(layersList), end(layersList),
         [&](Object *foundLayer) { return dynamic_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
-    if (layerIter == end(layersList)) return VRV_UNSET;
+    if (layerIter == end(layersList)) return { VRV_UNSET, "noAccidental" };
     auto collidingElementsList = dynamic_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
     
-    int optimalLoc = VRV_UNSET;
+    std::pair<int, std::string> finalElementInfo = { VRV_UNSET, "noAccidental" };
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
-        int currentElementLoc = GetNoteOrChordLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
-        if ((VRV_UNSET == optimalLoc) || (isTopLayer && (optimalLoc < currentElementLoc))
-            || (!isTopLayer && (optimalLoc > currentElementLoc))) {
-            optimalLoc = currentElementLoc;
+        auto currentElementInfo = GetNoteOrChordLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
+        if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
+            || (!isTopLayer && (finalElementInfo.first > currentElementInfo.first))) {
+            std::swap(finalElementInfo, currentElementInfo);
         }
     }
 
-    return optimalLoc;
+    return finalElementInfo;
 }
 
 int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentLayer, bool isTopLayer)
@@ -185,16 +185,17 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
     if (!currentStaff || !currentLayer) return VRV_UNSET;
         
     //Get previous and next elements from the current layer
-    Object *previousElement = currentLayer->GetPrevious(this);
-    Object *nextElement = currentLayer->GetNext(this);
+    InterfaceComparison ic(INTERFACE_STEMMED);
+    Object *previousElement = currentLayer->FindPreviousChild(&ic, this);
+    Object *nextElement = currentLayer->FindNextChild(&ic, this);
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
     // That way we'll get bottom chord note for top layer and top chord note for bottom layer
     const int previousElementLoc = previousElement 
-        ? GetNoteOrChordLocation(previousElement, currentLayer, !isTopLayer)
+        ? GetNoteOrChordLocation(previousElement, currentLayer, !isTopLayer).first
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, true, !isTopLayer);
     const int nextElementLoc = nextElement
-        ? GetNoteOrChordLocation(nextElement, currentLayer, !isTopLayer)
+        ? GetNoteOrChordLocation(nextElement, currentLayer, !isTopLayer).first
         : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, !isTopLayer);
 
     return isTopLayer ? std::min(previousElementLoc, nextElementLoc) : std::max(previousElementLoc, nextElementLoc);
@@ -232,30 +233,41 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     // Get last element if it's previous layer, get first one otherwise
     Object *lastLayerElement = isPrevious ? (*layerIter)->GetLast() : (*layerIter)->GetFirst();
     if (lastLayerElement->Is({ NOTE, CHORD })) {
-        return GetNoteOrChordLocation(lastLayerElement, dynamic_cast<Layer *>(*layerIter), isTopLayer);
+        return GetNoteOrChordLocation(lastLayerElement, dynamic_cast<Layer *>(*layerIter), isTopLayer).first;
     }
 
     return VRV_UNSET;
 }
 
-int Rest::GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer)
+std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer)
 {
     if (object->Is(NOTE)) {
-        return PitchInterface::CalcLoc(dynamic_cast<Note *>(object), dynamic_cast<Layer *>(layer), this);
+        Note *note = dynamic_cast<Note *>(object);
+        assert(note);
+        Accid* accid = note->GetDrawingAccid();
+        return { PitchInterface::CalcLoc(note, dynamic_cast<Layer *>(layer), this),
+            (accid && accid->GetAccid() != 0)? AttConverter::AccidentalWrittenToStr(accid->GetAccid()) : "noAccidental" };
     }
     if (object->Is(CHORD)) {
-        return PitchInterface::CalcLoc(dynamic_cast<Chord *>(object), dynamic_cast<Layer *>(layer), this, isTopLayer);
+        Chord* chord = dynamic_cast<Chord *>(object);
+        assert(chord);
+        Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
+        Accid* accid = relevantNote->GetDrawingAccid();
+        return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), this),
+            (accid && accid->GetAccid() != 0) ? AttConverter::AccidentalWrittenToStr(accid->GetAccid())
+                                              : "noAccidental" };
     }
-    return VRV_UNSET;
+    return { VRV_UNSET, "noAccidental" };
 }
 
-int Rest::GetRestOffsetFromOptions(const std::string& layer, int location, bool isTopLayer) const
+int Rest::GetRestOffsetFromOptions(
+    const std::string &layer, const std::pair<int, std::string>& location, bool isTopLayer) const
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    return doc->GetOptions()->m_restLayerOffsets.GetIntValue({ layer,
-        isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location % 2 ? "line" : "space",
+    return doc->GetOptions()->m_restLayerOffsets.GetIntValue({ location.second, layer,
+        isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location.first % 2 ? "line" : "space",
         Att::DurationToStr(data_DURATION(GetActualDur())) });
 }
 
