@@ -581,7 +581,11 @@ int System::AlignSystems(FunctorParams *functorParams)
         }
     }
 
-    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel() - systemMargin;
+    int bottom = m_systemAligner.GetBottomAlignment()->GetYRel();
+    int contentBottom = GetContentY1();
+    int diff = std::max(bottom - contentBottom, systemMargin);
+    params->m_shift += contentBottom - diff;
+
     params->m_justifiableSystems++;
     // -1 because of the bottom aligner
     params->m_justifiableStaves += m_systemAligner.GetChildCount() - 1;

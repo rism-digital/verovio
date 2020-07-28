@@ -520,6 +520,8 @@ public:
     OptionDbl m_spacingNonLinear;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
+    OptionInt m_spacingBracketGroup;
+    OptionInt m_spacingBraceGroup;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
     OptionIntMap m_systemDivider;

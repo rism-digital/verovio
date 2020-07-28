@@ -15,12 +15,14 @@
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "staffgrp.h"
 #include "tie.h"
 #include "vrv.h"
 
@@ -588,8 +590,33 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
     if (params->m_staffIdx > 0) {
         // Default or staffDef spacing
         int spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
-        if (this->m_staff && this->m_staff->m_drawingStaffDef && this->m_staff->m_drawingStaffDef->HasSpacing()) {
-            spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
+        if (this->m_staff && this->m_staff->m_drawingStaffDef) {
+            if (this->m_staff->m_drawingStaffDef->HasSpacing()) {
+                spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
+            }
+            else {
+                Object *staffDefParent = m_staff->m_drawingStaffDef->GetParent();
+                if (staffDefParent->Is(STAFFGRP)) {
+                    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDefParent);
+                    bool spacingIsNotSet = true;
+                    if (staffGrp->GetParent()->Is(STAFFGRP)) {
+                        // Nested staffGrp
+                        if (staffGrp->HasSymbol() && staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
+                            ListOfObjects allStaffs;
+                            ClassIdComparison matchType(STAFFDEF);
+                            staffGrp->FindAllDescendantByComparison(&allStaffs, &matchType);
+                            if (*allStaffs.begin() != m_staff->m_drawingStaffDef) {
+                                // this staff is inside braced group (not first)
+                                spacing = params->m_doc->GetOptions()->m_spacingBraceGroup.GetValue();
+                                spacingIsNotSet = false;
+                            }
+                        }
+                    }
+                    if (spacingIsNotSet) {
+                        spacing = params->m_doc->GetOptions()->m_spacingBracketGroup.GetValue();
+                    }
+                }
+            }
         }
         params->m_cumulatedShift += spacing * params->m_doc->GetDrawingUnit(100);
     }

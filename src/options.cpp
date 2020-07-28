@@ -769,6 +769,14 @@ Options::Options()
     m_spacingSystem.Init(3, 0, 12);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
+    m_spacingBracketGroup.SetInfo("Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");
+    m_spacingBracketGroup.Init(3, 0, 12);
+    this->Register(&m_spacingBracketGroup, "spacingBracketGroup", &m_generalLayout);
+
+    m_spacingBraceGroup.SetInfo("Spacing brace group", "Minimum space between staves inside a braced group in MEI units");
+    m_spacingBraceGroup.Init(3, 0, 12);
+    this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
+
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
