@@ -329,6 +329,7 @@ namespace humaux {
         suppress_tuplet_number = false;
         suppress_tuplet_bracket = false;
         tremolo = false;
+        pedal = false;
         righthalfstem = false;
 
         ottavanotestart = ottavanoteend = NULL;
@@ -15072,6 +15073,7 @@ std::string HumdrumInput::getEndIdForOttava(hum::HTp token)
 
 void HumdrumInput::handlePedalMark(hum::HTp token)
 {
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     int staffindex = m_currentstaff - 1;
 
     hum::HumNum durtobar = token->getDurationToBarline();
@@ -15091,11 +15093,14 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         pedal->SetDir(pedalLog_DIR_down);
         assignVerticalGroup(pedal, token);
         setStaff(pedal, m_currentstaff);
+        if (ss[staffindex].pedal) {
+            // already on, so turn off first
+            pedal->SetDir(pedalLog_DIR_bounce);
+            pedal->SetForm(pedalVis_FORM_altpedstar);
+        }
+        ss[staffindex].pedal = true;
     }
     else if (*token == "*Xped") {
-        // turn off pedal
-        // hum::HTp pdata = getPreviousDataToken(token);
-        // if (pdata != NULL) {
         Pedal *pedal = new Pedal;
         setLocationId(pedal, token);
         m_measure->AddChild(pedal);
@@ -15108,7 +15113,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         pedal->SetDir(pedalLog_DIR_up);
         assignVerticalGroup(pedal, token);
         setStaff(pedal, m_currentstaff);
-        // }
+        ss[staffindex].pedal = false;
     }
 }
 

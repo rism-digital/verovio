@@ -183,6 +183,9 @@ namespace humaux {
         // Used for tremolo compression
         bool tremolo;
 
+        // Used for sustain pedal
+        bool pedal;
+
         // cue_size == keeps track of whether or not the notes in the current
         // staff/layer should be cue sized.  Index 0 is used to control all
         // layers.
