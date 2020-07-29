@@ -151,8 +151,30 @@ void StaffAlignment::ClearPositioners()
 void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
 {
     m_staff = staff;
-    if (staff && doc) {
-        m_staffHeight = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    if (staff&&doc) {
+        m_staffHeight = (staff->m_drawingLines-1)*doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+        Object* staffDefParent = m_staff->m_drawingStaffDef->GetParent();
+        if (staffDefParent->Is(STAFFGRP)) {
+            StaffGrp* staffGrp = dynamic_cast<StaffGrp*>(staffDefParent);
+            ListOfObjects allStaffs;
+            ClassIdComparison matchType(STAFFDEF);
+            staffGrp->FindAllDescendantByComparison(&allStaffs, &matchType, 1);
+            bool firstInGroup = allStaffs.empty() || *allStaffs.begin() == m_staff->m_drawingStaffDef;
+            m_spacingType = firstInGroup ? SpacingType::System : SpacingType::Staff;
+            if (staffGrp->GetParent()->Is(STAFFGRP)) {
+                // Nested staffGrp
+                if (staffGrp->HasSymbol() && staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace && !firstInGroup) {
+                    // this staff is inside braced group (not first)
+                    m_spacingType = SpacingType::Brace;
+                }
+                else {
+                    m_spacingType = SpacingType::Bracket;
+                }
+            }
+        } else {
+            m_spacingType = SpacingType::System;
+        }
     }
 }
 
@@ -589,32 +611,28 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 
     if (params->m_staffIdx > 0) {
         // Default or staffDef spacing
-        int spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
+        int spacing = 0;
         if (this->m_staff && this->m_staff->m_drawingStaffDef) {
             if (this->m_staff->m_drawingStaffDef->HasSpacing()) {
                 spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
             }
             else {
-                Object *staffDefParent = m_staff->m_drawingStaffDef->GetParent();
-                if (staffDefParent->Is(STAFFGRP)) {
-                    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDefParent);
-                    bool spacingIsNotSet = true;
-                    if (staffGrp->GetParent()->Is(STAFFGRP)) {
-                        // Nested staffGrp
-                        if (staffGrp->HasSymbol() && staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
-                            ListOfObjects allStaffs;
-                            ClassIdComparison matchType(STAFFDEF);
-                            staffGrp->FindAllDescendantByComparison(&allStaffs, &matchType);
-                            if (*allStaffs.begin() != m_staff->m_drawingStaffDef) {
-                                // this staff is inside braced group (not first)
-                                spacing = params->m_doc->GetOptions()->m_spacingBraceGroup.GetValue();
-                                spacingIsNotSet = false;
-                            }
-                        }
-                    }
-                    if (spacingIsNotSet) {
+                switch (m_spacingType) {
+                    case SpacingType::System :
+                        spacing = params->m_doc->GetOptions()->m_spacingSystem.GetValue();
+                        break;
+                    case SpacingType::Staff :
+                        spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
+                        break;
+                    case SpacingType::Brace :
+                        spacing = params->m_doc->GetOptions()->m_spacingBraceGroup.GetValue();
+                        break;
+                    case SpacingType::Bracket :
                         spacing = params->m_doc->GetOptions()->m_spacingBracketGroup.GetValue();
-                    }
+                        break;
+                    case SpacingType::None:
+                    default:
+                        assert(false);
                 }
             }
         }

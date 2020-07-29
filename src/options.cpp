@@ -777,6 +777,22 @@ Options::Options()
     m_spacingBraceGroup.Init(3, 0, 12);
     this->Register(&m_spacingBraceGroup, "spacingBraceGroup", &m_generalLayout);
 
+    m_justificationStaff.SetInfo("Spacing staff justification", "The staff justification");
+    m_justificationStaff.Init(1., 0., 10.);
+    this->Register(&m_justificationStaff, "justificationStaff", &m_generalLayout);
+
+    m_justificationSystem.SetInfo("Spacing system justification", "The system spacing justification");
+    m_justificationSystem.Init(1., 0., 10.);
+    this->Register(&m_justificationSystem, "justificationSystem", &m_generalLayout);
+
+    m_justificationBracketGroup.SetInfo("Spacing bracket group justification", "Space between staves inside a bracketed group justification");
+    m_justificationBracketGroup.Init(1., 0., 10.);
+    this->Register(&m_justificationBracketGroup, "justificationBracketGroup", &m_generalLayout);
+
+    m_justificationBraceGroup.SetInfo("Spacing brace group justification", "Space between staves inside a braced group ijustification");
+    m_justificationBraceGroup.Init(1., 0., 10.);
+    this->Register(&m_justificationBraceGroup, "justificationBraceGroup", &m_generalLayout);
+
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);

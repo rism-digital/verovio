@@ -522,6 +522,10 @@ public:
     OptionInt m_spacingSystem;
     OptionInt m_spacingBracketGroup;
     OptionInt m_spacingBraceGroup;
+    OptionDbl m_justificationStaff;
+    OptionDbl m_justificationSystem;
+    OptionDbl m_justificationBraceGroup;
+    OptionDbl m_justificationBracketGroup;
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
     OptionIntMap m_systemDivider;

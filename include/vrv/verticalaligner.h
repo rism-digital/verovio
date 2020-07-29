@@ -242,6 +242,18 @@ public:
     //
 private:
     /**
+    * This enumeration defines spacing type between current staff and previous one
+    */
+    enum class SpacingType {
+        System,
+        Staff,
+        Brace,
+        Bracket,
+        None
+    };
+    SpacingType m_spacingType = SpacingType::None;
+
+    /**
      * The list of FloatingPositioner for the staff.
      */
     ArrayOfFloatingPositioners m_floatingPositioners;
