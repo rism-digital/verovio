@@ -810,9 +810,14 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
     else {
         // This is a hanging tie for no apparent reason.  Display it, but make
         // it red. L.v. will be handled differently as an ornament.
-        Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
-        tie->SetType("hanging");
-        tie->SetColor("red");
+        if (m_signifiers.terminallong && (token->find(m_signifiers.terminallong) != std::string::npos)) {
+            // suppress hanging tie (because it was removed)
+        }
+        else {
+            Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
+            tie->SetType("hanging");
+            tie->SetColor("red");
+        }
     }
 }
 
@@ -9589,6 +9594,7 @@ void HumdrumInput::processTerminalLong(hum::HTp token)
     if ((token->find('[') != string::npos) || (token->find('_') != string::npos)) {
         removeCharacter(token, '[');
         removeCharacter(token, '_');
+
         int pitch = hum::Convert::kernToBase40(token);
         hum::HTp testtok = token->getNextToken();
         while (testtok) {
