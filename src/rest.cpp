@@ -228,7 +228,7 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     auto layerIter = std::find_if(begin(layers), end(layers), [&](Object *foundLayer) {
         return dynamic_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
     });
-    if ((layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == end(layers))) return VRV_UNSET;
+    if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == end(layers))) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
     Object *lastLayerElement = isPrevious ? (*layerIter)->GetLast() : (*layerIter)->GetFirst();
@@ -241,12 +241,13 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
 
 std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer)
 {
+    AttConverter converter;
     if (object->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(object);
         assert(note);
         Accid* accid = note->GetDrawingAccid();
         return { PitchInterface::CalcLoc(note, dynamic_cast<Layer *>(layer), this),
-            (accid && accid->GetAccid() != 0)? AttConverter::AccidentalWrittenToStr(accid->GetAccid()) : "noAccidental" };
+            (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid()) : "noAccidental" };
     }
     if (object->Is(CHORD)) {
         Chord* chord = dynamic_cast<Chord *>(object);
@@ -254,7 +255,7 @@ std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *
         Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
         Accid* accid = relevantNote->GetDrawingAccid();
         return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), this),
-            (accid && accid->GetAccid() != 0) ? AttConverter::AccidentalWrittenToStr(accid->GetAccid())
+            (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid())
                                               : "noAccidental" };
     }
     return { VRV_UNSET, "noAccidental" };
@@ -268,7 +269,7 @@ int Rest::GetRestOffsetFromOptions(
 
     return doc->GetOptions()->m_restLayerOffsets.GetIntValue({ location.second, layer,
         isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location.first % 2 ? "line" : "space",
-        Att::DurationToStr(data_DURATION(GetActualDur())) });
+        this->AttDurationLogical::DurationToStr(data_DURATION(GetActualDur())) });
 }
 
 //----------------------------------------------------------------------------

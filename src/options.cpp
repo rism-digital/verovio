@@ -523,11 +523,14 @@ bool OptionJson::SetValue(const std::string &defaultValue)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
+    bool result(true);
     if (!m_values.parse(content)) {
         LogError("Input file '%s' is not valid or contains errors", defaultValue.c_str());
+        result = false;
     }
 
     in.close();
+    return result;
 }
 
 int OptionJson::GetIntValue(const std::vector<std::string> jsonNodePath) const 
