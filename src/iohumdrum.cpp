@@ -10985,9 +10985,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 int measures = getMeasureDifference(line->token(i), endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
-                pair<int, double> ts2(measures, tstamp2.getFloat());
+                // See issue https://github.com/rism-ch/verovio/issues/959
+                // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
+                double endingCorrection = 0.03;
+                pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
+                hairpin->SetType("endbar03");
+                m_measure->AddChild(hairpin);
 
                 std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
@@ -11001,7 +11006,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     // don't set a vertical group for this token
                 }
 
-                m_measure->AddChild(hairpin);
                 if (aboveQ) {
                     setPlace(hairpin, "above");
                 }
@@ -11083,9 +11087,13 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 int measures = getMeasureDifference(line->token(i), endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
-                pair<int, double> ts2(measures, tstamp2.getFloat());
+                // See issue https://github.com/rism-ch/verovio/issues/959
+                // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
+                double endingCorrection = 0.03;
+                pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
+                hairpin->SetType("endbar03");
                 m_measure->AddChild(hairpin);
 
                 std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
