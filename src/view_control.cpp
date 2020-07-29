@@ -42,6 +42,7 @@
 #include "options.h"
 #include "pedal.h"
 #include "reh.h"
+#include "rend.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -1628,9 +1629,18 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         }
         int y = fermata->GetDrawingY();
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, HORIZONTALALIGNMENT_center, (*staffIter)->m_drawingStaffSize);
-        dc->ResetFont();
+        if (fermata->HasGlyphNum()) {
+            TextDrawingParams params;
+            params.m_x = x;
+            params.m_y = y;
+            params.m_pointSize = m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false)->GetPointSize();
+            DrawExternalSymbol(dc, fermata, params);
+        }
+        else {
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, str, HORIZONTALALIGNMENT_center, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
     }
 
     dc->EndGraphic(fermata, this);
@@ -1944,10 +1954,19 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
         // Adjust the x position
         int drawingX = x - (1 + xShift) * m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
-
-        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, drawingX, y, str, HORIZONTALALIGNMENT_left, (*staffIter)->m_drawingStaffSize);
-        dc->ResetFont();
+        if (mordent->HasGlyphNum()) {
+            TextDrawingParams params;
+            params.m_x = drawingX;
+            params.m_y = y;
+            params.m_pointSize = m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false)->GetPointSize();
+            DrawExternalSymbol(dc, mordent, params);
+        }
+        else
+        {
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, drawingX, y, str, HORIZONTALALIGNMENT_left, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
     }
 
     dc->EndGraphic(mordent, this);
@@ -2170,7 +2189,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     }
 
     // for a start always put trill up
-    int code = trill->GetTrillGlyph();
+    int code = SMUFL_E566_ornamentTrill;
     std::wstring str;
 
     if (trill->GetLstartsym() != LINESTARTENDSYMBOL_none) {
@@ -2212,9 +2231,18 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
                 (*staffIter)->m_drawingStaffSize / 2, false);
         }
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
-        dc->ResetFont();
+        if (trill->HasGlyphNum()) {
+            TextDrawingParams params;
+            params.m_x = x;
+            params.m_y = y;
+            params.m_pointSize = m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false)->GetPointSize();
+            DrawExternalSymbol(dc, trill, params);
+        }
+        else {
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
     }
 
     dc->EndGraphic(trill, this);
@@ -2280,9 +2308,18 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
                 (*staffIter)->m_drawingStaffSize / 2, false);
         }
 
-        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
-        dc->ResetFont();
+        if (turn->HasGlyphNum()) {
+            TextDrawingParams params;
+            params.m_x = x;
+            params.m_y = y;
+            params.m_pointSize = m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false)->GetPointSize();
+            DrawExternalSymbol(dc, turn, params);
+        }
+        else {
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, str, alignment, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
     }
 
     dc->EndGraphic(turn, this);

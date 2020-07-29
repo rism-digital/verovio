@@ -13,7 +13,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "smufl.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -58,18 +57,6 @@ void Trill::Reset()
     ResetOrnamentAccid();
     ResetPlacement();
     ResetExtSym();
-}
-
-wchar_t Trill::GetTrillGlyph() const
-{
-    // If there is glyph.num, return glyph based on it
-    if (HasGlyphNum()) {
-        wchar_t code = GetGlyphNum();
-        if (NULL != Resources::GetGlyph(code)) return code;
-    }
-
-    // return default glyph for trill
-    return SMUFL_E566_ornamentTrill;
 }
 
 //----------------------------------------------------------------------------

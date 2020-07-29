@@ -2873,7 +2873,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             else if (xmlMordent.node().attribute("departure")) {
                 mordent_attributes += std::string("departure_") + xmlMordent.node().attribute("departure").as_string();
             }
-            mordent->SetExternalsymbols(mordent, "glyph.num", GetOrnamentGlyphNumber(mordent_attributes));
+            mordent->SetExternalsymbols(mordent, "glyph.num",
+                mordent_attributes.empty() ? "U+E5BD" : GetOrnamentGlyphNumber(mordent_attributes));
         }
     }
 
@@ -3706,12 +3707,12 @@ void MusicXmlInput::ShapeFermata(Fermata *fermata, pugi::xml_node node)
 std::string MusicXmlInput::GetOrnamentGlyphNumber(const std::string &attributes) const
 {
     static std::map<std::string, std::string> precomposedNames = {
-        { "inverted_approach_above", "U+E5B2"},
-        { "inverted_approach_below", "U+E5C3" },
-        { "approach_above", "U+E5BC" },
-        { "approach_below", "U+E5C7" }, 
+        { "inverted_approach_above", "U+E5C6"},
+        { "inverted_approach_below", "U+E5B5" },
+        { "approach_above", "U+E5C7" },
+        { "approach_below", "U+E5B8" }, 
         { "inverted_departure_above", "U+E5BB" },
-        { "inverted_departure_below", "U+E5B1" }
+        { "inverted_departure_below", "U+E5C8" }
     };
 
     return precomposedNames.end() != precomposedNames.find(attributes) ? precomposedNames[attributes] : "";

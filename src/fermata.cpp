@@ -64,12 +64,6 @@ void Fermata::ConvertFromAnalyticalMarkup(
 
 wchar_t Fermata::GetFermataGlyph() const
 {
-    // If there is glyph.num, prioritize it, otherwise check other attributes
-    if (HasGlyphNum()) {
-        wchar_t code = GetGlyphNum();
-        if (NULL != Resources::GetGlyph(code)) return code;
-    }
-
     // check for shape
     if (GetShape() == fermataVis_SHAPE_angular) {
         if (GetForm() == fermataVis_FORM_inv || (GetPlace() == STAFFREL_below && !(GetForm() == fermataVis_FORM_norm)))
