@@ -56,12 +56,6 @@ void Turn::Reset()
 
 wchar_t Turn::GetTurnGlyph() const
 {
-    // If there is glyph.num, prioritize it, otherwise check other attributes
-    if (HasGlyphNum()) {
-        wchar_t code = GetGlyphNum();
-        if (NULL != Resources::GetGlyph(code)) return code;
-    }
-
     return (GetForm() == turnLog_FORM_lower)? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
 }
 

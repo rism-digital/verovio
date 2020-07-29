@@ -54,11 +54,6 @@ public:
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
 
-    /**
-     * Get the SMuFL glyph for the trill based on glyph.num
-     */
-    wchar_t GetTrillGlyph() const;
-
     //----------//
     // Functors //
     //----------//

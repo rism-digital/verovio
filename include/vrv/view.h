@@ -363,6 +363,7 @@ protected:
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
+    void DrawExternalSymbol(DeviceContext *dc, Object *object, TextDrawingParams &params);
 
     /**
      * @name Method for drawing Beam and FTrem.
