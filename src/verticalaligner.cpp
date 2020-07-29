@@ -164,12 +164,11 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
             m_spacingType = firstInGroup ? SpacingType::System : SpacingType::Staff;
             if (staffGrp->GetParent()->Is(STAFFGRP)) {
                 // Nested staffGrp
-                if (staffGrp->HasSymbol() && staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace && !firstInGroup) {
-                    // this staff is inside braced group (not first)
-                    m_spacingType = SpacingType::Brace;
+                if (staffGrp->HasSymbol() && staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
+                    m_spacingType = firstInGroup ? SpacingType::Bracket : SpacingType::Brace;
                 }
                 else {
-                    m_spacingType = SpacingType::Bracket;
+                    m_spacingType = firstInGroup ? SpacingType::Bracket : SpacingType::Staff;
                 }
             }
         } else {
