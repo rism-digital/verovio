@@ -502,9 +502,10 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 // OptionJson
 //----------------------------------------------------------------------------
 
-void OptionJson::Init(const std::string& defaultValue)
+void OptionJson::Init(const std::string &defaultValue, const std::string &defaultJsonNode)
 {
     m_values.parse(defaultValue);
+    m_defaultJsonNode = defaultJsonNode;
 }
 
 bool OptionJson::SetValue(const std::string &defaultValue)
@@ -542,7 +543,7 @@ int OptionJson::GetIntValue(const std::vector<std::string> jsonNodePath) const
             // if this is not first element - break, we didn't find corrent elementk
             if (iter != std::begin(jsonNodePath)) break;
             // else treat this as default case and take values from "noAccidental" category
-            elem = map.find(noAccidentalCategory);
+            elem = map.find(m_defaultJsonNode);
             // if we didn't find anything even after that - exit
             if (elem == std::end(map)) break;
         }
@@ -874,7 +875,7 @@ Options::Options()
 
     m_restLayerOffsets.SetInfo("Rest layer offsets",
         "Path to json file describing offsets for rest location in relation to elements on other/same layers");
-    m_restLayerOffsets.Init(defaultRestLayerOffsets);
+    m_restLayerOffsets.Init(defaultRestLayerOffsets, noAccidentalCategory);
     this->Register(&m_restLayerOffsets, "restLayerOffsets", &m_generalLayout);
 
     /********* selectors *********/
