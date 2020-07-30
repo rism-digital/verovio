@@ -605,6 +605,7 @@ public:
         m_staffIdx = 0;
         m_staffN = 0;
         m_cumulatedShift = 0;
+        m_justificationSum = 0;
         m_pageWidth = 0;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -614,6 +615,7 @@ public:
     int m_staffIdx;
     int m_staffN;
     int m_cumulatedShift;
+    int m_justificationSum;
     int m_pageWidth;
     Functor *m_functor;
     Functor *m_functorEnd;

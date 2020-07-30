@@ -603,6 +603,34 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int StaffAlignment::AlignVertically(FunctorParams *functorParams)
+{
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+
+    if (m_staff) {
+        switch (m_spacingType) {
+            case SpacingType::System:
+                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationSystem.GetValue();
+                break;
+            case SpacingType::Staff:
+                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationStaff.GetValue();
+                break;
+            case SpacingType::Brace:
+                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationBraceGroup.GetValue();
+                break;
+            case SpacingType::Bracket:
+                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationBracketGroup.GetValue();
+                break;
+            case SpacingType::None:
+            default:
+                assert(false);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);

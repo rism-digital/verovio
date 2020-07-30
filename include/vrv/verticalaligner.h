@@ -204,6 +204,7 @@ public:
     /**
      * See Object::AlignVertically
      */
+    virtual int AlignVertically(FunctorParams *functorParams);
     virtual int AlignVerticallyEnd(FunctorParams *functorParams);
 
     /**

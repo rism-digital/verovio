@@ -369,6 +369,7 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
 
     params->m_staffIdx = 0;
 
+    m_systemAligner.Process(params->m_functor, params);
     m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
@@ -583,7 +584,7 @@ int System::AlignSystems(FunctorParams *functorParams)
 
     int bottom = m_systemAligner.GetBottomAlignment()->GetYRel();
     int contentBottom = GetContentY1();
-    int diff = std::max(bottom - contentBottom, systemMargin);
+    int diff = std::max(contentBottom - bottom, systemMargin);
     params->m_shift += contentBottom - diff;
 
     params->m_justifiableSystems++;
