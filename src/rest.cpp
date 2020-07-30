@@ -185,9 +185,16 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
     if (!currentStaff || !currentLayer) return VRV_UNSET;
         
     //Get previous and next elements from the current layer
-    InterfaceComparison ic(INTERFACE_STEMMED);
-    Object *previousElement = currentLayer->FindPreviousChild(&ic, this);
-    Object *nextElement = currentLayer->FindNextChild(&ic, this);
+    Object *previousElement = NULL;
+    Object *nextElement = NULL;
+    for (int i = GetIdx() - 1; i >= 0; --i) {
+        previousElement = currentLayer->GetChild(i);
+        if (previousElement->Is({ CHORD, NOTE })) break;
+    }
+    for (int i = GetIdx() + 1; i <= currentLayer->GetLast()->GetIdx(); ++i) {
+        nextElement = currentLayer->GetChild(i);
+        if (nextElement->Is({ CHORD, NOTE })) break;
+    }
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
     // That way we'll get bottom chord note for top layer and top chord note for bottom layer
@@ -254,7 +261,7 @@ std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *
         assert(chord);
         Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
         Accid* accid = relevantNote->GetDrawingAccid();
-        return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), this),
+        return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), this, isTopLayer),
             (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid())
                                               : "noAccidental" };
     }
@@ -267,9 +274,12 @@ int Rest::GetRestOffsetFromOptions(
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    return doc->GetOptions()->m_restLayerOffsets.GetIntValue({ location.second, layer,
-        isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location.first % 2 ? "line" : "space",
-        this->AttDurationLogical::DurationToStr(data_DURATION(GetActualDur())) });
+    std::vector<std::string> jsonNodePath{ layer };
+    if (layer == "otherLayer") jsonNodePath.emplace_back(location.second);
+    jsonNodePath.insert(end(jsonNodePath),
+        { isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location.first % 2 ? "noteOnLine" : "noteInSpace",
+            this->AttDurationLogical::DurationToStr(data_DURATION(GetActualDur())) });
+    return doc->GetOptions()->m_restLayerOffsets.GetIntValue(jsonNodePath);
 }
 
 //----------------------------------------------------------------------------
