@@ -1412,7 +1412,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         int staffNum = clef.node().attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = static_cast<Staff *>(measure->GetChild(staffNum - 1));
+        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1));
+        assert(staff);
         pugi::xpath_node clefSign = clef.node().select_node("sign");
         pugi::xpath_node clefLine = clef.node().select_node("line");
         if (clefSign && clefLine) {
@@ -1562,7 +1563,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    Staff *staff = static_cast<Staff *>(measure->GetFirst(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetFirst(STAFF));
+    assert(staff);
 
     std::string barStyle = GetContentOfChild(node, "bar-style");
     pugi::xpath_node repeat = node.select_node("repeat");
@@ -2999,11 +3001,11 @@ void MusicXmlInput::ReadMusicXmlNote(
         int breakSec = (int)node.select_nodes("beam[text()='continue']").size();
         if (breakSec) {
             if (element->Is(NOTE)) {
-                Note *note = static_cast<Note *>(element);
+                Note *note = dynamic_cast<Note *>(element);
                 note->SetBreaksec(breakSec);
             }
             else if (element->Is(CHORD)) {
-                Chord *chord = static_cast<Chord *>(element);
+                Chord *chord = dynamic_cast<Chord *>(element);
                 chord->SetBreaksec(breakSec);
             }
         }
