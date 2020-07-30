@@ -52,6 +52,7 @@ Note::Note()
     , AttColor()
     , AttColoration()
     , AttCue()
+    , AttExtSym()
     , AttGraced()
     , AttMidiVelocity()
     , AttNoteAnlMensural()
@@ -67,6 +68,7 @@ Note::Note()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_CUE);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_NOTEHEADS);
@@ -91,6 +93,7 @@ void Note::Reset()
     ResetColor();
     ResetColoration();
     ResetCue();
+    ResetExtSym();
     ResetGraced();
     ResetNoteAnlMensural();
     ResetNoteHeads();
@@ -400,24 +403,38 @@ wchar_t Note::GetMensuralSmuflNoteHead()
 
 wchar_t Note::GetNoteheadGlyph() const 
 {
+    static std::map<std::string, wchar_t> additionalNoteheadSymbols
+        = { { "vocalSprechgesang", SMUFL_E645_vocalSprechgesang },
+            { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
+            { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },
+            { "noteheadDiamondHalf", SMUFL_E0D9_noteheadDiamondHalf }, 
+            { "noteheadNull", SMUFL_E0A5_noteheadNull } };
+    if (HasGlyphName()) {
+        auto glyph = GetGlyphName();
+        if (end(additionalNoteheadSymbols) == additionalNoteheadSymbols.find(glyph)) {
+            return SMUFL_E0A4_noteheadBlack;
+        }
+        return additionalNoteheadSymbols[glyph];
+    }
+
     switch (GetHeadShape()) {
         case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
         case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
         case HEADSHAPE_whole: return SMUFL_E0A2_noteheadWhole;
         //case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
-        //case HEADSHAPE_circle: return SMUFL_noteheadCircle;
-        //case HEADSHAPE_plus: return SMUFL_noteheadPlus;
-        //case HEADSHAPE_diamond: return GetHeadFill() == FILL_void ? SMUFL_noteheadDiamondEmpty 
-        //                                                          : SMUFL_noteheadDiamondFilled;
-        //case HEADSHAPE_isotriangle: return SMUFL_noteheadIsoTriangle;
+        //case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
+        case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
+        case HEADSHAPE_diamond:
+            return GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
+        //case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         //case HEADSHAPE_oval: return SMUFL_noteheadOval;
-        //case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedgel
+        //case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
         //case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
         //case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         //case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
         case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
         //case HEADSHAPE_square: return SMUFL_noteheadSquare;
-        //case HEADSHAPE_x: return SMUFL_noteheadX;
+        case HEADSHAPE_x: return SMUFL_E0A9_noteheadXBlack;
         default: return SMUFL_E0A4_noteheadBlack;
     }
 }

@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "atts_externalsymbols.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
@@ -49,6 +50,7 @@ class Note : public LayerElement,
              public AttColor,
              public AttColoration,
              public AttCue,
+             public AttExtSym,
              public AttGraced,
              public AttMidiVelocity,
              public AttNoteAnlMensural,
