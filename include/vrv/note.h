@@ -180,7 +180,7 @@ public:
     /**
      * Return a SMuFL code for the notehead
      */
-    wchar_t GetNoteheadGlyph() const;
+    wchar_t GetNoteheadGlyph(int duration) const;
 
     /**
      * Check if a note or its parent chord are visible

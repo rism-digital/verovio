@@ -257,7 +257,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = GetNoteheadGlyph();
+    wchar_t code = GetNoteheadGlyph(GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
@@ -296,7 +296,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     Point p(defaultXShift, -defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = GetNoteheadGlyph();
+    wchar_t code = GetNoteheadGlyph(GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
@@ -401,14 +401,13 @@ wchar_t Note::GetMensuralSmuflNoteHead()
     return code;
 }
 
-wchar_t Note::GetNoteheadGlyph() const 
+wchar_t Note::GetNoteheadGlyph(int duration) const 
 {
     static std::map<std::string, wchar_t> additionalNoteheadSymbols
-        = { { "vocalSprechgesang", SMUFL_E645_vocalSprechgesang },
-            { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
-            { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },
-            { "noteheadDiamondHalf", SMUFL_E0D9_noteheadDiamondHalf }, 
+        = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
+            { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },             
             { "noteheadNull", SMUFL_E0A5_noteheadNull } };
+
     if (HasGlyphName()) {
         auto glyph = GetGlyphName();
         if (end(additionalNoteheadSymbols) == additionalNoteheadSymbols.find(glyph)) {
@@ -424,8 +423,10 @@ wchar_t Note::GetNoteheadGlyph() const
         //case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
         //case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
         case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
-        case HEADSHAPE_diamond:
+        case HEADSHAPE_diamond: {
+            if (DUR_1 == duration) return SMUFL_E0D9_noteheadDiamondHalf;
             return GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
+        }
         //case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         //case HEADSHAPE_oval: return SMUFL_noteheadOval;
         //case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
@@ -434,9 +435,16 @@ wchar_t Note::GetNoteheadGlyph() const
         //case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
         case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
         //case HEADSHAPE_square: return SMUFL_noteheadSquare;
-        case HEADSHAPE_x: return SMUFL_E0A9_noteheadXBlack;
-        default: return SMUFL_E0A4_noteheadBlack;
+        case HEADSHAPE_x: {
+            if (DUR_1 == duration || DUR_2 == duration) break; // return SMUFL_E0B3_noteheadCircleX;
+            return SMUFL_E0A9_noteheadXBlack;
+        } 
+        default: break;
     }
+
+    if (DUR_1 == duration) return SMUFL_E0A2_noteheadWhole;
+    if (DUR_2 == duration) return SMUFL_E0A3_noteheadHalf;
+    return SMUFL_E0A4_noteheadBlack;
 }
 
 bool Note::IsVisible()

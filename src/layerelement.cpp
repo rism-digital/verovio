@@ -467,12 +467,18 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
             return doc->GetGlyphWidth(note->GetMensuralSmuflNoteHead(), 
                 staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
         }
-        code = note->GetNoteheadGlyph();
+        code = note->GetNoteheadGlyph(dur);
     }
     else if (this->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
+        if (dur == DUR_1)
+            code = SMUFL_E0A2_noteheadWhole;
+        else if (dur == DUR_2)
+            code = SMUFL_E0A3_noteheadHalf;
+        else
+            code = SMUFL_E0A4_noteheadBlack;
     }
 
     // Mensural note shorter than DUR_BR
@@ -486,7 +492,6 @@ int LayerElement::GetDrawingRadius(Doc *doc, bool isInLigature)
         }
     }
 
-    if ((dur == DUR_1) || (dur == DUR_2)) code = (dur == DUR_1) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
