@@ -171,6 +171,7 @@ std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfO
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
         auto currentElementInfo = GetNoteOrChordLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
+        if (currentElementInfo.first == VRV_UNSET) continue;
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
             || (!isTopLayer && (finalElementInfo.first > currentElementInfo.first))) {
             std::swap(finalElementInfo, currentElementInfo);
