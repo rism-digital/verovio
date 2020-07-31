@@ -185,16 +185,11 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
     if (!currentStaff || !currentLayer) return VRV_UNSET;
         
     //Get previous and next elements from the current layer
-    Object *previousElement = NULL;
-    Object *nextElement = NULL;
-    for (int i = GetIdx() - 1; i >= 0; --i) {
-        previousElement = currentLayer->GetChild(i);
-        if (previousElement->Is({ CHORD, NOTE })) break;
-    }
-    for (int i = GetIdx() + 1; i <= currentLayer->GetLast()->GetIdx(); ++i) {
-        nextElement = currentLayer->GetChild(i);
-        if (nextElement->Is({ CHORD, NOTE })) break;
-    }
+    InterfaceComparison ic(INTERFACE_STEMMED);
+    Object *previousElement = currentLayer->FindPreviousChild(&ic, this);
+    Object *nextElement = currentLayer->FindNextChild(&ic, this);
+    if (previousElement && previousElement->GetParent()->Is(CHORD)) previousElement = previousElement->GetParent();
+    if (nextElement && nextElement->GetParent()->Is(CHORD)) nextElement = nextElement->GetParent();
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
     // That way we'll get bottom chord note for top layer and top chord note for bottom layer
