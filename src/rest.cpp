@@ -249,7 +249,7 @@ std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *
         Note *note = dynamic_cast<Note *>(object);
         assert(note);
         Accid* accid = note->GetDrawingAccid();
-        return { PitchInterface::CalcLoc(note, dynamic_cast<Layer *>(layer), this),
+        return { PitchInterface::CalcLoc(note, dynamic_cast<Layer *>(layer), note),
             (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid()) : "noAccidental" };
     }
     if (object->Is(CHORD)) {
@@ -257,7 +257,7 @@ std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *
         assert(chord);
         Note* relevantNote = isTopLayer ? chord->GetTopNote() : chord->GetBottomNote();
         Accid* accid = relevantNote->GetDrawingAccid();
-        return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), this, isTopLayer),
+        return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), relevantNote, isTopLayer),
             (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid())
                                               : "noAccidental" };
     }
