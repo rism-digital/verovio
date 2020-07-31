@@ -1622,7 +1622,10 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams)
     if (!GetDurationInterface() || Is(MSPACE) || Is(SPACE) || HasSameasLink())
         return FUNCTOR_CONTINUE;
 
-    const double duration = GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+    const double duration = !GetParent()->Is(CHORD)
+        ? GetAlignmentDuration(params->m_mensur, params->m_meterSig)
+        : dynamic_cast<Chord *>(GetParent())->GetAlignmentDuration(params->m_mensur, params->m_meterSig);
+        
     const double time = m_alignment->GetTime();
 
     // The event is starting after the end of the element
