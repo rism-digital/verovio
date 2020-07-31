@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "btrem.h"
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
@@ -72,6 +73,9 @@ bool Tuplet::IsSupportedChild(Object *child)
     }
     else if (child->Is(TUPLET_BRACKET)) {
         assert(dynamic_cast<TupletBracket *>(child));
+    }
+    else if (child->Is(BTREM)) {
+        assert(dynamic_cast<BTrem *>(child));
     }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
