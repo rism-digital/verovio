@@ -113,8 +113,9 @@ public:
 
 private:
 
-    TransPitch GetTransLoc();
-
+     /**
+     * Helper function to update rest oloc/ploc based on the input TransPitch
+     */
     void UpdateFromTransLoc(const TransPitch &tp);
 
 public:
