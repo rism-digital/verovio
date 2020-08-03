@@ -401,7 +401,7 @@ wchar_t Note::GetMensuralSmuflNoteHead()
     return code;
 }
 
-wchar_t Note::GetNoteheadGlyph(int duration) const 
+wchar_t Note::GetNoteheadGlyph(const int duration) const 
 {
     static std::map<std::string, wchar_t> additionalNoteheadSymbols
         = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
@@ -410,7 +410,7 @@ wchar_t Note::GetNoteheadGlyph(int duration) const
 
     if (HasGlyphName()) {
         auto glyph = GetGlyphName();
-        if (end(additionalNoteheadSymbols) == additionalNoteheadSymbols.find(glyph)) {
+        if (additionalNoteheadSymbols.end() == additionalNoteheadSymbols.find(glyph)) {
             return SMUFL_E0A4_noteheadBlack;
         }
         return additionalNoteheadSymbols[glyph];
