@@ -136,7 +136,7 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     staff->FindAllDescendantByComparison(&layers, &matchType);
-    const bool isTopLayer(dynamic_cast<Layer *>(*begin(layers))->GetN() == layer->GetN());
+    const bool isTopLayer(dynamic_cast<Layer *>(*layers.begin())->GetN() == layer->GetN());
 
     // find best rest location relative to elements on other layers
     const auto otherLayerRelativeLocationInfo = GetLocationRelativeToOtherLayers(layers, layer);
@@ -159,12 +159,12 @@ int Rest::GetOptimalLayerLocation(Staff *staff, Layer *layer, int defaultLocatio
 std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfObjects &layersList, Layer *currentLayer)
 {
     if (!currentLayer) return { VRV_UNSET, "noAccidental" };
-    const bool isTopLayer(dynamic_cast<Layer *>(*begin(layersList))->GetN() == currentLayer->GetN());
+    const bool isTopLayer(dynamic_cast<Layer *>(*layersList.begin())->GetN() == currentLayer->GetN());
 
     // Get iterator to another layer. We're going to find coliding elements there
-    auto layerIter = std::find_if(begin(layersList), end(layersList),
+    auto layerIter = std::find_if(layersList.begin(), layersList.end(),
         [&](Object *foundLayer) { return dynamic_cast<Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
-    if (layerIter == end(layersList)) return { VRV_UNSET, "noAccidental" };
+    if (layerIter == layersList.end()) return { VRV_UNSET, "noAccidental" };
     auto collidingElementsList = dynamic_cast<Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
     
     std::pair<int, std::string> finalElementInfo = { VRV_UNSET, "noAccidental" };
@@ -228,10 +228,10 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     ListOfObjects layers;
     ClassIdComparison matchType(LAYER);
     previousStaff->FindAllDescendantByComparison(&layers, &matchType);
-    auto layerIter = std::find_if(begin(layers), end(layers), [&](Object *foundLayer) {
+    auto layerIter = std::find_if(layers.begin(), layers.end(), [&](Object *foundLayer) {
         return dynamic_cast<Layer *>(foundLayer)->GetN() == currentLayer->GetN();
     });
-    if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == end(layers))) return VRV_UNSET;
+    if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
     Object *lastLayerElement = isPrevious ? (*layerIter)->GetLast() : (*layerIter)->GetFirst();
@@ -272,7 +272,7 @@ int Rest::GetRestOffsetFromOptions(
 
     std::vector<std::string> jsonNodePath{ layer };
     if (layer == "otherLayer") jsonNodePath.emplace_back(location.second);
-    jsonNodePath.insert(end(jsonNodePath),
+    jsonNodePath.insert(jsonNodePath.end(),
         { isTopLayer ? "restOnTopLayer" : "restOnBottomLayer", 0 == location.first % 2 ? "noteOnLine" : "noteInSpace",
             this->AttDurationLogical::DurationToStr(data_DURATION(GetActualDur())) });
     return doc->GetOptions()->m_restLayerOffsets.GetIntValue(jsonNodePath);
