@@ -195,6 +195,87 @@ TransPitch &TransPitch::operator=(const TransPitch &pitch)
 
 //////////////////////////////
 //
+// operator> TransPitch -- greater than operator pitches.
+//
+
+bool TransPitch::operator>(const TransPitch &pitch)
+{
+    if (this == &pitch) return false;
+
+    if (m_oct > pitch.m_oct) return true;
+    if (m_oct < pitch.m_oct) return false;
+
+    if (m_pname > pitch.m_pname) return true;
+    return false;
+}
+
+//////////////////////////////
+//
+// operator< TransPitch -- lesser than operator for pitches.
+//
+
+bool TransPitch::operator<(const TransPitch &pitch)
+{
+    if (this == &pitch) return false;
+
+    if (m_oct < pitch.m_oct) return true;
+    if (m_oct > pitch.m_oct) return false;
+
+    if (m_pname < pitch.m_pname) return true;
+    return false;
+}
+
+//////////////////////////////
+//
+// operator++ TransPitch -- increment operator for pitches.
+//
+
+TransPitch &TransPitch::operator++()
+{
+    if (m_pname != dpc_B) {
+        m_pname++;
+    }
+    else
+    {
+        m_pname = dpc_C;
+        m_oct++;
+    }
+    return *this;
+}
+
+TransPitch TransPitch::operator++(int)
+{
+    TransPitch temp = *this;
+    ++*this;
+    return temp;
+}
+
+//////////////////////////////
+//
+// operator-- TransPitch -- decrement operator for pitches.
+//
+
+TransPitch &TransPitch::operator--()
+{
+    if (m_pname != dpc_C) {
+        m_pname--;
+    }
+    else {
+        m_pname = dpc_B;
+        m_oct--;
+    }
+    return *this;
+}
+
+TransPitch TransPitch::operator--(int)
+{
+    TransPitch temp = *this;
+    --*this;
+    return temp;
+}
+
+//////////////////////////////
+//
 // TransPitch::IsValid -- returns true if the absolute value of the accidental
 //     is less than or equal to the max value.
 

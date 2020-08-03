@@ -47,7 +47,18 @@ public:
     TransPitch(int aPname, int anAccid, int anOct);
     TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW, int oct);
     TransPitch(const TransPitch &pitch);
+
+    // TransPitch operators
     TransPitch &operator=(const TransPitch &pitch);
+    // lesser/greater operators
+    bool operator>(const TransPitch &pitch);
+    bool operator<(const TransPitch &pitch);
+    // increament/decrement operators
+    TransPitch &operator++();
+    TransPitch operator++(int);
+    TransPitch &operator--();
+    TransPitch operator--(int);
+
     static int GetChromaticAlteration(data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW);
     data_ACCIDENTAL_GESTURAL GetAccidG() const;
     data_ACCIDENTAL_WRITTEN GetAccidW() const;
