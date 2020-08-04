@@ -305,7 +305,8 @@ int Rest::Transpose(FunctorParams *functorParams)
         params->m_transposer->IntervalToDiatonicChromatic(diatonic, chromatic, transval);
         int transposedLoc = GetLoc() + diatonic;
         // on outer layers move rest on odd locations one line further
-        if (isTopLayer || isBottomLayer) transposedLoc += transposedLoc % 2;
+        if (isTopLayer) transposedLoc += abs(transposedLoc % 2);
+        else if (isBottomLayer) transposedLoc -= abs(transposedLoc % 2);
         if ((isTopLayer && (transposedLoc < centralLocation)) || (isBottomLayer && (transposedLoc > centralLocation))) {
             SetLoc(centralLocation);
         }
