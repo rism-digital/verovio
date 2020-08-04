@@ -20,6 +20,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "note.h"
 #include "rest.h"
@@ -82,6 +83,9 @@ bool Tuplet::IsSupportedChild(Object *child)
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(FTREM)) {
+        assert(dynamic_cast<FTrem *>(child));
     }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
