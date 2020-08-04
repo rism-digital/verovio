@@ -766,7 +766,7 @@ Options::Options()
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
 
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
-    m_spacingSystem.Init(3, 0, 12);
+    m_spacingSystem.Init(8, 0, 24);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
     m_spacingBracketGroup.SetInfo("Spacing bracket group", "Minimum space between staves inside a bracketed group in MEI units");

@@ -8,7 +8,6 @@
 #ifndef __VRV_VERTICAL_ALIGNER_H__
 #define __VRV_VERTICAL_ALIGNER_H__
 
-#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -75,6 +74,11 @@ public:
      */
     void FindAllIntersectionPoints(
         SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
+    /**
+     * Get System Overflows
+     */
+    int GetOverflowAbove() const;
+    int GetOverflowBelow() const;
 
 private:
     //

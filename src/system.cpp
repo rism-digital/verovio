@@ -362,11 +362,7 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    if (this->GetIdx() > 0) {
-        params->m_cumulatedShift
-            = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
-    }
-
+    params->m_cumulatedShift = 0;
     params->m_staffIdx = 0;
 
     m_systemAligner.Process(params->m_functor, params);
@@ -567,29 +563,21 @@ int System::AlignSystems(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
+    assert(m_systemAligner.GetBottomAlignment());
+
+    int systemMargin = this->GetIdx() ? params->m_systemMargin : 0;
+    if (systemMargin) {
+        const int margin = systemMargin - (params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove());
+        params->m_shift -= margin > 0 ? margin : 0;
+    }
 
     SetDrawingYRel(params->m_shift);
 
-    assert(m_systemAligner.GetBottomAlignment());
-
-    int systemMargin = params->m_systemMargin;
-    if (params->m_doc->GetOptions()->m_justifyVertically.GetValue()) {
-        assert(GetParent());
-        // Check if we are on the last system: last system should stick to the footer.
-        // No margin required.
-        if (this->GetIdx() == GetParent()->GetChildCount() - 1) {
-            systemMargin = 0;
-        }
-    }
-
-    int bottom = m_systemAligner.GetBottomAlignment()->GetYRel();
-    int contentBottom = GetContentY1();
-    int diff = std::max(contentBottom - bottom, systemMargin);
-    params->m_shift += contentBottom - diff;
-
+    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel();
     params->m_justifiableSystems++;
     // -1 because of the bottom aligner
     params->m_justifiableStaves += m_systemAligner.GetChildCount() - 1;
+    params->m_prevBottomOverflow = m_systemAligner.GetOverflowBelow();
 
     return FUNCTOR_SIBLINGS;
 }

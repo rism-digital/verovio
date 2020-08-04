@@ -79,8 +79,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc
 StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
-    int i;
-    for (i = 0; i < this->GetChildCount(); ++i) {
+    for (int i = 0; i < this->GetChildCount(); ++i) {
         alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
         assert(alignment);
 
@@ -97,7 +96,7 @@ void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *posi
     positioners->clear();
 
     StaffAlignment *alignment = NULL;
-    for (auto &child : m_children) {
+    for (const auto child : m_children) {
         alignment = dynamic_cast<StaffAlignment *>(child);
         assert(alignment);
         FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
@@ -111,11 +110,25 @@ void SystemAligner::FindAllIntersectionPoints(
     SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin)
 {
     StaffAlignment *alignment = NULL;
-    for (auto &child : m_children) {
+    for (const auto child : m_children) {
         alignment = dynamic_cast<StaffAlignment *>(child);
         assert(alignment);
         alignment->FindAllIntersectionPoints(line, boundingBox, classIds, margin);
     }
+}
+
+int SystemAligner::GetOverflowAbove() const
+{
+    StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(0));
+    assert(alignment);
+    return alignment->GetOverflowAbove();
+}
+
+int SystemAligner::GetOverflowBelow() const
+{
+    StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(GetChildCount() - 2));
+    assert(alignment);
+    return alignment->GetOverflowBelow();
 }
 
 //----------------------------------------------------------------------------
@@ -151,28 +164,37 @@ void StaffAlignment::ClearPositioners()
 void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
 {
     m_staff = staff;
-    if (staff&&doc) {
-        m_staffHeight = (staff->m_drawingLines-1)*doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    if (staff && doc) {
+        m_staffHeight = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-        Object* staffDefParent = m_staff->m_drawingStaffDef->GetParent();
-        if (staffDefParent->Is(STAFFGRP)) {
-            StaffGrp* staffGrp = dynamic_cast<StaffGrp*>(staffDefParent);
-            ListOfObjects allStaffs;
-            ClassIdComparison matchType(STAFFDEF);
-            staffGrp->FindAllDescendantByComparison(&allStaffs, &matchType, 1);
-            bool firstInGroup = allStaffs.empty() || *allStaffs.begin() == m_staff->m_drawingStaffDef;
-            m_spacingType = firstInGroup ? SpacingType::System : SpacingType::Staff;
-            if (staffGrp->GetParent()->Is(STAFFGRP)) {
-                // Nested staffGrp
-                if (staffGrp->HasSymbol() && staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
-                    m_spacingType = firstInGroup ? SpacingType::Bracket : SpacingType::Brace;
-                }
-                else {
-                    m_spacingType = firstInGroup ? SpacingType::Bracket : SpacingType::Staff;
-                }
-            }
-        } else {
+        if (!staff->m_drawingStaffDef)
+            return;
+
+        Object *staffDefParent = m_staff->m_drawingStaffDef->GetParent();
+        if (!staffDefParent->Is(STAFFGRP) || staff->GetIdx() == 0) {
             m_spacingType = SpacingType::System;
+            return;
+        }
+
+        m_spacingType = SpacingType::Staff;
+
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDefParent);
+        ListOfObjects allStaffs;
+        ClassIdComparison matchType(STAFFDEF);
+        staffGrp->FindAllDescendantByComparison(&allStaffs, &matchType, 1);
+        const bool firstInGroup = allStaffs.empty() || *allStaffs.begin() == staff->m_drawingStaffDef;
+        if (!firstInGroup && staffGrp->GetParent()->Is(STAFFGRP) && staffGrp->HasSymbol()) {
+            switch (staffGrp->GetSymbol()) {
+                case staffGroupingSym_SYMBOL_brace:
+                    m_spacingType = SpacingType::Brace;
+                    break;
+                case staffGroupingSym_SYMBOL_bracket:
+                case staffGroupingSym_SYMBOL_bracketsq:
+                    m_spacingType = SpacingType::Bracket;
+                    break;
+                default:
+                    m_spacingType = SpacingType::Staff;
+            }
         }
     }
 }
@@ -281,7 +303,7 @@ FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject 
 void StaffAlignment::FindAllIntersectionPoints(
     SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin)
 {
-    for (auto &positioner : m_floatingPositioners) {
+    for (const auto positioner : m_floatingPositioners) {
         assert(positioner->GetObject());
         if (!positioner->GetObject()->Is(classIds)) {
             continue;
@@ -307,8 +329,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
 
     // For each grpId (sorted, see above), loop to find the highest / lowest positon to put the next group
     // The move the next group (if not already higher or lower)
-    ArrayOfFloatingPositioners::const_iterator iter;
-    for (auto &grp : grpIdYRel) {
+    for (auto const &grp : grpIdYRel) {
         // Check if the next group it not already higher or lower.
         if (params->m_place == STAFFREL_above) {
             yRel = (nextYRel < grp.second) ? nextYRel : grp.second;
@@ -317,6 +338,7 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
             yRel = (nextYRel > grp.second) ? nextYRel : grp.second;
         }
         // Go through all the positioners, but filter by group
+        ArrayOfFloatingPositioners::const_iterator iter;
         for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
             int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
             // Not the grpId we are processing, skip it.
@@ -404,7 +426,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             int overflowAbove = 0;
             if (!skipAbove) overflowAbove = this->CalcOverflowAbove((*iter));
             if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%sparams->m_doctop overflow: %d", current->GetUuid().c_str(), overflowAbove);
+                // LogMessage("%sparams->m_doc top overflow: %d", this->GetUuid().c_str(), overflowAbove);
                 this->SetOverflowAbove(overflowAbove);
                 this->m_overflowAboveBBoxes.push_back((*iter));
             }
@@ -412,7 +434,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             int overflowBelow = 0;
             if (!skipBelow) overflowBelow = this->CalcOverflowBelow((*iter));
             if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+                // LogMessage("%s bottom overflow: %d", this->GetUuid().c_str(), overflowBelow);
                 this->SetOverflowBelow(overflowBelow);
                 this->m_overflowBelowBBoxes.push_back((*iter));
             }
@@ -645,21 +667,20 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
             }
             else {
                 switch (m_spacingType) {
-                    case SpacingType::System :
+                    case SpacingType::System:
                         spacing = params->m_doc->GetOptions()->m_spacingSystem.GetValue();
                         break;
-                    case SpacingType::Staff :
+                    case SpacingType::Staff:
                         spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
                         break;
-                    case SpacingType::Brace :
+                    case SpacingType::Brace:
                         spacing = params->m_doc->GetOptions()->m_spacingBraceGroup.GetValue();
                         break;
-                    case SpacingType::Bracket :
+                    case SpacingType::Bracket:
                         spacing = params->m_doc->GetOptions()->m_spacingBracketGroup.GetValue();
                         break;
                     case SpacingType::None:
-                    default:
-                        assert(false);
+                    default: assert(false);
                 }
             }
         }

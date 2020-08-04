@@ -574,12 +574,14 @@ public:
         m_systemMargin = 0;
         m_justifiableSystems = 0;
         m_justifiableStaves = 0;
+        m_prevBottomOverflow = 0;
         m_doc = doc;
     }
     int m_shift;
     int m_systemMargin;
     int m_justifiableSystems;
     int m_justifiableStaves;
+    int m_prevBottomOverflow;
     Doc *m_doc;
 };
 
