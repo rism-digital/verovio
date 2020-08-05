@@ -794,6 +794,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 }
                 else {
                     LogError("Unsupported character in contour.");
+                    delete newNc;
+                    delete newZone;
                     m_infoObject.import("status", "FAILURE");
                     m_infoObject.import("message", "Unsupported character in contour.");
                     return false;
@@ -1641,9 +1643,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
-        Clef *tempClef;
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
-            tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
+            Clef *tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
             if (tempClef == NULL) {
                 Layer *layer = dynamic_cast<Layer *>((*it)->GetFirstAncestor(LAYER));
                 tempClef = layer->GetCurrentClef();
@@ -1805,7 +1806,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::wstring fullString = L"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                if (fullSyl == NULL && syl != NULL) {
+                if (syl == NULL) continue;
+                if (fullSyl == NULL) {
                     fullSyl = syl;
                 }
                 Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
@@ -1926,7 +1928,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *currentParent = NULL;
     Nc *firstNc = NULL;
     Nc *secondNc = NULL;
-    bool success1, success2;
+    bool success1 = false, success2 = false;
     int ligCount = 0;
     bool firstIsSyl = false;
     Clef *oldClef = NULL;
@@ -2047,7 +2049,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
-                if (nc->HasLigated()) continue;
+                if (nc->HasLigated() && (nc->GetLigated() == BOOLEAN_true)) nc->SetLigated(BOOLEAN_false);
             }
 
             // if the element is a syl then we want to keep it attached to the first node
@@ -2142,14 +2144,13 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         }
     }
     if (syllables.size() != 0) {
-        Clef *currentClef;
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
         std::vector<Object *> syllablesVector(syllables.begin(), syllables.end());
         std::stable_sort(syllablesVector.begin(), syllablesVector.end(), Object::sortByUlx);
         for (auto it = syllablesVector.begin(); it != syllablesVector.end(); ++it) {
-            currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
-            if (currentClef == NULL) {
+            Clef *currentClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, (*it)));
+            if (currentClef == NULL && sparent != NULL) {
                 currentClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
             }
             if (currentClef != oldClef) {
@@ -2243,6 +2244,8 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         }
         else {
             LogError("Unsupported character in contour.");
+            delete newNc;
+            delete zone;
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Unsupported character in contour.");
             return false;
@@ -2336,6 +2339,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     }
     else {
         LogError("isLigature is invalid!");
+        delete zone;
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "isLigature value '" + isLigature + "' is invalid.");
         return false;
@@ -2892,17 +2896,14 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        PitchInterface *pi;
-        FacsimileInterface *fi;
-
         for (auto it = pitchedChildren.begin(); it != pitchedChildren.end(); ++it) {
-            fi = (*it)->GetFacsimileInterface();
+            FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             if (fi == NULL || !fi->HasFacs()) {
                 LogError("Could not adjust pitch: child %s does not have facsimile data", (*it)->GetUuid().c_str());
                 return false;
             }
 
-            pi = (*it)->GetPitchInterface();
+            PitchInterface *pi = (*it)->GetPitchInterface();
             assert(pi);
             pi->SetPname(pname);
             pi->SetOct(3);

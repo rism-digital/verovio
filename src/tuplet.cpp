@@ -14,11 +14,13 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "btrem.h"
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "note.h"
 #include "rest.h"
@@ -73,11 +75,17 @@ bool Tuplet::IsSupportedChild(Object *child)
     else if (child->Is(TUPLET_BRACKET)) {
         assert(dynamic_cast<TupletBracket *>(child));
     }
+    else if (child->Is(BTREM)) {
+        assert(dynamic_cast<BTrem *>(child));
+    }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(FTREM)) {
+        assert(dynamic_cast<FTrem *>(child));
     }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));

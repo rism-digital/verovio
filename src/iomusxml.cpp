@@ -31,6 +31,7 @@
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
+#include "fing.h"
 #include "ftrem.h"
 #include "gliss.h"
 #include "hairpin.h"
@@ -1635,7 +1636,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             LogWarning("MusicXML import: Unsupported barline location 'middle'");
         }
         else {
-            fermata->SetTstamp(m_meterCount + 1);
+            fermata->SetTstamp(m_durTotal + 1);
         }
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         ShapeFermata(fermata, xmlFermata.node());
@@ -2316,6 +2317,33 @@ void MusicXmlInput::ReadMusicXmlNote(
         m_elementStackMap.at(layer).push_back(beam);
     }
 
+    // tuplet start
+    // For now tuplet with beam if starting at the same time. However, this will
+    // quite likely not work if we have a tuplet over serveral beams. We would need to check which
+    // one is ending first in order to determine which one is on top of the hierarchy.
+    // Also, it is not 100% sure that we can represent them as tuplet and beam elements.
+    pugi::xpath_node tupletStart = notations.node().select_node("tuplet[@type='start']");
+    if (tupletStart && !isChord) {
+        Tuplet *tuplet = new Tuplet();
+        AddLayerElement(layer, tuplet);
+        m_elementStackMap.at(layer).push_back(tuplet);
+        int num = node.select_node("time-modification/actual-notes").node().text().as_int();
+        int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
+        if (tupletStart.node().first_child()) {
+            num = tupletStart.node().select_node("tuplet-actual/tuplet-number").node().text().as_int();
+            numbase = tupletStart.node().select_node("tuplet-normal/tuplet-number").node().text().as_int();
+        }
+        if (num) tuplet->SetNum(num);
+        if (numbase) tuplet->SetNumbase(numbase);
+        tuplet->SetNumPlace(
+            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
+        tuplet->SetBracketPlace(
+            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
+        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
+        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
+        tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
+    }
+
     // tremolos
     pugi::xpath_node tremolo = notations.node().select_node("ornaments/tremolo");
     int tremSlashNum = 0;
@@ -2342,33 +2370,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             tremSlashNum = tremolo.node().text().as_int();
             // if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) bTrem->SetForm(bTremLog_FORM_unmeas);
         }
-    }
-
-    // tuplet start
-    // For now tuplet with beam if starting at the same time. However, this will
-    // quite likely not work if we have a tuplet over serveral beams. We would need to check which
-    // one is ending first in order to determine which one is on top of the hierarchy.
-    // Also, it is not 100% sure that we can represent them as tuplet and beam elements.
-    pugi::xpath_node tupletStart = notations.node().select_node("tuplet[@type='start']");
-    if (tupletStart && !isChord) {
-        Tuplet *tuplet = new Tuplet();
-        AddLayerElement(layer, tuplet);
-        m_elementStackMap.at(layer).push_back(tuplet);
-        int num = node.select_node("time-modification/actual-notes").node().text().as_int();
-        int numbase = node.select_node("time-modification/normal-notes").node().text().as_int();
-        if (tupletStart.node().first_child()) {
-            num = tupletStart.node().select_node("tuplet-actual/tuplet-number").node().text().as_int();
-            numbase = tupletStart.node().select_node("tuplet-normal/tuplet-number").node().text().as_int();
-        }
-        if (num) tuplet->SetNum(num);
-        if (numbase) tuplet->SetNumbase(numbase);
-        tuplet->SetNumPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetBracketPlace(
-            tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
-        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
-        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
-        tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
     }
 
     std::string noteID = node.attribute("id").as_string();
@@ -2713,8 +2714,12 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
         }
+
+        // technical
         for (pugi::xml_node technical : notations.node().children("technical")) {
+            // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
             if (technical.child("fingering")) continue;
+
             Artic *artic = new Artic();
             for (pugi::xml_node articulation : technical.children()) {
                 artics.push_back(ConvertArticulations(articulation.name()));
@@ -2778,6 +2783,20 @@ void MusicXmlInput::ReadMusicXmlNote(
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         if (xmlFermata.node().attribute("id")) fermata->SetUuid(xmlFermata.node().attribute("id").as_string());
         ShapeFermata(fermata, xmlFermata.node());
+    }
+
+    // fingering
+    auto xmlFing = notations.node().select_node("technical/fingering");
+    if (xmlFing) {
+        std::string fingText = GetContent(xmlFing.node());
+        Fing *fing = new Fing();
+        Text *text = new Text();
+        text->SetText(UTF8to16(fingText));
+        m_controlElements.push_back(std::make_pair(measureNum, fing));
+        fing->SetStartid(m_ID);
+        fing->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        fing->SetPlace(fing->AttPlacement::StrToStaffrel(xmlFing.node().attribute("placement").as_string()));
+        fing->AddChild(text);
     }
 
     // glissando and slide

@@ -557,6 +557,9 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
+
+    x -= m_doc->GetDrawingBeamWhiteWidth(staffSize, false); // distance between bar and start brace
+
     if (m_doc->GetOptions()->m_useBraceGlyph.GetValue()) {
         FontInfo *font = m_doc->GetDrawingSmuflFont(staffSize, false);
         int width = m_doc->GetGlyphWidth(SMUFL_E000_brace, staffSize, false);
@@ -564,7 +567,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
         const float scale = static_cast<float>(y1 - y2) / height;
         // We want the brace width always to be 2 units
         int braceWidth = m_doc->GetDrawingDoubleUnit(staffSize);
-        x -= braceWidth + m_doc->GetDrawingBeamWhiteWidth(staffSize, false) / 2 + m_doc->GetDrawingUnit(staffSize);
+        x -= braceWidth;
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
         const float widthAfterScalling = width * scale;
         font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
@@ -584,8 +587,6 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     BoundingBox::Swap(y1, y2);
 
     int ymed, xdec, fact;
-
-    x -= m_doc->GetDrawingBeamWhiteWidth(staffSize, false); // distance between bar and start brace
 
     ymed = (y1 + y2) / 2;
     fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
@@ -1032,7 +1033,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    if (staffDef->GetLinesVisible() != BOOLEAN_false) {
+    if (staffDef && (staffDef->GetLinesVisible() != BOOLEAN_false)) {
         DrawStaffLines(dc, staff, measure, system);
     }
 
@@ -1070,10 +1071,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     assert(system);
 
     int j, x1, x2, y1, y2;
-    double d;
 
     if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
-        d = staff->GetDrawingRotate();
+        double d = staff->GetDrawingRotate();
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();
         y1 = ToLogicalY(staff->GetDrawingY());
