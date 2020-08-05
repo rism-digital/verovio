@@ -117,18 +117,31 @@ void SystemAligner::FindAllIntersectionPoints(
     }
 }
 
-int SystemAligner::GetOverflowAbove() const
+int SystemAligner::GetOverflowAbove(const Doc *) const
 {
     StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(0));
     assert(alignment);
     return alignment->GetOverflowAbove();
 }
 
-int SystemAligner::GetOverflowBelow() const
+int SystemAligner::GetOverflowBelow(const Doc *doc) const
 {
     StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(GetChildCount() - 2));
     assert(alignment);
-    return alignment->GetOverflowBelow();
+    return alignment->GetOverflowBelow() + doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(alignment->GetStaffSize());
+}
+
+double SystemAligner::GetJustificationSum(const Doc *doc) const
+{
+    assert(doc);
+
+    double justificationSum = 0.;
+    for (const auto child : m_children) {
+        StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(child);
+        justificationSum += alignment ? alignment->GetJustificationFactor(doc) : 0.;
+    }
+
+    return justificationSum;
 }
 
 //----------------------------------------------------------------------------
@@ -241,6 +254,35 @@ void StaffAlignment::SetVerseCount(int verse_count)
     }
 }
 
+ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
+ {
+     assert(doc);
+
+     double justificationFactor = 0.;
+     if (m_staff) {
+         switch (m_spacingType) {
+             case SpacingType::System:
+                 justificationFactor = doc->GetOptions()->m_justificationSystem.GetValue();
+                 break;
+             case SpacingType::Staff:
+                 justificationFactor = doc->GetOptions()->m_justificationStaff.GetValue();
+                 break;
+             case SpacingType::Brace:
+                 justificationFactor = doc->GetOptions()->m_justificationBraceGroup.GetValue();
+                 break;
+             case SpacingType::Bracket:
+                 justificationFactor = doc->GetOptions()->m_justificationBracketGroup.GetValue();
+                 break;
+             case SpacingType::None:
+                 break;
+             default:
+                 assert(false);
+         }
+     }
+
+     return justificationFactor;
+ }
+
 int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
 {
     if (box->Is(FLOATING_POSITIONER)) {
@@ -259,6 +301,70 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
         return -(positioner->GetContentBottom() + m_staffHeight - this->GetYRel());
     }
     return -(box->GetSelfBottom() + m_staffHeight - this->GetYRel());
+}
+
+int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
+{
+    assert(doc);
+
+    int spacing = 0;
+    if (m_staff && m_staff->m_drawingStaffDef) {
+        // Default or staffDef spacing
+        if (m_staff->m_drawingStaffDef->HasSpacing()) {
+            spacing = m_staff->m_drawingStaffDef->GetSpacing();
+        }
+        else {
+            switch (m_spacingType) {
+                case SpacingType::System:
+                    spacing = doc->GetOptions()->m_spacingSystem.GetValue();
+                    break;
+                case SpacingType::Staff:
+                    spacing = doc->GetOptions()->m_spacingStaff.GetValue();
+                    break;
+                case SpacingType::Brace:
+                    spacing = doc->GetOptions()->m_spacingBraceGroup.GetValue();
+                    break;
+                case SpacingType::Bracket:
+                    spacing = doc->GetOptions()->m_spacingBracketGroup.GetValue();
+                    break;
+                case SpacingType::None:
+                    break;
+                default:
+                    assert(false);
+            }
+        }
+        spacing *= doc->GetDrawingUnit(100);
+    }
+    return spacing;
+}
+
+int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
+{
+    assert(doc);
+
+    Object *parent = GetParent();
+    assert(parent);
+
+    StaffAlignment *prevAlignment = dynamic_cast<StaffAlignment *>(parent->GetPrevious(this));
+
+    if (!prevAlignment) {
+        return GetOverflowAbove() + GetOverlap();
+    }
+
+    int overflowSum = 0;
+    if (prevAlignment->GetVerseCount() > 0) {
+        overflowSum = prevAlignment->GetOverflowBelow() + GetOverflowAbove();
+    } else {
+        // The maximum between the overflow below of the previous staff and the overflow above of the current
+        overflowSum = std::max(prevAlignment->GetOverflowBelow(), GetOverflowAbove());
+        // add overlap if there any
+        overflowSum += GetOverlap();
+    }
+
+    // Add a margin
+    overflowSum += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(GetStaffSize());
+
+    return overflowSum;
 }
 
 void StaffAlignment::SetCurrentFloatingPositioner(
@@ -625,66 +731,13 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    if (m_staff) {
-        switch (m_spacingType) {
-            case SpacingType::System:
-                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationSystem.GetValue();
-                break;
-            case SpacingType::Staff:
-                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationStaff.GetValue();
-                break;
-            case SpacingType::Brace:
-                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationBraceGroup.GetValue();
-                break;
-            case SpacingType::Bracket:
-                params->m_justificationSum += params->m_doc->GetOptions()->m_justificationBracketGroup.GetValue();
-                break;
-            case SpacingType::None:
-            default:
-                assert(false);
-        }
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    if (params->m_staffIdx > 0) {
-        // Default or staffDef spacing
-        int spacing = 0;
-        if (this->m_staff && this->m_staff->m_drawingStaffDef) {
-            if (this->m_staff->m_drawingStaffDef->HasSpacing()) {
-                spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
-            }
-            else {
-                switch (m_spacingType) {
-                    case SpacingType::System:
-                        spacing = params->m_doc->GetOptions()->m_spacingSystem.GetValue();
-                        break;
-                    case SpacingType::Staff:
-                        spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
-                        break;
-                    case SpacingType::Brace:
-                        spacing = params->m_doc->GetOptions()->m_spacingBraceGroup.GetValue();
-                        break;
-                    case SpacingType::Bracket:
-                        spacing = params->m_doc->GetOptions()->m_spacingBracketGroup.GetValue();
-                        break;
-                    case SpacingType::None:
-                    default: assert(false);
-                }
-            }
-        }
-        params->m_cumulatedShift += spacing * params->m_doc->GetDrawingUnit(100);
+    if (m_spacingType != SpacingType::System) {
+        params->m_cumulatedShift += GetMinimumSpacing(params->m_doc);
     }
 
     SetYRel(-params->m_cumulatedShift);
@@ -700,37 +753,17 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
-    int maxOverflowAbove;
-    if (params->m_previousVerseCount > 0) {
-        maxOverflowAbove = params->m_previousOverflowBelow + m_overflowAbove;
+    const int defaultSpacing = GetMinimumSpacing(params->m_doc);
+    const int minSpacing = CalcMinimumRequiredSpacing(params->m_doc);
+
+    if (m_spacingType == SpacingType::System) {
+        params->m_cumulatedShift += minSpacing;
     }
-    else {
-        // The maximum between the overflow below of the previous staff and the overflow above of the current
-        maxOverflowAbove = std::max(params->m_previousOverflowBelow, m_overflowAbove);
-
-        // If we have some overlap, add it
-        if (m_overlap) maxOverflowAbove += m_overlap;
+    else if (minSpacing > defaultSpacing) {
+        params->m_cumulatedShift += minSpacing - defaultSpacing;
     }
-
-    // Add a margin
-    maxOverflowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize());
-    // Default or staffDef spacing
-    int spacing = params->m_doc->GetOptions()->m_spacingStaff.GetValue();
-    if (this->m_staff && this->m_staff->m_drawingStaffDef && this->m_staff->m_drawingStaffDef->HasSpacing()) {
-        spacing = this->m_staff->m_drawingStaffDef->GetSpacing();
-    }
-
-    // Is the maximum the overflow (+ overlap) shift, or the default ?
-    maxOverflowAbove -= spacing * params->m_doc->GetDrawingUnit(100);
-    // Is the maximum the overflow (+ overlap) shift, or the default ?
-    int shift = std::max(0, maxOverflowAbove);
-
-    params->m_cumulatedShift += shift;
 
     SetYRel(GetYRel() - params->m_cumulatedShift);
-
-    params->m_previousOverflowBelow = m_overflowBelow;
-    params->m_previousVerseCount = this->GetVerseCount();
 
     return FUNCTOR_CONTINUE;
 }
@@ -740,13 +773,15 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
     JustifyYParams *params = dynamic_cast<JustifyYParams *>(functorParams);
     assert(params);
 
-    // Skip bottom aligner
-    if (!this->m_staff) {
+    // Skip bottom aligner and first staff
+    if (!this->m_staff || SpacingType::System == m_spacingType) {
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetYRel(this->GetYRel() - params->m_stepSize * params->m_stepCountStaff);
-    params->m_stepCountStaff++;
+    const double staffJustificationFactor = GetJustificationFactor(params->m_doc);
+    const double shift = staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+
+    this->SetYRel(this->GetYRel() - shift);
 
     return FUNCTOR_CONTINUE;
 }

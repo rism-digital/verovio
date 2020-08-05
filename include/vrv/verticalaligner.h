@@ -77,8 +77,13 @@ public:
     /**
      * Get System Overflows
      */
-    int GetOverflowAbove() const;
-    int GetOverflowBelow() const;
+    int GetOverflowAbove(const Doc *doc) const;
+    int GetOverflowBelow(const Doc *doc) const;
+
+    /**
+    * Get justification sum
+    */
+    double GetJustificationSum(const Doc *doc) const;
 
 private:
     //
@@ -167,6 +172,14 @@ public:
     ///@}
 
     /**
+     * @name Set of functions for spacing calculations
+     */
+    ///@{
+    int GetMinimumSpacing(const Doc *doc) const;
+    int CalcMinimumRequiredSpacing(const Doc *doc) const;
+    ///@}
+
+    /**
      * @name Setter and getter for overflow and overlap values
      */
     ///@{
@@ -177,6 +190,13 @@ public:
     void SetOverlap(int overlap);
     int GetOverlap() const { return m_overlap; }
     int GetStaffHeight() const { return m_staffHeight; }
+    ///@}
+
+    /**
+     * @name Returns justification factor based on staff type
+     */
+    ///@{
+    double GetJustificationFactor(const Doc *doc) const;
     ///@}
 
     /**
@@ -208,7 +228,6 @@ public:
     /**
      * See Object::AlignVertically
      */
-    virtual int AlignVertically(FunctorParams *functorParams);
     virtual int AlignVerticallyEnd(FunctorParams *functorParams);
 
     /**
@@ -247,15 +266,9 @@ public:
     //
 private:
     /**
-    * This enumeration defines spacing type between current staff and previous one
-    */
-    enum class SpacingType {
-        System,
-        Staff,
-        Brace,
-        Bracket,
-        None
-    };
+     * Defines spacing type between current staff and previous one
+     */
+    enum class SpacingType { System, Staff, Brace, Bracket, None };
     SpacingType m_spacingType = SpacingType::None;
 
     /**
