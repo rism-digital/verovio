@@ -56,7 +56,10 @@ Used libraries
 --------------
 
 The following libraries are embedded in Verovio:
-* [JSON++](https://github.com/hjiang/jsonxx)
-* [MidiFile](https://github.com/craigsapp/midifile)
-* [pugixml](https://pugixml.org/)
-* [UTF-CPP](http://utfcpp.sourceforge.net/)
+| library | purpose |
+| ------- | ------- |
+| [humlib](https://github.com/craigsapp/humlib)       | Humdrum file import/export |
+| [JSON++](https://github.com/hjiang/jsonxx)          | JSON data parser           |
+| [MidiFile](https://github.com/craigsapp/midifile)   | Standard MIDI file export  |
+| [pugixml](https://pugixml.org/)                     | XML data parser            |
+| [UTF-CPP](http://utfcpp.sourceforge.net/)           | UTF character conversions  |
