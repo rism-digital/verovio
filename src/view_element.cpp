@@ -1451,6 +1451,21 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY() - stem->GetDrawingStemLen());
 
+    if (stem->HasStemMod()) {
+        if (stem->GetStemMod() == STEMMODIFIER_sprech) {
+            int yShift = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            Note *note = dynamic_cast<Note *>(stem->GetParent());
+            assert(note);
+            if ((note->GetDrawingLoc() % 2) != 0) {
+                yShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+            yShift *= (stem->GetDrawingStemLen() > 0)? -1 : 1;
+            yShift -= m_doc->GetGlyphHeight(SMUFL_E645_vocalSprechgesang, staff->m_drawingStaffSize, false) / 2;
+            DrawSmuflCode(dc, stem->GetDrawingX(), note->GetDrawingY() + yShift, SMUFL_E645_vocalSprechgesang,
+                staff->m_drawingStaffSize, false);
+        }
+    }
+
     DrawLayerChildren(dc, stem, layer, staff, measure);
 
     /************ Draw slash ************/
