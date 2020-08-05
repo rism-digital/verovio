@@ -11,7 +11,7 @@ Verovio is written in standard 2017 C++ and can be compiled as a standalone comm
 
 Verovio uses the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
-The project page is http://www.verovio.org. Verovio is available under the LGPL license (see LICENSE.txt).
+The project page is http://www.verovio.org. Verovio is available under the LGPL license (see [LICENSE.txt](https://github.com/rism-ch/verovio/blob/develop/LICENSE.txt)).
 
 Building and use instructions by environment
 --------------------------------------------
@@ -72,7 +72,7 @@ Example resources using verovio
 | ---- | ----- | ----------- |
 | [Verovio Humdrum Viewer](https://verovio.humdrum.org) | editor | An online semi-graphical Humdrum data editor (can also be used to textually edit other digital scores compliant with verovio). |
 | [MoVI](https://dme.mozarteum.at/movi/en) | repertory | The digital Mozart digital score VIewer at the [Mozarteum](https://mozarteum.at) |
-| [Tasso in Music Project](https://www.tassomusic.org/work/?id=Trm0047a) | repertory | Musical settings of the poetry of [Torquato Tasso](https://en.wikipedia.org/wiki/Torquato_Tasso)
+| [Tasso in Music Project](https://www.tassomusic.org/work/?id=Trm0047m) | repertory | Musical settings of the poetry of [Torquato Tasso](https://en.wikipedia.org/wiki/Torquato_Tasso)
 | [Measuring Polyphony](https://measuringpolyphony.org/display.html?/assets/mensural/325_MENSURAL.mei) | repertory | Late medieval music in black mensural and modern notations |
 | [370 Bach Chorales](https://chorales.sapp.org) | repertory | Online edition of Bach chorales, including an interactive [typesetter page](https://chorales.sapp.org/typesetter) that allows for creating musical examples for online display or use in papers. |
 | [Humdrum Notation Plugin](https://plugin.humdrum.org) | tool | Javascript interface to verovio for displaying multiple musical examples on a webpage |
