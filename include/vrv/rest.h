@@ -127,9 +127,9 @@ private:
     int GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLayer, bool isPrevious, bool isTopLayer);
 
     /**
-     * Get location of the object on the layer if it's note or chord
+     * Get location of the object on the layer if it's note, chord or ftrem
      */
-    std::pair<int, std::string> GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer);
+    std::pair<int, std::string> GetElementLocation(Object *object, Layer *layer, bool isTopLayer);
 
     /**
      * Get correct offset for the rest from the options based on layer and location

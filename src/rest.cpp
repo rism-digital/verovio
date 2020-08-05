@@ -170,7 +170,7 @@ std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfO
     std::pair<int, std::string> finalElementInfo = { VRV_UNSET, "noAccidental" };
     // Go through each colliding element and figure out optimal location for the rest
     for (Object *object : collidingElementsList) {
-        auto currentElementInfo = GetNoteOrChordLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
+        auto currentElementInfo = GetElementLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
             || (!isTopLayer && (finalElementInfo.first > currentElementInfo.first))) {
@@ -185,21 +185,33 @@ int Rest::GetLocationRelativeToCurrentLayer(Staff *currentStaff, Layer *currentL
 {
     if (!currentStaff || !currentLayer) return VRV_UNSET;
         
-    //Get previous and next elements from the current layer
-    InterfaceComparison ic(INTERFACE_STEMMED);
-    Object *previousElement = currentLayer->FindPreviousChild(&ic, this);
-    Object *nextElement = currentLayer->FindNextChild(&ic, this);
-    if (previousElement && previousElement->GetParent()->Is(CHORD)) previousElement = previousElement->GetParent();
-    if (nextElement && nextElement->GetParent()->Is(CHORD)) nextElement = nextElement->GetParent();
+    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
+    GetRelativeLayerElementParams getRelativeLayerElementParams(GetIdx(), BACKWARD, false);
+
+    // Get previous and next elements from the current layer
+    currentLayer->Process(
+        &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    Object *previousElement
+        = getRelativeLayerElementParams.m_relativeElement;
+    // reset and search in other direction
+    getRelativeLayerElementParams.m_relativeElement = NULL;
+    getRelativeLayerElementParams.m_searchDirection = FORWARD;
+    getRelativeLayerElement.m_returnCode = FUNCTOR_CONTINUE;
+    currentLayer->Process(
+        &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD);
+    Object *nextElement = getRelativeLayerElementParams.m_relativeElement;
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
     // That way we'll get bottom chord note for top layer and top chord note for bottom layer
     const int previousElementLoc = previousElement 
-        ? GetNoteOrChordLocation(previousElement, currentLayer, !isTopLayer).first
-        : GetFirstRelativeElementLocation(currentStaff, currentLayer, true, !isTopLayer);
+        ? GetElementLocation(previousElement, currentLayer, !isTopLayer).first
+        : GetFirstRelativeElementLocation(currentStaff, currentLayer, true, isTopLayer);
     const int nextElementLoc = nextElement
-        ? GetNoteOrChordLocation(nextElement, currentLayer, !isTopLayer).first
-        : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, !isTopLayer);
+        ? GetElementLocation(nextElement, currentLayer, !isTopLayer).first
+        : GetFirstRelativeElementLocation(currentStaff, currentLayer, false, isTopLayer);
+
+    if (VRV_UNSET == previousElementLoc) return nextElementLoc;
+    if (VRV_UNSET == nextElementLoc) return previousElementLoc;
 
     return isTopLayer ? std::min(previousElementLoc, nextElementLoc) : std::max(previousElementLoc, nextElementLoc);
 }
@@ -234,15 +246,19 @@ int Rest::GetFirstRelativeElementLocation(Staff *currentStaff, Layer *currentLay
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
-    Object *lastLayerElement = isPrevious ? (*layerIter)->GetLast() : (*layerIter)->GetFirst();
-    if (lastLayerElement->Is({ NOTE, CHORD })) {
-        return GetNoteOrChordLocation(lastLayerElement, dynamic_cast<Layer *>(*layerIter), isTopLayer).first;
+    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
+    GetRelativeLayerElementParams getRelativeLayerElementParams(GetIdx(), !isPrevious, true);
+    (*layerIter)->Process(&getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, !isPrevious);
+
+    Object *lastLayerElement = getRelativeLayerElementParams.m_relativeElement;
+    if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
+        return GetElementLocation(lastLayerElement, dynamic_cast<Layer *>(*layerIter), !isTopLayer).first;
     }
 
     return VRV_UNSET;
 }
 
-std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *layer, bool isTopLayer)
+std::pair<int, std::string> Rest::GetElementLocation(Object *object, Layer *layer, bool isTopLayer)
 {
     AttConverter converter;
     if (object->Is(NOTE)) {
@@ -260,6 +276,14 @@ std::pair<int, std::string> Rest::GetNoteOrChordLocation(Object *object, Layer *
         return { PitchInterface::CalcLoc(chord, dynamic_cast<Layer *>(layer), relevantNote, isTopLayer),
             (accid && accid->GetAccid() != 0) ? converter.AccidentalWrittenToStr(accid->GetAccid())
                                               : "noAccidental" };
+    }
+    if (object->Is(FTREM)) {
+        std::vector<std::pair<int, std::string> > btremElements;
+        for (int i = 0; i < object->GetChildCount(); ++i) {
+            btremElements.emplace_back(GetElementLocation(object->GetChild(i), layer, isTopLayer));
+        }
+        return isTopLayer ? *std::max_element(btremElements.begin(), btremElements.end())
+                          : *std::min_element(btremElements.begin(), btremElements.end());
     }
     return { VRV_UNSET, "noAccidental" };
 }

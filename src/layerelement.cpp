@@ -1803,4 +1803,27 @@ int LayerElement::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
+{
+    GetRelativeLayerElementParams *params = dynamic_cast<GetRelativeLayerElementParams *>(functorParams);
+    assert(params);
+
+    // Do not check for index of the element if we're looking into neighboring layer or if nested element is being 
+    // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that 
+    // has been passed inside this functor)
+    if (!params->m_isInNeighboringLayer && GetParent()->Is(LAYER)) {
+        if (params->m_searchDirection == FORWARD && (GetIdx() <= params->m_initialElementId)) return FUNCTOR_SIBLINGS;
+        if (params->m_searchDirection == BACKWARD && (GetIdx() >= params->m_initialElementId)) return FUNCTOR_SIBLINGS;
+    }
+
+    if (Is({ NOTE, CHORD, FTREM })) {
+        params->m_relativeElement = this;
+        return FUNCTOR_STOP;
+    }
+
+    if (Is(REST)) return params->m_isInNeighboringLayer ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

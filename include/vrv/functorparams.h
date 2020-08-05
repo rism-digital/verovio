@@ -1384,19 +1384,17 @@ public:
  * member 2: the list of layer elements found
  * member 3: the current meter signature
  * member 4: the current mensur
- * member 5: the functor for redirection
- * member 6: layer to process elements on
+ * member 5: layer to process elements on
  **/
 
 class LayerElementsInTimeSpanParams : public FunctorParams {
 public:
-    LayerElementsInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Functor *functor, Layer *layer)
+    LayerElementsInTimeSpanParams(MeterSig *meterSig, Mensur *mensur, Layer *layer)
     {
         m_time = 0.0;
         m_duration = 0.0;
         m_meterSig = meterSig;
         m_mensur = mensur;
-        m_functor = functor;
         m_layer = layer;
     }
     double m_time;
@@ -1404,7 +1402,6 @@ public:
     ListOfObjects m_elements;
     MeterSig *m_meterSig;
     Mensur *m_mensur;
-    Functor *m_functor;
     Layer *m_layer;
 };
 
@@ -1931,6 +1928,32 @@ class UnsetCurrentScoreDefParams : public FunctorParams {
 public:
     UnsetCurrentScoreDefParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// GetRelativeLayerElementParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the next/previous relevant layer element
+ * member 1: Id of the layer element that is being compared to (starting point)
+ * member 2: direction of search - BACKWARD is for previous element, FORWARD - next
+ * member 3: flag to indicate whether search is done in the same layer as element Id, or in neighboring one
+ **/
+
+class GetRelativeLayerElementParams : public FunctorParams {
+public:
+    GetRelativeLayerElementParams(const int elementId, bool searchDirection, bool anotherLayer)
+    {
+        m_relativeElement = NULL;
+        m_initialElementId = elementId;
+        m_searchDirection = searchDirection;
+        m_isInNeighboringLayer = anotherLayer;
+    }
+    Object *m_relativeElement;
+    int m_initialElementId;
+    bool m_searchDirection;
+    bool m_isInNeighboringLayer;
 };
 
 } // namespace vrv

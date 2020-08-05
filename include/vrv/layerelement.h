@@ -331,6 +331,11 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::GetRelativeLayerElement
+     */
+    virtual int GetRelativeLayerElement(FunctorParams *functorParams);
+
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
 

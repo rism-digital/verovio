@@ -340,8 +340,7 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(double time, double duration, Me
     assert(measure);
 
     Functor layerElementsInTimeSpan(&Object::LayerElementsInTimeSpan);
-    LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(
-        GetCurrentMeterSig(), GetCurrentMensur(), &layerElementsInTimeSpan, this);
+    LayerElementsInTimeSpanParams layerElementsInTimeSpanParams(GetCurrentMeterSig(), GetCurrentMensur(), this);
     layerElementsInTimeSpanParams.m_time = time;
     layerElementsInTimeSpanParams.m_duration = duration;
 
