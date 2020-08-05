@@ -90,8 +90,8 @@ Here is a list of digital score repositories on Github that can be displayed wit
 |  [MEI complete examples](https://github.com/music-encoding/sample-encodings/tree/master/MEI_4.0/Music/Complete_examples) | MEI | 86 various works encoded in MEI |
 | [Mozart Piano Sonatas](https://github.com/craigsapp/mozart-piano-sonatas) | Humdrum | 17 Piano sonatas by W.A. Mozart from the Alte Mozart-Ausgabe ([in VHV](http://verovio.humdrum.org/?file=mozart/sonatas&k=e)) |
 | [Beethoven Piano Sonatas](https://github.com/craigsapp/beethoven-piano-sonatas) | Humdrum | 32 Piano sonatas by L. van Beethoven, edited by Paul Dukas ([in VHV](http://verovio.humdrum.org/?file=beethoven/sonatas&k=e)) |
-| Josquin Research Project | Humdrum | Over 1000 scores of early Renaissance music in modern editions ([website](https://josquin.stanford.edu)) |
-| Tasso in Music Project | Humdrum | Critical edition of 650 Late Renaissance madrigals using the poetry of Torquato Tasso for lyrics. ([website](https://www.tassomusic.org)) |
+| [Josquin Research Project](https://github.com/josquin-research-project/jrp-scores) | Humdrum | Over 1000 scores of early Renaissance music in modern editions ([website](https://josquin.stanford.edu)) |
+| [Tasso in Music Project](https://github.com/TassoInMusicProject/tasso-scores) | Humdrum | Critical edition of 650 Late Renaissance madrigals using the poetry of Torquato Tasso for lyrics. ([website](https://www.tassomusic.org)) |
 | [Music of Scott Joplin](https://github.com/craigsapp/joplin) | Humdrum | Digital scores of most of Scott Joplins music |
 | [Chopin mazurkas](https://github.com/craigsapp/chopin-mazurkas) | Humdrum | Digital scores of Chopin's mazurkas |
 | [Chopin preludes](https://github.com/craigsapp/chopin-preludes) | Humdrum | Digital scores of Chopin's op. 24 preludes |
