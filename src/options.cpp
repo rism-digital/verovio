@@ -617,6 +617,10 @@ Options::Options()
     m_expand.Init("");
     this->Register(&m_expand, "expand", &m_general);
 
+    m_shrinkToFit.SetInfo("Shrink content to fit page", "Scale down page content to fit the page height if needed");
+    m_shrinkToFit.Init(false);
+    this->Register(&m_shrinkToFit, "shrinkToFit", &m_general);
+
     m_svgBoundingBoxes.SetInfo("Svg bounding boxes viewbox on svg root", "Include bounding boxes in SVG output");
     m_svgBoundingBoxes.Init(false);
     this->Register(&m_svgBoundingBoxes, "svgBoundingBoxes", &m_general);
