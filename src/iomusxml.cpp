@@ -1625,8 +1625,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
     }
 
     // fermatas
-    pugi::xpath_node xmlFermata = node.select_node("fermata");
-    if (xmlFermata) {
+    for (pugi::xml_node xmlFermata : node.children("fermata")) {
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
         if (HasAttributeWithValue(node, "location", "left")) {
@@ -1636,10 +1635,10 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
             LogWarning("MusicXML import: Unsupported barline location 'middle'");
         }
         else {
-            fermata->SetTstamp(m_durTotal + 1);
+            fermata->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
         }
         fermata->SetStaff(staff->AttNInteger::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
-        ShapeFermata(fermata, xmlFermata.node());
+        ShapeFermata(fermata, xmlFermata);
     }
 }
 
@@ -1699,6 +1698,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
+        dir->SetType("coda");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
@@ -1729,6 +1729,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
             dir->SetTstamp(timeStamp);
+            dir->SetType(node.child("sound").first_attribute().name());
             pugi::xpath_node staffNode = node.select_node("staff");
             if (staffNode) {
                 dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList(
@@ -2072,6 +2073,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         Dir *dir = new Dir();
         dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         dir->SetTstamp(timeStamp - 1.0);
+        dir->SetType("segno");
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         Rend *rend = new Rend;
         rend->SetFontname("VerovioText");
