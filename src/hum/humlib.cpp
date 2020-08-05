@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Aug  4 16:47:44 PDT 2020
+// Last Modified: Tue Aug  4 22:27:48 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -84675,6 +84675,10 @@ bool Tool_tassoize::run(HumdrumFile& infile) {
 
 	// Re-load the text for each line from their tokens.
 	infile.createLinesFromTokens();
+
+	// Need to adjust the line numbers for tokens for later
+	// processing.
+	m_humdrum_text << infile;
 	return true;
 }
 

@@ -13466,7 +13466,7 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     double scale = tg.numscale;
     tuplet->SetNum(tg.num * scale);
     tuplet->SetNumbase(tg.numbase * scale);
-    if (suppressBracketTuplet) {
+    if (suppressBracketTuplet || suppressTupletNumber) {
         tuplet->SetBracketVisible(BOOLEAN_false);
     }
     if (shouldHideBeamBracket(tgs, layerdata, layerindex)) {
