@@ -1332,8 +1332,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // match open ties with close ties
-    std::vector<std::pair<Tie *, Note *> >::iterator iter;
-    for (iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
+    std::vector<std::pair<Tie *, Note *> >::iterator iter = m_tieStack.begin();
+    while (iter != m_tieStack.end()) {
         double lastScoreTimeOnset = 9999; // __DBL_MAX__;
         bool tieMatched = false;
         std::vector<Note *>::iterator jter;
@@ -1349,10 +1349,11 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             }
         }
         if (tieMatched) {
-            m_tieStack.erase(iter--);
+            iter = m_tieStack.erase(iter);
         }
         else {
             iter->second->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
+            ++iter;
         }
     }
     if (!m_tieStopStack.empty()) { // clear m_tieStopStack after each measure
