@@ -4,19 +4,20 @@
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
-Verovio is written in standard 2017 C++.   Verovio can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or it can be compiled to Javascript using the Emscripten LLVM-to-JavaScript compiler.  See the JavaScript toolkit running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) and check out the [app](http://www.verovio.org/app.html) or the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
+Verovio is written in standard 2017 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](http://www.verovio.org/tutorial.xhtml) for web integration and user interaction.
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/movies/reflow.gif)
 
 
-Verovio follows the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
+Verovio uses the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
 The project page is http://www.verovio.org. Verovio is available under the LGPL license (see LICENSE.txt).
 
-Building and using instructions
--------------------------------
+Building and use instructions by environment
+--------------------------------------------
 
 See the [wiki](https://github.com/rism-ch/verovio/wiki/Building-instructions), with instructions for:
+
 * [Command-line tool](https://github.com/rism-ch/verovio/wiki/Building-instructions#command-line-tool)
 * [XCode](https://github.com/rism-ch/verovio/wiki/Building-instructions#xcode)
 * [Visual Studio](https://github.com/rism-ch/verovio/wiki/Building-instructions#visual-studio)
@@ -39,6 +40,18 @@ Major releases of Verovio and MEI versions:
 
 From Verovio 2.x.x, the plan is to have even version numbers for Verovio releases using a stable version of MEI, and odd version numbers for releases using a development version of MEI. It means that once MEI 5.0 will be released, Verovio will move to version 4.x.x. Older versions of MEI are still supported by newer versions of Verovio. MEI files are internally upgraded when loaded into Verovio. This applies only to the features supported by Verovio. We will try to maintain this in the future.
 
+Used libraries
+--------------
+
+The following libraries are embedded in Verovio:
+| library | purpose |
+| ------- | ------- |
+| [humlib](https://github.com/craigsapp/humlib)       | Humdrum file import/export |
+| [JSON++](https://github.com/hjiang/jsonxx)          | JSON data parser           |
+| [MidiFile](https://github.com/craigsapp/midifile)   | Standard MIDI file export  |
+| [pugixml](https://pugixml.org/)                     | XML data parser            |
+| [UTF-CPP](http://utfcpp.sourceforge.net/)           | UTF character conversions  |
+
 Contributing
 ------------
 
@@ -51,14 +64,16 @@ This page was generated with version 2.4.0-dev-2748fed
 
 ![Example page](https://raw.githubusercontent.com/rism-ch/verovio.org/gh-pages/images/verovio-exp-2.4.0-dev.png)
 
-Used libraries
---------------
+Example projects/tools using verovio
+-----------------------------------------
 
-The following libraries are embedded in Verovio:
-| library | purpose |
-| ------- | ------- |
-| [humlib](https://github.com/craigsapp/humlib)       | Humdrum file import/export |
-| [JSON++](https://github.com/hjiang/jsonxx)          | JSON data parser           |
-| [MidiFile](https://github.com/craigsapp/midifile)   | Standard MIDI file export  |
-| [pugixml](https://pugixml.org/)                     | XML data parser            |
-| [UTF-CPP](http://utfcpp.sourceforge.net/)           | UTF character conversions  |
+| name | type  | description |
+| ---- | ----- | ----------- |
+| [Verovio Humdrum Viewer](https://verovio.humdrum.org) | editor | An online semi-graphical Humdrum data editor (can also be used to textually edit other digital scores compliant with verovio). |
+| [MoVI](https://dme.mozarteum.at/movi/en) | repertory | The digital Mozart digital score VIewer at the [Mozarteum](https://mozarteum.at) |
+| [Tasso in Music Project](https://www.tassomusic.org/work/?id=Trm0047a) | repertory | Musical settings of the poetry of [Torquato Tasso](https://en.wikipedia.org/wiki/Torquato_Tasso)
+| [Measuring Polyphony](https://measuringpolyphony.org/display.html?/assets/mensural/325_MENSURAL.mei) | repertory | Late medieval music in black mensural and modern notations |
+| [370 Bach Chorales](https://chorales.sapp.org) | repertory | Online edition of Bach chorales, including an interactive [typesetter page](https://chorales.sapp.org/typesetter) that allows for creating musical examples for online display or use in papers. |
+| [Humdrum Notation Plugin](https://plugin.humdrum.org) | tool | Javascript interface to verovio for displaying multiple musical examples on a webpage |
+| [Music Sheet Viewer](http://www.partitionnumerique.com/music-sheet-viewer-wordpress-plugin) | tool | WordPress plugin for displaying graphical music from MEI data | 
+
