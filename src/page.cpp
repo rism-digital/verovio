@@ -572,6 +572,10 @@ int Page::GetContentHeight() const
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
+    if (!GetChildCount()) {
+        return 0;
+    }
+
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();

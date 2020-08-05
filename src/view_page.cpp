@@ -73,8 +73,14 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     // The page one has previously been set by Object::SetCurrentScoreDef
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
-    // if (background) dc->DrawRectangle(0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight);
+    if (m_options->m_shrinkToFit.GetValue()) {
+        dc->SetContentHeight(m_doc->GetAdjustedDrawingPageHeight());
+    }
+    else {
+        dc->SetContentHeight(dc->GetHeight());
+    }
 
+    // if (background) dc->DrawRectangle(0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight);
     dc->DrawBackgroundImage();
 
     Point origin = dc->GetLogicalOrigin();

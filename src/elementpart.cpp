@@ -419,7 +419,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     /************ Set flag and slashes (if necessary) and adjust the length ************/
 
-    int slashFactor = this->GetStemMod() - 4;
+    int slashFactor = (this->GetStemMod() < 6)? this->GetStemMod() - 4 : 0;
 
     Flag *flag = NULL;
     if (params->m_dur > DUR_4) {
