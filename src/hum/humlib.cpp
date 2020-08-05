@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jul 23 11:01:49 PDT 2020
+// Last Modified: Tue Aug  4 16:47:44 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10502,7 +10502,7 @@ void HumGrid::addInvisibleRestsInFirstTrack(void) {
       	for (s=0; s<(int)part.size(); s++) {
 				GridStaff& staff = *part.at(s);
 				if (staff.size() == 0) {
-					cerr << "EMPTY STAFF VOICE WILL BE FILLED IN LATER!!!!" << endl;
+					// cerr << "EMPTY STAFF VOICE WILL BE FILLED IN LATER!!!!" << endl;
 					continue;
 				}
 				if (!staff.at(v)) {
@@ -40779,6 +40779,7 @@ MxmlEvent::~MxmlEvent() {
 
 void MxmlEvent::clear(void) {
 	m_starttime = m_duration = 0;
+	m_modification = 1;
 	m_eventtype = mevent_unknown;
 	m_owner = NULL;
 	m_linked = false;
@@ -40854,6 +40855,28 @@ void MxmlEvent::setStartTime(HumNum value) {
 
 void MxmlEvent::setDuration(HumNum value) {
 	m_duration = value;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getModification -- Get the tuplet scaling of the note's duration.
+//
+
+HumNum MxmlEvent::getModification(void) const {
+	return m_modification;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::setModification -- Set the tuplet scaling of the note's duration.
+//
+
+void MxmlEvent::setModification(HumNum value) {
+	m_modification = value;
 }
 
 
@@ -41132,8 +41155,9 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 	HumNum val = (int)value;
 	val /= (int)ticks;
 
+	HumNum modification;
 	if (el) {
-		HumNum checkval = getEmbeddedDuration(el);
+		HumNum checkval = getEmbeddedDuration(modification, el);
 		if ((checkval == 0) && isRest()) {
 			// This is a whole rest.
 			// val = val
@@ -41150,6 +41174,7 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 		}
 	}
 	setDuration(val);
+	setModification(modification);
 }
 
 
@@ -42481,12 +42506,17 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations,
 	if (arpeggio)     { ss << ":";  }
 
 	if (tremolo >= 8) {
-		int tvalue = tremolo;
+		HumNum tvalue = tremolo;
 		if (fingered) {
 			if (beamstarts) {
 				tvalue *= (1 << beamstarts);
 			}
-			ss << "@@" << tvalue << "@@";
+			tvalue *= m_modification;
+			if (tvalue.isInteger()) {
+				ss << "@@" << tvalue << "@@";
+			} else {
+				ss << "@@" << tvalue.getNumerator() << "%" << tvalue.getDenominator() << "@@";
+			}
 		} else {
 			HumNum duration = Convert::recipToDurationNoDots(recip);
 			if ((duration > 0) && (duration < 1)) {
@@ -42494,7 +42524,12 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations,
 				int twopow = int(dval);
 				tvalue *= (1 << twopow);
 			}
-			ss << "@" << tvalue << "@";
+			tvalue *= m_modification;
+			if (tvalue.isInteger()) {
+				ss << "@" << tvalue << "@";
+			} else {
+				ss << "@" << tvalue.getNumerator() << "%" << tvalue.getDenominator() << "@";
+			}
 		}
 	}
 }
@@ -42677,19 +42712,20 @@ string MxmlEvent::getRestPitch(void) const {
 //   duration of notes in MusicXML output from Sibelius.
 //
 
-HumNum MxmlEvent::getEmbeddedDuration(xml_node el) {
+HumNum MxmlEvent::getEmbeddedDuration(HumNum& modification, xml_node el) {
 	if (!el) {
 		return 0;
 	}
 	xml_node child = el.first_child();
-   int dots          = 0;  // count of <dot /> elements
-   HumNum type       = 0;  // powoftwo note type (as duration)
+   int dots          = 0;      // count of <dot /> elements
+   HumNum type       = 0;      // powoftwo note type (as duration)
    bool tuplet       = false;  // is a tuplet
    int actualnotes   = 1;      // numerator of tuplet factor
    int normalnotes   = 1;      // denominator of tuplet factor
    HumNum normaltype = 0;      // poweroftwo duration of tuplet
    int tupdots       = 0;      // dots of "normal type" duration
 	HumNum tfactor    = 1;
+	modification      = 1;
 
 	while (child) {
 		if (strcmp(child.name(), "dot") == 0) {
@@ -42726,7 +42762,7 @@ HumNum MxmlEvent::getEmbeddedDuration(xml_node el) {
 		duration = newdur;
 	}
 	if (tuplet) {
-		HumNum modification(actualnotes, normalnotes);
+		modification.setValue(actualnotes, normalnotes);
 		duration /= modification;
       if (normaltype != type) {
 			cerr << "Warning: cannot handle this tuplet type yet" << endl;
@@ -69273,7 +69309,10 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 
 Tool_msearch::Tool_msearch(void) {
 	define("debug=b",           "diatonic search");
-	define("q|query=s:cdefg",   "query string");
+	define("q|query=s:4c4d4e4f4g",  "combined rhythm/pitch query string");
+	define("p|pitch=s:cdefg",   "pitch query string");
+	define("i|interval=s:2222", "interval query string");
+	define("r|d|rhythm|duration=s:44444",   "rhythm query string");
 	define("t|text=s:",         "lyrical text query string");
 	define("x|cross=b",         "search across parts");
 	define("c|color=s",         "highlight color");
@@ -69320,8 +69359,9 @@ bool Tool_msearch::run(HumdrumFile& infile, ostream& out) {
 
 
 bool Tool_msearch::run(HumdrumFile& infile) {
+	m_debugQ = getBoolean("debug");
 	NoteGrid grid(infile);
-	if (getBoolean("debug")) {
+	if (m_debugQ) {
 		grid.printGridInfo(cerr);
 		// return 1;
 	}
@@ -69333,7 +69373,7 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 
 	if (m_text.empty()) {
 		vector<MSearchQueryToken> query;
-		fillMusicQuery(query, getString("query"));
+		fillMusicQuery(query);
 		doMusicSearch(infile, grid, query);
 	} else {
 		vector<MSearchTextQuery> query;
@@ -69491,6 +69531,17 @@ void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
 }
 
 
+//////////////////////////////
+//
+// Tool_msearch::printQuery --
+//
+
+void Tool_msearch::printQuery(vector<MSearchQueryToken>& query) {
+	for (int i=0; i<(int)query.size(); i++) {
+		cout << query[i];
+	}
+}
+
 
 //////////////////////////////
 //
@@ -69499,6 +69550,10 @@ void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
 
 void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 		vector<MSearchQueryToken>& query) {
+
+	if (m_debugQ) {
+		printQuery(query);
+	}
 
 	vector<vector<NoteCell*>> attacks;
 	attacks.resize(grid.getVoiceCount());
@@ -69642,7 +69697,6 @@ void Tool_msearch::markTextMatch(HumdrumFile& infile, TextInfo& word) {
 bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 		vector<MSearchQueryToken>& dpcQuery, vector<NoteCell*>& match) {
 	match.clear();
-
 	int maxi = (int)notes.size() - index;
 	if ((int)dpcQuery.size() > maxi) {
 		return false;
@@ -69663,6 +69717,7 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 			rhymatch = false;
 		}
 
+		
 		// check for gross-contour queries:
 		if (dpcQuery[i].base <= 0) {
 			lastIsInterval = true;
@@ -69796,67 +69851,227 @@ void Tool_msearch::fillTextQuery(vector<MSearchTextQuery>& query,
 // Tool_msearch::fillMusicQuery --
 //
 
-void Tool_msearch::fillMusicQuery(vector<MSearchQueryToken>& query,
-		const string& input) {
+void Tool_msearch::fillMusicQuery(vector<MSearchQueryToken>& query) {
 	query.clear();
-	char ch;
 
+	string qinput;
+	string pinput;
+	string iinput;
+	string rinput;
+
+	if (getBoolean("query")) {
+		qinput = getString("query");
+	}
+
+	if (getBoolean("pitch")) {
+		pinput = getString("pitch");
+	}
+
+	if (getBoolean("interval")) {
+		iinput = getString("interval");
+	}
+
+	if (getBoolean("rhythm")) {
+		rinput = getString("rhythm");
+	}
+
+	if (!rinput.empty()) {
+		fillMusicQueryRhythm(query, rinput);
+	}
+
+	if (!qinput.empty()) {
+		fillMusicQueryInterleaved(query, qinput);
+	}
+
+	if (!pinput.empty()) {
+		fillMusicQueryPitch(query, pinput);
+	}
+
+	if (!iinput.empty()) {
+		fillMusicQueryInterval(query, iinput);
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillMusicQueryPitch --
+//
+
+void Tool_msearch::fillMusicQueryPitch(vector<MSearchQueryToken>& query,
+		const string& input) { 
+	fillMusicQueryInterleaved(query, input);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillMusicQueryRhythm --
+//
+
+void Tool_msearch::fillMusicQueryRhythm(vector<MSearchQueryToken>& query,
+		const string& input) {
+	fillMusicQueryInterleaved(query, input, true);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillMusicQueryInterval --
+//
+
+void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
+		const string& input) { 
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillMusicQueryInterleaved --
+//
+
+void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
+		const string& input, bool rhythmQ) {
+	char ch;
+	int counter = 0;
 	MSearchQueryToken temp;
+	MSearchQueryToken *active = &temp;
+	if (query.size() > 0) {
+		active = &query.at(counter);
+	} else {
+	}
 
 	for (int i=0; i<(int)input.size(); i++) {
 		ch = tolower(input[i]);
 
+		if (ch == ' ') {
+			if (i > 0) {
+            if (input[i-1] == ' ') {
+					continue;
+				}
+			}
+		}
+
 		if (ch == '^') {
-			temp.direction = 1;
+			active->direction = 1;
 			continue;
 		}
 		if (ch == 'v') {
-			temp.direction = -1;
+			active->direction = -1;
 			continue;
 		}
 
-		if (isdigit(ch)) {
-			temp.rhythm += ch;
-		}
-
-		if (ch == '.') {
-			temp.rhythm += ch;
+		if (isdigit(ch) || (ch == '.')) {
+			active->rhythm += ch;
+			if (i < (int)input.size() - 1) {
+				if (input[i+1] == ' ') {
+					if (active == &temp) {
+						query.push_back(temp);
+						temp.clear();
+					}
+					counter++;
+					if ((int)query.size() > counter) {
+						active = &query.at(counter);
+					} else {
+						active = &temp;
+					}
+					continue;
+				}
+			} else {
+				// this is the last charcter in the input string
+				cerr << "LAST CHARACTER IN THE INPUT STRING" << endl;
+				if (active == &temp) {
+						query.push_back(temp);
+						temp.clear();
+				}
+				counter++;
+				if ((int)query.size() > counter) {
+					active = &query.at(counter);
+				} else {
+					active = &temp;
+				}
+			}
 		}
 
 		if (ch == '/') {
-			temp.direction = 1;
-			temp.base = -1;
-			temp.pc = -1;
-			query.push_back(temp);
-			temp.clear();
+			active->direction = 1;
+			active->base = -1;
+			active->pc = -1;
+			if (active == &temp) {
+				query.push_back(temp);
+				temp.clear();
+			}
+			counter++;
+			if ((int)query.size() > counter) {
+				active = &query.at(counter);
+			} else {
+				active = &temp;
+			}
 			continue;
 		} else if (ch == '\\') {
-			temp.direction = -1;
-			temp.base = -1;
-			temp.pc = -1;
-			query.push_back(temp);
-			temp.clear();
+			active->direction = -1;
+			active->base = -1;
+			active->pc = -1;
+			if (active == &temp) {
+				query.push_back(temp);
+				temp.clear();
+			}
+			counter++;
+			if ((int)query.size() > counter) {
+				active = &query.at(counter);
+			} else {
+				active = &temp;
+			}
 			continue;
 		} else if (ch == '=') {
-			temp.direction = 0;
-			temp.base = -1;
-			temp.pc = -1;
-			query.push_back(temp);
-			temp.clear();
+			active->direction = 0;
+			active->base = -1;
+			active->pc = -1;
+			if (active == &temp) {
+				query.push_back(temp);
+				temp.clear();
+			}
+			counter++;
+			if ((int)query.size() > counter) {
+				active = &query.at(counter);
+			} else {
+				active = &temp;
+			}
 			continue;
 		}
 
 		if ((ch >= 'a' && ch <= 'g')) {
-			temp.base = 7;
-			temp.pc = (ch - 'a' + 5) % 7;
-			query.push_back(temp);
-			temp.clear();
+			active->base = 7;
+			active->pc = (ch - 'a' + 5) % 7;
+			if (active == &temp) {
+				query.push_back(temp);
+				temp.clear();
+			}
+			counter++;
+			if ((int)query.size() > counter) {
+				active = &query.at(counter);
+			} else {
+				active = &temp;
+			}
 			continue;
 		} else if (ch == 'r') {
-			temp.base = 7;
-			temp.pc = GRIDREST;
-			query.push_back(temp);
-			temp.clear();
+			active->base = 7;
+			active->pc = GRIDREST;
+			if (active == &temp) {
+				query.push_back(temp);
+				temp.clear();
+			}
+			counter++;
+			if ((int)query.size() > counter) {
+				active = &query.at(counter);
+			} else {
+				active = &temp;
+			}
 			continue;
 		}
 
@@ -69874,6 +70089,11 @@ void Tool_msearch::fillMusicQuery(vector<MSearchQueryToken>& query,
 		// deal with double sharps and double flats here
 	}
 
+	if (rhythmQ) {
+		for (int i=0; i<(int)query.size(); i++) {
+			query[i].anypitch = true;
+		}
+	}
 
 	// Convert rhythms to durations
 	for (int i=0; i<(int)query.size(); i++) {
@@ -69883,12 +70103,29 @@ void Tool_msearch::fillMusicQuery(vector<MSearchQueryToken>& query,
 		query[i].duration = Convert::recipToDuration(query[i].rhythm);
 	}
 
-	if ((!query.empty()) && (query[0].base <= 0)) {
-		temp.clear();
-		temp.anything = true;
-		query.insert(query.begin(), temp);
-	}
+	// what is this for?:
+	//if ((!query.empty()) && (query[0].base <= 0)) {
+	//	temp.clear();
+	//	temp.anything = true;
+	//	query.insert(query.begin(), temp);
+	//}
+}
 
+
+//////////////////////////////
+//
+// operator<< -- print MSearchQueryToken item.
+//
+
+ostream& operator<<(ostream& out, MSearchQueryToken& item) {
+	out << "ITEM: "         << endl;
+	out << "\tPC:\t\t"      << item.pc        << endl;
+	out << "\tBASE:\t\t"    << item.base      << endl;
+	out << "\tDIRECTION:\t" << item.direction << endl;
+	out << "\tDURATION:\t"  << item.duration  << endl;
+	out << "\tRHYTHM:\t\t"  << item.rhythm    << endl;
+	out << "\tANYTHING:\t"  << item.anything  << endl;
+	return out;
 }
 
 
@@ -71877,7 +72114,6 @@ bool Tool_musicxml2hum::insertMeasure(HumGrid& outdata, int mnum,
 		}
 		status &= convertNowEvents(outdata.back(),
 				nowevents, nowparts, processtime, partdata, partstaves);
-
 	}
 
 	if (offsetHarmony.size() > 0) {
@@ -72161,7 +72397,26 @@ void Tool_musicxml2hum::appendNonZeroEvents(GridMeasure* outdata,
 
 	GridSlice* slice = new GridSlice(outdata, nowtime,
 			SliceType::Notes);
-	outdata->push_back(slice);
+	if (outdata->empty()) {
+		outdata->push_back(slice);
+	} else {
+		HumNum lasttime = outdata->back()->getTimestamp();
+		if (nowtime >= lasttime) {
+			outdata->push_back(slice);
+		} else {
+			// travel backwards in the measure until the correct
+			// time position is found.
+			auto it = outdata->rbegin();
+			while (it != outdata->rend()) {
+				lasttime = (*it)->getTimestamp();
+				if (nowtime >= lasttime) {
+					outdata->insert(it.base(), slice);
+					break;
+				}
+				it++;
+			}
+		}
+	}
 	slice->initializePartStaves(partdata);
 
 	for (int i=0; i<(int)nowevents.size(); i++) {
@@ -72181,7 +72436,6 @@ void Tool_musicxml2hum::appendNonZeroEvents(GridMeasure* outdata,
 
 void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEvent* event,
 		HumNum nowtime) {
-
 	int partindex;  // which part the event occurs in
 	int staffindex; // which staff the event occurs in (need to fix)
 	int voiceindex; // which voice the event occurs in (use for staff)
@@ -72254,7 +72508,8 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		}
 
 		if (grace) {
-			HumNum dur = event->getEmbeddedDuration(event->getNode()) / 4;
+			HumNum modification;
+			HumNum dur = event->getEmbeddedDuration(modification, event->getNode()) / 4;
 			if (dur.getNumerator() == 1) {
 				recip = to_string(dur.getDenominator()) + "q";
 			} else {
@@ -72386,8 +72641,6 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		addText(slice, outdata, partindex, staffindex, voiceindex, tnodes[i], true);
 	}
 	m_post_note_text.erase(it);
-
-// ggg
 }
 
 
@@ -82042,6 +82295,11 @@ void Tool_shed::prepareSearch(int index) {
 		m_barline = true;
 		m_data = false;
 	}
+	if (m_option.find("M") != std::string::npos) {
+		// measure is an alias for barline
+		m_barline = true;
+		m_data = false;
+	}
 	if (m_option.find("L") != std::string::npos) {
 		m_localcomment = true;
 		m_data = false;
@@ -84503,6 +84761,8 @@ void Tool_tassoize::processFile(HumdrumFile& infile) {
 	if (breaksQ)         { deleteBreaks(infile); }
 	if (transpositionsQ) { deleteDummyTranspositions(infile); }
 
+	adjustSystemDecoration(infile);
+
 	// Input lyrics may contain "=" signs which are to be converted into
 	// spaces in **text data, and into elisions when displaying with verovio.
 	Tool_shed shed;
@@ -84514,6 +84774,29 @@ void Tool_tassoize::processFile(HumdrumFile& infile) {
 	argv.push_back("s/=/ /g");
 	shed.process(argv);
 	shed.run(infile);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tassoize::adjustSystemDecoration --
+//    !!!system-decoration: [(s1)(s2)(s3)(s4)]
+// to:
+//    !!!system-decoration: [*]
+//
+
+void Tool_tassoize::adjustSystemDecoration(HumdrumFile& infile) {
+	for (int i=infile.getLineCount() - 1; i>=0; i--) {
+		if (!infile[i].isReference()) {
+			continue;
+		}
+		HTp token = infile.token(i, 0);
+		if (token->compare(0, 21, "!!!system-decoration:") == 0) {
+			token->setText("!!!system-decoration: [*]");
+			break;
+		}
+	}
 }
 
 
@@ -87524,7 +87807,7 @@ void Tool_tremolo::expandTremolos(void) {
 
 void Tool_tremolo::expandTremolo(HTp token) {
 	HumRegex hre;
-	int value = 0;
+	HumNum value = 0;
 	HumNum duration;
 	HumNum repeat;
 	HumNum increment;
@@ -87532,16 +87815,18 @@ void Tool_tremolo::expandTremolo(HTp token) {
 	int tnotes = -1;
 	if (hre.search(token, "@(\\d+)@")) {
 		value = hre.getMatchInt(1);
-		if (!Convert::isPowerOfTwo(value)) {
-			cerr << "Error: not a power of two: " << token << endl;
+		duration = Convert::recipToDuration(token);
+		HumNum count = value / duration;
+		if (!count.isInteger()) {
+			cerr << "Error: non-integer number of tremolo notes: " << token << endl;
 			return;
 		}
 		if (value < 8) {
-			cerr << "Error: tremolo can only be eighth-notes or shorter" << endl;
+			cerr << "Error: tremolo notes can only be eighth-notes or shorter" << endl;
 			return;
 		}
-		duration = Convert::recipToDuration(token);
-		if (duration >= 1) {
+		if (duration.getFloat() > 0.5) {
+			// needs to be less that one for tuplet quarter note tremolos
 			addBeam = true;
 		}
 
@@ -87568,8 +87853,8 @@ void Tool_tremolo::expandTremolo(HTp token) {
 
 	storeFirstTremoloNoteInfo(token);
 
-	int beams = log((double)(value))/log(2.0) - 2;
-	string markup = "@" + to_string(value) + "@";
+	int beams = log((double)(value.getFloat()))/log(2.0) - 2;
+	string markup = "@" + to_string(value.getNumerator()) + "@";
 	string base = token->getText();
 	hre.replaceDestructive(base, "", markup, "g");
 
@@ -87593,7 +87878,7 @@ void Tool_tremolo::expandTremolo(HTp token) {
 	// Set the rhythm of the tremolo notes.
 	// Augmentation dot is expected adjacent to regular rhythm value.
 	// Maybe allow anywhere?
-	hre.replaceDestructive(base, to_string(value), "\\d+%?\\d*\\.*", "g");
+	hre.replaceDestructive(base, to_string(value.getNumerator()), "\\d+%?\\d*\\.*", "g");
 	string initial = base;
 	if (hasBeamStart) {
 		initial += startbeam;

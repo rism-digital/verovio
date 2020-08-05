@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jul 23 11:01:49 PDT 2020
+// Last Modified: Tue Aug  4 16:47:44 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2109,7 +2109,7 @@ class HumdrumFileBase : public HumHash {
 		int m_ticksperquarternote;
 
 		// m_idprefix: an XML id prefix used to avoid id collisions when
-		// includeing multiple HumdrumFile XML in a single group.
+		// including multiple HumdrumFile XML in a single group.
 		std::string m_idprefix;
 
 		// m_strands1d: one-dimensional list of spine strands.
@@ -4469,10 +4469,11 @@ class MxmlEvent {
 		void               setTickDur         (long value, long ticks);
 		void               setStartTime       (HumNum value);
 		void               setDuration        (HumNum value);
-		void               setDurationByTicks (long value,
-		                                       xml_node el = xml_node(NULL));
+		void               setDurationByTicks (long value, xml_node el = xml_node(NULL));
+		void               setModification    (HumNum value);
 		HumNum             getStartTime       (void) const;
 		HumNum             getDuration        (void) const;
+		HumNum             getModification    (void) const;
 		void               setOwner           (MxmlMeasure* measure);
 		MxmlMeasure*       getOwner           (void) const;
 		const char*        getName            (void) const;
@@ -4547,22 +4548,23 @@ class MxmlEvent {
 		std::string        getRestPitch       (void) const;
 
 	protected:
-		HumNum             m_starttime;  // start time in quarter notes of event
-		HumNum             m_duration;   // duration in quarter notes of event
-		measure_event_type m_eventtype;  // enumeration type of event
-		xml_node           m_node;       // pointer to event in XML structure
-		MxmlMeasure*       m_owner;      // measure that contains this event
-		std::vector<MxmlEvent*> m_links; // list of secondary chord notes
-		bool               m_linked;     // true if a secondary chord note
-		int                m_sequence;   // ordering of event in XML file
-		static int         m_counter;    // counter for sequence variable
-		short              m_staff;      // staff number in part for event
-		short              m_voice;      // voice number in part for event
-		int                m_voiceindex; // voice index of item (remapping)
-      int                m_maxstaff;   // maximum staff number for measure
-		xml_node           m_hnode;      // harmony label starting at note event
-		bool               m_invisible;  // for forceInvisible();
-		bool               m_stems;      // for preserving stems
+		HumNum             m_starttime;    // start time in quarter notes of event
+		HumNum             m_duration;     // duration in quarter notes of event
+      HumNum             m_modification; // tuplet time adjustment of note
+		measure_event_type m_eventtype;    // enumeration type of event
+		xml_node           m_node;         // pointer to event in XML structure
+		MxmlMeasure*       m_owner;        // measure that contains this event
+		std::vector<MxmlEvent*> m_links;   // list of secondary chord notes
+		bool               m_linked;       // true if a secondary chord note
+		int                m_sequence;     // ordering of event in XML file
+		static int         m_counter;      // counter for sequence variable
+		short              m_staff;        // staff number in part for event
+		short              m_voice;        // voice number in part for event
+		int                m_voiceindex;   // voice index of item (remapping)
+      int                m_maxstaff;     // maximum staff number for measure
+		xml_node           m_hnode;        // harmony label starting at note event
+		bool               m_invisible;    // for forceInvisible();
+		bool               m_stems;        // for preserving stems
 
 		std::vector<xml_node> m_dynamics;   // dynamics <direction> starting just before note
 		xml_node          m_hairpin_ending; // hairpin <direction> starting just after note and before new measure
@@ -4576,9 +4578,9 @@ class MxmlEvent {
 		int    getDotCount               (void) const;
 
 	public:
-		static HumNum getEmbeddedDuration  (xml_node el = xml_node(NULL));
 		static HumNum getQuarterDurationFromType (const char* type);
 		static bool   nodeType             (xml_node node, const char* testname);
+		static HumNum getEmbeddedDuration  (HumNum& modification, xml_node el = xml_node(NULL));
 
 
 	friend MxmlMeasure;
@@ -6696,6 +6698,7 @@ class MSearchQueryToken {
 			clear();
 		}
 		MSearchQueryToken(const MSearchQueryToken& token) {
+			anypitch  = false;
 			pc        = token.pc;
 			base      = token.base;
 			direction = token.direction;
@@ -6716,6 +6719,7 @@ class MSearchQueryToken {
 			return *this;
 		}
 		void clear(void) {
+			anypitch  = false;
 			pc        = NAN;
 			base      = 0;
 			direction = 0;
@@ -6723,6 +6727,8 @@ class MSearchQueryToken {
 			rhythm    = "";
 			anything  = false;
 		}
+
+		bool   anypitch;
 		double pc;           // NAN = rest
 		int    base;
 		int    direction;
@@ -6732,6 +6738,7 @@ class MSearchQueryToken {
 };
 
 
+ostream& operator<<(ostream& out, MSearchQueryToken& item);
 
 class MSearchTextQuery {
 	public:
@@ -6796,7 +6803,7 @@ class Tool_msearch : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
+		bool     run               (const std::string& indata, ostream& out);
 		bool     run               (HumdrumFile& infile, ostream& out);
 
 	protected:
@@ -6805,10 +6812,17 @@ class Tool_msearch : public HumTool {
 		                            vector<MSearchQueryToken>& query);
 		void    doTextSearch       (HumdrumFile& infile, NoteGrid& grid,
 		                            vector<MSearchTextQuery>& query);
-		void    fillMusicQuery     (vector<MSearchQueryToken>& query,
-		                            const string& input);
+		void    fillMusicQuery     (vector<MSearchQueryToken>& query);
+		void    fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
+		                            const std::string& input, bool rhythmQ = false);
+		void    fillMusicQueryPitch(vector<MSearchQueryToken>& query,
+		                            const std::string& input);
+		void    fillMusicQueryInterval(vector<MSearchQueryToken>& query,
+		                            const std::string& input);
+		void    fillMusicQueryRhythm(vector<MSearchQueryToken>& query,
+		                            const std::string& input);
 		void    fillTextQuery      (vector<MSearchTextQuery>& query,
-		                            const string& input);
+		                            const std::string& input);
 		bool    checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 		                            vector<MSearchQueryToken>& dpcQuery,
 		                            vector<NoteCell*>& match);
@@ -6819,11 +6833,13 @@ class Tool_msearch : public HumTool {
 		                            vector<TextInfo*>& words);
 		void    fillWordsForTrack  (vector<TextInfo*>& words,
 		                            HTp starttoken);
+		void    printQuery         (vector<MSearchQueryToken>& query);
 
 	private:
 	 	vector<HTp> m_kernspines;
 		string      m_text;
 		string      m_marker;
+		bool        m_debugQ = false;
 };
 
 
@@ -7929,6 +7945,7 @@ class Tool_tassoize : public HumTool {
 		void     addTerminalLongs   (HumdrumFile& infile);
 		void     deleteDummyTranspositions(HumdrumFile& infile);
 		string   getDate            (void);
+		void     adjustSystemDecoration(HumdrumFile& infile);
 
 	private:
 		vector<vector<int>> m_pstates;
