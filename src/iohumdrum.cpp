@@ -10866,10 +10866,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             dynamic = "rfz";
         }
 
+        hum::HTp dyntok = line->token(i);
+
         if (!dynamic.empty()) {
+
             belowadj = 0;
-            bool aboveQ = hasAboveParameter(line->token(i), "DY");
-            bool belowQ = hasBelowParameter(line->token(i), "DY", belowadj);
+
+            bool aboveQ = hasAboveParameter(dyntok, "DY");
+            bool belowQ = hasBelowParameter(dyntok, "DY", belowadj);
             if (belowQ && belowadj) {
                 belowadj--;
             }
@@ -10884,17 +10888,56 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             // See https://github.com/music-encoding/music-encoding/issues/540
 
             int justification = 0;
-            if (line->token(i)->getLayoutParameter("DY", "rj") == "true") {
+            if (dyntok->getLayoutParameter("DY", "rj") == "true") {
                 justification = 1;
             }
 
-            std::string dcolor = line->token(i)->getLayoutParameter("DY", "color");
+            bool editorial = false;
+            string editstr = getLayoutParameter(dyntok, "DY", "ed", "true");
+            if (!editstr.empty()) {
+                editorial = true;
+                string newdynamic;
+                if (editstr.find("brack") != std::string::npos) {
+                    newdynamic = "[ ";
+                    newdynamic += dynamic;
+                    newdynamic += " ]";
+                    dynamic = newdynamic;
+                }
+                else if (editstr.find("paren") != std::string::npos) {
+                    newdynamic = "( ";
+                    newdynamic += dynamic;
+                    newdynamic += " )";
+                    dynamic = newdynamic;
+                }
+                else if (editstr.find("curly") != std::string::npos) {
+                    newdynamic = "{ ";
+                    newdynamic += dynamic;
+                    newdynamic += " }";
+                    dynamic = newdynamic;
+                }
+                else if (editstr.find("angle") != std::string::npos) {
+                    newdynamic = "< ";
+                    newdynamic += dynamic;
+                    newdynamic += " >";
+                    dynamic = newdynamic;
+                }
+            }
+
+            std::string dcolor = dyntok->getLayoutParameter("DY", "color");
             int needsrend = justification || dcolor.size();
 
             Dynam *dynam = new Dynam;
-            m_measure->AddChild(dynam);
+            if (editorial) {
+                Supplied *supplied = new Supplied;
+                appendElement(supplied, dynam);
+                m_measure->AddChild(supplied);
+                dynam->SetType("editorial");
+            }
+            else {
+                m_measure->AddChild(dynam);
+            }
             setStaff(dynam, m_currentstaff + belowadj);
-            setLocationId(dynam, line->token(i), -1);
+            setLocationId(dynam, dyntok, -1);
 
             if (needsrend) {
                 Rend *rend = new Rend;
@@ -10937,7 +10980,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 dynam->SetTstamp(barstamp.getFloat());
             }
 
-            std::string verticalgroup = line->token(i)->getLayoutParameter("DY", "vg");
+            std::string verticalgroup = dyntok->getLayoutParameter("DY", "vg");
             if (verticalgroup.empty()) {
                 // 100 is the default group for dynamics:
                 dynam->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -10976,11 +11019,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endline = true;
             }
             else {
-                endtok = getCrescendoEnd(line->token(i));
+                endtok = getCrescendoEnd(dyntok);
             }
             belowadj = 0;
-            bool aboveQ = hasAboveParameter(line->token(i), "HP");
-            bool belowQ = hasBelowParameter(line->token(i), "HP", belowadj);
+            bool aboveQ = hasAboveParameter(dyntok, "HP");
+            bool belowQ = hasBelowParameter(dyntok, "HP", belowadj);
             if (belowQ && belowadj) {
                 belowadj--;
             }
@@ -10991,11 +11034,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (endtok != NULL) {
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff + belowadj);
-                setLocationId(hairpin, line->token(i), -1);
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                setLocationId(hairpin, dyntok, -1);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 hum::HumNum tstamp2;
                 if (duration > 0) {
-                    tstamp2 = getMeasureTstamp(line->token(i), duration, staffindex);
+                    tstamp2 = getMeasureTstamp(dyntok, duration, staffindex);
                 }
                 else {
                     tstamp2 = getMeasureTstamp(endtok, staffindex);
@@ -11005,7 +11048,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
                     tstamp2 += endtok->getLine()->getDuration() * mfactor;
                 }
-                int measures = getMeasureDifference(line->token(i), endtok);
+                int measures = getMeasureDifference(dyntok, endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
                 // See issue https://github.com/rism-ch/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
@@ -11016,7 +11059,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetType("endbar03");
                 m_measure->AddChild(hairpin);
 
-                std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
+                std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
                     // 100 is the default group for dynamics:
                     hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -11046,8 +11089,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 Dir *dir = new Dir;
                 m_measure->AddChild(dir);
                 setStaff(dir, m_currentstaff + belowadj);
-                setLocationId(dir, line->token(i));
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                setLocationId(dir, dyntok);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 dir->SetTstamp(tstamp.getFloat());
                 std::string fontstyle;
                 std::string content = "cresc.";
@@ -11080,12 +11123,12 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endline = true;
             }
             else {
-                endtok = getDecrescendoEnd(line->token(i));
+                endtok = getDecrescendoEnd(dyntok);
             }
 
             belowadj = 0;
-            bool aboveQ = hasAboveParameter(line->token(i), "HP");
-            bool belowQ = hasBelowParameter(line->token(i), "HP", belowadj);
+            bool aboveQ = hasAboveParameter(dyntok, "HP");
+            bool belowQ = hasBelowParameter(dyntok, "HP", belowadj);
             if (belowQ && belowadj) {
                 belowadj--;
             }
@@ -11095,11 +11138,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             if (endtok != NULL) {
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff + belowadj);
-                setLocationId(hairpin, line->token(i), -1);
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                setLocationId(hairpin, dyntok, -1);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 hum::HumNum tstamp2;
                 if (duration > 0) {
-                    tstamp2 = getMeasureTstamp(line->token(i), duration, staffindex);
+                    tstamp2 = getMeasureTstamp(dyntok, duration, staffindex);
                 }
                 else {
                     tstamp2 = getMeasureTstamp(endtok, staffindex);
@@ -11107,7 +11150,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 if ((duration == 0) && (endline || (endtok->find("]]") != std::string::npos))) {
                     tstamp2 += endtok->getLine()->getDuration();
                 }
-                int measures = getMeasureDifference(line->token(i), endtok);
+                int measures = getMeasureDifference(dyntok, endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
                 // See issue https://github.com/rism-ch/verovio/issues/959
                 // and https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/329
@@ -11118,7 +11161,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetType("endbar03");
                 m_measure->AddChild(hairpin);
 
-                std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
+                std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
                     // 100 is the default group for dynamics:
                     hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -11148,12 +11191,12 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 Dir *dir = new Dir;
                 m_measure->AddChild(dir);
                 setStaff(dir, m_currentstaff + belowadj);
-                setLocationId(dir, line->token(i));
-                bool aboveQ = hasAboveParameter(line->token(i), "HP");
+                setLocationId(dir, dyntok);
+                bool aboveQ = hasAboveParameter(dyntok, "HP");
                 if (aboveQ) {
                     setPlace(dir, "above");
                 }
-                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
                 dir->SetTstamp(tstamp.getFloat());
                 std::string fontstyle = "";
                 std::string content = "decresc.";
@@ -11299,6 +11342,52 @@ bool HumdrumInput::hasAboveParameter(hum::HTp token, const std::string &category
         }
     }
     return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLayoutParameter -- Get an attached layout parameter
+//   for a token.  Move this variant into HumdrumToken class at some point.
+//
+//     trueString = value to return if there is a parameter but the
+//                  value is empty.
+//     falseString = value to return if there is no parameter.
+//                   default value = ""
+//
+
+string HumdrumInput::getLayoutParameter(hum::HTp token, const std::string &category, const std::string &catkey,
+    const string &trueString, const string &falseString)
+{
+    int lcount = token->getLinkedParameterSetCount();
+    if (lcount == 0) {
+        return falseString;
+    }
+
+    for (int p = 0; p < token->getLinkedParameterSetCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameterSet(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); ++q) {
+            string key = hps->getParameterName(q);
+            if (key == catkey) {
+                string value = hps->getParameterValue(q);
+                if (value.empty()) {
+                    return trueString;
+                }
+                else {
+                    return value;
+                }
+            }
+        }
+    }
+    return falseString;
 }
 
 //////////////////////////////

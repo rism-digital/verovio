@@ -635,6 +635,8 @@ protected:
         std::vector<hum::HumNum> &durations, std::vector<bool> &durforce);
     bool hasLayoutParameter(hum::HTp token, const std::string &category, const std::string &param);
     void assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
+    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &catkey,
+        const string &trueString, const string &falseString = "");
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
