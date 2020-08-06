@@ -770,16 +770,18 @@ int Note::CalcDots(FunctorParams *functorParams)
         std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
         int loc = this->GetDrawingLoc();
 
+        int threshold = loc + 4 - this->GetDur();
         // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
         if ((loc % 2) == 0) {
             loc += 1;
+            threshold += 4;
         }
+        threshold = (this->GetDur() > 4)? threshold : 0;
         dotLocs->push_back(loc);
-
         // Stem up, shorter than 4th and not in beam
-        if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+        if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (threshold > 0) && !this->IsInBeam()) {
             // HARDCODED
-            flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            if (this->GetDrawingStemLen() < 3) flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
         }
     }
     else {
