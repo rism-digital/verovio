@@ -4096,6 +4096,20 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     hum::HTp part = partstart;
     while (part && !part->getLine()->isData()) {
         if (part->compare(0, 5, "*clef") == 0) {
+
+            if (cleftok) {
+                if (clef == *part) {
+                    // there is already a clef found, and it is the same
+                    // as this one, so ignore the second one.
+                }
+                else {
+                    // mark clef as a clef change to print in the layer
+                    part->setValue("auto", "clefChange", 1);
+                }
+                part = part->getNextToken();
+                continue;
+            }
+
             if (hre.search(part, 5, "\\d")) {
                 clef = *part;
                 cleftok = part;
@@ -7828,6 +7842,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
             }
+
+            bool forceClefChange = false;
+            if (layerdata[i]->isClef()) {
+                if (layerdata[i]->getValueBool("auto", "clefChange")) {
+                    forceClefChange = true;
+                }
+            }
+
             if (layerdata[i]->isMens()) {
                 if (layerdata[i]->isClef()) {
                     if (ss.at(m_currentstaff - 1).last_clef != *layerdata[i]) {
@@ -7836,7 +7858,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
             }
-            else if (layerdata[i]->getDurationFromStart() != 0) {
+            else if (forceClefChange || (layerdata[i]->getDurationFromStart() != 0)) {
                 if (layerdata[i]->isClef()) {
                     int subtrack = layerdata[i]->getSubtrack();
                     if (subtrack) {
