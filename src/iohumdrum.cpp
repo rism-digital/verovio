@@ -727,7 +727,7 @@ bool HumdrumInput::convertHumdrum()
                 m_sections.back()->AddChild(sb);
                 if (token->find("original")) {
                     // maybe allow other types of system breaks here
-                    sb->SetType("original");
+                    addType(sb, "original");
                 }
             }
             else if (token->compare(0, 12, "!!pagebreak:") == 0) {
@@ -735,7 +735,7 @@ bool HumdrumInput::convertHumdrum()
                 m_sections.back()->AddChild(sb);
                 if (token->find("original")) {
                     // maybe allow other types of page breaks here
-                    sb->SetType("original");
+                    addType(sb, "original");
                 }
             }
         }
@@ -801,11 +801,11 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
     if (scordur == tobegin + duration) {
         // This is a hanging tie the goes off of the end of the music
         Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
-        tie->SetType("hanging-terminal");
+        addType(tie, "hanging-terminal");
     }
     else if (atEndingBoundaryEnd(token)) {
         Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
-        tie->SetType("hanging-terminal-ending");
+        addType(tie, "hanging-terminal-ending");
     }
     else {
         // This is a hanging tie for no apparent reason.  Display it, but make
@@ -815,7 +815,7 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         }
         else {
             Tie *tie = addHangingTieToNextItem(token, subindex, meterunit, measure);
-            tie->SetType("hanging");
+            addType(tie, "hanging");
             tie->SetColor("red");
         }
     }
@@ -892,7 +892,7 @@ void HumdrumInput::processHangingTieEnd(
     if (position == 0) {
         // Hanging tie at start of music.
         Tie *tie = tieToPreviousItem(token, subindex, meterunit);
-        tie->SetType("hanging-initial");
+        addType(tie, "hanging-initial");
     }
     else if (atEndingBoundaryStart(token)) {
         // The note is at the start of a secondary ending, and
@@ -901,13 +901,13 @@ void HumdrumInput::processHangingTieEnd(
         // a tie split across ending boundaries (currently they will
         // automatically merge).
         Tie *tie = tieToPreviousItem(token, subindex, meterunit);
-        tie->SetType("hanging-initial-ending");
+        addType(tie, "hanging-initial-ending");
     }
     else {
         // This is a hanging tie for no apparent reason.  Display it, but make
         // it red. L.v. will be handled differently as an ornament.
         Tie *tie = tieToPreviousItem(token, subindex, meterunit);
-        tie->SetType("hanging");
+        addType(tie, "hanging");
         tie->SetColor("red");
     }
 }
@@ -5381,7 +5381,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
         m_sections.back()->AddChild(sb);
-        sb->SetType(tstring);
+        addType(sb, tstring);
         return;
     }
 
@@ -5390,7 +5390,7 @@ void HumdrumInput::checkForLayoutBreak(int line)
         std::string tstring = removeCommas(group);
         Sb *sb = new Sb;
         m_sections.back()->AddChild(sb);
-        sb->SetType(tstring);
+        addType(sb, tstring);
         return;
     }
 }
@@ -8462,7 +8462,7 @@ void HumdrumInput::addSlur(FTrem *ftrem, hum::HTp start, hum::HTp ending)
     slur->SetStartid("#" + firstid);
     // check for slur direction here
 
-    slur->SetType("ftrem");
+    addType(slur, "ftrem");
     setStaff(slur, m_currentstaff);
     m_ftrem_slurs.push_back(slur);
 }
@@ -9393,13 +9393,13 @@ void HumdrumInput::colorVerse(Verse *verse, std::string &token)
 template <class ELEMENT> void HumdrumInput::appendTypeTag(ELEMENT *note, const std::string &tag)
 {
     if (note->GetType().empty()) {
-        note->SetType(tag); // Allow type to be set from data later.
+        addType(note, tag); // Allow type to be set from data later.
     }
     else {
         std::string newtag = note->GetType();
         newtag += " ";
         newtag += tag;
-        note->SetType(newtag);
+        addType(note, newtag);
     }
 }
 
@@ -10243,21 +10243,15 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     // bool sicQ = false;
 
     if (problemQ) {
-        dir->SetType("problem");
+        addType(dir, "problem");
     }
 
     if (sicQ) {
-        dir->SetType("sic");
+        addType(dir, "sic");
     }
 
     if (!typevalue.empty()) {
-        dir->SetType(typevalue);
-    }
-    else if (problemQ) {
-        dir->SetType("problem");
-    }
-    else if (sicQ) {
-        dir->SetType("sic");
+        addType(dir, typevalue);
     }
 
     m_measure->AddChild(dir);
@@ -10538,20 +10532,20 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     std::string problem = token->getLayoutParameter("TX", "problem");
     if (problem == "true") {
         problemQ = true;
-        dir->SetType("problem");
+        addType(dir, "problem");
     }
 
     bool sicQ = false;
     std::string sic = token->getLayoutParameter("SIC", "sic");
     if (sic == "true") {
         sicQ = true;
-        dir->SetType("sic");
+        addType(dir, "sic");
     }
 
     // convert to HPS input value in the future:
     std::string typevalue = token->getLayoutParameter("TX", "type");
     if (!typevalue.empty()) {
-        dir->SetType(typevalue);
+        addType(dir, typevalue);
     }
 
     m_measure->AddChild(dir);
@@ -10931,7 +10925,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 Supplied *supplied = new Supplied;
                 appendElement(supplied, dynam);
                 m_measure->AddChild(supplied);
-                dynam->SetType("editorial");
+                addType(dynam, "editorial");
             }
             else {
                 m_measure->AddChild(dynam);
@@ -11056,7 +11050,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
-                hairpin->SetType("endbar03");
+                addType(hairpin, "endbar03");
                 m_measure->AddChild(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
@@ -11158,7 +11152,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat() - endingCorrection);
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
-                hairpin->SetType("endbar03");
+                addType(hairpin, "endbar03");
                 m_measure->AddChild(hairpin);
 
                 std::string verticalgroup = dyntok->getLayoutParameter("HP", "vg");
@@ -12177,7 +12171,7 @@ void HumdrumInput::insertPhrase(ELEMENT phrase, hum::HTp phrasestart, hum::HTp p
     std::vector<int> &endpitches, std::vector<bool> &indexused)
 {
 
-    phrase->SetType("phrase");
+    addType(phrase, "phrase");
 
     string style = m_signifiers.phrase_style;
 
@@ -13195,7 +13189,7 @@ Clef *HumdrumInput::insertClefElement(
     if (sameas) {
         // make 100% transparent red in case sameas method changes:
         clef->SetColor("#ff000000");
-        // clef->SetType("sameas");
+        // addType(clef, "sameas");
     }
 
     if (iseditorial) {
@@ -13208,7 +13202,7 @@ Clef *HumdrumInput::insertClefElement(
         else {
             clef->SetColor(color);
         }
-        clef->SetType("editorial");
+        addType(clef, "editorial");
     }
     else {
         appendElement(elements, pointers, clef);
@@ -15843,14 +15837,11 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
     // then color the rest (may change later, or be done with a label).
     bool phraseStart = token->find('{') != string::npos ? true : false;
     bool phraseStop = token->find('}') != string::npos ? true : false;
-    if (phraseStart && phraseStop) {
-        rest->SetType("phraseStop phraseStart");
+    if (phraseStart) {
+        addType(rest, "phraseStart");
     }
-    else if (phraseStart) {
-        rest->SetType("phraseStart");
-    }
-    else if (phraseStop) {
-        rest->SetType("phraseStop");
+    if (phraseStop) {
+        addType(rest, "phraseStop");
     }
 
     token->setValue("MEI", "xml:id", rest->GetUuid());
@@ -15995,6 +15986,13 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             // if there is a rhythm).
             note->SetDur(DURATION_8);
         }
+    }
+
+    if (tstring.find("P") != std::string::npos) {
+        addType(note, "appoggiatura-start");
+    }
+    if (tstring.find("p") != std::string::npos) {
+        addType(note, "appoggiatura-stop");
     }
 
     // Add the pitch information
@@ -16475,14 +16473,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     // then color the note (may change later, or be done with a label).
     bool phraseStart = token->find('{') != string::npos ? true : false;
     bool phraseStop = token->find('}') != string::npos ? true : false;
-    if (phraseStart && phraseStop) {
-        note->SetType("phraseStart phraseStop");
+    if (phraseStart) {
+        addType(note, "phraseStart");
     }
-    else if (phraseStart) {
-        note->SetType("phraseStart");
-    }
-    else if (phraseStop) {
-        note->SetType("phraseStop");
+    if (phraseStop) {
+        addType(note, "phraseStop");
     }
 
     if (!scordaturaGes.empty()) {
@@ -16510,12 +16505,26 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                 case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
             }
         }
-        std::string notetype = note->GetType();
-        if (!notetype.empty()) {
-            notetype += " ";
-        }
-        notetype += "scordatura";
-        note->SetType(notetype);
+        addType(note, "scoredatura");
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addType -- add a type to an MEI element.  Appends to the
+//    current type if there is already any type contents.
+//
+
+template <class ELEMENT> void HumdrumInput::addType(ELEMENT element, const std::string &aType)
+{
+    std::string currentType = element->GetType();
+    if (currentType.empty()) {
+        element->SetType(aType);
+    }
+    else {
+        currentType += " ";
+        currentType += aType;
+        element->SetType(currentType);
     }
 }
 

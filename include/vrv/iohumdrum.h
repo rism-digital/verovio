@@ -696,6 +696,7 @@ protected:
     void setInstrumentName(ELEMENT *staffdef, const std::string &name, hum::HTp labeltok = NULL);
     template <class ELEMENT>
     void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name, hum::HTp abbrtok);
+    template <class ELEMENT> void addType(ELEMENT element, const std::string &aType);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
