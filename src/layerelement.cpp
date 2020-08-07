@@ -1812,8 +1812,8 @@ int LayerElement::GetRelativeLayerElement(FunctorParams *functorParams)
     // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that 
     // has been passed inside this functor)
     if (!params->m_isInNeighboringLayer && GetParent()->Is(LAYER)) {
-        if (params->m_searchDirection == FORWARD && (GetIdx() <= params->m_initialElementId)) return FUNCTOR_SIBLINGS;
-        if (params->m_searchDirection == BACKWARD && (GetIdx() >= params->m_initialElementId)) return FUNCTOR_SIBLINGS;
+        if (params->m_searchDirection == FORWARD && (GetIdx() < params->m_initialElementId)) return FUNCTOR_SIBLINGS;
+        if (params->m_searchDirection == BACKWARD && (GetIdx() > params->m_initialElementId)) return FUNCTOR_SIBLINGS;
     }
 
     if (Is({ NOTE, CHORD, FTREM })) {
