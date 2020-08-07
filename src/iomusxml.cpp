@@ -2369,7 +2369,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             // this is default tremolo type in MusicXML
             BTrem *bTrem = new BTrem();
             AddLayerElement(layer, bTrem);
-            m_elementStackMap.at(layer).push_back(bTrem);
+            if (!isChord) m_elementStackMap.at(layer).push_back(bTrem);
             tremSlashNum = tremolo.node().text().as_int();
             // if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) bTrem->SetForm(bTremLog_FORM_unmeas);
         }
