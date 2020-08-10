@@ -525,14 +525,14 @@ bool OptionJson::SetValue(const std::string &defaultValue)
 int OptionJson::GetIntValue(const std::vector<std::string> jsonNodePath) const 
 {
     JsonMap map = m_values.kv_map();
-    for (auto iter = std::begin(jsonNodePath); iter != std::end(jsonNodePath); ++iter) {
+    for (auto iter = jsonNodePath.begin(); iter != jsonNodePath.end(); ++iter) {
         auto elem = map.find(*iter);
-        if (elem == std::end(map)) {
+        if (elem == map.end()) {
             // search for default element of each try for now
             // Should improve by adding a map? of elements to seach instead
             elem = map.find(m_defaultJsonNode);
             // if we didn't find anything even after that - exit
-            if (elem == std::end(map)) break;
+            if (elem == map.end()) break;
         }
         // at the end bottom of the value tree we always should have number values, so process them here
         if (*iter == jsonNodePath.back()) {
