@@ -528,9 +528,8 @@ int OptionJson::GetIntValue(const std::vector<std::string> jsonNodePath) const
     for (auto iter = std::begin(jsonNodePath); iter != std::end(jsonNodePath); ++iter) {
         auto elem = map.find(*iter);
         if (elem == std::end(map)) {
-            // if this is not first element - break, we didn't find corrent elementk
-            if (iter != std::begin(jsonNodePath)) break;
-            // else treat this as default case and take values from "noAccidental" category
+            // search for default element of each try for now
+            // Should improve by adding a map? of elements to seach instead
             elem = map.find(m_defaultJsonNode);
             // if we didn't find anything even after that - exit
             if (elem == std::end(map)) break;
