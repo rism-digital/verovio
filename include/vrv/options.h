@@ -556,6 +556,7 @@ public:
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
     OptionDbl m_tieThickness;
+    OptionJson m_engravingDefaults;
 
     /**
      * Selectors

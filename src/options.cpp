@@ -35,7 +35,10 @@ std::map<int, std::string> Option::s_measureNumber
 std::map<int, std::string> Option::s_systemDivider
     = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
-constexpr char *defaultCategory = "default";
+constexpr char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.3,'lyricLineThickness':0.25,"
+    "'slurMidpointThickness':0.6,'staffLineThickness':0.15,'stemThickness':0.2,'tieMidpointThickness':0.5,}}";
+
+constexpr char *engravingDefaultsNode = "engravingDefaults";
 
 //----------------------------------------------------------------------------
 // Option
@@ -859,6 +862,11 @@ Options::Options()
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
+
+    m_engravingDefaults.SetInfo("Engraving defaults", 
+        "Path to json file describing defaults for engraving SMuFL elements");
+    m_engravingDefaults.Init(engravingDefaults, engravingDefaultsNode);
+    this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
 
     /********* selectors *********/
 
