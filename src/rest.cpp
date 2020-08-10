@@ -172,6 +172,10 @@ std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfO
     for (Object *object : collidingElementsList) {
         auto currentElementInfo = GetElementLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
+		//  If note on other layer is not on the same x position as rest - ignore its accidental
+		if (GetDrawingX() != object->GetDrawingX()) {
+            currentElementInfo.second = "noAccidental";
+        }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
             || (!isTopLayer && (finalElementInfo.first > currentElementInfo.first))) {
             std::swap(finalElementInfo, currentElementInfo);

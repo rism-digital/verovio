@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <assert.h>
+#include <chrono>
 #include <iostream>
 #include <regex>
 #include <sstream>
@@ -202,6 +203,8 @@ int main(int argc, char **argv)
     int page = 1;
     int show_help = 0;
     int show_version = 0;
+	
+	auto start = std::chrono::steady_clock::now();
 
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
@@ -557,6 +560,10 @@ int main(int argc, char **argv)
             }
         }
     }
+	
+	auto end = std::chrono::steady_clock::now();
+    std::cout << "Elapsed time in milliseconds : "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
 
     free(long_options);
     return 0;
