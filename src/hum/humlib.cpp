@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Aug  4 22:27:48 PDT 2020
+// Last Modified: Sat Aug  8 14:00:10 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -69308,15 +69308,17 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 //
 
 Tool_msearch::Tool_msearch(void) {
-	define("debug=b",           "diatonic search");
+	define("debug=b",               "diatonic search");
 	define("q|query=s:4c4d4e4f4g",  "combined rhythm/pitch query string");
-	define("p|pitch=s:cdefg",   "pitch query string");
-	define("i|interval=s:2222", "interval query string");
-	define("r|d|rhythm|duration=s:44444",   "rhythm query string");
-	define("t|text=s:",         "lyrical text query string");
-	define("x|cross=b",         "search across parts");
-	define("c|color=s",         "highlight color");
-	define("m|mark|marker=s:@", "marking character");
+	define("p|pitch=s:cdefg",       "pitch query string");
+	define("i|interval=s:2222",     "interval query string");
+	define("r|d|rhythm|duration=s:44444", "rhythm query string");
+	define("t|text=s:",             "lyrical text query string");
+	define("x|cross=b",             "search across parts");
+	define("c|color=s",             "highlight color");
+	define("m|mark|marker=s:@",     "marking character");
+	define("M|no-mark|no-marker=b", "do not mark matches");
+	define("Q|quiet=b",             "quite mode: do not summarize matches");
 }
 
 
@@ -69360,6 +69362,7 @@ bool Tool_msearch::run(HumdrumFile& infile, ostream& out) {
 
 bool Tool_msearch::run(HumdrumFile& infile) {
 	m_debugQ = getBoolean("debug");
+	m_quietQ = getBoolean("quiet");
 	NoteGrid grid(infile);
 	if (m_debugQ) {
 		grid.printGridInfo(cerr);
@@ -69392,8 +69395,13 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 
 void Tool_msearch::initialize(void) {
 	m_marker = getString("marker");
-	m_marker = m_marker[0];
-
+	// only allowing a single character for now:
+	m_markQ = !getBoolean("no-marker");
+	if (!m_markQ) {
+		m_marker.clear();
+	} else if (!m_marker.empty()) {
+		m_marker = m_marker[0];
+	}
 }
 
 
@@ -69511,7 +69519,7 @@ void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
 		textinterp = "**silbe";
 	}
 
-	if (tcount) {
+	if (tcount && m_markQ) {
 		string content = "!!!RDF";
 		content += textinterp;
 		content += ": ";
@@ -69527,6 +69535,10 @@ void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
 	for (int i=0; i<(int)words.size(); i++) {
 		delete words[i];
 		words[i] = NULL;
+	}
+
+	if (!m_quietQ) {
+		addTextSearchSummary(infile, tcount, m_marker);
 	}
 }
 
@@ -69575,7 +69587,7 @@ void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 		}
 	}
 
-	if (mcount) {
+	if (mcount && m_markQ) {
 		string content = "!!!RDF**kern: " + m_marker + " = marked note";
 		if (getBoolean("color")) {
 			content += ", color=\"" + getString("color") + "\"";
@@ -69583,8 +69595,127 @@ void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 		infile.appendLine(content);
 		infile.createLinesFromTokens();
 	}
+	if (!m_quietQ) {
+		addMusicSearchSummary(infile, mcount, m_marker);
+	}
 }
 
+
+//////////////////////////////
+//
+// Tool_msearch::addMusicSearchSummary --
+//
+
+void Tool_msearch::addMusicSearchSummary(HumdrumFile& infile, int mcount, const string& marker) {
+	infile.appendLine("!!@@BEGIN: MUSIC_SEARCH_RESULT");
+	string line;
+
+	line = "!!@QUERY:\t";
+
+	if (getBoolean("query")) {
+		line += " -q ";
+		string qstring = getString("query");
+		if (qstring.find(' ') != string::npos) {
+			line += '"';
+			line += qstring;
+			line += '"';
+		} else {
+			line += qstring;
+		}
+	}
+
+	if (getBoolean("pitch")) {
+		line += " -p ";
+		string pstring = getString("pitch");
+		if (pstring.find(' ') != string::npos) {
+			line += '"';
+			line += pstring;
+			line += '"';
+		} else {
+			line += pstring;
+		}
+	}
+
+	if (getBoolean("rhythm")) {
+		line += " -r ";
+		string rstring = getString("rhythm");
+		if (rstring.find(' ') != string::npos) {
+			line += '"';
+			line += rstring;
+			line += '"';
+		} else {
+			line += rstring;
+		}
+	}
+
+	if (getBoolean("interval")) {
+		line += " -i ";
+		string istring = getString("interval");
+		if (istring.find(' ') != string::npos) {
+			line += '"';
+			line += istring;
+			line += '"';
+		} else {
+			line += istring;
+		}
+	}
+
+	infile.appendLine(line);
+
+	line = "!!@MATCHES:\t";
+	line += to_string(mcount);
+	infile.appendLine(line);
+
+	if (m_markQ) {
+		line = "!!@MARKER:\t";
+		line += marker;
+		infile.appendLine(line);
+	}
+
+	// Print match location here.
+	infile.appendLine("!!@@END: MUSIC_SEARCH_RESULT");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::addTextSearchSummary --
+//
+
+void Tool_msearch::addTextSearchSummary(HumdrumFile& infile, int mcount, const string& marker) {
+	infile.appendLine("!!@@BEGIN: TEXT_SEARCH_RESULT");
+	string line;
+
+	line = "!!@QUERY:\t";
+
+	if (getBoolean("text")) {
+		line += " -t ";
+		string tstring = getString("text");
+		if (tstring.find(' ') != string::npos) {
+			line += '"';
+			line += tstring;
+			line += '"';
+		} else {
+			line += tstring;
+		}
+	}
+
+	infile.appendLine(line);
+
+	line = "!!@MATCHES:\t";
+	line += to_string(mcount);
+	infile.appendLine(line);
+
+	if (m_markQ) {
+		line = "!!@MARKER:\t";
+		line += marker;
+		infile.appendLine(line);
+	}
+
+	// Print match location here.
+	infile.appendLine("!!@@END: TEXT_SEARCH_RESULT");
+}
 
 
 //////////////////////////////
@@ -69722,16 +69853,17 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 		if (dpcQuery[i].base <= 0) {
 			lastIsInterval = true;
 			// Search by gross contour
+			int lastindex = index+i-1-c;
 			if ((dpcQuery[i].direction == 1) && (notes[index+i-c]->getAbsMidiPitch() >
 					notes[index+i-1-c]->getAbsMidiPitch())) {
 				match.push_back(notes[index+i-c]);
 				continue;
-			} else if ((dpcQuery[i].direction == -1) && (notes[index+i-c]->getAbsMidiPitch() <
-					notes[index+i-1-c]->getAbsMidiPitch())) {
+			} else if ((lastindex >= 0) && (dpcQuery[i].direction == -1) && (notes[index+i-c]->getAbsMidiPitch() <
+					notes[lastindex]->getAbsMidiPitch())) {
 				match.push_back(notes[index+i-c]);
 				continue;
-			} else if ((dpcQuery[i].direction == 0) && (notes[index+i-c]->getAbsMidiPitch() ==
-					notes[index+i-1-c]->getAbsMidiPitch())) {
+			} else if ((lastindex >= 0) && (dpcQuery[i].direction == 0) && (notes[index+i-c]->getAbsMidiPitch() ==
+					notes[lastindex]->getAbsMidiPitch())) {
 				match.push_back(notes[index+i-c]);
 				continue;
 			} else {
@@ -69747,14 +69879,16 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 			lastIsInterval = false;
 		}
 
+		int lastindex = index+i-1-c;
+
 		// Search by pitch/rest
 		if (dpcQuery[i].base == 40) {
 			if ((Convert::isNaN(notes[index+i-c]->getAbsBase40PitchClass()) &&
 					Convert::isNaN(dpcQuery[i].pc)) ||
 					(notes[index+i-c]->getAbsBase40PitchClass() == dpcQuery[i].pc)) {
-				if ((index+i-c>0) && dpcQuery[i].direction) {
+				if ((lastindex >= 0) && (index+i-c>0) && dpcQuery[i].direction) {
 					interval = (int)(notes[index+i-c]->getAbsBase40Pitch() -
-							notes[index+i-1-c]->getAbsBase40Pitch());
+							notes[lastindex]->getAbsBase40Pitch());
 					if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
 						match.clear();
 						return false;
@@ -69778,9 +69912,9 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 		} else if ((Convert::isNaN(notes[index+i-c]->getAbsDiatonicPitchClass()) &&
 				Convert::isNaN(dpcQuery[i].pc)) ||
 				(notes[index+i-c]->getAbsDiatonicPitchClass() == dpcQuery[i].pc)) {
-			if ((index+i-c>0) && dpcQuery[i].direction) {
+			if ((lastindex >= 0) && (index+i-c>0) && dpcQuery[i].direction) {
 				interval = (int)(notes[index+i-c]->getAbsBase40Pitch() -
-						notes[index+i-1-c]->getAbsBase40Pitch());
+						notes[lastindex]->getAbsBase40Pitch());
 				if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
 					match.clear();
 					return false;

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Aug  4 22:27:48 PDT 2020
+// Last Modified: Sat Aug  8 14:00:10 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6834,11 +6834,15 @@ class Tool_msearch : public HumTool {
 		void    fillWordsForTrack  (vector<TextInfo*>& words,
 		                            HTp starttoken);
 		void    printQuery         (vector<MSearchQueryToken>& query);
+		void    addMusicSearchSummary (HumdrumFile& infile, int mcount, const string& marker);
+		void    addTextSearchSummary (HumdrumFile& infile, int mcount, const string& marker);
 
 	private:
 	 	vector<HTp> m_kernspines;
 		string      m_text;
 		string      m_marker;
+		bool        m_markQ  = false;
+		bool        m_quietQ = false;
 		bool        m_debugQ = false;
 };
 
