@@ -35,6 +35,8 @@ std::map<int, std::string> Option::s_measureNumber
 std::map<int, std::string> Option::s_systemDivider
     = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
+constexpr char *defaultCategory = "default";
+
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
@@ -521,7 +523,14 @@ int OptionJson::GetIntValue(const std::vector<std::string> jsonNodePath) const
     JsonMap map = m_values.kv_map();
     for (auto iter = std::begin(jsonNodePath); iter != std::end(jsonNodePath); ++iter) {
         auto elem = map.find(*iter);
-        if (elem == std::end(map)) break;
+        if (elem == std::end(map)) {
+            // if this is not first element - break, we didn't find corrent elementk
+            if (iter != std::begin(jsonNodePath)) break;
+            // else treat this as default case and take values from "noAccidental" category
+            elem = map.find(defaultCategory);
+            // if we didn't find anything even after that - exit
+            if (elem == std::end(map)) break;
+        }
         // at the end bottom of the value tree we always should have number values, so process them here
         if (*iter == jsonNodePath.back()) {
             if (elem->second->type_ != jsonxx::Value::NUMBER_) break; // path is invalid - last element should be number
