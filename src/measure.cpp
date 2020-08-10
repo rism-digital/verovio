@@ -378,11 +378,11 @@ Staff *Measure::GetBottomVisibleStaff()
     ListOfObjects staves;
     ClassIdComparison matchType(STAFF);
     this->FindAllDescendantByComparison(&staves, &matchType, 1);
-    for (auto &child : staves) {
+    for (const auto child : staves) {
         Staff* staff = dynamic_cast<Staff *>(child);
         assert(staff);
         if (!staff->DrawingIsVisible()) {
-            break;
+            continue;
         }
         bottomStaff = staff;
     }
