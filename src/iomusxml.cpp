@@ -2543,7 +2543,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 && m_elementStackMap.at(layer).back()->Is(CHORD)) {
                 chord = dynamic_cast<Chord *>(m_elementStackMap.at(layer).back());
             }
-            assert(chord);
+            if (!chord) {
+                LogError("MusicXML import: Chord starting point has not been found.");
+                return;
+            }
             // Mark a chord as cue=true if and only if all its child notes are cue.
             // (This causes it to have a smaller stem).
             if (!cue) {
