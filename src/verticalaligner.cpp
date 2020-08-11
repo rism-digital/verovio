@@ -158,6 +158,8 @@ StaffAlignment::StaffAlignment() : Object()
     m_overflowBelow = 0;
     m_staffHeight = 0;
     m_overlap = 0;
+
+    m_spacingType = SpacingType::None;
 }
 
 StaffAlignment::~StaffAlignment()
@@ -191,13 +193,18 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
 
         m_spacingType = SpacingType::Staff;
 
-        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDefParent);
         ListOfObjects allStaffs;
         ClassIdComparison matchType(STAFFDEF);
-        staffGrp->FindAllDescendantByComparison(&allStaffs, &matchType, 1);
-        const bool firstInGroup = allStaffs.empty() || *allStaffs.begin() == staff->m_drawingStaffDef;
-        if (!firstInGroup && staffGrp->GetParent()->Is(STAFFGRP) && staffGrp->HasSymbol()) {
-            switch (staffGrp->GetSymbol()) {
+        staffDefParent->FindAllDescendantByComparison(&allStaffs, &matchType, 1);
+        // first staff in group
+        if (allStaffs.empty() || allStaffs.front() == staff->m_drawingStaffDef) {
+            return;
+        }
+
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDefParent);
+        while (staffGrp && staffGrp->Is(STAFFGRP)) {
+            if (staffGrp->HasSymbol()) {
+                switch (staffGrp->GetSymbol()) {
                 case staffGroupingSym_SYMBOL_brace:
                     m_spacingType = SpacingType::Brace;
                     break;
@@ -207,7 +214,10 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
                     break;
                 default:
                     m_spacingType = SpacingType::Staff;
+                }
+                break;
             }
+            staffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetParent());
         }
     }
 }
