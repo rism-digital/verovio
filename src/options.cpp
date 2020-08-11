@@ -549,7 +549,7 @@ bool OptionJson::SetValue(const std::string &defaultValue)
     return result;
 }
 
-int OptionJson::GetIntValue(const std::vector<std::string> jsonNodePath) const 
+int OptionJson::GetIntValue(const std::vector<std::string>& jsonNodePath) const 
 {
     JsonMap map = m_values.kv_map();
     for (auto iter = jsonNodePath.begin(); iter != jsonNodePath.end(); ++iter) {

@@ -402,7 +402,7 @@ public:
     virtual bool SetValue(const std::string &jsonFilePath);
     //virtual std::string GetStrValue() const;
 
-    int GetIntValue(const std::vector<std::string> jsonNodePath) const;
+    int GetIntValue(const std::vector<std::string>& jsonNodePath) const;
     //
 public:
     //
