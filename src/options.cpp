@@ -40,7 +40,7 @@ constexpr char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness
     "'hairpinThickness':0.4,'thickBarlineThickness':1,'tupletBracketThickness':0.4,'subBracketThickness':1,"
     "'bracketThickness':0.2}}";
 
-constexpr char *engravingDefaultsNode = "engravingDefaults";
+constexpr char *engravingDefaultsNode = "stemThickness";
 
 //----------------------------------------------------------------------------
 // Option
