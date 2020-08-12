@@ -371,15 +371,15 @@ void View::DrawStaffGrp(
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
-        int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+        int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
         x += barLineWidth / 2;
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
-        DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * m_doc->GetDrawingBeamWidth(staffSize, false),
-            m_doc->GetDrawingBeamWidth(staffSize, false));
-        x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
+        const int lineWidth = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize);
+        DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
+        x -= 2 * lineWidth;
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
         DrawBrace(dc, x, yTop, yBottom, staffSize);
