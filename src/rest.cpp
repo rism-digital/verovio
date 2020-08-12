@@ -268,6 +268,8 @@ int Rest::Transpose(FunctorParams *functorParams)
     Staff *parentStaff = dynamic_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(parentStaff);
 
+    const int layerCount = parentStaff->GetChildCount(LAYER);
+
     Layer *parentLayer = dynamic_cast<Layer *>(GetFirstAncestor(LAYER));
     assert(parentLayer);
 
@@ -285,14 +287,16 @@ int Rest::Transpose(FunctorParams *functorParams)
         const bool isRestOnSpace = static_cast<bool>((restLoc.m_oct * 7 + restLoc.m_pname) % 2);
         // on outer layers move rest on odd locations one line further 
         // in middle layers tolerate even locations to not risk collisions
-        if (isTopLayer && isRestOnSpace) {
-            restLoc++;
-        }
-        else if (isBottomLayer && isRestOnSpace) {
-            restLoc--;
-        }
-        if ((isTopLayer && (restLoc < centralLocation)) || (isBottomLayer && (restLoc > centralLocation))) {
-            restLoc = centralLocation;
+        if (layerCount > 1) {
+            if (isTopLayer && isRestOnSpace) {
+                restLoc++;
+            }
+            else if (isBottomLayer && isRestOnSpace) {
+                restLoc--;
+            }
+            if ((isTopLayer && (restLoc < centralLocation)) || (isBottomLayer && (restLoc > centralLocation))) {
+                restLoc = centralLocation;
+            }
         }
         
         UpdateFromTransLoc(restLoc);
@@ -307,14 +311,17 @@ int Rest::Transpose(FunctorParams *functorParams)
         int transposedLoc = GetLoc() + diatonic;
         // on outer layers move rest on odd locations one line further
         // in middle layers tolerate even locations to not risk collisions
-        if (isTopLayer) transposedLoc += abs(transposedLoc % 2);
-        else if (isBottomLayer) transposedLoc -= abs(transposedLoc % 2);
-        if ((isTopLayer && (transposedLoc < centralLocation)) || (isBottomLayer && (transposedLoc > centralLocation))) {
-            SetLoc(centralLocation);
+        if (layerCount > 1) {
+            if (isTopLayer)
+                transposedLoc += abs(transposedLoc % 2);
+            else if (isBottomLayer)
+                transposedLoc -= abs(transposedLoc % 2);
+            if ((isTopLayer && (transposedLoc < centralLocation))
+                || (isBottomLayer && (transposedLoc > centralLocation))) {
+                transposedLoc = centralLocation;
+            }
         }
-        else {
-            SetLoc(transposedLoc);
-        }
+        SetLoc(transposedLoc);
     }
 
     return FUNCTOR_SIBLINGS;
