@@ -806,7 +806,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
 
     int x = barLine->GetDrawingX();
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-    const int barLineThickWidth = m_doc->GetDrawingThickBarlineWidth(staffSize);
+    const int barLineThickWidth = m_doc->GetDrawingElementDefaultSize("thickBarlineThickness", staffSize);
     int x1 = x - barLineThickWidth - barLineWidth;
     int x2 = x + barLineThickWidth + barLineWidth;
 

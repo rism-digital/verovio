@@ -1544,15 +1544,9 @@ int Doc::GetCueSize(int value) const
     return value * this->m_options->m_graceFactor.GetValue();
 }
 
-int Doc::GetDrawingHairpinWidth(int staffSize) const
+int Doc::GetDrawingElementDefaultSize(const std::string& engravingElement, int staffSize) const 
 {
-    return m_options->m_engravingDefaults.GetDoubleValue({ "engravingDefaults", "hairpinThickness" })
-        * GetDrawingUnit(staffSize);
-}
-
-int Doc::GetDrawingThickBarlineWidth(int staffSize) const
-{
-    return m_options->m_engravingDefaults.GetDoubleValue({ "engravingDefaults", "thickBarlineThickness" })
+    return m_options->m_engravingDefaults.GetDoubleValue({ "engravingDefaults", engravingElement })
         * GetDrawingUnit(staffSize);
 }
 
