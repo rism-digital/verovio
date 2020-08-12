@@ -196,7 +196,7 @@ protected:
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool abbreviations = false);
     void DrawLabels(
         DeviceContext *dc, System *system, Object *object, int x, int y, bool abbreviations, int staffSize, int space);
-    void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
+    void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool topStaffGrp = false);
     void DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);

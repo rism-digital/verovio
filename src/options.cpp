@@ -38,7 +38,7 @@ std::map<int, std::string> Option::s_systemDivider
 constexpr char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.3,'lyricLineThickness':0.25,"
     "'slurMidpointThickness':0.6,'staffLineThickness':0.15,'stemThickness':0.2,'tieMidpointThickness':0.5,"
     "'hairpinThickness':0.4,'thickBarlineThickness':1,'tupletBracketThickness':0.4,'subBracketThickness':1,"
-    "'bracketThickness':0.2}}";
+    "'bracketThickness':1}}";
 
 constexpr char *engravingDefaultsNode = "stemThickness";
 
@@ -534,7 +534,7 @@ int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool g
 
 double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    JsonMap map = getDefault? m_defaultValues.kv_map() : m_values.kv_map();
+    JsonMap map = getDefault ? m_defaultValues.kv_map() : m_values.kv_map();
     for (auto iter = jsonNodePath.begin(); iter != jsonNodePath.end(); ++iter) {
         auto elem = map.find(*iter);
         if (elem == map.end()) {

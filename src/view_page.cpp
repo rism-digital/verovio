@@ -371,13 +371,15 @@ void View::DrawStaffGrp(
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
-        int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
+        //int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
+        int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
         x += barLineWidth / 2;
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
-        const int lineWidth = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize);
+        const int lineWidth
+            = m_doc->GetDrawingElementDefaultSize(topStaffGrp ? "bracketThickness" : "subBracketThickness", staffSize);
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
         x -= 2 * lineWidth;
     }
@@ -386,7 +388,7 @@ void View::DrawStaffGrp(
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
-        DrawBracket(dc, x, yTop, yBottom, staffSize);
+        DrawBracket(dc, x, yTop, yBottom, staffSize, topStaffGrp);
         x -= 2 * m_doc->GetDrawingBeamWidth(staffSize, false);
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracketsq) {
@@ -518,14 +520,17 @@ void View::DrawLabels(
     dc->ResetBrush();
 }
 
-void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
+void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize, bool topStaffGrp)
 {
     assert(dc);
 
     int x1, x2, offset;
 
-    x2 = x - m_doc->GetDrawingBeamWidth(staffSize, false);
-    x1 = x2 - m_doc->GetDrawingBeamWidth(staffSize, false);
+    const int bracketThickness
+        = m_doc->GetDrawingElementDefaultSize(topStaffGrp ? "bracketThickness" : "subBracketThickness", staffSize);
+
+    x2 = x - bracketThickness;
+    x1 = x2 - bracketThickness;
     offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
 
     dc->StartCustomGraphic("grpSym");
