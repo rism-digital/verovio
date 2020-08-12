@@ -272,7 +272,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = interface->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = interface->GetTstampStaves(measure, element);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
@@ -1400,7 +1400,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     }
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = breath->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = breath->GetTstampStaves(measure, breath);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter)) {
             continue;
@@ -1443,7 +1443,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = dir->GetTstampStaves(measure, dir);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
             continue;
@@ -1505,7 +1505,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     }
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = dynam->GetTstampStaves(measure, dynam);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter)) {
             continue;
@@ -1619,7 +1619,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     str.push_back(code);
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = fermata->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = fermata->GetTstampStaves(measure, fermata);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter)) {
             continue;
@@ -1656,8 +1656,9 @@ void View::DrawFing(DeviceContext* dc, Fing* fing, Measure* measure, System* sys
     // center fingering 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
 
-    auto staffList = fing->GetTstampStaves(measure);
-    for (auto staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = fing->GetTstampStaves(measure, fing);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fing, fing->GetStart(), *staffIter)) {
             continue;
         }
@@ -1815,7 +1816,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     }
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = harm->GetTstampStaves(measure, harm);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter)) {
             continue;
@@ -1869,7 +1870,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     str.push_back(code);
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = mordent->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = mordent->GetTstampStaves(measure, mordent);
     double xShift = 0.0;
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter)) {
@@ -1982,7 +1983,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         }
 
         std::vector<Staff *>::iterator staffIter;
-        std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
+        std::vector<Staff *> staffList = pedal->GetTstampStaves(measure, pedal);
 
         int code = SMUFL_E655_keyboardPedalUp;
         std::wstring str;
@@ -2049,7 +2050,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
     if (alignment == 0) alignment = HORIZONTALALIGNMENT_center;
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = reh->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = reh->GetTstampStaves(measure, reh);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), reh, reh->GetStart(), *staffIter)) {
             continue;
@@ -2111,7 +2112,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     if (alignment == 0) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = tempo->GetTstampStaves(measure, tempo);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter)) {
             continue;
@@ -2168,7 +2169,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     }
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = trill->GetTstampStaves(measure, trill);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, trill->GetStart(), *staffIter)) {
             continue;
@@ -2239,7 +2240,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     str.push_back(code);
 
     std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = turn->GetTstampStaves(measure);
+    std::vector<Staff *> staffList = turn->GetTstampStaves(measure, turn);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, turn->GetStart(), *staffIter)) {
             continue;
