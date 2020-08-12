@@ -195,8 +195,8 @@ TransPitch &TransPitch::operator=(const TransPitch &pitch)
 
 //////////////////////////////
 //
-// operator> TransPitch -- greater than operator pitches.
-//
+// TransPitch::operator> -- Compare two pitches diatonically (accidental alterations are ignored).
+//    Higher pitches are greater than lower pitches.
 
 bool TransPitch::operator>(const TransPitch &pitch)
 {
@@ -211,8 +211,8 @@ bool TransPitch::operator>(const TransPitch &pitch)
 
 //////////////////////////////
 //
-// operator< TransPitch -- lesser than operator for pitches.
-//
+// TransPitch::operator< -- Compare two pitches diatonically (accidental alterations are ignored).
+//    Lower pitches are less than higher pitches.
 
 bool TransPitch::operator<(const TransPitch &pitch)
 {
@@ -227,8 +227,8 @@ bool TransPitch::operator<(const TransPitch &pitch)
 
 //////////////////////////////
 //
-// operator++ TransPitch -- increment operator for pitches.
-//
+// TransPitch::operator++ -- Transpose a pitch up one diatonic step.  Any chromatic alteration
+//     will remain the same.  For example, B-flat 3 will be incremented to C-flat 4.
 
 TransPitch &TransPitch::operator++()
 {
@@ -252,8 +252,8 @@ TransPitch TransPitch::operator++(int)
 
 //////////////////////////////
 //
-// operator-- TransPitch -- decrement operator for pitches.
-//
+// TransPitch::operator-- -- Transpose a pitch down one diatonic step.  Any chromatic alteration
+//     will remain the same.  For example, C-sharp 4 will be decremented to B-sharp 3.
 
 TransPitch &TransPitch::operator--()
 {

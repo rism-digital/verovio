@@ -264,7 +264,7 @@ int Rest::Transpose(FunctorParams *functorParams)
 
     if ((!HasOloc() || !HasPloc()) && !HasLoc()) return FUNCTOR_SIBLINGS;
 
-    // Find whether current layer is top, middle (either one if multiple) or bttom
+    // Find whether current layer is top, middle (either one if multiple) or bottom
     Staff *parentStaff = dynamic_cast<Staff *>(GetFirstAncestor(STAFF));
     assert(parentStaff);
 
