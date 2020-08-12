@@ -185,39 +185,49 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
         if (!staff->m_drawingStaffDef)
             return;
 
-        Object *staffDefParent = m_staff->m_drawingStaffDef->GetParent();
-        if (!staffDefParent->Is(STAFFGRP) || staff->GetIdx() == 0) {
+        Object *staffParent = m_staff->m_drawingStaffDef->GetParent();
+        if (!staffParent->Is(STAFFGRP) || staff->GetIdx() == 0) {
             m_spacingType = SpacingType::System;
             return;
         }
 
-        m_spacingType = SpacingType::Staff;
+        ClassIdsComparison matchType({ STAFFDEF, STAFFGRP });
+        Object *staffChild = staff->m_drawingStaffDef;
+        bool notFirstInGroup = false;
+        while (m_spacingType == SpacingType::None) {
+             ListOfObjects allStaffs;
+             staffParent->FindAllDescendantByComparison(&allStaffs, &matchType, 1);
+             // drop parent from the list of descendant
+             if (!allStaffs.empty() && allStaffs.front() == staffParent) {
+                 allStaffs.erase(allStaffs.begin());
+             }
+             // for first child in staff group parent's symbol should be taken, except
+             // when we had a child which not on the first place in group, than take first symbol
+             notFirstInGroup = notFirstInGroup || !allStaffs.empty() && allStaffs.front() != staffChild;
+             if (notFirstInGroup) {
+                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
+                 if (staffGrp && staffGrp->HasSymbol()) {
+                     switch (staffGrp->GetSymbol()) {
+                         case staffGroupingSym_SYMBOL_brace:
+                             m_spacingType = SpacingType::Brace;
+                             break;
+                         case staffGroupingSym_SYMBOL_bracket:
+                         case staffGroupingSym_SYMBOL_bracketsq:
+                             m_spacingType = SpacingType::Bracket;
+                             break;
+                         default:
+                             m_spacingType = SpacingType::None;
+                     }
+                 }
+             }
 
-        ListOfObjects allStaffs;
-        ClassIdComparison matchType(STAFFDEF);
-        staffDefParent->FindAllDescendantByComparison(&allStaffs, &matchType, 1);
-        // first staff in group
-        if (allStaffs.empty() || allStaffs.front() == staff->m_drawingStaffDef) {
-            return;
-        }
-
-        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDefParent);
-        while (staffGrp && staffGrp->Is(STAFFGRP)) {
-            if (staffGrp->HasSymbol()) {
-                switch (staffGrp->GetSymbol()) {
-                case staffGroupingSym_SYMBOL_brace:
-                    m_spacingType = SpacingType::Brace;
-                    break;
-                case staffGroupingSym_SYMBOL_bracket:
-                case staffGroupingSym_SYMBOL_bracketsq:
-                    m_spacingType = SpacingType::Bracket;
-                    break;
-                default:
-                    m_spacingType = SpacingType::Staff;
-                }
-                break;
-            }
-            staffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetParent());
+             if (m_spacingType == SpacingType::None) {
+                 staffChild = staffParent;
+                 staffParent = staffChild->GetParent();
+                 if (!staffParent || !staffParent->Is(STAFFGRP)) {
+                     m_spacingType = SpacingType::Staff;
+                 }
+             }
         }
     }
 }
