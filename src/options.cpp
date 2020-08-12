@@ -497,7 +497,7 @@ std::string OptionStaffrel::GetDefaultStrValue() const
 
 void OptionJson::Init(const std::string &defaultValue, const std::string &defaultJsonNode)
 {
-    m_values.parse(defaultValue);
+    m_defaultValues.parse(defaultValue);
     m_defaultJsonNode = defaultJsonNode;
 }
 
@@ -527,14 +527,14 @@ bool OptionJson::SetValue(const std::string &defaultValue)
     return result;
 }
 
-int OptionJson::GetIntValue(const std::vector<std::string>& jsonNodePath) const
+int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    return static_cast<int>(GetDoubleValue(jsonNodePath));
+    return static_cast<int>(GetDoubleValue(jsonNodePath, getDefault));
 }
 
-double OptionJson::GetDoubleValue(const std::vector<std::string>& jsonNodePath) const 
+double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    JsonMap map = m_values.kv_map();
+    JsonMap map = getDefault? m_defaultValues.kv_map() : m_values.kv_map();
     for (auto iter = jsonNodePath.begin(); iter != jsonNodePath.end(); ++iter) {
         auto elem = map.find(*iter);
         if (elem == map.end()) {
@@ -557,7 +557,7 @@ double OptionJson::GetDoubleValue(const std::vector<std::string>& jsonNodePath) 
         }
     }
 
-    return 0;
+    return getDefault ? 0 : GetDoubleValue(jsonNodePath, true);
 }
 
 //----------------------------------------------------------------------------

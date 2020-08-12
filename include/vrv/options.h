@@ -402,13 +402,14 @@ public:
     virtual bool SetValue(const std::string &jsonFilePath);
     //virtual std::string GetStrValue() const;
 
-    int GetIntValue(const std::vector<std::string>& jsonNodePath) const;
-    double GetDoubleValue(const std::vector<std::string>& jsonNodePath) const;
+    int GetIntValue(const std::vector<std::string>& jsonNodePath, bool getDefault = false) const;
+    double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     //
 public:
     //
 private:
     jsonxx::Object m_values;
+    jsonxx::Object m_defaultValues;
     std::string m_defaultJsonNode;
 };
 
