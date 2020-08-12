@@ -631,8 +631,11 @@ int System::JustifyY(FunctorParams *functorParams)
     const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
 
     if (this->GetIdx())
-        this->SetDrawingYRel(this->GetDrawingY() - shift);
+        params->m_cumulatedShift += shift;
 
+    this->SetDrawingYRel(this->GetDrawingY() - params->m_cumulatedShift);
+
+    params->m_cumulatedShift = 0;
     m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;

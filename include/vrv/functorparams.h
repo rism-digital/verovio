@@ -466,12 +466,9 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the previous staff height
- * member 1: the extra staff height
- * member 2  the previous verse count
- * member 3: the cumulated shift
- * member 4: the doc
- * member 5: the functor to be redirected to SystemAligner
+ * member 0: the cumulated shift
+ * member 1: the doc
+ * member 2: the functor to be redirected to SystemAligner
  **/
 
 class AdjustYPosParams : public FunctorParams {
@@ -559,7 +556,9 @@ public:
 /**
  * member 0: the cumulated shift
  * member 1: the system margin
- * member 2: the doc
+ * member 2: the overflow below of previous system
+ * member 3: the sum of justification factors per page
+ * member 4: the doc
  **/
 
 class AlignSystemsParams : public FunctorParams {
@@ -588,9 +587,11 @@ public:
  * member 1: the staffIdx
  * member 2: the staffN
  * member 3: the cumulated shift for the default alignment
- * member 4: the functor (for redirecting from page running elements)
- * member 4: the end functor (for redirecting from measure)
- * member 5: the doc
+ * member 4: the sum of justification factors per page
+ * member 5: the page width
+ * member 6: the functor (for redirecting from page running elements)
+ * member 7: the end functor (for redirecting from measure)
+ * member 8: the doc
  **/
 
 class AlignVerticallyParams : public FunctorParams {
@@ -1318,21 +1319,25 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the justification ratio
- * member 4: the functor to be redirected to the MeasureAligner
- * member 5: the doc
+ * member 0: the cumulated shift
+ * member 1: the amount of space for distribution
+ * member 2: the sum of justification factors per page
+ * member 3: the functor to be redirected to the MeasureAligner
+ * member 4: the doc
  **/
 
 class JustifyYParams : public FunctorParams {
 public:
     JustifyYParams(Functor *functor, Doc *doc)
     {
+        m_cumulatedShift = 0;
         m_spaceToDistribute = 0;
-        m_justificationSum = 0;
+        m_justificationSum = 0.;
         m_functor = functor;
         m_doc = doc;
     }
 
+    int m_cumulatedShift;
     int m_spaceToDistribute;
     double m_justificationSum;
     Functor *m_functor;

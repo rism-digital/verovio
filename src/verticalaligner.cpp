@@ -789,9 +789,9 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
     }
 
     const double staffJustificationFactor = GetJustificationFactor(params->m_doc);
-    const double shift = staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
+    params->m_cumulatedShift += staffJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
 
-    this->SetYRel(this->GetYRel() - shift);
+    this->SetYRel(this->GetYRel() - params->m_cumulatedShift);
 
     return FUNCTOR_CONTINUE;
 }
