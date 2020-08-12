@@ -588,9 +588,9 @@ void View::DrawHairpin(
     // dc->DeactivateGraphic();
 
     DrawObliquePolygon(
-        dc, x1, y1 - startY / 2, x2, y2 - endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+        dc, x1, y1 - startY / 2, x2, y2 - endY / 2, m_doc->GetDrawingHairpinWidth(staff->m_drawingStaffSize));
     DrawObliquePolygon(
-        dc, x1, y1 + startY / 2, x2, y2 + endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+        dc, x1, y1 + startY / 2, x2, y2 + endY / 2, m_doc->GetDrawingHairpinWidth(staff->m_drawingStaffSize));
 
     // dc->ReactivateGraphic();
     if (graphic)

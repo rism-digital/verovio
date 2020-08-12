@@ -805,10 +805,10 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
 
     int x = barLine->GetDrawingX();
-    int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-    int barLineThickWidth = m_doc->GetDrawingBeamWidth(staffSize, false);
-    int x1 = x - m_doc->GetDrawingBeamWidth(staffSize, false) - barLineWidth;
-    int x2 = x + m_doc->GetDrawingBeamWidth(staffSize, false) + barLineWidth;
+    const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
+    const int barLineThickWidth = m_doc->GetDrawingThickBarlineWidth(staffSize);
+    int x1 = x - barLineThickWidth - barLineWidth;
+    int x2 = x + barLineThickWidth + barLineWidth;
 
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(staffSize) * 16 / 13;

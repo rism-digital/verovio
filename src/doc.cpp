@@ -1544,6 +1544,18 @@ int Doc::GetCueSize(int value) const
     return value * this->m_options->m_graceFactor.GetValue();
 }
 
+int Doc::GetDrawingHairpinWidth(int staffSize) const
+{
+    return m_options->m_engravingDefaults.GetDoubleValue({ "engravingDefaults", "hairpinThickness" })
+        * GetDrawingUnit(staffSize);
+}
+
+int Doc::GetDrawingThickBarlineWidth(int staffSize) const
+{
+    return m_options->m_engravingDefaults.GetDoubleValue({ "engravingDefaults", "thickBarlineThickness" })
+        * GetDrawingUnit(staffSize);
+}
+
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
 {
     m_drawingSmuflFont.SetFaceName(m_options->m_font.GetValue().c_str());

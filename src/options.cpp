@@ -37,7 +37,7 @@ std::map<int, std::string> Option::s_systemDivider
 
 constexpr char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.3,'lyricLineThickness':0.25,"
     "'slurMidpointThickness':0.6,'staffLineThickness':0.15,'stemThickness':0.2,'tieMidpointThickness':0.5,"
-    "'hairpinThickness':0.4}}";
+    "'hairpinThickness':0.4,'thickBarlineThickness':1}}";
 
 constexpr char *engravingDefaultsNode = "engravingDefaults";
 
