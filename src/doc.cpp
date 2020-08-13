@@ -1489,17 +1489,17 @@ int Doc::GetDrawingBrevisWidth(int staffSize) const
 
 int Doc::GetDrawingBarLineWidth(int staffSize) const
 {
-    return m_options->m_barLineWidth.GetValue() * GetDrawingUnit(staffSize);
+    return GetDrawingElementDefaultSize("thinBarlineThickness", staffSize);
 }
 
 int Doc::GetDrawingStaffLineWidth(int staffSize) const
 {
-    return m_options->m_staffLineWidth.GetValue() * GetDrawingUnit(staffSize);
+    return GetDrawingElementDefaultSize("staffLineThickness", staffSize);
 }
 
 int Doc::GetDrawingStemWidth(int staffSize) const
 {
-    return m_options->m_stemWidth.GetValue() * GetDrawingUnit(staffSize);
+    return GetDrawingElementDefaultSize("stemThickness", staffSize);
 }
 
 int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
@@ -1547,7 +1547,7 @@ int Doc::GetCueSize(int value) const
 int Doc::GetDrawingElementDefaultSize(const std::string& engravingElement, int staffSize) const 
 {
     return m_options->m_engravingDefaults.GetDoubleValue({ "engravingDefaults", engravingElement })
-        * GetDrawingUnit(staffSize) * 2;
+        * GetDrawingUnit(staffSize);
 }
 
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)

@@ -588,9 +588,9 @@ void View::DrawHairpin(
     // dc->DeactivateGraphic();
 
     DrawObliquePolygon(dc, x1, y1 - startY / 2, x2, y2 - endY / 2,
-        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize));
+        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize) * 2);
     DrawObliquePolygon(dc, x1, y1 + startY / 2, x2, y2 + endY / 2,
-        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize));
+        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize) * 2);
 
     // dc->ReactivateGraphic();
     if (graphic)
@@ -880,7 +880,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
         height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieThickness.GetValue();
+    int thickness = m_doc->GetDrawingElementDefaultSize("tieMidpointThickness", staff->m_drawingStaffSize);
 
     // control points
     Point c1, c2;
@@ -1074,7 +1074,7 @@ void View::DrawControlElementConnector(
         }
     }
 
-    int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int width = m_doc->GetDrawingElementDefaultSize("lyricLineThickness", staff->m_drawingStaffSize);
 
     // the length of the dash and the space between them - can be made a parameter
     int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
@@ -1175,7 +1175,7 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
 
     dc->DeactivateGraphic();
 
-    int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int width = m_doc->GetDrawingElementDefaultSize("lyricLineThickness", staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
     DrawFilledRectangle(dc, x1, y, x2, y + width);
@@ -1264,7 +1264,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         return;
     }
 
-    int thickness = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int thickness = m_doc->GetDrawingElementDefaultSize("lyricLineThickness", staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     thickness *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
 

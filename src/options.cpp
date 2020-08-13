@@ -146,6 +146,7 @@ std::string OptionBool::GetDefaultStrValue() const
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
+    m_isSet = true;
     return true;
 }
 
@@ -196,6 +197,7 @@ bool OptionDbl::SetValue(double value)
         return false;
     }
     m_value = value;
+    m_isSet =  true;
     return true;
 }
 
@@ -257,6 +259,7 @@ bool OptionInt::SetValue(int value)
         return false;
     }
     m_value = value;
+    m_isSet = true;
     return true;
 }
 
@@ -280,6 +283,7 @@ void OptionString::Init(const std::string &defaultValue)
 bool OptionString::SetValue(const std::string &value)
 {
     m_value = value;
+    m_isSet = true;
     return true;
 }
 
@@ -303,6 +307,7 @@ void OptionArray::Init()
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
+    m_isSet = true;
     // m_values.erase(std::remove_if(m_values.begin(), m_values.end(),
     //                                       [](const std::string &s) { return s.empty(); }),
     //                        m_values.end());
@@ -314,6 +319,7 @@ bool OptionArray::SetValue(const std::string &value)
     // Passing a single value to an array option adds it to the values and to not replace them
     if (!value.empty()) {
         m_values.push_back(value);
+        m_isSet =  true;
     }
     return true;
 }
@@ -347,6 +353,7 @@ std::string OptionArray::GetDefaultStrValue() const
 bool OptionArray::SetValue(std::vector<std::string> const &values)
 {
     m_values = values;
+    m_isSet = true;
     m_values.erase(std::remove_if(m_values.begin(), m_values.end(), [](const std::string &s) { return s.empty(); }),
         m_values.end());
     return true;
@@ -387,6 +394,7 @@ bool OptionIntMap::SetValue(const std::string &value)
     for (it = m_values->begin(); it != m_values->end(); ++it)
         if (it->second == value) {
             m_value = it->first;
+            m_isSet = true;
             return true;
         }
     LogError("Parameter '%s' not valid for '%s'", value.c_str(), GetKey().c_str());
@@ -415,6 +423,7 @@ bool OptionIntMap::SetValue(int value)
     assert(m_values->count(value));
 
     m_value = value;
+    m_isSet = true;
 
     return true;
 }
@@ -476,6 +485,7 @@ bool OptionStaffrel::SetValue(const std::string &value)
         return false;
     }
     m_value = staffrel;
+    m_isSet = true;
     return true;
 }
 
@@ -499,32 +509,27 @@ void OptionJson::Init(const std::string &defaultValue, const std::string &defaul
 {
     m_defaultValues.parse(defaultValue);
     m_defaultJsonNode = defaultJsonNode;
+    m_isSet = false;
 }
 
-bool OptionJson::SetValue(const std::string &defaultValue)
+bool OptionJson::SetValue(const std::string &jsonFilePath)
 {
-    std::ifstream in(defaultValue.c_str());
+    std::ifstream in(jsonFilePath.c_str());
     if (!in.is_open()) {
         return false;
     }
 
-    in.seekg(0, std::ios::end);
-    std::streamsize fileSize = (std::streamsize)in.tellg();
-    in.clear();
-    in.seekg(0, std::ios::beg);
-
-    // read the file into the std::string:
-    std::string content(fileSize, 0);
-    in.read(&content[0], fileSize);
-
-    bool result(true);
-    if (!m_values.parse(content)) {
-        LogError("Input file '%s' is not valid or contains errors", defaultValue.c_str());
-        result = false;
+    jsonxx::Object newValues;
+    if (!newValues.parse(in)) {
+        LogError("Input file '%s' is not valid or contains errors", jsonFilePath.c_str());
+        return false;
     }
 
+    m_values = newValues;
+    m_isSet = true;
+
     in.close();
-    return result;
+    return true;
 }
 
 int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
@@ -534,30 +539,68 @@ int OptionJson::GetIntValue(const std::vector<std::string> &jsonNodePath, bool g
 
 double OptionJson::GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault) const
 {
-    JsonMap map = getDefault ? m_defaultValues.kv_map() : m_values.kv_map();
-    for (auto iter = jsonNodePath.begin(); iter != jsonNodePath.end(); ++iter) {
-        auto elem = map.find(*iter);
-        if (elem == map.end()) {
-            // search for default element of each try for now
-            // Should improve by adding a map? of elements to seach instead
-            elem = map.find(m_defaultJsonNode);
-            // if we didn't find anything even after that - exit
-            if (elem == map.end()) break;
+    JsonPath path = getDefault ? StringPath2NodePath(m_defaultValues, jsonNodePath)
+                               : StringPath2NodePath(m_values, jsonNodePath);
+
+    if (path.size() != jsonNodePath.size() && !getDefault) {
+        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
+    }
+
+    if (path.size() != jsonNodePath.size() || !path.back().get().is<jsonxx::Number>())
+        return 0;
+
+    return path.back().get().get<jsonxx::Number>();
+}
+
+bool OptionJson::UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value)
+{
+    if (jsonNodePath.empty()) {
+        return false;
+    }
+
+    JsonPath path = StringPath2NodePath(m_values, jsonNodePath);
+    if (path.size() != jsonNodePath.size()) {
+        path = StringPath2NodePath(m_defaultValues, jsonNodePath);
+    }
+
+    if (path.size() != jsonNodePath.size()) {
+        return false;
+    }
+
+    path.back().get().parse(value);
+    return true;
+}
+
+OptionJson::JsonPath OptionJson::StringPath2NodePath(
+    const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const
+{
+    JsonPath path;
+    if (jsonNodePath.empty() || !obj.has<jsonxx::Value>(jsonNodePath.front())) {
+        return path;
+    }
+    path.reserve(jsonNodePath.size());
+    path.push_back(const_cast<jsonxx::Value &>(obj.get<jsonxx::Value>(jsonNodePath.front())));
+    for (auto iter = jsonNodePath.begin() + 1; iter != jsonNodePath.end(); ++iter) {
+        jsonxx::Value &val = path.back();
+        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(*iter)) {
+            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
         }
-        // at the end bottom of the value tree we always should have number values, so process them here
-        if (*iter == jsonNodePath.back()) {
-            if (elem->second->type_ != jsonxx::Value::NUMBER_) break; // path is invalid - last element should be number
-            return elem->second->number_value_;
-        }
-        // otherwise try to go deeper in the tree
-        else {
-            if (elem->second->type_ != jsonxx::Value::OBJECT_)
-                break; // path is invalid - intermediary elements should be of object type
-            map = elem->second->object_value_->kv_map();
+        else if (val.is<jsonxx::Array>()) {
+            try {
+                const int index = std::stoi(*iter);
+                if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index))
+                    break;
+
+                path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
+            }
+            catch (const std::logic_error &) {
+                // invalid index, leaving
+                break;
+            }
         }
     }
 
-    return getDefault ? 0 : GetDoubleValue(jsonNodePath, true);
+    return path;
 }
 
 //----------------------------------------------------------------------------
@@ -870,7 +913,7 @@ Options::Options()
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
 
-    m_engravingDefaults.SetInfo("Engraving defaults", 
+    m_engravingDefaults.SetInfo("Engraving defaults",
         "Path to json file describing defaults for engraving SMuFL elements");
     m_engravingDefaults.Init(engravingDefaults, engravingDefaultsNode);
     this->Register(&m_engravingDefaults, "engravingDefaults", &m_generalLayout);
@@ -1120,6 +1163,22 @@ Options &Options::operator=(const Options &options)
 }
 
 Options::~Options() {}
+
+void Options::sync() {
+    // override default or passed engravingDefaults with explicitely set one
+    if (m_barLineWidth.isSet())
+        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "thinBarlineThickness"}, m_barLineWidth.GetStrValue());
+    if (m_lyricLineThickness.isSet())
+        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "lyricLineThickness"}, m_lyricLineThickness.GetStrValue());
+    if (m_slurThickness.isSet())
+        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "slurMidpointThickness"}, m_slurThickness.GetStrValue());
+    if (m_staffLineWidth.isSet())
+        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "staffLineThickness" }, m_staffLineWidth.GetStrValue());
+    if (m_stemWidth.isSet())
+        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "stemThickness" }, m_stemWidth.GetStrValue());
+    if (m_tieThickness.isSet())
+        m_engravingDefaults.UpdateNodeValue({ "engravingDefaults", "tieMidpointThickness" }, m_tieThickness.GetStrValue());
+}
 
 void Options::Register(Option *option, const std::string &key, OptionGrp *grp)
 {
