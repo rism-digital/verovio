@@ -203,8 +203,9 @@ public:
 
 /**
  * member 0: the classId
- * member 1: the doc
- * member 2: a pointer to the functor for passing it to the system aligner
+ * member 1: a flag indicating we are processing floating object to be put in between
+ * member 2: the doc
+ * member 3: a pointer to the functor for passing it to the system aligner
  **/
 
 class AdjustFloatingPositionersParams : public FunctorParams {
@@ -212,10 +213,12 @@ public:
     AdjustFloatingPositionersParams(Doc *doc, Functor *functor)
     {
         m_classId = OBJECT;
+        m_inBetween = false;
         m_doc = doc;
         m_functor = functor;
     }
     ClassId m_classId;
+    bool m_inBetween;
     Doc *m_doc;
     Functor *m_functor;
 };

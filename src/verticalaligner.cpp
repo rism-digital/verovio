@@ -352,7 +352,14 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         assert((*iter)->GetObject());
-        if (!(*iter)->GetObject()->Is(params->m_classId)) continue;
+        if (!params->m_inBetween && !(*iter)->GetObject()->Is(params->m_classId)) continue;
+        
+        if (params->m_inBetween) {
+            if ((*iter)->GetDrawingPlace() != STAFFREL_between) continue;
+        }
+        else {
+            if ((*iter)->GetDrawingPlace() == STAFFREL_between) continue;
+        }
 
         // Skip if no content bounding box is available
         if (!(*iter)->HasContentBB()) continue;
@@ -423,6 +430,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             overflowBoxes->push_back((*iter));
             this->SetOverflowAbove(overflowAbove);
         }
+        // below (or between)
         else {
             int overflowBelow = this->CalcOverflowBelow((*iter));
             overflowBoxes->push_back((*iter));
