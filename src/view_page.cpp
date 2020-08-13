@@ -1291,7 +1291,22 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
     // Draw system divider (from the second one) if scoreDef is optimized
     if (!firstMeasure || (m_options->m_systemDivider.GetValue() == SYSTEMDIVIDER_none)) return;
     // initialize to zero, first measure is not supposed to have system divider
-    static int previousSystemBottomMarginY = 0;
+    int previousSystemBottomMarginY = 0;
+    Object *currentPage = system->GetFirstAncestor(PAGE);
+    if (currentPage) {
+        Object *previousSystem = currentPage->GetPrevious(system);
+        if (previousSystem) {
+            Measure *previousSystemMeasure = dynamic_cast<Measure *>(previousSystem->FindDescendantByType(MEASURE, 1));
+
+            Staff *bottomStaff = previousSystemMeasure->GetBottomVisibleStaff();
+            // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
+            // substract offset of the system divider symbol itself (added to y2 and y4)
+            previousSystemBottomMarginY = bottomStaff->GetDrawingY()
+                - (bottomStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
+                - m_doc->GetDrawingUnit(100) * 5;
+        }
+    }
+
     if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
         int y = system->GetDrawingY();
         Staff *staff = firstMeasure->GetTopVisibleStaff();
@@ -1323,13 +1338,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
         }
 
         dc->EndCustomGraphic();
-    }
-    Staff *bottomStaff = firstMeasure->GetBottomVisibleStaff();
-    // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
-    // substract offset of the system divider symbol itself (added to y2 and y4)
-    previousSystemBottomMarginY = bottomStaff->GetDrawingY()
-        - (bottomStaff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(bottomStaff->m_drawingStaffSize)
-        - m_doc->GetDrawingUnit(100) * 5;
+    }  
 }
 
 //----------------------------------------------------------------------------
