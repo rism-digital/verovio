@@ -35,10 +35,10 @@ std::map<int, std::string> Option::s_measureNumber
 std::map<int, std::string> Option::s_systemDivider
     = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
-constexpr char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.3,'lyricLineThickness':0.25,"
-    "'slurMidpointThickness':0.6,'staffLineThickness':0.15,'stemThickness':0.2,'tieMidpointThickness':0.5,"
-    "'hairpinThickness':0.4,'thickBarlineThickness':1,'tupletBracketThickness':0.4,'subBracketThickness':1,"
-    "'bracketThickness':1}}";
+constexpr char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
+    "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
+    "'hairpinThickness':0.2,'thickBarlineThickness':0.5,'tupletBracketThickness':0.2,'subBracketThickness':0.25,"
+    "'bracketThickness':0.5}}";
 
 constexpr char *engravingDefaultsNode = "stemThickness";
 
