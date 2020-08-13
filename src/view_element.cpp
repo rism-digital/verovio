@@ -1459,7 +1459,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             if ((note->GetDrawingLoc() % 2) != 0) {
                 yShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
-            yShift *= (stem->GetDrawingStemLen() > 0)? -1 : 1;
+            yShift *= (stem->GetDrawingStemLen() > 0) ? -1 : 1;
             yShift -= m_doc->GetGlyphHeight(SMUFL_E645_vocalSprechgesang, staff->m_drawingStaffSize, false) / 2;
             DrawSmuflCode(dc, stem->GetDrawingX(), note->GetDrawingY() + yShift, SMUFL_E645_vocalSprechgesang,
                 staff->m_drawingStaffSize, false);

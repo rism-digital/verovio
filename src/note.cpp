@@ -776,12 +776,13 @@ int Note::CalcDots(FunctorParams *functorParams)
             loc += 1;
             threshold += 4;
         }
-        threshold = (this->GetDur() > 4)? threshold : 0;
+        threshold = (this->GetDur() > 4) ? threshold : 0;
         dotLocs->push_back(loc);
         // Stem up, shorter than 4th and not in beam
         if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (threshold > 0) && !this->IsInBeam()) {
             // HARDCODED
-            if (this->GetDrawingStemLen() < 3) flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            if (this->GetDrawingStemLen() < 3)
+                flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
         }
     }
     else {

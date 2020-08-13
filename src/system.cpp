@@ -769,9 +769,9 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
     m_systemAligner.Process(params->m_functor, params);
-    
+
     /**** Process elements that needs to be put in between ****/
-    
+
     params->m_inBetween = true;
     // All of them with no particular processing order.
     // The resulting layout order will correspond to the order in the encoding.

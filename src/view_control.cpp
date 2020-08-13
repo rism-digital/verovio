@@ -1634,14 +1634,14 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     dc->EndGraphic(fermata, this);
 }
 
-void View::DrawFing(DeviceContext* dc, Fing* fing, Measure* measure, System* system)
+void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *system)
 {
     assert(dc);
     assert(system);
     assert(measure);
     assert(fing);
 
-     // Cannot draw a fing that has no start position
+    // Cannot draw a fing that has no start position
     if (!fing->GetStart()) return;
 
     dc->StartGraphic(fing, "", fing->GetUuid());
@@ -1653,7 +1653,7 @@ void View::DrawFing(DeviceContext* dc, Fing* fing, Measure* measure, System* sys
 
     TextDrawingParams params;
     params.m_x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
-    // center fingering 
+    // center fingering
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
 
     std::vector<Staff *>::iterator staffIter;

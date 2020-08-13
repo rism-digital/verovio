@@ -353,7 +353,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         assert((*iter)->GetObject());
         if (!params->m_inBetween && !(*iter)->GetObject()->Is(params->m_classId)) continue;
-        
+
         if (params->m_inBetween) {
             if ((*iter)->GetDrawingPlace() != STAFFREL_between) continue;
         }

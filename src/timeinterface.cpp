@@ -107,14 +107,14 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
 {
     assert(measure);
     assert(object);
-    
+
     std::vector<Staff *> staves;
     std::vector<int>::iterator iter;
     std::vector<int> staffList;
     if (this->HasStaff()) {
         bool isInBetween = false;
         // limit between support to some elements?
-        if (object->Is({DYNAM, DIR, HAIRPIN, TEMPO})) {
+        if (object->Is({ DYNAM, DIR, HAIRPIN, TEMPO })) {
             AttPlacement *att = dynamic_cast<AttPlacement *>(object);
             assert(att);
             isInBetween = (att->GetPlace() == STAFFREL_between);

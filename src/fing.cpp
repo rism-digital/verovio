@@ -39,7 +39,7 @@ void Fing::Reset()
     ResetNNumberLike();
 }
 
-bool Fing::IsSupportedChild(Object *child) 
+bool Fing::IsSupportedChild(Object *child)
 {
     if (!child->Is({ REND, TEXT })) {
         return false;
