@@ -173,7 +173,7 @@ std::pair<int, std::string> Rest::GetLocationRelativeToOtherLayers(const ListOfO
         auto currentElementInfo = GetElementLocation(object, dynamic_cast<Layer *>(*layerIter), isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
 		//  If note on other layer is not on the same x position as rest - ignore its accidental
-		if (GetDrawingX() != object->GetDrawingX()) {
+        if (GetAlignment()->GetTime() != dynamic_cast<LayerElement*>(object)->GetAlignment()->GetTime()) {
             currentElementInfo.second = "noAccidental";
         }
         if ((VRV_UNSET == finalElementInfo.first) || (isTopLayer && (finalElementInfo.first < currentElementInfo.first))
