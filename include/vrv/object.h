@@ -221,7 +221,7 @@ public:
      */
     virtual void CloneReset();
 
-    std::string GetUuid() const { return m_uuid; }
+    const std::string& GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
