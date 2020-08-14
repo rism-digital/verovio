@@ -10092,6 +10092,9 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     string key;
     string value;
     string typevalue;
+    string verboseType;
+    string ovalue;
+    string svalue;
 
     for (int i = 0; i < hps->getCount(); ++i) {
         key = hps->getParameterName(i);
@@ -10146,6 +10149,13 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
         if (key == "v") {
             verboseQ = true;
+            verboseType = value;
+        }
+        if (key == "o") {
+            ovalue = value;
+        }
+        if (key == "s") {
+            svalue = value;
         }
         if (key == "problem") {
             problemQ = true;
@@ -10191,7 +10201,20 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (sicQ) {
-        text = "S";
+        if (verboseType == "text") {
+            if (!ovalue.empty()) {
+                text = ovalue;
+            }
+            else if (!svalue.empty()) {
+                text = svalue;
+            }
+            else {
+                text = "S";
+            }
+        }
+        else {
+            text = "S";
+        }
     }
 
     int maxstaff = (int)m_staffstarts.size() - 1;
