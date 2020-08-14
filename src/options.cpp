@@ -891,11 +891,11 @@ Options::Options()
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
-    m_staffLineWidth.Init(0.15, 0.1, 0.30);
+    m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
 
     m_stemWidth.SetInfo("Stem width", "The stem width");
-    m_stemWidth.Init(0.2, 0.1, 0.50);
+    m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
 
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
