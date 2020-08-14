@@ -1164,20 +1164,24 @@ Options &Options::operator=(const Options &options)
 
 Options::~Options() {}
 
-void Options::sync() {
-    // override default or passed engravingDefaults with explicitely set one
-    if (m_barLineWidth.isSet())
-        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "thinBarlineThickness"}, m_barLineWidth.GetStrValue());
-    if (m_lyricLineThickness.isSet())
-        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "lyricLineThickness"}, m_lyricLineThickness.GetStrValue());
-    if (m_slurThickness.isSet())
-        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "slurMidpointThickness"}, m_slurThickness.GetStrValue());
-    if (m_staffLineWidth.isSet())
-        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "staffLineThickness" }, m_staffLineWidth.GetStrValue());
-    if (m_stemWidth.isSet())
-        m_engravingDefaults.UpdateNodeValue({"engravingDefaults", "stemThickness" }, m_stemWidth.GetStrValue());
-    if (m_tieThickness.isSet())
-        m_engravingDefaults.UpdateNodeValue({ "engravingDefaults", "tieMidpointThickness" }, m_tieThickness.GetStrValue());
+void Options::sync()
+{
+    // override default or passed engravingDefaults with explicitly set values
+    std::list<std::pair<std::string, const OptionDbl *>> engravingDefaults
+        = { { "thinBarlineThickness", &m_barLineWidth },
+            { "lyricLineThickness", &m_lyricLineThickness },
+            { "slurMidpointThickness", &m_slurThickness },
+            { "staffLineThickness", &m_staffLineWidth },
+            { "stemThickness", &m_stemWidth },
+            { "tieMidpointThickness", &m_tieThickness } };
+
+    for (auto &const pair : engravingDefaults) {
+        if (pair.second->isSet()) {
+            const std::string value = std::to_string(pair.second->GetValue() / 2.0);
+            const bool success = m_engravingDefaults.UpdateNodeValue({ "engravingDefaults", pair.first }, value);
+            if (!success) LogWarning("Unable to update %s engraving default with value %s.", pair.first, value);
+        }
+    }
 }
 
 void Options::Register(Option *option, const std::string &key, OptionGrp *grp)

@@ -379,7 +379,7 @@ void View::DrawStaffGrp(
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         const int lineWidth
-            = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize) * 2;
+            = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize);
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
         x -= 2 * lineWidth;
     }
