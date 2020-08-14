@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Aug  8 14:00:10 PDT 2020
+// Last Modified: Wed Aug 12 01:48:44 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -60445,7 +60445,7 @@ void Tool_filter::getCommandList(vector<pair<string, string> >& commands,
 			continue;
 		}
 		string command = refs[i]->getGlobalReferenceValue();
-		hre.split(clist, command, "\\s*\\|\\s*");
+		splitPipeline(clist, command);
 		for (int j=0; j<(int)clist.size(); j++) {
 			if (hre.search(clist[j], "^\\s*([^\\s]+)")) {
 				entry.first  = hre.getMatch(1);
@@ -60455,6 +60455,103 @@ void Tool_filter::getCommandList(vector<pair<string, string> >& commands,
 		}
 	}
 }
+
+
+
+//////////////////////////////
+//
+//  Tool_filter::splitPipeline --
+//
+
+void Tool_filter::splitPipeline(vector<string>& clist, const string& command) {
+	clist.clear();
+	clist.resize(1);
+	clist[0] = "";
+	int inDoubleQuotes = -1;
+	int inSingleQuotes = -1;
+	char ch = '\0';
+	char lastch;
+	for (int i=0; i<(int)command.size(); i++) {
+		lastch = ch;
+		ch = command[i];
+
+		if (ch == '"') {
+			if (lastch == '\\') {
+				// escaped double quote, so treat as regular character
+				clist.back() += ch;
+				continue;
+			} else if (inDoubleQuotes >= 0) {
+				// turn off previous double quote sequence
+				clist.back() += ch;
+				inDoubleQuotes = -1;
+				continue;
+			} else if (inSingleQuotes >= 0) {
+				// in an active single quote, so this is not a closing double quote
+				clist.back() += ch;
+				continue;
+			} else {
+				// this is the start of a double quote sequence
+				clist.back() += ch;
+				inDoubleQuotes = i;
+				continue;
+			}
+		}
+
+		if (ch == '\'') {
+			if (lastch == '\\') {
+				// escaped single quote, so treat as regular character
+				clist.back() += ch;
+				continue;
+			} else if (inSingleQuotes >= 0) {
+				// turn off previous single quote sequence
+				clist.back() += ch;
+				inSingleQuotes = -1;
+				continue;
+			} else if (inDoubleQuotes >= 0) {
+				// in an active double quote, so this is not a closing single quote
+				clist.back() += ch;
+				continue;
+			} else {
+				// this is the start of a single quote sequence
+				clist.back() += ch;
+				inSingleQuotes = i;
+				continue;
+			}
+		}
+
+		if (ch == '|') {
+			if (inSingleQuotes || inDoubleQuotes) {
+				// pipe character
+				clist.back() += ch;
+				continue;
+			} else {
+				// this is a real pipe
+				clist.resize(clist.size() + 1);
+				continue;
+			}
+		}
+
+		if (isspace(ch) && (!inSingleQuotes) && (!inDoubleQuotes)) {
+			if (isspace(lastch)) {
+				// don't repeat spaces outside of quotes.
+				continue;
+			} else {
+				clist.back() += ' ';
+			}
+		}
+
+		// regular character
+		clist.back() += ch;
+	}
+
+	// remove leading and trailing spaces
+	HumRegex hre;
+	for (int i=0; i<(int)clist.size(); i++) {
+		hre.replaceDestructive(clist[i], "", "^\\s+");
+		hre.replaceDestructive(clist[i], "", "\\s+$");
+	}
+}
+
 
 
 //////////////////////////////
@@ -70259,6 +70356,7 @@ ostream& operator<<(ostream& out, MSearchQueryToken& item) {
 	out << "\tDURATION:\t"  << item.duration  << endl;
 	out << "\tRHYTHM:\t\t"  << item.rhythm    << endl;
 	out << "\tANYTHING:\t"  << item.anything  << endl;
+	out << "\tANYPITCH:\t"  << item.anypitch  << endl;
 	return out;
 }
 
@@ -76162,10 +76260,12 @@ ostream& operator<<(ostream& out, MeasureInfo& info) {
 	}
 	HumdrumFile& infile = *(info.file);
 	out << "================================== " << endl;
-	out << "NUMBER         = " << info.num << endl;
-	out << "SEGMENT        = " << info.seg << endl;
-	out << "START          = " << info.start << endl;
-	out << "STOP           = " << info.stop << endl;
+	out << "NUMBER      = " << info.num   << endl;
+	out << "SEGMENT     = " << info.seg   << endl;
+	out << "START       = " << info.start << endl;
+	out << "STOP        = " << info.stop  << endl;
+	out << "STOP_STYLE  = " << info.stopStyle << endl;
+	out << "START_STYLE = " << info.startStyle << endl;
 
 	for (int i=1; i<(int)info.sclef.size(); i++) {
 		out << "TRACK " << i << ":" << endl;
@@ -76282,7 +76382,7 @@ void Tool_myank::processFile(HumdrumFile& infile) {
 	getMetStates(metstates, infile);
 	getMeasureStartStop(MeasureInList, infile);
 
-	string measurestring = getString("measure");
+	string measurestring = getString("measures");
 	if (markQ) {
 		stringstream mstring;
 		getMarkString(mstring, infile);
@@ -76319,6 +76419,12 @@ void Tool_myank::processFile(HumdrumFile& infile) {
 	if (MeasureOutList.size() == 0) {
 		// disallow processing files with no barlines
 		return;
+	}
+
+	// move stopStyle to startStyle of next measure group.
+	for (int i=(int)MeasureOutList.size()-1; i>0; i--) {
+		MeasureOutList[i].startStyle = MeasureOutList[i-1].stopStyle;
+		MeasureOutList[i-1].stopStyle = "";
 	}
 
 	myank(infile, MeasureOutList);
@@ -76534,6 +76640,7 @@ outerforloop: ;
 //
 
 void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
+
 	if (outmeasures.size() > 0) {
 		printStarting(infile);
 	}
@@ -76590,6 +76697,9 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 			} else if (doubleQ && measurestart) {
 				printDoubleBarline(infile, i);
 				measurestart = 0;
+			} else if (measurestart && infile[i].isBarline()) {
+				printMeasureStart(infile, i, outmeasures[h].startStyle);
+				measurestart = 0;
 			} else {
 				m_humdrum_text << infile[i] << "\n";
 				if (barnumtextQ && (bartextcount++ == 0) && infile[i].isBarline()) {
@@ -76615,7 +76725,9 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 	if ((!nolastbarQ) &&  (lasti >= 0) && infile[lasti].isBarline()) {
 		for (j=0; j<infile[lasti].getFieldCount(); j++) {
 			token = *infile.token(lasti, j);
-			hre.replaceDestructive(token, "", "\\d+");
+			hre.replaceDestructive(token, outmeasures.back().stopStyle, "\\d+.*");
+			// collapse final barlines
+			hre.replaceDestructive(token, "==", "===+");
 			if (doubleQ) {
 				if (hre.search(token, "=(.+)")) {
 					// don't add double barline, there is already
@@ -76640,7 +76752,6 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 	}
 
 	if (lastline >= 0) {
-		//printEnding(infile, lastline);
 		printEnding(infile, outmeasures.back().stop, lasti);
 	}
 }
@@ -77147,6 +77258,51 @@ void Tool_myank::adjustGlobalInterpretationsStart(HumdrumFile& infile, int ii,
 }
 
 
+//////////////////////////////
+//
+// Tool_myank::printMeasureStart -- print a starting measure of a segment.
+//
+
+void Tool_myank::printMeasureStart(HumdrumFile& infile, int line, const string& style) {
+	if (!infile[line].isBarline()) {
+		m_humdrum_text << infile[line] << "\n";
+		return;
+	}
+
+	HumRegex hre;
+	int j;
+	for (j=0; j<infile[line].getFieldCount(); j++) {
+		if (hre.search(infile.token(line, j), "=(\\d*)(.*)", "")) {
+			if (style == "==") {
+				m_humdrum_text << "==";
+				m_humdrum_text << hre.getMatch(1);
+			} else {
+				m_humdrum_text << "=";
+				m_humdrum_text << hre.getMatch(1);
+				m_humdrum_text << style;
+			}
+		} else {
+			if (style == "==") {
+				m_humdrum_text << "==";
+			} else {
+				m_humdrum_text << "=" << style;
+			}
+		}
+		if (j < infile[line].getFieldCount()-1) {
+			m_humdrum_text << "\t";
+		}
+	}
+	m_humdrum_text << "\n";
+
+	if (barnumtextQ) {
+		int barline = 0;
+		sscanf(infile.token(line, 0)->c_str(), "=%d", &barline);
+		if (barline > 0) {
+			m_humdrum_text << "!!LO:TX:Z=20:X=-25:t=" << barline << endl;
+		}
+	}
+}
+
 
 //////////////////////////////
 //
@@ -77154,7 +77310,6 @@ void Tool_myank::adjustGlobalInterpretationsStart(HumdrumFile& infile, int ii,
 //
 
 void Tool_myank::printDoubleBarline(HumdrumFile& infile, int line) {
-
 
 	if (!infile[line].isBarline()) {
 		m_humdrum_text << infile[line] << "\n";
@@ -77447,7 +77602,8 @@ void Tool_myank::printStarting(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_myank::printEnding -- print the measure
+// Tool_myank::printEnding -- print the spine terminators and any
+//     content after the end of the data.
 //
 
 void Tool_myank::printEnding(HumdrumFile& infile, int lastline, int adjlin) {
@@ -77825,13 +77981,14 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 	int start = 0;
 	vector<MeasureInfo>& range = measureout;
 	range.reserve(10000);
-	value = hre.search(ostring, "^([^,]+,?)");
+	string searchexp = "^([\\d$-]+[^\\d$-]*)";
+	value = hre.search(ostring, searchexp);
 	while (value != 0) {
 		start += value - 1;
 		start += (int)hre.getMatch(1).size();
 		processFieldEntry(range, hre.getMatch(1), infile, maxmeasure,
 			 measurein, inmap);
-		value = hre.search(ostring, start, "^([^,]+,?)");
+		value = hre.search(ostring, start, searchexp);
 	}
 }
 
@@ -78205,6 +78362,12 @@ void Tool_myank::processFieldEntry(vector<MeasureInfo>& field,
 	// remove any comma left at end of input string (or anywhere else)
 	hre.replaceDestructive(buffer, "", ",", "g");
 
+	string measureStyling = "";
+	if (hre.search(buffer, "([|:!=]+)$")) {
+		measureStyling = hre.getMatch(1);
+		hre.replaceDestructive(buffer, "", "([|:!=]+)$");
+	}
+
 	if (hre.search(buffer, "^(\\d+)[a-z]?-(\\d+)[a-z]?$")) {
 		int firstone = hre.getMatchInt(1);
 		int lastone  = hre.getMatchInt(2);
@@ -78330,6 +78493,8 @@ void Tool_myank::processFieldEntry(vector<MeasureInfo>& field,
 			}
 		}
 	}
+
+	field.back().stopStyle = measureStyling;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Aug  8 14:00:10 PDT 2020
+// Last Modified: Wed Aug 12 01:48:44 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5980,6 +5980,7 @@ class Tool_filter : public HumTool {
 		void     initialize         (HumdrumFile& infile);
 		void     removeGlobalFilterLines    (HumdrumFile& infile);
 		void     removeUniversalFilterLines (HumdrumFileSet& infiles);
+		void     splitPipeline      (vector<string>& clist, const string& command);
 
 	private:
 		string   m_variant;        // used with -v option.
@@ -7187,6 +7188,8 @@ class MeasureInfo {
 			tracks = tcount;
 		}
 		int num;          // measure number
+		string stopStyle;  // styling for end of last measure
+		string startStyle; // styling for start of first measure
 		int seg;          // measure segment
 		int start;        // starting line of segment
 		int stop;         // ending line of segment
@@ -7267,6 +7270,7 @@ class Tool_myank : public HumTool {
 		void      getSectionString     (string& sstring, HumdrumFile& infile,
 		                                int sec);
 		void      collapseSpines       (HumdrumFile& infile, int line);
+		void      printMeasureStart    (HumdrumFile& infile, int line, const string& style);
 
 	private:
 		int    debugQ      = 0;             // used with --debug option
