@@ -475,7 +475,7 @@ public:
 
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
 
-    // post procesing of parameters
+    // post processing of parameters
     void sync();
 
 private:
@@ -536,7 +536,6 @@ public:
      */
     OptionGrp m_generalLayout;
 
-    OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionString m_font;
@@ -545,7 +544,6 @@ public:
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
     OptionDbl m_lyricHyphenLength;
-    OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
     OptionDbl m_lyricTopMinMargin;
@@ -558,17 +556,13 @@ public:
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
-    OptionDbl m_slurThickness;
     OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
-    OptionDbl m_staffLineWidth;
-    OptionDbl m_stemWidth;
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
-    OptionDbl m_tieThickness;
     OptionJson m_engravingDefaults;
 
     /**
@@ -633,6 +627,17 @@ public:
     OptionDbl m_topMarginHarm;
 
 private:
+    /**
+     * General layout hidden options
+     * could be reached through engravingDefaults
+     */
+    OptionDbl m_barLineWidth;
+    OptionDbl m_lyricLineThickness;
+    OptionDbl m_slurThickness;
+    OptionDbl m_staffLineWidth;
+    OptionDbl m_stemWidth;
+    OptionDbl m_tieThickness;
+
     /** The array of style parameters */
     MapOfStrOptions m_items;
 

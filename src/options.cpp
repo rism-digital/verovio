@@ -781,7 +781,7 @@ Options::Options()
     m_grps.push_back(&m_generalLayout);
 
     m_barLineWidth.SetInfo("Bar line width", "The barLine width");
-    m_barLineWidth.Init(0.30, 0.10, 0.80);
+    m_barLineWidth.Init(0.15, 0.05, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
 
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
@@ -817,7 +817,7 @@ Options::Options()
     this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
 
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
-    m_lyricLineThickness.Init(0.25, 0.10, 0.50);
+    m_lyricLineThickness.Init(0.125, 0.05, 0.50);
     this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
 
     m_lyricNoStartHyphen.SetInfo("Lyric no start hyphen", "Do not show hyphens at the beginning of a system");
@@ -870,7 +870,7 @@ Options::Options()
     this->Register(&m_slurMaxSlope, "slurMaxSlope", &m_generalLayout);
 
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
-    m_slurThickness.Init(0.6, 0.2, 1.2);
+    m_slurThickness.Init(0.3, 0.1, 1.2);
     this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
 
     m_spacingDurDetection.SetInfo("Spacing dur detection", "Detect long duration for adjusting spacing");
@@ -894,11 +894,11 @@ Options::Options()
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
-    m_staffLineWidth.Init(0.15, 0.10, 0.30);
+    m_staffLineWidth.Init(0.075, 0.05, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
 
     m_stemWidth.SetInfo("Stem width", "The stem width");
-    m_stemWidth.Init(0.20, 0.10, 0.50);
+    m_stemWidth.Init(0.1, 0.05, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
 
     m_systemDivider.SetInfo("System divider", "The display of system dividers");
@@ -910,7 +910,7 @@ Options::Options()
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
-    m_tieThickness.Init(0.5, 0.2, 1.0);
+    m_tieThickness.Init(0.25, 0.1, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
 
     m_engravingDefaults.SetInfo("Engraving defaults",
