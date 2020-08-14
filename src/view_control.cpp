@@ -588,9 +588,9 @@ void View::DrawHairpin(
     // dc->DeactivateGraphic();
 
     DrawObliquePolygon(dc, x1, y1 - startY / 2, x2, y2 - endY / 2,
-        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize) * 2);
+        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize));
     DrawObliquePolygon(dc, x1, y1 + startY / 2, x2, y2 + endY / 2,
-        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize) * 2);
+        m_doc->GetDrawingElementDefaultSize("hairpinThickness", staff->m_drawingStaffSize));
 
     // dc->ReactivateGraphic();
     if (graphic)
@@ -1074,12 +1074,12 @@ void View::DrawControlElementConnector(
         }
     }
 
-    int width = m_doc->GetDrawingElementDefaultSize("lyricLineThickness", staff->m_drawingStaffSize);
+    const int width = m_doc->GetDrawingElementDefaultSize("lyricLineThickness", staff->m_drawingStaffSize);
 
     // the length of the dash and the space between them - can be made a parameter
-    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
-    int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
-    int halfDashLength = dashLength / 2;
+    const int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
+    const int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
+    const int halfDashLength = dashLength / 2;
 
     int dist = x2 - x1;
     int nbDashes = dist / dashSpace;

@@ -371,7 +371,7 @@ void View::DrawStaffGrp(
         && ((((firstDef != lastDef) || staffGrp->HasSymbol())
                 && (m_doc->m_mdivScoreDef.GetSystemLeftline() != BOOLEAN_false))
             || (m_doc->m_mdivScoreDef.GetSystemLeftline() == BOOLEAN_true))) {
-        //int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize) * 2;
+        //int barLineWidth = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
         int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
         x += barLineWidth / 2;
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
@@ -379,7 +379,7 @@ void View::DrawStaffGrp(
     // actually draw the line, the brace or the bracket
     if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         const int lineWidth
-            = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize) * 2;
+            = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize);
         DrawVerticalLine(dc, yTop, yBottom, x - 1.5 * lineWidth, lineWidth);
         x -= 2 * lineWidth;
     }
@@ -527,7 +527,7 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     int x1, x2, offset;
 
     const int bracketThickness
-        = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize) * 2;
+        = m_doc->GetDrawingElementDefaultSize("bracketThickness", staffSize);
 
     x2 = x - bracketThickness;
     x1 = x2 - bracketThickness;
@@ -551,7 +551,7 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 
     int offset;
 
-    const int bracketWidth = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize) * 2;
+    const int bracketWidth = m_doc->GetDrawingElementDefaultSize("subBracketThickness", staffSize);
     x -= bracketWidth;
     offset = m_doc->GetDrawingStaffLineWidth(staffSize) / 2;
 
@@ -812,7 +812,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
 
     int x = barLine->GetDrawingX();
     const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
-    const int barLineThickWidth = m_doc->GetDrawingElementDefaultSize("thickBarlineThickness", staffSize) * 2;
+    const int barLineThickWidth = m_doc->GetDrawingElementDefaultSize("thickBarlineThickness", staffSize);
     int x1 = x - barLineThickWidth - barLineWidth;
     int x2 = x + barLineThickWidth + barLineWidth;
 
