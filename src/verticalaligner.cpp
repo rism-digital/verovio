@@ -119,6 +119,9 @@ void SystemAligner::FindAllIntersectionPoints(
 
 int SystemAligner::GetOverflowAbove(const Doc *) const
 {
+    if (!GetChildCount() || GetChild(0) == m_bottomAlignment)
+        return 0;
+
     StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(0));
     assert(alignment);
     return alignment->GetOverflowAbove();
@@ -126,6 +129,9 @@ int SystemAligner::GetOverflowAbove(const Doc *) const
 
 int SystemAligner::GetOverflowBelow(const Doc *doc) const
 {
+    if (!GetChildCount() || GetChild(0) == m_bottomAlignment)
+        return 0;
+
     StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(GetChildCount() - 2));
     assert(alignment);
     return alignment->GetOverflowBelow() + doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(alignment->GetStaffSize());
@@ -203,7 +209,7 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
              }
              // for first child in staff group parent's symbol should be taken, except
              // when we had a child which not on the first place in group, than take first symbol
-             notFirstInGroup = notFirstInGroup || !allStaffs.empty() && allStaffs.front() != staffChild;
+             notFirstInGroup = notFirstInGroup || (!allStaffs.empty() && allStaffs.front() != staffChild);
              if (notFirstInGroup) {
                  StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
                  if (staffGrp && staffGrp->HasSymbol()) {
@@ -298,6 +304,8 @@ void StaffAlignment::SetVerseCount(int verse_count)
              default:
                  assert(false);
          }
+         if (m_spacingType != SpacingType::System)
+            justificationFactor *= GetStaffSize() / 100.0;
      }
 
      return justificationFactor;
@@ -353,7 +361,13 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
                     assert(false);
             }
         }
-        spacing *= doc->GetDrawingUnit(100);
+
+        if (m_staff->m_drawingStaffDef->HasSpacing() || m_spacingType == SpacingType::System) {
+            spacing *= doc->GetDrawingUnit(100);
+        }
+        else {
+            spacing *= doc->GetDrawingUnit(GetStaffSize());
+        }
     }
     return spacing;
 }
@@ -794,7 +808,7 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
     assert(params);
 
     // Skip bottom aligner and first staff
-    if (!this->m_staff || SpacingType::System == m_spacingType) {
+    if (!m_staff || SpacingType::System == m_spacingType) {
         return FUNCTOR_CONTINUE;
     }
 
