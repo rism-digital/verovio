@@ -402,7 +402,7 @@ public:
     //
     OptionJson() = default;
     virtual ~OptionJson() = default;
-    virtual void Init(const std::string &defaultValue, const std::string &defaultJsonNode);
+    virtual void Init(const std::string &defaultValue);
 
     virtual bool SetValue(const std::string &jsonFilePath);
     //virtual std::string GetStrValue() const;
@@ -418,7 +418,6 @@ protected:
 private:
     jsonxx::Object m_values;
     jsonxx::Object m_defaultValues;
-    std::string m_defaultJsonNode;
 };
 
 
