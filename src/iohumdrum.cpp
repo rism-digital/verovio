@@ -18694,7 +18694,6 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
 
 Tie *HumdrumInput::tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum meterunit)
 {
-
     Tie *tie = new Tie;
     addTieLineStyle(tie, token, subindex);
     m_measure->AddChild(tie);
@@ -18723,9 +18722,6 @@ Tie *HumdrumInput::tieToPreviousItem(hum::HTp token, int subindex, hum::HumNum m
     setTieLocationId(tie, starttoken, -1, token, subindex);
 
     std::string endid = getLocationId("note", token);
-    if (token->isChord()) {
-        endid += "S" + to_string(subindex + 1);
-    }
     if (token->isChord()) {
         int endnumber = subindex + 1;
         if (endnumber > 0) {
