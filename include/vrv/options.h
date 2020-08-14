@@ -395,7 +395,6 @@ private:
  */
 
 class OptionJson : public Option {
-    using JsonMap = std::map<std::string, jsonxx::Value *>;
     using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
 
 public:
