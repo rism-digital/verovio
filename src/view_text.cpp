@@ -429,11 +429,13 @@ void View::DrawExternalSymbol(DeviceContext *dc, Object *object, TextDrawingPara
     assert(dc);
     assert(object);
 
+    // Get external symbol that we're going to draw
     auto *extSym = dynamic_cast<AttExtSym *>(object);
     assert(extSym);
 
     std::wstring glyph = { extSym->GetGlyphNum() };
 
+    // Set glyph, fontname and style needed to draw
     Text *text = new Text();
     text->SetText(glyph);
     Rend *rend = new Rend();
@@ -449,6 +451,8 @@ void View::DrawExternalSymbol(DeviceContext *dc, Object *object, TextDrawingPara
         dirTxt.SetStyle(FONTSTYLE_italic);
     }
     dirTxt.SetPointSize(params.m_pointSize);
+    // Draw a rend with all parameters that were set
+    // This will allow to draw a glyph if it's present in the font
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&dirTxt);
 
