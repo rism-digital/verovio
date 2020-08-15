@@ -8611,7 +8611,7 @@ void HumdrumInput::handleColoration(hum::HTp token)
         if (colend->compare("*Xcol") == 0) {
             break;
         }
-        if (colend->isNote()) {
+        if (colend->isNote() || colend->isRest()) {
             if (!firstnote) {
                 firstnote = colend;
             }
@@ -8649,9 +8649,22 @@ void HumdrumInput::handleColoration(hum::HTp token)
     coloration->SetUuid(id);
 
     // not considering if notes are in chords (which they should not)
-    std::string startid = getLocationId("note", firstnote);
+    std::string startid;
+    if (firstnote->isNote()) {
+        startid = getLocationId("note", firstnote);
+    }
+    else {
+        startid = getLocationId("rest", firstnote);
+    }
     coloration->SetStartid("#" + startid);
-    std::string endid = getLocationId("note", lastnote);
+
+    std::string endid;
+    if (lastnote->isNote()) {
+        endid = getLocationId("note", lastnote);
+    }
+    else {
+        endid = getLocationId("rest", lastnote);
+    }
     coloration->SetEndid("#" + endid);
 
     // data_LINEWIDTH lw;
