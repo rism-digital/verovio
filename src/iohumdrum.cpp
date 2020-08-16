@@ -10775,13 +10775,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool active = true;
     for (int i = startfield; i < line->getFieldCount(); ++i) {
         belowadj = 0;
-        string exinterp = line->token(i)->getDataType();
+        hum::HTp dyntok = line->token(i);
+        string exinterp = dyntok->getDataType();
         if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
             active = false;
         }
-        if (line->token(i)->isKern()) {
+        if (dyntok->isKern()) {
             active = true;
-            ttrack = line->token(i)->getTrack();
+            ttrack = dyntok->getTrack();
             if (ttrack != track) {
                 if (ttrack != lasttrack) {
                     trackdiff++;
@@ -10795,30 +10796,30 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
             }
             // Break if this is not the last layer for the current spine
-            if (!line->token(i)->isNull()) {
+            if (!dyntok->isNull()) {
                 break;
             }
         }
         if (!active) {
             continue;
         }
-        if (!(line->token(i)->isDataType("**dynam") || line->token(i)->isDataType("**dyn"))) {
+        if (!(dyntok->isDataType("**dynam") || dyntok->isDataType("**dyn"))) {
             continue;
         }
         // Don't skip NULL tokens, because this algorithm only prints dynamics
         // after the last layer, and there could be notes in earlier layer
         // that need the dynamic.
-        // if (line->token(i)->isNull()) {
+        // if (dyntok->isNull()) {
         //     continue;
         // }
 
         std::string tok = *line->token(i);
-        if (line->token(i)->getValueBool("auto", "DY", "processed")) {
+        if (dyntok->getValueBool("auto", "DY", "processed")) {
             return;
         }
-        line->token(i)->setValue("auto", "DY", "processed", "true");
+        dyntok->setValue("auto", "DY", "processed", "true");
 
-        // int pcount = line->token(i)->getLinkedParameterSetCount();
+        // int pcount = dyntok->getLinkedParameterSetCount();
 
         std::string hairpins;
         std::string letters;
@@ -10896,11 +10897,16 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             dynamic = "rfz";
         }
 
-        hum::HTp dyntok = line->token(i);
-
         if (!dynamic.empty()) {
 
             belowadj = 0;
+
+            std::string dyntext = getLayoutParameter(dyntok, "DY", "t", "", "");
+            if (!dyntext.empty()) {
+                hum::HumRegex hre;
+                hre.replaceDestructive(dyntext, dynamic, "%s", "g");
+                dynamic = dyntext;
+            }
 
             bool aboveQ = hasAboveParameter(dyntok, "DY");
             bool belowQ = hasBelowParameter(dyntok, "DY", belowadj);
