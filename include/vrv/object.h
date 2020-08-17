@@ -221,7 +221,7 @@ public:
      */
     virtual void CloneReset();
 
-    const std::string& GetUuid() const { return m_uuid; }
+    const std::string &GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);
     void SwapUuid(Object *other);
     void ResetUuid();
@@ -817,7 +817,7 @@ public:
      * Adjust the position of all floating positionners, staff by staff.
      */
     virtual int AdjustFloatingPositioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * Adjust the position of floating positionners placed between staves
      */

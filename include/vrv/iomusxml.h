@@ -189,7 +189,7 @@ private:
     void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, std::string measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, const std::string& measureNum, const int staffOffset);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset);
     void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
@@ -237,9 +237,9 @@ private:
      * @name Helper methods for checking presence of values of attributes or elements
      */
     ///@{
-    bool HasAttributeWithValue(const pugi::xml_node node, const std::string& attribute, const std::string& value) const;
+    bool HasAttributeWithValue(const pugi::xml_node node, const std::string &attribute, const std::string &value) const;
     bool IsElement(const pugi::xml_node node, const std::string &name) const;
-    bool HasContentWithValue(const pugi::xml_node node, const std::string& value) const;
+    bool HasContentWithValue(const pugi::xml_node node, const std::string &value) const;
     ///@}
 
     /*
@@ -254,7 +254,7 @@ private:
      */
     ///@{
     std::string GetContent(const pugi::xml_node node) const;
-    std::string GetContentOfChild(const pugi::xml_node node, const std::string& child) const;
+    std::string GetContentOfChild(const pugi::xml_node node, const std::string &child) const;
     ///@}
 
     /*

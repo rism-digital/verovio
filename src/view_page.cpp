@@ -1338,7 +1338,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
         }
 
         dc->EndCustomGraphic();
-    }  
+    }
 }
 
 //----------------------------------------------------------------------------

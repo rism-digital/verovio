@@ -106,7 +106,8 @@ bool MusicXmlInput::Import(std::string const &musicxml)
 //////////////////////////////////////////////////////////////////////////////
 // XML helpers
 
-bool MusicXmlInput::HasAttributeWithValue(const pugi::xml_node node, const std::string& attribute, const std::string& value) const
+bool MusicXmlInput::HasAttributeWithValue(
+    const pugi::xml_node node, const std::string &attribute, const std::string &value) const
 {
     assert(node);
 
@@ -116,7 +117,7 @@ bool MusicXmlInput::HasAttributeWithValue(const pugi::xml_node node, const std::
     return false;
 }
 
-bool MusicXmlInput::IsElement(const pugi::xml_node node, const std::string& name) const
+bool MusicXmlInput::IsElement(const pugi::xml_node node, const std::string &name) const
 {
     assert(node);
 
@@ -126,7 +127,7 @@ bool MusicXmlInput::IsElement(const pugi::xml_node node, const std::string& name
     return false;
 }
 
-bool MusicXmlInput::HasContentWithValue(const pugi::xml_node node, const std::string& value) const
+bool MusicXmlInput::HasContentWithValue(const pugi::xml_node node, const std::string &value) const
 {
     assert(node);
 
@@ -146,7 +147,7 @@ std::string MusicXmlInput::GetContent(const pugi::xml_node node) const
     return "";
 }
 
-std::string MusicXmlInput::GetContentOfChild(const pugi::xml_node node, const std::string& child) const
+std::string MusicXmlInput::GetContentOfChild(const pugi::xml_node node, const std::string &child) const
 {
     pugi::xpath_node childNode = node.select_node(child.c_str());
     if (childNode.node()) {
@@ -1656,7 +1657,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, s
 }
 
 void MusicXmlInput::ReadMusicXmlDirection(
-    pugi::xml_node node, Measure *measure, const std::string& measureNum, const int staffOffset)
+    pugi::xml_node node, Measure *measure, const std::string &measureNum, const int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -1669,8 +1670,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
     const pugi::xpath_node voice = node.select_node("voice");
-    if (voice)
-        m_prevLayer = SelectLayer(node, measure);
+    if (voice) m_prevLayer = SelectLayer(node, measure);
 
     const pugi::xml_node type = node.select_node("direction-type").node();
 
@@ -1851,8 +1851,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     // Dynamics
     if (containsDynamics) {
-        pugi::xpath_node_set dynamics = node.select_nodes(containsWords ?
-            "direction-type/dynamics|direction-type/words" : "direction-type/dynamics");
+        pugi::xpath_node_set dynamics = node.select_nodes(
+            containsWords ? "direction-type/dynamics|direction-type/words" : "direction-type/dynamics");
 
         dynamics.sort();
 
@@ -2135,8 +2135,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
     }
 
     // other cases
-    if (!containsWords && !containsDynamics && !coda && !bracket && !lead && !metronome && !segno
-        && !xmlShift && !xmlPedal && !wedge && !dashes && !rehearsal) {
+    if (!containsWords && !containsDynamics && !coda && !bracket && !lead && !metronome && !segno && !xmlShift
+        && !xmlPedal && !wedge && !dashes && !rehearsal) {
         LogWarning("MusicXML import: Unsupported direction-type '%s'", type.first_child().name());
     }
 }
