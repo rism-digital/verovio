@@ -781,6 +781,18 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int System::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
+{
+    AdjustFloatingPositionersBetweenParams *params = dynamic_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
+    assert(params);
+
+    params->m_previousStaffPositioners = NULL;
+    params->m_previousStaffAlignment = NULL;
+    m_systemAligner.Process(params->m_functor, params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int System::AdjustSlurs(FunctorParams *functorParams)
 {
     AdjustSlursParams *params = dynamic_cast<AdjustSlursParams *>(functorParams);

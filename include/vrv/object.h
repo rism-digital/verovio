@@ -814,9 +814,14 @@ public:
     ///@}
 
     /**
-     * Adjust the position of all floating positionner, staff by staff.
+     * Adjust the position of all floating positionners, staff by staff.
      */
     virtual int AdjustFloatingPositioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Adjust the position of floating positionners placed between staves
+     */
+    virtual int AdjustFloatingPositionersBetween(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner that are grouped, staff by staff.

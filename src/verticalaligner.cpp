@@ -441,6 +441,61 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
+{
+    AdjustFloatingPositionersBetweenParams *params = dynamic_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
+    assert(params);
+
+    //int staffSize = this->GetStaffSize();
+    
+    // First staff - nothing to do
+    if (params->m_previousStaffPositioners == NULL) {
+        params->m_previousStaffPositioners = &m_floatingPositioners;
+        params->m_previousStaffAlignment = this;
+        return FUNCTOR_SIBLINGS;
+    }
+    assert(params->m_previousStaffAlignment);
+    
+    int dist = params->m_previousStaffAlignment->GetYRel() - this->GetYRel();
+    dist -= params->m_previousStaffAlignment->m_staffHeight;
+    int centerYRel = dist / 2 + params->m_previousStaffAlignment->m_staffHeight;
+    
+    for (auto &positioner : *params->m_previousStaffPositioners) {
+        assert(positioner->GetObject());
+        if (!positioner->GetObject()->Is({ DIR, DYNAM, HAIRPIN, TEMPO })) continue;
+
+        if (positioner->GetDrawingPlace() != STAFFREL_between) continue;
+
+        // Skip if no content bounding box is available
+        if (!positioner->HasContentBB()) continue;
+        
+        positioner->SetDrawingYRel(centerYRel);
+        
+        /*
+
+        ArrayOfBoundingBoxes *overflowBoxes = &m_overflowAboveBBoxes;
+        auto i = overflowBoxes->begin();
+        auto end = overflowBoxes->end();
+        while (i != end) {
+            // find all the overflowing elements from the staff that overlap horizonatally
+            i = std::find_if(i, end, [positioner](BoundingBox *elem) { return positioner->HorizontalContentOverlap(elem); });
+            if (i != end) {
+                // update the yRel accordingly
+                //(*iter)->CalcDrawingYRel(params->m_doc, this, *i);
+                i++;
+            }
+        }
+        */
+    }
+
+    params->m_previousStaffPositioners = &m_floatingPositioners;
+    params->m_previousStaffAlignment = this;
+    
+    return FUNCTOR_SIBLINGS;
+    
+    
+}
+
 int StaffAlignment::AdjustFloatingPositionerGrps(FunctorParams *functorParams)
 {
     AdjustFloatingPositionerGrpsParams *params = dynamic_cast<AdjustFloatingPositionerGrpsParams *>(functorParams);

@@ -224,6 +224,30 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustFloatingPositionersBetweenParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 2: the doc
+ * member 3: a pointer to the functor for passing it to the system aligner
+ **/
+
+class AdjustFloatingPositionersBetweenParams : public FunctorParams {
+public:
+    AdjustFloatingPositionersBetweenParams(Doc *doc, Functor *functor)
+    {
+        m_previousStaffPositioners = NULL;
+        m_previousStaffAlignment = NULL;
+        m_doc = doc;
+        m_functor = functor;
+    }
+    ArrayOfFloatingPositioners *m_previousStaffPositioners;
+    StaffAlignment *m_previousStaffAlignment;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // AdjustFloatingPositionerGrpsParams
 //----------------------------------------------------------------------------
 
