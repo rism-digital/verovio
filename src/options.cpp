@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <fstream>
+#include <functional>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ std::map<int, std::string> Option::s_measureNumber
 std::map<int, std::string> Option::s_systemDivider
     = { { SYSTEMDIVIDER_none, "none" }, { SYSTEMDIVIDER_left, "left" }, { SYSTEMDIVIDER_left_right, "left-right" } };
 
-constexpr char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
+constexpr const char *engravingDefaults = "{'engravingDefaults':{'thinBarlineThickness':0.15,'lyricLineThickness':0.125,"
     "'slurMidpointThickness':0.3,'staffLineThickness':0.075,'stemThickness':0.1,'tieMidpointThickness':0.25,"
     "'hairpinThickness':0.1,'thickBarlineThickness':0.5,'tupletBracketThickness':0.1,'subBracketThickness':0.5,"
     "'bracketThickness':0.5}}";
@@ -1172,7 +1173,7 @@ void Options::sync()
             { "stemThickness", &m_stemWidth },
             { "tieMidpointThickness", &m_tieThickness } };
 
-    for (auto &const pair : engravingDefaults) {
+    for (const auto &pair : engravingDefaults) {
         if (pair.second->isSet()) {
             const std::string value = std::to_string(pair.second->GetValue() / 2.0);
             const bool success = m_engravingDefaults.UpdateNodeValue({ "engravingDefaults", pair.first }, value);
