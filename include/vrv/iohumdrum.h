@@ -142,6 +142,7 @@ namespace humaux {
         bool force;
         hum::HTp token;
         hum::HumNum duration;
+        hum::HumNum durationnodots;
 
         HumdrumBeamAndTuplet() { clear(); }
         ~HumdrumBeamAndTuplet() { clear(); }
@@ -155,6 +156,8 @@ namespace humaux {
             gbeamstart = gbeamend = 0;
             force = false;
             priority = ' ';
+            duration = 0;
+            durationnodots = 0;
             token = NULL;
         }
     };

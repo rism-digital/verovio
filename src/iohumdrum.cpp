@@ -13893,7 +13893,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         return;
     }
 
-    // durationswithdots == full duration of the note/rest including augmentation dots.
+    // durationwithdots == full duration of the note/rest including augmentation dots.
     std::vector<hum::HumNum> durationwithdots(duritems.size());
 
     // dursum = a cumulative sum of the full durs, starting at 0 for
@@ -14195,6 +14195,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (indexmapping2[i] < 0) {
             // this is a non-durational layer item or a non-tuplet note.
             tgs.at(i).duration = 0;
+            tgs.at(i).durationnodots = 0;
             tgs.at(i).group = -1;
             tgs.at(i).bracket = -1;
             tgs.at(i).num = -1;
@@ -14212,6 +14213,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         else {
             // this is a tuplet note (with duration)
             tgs.at(i).duration = layerdata[i]->getDuration();
+            tgs.at(i).durationnodots = layerdata[i]->getDurationNoDots();
             tgs.at(i).group = tupletgroups.at(indexmapping2.at(i));
             tgs.at(i).bracket = tupletbracket.at(indexmapping2.at(i));
             tgs.at(i).num = tuptop.at(indexmapping2.at(i));
@@ -14310,7 +14312,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
 
     std::map<hum::HumNum, int> durcounts;
     for (int i = 0; i < (int)tggroup.size(); i++) {
-        durcounts[tggroup[i]->duration]++;
+        durcounts[tggroup[i]->durationnodots]++;
     }
 
     // All durations are the same, so set the scale to the multiple of how
@@ -14343,6 +14345,7 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
         }
     }
 
+    /*
     // Use the most common duration for the tuplet scaling:
     // (this could be refined for dotted durations)
     hum::HumNum maxcountdur = 0;
@@ -14353,13 +14356,13 @@ void HumdrumInput::assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAnd
             maxcountdur = it.first;
         }
     }
+    */
 
     // Select the longest duration if there is a tie.
+    hum::HumNum maxcountdur = 0;
     for (auto it : durcounts) {
-        if (it.second == maxcount) {
-            if (it.first > maxcountdur) {
-                maxcountdur = it.first;
-            }
+        if (it.first > maxcountdur) {
+            maxcountdur = it.first;
         }
     }
 
