@@ -5531,8 +5531,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     lt.clear();
     lt.resize(staffstarts.size());
 
-    int i, j;
-    for (i = 0; i < (int)staffstarts.size(); ++i) {
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
         lt[i].clear();
     }
 
@@ -5540,12 +5539,51 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     int track = -1;
     int staffindex = -1;
     int layerindex = 0;
-    for (i = startline; i <= endline; ++i) {
+
+    // First need to pre-allocate layer information so that clefs can
+    // be inserted into partial layers (which otherwise may not have
+    // been created before the clef needs to be inserted).
+
+    for (int i = startline; i <= endline; ++i) {
+        if ((i > startline) || (i < endline)) {
+            if (infile[i].isData() && infile[i - 1].isData()) {
+                // spining cannot change between data lines
+                // so do not bother to check.
+                continue;
+            }
+        }
+        // check for the maximum size of each spine (check staff
+        // for maximum layer count):
+        lasttrack = -1;
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            hum::HTp token = infile[i].token(j);
+            if (!token->isStaff()) {
+                continue;
+            }
+            track = token->getTrack();
+            if (track != lasttrack) {
+                layerindex = 0;
+            }
+            else {
+                layerindex++;
+            }
+            if (track != lasttrack) {
+                lasttrack = track;
+                continue;
+            }
+            staffindex = rkern[track];
+            if ((int)lt[staffindex].size() < layerindex + 1) {
+                lt[staffindex].resize(lt[staffindex].size() + 1);
+            }
+        }
+    }
+
+    for (int i = startline; i <= endline; ++i) {
         if (!infile[i].hasSpines()) {
             continue;
         }
         lasttrack = -1;
-        for (j = 0; j < infile[i].getFieldCount(); ++j) {
+        for (int j = 0; j < infile[i].getFieldCount(); ++j) {
             hum::HTp token = infile[i].token(j);
             track = token->getTrack();
             if (track < 1) {
@@ -5586,10 +5624,15 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 }
             }
             lt[staffindex][layerindex].push_back(token);
+
             if ((layerindex == 0) && (token->isClef())) {
+
+                int layercount = getCurrentLayerCount(token);
+
                 // Duplicate clef in all layers (needed for cases when
                 // a secondary layer ends before the end of a measure.
-                for (int k = 1; k < (int)lt[staffindex].size(); k++) {
+
+                for (int k = layercount; k < (int)lt[staffindex].size(); k++) {
                     lt[staffindex][k].push_back(token);
                 }
             }
@@ -5599,6 +5642,29 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     if (m_debug) {
         printMeasureTokens();
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getCurrentLayerCount -- Given a token in layer 1
+//    of a staff, count how many active layers there are at the
+//    same time.
+//
+
+int HumdrumInput::getCurrentLayerCount(hum::HTp token)
+{
+    int output = 1;
+    int ttrack = token->getTrack();
+    hum::HTp current = token->getNextFieldToken();
+    while (current) {
+        int track = current->getTrack();
+        if (track != ttrack) {
+            break;
+        }
+        output++;
+        current = current->getNextFieldToken();
+    }
+    return output;
 }
 
 //////////////////////////////

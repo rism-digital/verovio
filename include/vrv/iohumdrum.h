@@ -643,6 +643,7 @@ protected:
     void analyzeClefNulls(hum::HumdrumFile &infile);
     void markAdjacentNullsWithClef(hum::HTp clef);
     void markOtherClefsAsChange(hum::HTp clef);
+    int getCurrentLayerCount(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
