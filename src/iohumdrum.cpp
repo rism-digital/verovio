@@ -14141,6 +14141,11 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         hum::HumNum value = dotlessdur[i] / nextpowoftwo;
         tuptop[i] = value.getDenominator();
         tupbot[i] = value.getNumerator();
+
+        // Reference tuplet breve to breve rather than whole.
+        if ((dotlessdur[i].getNumerator() == 4) && (dotlessdur[i].getDenominator() == 3)) {
+            tupbot[i] = 2;
+        }
     }
 
     // adjust tupletgroups based on tuptop and tupbot changes
