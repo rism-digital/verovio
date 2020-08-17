@@ -71,7 +71,7 @@ enum option_SYSTEMDIVIDER { SYSTEMDIVIDER_none = 0, SYSTEMDIVIDER_left, SYSTEMDI
 class Option {
 public:
     // constructors and destructors
-    Option() {}
+    Option() : m_isSet(false) {}
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
 
@@ -89,6 +89,8 @@ public:
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
 
+    bool isSet() const { return m_isSet; }
+
 public:
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
@@ -102,6 +104,7 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
+    bool m_isSet;
 
 private:
     std::string m_key;
@@ -392,20 +395,25 @@ private:
  */
 
 class OptionJson : public Option {
-    using JsonMap = std::map<std::string, jsonxx::Value*>;
+    using JsonMap = std::map<std::string, jsonxx::Value *>;
+    using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
+
 public:
     //
     OptionJson() = default;
     virtual ~OptionJson() = default;
-    virtual void Init(const std::string &defaultValue, const std::string& defaultJsonNode);
+    virtual void Init(const std::string &defaultValue, const std::string &defaultJsonNode);
 
     virtual bool SetValue(const std::string &jsonFilePath);
     //virtual std::string GetStrValue() const;
 
-    int GetIntValue(const std::vector<std::string>& jsonNodePath, bool getDefault = false) const;
+    int GetIntValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     double GetDoubleValue(const std::vector<std::string> &jsonNodePath, bool getDefault = false) const;
     //
-public:
+    bool UpdateNodeValue(const std::vector<std::string> &jsonNodePath, const std::string &value);
+    //
+protected:
+    JsonPath StringPath2NodePath(const jsonxx::Object &obj, const std::vector<std::string> &jsonNodePath) const;
     //
 private:
     jsonxx::Object m_values;
