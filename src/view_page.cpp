@@ -556,9 +556,9 @@ void View::DrawBracketsq(DeviceContext *dc, int x, int y1, int y2, int staffSize
 
     dc->StartCustomGraphic("grpSym");
 
-    DrawFilledRectangle(dc, x - 3 * offset, y1 + offset, x + 3 * offset, y2 - offset);
-    DrawFilledRectangle(dc, x, y1 + offset, x + bracketWidth, y1 - offset);
-    DrawFilledRectangle(dc, x, y2 + offset, x + bracketWidth, y2 - offset);
+    DrawFilledRectangle(dc, x, y1 + offset, x - bracketWidth, y2 - offset); // left
+    DrawFilledRectangle(dc, x, y1 + offset, x + bracketWidth, y1 - offset); // top
+    DrawFilledRectangle(dc, x, y2 + offset, x + bracketWidth, y2 - offset); // bottom
 
     dc->EndCustomGraphic();
 
