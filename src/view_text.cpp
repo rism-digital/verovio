@@ -16,7 +16,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "atts_externalsymbols.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "dynam.h"
@@ -423,45 +422,4 @@ void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
 
     dc->EndGraphic(svg, this);
 }
-
-void View::DrawExternalSymbol(DeviceContext *dc, Object *object, TextDrawingParams &params)
-{
-    assert(dc);
-    assert(object);
-
-    // Get external symbol that we're going to draw
-    auto *extSym = dynamic_cast<AttExtSym *>(object);
-    assert(extSym);
-
-    std::wstring glyph = { extSym->GetGlyphNum() };
-
-    // Set glyph, fontname and style needed to draw
-    Text *text = new Text();
-    text->SetText(glyph);
-    Rend *rend = new Rend();
-    rend->SetFontname(m_doc->GetOptions()->m_font.GetStrValue());
-    rend->SetFontstyle(FONTSTYLE_normal);
-    rend->SetHalign(HORIZONTALALIGNMENT_center);
-    rend->AddChild(text);
-    rend->SetParent(object);
-
-    FontInfo dirTxt;
-    if (!dc->UseGlobalStyling()) {
-        dirTxt.SetFaceName("Times");
-        dirTxt.SetStyle(FONTSTYLE_italic);
-    }
-    dirTxt.SetPointSize(params.m_pointSize);
-    // Draw a rend with all parameters that were set
-    // This will allow to draw a glyph if it's present in the font
-    dc->SetBrush(m_currentColour, AxSOLID);
-    dc->SetFont(&dirTxt);
-
-    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
-    DrawRend(dc, rend, params);
-    dc->EndText();
-
-    dc->ResetFont();
-    dc->ResetBrush();
-}
-
 } // namespace vrv

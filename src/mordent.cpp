@@ -56,6 +56,12 @@ void Mordent::Reset()
 
 wchar_t Mordent::GetMordentGlyph() const
 {
+    // If there is glyph.num, prioritize it, otherwise check other attributes
+    if (HasGlyphNum()) {
+        wchar_t code = GetGlyphNum();
+        if (NULL != Resources::GetGlyph(code)) return code;
+    }
+
     // Handle glyph based on other attributes
     if (GetLong() == BOOLEAN_true) {
         // We need ornamentTremblementInverted, so for the time being return same result here
