@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Aug 12 01:48:44 PDT 2020
+// Last Modified: Sun Aug 16 15:38:03 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -69411,6 +69411,7 @@ Tool_msearch::Tool_msearch(void) {
 	define("i|interval=s:2222",     "interval query string");
 	define("r|d|rhythm|duration=s:44444", "rhythm query string");
 	define("t|text=s:",             "lyrical text query string");
+	define("O|no-overlap=b",        "do not allow matches to overlap");
 	define("x|cross=b",             "search across parts");
 	define("c|color=s",             "highlight color");
 	define("m|mark|marker=s:@",     "marking character");
@@ -69460,6 +69461,7 @@ bool Tool_msearch::run(HumdrumFile& infile, ostream& out) {
 bool Tool_msearch::run(HumdrumFile& infile) {
 	m_debugQ = getBoolean("debug");
 	m_quietQ = getBoolean("quiet");
+	m_nooverlapQ = getBoolean("no-overlap");
 	NoteGrid grid(infile);
 	if (m_debugQ) {
 		grid.printGridInfo(cerr);
@@ -69919,125 +69921,189 @@ void Tool_msearch::markTextMatch(HumdrumFile& infile, TextInfo& word) {
 
 //////////////////////////////
 //
-// Tool_msearch::checkForMatchDiatonicPC --
+// Tool_msearch::checkForMatchDiatonicPC -- See if the given position
+//    in the music matches the query.
 //
 
 bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
-		vector<MSearchQueryToken>& dpcQuery, vector<NoteCell*>& match) {
+		vector<MSearchQueryToken>& query, vector<NoteCell*>& match) {
+
 	match.clear();
 	int maxi = (int)notes.size() - index;
-	if ((int)dpcQuery.size() > maxi) {
+	if ((int)query.size() > maxi) {
+		// Search would extend off of the end of the music, so cannot be a match.
 		return false;
 	}
-	bool lastIsInterval = false;
-	int interval;
-	bool rhymatch;
+
 	int c = 0;
-	for (int i=0; i<(int)dpcQuery.size(); i++) {
-		if (dpcQuery[i].anything) {
-			match.push_back(notes[index+i-c]);
+
+	for (int i=0; i<(int)query.size(); i++) {
+
+		int currindex = index + i - c;
+		int lastindex = index + i -c - 1;
+		int nextindex = index + i -c + 1;
+		if (nextindex >= (int)notes.size()) {
+			nextindex = -1;
+		}
+
+		if (currindex < 0) {
+			cerr << "STRANGE NEGATIVE INDEX " << currindex << endl;
+			break;
+		}
+
+		// If the query item can be anything, it automatically matches:
+		if (query[i].anything) {
+			match.push_back(notes[currindex]);
 			continue;
 		}
-		rhymatch = true;
-		if ((!dpcQuery[i].rhythm.empty())
-				&& (notes[index+i-c]->getDuration() != dpcQuery[i].duration)) {
-			// duration needs to match query, but does not
-			rhymatch = false;
-		}
 
-		
-		// check for gross-contour queries:
-		if (dpcQuery[i].base <= 0) {
-			lastIsInterval = true;
-			// Search by gross contour
-			int lastindex = index+i-1-c;
-			if ((dpcQuery[i].direction == 1) && (notes[index+i-c]->getAbsMidiPitch() >
-					notes[index+i-1-c]->getAbsMidiPitch())) {
-				match.push_back(notes[index+i-c]);
-				continue;
-			} else if ((lastindex >= 0) && (dpcQuery[i].direction == -1) && (notes[index+i-c]->getAbsMidiPitch() <
-					notes[lastindex]->getAbsMidiPitch())) {
-				match.push_back(notes[index+i-c]);
-				continue;
-			} else if ((lastindex >= 0) && (dpcQuery[i].direction == 0) && (notes[index+i-c]->getAbsMidiPitch() ==
-					notes[lastindex]->getAbsMidiPitch())) {
-				match.push_back(notes[index+i-c]);
-				continue;
-			} else {
+		//////////////////////////////
+		//
+		// RHYTHM
+		//
+
+		if (!query[i].anyrhythm) {
+			if (notes[currindex]->getDuration() != query[i].duration) {
 				match.clear();
 				return false;
 			}
 		}
 
-		// Interface between interval moving to pitch:
-		if (lastIsInterval) {
-			c++;
-			match.pop_back();
-			lastIsInterval = false;
-		}
+		//////////////////////////////
+		//
+		// INTERVAL
+		//
 
-		int lastindex = index+i-1-c;
+		if (!query[i].anyinterval) {
+			double currpitch;
+			double nextpitch;
+			double lastpitch;
 
-		// Search by pitch/rest
-		if (dpcQuery[i].base == 40) {
-			if ((Convert::isNaN(notes[index+i-c]->getAbsBase40PitchClass()) &&
-					Convert::isNaN(dpcQuery[i].pc)) ||
-					(notes[index+i-c]->getAbsBase40PitchClass() == dpcQuery[i].pc)) {
-				if ((lastindex >= 0) && (index+i-c>0) && dpcQuery[i].direction) {
-					interval = (int)(notes[index+i-c]->getAbsBase40Pitch() -
-							notes[lastindex]->getAbsBase40Pitch());
-					if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
-						match.clear();
-						return false;
-					}
-					if ((dpcQuery[i].direction < 0) && (interval >= 0)) {
-						match.clear();
-						return false;
-					}
-				}
-				if (rhymatch) {
-					match.push_back(notes[index+i-c]);
+			currpitch = notes[currindex]->getAbsMidiPitch();
+
+			if (nextindex >= 0) {
+				nextpitch = notes[nextindex]->getAbsMidiPitch();
+			} else {
+				nextpitch = -123456789.0;
+			}
+
+			if (lastindex >= 0) {
+				lastpitch = notes[nextindex]->getAbsMidiPitch();
+			} else {
+				lastpitch = -987654321.0;
+			}
+
+			if (query[i].anypitch) {
+				// search forward interval
+				if (nextindex < 0) {
+					// Match can not go off the edge of the music.
+					match.clear();
+					return false;
 				} else {
-					match.clear();
-					return false;
-				}
-			} else {
-				// not a match
-				match.clear();
-				return false;
-			}
-		} else if ((Convert::isNaN(notes[index+i-c]->getAbsDiatonicPitchClass()) &&
-				Convert::isNaN(dpcQuery[i].pc)) ||
-				(notes[index+i-c]->getAbsDiatonicPitchClass() == dpcQuery[i].pc)) {
-			if ((lastindex >= 0) && (index+i-c>0) && dpcQuery[i].direction) {
-				interval = (int)(notes[index+i-c]->getAbsBase40Pitch() -
-						notes[lastindex]->getAbsBase40Pitch());
-				if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
-					match.clear();
-					return false;
-				}
-				if ((dpcQuery[i].direction < 0) && (interval >= 0)) {
-					match.clear();
-					return false;
-				}
-			}
-			if (rhymatch) {
-				match.push_back(notes[index+i-c]);
-			} else {
-				match.clear();
-				return false;
-			}
+					// check here if either note is a rest
+					if (notes[currindex]->isRest() || notes[nextindex]->isRest()) {
+						match.clear();
+						return false;
+					}
 
-		} else {
-			// not a match
-			match.clear();
-			return false;
+					if (query[i].direction > 0) {
+						if (nextpitch - currpitch <= 0.0) {
+							match.clear();
+							return false;
+						}
+					} if (query[i].direction < 0) {
+						if (nextpitch - currpitch >= 0.0) {
+							match.clear();
+							return false;
+						}
+					} else if (query[i].direction == 0.0) {
+						if (nextpitch - currpitch != 0) {
+							match.clear();
+							return false;
+						}
+					}
+				}
+			} else {
+				// search backward interval
+				if (lastindex < 0) {
+					// Match can not go off the edge of the music.
+					match.clear();
+					return false;
+				} else {
+					// check here if either note is a rest.
+					if (notes[currindex]->isRest() || notes[nextindex]->isRest()) {
+						match.clear();
+						return false;
+					}
+
+					if (query[i].direction > 0) {
+						if (lastpitch - currpitch <= 0.0) {
+							match.clear();
+							return false;
+						}
+					} if (query[i].direction < 0) {
+						if (lastpitch - currpitch >= 0.0) {
+							match.clear();
+							return false;
+						}
+					} else if (query[i].direction == 0.0) {
+						if (lastpitch - currpitch != 0) {
+							match.clear();
+							return false;
+						}
+					}
+				}
+			}
 		}
-	}
 
+		//////////////////////////////
+		//
+		// INTERVAL
+		//
+			
+		if (!query[i].anypitch) {
+			double qpitch = query[i].pc;
+			double npitch = 0;
+			if (notes[currindex]->isRest()) {
+				if (Convert::isNaN(qpitch)) {
+					// both notes are rests, so they match
+					match.push_back(notes[currindex]);
+					continue;
+				} else {
+					// query is not a rest but test note is
+					match.clear();
+					return false;
+				}
+			} else if (Convert::isNaN(qpitch)) {
+				// query is a rest but test note is not
+				match.clear();
+				return false;
+			}
+
+			if (query[i].base == 40) {
+				npitch = notes[currindex]->getAbsBase40PitchClass();
+			} else if (query[i].base == 12) {
+				npitch = ((int)notes[currindex]->getAbsMidiPitch()) % 12;
+			} else if (query[i].base == 7) {
+				npitch = ((int)notes[currindex]->getAbsDiatonicPitch()) % 7;
+			} else {
+				npitch = notes[currindex]->getAbsBase40PitchClass();
+			}
+
+			if (qpitch != npitch) {
+				match.clear();
+				return false;
+			}
+		}
+
+		// All requirements for the note were matched, so store note
+		// and continue to next note if needed.
+		match.push_back(notes[currindex]);
+	}
+	
 	// Add extra token for marking tied notes at end of match
-	if (index + (int)dpcQuery.size() < (int)notes.size()) {
-		match.push_back(notes[index + (int)dpcQuery.size() - c]);
+	if (index + (int)query.size() < (int)notes.size()) {
+		match.push_back(notes[index + (int)query.size() - c]);
 	} else {
 		match.push_back(NULL);
 	}
@@ -70132,7 +70198,7 @@ void Tool_msearch::fillMusicQuery(vector<MSearchQueryToken>& query) {
 //
 
 void Tool_msearch::fillMusicQueryPitch(vector<MSearchQueryToken>& query,
-		const string& input) { 
+		const string& input) {
 	fillMusicQueryInterleaved(query, input);
 }
 
@@ -70156,7 +70222,10 @@ void Tool_msearch::fillMusicQueryRhythm(vector<MSearchQueryToken>& query,
 //
 
 void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
-		const string& input) { 
+		const string& input) {
+
+
+
 }
 
 
@@ -70168,19 +70237,23 @@ void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 
 void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 		const string& input, bool rhythmQ) {
+
 	char ch;
 	int counter = 0;
 	MSearchQueryToken temp;
 	MSearchQueryToken *active = &temp;
+
 	if (query.size() > 0) {
 		active = &query.at(counter);
 	} else {
+		// what is this for?
 	}
 
 	for (int i=0; i<(int)input.size(); i++) {
 		ch = tolower(input[i]);
 
 		if (ch == ' ') {
+			// skip over multiple spaces
 			if (i > 0) {
             if (input[i-1] == ' ') {
 					continue;
@@ -70189,15 +70262,22 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 		}
 
 		if (ch == '^') {
-			active->direction = 1;
-			continue;
-		}
-		if (ch == 'v') {
+			active->anything = false;
+			active->anyinterval = false;
 			active->direction = -1;
 			continue;
 		}
+		if (ch == 'v') {
+			active->anything = false;
+			active->anyinterval = false;
+			active->direction = 1;
+			continue;
+		}
 
+		// process rhythm.  This must go first then intervals then pitches
 		if (isdigit(ch) || (ch == '.')) {
+			active->anything = false;
+			active->anyrhythm = false;
 			active->rhythm += ch;
 			if (i < (int)input.size() - 1) {
 				if (input[i+1] == ' ') {
@@ -70215,7 +70295,6 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 				}
 			} else {
 				// this is the last charcter in the input string
-				cerr << "LAST CHARACTER IN THE INPUT STRING" << endl;
 				if (active == &temp) {
 						query.push_back(temp);
 						temp.clear();
@@ -70229,10 +70308,14 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 			}
 		}
 
+		// check for intervals.  Intervals will trigger a
+		// new element in the query list
+		// A new type ^ or v will not increment the query list
+		// (and they will expect a pitch after them).
 		if (ch == '/') {
+			active->anything = false;
+			active->anyinterval = false;
 			active->direction = 1;
-			active->base = -1;
-			active->pc = -1;
 			if (active == &temp) {
 				query.push_back(temp);
 				temp.clear();
@@ -70245,9 +70328,9 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 			}
 			continue;
 		} else if (ch == '\\') {
+			active->anything = false;
+			active->anyinterval = false;
 			active->direction = -1;
-			active->base = -1;
-			active->pc = -1;
 			if (active == &temp) {
 				query.push_back(temp);
 				temp.clear();
@@ -70260,9 +70343,9 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 			}
 			continue;
 		} else if (ch == '=') {
+			active->anything = false;
+			active->anyinterval = false;
 			active->direction = 0;
-			active->base = -1;
-			active->pc = -1;
 			if (active == &temp) {
 				query.push_back(temp);
 				temp.clear();
@@ -70276,7 +70359,11 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 			continue;
 		}
 
+
+		// check for actual pitches
 		if ((ch >= 'a' && ch <= 'g')) {
+			active->anything = false;
+			active->anypitch = false;
 			active->base = 7;
 			active->pc = (ch - 'a' + 5) % 7;
 			if (active == &temp) {
@@ -70291,6 +70378,8 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 			}
 			continue;
 		} else if (ch == 'r') {
+			active->anything = false;
+			active->anypitch = false;
 			active->base = 7;
 			active->pc = GRIDREST;
 			if (active == &temp) {
@@ -70320,21 +70409,18 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 		// deal with double sharps and double flats here
 	}
 
-	if (rhythmQ) {
-		for (int i=0; i<(int)query.size(); i++) {
-			query[i].anypitch = true;
-		}
-	}
-
 	// Convert rhythms to durations
 	for (int i=0; i<(int)query.size(); i++) {
+		if (query[i].anyrhythm) {
+			continue;
+		}
 		if (query[i].rhythm.empty()) {
 			continue;
 		}
 		query[i].duration = Convert::recipToDuration(query[i].rhythm);
 	}
 
-	// what is this for?:
+	// what is this for (end condition)?
 	//if ((!query.empty()) && (query[0].base <= 0)) {
 	//	temp.clear();
 	//	temp.anything = true;
@@ -70349,14 +70435,16 @@ void Tool_msearch::fillMusicQueryInterleaved(vector<MSearchQueryToken>& query,
 //
 
 ostream& operator<<(ostream& out, MSearchQueryToken& item) {
-	out << "ITEM: "         << endl;
-	out << "\tPC:\t\t"      << item.pc        << endl;
-	out << "\tBASE:\t\t"    << item.base      << endl;
-	out << "\tDIRECTION:\t" << item.direction << endl;
-	out << "\tDURATION:\t"  << item.duration  << endl;
-	out << "\tRHYTHM:\t\t"  << item.rhythm    << endl;
-	out << "\tANYTHING:\t"  << item.anything  << endl;
-	out << "\tANYPITCH:\t"  << item.anypitch  << endl;
+	out << "ITEM: "           << endl;
+	out << "\tANYTHING:\t"    << item.anything    << endl;
+	out << "\tANYPITCH:\t"    << item.anypitch    << endl;
+	out << "\tANYINTERVAL:\t" << item.anyinterval << endl;
+	out << "\tANYRHYTHM:\t"   << item.anyrhythm   << endl;
+	out << "\tPC:\t\t"        << item.pc          << endl;
+	out << "\tBASE:\t\t"      << item.base        << endl;
+	out << "\tDIRECTION:\t"   << item.direction   << endl;
+	out << "\tRHYTHM:\t\t"    << item.rhythm      << endl;
+	out << "\tDURATION:\t"    << item.duration    << endl;
 	return out;
 }
 
