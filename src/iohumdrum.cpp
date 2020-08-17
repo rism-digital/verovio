@@ -604,6 +604,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeRScale();
     infile.analyzeCrossStaffStemDirections();
     infile.analyzeBarlines();
+    analyzeClefNulls(infile);
     if (infile.hasDifferentBarlines()) {
         adjustMeasureTimings(infile);
     }
@@ -4105,6 +4106,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
                 else {
                     // mark clef as a clef change to print in the layer
                     part->setValue("auto", "clefChange", 1);
+                    markOtherClefsAsChange(part);
                 }
                 part = part->getNextToken();
                 continue;
@@ -7804,7 +7806,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             addSpace(elements, pointers, prespace.at(i));
         }
         if (layerdata[i]->isData() && layerdata[i]->isNull()) {
-            // print any global text directions attacked to the null token
+            // print any global text directions attached to the null token
             // and then skip to next token.
             processDirections(layerdata[i], staffindex);
             continue;
@@ -7864,11 +7866,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     if (subtrack) {
                         subtrack--;
                     }
-                    if (subtrack) {
-                        // ignore clef changes in subtracks and only
-                        // use the one in the primary track
-                        continue;
-                    }
+
+                    // this code is no longer needed, since it can ignore
+                    // clef changes in partial layers.
+                    // if (subtrack) {
+                    //		cerr << "IGNORING CLEF IN SUBTRACK " << subtrack << endl;
+                    //     // ignore clef changes in subtracks and only
+                    //    // use the one in the primary track
+                    //   continue;
+                    // }
+
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
 
                     setLocationId(clef, layerdata[i]);
@@ -15557,6 +15564,17 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
         if (layerdata.at(i)->isData()) {
             dataindex.push_back(i);
         }
+        else if (layerdata.at(i)->isInterpretation()) {
+            if (layerdata.at(i)->isClef()) {
+                dataindex.push_back(i);
+            }
+            else if (*layerdata.at(i) == "*") {
+                std::string ctext = layerdata.at(i)->getValue("auto", "clef");
+                if (ctext.compare(0, 5, "*clef") == 0) {
+                    dataindex.push_back(i);
+                }
+            }
+        }
     }
 
     std::vector<hum::HumNum> startdur(dataindex.size(), 0);
@@ -20719,6 +20737,105 @@ void HumdrumInput::hideBarlinesInTiedGroup(hum::HTp startnote)
             break;
         }
         current = current->getNextToken();
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeClefNulls -- Mark all null interpretations
+//    that are in the same track as a clef interpretation.
+//
+
+void HumdrumInput::analyzeClefNulls(hum::HumdrumFile &infile)
+{
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isInterpretation()) {
+            continue;
+        }
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            hum::HTp token = infile[i].token(j);
+            if (!token->isKern()) {
+                continue;
+            }
+            if (!token->isClef()) {
+                continue;
+            }
+            markAdjacentNullsWithClef(token);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::markAdjacentNullsWithClef -- Input is a clef token,
+//     and all null interpretations in the same spine will be marked
+//     as being the same clef, since verovio/MEI requires clef changes
+//     to be present in all layers.
+//
+
+void HumdrumInput::markAdjacentNullsWithClef(hum::HTp clef)
+{
+    int ctrack = clef->getTrack();
+    int track;
+
+    hum::HTp current = clef->getNextFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        if (*current == "*") {
+            current->setValue("auto", "clef", *clef);
+        }
+        current = current->getNextFieldToken();
+    }
+
+    current = clef->getPreviousFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        if (*current == "*") {
+            current->setValue("auto", "clef", *clef);
+        }
+        current = current->getPreviousFieldToken();
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::markOtherClefsAsChange -- There is a case
+//     where spine splits at the start of the music miss a clef
+//     change that needs to be added to a secondary layer.  This
+//     function will mark the secondary clefs so that they will
+//     be converted as clef changes.
+//
+
+void HumdrumInput::markOtherClefsAsChange(hum::HTp clef)
+{
+
+    int ctrack = clef->getTrack();
+    int track;
+
+    hum::HTp current = clef->getNextFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        current->setValue("auto", "clefChange", 1);
+        current = current->getNextFieldToken();
+    }
+
+    current = clef->getPreviousFieldToken();
+    while (current) {
+        track = current->getTrack();
+        if (track != ctrack) {
+            break;
+        }
+        current->setValue("auto", "clefChange", 1);
+        current = current->getPreviousFieldToken();
     }
 }
 

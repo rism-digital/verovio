@@ -640,6 +640,9 @@ protected:
     void assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &catkey,
         const string &trueString, const string &falseString = "");
+    void analyzeClefNulls(hum::HumdrumFile &infile);
+    void markAdjacentNullsWithClef(hum::HTp clef);
+    void markOtherClefsAsChange(hum::HTp clef);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
