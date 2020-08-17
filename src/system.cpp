@@ -783,7 +783,8 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 
 int System::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
 {
-    AdjustFloatingPositionersBetweenParams *params = dynamic_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
+    AdjustFloatingPositionersBetweenParams *params
+        = dynamic_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
     assert(params);
 
     params->m_previousStaffPositioners = NULL;

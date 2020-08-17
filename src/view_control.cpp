@@ -531,8 +531,10 @@ void View::DrawHairpin(
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
-    // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
-    int y1 = hairpin->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int y1 = hairpin->GetDrawingY();
+    if (hairpin->GetPlace() != STAFFREL_between) {
+        y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
     int y2 = y1;
 
     /************** start / end opening **************/
@@ -1454,6 +1456,10 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
         dirTxt.SetPointSize(params.m_pointSize);
 
+        if (dir->GetPlace() == STAFFREL_between) {
+            params.m_y -= m_doc->GetTextXHeight(&dirTxt, false) / 2;
+        }
+
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
@@ -1515,6 +1521,10 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
         dynamTxt.SetPointSize(params.m_pointSize);
+
+        if (dynam->GetPlace() == STAFFREL_between) {
+            params.m_y -= m_doc->GetTextXHeight(&dynamTxt, false) / 2;
+        }
 
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
@@ -2122,6 +2132,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
         tempoTxt.SetPointSize(params.m_pointSize);
+
+        if (tempo->GetPlace() == STAFFREL_between) {
+            params.m_y -= m_doc->GetTextXHeight(&tempoTxt, false) / 2;
+        }
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);

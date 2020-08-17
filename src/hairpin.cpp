@@ -89,7 +89,6 @@ int Hairpin::CalcHeight(
         assert(left);
         // Take into account its length only if the left one is actually a <
         if (left->GetForm() == hairpinLog_FORM_cres) {
-            ;
             length = std::max(length, left->GetDrawingLength());
         }
     }

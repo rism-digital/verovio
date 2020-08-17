@@ -442,10 +442,11 @@ void Page::LayOutVertically()
     Functor adjustYPos(&Object::AdjustYPos);
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
-    
+
     // Adjust the positioners of floationg elements placed between staves
     Functor adjustFloatingPositionersBetween(&Object::AdjustFloatingPositionersBetween);
-    AdjustFloatingPositionersBetweenParams adjustFloatingPositionersBetweenParams(doc, &adjustFloatingPositionersBetween);
+    AdjustFloatingPositionersBetweenParams adjustFloatingPositionersBetweenParams(
+        doc, &adjustFloatingPositionersBetween);
     this->Process(&adjustFloatingPositionersBetween, &adjustFloatingPositionersBetweenParams);
 
     Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
