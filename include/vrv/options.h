@@ -395,14 +395,13 @@ private:
  */
 
 class OptionJson : public Option {
-    using JsonMap = std::map<std::string, jsonxx::Value *>;
     using JsonPath = std::vector<std::reference_wrapper<jsonxx::Value> >;
 
 public:
     //
     OptionJson() = default;
     virtual ~OptionJson() = default;
-    virtual void Init(const std::string &defaultValue, const std::string &defaultJsonNode);
+    virtual void Init(const std::string &defaultValue);
 
     virtual bool SetValue(const std::string &jsonFilePath);
     //virtual std::string GetStrValue() const;
