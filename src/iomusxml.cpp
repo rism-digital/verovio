@@ -2375,8 +2375,10 @@ void MusicXmlInput::ReadMusicXmlNote(
     if (tremolo) {
         if (HasAttributeWithValue(tremolo.node(), "type", "start")) {
             FTrem *fTrem = new FTrem();
-            AddLayerElement(layer, fTrem);
-            m_elementStackMap.at(layer).push_back(fTrem);
+            if (!isChord) {
+                AddLayerElement(layer, fTrem);
+                m_elementStackMap.at(layer).push_back(fTrem);
+            }
             int beamFloatNum = tremolo.node().text().as_int(); // number of floating beams
             int beamAttachedNum = 0; // number of attached beams
             while (beamStart && beamAttachedNum < 8) { // count number of (attached) beams, max 8
@@ -2390,8 +2392,10 @@ void MusicXmlInput::ReadMusicXmlNote(
         else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
             // this is default tremolo type in MusicXML
             BTrem *bTrem = new BTrem();
-            AddLayerElement(layer, bTrem);
-            m_elementStackMap.at(layer).push_back(bTrem);
+            if (!isChord) {
+                AddLayerElement(layer, bTrem);
+                m_elementStackMap.at(layer).push_back(bTrem);
+            }
             tremSlashNum = tremolo.node().text().as_int();
             // if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) bTrem->SetForm(bTremLog_FORM_unmeas);
         }
@@ -2561,7 +2565,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 && m_elementStackMap.at(layer).back()->Is(CHORD)) {
                 chord = dynamic_cast<Chord *>(m_elementStackMap.at(layer).back());
             }
-            assert(chord);
+            if (!chord) {
+                LogError("MusicXML import: Chord starting point has not been found.");
+                return;
+            }
             // Mark a chord as cue=true if and only if all its child notes are cue.
             // (This causes it to have a smaller stem).
             if (!cue) {
@@ -3010,7 +3017,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // tremolo end
     if (tremolo) {
-        if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
+        if (HasAttributeWithValue(tremolo.node(), "type", "single") && !nextIsChord) {
             RemoveLastFromStack(BTREM, layer);
         }
         if (HasAttributeWithValue(tremolo.node(), "type", "stop")) {
