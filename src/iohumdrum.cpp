@@ -17948,6 +17948,9 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
                     turnend = j - 1;
                     break;
                 }
+                else {
+                    turnend = j;
+                }
             }
             break;
         }
