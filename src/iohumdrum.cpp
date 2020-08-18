@@ -17997,10 +17997,10 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     }
 
     if (invertedQ) {
-        turn->SetForm(turnLog_FORM_upper);
+        turn->SetForm(turnLog_FORM_lower);
     }
     else {
-        turn->SetForm(turnLog_FORM_lower);
+        turn->SetForm(turnLog_FORM_upper);
     }
 
     setLocationId(turn, token);
