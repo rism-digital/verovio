@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Aug 16 15:38:03 PDT 2020
+// Last Modified: Tue Aug 18 03:19:15 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -78457,6 +78457,7 @@ void Tool_myank::processFieldEntry(vector<MeasureInfo>& field,
 	}
 
 	if (hre.search(buffer, "^(\\d+)[a-z]?-(\\d+)[a-z]?$")) {
+		// processing a measure range
 		int firstone = hre.getMatchInt(1);
 		int lastone  = hre.getMatchInt(2);
 
@@ -78480,69 +78481,62 @@ void Tool_myank::processFieldEntry(vector<MeasureInfo>& field,
 		}
 
 		if (firstone > lastone) {
+			// reverse the order of the measures
 			for (int i=firstone; i>=lastone; i--) {
 				if (inmap[i] >= 0) {
-					if ((field.size() > 0) &&
-							(field.back().stop == inmeasures[inmap[i]].start)) {
-						field.back().stop = inmeasures[inmap[i]].stop;
-					} else {
-						current.clear();
-						current.file = &infile;
-						current.num = i;
-						current.start = inmeasures[inmap[i]].start;
-						current.stop = inmeasures[inmap[i]].stop;
+					current.clear();
+					current.file = &infile;
+					current.num = i;
+					current.start = inmeasures[inmap[i]].start;
+					current.stop = inmeasures[inmap[i]].stop;
 
-						current.sclef    = inmeasures[inmap[i]].sclef;
-						current.skeysig  = inmeasures[inmap[i]].skeysig;
-						current.skey     = inmeasures[inmap[i]].skey;
-						current.stimesig = inmeasures[inmap[i]].stimesig;
-						current.smet     = inmeasures[inmap[i]].smet;
-						current.stempo   = inmeasures[inmap[i]].stempo;
+					current.sclef    = inmeasures[inmap[i]].sclef;
+					current.skeysig  = inmeasures[inmap[i]].skeysig;
+					current.skey     = inmeasures[inmap[i]].skey;
+					current.stimesig = inmeasures[inmap[i]].stimesig;
+					current.smet     = inmeasures[inmap[i]].smet;
+					current.stempo   = inmeasures[inmap[i]].stempo;
 
-						current.eclef    = inmeasures[inmap[i]].eclef;
-						current.ekeysig  = inmeasures[inmap[i]].ekeysig;
-						current.ekey     = inmeasures[inmap[i]].ekey;
-						current.etimesig = inmeasures[inmap[i]].etimesig;
-						current.emet     = inmeasures[inmap[i]].emet;
-						current.etempo   = inmeasures[inmap[i]].etempo;
+					current.eclef    = inmeasures[inmap[i]].eclef;
+					current.ekeysig  = inmeasures[inmap[i]].ekeysig;
+					current.ekey     = inmeasures[inmap[i]].ekey;
+					current.etimesig = inmeasures[inmap[i]].etimesig;
+					current.emet     = inmeasures[inmap[i]].emet;
+					current.etempo   = inmeasures[inmap[i]].etempo;
 
-						field.push_back(current);
-					}
+					field.push_back(current);
 				}
 			}
 		} else {
+			// measure range not reversed
 			for (int i=firstone; i<=lastone; i++) {
 				if (inmap[i] >= 0) {
-					if ((field.size() > 0) &&
-							(field.back().stop == inmeasures[inmap[i]].start)) {
-						field.back().stop = inmeasures[inmap[i]].stop;
-					} else {
-						current.clear();
-						current.file = &infile;
-						current.num = i;
-						current.start = inmeasures[inmap[i]].start;
-						current.stop = inmeasures[inmap[i]].stop;
+					current.clear();
+					current.file = &infile;
+					current.num = i;
+					current.start = inmeasures[inmap[i]].start;
+					current.stop = inmeasures[inmap[i]].stop;
 
-						current.sclef    = inmeasures[inmap[i]].sclef;
-						current.skeysig  = inmeasures[inmap[i]].skeysig;
-						current.skey     = inmeasures[inmap[i]].skey;
-						current.stimesig = inmeasures[inmap[i]].stimesig;
-						current.smet     = inmeasures[inmap[i]].smet;
-						current.stempo   = inmeasures[inmap[i]].stempo;
+					current.sclef    = inmeasures[inmap[i]].sclef;
+					current.skeysig  = inmeasures[inmap[i]].skeysig;
+					current.skey     = inmeasures[inmap[i]].skey;
+					current.stimesig = inmeasures[inmap[i]].stimesig;
+					current.smet     = inmeasures[inmap[i]].smet;
+					current.stempo   = inmeasures[inmap[i]].stempo;
 
-						current.eclef    = inmeasures[inmap[i]].eclef;
-						current.ekeysig  = inmeasures[inmap[i]].ekeysig;
-						current.ekey     = inmeasures[inmap[i]].ekey;
-						current.etimesig = inmeasures[inmap[i]].etimesig;
-						current.emet     = inmeasures[inmap[i]].emet;
-						current.etempo   = inmeasures[inmap[i]].etempo;
+					current.eclef    = inmeasures[inmap[i]].eclef;
+					current.ekeysig  = inmeasures[inmap[i]].ekeysig;
+					current.ekey     = inmeasures[inmap[i]].ekey;
+					current.etimesig = inmeasures[inmap[i]].etimesig;
+					current.emet     = inmeasures[inmap[i]].emet;
+					current.etempo   = inmeasures[inmap[i]].etempo;
 
-						field.push_back(current);
-					}
+					field.push_back(current);
 				}
 			}
 		}
 	} else if (hre.search(buffer, "^(\\d+)([a-z]*)")) {
+		// processing a single measure number
 		int value = hre.getMatchInt(1);
 		// do something with letter later...
 
@@ -78553,36 +78547,32 @@ void Tool_myank::processFieldEntry(vector<MeasureInfo>& field,
 			exit(1);
 		}
 		if (inmap[value] >= 0) {
-			if ((field.size() > 0) &&
-					(field.back().stop == inmeasures[inmap[value]].start)) {
-				field.back().stop = inmeasures[inmap[value]].stop;
-			} else {
-				current.clear();
-				current.file = &infile;
-				current.num = value;
-				current.start = inmeasures[inmap[value]].start;
-				current.stop = inmeasures[inmap[value]].stop;
+			current.clear();
+			current.file = &infile;
+			current.num = value;
+			current.start = inmeasures[inmap[value]].start;
+			current.stop = inmeasures[inmap[value]].stop;
 
-				current.sclef    = inmeasures[inmap[value]].sclef;
-				current.skeysig  = inmeasures[inmap[value]].skeysig;
-				current.skey     = inmeasures[inmap[value]].skey;
-				current.stimesig = inmeasures[inmap[value]].stimesig;
-				current.smet     = inmeasures[inmap[value]].smet;
-				current.stempo   = inmeasures[inmap[value]].stempo;
+			current.sclef    = inmeasures[inmap[value]].sclef;
+			current.skeysig  = inmeasures[inmap[value]].skeysig;
+			current.skey     = inmeasures[inmap[value]].skey;
+			current.stimesig = inmeasures[inmap[value]].stimesig;
+			current.smet     = inmeasures[inmap[value]].smet;
+			current.stempo   = inmeasures[inmap[value]].stempo;
 
-				current.eclef    = inmeasures[inmap[value]].eclef;
-				current.ekeysig  = inmeasures[inmap[value]].ekeysig;
-				current.ekey     = inmeasures[inmap[value]].ekey;
-				current.etimesig = inmeasures[inmap[value]].etimesig;
-				current.emet     = inmeasures[inmap[value]].emet;
-				current.etempo   = inmeasures[inmap[value]].etempo;
+			current.eclef    = inmeasures[inmap[value]].eclef;
+			current.ekeysig  = inmeasures[inmap[value]].ekeysig;
+			current.ekey     = inmeasures[inmap[value]].ekey;
+			current.etimesig = inmeasures[inmap[value]].etimesig;
+			current.emet     = inmeasures[inmap[value]].emet;
+			current.etempo   = inmeasures[inmap[value]].etempo;
 
-				field.push_back(current);
-			}
+			field.push_back(current);
 		}
 	}
 
 	field.back().stopStyle = measureStyling;
+
 }
 
 
