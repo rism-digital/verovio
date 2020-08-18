@@ -17944,10 +17944,10 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
             turnstart = i;
             turnend = i;
             for (int j = i + 1; j < (int)tok.size(); j++) {
-                if (!((tok[i] == 's') || (tok[i] == 'S') || (tok[i] == '$'))) {
+                if (!((tok[j] == 's') || (tok[j] == 'S') || (tok[j] == '$'))) {
+                    turnend = j - 1;
                     break;
                 }
-                turnend = j;
             }
             break;
         }
