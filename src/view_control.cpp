@@ -1437,6 +1437,8 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     TextDrawingParams params;
 
+    int lineCount = dir->GetNumberOfLines(dir);
+
     // If we have not timestamp
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
@@ -1457,6 +1459,9 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dirTxt.SetPointSize(params.m_pointSize);
 
         if (dir->GetPlace() == STAFFREL_between) {
+            if (lineCount > 1) {
+                params.m_y += (m_doc->GetTextLineHeight(&dirTxt, false) * (lineCount - 1) / 2);
+            }
             params.m_y -= m_doc->GetTextXHeight(&dirTxt, false) / 2;
         }
 
@@ -1500,6 +1505,8 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     TextDrawingParams params;
 
+    int lineCount = dynam->GetNumberOfLines(dynam);
+
     // If we have not timestamp
     params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
@@ -1523,6 +1530,9 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamTxt.SetPointSize(params.m_pointSize);
 
         if (dynam->GetPlace() == STAFFREL_between) {
+            if (lineCount > 1) {
+                params.m_y += (m_doc->GetTextLineHeight(&dynamTxt, false) * (lineCount - 1) / 2);
+            }
             params.m_y -= m_doc->GetTextXHeight(&dynamTxt, false) / 2;
         }
 
@@ -2103,6 +2113,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
 
+    int lineCount = tempo->GetNumberOfLines(tempo);
+
     TextDrawingParams params;
 
     // see if we have a meter signature for this measure
@@ -2134,6 +2146,9 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         tempoTxt.SetPointSize(params.m_pointSize);
 
         if (tempo->GetPlace() == STAFFREL_between) {
+            if (lineCount > 1) {
+                params.m_y += (m_doc->GetTextLineHeight(&tempoTxt, false) * (lineCount - 1) / 2);
+            }
             params.m_y -= m_doc->GetTextXHeight(&tempoTxt, false) / 2;
         }
 
