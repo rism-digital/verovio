@@ -436,7 +436,8 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
         case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
         //case HEADSHAPE_square: return SMUFL_noteheadSquare;
         case HEADSHAPE_x: {
-            if (DUR_1 == duration || DUR_2 == duration) break; // return SMUFL_E0B3_noteheadCircleX;
+            if (DUR_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
+            if (DUR_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
             return SMUFL_E0A9_noteheadXBlack;
         } 
         default: break;
