@@ -1663,7 +1663,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     assert(measure);
 
     const pugi::xpath_node staffNode = node.select_node("staff");
-    const int staffNum = staffNode ? staffNode.node().text().as_int() + staffOffset : -1;
+    // const int staffNum = staffNode ? staffNode.node().text().as_int() + staffOffset : -1;
 
     const std::string placeStr = node.attribute("placement").as_string();
     const int offset = node.select_node("offset").node().text().as_int();
@@ -1794,7 +1794,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     pugi::xpath_node_set words = node.select_nodes("direction-type/words");
     const bool containsWords = !words.empty();
-    bool containsDynamics = !node.select_single_node("direction-type/dynamics").node().empty();
+    bool containsDynamics = !node.select_node("direction-type/dynamics").node().empty();
 
     // Directive
     int defaultY = 0; // y position attribute, only for directives and dynamics
