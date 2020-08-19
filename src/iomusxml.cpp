@@ -2391,8 +2391,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
         else if (!HasAttributeWithValue(tremolo.node(), "type", "stop")) {
             // this is default tremolo type in MusicXML
-            BTrem *bTrem = new BTrem();
             if (!isChord) {
+                BTrem *bTrem = new BTrem();
                 AddLayerElement(layer, bTrem);
                 m_elementStackMap.at(layer).push_back(bTrem);
             }
