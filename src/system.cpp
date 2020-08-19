@@ -666,6 +666,8 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
     AdjustFloatingPositionersParams *params = dynamic_cast<AdjustFloatingPositionersParams *>(functorParams);
     assert(params);
+    
+    params->m_inBetween = false;
 
     AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
     Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
