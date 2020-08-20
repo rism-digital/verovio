@@ -496,6 +496,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
 
+    // conlude from logical attributes
     if (bTrem->HasUnitdur() && (stemMod == STEMMODIFIER_NONE)) {
         int slashDur = bTrem->GetUnitdur() - drawingDur;
         if (drawingDur < DUR_4) slashDur = bTrem->GetUnitdur() - DUR_4;
@@ -542,7 +543,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Idem as above
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false)
                 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+            x = stemPoint.x;
         }
         else {
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
