@@ -501,7 +501,7 @@ void Page::JustifyVertically()
     assert(this == doc->GetDrawingPage());
 
     // Nothing to justify
-    if (this->m_drawingJustifiableHeight < 0) {
+    if (m_drawingJustifiableHeight <= 0 || m_justificationSum <= 0) {
         return;
     }
 

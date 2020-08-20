@@ -261,14 +261,21 @@ public:
     virtual int JustifyY(FunctorParams *functorParams);
 
 private:
-    //
+    /**
+     * Declaration of different spacing types
+     */
+    enum class SpacingType { System, Staff, Brace, Bracket, None };
+    /**
+     * Calculates above spacing type for current staff
+     */
+    StaffAlignment::SpacingType CalculateSpacing() const;
+
 public:
     //
 private:
     /**
      * Defines spacing type between current staff and previous one
      */
-    enum class SpacingType { System, Staff, Brace, Bracket, None };
     SpacingType m_spacingType = SpacingType::None;
 
     /**
