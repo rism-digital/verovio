@@ -1011,17 +1011,17 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffDef(dc, staff, measure);
 
-    if (staff->GetLedgerLinesAbove()) {
-        DrawLedgerLines(dc, staff, staff->GetLedgerLinesAbove(), false, false);
+    if (staff->GetLegerLinesAbove()) {
+        DrawLegerLines(dc, staff, staff->GetLegerLinesAbove(), false, false);
     }
-    if (staff->GetLedgerLinesBelow()) {
-        DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelow(), true, false);
+    if (staff->GetLegerLinesBelow()) {
+        DrawLegerLines(dc, staff, staff->GetLegerLinesBelow(), true, false);
     }
-    if (staff->GetLedgerLinesAboveCue()) {
-        DrawLedgerLines(dc, staff, staff->GetLedgerLinesAboveCue(), false, true);
+    if (staff->GetLegerLinesAboveCue()) {
+        DrawLegerLines(dc, staff, staff->GetLegerLinesAboveCue(), false, true);
     }
-    if (staff->GetLedgerLinesBelowCue()) {
-        DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelowCue(), true, true);
+    if (staff->GetLegerLinesBelowCue()) {
+        DrawLegerLines(dc, staff, staff->GetLegerLinesBelowCue(), true, true);
     }
 
     DrawStaffChildren(dc, staff, staff, measure);
@@ -1076,7 +1076,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     return;
 }
 
-void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize)
+void View::DrawLegerLines(DeviceContext *dc, Staff *staff, ArrayOfLegerLines *lines, bool below, bool cueSize)
 {
     assert(dc);
     assert(staff);
@@ -1098,7 +1098,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
         gClass += " cue";
     }
 
-    dc->StartCustomGraphic("ledgerLines", gClass);
+    dc->StartCustomGraphic("legerLines", gClass);
 
     // HARDCODED
     int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.75;
@@ -1107,7 +1107,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    ArrayOfLedgerLines::iterator iter;
+    ArrayOfLegerLines::iterator iter;
     std::list<std::pair<int, int> >::iterator iterDashes;
 
     // First add the dash

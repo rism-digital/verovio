@@ -45,10 +45,10 @@ Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), Att
     RegisterAttClass(ATT_VISIBILITY);
     RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     // owned pointers need to be set to NULL;
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
+    m_legerLinesAbove = NULL;
+    m_legerLinesBelow = NULL;
+    m_legerLinesAboveCue = NULL;
+    m_legerLinesBelowCue = NULL;
 
     Reset();
     SetN(n);
@@ -56,7 +56,7 @@ Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), Att
 
 Staff::~Staff()
 {
-    ClearLedgerLines();
+    ClearLegerLines();
 }
 
 void Staff::Reset()
@@ -76,17 +76,17 @@ void Staff::Reset()
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
 
-    ClearLedgerLines();
+    ClearLegerLines();
 }
 
 void Staff::CloneReset()
 {
     Object::CloneReset();
 
-    m_ledgerLinesAbove = NULL;
-    m_ledgerLinesBelow = NULL;
-    m_ledgerLinesAboveCue = NULL;
-    m_ledgerLinesBelowCue = NULL;
+    m_legerLinesAbove = NULL;
+    m_legerLinesBelow = NULL;
+    m_legerLinesAboveCue = NULL;
+    m_legerLinesBelowCue = NULL;
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
@@ -96,23 +96,23 @@ void Staff::CloneReset()
     m_drawingStaffDef = NULL;
 }
 
-void Staff::ClearLedgerLines()
+void Staff::ClearLegerLines()
 {
-    if (m_ledgerLinesAbove) {
-        delete m_ledgerLinesAbove;
-        m_ledgerLinesAbove = NULL;
+    if (m_legerLinesAbove) {
+        delete m_legerLinesAbove;
+        m_legerLinesAbove = NULL;
     }
-    if (m_ledgerLinesBelow) {
-        delete m_ledgerLinesBelow;
-        m_ledgerLinesBelow = NULL;
+    if (m_legerLinesBelow) {
+        delete m_legerLinesBelow;
+        m_legerLinesBelow = NULL;
     }
-    if (m_ledgerLinesAboveCue) {
-        delete m_ledgerLinesAboveCue;
-        m_ledgerLinesAboveCue = NULL;
+    if (m_legerLinesAboveCue) {
+        delete m_legerLinesAboveCue;
+        m_legerLinesAboveCue = NULL;
     }
-    if (m_ledgerLinesBelowCue) {
-        delete m_ledgerLinesBelowCue;
-        m_ledgerLinesBelowCue = NULL;
+    if (m_legerLinesBelowCue) {
+        delete m_legerLinesBelowCue;
+        m_legerLinesBelowCue = NULL;
     }
 }
 
@@ -222,28 +222,28 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 void Staff::AddLegerLineAbove(int count, int left, int right, bool cueSize)
 {
     if (cueSize) {
-        if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesAboveCue, count, left, right);
+        if (m_legerLinesAboveCue == NULL) m_legerLinesAboveCue = new ArrayOfLegerLines;
+        AddLegerLines(m_legerLinesAboveCue, count, left, right);
     }
     else {
-        if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesAbove, count, left, right);
+        if (m_legerLinesAbove == NULL) m_legerLinesAbove = new ArrayOfLegerLines;
+        AddLegerLines(m_legerLinesAbove, count, left, right);
     }
 }
 
 void Staff::AddLegerLineBelow(int count, int left, int right, bool cueSize)
 {
     if (cueSize) {
-        if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesBelowCue, count, left, right);
+        if (m_legerLinesBelowCue == NULL) m_legerLinesBelowCue = new ArrayOfLegerLines;
+        AddLegerLines(m_legerLinesBelowCue, count, left, right);
     }
     else {
-        if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
-        AddLegerLines(m_ledgerLinesBelow, count, left, right);
+        if (m_legerLinesBelow == NULL) m_legerLinesBelow = new ArrayOfLegerLines;
+        AddLegerLines(m_legerLinesBelow, count, left, right);
     }
 }
 
-void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right)
+void Staff::AddLegerLines(ArrayOfLegerLines *lines, int count, int left, int right)
 {
     assert(lines);
 
@@ -267,22 +267,22 @@ void Staff::SetFromFacsimile(Doc *doc)
 }
 
 //----------------------------------------------------------------------------
-// LedgerLine
+// LegerLine
 //----------------------------------------------------------------------------
 
-LedgerLine::LedgerLine()
+LegerLine::LegerLine()
 {
     Reset();
 }
 
-LedgerLine::~LedgerLine() {}
+LegerLine::~LegerLine() {}
 
-void LedgerLine::Reset()
+void LegerLine::Reset()
 {
     m_dashes.clear();
 }
 
-void LedgerLine::AddDash(int left, int right)
+void LegerLine::AddDash(int left, int right)
 {
     assert(left < right);
 
@@ -384,7 +384,7 @@ int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_staffAlignment = NULL;
 
-    ClearLedgerLines();
+    ClearLegerLines();
 
     return FUNCTOR_CONTINUE;
 }
@@ -473,7 +473,7 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 int Staff::ResetDrawing(FunctorParams *functorParams)
 {
     this->m_timeSpanningElements.clear();
-    ClearLedgerLines();
+    ClearLegerLines();
     return FUNCTOR_CONTINUE;
 }
 

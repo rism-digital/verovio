@@ -263,7 +263,7 @@ class FloatingPositioner;
 class GraceAligner;
 class InterfaceComparison;
 class LayerElement;
-class LedgerLine;
+class LegerLine;
 class LinkingInterface;
 class Nc;
 class Note;
@@ -309,7 +309,7 @@ typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 
-typedef std::vector<LedgerLine> ArrayOfLedgerLines;
+typedef std::vector<LegerLine> ArrayOfLegerLines;
 
 typedef std::vector<TextElement *> ArrayOfTextElements;
 

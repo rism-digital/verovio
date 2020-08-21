@@ -182,7 +182,7 @@ Accid *Note::GetDrawingAccid()
     return accid;
 }
 
-bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, Staff *staff)
+bool Note::HasLegerLines(int &linesAbove, int &linesBelow, Staff *staff)
 {
     if (!staff) {
         staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
@@ -812,7 +812,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Note::CalcLedgerLines(FunctorParams *functorParams)
+int Note::CalcLegerLines(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
@@ -835,12 +835,12 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     int staffX = staff->GetDrawingX();
     int radius = GetDrawingRadius(params->m_doc);
 
-    /************** Ledger lines: **************/
+    /************** Leger lines: **************/
 
     int linesAbove = 0;
     int linesBelow = 0;
 
-    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
+    if (!this->HasLegerLines(linesAbove, linesBelow, staff)) return FUNCTOR_CONTINUE;
 
     // HARDCODED
     int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);

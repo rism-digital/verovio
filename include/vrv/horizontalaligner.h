@@ -17,7 +17,7 @@ class Accid;
 class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
-class LedgerLine;
+class LegerLine;
 class MeasureAligner;
 class Note;
 class TimestampAttr;

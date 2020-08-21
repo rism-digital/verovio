@@ -85,8 +85,8 @@ public:
     double m_beamSlope; // the slope of the beam
     int m_verticalCenter;
     int m_avgY;
-    int m_ledgerLinesAbove;
-    int m_ledgerLinesBelow;
+    int m_legerLinesAbove;
+    int m_legerLinesBelow;
 
     BeamElementCoord *m_firstNoteOrChord;
     BeamElementCoord *m_lastNoteOrChord;

@@ -57,8 +57,8 @@ void BeamSegment::Reset()
     m_verticalCenter = 0;
     m_avgY = 0;
     m_extendedToCenter = false;
-    m_ledgerLinesAbove = 0;
-    m_ledgerLinesBelow = 0;
+    m_legerLinesAbove = 0;
+    m_legerLinesBelow = 0;
 
     m_firstNoteOrChord = NULL;
     m_lastNoteOrChord = NULL;
@@ -262,8 +262,8 @@ void BeamSegment::CalcBeamInit(
     m_avgY = 0;
     m_nbNotesOrChords = 0;
     m_extendedToCenter = false;
-    m_ledgerLinesAbove = 0;
-    m_ledgerLinesBelow = 0;
+    m_legerLinesAbove = 0;
+    m_legerLinesBelow = 0;
 
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
@@ -287,13 +287,13 @@ void BeamSegment::CalcBeamInit(
             int linesBelow = 0;
             Note *bottomNote = chord->GetBottomNote();
             assert(bottomNote);
-            if (bottomNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
-                m_ledgerLinesBelow += linesBelow;
+            if (bottomNote->HasLegerLines(linesAbove, linesBelow, staff)) {
+                m_legerLinesBelow += linesBelow;
             }
             Note *topNote = chord->GetTopNote();
             assert(topNote);
-            if (topNote->HasLedgerLines(linesAbove, linesBelow, staff)) {
-                m_ledgerLinesAbove += linesAbove;
+            if (topNote->HasLegerLines(linesAbove, linesBelow, staff)) {
+                m_legerLinesAbove += linesAbove;
             }
         }
         else if (coord->m_element->Is(NOTE)) {
@@ -303,9 +303,9 @@ void BeamSegment::CalcBeamInit(
 
             int linesAbove = 0;
             int linesBelow = 0;
-            if (note->HasLedgerLines(linesAbove, linesBelow, staff)) {
-                m_ledgerLinesBelow += linesBelow;
-                m_ledgerLinesAbove += linesAbove;
+            if (note->HasLegerLines(linesAbove, linesBelow, staff)) {
+                m_legerLinesBelow += linesBelow;
+                m_legerLinesAbove += linesAbove;
             }
         }
         else {
@@ -728,9 +728,9 @@ void BeamSegment::CalcBeamPlace(Layer *layer, BeamDrawingInterface *beamInterfac
         data_STEMDIRECTION layerStemDir = layer->GetDrawingStemDir(&m_beamElementCoordRefs);
         // Layer direction ?
         if (layerStemDir == STEMDIRECTION_NONE) {
-            if (this->m_ledgerLinesBelow != this->m_ledgerLinesAbove) {
+            if (this->m_legerLinesBelow != this->m_legerLinesAbove) {
                 beamInterface->m_drawingPlace
-                    = (this->m_ledgerLinesBelow > this->m_ledgerLinesAbove) ? BEAMPLACE_above : BEAMPLACE_below;
+                    = (this->m_legerLinesBelow > this->m_legerLinesAbove) ? BEAMPLACE_above : BEAMPLACE_below;
             }
             else {
                 beamInterface->m_drawingPlace
@@ -982,8 +982,8 @@ void BeamElementCoord::SetDrawingStemDir(
 
     this->m_stem->SetDrawingStemDir(stemDir);
     bool onStaffLine = false;
-    int ledgerLines = 0;
-    int ledgerLinesOpposite = 0;
+    int legerLines = 0;
+    int legerLinesOpposite = 0;
     this->m_centered = false;
     this->m_shortened = false;
     this->m_closestNote = NULL;
@@ -1006,7 +1006,7 @@ void BeamElementCoord::SetDrawingStemDir(
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
             onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
-            m_closestNote->HasLedgerLines(ledgerLinesOpposite, ledgerLines);
+            m_closestNote->HasLegerLines(legerLinesOpposite, legerLines);
         }
     }
     else {
@@ -1019,7 +1019,7 @@ void BeamElementCoord::SetDrawingStemDir(
         if (m_closestNote) {
             this->m_yBeam = m_closestNote->GetDrawingY();
             onStaffLine = (m_closestNote->GetDrawingLoc() % 2);
-            m_closestNote->HasLedgerLines(ledgerLines, ledgerLinesOpposite);
+            m_closestNote->HasLegerLines(legerLines, legerLinesOpposite);
         }
         stemLen = -1;
     }
@@ -1085,11 +1085,11 @@ void BeamElementCoord::SetDrawingStemDir(
         }
     }
 
-    // Make sure there is a at least one staff space before the ledger lines
-    if ((ledgerLines > 2) && (this->m_dur > DUR_32)) {
+    // Make sure there is a at least one staff space before the leger lines
+    if ((legerLines > 2) && (this->m_dur > DUR_32)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 4 * unit : -4 * unit;
     }
-    else if ((ledgerLines > 1) && (this->m_dur > DUR_16)) {
+    else if ((legerLines > 1) && (this->m_dur > DUR_16)) {
         this->m_yBeam += (stemDir == STEMDIRECTION_up) ? 2 * unit : -2 * unit;
     }
 }

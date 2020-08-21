@@ -1106,7 +1106,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 
                 // if loc is odd, we need to offset it to be even
                 // so that the dots do not collide with the staff lines
-                // or on ledger lines
+                // or on leger lines
                 if (loc % 2 != 0) {
                     // if it's above the staff, offset downwards
                     // if below the staff, offset upwards

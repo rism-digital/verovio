@@ -1159,7 +1159,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
     else
         DrawRestWhole(dc,
-            mRest->GetDrawingX() - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false) * 2 / 3, y,
+            mRest->GetDrawingX() - m_doc->GetDrawingLegerLineLength(staff->m_drawingStaffSize, false) * 2 / 3, y,
             DUR_1, false, staff);
 
     dc->EndGraphic(element, this);
@@ -1279,7 +1279,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (num == 2)
             DrawFilledRectangle(dc, x1, y1 + 4, x2, y2 - 4);
         else
-            DrawRestWhole(dc, xCentered - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false) * 2 / 3,
+            DrawRestWhole(dc, xCentered - m_doc->GetDrawingLegerLineLength(staff->m_drawingStaffSize, false) * 2 / 3,
                 y1, DUR_1, false, staff);
     }
 
@@ -1754,7 +1754,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
     vertic = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     int off
-        = m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, cueSize) * 2 / 3; // i.e., la moitie de la ronde
+        = m_doc->GetDrawingLegerLineLength(staff->m_drawingStaffSize, cueSize) * 2 / 3; // i.e., la moitie de la ronde
 
     x1 = x; // - off;
     x2 = x + 2 * off;

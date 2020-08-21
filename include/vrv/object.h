@@ -785,9 +785,9 @@ public:
     virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the note head flipped positions and calc the ledger lines
+     * Set the note head flipped positions and calc the leger lines
      */
-    virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcLegerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Calcultate the position the outside articulations.

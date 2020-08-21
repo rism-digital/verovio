@@ -16,7 +16,7 @@ namespace vrv {
 
 class DeviceContext;
 class Layer;
-class LedgerLine;
+class LegerLine;
 class StaffAlignment;
 class StaffDef;
 class Syl;
@@ -58,7 +58,7 @@ public:
     /**
      * Delete all the legder line arrays.
      */
-    void ClearLedgerLines();
+    void ClearLegerLines();
 
     /**
      * @name Methods for adding allowed content
@@ -103,18 +103,18 @@ public:
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     /**
-     * Return the ledger line arrays (NULL if none)
+     * Return the leger line arrays (NULL if none)
      */
     ///@{
-    ArrayOfLedgerLines *GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
-    ArrayOfLedgerLines *GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
-    ArrayOfLedgerLines *GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
-    ArrayOfLedgerLines *GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
+    ArrayOfLegerLines *GetLegerLinesAbove() { return m_legerLinesAbove; }
+    ArrayOfLegerLines *GetLegerLinesAboveCue() { return m_legerLinesAboveCue; }
+    ArrayOfLegerLines *GetLegerLinesBelow() { return m_legerLinesBelow; }
+    ArrayOfLegerLines *GetLegerLinesBelowCue() { return m_legerLinesBelowCue; }
     ///@}
 
     /**
-     * Add the ledger lines above or below.
-     * If necessary creates the ledger line array.
+     * Add the leger lines above or below.
+     * If necessary creates the leger line array.
      */
     ///@{
     void AddLegerLineAbove(int count, int left, int right, bool cueSize);
@@ -201,9 +201,9 @@ public:
 
 private:
     /**
-     * Add the ledger line dashes to the legderline array.
+     * Add the leger line dashes to the legderline array.
      */
-    void AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
+    void AddLegerLines(ArrayOfLegerLines *lines, int count, int left, int right);
 
 public:
     /**
@@ -244,36 +244,36 @@ private:
      * A pointer to the legder lines (above / below and normal / cue)
      */
     ///@{
-    ArrayOfLedgerLines *m_ledgerLinesAbove;
-    ArrayOfLedgerLines *m_ledgerLinesBelow;
-    ArrayOfLedgerLines *m_ledgerLinesAboveCue;
-    ArrayOfLedgerLines *m_ledgerLinesBelowCue;
+    ArrayOfLegerLines *m_legerLinesAbove;
+    ArrayOfLegerLines *m_legerLinesBelow;
+    ArrayOfLegerLines *m_legerLinesAboveCue;
+    ArrayOfLegerLines *m_legerLinesBelowCue;
     ///@}
 };
 
 //----------------------------------------------------------------------------
-// LedgerLine
+// LegerLine
 //----------------------------------------------------------------------------
 
 /**
  * This is a class with no MEI equivalent for representing legder lines.
- * A ledger line is represented by a list of dashes.
+ * A leger line is represented by a list of dashes.
  * Each dash is represented by a pair of points (left - right).
  */
-class LedgerLine {
+class LegerLine {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method reset all attribute classes
      */
     ///@{
-    LedgerLine();
-    virtual ~LedgerLine();
+    LegerLine();
+    virtual ~LegerLine();
     virtual void Reset();
     ///@}
 
     /**
-     * Add a dash to the ledger line object.
+     * Add a dash to the leger line object.
      * If necessary merges overlapping dashes.
      */
     void AddDash(int left, int right);
