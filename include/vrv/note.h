@@ -279,6 +279,12 @@ private:
 
     void UpdateFromTransPitch(const TransPitch &tp);
 
+    /**
+     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
+     * as position of the note and position of the dots
+     */
+    bool IsDotOverlappingWithFlag(Doc *doc, const int staffSize, bool isDotShifted);
+
 public:
     //
 private:
