@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
+#include "scoredef.h"
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -28,36 +29,6 @@
 #include "vrv.h"
 
 namespace vrv {
-namespace {
-//----------------------------------------------------------------------------
-// VisibleStaffDefOrGRPObject
-//----------------------------------------------------------------------------
-
-class VisibleStaffDefOrGRPObject : public ClassIdsComparison {
-
-public:
-    VisibleStaffDefOrGRPObject(): ClassIdsComparison({ STAFFDEF, STAFFGRP }) {}
-
-    void skip(const Object *objectToExclude) { m_objectToExclude = objectToExclude; }
-
-    virtual bool operator()(Object *object)
-    {
-        if (object == m_objectToExclude || !ClassIdsComparison::operator()(object))
-            return false;
-
-        if (object->Is(STAFFDEF)) {
-            StaffDef *staffDef = dynamic_cast<StaffDef *>(object);
-            return staffDef && staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
-        }
-
-        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(object);
-        return staffGrp && staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
-    }
-
-protected:
-    const Object *m_objectToExclude;
-};
-} // namespace
 
 //----------------------------------------------------------------------------
 // SystemAligner
@@ -96,7 +67,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
     StaffAlignment *alignment = new StaffAlignment();
-    alignment->SetStaff(staff, doc);
+    alignment->SetStaff(staff, doc, GetAboveSpacingType(staff));
     alignment->SetParent(this);
     m_children.push_back(alignment);
 
@@ -180,6 +151,86 @@ double SystemAligner::GetJustificationSum(const Doc *doc) const
 
     return justificationSum;
 }
+void SystemAligner::SetSpacing(ScoreDef *scoreDef)
+{
+    assert(scoreDef);
+
+    m_spacingTypes.clear();
+
+    const ArrayOfObjects *childList = scoreDef->GetList(scoreDef);
+    for (auto iter = childList->begin(); iter != childList->end(); ++iter) {
+        // It should be staffDef only, but double check.
+        if (!(*iter)->Is(STAFFDEF)) continue;
+        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+        assert(staffDef);
+
+        m_spacingTypes[staffDef->GetN()] = CalculateSpacingAbove(staffDef);
+    }
+}
+
+SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(Staff* staff)
+{
+    if (!staff)
+        return SpacingType::None;
+
+    if (m_spacingTypes.empty()) {
+        System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
+        ScoreDef *scoreDef = system ? system->GetDrawingScoreDef() : NULL;
+        SetSpacing(scoreDef);
+    }
+
+    auto iter = m_spacingTypes.find(staff->GetN());
+    assert(iter != m_spacingTypes.end());
+
+    return iter->second;
+}
+
+SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffDef) const
+{
+    assert(staffDef);
+
+    SpacingType spacingType = SpacingType::None;
+    if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+        Object *staffChild = staffDef;
+        Object *staffParent = staffChild->GetParent();
+        bool notFirstInGroup = false;
+        VisibleStaffDefOrGrpObject matchType;
+        while (spacingType == SpacingType::None) {
+            matchType.Skip(staffParent);
+            Object *firstVisible = staffParent->FindDescendantByComparison(&matchType, 1);
+
+            // for first child in staff group parent's symbol should be taken, except
+            // when we had a child which not on the first place in group, than take first symbol
+            notFirstInGroup = notFirstInGroup || (firstVisible && firstVisible != staffChild);
+            if (notFirstInGroup) {
+                StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
+                if (staffGrp && staffGrp->HasSymbol()) {
+                    switch (staffGrp->GetSymbol()) {
+                        case staffGroupingSym_SYMBOL_brace:
+                            spacingType = SpacingType::Brace;
+                            break;
+                        case staffGroupingSym_SYMBOL_bracket:
+                        case staffGroupingSym_SYMBOL_bracketsq:
+                            spacingType = SpacingType::Bracket;
+                            break;
+                        default:
+                            spacingType = SpacingType::None;
+                    }
+                }
+            }
+
+            if (spacingType == SpacingType::None) {
+                staffChild = staffParent;
+                staffParent = staffChild->GetParent();
+                if (!staffParent || !staffParent->Is(STAFFGRP)) {
+                    spacingType = notFirstInGroup ? SpacingType::Staff : SpacingType::System;
+                }
+            }
+        }
+    }
+
+    return spacingType;
+}
 
 //----------------------------------------------------------------------------
 // StaffAlignment
@@ -195,67 +246,11 @@ StaffAlignment::StaffAlignment() : Object()
     m_overflowBelow = 0;
     m_staffHeight = 0;
     m_overlap = 0;
-
-    m_spacingType = SpacingType::None;
 }
 
 StaffAlignment::~StaffAlignment()
 {
     ClearPositioners();
-}
-
-StaffAlignment::SpacingType StaffAlignment::CalculateSpacing() const
-{
-    SpacingType spacingType = SpacingType::None;
-    if (!m_staff) {
-        return spacingType;
-    }
-
-    System *system = dynamic_cast<System *>(m_staff->GetFirstAncestor(SYSTEM));
-    ScoreDef* scoreDef = system ? system->GetDrawingScoreDef() : NULL;
-    StaffDef *drawingStaffDef = scoreDef ? scoreDef->GetStaffDef(m_staff->GetN()) : NULL;
-    if (!drawingStaffDef || drawingStaffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
-        return spacingType;
-    }
-
-    Object *staffChild = drawingStaffDef;
-    Object *staffParent = staffChild->GetParent();
-    bool notFirstInGroup = false;
-    VisibleStaffDefOrGRPObject matchType;
-    while (spacingType == SpacingType::None) {
-        matchType.skip(staffParent);
-        Object* firstVisible = staffParent->FindDescendantByComparison(&matchType, 1);
-
-        // for first child in staff group parent's symbol should be taken, except
-        // when we had a child which not on the first place in group, than take first symbol
-        notFirstInGroup = notFirstInGroup || (firstVisible && firstVisible != staffChild);
-        if (notFirstInGroup) {
-            StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
-            if (staffGrp && staffGrp->HasSymbol()) {
-                switch (staffGrp->GetSymbol()) {
-                    case staffGroupingSym_SYMBOL_brace:
-                        spacingType = SpacingType::Brace;
-                        break;
-                    case staffGroupingSym_SYMBOL_bracket:
-                    case staffGroupingSym_SYMBOL_bracketsq:
-                        spacingType = SpacingType::Bracket;
-                        break;
-                    default:
-                        spacingType = SpacingType::None;
-                }
-            }
-        }
-
-        if (spacingType == SpacingType::None) {
-            staffChild = staffParent;
-            staffParent = staffChild->GetParent();
-            if (!staffParent || !staffParent->Is(STAFFGRP)) {
-                spacingType = notFirstInGroup ? SpacingType::Staff : SpacingType::System;
-            }
-        }
-    }
-
-    return spacingType;
 }
 
 void StaffAlignment::ClearPositioners()
@@ -267,12 +262,12 @@ void StaffAlignment::ClearPositioners()
     m_floatingPositioners.clear();
 }
 
-void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
+void StaffAlignment::SetStaff(Staff *staff, Doc *doc, SystemAligner::SpacingType spacingType)
 {
     m_staff = staff;
+    m_spacingType = spacingType;
     if (staff && doc) {
         m_staffHeight = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        m_spacingType = CalculateSpacing();
     }
 }
 
@@ -325,22 +320,22 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
     double justificationFactor = 0.;
     if (m_staff) {
         switch (m_spacingType) {
-            case SpacingType::System:
+            case SystemAligner::SpacingType::System :
                 justificationFactor = doc->GetOptions()->m_justificationSystem.GetValue();
                 break;
-            case SpacingType::Staff:
+            case SystemAligner::SpacingType::Staff:
                 justificationFactor = doc->GetOptions()->m_justificationStaff.GetValue();
                 break;
-            case SpacingType::Brace:
+            case SystemAligner::SpacingType::Brace:
                 justificationFactor = doc->GetOptions()->m_justificationBraceGroup.GetValue();
                 break;
-            case SpacingType::Bracket:
+            case SystemAligner::SpacingType::Bracket:
                 justificationFactor = doc->GetOptions()->m_justificationBracketGroup.GetValue();
                 break;
-            case SpacingType::None: break;
+            case SystemAligner::SpacingType::None: break;
             default: assert(false);
         }
-        if (m_spacingType != SpacingType::System)
+        if (m_spacingType != SystemAligner::SpacingType::System)
             justificationFactor *= GetStaffSize() / 100.0;
     }
 
@@ -379,26 +374,26 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
         }
         else {
             switch (m_spacingType) {
-                case SpacingType::System:
+                case SystemAligner::SpacingType::System:
                     spacing = doc->GetOptions()->m_spacingSystem.GetValue();
                     break;
-                case SpacingType::Staff:
+                case SystemAligner::SpacingType::Staff:
                     spacing = doc->GetOptions()->m_spacingStaff.GetValue();
                     break;
-                case SpacingType::Brace:
+                case SystemAligner::SpacingType::Brace:
                     spacing = doc->GetOptions()->m_spacingBraceGroup.GetValue();
                     break;
-                case SpacingType::Bracket:
+                case SystemAligner::SpacingType::Bracket:
                     spacing = doc->GetOptions()->m_spacingBracketGroup.GetValue();
                     break;
-                case SpacingType::None:
+                case SystemAligner::SpacingType::None:
                     break;
                 default:
                     assert(false);
             }
         }
 
-        if (m_staff->m_drawingStaffDef->HasSpacing() || m_spacingType == SpacingType::System) {
+        if (m_staff->m_drawingStaffDef->HasSpacing() || m_spacingType == SystemAligner::SpacingType::System) {
             spacing *= doc->GetDrawingUnit(100);
         }
         else {
@@ -806,7 +801,7 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    if (m_spacingType != SpacingType::System) {
+    if (m_spacingType != SystemAligner::SpacingType::System) {
         params->m_cumulatedShift += GetMinimumSpacing(params->m_doc);
     }
 
@@ -826,7 +821,7 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     const int defaultSpacing = GetMinimumSpacing(params->m_doc);
     const int minSpacing = CalcMinimumRequiredSpacing(params->m_doc);
 
-    if (m_spacingType == SpacingType::System) {
+    if (m_spacingType == SystemAligner::SpacingType::System) {
         params->m_cumulatedShift += minSpacing;
     }
     else if (minSpacing > defaultSpacing) {
@@ -844,7 +839,7 @@ int StaffAlignment::JustifyY(FunctorParams *functorParams)
     assert(params);
 
     // Skip bottom aligner and first staff
-    if (!m_staff || SpacingType::System == m_spacingType) {
+    if (!m_staff || SystemAligner::SpacingType::System == m_spacingType) {
         return FUNCTOR_CONTINUE;
     }
 

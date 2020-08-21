@@ -301,6 +301,7 @@ int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
     assert(params);
 
     params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
+    m_systemAligner.SetSpacing(params->m_currentScoreDef);
 
     return FUNCTOR_CONTINUE;
 }

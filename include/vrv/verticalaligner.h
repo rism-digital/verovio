@@ -14,7 +14,9 @@ namespace vrv {
 
 class AdjustFloatingPositionerGrpsParams;
 class FloatingObject;
+class ScoreDef;
 class StaffAlignment;
+class StaffDef;
 class SystemAligner;
 class TimestampAttr;
 
@@ -28,6 +30,11 @@ class TimestampAttr;
  */
 class SystemAligner : public Object {
 public:
+    /**
+     * Declares different spacing types between staves
+     */
+    enum class SpacingType { System, Staff, Brace, Bracket, None };
+
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
@@ -85,8 +92,22 @@ public:
     */
     double GetJustificationSum(const Doc *doc) const;
 
+    /**
+     * Calculates and sets spacing for specified ScoreDef
+     */
+    void SetSpacing(ScoreDef *scoreDef);
+
 private:
-    //
+    /**
+     * Return above spacing type for passed staff.
+     * Calculates spacings if required.
+     */
+    SpacingType GetAboveSpacingType(Staff *staff);
+    /**
+     * Calculates above spacing type for staffDef
+     */
+    SpacingType CalculateSpacingAbove(StaffDef *staffDef) const;
+
 public:
     //
 private:
@@ -94,6 +115,8 @@ private:
      * A pointer to the left StaffAlignment object kept for the system bottom position
      */
     StaffAlignment *m_bottomAlignment;
+    /** Stores the above spacing type of staves (based on visibility)*/
+    std::map<int, SpacingType> m_spacingTypes;
 };
 
 //----------------------------------------------------------------------------
@@ -153,7 +176,7 @@ public:
      */
     ///@{
     Staff *GetStaff() const { return m_staff; }
-    void SetStaff(Staff *staff, Doc *doc);
+    void SetStaff(Staff *staff, Doc *doc, SystemAligner::SpacingType spacingType);
     ///@}
 
     /**
@@ -261,22 +284,14 @@ public:
     virtual int JustifyY(FunctorParams *functorParams);
 
 private:
-    /**
-     * Declaration of different spacing types
-     */
-    enum class SpacingType { System, Staff, Brace, Bracket, None };
-    /**
-     * Calculates above spacing type for current staff
-     */
-    StaffAlignment::SpacingType CalculateSpacing() const;
-
+    //
 public:
     //
 private:
     /**
      * Defines spacing type between current staff and previous one
      */
-    SpacingType m_spacingType = SpacingType::None;
+    SystemAligner::SpacingType m_spacingType = SystemAligner::SpacingType::None;
 
     /**
      * The list of FloatingPositioner for the staff.
