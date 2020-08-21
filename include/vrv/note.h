@@ -117,7 +117,7 @@ public:
     ///@}
 
     /**
-     * Check if the note has leger lines.
+     * Check if the note has ledger lines.
      * If staff is passed, use it for getting the staff line number.
      * Otherwise, it will look for the Staff ancestor.
      * Set the value of ledger lines above or below.
