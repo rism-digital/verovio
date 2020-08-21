@@ -15,23 +15,26 @@ var content;
 var glyphAnchors, glyphMap;
 
 // Retain same behavior for the json file
-if (metadata.search(".json") != -1) {
+if (metadata.search(".json") !== -1) {
 	content = JSON.parse(fs.read(metadata));
 	if (content.hasOwnProperty("glyphsWithAnchors")) {
 		glyphAnchors = content["glyphsWithAnchors"];
 	}
 }
 // Or parse file and create symbol-code mapping if cgf file has been provided
-else if (metadata.search(".cfg") != -1)
+else if (metadata.search(".g2n") !== -1)
 {
 	glyphMap = new Map();
 	content = fs.read(metadata);
 	lines = content.split("\n");
 	for(i in lines) {
-		var input = lines[i].split(" ");
-		if (input[1] == "N") {
-			glyphMap[input[2]] = parseInt(input[0], 16);
+		var input = lines[i].split(new RegExp("\\s+"));
+		if (input.length !== 6) {
+			continue;
 		}
+		//GLYPHID n	PSNAME str	UNICODE hex
+		glyphMap[input[3]] = parseInt(input[5], 16);
+		
 	}
 }
 
