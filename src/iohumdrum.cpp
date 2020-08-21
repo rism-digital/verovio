@@ -878,6 +878,12 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
     tie->SetTstamp2(ts2); // attach start to beginning of measure
     tie->SetStartid("#" + startid);
 
+    int track = token->getTrack();
+    std::vector<int> &rkern = m_rkern;
+    int staffindex = rkern[track];
+    int staffnum = staffindex + 1;
+    setStaff(tie, staffnum);
+
     return tie;
 }
 
@@ -889,10 +895,11 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
 void HumdrumInput::processHangingTieEnd(
     Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit)
 {
+    Tie *tie = NULL;
     hum::HumNum position = token->getDurationFromStart();
     if (position == 0) {
         // Hanging tie at start of music.
-        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
+        tie = tieToPreviousItem(token, subindex, meterunit);
         addType(tie, "hanging-initial");
     }
     else if (atEndingBoundaryStart(token)) {
@@ -901,15 +908,23 @@ void HumdrumInput::processHangingTieEnd(
         // measure before the first ending.  Also need to force
         // a tie split across ending boundaries (currently they will
         // automatically merge).
-        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
+        tie = tieToPreviousItem(token, subindex, meterunit);
         addType(tie, "hanging-initial-ending");
     }
     else {
         // This is a hanging tie for no apparent reason.  Display it, but make
         // it red. L.v. will be handled differently as an ornament.
-        Tie *tie = tieToPreviousItem(token, subindex, meterunit);
+        tie = tieToPreviousItem(token, subindex, meterunit);
         addType(tie, "hanging");
         tie->SetColor("red");
+    }
+
+    if (tie != NULL) {
+        int track = token->getTrack();
+        std::vector<int> &rkern = m_rkern;
+        int staffindex = rkern[track];
+        int staffnum = staffindex + 1;
+        setStaff(tie, staffnum);
     }
 }
 
