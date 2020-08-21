@@ -58,8 +58,7 @@ void Page::Reset()
     m_PPUFactor = 1.0;
 
     m_drawingJustifiableHeight = 0;
-    m_drawingJustifiableSystems = 0;
-    m_drawingJustifiableStaves = 0;
+    m_justificationSum = 0.;
 }
 
 bool Page::IsSupportedChild(Object *child)
@@ -508,7 +507,7 @@ void Page::JustifyVertically()
     assert(this == doc->GetDrawingPage());
 
     // Nothing to justify
-    if (this->m_drawingJustifiableHeight < 0) {
+    if (m_drawingJustifiableHeight <= 0 || m_justificationSum <= 0) {
         return;
     }
 
@@ -516,9 +515,6 @@ void Page::JustifyVertically()
     if (!doc->GetOptions()->m_justifyVertically.GetValue()) {
         return;
     }
-
-    bool systemsOnly = doc->GetOptions()->m_justifySystemsOnly.GetValue();
-    int stepSize = this->CalcJustificationStepSize(systemsOnly);
 
     // Last page and justification of last page is not enabled
     Pages *pages = doc->GetPages();
@@ -531,14 +527,9 @@ void Page::JustifyVertically()
         if (idx > 0) {
             Page *penultimatePage = dynamic_cast<Page *>(pages->GetPrevious(this));
             assert(penultimatePage);
-            if (!penultimatePage->m_layoutDone) {
-                doc->SetDrawingPage(idx - 1);
-                penultimatePage->LayOut();
-                doc->SetDrawingPage(idx);
-            }
-            int previousStepSize = penultimatePage->CalcJustificationStepSize(systemsOnly);
-            if (previousStepSize < stepSize) {
-                stepSize = previousStepSize;
+
+            if (penultimatePage->m_drawingJustifiableHeight < this->m_drawingJustifiableHeight) {
+                this->m_drawingJustifiableHeight = penultimatePage->m_drawingJustifiableHeight;
             }
         }
     }
@@ -546,7 +537,8 @@ void Page::JustifyVertically()
     // Justify Y position
     Functor justifyY(&Object::JustifyY);
     JustifyYParams justifyYParams(&justifyY, doc);
-    justifyYParams.m_stepSize = stepSize;
+    justifyYParams.m_justificationSum = this->m_justificationSum;
+    justifyYParams.m_spaceToDistribute = this->m_drawingJustifiableHeight;
     this->Process(&justifyY, &justifyYParams);
 }
 
@@ -618,28 +610,6 @@ int Page::GetContentWidth() const
     doc = NULL;
 
     return maxWidth;
-}
-
-int Page::CalcJustificationStepSize(bool systemsOnly) const
-{
-    if (this->m_drawingJustifiableHeight < 0) {
-        return 0;
-    }
-
-    int stepCount = 0;
-    if (systemsOnly) {
-        stepCount = this->m_drawingJustifiableSystems - 1;
-    }
-    else {
-        stepCount = this->m_drawingJustifiableStaves - 1;
-    }
-
-    // Step should be greater than one...
-    if (stepCount == 0) {
-        return 0;
-    }
-
-    return this->m_drawingJustifiableHeight / stepCount;
 }
 
 void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
@@ -719,8 +689,7 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift
-        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift = 0;
 
     // Also align the header and footer
 
@@ -745,8 +714,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
-    params->m_justifiableSystems = 0;
-    params->m_justifiableStaves = 0;
+    params->m_justificationSum = 0;
 
     RunningElement *header = this->GetHeader();
     if (header) {
@@ -771,8 +739,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
     assert(params);
 
     this->m_drawingJustifiableHeight = params->m_shift;
-    this->m_drawingJustifiableSystems = params->m_justifiableSystems;
-    this->m_drawingJustifiableStaves = params->m_justifiableStaves;
+    this->m_justificationSum = params->m_justificationSum;
 
     RunningElement *footer = this->GetFooter();
     if (footer) {

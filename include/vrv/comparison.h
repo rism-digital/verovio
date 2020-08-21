@@ -15,6 +15,8 @@
 #include "measure.h"
 #include "note.h"
 #include "object.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -432,6 +434,38 @@ public:
 
 private:
     int m_time;
+};
+
+//----------------------------------------------------------------------------
+// VisibleStaffDefOrGrpObject
+//----------------------------------------------------------------------------
+/**
+ * This class evaluates if the object is a visible StaffDef or StaffGrp.
+ * As well it is able to exlude object passed to skip from the result set.
+ */
+class VisibleStaffDefOrGrpObject : public ClassIdsComparison {
+
+public:
+    VisibleStaffDefOrGrpObject() : ClassIdsComparison({ STAFFDEF, STAFFGRP }) {}
+
+    void Skip(const Object *objectToExclude) { m_objectToExclude = objectToExclude; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (object == m_objectToExclude || !ClassIdsComparison::operator()(object))
+            return false;
+
+        if (object->Is(STAFFDEF)) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(object);
+            return staffDef && staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
+        }
+
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(object);
+        return staffGrp && staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN;
+    }
+
+protected:
+    const Object *m_objectToExclude;
 };
 
 } // namespace vrv
