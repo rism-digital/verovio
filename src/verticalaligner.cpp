@@ -460,6 +460,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
     int dist = params->m_previousStaffAlignment->GetYRel() - this->GetYRel();
     dist -= params->m_previousStaffAlignment->m_staffHeight;
     int centerYRel = dist / 2 + params->m_previousStaffAlignment->m_staffHeight;
+    
 
     for (auto &positioner : *params->m_previousStaffPositioners) {
         assert(positioner->GetObject());
@@ -470,24 +471,36 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
         // Skip if no content bounding box is available
         if (!positioner->HasContentBB()) continue;
 
-        positioner->SetDrawingYRel(centerYRel);
-
-        /*
+        //positioner->SetDrawingYRel(centerYRel);
+        int diffY = centerYRel - positioner->GetDrawingYRel();
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowAboveBBoxes;
         auto i = overflowBoxes->begin();
         auto end = overflowBoxes->end();
+        bool adjusted = false;
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizonatally
             i = std::find_if(i, end, [positioner](BoundingBox *elem) { return
-        positioner->HorizontalContentOverlap(elem); }); if (i != end) {
+        positioner->HorizontalContentOverlap(elem); });
+            if (i != end) {
                 // update the yRel accordingly
-                //(*iter)->CalcDrawingYRel(params->m_doc, this, *i);
+                int y = positioner->CalcBDrawingYRel(params->m_doc, this, *i);
+                if (y < diffY) {
+                    diffY = y;
+                    adjusted = true;
+                }
                 i++;
             }
+        
+            if (!adjusted) {
+                positioner->SetDrawingYRel(centerYRel);
+            }
+            else {
+                positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
+            }
         }
-        */
     }
+
 
     params->m_previousStaffPositioners = &m_floatingPositioners;
     params->m_previousStaffAlignment = this;
