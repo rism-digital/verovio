@@ -16570,12 +16570,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     // handle ties
-    if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
-        processTieStart(note, token, tstring, subtoken);
-    }
+    if (!token->isDataType("**mens")) {
+        if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
+            processTieStart(note, token, tstring, subtoken);
+        }
 
-    if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
-        processTieEnd(note, token, tstring, subtoken);
+        if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
+            processTieEnd(note, token, tstring, subtoken);
+        }
     }
 
     if (m_signifiers.above) {
@@ -18486,6 +18488,9 @@ void HumdrumInput::addTrill(hum::HTp token)
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    if (token->isDataType("**mens")) {
+        return;
+    }
     std::string endtag = "tieEnd";
     if (subindex >= 0) {
         endtag += to_string(subindex + 1);
@@ -18605,6 +18610,9 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
 void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    if (token->isDataType("**mens")) {
+        return;
+    }
     std::string starttag = "tieStart";
     if (token->isChord()) {
         starttag += to_string(subindex + 1);
