@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Aug 18 03:19:15 PDT 2020
+// Last Modified: Sat Aug 22 18:16:35 PDT 2020
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -69676,8 +69676,8 @@ void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 	int mcount = 0;
 	for (int i=0; i<(int)attacks.size(); i++) {
 		for (int j=0; j<(int)attacks[i].size(); j++) {
-			checkForMatchDiatonicPC(attacks[i], j, query, match);
-			if (!match.empty()) {
+			bool status = checkForMatchDiatonicPC(attacks[i], j, query, match);
+			if (status && !match.empty()) {
 				mcount++;
 				markMatch(infile, match);
 				// cerr << "FOUND MATCH AT " << i << ", " << j << endl;
@@ -69831,7 +69831,8 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 	if (match.back() != NULL) {
 		mend = match.back()->getToken();
 	} else {
-		cerr << "GOT TO THIS STRANGE PLACE start=" << mstart << endl;
+		// there is an extra NULL token at the end of the music to allow
+		// marking tied notes.
 	}
 	HTp tok = mstart;
 	string text;
@@ -69932,6 +69933,7 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 	int maxi = (int)notes.size() - index;
 	if ((int)query.size() > maxi) {
 		// Search would extend off of the end of the music, so cannot be a match.
+		match.clear();
 		return false;
 	}
 
@@ -69974,21 +69976,43 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 		// INTERVAL
 		//
 
-		if (!query[i].anyinterval) {
+		if (query[i].dinterval > -1000) {
+			// match to a specific interval to the next note
+
+			double currpitch;
+			double nextpitch;
+
+			currpitch = notes[currindex]->getAbsDiatonicPitch();
+
+			if (nextindex >= 0) {
+				nextpitch = notes[nextindex]->getAbsDiatonicPitch();
+			} else {
+				nextpitch = -123456789.0;
+			}
+
+			int interval = nextpitch - currpitch;
+
+			if (interval != query[i].dinterval) {
+				match.clear();
+				return false;
+			}
+
+		} else if (!query[i].anyinterval) {
+
 			double currpitch;
 			double nextpitch;
 			double lastpitch;
 
-			currpitch = notes[currindex]->getAbsMidiPitch();
+			currpitch = notes[currindex]->getAbsDiatonicPitchClass();
 
 			if (nextindex >= 0) {
-				nextpitch = notes[nextindex]->getAbsMidiPitch();
+				nextpitch = notes[nextindex]->getAbsDiatonicPitchClass();
 			} else {
 				nextpitch = -123456789.0;
 			}
 
 			if (lastindex >= 0) {
-				lastpitch = notes[nextindex]->getAbsMidiPitch();
+				lastpitch = notes[nextindex]->getAbsDiatonicPitchClass();
 			} else {
 				lastpitch = -987654321.0;
 			}
@@ -70058,7 +70082,7 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 
 		//////////////////////////////
 		//
-		// INTERVAL
+		// PITCH
 		//
 			
 		if (!query[i].anypitch) {
@@ -70224,9 +70248,67 @@ void Tool_msearch::fillMusicQueryRhythm(vector<MSearchQueryToken>& query,
 void Tool_msearch::fillMusicQueryInterval(vector<MSearchQueryToken>& query,
 		const string& input) {
 
+	char ch;
+	int counter = 0;
+	MSearchQueryToken temp;
+	MSearchQueryToken *active = &temp;
+
+	if (query.size() > 0) {
+		active = &query.at(counter);
+	} else {
+		// what is this for?
+	}
+
+	for (int i=0; i<(int)input.size(); i++) {
+		ch = tolower(input[i]);
+
+		if (ch == ' ') {
+			// skip over spaces
+			continue;
+		}
+
+		if (!isdigit(ch)) {
+			// skip over non-digits (sign of interval
+			// will be read retroactively).
+			continue;
+		}
+
+		// check for intervals.  Intervals will trigger a
+		// new element in the query list
+
+		active->anything = false;
+		active->anyinterval = false;
+		// active->direction = 1;
+		active->dinterval = (ch - '0') - 1; // zero-indexed interval
+		if ((i>0) && (input[i-1] == '-')) {
+			active->dinterval *= -1;
+		}
+		if (active == &temp) {
+			query.push_back(temp);
+			temp.clear();
+		}
+		counter++;
+		if ((int)query.size() > counter) {
+			active = &query.at(counter);
+		} else {
+			active = &temp;
+		}
+	}
+
+	// The last element in the interval search is set to 
+	// any pitch, because the interval was already checked
+	// to the next note, and this value is needed to highlight
+	// the next note of the interval.
+	active->anything = true;
+	active->anyinterval = true;
+	if (active == &temp) {
+		query.push_back(temp);
+		temp.clear();
+	}
 
 
 }
+
 
 
 
@@ -70443,6 +70525,7 @@ ostream& operator<<(ostream& out, MSearchQueryToken& item) {
 	out << "\tPC:\t\t"        << item.pc          << endl;
 	out << "\tBASE:\t\t"      << item.base        << endl;
 	out << "\tDIRECTION:\t"   << item.direction   << endl;
+	out << "\tDINTERVAL:\t"   << item.dinterval   << endl;
 	out << "\tRHYTHM:\t\t"    << item.rhythm      << endl;
 	out << "\tDURATION:\t"    << item.duration    << endl;
 	return out;

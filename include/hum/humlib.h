@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Aug 18 03:19:15 PDT 2020
+// Last Modified: Sat Aug 22 18:16:35 PDT 2020
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6706,6 +6706,7 @@ class MSearchQueryToken {
 			pc          = token.pc;
 			base        = token.base;
 			direction   = token.direction;
+			dinterval   = token.dinterval;
 			duration    = token.duration;
 			rhythm      = token.rhythm;
 		}
@@ -6720,6 +6721,7 @@ class MSearchQueryToken {
 			pc          = token.pc;
 			base        = token.base;
 			direction   = token.direction;
+			dinterval   = token.dinterval;
 			duration    = token.duration;
 			rhythm      = token.rhythm;
 			return *this;
@@ -6732,6 +6734,7 @@ class MSearchQueryToken {
 			pc           = NAN;
 			base         = 0;
 			direction    = -123456789;
+			dinterval    = -123456789;
 			duration     = -1;
 			rhythm       = "";
 		}
@@ -6746,7 +6749,8 @@ class MSearchQueryToken {
 		int    base;
 
 		// interval features:
-		int    direction;
+		int    direction;   // which melodic direction for interval?
+		int    dinterval;   // diatonic interval
 
 		// rhythm features:
 		HumNum duration;
