@@ -1052,7 +1052,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed
-    if (!Resources::SetFont(m_options->m_font.GetValue())) {
+    if (!Resources::SetMusicFont(m_options->m_font.GetValue())) {
         LogWarning("Font '%s' could not be loaded", m_options->m_font.GetValue().c_str());
     }
 

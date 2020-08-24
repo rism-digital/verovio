@@ -581,6 +581,7 @@ public:
     OptionDbl m_thickBarlineThickness;
     OptionDbl m_tieThickness;    
     OptionDbl m_tupletBracketThickness;
+    OptionString m_textFont;
 
     /**
      * Selectors
