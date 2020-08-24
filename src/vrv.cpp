@@ -84,25 +84,9 @@ bool Resources::InitFonts()
         return false;
     }
 
-    struct TextFontInfo_type {
-        const StyleAttributes m_style;
-        const std::string m_fileName;
-        bool m_isMandatory;
-    };
-
-    static const TextFontInfo_type textFontInfos[] = { { k_defaultStyle, "Times", true },
-        { k_defaultStyle, "VerovioText-1.0", true }, { { FONTWEIGHT_bold, FONTSTYLE_normal }, "Times-bold", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "VerovioText-1.0", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "Times-bold-italic", false },
-        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "VerovioText-1.0", false },
-        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "Times-italic", false },
-        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "VerovioText-1.0", false } };
-
-    for (const auto &textFontInfo : textFontInfos) {
-        if (!InitTextFont(textFontInfo.m_fileName, textFontInfo.m_style) && textFontInfo.m_isMandatory) {
-            LogError("Text font could not be initialized.");
-            return false;
-        }
+    if (!SetTextFont("VerovioText-1.0", false)) {
+        LogError("Text font could not be initialized.");
+        return false;
     }
 
     s_currentStyle = k_defaultStyle;
@@ -110,9 +94,33 @@ bool Resources::InitFonts()
     return true;
 }
 
-bool Resources::SetFont(const std::string &fontName)
+bool Resources::SetMusicFont(const std::string &fontName)
 {
     return LoadFont(fontName);
+}
+
+bool Resources::SetTextFont(const std::string &fontName, const bool usePostfixes)
+{
+    struct TextFontInfo_type {
+        const StyleAttributes m_style;
+        const std::string m_postfix;
+        bool m_isMandatory;
+    };
+
+    static const TextFontInfo_type textFontInfos[] = {
+        { k_defaultStyle, "", true },
+        { { FONTWEIGHT_bold, FONTSTYLE_normal }, "-bold", false },
+        { { FONTWEIGHT_bold, FONTSTYLE_italic }, "-bold-italic", false },
+        { { FONTWEIGHT_normal, FONTSTYLE_italic }, "-italic", false } };
+
+    for (const auto &textFontInfo : textFontInfos) {
+        const bool success = InitTextFont(fontName + (usePostfixes ? textFontInfo.m_postfix : ""), textFontInfo.m_style);
+        if (!success && textFontInfo.m_isMandatory) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 Glyph *Resources::GetGlyph(wchar_t smuflCode)

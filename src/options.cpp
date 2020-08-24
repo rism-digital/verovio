@@ -789,6 +789,10 @@ Options::Options()
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
+    m_textFont.SetInfo("Text font", "Set the text font");
+    m_textFont.Init("Times");
+    this->Register(&m_textFont, "textFont", &m_generalLayout);
+
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
