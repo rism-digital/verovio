@@ -376,6 +376,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     assert(params->m_interface);
 
     int staffSize = params->m_staff->m_drawingStaffSize;
+    int stemShift = params->m_doc->GetDrawingStemWidth(staffSize) / 2;
     bool drawingCueSize = this->GetDrawingCueSize();
 
     /************ Set the position, the length and adjust to the note head ************/
@@ -398,18 +399,22 @@ int Stem::CalcStem(FunctorParams *functorParams)
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetStemPos() == STEMPOSITION_left) {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+                p.x += stemShift;
             }
             else {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+                p.x -= stemShift;
             }
             this->SetDrawingStemLen(baseStem + params->m_chordStemLength + p.y);
         }
         else {
             if (this->GetStemPos() == STEMPOSITION_right) {
                 p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+                p.x -= stemShift;
             }
             else {
                 p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+                p.x += stemShift;
             }
             this->SetDrawingStemLen(-(baseStem + params->m_chordStemLength - p.y));
         }

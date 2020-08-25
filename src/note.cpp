@@ -249,8 +249,6 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
     // x default is always set to the right for now
     int defaultXShift = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, isCueSize);
-    // adjust the x shift in order to take the stem width into account
-    defaultXShift -= doc->GetDrawingStemWidth(staffSize) / 2;
     Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
@@ -263,11 +261,6 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
         code = this->GetMensuralSmuflNoteHead();
         p.y = doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
-    }
-
-    // Use the default for standard quarter and half note heads
-    if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
-        return p;
     }
 
     Glyph *glyph = Resources::GetGlyph(code);
@@ -287,10 +280,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
     // x default is always set to the left for now
-    int defaultXShift = 0;
-    // adjust the x shift in order to take the stem width into account
-    defaultXShift += doc->GetDrawingStemWidth(staffSize) / 2;
-    Point p(defaultXShift, -defaultYShift);
+    Point p(0, -defaultYShift);
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
@@ -302,11 +292,6 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
         code = this->GetMensuralSmuflNoteHead();
         p.y = -doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
         p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
-    }
-
-    // Use the default for standard quarter and half note heads
-    if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
-        return p;
     }
 
     Glyph *glyph = Resources::GetGlyph(code);
