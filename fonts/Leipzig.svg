@@ -46,14 +46,15 @@ Version 5.2.40 - adding brace glyph
 Version 5.2.41 - adding sprechgesang glyph
 Version 5.2.42 - adding some notehead glyphs
 Version 5.2.43 - adding buzz roll glyph
+Version 5.2.44 - adding anchor points to noteheads
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20190801 at Mon Aug 17 21:19:25 2020
+Created by FontForge 20190801 at Fri Aug 21 15:11:07 2020
  By Klaus Rettinghaus
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.43
+Version 5.2.44
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
