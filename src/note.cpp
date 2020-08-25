@@ -409,7 +409,7 @@ wchar_t Note::GetNoteheadGlyph(const int duration) const
             { "noteheadNull", SMUFL_E0A5_noteheadNull } };
 
     if (HasGlyphName()) {
-        auto glyph = GetGlyphName();
+        const std::string glyph = GetGlyphName();
         if (additionalNoteheadSymbols.end() == additionalNoteheadSymbols.find(glyph)) {
             return SMUFL_E0A4_noteheadBlack;
         }
