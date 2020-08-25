@@ -52,6 +52,7 @@ Note::Note()
     , AttColor()
     , AttColoration()
     , AttCue()
+    , AttExtSym()
     , AttGraced()
     , AttMidiVelocity()
     , AttNoteAnlMensural()
@@ -67,6 +68,7 @@ Note::Note()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_CUE);
+    RegisterAttClass(ATT_EXTSYM);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_NOTEHEADS);
@@ -91,6 +93,7 @@ void Note::Reset()
     ResetColor();
     ResetColoration();
     ResetCue();
+    ResetExtSym();
     ResetGraced();
     ResetNoteAnlMensural();
     ResetNoteHeads();
@@ -252,7 +255,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
     Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = SMUFL_E0A4_noteheadBlack;
+    wchar_t code = GetNoteheadGlyph(GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
@@ -283,7 +286,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     Point p(0, -defaultYShift);
 
     // Here we should get the notehead value
-    wchar_t code = SMUFL_E0A4_noteheadBlack;
+    wchar_t code = GetNoteheadGlyph(GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
@@ -381,6 +384,53 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         }
     }
     return code;
+}
+
+wchar_t Note::GetNoteheadGlyph(const int duration) const 
+{
+    static std::map<std::string, wchar_t> additionalNoteheadSymbols
+        = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
+            { "noteheadDiamondWhiteWide", SMUFL_E0DE_noteheadDiamondWhiteWide },             
+            { "noteheadNull", SMUFL_E0A5_noteheadNull } };
+
+    if (HasGlyphName()) {
+        const std::string glyph = GetGlyphName();
+        if (additionalNoteheadSymbols.end() == additionalNoteheadSymbols.find(glyph)) {
+            return SMUFL_E0A4_noteheadBlack;
+        }
+        return additionalNoteheadSymbols[glyph];
+    }
+
+    switch (GetHeadShape()) {
+        case HEADSHAPE_quarter: return SMUFL_E0A4_noteheadBlack;
+        case HEADSHAPE_half: return SMUFL_E0A3_noteheadHalf;
+        case HEADSHAPE_whole: return SMUFL_E0A2_noteheadWhole;
+        //case HEADSHAPE_backslash: return SMUFL_noteheadBackslash;
+        //case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
+        case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
+        case HEADSHAPE_diamond: {
+            if (DUR_1 == duration) return SMUFL_E0D9_noteheadDiamondHalf;
+            return GetHeadFill() == FILL_void ? SMUFL_E0DD_noteheadDiamondWhite : SMUFL_E0DB_noteheadDiamondBlack;
+        }
+        //case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
+        //case HEADSHAPE_oval: return SMUFL_noteheadOval;
+        //case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
+        //case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
+        //case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
+        //case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
+        case HEADSHAPE_slash: return SMUFL_E101_noteheadSlashHorizontalEnds;
+        //case HEADSHAPE_square: return SMUFL_noteheadSquare;
+        case HEADSHAPE_x: {
+            if (DUR_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
+            if (DUR_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
+            return SMUFL_E0A9_noteheadXBlack;
+        } 
+        default: break;
+    }
+
+    if (DUR_1 == duration) return SMUFL_E0A2_noteheadWhole;
+    if (DUR_2 == duration) return SMUFL_E0A3_noteheadHalf;
+    return SMUFL_E0A4_noteheadBlack;
 }
 
 bool Note::IsVisible()

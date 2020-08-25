@@ -2542,6 +2542,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetHeadColor(notehead.node().attribute("color").as_string());
             note->SetHeadShape(ConvertNotehead(notehead.node().text().as_string()));
             if (notehead.node().attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
+            auto noteHeadFill = notehead.node().attribute("filled");
+            if (noteHeadFill) note->SetHeadFill(noteHeadFill.as_bool() ? FILL_solid : FILL_void);
             if (!std::strncmp(notehead.node().text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
         }
 
