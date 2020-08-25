@@ -1431,7 +1431,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     FontInfo dirTxt;
     if (!dc->UseGlobalStyling()) {
-        dirTxt.SetFaceName("Times");
+        dirTxt.SetFaceName(m_options->m_textFont.GetValue().c_str());
         dirTxt.SetStyle(FONTSTYLE_italic);
     }
 
@@ -1499,7 +1499,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     FontInfo dynamTxt;
     if (!dc->UseGlobalStyling()) {
-        dynamTxt.SetFaceName("Times");
+        dynamTxt.SetFaceName(m_options->m_textFont.GetValue().c_str());
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
 
@@ -1650,7 +1650,7 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
 
     FontInfo fingTxt;
     if (!dc->UseGlobalStyling()) {
-        fingTxt.SetFaceName("Times");
+        fingTxt.SetFaceName(m_options->m_textFont.GetValue().c_str());
     }
 
     TextDrawingParams params;
@@ -1802,7 +1802,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     FontInfo harmTxt;
     if (!dc->UseGlobalStyling()) {
-        harmTxt.SetFaceName("Times");
+        harmTxt.SetFaceName(m_options->m_textFont.GetValue().c_str());
     }
 
     TextDrawingParams params;
@@ -2028,7 +2028,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
 
     FontInfo rehTxt;
     if (!dc->UseGlobalStyling()) {
-        rehTxt.SetFaceName("Times");
+        rehTxt.SetFaceName(m_options->m_textFont.GetValue().c_str());
         rehTxt.SetWeight(FONTWEIGHT_bold);
     }
 
@@ -2080,7 +2080,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     FontInfo tempoTxt;
     if (!dc->UseGlobalStyling()) {
-        tempoTxt.SetFaceName("Times");
+        tempoTxt.SetFaceName(m_options->m_textFont.GetValue().c_str());
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
 
