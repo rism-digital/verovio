@@ -1252,6 +1252,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
+    svg.SetDefaultFontName(m_options->m_textFont.GetValue());
 
     int indent = (m_options->m_outputIndentTab.GetValue()) ? -1 : m_options->m_outputIndent.GetValue();
     svg.SetIndent(indent);
