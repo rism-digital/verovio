@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Support for buzz roll tremolos (@rettinghaus)
+* Support for `Sprechgesang` stems (@rettinghaus)
 * Support for `<phrase>`
 * Support (limited) for preserving XML comments in the MEI output
 * Support for `hairpin@opening` (@rettinghaus)

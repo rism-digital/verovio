@@ -70,7 +70,8 @@ BeamDrawingInterface::BeamDrawingInterface()
     Reset();
 }
 
-BeamDrawingInterface::~BeamDrawingInterface() {
+BeamDrawingInterface::~BeamDrawingInterface()
+{
     ClearCoords();
 }
 

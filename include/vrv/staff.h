@@ -117,8 +117,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLegerLineAbove(int count, int left, int right, bool cueSize);
-    void AddLegerLineBelow(int count, int left, int right, bool cueSize);
+    void AddLedgerLineAbove(int count, int left, int right, bool cueSize);
+    void AddLedgerLineBelow(int count, int left, int right, bool cueSize);
     ///@}
 
     //----------//
@@ -203,7 +203,7 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
+    void AddLedgerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
 
 public:
     /**

@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <bTrem> element.
  */
-class BTrem : public LayerElement, public AttTremMeasured {
+class BTrem : public LayerElement, public AttBTremLog, public AttTremMeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

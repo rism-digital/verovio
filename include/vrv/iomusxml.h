@@ -189,7 +189,7 @@ private:
     void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, std::string measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset);
     void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
@@ -237,9 +237,9 @@ private:
      * @name Helper methods for checking presence of values of attributes or elements
      */
     ///@{
-    bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
-    bool IsElement(pugi::xml_node node, std::string name);
-    bool HasContentWithValue(pugi::xml_node node, std::string value);
+    bool HasAttributeWithValue(const pugi::xml_node node, const std::string &attribute, const std::string &value) const;
+    bool IsElement(const pugi::xml_node node, const std::string &name) const;
+    bool HasContentWithValue(const pugi::xml_node node, const std::string &value) const;
     ///@}
 
     /*
@@ -253,8 +253,8 @@ private:
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
-    std::string GetContent(pugi::xml_node node);
-    std::string GetContentOfChild(pugi::xml_node node, std::string child);
+    std::string GetContent(const pugi::xml_node node) const;
+    std::string GetContentOfChild(const pugi::xml_node node, const std::string &child) const;
     ///@}
 
     /*
@@ -275,7 +275,8 @@ private:
      */
     ///@{
     ///@}
-    void TextRendition(pugi::xpath_node_set words, ControlElement *element);
+    std::string GetWordsOrDynamicsText(const pugi::xml_node node) const;
+    void TextRendition(const pugi::xpath_node_set words, ControlElement *element) const;
     std::string StyleLabel(pugi::xml_node display);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 

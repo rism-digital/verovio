@@ -106,8 +106,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
     const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();
 
-    assert(beamElementCoords->size() == 2);
-
+    if (beamElementCoords->size() != 2) {
+        LogError("View draw: <fTrem> element has invalid number of descendants.");
+        return;
+    }
     BeamElementCoord *firstElement = beamElementCoords->at(0);
     BeamElementCoord *secondElement = beamElementCoords->at(1);
 

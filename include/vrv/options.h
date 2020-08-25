@@ -498,7 +498,6 @@ public:
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
     OptionBool m_justifyIncludeLastPage;
-    OptionBool m_justifySystemsOnly;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
     OptionBool m_mensuralToMeasure;
@@ -541,6 +540,10 @@ public:
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
+    OptionDbl m_justificationBraceGroup;
+    OptionDbl m_justificationBracketGroup;
+    OptionDbl m_justificationStaff;
+    OptionDbl m_justificationSystem;
     OptionDbl m_lyricHyphenLength;
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
@@ -554,6 +557,9 @@ public:
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
+    OptionDbl m_slurThickness;
+    OptionInt m_spacingBraceGroup;
+    OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
