@@ -1928,11 +1928,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *fparent = NULL;
     Object *sparent = NULL;
     Object *currentParent = NULL;
-    Nc *firstNc = NULL;
-    Nc *secondNc = NULL;
-    bool success1 = false, success2 = false;
     int ligCount = 0;
-    bool firstIsSyl = false;
     Clef *oldClef = NULL;
     ClassIdComparison ac(CLEF);
     ListOfObjects syllables;
@@ -1949,84 +1945,12 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
 
-        // Check for ligatures and toggle them before ungrouping
-        // only if the ligature is the entire selection
-        if (groupType == "nc" && elementIds.size() == 2) {
-            Nc *nc = dynamic_cast<Nc *>(el);
-            assert(nc);
-            if (nc->HasLigated() && nc->GetLigated() == BOOLEAN_true) {
-                nc->SetLigated(BOOLEAN_false);
-                ligCount++;
-                if (ligCount == 1) {
-                    firstNc = nc;
-                    assert(firstNc);
-                }
-                else if (ligCount == 2) {
-                    secondNc = nc;
-                    assert(secondNc);
-                    Zone *zone = new Zone();
-
-                    Staff *staff = dynamic_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
-                    assert(staff);
-                    Facsimile *facsimile = m_doc->GetFacsimile();
-                    assert(facsimile);
-                    Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
-                    assert(surface);
-
-                    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-                    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-
-                    if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
-
-                    int ligUlx = firstNc->GetZone()->GetUlx();
-                    int ligUly = firstNc->GetZone()->GetUly();
-                    int ligLrx = firstNc->GetZone()->GetLrx();
-                    int ligLry = firstNc->GetZone()->GetLry();
-
-                    zone->SetUlx(ligUlx + noteWidth);
-                    zone->SetUly(ligUly + noteHeight);
-                    zone->SetLrx(ligLrx + noteWidth);
-                    zone->SetLry(ligLry + noteHeight);
-
-                    Zone *origZoneUuid = secondNc->GetZone();
-                    surface->DeleteChild(origZoneUuid);
-
-                    secondNc->SetZone(zone);
-                    // secondNc->ResetFacsimile();
-
-                    if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
-                    if (success1 && success2) {
-                        ligCount = 0;
-                        firstNc = NULL;
-                        secondNc = NULL;
-                    }
-                    else {
-                        LogError("Unable to toggle ligature within ungroup ncs!");
-                        m_infoObject.import("status", "FAILURE");
-                        m_infoObject.import("message", "Unable to toggle ligature within ungroup ncs.");
-                        return false;
-                    }
-                }
-            }
-        }
-        if (elementIds.begin() == it || firstIsSyl) {
-            // if the element is a syl we want it to stay attached to the first element
-            // we'll still need to initialize all the parents, thus the bool
+        if (groupType == "neume") {
+            // Keep the syl attached to the original syllable.
             if (el->Is(SYL)) {
-                firstIsSyl = true;
                 continue;
             }
-            else if (groupType == "nc") {
-                fparent = el->GetFirstAncestor(NEUME);
-                assert(fparent);
-                uuidArray << fparent->GetUuid();
-                sparent = fparent->GetFirstAncestor(SYLLABLE);
-                assert(sparent);
-                currentParent = dynamic_cast<Neume *>(fparent);
-                assert(currentParent);
-                firstIsSyl = false;
-            }
-            else if (groupType == "neume") {
+            if (currentParent == NULL) {
                 fparent = el->GetFirstAncestor(SYLLABLE);
                 assert(fparent);
                 uuidArray << fparent->GetUuid();
@@ -2034,52 +1958,36 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 assert(sparent);
                 currentParent = dynamic_cast<Syllable *>(fparent);
                 assert(currentParent);
-                firstIsSyl = false;
+
+                // Get clef for clef changes
                 oldClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, currentParent));
                 if (oldClef == NULL) {
                     oldClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
                 }
             }
+
             else {
-                LogError("Invalid groupType for ungrouping");
-                m_infoObject.import("status", "FAILURE");
-                m_infoObject.import("message", "Invalid groupType for ungrouping.");
-                return false;
-            }
-        }
-        else if (currentParent) {
-            if (groupType == "nc") {
-                Nc *nc = dynamic_cast<Nc *>(el);
-                assert(nc);
-                if (nc->HasLigated() && (nc->GetLigated() == BOOLEAN_true)) nc->SetLigated(BOOLEAN_false);
-            }
+                // Create a new parent
+                Object *newParent = currentParent->Clone();
+                newParent->CloneReset();
+                assert(newParent);
+                newParent->ClearChildren();
 
-            // if the element is a syl then we want to keep it attached to the first node
+                // Reassign neume
+                el->MoveItselfTo(newParent);
+                fparent->ClearRelinquishedChildren();
 
-            if (el->Is(SYL)) {
-                continue;
-            }
-            Object *newParent = currentParent->Clone();
-            newParent->CloneReset();
-            assert(newParent);
-            newParent->ClearChildren();
-
-            el->MoveItselfTo(newParent);
-            fparent->ClearRelinquishedChildren();
-
-            if (newParent->Is(SYLLABLE)) {
                 syllables.push_back(newParent);
-
                 Syl *syl = new Syl();
                 Text *text = new Text();
                 syl->AddChild(text);
                 newParent->AddChild(syl);
 
-                // add a default bounding box if you need to
+                // Create default bounding box if facs
                 if (m_doc->GetType() == Facs) {
                     Zone *zone = new Zone();
 
-                    // if it's syllable parent has position values just use those
+                    // Use syllable parent positions if possible
                     FacsimileInterface *syllableFi = NULL;
                     if (syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
                         syllableFi = syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface();
@@ -2134,17 +2042,67 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
                     assert(fi);
                     fi->SetZone(zone);
+                }
+                uuidArray << newParent->GetUuid();
+                sparent->AddChild(newParent);
+                sparent->ReorderByXPos();
+            }
+        }
+        else if (groupType == "nc") {
+            // Only ungroup ligatures if the entire neume is a ligature!
+            Nc *nc = dynamic_cast<Nc *>(el);
+            assert(nc);
+            if (elementIds.size() == 2 && nc->GetLigated() == BOOLEAN_true)  {
+                this->ToggleLigature(elementIds, "true");
+            }
+            // Keep track of existing ligatures
+            if (nc->GetLigated() == BOOLEAN_true) {
+                ligCount += 1;
+            }
 
-                    // syl->ResetFacsimile();
-                    // syl->SetFacs(zone->GetUuid());
+            if (elementIds.begin() == it) {
+                fparent = el->GetFirstAncestor(NEUME);
+                assert(fparent);
+                uuidArray << fparent->GetUuid();
+                sparent = fparent->GetFirstAncestor(SYLLABLE);
+                assert(sparent);
+                currentParent = dynamic_cast<Neume *>(fparent);
+                assert(currentParent);
+            }
+            else {
+                // Maintain ligatures
+                if (ligCount == 2) {
+                    if (currentParent != fparent) {
+                        el->MoveItselfTo(currentParent);
+                        fparent->ClearRelinquishedChildren();
+                    }
+                    ligCount = 0;
+                }
+                else {
+                    Object *newParent = currentParent->Clone();
+                    newParent->CloneReset();
+                    assert(newParent);
+                    newParent->ClearChildren();
+
+                    el->MoveItselfTo(newParent);
+                    fparent->ClearRelinquishedChildren();
+                    uuidArray << newParent->GetUuid();
+                    sparent->AddChild(newParent);
+                    sparent->ReorderByXPos();
+
+                    currentParent = newParent;
                 }
             }
-            uuidArray << newParent->GetUuid();
-
-            sparent->AddChild(newParent);
-            sparent->ReorderByXPos();
+        }
+        else {
+            LogError("Invalid groupType: %s", groupType.c_str());
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "Invalid groupType for ungrouping.");
+            return false;
         }
     }
+
+    // Check for clef change
     if (syllables.size() != 0) {
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
