@@ -525,6 +525,7 @@ public:
     OptionDbl m_stemWidth;
     OptionIntMap m_systemDivider;
     OptionInt m_systemMaxPerPage;
+    OptionString m_textFont;
     OptionDbl m_tieThickness;
 
     /**
