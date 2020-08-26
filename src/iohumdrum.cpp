@@ -10978,6 +10978,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             // otherwise "zz" on **kern notes is probably better.
             dynamic = "sfz";
         }
+        else if (letters == "sff") {
+            dynamic = "sff";
+        }
         else if (letters == "rf") {
             dynamic = "rf";
         }
