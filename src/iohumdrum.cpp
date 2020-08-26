@@ -11218,10 +11218,19 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 dir->SetTstamp(tstamp.getFloat());
                 std::string fontstyle;
                 std::string content = "cresc.";
+
                 if (!m_signifiers.cresctext.empty()) {
                     content = m_signifiers.cresctext;
                     fontstyle = m_signifiers.crescfontstyle;
                 }
+
+                std::string pintext = getLayoutParameter(dyntok, "HP", "t", "", "");
+                if (!pintext.empty()) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(pintext, content, "%s", "g");
+                    content = pintext;
+                }
+
                 addTextElement(dir, content, fontstyle);
                 if (aboveQ) {
                     setPlace(dir, "above");
@@ -11328,6 +11337,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     content = m_signifiers.decresctext;
                     fontstyle = m_signifiers.decrescfontstyle;
                 }
+
+                std::string pintext = getLayoutParameter(dyntok, "HP", "t", "", "");
+                if (!pintext.empty()) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(pintext, content, "%s", "g");
+                    content = pintext;
+                }
+
                 addTextElement(dir, content, fontstyle);
                 if (aboveQ) {
                     setPlace(dir, "above");
