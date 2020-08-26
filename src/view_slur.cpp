@@ -246,7 +246,7 @@ void View::DrawSlurInitial(FloatingCurvePositioner *curve, Slur *slur, int x1, i
     bool isShortSlur = false;
     if (x2 - x1 < 1 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
 
-    int yChordMax, yChordMin;
+    int yChordMax = 0, yChordMin = 0;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
         if (startParentChord) {
