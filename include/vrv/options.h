@@ -557,7 +557,6 @@ public:
     OptionDbl m_slurMaxHeight;
     OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
-    OptionDbl m_slurThickness;
     OptionInt m_spacingBraceGroup;
     OptionInt m_spacingBracketGroup;
     OptionBool m_spacingDurDetection;
