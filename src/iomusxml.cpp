@@ -1350,7 +1350,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             // and with earliest end note.
             if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
                 && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
+                       && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
                 iter->first->SetEndid("#" + (*jter)->GetUuid());
                 lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
                 tieMatched = true;
@@ -3153,32 +3153,21 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::string &value)
 {
-    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> Accidental2Accid {
-        { "sharp", ACCIDENTAL_WRITTEN_s },
-        { "natural", ACCIDENTAL_WRITTEN_n },
-        { "flat", ACCIDENTAL_WRITTEN_f },
-        { "double-sharp", ACCIDENTAL_WRITTEN_x },
-        { "sharp-sharp", ACCIDENTAL_WRITTEN_ss },
-        { "flat-flat", ACCIDENTAL_WRITTEN_ff },
-        { "natural-sharp", ACCIDENTAL_WRITTEN_ns },
-        { "natural-flat", ACCIDENTAL_WRITTEN_nf },
-        { "quarter-flat", ACCIDENTAL_WRITTEN_1qf },
-        { "quarter-sharp", ACCIDENTAL_WRITTEN_1qs },
-        { "three-quarters-flat", ACCIDENTAL_WRITTEN_3qf },
-        { "three-quarters-sharp", ACCIDENTAL_WRITTEN_3qs },
-        { "sharp-down", ACCIDENTAL_WRITTEN_sd },
-        { "sharp-up", ACCIDENTAL_WRITTEN_su },
-        { "natural-down", ACCIDENTAL_WRITTEN_nd },
-        { "natural-up", ACCIDENTAL_WRITTEN_nu },
-        { "flat-down", ACCIDENTAL_WRITTEN_fd },
-        { "flat-up", ACCIDENTAL_WRITTEN_fu },
-        { "triple-sharp", ACCIDENTAL_WRITTEN_ts },
-        { "triple-flat", ACCIDENTAL_WRITTEN_tf }
-    };
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> Accidental2Accid{ { "sharp", ACCIDENTAL_WRITTEN_s },
+        { "natural", ACCIDENTAL_WRITTEN_n }, { "flat", ACCIDENTAL_WRITTEN_f }, { "double-sharp", ACCIDENTAL_WRITTEN_x },
+        { "sharp-sharp", ACCIDENTAL_WRITTEN_ss }, { "flat-flat", ACCIDENTAL_WRITTEN_ff },
+        { "natural-sharp", ACCIDENTAL_WRITTEN_ns }, { "natural-flat", ACCIDENTAL_WRITTEN_nf },
+        { "quarter-flat", ACCIDENTAL_WRITTEN_1qf }, { "quarter-sharp", ACCIDENTAL_WRITTEN_1qs },
+        { "three-quarters-flat", ACCIDENTAL_WRITTEN_3qf }, { "three-quarters-sharp", ACCIDENTAL_WRITTEN_3qs },
+        { "sharp-down", ACCIDENTAL_WRITTEN_sd }, { "sharp-up", ACCIDENTAL_WRITTEN_su },
+        { "natural-down", ACCIDENTAL_WRITTEN_nd }, { "natural-up", ACCIDENTAL_WRITTEN_nu },
+        { "flat-down", ACCIDENTAL_WRITTEN_fd }, { "flat-up", ACCIDENTAL_WRITTEN_fu },
+        { "triple-sharp", ACCIDENTAL_WRITTEN_ts }, { "triple-flat", ACCIDENTAL_WRITTEN_tf } };
 
     const auto result = Accidental2Accid.find(value);
-    if (result != Accidental2Accid.end())
+    if (result != Accidental2Accid.end()) {
         return result->second;
+    }
 
     LogWarning("MusicXML import: Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_WRITTEN_NONE;
@@ -3186,21 +3175,15 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
 
 data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
 {
-    static const std::map<float, data_ACCIDENTAL_GESTURAL> Alter2Accid {
-        { -2, ACCIDENTAL_GESTURAL_ff },
-        { -1.5, ACCIDENTAL_GESTURAL_fd },
-        { -1, ACCIDENTAL_GESTURAL_f },
-        { -0.5, ACCIDENTAL_GESTURAL_fu },
-        { 0, ACCIDENTAL_GESTURAL_n },
-        { 0.5, ACCIDENTAL_GESTURAL_sd },
-        { 1, ACCIDENTAL_GESTURAL_s },
-        { 1.5, ACCIDENTAL_GESTURAL_su },
-        { 2, ACCIDENTAL_GESTURAL_ss }
-    };
+    static const std::map<float, data_ACCIDENTAL_GESTURAL> Alter2Accid{ { -2, ACCIDENTAL_GESTURAL_ff },
+        { -1.5, ACCIDENTAL_GESTURAL_fd }, { -1, ACCIDENTAL_GESTURAL_f }, { -0.5, ACCIDENTAL_GESTURAL_fu },
+        { 0, ACCIDENTAL_GESTURAL_n }, { 0.5, ACCIDENTAL_GESTURAL_sd }, { 1, ACCIDENTAL_GESTURAL_s },
+        { 1.5, ACCIDENTAL_GESTURAL_su }, { 2, ACCIDENTAL_GESTURAL_ss } };
 
     const auto result = Alter2Accid.find(value);
-    if (result != Alter2Accid.end())
+    if (result != Alter2Accid.end()) {
         return result->second;
+    }
 
     LogWarning("MusicXML import: Unsupported alter value '%.1f'", value);
     return ACCIDENTAL_GESTURAL_NONE;
@@ -3208,37 +3191,22 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
 
 data_ARTICULATION MusicXmlInput::ConvertArticulations(const std::string &value)
 {
-    static const std::map<std::string, data_ARTICULATION> Articulations2Id {
-        // articulations
-        { "accent", ARTICULATION_acc },
-        { "detached-legato", ARTICULATION_NONE },
-        { "doit", ARTICULATION_doit },
-        { "falloff", ARTICULATION_fall },
-        { "plop", ARTICULATION_plop },
-        { "scoop", ARTICULATION_scoop },
-        { "spiccato", ARTICULATION_spicc },
-        { "staccatissimo", ARTICULATION_stacciss },
-        { "staccato", ARTICULATION_stacc },
-        { "strong-accent", ARTICULATION_marc },
-        { "tenuto", ARTICULATION_ten },
+    static const std::map<std::string, data_ARTICULATION> Articulations2Id{ // articulations
+        { "accent", ARTICULATION_acc }, { "detached-legato", ARTICULATION_NONE }, { "doit", ARTICULATION_doit },
+        { "falloff", ARTICULATION_fall }, { "plop", ARTICULATION_plop }, { "scoop", ARTICULATION_scoop },
+        { "spiccato", ARTICULATION_spicc }, { "staccatissimo", ARTICULATION_stacciss },
+        { "staccato", ARTICULATION_stacc }, { "strong-accent", ARTICULATION_marc }, { "tenuto", ARTICULATION_ten },
         // technical
-        { "bend", ARTICULATION_bend },
-        { "double-tongue", ARTICULATION_dbltongue },
-        { "down-bow", ARTICULATION_dnbow },
-        { "fingernails", ARTICULATION_fingernail },
-        { "harmonic", ARTICULATION_harm },
-        { "heel", ARTICULATION_heel },
-        { "open-string", ARTICULATION_open },
-        { "snap-pizzicato", ARTICULATION_snap },
-        { "stopped", ARTICULATION_stop },
-        { "toe", ARTICULATION_toe },
-        { "triple-tongue", ARTICULATION_trpltongue },
-        { "up-bow", ARTICULATION_upbow }
+        { "bend", ARTICULATION_bend }, { "double-tongue", ARTICULATION_dbltongue }, { "down-bow", ARTICULATION_dnbow },
+        { "fingernails", ARTICULATION_fingernail }, { "harmonic", ARTICULATION_harm }, { "heel", ARTICULATION_heel },
+        { "open-string", ARTICULATION_open }, { "snap-pizzicato", ARTICULATION_snap }, { "stopped", ARTICULATION_stop },
+        { "toe", ARTICULATION_toe }, { "triple-tongue", ARTICULATION_trpltongue }, { "up-bow", ARTICULATION_upbow }
     };
 
     const auto result = Articulations2Id.find(value);
-    if (result != Articulations2Id.end())
+    if (result != Articulations2Id.end()) {
         return result->second;
+    }
 
     return ARTICULATION_NONE;
 }
@@ -3263,34 +3231,25 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(const std::string &value, co
 
 data_BOOLEAN MusicXmlInput::ConvertWordToBool(const std::string &value)
 {
-    if (value == "yes")
-        return BOOLEAN_true;
-    if (value == "no")
-        return BOOLEAN_false;
+    if (value == "yes") return BOOLEAN_true;
+    if (value == "no") return BOOLEAN_false;
 
     return BOOLEAN_NONE;
 }
 
 data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
 {
-    static const std::map<std::string, data_DURATION> Type2Dur {
+    static const std::map<std::string, data_DURATION> Type2Dur{
         { "maxima", DURATION_maxima }, // this is a mensural MEI value
         { "long", DURATION_long }, // mensural MEI value longa isn't supported
-        { "breve", DURATION_breve },
-        { "whole", DURATION_1 },
-        { "half", DURATION_2 },
-        { "quarter", DURATION_4 },
-        { "eighth", DURATION_8 },
-        { "16th", DURATION_16 },
-        { "32nd", DURATION_32 },
-        { "64th", DURATION_64 },
-        { "128th", DURATION_128 },
-        { "256th", DURATION_256 }
-    };
+        { "breve", DURATION_breve }, { "whole", DURATION_1 }, { "half", DURATION_2 }, { "quarter", DURATION_4 },
+        { "eighth", DURATION_8 }, { "16th", DURATION_16 }, { "32nd", DURATION_32 }, { "64th", DURATION_64 },
+        { "128th", DURATION_128 }, { "256th", DURATION_256 } };
 
     const auto result = Type2Dur.find(value);
-    if (result != Type2Dur.end())
+    if (result != Type2Dur.end()) {
         return result->second;
+    }
 
     LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
     return DURATION_NONE;
@@ -3298,43 +3257,29 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(const std::string &value)
 
 data_TEXTRENDITION MusicXmlInput::ConvertEnclosure(const std::string &value)
 {
-    static const std::map<std::string, data_TEXTRENDITION> Enclosure2Id {
-        { "rectangle", TEXTRENDITION_box },
-        { "square", TEXTRENDITION_box },
-        { "oval", TEXTRENDITION_circle },
-        { "circle", TEXTRENDITION_circle },
-        { "triangle", TEXTRENDITION_tbox },
-        { "diamond", TEXTRENDITION_dbox },
-        { "none", TEXTRENDITION_none }
-    };
+    static const std::map<std::string, data_TEXTRENDITION> Enclosure2Id{ { "rectangle", TEXTRENDITION_box },
+        { "square", TEXTRENDITION_box }, { "oval", TEXTRENDITION_circle }, { "circle", TEXTRENDITION_circle },
+        { "triangle", TEXTRENDITION_tbox }, { "diamond", TEXTRENDITION_dbox }, { "none", TEXTRENDITION_none } };
 
     const auto result = Enclosure2Id.find(value);
-    if (result != Enclosure2Id.end())
+    if (result != Enclosure2Id.end()) {
         return result->second;
+    }
 
     return TEXTRENDITION_box;
 }
 
 std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 {
-    static const std::map<std::string, std::wstring> Type2VerovioText {
-        { "breve", L"\xE1D1" },
-        { "whole", L"\xE1D2" },
-        { "half", L"\xE1D3" },
-        { "quarter", L"\xE1D5" },
-        { "eighth", L"\xE1D7" },
-        { "16th", L"\xE1D9" },
-        { "32nd", L"\xE1DB" },
-        { "64th", L"\xE1DD" },
-        { "128th", L"\xE1DF" },
-        { "256th", L"\xE1E1" },
-        { "512th", L"\xE1E3" },
-        { "1024th", L"\xE1E5" }
-    };
+    static const std::map<std::string, std::wstring> Type2VerovioText{ { "breve", L"\xE1D1" }, { "whole", L"\xE1D2" },
+        { "half", L"\xE1D3" }, { "quarter", L"\xE1D5" }, { "eighth", L"\xE1D7" }, { "16th", L"\xE1D9" },
+        { "32nd", L"\xE1DB" }, { "64th", L"\xE1DD" }, { "128th", L"\xE1DF" }, { "256th", L"\xE1E1" },
+        { "512th", L"\xE1E3" }, { "1024th", L"\xE1E5" } };
 
     const auto result = Type2VerovioText.find(value);
-    if (result != Type2VerovioText.end())
+    if (result != Type2VerovioText.end()) {
         return result->second;
+    }
 
     LogWarning("MusicXML import: Unsupported type '%s'", value.c_str());
     return std::wstring();
@@ -3342,61 +3287,44 @@ std::wstring MusicXmlInput::ConvertTypeToVerovioText(const std::string &value)
 
 data_HEADSHAPE MusicXmlInput::ConvertNotehead(const std::string &value)
 {
-    static const std::map<std::string, data_HEADSHAPE> Notehead2Id {
-        { "slash", HEADSHAPE_slash },
-        { "triangle", HEADSHAPE_rtriangle },
-        { "diamond", HEADSHAPE_diamond },
-        { "square", HEADSHAPE_square },
-        { "cross", HEADSHAPE_plus },
-        { "x", HEADSHAPE_slash },
-        { "circle-x", HEADSHAPE_slash },
-        { "inverted triangle", HEADSHAPE_slash },
-        { "arrow down", HEADSHAPE_slash },
-        { "arrow up", HEADSHAPE_slash },
-        { "circle dot", HEADSHAPE_circle }
-    };
+    static const std::map<std::string, data_HEADSHAPE> Notehead2Id{ { "slash", HEADSHAPE_slash },
+        { "triangle", HEADSHAPE_rtriangle }, { "diamond", HEADSHAPE_diamond }, { "square", HEADSHAPE_square },
+        { "cross", HEADSHAPE_plus }, { "x", HEADSHAPE_slash }, { "circle-x", HEADSHAPE_slash },
+        { "inverted triangle", HEADSHAPE_slash }, { "arrow down", HEADSHAPE_slash }, { "arrow up", HEADSHAPE_slash },
+        { "circle dot", HEADSHAPE_circle } };
 
     const auto result = Notehead2Id.find(value);
-    if (result != Notehead2Id.end())
+    if (result != Notehead2Id.end()) {
         return result->second;
+    }
 
     return HEADSHAPE_NONE;
 }
 
 data_LINESTARTENDSYMBOL MusicXmlInput::ConvertLineEndSymbol(const std::string &value)
 {
-    static const std::map<std::string, data_LINESTARTENDSYMBOL> LineEndSymbol2Id {
-        { "up", LINESTARTENDSYMBOL_angleup },
-        { "down", LINESTARTENDSYMBOL_angledown },
-        { "arrow", LINESTARTENDSYMBOL_arrow },
-        { "Hauptstimme", LINESTARTENDSYMBOL_H },
-        { "Nebenstimme", LINESTARTENDSYMBOL_N },
-        { "none", LINESTARTENDSYMBOL_none },
-        { "plain", LINESTARTENDSYMBOL_NONE }
-    };
+    static const std::map<std::string, data_LINESTARTENDSYMBOL> LineEndSymbol2Id{ { "up", LINESTARTENDSYMBOL_angleup },
+        { "down", LINESTARTENDSYMBOL_angledown }, { "arrow", LINESTARTENDSYMBOL_arrow },
+        { "Hauptstimme", LINESTARTENDSYMBOL_H }, { "Nebenstimme", LINESTARTENDSYMBOL_N },
+        { "none", LINESTARTENDSYMBOL_none }, { "plain", LINESTARTENDSYMBOL_NONE } };
 
     const auto result = LineEndSymbol2Id.find(value);
-    if (result != LineEndSymbol2Id.end())
+    if (result != LineEndSymbol2Id.end()) {
         return result->second;
+    }
 
     return LINESTARTENDSYMBOL_NONE;
 }
 
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(const std::string &value)
 {
-    static const std::map<std::string, data_PITCHNAME> Step2PitchName {
-        { "C", PITCHNAME_c },
-        { "D", PITCHNAME_d },
-        { "E", PITCHNAME_e },
-        { "F", PITCHNAME_f },
-        { "G", PITCHNAME_g },
-        { "A", PITCHNAME_a },
-        { "B", PITCHNAME_b }
-    };
+    static const std::map<std::string, data_PITCHNAME> Step2PitchName{ { "C", PITCHNAME_c }, { "D", PITCHNAME_d },
+        { "E", PITCHNAME_e }, { "F", PITCHNAME_f }, { "G", PITCHNAME_g }, { "A", PITCHNAME_a }, { "B", PITCHNAME_b } };
 
     const auto result = Step2PitchName.find(value);
-    if (result != Step2PitchName.end())
+    if (result != Step2PitchName.end()) {
         return result->second;
+    }
 
     LogWarning("MusicXML import: Unsupported pitch name '%s'", value.c_str());
     return PITCHNAME_NONE;
@@ -3417,31 +3345,26 @@ curvature_CURVEDIR MusicXmlInput::InferCurvedir(const pugi::xml_node slurOrTie)
 
 fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(const std::string &value)
 {
-    static const std::map<std::string, fermataVis_SHAPE> FermataShape2Id {
-        { "normal", fermataVis_SHAPE_curved },
-        { "angled", fermataVis_SHAPE_angular },
-        { "square", fermataVis_SHAPE_square }
-    };
+    static const std::map<std::string, fermataVis_SHAPE> FermataShape2Id{ { "normal", fermataVis_SHAPE_curved },
+        { "angled", fermataVis_SHAPE_angular }, { "square", fermataVis_SHAPE_square } };
 
     const auto result = FermataShape2Id.find(value);
-    if (result != FermataShape2Id.end())
+    if (result != FermataShape2Id.end()) {
         return result->second;
+    }
 
     return fermataVis_SHAPE_NONE;
 }
 
 pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(const std::string &value)
 {
-    static const std::map<std::string, pedalLog_DIR> PedalType2Dir {
-        { "start", pedalLog_DIR_down },
-        { "stop", pedalLog_DIR_up },
-        { "sostenuto", pedalLog_DIR_down },
-        { "change", pedalLog_DIR_bounce }
-    };
+    static const std::map<std::string, pedalLog_DIR> PedalType2Dir{ { "start", pedalLog_DIR_down },
+        { "stop", pedalLog_DIR_up }, { "sostenuto", pedalLog_DIR_down }, { "change", pedalLog_DIR_bounce } };
 
     const auto result = PedalType2Dir.find(value);
-    if (result != PedalType2Dir.end())
+    if (result != PedalType2Dir.end()) {
         return result->second;
+    }
 
     LogWarning("MusicXML import: Unsupported type '%s' for pedal", value.c_str());
     return pedalLog_DIR_NONE;
@@ -3449,57 +3372,34 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(const std::string &value)
 
 tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(const std::string &value)
 {
-    if (value == "actual")
-        return tupletVis_NUMFORMAT_count;
-    if (value == "both")
-        return tupletVis_NUMFORMAT_ratio;
+    if (value == "actual") return tupletVis_NUMFORMAT_count;
+    if (value == "both") return tupletVis_NUMFORMAT_ratio;
     return tupletVis_NUMFORMAT_NONE;
 }
 
 std::string MusicXmlInput::ConvertAlterToSymbol(const std::string &value)
 {
-    static const std::map<std::string, std::string> Alter2Symbol {
-        { "-2", "𝄫" },
-        { "-1", "♭" },
-        { "0", "♮" },
-        { "1", "♯" },
-        { "2", "𝄪" }
-    };
+    static const std::map<std::string, std::string> Alter2Symbol{ { "-2", "𝄫" }, { "-1", "♭" }, { "0", "♮" },
+        { "1", "♯" }, { "2", "𝄪" } };
 
     const auto result = Alter2Symbol.find(value);
-    if (result != Alter2Symbol.end())
+    if (result != Alter2Symbol.end()) {
         return result->second;
+    }
 
     return std::string();
 }
 
 std::string MusicXmlInput::ConvertKindToSymbol(const std::string &value)
 {
-    static const std::map<std::string, std::string> Kind2Symbol {
+    static const std::map<std::string, std::string> Kind2Symbol{
         { "major", "" }, // Use no symbol to avoid ambiguity of "C△".
-        { "minor", "-" },
-        { "augmented", "+" },
-        { "diminished", "°" },
-        { "dominant", "7" },
-        { "major-seventh", "△7" },
-        { "minor-seventh", "-7" },
-        { "diminished-seventh", "°7" },
-        { "augmented-seventh", "+7" },
-        { "half-diminished", "ø" },
-        { "major-minor", "-△7" },
-        { "major-sixth", "6" },
-        { "minor-sixth", "-6" },
-        { "dominant-ninth", "9" },
-        { "major-ninth", "△9" },
-        { "minor-ninth", "-9" },
-        { "dominant-11th", "11" },
-        { "major-11th", "△11" },
-        { "minor-11th", "-11" },
-        { "dominant-13th", "13" },
-        { "major-13th", "△13" },
-        { "minor-13th", "-13" },
-        { "suspended-second", "sus2" },
-        { "suspended-fourth", "sus4" },
+        { "minor", "-" }, { "augmented", "+" }, { "diminished", "°" }, { "dominant", "7" }, { "major-seventh", "△7" },
+        { "minor-seventh", "-7" }, { "diminished-seventh", "°7" }, { "augmented-seventh", "+7" },
+        { "half-diminished", "ø" }, { "major-minor", "-△7" }, { "major-sixth", "6" }, { "minor-sixth", "-6" },
+        { "dominant-ninth", "9" }, { "major-ninth", "△9" }, { "minor-ninth", "-9" }, { "dominant-11th", "11" },
+        { "major-11th", "△11" }, { "minor-11th", "-11" }, { "dominant-13th", "13" }, { "major-13th", "△13" },
+        { "minor-13th", "-13" }, { "suspended-second", "sus2" }, { "suspended-fourth", "sus4" },
         // Skipping "functional sixths": Neapolitan, Italian, French, German.
         // Skipping pedal (pedal-point bass)
         { "power", "5" }
@@ -3507,38 +3407,22 @@ std::string MusicXmlInput::ConvertKindToSymbol(const std::string &value)
     };
 
     const auto result = Kind2Symbol.find(value);
-    if (result != Kind2Symbol.end())
+    if (result != Kind2Symbol.end()) {
         return result->second;
+    }
 
     return std::string();
 }
 
 std::string MusicXmlInput::ConvertKindToText(const std::string &value)
 {
-    static const std::map<std::string, std::string> Kind2Text {
-        { "major", "" },
-        { "minor", "m" },
-        { "augmented", "aug" },
-        { "diminished", "dim" },
-        { "dominant", "7" },
-        { "major-seventh", "Maj7" },
-        { "minor-seventh", "m7" },
-        { "diminished-seventh", "dim7" },
-        { "augmented-seventh", "aug7" },
-        { "half-diminished", "m7♭5" },
-        { "major-minor", "mMaj7" },
-        { "major-sixth", "6" },
-        { "minor-sixth", "m6" },
-        { "dominant-ninth", "9" },
-        { "major-ninth", "Maj9" },
-        { "minor-ninth", "m9" },
-        { "dominant-11th", "11" },
-        { "major-11th", "Maj11" },
-        { "minor-11th", "m11" },
-        { "dominant-13th", "13" },
-        { "major-13th", "Maj13" },
-        { "minor-13th", "m13" },
-        { "suspended-second", "sus2" },
+    static const std::map<std::string, std::string> Kind2Text{
+        { "major", "" }, { "minor", "m" }, { "augmented", "aug" }, { "diminished", "dim" }, { "dominant", "7" },
+        { "major-seventh", "Maj7" }, { "minor-seventh", "m7" }, { "diminished-seventh", "dim7" },
+        { "augmented-seventh", "aug7" }, { "half-diminished", "m7♭5" }, { "major-minor", "mMaj7" },
+        { "major-sixth", "6" }, { "minor-sixth", "m6" }, { "dominant-ninth", "9" }, { "major-ninth", "Maj9" },
+        { "minor-ninth", "m9" }, { "dominant-11th", "11" }, { "major-11th", "Maj11" }, { "minor-11th", "m11" },
+        { "dominant-13th", "13" }, { "major-13th", "Maj13" }, { "minor-13th", "m13" }, { "suspended-second", "sus2" },
         { "suspended-fourth", "sus4" },
         // Skipping "functional sixths": Neapolitan, Italian, French, German.
         // Skipping pedal (pedal-point bass)
@@ -3547,29 +3431,23 @@ std::string MusicXmlInput::ConvertKindToText(const std::string &value)
     };
 
     const auto result = Kind2Text.find(value);
-    if (result != Kind2Text.end())
+    if (result != Kind2Text.end()) {
         return result->second;
+    }
 
     return std::string();
 }
 
 std::string MusicXmlInput::ConvertFigureGlyph(const std::string &value)
 {
-    static const std::map<std::string, std::string> FigureGlyphMap {
-        { "sharp", "♯" },
-        { "flat", "♭" },
-        { "natural", "♮" },
-        { "double-sharp", "𝄪" },
-        { "flat-flat", "𝄫" },
-        { "sharp-sharp", "♯♯" },
-        { "backslash", "\u20E5" },
-        { "slash", "\u0338" },
-        { "cross", "+" }
-    };
+    static const std::map<std::string, std::string> FigureGlyphMap{ { "sharp", "♯" }, { "flat", "♭" },
+        { "natural", "♮" }, { "double-sharp", "𝄪" }, { "flat-flat", "𝄫" }, { "sharp-sharp", "♯♯" },
+        { "backslash", "\u20E5" }, { "slash", "\u0338" }, { "cross", "+" } };
 
     const auto result = FigureGlyphMap.find(value);
-    if (result != FigureGlyphMap.end())
+    if (result != FigureGlyphMap.end()) {
         return result->second;
+    }
 
     return std::string();
 }
