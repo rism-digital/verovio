@@ -12,9 +12,13 @@ then
 	exit 1
 fi
 
+scriptdir=$(dirname "$0")
+fontfile="${1%.*}"
+fontname=$(basename $fontfile)
+
 # generate SVG and G2N files for the text font
-fontforge generate_plain_font_metadata.py "$1.ttf"
+fontforge "$scriptdir"/generate_plain_font_metadata.py "$1"
 # generate bounding boxes SVG for the text font
-saxon "$1.svg" extract-glyphs-all-fonts.xsl > "tmp/$1-bounding-boxes.svg"
+saxon "$fontfile".svg "$scriptdir"/extract-glyphs-all-fonts.xsl > "$scriptdir"/tmp/"$fontname"-bounding-boxes.svg
 # generate XML file with bounding boxes
-phantomjs generate-bbox.js "tmp/$1-bounding-boxes.svg" "../data/text/$1.xml" "$1.g2n"
+phantomjs "$scriptdir"/generate-bbox.js "$scriptdir"/tmp/"$fontname"-bounding-boxes.svg "$scriptdir"/../data/text/"$fontname".xml "$fontfile".g2n
