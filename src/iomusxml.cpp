@@ -3122,21 +3122,21 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     pugi::xpath_node beamStart = node.select_node("beam[@number='1'][text()='begin']");
     pugi::xpath_node tupletStart = node.select_node("notations/tuplet[@type='start']");
 
-    auto measureNodeChildren = node.select_node("../.").node().children();
+    const auto measureNodeChildren = node.select_node("../.").node().children();
     std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
-    // in case note is a start of both beam and tuplet need to figure which one is longer
+    // in case note is a start of both beam and tuplet - need to figure which one is longer
     if (beamStart && tupletStart) {
         pugi::xml_node beamEnd
             = node.select_single_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
         pugi::xml_node tupletEnd
             = node.select_single_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
-        auto beamEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), beamEnd);
-        auto tupletEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), tupletEnd);
+        const auto beamEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), beamEnd);
+        const auto tupletEndIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), tupletEnd);
 
         // find distance between iterator, i.e. whether beam or tuplet ends first.
         // Negative number - beam ends first, positive - tuplet, zero - both are of the same length
-        int distance = std::distance(beamEndIterator, tupletEndIterator);
+        const int distance = std::distance(beamEndIterator, tupletEndIterator);
         if (distance > 0) {
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
             ReadMusicXmlBeamStart(node, beamStart.node(), layer);
@@ -3146,6 +3146,8 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
         }
     }
+    // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of  
+    // the whole duration of this beam
     else if (beamStart) {
         pugi::xml_node beamEnd
             = node.select_single_node("./following-sibling::note[beam[@number='1'][text()='end']]").node();
@@ -3156,22 +3158,26 @@ void MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
             = node.select_single_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
 
         // find start and end of the beam
-        auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
-        auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
+        const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
+        const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
         // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
         std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
-        bool tupletStartInBeam
+        bool isTupletStartInBeam
             = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
-        bool tupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
+        bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
         // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
-        if ((tupletEnd != beamEnd) && ((tupletStartInBeam && !tupletEndInBeam) || (!tupletStartInBeam && tupletEndInBeam))) {
-            // TODO: handle beamSpans here
+        if ((tupletEnd != beamEnd)
+            && ((isTupletStartInBeam && !isTupletEndInBeam) || (!isTupletStartInBeam && isTupletEndInBeam))) {
+            // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
+            // before this case can be handled correctly
+            ReadMusicXmlBeamStart(node, beamStart.node(), layer);
         }
         else
         {
             ReadMusicXmlBeamStart(node, beamStart.node(), layer);
         }
     }
+    // no special logic needed if we have just tupletStart - just read it as is
     else if (tupletStart) {
         if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
     }
