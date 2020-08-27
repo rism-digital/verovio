@@ -1197,7 +1197,7 @@ void Options::sync()
         if (pair.second->isSet()) {
             const std::string value = std::to_string(pair.second->GetValue() / 2.0);
             const bool success = m_engravingDefaults.UpdateNodeValue({ "engravingDefaults", pair.first }, value);
-            if (!success) LogWarning("Unable to update %s engraving default with value %s.", pair.first, value);
+            if (!success) LogWarning("Unable to update %s engraving default with value %s.", pair.first.c_str(), value.c_str());
         }
     }
 }
