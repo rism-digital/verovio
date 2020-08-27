@@ -1925,13 +1925,20 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
 bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
-    Object *fparent = NULL;
-    Object *sparent = NULL;
+    /**
+     * Ungroup neume elements from a syllable (groupType=neume) or neume component elements from
+     * a neume (groupType=nc). Keep the syl element attached to the original/first syllable in the
+     * former, and preserve ligatures in the latter even though it is made of two neume components.
+     * Exception: if the ligature is the entire neume being ungrouped then it should be toggled off
+     * and the neume components ungrouped as otherwise nothing would happen.
+     */
+    Object *fparent = NULL; // Parent one level up (first parent)
+    Object *sparent = NULL; // Parent two levels up (second parent)
     Object *currentParent = NULL;
-    int ligCount = 0;
-    Clef *oldClef = NULL;
+    int ligCount = 0;       // track ligature components. groupType=nc only.
+    Clef *oldClef = NULL;   // clef element originally applied to neumes. groupType=neume only.
     ClassIdComparison ac(CLEF);
-    ListOfObjects syllables;
+    ListOfObjects syllables;    // List of syllables used. groupType=neume only.
 
     jsonxx::Array uuidArray;
 
@@ -2041,7 +2048,14 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
                     FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
                     assert(fi);
-                    fi->SetZone(zone);
+                    Object *surface = m_doc->GetFacsimile()->FindDescendantByType(SURFACE);
+                    if (surface != NULL) {
+                        surface->AddChild(zone);
+                        fi->SetZone(zone);
+                    }
+                    else {
+                        delete zone;
+                    }
                 }
                 uuidArray << newParent->GetUuid();
                 sparent->AddChild(newParent);
