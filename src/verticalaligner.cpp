@@ -687,7 +687,6 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
         // Skip if no content bounding box is available
         if (!positioner->HasContentBB()) continue;
 
-        //positioner->SetDrawingYRel(centerYRel);
         int diffY = centerYRel - positioner->GetDrawingYRel();
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowAboveBBoxes;
@@ -695,26 +694,27 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
         auto end = overflowBoxes->end();
         bool adjusted = false;
         while (i != end) {
+
             // find all the overflowing elements from the staff that overlap horizonatally
             i = std::find_if(i, end, [positioner](BoundingBox *elem) { return
         positioner->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // update the yRel accordingly
-                int y = positioner->CalcBDrawingYRel(params->m_doc, this, *i);
+                int y = positioner->GetSpaceBelow(params->m_doc, this, *i);
                 if (y < diffY) {
                     diffY = y;
                     adjusted = true;
                 }
                 i++;
             }
-        
-            if (!adjusted) {
-                positioner->SetDrawingYRel(centerYRel);
-            }
-            else {
-                positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
-            }
         }
+        if (!adjusted) {
+            positioner->SetDrawingYRel(centerYRel);
+        }
+        else {
+            positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
+        }
+        
     }
 
 

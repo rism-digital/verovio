@@ -382,13 +382,12 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     return true;
 }
 
-int FloatingPositioner::CalcBDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
+int FloatingPositioner::GetSpaceBelow(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
     if (this->m_place != STAFFREL_between) return VRV_UNSET;
     
     int staffSize = staffAlignment->GetStaffSize();
-    int yRel;
-    
+
     FloatingCurvePositioner *curve = dynamic_cast<FloatingCurvePositioner *>(horizOverlapingBBox);
     if (curve) {
         assert(curve->m_object);
@@ -401,8 +400,6 @@ int FloatingPositioner::CalcBDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     }
     
     return this->GetContentBottom() - horizOverlapingBBox->GetSelfTop() -  margin;
-    //yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
-    //return yRel;
 }
 
 
