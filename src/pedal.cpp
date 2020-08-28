@@ -130,7 +130,10 @@ int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
     if (!this->HasDir()) return FUNCTOR_CONTINUE;
 
     if (params->m_pedalLine && (this->GetDir() != pedalLog_DIR_down)) {
-        params->m_pedalLine->SetEnd(this->GetStart());
+        params->m_pedalLine->SetEnd(GetStart());
+
+        SetEnd(GetStart());
+        SetStart(params->m_pedalLine->GetStart());
         if (this->GetDir() == pedalLog_DIR_bounce) {
             params->m_pedalLine->EndsWithBounce(true);
         }
