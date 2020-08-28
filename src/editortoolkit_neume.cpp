@@ -1935,10 +1935,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     Object *fparent = NULL; // Parent one level up (first parent)
     Object *sparent = NULL; // Parent two levels up (second parent)
     Object *currentParent = NULL;
-    int ligCount = 0;       // track ligature components. groupType=nc only.
-    Clef *oldClef = NULL;   // clef element originally applied to neumes. groupType=neume only.
+    int ligCount = 0; // track ligature components. groupType=nc only.
+    Clef *oldClef = NULL; // clef element originally applied to neumes. groupType=neume only.
     ClassIdComparison ac(CLEF);
-    ListOfObjects syllables;    // List of syllables used. groupType=neume only.
+    ListOfObjects syllables; // List of syllables used. groupType=neume only.
 
     jsonxx::Array uuidArray;
 
@@ -2066,7 +2066,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             // Only ungroup ligatures if the entire neume is a ligature!
             Nc *nc = dynamic_cast<Nc *>(el);
             assert(nc);
-            if (elementIds.size() == 2 && nc->GetLigated() == BOOLEAN_true)  {
+            if (elementIds.size() == 2 && nc->GetLigated() == BOOLEAN_true) {
                 this->ToggleLigature(elementIds, "true");
             }
             // Keep track of existing ligatures

@@ -121,8 +121,7 @@ void SystemAligner::FindAllIntersectionPoints(
 
 int SystemAligner::GetOverflowAbove(const Doc *) const
 {
-    if (!GetChildCount() || GetChild(0) == m_bottomAlignment)
-        return 0;
+    if (!GetChildCount() || GetChild(0) == m_bottomAlignment) return 0;
 
     StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(0));
     assert(alignment);
@@ -131,8 +130,7 @@ int SystemAligner::GetOverflowAbove(const Doc *) const
 
 int SystemAligner::GetOverflowBelow(const Doc *doc) const
 {
-    if (!GetChildCount() || GetChild(0) == m_bottomAlignment)
-        return 0;
+    if (!GetChildCount() || GetChild(0) == m_bottomAlignment) return 0;
 
     StaffAlignment *alignment = dynamic_cast<StaffAlignment *>(GetChild(GetChildCount() - 2));
     assert(alignment);
@@ -168,10 +166,9 @@ void SystemAligner::SetSpacing(ScoreDef *scoreDef)
     }
 }
 
-SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(Staff* staff)
+SystemAligner::SpacingType SystemAligner::GetAboveSpacingType(Staff *staff)
 {
-    if (!staff)
-        return SpacingType::None;
+    if (!staff) return SpacingType::None;
 
     if (m_spacingTypes.empty()) {
         System *system = dynamic_cast<System *>(staff->GetFirstAncestor(SYSTEM));
@@ -206,15 +203,10 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(StaffDef *staffD
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffParent);
                 if (staffGrp && staffGrp->HasSymbol()) {
                     switch (staffGrp->GetSymbol()) {
-                        case staffGroupingSym_SYMBOL_brace:
-                            spacingType = SpacingType::Brace;
-                            break;
+                        case staffGroupingSym_SYMBOL_brace: spacingType = SpacingType::Brace; break;
                         case staffGroupingSym_SYMBOL_bracket:
-                        case staffGroupingSym_SYMBOL_bracketsq:
-                            spacingType = SpacingType::Bracket;
-                            break;
-                        default:
-                            spacingType = SpacingType::None;
+                        case staffGroupingSym_SYMBOL_bracketsq: spacingType = SpacingType::Bracket; break;
+                        default: spacingType = SpacingType::None;
                     }
                 }
             }
@@ -320,7 +312,7 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
     double justificationFactor = 0.;
     if (m_staff) {
         switch (m_spacingType) {
-            case SystemAligner::SpacingType::System :
+            case SystemAligner::SpacingType::System:
                 justificationFactor = doc->GetOptions()->m_justificationSystem.GetValue();
                 break;
             case SystemAligner::SpacingType::Staff:
@@ -335,8 +327,7 @@ double StaffAlignment::GetJustificationFactor(const Doc *doc) const
             case SystemAligner::SpacingType::None: break;
             default: assert(false);
         }
-        if (m_spacingType != SystemAligner::SpacingType::System)
-            justificationFactor *= GetStaffSize() / 100.0;
+        if (m_spacingType != SystemAligner::SpacingType::System) justificationFactor *= GetStaffSize() / 100.0;
     }
 
     return justificationFactor;
@@ -374,22 +365,16 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
         }
         else {
             switch (m_spacingType) {
-                case SystemAligner::SpacingType::System:
-                    spacing = doc->GetOptions()->m_spacingSystem.GetValue();
-                    break;
-                case SystemAligner::SpacingType::Staff:
-                    spacing = doc->GetOptions()->m_spacingStaff.GetValue();
-                    break;
+                case SystemAligner::SpacingType::System: spacing = doc->GetOptions()->m_spacingSystem.GetValue(); break;
+                case SystemAligner::SpacingType::Staff: spacing = doc->GetOptions()->m_spacingStaff.GetValue(); break;
                 case SystemAligner::SpacingType::Brace:
                     spacing = doc->GetOptions()->m_spacingBraceGroup.GetValue();
                     break;
                 case SystemAligner::SpacingType::Bracket:
                     spacing = doc->GetOptions()->m_spacingBracketGroup.GetValue();
                     break;
-                case SystemAligner::SpacingType::None:
-                    break;
-                default:
-                    assert(false);
+                case SystemAligner::SpacingType::None: break;
+                default: assert(false);
             }
         }
 
@@ -419,7 +404,8 @@ int StaffAlignment::CalcMinimumRequiredSpacing(const Doc *doc) const
     int overflowSum = 0;
     if (prevAlignment->GetVerseCount() > 0) {
         overflowSum = prevAlignment->GetOverflowBelow() + GetOverflowAbove();
-    } else {
+    }
+    else {
         // The maximum between the overflow below of the previous staff and the overflow above of the current
         overflowSum = std::max(prevAlignment->GetOverflowBelow(), GetOverflowAbove());
         // add overlap if there any
@@ -676,7 +662,6 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
     int dist = params->m_previousStaffAlignment->GetYRel() - this->GetYRel();
     dist -= params->m_previousStaffAlignment->m_staffHeight;
     int centerYRel = dist / 2 + params->m_previousStaffAlignment->m_staffHeight;
-    
 
     for (auto &positioner : *params->m_previousStaffPositioners) {
         assert(positioner->GetObject());
@@ -696,8 +681,8 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
         while (i != end) {
 
             // find all the overflowing elements from the staff that overlap horizonatally
-            i = std::find_if(i, end, [positioner](BoundingBox *elem) { return
-        positioner->HorizontalContentOverlap(elem); });
+            i = std::find_if(
+                i, end, [positioner](BoundingBox *elem) { return positioner->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // update the yRel accordingly
                 int y = positioner->GetSpaceBelow(params->m_doc, this, *i);
@@ -714,9 +699,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
         else {
             positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
         }
-        
     }
-
 
     params->m_previousStaffPositioners = &m_floatingPositioners;
     params->m_previousStaffAlignment = this;

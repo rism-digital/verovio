@@ -186,14 +186,15 @@ private:
      * @name Methods for reading the content of a MusicXml measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string& measureNum);
+    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset);
     void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset, Section *section);
+    void ReadMusicXmlNote(
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     ///@}
 
@@ -207,7 +208,7 @@ private:
     /*
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
-    void AddLayerElement(Layer *layer, LayerElement *element, int duration=0);
+    void AddLayerElement(Layer *layer, LayerElement *element, int duration = 0);
 
     /*
      * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.

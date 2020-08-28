@@ -452,8 +452,7 @@ public:
 
     virtual bool operator()(Object *object)
     {
-        if (object == m_objectToExclude || !ClassIdsComparison::operator()(object))
-            return false;
+        if (object == m_objectToExclude || !ClassIdsComparison::operator()(object)) return false;
 
         if (object->Is(STAFFDEF)) {
             StaffDef *staffDef = dynamic_cast<StaffDef *>(object);

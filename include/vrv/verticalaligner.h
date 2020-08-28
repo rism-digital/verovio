@@ -88,8 +88,8 @@ public:
     int GetOverflowBelow(const Doc *doc) const;
 
     /**
-    * Get justification sum
-    */
+     * Get justification sum
+     */
     double GetJustificationSum(const Doc *doc) const;
 
     /**
