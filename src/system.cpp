@@ -366,7 +366,6 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     params->m_cumulatedShift = 0;
     params->m_staffIdx = 0;
 
-    m_systemAligner.Process(params->m_functor, params);
     m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
